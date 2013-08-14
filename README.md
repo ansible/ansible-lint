@@ -4,6 +4,14 @@ Ansible-lint
 ansible-lint checks playbooks for practices and behaviour that could
 potentially be improved
 
+WARNING
+-------
+
+I am using documentation-driven development to produce the first version of
+ansible-lint. This is at present a work in progress. This is on github as
+I see no point in concealing this work, but at present, there is not yet even
+a binary!
+
 Usage
 -----
 
@@ -26,8 +34,8 @@ of matching lines
 
 An example rule is
 ```
-from ansible.lint.rule import AnsibleLintRule
-from ansible.lint.rule import RulesCollection
+from ansiblelint import AnsibleLintRule
+from ansiblelint import RulesCollection
 
 class Ansible0001(AnsibleLintRule):
 
@@ -36,14 +44,16 @@ class Ansible0001(AnsibleLintRule):
     TAGS = [ 'deprecated' ]
 
     def __init__(self):
-        self.super(id=ID, description=DESCRIPTION, tags=TAGS)
+        super(Ansible0001, self).__init__(id=Ansible0001.ID, 
+                                          description=Ansible0001.DESCRIPTION, 
+                                          tags=Ansible0001.TAGS)
 
     def prematch(self, playbook):
         result = []
-        for (lineno, line) in playbook.split("\n").enumerate():
+        for (lineno, line) in enumerate(playbook.split("\n")):
             if '${' in line:
                 result.push(lineno)
         return result
 
-RulesCollection.getInstance().register(Ansible0001.new())
+RulesCollection.register(Ansible0001())
 ```
