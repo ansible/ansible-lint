@@ -1,4 +1,3 @@
-starts with 0
 hello
 nothing
 exciting

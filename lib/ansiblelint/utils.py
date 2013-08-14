@@ -1,6 +1,8 @@
 def matchlines(text, fn):
     result = []
-    for (lineno, line) in enumerate(text.split("\n")):
+    # arrays are 0-based, line numbers are 1-based
+    # so use prev_line_no as the counter 
+    for (prev_line_no, line) in enumerate(text.split("\n")):
         if fn(line):
-            result.append(lineno)
+            result.append(prev_line_no+1)
     return result
