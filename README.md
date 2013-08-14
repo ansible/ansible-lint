@@ -49,11 +49,7 @@ class Ansible0001(AnsibleLintRule):
                                           tags=Ansible0001.TAGS)
 
     def prematch(self, playbook):
-        result = []
-        for (lineno, line) in enumerate(playbook.split("\n")):
-            if '${' in line:
-                result.push(lineno)
-        return result
+        return ansiblelint.utils.matchlines(playbook, lambda x: '${' in x)
 
 RulesCollection.register(Ansible0001())
 ```

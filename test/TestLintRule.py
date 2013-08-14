@@ -1,5 +1,6 @@
 import unittest
 
+import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
 
 class EMatcherRule(AnsibleLintRule):
@@ -14,11 +15,8 @@ class EMatcherRule(AnsibleLintRule):
                                            tags=EMatcherRule.TAGS)
 
     def prematch(self,playbook):
-        result = []
-        for (lineno, line) in enumerate(playbook.split("\n")):
-            if "e" in line:
-                result.append(lineno)
-        return result
+        return ansiblelint.utils.matchlines(playbook, lambda x : "e" in x)
+
 
 class TestRule(unittest.TestCase):
 
