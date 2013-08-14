@@ -19,14 +19,13 @@ Usage
 Usage: ansible-lint playbook.yml
 
 Options:
-  --version             show program's version number and exit
-  -h, --help            show this help message and exit
-  -c CONFIGFILE, --configfile=CONFIGFILE
-  -r RULESDIR, --rulesdir=RULESDIR
-  -i INVENTORY, --inventory=INVENTORY
-  -t TAGS, --tags=TAGS  only check rules tagged with these values
-  -x SKIP_TAGS, --skip-tags=SKIP_TAGS only check rules whose tags do not match these values
-
+  --version      show program's version number and exit
+  -h, --help     show this help message and exit
+  -c CONFIGFILE  location of configuration file
+  -r RULESDIR    location of rules directory
+  -i INVENTORY   specify inventory host file
+  -t TAGS        only check rules tagged with these values
+  -x SKIP_TAGS   only check rules whose tags do not match these values
 ```
 
 Rules
