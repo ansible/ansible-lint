@@ -15,7 +15,19 @@ a binary!
 Usage
 -----
 
-```ansible-lint [ -c configfile ] [ -r rulesdir ] [ -i inventory ] [ -t tag1,tag2 ] [ -x excludetag1,excludetag2 ] playbook```
+```
+Usage: ansible-lint playbook.yml
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -c CONFIGFILE, --configfile=CONFIGFILE
+  -r RULESDIR, --rulesdir=RULESDIR
+  -i INVENTORY, --inventory=INVENTORY
+  -t TAGS, --tags=TAGS  only check rules tagged with these values
+  -x SKIP_TAGS, --skip-tags=SKIP_TAGS only check rules whose tags do not match these values
+
+```
 
 Rules
 =====
