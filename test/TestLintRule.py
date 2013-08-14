@@ -4,7 +4,7 @@ from ansiblelint import AnsibleLintRule
 
 class EMatcherRule(AnsibleLintRule):
     ID = 'TEST0001'
-    DESCRIPTION = 'This is a test rule that looks for lines '
+    DESCRIPTION = 'This is a test rule that looks for lines ' + \
                   'containing the letter e'
     TAGS = ['fake', 'dummy']
 
