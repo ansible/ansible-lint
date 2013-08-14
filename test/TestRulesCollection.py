@@ -3,7 +3,7 @@ import unittest
 from ansiblelint import AnsibleLintRule
 from ansiblelint import RulesCollection
 
-class TestRule(unittest.TestCase):
+class TestRulesCollection(unittest.TestCase):
 
     def tearDown(self):
         RulesCollection.resetInstance()
