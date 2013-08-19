@@ -17,16 +17,10 @@ class AnsibleLintRule(object):
 
 class RulesCollection(object):
 
-    rulesInstance = []
+    rules = []
 
-    @classmethod
-    def getInstance(cls):
-        return cls.rulesInstance
+    def register(self,obj):
+        self.rules.append(obj)
 
-    @classmethod
-    def register(cls,obj):
-        cls.rulesInstance.append(obj)
-
-    @classmethod
-    def resetInstance(cls):
-        cls.rulesInstance = []
+    def __len__(self):
+        return len(self.rules)
