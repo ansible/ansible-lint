@@ -1,3 +1,5 @@
+import ansiblelint.utils
+
 class AnsibleLintRule(object):
 
     def __init__(self,
@@ -8,6 +10,9 @@ class AnsibleLintRule(object):
         self.description = description
         self.tags = tags
 
+    def __repr__(self):
+        return self.id + ": " + self.description
+
     def prematch(self, playbook=""):
         return []
 
@@ -17,10 +22,17 @@ class AnsibleLintRule(object):
 
 class RulesCollection(object):
 
-    rules = []
+    def __init__(self):
+        self.rules = []
 
     def register(self,obj):
         self.rules.append(obj)
 
     def __len__(self):
         return len(self.rules)
+
+    @classmethod
+    def create_from_directory(cls, rulesdir):
+        result = cls()
+        result.rules = utils.load_plugins(rulesdir)
+        return result

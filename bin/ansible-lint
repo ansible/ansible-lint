@@ -3,6 +3,8 @@
 import ansible.utils as utils
 import sys
 import optparse
+import ansible.constants as C
+from ansiblelint.rules import *
 
 VERSION = "0.0.1"
 
@@ -11,21 +13,25 @@ def main(args):
     parser = optparse.OptionParser("%prog playbook.yml", 
                                    version="%prog " + VERSION)
 
-    parser.add_option('-c', dest="configfile",
-                      help="location of configuration file")
-    parser.add_option('-r', dest="rulesdir",
+    parser.add_option('-r', dest="rulesdir", 
+                      default = os.path.join(os.dirname(__FILE__), '..', 'rules')
                       help="location of rules directory")
-    parser.add_option('-i', dest="inventory",
+    parser.add_option('-i', dest="inventory", default = C.INVENTORY,
                       help="specify inventory host file")
-    parser.add_option('-t', dest='tags', default='all',
+    parser.add_option('-t', dest='tags', 
                       help="only check rules tagged with these values")
-    parser.add_option('-x', dest='skip_tags',
+    parser.add_option('-x', dest='skip_tags', 
                       help="only check rules whose tags do not match these values")
     options, args = parser.parse_args(args)
 
     if len(args) == 0:
         parser.print_help(file=sys.stderr)
         return 1
+
+    rules = RulesCollection.createFromDirectory(rulesdir)
+
+    for arg in args: 
+        rules.run(arg, tags=tags, skip_tags=skip_tags)
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

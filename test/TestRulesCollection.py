@@ -5,16 +5,15 @@ from ansiblelint import RulesCollection
 
 class TestRulesCollection(unittest.TestCase):
 
-    rules = None
-    
-    def setUp(self):
-        self.rules = RulesCollection()
-
     def test_add_two_rules(self):
-        self.assertEqual(len(self.rules), 0)
+        rules = RulesCollection()
+        self.assertEqual(len(rules), 0)
         rule1 = AnsibleLintRule(id='RULE1', description='rule1')
-        self.rules.register(rule1)
+        rules.register(rule1)
         rule2 = AnsibleLintRule(id='RULE2', description='rule2')
-        self.rules.register(rule2)
-        self.assertEqual(len(self.rules), 2)
+        rules.register(rule2)
+        self.assertEqual(len(rules), 2)
 
+    def test_load_collection_from_directory(self):
+        rules = RulesCollection.create_from_directory('./test/rules')
+        self.assertEqual(len(rules), 1)
