@@ -28,7 +28,7 @@ def main(args):
         parser.print_help(file=sys.stderr)
         return 1
 
-    rules = RulesCollection.createFromDirectory(rulesdir)
+    rules = RulesCollection.create_from_directory(rulesdir)
 
     for arg in args: 
         rules.run(arg, tags=tags, skip_tags=skip_tags)
