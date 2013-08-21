@@ -19,20 +19,21 @@ Usage
 Usage: ansible-lint playbook.yml
 
 Options:
-  --version      show program's version number and exit
-  -h, --help     show this help message and exit
-  -c CONFIGFILE  location of configuration file
-  -r RULESDIR    location of rules directory
-  -i INVENTORY   specify inventory host file
-  -t TAGS        only check rules tagged with these values
-  -x SKIP_TAGS   only check rules whose tags do not match these values
+  --version     show program's version number and exit
+  -h, --help    show this help message and exit
+  -e EXTRA      extra variables that populate the playbook
+  -i INVENTORY  specify inventory host file
+  -q            quieter, although not silent output
+  -r RULESDIR   location of rules directory
+  -t TAGS       only check rules tagged with these values
+  -x SKIP_TAGS  only check rules whose tags do not match these values
 ```
 
 Rules
 =====
 
 Rules are described using a class file per rule. 
-Default rules are named ansible0001.py etc. 
+Default rules are named DeprecatedVariableRule.py etc. 
 
 Each rule definition should have the following:
 * ID: A unique identifier
@@ -48,19 +49,17 @@ An example rule is
 from ansiblelint import AnsibleLintRule
 from ansiblelint import RulesCollection
 
-class Ansible0001(AnsibleLintRule):
+class DeprecatedVariableRule(AnsibleLintRule):
 
     ID = 'ANSIBLE0001'
     DESCRIPTION = 'Deprecated variable declarations'
     TAGS = [ 'deprecated' ]
 
     def __init__(self):
-        super(Ansible0001, self).__init__(id=Ansible0001.ID, 
-                                          description=Ansible0001.DESCRIPTION, 
-                                          tags=Ansible0001.TAGS)
+        super(self.__class__, self).__init__(id=self.ID, 
+                                             description=self.DESCRIPTION, 
+                                             tags=self.TAGS)
 
     def prematch(self, playbook):
         return ansiblelint.utils.matchlines(playbook, lambda x: '${' in x)
-
-RulesCollection.register(Ansible0001())
 ```
