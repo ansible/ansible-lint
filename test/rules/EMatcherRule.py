@@ -5,7 +5,7 @@ class EMatcherRule(AnsibleLintRule):
     ID = 'TEST0001'
     DESCRIPTION = 'This is a test rule that looks for lines ' + \
                   'containing the letter e'
-    TAGS = ['fake', 'dummy']
+    TAGS = ['fake', 'dummy', 'test1']
 
     def __init__(self):
         super(EMatcherRule, self).__init__(id=EMatcherRule.ID, 

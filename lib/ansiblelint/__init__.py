@@ -37,10 +37,9 @@ class RulesCollection(object):
         with open(playbookfile, 'r') as f:
             text = f.read()
         for rule in self.rules:
-            if not tags or rule.tag in tags:
-                if not skip_tags or rule.tag not in skip_tags:
-                    matches.extend(Match.from_matches(filename, rule, text))
-                    matches.extend(rule.postmatch(text))
+            if not tags or utils.tags_intersect(rule.tags, tags):
+                if not skip_tags or not utils.tags_intersect(rule.tags, skip_tags):
+                    matches.extend(Match.from_matches(playbookfile, rule, text))
         return matches
 
     @classmethod
@@ -59,12 +58,15 @@ class Match:
         self.rule = rule
 
     def __repr__(self):
-        return "[{}] ({}) matched {}:{} {}" % (rule.id, rule.description,
-                                               filename, linenumber, line)
+        formatstr = "[{}] ({}) matched {}:{} {}"
+        return formatstr.format(self.rule.id, self.rule.description,
+                                self.filename, self.linenumber, self.line)
 
     @staticmethod
     def from_matches(filename, rule, text):
-        result = list()
-        for match in rule.prematch(text).extend(rule.postmatch(text)):
-            result.append(match, text.split("\n")[match-1], filename, rule)
-        return result
+        lines = list()
+        lines.extend(rule.prematch(text))
+        lines.extend(rule.postmatch(text))
+        results = [Match(line, text.split("\n")[line-1], filename, rule)
+                for line in lines]
+        return results

@@ -27,3 +27,9 @@ def load_plugins(directory):
             if fh:
                 fh.close()
     return result
+
+def tags_intersect(tagsA, tagsB):
+    for tagA in tagsA:
+        if tagA in tagsB: 
+            return True
+    return False
