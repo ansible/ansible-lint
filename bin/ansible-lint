@@ -1,37 +1,53 @@
 #!/usr/bin/env python
 
+import ansible.constants as C
 import ansible.utils as utils
+import ansiblelint.formatters as formatters
+from ansiblelint import RulesCollection
+import os
 import sys
 import optparse
-import ansible.constants as C
-from ansiblelint.rules import *
 
 VERSION = "0.0.1"
 
 def main(args):
 
+    formatter = formatters.Formatter()
+
     parser = optparse.OptionParser("%prog playbook.yml", 
                                    version="%prog " + VERSION)
 
     parser.add_option('-r', dest="rulesdir", 
-                      default = os.path.join(os.dirname(__FILE__), '..', 'rules')
+                      default = os.path.join(os.path.dirname(__file__), 
+                                             '..', 'rules'),
                       help="location of rules directory")
-    parser.add_option('-i', dest="inventory", default = C.INVENTORY,
+    parser.add_option('-e', dest="extra", 
+                      help="extra variables that populate the playbook")
+    parser.add_option('-i', dest="inventory", 
                       help="specify inventory host file")
+    parser.add_option('-q', dest='quiet', default=False, action='store_true',
+                      help="quieter, although not silent output") 
     parser.add_option('-t', dest='tags', 
                       help="only check rules tagged with these values")
     parser.add_option('-x', dest='skip_tags', 
                       help="only check rules whose tags do not match these values")
     options, args = parser.parse_args(args)
 
+    if options.quiet:
+        formatter = formatters.QuietFormatter()
+
     if len(args) == 0:
         parser.print_help(file=sys.stderr)
         return 1
 
-    rules = RulesCollection.create_from_directory(rulesdir)
+    rules = RulesCollection.create_from_directory(options.rulesdir)
 
     for arg in args: 
-        rules.run(arg, tags=tags, skip_tags=skip_tags)
+        matches = rules.run(arg, tags=options.tags, skip_tags=options.skip_tags)
+
+    for match in matches:
+        print formatter.format(match)
+
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

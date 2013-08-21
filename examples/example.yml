@@ -1,0 +1,16 @@
+---
+- hosts: {{env}}
+
+  vars:
+    oldskool: "1.2.3"
+    bracket: "and close bracket"
+
+  tasks:
+  - name: bobbins
+    action: command echo ${oldskool}
+
+  - name: blah
+    action: debug oops a missing {{bracket}
+
+  - name: unset variable
+    action: {{thisvariable}} is not set in this playbook
