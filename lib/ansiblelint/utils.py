@@ -29,19 +29,18 @@ def load_plugins(directory):
     return result
 
 def tags_intersect(tagsA, tagsB):
-    for tagA in tagsA:
-        if tagA in tagsB: 
-            return True
-    return False
+    return not set(tagsA).isdisjoint(set(tagsB))
 
 
 def tokenize(line):
-    tokens = line.split(" ")
+    tokens = line.lstrip().split(" ")
     if tokens[0] == 'action:': 
         tokens = tokens[1:]
     key = tokens[0].replace(":", "")
     args = dict()
     for arg in tokens[1:]:
-        (k,v) = arg.split("=") 
-        args[k] = v
+        kv = arg.split("=",1) 
+        # make rhs of = blank if not set
+        # http://stackoverflow.com/questions/2492087
+        args[kv[0]] = (kv[1:] or [''])[0]
     return (key, args)

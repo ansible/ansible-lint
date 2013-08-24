@@ -17,3 +17,12 @@
 
   - name: trailing whitespace
     action: do nothing   
+
+  - name: git check
+    action: git a=b c=d
+
+  - name: git check 2
+    action: git version=HEAD c=d
+
+  - name: git check 3
+    git: version=a1b2c3d4 repo=xyz bobbins=d
