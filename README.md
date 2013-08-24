@@ -4,14 +4,6 @@ Ansible-lint
 ansible-lint checks playbooks for practices and behaviour that could
 potentially be improved
 
-WARNING
--------
-
-I am using documentation-driven development to produce the first version of
-ansible-lint. This is at present a work in progress. This is on github as
-I see no point in concealing this work, but at present, there is not yet even
-a binary!
-
 Usage
 -----
 
@@ -36,12 +28,11 @@ Default rules are named DeprecatedVariableRule.py etc.
 
 Each rule definition should have the following:
 * ID: A unique identifier
+* Short description: Brief description of the rule
 * Description: Behaviour the rule is looking for
 * Tags: one or more tags that may be used to include or exclude the rule
-* A method ```prematch``` that takes an unparsed playbook and returns an 
+* A method ```match``` that takes an unparsed playbook and returns an 
 array of matching lines
-* A method ```postmatch``` that takes a parsed playbook and returns an array 
-of matching lines
 
 An example rule is
 ```
@@ -51,14 +42,17 @@ from ansiblelint import RulesCollection
 class DeprecatedVariableRule(AnsibleLintRule):
 
     ID = 'ANSIBLE0001'
-    DESCRIPTION = 'Deprecated variable declarations'
+    SHORTDESC = 'Deprecated variable declarations' 
+    DESCRIPTION = 'Check for lines that have old style ${var} ' + \
+                  'declarations'
     TAGS = [ 'deprecated' ]
 
     def __init__(self):
         super(self.__class__, self).__init__(id=self.ID, 
+                                             shortdesc=self.SHORTDESC,
                                              description=self.DESCRIPTION, 
                                              tags=self.TAGS)
 
-    def prematch(self, playbook):
+    def match(self, playbook):
         return ansiblelint.utils.matchlines(playbook, lambda x: '${' in x)
 ```
