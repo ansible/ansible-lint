@@ -33,3 +33,15 @@ def tags_intersect(tagsA, tagsB):
         if tagA in tagsB: 
             return True
     return False
+
+
+def tokenize(line):
+    tokens = line.split(" ")
+    if tokens[0] == 'action:': 
+        tokens = tokens[1:]
+    key = tokens[0].replace(":", "")
+    args = dict()
+    for arg in tokens[1:]:
+        (k,v) = arg.split("=") 
+        args[k] = v
+    return (key, args)
