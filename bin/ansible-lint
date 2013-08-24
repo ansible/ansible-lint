@@ -25,9 +25,9 @@ def main(args):
                       default = os.path.join(os.path.dirname(__file__), 
                                              '..', 'rules'),
                       help="location of rules directory")
-    parser.add_option('-t', dest='tags', 
+    parser.add_option('-t', dest='tags', default = [],
                       help="only check rules tagged with these values")
-    parser.add_option('-x', dest='skip_tags', 
+    parser.add_option('-x', dest='skip_tags', default = [],
                       help="only check rules whose tags do not match these values")
     options, args = parser.parse_args(args)
 
