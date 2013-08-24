@@ -5,18 +5,21 @@ class AnsibleLintRule(object):
     def __init__(self,
             id=None,
             description="",
+            shortdesc="",
             tags=[]):
         self.id = id
+        self.shortdesc = shortdesc
         self.description = description
         self.tags = tags
 
     def __repr__(self):
-        return self.id + ": " + self.description
+        return self.id + ": " + self.shortdesc
 
-    def prematch(self, playbook=""):
-        return []
+    def verbose(self):
+        return self.id + ": " + self.shortdesc + "\n" + self.description
 
-    def postmatch(self, playbook=""):
+
+    def match(self, playbook=""):
         return []
 
 
@@ -42,6 +45,9 @@ class RulesCollection(object):
                     matches.extend(Match.from_matches(playbookfile, rule, text))
         return matches
 
+    def __repr__(self):
+        return "\n".join([rule.verbose() for rule in sorted(self.rules, key = lambda x: x.id)])
+
     @classmethod
     def create_from_directory(cls, rulesdir):
         result = cls()
@@ -64,9 +70,7 @@ class Match:
 
     @staticmethod
     def from_matches(filename, rule, text):
-        lines = list()
-        lines.extend(rule.prematch(text))
-        lines.extend(rule.postmatch(text))
+        lines = rule.match(text)
         results = [Match(line, text.split("\n")[line-1], filename, rule)
                 for line in lines]
         return results

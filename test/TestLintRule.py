@@ -12,7 +12,7 @@ class TestRule(unittest.TestCase):
         with open('test/ematchtest.txt') as f:
             text = f.read()
         ematcher = EMatcherRule.EMatcherRule()
-        linenos = ematcher.prematch(text)
+        linenos = ematcher.match(text)
         self.assertEqual(linenos, [1,3,5])
 
     def test_rule_postmatching(self):
@@ -20,5 +20,5 @@ class TestRule(unittest.TestCase):
         with open('test/bracketsmatchtest.txt') as f:
             text = f.read()
         rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
-        linenos = rule.postmatch(text)
+        linenos = rule.match(text)
         self.assertEqual(linenos, [1,3])

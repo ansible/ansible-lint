@@ -21,8 +21,7 @@ Usage: ansible-lint playbook.yml
 Options:
   --version     show program's version number and exit
   -h, --help    show this help message and exit
-  -e EXTRA      extra variables that populate the playbook
-  -i INVENTORY  specify inventory host file
+  -L            list all the rules
   -q            quieter, although not silent output
   -r RULESDIR   location of rules directory
   -t TAGS       only check rules tagged with these values

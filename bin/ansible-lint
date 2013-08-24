@@ -17,10 +17,8 @@ def main(args):
     parser = optparse.OptionParser("%prog playbook.yml", 
                                    version="%prog " + VERSION)
 
-    parser.add_option('-e', dest="extra", 
-                      help="extra variables that populate the playbook")
-    parser.add_option('-i', dest="inventory", 
-                      help="specify inventory host file")
+    parser.add_option('-L', dest='listrules', default=False, 
+                      action='store_true', help="list all the rules") 
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
                       help="quieter, although not silent output") 
     parser.add_option('-r', dest="rulesdir", 
@@ -36,11 +34,14 @@ def main(args):
     if options.quiet:
         formatter = formatters.QuietFormatter()
 
-    if len(args) == 0:
+    if len(args) == 0 and not options.listrules:
         parser.print_help(file=sys.stderr)
         return 1
 
     rules = RulesCollection.create_from_directory(options.rulesdir)
+    if options.listrules:
+        print rules
+        return 0
 
     for arg in args: 
         matches = rules.run(arg, tags=options.tags, skip_tags=options.skip_tags)

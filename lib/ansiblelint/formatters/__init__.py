@@ -1,7 +1,7 @@
 class Formatter:
     
     def format(self, match):
-        formatstr = "[{}] {}\n{}:{}\n{}"
+        formatstr = "[{}] {}\n{}:{}\n{}\n"
         return formatstr.format(match.rule.id,
                                 match.rule.description,
                                 match.filename, 

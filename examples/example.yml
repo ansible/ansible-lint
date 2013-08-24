@@ -14,3 +14,6 @@
 
   - name: unset variable
     action: {{thisvariable}} is not set in this playbook
+
+  - name: trailing whitespace
+    action: do nothing   
