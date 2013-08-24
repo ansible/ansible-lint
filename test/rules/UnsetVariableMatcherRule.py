@@ -6,7 +6,7 @@ class UnsetVariableMatcherRule(AnsibleLintRule):
     SHORTDESC = 'Line contains untemplated variable'
     DESCRIPTION = 'This is a test rule that looks for lines ' + \
                   'post templating that still contain {{'
-    TAGS = ['fake', 'dummy', 'test2']
+    TAGS = {'fake', 'dummy', 'test2'}
 
     def __init__(self):
         super(self.__class__, self).__init__(id=self.ID, 

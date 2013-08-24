@@ -6,7 +6,7 @@ class MercurialHasRevisionRule(AnsibleLintRule):
     SHORTDESC = 'Mercurial checkouts must contain explicit revision'
     DESCRIPTION = 'All version control checkouts must point to ' + \
                   'an explicit commit or tag, not just "latest"'
-    TAGS = ['repeatability']
+    TAGS = {'repeatability'}
 
     def __init__(self):
         super(self.__class__, self).__init__(id=self.ID, 

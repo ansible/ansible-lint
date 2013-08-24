@@ -7,7 +7,7 @@ class DeprecatedTemplateBracketsRule(AnsibleLintRule):
     DESCRIPTION = 'Checks for old style ${var} ' + \
                   'rather than {{var}}'
 
-    TAGS = ['deprecation']
+    TAGS = {'deprecation'}
 
     def __init__(self):
         super(self.__class__, self).__init__(id=self.ID, 

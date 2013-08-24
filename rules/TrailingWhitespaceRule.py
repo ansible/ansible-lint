@@ -5,7 +5,7 @@ class TrailingWhitespaceRule(AnsibleLintRule):
     ID = 'ANSIBLE0002'
     SHORTDESC = 'Trailing whitespace'
     DESCRIPTION = 'There should not be any trailing whitespace'
-    TAGS = ['formatting']
+    TAGS = {'formatting'}
 
     def __init__(self):
         super(self.__class__, self).__init__(id=self.ID, 

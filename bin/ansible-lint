@@ -44,7 +44,7 @@ def main(args):
         return 0
 
     for arg in args: 
-        matches = rules.run(arg, tags=options.tags, skip_tags=options.skip_tags)
+        matches = rules.run(arg, tags=set(options.tags), skip_tags=set(options.skip_tags))
 
     for match in matches:
         print formatter.format(match)

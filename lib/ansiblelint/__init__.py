@@ -34,14 +34,14 @@ class RulesCollection(object):
     def __len__(self):
         return len(self.rules)
 
-    def run(self, playbookfile, tags=None, skip_tags=None):
+    def run(self, playbookfile, tags=set(), skip_tags=set()):
         text = ""
         matches = list()
         with open(playbookfile, 'r') as f:
             text = f.read()
         for rule in self.rules:
-            if not tags or utils.tags_intersect(rule.tags, tags):
-                if not skip_tags or not utils.tags_intersect(rule.tags, skip_tags):
+            if not tags or not rule.tags.isdisjoint(tags):
+                if rule.tags.isdisjoint(skip_tags):
                     matches.extend(Match.from_matches(playbookfile, rule, text))
         return matches
 

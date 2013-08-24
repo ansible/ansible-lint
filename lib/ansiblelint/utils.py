@@ -28,9 +28,6 @@ def load_plugins(directory):
                 fh.close()
     return result
 
-def tags_intersect(tagsA, tagsB):
-    return not set(tagsA).isdisjoint(set(tagsB))
-
 
 def tokenize(line):
     tokens = line.lstrip().split(" ")
