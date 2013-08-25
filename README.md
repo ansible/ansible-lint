@@ -4,6 +4,13 @@ Ansible-lint
 ansible-lint checks playbooks for practices and behaviour that could
 potentially be improved
 
+Setup
+-----
+You'll need to add ansible-lint/lib to your PYTHONPATH
+```
+export PYTHONPATH=$PYTHONPATH:`pwd`/lib
+```
+
 Usage
 -----
 
@@ -50,4 +57,45 @@ class DeprecatedVariableRule(AnsibleLintRule):
 
     def match(self, playbook):
         return ansiblelint.utils.matchlines(playbook, lambda x: '${' in x)
+```
+
+Examples
+--------
+There are some example playbooks with undesirable features. Running
+ansible-lint on them works:
+```
+$ bin/ansible-lint examples/example.yml
+[ANSIBLE0001] Old style (${var}) brackets
+examples/example.yml:10
+    action: command echo ${oldskool}
+
+[ANSIBLE0004] Checkouts must contain explicit version
+examples/example.yml:22
+    action: git a=b c=d
+
+[ANSIBLE0004] Checkouts must contain explicit version
+examples/example.yml:25
+    action: git version=HEAD c=d
+
+[ANSIBLE0003] Mismatched { and }
+examples/example.yml:13
+    action: debug oops a missing {{bracket}
+
+[ANSIBLE0002] Trailing whitespace
+examples/example.yml:19
+    action: do nothing   
+
+```
+If playbooks include other playbooks, or tasks, or handlers or roles, these
+are also handled:
+```
+$ bin/ansible-lint examples/include.yml
+[ANSIBLE0003] Mismatched { and }
+/Users/will/src/ansible-lint/examples/play.yml:6
+    action: oops {{the} bracketing is {{wrong}}
+
+[ANSIBLE0004] Checkouts must contain explicit version
+/Users/will/src/ansible-lint/examples/roles/bobbins/tasks/main.yml:3
+action: git a=b c=d
+
 ```
