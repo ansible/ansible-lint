@@ -45,7 +45,7 @@ class DeprecatedVariableRule(AnsibleLintRule):
     SHORTDESC = 'Deprecated variable declarations' 
     DESCRIPTION = 'Check for lines that have old style ${var} ' + \
                   'declarations'
-    TAGS = [ 'deprecated' ]
+    TAGS = { 'deprecated' }
 
     def __init__(self):
         super(self.__class__, self).__init__(id=self.ID, 

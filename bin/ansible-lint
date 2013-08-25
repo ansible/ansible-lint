@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import ansible.constants as C
-import ansible.utils as utils
+import ansiblelint.utils as utils
 import ansiblelint.formatters as formatters
 from ansiblelint import RulesCollection
 import os
@@ -43,8 +43,16 @@ def main(args):
         print rules
         return 0
 
-    for arg in args: 
-        matches = rules.run(arg, tags=set(options.tags), skip_tags=set(options.skip_tags))
+    playbooks = set(args)
+    visited = set()
+    while (visited != playbooks):
+        for arg in playbooks - visited:
+            playbooks |= set(utils.find_children(arg))
+            visited.add(arg)
+
+    matches = list()
+    for playbook in playbooks: 
+        matches.extend(rules.run(playbook, tags=set(options.tags), skip_tags=set(options.skip_tags)))
 
     for match in matches:
         print formatter.format(match)

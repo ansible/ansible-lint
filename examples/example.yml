@@ -1,5 +1,5 @@
 ---
-- hosts: {{env}}
+- hosts: webservers
 
   vars:
     oldskool: "1.2.3"
@@ -13,7 +13,7 @@
     action: debug oops a missing {{bracket}
 
   - name: unset variable
-    action: {{thisvariable}} is not set in this playbook
+    action: command echo {{thisvariable}} is not set in this playbook
 
   - name: trailing whitespace
     action: do nothing   

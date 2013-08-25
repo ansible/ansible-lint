@@ -1,0 +1,9 @@
+---
+- hosts: bobbins
+
+  tasks:
+  - name: lets mismatch some braces
+    action: oops {{the} bracketing is {{wrong}}
+
+  - name: this won't be picked up though
+    action: this isn't {{actually} right {but}} oh well.
