@@ -41,17 +41,12 @@ from ansiblelint import RulesCollection
 
 class DeprecatedVariableRule(AnsibleLintRule):
 
-    ID = 'ANSIBLE0001'
-    SHORTDESC = 'Deprecated variable declarations' 
-    DESCRIPTION = 'Check for lines that have old style ${var} ' + \
+    id = 'ANSIBLE0001'
+    shortdesc = 'Deprecated variable declarations' 
+    description = 'Check for lines that have old style ${var} ' + \
                   'declarations'
-    TAGS = { 'deprecated' }
+    tags = { 'deprecated' }
 
-    def __init__(self):
-        super(self.__class__, self).__init__(id=self.ID, 
-                                             shortdesc=self.SHORTDESC,
-                                             description=self.DESCRIPTION, 
-                                             tags=self.TAGS)
 
     def match(self, playbook):
         return ansiblelint.utils.matchlines(playbook, lambda x: '${' in x)

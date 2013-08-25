@@ -2,16 +2,6 @@ import ansiblelint.utils
 
 class AnsibleLintRule(object):
 
-    def __init__(self,
-            id=None,
-            description="",
-            shortdesc="",
-            tags=[]):
-        self.id = id
-        self.shortdesc = shortdesc
-        self.description = description
-        self.tags = tags
-
     def __repr__(self):
         return self.id + ": " + self.shortdesc
 
