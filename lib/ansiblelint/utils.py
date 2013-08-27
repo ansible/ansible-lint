@@ -31,17 +31,22 @@ def load_plugins(directory):
 
 
 def tokenize(line):
+    result = list()
     tokens = line.lstrip().split(" ")
     if tokens[0] == 'action:': 
         tokens = tokens[1:]
-    key = tokens[0].replace(":", "")
+    result.append(tokens[0].replace(":", ""))
+
     args = dict()
     for arg in tokens[1:]:
-        kv = arg.split("=",1) 
-        # make rhs of = blank if not set
-        # http://stackoverflow.com/questions/2492087
-        args[kv[0]] = (kv[1:] or [''])[0]
-    return (key, args)
+        if "=" in arg: 
+            kv = arg.split("=",1) 
+            # make rhs of = blank if not set
+            # http://stackoverflow.com/questions/2492087
+            result.append({ kv[0] : kv[1]})
+        else:
+            result.append(arg)
+    return result
 
 def _playbook_items(pb_data):
     if isinstance(pb_data, dict):

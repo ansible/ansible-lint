@@ -10,8 +10,13 @@ class GitHasVersionRule(AnsibleLintRule):
 
 
     def _git_match(self, line):
-        (module, args) = ansiblelint.utils.tokenize(line)
-        return (module == 'git' and args.get('version', 'HEAD') == 'HEAD')
+        tokens = ansiblelint.utils.tokenize(line)
+        if tokens[0] == 'git':
+            for arg in tokens[1:]:
+                if isinstance(arg, dict) and arg.has_key('version') and arg.get('version') != 'HEAD':
+                    return False
+            return True
+        return False
 
 
     def match(self,playbook):

@@ -26,3 +26,9 @@
 
   - name: git check 3
     git: version=a1b2c3d4 repo=xyz bobbins=d
+
+  - name: executing git through command
+    action: command git clone blah
+
+  - name: using git module
+    action: git command

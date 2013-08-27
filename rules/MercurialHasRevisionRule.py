@@ -11,8 +11,13 @@ class MercurialHasRevisionRule(AnsibleLintRule):
 
 
     def _hg_match(self, line):
-        (module, args) = ansiblelint.utils.tokenize(line)
-        return (module == 'hg' and args.get('revision', 'default') == 'default')
+        tokens = ansiblelint.utils.tokenize(line)
+        if tokens[0] == 'hg':
+            for arg in tokens[1:]:
+                if isinstance(arg, dict) and arg.has_key('revision') and arg.get('revision') != 'default':
+                    return False
+            return True
+        return False
 
 
     def match(self,playbook):
