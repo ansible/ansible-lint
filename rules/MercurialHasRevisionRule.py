@@ -10,15 +10,6 @@ class MercurialHasRevisionRule(AnsibleLintRule):
     tags = {'repeatability'}
 
 
-    def _hg_match(self, line):
-        tokens = ansiblelint.utils.tokenize(line)
-        if tokens[0] == 'hg':
-            for arg in tokens[1:]:
-                if isinstance(arg, dict) and arg.has_key('revision') and arg.get('revision') != 'default':
-                    return False
-            return True
-        return False
-
-
-    def match(self,playbook):
-        return ansiblelint.utils.matchlines(playbook, self._hg_match)
+    def match(self, line):
+        (module, args, kwargs) = ansiblelint.utils.tokenize(line)
+        return (module == 'hg' and kwargs.get('revision', 'default') == 'default')

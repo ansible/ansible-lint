@@ -10,14 +10,16 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     tags = {'resources'}
 
     _commands = [ 'command', 'shell', 'raw' ]
-    _modules = [ 'git', 'hg', 'curl', 'wget', 'svn', 'ln', 'cp', 'service', 'mount' ]
+    _modules = { 'git': 'git', 'hg': 'hg', 'curl': 'get_url', 'wget': 'get_url', 
+                 'svn': 'subversion', 'cp': 'copy', 'service': 'service', 
+                  'mount': 'mount', 'rpm': 'yum', 'yum': 'yum', 'apt-get': 'apt-get' }
 
 
-    def _command_matcher(self, line):
-        tokens = ansiblelint.utils.tokenize(line)
-        return tokens[0] in self._commands and os.path.basename(tokens[1]) in self._modules
-
-
-    def match(self,playbook):
-        return ansiblelint.utils.matchlines(playbook, self._command_matcher)
-                
+    def match(self, line):
+        (command, args, kwargs) = ansiblelint.utils.tokenize(line)
+        if args == []:
+            return None
+        executable = os.path.basename(args[0])
+        if command in self._commands and self._modules.has_key(executable):
+            message = "{} used in place of {} module"
+            return message.format(executable, self._modules[executable])

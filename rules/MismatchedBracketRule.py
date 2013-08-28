@@ -9,6 +9,5 @@ class MismatchedBracketRule(AnsibleLintRule):
     tags = {'templating'}
 
 
-    def match(self,playbook):
-        return ansiblelint.utils.matchlines(playbook, 
-                lambda x : x.count("{") != x.count("}"))
+    def match(self, line):
+        return line.count("{") != line.count("}")

@@ -9,15 +9,6 @@ class GitHasVersionRule(AnsibleLintRule):
     tags = {'repeatability'}
 
 
-    def _git_match(self, line):
-        tokens = ansiblelint.utils.tokenize(line)
-        if tokens[0] == 'git':
-            for arg in tokens[1:]:
-                if isinstance(arg, dict) and arg.has_key('version') and arg.get('version') != 'HEAD':
-                    return False
-            return True
-        return False
-
-
-    def match(self,playbook):
-        return ansiblelint.utils.matchlines(playbook, self._git_match)
+    def match(self, line):
+        (module, args, kwargs) = ansiblelint.utils.tokenize(line)
+        return (module == 'git' and kwargs.get('version', 'HEAD') == 'HEAD')

@@ -12,6 +12,20 @@ class AnsibleLintRule(object):
     def match(self, playbook=""):
         return []
 
+    def matchlines(self, filename, text):
+        matches = []
+        # arrays are 0-based, line numbers are 1-based
+        # so use prev_line_no as the counter
+        for (prev_line_no, line) in enumerate(text.split("\n")):
+            result = self.match(line)
+            if result:
+                message = None
+                if isinstance(result, str):
+                    message = result
+                matches.append(Match(prev_line_no+1, line, filename, self, message))
+        return matches
+
+
 
 class RulesCollection(object):
 
@@ -32,7 +46,8 @@ class RulesCollection(object):
         for rule in self.rules:
             if not tags or not rule.tags.isdisjoint(tags):
                 if rule.tags.isdisjoint(skip_tags):
-                    matches.extend(Match.from_matches(playbookfile, rule, text))
+                    matches.extend(rule.matchlines(playbookfile, text))
+
         return matches
 
     def __repr__(self):
@@ -47,20 +62,14 @@ class RulesCollection(object):
 
 class Match:
 
-    def __init__(self, linenumber, line, filename, rule):
+    def __init__(self, linenumber, line, filename, rule, message=None):
         self.linenumber = linenumber
         self.line = line
         self.filename = filename
         self.rule = rule
+        self.message = message or rule.shortdesc
 
     def __repr__(self):
         formatstr = "[{}] ({}) matched {}:{} {}"
-        return formatstr.format(self.rule.id, self.rule.description,
+        return formatstr.format(self.rule.id, self.message,
                                 self.filename, self.linenumber, self.line)
-
-    @staticmethod
-    def from_matches(filename, rule, text):
-        lines = rule.match(text)
-        results = [Match(line, text.split("\n")[line-1], filename, rule)
-                for line in lines]
-        return results

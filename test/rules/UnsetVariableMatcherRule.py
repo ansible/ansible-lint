@@ -8,5 +8,5 @@ class UnsetVariableMatcherRule(AnsibleLintRule):
                   'post templating that still contain {{'
     tags = {'fake', 'dummy', 'test2'}
 
-    def match(self,playbook):
-        return ansiblelint.utils.matchlines(playbook, lambda x : "{{" in x)
+    def match(self,line):
+        return "{{" in line

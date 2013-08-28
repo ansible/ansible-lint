@@ -10,13 +10,16 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     tags = {'resources'}
 
     _commands = [ 'command', 'shell', 'raw' ]
-    _arguments = [ 'chown', 'chmod', 'chgrp' ]
+    _arguments = { 'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group', 
+                   'ln': 'state=link', 'mkdir': 'state=directory', 
+                   'rmdir': 'state=absent', 'rm': 'state=absent' }
 
 
-    def _command_matcher(self, line):
-        tokens = ansiblelint.utils.tokenize(line)
-        return tokens[0] in self._commands and os.path.basename(tokens[1]) in self._arguments
-
-
-    def match(self,playbook):
-        return ansiblelint.utils.matchlines(playbook, self._command_matcher)
+    def match(self, line):
+        (command, args, kwargs) = ansiblelint.utils.tokenize(line)
+        if args == []:
+            return None
+        executable = os.path.basename(args[0])
+        if command in self._commands and self._arguments.has_key(executable):
+            message = "{} used in place of argument {} to file module"
+            return message.format(executable, self._arguments[executable])

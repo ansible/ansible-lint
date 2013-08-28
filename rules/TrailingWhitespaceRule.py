@@ -8,6 +8,5 @@ class TrailingWhitespaceRule(AnsibleLintRule):
     tags = {'formatting'}
 
 
-    def match(self,playbook):
-        return ansiblelint.utils.matchlines(playbook, 
-                lambda x : x.rstrip() != x)
+    def match(self, line):
+        return line.rstrip() != line

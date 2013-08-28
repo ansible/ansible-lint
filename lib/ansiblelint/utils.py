@@ -3,14 +3,6 @@ import glob
 import imp
 import ansible.utils
 
-def matchlines(text, fn):
-    result = []
-    # arrays are 0-based, line numbers are 1-based
-    # so use prev_line_no as the counter 
-    for (prev_line_no, line) in enumerate(text.split("\n")):
-        if fn(line):
-            result.append(prev_line_no+1)
-    return result
 
 def load_plugins(directory):
     result = []
@@ -35,18 +27,17 @@ def tokenize(line):
     tokens = line.lstrip().split(" ")
     if tokens[0] == 'action:': 
         tokens = tokens[1:]
-    result.append(tokens[0].replace(":", ""))
+    command = tokens[0].replace(":", "")
 
-    args = dict()
+    args = list()
+    kwargs = dict()
     for arg in tokens[1:]:
         if "=" in arg: 
             kv = arg.split("=",1) 
-            # make rhs of = blank if not set
-            # http://stackoverflow.com/questions/2492087
-            result.append({ kv[0] : kv[1]})
+            kwargs[kv[0]] = kv[1]
         else:
-            result.append(arg)
-    return result
+            args.append(arg)
+    return (command, args, kwargs)
 
 def _playbook_items(pb_data):
     if isinstance(pb_data, dict):

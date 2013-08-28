@@ -38,13 +38,13 @@ Each rule definition should have the following:
 * Short description: Brief description of the rule
 * Description: Behaviour the rule is looking for
 * Tags: one or more tags that may be used to include or exclude the rule
-* A method ```match``` that takes an unparsed playbook and returns an 
-array of matching lines
+* A method ```match``` that takes a line and returns ```None``` or ```False``` if
+the line doesn't match the test and ```True``` or a custom message (this allows
+one rule to test multiple behaviours - see e.g. the CommandsInsteadOfModulesRule
 
 An example rule is
 ```
 from ansiblelint import AnsibleLintRule
-from ansiblelint import RulesCollection
 
 class DeprecatedVariableRule(AnsibleLintRule):
 
@@ -55,8 +55,8 @@ class DeprecatedVariableRule(AnsibleLintRule):
     tags = { 'deprecated' }
 
 
-    def match(self, playbook):
-        return ansiblelint.utils.matchlines(playbook, lambda x: '${' in x)
+    def match(self, line):
+        return '${' in line
 ```
 
 Examples
@@ -64,10 +64,22 @@ Examples
 There are some example playbooks with undesirable features. Running
 ansible-lint on them works:
 ```
-$ bin/ansible-lint examples/example.yml
+ansible-lint examples/example.yml
+[ANSIBLE0006] git used in place of git module
+examples/example.yml:31
+    action: command git clone blah
+
+[ANSIBLE0002] Trailing whitespace
+examples/example.yml:19
+    action: do nothing   
+
 [ANSIBLE0001] Old style (${var}) brackets
 examples/example.yml:10
     action: command echo ${oldskool}
+
+[ANSIBLE0003] Mismatched { and }
+examples/example.yml:13
+    action: debug oops a missing {{bracket}
 
 [ANSIBLE0004] Checkouts must contain explicit version
 examples/example.yml:22
@@ -77,13 +89,9 @@ examples/example.yml:22
 examples/example.yml:25
     action: git version=HEAD c=d
 
-[ANSIBLE0003] Mismatched { and }
-examples/example.yml:13
-    action: debug oops a missing {{bracket}
-
-[ANSIBLE0002] Trailing whitespace
-examples/example.yml:19
-    action: do nothing   
+[ANSIBLE0004] Checkouts must contain explicit version
+examples/example.yml:34
+    action: git command
 
 ```
 If playbooks include other playbooks, or tasks, or handlers or roles, these

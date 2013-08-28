@@ -8,5 +8,5 @@ class EMatcherRule(AnsibleLintRule):
     shortdesc = 'The letter "e" is present'
     tags = {'fake', 'dummy', 'test1'}
 
-    def match(self,playbook):
-        return ansiblelint.utils.matchlines(playbook, lambda x : "e" in x)
+    def match(self,line):
+        return "e" in line 

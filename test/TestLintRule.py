@@ -9,16 +9,18 @@ class TestRule(unittest.TestCase):
 
     def test_rule_matching(self):
         text = ""
-        with open('test/ematchtest.txt') as f:
+        filename = 'test/ematchtest.txt'
+        with open(filename) as f:
             text = f.read()
         ematcher = EMatcherRule.EMatcherRule()
-        linenos = ematcher.match(text)
-        self.assertEqual(linenos, [1,3,5])
+        matches = ematcher.matchlines(filename, text)
+        self.assertEqual(len(matches), 3)
 
     def test_rule_postmatching(self):
         text = ""
-        with open('test/bracketsmatchtest.txt') as f:
+        filename = 'test/bracketsmatchtest.txt'
+        with open(filename) as f:
             text = f.read()
         rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
-        linenos = rule.match(text)
-        self.assertEqual(linenos, [1,3])
+        matches = rule.matchlines(filename, text)
+        self.assertEqual(len(matches), 2)
