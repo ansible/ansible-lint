@@ -24,6 +24,7 @@ Options:
   -q            quieter, although not silent output
   -r RULESDIR   location of rules directory
   -t TAGS       only check rules tagged with these values
+  -T            list all the tags
   -x SKIP_TAGS  only check rules whose tags do not match these values
 ```
 
