@@ -30,5 +30,8 @@
   - name: executing git through command
     action: command git clone blah
 
+  - name: executing git through command
+    action: command chdir=bobbins creates=whatever /usr/bin/git clone blah
+
   - name: using git module
     action: git command

@@ -1,4 +1,3 @@
-import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
 
 class MismatchedBracketRule(AnsibleLintRule):
