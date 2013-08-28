@@ -108,3 +108,8 @@ $ bin/ansible-lint examples/include.yml
 action: git a=b c=d
 
 ```
+
+Contributing
+============
+
+Please read CONTRIBUTING.md if you wish to contribute.
