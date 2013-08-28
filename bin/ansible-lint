@@ -8,7 +8,7 @@ import os
 import sys
 import optparse
 
-VERSION = "0.0.1"
+VERSION = "0.1.0"
 
 def main(args):
 
@@ -27,6 +27,8 @@ def main(args):
                       help="location of rules directory")
     parser.add_option('-t', dest='tags', default = [],
                       help="only check rules tagged with these values")
+    parser.add_option('-T', dest='listtags', action='store_true',
+                      help="list all the tags")
     parser.add_option('-x', dest='skip_tags', default = [],
                       help="only check rules whose tags do not match these values")
     options, args = parser.parse_args(args)
@@ -34,13 +36,17 @@ def main(args):
     if options.quiet:
         formatter = formatters.QuietFormatter()
 
-    if len(args) == 0 and not options.listrules:
+    if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
         return 1
 
     rules = RulesCollection.create_from_directory(options.rulesdir)
     if options.listrules:
         print rules
+        return 0
+
+    if options.listtags:
+        print rules.listtags()
         return 0
 
     playbooks = set(args)

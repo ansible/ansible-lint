@@ -1,4 +1,5 @@
 import ansiblelint.utils
+from collections import defaultdict
 
 class AnsibleLintRule(object):
 
@@ -52,6 +53,16 @@ class RulesCollection(object):
 
     def __repr__(self):
         return "\n".join([rule.verbose() for rule in sorted(self.rules, key = lambda x: x.id)])
+
+    def listtags(self):
+        tags = defaultdict(list)
+        for rule in self.rules:
+            for tag in rule.tags:
+                tags[tag].append("[{}]".format(rule.id))
+        results = []
+        for tag in sorted(tags):
+            results.append("{} {}".format(tag, tags[tag]))
+        return "\n".join(results)
 
     @classmethod
     def create_from_directory(cls, rulesdir):
