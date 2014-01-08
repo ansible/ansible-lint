@@ -7,7 +7,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     shortdesc = 'Using command rather than module'
     description = 'Executing a command when there is an Ansible module ' + \
                   'is generally a bad idea'
-    tags = {'resources'}
+    tags = ['resources']
 
     _commands = [ 'command', 'shell', 'raw' ]
     _modules = { 'git': 'git', 'hg': 'hg', 'curl': 'get_url', 'wget': 'get_url', 

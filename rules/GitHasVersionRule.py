@@ -6,7 +6,7 @@ class GitHasVersionRule(AnsibleLintRule):
     shortdesc = 'Checkouts must contain explicit version'
     description = 'All version control checkouts must point to ' + \
                   'an explicit commit or tag, not just "latest"'
-    tags = {'repeatability'}
+    tags = ['repeatability']
 
 
     def match(self, line):

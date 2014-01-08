@@ -5,7 +5,7 @@ class MismatchedBracketRule(AnsibleLintRule):
     shortdesc='Mismatched { and }'
     description = 'If lines contain more { than } or vice ' + \
                   'versa then templating can fail nastily'
-    tags = {'templating'}
+    tags = ['templating']
 
 
     def match(self, line):

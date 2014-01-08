@@ -7,7 +7,7 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     shortdesc = 'Using command rather than an argument to e.g. file'
     description = 'Executing a command when there is are arguments to modules ' + \
                   'is generally a bad idea'
-    tags = {'resources'}
+    tags = ['resources']
 
     _commands = [ 'command', 'shell', 'raw' ]
     _arguments = { 'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group', 
