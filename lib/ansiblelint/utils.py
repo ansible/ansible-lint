@@ -25,7 +25,9 @@ def load_plugins(directory):
 def tokenize(line):
     result = list()
     tokens = line.lstrip().split(" ")
-    if tokens[0] == 'action:': 
+    if tokens[0] == '-':
+        tokens = tokens[1:]
+    if tokens[0] == 'action:':
         tokens = tokens[1:]
     command = tokens[0].replace(":", "")
 
