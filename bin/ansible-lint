@@ -58,7 +58,7 @@ def main(args):
 
     matches = list()
     for playbook in playbooks: 
-        matches.extend(rules.run(playbook, tags=set(options.tags), skip_tags=set(options.skip_tags)))
+        matches.extend(rules.run(playbook, tags=set(options.tags.split(',')), skip_tags=set(options.skip_tags.split(','))))
 
     for match in matches:
         print formatter.format(match)
