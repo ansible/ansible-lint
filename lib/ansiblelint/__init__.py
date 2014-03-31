@@ -45,8 +45,8 @@ class RulesCollection(object):
         with open(playbookfile, 'r') as f:
             text = f.read()
         for rule in self.rules:
-            if not tags or not rule.tags.isdisjoint(tags):
-                if rule.tags.isdisjoint(skip_tags):
+            if not tags or not set(rule.tags).isdisjoint(tags):
+                if set(rule.tags).isdisjoint(skip_tags):
                     matches.extend(rule.matchlines(playbookfile, text))
 
         return matches
