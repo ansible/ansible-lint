@@ -57,8 +57,12 @@ def main(args):
             visited.add(arg)
 
     matches = list()
-    for playbook in playbooks: 
-        matches.extend(rules.run(playbook, tags=set(options.tags.split(',')), skip_tags=set(options.skip_tags.split(','))))
+    for playbook in playbooks:
+        if isinstance(options.tags, basestring):
+          options.tags = options.tags.split(',')
+        if isinstance(options.skip_tags, basestring):
+          options.skip_tags = options.skip_tags.split(',')
+        matches.extend(rules.run(playbook, tags=set(options.tags), skip_tags=set(options.skip_tags)))
 
     for match in matches:
         print formatter.format(match)
