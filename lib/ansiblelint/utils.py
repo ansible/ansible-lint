@@ -58,7 +58,10 @@ def find_children(playbook):
     items = _playbook_items(pb_data)
     for item in _playbook_items(pb_data):
         for child in play_children(basedir, item):
-            results.append(ansible.utils.path_dwim(basedir, child))
+            results.append({
+                'path': ansible.utils.path_dwim(basedir, child['path']),
+                'type': child['type']
+            })
     return results
 
 
@@ -77,10 +80,11 @@ def play_children(basedir, item):
         return []
 
 def _include_children(basedir, k, v):
-    return [ansible.utils.path_dwim(basedir, v)]
+    return [{ 'path': ansible.utils.path_dwim(basedir, v), 'type': 'tasks' }]
 
 def _taskshandlers_children(basedir, k, v):
-    return [ansible.utils.path_dwim(basedir, th['include']) 
+    return [{ 'path': ansible.utils.path_dwim(basedir, th['include']),
+              'type': 'tasks' }
             for th in v if 'include' in th.items()]
 
 def _roles_children(basedir, k, v):
@@ -113,6 +117,6 @@ def _look_for_role_files(basedir, role):
     for th in ['tasks', 'handlers', 'meta']: 
         thpath = os.path.join(_rolepath(basedir, role), th, 'main.yml')
         if os.path.exists(thpath):
-            results.append(thpath)
+            results.append({ 'path': thpath, 'type': th })
     return results
 
