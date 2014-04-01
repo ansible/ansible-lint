@@ -120,3 +120,10 @@ def _look_for_role_files(basedir, role):
             results.append({ 'path': thpath, 'type': th })
     return results
 
+def rolename(filepath):
+    idx = filepath.find('roles/')
+    if idx < 0:
+        return ''
+    role = filepath[idx+6:]
+    role = role[:role.find('/')]
+    return role
