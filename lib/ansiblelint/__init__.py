@@ -11,23 +11,23 @@ class AnsibleLintRule(object):
         return self.id + ": " + self.shortdesc + "\n" + self.description
 
 
-    def match(self, line=""):
+    def match(self, file="", line=""):
         return []
 
-    def matchlines(self, filename, text):
+    def matchlines(self, file, text):
         matches = []
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(text.split("\n")):
-            result = self.match(line)
+            result = self.match(file, line)
             if result:
                 message = None
                 if isinstance(result, str):
                     message = result
-                matches.append(Match(prev_line_no+1, line, filename, self, message))
+                matches.append(Match(prev_line_no+1, line, file['path'], self, message))
         return matches
 
-    def matchblock(self, file, block):
+    def matchblock(self, file="", block=""):
         return []
 
     def matchblocks(self, file, text):
@@ -63,7 +63,7 @@ class RulesCollection(object):
         for rule in self.rules:
             if not tags or not set(rule.tags).isdisjoint(tags):
                 if set(rule.tags).isdisjoint(skip_tags):
-                    matches.extend(rule.matchlines(playbookfile['path'], text))
+                    matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchblocks(playbookfile, text))
 
         return matches

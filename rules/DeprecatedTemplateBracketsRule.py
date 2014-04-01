@@ -8,5 +8,5 @@ class DeprecatedTemplateBracketsRule(AnsibleLintRule):
 
     tags = ['deprecation']
 
-    def match(self, line):
+    def match(self, file, line):
         return "${" in line
