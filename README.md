@@ -39,7 +39,7 @@ Each rule definition should have the following:
 * Short description: Brief description of the rule
 * Description: Behaviour the rule is looking for
 * Tags: one or more tags that may be used to include or exclude the rule
-* At least of the following methods:
+* At least one of the following methods:
   * ```match``` that takes a line and returns ```None``` or ```False``` if
   the line doesn't match the test and ```True``` or a custom message (this
   allows one rule to test multiple behaviours - see e.g. the
