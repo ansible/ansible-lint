@@ -31,33 +31,70 @@ Options:
 Rules
 =====
 
-Rules are described using a class file per rule. 
-Default rules are named DeprecatedVariableRule.py etc. 
+Rules are described using a class file per rule.
+Default rules are named DeprecatedVariableRule.py etc.
 
 Each rule definition should have the following:
 * ID: A unique identifier
 * Short description: Brief description of the rule
 * Description: Behaviour the rule is looking for
 * Tags: one or more tags that may be used to include or exclude the rule
-* A method ```match``` that takes a line and returns ```None``` or ```False``` if
-the line doesn't match the test and ```True``` or a custom message (this allows
-one rule to test multiple behaviours - see e.g. the CommandsInsteadOfModulesRule
+* At least of the following methods:
+  * ```match``` that takes the details about the file and a line.
+  It returns ```None``` or ```False``` if the line doesn't match the test
+  and ```True``` or a custom message (this allows one rule to test
+  multiple behaviours - see e.g. the CommandsInsteadOfModulesRule).
+  * ```matchblock``` that takes the details about the file and a block.
+  It returns ```None``` or ```False``` if the line doesn't match the test
+  and ```True``` or a custom message.
 
-An example rule is
+An example rule using ```match``` is
 ```
 from ansiblelint import AnsibleLintRule
 
 class DeprecatedVariableRule(AnsibleLintRule):
 
     id = 'ANSIBLE0001'
-    shortdesc = 'Deprecated variable declarations' 
+    shortdesc = 'Deprecated variable declarations'
     description = 'Check for lines that have old style ${var} ' + \
                   'declarations'
     tags = { 'deprecated' }
 
 
-    def match(self, line):
+    def match(self, file, line):
         return '${' in line
+```
+
+An example rule using ```matchblock``` is
+```
+import ansiblelint.utils
+from ansiblelint import AnsibleLintRule
+
+class TaskHasTag(AnsibleLintRule):
+    id = 'ANSIBLE0008'
+    shortdesc = 'Tasks must have tag'
+    description = 'Tasks must have tag'
+    tags = ['productivity']
+
+
+    def matchblock(self, file, block):
+        # The meta files don't have tags
+        if file['type'] in ["meta", "playbooks"]:
+            return False
+
+        if isinstance(block, basestring):
+            return False
+
+        # If the task include another task or make the playbook fail
+        # Don't force to have a tag
+        if not set(block.keys()).isdisjoint(['include','fail']):
+            return False
+
+        # Task should have tags
+        if not block.has_key('tags'):
+              return True
+
+        return False
 ```
 
 Examples

@@ -50,19 +50,24 @@ def main(args):
         return 0
 
     playbooks = set(args)
+    files = list()
+    for playbook in playbooks:
+        files.append({ 'path': playbook, 'type': 'playbooks' })
     visited = set()
     while (visited != playbooks):
         for arg in playbooks - visited:
-            playbooks |= set(utils.find_children(arg))
+            for file in utils.find_children(arg):
+              playbooks.add(file['path'])
+              files.append(file)
             visited.add(arg)
 
     matches = list()
-    for playbook in playbooks:
+    for file in files:
         if isinstance(options.tags, basestring):
           options.tags = options.tags.split(',')
         if isinstance(options.skip_tags, basestring):
           options.skip_tags = options.skip_tags.split(',')
-        matches.extend(rules.run(playbook, tags=set(options.tags), skip_tags=set(options.skip_tags)))
+        matches.extend(rules.run(file, tags=set(options.tags), skip_tags=set(options.skip_tags)))
 
     for match in matches:
         print formatter.format(match)

@@ -7,5 +7,5 @@ class TrailingWhitespaceRule(AnsibleLintRule):
     tags = ['formatting']
 
 
-    def match(self, line):
+    def match(self, file, line):
         return line.rstrip() != line

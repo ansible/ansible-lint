@@ -1,4 +1,5 @@
 import ansiblelint.utils
+import ansible.utils
 from collections import defaultdict
 
 class AnsibleLintRule(object):
@@ -10,22 +11,37 @@ class AnsibleLintRule(object):
         return self.id + ": " + self.shortdesc + "\n" + self.description
 
 
-    def match(self, playbook=""):
+    def match(self, file="", line=""):
         return []
 
-    def matchlines(self, filename, text):
+    def matchlines(self, file, text):
         matches = []
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(text.split("\n")):
-            result = self.match(line)
+            result = self.match(file, line)
             if result:
                 message = None
                 if isinstance(result, str):
                     message = result
-                matches.append(Match(prev_line_no+1, line, filename, self, message))
+                matches.append(Match(prev_line_no+1, line, file['path'], self, message))
         return matches
 
+    def matchblock(self, file="", block=""):
+        return []
+
+    def matchblocks(self, file, text):
+        matches = []
+        yaml = ansible.utils.parse_yaml(text)
+        if yaml:
+            for block in yaml:
+                result = self.matchblock(file, block)
+                if result:
+                      message = None
+                      if isinstance(result, str):
+                          message = result
+                      matches.append(Match(0, block, file['path'], self, message))
+        return matches
 
 
 class RulesCollection(object):
@@ -42,12 +58,13 @@ class RulesCollection(object):
     def run(self, playbookfile, tags=set(), skip_tags=set()):
         text = ""
         matches = list()
-        with open(playbookfile, 'r') as f:
+        with open(playbookfile['path'], 'r') as f:
             text = f.read()
         for rule in self.rules:
             if not tags or not set(rule.tags).isdisjoint(tags):
                 if set(rule.tags).isdisjoint(skip_tags):
                     matches.extend(rule.matchlines(playbookfile, text))
+                    matches.extend(rule.matchblocks(playbookfile, text))
 
         return matches
 

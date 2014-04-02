@@ -15,7 +15,7 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
                    'rmdir': 'state=absent', 'rm': 'state=absent' }
 
 
-    def match(self, line):
+    def match(self, file, line):
         (command, args, kwargs) = ansiblelint.utils.tokenize(line)
         if args == []:
             return None

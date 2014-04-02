@@ -15,7 +15,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
                   'mount': 'mount', 'rpm': 'yum', 'yum': 'yum', 'apt-get': 'apt-get' }
 
 
-    def match(self, line):
+    def match(self, file, line):
         (command, args, kwargs) = ansiblelint.utils.tokenize(line)
         if args == []:
             return None
