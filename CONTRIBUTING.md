@@ -1,8 +1,9 @@
 Contributing to Ansible-lint
 ============================
 
-To contribute to ansible-lint, please use pull requests on a branch of your own fork
-After creating your fork on github, you can do
+To contribute to ansible-lint, please use pull requests on a branch of your own fork.
+
+After creating your fork on github, you can do:
 ```
 git clone git@github.com:yourname/ansible-lint
 cd ansible-lint
@@ -10,7 +11,7 @@ git checkout -b your-branch-name
 DO SOME CODING HERE
 git add your new files
 git commit
-git push origin your-branch-nane
+git push origin your-branch-name
 ```
 You will then be able to create a pull request from your commit. 
 
