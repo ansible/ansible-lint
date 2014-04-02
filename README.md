@@ -109,7 +109,7 @@ examples/example.yml:31
 
 [ANSIBLE0002] Trailing whitespace
 examples/example.yml:19
-    action: do nothing
+    action: do nothing  
 
 [ANSIBLE0001] Old style (${var}) brackets
 examples/example.yml:10
