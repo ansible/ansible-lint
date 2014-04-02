@@ -40,10 +40,10 @@ Each rule definition should have the following:
 * Description: Behaviour the rule is looking for
 * Tags: one or more tags that may be used to include or exclude the rule
 * At least of the following methods:
-  * ```match``` that takes a line and returns ```None``` or ```False``` if
-  the line doesn't match the test and ```True``` or a custom message (this
-  allows one rule to test multiple behaviours - see e.g. the
-  CommandsInsteadOfModulesRule
+  * ```match``` that takes the details about the file and a line.
+  It returns ```None``` or ```False``` if the line doesn't match the test
+  and ```True``` or a custom message (this allows one rule to test
+  multiple behaviours - see e.g. the CommandsInsteadOfModulesRule).
   * ```matchblock``` that takes the details about the file and a block.
   It returns ```None``` or ```False``` if the line doesn't match the test
   and ```True``` or a custom message.
@@ -61,7 +61,7 @@ class DeprecatedVariableRule(AnsibleLintRule):
     tags = { 'deprecated' }
 
 
-    def match(self, line):
+    def match(self, file, line):
         return '${' in line
 ```
 
@@ -109,7 +109,7 @@ examples/example.yml:31
 
 [ANSIBLE0002] Trailing whitespace
 examples/example.yml:19
-    action: do nothing
+    action: do nothing   
 
 [ANSIBLE0001] Old style (${var}) brackets
 examples/example.yml:10
