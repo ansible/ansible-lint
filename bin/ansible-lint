@@ -22,9 +22,9 @@ def main(args):
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
                       help="quieter, although not silent output") 
     parser.add_option('-r', dest="rulesdir", 
-                      default = os.path.join(os.path.dirname(__file__), 
-                                             '..', 'rules'),
-                      help="location of rules directory")
+                      default = os.path.join(os.path.dirname(utils.__file__), 
+                                             'rules'),
+                      help="location of rules directory (default: %default)")
     parser.add_option('-t', dest='tags', default = [],
                       help="only check rules tagged with these values")
     parser.add_option('-T', dest='listtags', action='store_true',
