@@ -7,9 +7,15 @@ potentially be improved
 Setup
 -----
 
-You'll need to add ansible-lint/lib to your PYTHONPATH
+Using pip:
 ```
-export PYTHONPATH=$PYTHONPATH:`pwd`/lib
+pip install https://github.com/willthames/ansible-lint/archive/master.zip
+```
+
+From source:
+```
+git clone https://github.com/willthames/ansible-lint
+export PYTHONPATH=$PYTHONPATH:`pwd`/ansible-lint/lib
 ```
 
 Usage
