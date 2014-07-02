@@ -6,6 +6,7 @@ potentially be improved
 
 Setup
 -----
+
 You'll need to add ansible-lint/lib to your PYTHONPATH
 ```
 export PYTHONPATH=$PYTHONPATH:`pwd`/lib
@@ -32,7 +33,7 @@ Rules
 =====
 
 Rules are described using a class file per rule.
-Default rules are named DeprecatedVariableRule.py etc.
+Default rules are named `DeprecatedVariableRule.py`, etc.
 
 Each rule definition should have the following:
 * ID: A unique identifier
@@ -48,8 +49,9 @@ Each rule definition should have the following:
   It returns ```None``` or ```False``` if the line doesn't match the test
   and ```True``` or a custom message.
 
-An example rule using ```match``` is
-```
+An example rule using ```match``` is:
+
+```python
 from ansiblelint import AnsibleLintRule
 
 class DeprecatedVariableRule(AnsibleLintRule):
@@ -65,8 +67,9 @@ class DeprecatedVariableRule(AnsibleLintRule):
         return '${' in line
 ```
 
-An example rule using ```matchblock``` is
-```
+An example rule using ```matchblock``` is:
+
+```python
 import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
 
@@ -99,8 +102,10 @@ class TaskHasTag(AnsibleLintRule):
 
 Examples
 --------
+
 There are some example playbooks with undesirable features. Running
 ansible-lint on them works:
+
 ```
 ansible-lint examples/example.yml
 [ANSIBLE0006] git used in place of git module
@@ -109,7 +114,7 @@ examples/example.yml:31
 
 [ANSIBLE0002] Trailing whitespace
 examples/example.yml:19
-    action: do nothing  
+    action: do nothing
 
 [ANSIBLE0001] Old style (${var}) brackets
 examples/example.yml:10
@@ -132,8 +137,10 @@ examples/example.yml:34
     action: git command
 
 ```
+
 If playbooks include other playbooks, or tasks, or handlers or roles, these
 are also handled:
+
 ```
 $ bin/ansible-lint examples/include.yml
 [ANSIBLE0003] Mismatched { and }
@@ -143,10 +150,10 @@ $ bin/ansible-lint examples/include.yml
 [ANSIBLE0004] Checkouts must contain explicit version
 /Users/will/src/ansible-lint/examples/roles/bobbins/tasks/main.yml:3
 action: git a=b c=d
-
 ```
 
 Contributing
 ============
 
-Please read CONTRIBUTING.md if you wish to contribute.
+Please read
+[CONTRIBUTING.md](https://github.com/willthames/ansible-lint/blob/master/CONTRIBUTING.md) if you wish to contribute.
