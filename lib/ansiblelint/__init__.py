@@ -24,7 +24,7 @@ class AnsibleLintRule(object):
                 message = None
                 if isinstance(result, str):
                     message = result
-                matches.append(Match(prev_line_no+1, line, file['path'], self, message))
+                matches.append(Match(prev_line_no+1, line, file, self, message))
         return matches
 
     def matchblock(self, file="", block=""):
@@ -58,7 +58,7 @@ class RulesCollection(object):
     def run(self, playbookfile, tags=set(), skip_tags=set()):
         text = ""
         matches = list()
-        with open(playbookfile['path'], 'r') as f:
+        with open(playbookfile, 'r') as f:
             text = f.read()
         for rule in self.rules:
             if not tags or not set(rule.tags).isdisjoint(tags):
