@@ -7,9 +7,8 @@ potentially be improved
 Setup
 -----
 
-You'll need to add ansible-lint/lib to your PYTHONPATH
 ```
-export PYTHONPATH=$PYTHONPATH:`pwd`/lib
+pip install https://github.com/willthames/ansible-lint/archive/master.zip
 ```
 
 Usage
@@ -156,4 +155,6 @@ Contributing
 ============
 
 Please read
-[CONTRIBUTING.md](https://github.com/willthames/ansible-lint/blob/master/CONTRIBUTING.md) if you wish to contribute.
+[CONTRIBUTING.md](https://github.com/willthames/ansible-lint/blob/master/CONTRIBUTING.md)
+if you wish to contribute.
+
