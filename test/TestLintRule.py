@@ -13,7 +13,7 @@ class TestRule(unittest.TestCase):
         with open(filename) as f:
             text = f.read()
         ematcher = EMatcherRule.EMatcherRule()
-        matches = ematcher.matchlines(filename, text)
+        matches = ematcher.matchlines(dict(path=filename, type='playbooks'), text)
         self.assertEqual(len(matches), 3)
 
     def test_rule_postmatching(self):
@@ -22,5 +22,5 @@ class TestRule(unittest.TestCase):
         with open(filename) as f:
             text = f.read()
         rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
-        matches = rule.matchlines(filename, text)
+        matches = rule.matchlines(dict(path=filename, type='playbooks'), text)
         self.assertEqual(len(matches), 2)
