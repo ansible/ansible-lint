@@ -4,6 +4,7 @@ import ansible.constants as C
 import ansiblelint.utils as utils
 import ansiblelint.formatters as formatters
 from ansiblelint import RulesCollection
+import errno
 import os
 import sys
 import optparse
@@ -74,4 +75,8 @@ def main(args):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except IOError as exc:
+        if exc.errno != errno.EPIPE:
+            raise
