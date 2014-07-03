@@ -1,0 +1,1000 @@
+---
+# This playbook causes ansible-lint to output tons of warnings
+# Enough to exceed typical stdout buffering size and thus to show the need for
+# catching IOError (EPIEP) errors.
+
+- hosts: webservers
+
+  tasks:
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
+  - name: executing git through command
+    action: command git clone blah
