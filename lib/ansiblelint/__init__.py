@@ -106,3 +106,31 @@ class Match:
         formatstr = "[{}] ({}) matched {}:{} {}"
         return formatstr.format(self.rule.id, self.message,
                                 self.filename, self.linenumber, self.line)
+
+
+class Runner:
+
+    def __init__(self, rules, playbooks, tags, skip_tags):
+        self.rules = rules
+        self.playbooks = playbooks
+        self.tags = tags
+        self.skip_tags = skip_tags
+
+    def run(self):
+        files = list()
+        for playbook in self.playbooks:
+            files.append({ 'path': playbook, 'type': 'playbooks' })
+        visited = set()
+        while (visited != self.playbooks):
+            for arg in self.playbooks - visited:
+                for file in utils.find_children(arg):
+                    self.playbooks.add(file['path'])
+                    files.append(file)
+                visited.add(arg)
+
+        matches = list()
+        for file in files:
+            matches.extend(self.rules.run(file, tags=set(self.tags), 
+                skip_tags=set(self.skip_tags)))
+
+        return matches
