@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import ansible.constants as C
 import ansiblelint.utils as utils
 import ansiblelint.formatters as formatters
 from ansiblelint import RulesCollection
@@ -20,20 +19,25 @@ def main(args):
     parser = optparse.OptionParser("%prog playbook.yml",
                                    version="%prog " + VERSION)
 
-    defaultrulesdir = os.path.join(os.path.dirname(utils.__file__), 'rules'),
+    rulesdirs = [os.path.join(os.path.dirname(utils.__file__), 'rules')]
+
+    def add_rules_dir(option, opt_str, value, parser):
+        rulesdirs.append(value)
+
     parser.add_option('-L', dest='listrules', default=False,
                       action='store_true', help="list all the rules")
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
                       help="quieter, although not silent output")
-    parser.add_option('-r', dest="rulesdir",
-                      help="one or more (separator='" + os.path.pathsep +
-                      "') rules directories (default=%default)",
-                      default=defaultrulesdir)
-    parser.add_option('-t', dest='tags', default = [],
+    parser.add_option('-r', action='callback', 
+                      callback=add_rules_dir, type='str',
+                      help="add one or more rules directories using " +
+                      "one or more -r arguments. The default rules " +
+                      "directory is always included")
+    parser.add_option('-t', dest='tags', default=[],
                       help="only check rules tagged with these values")
     parser.add_option('-T', dest='listtags', action='store_true',
                       help="list all the tags")
-    parser.add_option('-x', dest='skip_tags', default = [],
+    parser.add_option('-x', dest='skip_tags', default=[],
                       help="only check rules whose tags do not " +
                       "match these values")
     options, args = parser.parse_args(args)
@@ -46,7 +50,7 @@ def main(args):
         return 1
 
     rules = RulesCollection()
-    for rulesdir in options.rulesdir.split(os.path.pathsep):
+    for rulesdir in rulesdirs:
         rules.extend(RulesCollection.create_from_directory(rulesdir))
 
     if options.listrules:
@@ -63,8 +67,8 @@ def main(args):
         options.skip_tags = options.skip_tags.split(',')
 
     playbooks = set(args)
-    runner = ansiblelint.Runner(rules, playbooks, options.tags, 
-            options.skip_tags)
+    runner = ansiblelint.Runner(rules, playbooks, options.tags,
+                                options.skip_tags)
     matches = runner.run()
 
     for match in matches:
