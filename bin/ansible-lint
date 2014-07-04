@@ -28,7 +28,7 @@ def main(args):
                       action='store_true', help="list all the rules")
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
                       help="quieter, although not silent output")
-    parser.add_option('-r', action='callback', 
+    parser.add_option('-r', action='callback', dest='rulesdir',
                       callback=add_rules_dir, type='str',
                       help="add one or more rules directories using " +
                       "one or more -r arguments. The default rules " +
