@@ -11,27 +11,30 @@ import optparse
 
 VERSION = "0.1.0"
 
+
 def main(args):
 
     formatter = formatters.Formatter()
 
-    parser = optparse.OptionParser("%prog playbook.yml", 
+    parser = optparse.OptionParser("%prog playbook.yml",
                                    version="%prog " + VERSION)
 
-    parser.add_option('-L', dest='listrules', default=False, 
-                      action='store_true', help="list all the rules") 
+    defaultrulesdir = os.path.join(os.path.dirname(utils.__file__), 'rules'),
+    parser.add_option('-L', dest='listrules', default=False,
+                      action='store_true', help="list all the rules")
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
-                      help="quieter, although not silent output") 
-    parser.add_option('-r', dest="rulesdir", 
-                      default = os.path.join(os.path.dirname(utils.__file__), 
-                                             'rules'),
-                      help="location of rules directory (default: %default)")
+                      help="quieter, although not silent output")
+    parser.add_option('-r', dest="rulesdir",
+                      help="one or more (separator='" + os.path.pathsep +
+                      "') rules directories (default=%default)",
+                      default=defaultrulesdir)
     parser.add_option('-t', dest='tags', default = [],
                       help="only check rules tagged with these values")
     parser.add_option('-T', dest='listtags', action='store_true',
                       help="list all the tags")
     parser.add_option('-x', dest='skip_tags', default = [],
-                      help="only check rules whose tags do not match these values")
+                      help="only check rules whose tags do not " +
+                      "match these values")
     options, args = parser.parse_args(args)
 
     if options.quiet:
@@ -41,7 +44,10 @@ def main(args):
         parser.print_help(file=sys.stderr)
         return 1
 
-    rules = RulesCollection.create_from_directory(options.rulesdir)
+    rules = RulesCollection()
+    for rulesdir in options.rulesdir.split(os.path.pathsep):
+        rules.extend(RulesCollection.create_from_directory(rulesdir))
+
     if options.listrules:
         print rules
         return 0

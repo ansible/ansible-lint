@@ -2,6 +2,7 @@ import ansiblelint.utils
 import ansible.utils
 from collections import defaultdict
 
+
 class AnsibleLintRule(object):
 
     def __repr__(self):
@@ -9,7 +10,6 @@ class AnsibleLintRule(object):
 
     def verbose(self):
         return self.id + ": " + self.shortdesc + "\n" + self.description
-
 
     def match(self, file="", line=""):
         return []
@@ -37,10 +37,10 @@ class AnsibleLintRule(object):
             for block in yaml:
                 result = self.matchblock(file, block)
                 if result:
-                      message = None
-                      if isinstance(result, str):
-                          message = result
-                      matches.append(Match(0, block, file['path'], self, message))
+                    message = None
+                    if isinstance(result, str):
+                        message = result
+                    matches.append(Match(0, block, file['path'], self, message))
         return matches
 
 
@@ -49,11 +49,14 @@ class RulesCollection(object):
     def __init__(self):
         self.rules = []
 
-    def register(self,obj):
+    def register(self, obj):
         self.rules.append(obj)
 
-    def __len__(self):
-        return len(self.rules)
+    def __iter__(self):
+        return iter(self.rules)
+
+    def extend(self, more):
+        self.rules.extend(more)
 
     def run(self, playbookfile, tags=set(), skip_tags=set()):
         text = ""
@@ -69,7 +72,7 @@ class RulesCollection(object):
         return matches
 
     def __repr__(self):
-        return "\n".join([rule.verbose() for rule in sorted(self.rules, key = lambda x: x.id)])
+        return "\n".join([rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)])
 
     def listtags(self):
         tags = defaultdict(list)
