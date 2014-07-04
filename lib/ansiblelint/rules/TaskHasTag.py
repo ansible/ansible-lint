@@ -5,7 +5,7 @@ class TaskHasTag(AnsibleLintRule):
     id = 'ANSIBLE0008'
     shortdesc = 'Tasks must have tag'
     description = 'Tasks must have tag'
-    tags = ['productivity']
+    tags = ['productivity', 'tags']
 
 
     def matchblock(self, file, block):
