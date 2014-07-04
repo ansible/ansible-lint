@@ -1,6 +1,8 @@
+from collections import defaultdict
+import os
+
 import ansiblelint.utils
 import ansible.utils
-from collections import defaultdict
 
 
 class AnsibleLintRule(object):
@@ -87,7 +89,7 @@ class RulesCollection(object):
     @classmethod
     def create_from_directory(cls, rulesdir):
         result = cls()
-        result.rules = utils.load_plugins(rulesdir)
+        result.rules = utils.load_plugins(os.path.expanduser(rulesdir))
         return result
 
 

@@ -41,6 +41,7 @@ def tokenize(line):
             args.append(arg)
     return (command, args, kwargs)
 
+
 def _playbook_items(pb_data):
     if isinstance(pb_data, dict):
         return pb_data.items()
@@ -48,6 +49,7 @@ def _playbook_items(pb_data):
         return []
     else:
         return [item for play in pb_data for item in play.items()]
+
 
 def find_children(playbook):
     if not os.path.exists(playbook):
@@ -79,23 +81,26 @@ def play_children(basedir, item):
     else:
         return []
 
+
 def _include_children(basedir, k, v):
     return [{ 'path': ansible.utils.path_dwim(basedir, v), 'type': 'tasks' }]
+
 
 def _taskshandlers_children(basedir, k, v):
     return [{ 'path': ansible.utils.path_dwim(basedir, th['include']),
               'type': 'tasks' }
             for th in v if 'include' in th.items()]
 
+
 def _roles_children(basedir, k, v):
     results = []
-    for role in v: 
+    for role in v:
         if isinstance(role, dict):
             results.extend(_look_for_role_files(basedir, role['role']))
         else:
             results.extend(_look_for_role_files(basedir, role))
-    
     return results
+
 
 def _rolepath(basedir, role):
     if os.path.isabs(role):
@@ -119,6 +124,7 @@ def _look_for_role_files(basedir, role):
         if os.path.exists(thpath):
             results.append({ 'path': thpath, 'type': th })
     return results
+
 
 def rolename(filepath):
     idx = filepath.find('roles/')
