@@ -57,6 +57,9 @@ class RulesCollection(object):
     def __iter__(self):
         return iter(self.rules)
 
+    def __len__(self):
+        return len(self.rules)
+
     def extend(self, more):
         self.rules.extend(more)
 
@@ -119,7 +122,7 @@ class Runner:
     def run(self):
         files = list()
         for playbook in self.playbooks:
-            files.append({ 'path': playbook, 'type': 'playbooks' })
+            files.append({'path': playbook, 'type': 'playbooks'})
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
@@ -130,7 +133,7 @@ class Runner:
 
         matches = list()
         for file in files:
-            matches.extend(self.rules.run(file, tags=set(self.tags), 
-                skip_tags=set(self.skip_tags)))
+            matches.extend(self.rules.run(file, tags=set(self.tags),
+                           skip_tags=set(self.skip_tags)))
 
         return matches
