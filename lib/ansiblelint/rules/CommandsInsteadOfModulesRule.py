@@ -15,11 +15,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
                   'mount': 'mount', 'rpm': 'yum', 'yum': 'yum', 'apt-get': 'apt-get' }
 
 
-    def match(self, file, line):
-        (command, args, kwargs) = ansiblelint.utils.tokenize(line)
-        if args == []:
-            return None
-        executable = os.path.basename(args[0])
-        if command in self._commands and self._modules.has_key(executable):
-            message = "{} used in place of {} module"
-            return message.format(executable, self._modules[executable])
+    def matchtask(self, file, task):
+        if task["action"]["module"] in self._commands:
+            executable = os.path.basename(task["action"]["args"][0])
+            if self._modules.has_key(executable):
+                message = "{} used in place of {} module"
+                return message.format(executable, self._modules[executable])

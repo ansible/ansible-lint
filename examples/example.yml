@@ -35,3 +35,9 @@
 
   - name: using git module
     action: git command
+
+  - name: passing git as an argument to another task
+    action: debug msg="{{item}}"
+    with_items: 
+      - git
+      - bobbins

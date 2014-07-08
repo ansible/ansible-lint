@@ -1,4 +1,4 @@
 ---
-name: test tasks
-action: git a=b c=d
+- name: test tasks
+  action: git a=b c=d
 

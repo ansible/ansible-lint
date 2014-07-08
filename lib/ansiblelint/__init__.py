@@ -26,23 +26,26 @@ class AnsibleLintRule(object):
                 message = None
                 if isinstance(result, str):
                     message = result
-                matches.append(Match(prev_line_no+1, line, file['path'], self, message))
+                matches.append(Match(prev_line_no+1, line,
+                               file['path'], self, message))
         return matches
 
-    def matchblock(self, file="", block=""):
+    def matchtask(self, file="", task=None):
         return []
 
-    def matchblocks(self, file, text):
+    def matchtasks(self, file, text):
         matches = []
         yaml = ansible.utils.parse_yaml(text)
         if yaml:
-            for block in yaml:
-                result = self.matchblock(file, block)
+            for task in utils.get_action_tasks(yaml, file):
+                result = self.matchtask(file, task)
                 if result:
                     message = None
                     if isinstance(result, str):
                         message = result
-                    matches.append(Match(0, block, file['path'], self, message))
+                    taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
+                    matches.append(Match(0, taskstr,
+                                   file['path'], self, message))
         return matches
 
 
@@ -72,12 +75,13 @@ class RulesCollection(object):
             if not tags or not set(rule.tags).isdisjoint(tags):
                 if set(rule.tags).isdisjoint(skip_tags):
                     matches.extend(rule.matchlines(playbookfile, text))
-                    matches.extend(rule.matchblocks(playbookfile, text))
+                    matches.extend(rule.matchtasks(playbookfile, text))
 
         return matches
 
     def __repr__(self):
-        return "\n".join([rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)])
+        return "\n".join([rule.verbose()
+                          for rule in sorted(self.rules, key=lambda x: x.id)])
 
     def listtags(self):
         tags = defaultdict(list)

@@ -73,7 +73,7 @@ class DeprecatedVariableRule(AnsibleLintRule):
         return '${' in line
 ```
 
-An example rule using ```matchblock``` is:
+An example rule using ```matchtask``` is:
 
 ```python
 import ansiblelint.utils
@@ -86,21 +86,14 @@ class TaskHasTag(AnsibleLintRule):
     tags = ['productivity']
 
 
-    def matchblock(self, file, block):
-        # The meta files don't have tags
-        if file['type'] in ["meta", "playbooks"]:
-            return False
-
-        if isinstance(block, basestring):
-            return False
-
+    def matchtask(self, file, block):
         # If the task include another task or make the playbook fail
         # Don't force to have a tag
-        if not set(block.keys()).isdisjoint(['include','fail']):
+        if not set(task.keys()).isdisjoint(['include','fail']):
             return False
 
         # Task should have tags
-        if not block.has_key('tags'):
+        if not task.has_key('tags'):
               return True
 
         return False
