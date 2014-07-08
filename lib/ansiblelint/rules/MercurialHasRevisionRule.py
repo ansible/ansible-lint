@@ -10,6 +10,5 @@ class MercurialHasRevisionRule(AnsibleLintRule):
     tags = ['repeatability']
 
 
-    def match(self, file, line):
-        (module, args, kwargs) = ansiblelint.utils.tokenize(line)
-        return (module == 'hg' and kwargs.get('revision', 'default') == 'default')
+    def matchtask(self, file, task):
+        return task['action']['module'] == 'hg' and task['action'].get('revision', 'default') == 'default')
