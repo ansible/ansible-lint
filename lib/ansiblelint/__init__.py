@@ -69,7 +69,7 @@ class RulesCollection(object):
     def run(self, playbookfile, tags=set(), skip_tags=set()):
         text = ""
         matches = list()
-        with open(playbookfile['path'], 'r') as f:
+        with open(playbookfile['path'], 'Ur') as f:
             text = f.read()
         for rule in self.rules:
             if not tags or not set(rule.tags).isdisjoint(tags):
