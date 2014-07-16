@@ -11,4 +11,4 @@ class MercurialHasRevisionRule(AnsibleLintRule):
 
 
     def matchtask(self, file, task):
-        return task['action']['module'] == 'hg' and task['action'].get('revision', 'default') == 'default')
+        return task['action']['module'] == 'hg' and task['action'].get('revision', 'default') == 'default'
