@@ -48,6 +48,18 @@ class AnsibleLintRule(object):
                                    file['path'], self, message))
         return matches
 
+    def matchyaml(self, file, text):
+        matches = []
+        yaml = ansible.utils.parse_yaml(text)
+        if yaml and hasattr(self, 'matchplay'):
+            for play in yaml:
+                result = self.matchplay(file, play)
+                if result:
+                    (section, message) = result
+                    matches.append(Match(0, section,
+                        file['path'], self, message))
+        return matches
+
 
 class RulesCollection(object):
 
@@ -76,6 +88,7 @@ class RulesCollection(object):
                 if set(rule.tags).isdisjoint(skip_tags):
                     matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchtasks(playbookfile, text))
+                    matches.extend(rule.matchyaml(playbookfile, text))
 
         return matches
 

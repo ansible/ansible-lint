@@ -185,9 +185,8 @@ def get_action_tasks(yaml, file):
         tasks = yaml
     else:
         for block in yaml:
-            if 'tasks' in block:
-                tasks.extend(block.get('tasks'))
-            if 'handlers' in block:
-                tasks.extend(block.get('handlers'))
+            for section in ['tasks', 'handlers', 'pre_tasks', 'post_tasks']:
+                if section in block:
+                    tasks.extend(block.get(section))
     return [normalize_task(task) for task in tasks
             if 'include' not in task.keys()]
