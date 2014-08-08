@@ -100,10 +100,10 @@ class RulesCollection(object):
         tags = defaultdict(list)
         for rule in self.rules:
             for tag in rule.tags:
-                tags[tag].append("[{}]".format(rule.id))
+                tags[tag].append("[{0}]".format(rule.id))
         results = []
         for tag in sorted(tags):
-            results.append("{} {}".format(tag, tags[tag]))
+            results.append("{0} {1}".format(tag, tags[tag]))
         return "\n".join(results)
 
     @classmethod
@@ -123,7 +123,7 @@ class Match:
         self.message = message or rule.shortdesc
 
     def __repr__(self):
-        formatstr = "[{}] ({}) matched {}:{} {}"
+        formatstr = "[{0}] ({1}) matched {2}:{3} {4}"
         return formatstr.format(self.rule.id, self.message,
                                 self.filename, self.linenumber, self.line)
 

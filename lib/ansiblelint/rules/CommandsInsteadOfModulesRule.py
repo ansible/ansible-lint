@@ -20,5 +20,5 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         if task["action"]["module"] in self._commands:
             executable = os.path.basename(task["action"]["args"][0])
             if self._modules.has_key(executable):
-                message = "{} used in place of {} module"
+                message = "{0} used in place of {1} module"
                 return message.format(executable, self._modules[executable])

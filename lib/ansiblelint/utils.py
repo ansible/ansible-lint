@@ -176,7 +176,7 @@ def task_to_str(task):
     action = task.get("action")
     args = " ".join(["k=v" for (k, v) in action.items() if k != "args"] +
                     action["args"])
-    return "{} {}".format(action["module"], args)
+    return "{0} {1}".format(action["module"], args)
 
 
 def get_action_tasks(yaml, file):
