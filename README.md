@@ -16,6 +16,7 @@ From source:
 ```
 git clone https://github.com/willthames/ansible-lint
 export PYTHONPATH=$PYTHONPATH:`pwd`/ansible-lint/lib
+export PATH=$PATH:`pwd`/ansible-lint/bin
 ```
 
 Usage
