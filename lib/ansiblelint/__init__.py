@@ -38,14 +38,15 @@ class AnsibleLintRule(object):
         yaml = ansible.utils.parse_yaml(text)
         if yaml:
             for task in utils.get_action_tasks(yaml, file):
-                result = self.matchtask(file, task)
-                if result:
-                    message = None
-                    if isinstance(result, str):
-                        message = result
-                    taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-                    matches.append(Match(0, taskstr,
-                                   file['path'], self, message))
+                if 'action' in task:
+                    result = self.matchtask(file, task)
+                    if result:
+                        message = None
+                        if isinstance(result, str):
+                            message = result
+                        taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
+                        matches.append(Match(0, taskstr,
+                                    file['path'], self, message))
         return matches
 
     def matchyaml(self, file, text):
@@ -132,19 +133,21 @@ class Runner:
 
     def __init__(self, rules, playbooks, tags, skip_tags):
         self.rules = rules
-        self.playbooks = playbooks
+        self.playbooks = set()
+        for pb in playbooks:
+            self.playbooks.add((pb, 'playbook'))
         self.tags = tags
         self.skip_tags = skip_tags
 
     def run(self):
         files = list()
         for playbook in self.playbooks:
-            files.append({'path': playbook, 'type': 'playbooks'})
+            files.append({'path': playbook[0], 'type': playbook[1]})
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
                 for file in utils.find_children(arg):
-                    self.playbooks.add(file['path'])
+                    self.playbooks.add((file['path'], file['type']))
                     files.append(file)
                 visited.add(arg)
 
