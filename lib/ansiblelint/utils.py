@@ -2,6 +2,7 @@ import os
 import glob
 import imp
 import ansible.utils
+import shlex
 from ansible.playbook.task import Task
 
 
@@ -53,24 +54,27 @@ def _playbook_items(pb_data):
 
 
 def find_children(playbook):
-    if not os.path.exists(playbook):
+    if not os.path.exists(playbook[0]):
         return []
     results = []
-    basedir = os.path.dirname(playbook)
-    pb_data = ansible.utils.parse_yaml_from_file(playbook)
+    basedir = os.path.dirname(playbook[0])
+    pb_data = ansible.utils.parse_yaml_from_file(playbook[0])
     items = _playbook_items(pb_data)
-    for item in _playbook_items(pb_data):
-        for child in play_children(basedir, item):
+    for item in items:
+        for child in play_children(basedir, item, playbook[1]):
+            path = shlex.split(child['path'])[0]  # strip tags=smsng
             results.append({
-                'path': ansible.utils.path_dwim(basedir, child['path']),
+                'path': ansible.utils.path_dwim(basedir, path),
                 'type': child['type']
             })
     return results
 
 
-def play_children(basedir, item):
+def play_children(basedir, item, parent_type):
     delegate_map = {
         'tasks': _taskshandlers_children,
+        'pre_tasks': _taskshandlers_children,
+        'post_tasks': _taskshandlers_children,
         'include': _include_children,
         'roles': _roles_children,
         'dependencies': _roles_children,
@@ -78,22 +82,22 @@ def play_children(basedir, item):
     }
     (k, v) = item
     if k in delegate_map:
-        return delegate_map[k](basedir, k, v)
-    else:
-        return []
+        if v:
+            return delegate_map[k](basedir, k, v, parent_type)
+    return []
 
 
-def _include_children(basedir, k, v):
-    return [{'path': ansible.utils.path_dwim(basedir, v), 'type': 'playbook'}]
+def _include_children(basedir, k, v, parent_type):
+    return [{'path': ansible.utils.path_dwim(basedir, v), 'type': parent_type}]
 
 
-def _taskshandlers_children(basedir, k, v):
+def _taskshandlers_children(basedir, k, v, parent_type):
     return [{'path': ansible.utils.path_dwim(basedir, th['include']),
              'type': 'tasks'}
-            for th in v if 'include' in th.items()]
+            for th in v if 'include' in th]
 
 
-def _roles_children(basedir, k, v):
+def _roles_children(basedir, k, v, parent_type):
     results = []
     for role in v:
         if isinstance(role, dict):
