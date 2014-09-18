@@ -1,1 +1,1 @@
-__all__ = [ 'UnsetVariableMatcherRule', 'EMatcherRule' ]
+__all__ = ['UnsetVariableMatcherRule', 'EMatcherRule']
