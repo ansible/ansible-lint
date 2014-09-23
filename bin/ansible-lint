@@ -28,8 +28,7 @@ import errno
 import os
 import sys
 import optparse
-
-VERSION = ansiblelint.__version__
+from ansiblelint.version import __version__
 
 
 def main(args):
@@ -37,7 +36,7 @@ def main(args):
     formatter = formatters.Formatter()
 
     parser = optparse.OptionParser("%prog playbook.yml",
-                                   version="%prog " + VERSION)
+                                   version="%prog " + __version__)
 
     rulesdirs = [os.path.join(os.path.dirname(utils.__file__), 'rules')]
 

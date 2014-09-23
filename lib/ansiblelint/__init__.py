@@ -24,8 +24,6 @@ import os
 import ansiblelint.utils
 import ansible.utils
 
-__version__ = '1.0.0'
-
 
 class AnsibleLintRule(object):
 
