@@ -20,4 +20,5 @@ setup(
     install_requires=['ansible'],
     scripts=['bin/ansible-lint'],
     license='MIT',
+    include_package_date=True,
 )
