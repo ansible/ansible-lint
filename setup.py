@@ -19,4 +19,5 @@ setup(
     zip_safe=False,
     install_requires=['ansible'],
     scripts=['bin/ansible-lint'],
+    license='MIT',
 )
