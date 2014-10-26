@@ -38,17 +38,12 @@ def main(args):
     parser = optparse.OptionParser("%prog playbook.yml",
                                    version="%prog " + __version__)
 
-    rulesdirs = [os.path.join(os.path.dirname(utils.__file__), 'rules')]
-
-    def add_rules_dir(option, opt_str, value, parser):
-        rulesdirs.append(value)
-
     parser.add_option('-L', dest='listrules', default=False,
                       action='store_true', help="list all the rules")
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
                       help="quieter, although not silent output")
-    parser.add_option('-r', action='callback', dest='rulesdir',
-                      callback=add_rules_dir, type='str',
+    parser.add_option('-r', action='append', dest='rulesdir',
+                      default=[], type='str',
                       help="add one or more rules directories using " +
                       "one or more -r arguments. The default rules " +
                       "directory is always included")
@@ -67,6 +62,8 @@ def main(args):
     if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
         return 1
+
+    rulesdirs = options.rulesdir or [os.path.join(os.path.dirname(utils.__file__), 'rules')]
 
     rules = RulesCollection()
     for rulesdir in rulesdirs:
