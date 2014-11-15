@@ -58,6 +58,8 @@ def tokenize(line):
     for arg in tokens[1:]:
         if "=" in arg:
             kv = arg.split("=", 1)
+            if kv[0] == 'args':
+                kv[0] = 'task_args'
             kwargs[kv[0]] = kv[1]
         else:
             args.append(arg)
