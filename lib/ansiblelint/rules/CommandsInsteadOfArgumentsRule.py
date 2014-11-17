@@ -37,7 +37,7 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
 
     def matchtask(self, file, task):
         if task["action"]["module"] in self._commands:
-            executable = os.path.basename(task["action"]["args"][0])
+            executable = os.path.basename(task["action"]["module_arguments"][0])
             if executable in self._arguments:
                 message = "{0} used in place of argument {1} to file module"
                 return message.format(executable, self._arguments[executable])

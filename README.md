@@ -9,7 +9,7 @@ Setup
 
 Using pip:
 ```
-pip install https://github.com/willthames/ansible-lint/archive/master.zip
+pip install ansible-lint
 ```
 
 From source:
@@ -47,15 +47,15 @@ Each rule definition should have the following:
 * Description: Behaviour the rule is looking for
 * Tags: one or more tags that may be used to include or exclude the rule
 * At least one of the following methods:
-  * ```match``` that takes a line and returns ```None``` or ```False``` if
-  the line doesn't match the test and ```True``` or a custom message (this
+  * `match` that takes a line and returns `None` or `False` if
+  the line doesn't match the test and `True` or a custom message (this
   allows one rule to test multiple behaviours - see e.g. the
   CommandsInsteadOfModulesRule
-  * ```matchblock``` that takes the details about the file and a block.
-  It returns ```None``` or ```False``` if the line doesn't match the test
-  and ```True``` or a custom message.
+  * `matchblock` that takes the details about the file and a block.
+  It returns `None` or `False` if the line doesn't match the test
+  and `True` or a custom message.
 
-An example rule using ```match``` is:
+An example rule using `match` is:
 
 ```python
 from ansiblelint import AnsibleLintRule
@@ -73,7 +73,7 @@ class DeprecatedVariableRule(AnsibleLintRule):
         return '${' in line
 ```
 
-An example rule using ```matchtask``` is:
+An example rule using `matchtask` is:
 
 ```python
 import ansiblelint.utils
@@ -86,7 +86,7 @@ class TaskHasTag(AnsibleLintRule):
     tags = ['productivity']
 
 
-    def matchtask(self, file, block):
+    def matchtask(self, file, task):
         # If the task include another task or make the playbook fail
         # Don't force to have a tag
         if not set(task.keys()).isdisjoint(['include','fail']):
@@ -99,6 +99,12 @@ class TaskHasTag(AnsibleLintRule):
         return False
 ```
 
+The `task` argument to `matchtask` contains a number of keys - the critical one is `action`.
+The value of `task['action']` contains the module being used, and the arguments passed, both
+as key-value pairs and a list of other arguments (e.g. the command used with `shell`)
+
+In ansible-lint 2.0.0, `task['action']['args']` was renamed `task['action']['module_arguments']`
+to avoid a clash when a module actually takes `args` as a parameter key (e.g. `ec2_tag`)
 Examples
 --------
 

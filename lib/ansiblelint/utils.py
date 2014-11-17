@@ -162,7 +162,7 @@ def rolename(filepath):
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(module=command, args=args, **kwargs))
+    return (dict(module=command, module_arguments=args, **kwargs))
 
 
 def normalize_task(task):
@@ -175,7 +175,7 @@ def normalize_task(task):
             if k == 'local_action' or k == 'action':
                 if not isinstance(v, dict):
                     v = _kv_to_dict(v)
-                v['args'] = v.get('args', list())
+                v['module_arguments'] = v.get('module_arguments', list())
                 result['action'] = v
             else:
                 result[k] = v
@@ -190,7 +190,7 @@ def normalize_task(task):
                 else:
                     # Should not get here!
                     assert False
-            v['args'] = v.get('args', list())
+            v['module_arguments'] = v.get('module_arguments', list())
             result['action'] = v
     return result
 
@@ -200,8 +200,8 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " ".join(["k=v" for (k, v) in action.items() if k != "args"] +
-                    action["args"])
+    args = " ".join(["k=v" for (k, v) in action.items() if k != "module_arguments"] +
+                    action.get("module_arguments"))
     return "{0} {1}".format(action["module"], args)
 
 
