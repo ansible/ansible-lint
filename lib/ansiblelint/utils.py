@@ -182,6 +182,8 @@ def normalize_task(task):
         else:
             if isinstance(v, str):
                 v = _kv_to_dict(k + ' ' + v)
+            elif not v:
+                v = dict(module=k)
             else:
                 if isinstance(v, dict):
                     v.update(dict(module=k))
@@ -211,6 +213,7 @@ def get_action_tasks(yaml, file):
         for block in yaml:
             for section in ['tasks', 'handlers', 'pre_tasks', 'post_tasks']:
                 if section in block:
-                    tasks.extend(block.get(section))
+                    block_tasks = block.get(section) or []
+                    tasks.extend(block_tasks)
     return [normalize_task(task) for task in tasks
             if 'include' not in task.keys()]
