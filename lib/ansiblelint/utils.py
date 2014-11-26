@@ -21,8 +21,8 @@
 import os
 import glob
 import imp
-import ansible.utils
 import shlex
+import ansible.utils
 from ansible.playbook.task import Task
 
 

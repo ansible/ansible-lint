@@ -21,9 +21,6 @@
 from collections import defaultdict
 import os
 
-import ansiblelint.utils
-import ansible.utils
-
 
 class AnsibleLintRule(object):
 
@@ -54,6 +51,9 @@ class AnsibleLintRule(object):
         return []
 
     def matchtasks(self, file, text):
+        import ansiblelint.utils
+        import ansible.utils
+
         matches = []
         yaml = ansible.utils.parse_yaml(text)
         if yaml:
@@ -70,6 +70,8 @@ class AnsibleLintRule(object):
         return matches
 
     def matchyaml(self, file, text):
+        import ansible.utils
+
         matches = []
         yaml = ansible.utils.parse_yaml(text)
         if yaml and hasattr(self, 'matchplay'):
@@ -129,6 +131,8 @@ class RulesCollection(object):
 
     @classmethod
     def create_from_directory(cls, rulesdir):
+        import ansiblelint.utils
+
         result = cls()
         result.rules = utils.load_plugins(os.path.expanduser(rulesdir))
         return result
@@ -160,6 +164,8 @@ class Runner:
         self.skip_tags = skip_tags
 
     def run(self):
+        import ansiblelint.utils
+
         files = list()
         for playbook in self.playbooks:
             files.append({'path': playbook[0], 'type': playbook[1]})
