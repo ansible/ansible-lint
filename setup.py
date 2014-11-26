@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 sys.path.insert(0, os.path.abspath('lib'))
 
-from ansiblelint.version import __version__
+execfile('lib/ansiblelint/version.py')
 
 setup(
     name='ansible-lint',
