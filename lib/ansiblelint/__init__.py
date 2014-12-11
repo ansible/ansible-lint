@@ -31,7 +31,7 @@ class AnsibleLintRule(object):
         return self.id + ": " + self.shortdesc
 
     def verbose(self):
-        return self.id + ": " + self.shortdesc + "\n" + self.description
+        return self.id + ": " + self.shortdesc + "\n  " + self.description
 
     def match(self, file="", line=""):
         return []
