@@ -58,6 +58,8 @@ class AnsibleLintRule(object):
         yaml = ansible.utils.parse_yaml(text)
         if yaml:
             for task in utils.get_action_tasks(yaml, file):
+                if 'skip_ansible_lint' in task.get('tags', []):
+                    continue
                 if 'action' in task:
                     result = self.matchtask(file, task)
                     if result:
