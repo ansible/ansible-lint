@@ -1,0 +1,36 @@
+---
+- hosts: all
+
+  tasks:
+
+    - name: test ANSIBLE0004
+      action: git
+
+    - name: test ANSIBLE0005
+      action: hg
+
+    - name: test ANSIBLE0006
+      command: git log
+
+    - name: test ANSIBLE0007
+      command: chmod 644 A
+
+    - name: test ANSIBLE0004 (skip)
+      action: git
+      tags:
+        - skip_ansible_lint
+
+    - name: test ANSIBLE0005 (skip)
+      action: hg
+      tags:
+        - skip_ansible_lint
+
+    - name: test ANSIBLE0006 (skip)
+      command: git log
+      tags:
+        - skip_ansible_lint
+
+    - name: test ANSIBLE0007 (skip)
+      command: chmod 644 A
+      tags:
+        - skip_ansible_lint
