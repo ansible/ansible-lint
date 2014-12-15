@@ -36,8 +36,6 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
                   'rmdir': 'state=absent', 'rm': 'state=absent'}
 
     def matchtask(self, file, task):
-        if "skip_ansible_lint" in task.get("tags", []):
-            return
         if task["action"]["module"] in self._commands:
             executable = os.path.basename(task["action"]["module_arguments"][0])
             if executable in self._arguments:
