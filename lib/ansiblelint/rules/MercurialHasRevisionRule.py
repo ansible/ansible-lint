@@ -31,4 +31,6 @@ class MercurialHasRevisionRule(AnsibleLintRule):
     tags = ['repeatability']
 
     def matchtask(self, file, task):
+        if "skip_ansible_lint" in task.get("tags", []):
+            return
         return task['action']['module'] == 'hg' and task['action'].get('revision', 'default') == 'default'
