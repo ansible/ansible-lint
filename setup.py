@@ -17,7 +17,7 @@ setup(
     package_dir={'': 'lib'},
     packages=find_packages('lib'),
     zip_safe=False,
-    install_requires=['ansible'],
+    install_requires=['ansible', 'pyyaml'],
     scripts=['bin/ansible-lint'],
     license='MIT',
     include_package_date=True,
