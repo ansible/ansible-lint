@@ -44,6 +44,9 @@ def main(args):
                       action='store_true', help="list all the rules")
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
                       help="quieter, although not silent output")
+    parser.add_option('-p', dest='parseable',
+                      default=False, action='store_true',
+                      help="parseable output in the format of pep8")
     parser.add_option('-r', action='append', dest='rulesdir',
                       default=[], type='str',
                       help="add one or more rules directories using "
@@ -61,6 +64,9 @@ def main(args):
 
     if options.quiet:
         formatter = formatters.QuietFormatter()
+
+    if options.parseable:
+        formatter = formatters.ParseableFormatter()
 
     if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
