@@ -39,6 +39,11 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     def matchtask(self, file, task):
         if task["action"]["module"] in self._commands:
             executable = os.path.basename(task["action"]["module_arguments"][0])
+
+            # At this point, there is no equivalent of apt-get build-dep
+            if executable == 'apt-get' and task["action"]["module_arguments"][1] == 'build-dep':
+                return False
+
             if executable in self._modules:
                 message = "{0} used in place of {1} module"
                 return message.format(executable, self._modules[executable])
