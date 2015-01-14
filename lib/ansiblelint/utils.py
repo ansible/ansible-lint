@@ -82,6 +82,8 @@ def find_children(playbook):
     items = _playbook_items(pb_data)
     for item in items:
         for child in play_children(basedir, item, playbook[1]):
+            if ansible.utils.contains_vars(child['path']):
+                continue
             path = shlex.split(child['path'])[0]  # strip tags=smsng
             results.append({
                 'path': ansible.utils.path_dwim(basedir, path),

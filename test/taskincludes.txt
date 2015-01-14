@@ -2,3 +2,4 @@
 - hosts: webservers
   tasks:
     - include: nestedincludes.txt tags=nested
+    - include: "{{ name }}.txt"
