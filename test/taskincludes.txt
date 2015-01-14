@@ -1,5 +1,8 @@
 ---
 - hosts: webservers
+  vars:
+    varset: varset
   tasks:
     - include: nestedincludes.txt tags=nested
-    - include: "{{ name }}.txt"
+    - include: "{{ varnotset }}.txt"
+    - include: "{{ varset }}.txt"
