@@ -24,7 +24,11 @@ import imp
 import ansible.utils
 import shlex
 from ansible.playbook.task import Task
+import yaml
+from yaml.composer import Composer
+from yaml.constructor import Constructor
 
+LINE_NUMBER_KEY = '__line__'
 
 def load_plugins(directory):
     result = []
@@ -190,8 +194,14 @@ def normalize_task(task):
                 if isinstance(v, dict):
                     v.update(dict(module=k))
                 else:
-                    # Should not get here!
-                    assert False
+                    if k == '__line__':
+                        # Keep the line number stored
+                        result[k] = v
+                        continue
+
+                    else:
+                        # Should not get here!
+                        assert False
             v['module_arguments'] = v.get('module_arguments', list())
             result['action'] = v
     return result
@@ -219,3 +229,26 @@ def get_action_tasks(yaml, file):
                     tasks.extend(block_tasks)
     return [normalize_task(task) for task in tasks
             if 'include' not in task.keys()]
+
+def parse_yaml_linenumbers(data):
+    """Parses yaml as ansible.utils.parse_yaml but with linenumbers.
+
+    The line numbers are stored in each node's LINE_NUMBER_KEY key"""
+    loader = yaml.Loader(data)
+
+    def compose_node(parent, index):
+        # the line number where the previous token has ended (plus empty lines)
+        line = loader.line
+        node = Composer.compose_node(loader, parent, index)
+        node.__line__ = line + 1
+        return node
+
+    def construct_mapping(node, deep=False):
+        mapping = Constructor.construct_mapping(loader, node, deep=deep)
+        mapping[LINE_NUMBER_KEY] = node.__line__
+        return mapping
+
+    loader.compose_node = compose_node
+    loader.construct_mapping = construct_mapping
+    data = loader.get_single_data()
+    return data
