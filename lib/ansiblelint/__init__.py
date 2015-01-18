@@ -55,7 +55,7 @@ class AnsibleLintRule(object):
 
     def matchtasks(self, file, text):
         matches = []
-        yaml = ansible.utils.parse_yaml(text)
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml:
             for task in utils.get_action_tasks(yaml, file):
                 if 'skip_ansible_lint' in task.get('tags', []):
@@ -67,19 +67,19 @@ class AnsibleLintRule(object):
                         if isinstance(result, str):
                             message = result
                         taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-                        matches.append(Match(0, taskstr,
+                        matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], taskstr,
                                        file['path'], self, message))
         return matches
 
     def matchyaml(self, file, text):
         matches = []
-        yaml = ansible.utils.parse_yaml(text)
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml and hasattr(self, 'matchplay'):
             for play in yaml:
                 result = self.matchplay(file, play)
                 if result:
                     (section, message) = result
-                    matches.append(Match(0, section,
+                    matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY], section,
                                    file['path'], self, message))
         return matches
 
