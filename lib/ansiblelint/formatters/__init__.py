@@ -20,7 +20,7 @@ class QuietFormatter:
 class ParseableFormatter:
 
     def format(self, match):
-        formatstr = "{0}:{1}: {2} {3}"
+        formatstr = "{0}:{1}: [{2}] {3}"
         return formatstr.format(match.filename,
                                 match.linenumber,
                                 match.rule.id,
