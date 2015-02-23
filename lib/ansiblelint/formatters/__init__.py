@@ -15,3 +15,14 @@ class QuietFormatter:
         formatstr = "[{0}] {1}:{2}"
         return formatstr.format(match.rule.id, match.filename,
                                 match.linenumber)
+
+
+class ParseableFormatter:
+
+    def format(self, match):
+        formatstr = "{0}:{1}: {2} {3}"
+        return formatstr.format(match.filename,
+                                match.linenumber,
+                                match.rule.id,
+                                match.message,
+                                )
