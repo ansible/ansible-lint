@@ -142,7 +142,8 @@ def _rolepath(basedir, role):
         ansible.utils.path_dwim(basedir, os.path.join('roles', role)),
         ansible.utils.path_dwim(basedir, role),
         # if included from roles/meta/main.yml
-        ansible.utils.path_dwim(basedir, os.path.join('..', '..', 'roles', role))
+        ansible.utils.path_dwim(basedir,
+                                os.path.join('..', '..', 'roles', role))
     ]
 
     if C.DEFAULT_ROLES_PATH:
