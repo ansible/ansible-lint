@@ -22,7 +22,6 @@ from collections import defaultdict
 import os
 
 import ansiblelint.utils
-import ansible.utils
 
 
 class AnsibleLintRule(object):
@@ -57,7 +56,7 @@ class AnsibleLintRule(object):
         matches = []
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml:
-            for task in utils.get_action_tasks(yaml, file):
+            for task in ansiblelint.utils.get_action_tasks(yaml, file):
                 if 'skip_ansible_lint' in task.get('tags', []):
                     continue
                 if 'action' in task:
@@ -132,7 +131,7 @@ class RulesCollection(object):
     @classmethod
     def create_from_directory(cls, rulesdir):
         result = cls()
-        result.rules = utils.load_plugins(os.path.expanduser(rulesdir))
+        result.rules = ansiblelint.utils.load_plugins(os.path.expanduser(rulesdir))
         return result
 
 
@@ -168,7 +167,7 @@ class Runner:
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
-                for file in utils.find_children(arg):
+                for file in ansiblelint.utils.find_children(arg):
                     self.playbooks.add((file['path'], file['type']))
                     files.append(file)
                 visited.add(arg)
