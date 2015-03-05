@@ -30,7 +30,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
                   'is generally a bad idea'
     tags = ['resources']
 
-    _commands = ['command', 'shell', 'raw']
+    _commands = ['command', 'shell']
     _modules = {'git': 'git', 'hg': 'hg', 'curl': 'get_url', 'wget': 'get_url',
                 'svn': 'subversion', 'cp': 'copy', 'service': 'service',
                 'mount': 'mount', 'rpm': 'yum', 'yum': 'yum', 'apt-get': 'apt-get',
