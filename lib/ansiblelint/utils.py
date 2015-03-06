@@ -186,7 +186,7 @@ def normalize_task(task):
             else:
                 result[k] = v
         else:
-            if isinstance(v, str):
+            if isinstance(v, basestring):
                 v = _kv_to_dict(k + ' ' + v)
             elif not v:
                 v = dict(module=k)
