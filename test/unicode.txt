@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  connection: local
+
+  tasks:
+  - name: bonjour, ça va?
+    file: state=touch dest=/tmp/naïve.txt

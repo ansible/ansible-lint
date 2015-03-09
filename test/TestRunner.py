@@ -35,3 +35,8 @@ class TestRule(unittest.TestCase):
         filename = 'test/nomatchestest.txt'
         runner = ansiblelint.Runner(self.rules, {filename}, [], [])
         assert (len(runner.run()) == 0)
+
+    def test_unicode_runner_count(self):
+        filename = 'test/unicode.txt'
+        runner = ansiblelint.Runner(self.rules, {filename}, [], [])
+        assert (len(runner.run()) == 0)
