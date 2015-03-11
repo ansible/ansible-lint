@@ -24,6 +24,7 @@ import imp
 import ansible.utils
 import shlex
 from ansible.playbook.task import Task
+import ansible.constants as C
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
@@ -134,18 +135,29 @@ def _roles_children(basedir, k, v, parent_type):
 
 
 def _rolepath(basedir, role):
-    if os.path.isabs(role):
-        return role
-    # if included from a playbook
-    pbrolepath = ansible.utils.path_dwim(basedir, os.path.join('roles', role))
-    if os.path.exists(pbrolepath):
-        return pbrolepath
-    # if included from roles/meta/main.yml
-    gpdir = os.path.normpath(os.path.join(basedir, '..', '..'))
-    if os.path.basename(gpdir) == 'roles':
-        rolepath = os.path.join(gpdir, role)
-        return rolepath
-    return basedir
+    role_path = None
+
+    possible_paths = [
+        # if included from a playbook
+        ansible.utils.path_dwim(basedir, os.path.join('roles', role)),
+        ansible.utils.path_dwim(basedir, role),
+        # if included from roles/meta/main.yml
+        ansible.utils.path_dwim(basedir,
+                                os.path.join('..', '..', 'roles', role))
+    ]
+
+    if C.DEFAULT_ROLES_PATH:
+        search_locations = C.DEFAULT_ROLES_PATH.split(os.pathsep)
+        for loc in search_locations:
+            loc = os.path.expanduser(loc)
+            possible_paths.append(ansible.utils.path_dwim(loc, role))
+
+    for path_option in possible_paths:
+        if os.path.isdir(path_option):
+            role_path = path_option
+            break
+
+    return role_path
 
 
 def _look_for_role_files(basedir, role):
