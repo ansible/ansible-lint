@@ -105,6 +105,7 @@ class RulesCollection(object):
         matches = list()
         with open(playbookfile['path'], 'Ur') as f:
             text = f.read()
+        text = text.replace('|\n', '')
         for rule in self.rules:
             if not tags or not set(rule.tags).isdisjoint(tags):
                 if set(rule.tags).isdisjoint(skip_tags):
