@@ -31,6 +31,7 @@ from yaml.constructor import Constructor
 
 LINE_NUMBER_KEY = '__line__'
 
+
 def load_plugins(directory):
     result = []
     fh = None
@@ -164,9 +165,11 @@ def _rolepath(basedir, role):
 def _look_for_role_files(basedir, role):
     results = []
     for th in ['tasks', 'handlers', 'meta']:
-        thpath = os.path.join(_rolepath(basedir, role), th, 'main.yml')
-        if os.path.exists(thpath):
-            results.append({'path': thpath, 'type': th})
+        role_path = _rolepath(basedir, role)
+        if role_path:
+            thpath = os.path.join(role_path, th, 'main.yml')
+            if os.path.exists(thpath):
+                results.append({'path': thpath, 'type': th})
     return results
 
 
@@ -242,6 +245,7 @@ def get_action_tasks(yaml, file):
                     tasks.extend(block_tasks)
     return [normalize_task(task) for task in tasks
             if 'include' not in task.keys()]
+
 
 def parse_yaml_linenumbers(data):
     """Parses yaml as ansible.utils.parse_yaml but with linenumbers.
