@@ -72,6 +72,9 @@ def main(args):
         parser.print_help(file=sys.stderr)
         return 1
 
+    if 'legacy' not in options.tags:
+        options.skip_tags.append('legacy')
+
     rulesdirs = options.rulesdir or default_rulesdir
 
     rules = RulesCollection()

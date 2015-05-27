@@ -27,7 +27,7 @@ class DeprecatedTemplateBracketsRule(AnsibleLintRule):
     description = 'Checks for old style ${var} ' + \
                   'rather than {{var}}'
 
-    tags = ['deprecation']
+    tags = ['deprecation', 'legacy']
 
     def match(self, file, line):
         return "${" in line
