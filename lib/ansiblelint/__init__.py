@@ -32,54 +32,54 @@ class AnsibleLintRule(object):
     def verbose(self):
         return self.id + ": " + self.shortdesc + "\n  " + self.description
 
-    def match(self, file="", line=""):
+    def match(self, playbookfile="", line=""):
         return []
 
-    def matchlines(self, file, text):
+    def matchlines(self, playbookfile, text):
         matches = []
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(text.split("\n")):
-            result = self.match(file, line)
+            result = self.match(playbookfile, line)
             if result:
                 message = None
                 if isinstance(result, str):
                     message = result
                 matches.append(Match(prev_line_no+1, line,
-                               file['path'], self, message))
+                               playbookfile['path'], self, message))
         return matches
 
-    def matchtask(self, file="", task=None):
+    def matchtask(self, playbookfile="", task=None):
         return []
 
-    def matchtasks(self, file, text):
+    def matchtasks(self, playbookfile, text):
         matches = []
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml:
-            for task in ansiblelint.utils.get_action_tasks(yaml, file):
+            for task in ansiblelint.utils.get_action_tasks(yaml, playbookfile):
                 if 'skip_ansible_lint' in task.get('tags', []):
                     continue
                 if 'action' in task:
-                    result = self.matchtask(file, task)
+                    result = self.matchtask(playbookfile, task)
                     if result:
                         message = None
                         if isinstance(result, str):
                             message = result
                         taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
                         matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], taskstr,
-                                       file['path'], self, message))
+                                       playbookfile['path'], self, message))
         return matches
 
-    def matchyaml(self, file, text):
+    def matchyaml(self, playbookfile, text):
         matches = []
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml and hasattr(self, 'matchplay'):
             for play in yaml:
-                result = self.matchplay(file, play)
+                result = self.matchplay(playbookfile, play)
                 if result:
                     (section, message) = result
                     matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY], section,
-                                   file['path'], self, message))
+                                   playbookfile['path'], self, message))
         return matches
 
 
@@ -135,7 +135,7 @@ class RulesCollection(object):
         return result
 
 
-class Match:
+class Match(object):
 
     def __init__(self, linenumber, line, filename, rule, message=None):
         self.linenumber = linenumber
@@ -150,7 +150,7 @@ class Match:
                                 self.filename, self.linenumber, self.line)
 
 
-class Runner:
+class Runner(object):
 
     def __init__(self, rules, playbooks, tags, skip_tags):
         self.rules = rules
@@ -161,20 +161,20 @@ class Runner:
         self.skip_tags = skip_tags
 
     def run(self):
-        files = list()
+        playbookfiles = list()
         for playbook in self.playbooks:
-            files.append({'path': playbook[0], 'type': playbook[1]})
+            playbookfiles.append({'path': playbook[0], 'type': playbook[1]})
         visited = set()
-        while (visited != self.playbooks):
+        while visited != self.playbooks:
             for arg in self.playbooks - visited:
-                for file in ansiblelint.utils.find_children(arg):
-                    self.playbooks.add((file['path'], file['type']))
-                    files.append(file)
+                for playbookfile in ansiblelint.utils.find_children(arg):
+                    self.playbooks.add((playbookfile['path'], playbookfile['type']))
+                    playbookfiles.append(playbookfile)
                 visited.add(arg)
 
         matches = list()
-        for file in files:
-            matches.extend(self.rules.run(file, tags=set(self.tags),
+        for playbookfile in playbookfiles:
+            matches.extend(self.rules.run(playbookfile, tags=set(self.tags),
                            skip_tags=set(self.skip_tags)))
 
         return matches
