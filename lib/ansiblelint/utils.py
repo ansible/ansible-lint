@@ -22,9 +22,9 @@ import os
 import glob
 import imp
 import ansible.utils
-import shlex
 from ansible.playbook.task import Task
 import ansible.constants as C
+from ansible.module_utils.splitter import split_args
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
@@ -90,7 +90,12 @@ def find_children(playbook):
         for child in play_children(basedir, item, playbook[1]):
             if "$" in child['path'] or "{{" in child['path']:
                 continue
-            path = shlex.split(child['path'])[0]  # strip tags=smsng
+            valid_tokens = list()
+            for token in split_args(child['path']):
+                if '=' in token:
+                    break
+                valid_tokens.append(token)
+            path = ' '.join(valid_tokens)
             results.append({
                 'path': ansible.utils.path_dwim(basedir, path),
                 'type': child['type']
