@@ -6,3 +6,4 @@
     - include: nestedincludes.txt tags=nested
     - include: "{{ varnotset }}.txt"
     - include: "{{ varset }}.txt"
+    - include: "directory with spaces/main.txt"
