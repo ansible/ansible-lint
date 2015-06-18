@@ -151,6 +151,8 @@ def _rolepath(basedir, role):
         ansible.utils.path_dwim(
             basedir, os.path.join('..', '..', '..', 'roles', role)
         ),
+        ansible.utils.path_dwim(basedir,
+                                os.path.join('..', '..', role))
     ]
 
     if C.DEFAULT_ROLES_PATH:
