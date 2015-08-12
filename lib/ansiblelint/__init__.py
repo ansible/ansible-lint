@@ -135,7 +135,7 @@ class RulesCollection(object):
         return result
 
 
-class Match:
+class Match(object):
 
     def __init__(self, linenumber, line, filename, rule, message=None):
         self.linenumber = linenumber
@@ -150,7 +150,7 @@ class Match:
                                 self.filename, self.linenumber, self.line)
 
 
-class Runner:
+class Runner(object):
 
     def __init__(self, rules, playbooks, tags, skip_tags):
         self.rules = rules

@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 import os
+
 from ansiblelint import AnsibleLintRule
 
 

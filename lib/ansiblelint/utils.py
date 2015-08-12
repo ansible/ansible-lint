@@ -18,16 +18,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import os
 import glob
 import imp
-import ansible.utils
-from ansible.playbook.task import Task
-import ansible.constants as C
-from ansible.module_utils.splitter import split_args
+import os
+
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
+
+import ansible.constants as C
+from ansible.module_utils.splitter import split_args
+from ansible.playbook.task import Task
+import ansible.utils
+
 
 LINE_NUMBER_KEY = '__line__'
 
@@ -51,7 +54,6 @@ def load_plugins(directory):
 
 
 def tokenize(line):
-    result = list()
     tokens = line.lstrip().split(" ")
     if tokens[0] == '-':
         tokens = tokens[1:]
@@ -195,8 +197,11 @@ def _kv_to_dict(v):
 
 
 def normalize_task(task):
-    ''' ensures that all tasks have an action key
-        and that string values are converted to python objects '''
+    """Normalize task action key and values.
+
+    Ensures that all tasks have an action key and that string values are
+    converted to python objects.
+    """
 
     result = dict()
     for (k, v) in task.items():
@@ -259,7 +264,8 @@ def get_action_tasks(yaml, file):
 def parse_yaml_linenumbers(data):
     """Parses yaml as ansible.utils.parse_yaml but with linenumbers.
 
-    The line numbers are stored in each node's LINE_NUMBER_KEY key"""
+    The line numbers are stored in each node's LINE_NUMBER_KEY key.
+    """
     loader = yaml.Loader(data)
 
     def compose_node(parent, index):
