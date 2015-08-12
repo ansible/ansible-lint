@@ -40,7 +40,6 @@ def load_plugins(directory):
     fh = None
 
     for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
-
         pluginname = os.path.basename(pluginfile.replace('.py', ''))
         try:
             fh, filename, desc = imp.find_module(pluginname, [directory])
@@ -61,7 +60,7 @@ def tokenize(line):
         tokens = tokens[1:]
     command = tokens[0].replace(":", "")
 
-    args = list()
+    args = []
     kwargs = dict()
     for arg in tokens[1:]:
         if "=" in arg:
@@ -84,6 +83,7 @@ def _playbook_items(pb_data):
 def find_children(playbook):
     if not os.path.exists(playbook[0]):
         return []
+
     results = []
     basedir = os.path.dirname(playbook[0])
     pb_data = ansible.utils.parse_yaml_from_file(playbook[0])
@@ -92,7 +92,7 @@ def find_children(playbook):
         for child in play_children(basedir, item, playbook[1]):
             if "$" in child['path'] or "{{" in child['path']:
                 continue
-            valid_tokens = list()
+            valid_tokens = []
             for token in split_args(child['path']):
                 if '=' in token:
                     break
@@ -116,9 +116,8 @@ def play_children(basedir, item, parent_type):
         'handlers': _taskshandlers_children,
     }
     (k, v) = item
-    if k in delegate_map:
-        if v:
-            return delegate_map[k](basedir, k, v, parent_type)
+    if k in delegate_map and v:
+        return delegate_map[k](basedir, k, v, parent_type)
     return []
 
 
@@ -186,14 +185,14 @@ def rolename(filepath):
     idx = filepath.find('roles/')
     if idx < 0:
         return ''
-    role = filepath[idx+6:]
+    role = filepath[idx + 6:]
     role = role[:role.find('/')]
     return role
 
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(module=command, module_arguments=args, **kwargs))
+    return dict(module=command, module_arguments=args, **kwargs)
 
 
 def normalize_task(task):
@@ -242,13 +241,13 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " ".join(["k=v" for (k, v) in action.items() if k != "module_arguments"] +
-                    action.get("module_arguments"))
+    args = " ".join(["{0}={1}".format(k, v) for (k, v) in action.items()
+                     if k != "module_arguments"] + action.get("module_arguments"))
     return "{0} {1}".format(action["module"], args)
 
 
 def get_action_tasks(yaml, file):
-    tasks = list()
+    tasks = []
     if file['type'] in ['tasks', 'handlers']:
         tasks = yaml
     else:

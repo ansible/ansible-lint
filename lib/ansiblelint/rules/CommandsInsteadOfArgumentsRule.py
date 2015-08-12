@@ -26,7 +26,7 @@ from ansiblelint import AnsibleLintRule
 class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     id = 'ANSIBLE0007'
     shortdesc = 'Using command rather than an argument to e.g. file'
-    description = 'Executing a command when there is are arguments to modules ' + \
+    description = 'Executing a command when there are arguments to modules ' + \
                   'is generally a bad idea'
     tags = ['resources']
 

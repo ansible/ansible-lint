@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 from collections import defaultdict
+import operator
 import os
 
 import ansiblelint.utils
@@ -45,7 +46,7 @@ class AnsibleLintRule(object):
                 message = None
                 if isinstance(result, str):
                     message = result
-                matches.append(Match(prev_line_no+1, line,
+                matches.append(Match(prev_line_no + 1, line,
                                file['path'], self, message))
         return matches
 
@@ -102,7 +103,7 @@ class RulesCollection(object):
 
     def run(self, playbookfile, tags=set(), skip_tags=set()):
         text = ""
-        matches = list()
+        matches = []
         with open(playbookfile['path'], 'Ur') as f:
             text = f.read()
         for rule in self.rules:
@@ -120,13 +121,12 @@ class RulesCollection(object):
 
     def listtags(self):
         tags = defaultdict(list)
+
         for rule in self.rules:
             for tag in rule.tags:
                 tags[tag].append("[{0}]".format(rule.id))
-        results = []
-        for tag in sorted(tags):
-            results.append("{0} {1}".format(tag, tags[tag]))
-        return "\n".join(results)
+
+        return "\n".join("{0} {1}".format(tag, tags[tag]) for tag in sorted(tags))
 
     @classmethod
     def create_from_directory(cls, rulesdir):
@@ -154,27 +154,22 @@ class Runner(object):
 
     def __init__(self, rules, playbooks, tags, skip_tags):
         self.rules = rules
-        self.playbooks = set()
-        for pb in playbooks:
-            self.playbooks.add((pb, 'playbook'))
+        self.playbooks = set((pb, 'playbook') for pb in playbooks)
         self.tags = tags
         self.skip_tags = skip_tags
 
     def run(self):
-        files = list()
-        for playbook in self.playbooks:
-            files.append({'path': playbook[0], 'type': playbook[1]})
+        files = [dict(zip(('path', 'type'), playbook)) for playbook in self.playbooks]
         visited = set()
-        while (visited != self.playbooks):
+        while visited != self.playbooks:
             for arg in self.playbooks - visited:
                 for file in ansiblelint.utils.find_children(arg):
                     self.playbooks.add((file['path'], file['type']))
                     files.append(file)
                 visited.add(arg)
 
-        matches = list()
-        for file in files:
-            matches.extend(self.rules.run(file, tags=set(self.tags),
-                           skip_tags=set(self.skip_tags)))
+        matches = [self.rules.run(file, tags=set(self.tags), skip_tags=set(self.skip_tags))
+                   for file in files]
+        return reduce(operator.add, matches)
 
         return matches
