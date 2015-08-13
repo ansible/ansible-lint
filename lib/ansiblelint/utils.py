@@ -224,7 +224,9 @@ def normalize_task(task):
 
                     else:
                         # Should not get here!
-                        assert False
+                        print "Was not expecting value %s of type %s for key %s" % (str(v), type(v), k)
+                        print "Task: %s" % str(task)
+                        exit(1)
             v['module_arguments'] = v.get('module_arguments', list())
             result['action'] = v
     return result
