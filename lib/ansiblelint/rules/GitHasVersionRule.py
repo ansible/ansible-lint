@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
 
 
@@ -29,5 +28,8 @@ class GitHasVersionRule(AnsibleLintRule):
                   'an explicit commit or tag, not just "latest"'
     tags = ['repeatability']
 
-    def matchtask(self, file, task):
-        return (task['action']['module'] == 'git' and task['action'].get('version', 'HEAD') == 'HEAD')
+    def matchtask(self, ansiblefile, task):
+        del ansiblefile
+
+        return (task['action']['module'] == 'git' and
+                task['action'].get('version', 'HEAD') == 'HEAD')

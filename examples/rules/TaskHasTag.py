@@ -1,12 +1,11 @@
-import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
+
 
 class TaskHasTag(AnsibleLintRule):
     id = 'EXAMPLE001'
     shortdesc = 'Tasks must have tag'
     description = 'Tasks must have tag'
     tags = ['productivity', 'tags']
-
 
     def matchtask(self, file, task):
         # The meta files don't have tags
@@ -18,12 +17,11 @@ class TaskHasTag(AnsibleLintRule):
 
         # If the task include another task or make the playbook fail
         # Don't force to have a tag
-        if not set(task.keys()).isdisjoint(['include','fail']):
+        if not set(task.keys()).isdisjoint(['include', 'fail']):
             return False
 
         # Task should have tags
-        if not task.has_key('tags'):
-              return True
+        if 'tags' not in task:
+            return True
 
         return False
-

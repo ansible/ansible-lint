@@ -28,5 +28,5 @@ class MismatchedBracketRule(AnsibleLintRule):
                   'versa then templating can fail nastily'
     tags = ['templating']
 
-    def match(self, file, line):
+    def match(self, _, line):
         return line.count("{") != line.count("}")

@@ -18,16 +18,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import os
 import glob
 import imp
-import ansible.utils
-from ansible.playbook.task import Task
-import ansible.constants as C
-from ansible.module_utils.splitter import split_args
+import os
+
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
+
+import ansible.constants as C
+from ansible.module_utils.splitter import split_args
+from ansible.playbook.task import Task
+import ansible.utils
+
 
 LINE_NUMBER_KEY = '__line__'
 
@@ -37,7 +40,6 @@ def load_plugins(directory):
     fh = None
 
     for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
-
         pluginname = os.path.basename(pluginfile.replace('.py', ''))
         try:
             fh, filename, desc = imp.find_module(pluginname, [directory])
@@ -51,7 +53,6 @@ def load_plugins(directory):
 
 
 def tokenize(line):
-    result = list()
     tokens = line.lstrip().split(" ")
     if tokens[0] == '-':
         tokens = tokens[1:]
@@ -59,7 +60,7 @@ def tokenize(line):
         tokens = tokens[1:]
     command = tokens[0].replace(":", "")
 
-    args = list()
+    args = []
     kwargs = dict()
     for arg in tokens[1:]:
         if "=" in arg:
@@ -82,6 +83,7 @@ def _playbook_items(pb_data):
 def find_children(playbook):
     if not os.path.exists(playbook[0]):
         return []
+
     results = []
     basedir = os.path.dirname(playbook[0])
     pb_data = ansible.utils.parse_yaml_from_file(playbook[0])
@@ -90,7 +92,7 @@ def find_children(playbook):
         for child in play_children(basedir, item, playbook[1]):
             if "$" in child['path'] or "{{" in child['path']:
                 continue
-            valid_tokens = list()
+            valid_tokens = []
             for token in split_args(child['path']):
                 if '=' in token:
                     break
@@ -114,23 +116,25 @@ def play_children(basedir, item, parent_type):
         'handlers': _taskshandlers_children,
     }
     (k, v) = item
-    if k in delegate_map:
-        if v:
-            return delegate_map[k](basedir, k, v, parent_type)
+    if k in delegate_map and v:
+        return delegate_map[k](basedir, k, v, parent_type)
     return []
 
 
-def _include_children(basedir, k, v, parent_type):
+def _include_children(basedir, _, v, parent_type):
     return [{'path': ansible.utils.path_dwim(basedir, v), 'type': parent_type}]
 
 
 def _taskshandlers_children(basedir, k, v, parent_type):
+    del k, parent_type
     return [{'path': ansible.utils.path_dwim(basedir, th['include']),
              'type': 'tasks'}
             for th in v if 'include' in th]
 
 
 def _roles_children(basedir, k, v, parent_type):
+    del k, parent_type
+
     results = []
     for role in v:
         if isinstance(role, dict):
@@ -155,7 +159,7 @@ def _rolepath(basedir, role):
                                 os.path.join('..', '..', role))
     ]
 
-    if C.DEFAULT_ROLES_PATH:
+    if C.DEFAULT_ROLES_PATH != "":
         search_locations = C.DEFAULT_ROLES_PATH.split(os.pathsep)
         for loc in search_locations:
             loc = os.path.expanduser(loc)
@@ -170,13 +174,18 @@ def _rolepath(basedir, role):
 
 
 def _look_for_role_files(basedir, role):
+    role_path = _rolepath(basedir, role)
+    if not role_path:
+        return []
+
     results = []
+
     for th in ['tasks', 'handlers', 'meta']:
-        role_path = _rolepath(basedir, role)
-        if role_path:
-            thpath = os.path.join(role_path, th, 'main.yml')
+        for ext in ('.yml', '.yaml'):
+            thpath = os.path.join(role_path, th, 'main' + ext)
             if os.path.exists(thpath):
                 results.append({'path': thpath, 'type': th})
+                break
     return results
 
 
@@ -184,19 +193,22 @@ def rolename(filepath):
     idx = filepath.find('roles/')
     if idx < 0:
         return ''
-    role = filepath[idx+6:]
+    role = filepath[idx + 6:]
     role = role[:role.find('/')]
     return role
 
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(module=command, module_arguments=args, **kwargs))
+    return dict(module=command, module_arguments=args, **kwargs)
 
 
 def normalize_task(task):
-    ''' ensures that all tasks have an action key
-        and that string values are converted to python objects '''
+    """Normalize task action key and values.
+
+    Ensures that all tasks have an action key and that string values are
+    converted to python objects.
+    """
 
     result = dict()
     for (k, v) in task.items():
@@ -237,17 +249,17 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " ".join(["k=v" for (k, v) in action.items() if k != "module_arguments"] +
-                    action.get("module_arguments"))
+    args = " ".join(["{0}={1}".format(k, v) for (k, v) in action.items()
+                     if k != "module_arguments"] + action.get("module_arguments"))
     return "{0} {1}".format(action["module"], args)
 
 
-def get_action_tasks(yaml, file):
-    tasks = list()
-    if file['type'] in ['tasks', 'handlers']:
-        tasks = yaml
+def get_action_tasks(yamldata, yamlfile):
+    tasks = []
+    if yamlfile['type'] in ['tasks', 'handlers']:
+        tasks = yamldata
     else:
-        for block in yaml:
+        for block in yamldata:
             for section in ['tasks', 'handlers', 'pre_tasks', 'post_tasks']:
                 if section in block:
                     block_tasks = block.get(section) or []
@@ -259,7 +271,8 @@ def get_action_tasks(yaml, file):
 def parse_yaml_linenumbers(data):
     """Parses yaml as ansible.utils.parse_yaml but with linenumbers.
 
-    The line numbers are stored in each node's LINE_NUMBER_KEY key"""
+    The line numbers are stored in each node's LINE_NUMBER_KEY key.
+    """
     loader = yaml.Loader(data)
 
     def compose_node(parent, index):
