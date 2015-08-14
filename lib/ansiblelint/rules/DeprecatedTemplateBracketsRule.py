@@ -22,11 +22,13 @@ from ansiblelint import AnsibleLintRule
 
 
 class DeprecatedTemplateBracketsRule(AnsibleLintRule):
-    id = 'ANSIBLE0001'
-    shortdesc = 'Old style (${var}) brackets'
-    description = 'Checks for old style ${var} rather than {{var}}'
+    def __init__(self):
+        super(DeprecatedTemplateBracketsRule, self).__init__()
 
-    tags = ['deprecation']
+        self.id = 'ANSIBLE0001'
+        self.shortdesc = 'Old style (${var}) brackets'
+        self.description = 'Checks for old style ${var} rather than {{var}}'
+        self.tags = ['deprecation']
 
     def match(self, _, line):
         return "${" in line

@@ -24,17 +24,20 @@ from ansiblelint import AnsibleLintRule
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
-    id = 'ANSIBLE0006'
-    shortdesc = 'Using command rather than module'
-    description = 'Executing a command when there is an Ansible module ' + \
-                  'is generally a bad idea'
-    tags = ['resources']
-
     _commands = ['command', 'shell']
     _modules = {'git': 'git', 'hg': 'hg', 'curl': 'get_url', 'wget': 'get_url',
                 'svn': 'subversion', 'service': 'service', 'mount': 'mount',
                 'rpm': 'yum', 'yum': 'yum', 'apt-get': 'apt-get',
                 'unzip': 'unarchive', 'tar': 'unarchive'}
+
+    def __init__(self):
+        super(CommandsInsteadOfModulesRule, self).__init__()
+
+        self.id = 'ANSIBLE0006'
+        self.shortdesc = 'Using command rather than module'
+        self.description = 'Executing a command when there is an Ansible module ' + \
+                           'is generally a bad idea'
+        self.tags = ['resources']
 
     def matchtask(self, ansiblefile, task):
         del ansiblefile

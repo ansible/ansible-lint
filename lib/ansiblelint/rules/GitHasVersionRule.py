@@ -22,11 +22,14 @@ from ansiblelint import AnsibleLintRule
 
 
 class GitHasVersionRule(AnsibleLintRule):
-    id = 'ANSIBLE0004'
-    shortdesc = 'Git checkouts must contain explicit version'
-    description = 'All version control checkouts must point to ' + \
-                  'an explicit commit or tag, not just "latest"'
-    tags = ['repeatability']
+    def __init__(self):
+        super(GitHasVersionRule, self).__init__()
+
+        self.id = 'ANSIBLE0004'
+        self.shortdesc = 'Git checkouts must contain explicit version'
+        self.description = 'All version control checkouts must point to ' + \
+                           'an explicit commit or tag, not just "latest"'
+        self.tags = ['repeatability']
 
     def matchtask(self, ansiblefile, task):
         del ansiblefile
