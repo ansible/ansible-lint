@@ -1,0 +1,17 @@
+---
+- hosts: all
+  tasks:
+    - name: "Get foosball, fail: HEAD version"
+      git: repo=git://foosball.example.org/path/to/repo.git
+           dest=/srv/checkout
+           version=HEAD
+
+    - name: "Get foosball, fail: no version"
+      git: repo=git://foosball.example.org/path/to/repo.git
+           dest=/srv/checkout
+
+    - name: "Get foosball, good"
+      git: repo=git://foosball.example.org/path/to/repo.git
+           dest=/srv/checkout
+           version=master
+
