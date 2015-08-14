@@ -28,5 +28,6 @@ class GitHasVersionRule(AnsibleLintRule):
                   'an explicit commit or tag, not just "latest"'
     tags = ['repeatability']
 
-    def matchtask(self, file, task):
-        return (task['action']['module'] == 'git' and task['action'].get('version', 'HEAD') == 'HEAD')
+    def matchtask(self, _, task):
+        return (task['action']['module'] == 'git' and
+                task['action'].get('version', 'HEAD') == 'HEAD')

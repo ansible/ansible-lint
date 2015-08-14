@@ -36,7 +36,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
                 'rpm': 'yum', 'yum': 'yum', 'apt-get': 'apt-get',
                 'unzip': 'unarchive', 'tar': 'unarchive'}
 
-    def matchtask(self, file, task):
+    def matchtask(self, _, task):
         if task["action"]["module"] in self._commands:
             executable = os.path.basename(task["action"]["module_arguments"][0])
             if executable in self._modules:

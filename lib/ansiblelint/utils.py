@@ -121,17 +121,20 @@ def play_children(basedir, item, parent_type):
     return []
 
 
-def _include_children(basedir, k, v, parent_type):
+def _include_children(basedir, _, v, parent_type):
     return [{'path': ansible.utils.path_dwim(basedir, v), 'type': parent_type}]
 
 
 def _taskshandlers_children(basedir, k, v, parent_type):
+    del k, parent_type
     return [{'path': ansible.utils.path_dwim(basedir, th['include']),
              'type': 'tasks'}
             for th in v if 'include' in th]
 
 
 def _roles_children(basedir, k, v, parent_type):
+    del k, parent_type
+
     results = []
     for role in v:
         if isinstance(role, dict):
@@ -156,7 +159,7 @@ def _rolepath(basedir, role):
                                 os.path.join('..', '..', role))
     ]
 
-    if C.DEFAULT_ROLES_PATH:
+    if C.DEFAULT_ROLES_PATH != "":
         search_locations = C.DEFAULT_ROLES_PATH.split(os.pathsep)
         for loc in search_locations:
             loc = os.path.expanduser(loc)
@@ -246,12 +249,12 @@ def task_to_str(task):
     return "{0} {1}".format(action["module"], args)
 
 
-def get_action_tasks(yaml, file):
+def get_action_tasks(yamldata, yamlfile):
     tasks = []
-    if file['type'] in ['tasks', 'handlers']:
-        tasks = yaml
+    if yamlfile['type'] in ['tasks', 'handlers']:
+        tasks = yamldata
     else:
-        for block in yaml:
+        for block in yamldata:
             for section in ['tasks', 'handlers', 'pre_tasks', 'post_tasks']:
                 if section in block:
                     block_tasks = block.get(section) or []

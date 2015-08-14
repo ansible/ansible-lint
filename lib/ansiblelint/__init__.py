@@ -27,60 +27,68 @@ import ansiblelint.utils
 
 class AnsibleLintRule(object):
 
+    def __init__(self):
+        self.id = None
+        self.shortdesc = None
+        self.description = None
+
     def __repr__(self):
         return self.id + ": " + self.shortdesc
 
     def verbose(self):
         return self.id + ": " + self.shortdesc + "\n  " + self.description
 
-    def match(self, file="", line=""):
+    def match(self, ansiblefile="", line=""):
         return []
 
-    def matchlines(self, file, text):
+    def matchlines(self, ansiblefile, text):
         matches = []
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(text.split("\n")):
-            result = self.match(file, line)
+            result = self.match(ansiblefile, line)
             if result:
                 message = None
                 if isinstance(result, str):
                     message = result
                 matches.append(Match(prev_line_no + 1, line,
-                               file['path'], self, message))
+                               ansiblefile['path'], self, message))
         return matches
 
-    def matchtask(self, file="", task=None):
+    def matchplay(self, ansiblefile, play):
         return []
 
-    def matchtasks(self, file, text):
+    def matchtask(self, ansiblefile="", task=None):
+        return []
+
+    def matchtasks(self, ansiblefile, text):
         matches = []
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml:
-            for task in ansiblelint.utils.get_action_tasks(yaml, file):
+            for task in ansiblelint.utils.get_action_tasks(yaml, ansiblefile):
                 if 'skip_ansible_lint' in task.get('tags', []):
                     continue
                 if 'action' in task:
-                    result = self.matchtask(file, task)
+                    result = self.matchtask(ansiblefile, task)
                     if result:
                         message = None
                         if isinstance(result, str):
                             message = result
                         taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
                         matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], taskstr,
-                                       file['path'], self, message))
+                                       ansiblefile['path'], self, message))
         return matches
 
-    def matchyaml(self, file, text):
+    def matchyaml(self, ansiblefile, text):
         matches = []
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml and hasattr(self, 'matchplay'):
             for play in yaml:
-                result = self.matchplay(file, play)
+                result = self.matchplay(ansiblefile, play)
                 if result:
                     (section, message) = result
                     matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY], section,
-                                   file['path'], self, message))
+                                   ansiblefile['path'], self, message))
         return matches
 
 
@@ -101,7 +109,12 @@ class RulesCollection(object):
     def extend(self, more):
         self.rules.extend(more)
 
-    def run(self, playbookfile, tags=set(), skip_tags=set()):
+    def run(self, playbookfile, tags=None, skip_tags=None):
+        if tags is None:
+            tags = set()
+        if skip_tags is None:
+            skip_tags = set()
+
         text = ""
         matches = []
         with open(playbookfile['path'], 'Ur') as f:
@@ -163,13 +176,11 @@ class Runner(object):
         visited = set()
         while visited != self.playbooks:
             for arg in self.playbooks - visited:
-                for file in ansiblelint.utils.find_children(arg):
-                    self.playbooks.add((file['path'], file['type']))
-                    files.append(file)
+                for ansiblefile in ansiblelint.utils.find_children(arg):
+                    self.playbooks.add((ansiblefile['path'], ansiblefile['type']))
+                    files.append(ansiblefile)
                 visited.add(arg)
 
-        matches = [self.rules.run(file, tags=set(self.tags), skip_tags=set(self.skip_tags))
-                   for file in files]
+        matches = [self.rules.run(ansiblefile, tags=set(self.tags), skip_tags=set(self.skip_tags))
+                   for ansiblefile in files]
         return reduce(operator.add, matches)
-
-        return matches
