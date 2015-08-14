@@ -30,7 +30,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     tags = ['resources']
 
     _commands = ['command', 'shell']
-    _modules = {'git': 'git', 'hg': 'hg', 'curl': 'get_url', 'wget': 'get_url',
+    _modules = {'git': 'git', 'hg': 'hg', 'curl': 'get_url or uri', 'wget': 'get_url or uri',
                 'svn': 'subversion', 'service': 'service', 'mount': 'mount',
                 'rpm': 'yum', 'yum': 'yum', 'apt-get': 'apt-get',
                 'unzip': 'unarchive', 'tar': 'unarchive'}
