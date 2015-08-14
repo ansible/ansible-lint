@@ -170,13 +170,18 @@ def _rolepath(basedir, role):
 
 
 def _look_for_role_files(basedir, role):
+    role_path = _rolepath(basedir, role)
+    if not role_path:
+        return []
+
     results = []
+
     for th in ['tasks', 'handlers', 'meta']:
-        role_path = _rolepath(basedir, role)
-        if role_path:
-            thpath = os.path.join(role_path, th, 'main.yml')
+        for ext in ('.yml', '.yaml'):
+            thpath = os.path.join(role_path, th, 'main' + ext)
             if os.path.exists(thpath):
                 results.append({'path': thpath, 'type': th})
+                break
     return results
 
 
