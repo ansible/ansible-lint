@@ -38,7 +38,8 @@ class AnsibleLintRule(object):
     def verbose(self):
         return self.id + ": " + self.shortdesc + "\n  " + self.description
 
-    def match(self, ansiblefile="", line=""):
+    def match(self, ansiblefile, line):
+        del ansiblefile, line
         return []
 
     def matchlines(self, ansiblefile, text):
@@ -56,9 +57,11 @@ class AnsibleLintRule(object):
         return matches
 
     def matchplay(self, ansiblefile, play):
+        del ansiblefile, play
         return []
 
-    def matchtask(self, ansiblefile="", task=None):
+    def matchtask(self, ansiblefile, task):
+        del ansiblefile, task
         return []
 
     def matchtasks(self, ansiblefile, text):

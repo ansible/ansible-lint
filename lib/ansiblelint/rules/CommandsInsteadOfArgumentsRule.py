@@ -35,7 +35,9 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
                   'ln': 'state=link', 'mkdir': 'state=directory',
                   'rmdir': 'state=absent', 'rm': 'state=absent'}
 
-    def matchtask(self, _, task):
+    def matchtask(self, ansiblefile, task):
+        del ansiblefile
+
         if task["action"]["module"] in self._commands:
             executable = os.path.basename(task["action"]["module_arguments"][0])
             if executable in self._arguments:

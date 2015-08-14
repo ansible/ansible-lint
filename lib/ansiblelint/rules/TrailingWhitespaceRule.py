@@ -27,5 +27,7 @@ class TrailingWhitespaceRule(AnsibleLintRule):
     description = 'There should not be any trailing whitespace'
     tags = ['formatting']
 
-    def match(self, _, line):
+    def match(self, ansiblefile, line):
+        del ansiblefile
+
         return line.rstrip() != line
