@@ -1,0 +1,2 @@
+[MESSAGES CONTROL]
+disable=missing-docstring,no-self-use,too-few-public-methods,bad-continuation,too-many-arguments,invalid-name
