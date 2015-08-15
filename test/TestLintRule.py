@@ -44,3 +44,4 @@ class TestRule(unittest.TestCase):
         rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
         matches = rule.matchlines(dict(path=filename, type='playbooks'), text)
         self.assertEqual(len(matches), 2)
+        self.assertEqual(matches[0].rule.id, 'TEST0002')

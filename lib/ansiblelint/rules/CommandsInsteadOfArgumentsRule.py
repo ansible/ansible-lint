@@ -18,24 +18,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import ansiblelint.utils
 import os
+
 from ansiblelint import AnsibleLintRule
 
 
 class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
-    id = 'ANSIBLE0007'
-    shortdesc = 'Using command rather than an argument to e.g. file'
-    description = 'Executing a command when there is are arguments to modules ' + \
-                  'is generally a bad idea'
-    tags = ['resources']
-
     _commands = ['command', 'shell', 'raw']
     _arguments = {'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group',
                   'ln': 'state=link', 'mkdir': 'state=directory',
                   'rmdir': 'state=absent', 'rm': 'state=absent'}
 
-    def matchtask(self, file, task):
+    def __init__(self):
+        super(CommandsInsteadOfArgumentsRule, self).__init__()
+
+        self.id = 'ANSIBLE0007'
+        self.shortdesc = 'Using command rather than an argument to e.g. file'
+        self.description = 'Executing a command when there are arguments to modules ' + \
+                           'is generally a bad idea'
+        self.tags = ['resources']
+
+    def matchtask(self, ansiblefile, task):
+        del ansiblefile
+
         if task["action"]["module"] in self._commands:
             executable = os.path.basename(task["action"]["module_arguments"][0])
             if executable in self._arguments:

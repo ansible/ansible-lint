@@ -22,11 +22,14 @@ from ansiblelint import AnsibleLintRule
 
 
 class MismatchedBracketRule(AnsibleLintRule):
-    id = 'ANSIBLE0003'
-    shortdesc = 'Mismatched { and }'
-    description = 'If lines contain more { than } or vice ' + \
-                  'versa then templating can fail nastily'
-    tags = ['templating']
+    def __init__(self):
+        super(MismatchedBracketRule, self).__init__()
 
-    def match(self, file, line):
+        self.id = 'ANSIBLE0003'
+        self.shortdesc = 'Mismatched { and }'
+        self.description = 'If lines contain more { than } or vice ' + \
+                      'versa then templating can fail nastily'
+        self.tags = ['templating']
+
+    def match(self, _, line):
         return line.count("{") != line.count("}")

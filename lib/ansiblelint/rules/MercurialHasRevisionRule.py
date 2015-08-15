@@ -18,17 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
 
 
 class MercurialHasRevisionRule(AnsibleLintRule):
-    id = 'ANSIBLE0005'
-    shortdesc = 'Mercurial checkouts must contain explicit revision'
-    description = 'All version control checkouts must point to ' + \
-                  'an explicit commit or tag, not just "latest"'
+    def __init__(self):
+        super(MercurialHasRevisionRule, self).__init__()
 
-    tags = ['repeatability']
+        self.id = 'ANSIBLE0005'
+        self.shortdesc = 'Mercurial checkouts must contain explicit revision'
+        self.description = 'All version control checkouts must point to ' + \
+                      'an explicit commit or tag, not just "latest"'
+        self.tags = ['repeatability']
 
-    def matchtask(self, file, task):
-        return task['action']['module'] == 'hg' and task['action'].get('revision', 'default') == 'default'
+    def matchtask(self, ansiblefile, task):
+        del ansiblefile
+
+        return (task['action']['module'] == 'hg' and
+                task['action'].get('revision', 'default') == 'default')
