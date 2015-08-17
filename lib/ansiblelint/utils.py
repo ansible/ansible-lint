@@ -51,7 +51,6 @@ def load_plugins(directory):
 
 
 def tokenize(line):
-    result = list()
     tokens = line.lstrip().split(" ")
     if tokens[0] == '-':
         tokens = tokens[1:]
@@ -191,7 +190,7 @@ def rolename(filepath):
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(module=command, module_arguments=args, **kwargs))
+    return dict(module=command, module_arguments=args, **kwargs)
 
 
 def normalize_task(task):
@@ -242,12 +241,12 @@ def task_to_str(task):
     return "{0} {1}".format(action["module"], args)
 
 
-def get_action_tasks(yaml, file):
+def get_action_tasks(parsed_yaml, playbookfile):
     tasks = list()
-    if file['type'] in ['tasks', 'handlers']:
-        tasks = yaml
+    if playbookfile['type'] in ['tasks', 'handlers']:
+        tasks = parsed_yaml
     else:
-        for block in yaml:
+        for block in parsed_yaml:
             for section in ['tasks', 'handlers', 'pre_tasks', 'post_tasks']:
                 if section in block:
                     block_tasks = block.get(section) or []
