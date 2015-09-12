@@ -100,14 +100,16 @@ class RulesCollection(object):
     def extend(self, more):
         self.rules.extend(more)
 
-    def run(self, playbookfile, tags=set(), skip_tags=set()):
+    def run(self, playbookfile, tags=set(), skip_list=set()):
         text = ""
         matches = list()
         with open(playbookfile['path'], 'Ur') as f:
             text = f.read()
         for rule in self.rules:
             if not tags or not set(rule.tags).isdisjoint(tags):
-                if set(rule.tags).isdisjoint(skip_tags):
+                rule_definition = set(rule.tags)
+                rule_definition.add(rule.id)
+                if set(rule_definition).isdisjoint(skip_list):
                     matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchtasks(playbookfile, text))
                     matches.extend(rule.matchyaml(playbookfile, text))
@@ -152,13 +154,13 @@ class Match:
 
 class Runner:
 
-    def __init__(self, rules, playbooks, tags, skip_tags):
+    def __init__(self, rules, playbooks, tags, skip_list):
         self.rules = rules
         self.playbooks = set()
         for pb in playbooks:
             self.playbooks.add((pb, 'playbook'))
         self.tags = tags
-        self.skip_tags = skip_tags
+        self.skip_list = skip_list
 
     def run(self):
         files = list()
@@ -175,6 +177,6 @@ class Runner:
         matches = list()
         for file in files:
             matches.extend(self.rules.run(file, tags=set(self.tags),
-                           skip_tags=set(self.skip_tags)))
+                           skip_list=set(self.skip_list)))
 
         return matches
