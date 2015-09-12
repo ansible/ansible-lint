@@ -51,11 +51,21 @@ class TestRulesCollection(unittest.TestCase):
         self.assertEqual(len(matches), 2)
 
     def test_skip_tags(self):
-        matches = self.rules.run(self.ematchtestfile, skip_tags=['test1'])
+        matches = self.rules.run(self.ematchtestfile, skip_list=['test1'])
         self.assertEqual(len(matches), 0)
-        matches = self.rules.run(self.ematchtestfile, skip_tags=['test2'])
+        matches = self.rules.run(self.ematchtestfile, skip_list=['test2'])
         self.assertEqual(len(matches), 3)
-        matches = self.rules.run(self.bracketsmatchtestfile, skip_tags=['test1'])
+        matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['test1'])
         self.assertEqual(len(matches), 2)
-        matches = self.rules.run(self.bracketsmatchtestfile, skip_tags=['test2'])
+        matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['test2'])
+        self.assertEqual(len(matches), 1)
+
+    def test_skip_id(self):
+        matches = self.rules.run(self.ematchtestfile, skip_list=['TEST0001'])
+        self.assertEqual(len(matches), 0)
+        matches = self.rules.run(self.ematchtestfile, skip_list=['TEST0002'])
+        self.assertEqual(len(matches), 3)
+        matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['TEST0001'])
+        self.assertEqual(len(matches), 2)
+        matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['TEST0002'])
         self.assertEqual(len(matches), 1)
