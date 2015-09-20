@@ -69,3 +69,7 @@ class TestRulesCollection(unittest.TestCase):
         self.assertEqual(len(matches), 2)
         matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['TEST0002'])
         self.assertEqual(len(matches), 1)
+
+    def test_skip_non_existent_id(self):
+        matches = self.rules.run(self.ematchtestfile, skip_list=['DOESNOTEXIST'])
+        self.assertEqual(len(matches), 3)
