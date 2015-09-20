@@ -32,7 +32,7 @@ Options:
   -r RULESDIR   location of rules directory
   -t TAGS       only check rules tagged with these values
   -T            list all the tags
-  -x SKIP_TAGS  only check rules whose tags do not match these values
+  -x SKIP_LIST  only check rules whose id/tags do not match these values
 ```
 
 Rules
