@@ -26,3 +26,10 @@ Standards
 Although the code is not currently PEP8 compliant, that is an aspiration.
 Fixes that only adjust PEP8 (especially large scale ones) affect git blame in 
 a bad way, but please feel free to clean up code in areas near where you're working!
+
+Similarly, adhering to pylint, pyflakes etc. would be nice in principle but
+confuses authorship for similar reasons.
+
+An easy rule is that if the change doesn't change behaviour such that it would
+fail a unit test beforehand and pass the same test afterwards, the change 
+probably won't be accepted.
