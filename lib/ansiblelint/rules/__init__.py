@@ -1,8 +1,0 @@
-import CommandsInsteadOfArgumentsRule
-import CommandsInsteadOfModulesRule
-import DeprecatedTemplateBracketsRule
-import GitHasVersionRule
-import MercurialHasRevisionRule
-import MismatchedBracketRule
-import TrailingWhitespaceRule
-
