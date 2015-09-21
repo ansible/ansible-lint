@@ -1,10 +1,12 @@
 import os
+from setuptools import find_packages
+from setuptools import setup
 import sys
-from setuptools import setup, find_packages
+
 
 sys.path.insert(0, os.path.abspath('lib'))
 
-execfile('lib/ansiblelint/version.py')
+exec(open('lib/ansiblelint/version.py').read())
 
 setup(
     name='ansible-lint',

@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
 
 
@@ -31,4 +30,5 @@ class MercurialHasRevisionRule(AnsibleLintRule):
     tags = ['repeatability']
 
     def matchtask(self, file, task):
-        return task['action']['module'] == 'hg' and task['action'].get('revision', 'default') == 'default'
+        return (task['action']['module'] == 'hg' and
+                task['action'].get('revision', 'default') == 'default')

@@ -1,5 +1,5 @@
-import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
+
 
 class UnsetVariableMatcherRule(AnsibleLintRule):
     id = 'TEST0002'
@@ -8,5 +8,5 @@ class UnsetVariableMatcherRule(AnsibleLintRule):
                   'post templating that still contain {{'
     tags = {'fake', 'dummy', 'test2'}
 
-    def match(self,filename,line):
+    def match(self, filename, line):
         return "{{" in line
