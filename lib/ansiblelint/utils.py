@@ -21,13 +21,21 @@
 import os
 import glob
 import imp
-import ansible.utils
+from ansible.utils import path_dwim
 from ansible.playbook.task import Task
 import ansible.constants as C
 from ansible.module_utils.splitter import split_args
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
+
+try:
+    from ansible.utils import parse_yaml_from_file
+except ImportError:
+    from ansible.parsing import DataLoader
+    def parse_yaml_from_file(filepath):
+        dl = DataLoader()
+        dl.load_from_file(filepath)
 
 LINE_NUMBER_KEY = '__line__'
 
@@ -84,7 +92,7 @@ def find_children(playbook):
         return []
     results = []
     basedir = os.path.dirname(playbook[0])
-    pb_data = ansible.utils.parse_yaml_from_file(playbook[0])
+    pb_data = parse_yaml_from_file(playbook[0])
     items = _playbook_items(pb_data)
     for item in items:
         for child in play_children(basedir, item, playbook[1]):
@@ -97,7 +105,7 @@ def find_children(playbook):
                 valid_tokens.append(token)
             path = ' '.join(valid_tokens)
             results.append({
-                'path': ansible.utils.path_dwim(basedir, path),
+                'path': path_dwim(basedir, path),
                 'type': child['type']
             })
     return results
@@ -121,11 +129,11 @@ def play_children(basedir, item, parent_type):
 
 
 def _include_children(basedir, k, v, parent_type):
-    return [{'path': ansible.utils.path_dwim(basedir, v), 'type': parent_type}]
+    return [{'path': path_dwim(basedir, v), 'type': parent_type}]
 
 
 def _taskshandlers_children(basedir, k, v, parent_type):
-    return [{'path': ansible.utils.path_dwim(basedir, th['include']),
+    return [{'path': path_dwim(basedir, th['include']),
              'type': 'tasks'}
             for th in v if 'include' in th]
 
@@ -145,13 +153,13 @@ def _rolepath(basedir, role):
 
     possible_paths = [
         # if included from a playbook
-        ansible.utils.path_dwim(basedir, os.path.join('roles', role)),
-        ansible.utils.path_dwim(basedir, role),
+        path_dwim(basedir, os.path.join('roles', role)),
+        path_dwim(basedir, role),
         # if included from roles/[role]/meta/main.yml
-        ansible.utils.path_dwim(
+        path_dwim(
             basedir, os.path.join('..', '..', '..', 'roles', role)
         ),
-        ansible.utils.path_dwim(basedir,
+        path_dwim(basedir,
                                 os.path.join('..', '..', role))
     ]
 
@@ -159,7 +167,7 @@ def _rolepath(basedir, role):
         search_locations = C.DEFAULT_ROLES_PATH.split(os.pathsep)
         for loc in search_locations:
             loc = os.path.expanduser(loc)
-            possible_paths.append(ansible.utils.path_dwim(loc, role))
+            possible_paths.append(path_dwim(loc, role))
 
     for path_option in possible_paths:
         if os.path.isdir(path_option):
