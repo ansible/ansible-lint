@@ -60,6 +60,14 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(args[2], "zyx.tgz")
         self.assertEqual(kwargs, {'chdir': 'wxy', 'creates': 'zyx'})
 
+    def test_tokenize_command_with_nested_jinja(self):
+        (cmd, args, kwargs) = utils.tokenize("action: command tar xzf '{{ item }}'")
+        self.assertEquals(cmd, "command")
+        self.assertEquals(args[0], "tar")
+        self.assertEquals(args[1], "xzf")
+        self.assertEquals(args[2], "'{{ item }}'")
+        self.assertEquals(kwargs, { })
+
     def test_normalize_simple_command(self):
         task1 = dict(name="hello", action="command chdir=abc echo hello world")
         task2 = dict(name="hello", command="chdir=abc echo hello world")
