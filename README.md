@@ -25,14 +25,22 @@ Usage
 Usage: ansible-lint playbook.yml
 
 Options:
-  --version     show program's version number and exit
-  -h, --help    show this help message and exit
-  -L            list all the rules
-  -q            quieter, although not silent output
-  -r RULESDIR   location of rules directory
-  -t TAGS       only check rules tagged with these values
-  -T            list all the tags
-  -x SKIP_LIST  only check rules whose id/tags do not match these values
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -L                    list all the rules
+  -q                    quieter, although not silent output
+  -p                    parseable output in the format of pep8
+  -r RULESDIR           add one or more rules directories using one or more -r
+                        arguments. Defaults to ['/Users/icordasc/sandbox
+                        /ansible-lint/lib/ansiblelint/rules'] but any -r flags
+                        completely override this.
+  -t TAGS               only check rules tagged with these values
+  -T                    list all the tags
+  -x SKIP_LIST          only check rules whose id/tags do not match these
+                        values
+  --exclude=EXCLUDE_PATHS
+                        path to directories or files to skip. This option is
+                        repeatable.
 ```
 
 Rules

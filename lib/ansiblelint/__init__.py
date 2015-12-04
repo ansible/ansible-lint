@@ -154,22 +154,44 @@ class Match:
 
 class Runner:
 
-    def __init__(self, rules, playbooks, tags, skip_list):
+    def __init__(self, rules, playbooks, tags, skip_list, exclude_paths):
         self.rules = rules
         self.playbooks = set()
         for pb in playbooks:
             self.playbooks.add((pb, 'playbook'))
         self.tags = tags
         self.skip_list = skip_list
+        self._update_exclude_paths(exclude_paths)
+
+    def _update_exclude_paths(self, exclude_paths):
+        if exclude_paths:
+            # These will be (potentially) relative paths
+            paths = [s.strip() for s in exclude_paths]
+            # Since ansiblelint.utils.find_children returns absolute paths,
+            # and the list of files we create in `Runner.run` can contain both
+            # relative and absolute paths, we need to cover both bases.
+            self.exclude_paths = paths + [os.path.abspath(p) for p in paths]
+        else:
+            self.exclude_paths = []
+
+    def is_excluded(self, file_path):
+        # Any will short-circuit as soon as something returns True, but will
+        # be poor performance for the case where the path under question is
+        # not excluded.
+        return any(file_path.startswith(path) for path in self.exclude_paths)
 
     def run(self):
         files = list()
         for playbook in self.playbooks:
+            if self.is_excluded(playbook[0]):
+                continue
             files.append({'path': playbook[0], 'type': playbook[1]})
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
                 for file in ansiblelint.utils.find_children(arg):
+                    if self.is_excluded(file['path']):
+                        continue
                     self.playbooks.add((file['path'], file['type']))
                     files.append(file)
                 visited.add(arg)
