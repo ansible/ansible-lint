@@ -34,5 +34,5 @@ class TestRule(unittest.TestCase):
 
     def test_runner_count(self):
         filename = 'test/skiptasks.txt'
-        runner = ansiblelint.Runner(self.rules, {filename}, [], [])
+        runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
         self.assertEqual(len(runner.run()), 4)
