@@ -77,9 +77,15 @@ class AnsibleLintRule(object):
             for play in yaml:
                 result = self.matchplay(file, play)
                 if result:
-                    (section, message) = result
-                    matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY], section,
-                                   file['path'], self, message))
+                    if isinstance(result, tuple):
+                        result = [result]
+
+                    if not isinstance(result, list):
+                        raise Exception("{} is not a list".format(result))
+
+                    for section, message in result:
+                        matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY],
+                                             section, file['path'], self, message))
         return matches
 
 

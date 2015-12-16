@@ -1,0 +1,22 @@
+---
+- hosts: foo
+  roles:
+    - ../../../roles/base_os
+    - ../../../roles/repos
+    - {
+        role: ../../../roles/openshift_master,
+        oo_minion_ips: "{{ hostvars['localhost'].oo_minion_ips | default(['']) }}",
+        oo_bind_ip: "{{ hostvars[inventory_hostname].ansible_eth0.ipv4.address | default(['']) }}"
+      }
+    - ../../../roles/pods
+
+- name: "Set Origin specific facts on localhost (for later use)"
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Setting oo_minion_ips fact on localhost
+      set_fact:
+        oo_minion_ips: "{{ hostvars
+            | oo_select_keys(groups['tag_env-host-type-' + oo_env + '-openshift-minion'])
+            | oo_collect(attribute='ansible_eth0.ipv4.address') }}"
+      when: groups['tag_env-host-type-' + oo_env + '-openshift-minion'] is defined
