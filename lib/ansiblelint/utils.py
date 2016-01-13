@@ -30,7 +30,7 @@ from yaml.constructor import Constructor
 try:
     from ansible.utils import parse_yaml_from_file, path_dwim
 except ImportError:
-    from ansible.parsing import DataLoader
+    from ansible.parsing.dataloader import DataLoader
 
     def parse_yaml_from_file(filepath):
         dl = DataLoader()
