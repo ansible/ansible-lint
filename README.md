@@ -129,10 +129,6 @@ examples/example.yml:31
 examples/example.yml:19
     action: do nothing
 
-[ANSIBLE0001] Old style (${var}) brackets
-examples/example.yml:10
-    action: command echo ${oldskool}
-
 [ANSIBLE0003] Mismatched { and }
 examples/example.yml:13
     action: debug oops a missing {{bracket}
