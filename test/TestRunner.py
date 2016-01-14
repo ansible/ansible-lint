@@ -32,17 +32,17 @@ class TestRule(unittest.TestCase):
         self.rules = RulesCollection.create_from_directory(rulesdir)
 
     def test_runner_count(self):
-        filename = 'test/nomatchestest.txt'
+        filename = 'test/nomatchestest.yml'
         runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_unicode_runner_count(self):
-        filename = 'test/unicode.txt'
+        filename = 'test/unicode.yml'
         runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_runner_excludes_paths(self):
-        files = {'test/unicode.txt', 'examples/lots_of_warnings.yml'}
+        files = {'test/unicode.yml', 'examples/lots_of_warnings.yml'}
         excludes = ['examples/lots_of_warnings.yml']
         runner = ansiblelint.Runner(self.rules, files, [], [], excludes)
         assert (len(runner.run()) == 0)

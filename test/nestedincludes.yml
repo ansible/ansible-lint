@@ -1,0 +1,2 @@
+---
+- include: simpletask.yml tags=nginx

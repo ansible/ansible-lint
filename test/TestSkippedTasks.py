@@ -33,6 +33,6 @@ class TestRule(unittest.TestCase):
         self.rules = RulesCollection.create_from_directory(rulesdir)
 
     def test_runner_count(self):
-        filename = 'test/skiptasks.txt'
+        filename = 'test/skiptasks.yml'
         runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
         self.assertEqual(len(runner.run()), 4)

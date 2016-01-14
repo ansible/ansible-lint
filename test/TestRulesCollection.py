@@ -27,8 +27,8 @@ from ansiblelint import RulesCollection
 class TestRulesCollection(unittest.TestCase):
 
     rules = None
-    ematchtestfile = dict(path='test/ematchtest.txt', type='playbook')
-    bracketsmatchtestfile = dict(path='test/bracketsmatchtest.txt', type='playbook')
+    ematchtestfile = dict(path='test/ematchtest.yml', type='playbook')
+    bracketsmatchtestfile = dict(path='test/bracketsmatchtest.yml', type='playbook')
 
     def setUp(self):
         self.rules = RulesCollection.create_from_directory('./test/rules')

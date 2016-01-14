@@ -4,4 +4,4 @@
 
   tasks:
   - name: bonjour, ça va?
-    file: state=touch dest=/tmp/naïve.txt
+    file: state=touch dest=/tmp/naïve.yml

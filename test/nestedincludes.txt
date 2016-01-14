@@ -1,2 +1,0 @@
----
-- include: simpletask.txt tags=nginx
