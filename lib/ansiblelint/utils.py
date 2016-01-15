@@ -266,17 +266,26 @@ def task_to_str(task):
                     action.get("module_arguments"))
     return "{0} {1}".format(action["module"], args)
 
+def extract_from_list(blocks, candidates):
+    results = list()
+    for block in blocks:
+        for candidate in candidates:
+            if candidate in block:
+                results.extend(block[candidate])
+    return results
 
 def get_action_tasks(yaml, file):
     tasks = list()
     if file['type'] in ['tasks', 'handlers']:
         tasks = yaml
     else:
-        for block in yaml:
-            for section in ['tasks', 'handlers', 'pre_tasks', 'post_tasks']:
-                if section in block:
-                    block_tasks = block.get(section) or []
-                    tasks.extend(block_tasks)
+        tasks.extend(extract_from_list(yaml, ['tasks', 'handlers', 'pre_tasks', 'post_tasks']))
+
+    # Add sub-elements of block/rescue/always to tasks list
+    tasks.extend(extract_from_list(tasks, ['block', 'rescue', 'always']))
+    # Remove block/rescue/always elements from tasks list
+    tasks[:] = [task for task in tasks if all (k not in task for k in ('block', 'rescue', 'always'))]
+
     return [normalize_task(task) for task in tasks
             if 'include' not in task.keys()]
 
