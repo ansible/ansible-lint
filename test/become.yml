@@ -1,0 +1,14 @@
+- hosts: all
+
+  tasks:
+  - name: clone content repository
+    git:
+      repo: '{{ archive_services_repo_url }}'
+      dest: '/home/www'
+      accept_hostkey: yes
+      version: master
+      update: no
+    become: yes
+    become_user: nobody
+    notify:
+    - restart apache2

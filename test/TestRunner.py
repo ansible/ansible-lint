@@ -51,3 +51,8 @@ class TestRule(unittest.TestCase):
         files = {'test/block.yml'}
         runner = ansiblelint.Runner(self.rules, files, [], [], [])
         assert (len(runner.run()) == 0)
+
+    def test_runner_become_count(self):
+        files = {'test/become.yml'}
+        runner = ansiblelint.Runner(self.rules, files, [], [], [])
+        assert (len(runner.run()) == 0)
