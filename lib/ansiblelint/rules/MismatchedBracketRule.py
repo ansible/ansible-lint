@@ -28,5 +28,27 @@ class MismatchedBracketRule(AnsibleLintRule):
                   'versa then templating can fail nastily'
     tags = ['templating']
 
-    def match(self, file, line):
-        return line.count("{") != line.count("}")
+    def _check_value(self, v):
+        results = []
+
+        if isinstance(v, dict):
+            # Transform into a list to simplify processing
+            # since we do not care about the keys
+            v = v.values()
+
+        if isinstance(v, list):
+            for i in v:
+                output = self._check_value(i)
+                if output:
+                    results += output
+        elif isinstance(v, (str, unicode)):
+            if v.count("{") != v.count("}"):
+                results.append((v, "mismatched braces"))
+        else:
+            # not a type we care about
+            pass
+
+        return results
+
+    def matchplay(self, file, play):
+        return self._check_value(play)
