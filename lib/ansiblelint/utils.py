@@ -288,9 +288,9 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " ".join(["{0}={1}".format(k, v) for (k, v) in action.items()
-                    if k not in ["module", "module_arguments"]] +
-                    action.get("module_arguments"))
+    args = " " .join(["{0}={1}".format(k, v) for (k, v) in action.items()
+                     if k not in ["module", "module_arguments"]] +
+                     action.get("module_arguments"))
     return "{0} {1}".format(action["module"], args)
 
 
@@ -317,7 +317,8 @@ def get_action_tasks(yaml, file):
     # Add sub-elements of block/rescue/always to tasks list
     tasks.extend(extract_from_list(tasks, ['block', 'rescue', 'always']))
     # Remove block/rescue/always elements from tasks list
-    tasks[:] = [task for task in tasks if all(k not in task for k in ('block', 'rescue', 'always'))]
+    block_rescue_always = ('block', 'rescue', 'always')
+    tasks[:] = [task for task in tasks if all(k not in task for k in block_rescue_always)]
 
     return [normalize_task(task) for task in tasks
             if 'include' not in task.keys()]
