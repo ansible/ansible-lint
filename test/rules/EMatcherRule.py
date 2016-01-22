@@ -1,5 +1,5 @@
-import ansiblelint.utils
 from ansiblelint import AnsibleLintRule
+
 
 class EMatcherRule(AnsibleLintRule):
     id = 'TEST0001'
@@ -9,4 +9,4 @@ class EMatcherRule(AnsibleLintRule):
     tags = {'fake', 'dummy', 'test1'}
 
     def match(self, filename, line):
-        return "e" in line 
+        return "e" in line

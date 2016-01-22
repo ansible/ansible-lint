@@ -20,14 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import ansiblelint.utils as utils
-import ansiblelint.formatters as formatters
-from ansiblelint import RulesCollection
-import ansiblelint
+from __future__ import print_function
+
 import errno
+import optparse
 import os
 import sys
-import optparse
+
+import ansiblelint
+import ansiblelint.formatters as formatters
+from ansiblelint import RulesCollection
+import ansiblelint.utils as utils
 from ansiblelint.version import __version__
 
 
@@ -82,11 +85,11 @@ def main(args):
         rules.extend(RulesCollection.create_from_directory(rulesdir))
 
     if options.listrules:
-        print rules
+        print(rules)
         return 0
 
     if options.listtags:
-        print rules.listtags()
+        print(rules.listtags())
         return 0
 
     if isinstance(options.tags, basestring):
@@ -100,7 +103,7 @@ def main(args):
     matches = runner.run()
 
     for match in matches:
-        print formatter.format(match)
+        print(formatter.format(match))
 
     if len(matches):
         return 2
@@ -114,3 +117,5 @@ if __name__ == "__main__":
     except IOError as exc:
         if exc.errno != errno.EPIPE:
             raise
+    except RuntimeError as e:
+        raise SystemExit(str(e))

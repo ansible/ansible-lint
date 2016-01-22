@@ -20,9 +20,8 @@
 
 import unittest
 
-import ansiblelint.utils
-from ansiblelint import AnsibleLintRule
-from rules import EMatcherRule, UnsetVariableMatcherRule
+from rules import EMatcherRule
+from rules import UnsetVariableMatcherRule
 
 
 class TestRule(unittest.TestCase):

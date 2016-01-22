@@ -1,4 +1,4 @@
-class Formatter:
+class Formatter(object):
 
     def format(self, match):
         formatstr = "[{0}] {1}\n{2}:{3}\n{4}\n"
@@ -9,7 +9,7 @@ class Formatter:
                                 match.line)
 
 
-class QuietFormatter:
+class QuietFormatter(object):
 
     def format(self, match):
         formatstr = "[{0}] {1}:{2}"
@@ -17,7 +17,7 @@ class QuietFormatter:
                                 match.linenumber)
 
 
-class ParseableFormatter:
+class ParseableFormatter(object):
 
     def format(self, match):
         formatstr = "{0}:{1}: [{2}] {3}"

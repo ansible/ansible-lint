@@ -18,17 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import os
 import glob
 import imp
+import os
+
 import ansible.constants as C
 from ansible.module_utils.splitter import split_args
+
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
 
 try:
-    from ansible.utils import parse_yaml_from_file, path_dwim
+    from ansible.utils import parse_yaml_from_file
+    from ansible.utils import path_dwim
 except ImportError:
     from ansible.parsing.dataloader import DataLoader
 
@@ -53,6 +56,7 @@ VALID_KEYS = [
     'become', 'become_user', 'become_method',
 ]
 
+
 def load_plugins(directory):
     result = []
     fh = None
@@ -72,7 +76,6 @@ def load_plugins(directory):
 
 
 def tokenize(line):
-    result = list()
     tokens = line.lstrip().split(" ")
     if tokens[0] == '-':
         tokens = tokens[1:]
@@ -172,8 +175,7 @@ def _rolepath(basedir, role):
         path_dwim(
             basedir, os.path.join('..', '..', '..', 'roles', role)
         ),
-        path_dwim(basedir,
-                                os.path.join('..', '..', role))
+        path_dwim(basedir, os.path.join('..', '..', role))
     ]
 
     if C.DEFAULT_ROLES_PATH:
@@ -221,8 +223,7 @@ def _kv_to_dict(v):
 
 
 def normalize_task(task):
-    ''' ensures that all tasks have an action key
-        and that string values are converted to python objects '''
+    '''Ensures tasks have an action key and strings are converted to python objects'''
 
     result = dict()
     for (k, v) in task.items():
@@ -250,9 +251,7 @@ def normalize_task(task):
 
                     else:
                         # Should not get here!
-                        print "Was not expecting value %s of type %s for key %s" % (str(v), type(v), k)
-                        print "Task: %s" % str(task)
-                        exit(1)
+                        raise RuntimeError("Was not expecting value %s of type %s for key %s\nTask: %s" % (str(v), type(v), k), str(task))  # noqa
             v['module_arguments'] = v.get('module_arguments', list())
             result['action'] = v
     return result
@@ -267,6 +266,7 @@ def task_to_str(task):
                     action.get("module_arguments"))
     return "{0} {1}".format(action["module"], args)
 
+
 def extract_from_list(blocks, candidates):
     results = list()
     for block in blocks:
@@ -274,6 +274,7 @@ def extract_from_list(blocks, candidates):
             if candidate in block:
                 results.extend(block[candidate])
     return results
+
 
 def get_action_tasks(yaml, file):
     tasks = list()
@@ -285,7 +286,7 @@ def get_action_tasks(yaml, file):
     # Add sub-elements of block/rescue/always to tasks list
     tasks.extend(extract_from_list(tasks, ['block', 'rescue', 'always']))
     # Remove block/rescue/always elements from tasks list
-    tasks[:] = [task for task in tasks if all (k not in task for k in ('block', 'rescue', 'always'))]
+    tasks[:] = [task for task in tasks if all(k not in task for k in ('block', 'rescue', 'always'))]
 
     return [normalize_task(task) for task in tasks
             if 'include' not in task.keys()]
@@ -294,7 +295,8 @@ def get_action_tasks(yaml, file):
 def parse_yaml_linenumbers(data):
     """Parses yaml as ansible.utils.parse_yaml but with linenumbers.
 
-    The line numbers are stored in each node's LINE_NUMBER_KEY key"""
+    The line numbers are stored in each node's LINE_NUMBER_KEY key.
+    """
     loader = yaml.Loader(data)
 
     def compose_node(parent, index):
