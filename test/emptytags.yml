@@ -1,0 +1,6 @@
+---
+- hosts: all
+
+  tasks:
+  - debug: msg="hello world"
+    tags:
