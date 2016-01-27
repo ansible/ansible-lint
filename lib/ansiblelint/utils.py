@@ -75,6 +75,11 @@ def load_plugins(directory):
     return result
 
 
+def contains_quote(str1, list1):
+    for item in list1:
+        if item in str1:
+            return item
+
 def tokenize(line):
     tokens = line.lstrip().split(" ")
     if tokens[0] == '-':
@@ -85,12 +90,27 @@ def tokenize(line):
 
     args = list()
     kwargs = dict()
+    
+    start_quotes = ['\'', '\"', '{{', '{%', '{#']
+    end_quotes   = ['\'', '\"', '}}', '%}', '#}']
+    quote = None
+    tmp = ''
     for arg in tokens[1:]:
-        if "=" in arg:
-            kv = arg.split("=", 1)
-            kwargs[kv[0]] = kv[1]
-        else:
-            args.append(arg)
+        if quote is not None:
+            tmp = tmp + ' ' + arg
+            if len(arg) > 0 and quote in arg:
+                 quote = None
+                 arg = tmp
+        elif len(arg) > 0 and contains_quote(arg, start_quotes) is not None:
+            tmp = arg
+            item = contains_quote(arg, start_quotes)
+            quote = end_quotes[start_quotes.index(item)]
+        if quote is None:
+            if "=" in arg:
+                kv = arg.split("=", 1)
+                kwargs[kv[0]] = kv[1]
+            else:
+                args.append(arg)
     return (command, args, kwargs)
 
 
