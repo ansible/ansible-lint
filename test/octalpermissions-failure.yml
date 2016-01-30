@@ -1,0 +1,19 @@
+---
+- hosts: hosts
+  vars:
+    varset: varset
+  tasks:
+    - name: octal permissions test fail (600)
+      file:
+        path: foo
+        mode: 600
+
+    - name: octal permissions test fail (000)
+      file:
+        path: foo
+        mode: 000
+
+    - name: octal permissions test fail (123)
+      file:
+        path: foo
+        mode: 123
