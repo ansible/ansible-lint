@@ -28,16 +28,12 @@ class OctalPermissionsRule(AnsibleLintRule):
             'in unexpected ways. See ' + \
             'http://docs.ansible.com/ansible/file_module.html'
     tags = ['formatting']
-    digits_regex = re.compile(r'[0-9]+')
-    valid_permissions_regex = re.compile(r'0[0-7]{3}')
 
-    def matchtask(self, file, task):
-        try:
-            mode_str = str(task['action']['mode'])
-            # If it is a numeric permission,
-            if re.match(self.digits_regex, mode_str):
-                # Return the inverse of if it's valid
-                return not re.match(self.valid_permissions_regex, mode_str)
-        # If the task didn't have a 'mode' argument, it can't be wrong
-        except KeyError:
-            return False
+    # At least an indent, "mode:", optional whitespace, any digits, EOL
+    mode_regex = re.compile(r'^\s+mode:\s*[0-9]+\s*$')
+    # Same as above, but with a leading zero before three digits
+    valid_mode_regex = re.compile(r'^\s+mode:\s*0[0-7]{3}\s*$')
+
+    def match(self, file,line):
+        if re.match(self.mode_regex, line):
+            return not re.match(self.valid_mode_regex, line)
