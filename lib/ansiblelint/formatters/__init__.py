@@ -1,7 +1,7 @@
 class Formatter(object):
 
     def format(self, match):
-        formatstr = "[{0}] {1}\n{2}:{3}\n{4}\n"
+        formatstr = u"[{0}] {1}\n{2}:{3}\n{4}\n"
         return formatstr.format(match.rule.id,
                                 match.message,
                                 match.filename,
@@ -12,7 +12,7 @@ class Formatter(object):
 class QuietFormatter(object):
 
     def format(self, match):
-        formatstr = "[{0}] {1}:{2}"
+        formatstr = u"[{0}] {1}:{2}"
         return formatstr.format(match.rule.id, match.filename,
                                 match.linenumber)
 
@@ -20,7 +20,7 @@ class QuietFormatter(object):
 class ParseableFormatter(object):
 
     def format(self, match):
-        formatstr = "{0}:{1}: [{2}] {3}"
+        formatstr = u"{0}:{1}: [{2}] {3}"
         return formatstr.format(match.filename,
                                 match.linenumber,
                                 match.rule.id,
