@@ -21,12 +21,13 @@
 from ansiblelint import AnsibleLintRule
 import re
 
+
 class OctalPermissionsRule(AnsibleLintRule):
     id = 'ANSIBLE0008'
     shortdesc = 'Octal file permissions must contain leading zero'
     description = 'Numeric file permissions without leading zero can behave' + \
-            'in unexpected ways. See ' + \
-            'http://docs.ansible.com/ansible/file_module.html'
+        'in unexpected ways. See ' + \
+        'http://docs.ansible.com/ansible/file_module.html'
     tags = ['formatting']
 
     # At least an indent, "mode:", optional whitespace, any digits, EOL
@@ -34,6 +35,6 @@ class OctalPermissionsRule(AnsibleLintRule):
     # Same as above, but with a leading zero before three digits
     valid_mode_regex = re.compile(r'^\s+mode:\s*0[0-7]{3}\s*$')
 
-    def match(self, file,line):
+    def match(self, file, line):
         if re.match(self.mode_regex, line):
             return not re.match(self.valid_mode_regex, line)
