@@ -66,7 +66,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(utils.normalize_task(task1), utils.normalize_task(task2))
 
     def test_normalize_complex_command(self):
-        task1 = dict(name="hello", action={'module': 'ec2',
+        task1 = dict(name="hello", action={'__ansible_module__': 'ec2',
                                            'region': 'us-east1',
                                            'etc': 'whatever'})
         task2 = dict(name="hello", ec2={'region': 'us-east1',
@@ -79,7 +79,7 @@ class TestUtils(unittest.TestCase):
 
     def test_normalize_task_is_idempotent(self):
         tasks = list()
-        tasks.append(dict(name="hello", action={'module': 'ec2',
+        tasks.append(dict(name="hello", action={'__ansible_module__': 'ec2',
                                                 'region': 'us-east1',
                                                 'etc': 'whatever'}))
         tasks.append(dict(name="hello", ec2={'region': 'us-east1', 'etc': 'whatever'}))
