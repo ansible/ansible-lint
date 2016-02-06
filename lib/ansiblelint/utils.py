@@ -219,7 +219,7 @@ def rolename(filepath):
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(module=command, module_arguments=args, **kwargs))
+    return (dict(__ansible_module__=command, module_arguments=args, **kwargs))
 
 
 def normalize_task(task):
@@ -239,10 +239,10 @@ def normalize_task(task):
             if isinstance(v, basestring):
                 v = _kv_to_dict(k + ' ' + v)
             elif not v:
-                v = dict(module=k)
+                v = dict(__ansible_module__=k)
             else:
                 if isinstance(v, dict):
-                    v.update(dict(module=k))
+                    v.update(dict(__ansible_module__=k))
                 else:
                     if k == '__line__':
                         # Keep the line number stored
@@ -264,7 +264,7 @@ def task_to_str(task):
     action = task.get("action")
     args = " ".join(["k=v" for (k, v) in action.items() if k != "module_arguments"] +
                     action.get("module_arguments"))
-    return "{0} {1}".format(action["module"], args)
+    return "{0} {1}".format(action["__ansible_module__"], args)
 
 
 def extract_from_list(blocks, candidates):
