@@ -33,7 +33,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     _commands = ['command', 'shell']
     _modules = {'git': 'git', 'hg': 'hg', 'curl': 'get_url or uri', 'wget': 'get_url or uri',
                 'svn': 'subversion', 'service': 'service', 'mount': 'mount',
-                'rpm': 'yum', 'yum': 'yum', 'apt-get': 'apt-get',
+                'rpm': 'yum or rpm_key', 'yum': 'yum', 'apt-get': 'apt-get',
                 'unzip': 'unarchive', 'tar': 'unarchive'}
 
     def matchtask(self, file, task):
