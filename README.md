@@ -77,7 +77,7 @@ class DeprecatedVariableRule(AnsibleLintRule):
     tags = { 'deprecated' }
 
 
-    def match(self, line):
+    def match(self, file, line):
         return '${' in line
 ```
 
