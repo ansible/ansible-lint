@@ -88,3 +88,20 @@ class TestUtils(unittest.TestCase):
         for task in tasks:
             normalized_task = utils.normalize_task(task)
             self.assertEqual(normalized_task, utils.normalize_task(normalized_task))
+
+    def test_extract_from_list(self):
+        block = dict(
+            test_list = ['foo', 'bar'],
+            test_none = None,
+            test_string = 'foo'
+        )
+        blocks = [block]
+
+        test_list = utils.extract_from_list(blocks, ['test_list'])
+        test_none = utils.extract_from_list(blocks, ['test_none'])
+
+        self.assertEqual(list(block['test_list']), test_list)
+        self.assertEqual(list(), test_none)
+        with self.assertRaises(RuntimeError):
+            utils.extract_from_list(blocks, ['test_string'])
+
