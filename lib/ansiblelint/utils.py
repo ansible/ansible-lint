@@ -272,7 +272,11 @@ def extract_from_list(blocks, candidates):
     for block in blocks:
         for candidate in candidates:
             if candidate in block:
-                results.extend(block[candidate])
+                if isinstance(block[candidate], list):
+                    results.extend(block[candidate])
+                elif block[candidate] is not None:
+                    raise RuntimeError(
+                            "Key '%s' defined, but bad value: '%s'" % (candidate, str(block[candidate])))
     return results
 
 
