@@ -17,3 +17,13 @@
       file:
         path: foo
         mode: 123
+
+    - name: octal permissions test fail (4000)
+      file:
+        path: baz
+        mode: 4000
+
+    - name: octal permissions test fail (2000)
+      file:
+        path: bar
+        mode: 2000
