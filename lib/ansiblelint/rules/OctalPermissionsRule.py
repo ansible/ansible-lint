@@ -23,7 +23,7 @@ import re
 
 
 class OctalPermissionsRule(AnsibleLintRule):
-    id = 'ANSIBLE0008'
+    id = 'ANSIBLE0009'
     shortdesc = 'Octal file permissions must contain leading zero'
     description = 'Numeric file permissions without leading zero can behave' + \
         'in unexpected ways. See ' + \
