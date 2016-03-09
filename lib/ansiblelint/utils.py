@@ -32,8 +32,10 @@ from yaml.constructor import Constructor
 try:
     from ansible.utils import parse_yaml_from_file
     from ansible.utils import path_dwim
+    from ansible.utils.template import template
 except ImportError:
     from ansible.parsing.dataloader import DataLoader
+    from ansible.template import Templar
 
     def parse_yaml_from_file(filepath):
         dl = DataLoader()
@@ -43,6 +45,12 @@ except ImportError:
         dl = DataLoader()
         dl.set_basedir(basedir)
         return dl.path_dwim(given)
+
+    def template(basedir, varname, templatevars, **kwargs):
+        dl = DataLoader()
+        dl.set_basedir(basedir)
+        templar = Templar(dl, variables=templatevars)
+        return templar.template(varname, **kwargs)
 
 LINE_NUMBER_KEY = '__line__'
 
@@ -140,6 +148,7 @@ def play_children(basedir, item, parent_type):
     (k, v) = item
     if k in delegate_map:
         if v:
+            v = template(basedir, v, dict(playbook_dir=os.path.abspath(basedir)), fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
 
