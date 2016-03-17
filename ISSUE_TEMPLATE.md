@@ -19,8 +19,6 @@ or what should happen if providing a bug report
 
 # Actual Behaviour (Bug report only)
 
-Please give some details of what is actually happen.
-Include:
-- [minimum complete verifiable example](http://stackoverflow.com/help/mcve)
-- Playbook
-- Output
+Please give some details of what is actually happening.
+Include a [minimum complete verifiable example](http://stackoverflow.com/help/mcve)
+with playbook and output
