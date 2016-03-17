@@ -2,13 +2,15 @@
 - Bug report
 - Feature request
 
-# Ansible Lint details
+# Ansible and Ansible Lint details
 
 ```
+ansible --version
 ansible-lint --version
 ```
 
-Installation method: one of source, pip, OS package
+- ansible installation method: one of source, pip, OS package
+- ansible-lint installation method: one of source, pip, OS package
 
 # Desired Behaviour
 
