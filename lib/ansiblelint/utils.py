@@ -154,7 +154,13 @@ def play_children(basedir, item, parent_type):
 
 
 def _include_children(basedir, k, v, parent_type):
-    return [{'path': path_dwim(basedir, v), 'type': parent_type}]
+    # handle include: filename.yml tags=blah
+    (command, args, kwargs) = tokenize("{0}: {1}".format(k,v))
+
+    result = path_dwim(basedir, args[0])
+    if not os.path.exists(result) and not basedir.endswith('tasks'):
+        result = path_dwim(os.path.join(basedir, '..', 'tasks'), v)
+    return [{'path': result, 'type': parent_type}]
 
 
 def _taskshandlers_children(basedir, k, v, parent_type):
