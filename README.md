@@ -129,10 +129,6 @@ examples/example.yml:31
 examples/example.yml:19
     action: do nothing
 
-[ANSIBLE0003] Mismatched { and }
-examples/example.yml:13
-    action: debug oops a missing {{bracket}
-
 [ANSIBLE0004] Checkouts must contain explicit version
 examples/example.yml:22
     action: git a=b c=d
@@ -152,10 +148,6 @@ are also handled:
 
 ```
 $ bin/ansible-lint examples/include.yml
-[ANSIBLE0003] Mismatched { and }
-/Users/will/src/ansible-lint/examples/play.yml:6
-    action: oops {{the} bracketing is {{wrong}}
-
 [ANSIBLE0004] Checkouts must contain explicit version
 /Users/will/src/ansible-lint/examples/roles/bobbins/tasks/main.yml:3
 action: git a=b c=d
