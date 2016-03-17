@@ -271,7 +271,8 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " ".join(["k=v" for (k, v) in action.items() if k != "module_arguments"] +
+    args = " ".join(["{0}={1}".format(k,v) for (k, v) in action.items()
+                    if k not in ["module", "module_arguments"]] +
                     action.get("module_arguments"))
     return "{0} {1}".format(action["module"], args)
 
