@@ -6,12 +6,6 @@
     bracket: "and close bracket"
 
   tasks:
-  - name: bobbins
-    action: command echo ${oldskool}
-
-  - name: blah
-    action: debug oops a missing {{bracket}
-
   - name: unset variable
     action: command echo {{thisvariable}} is not set in this playbook
 
