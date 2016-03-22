@@ -21,4 +21,8 @@ or what should happen if providing a bug report
 
 Please give some details of what is actually happening.
 Include a [minimum complete verifiable example](http://stackoverflow.com/help/mcve)
-with playbook and output
+with:
+- playbook
+- output of running ansible-lint
+- if you're getting a stack trace, output of
+  `ansible-playbook --syntax-check playbook`
