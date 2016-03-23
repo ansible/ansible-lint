@@ -23,6 +23,7 @@ import imp
 import os
 
 import ansible.constants as C
+from ansible.errors import AnsibleError
 from ansible.module_utils.splitter import split_args
 
 import yaml
@@ -116,7 +117,10 @@ def find_children(playbook):
         return []
     results = []
     basedir = os.path.dirname(playbook[0])
-    pb_data = parse_yaml_from_file(playbook[0])
+    try:
+        pb_data = parse_yaml_from_file(playbook[0])
+    except AnsibleError, e:
+        raise SystemExit(str(e))
     items = _playbook_items(pb_data)
     for item in items:
         for child in play_children(basedir, item, playbook[1]):
@@ -173,7 +177,10 @@ def _roles_children(basedir, k, v, parent_type):
     results = []
     for role in v:
         if isinstance(role, dict):
-            results.extend(_look_for_role_files(basedir, role['role']))
+            if 'role' in role:
+                results.extend(_look_for_role_files(basedir, role['role']))
+            else:
+                raise SystemExit('role dict {0} does not contain a "role" key'.format(role))
         else:
             results.extend(_look_for_role_files(basedir, role))
     return results
