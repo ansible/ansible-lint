@@ -31,9 +31,9 @@ class OctalPermissionsRule(AnsibleLintRule):
     tags = ['formatting']
 
     # At least an indent, "mode:", optional whitespace, any digits, EOL
-    mode_regex = re.compile(r'^\s+mode:\s*[0-9]+\s*$')
+    mode_regex = re.compile(r'^.*mode(?:=|:)\s*[0-9]+\s*$')
     # Same as above, but with a leading zero before three digits
-    valid_mode_regex = re.compile(r'^\s+mode:\s*0[0-7]{3,4}\s*$')
+    valid_mode_regex = re.compile(r'^.*mode(?:=|:)\s*0[0-7]{3,4}\s*$')
 
     def match(self, file, line):
         if re.match(self.mode_regex, line):
