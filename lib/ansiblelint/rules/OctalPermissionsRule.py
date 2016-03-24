@@ -30,11 +30,15 @@ class OctalPermissionsRule(AnsibleLintRule):
         'http://docs.ansible.com/ansible/file_module.html'
     tags = ['formatting']
 
-    # At least an indent, "mode:", optional whitespace, any digits, EOL
-    mode_regex = re.compile(r'^\s+mode:\s*[0-9]+\s*$')
-    # Same as above, but with a leading zero before three digits
-    valid_mode_regex = re.compile(r'^\s+mode:\s*0[0-7]{3,4}\s*$')
+    _modules = {'assemble', 'copy', 'file', 'ini_file', 'lineinfile',
+                'replace', 'synchronize', 'template', 'unarchive'}
 
-    def match(self, file, line):
-        if re.match(self.mode_regex, line):
-            return not re.match(self.valid_mode_regex, line)
+    # At least an indent, "mode:", optional whitespace, any digits, EOL
+    mode_regex = re.compile(r'^\s*[0-9]+\s*$')
+    # Same as above, but with a leading zero before three digits
+    valid_mode_regex = re.compile(r'^\s*0[0-7]{3,4}\s*$')
+
+    def matchtask(self, file, task):
+        if task["action"]["module"] in self._modules:
+            if self.mode_regex.match(task['action']['module_arguments']['mode'][0]):
+                return not self.mode_regex.match(task['action']['module_arguments']['mode'][0])

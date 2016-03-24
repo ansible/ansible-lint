@@ -27,3 +27,6 @@
       file:
         path: bar
         mode: 2000
+
+    - name: octal permissions test fail (777)
+      file: path=baz mode=777
