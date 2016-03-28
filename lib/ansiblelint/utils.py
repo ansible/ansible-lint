@@ -148,7 +148,11 @@ def play_children(basedir, item, parent_type):
     (k, v) = item
     if k in delegate_map:
         if v:
-            v = template(basedir, v, dict(playbook_dir=os.path.abspath(basedir)), fail_on_undefined=False)
+            v = template(
+                os.path.abspath(basedir),
+                v,
+                dict(playbook_dir=os.path.abspath(basedir)),
+                fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
 
