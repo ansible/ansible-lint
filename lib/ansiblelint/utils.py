@@ -303,7 +303,7 @@ def extract_from_list(blocks, candidates):
                     results.extend(block[candidate])
                 elif block[candidate] is not None:
                     raise RuntimeError(
-                            "Key '%s' defined, but bad value: '%s'" % (candidate, str(block[candidate])))
+                        "Key '%s' defined, but bad value: '%s'" % (candidate, str(block[candidate])))
     return results
 
 

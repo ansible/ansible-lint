@@ -33,12 +33,27 @@ class OctalPermissionsRule(AnsibleLintRule):
     _modules = {'assemble', 'copy', 'file', 'ini_file', 'lineinfile',
                 'replace', 'synchronize', 'template', 'unarchive'}
 
-    # At least an indent, "mode:", optional whitespace, any digits, EOL
     mode_regex = re.compile(r'^\s*[0-9]+\s*$')
-    # Same as above, but with a leading zero before three digits
     valid_mode_regex = re.compile(r'^\s*0[0-7]{3,4}\s*$')
 
     def matchtask(self, file, task):
         if task["action"]["module"] in self._modules:
-            if self.mode_regex.match(task['action']['module_arguments']['mode'][0]):
-                return not self.mode_regex.match(task['action']['module_arguments']['mode'][0])
+            mode = task['action'].get('mode', None)
+            if isinstance(mode, basestring) and self.mode_regex.match(mode):
+                return not self.valid_mode_regex.match(mode)
+            if isinstance(mode, int):
+                # sensible file permission modes don't
+                # have write or execute bit set when read bit is
+                # not set
+                # also, user permissions are more generous than
+                # group permissions and user and group permissions
+                # are more generous than world permissions
+
+                result = (mode % 8 and mode % 8 < 4 or
+                          (mode >> 3) % 8 and (mode >> 3) % 8 < 4 or
+                          (mode >> 6) % 8 and (mode >> 6) % 8 < 4 or
+                          mode & 8 < (mode << 3) & 8 or
+                          mode & 8 < (mode << 6) & 8 or
+                          (mode << 3) & 8 < (mode << 6) & 8)
+
+                return result

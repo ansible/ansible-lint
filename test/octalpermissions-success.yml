@@ -13,16 +13,6 @@
         path: foo
         mode: 0000
 
-    - name: octal permissions test success (0123)
-      file:
-        path: foo
-        mode: 0123
-
-    - name: octal permissions test success (04000)
-      file:
-        path: baz
-        mode: 04000
-
     - name: octal permissions test success (02000)
       file:
         path: bar
@@ -30,3 +20,6 @@
 
     - name: octal permissions test success (0777)
       file: path=baz mode=0777
+
+    - name:  permissions test success (0777)
+      file: path=baz mode=u+rwx
