@@ -6,12 +6,19 @@
 
   tasks:
   - block:
-      - debug: msg='i execute normally'
-      - command: /bin/false
-      - debug: msg='i never execute, cause ERROR!'
+      - name: successful debug message
+        debug: msg='i execute normally'
+      - name: failure command
+        command: /bin/false
+      - name: never reacehd debug message
+        debug: msg='i never execute, cause ERROR!'
     rescue:
-      - debug: msg='I caught an error'
-      - command: /bin/false
-      - debug: msg='I also never execute :-('
+      - name: exception debug message
+        debug: msg='I caught an error'
+      - name: another failure command
+        command: /bin/false
+      - name: another missed debug message
+        debug: msg='I also never execute :-('
     always:
-      - debug: msg="this always executes"
+      - name: always reached debug message
+        debug: msg="this always executes"

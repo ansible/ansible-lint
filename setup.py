@@ -22,6 +22,5 @@ setup(
     install_requires=['ansible', 'pyyaml'],
     scripts=['bin/ansible-lint'],
     license='MIT',
-    include_package_date=True,
     test_suite="test"
 )
