@@ -35,3 +35,11 @@
     with_items: 
       - git
       - bobbins
+
+  - name: yum latest
+    yum: state=latest name=httpd
+
+  - debug: msg="task without a name"
+
+  - name: apt latest
+    apt: state=latest name=apache2
