@@ -43,6 +43,39 @@ Options:
                         repeatable.
 ```
 
+False positives
+===============
+
+Some rules are a bit of a rule of thumb. Advanced git, yum or apt usage,
+for example, is typically difficult to achieve through the modules. In
+this case, you should mark the task so that warnings aren't produced.
+
+There are two mechanisms for this - one works with all tasks, the other
+works with the command checking modules.
+
+Use the `warn` parameter with the command or shell module.
+
+Use `skip_ansible_lint` tag with any task that you want to skip.
+
+I recommend commenting the reasons why you're skipping the check.
+Unfortunately ansible-lint is unable to check for such comments
+at this time! (patches welcome)
+
+```
+- name: this would typically fire CommandsInsteadOfArgumentRule
+  command: warn=no chmod 644 X
+
+- name: this would typically fire CommandsInsteadOfModuleRule
+  command: git pull --rebase
+  args:
+    warn: False
+
+- name: this would typically fire GitHasVersionRule
+  git: src=/path/to/git/repo dest=checkout 
+  tags:
+  - skip_ansible_lint
+```
+
 Rules
 =====
 
