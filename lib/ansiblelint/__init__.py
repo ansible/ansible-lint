@@ -178,7 +178,11 @@ class Runner(object):
         self.rules = rules
         self.playbooks = set()
         for pb in playbooks:
-            self.playbooks.add((pb, 'playbook'))
+            # assume role if directory
+            if os.path.isdir(pb):
+                self.playbooks.add((pb, 'role'))
+            else:
+                self.playbooks.add((pb, 'playbook'))
         self.tags = tags
         self.skip_list = skip_list
         self._update_exclude_paths(exclude_paths)
@@ -205,15 +209,17 @@ class Runner(object):
         for playbook in self.playbooks:
             if self.is_excluded(playbook[0]):
                 continue
+            if playbook[1] == 'role':
+                continue
             files.append({'path': playbook[0], 'type': playbook[1]})
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
-                for file in ansiblelint.utils.find_children(arg):
-                    if self.is_excluded(file['path']):
+                for child in ansiblelint.utils.find_children(arg):
+                    if self.is_excluded(child['path']):
                         continue
-                    self.playbooks.add((file['path'], file['type']))
-                    files.append(file)
+                    self.playbooks.add((child['path'], child['type']))
+                    files.append(child)
                 visited.add(arg)
 
         matches = list()

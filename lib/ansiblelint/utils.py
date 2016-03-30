@@ -117,13 +117,16 @@ def _playbook_items(pb_data):
 def find_children(playbook):
     if not os.path.exists(playbook[0]):
         return []
+    if playbook[1] == 'role':
+        playbook_ds = {'roles': [{'role': playbook[0]}]}
+    else:
+        try:
+            playbook_ds = parse_yaml_from_file(playbook[0])
+        except AnsibleError, e:
+            raise SystemExit(str(e))
     results = []
     basedir = os.path.dirname(playbook[0])
-    try:
-        pb_data = parse_yaml_from_file(playbook[0])
-    except AnsibleError, e:
-        raise SystemExit(str(e))
-    items = _playbook_items(pb_data)
+    items = _playbook_items(playbook_ds)
     for item in items:
         for child in play_children(basedir, item, playbook[1]):
             if "$" in child['path'] or "{{" in child['path']:
