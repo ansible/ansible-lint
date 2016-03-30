@@ -18,8 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from __future__ import print_function
 from collections import defaultdict
 import os
+import sys
 
 import ansiblelint.utils
 
@@ -112,8 +114,16 @@ class RulesCollection(object):
     def run(self, playbookfile, tags=set(), skip_list=set()):
         text = ""
         matches = list()
-        with open(playbookfile['path'], 'Ur') as f:
-            text = f.read()
+
+        try:
+            with open(playbookfile['path'], 'Ur') as f:
+                text = f.read()
+        except IOError, e:
+            print("WARNING: Couldn't open %s - %s" %
+                  (playbookfile['path'], e.strerror),
+                  file=sys.stderr)
+            return matches
+
         for rule in self.rules:
             if not tags or not set(rule.tags).isdisjoint(tags):
                 rule_definition = set(rule.tags)

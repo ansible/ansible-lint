@@ -1,6 +1,9 @@
 ---
 - hosts: all
 
+  pre_tasks:
+  - { include: 'doesnotexist.yml' }
+
   tasks:
   - block:
       - debug: msg='i execute normally'
