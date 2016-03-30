@@ -8,22 +8,15 @@
         path: foo
         mode: 600
 
-    - name: octal permissions test fail (000)
-      file:
-        path: foo
-        mode: 000
-
     - name: octal permissions test fail (123)
       file:
         path: foo
         mode: 123
 
-    - name: octal permissions test fail (4000)
-      file:
-        path: baz
-        mode: 4000
-
     - name: octal permissions test fail (2000)
       file:
         path: bar
         mode: 2000
+
+    - name: octal permissions test fail (777)
+      file: path=baz mode=777

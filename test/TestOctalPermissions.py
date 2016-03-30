@@ -19,4 +19,4 @@ class TestOctalPermissionsRuleWithFile(unittest.TestCase):
         failure = 'test/octalpermissions-failure.yml'
         bad_runner = ansiblelint.Runner(self.collection, [failure], [], [], [])
         errs = bad_runner.run()
-        self.assertEqual(5, len(errs))
+        self.assertEqual(4, len(errs))
