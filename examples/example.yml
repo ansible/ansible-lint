@@ -10,7 +10,7 @@
     action: command echo {{thisvariable}} is not set in this playbook
 
   - name: trailing whitespace
-    action: do nothing   
+    action: command echo do nothing   
 
   - name: git check
     action: git a=b c=d
@@ -28,7 +28,7 @@
     action: command chdir=bobbins creates=whatever /usr/bin/git clone blah
 
   - name: using git module
-    action: git command
+    action: git repo=blah
 
   - name: passing git as an argument to another task
     action: debug msg="{{item}}"
