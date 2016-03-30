@@ -25,7 +25,6 @@ import os
 import ansible.constants as C
 from ansible.errors import AnsibleError
 from ansible.module_utils.splitter import split_args
-
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
@@ -34,9 +33,12 @@ try:
     from ansible.utils import parse_yaml_from_file
     from ansible.utils import path_dwim
     from ansible.utils.template import template
+    ANSIBLE_VERSION = 1
 except ImportError:
     from ansible.parsing.dataloader import DataLoader
     from ansible.template import Templar
+    from ansible.parsing.mod_args import ModuleArgsParser
+    ANSIBLE_VERSION = 2
 
     def parse_yaml_from_file(filepath):
         dl = DataLoader()
@@ -248,9 +250,38 @@ def _kv_to_dict(v):
     return (dict(module=command, module_arguments=args, **kwargs))
 
 
-def normalize_task(task):
+def normalize_task_v2(task):
     '''Ensures tasks have an action key and strings are converted to python objects'''
 
+    result = dict()
+    mod_arg_parser = ModuleArgsParser(task)
+    action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+
+    # denormalize shell -> command conversion
+    if '_use_shell' in arguments:
+        action = 'shell'
+        del(arguments['_use_shell'])
+
+    for (k, v) in list(task.items()):
+        if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
+            # we don't want to re-assign these values, which were
+            # determined by the ModuleArgsParser() above
+            continue
+        else:
+            result[k] = v
+
+    result['action'] = dict(module=action)
+
+    if '_raw_params' in arguments:
+        result['action']['module_arguments'] = arguments['_raw_params'].split()
+        del(arguments['_raw_params'])
+    else:
+        result['action']['module_arguments'] = list()
+    result['action'].update(arguments)
+    return result
+
+
+def normalize_task_v1(task):
     result = dict()
     for (k, v) in task.items():
         if k in VALID_KEYS or k.startswith('with_'):
@@ -283,6 +314,13 @@ def normalize_task(task):
     return result
 
 
+def normalize_task(task):
+    if ANSIBLE_VERSION < 2:
+        return normalize_task_v1(task)
+    else:
+        return normalize_task_v2(task)
+
+
 def task_to_str(task):
     name = task.get("name")
     if name:
@@ -303,7 +341,8 @@ def extract_from_list(blocks, candidates):
                     results.extend(block[candidate])
                 elif block[candidate] is not None:
                     raise RuntimeError(
-                        "Key '%s' defined, but bad value: '%s'" % (candidate, str(block[candidate])))
+                        "Key '%s' defined, but bad value: '%s'" %
+                        (candidate, str(block[candidate])))
     return results
 
 

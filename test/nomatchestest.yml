@@ -6,4 +6,4 @@
       action: debug msg="Hello!"
 
     - name: this should be fine too
-      action: file state=touch ./wherever
+      action: file state=touch dest=./wherever
