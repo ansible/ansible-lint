@@ -52,9 +52,15 @@ def main(args):
                       help="parseable output in the format of pep8")
     parser.add_option('-r', action='append', dest='rulesdir',
                       default=[], type='str',
-                      help="add one or more rules directories using "
-                           "one or more -r arguments. Defaults to %s but any "
-                           "-r flags completely override this."
+                      help="specify one or more rules directories using "
+                           "one or more -r arguments. Any -r flags override "
+                           "the default rules in %s, unless -R is also used."
+                           % default_rulesdir)
+    parser.add_option('-R', action='store_true', default=False,
+                      dest='use_default_rules',
+                      help="Use default rules %s in addition to any extra "
+                           "rules directories specified with -r. There is "
+                           "no need to specify this if no -r flags are used"
                            % default_rulesdir)
     parser.add_option('-t', dest='tags', default=[],
                       help="only check rules tagged with these values")
@@ -78,7 +84,10 @@ def main(args):
         parser.print_help(file=sys.stderr)
         return 1
 
-    rulesdirs = options.rulesdir or default_rulesdir
+    if options.use_default_rules:
+        rulesdir = options.rulesdir + default_rulesdir
+    else:
+        rulesdirs = options.rulesdir or default_rulesdir
 
     rules = RulesCollection()
     for rulesdir in rulesdirs:

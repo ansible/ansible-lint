@@ -30,10 +30,14 @@ Options:
   -L                    list all the rules
   -q                    quieter, although not silent output
   -p                    parseable output in the format of pep8
-  -r RULESDIR           add one or more rules directories using one or more -r
-                        arguments. Defaults to ['/Users/icordasc/sandbox
-                        /ansible-lint/lib/ansiblelint/rules'] but any -r flags
-                        completely override this.
+  -r RULESDIR           specify one or more rules directories using one or
+                        more -r arguments. Any -r flags override the default
+                        rules in ['/path/to/ansible-
+                        lint/lib/ansiblelint/rules'], unless -R is also used.
+  -R                    Use default rules ['/path/to/ansible-
+                        lint/lib/ansiblelint/rules'] in addition to any extra
+                        rules directories specified with -r. There is no need
+                        to specify this if no -r flags are used
   -t TAGS               only check rules tagged with these values
   -T                    list all the tags
   -x SKIP_LIST          only check rules whose id/tags do not match these
@@ -153,26 +157,34 @@ There are some example playbooks with undesirable features. Running
 ansible-lint on them works:
 
 ```
-ansible-lint examples/example.yml
-[ANSIBLE0006] git used in place of git module
-examples/example.yml:31
-    action: command git clone blah
+$ ansible-lint examples/example.yml
+[ANSIBLE0004] Git checkouts must contain explicit version
+examples/example.yml:15
+Task/Handler: git check
+
+[ANSIBLE0004] Git checkouts must contain explicit version
+examples/example.yml:18
+Task/Handler: git check 2
+
+[ANSIBLE0004] Git checkouts must contain explicit version
+examples/example.yml:30
+Task/Handler: using git module
 
 [ANSIBLE0002] Trailing whitespace
-examples/example.yml:19
-    action: do nothing
+examples/example.yml:13
+    action: do nothing   
 
-[ANSIBLE0004] Checkouts must contain explicit version
-examples/example.yml:22
-    action: git a=b c=d
+[ANSIBLE0002] Trailing whitespace
+examples/example.yml:35
+    with_items: 
 
-[ANSIBLE0004] Checkouts must contain explicit version
-examples/example.yml:25
-    action: git version=HEAD c=d
+[ANSIBLE0006] git used in place of git module
+examples/example.yml:24
+Task/Handler: executing git through command
 
-[ANSIBLE0004] Checkouts must contain explicit version
-examples/example.yml:34
-    action: git command
+[ANSIBLE0006] git used in place of git module
+examples/example.yml:27
+Task/Handler: executing git through command
 
 ```
 
