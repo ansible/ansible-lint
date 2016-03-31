@@ -29,5 +29,5 @@ class GitHasVersionRule(AnsibleLintRule):
     tags = ['repeatability']
 
     def matchtask(self, file, task):
-        return (task['action']['module'] == 'git' and
+        return (task['action']['__ansible_module__'] == 'git' and
                 task['action'].get('version', 'HEAD') == 'HEAD')
