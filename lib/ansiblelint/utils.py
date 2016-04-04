@@ -276,8 +276,12 @@ def normalize_task(task):
                         continue
 
                     else:
-                        # Should not get here!
-                        raise RuntimeError("Was not expecting value %s of type %s for key %s\nTask: %s" % (str(v), type(v), k), str(task))  # noqa
+                        # Tasks that include playbooks (rather than task files)
+                        # can get here
+                        # https://github.com/willthames/ansible-lint/issues/138
+                        raise RuntimeError("Was not expecting value %s of type %s for key %s\nTask: %s. "
+                                           "Check the syntax of your playbook using ansible-playbook "
+                                           "--syntax-check" % (str(v), type(v), k, str(task)))
             v['module_arguments'] = v.get('module_arguments', list())
             result['action'] = v
     return result
