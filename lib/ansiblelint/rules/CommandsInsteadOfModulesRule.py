@@ -21,6 +21,10 @@
 import os
 
 from ansiblelint import AnsibleLintRule
+try:
+    from ansible.utils.boolean import boolean
+except ImportError:
+    from ansible.utils import boolean
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
@@ -39,6 +43,8 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     def matchtask(self, file, task):
         if task["action"]["module"] in self._commands:
             executable = os.path.basename(task["action"]["module_arguments"][0])
-            if executable in self._modules:
+            if executable in self._modules and \
+                    boolean(task['action'].get('warn', True)) and \
+                    boolean(task.get('args', {}).get('warn', True)):
                 message = "{0} used in place of {1} module"
                 return message.format(executable, self._modules[executable])

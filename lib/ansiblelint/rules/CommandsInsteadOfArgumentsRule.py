@@ -21,6 +21,10 @@
 import os
 
 from ansiblelint import AnsibleLintRule
+try:
+    from ansible.utils.boolean import boolean
+except ImportError:
+    from ansible.utils import boolean
 
 
 class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
@@ -38,6 +42,8 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     def matchtask(self, file, task):
         if task["action"]["module"] in self._commands:
             executable = os.path.basename(task["action"]["module_arguments"][0])
-            if executable in self._arguments:
+            if executable in self._arguments and \
+                    boolean(task['action'].get('warn', True)) and \
+                    boolean(task.get('args', {}).get('warn', True)):
                 message = "{0} used in place of argument {1} to file module"
                 return message.format(executable, self._arguments[executable])
