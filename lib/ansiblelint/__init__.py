@@ -24,6 +24,7 @@ import os
 import sys
 
 import ansiblelint.utils
+import codecs
 
 
 class AnsibleLintRule(object):
@@ -68,7 +69,7 @@ class AnsibleLintRule(object):
                     result = self.matchtask(file, task)
                     if result:
                         message = None
-                        if isinstance(result, str):
+                        if isinstance(result, basestring):
                             message = result
                         taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
                         matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], taskstr,
@@ -116,7 +117,7 @@ class RulesCollection(object):
         matches = list()
 
         try:
-            with open(playbookfile['path'], 'Ur') as f:
+            with codecs.open(playbookfile['path'], mode='rb', encoding='utf-8') as f:
                 text = f.read()
         except IOError, e:
             print("WARNING: Couldn't open %s - %s" %
@@ -166,7 +167,7 @@ class Match(object):
         self.message = message or rule.shortdesc
 
     def __repr__(self):
-        formatstr = "[{0}] ({1}) matched {2}:{3} {4}"
+        formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
         return formatstr.format(self.rule.id, self.message,
                                 self.filename, self.linenumber, self.line)
 
