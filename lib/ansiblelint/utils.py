@@ -23,7 +23,7 @@ import imp
 import os
 
 import ansible.constants as C
-from ansible.errors import AnsibleError
+from ansible import errors
 from ansible.module_utils.splitter import split_args
 import yaml
 from yaml.composer import Composer
@@ -121,7 +121,7 @@ def find_children(playbook):
     basedir = os.path.dirname(playbook[0])
     try:
         pb_data = parse_yaml_from_file(playbook[0])
-    except AnsibleError, e:
+    except errors.AnsibleError, e:
         raise SystemExit(str(e))
     items = _playbook_items(pb_data)
     for item in items:
@@ -255,30 +255,36 @@ def normalize_task_v2(task):
 
     result = dict()
     mod_arg_parser = ModuleArgsParser(task)
-    action, arguments, result['delegate_to'] = mod_arg_parser.parse()
-
-    # denormalize shell -> command conversion
-    if '_use_shell' in arguments:
-        action = 'shell'
-        del(arguments['_use_shell'])
-
-    for (k, v) in list(task.items()):
-        if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
-            # we don't want to re-assign these values, which were
-            # determined by the ModuleArgsParser() above
-            continue
-        else:
-            result[k] = v
-
-    result['action'] = dict(module=action)
-
-    if '_raw_params' in arguments:
-        result['action']['module_arguments'] = arguments['_raw_params'].split()
-        del(arguments['_raw_params'])
+    try:
+        action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+    except errors.AnsibleParserError:
+        # Fall back to v1 task normalization if the ModuleArgsParser class
+        #  throws an AnsibleParserError exception. This is a common exception
+        #  when a role has a nested library.
+        return normalize_task_v1(task)
     else:
-        result['action']['module_arguments'] = list()
-    result['action'].update(arguments)
-    return result
+        # denormalize shell -> command conversion
+        if '_use_shell' in arguments:
+            action = 'shell'
+            del(arguments['_use_shell'])
+
+        for (k, v) in list(task.items()):
+            if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
+                # we don't want to re-assign these values, which were
+                # determined by the ModuleArgsParser() above
+                continue
+            else:
+                result[k] = v
+
+        result['action'] = dict(module=action)
+
+        if '_raw_params' in arguments:
+            result['action']['module_arguments'] = arguments['_raw_params'].split()
+            del(arguments['_raw_params'])
+        else:
+            result['action']['module_arguments'] = list()
+        result['action'].update(arguments)
+        return result
 
 
 def normalize_task_v1(task):
