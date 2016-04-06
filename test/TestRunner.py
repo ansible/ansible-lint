@@ -23,6 +23,7 @@ import unittest
 
 import ansiblelint
 from ansiblelint import RulesCollection
+from ansiblelint.formatters import Formatter
 
 
 class TestRule(unittest.TestCase):
@@ -39,13 +40,20 @@ class TestRule(unittest.TestCase):
     def test_unicode_runner_count(self):
         filename = 'test/unicode.yml'
         runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
-        assert (len(runner.run()) == 0)
+        assert (len(runner.run()) == 1)
+
+    def test_unicode_formatting(self):
+        filename = 'test/unicode.yml'
+        runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
+        matches = runner.run()
+        formatter = Formatter()
+        formatter.format(matches[0])
 
     def test_runner_excludes_paths(self):
         files = {'test/unicode.yml', 'examples/lots_of_warnings.yml'}
         excludes = ['examples/lots_of_warnings.yml']
         runner = ansiblelint.Runner(self.rules, files, [], [], excludes)
-        assert (len(runner.run()) == 0)
+        assert (len(runner.run()) == 1)
 
     def test_runner_block_count(self):
         files = {'test/block.yml'}

@@ -1,6 +1,8 @@
 ---
 - hosts: localhost
   connection: local
+  vars:
+    unicode_var: a_b_cö   
 
   tasks:
   - name: bonjour, ça va?
