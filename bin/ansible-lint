@@ -85,7 +85,7 @@ def main(args):
         return 1
 
     if options.use_default_rules:
-        rulesdir = options.rulesdir + default_rulesdir
+        rulesdirs = options.rulesdir + default_rulesdir
     else:
         rulesdirs = options.rulesdir or default_rulesdir
 
