@@ -174,7 +174,7 @@ class Match(object):
 
 class Runner(object):
 
-    def __init__(self, rules, playbook, tags, skip_list, exclude_paths):
+    def __init__(self, rules, playbook, tags, skip_list, exclude_paths, ignore_roles=False):
         self.rules = rules
         self.playbooks = set()
         # assume role if directory
@@ -186,6 +186,7 @@ class Runner(object):
         self.tags = tags
         self.skip_list = skip_list
         self._update_exclude_paths(exclude_paths)
+        self.ignore_roles = ignore_roles
 
     def _update_exclude_paths(self, exclude_paths):
         if exclude_paths:
@@ -215,7 +216,7 @@ class Runner(object):
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
-                for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
+                for child in ansiblelint.utils.find_children(arg, self.playbook_dir, self.ignore_roles):
                     if self.is_excluded(child['path']):
                         continue
                     self.playbooks.add((child['path'], child['type']))

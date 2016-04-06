@@ -53,7 +53,7 @@ class TestRule(unittest.TestCase):
         filename = 'examples/lots_of_warnings.yml'
         excludes = ['examples/lots_of_warnings.yml']
         runner = ansiblelint.Runner(self.rules, filename, [], [], excludes)
-        assert (len(runner.run()) == 1)
+        assert (len(runner.run()) == 0)
 
     def test_runner_block_count(self):
         filename = 'test/block.yml'

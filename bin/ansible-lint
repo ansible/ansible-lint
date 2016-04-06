@@ -45,6 +45,8 @@ def main(args):
 
     parser.add_option('-L', dest='listrules', default=False,
                       action='store_true', help="list all the rules")
+    parser.add_option('--ignore-roles', dest='ignore_roles', default=False,
+                      action='store_true', help="Don't examine included roles")
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
                       help="quieter, although not silent output")
     parser.add_option('-p', dest='parseable',
@@ -110,7 +112,8 @@ def main(args):
     matches = list()
     for playbook in playbooks:
         runner = ansiblelint.Runner(rules, playbook, options.tags,
-                                    options.skip_list, options.exclude_paths)
+                                    options.skip_list, options.exclude_paths,
+                                    options.ignore_roles)
         matches.extend(runner.run())
 
     for match in matches:
