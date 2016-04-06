@@ -316,6 +316,9 @@ def normalize_task_v1(task):
                                            (str(v), type(v), k, str(task)))
             v['module_arguments'] = v.get('module_arguments', list())
             result['action'] = v
+    if 'args' in result:
+        result['action'].update(result.get('args'))
+        del(result['args'])
     return result
 
 

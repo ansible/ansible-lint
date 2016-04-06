@@ -89,6 +89,16 @@ class TestUtils(unittest.TestCase):
             normalized_task = utils.normalize_task(task)
             self.assertEqual(normalized_task, utils.normalize_task(normalized_task))
 
+    def test_normalize_args(self):
+        task1 = dict(git={'version': 'abc'}, args={'repo': 'blah', 'dest': 'xyz'})
+        task2 = dict(git={'version': 'abc', 'repo': 'blah', 'dest': 'xyz'})
+
+        task3 = dict(git='version=abc repo=blah dest=xyz')
+        task4 = dict(git=None, args={'repo': 'blah', 'dest': 'xyz', 'version': 'abc'})
+        self.assertEqual(utils.normalize_task(task1), utils.normalize_task(task2))
+        self.assertEqual(utils.normalize_task(task1), utils.normalize_task(task3))
+        self.assertEqual(utils.normalize_task(task1), utils.normalize_task(task4))
+
     def test_extract_from_list(self):
         block = dict(
             test_list = ['foo', 'bar'],
