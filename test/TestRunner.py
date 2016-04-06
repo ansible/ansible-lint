@@ -34,38 +34,38 @@ class TestRule(unittest.TestCase):
 
     def test_runner_count(self):
         filename = 'test/nomatchestest.yml'
-        runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_unicode_runner_count(self):
         filename = 'test/unicode.yml'
-        runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 1)
 
     def test_unicode_formatting(self):
         filename = 'test/unicode.yml'
-        runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
         matches = runner.run()
         formatter = Formatter()
         formatter.format(matches[0])
 
     def test_runner_excludes_paths(self):
-        files = {'test/unicode.yml', 'examples/lots_of_warnings.yml'}
+        filename = 'examples/lots_of_warnings.yml'
         excludes = ['examples/lots_of_warnings.yml']
-        runner = ansiblelint.Runner(self.rules, files, [], [], excludes)
-        assert (len(runner.run()) == 1)
+        runner = ansiblelint.Runner(self.rules, filename, [], [], excludes)
+        assert (len(runner.run()) == 0)
 
     def test_runner_block_count(self):
-        files = {'test/block.yml'}
-        runner = ansiblelint.Runner(self.rules, files, [], [], [])
+        filename = 'test/block.yml'
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_runner_become_count(self):
-        files = {'test/become.yml'}
-        runner = ansiblelint.Runner(self.rules, files, [], [], [])
+        filename = 'test/become.yml'
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_runner_empty_tags_count(self):
-        files = {'test/emptytags.yml'}
-        runner = ansiblelint.Runner(self.rules, files, [], [], [])
+        filename = 'test/emptytags.yml'
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)

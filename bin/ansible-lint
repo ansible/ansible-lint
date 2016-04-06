@@ -109,10 +109,12 @@ def main(args):
         options.skip_list = options.skip_list.split(',')
 
     playbooks = set(args)
-    runner = ansiblelint.Runner(rules, playbooks, options.tags,
-                                options.skip_list, options.exclude_paths,
-                                options.verbosity)
-    matches = runner.run()
+    matches = list()
+    for playbook in playbooks:
+        runner = ansiblelint.Runner(rules, playbook, options.tags,
+                                    options.skip_list, options.exclude_paths,
+                                    options.verbosity)
+        matches.extend(runner.run())
 
     for match in matches:
         print(formatter.format(match))
