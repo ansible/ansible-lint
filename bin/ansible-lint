@@ -63,7 +63,7 @@ def main(args):
                            "no need to specify this if no -r flags are used"
                            % default_rulesdir)
     parser.add_option('-t', dest='tags', default=[],
-                      help="only check rules tagged with these values")
+                      help="only check rules whose id/tags match these values")
     parser.add_option('-T', dest='listtags', action='store_true',
                       help="list all the tags")
     parser.add_option('-x', dest='skip_list', default=[],

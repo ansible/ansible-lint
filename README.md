@@ -39,7 +39,7 @@ Options:
                         lint/lib/ansiblelint/rules'] in addition to any extra
                         rules directories specified with -r. There is no need
                         to specify this if no -r flags are used
-  -t TAGS               only check rules tagged with these values
+  -t TAGS               only check rules whose id/tags match these values
   -T                    list all the tags
   -x SKIP_LIST          only check rules whose id/tags do not match these
                         values

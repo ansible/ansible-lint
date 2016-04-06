@@ -125,7 +125,7 @@ class RulesCollection(object):
             return matches
 
         for rule in self.rules:
-            if not tags or not set(rule.tags).isdisjoint(tags):
+            if not tags or not set(rule.tags + [rule.id]).isdisjoint(tags):
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if set(rule_definition).isdisjoint(skip_list):
