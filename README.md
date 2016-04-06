@@ -100,6 +100,12 @@ Each rule definition should have the following:
   * `matchblock` that takes the details about the file and a block.
   It returns `None` or `False` if the line doesn't match the test
   and `True` or a custom message.
+  * `matchtask` operates on a single task or handler. Such a task
+      get standardized to always contain a `module` key and
+      `module_arguments` key. Other common task modifiers such as
+      `when`, `with_items` etc. are also available as keys if present
+      in the task.
+
 
 An example rule using `match` is:
 
