@@ -114,7 +114,7 @@ def _playbook_items(pb_data):
         return [item for play in pb_data for item in play.items()]
 
 
-def find_children(playbook):
+def find_children(playbook, playbook_dir):
     if not os.path.exists(playbook[0]):
         return []
     if playbook[1] == 'role':
@@ -128,7 +128,7 @@ def find_children(playbook):
     basedir = os.path.dirname(playbook[0])
     items = _playbook_items(playbook_ds)
     for item in items:
-        for child in play_children(basedir, item, playbook[1]):
+        for child in play_children(basedir, item, playbook[1], playbook_dir):
             if "$" in child['path'] or "{{" in child['path']:
                 continue
             valid_tokens = list()
@@ -144,7 +144,7 @@ def find_children(playbook):
     return results
 
 
-def play_children(basedir, item, parent_type):
+def play_children(basedir, item, parent_type, playbook_dir):
     delegate_map = {
         'tasks': _taskshandlers_children,
         'pre_tasks': _taskshandlers_children,
@@ -160,7 +160,7 @@ def play_children(basedir, item, parent_type):
             v = template(
                 os.path.abspath(basedir),
                 v,
-                dict(playbook_dir=os.path.abspath(basedir)),
+                dict(playbook_dir=os.path.abspath(playbook_dir)),
                 fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
