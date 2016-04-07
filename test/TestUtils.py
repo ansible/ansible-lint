@@ -101,10 +101,9 @@ class TestUtils(unittest.TestCase):
 
     def test_extract_from_list(self):
         block = dict(
-            test_list = ['foo', 'bar'],
-            test_none = None,
-            test_string = 'foo'
-        )
+            test_list=['foo', 'bar'],
+            test_none=None,
+            test_string='foo')
         blocks = [block]
 
         test_list = utils.extract_from_list(blocks, ['test_list'])
@@ -114,4 +113,3 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(list(), test_none)
         with self.assertRaises(RuntimeError):
             utils.extract_from_list(blocks, ['test_string'])
-

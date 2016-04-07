@@ -4,6 +4,7 @@
 *.class
 
 # Packages
+*.whl
 *.egg
 *.egg-info
 dist

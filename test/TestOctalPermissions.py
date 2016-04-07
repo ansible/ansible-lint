@@ -1,6 +1,5 @@
 import unittest
 import ansiblelint.utils
-from itertools import product  # Cartesian product: all subsets of length n
 from ansiblelint import RulesCollection
 from ansiblelint.rules.OctalPermissionsRule import OctalPermissionsRule
 

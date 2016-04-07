@@ -21,7 +21,7 @@ class TestSudoRule(unittest.TestCase):
         self.assertEquals(0, len(result))
 
     def test_check_value_shallow_dict(self):
-        result = self.rule._check_value({ 'sudo': 'yes', 'sudo_user': 'somebody' })
+        result = self.rule._check_value({'sudo': 'yes', 'sudo_user': 'somebody'})
         self.assertEquals(2, len(result))
 
     def test_check_value_nested(self):
@@ -31,12 +31,12 @@ class TestSudoRule(unittest.TestCase):
                 'sudo': 'yes',
                 'sudo_user': 'nobody',
                 'tasks': [
-                   {
-                      'name': 'test',
-                      'debug': 'msg=test',
-                      'sudo': 'yes',
-                      'sudo_user': 'somebody'
-                   }
+                    {
+                        'name': 'test',
+                        'debug': 'msg=test',
+                        'sudo': 'yes',
+                        'sudo_user': 'somebody'
+                    }
                 ]
             }
         ]
