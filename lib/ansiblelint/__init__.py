@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from __future__ import absolute_import
 from __future__ import print_function
 from collections import defaultdict
 import codecs
@@ -52,8 +53,8 @@ class AnsibleLintRule(object):
                 message = None
                 if isinstance(result, str):
                     message = result
-                matches.append(Match(prev_line_no+1, line,
-                               file['path'], self, message))
+                matches.append(Match(prev_line_no + 1, line,
+                                     file['path'], self, message))
         return matches
 
     def matchtask(self, file="", task=None):
@@ -77,7 +78,7 @@ class AnsibleLintRule(object):
                             message = result
                         taskstr = "Task/Handler: " + utils.task_to_str(task)
                         matches.append(Match(task[utils.LINE_NUMBER_KEY], taskstr,
-                                       file['path'], self, message))
+                                             file['path'], self, message))
         return matches
 
     def matchyaml(self, file, text):
@@ -223,31 +224,14 @@ class Runner(object):
         matches = list()
         for file in files:
             matches.extend(self.rules.run(file, tags=set(self.tags),
-                           skip_list=set(self.skip_list)))
+                                          skip_list=set(self.skip_list)))
 
         return matches
+
 
 def main(args=None):
     if args is None:
         args = sys.argv[1:]
-
-    #try:
-    #    cmd_name, cmd_args = parseopts(args)
-    #except Exception as exc:
-    #    sys.stderr.write("ERROR: %s" % exc)
-    #    sys.stderr.write(os.linesep)
-    #    sys.exit(1)
-
-    # Needed for locale.getpreferredencoding(False) to work
-    # in pip.utils.encoding.auto_decode
-    #try:
-    #    locale.setlocale(locale.LC_ALL, '')
-    #except locale.Error as e:
-    #    # setlocale can apparently crash if locale are uninitialized
-    #    logger.debug("Ignoring error %s when setting locale", e)
-    #command = commands_dict[cmd_name](isolated=check_isolated(cmd_args))
-    #return command.main(cmd_args)
-
 
     formatter = formatters.Formatter()
 
@@ -321,7 +305,7 @@ def main(args=None):
 
     playbooks = set(args)
     runner = Runner(rules, playbooks, options.tags,
-                                options.skip_list, options.exclude_paths)
+                    options.skip_list, options.exclude_paths)
     matches = runner.run()
 
     for match in matches:

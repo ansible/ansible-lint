@@ -1,12 +1,9 @@
-import os
+#!/usr/bin/env python2
+from __future__ import absolute_import
 from setuptools import find_packages
 from setuptools import setup
-import sys
 
-
-sys.path.insert(0, os.path.abspath('lib'))
-
-exec(open('lib/ansiblelint/version.py').read())
+from lib.ansiblelint import __version__
 
 setup(
     name='ansible-lint',

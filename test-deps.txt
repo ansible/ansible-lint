@@ -2,3 +2,4 @@ tox
 flake8
 nose
 wheel
+setuptools
