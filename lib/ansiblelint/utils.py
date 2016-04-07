@@ -114,18 +114,21 @@ def _playbook_items(pb_data):
         return [item for play in pb_data for item in play.items()]
 
 
-def find_children(playbook):
+def find_children(playbook, playbook_dir, ignore_roles):
     if not os.path.exists(playbook[0]):
         return []
+    if playbook[1] == 'role':
+        playbook_ds = {'roles': [{'role': playbook[0]}]}
+    else:
+        try:
+            playbook_ds = parse_yaml_from_file(playbook[0])
+        except AnsibleError, e:
+            raise SystemExit(str(e))
     results = []
     basedir = os.path.dirname(playbook[0])
-    try:
-        pb_data = parse_yaml_from_file(playbook[0])
-    except AnsibleError, e:
-        raise SystemExit(str(e))
-    items = _playbook_items(pb_data)
+    items = _playbook_items(playbook_ds)
     for item in items:
-        for child in play_children(basedir, item, playbook[1]):
+        for child in play_children(basedir, item, playbook[1], playbook_dir, ignore_roles):
             if "$" in child['path'] or "{{" in child['path']:
                 continue
             valid_tokens = list()
@@ -141,7 +144,7 @@ def find_children(playbook):
     return results
 
 
-def play_children(basedir, item, parent_type):
+def play_children(basedir, item, parent_type, playbook_dir, ignore_roles):
     delegate_map = {
         'tasks': _taskshandlers_children,
         'pre_tasks': _taskshandlers_children,
@@ -151,13 +154,15 @@ def play_children(basedir, item, parent_type):
         'dependencies': _roles_children,
         'handlers': _taskshandlers_children,
     }
+    if ignore_roles:
+        delegate_map['roles'] = lambda *args: []
     (k, v) = item
     if k in delegate_map:
         if v:
             v = template(
                 os.path.abspath(basedir),
                 v,
-                dict(playbook_dir=os.path.abspath(basedir)),
+                dict(playbook_dir=os.path.abspath(playbook_dir)),
                 fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
@@ -247,7 +252,7 @@ def rolename(filepath):
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(module=command, module_arguments=args, **kwargs))
+    return (dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs))
 
 
 def normalize_task_v2(task):
@@ -258,9 +263,9 @@ def normalize_task_v2(task):
     action, arguments, result['delegate_to'] = mod_arg_parser.parse()
 
     # denormalize shell -> command conversion
-    if '_use_shell' in arguments:
+    if '_uses_shell' in arguments:
         action = 'shell'
-        del(arguments['_use_shell'])
+        del(arguments['_uses_shell'])
 
     for (k, v) in list(task.items()):
         if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
@@ -270,13 +275,13 @@ def normalize_task_v2(task):
         else:
             result[k] = v
 
-    result['action'] = dict(module=action)
+    result['action'] = dict(__ansible_module__=action)
 
     if '_raw_params' in arguments:
-        result['action']['module_arguments'] = arguments['_raw_params'].split()
+        result['action']['__ansible_arguments__'] = arguments['_raw_params'].split()
         del(arguments['_raw_params'])
     else:
-        result['action']['module_arguments'] = list()
+        result['action']['__ansible_arguments__'] = list()
     result['action'].update(arguments)
     return result
 
@@ -288,7 +293,7 @@ def normalize_task_v1(task):
             if k == 'local_action' or k == 'action':
                 if not isinstance(v, dict):
                     v = _kv_to_dict(v)
-                v['module_arguments'] = v.get('module_arguments', list())
+                v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
                 result['action'] = v
             else:
                 result[k] = v
@@ -296,10 +301,10 @@ def normalize_task_v1(task):
             if isinstance(v, basestring):
                 v = _kv_to_dict(k + ' ' + v)
             elif not v:
-                v = dict(module=k)
+                v = dict(__ansible_module__=k)
             else:
                 if isinstance(v, dict):
-                    v.update(dict(module=k))
+                    v.update(dict(__ansible_module__=k))
                 else:
                     if k == '__line__':
                         # Keep the line number stored
@@ -314,8 +319,15 @@ def normalize_task_v1(task):
                                            "Task: %s. Check the syntax of your playbook using "
                                            "ansible-playbook --syntax-check" %
                                            (str(v), type(v), k, str(task)))
-            v['module_arguments'] = v.get('module_arguments', list())
+            v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
             result['action'] = v
+    if 'module' in result['action']:
+        # this happens when a task uses
+        # local_action:
+        #   module: ec2
+        #   etc...
+        result['action']['__ansible_module__'] = result['action']['module']
+        del(result['action']['module'])
     if 'args' in result:
         result['action'].update(result.get('args'))
         del(result['args'])
@@ -335,9 +347,9 @@ def task_to_str(task):
         return name
     action = task.get("action")
     args = " " .join(["{0}={1}".format(k, v) for (k, v) in action.items()
-                     if k not in ["module", "module_arguments"]] +
-                     action.get("module_arguments"))
-    return "{0} {1}".format(action["module"], args)
+                     if k not in ["__ansible_module__", "__ansible_arguments__"]] +
+                     action.get("__ansible_arguments__"))
+    return "{0} {1}".format(action["__ansible_module__"], args)
 
 
 def extract_from_list(blocks, candidates):

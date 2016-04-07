@@ -10,7 +10,7 @@
     action: command echo {{thisvariable}} is not set in this playbook
 
   - name: trailing whitespace
-    action: do nothing   
+    action: command echo do nothing   
 
   - name: git check
     action: git a=b c=d
@@ -28,10 +28,18 @@
     action: command chdir=bobbins creates=whatever /usr/bin/git clone blah
 
   - name: using git module
-    action: git command
+    action: git repo=blah
 
   - name: passing git as an argument to another task
     action: debug msg="{{item}}"
     with_items: 
       - git
       - bobbins
+
+  - name: yum latest
+    yum: state=latest name=httpd
+
+  - debug: msg="task without a name"
+
+  - name: apt latest
+    apt: state=latest name=apache2

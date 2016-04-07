@@ -11,9 +11,10 @@
 
     - name: test ANSIBLE0006
       command: git log
+      changed_when: False
 
     - name: test ANSIBLE0007
-      command: chmod 644 A
+      command: creates=B chmod 644 A
 
     - name: test ANSIBLE0004 (skip)
       action: git
@@ -39,22 +40,26 @@
       command: git log
       args:
         warn: False
+      changed_when: False
 
     - name: test ANSIBLE0005 (don't warn)
       command: chmod 644 A
       args:
         warn: False
+        creates: B
 
     - name: test ANSIBLE0005 (warn)
       command: chmod 644 A
       args:
         warn: yes
+        creates: B
 
     - name: test ANSIBLE0004 (don't warn single line)
       command: warn=False chdir=/tmp/blah git log
+      changed_when: False
 
     - name: test ANSIBLE0005 (don't warn single line)
-      command: warn=no chmod 644 A
+      command: warn=no creates=B chmod 644 A
 
     - name: test ANSIBLE0005 (warn single line)
-      command: warn=yes chmod 644 A
+      command: warn=yes creates=B chmod 644 A

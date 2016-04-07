@@ -1,0 +1,41 @@
+- tasks:
+  - name: command with creates check
+    command: echo blah
+    args:
+      creates: Z
+
+  - name: command with removes check
+    command: echo blah
+    args:
+      removes: Z
+
+  - name: command with changed_when
+    command: echo blah
+    changed_when: False
+
+  - name: command with inline creates
+    command: creates=Z echo blah
+
+  - name: command with inline removes
+    command: removes=Z echo blah
+
+  - name: shell with creates check
+    shell: echo blah
+    args:
+      creates: Z
+
+  - name: shell with removes check
+    shell: echo blah
+    args:
+      removes: Z
+
+  - name: shell with changed_when
+    shell: echo blah
+    changed_when: False
+
+  - name: shell with inline creates
+    shell: creates=Z echo blah
+
+  - name: shell with inline removes
+    shell: removes=Z echo blah
+

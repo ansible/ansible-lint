@@ -77,18 +77,6 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(utils.normalize_task(task2), utils.normalize_task(task3))
         self.assertEqual(utils.normalize_task(task3), utils.normalize_task(task4))
 
-    def test_normalize_task_is_idempotent(self):
-        tasks = list()
-        tasks.append(dict(name="hello", action={'module': 'ec2',
-                                                'region': 'us-east1',
-                                                'etc': 'whatever'}))
-        tasks.append(dict(name="hello", ec2={'region': 'us-east1', 'etc': 'whatever'}))
-        tasks.append(dict(name="hello", ec2="region=us-east1 etc=whatever"))
-        tasks.append(dict(name="hello", action="ec2 region=us-east1 etc=whatever"))
-        for task in tasks:
-            normalized_task = utils.normalize_task(task)
-            self.assertEqual(normalized_task, utils.normalize_task(normalized_task))
-
     def test_normalize_args(self):
         task1 = dict(git={'version': 'abc'}, args={'repo': 'blah', 'dest': 'xyz'})
         task2 = dict(git={'version': 'abc', 'repo': 'blah', 'dest': 'xyz'})

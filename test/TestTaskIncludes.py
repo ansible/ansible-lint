@@ -12,6 +12,6 @@ class TestTaskIncludes(unittest.TestCase):
 
     def test_included_tasks(self):
         filename = 'test/taskincludes.yml'
-        runner = ansiblelint.Runner(self.rules, {filename}, [], [], [])
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
         runner.run()
         self.assertEqual(len(runner.playbooks), 4)
