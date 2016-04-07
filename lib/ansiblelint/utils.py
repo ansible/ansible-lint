@@ -58,7 +58,7 @@ except ImportError:
 LINE_NUMBER_KEY = '__line__'
 
 VALID_KEYS = [
-    'name', 'meta', 'action', 'when', 'async', 'poll', 'notify',
+    'name', 'action', 'when', 'async', 'poll', 'notify',
     'first_available_file', 'include', 'tags', 'register', 'ignore_errors',
     'delegate_to', 'local_action', 'transport', 'remote_user', 'sudo', 'sudo_user',
     'sudo_pass', 'when', 'connection', 'environment', 'args',
