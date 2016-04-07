@@ -23,5 +23,9 @@ setup(
     scripts=['bin/ansible-lint'],
     license='MIT',
     include_package_date=True,
-    test_suite="test"
+    test_suite="test",
+    entry_points={
+        "console_scripts": [
+            "ansible-lint=ansiblelint:main"
+        ]}
 )

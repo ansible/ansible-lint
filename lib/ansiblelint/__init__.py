@@ -20,11 +20,15 @@
 
 from __future__ import print_function
 from collections import defaultdict
+import codecs
+import errno
+import optparse
 import os
 import sys
 
-import ansiblelint.utils
-import codecs
+from ansiblelint.version import __version__
+import ansiblelint.formatters as formatters
+import ansiblelint.utils as utils
 
 
 class AnsibleLintRule(object):
@@ -57,9 +61,9 @@ class AnsibleLintRule(object):
 
     def matchtasks(self, file, text):
         matches = []
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
+        yaml = utils.parse_yaml_linenumbers(text)
         if yaml:
-            for task in ansiblelint.utils.get_action_tasks(yaml, file):
+            for task in utils.get_action_tasks(yaml, file):
                 # An empty `tags` block causes `None` to be returned if
                 # the `or []` is not present - `task.get('tags', [])`
                 # does not suffice.
@@ -71,14 +75,14 @@ class AnsibleLintRule(object):
                         message = None
                         if isinstance(result, basestring):
                             message = result
-                        taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-                        matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], taskstr,
+                        taskstr = "Task/Handler: " + utils.task_to_str(task)
+                        matches.append(Match(task[utils.LINE_NUMBER_KEY], taskstr,
                                        file['path'], self, message))
         return matches
 
     def matchyaml(self, file, text):
         matches = []
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
+        yaml = utils.parse_yaml_linenumbers(text)
         if yaml and hasattr(self, 'matchplay'):
             for play in yaml:
                 result = self.matchplay(file, play)
@@ -90,7 +94,7 @@ class AnsibleLintRule(object):
                         raise Exception("{} is not a list".format(result))
 
                     for section, message in result:
-                        matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY],
+                        matches.append(Match(play[utils.LINE_NUMBER_KEY],
                                              section, file['path'], self, message))
         return matches
 
@@ -153,7 +157,7 @@ class RulesCollection(object):
     @classmethod
     def create_from_directory(cls, rulesdir):
         result = cls()
-        result.rules = ansiblelint.utils.load_plugins(os.path.expanduser(rulesdir))
+        result.rules = utils.load_plugins(os.path.expanduser(rulesdir))
         return result
 
 
@@ -187,7 +191,7 @@ class Runner(object):
         if exclude_paths:
             # These will be (potentially) relative paths
             paths = [s.strip() for s in exclude_paths]
-            # Since ansiblelint.utils.find_children returns absolute paths,
+            # Since utils.find_children returns absolute paths,
             # and the list of files we create in `Runner.run` can contain both
             # relative and absolute paths, we need to cover both bases.
             self.exclude_paths = paths + [os.path.abspath(p) for p in paths]
@@ -209,7 +213,7 @@ class Runner(object):
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
-                for file in ansiblelint.utils.find_children(arg):
+                for file in utils.find_children(arg):
                     if self.is_excluded(file['path']):
                         continue
                     self.playbooks.add((file['path'], file['type']))
@@ -222,3 +226,118 @@ class Runner(object):
                            skip_list=set(self.skip_list)))
 
         return matches
+
+def main(args=None):
+    if args is None:
+        args = sys.argv[1:]
+
+    #try:
+    #    cmd_name, cmd_args = parseopts(args)
+    #except Exception as exc:
+    #    sys.stderr.write("ERROR: %s" % exc)
+    #    sys.stderr.write(os.linesep)
+    #    sys.exit(1)
+
+    # Needed for locale.getpreferredencoding(False) to work
+    # in pip.utils.encoding.auto_decode
+    #try:
+    #    locale.setlocale(locale.LC_ALL, '')
+    #except locale.Error as e:
+    #    # setlocale can apparently crash if locale are uninitialized
+    #    logger.debug("Ignoring error %s when setting locale", e)
+    #command = commands_dict[cmd_name](isolated=check_isolated(cmd_args))
+    #return command.main(cmd_args)
+
+
+    formatter = formatters.Formatter()
+
+    parser = optparse.OptionParser("%prog playbook.yml",
+                                   version="%prog " + __version__)
+
+    default_rulesdir = [os.path.join(os.path.dirname(utils.__file__), 'rules')]
+
+    parser.add_option('-L', dest='listrules', default=False,
+                      action='store_true', help="list all the rules")
+    parser.add_option('-q', dest='quiet', default=False, action='store_true',
+                      help="quieter, although not silent output")
+    parser.add_option('-p', dest='parseable',
+                      default=False, action='store_true',
+                      help="parseable output in the format of pep8")
+    parser.add_option('-r', action='append', dest='rulesdir',
+                      default=[], type='str',
+                      help="specify one or more rules directories using "
+                           "one or more -r arguments. Any -r flags override "
+                           "the default rules in %s, unless -R is also used."
+                           % default_rulesdir)
+    parser.add_option('-R', action='store_true', default=False,
+                      dest='use_default_rules',
+                      help="Use default rules %s in addition to any extra "
+                           "rules directories specified with -r. There is "
+                           "no need to specify this if no -r flags are used"
+                           % default_rulesdir)
+    parser.add_option('-t', dest='tags', default=[],
+                      help="only check rules whose id/tags match these values")
+    parser.add_option('-T', dest='listtags', action='store_true',
+                      help="list all the tags")
+    parser.add_option('-x', dest='skip_list', default=[],
+                      help="only check rules whose id/tags do not " +
+                      "match these values")
+    parser.add_option('--exclude', dest='exclude_paths', action='append',
+                      help='path to directories or files to skip. This option'
+                           ' is repeatable.')
+    options, args = parser.parse_args(args)
+
+    if options.quiet:
+        formatter = formatters.QuietFormatter()
+
+    if options.parseable:
+        formatter = formatters.ParseableFormatter()
+
+    if len(args) == 0 and not (options.listrules or options.listtags):
+        parser.print_help(file=sys.stderr)
+        return 1
+
+    if options.use_default_rules:
+        rulesdirs = options.rulesdir + default_rulesdir
+    else:
+        rulesdirs = options.rulesdir or default_rulesdir
+
+    rules = RulesCollection()
+    for rulesdir in rulesdirs:
+        rules.extend(RulesCollection.create_from_directory(rulesdir))
+
+    if options.listrules:
+        print(rules)
+        return 0
+
+    if options.listtags:
+        print(rules.listtags())
+        return 0
+
+    if isinstance(options.tags, basestring):
+        options.tags = options.tags.split(',')
+    if isinstance(options.skip_list, basestring):
+        options.skip_list = options.skip_list.split(',')
+
+    playbooks = set(args)
+    runner = Runner(rules, playbooks, options.tags,
+                                options.skip_list, options.exclude_paths)
+    matches = runner.run()
+
+    for match in matches:
+        print(formatter.format(match))
+
+    if len(matches):
+        return 2
+    else:
+        return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except IOError as exc:
+        if exc.errno != errno.EPIPE:
+            raise
+    except RuntimeError as e:
+        raise SystemExit(str(e))
