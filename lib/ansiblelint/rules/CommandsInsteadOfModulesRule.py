@@ -41,8 +41,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
                 'unzip': 'unarchive', 'tar': 'unarchive', 'chkconfig': 'service'}
 
     def matchtask(self, file, task):
-        if task["action"]["__ansible_module__"] in self._commands and task["action"]["module_arguments"]:
-            executable = os.path.basename(task["action"]["module_arguments"][0])
+        if task["action"]["__ansible_module__"] in self._commands and \
+                task["action"]["__ansible_arguments__"]:
+            executable = os.path.basename(task["action"]["__ansible_arguments__"][0])
             if executable in self._modules and \
                     boolean(task['action'].get('warn', True)):
                 message = "{0} used in place of {1} module"
