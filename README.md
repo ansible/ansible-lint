@@ -199,7 +199,7 @@ If playbooks include other playbooks, or tasks, or handlers or roles, these
 are also handled:
 
 ```
-$ bin/ansible-lint examples/include.yml
+$ ansible-lint examples/include.yml
 [ANSIBLE0004] Checkouts must contain explicit version
 /Users/will/src/ansible-lint/examples/roles/bobbins/tasks/main.yml:3
 action: git a=b c=d
