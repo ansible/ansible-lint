@@ -247,7 +247,7 @@ def rolename(filepath):
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(__ansible_module__=command, module_arguments=args, **kwargs))
+    return (dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs))
 
 
 def normalize_task_v2(task):
@@ -270,13 +270,13 @@ def normalize_task_v2(task):
         else:
             result[k] = v
 
-    result['action'] = dict(module=action)
+    result['action'] = dict(__ansible_module__=action)
 
     if '_raw_params' in arguments:
-        result['action']['module_arguments'] = arguments['_raw_params'].split()
+        result['action']['__ansible_arguments__'] = arguments['_raw_params'].split()
         del(arguments['_raw_params'])
     else:
-        result['action']['module_arguments'] = list()
+        result['action']['__ansible_arguments__'] = list()
     result['action'].update(arguments)
     return result
 
@@ -288,7 +288,7 @@ def normalize_task_v1(task):
             if k == 'local_action' or k == 'action':
                 if not isinstance(v, dict):
                     v = _kv_to_dict(v)
-                v['module_arguments'] = v.get('module_arguments', list())
+                v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
                 result['action'] = v
             else:
                 result[k] = v
@@ -314,7 +314,7 @@ def normalize_task_v1(task):
                                            "Task: %s. Check the syntax of your playbook using "
                                            "ansible-playbook --syntax-check" %
                                            (str(v), type(v), k, str(task)))
-            v['module_arguments'] = v.get('module_arguments', list())
+            v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
             result['action'] = v
     if 'args' in result:
         result['action'].update(result.get('args'))
@@ -335,8 +335,8 @@ def task_to_str(task):
         return name
     action = task.get("action")
     args = " " .join(["{0}={1}".format(k, v) for (k, v) in action.items()
-                     if k not in ["__ansible_module__", "module_arguments"]] +
-                     action.get("module_arguments"))
+                     if k not in ["__ansible_module__", "__ansible_arguments__"]] +
+                     action.get("__ansible_arguments__"))
     return "{0} {1}".format(action["__ansible_module__"], args)
 
 

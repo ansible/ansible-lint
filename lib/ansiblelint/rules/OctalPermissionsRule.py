@@ -37,7 +37,7 @@ class OctalPermissionsRule(AnsibleLintRule):
     valid_mode_regex = re.compile(r'^\s*0[0-7]{3,4}\s*$')
 
     def matchtask(self, file, task):
-        if task["action"]["module"] in self._modules:
+        if task["action"]["__ansible_module__"] in self._modules:
             mode = task['action'].get('mode', None)
             if isinstance(mode, basestring) and self.mode_regex.match(mode):
                 return not self.valid_mode_regex.match(mode)
