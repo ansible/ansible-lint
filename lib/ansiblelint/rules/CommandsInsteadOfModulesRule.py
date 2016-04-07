@@ -41,7 +41,8 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
                 'unzip': 'unarchive', 'tar': 'unarchive'}
 
     def matchtask(self, file, task):
-        if task["action"]["__ansible_module__"] in self._commands and task["action"]["__ansible_arguments__"]:
+        if task["action"]["__ansible_module__"] in self._commands and \
+                task["action"]["__ansible_arguments__"]:
             executable = os.path.basename(task["action"]["__ansible_arguments__"][0])
             if executable in self._modules and \
                     boolean(task['action'].get('warn', True)):

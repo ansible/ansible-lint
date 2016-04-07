@@ -316,6 +316,13 @@ def normalize_task_v1(task):
                                            (str(v), type(v), k, str(task)))
             v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
             result['action'] = v
+    if 'module' in result['action']:
+        # this happens when a task uses
+        # local_action:
+        #   module: ec2
+        #   etc...
+        result['action']['__ansible_module__'] = result['action']['module']
+        del(result['action']['module'])
     if 'args' in result:
         result['action'].update(result.get('args'))
         del(result['args'])
