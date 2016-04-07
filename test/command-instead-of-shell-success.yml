@@ -1,0 +1,9 @@
+- tasks:
+  - name: shell with pipe
+    shell: echo hello | true
+
+  - name: shell with redirect
+    shell: echo hello >  /tmp/hello
+
+  - name: chain two shell commands
+    shell: echo hello && echo goodbye

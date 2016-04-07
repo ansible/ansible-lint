@@ -284,9 +284,9 @@ def normalize_task_v2(task):
     action, arguments, result['delegate_to'] = mod_arg_parser.parse()
 
     # denormalize shell -> command conversion
-    if '_use_shell' in arguments:
+    if '_uses_shell' in arguments:
         action = 'shell'
-        del(arguments['_use_shell'])
+        del(arguments['_uses_shell'])
 
     for (k, v) in list(task.items()):
         if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
