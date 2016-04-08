@@ -41,8 +41,6 @@ def main(args):
     parser = optparse.OptionParser("%prog playbook.yml",
                                    version="%prog " + __version__)
 
-    default_rulesdir = [os.path.join(os.path.dirname(utils.__file__), 'rules')]
-
     parser.add_option('-L', dest='listrules', default=False,
                       action='store_true', help="list all the rules")
     parser.add_option('-q', dest='quiet', default=False, action='store_true',
@@ -55,13 +53,13 @@ def main(args):
                       help="specify one or more rules directories using "
                            "one or more -r arguments. Any -r flags override "
                            "the default rules in %s, unless -R is also used."
-                           % default_rulesdir)
+                           % ansiblelint.default_rulesdir)
     parser.add_option('-R', action='store_true', default=False,
                       dest='use_default_rules',
-                      help="Use default rules %s in addition to any extra "
+                      help="Use default rules in %s in addition to any extra "
                            "rules directories specified with -r. There is "
                            "no need to specify this if no -r flags are used"
-                           % default_rulesdir)
+                           % ansiblelint.default_rulesdir)
     parser.add_option('-t', dest='tags', default=[],
                       help="only check rules whose id/tags match these values")
     parser.add_option('-T', dest='listtags', action='store_true',
@@ -87,9 +85,9 @@ def main(args):
         return 1
 
     if options.use_default_rules:
-        rulesdirs = options.rulesdir + default_rulesdir
+        rulesdirs = options.rulesdir + [ansiblelint.default_rulesdir]
     else:
-        rulesdirs = options.rulesdir or default_rulesdir
+        rulesdirs = options.rulesdir or [ansiblelint.default_rulesdir]
 
     rules = RulesCollection()
     for rulesdir in rulesdirs:

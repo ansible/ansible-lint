@@ -26,6 +26,8 @@ import sys
 import ansiblelint.utils
 import codecs
 
+default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
+
 
 class AnsibleLintRule(object):
 
