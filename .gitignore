@@ -1,30 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__
 *.py[co]
-
-# Jython
-*.class
+*$py.class
 
 # Packages
-*.egg
-*.egg-info
-dist
-build
-.eggs
-parts
-bin
-var
-sdist
-develop-eggs
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
 .installed.cfg
+*.egg
 
 # Installer logs
 pip-log.txt
 
 # Unit test / coverage reports
-.coverage
 .tox
-
-#Translations
-*.mo
-
-#Mr Developer
-.mr.developer.cfg
