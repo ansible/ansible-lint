@@ -37,11 +37,14 @@ class AnsibleLintRule(object):
     def verbose(self):
         return self.id + ": " + self.shortdesc + "\n  " + self.description
 
-    def match(self, file="", line=""):
-        return []
+    match = None
+    matchtask = None
+    matchplay = None
 
     def matchlines(self, file, text):
         matches = []
+        if not self.match:
+            return matches
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(text.split("\n")):
@@ -54,11 +57,10 @@ class AnsibleLintRule(object):
                                file['path'], self, message))
         return matches
 
-    def matchtask(self, file="", task=None):
-        return []
-
     def matchtasks(self, file, text):
         matches = []
+        if not self.matchtask:
+            return matches
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml:
             for task in ansiblelint.utils.get_action_tasks(yaml, file):
@@ -80,6 +82,8 @@ class AnsibleLintRule(object):
 
     def matchyaml(self, file, text):
         matches = []
+        if not self.matchplay:
+            return matches
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml and hasattr(self, 'matchplay'):
             for play in yaml:
