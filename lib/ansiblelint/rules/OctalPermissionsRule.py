@@ -30,8 +30,8 @@ class OctalPermissionsRule(AnsibleLintRule):
         'http://docs.ansible.com/ansible/file_module.html'
     tags = ['formatting']
 
-    _modules = {'assemble', 'copy', 'file', 'ini_file', 'lineinfile',
-                'replace', 'synchronize', 'template', 'unarchive'}
+    _modules = ['assemble', 'copy', 'file', 'ini_file', 'lineinfile',
+                'replace', 'synchronize', 'template', 'unarchive']
 
     mode_regex = re.compile(r'^\s*[0-9]+\s*$')
     valid_mode_regex = re.compile(r'^\s*0[0-7]{3,4}\s*$')
