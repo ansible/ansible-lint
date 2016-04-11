@@ -1,0 +1,8 @@
+- hosts: localhost
+
+  tasks:
+  - name: this doesn't work as it appears
+    shell: HELLO=hello echo $HELLO
+
+  - name: typo some stuff
+    command: cerates=/tmp/blah warn=no touch /tmp/blah

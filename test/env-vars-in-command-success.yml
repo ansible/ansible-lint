@@ -1,0 +1,10 @@
+- hosts: localhost
+
+  tasks:
+  - name: actual use of environment
+    shell: echo $HELLO
+    environment:
+      HELLO: hello
+
+  - name: use some key-value pairs
+    command: chdir=/tmp creates=/tmp/bobbins warn=no touch bobbins
