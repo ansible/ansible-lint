@@ -99,11 +99,13 @@ def tokenize(line):
 
     args = list()
     kwargs = dict()
+    nonkvfound = False
     for arg in tokens[1:]:
-        if "=" in arg:
+        if "=" in arg and not nonkvfound:
             kv = arg.split("=", 1)
             kwargs[kv[0]] = kv[1]
         else:
+            nonkvfound = True
             args.append(arg)
     return (command, args, kwargs)
 

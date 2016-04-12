@@ -8,3 +8,9 @@
 
   - name: use some key-value pairs
     command: chdir=/tmp creates=/tmp/bobbins warn=no touch bobbins
+
+  - name: commands can have flags
+    command: abc --xyz=def blah
+
+  - name: commands can have equals in them
+    command: echo "==========="

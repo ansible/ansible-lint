@@ -35,4 +35,4 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     def matchtask(self, file, task):
         if task["action"]["__ansible_module__"] in ['shell', 'command']:
             return any([arg not in self.expected_args for arg in task['action']] +
-                       ["=" in token for token in task['action']['__ansible_arguments__']])
+                       ["=" in task['action']['__ansible_arguments__'][0]])

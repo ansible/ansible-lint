@@ -50,7 +50,9 @@ class TestUtils(unittest.TestCase):
         (cmd, args, kwargs) = utils.tokenize("action: whatever bobbins x=y z=x c=3")
         self.assertEqual(cmd, "whatever")
         self.assertEqual(args[0], "bobbins")
-        self.assertEqual(kwargs, {'x': 'y', 'z': 'x', 'c': '3'})
+        self.assertEqual(args[1], "x=y")
+        self.assertEqual(args[2], "z=x")
+        self.assertEqual(args[3], "c=3")
 
     def test_tokenize_command_with_args(self):
         cmd, args, kwargs = utils.tokenize("action: command chdir=wxy creates=zyx tar xzf zyx.tgz")
