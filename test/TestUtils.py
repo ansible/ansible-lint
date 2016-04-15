@@ -115,3 +115,12 @@ class TestUtils(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             utils.extract_from_list(blocks, ['test_string'])
 
+    def test_simple_template(self):
+        v = "{{ playbook_dir }}"
+        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
+        self.assertEqual(result, "/a/b/c")
+
+    def test_missing_filter(self):
+        v = "{{ 'hello' | doesnotexist }}"
+        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
+        self.assertEqual(result, "{{ 'hello' | doesnotexist }}")

@@ -32,7 +32,7 @@ from yaml.constructor import Constructor
 try:
     from ansible.utils import parse_yaml_from_file
     from ansible.utils import path_dwim
-    from ansible.utils.template import template
+    from ansible.utils.template import template as ansible_template
     from ansible.utils import module_finder
     module_loader = module_finder
     ANSIBLE_VERSION = 1
@@ -52,7 +52,7 @@ except ImportError:
         dl.set_basedir(basedir)
         return dl.path_dwim(given)
 
-    def template(basedir, varname, templatevars, **kwargs):
+    def ansible_template(basedir, varname, templatevars, **kwargs):
         dl = DataLoader()
         dl.set_basedir(basedir)
         templar = Templar(dl, variables=templatevars)
@@ -147,6 +147,15 @@ def find_children(playbook):
     return results
 
 
+def template(basedir, value, vars, fail_on_undefined=False, **kwargs):
+    try:
+        value = ansible_template(os.path.abspath(basedir), value, vars, **kwargs)
+    except AnsibleError:
+        # templating failed, so just keep value as is.
+        pass
+    return value
+
+
 def play_children(basedir, item, parent_type):
     delegate_map = {
         'tasks': _taskshandlers_children,
@@ -161,10 +170,10 @@ def play_children(basedir, item, parent_type):
     if k in delegate_map:
         if v:
             v = template(
-                os.path.abspath(basedir),
-                v,
-                dict(playbook_dir=os.path.abspath(basedir)),
-                fail_on_undefined=False)
+                    os.path.abspath(basedir),
+                    v,
+                    dict(playbook_dir=os.path.abspath(basedir)),
+                    fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
 
