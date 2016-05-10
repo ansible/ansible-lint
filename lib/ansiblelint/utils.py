@@ -149,8 +149,11 @@ def find_children(playbook):
 
 def template(basedir, value, vars, fail_on_undefined=False, **kwargs):
     try:
-        value = ansible_template(os.path.abspath(basedir), value, vars, **kwargs)
-    except AnsibleError:
+        value = ansible_template(os.path.abspath(basedir), value, vars,
+                                 **dict(kwargs, fail_on_undefined=fail_on_undefined))
+        # Hack to skip the following exception when using to_json filter on a variable.
+        # I guess the filter doesn't like empty vars...
+    except (AnsibleError, ValueError):
         # templating failed, so just keep value as is.
         pass
     return value
