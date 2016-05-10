@@ -23,6 +23,6 @@ class ParseableFormatter(object):
         formatstr = u"{0}:{1}: [{2}] {3}"
         return formatstr.format(match.filename,
                                 match.linenumber,
-                                match.rule.id,
+                                "E" + match.rule.id,
                                 match.message,
                                 )
