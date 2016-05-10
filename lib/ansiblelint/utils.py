@@ -199,7 +199,8 @@ def _roles_children(basedir, k, v, parent_type):
     for role in v:
         if isinstance(role, dict):
             if 'role' in role:
-                results.extend(_look_for_role_files(basedir, role['role']))
+                if 'tags' not in role or 'skip_ansible_lint' not in role['tags']:
+                    results.extend(_look_for_role_files(basedir, role['role']))
             else:
                 raise SystemExit('role dict {0} does not contain a "role" key'.format(role))
         else:
