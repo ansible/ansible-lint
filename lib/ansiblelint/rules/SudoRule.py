@@ -28,3 +28,6 @@ class SudoRule(AnsibleLintRule):
 
     def matchplay(self, file, play):
         return self._check_value(play)
+
+    def matchtask(self, file, task):
+        return 'sudo' in task or 'sudo_user' in task
