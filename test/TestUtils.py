@@ -124,3 +124,8 @@ class TestUtils(unittest.TestCase):
         v = "{{ 'hello' | doesnotexist }}"
         result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
         self.assertEqual(result, "{{ 'hello' | doesnotexist }}")
+
+    def test_existing_filter_on_unknown_var(self):
+        v = "{{ hello | to_json }}"
+        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
+        self.assertEqual(result, "{{ hello | to_json }}")
