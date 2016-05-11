@@ -226,7 +226,9 @@ def _rolepath(basedir, role):
     ]
 
     if C.DEFAULT_ROLES_PATH:
-        search_locations = C.DEFAULT_ROLES_PATH.split(os.pathsep)
+        search_locations = C.DEFAULT_ROLES_PATH
+        if isinstance(search_locations, basestring):
+            search_locations = search_locations.split(os.pathsep)
         for loc in search_locations:
             loc = os.path.expanduser(loc)
             possible_paths.append(path_dwim(loc, role))
