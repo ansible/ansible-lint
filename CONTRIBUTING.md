@@ -23,13 +23,12 @@ Feel free to raise issues in the repo if you don't feel able to contribute a cod
 Standards
 =========
 
-Although the code is not currently PEP8 compliant, that is an aspiration.
-Fixes that only adjust PEP8 (especially large scale ones) affect git blame in 
-a bad way, but please feel free to clean up code in areas near where you're working!
+ansible-lint is flake8 compliant with `max-line-length` set to 100
+(see [setup.cfg](setup.cfg)).
 
-Similarly, adhering to pylint, pyflakes etc. would be nice in principle but
-confuses authorship for similar reasons.
+ansible-lint works with both Ansible 1.9 and Ansible 2.0 onwards. This will be
+the case for the foreseeable future, so please ensure all contributions work
+with both.
 
-An easy rule is that if the change doesn't change behaviour such that it would
-fail a unit test beforehand and pass the same test afterwards, the change 
-probably won't be accepted.
+Automated tests will be run against all PRs for flake8 compliance and Ansible
+compatibility - to check before pushing commits, just use `tox`.
