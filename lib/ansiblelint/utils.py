@@ -25,6 +25,7 @@ import os
 import ansible.constants as C
 from ansible.errors import AnsibleError
 from ansible.module_utils.splitter import split_args
+import pprint
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
@@ -41,6 +42,7 @@ except ImportError:
     from ansible.template import Templar
     from ansible.parsing.mod_args import ModuleArgsParser
     from ansible.plugins import module_loader
+    from ansible.errors import AnsibleParserError
     ANSIBLE_VERSION = 2
 
     def parse_yaml_from_file(filepath):
@@ -283,7 +285,16 @@ def normalize_task_v2(task):
 
     result = dict()
     mod_arg_parser = ModuleArgsParser(task)
-    action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+    try:
+        action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+    except AnsibleParserError as e:
+        try:
+            import pprint
+            pp = pprint.PrettyPrinter(indent=2)
+            task_pprint = pp.pformat(task)
+        except ImportError:
+            task_pprint = task
+        raise SystemExit("Couldn't parse task (%s)\n%s" % (e.message, task_pprint))
 
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
