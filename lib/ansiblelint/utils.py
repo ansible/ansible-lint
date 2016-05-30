@@ -25,7 +25,6 @@ import os
 import ansible.constants as C
 from ansible.errors import AnsibleError
 from ansible.module_utils.splitter import split_args
-import pprint
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
@@ -289,13 +288,16 @@ def normalize_task_v2(task):
     try:
         action, arguments, result['delegate_to'] = mod_arg_parser.parse()
     except AnsibleParserError as e:
+        task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
+        del task[FILENAME_KEY]
+        del task[LINE_NUMBER_KEY]
         try:
             import pprint
             pp = pprint.PrettyPrinter(indent=2)
             task_pprint = pp.pformat(task)
         except ImportError:
             task_pprint = task
-        raise SystemExit("Couldn't parse task (%s)\n%s" % (e.message, task_pprint))
+        raise SystemExit("Couldn't parse task at %s (%s)\n%s" % (task_info, e.message, task_pprint))
 
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
@@ -373,7 +375,7 @@ def normalize_task(task, filename):
     if ANSIBLE_VERSION < 2:
         task = normalize_task_v1(task)
     else:
-        task normalize_task_v2(task)
+        task = normalize_task_v2(task)
     task[FILENAME_KEY] = filename
     return task
 
