@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 from ansiblelint import AnsibleLintRule
+from ansiblelint.utils import LINE_NUMBER_KEY, FILENAME_KEY
 
 
 class EnvVarsInCommandRule(AnsibleLintRule):
@@ -30,7 +31,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
 
     expected_args = ['chdir', 'creates', 'executable', 'removes', 'warn',
                      '__ansible_module__', '__ansible_arguments__',
-                     '__line__']
+                     LINE_NUMBER_KEY, FILENAME_KEY]
 
     def matchtask(self, file, task):
         if task["action"]["__ansible_module__"] in ['shell', 'command']:

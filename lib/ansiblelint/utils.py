@@ -61,6 +61,7 @@ except ImportError:
         return templar.template(varname, **kwargs)
 
 LINE_NUMBER_KEY = '__line__'
+FILENAME_KEY = '__file__'
 
 VALID_KEYS = [
     'name', 'action', 'when', 'async', 'poll', 'notify',
@@ -368,11 +369,13 @@ def normalize_task_v1(task):
     return result
 
 
-def normalize_task(task):
+def normalize_task(task, filename):
     if ANSIBLE_VERSION < 2:
-        return normalize_task_v1(task)
+        task = normalize_task_v1(task)
     else:
-        return normalize_task_v2(task)
+        task normalize_task_v2(task)
+    task[FILENAME_KEY] = filename
+    return task
 
 
 def task_to_str(task):
@@ -413,7 +416,7 @@ def get_action_tasks(yaml, file):
     block_rescue_always = ('block', 'rescue', 'always')
     tasks[:] = [task for task in tasks if all(k not in task for k in block_rescue_always)]
 
-    return [normalize_task(task) for task in tasks
+    return [normalize_task(task, file['path']) for task in tasks
             if 'include' not in task.keys()]
 
 
