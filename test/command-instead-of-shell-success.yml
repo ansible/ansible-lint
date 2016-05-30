@@ -7,3 +7,9 @@
 
   - name: chain two shell commands
     shell: echo hello && echo goodbye
+
+  - name: run commands in succession
+    shell: echo hello ; echo goodbye
+
+  - name: use variables
+    shell: echo $HOME $USER

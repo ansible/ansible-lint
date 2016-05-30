@@ -18,4 +18,4 @@ class TestUseCommandInsteadOfShell(unittest.TestCase):
         failure = 'test/command-instead-of-shell-failure.yml'
         bad_runner = ansiblelint.Runner(self.collection, failure, [], [], [])
         errs = bad_runner.run()
-        self.assertEqual(3, len(errs))
+        self.assertEqual(2, len(errs))
