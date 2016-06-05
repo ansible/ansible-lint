@@ -38,7 +38,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     _modules = {'git': 'git', 'hg': 'hg', 'curl': 'get_url or uri', 'wget': 'get_url or uri',
                 'svn': 'subversion', 'service': 'service', 'mount': 'mount',
                 'rpm': 'yum or rpm_key', 'yum': 'yum', 'apt-get': 'apt-get',
-                'unzip': 'unarchive', 'tar': 'unarchive'}
+                'unzip': 'unarchive', 'tar': 'unarchive', 'chkconfig': 'service'}
 
     def matchtask(self, file, task):
         if task["action"]["module"] in self._commands and task["action"]["module_arguments"]:
