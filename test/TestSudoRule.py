@@ -61,6 +61,6 @@ class TestSudoRuleWithFile(unittest.TestCase):
     def test_matchtask_sudo(self):
         yaml = ansiblelint.utils.parse_yaml_linenumbers(open(self.file1).read())
         results = []
-        for task in ansiblelint.utils.get_action_tasks(yaml, dict(path=self.file1, type='playbook')):
+        for task in ansiblelint.utils.get_normalized_tasks(yaml, dict(path=self.file1, type='playbook')):
             results.append(self.rule.matchtask(self.file1, task))
         self.assertEquals(1, len([result for result in results if result]))

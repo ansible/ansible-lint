@@ -63,7 +63,7 @@ class AnsibleLintRule(object):
             return matches
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
         if yaml:
-            for task in ansiblelint.utils.get_action_tasks(yaml, file):
+            for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
                 # An empty `tags` block causes `None` to be returned if
                 # the `or []` is not present - `task.get('tags', [])`
                 # does not suffice.

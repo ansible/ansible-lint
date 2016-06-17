@@ -418,8 +418,12 @@ def get_action_tasks(yaml, file):
     block_rescue_always = ('block', 'rescue', 'always')
     tasks[:] = [task for task in tasks if all(k not in task for k in block_rescue_always)]
 
-    return [normalize_task(task, file['path']) for task in tasks
-            if 'include' not in task.keys()]
+    return [task for task in tasks if 'include' not in task.keys()]
+
+
+def get_normalized_tasks(yaml, file):
+    tasks = get_action_tasks(yaml, file)
+    return [normalize_task(task, file['path']) for task in tasks]
 
 
 def parse_yaml_linenumbers(data):
@@ -427,7 +431,6 @@ def parse_yaml_linenumbers(data):
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
-    loader = yaml.Loader(data)
 
     def compose_node(parent, index):
         # the line number where the previous token has ended (plus empty lines)
@@ -441,7 +444,11 @@ def parse_yaml_linenumbers(data):
         mapping[LINE_NUMBER_KEY] = node.__line__
         return mapping
 
-    loader.compose_node = compose_node
-    loader.construct_mapping = construct_mapping
-    data = loader.get_single_data()
+    try:
+        loader = yaml.Loader(data)
+        loader.compose_node = compose_node
+        loader.construct_mapping = construct_mapping
+        data = loader.get_single_data()
+    except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
+        raise SystemExit("Failed to parse YAML %s: %s" % (data, str(e)))
     return data
