@@ -61,7 +61,7 @@ class AnsibleLintRule(object):
         matches = []
         if not self.matchtask:
             return matches
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
         if yaml:
             for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
                 # An empty `tags` block causes `None` to be returned if
@@ -84,7 +84,7 @@ class AnsibleLintRule(object):
         matches = []
         if not self.matchplay:
             return matches
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text)
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
         if yaml and hasattr(self, 'matchplay'):
             for play in yaml:
                 result = self.matchplay(file, play)

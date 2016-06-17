@@ -51,7 +51,7 @@ class TestSudoRuleWithFile(unittest.TestCase):
         self.rule = SudoRule()
 
     def test_matchplay_sudo(self):
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(open(self.file1).read())
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(open(self.file1).read(), self.file1)
 
         self.assertTrue(yaml)
         for play in yaml:
@@ -59,7 +59,7 @@ class TestSudoRuleWithFile(unittest.TestCase):
             self.assertEquals(2, len(result))
 
     def test_matchtask_sudo(self):
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(open(self.file1).read())
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(open(self.file1).read(), self.file1)
         results = []
         for task in ansiblelint.utils.get_normalized_tasks(yaml, dict(path=self.file1, type='playbook')):
             results.append(self.rule.matchtask(self.file1, task))
