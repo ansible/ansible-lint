@@ -288,9 +288,12 @@ def normalize_task_v2(task):
     try:
         action, arguments, result['delegate_to'] = mod_arg_parser.parse()
     except AnsibleParserError as e:
-        task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
-        del task[FILENAME_KEY]
-        del task[LINE_NUMBER_KEY]
+        try:
+            task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
+            del task[FILENAME_KEY]
+            del task[LINE_NUMBER_KEY]
+        except KeyError:
+            task_info = "Unknown"
         try:
             import pprint
             pp = pprint.PrettyPrinter(indent=2)
