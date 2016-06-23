@@ -174,6 +174,9 @@ def play_children(basedir, item, parent_type, playbook_dir):
         'handlers': _taskshandlers_children,
     }
     (k, v) = item
+    play_library = os.path.join(os.path.abspath(basedir), 'library')
+    _load_library_if_exists(play_library)
+
     if k in delegate_map:
         if v:
             v = template(
@@ -215,6 +218,11 @@ def _roles_children(basedir, k, v, parent_type):
     return results
 
 
+def _load_library_if_exists(path):
+    if os.path.exists(path):
+        module_loader.add_directory(path)
+
+
 def _rolepath(basedir, role):
     role_path = None
 
@@ -243,9 +251,7 @@ def _rolepath(basedir, role):
             break
 
     if role_path:
-        role_modules = os.path.join(role_path, 'library')
-        if os.path.exists(role_modules):
-            module_loader.add_directory(role_modules)
+        _load_library_if_exists(os.path.join(role_path, 'library'))
 
     return role_path
 
