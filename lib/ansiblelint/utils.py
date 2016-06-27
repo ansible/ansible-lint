@@ -461,3 +461,34 @@ def parse_yaml_linenumbers(data, filename):
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
         raise SystemExit("Failed to parse YAML in %s: %s" % (filename, str(e)))
     return data
+
+
+# --- begin "pretty"
+#
+# pretty - A miniature library that provides a Python print and stdout
+# wrapper that makes colored terminal text easier to use (e.g. without
+# having to mess around with ANSI escape sequences). This code is public
+# domain - there is no license except that you must leave this header.
+#
+# Copyright (C) 2008 Brian Nez <thedude at bri1 dot com>
+#
+# http://nezzen.net/2008/06/23/colored-text-in-python-using-ansi-escape-sequences/
+
+codeCodes = {
+    'black':     u'0;30', 'bright gray':    u'0;37',
+    'blue':      u'0;34', 'white':          u'1;37',
+    'green':     u'0;32', 'bright blue':    u'1;34',
+    'cyan':      u'0;36', 'bright green':   u'1;32',
+    'red':       u'0;31', 'bright cyan':    u'1;36',
+    'purple':    u'0;35', 'bright red':     u'1;31',
+    'yellow':    u'0;33', 'bright purple':  u'1;35',
+    'dark gray': u'1;30', 'bright yellow':  u'1;33',
+    'magenta':   u'0;35', 'bright magenta': u'1;35',
+    'normal':    u'0'
+}
+
+def stringc(text, color):
+    """String in color."""
+    return u"\033[%sm%s\033[0m" % (codeCodes[color], text)
+
+# --- end "pretty"

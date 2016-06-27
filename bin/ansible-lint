@@ -48,6 +48,9 @@ def main(args):
     parser.add_option('-p', dest='parseable',
                       default=False, action='store_true',
                       help="parseable output in the format of pep8")
+    parser.add_option('-c', dest='colored',
+                      default=False, action='store_true',
+                      help="colored output using ANSI escape sequences")
     parser.add_option('-r', action='append', dest='rulesdir',
                       default=[], type='str',
                       help="specify one or more rules directories using "
@@ -79,6 +82,9 @@ def main(args):
 
     if options.parseable:
         formatter = formatters.ParseableFormatter()
+
+    if options.colored:
+        formatter = formatters.ColoredFormatter()
 
     if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
