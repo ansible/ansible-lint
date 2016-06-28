@@ -1,0 +1,79 @@
+---
+- hosts: localhost
+  become: no
+  vars:
+    my_list:
+      - foo
+      - bar
+
+    my_list2:
+      - 1
+      - 2
+
+    my_dict:
+      foo: bar
+
+  tasks:
+    ### Testing with_items loops
+    - name: with_items loop using static list
+      debug:
+        msg: "{{ item }}"
+      with_items:
+        - foo
+        - bar
+
+    - name: with_items using a static hash
+      debug:
+        msg: "{{ item.key }} - {{ item.value }}"
+      with_items:
+        - { key: foo, value: 1 }
+        - { key: bar, value: 2 }
+
+    - name: with_items loop using variable
+      debug:
+        msg: "{{ item }}"
+      with_items: "{{ my_list }}"
+
+    ### Testing with_nested loops
+    - name: with_nested loop using static lists
+      debug:
+        msg: "{{ item[0] }} - {{ item[1] }}"
+      with_nested:
+        - [ 'foo', 'bar' ]
+        - [ '1', '2', '3' ]
+
+    - name: with_nested loop using variable list and static
+      debug:
+        msg: "{{ item[0] }} - {{ item[1] }}"
+      with_nested:
+        - "{{ my_list }}"
+        - [ '1', '2', '3' ]
+
+    ### Testing with_dict
+    - name: with_dict loop using variable
+      debug:
+        msg: "{{ item.key }} - {{ item.value }}"
+      with_dict: "{{ my_dict }}"
+
+    ### Testing with_file
+    - name: with_file loop using static files list
+      debug:
+        msg: "{{ item }}"
+      with_file:
+        - foo.txt
+        - bar.txt
+
+    ### Testing with_fileglob
+    - name: with_fileglob loop using *.txt
+      debug:
+        msg: "{{ item }}"
+      with_fileglob:
+        - '*.txt'
+
+    ### Testing with_together
+    - name: with_together loop using variable lists
+      debug:
+        msg: "{{ item.0 }} - {{ item.1 }}"
+      with_together:
+        - "{{ my_list }}"
+        - "{{ my_list2 }}"
