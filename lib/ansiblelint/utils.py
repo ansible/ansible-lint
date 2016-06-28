@@ -30,6 +30,7 @@ from yaml.composer import Composer
 from yaml.constructor import Constructor
 
 try:
+    from ansible.color import stringc
     from ansible.utils import parse_yaml_from_file
     from ansible.utils import path_dwim
     from ansible.utils.template import template as ansible_template
@@ -37,6 +38,7 @@ try:
     module_loader = module_finder
     ANSIBLE_VERSION = 1
 except ImportError:
+    from ansible.utils.color import stringc
     from ansible.parsing.dataloader import DataLoader
     from ansible.template import Templar
     from ansible.parsing.mod_args import ModuleArgsParser
