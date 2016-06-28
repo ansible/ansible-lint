@@ -83,9 +83,6 @@ def main(args):
     if options.parseable:
         formatter = formatters.ParseableFormatter()
 
-    if options.colored:
-        formatter = formatters.ColoredFormatter()
-
     if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
         return 1
@@ -121,7 +118,7 @@ def main(args):
         matches.extend(runner.run())
 
     for match in matches:
-        print(formatter.format(match))
+        print(formatter.format(match, options.colored))
 
     if len(matches):
         return 2
