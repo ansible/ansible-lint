@@ -69,6 +69,10 @@ def main(args):
     parser.add_option('-x', dest='skip_list', default=[],
                       help="only check rules whose id/tags do not " +
                       "match these values")
+    parser.add_option('--nocolor', dest='colored',
+                      default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
+                      action='store_false',
+                      help="disable colored output")
     parser.add_option('--exclude', dest='exclude_paths', action='append',
                       help='path to directories or files to skip. This option'
                            ' is repeatable.')
@@ -115,7 +119,7 @@ def main(args):
         matches.extend(runner.run())
 
     for match in matches:
-        print(formatter.format(match))
+        print(formatter.format(match, options.colored))
 
     if len(matches):
         return 2
