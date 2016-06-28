@@ -461,4 +461,3 @@ def parse_yaml_linenumbers(data, filename):
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
         raise SystemExit("Failed to parse YAML in %s: %s" % (filename, str(e)))
     return data
-
