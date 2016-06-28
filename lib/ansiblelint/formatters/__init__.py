@@ -1,12 +1,12 @@
 try:
-    from ansiblelint.utils import stringc
+    from ansible.color import stringc
 except ImportError:
     from ansible.utils.color import stringc
 
 
 class Formatter(object):
 
-    def format(self, match, colored):
+    def format(self, match, colored=False):
         formatstr = u"{0} {1}\n{2}:{3}\n{4}\n"
 
         if colored:
@@ -25,7 +25,7 @@ class Formatter(object):
 
 class QuietFormatter(object):
 
-    def format(self, match, colored):
+    def format(self, match, colored=False):
         formatstr = u"{0} {1}:{2}"
         if colored:
             return formatstr.format(stringc(u"[{0}]".format(match.rule.id), 'bright red'),
@@ -38,7 +38,7 @@ class QuietFormatter(object):
 
 class ParseableFormatter(object):
 
-    def format(self, match, colored):
+    def format(self, match, colored=False):
         formatstr = u"{0}:{1}: [{2}] {3}"
         if colored:
             return formatstr.format(stringc(match.filename, 'blue'),
