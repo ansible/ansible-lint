@@ -27,7 +27,13 @@ class ParseableFormatter(object):
                                 match.message,
                                 )
 
-from ansiblelint.utils import stringc
+
+try:
+    from ansible.color import stringc
+    ANSIBLE_VERSION = 1
+except ImportError:
+    from ansible.utils.color import stringc
+    ANSIBLE_VERSION = 2
 
 class ColoredFormatter(object):
 
