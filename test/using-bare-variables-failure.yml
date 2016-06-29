@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  become: no
+  vars:
+    my_list:
+      - foo
+      - bar
+
+    my_dict:
+      foo: bar
+
+  tasks:
+    - name: with_items loop using bare variable
+      debug:
+        msg: "{{ item }}"
+      with_items: my_list
+
+    - name: with_dict loop using bare variable
+      debug:
+        msg: "{{ item }}"
+      with_dict: my_dict
