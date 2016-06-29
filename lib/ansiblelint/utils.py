@@ -72,6 +72,16 @@ VALID_KEYS = [
     'become', 'become_user', 'become_method',
 ]
 
+BLOCK_NAME_TO_ACTION_TYPE_MAP = {
+    'tasks': 'task',
+    'handlers': 'handler',
+    'pre_tasks': 'task',
+    'post_tasks': 'task',
+    'block': 'meta',
+    'rescue': 'meta',
+    'always': 'meta',
+}
+
 
 def load_plugins(directory):
     result = []
@@ -179,11 +189,10 @@ def play_children(basedir, item, parent_type, playbook_dir):
 
     if k in delegate_map:
         if v:
-            v = template(
-                    os.path.abspath(basedir),
-                    v,
-                    dict(playbook_dir=os.path.abspath(basedir)),
-                    fail_on_undefined=False)
+            v = template(os.path.abspath(basedir),
+                         v,
+                         dict(playbook_dir=os.path.abspath(basedir)),
+                         fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
 
@@ -381,11 +390,15 @@ def normalize_task_v1(task):
 
 
 def normalize_task(task, filename):
+    ansible_action_type = task.get('__ansible_action_type__', 'task')
+    if '__ansible_action_type__' in task:
+        del(task['__ansible_action_type__'])
     if ANSIBLE_VERSION < 2:
         task = normalize_task_v1(task)
     else:
         task = normalize_task_v2(task)
     task[FILENAME_KEY] = filename
+    task['__ansible_action_type__'] = ansible_action_type
     return task
 
 
@@ -406,7 +419,7 @@ def extract_from_list(blocks, candidates):
         for candidate in candidates:
             if candidate in block:
                 if isinstance(block[candidate], list):
-                    results.extend(block[candidate])
+                    results.extend(add_action_type(block[candidate], candidate))
                 elif block[candidate] is not None:
                     raise RuntimeError(
                         "Key '%s' defined, but bad value: '%s'" %
@@ -414,10 +427,18 @@ def extract_from_list(blocks, candidates):
     return results
 
 
+def add_action_type(actions, action_type):
+    results = list()
+    for action in actions:
+        action['__ansible_action_type__'] = BLOCK_NAME_TO_ACTION_TYPE_MAP[action_type]
+        results.append(action)
+    return results
+
+
 def get_action_tasks(yaml, file):
     tasks = list()
     if file['type'] in ['tasks', 'handlers']:
-        tasks = yaml
+        tasks = add_action_type(yaml, file['type'])
     else:
         tasks.extend(extract_from_list(yaml, ['tasks', 'handlers', 'pre_tasks', 'post_tasks']))
 

@@ -33,8 +33,9 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
     _commands = ['command', 'shell', 'raw']
 
     def matchtask(self, file, task):
-        if task["action"]["__ansible_module__"] in self._commands:
-            return 'changed_when' not in task and \
-                'when' not in task and \
-                'creates' not in task['action'] and \
-                'removes' not in task['action']
+        if task["__ansible_action_type__"] == 'task':
+            if task["action"]["__ansible_module__"] in self._commands:
+                return 'changed_when' not in task and \
+                    'when' not in task and \
+                    'creates' not in task['action'] and \
+                    'removes' not in task['action']

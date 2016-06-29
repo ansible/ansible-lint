@@ -39,3 +39,6 @@
   - name: shell with inline removes
     shell: removes=Z echo blah
 
+- handlers:
+  - name: restart something
+    command: do something
