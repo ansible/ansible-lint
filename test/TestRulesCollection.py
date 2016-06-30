@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import collections
 import unittest
 
 from ansiblelint import RulesCollection
@@ -72,3 +73,8 @@ class TestRulesCollection(unittest.TestCase):
     def test_skip_non_existent_id(self):
         matches = self.rules.run(self.ematchtestfile, skip_list=['DOESNOTEXIST'])
         self.assertEqual(len(matches), 3)
+
+    def test_no_duplicate_rule_ids(self):
+        real_rules = RulesCollection.create_from_directory('./lib/ansiblelint/rules')
+        rule_ids = [ rule.id for rule in real_rules ]
+        self.assertEqual([x for x, y in collections.Counter(rule_ids).items() if y > 1], [])
