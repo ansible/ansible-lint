@@ -13,7 +13,7 @@ class Formatter(object):
                                     stringc(match.message, 'red'),
                                     stringc(match.filename, 'blue'),
                                     stringc(match.linenumber, 'cyan'),
-                                    stringc(match.line, 'magenta'))
+                                    stringc(match.line, 'purple'))
         else:
             return formatstr.format(match.rule.id,
                                     match.message,
