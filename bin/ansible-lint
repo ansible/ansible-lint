@@ -73,6 +73,10 @@ def main(args):
                       default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
                       action='store_false',
                       help="disable colored output")
+    parser.add_option('--force-color', dest='force_colored',
+                      default=False,
+                      action='store_true',
+                      help="Try force colored output")
     parser.add_option('--exclude', dest='exclude_paths', action='append',
                       help='path to directories or files to skip. This option'
                            ' is repeatable.')
@@ -83,6 +87,12 @@ def main(args):
 
     if options.parseable:
         formatter = formatters.ParseableFormatter()
+
+    # Try to rely on ansible's ansible.color.stringc mechanism in order to detect the possibility
+    # to type with colors. --force-color takes precedence.
+    colored_output = options.colored
+    if options.force_colored:
+        colored_output = options.force_colored
 
     if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
@@ -119,7 +129,7 @@ def main(args):
         matches.extend(runner.run())
 
     for match in matches:
-        print(formatter.format(match, options.colored))
+        print(formatter.format(match, colored_output))
 
     if len(matches):
         return 2
