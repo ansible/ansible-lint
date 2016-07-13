@@ -69,12 +69,14 @@ def main(args):
     parser.add_option('-x', dest='skip_list', default=[],
                       help="only check rules whose id/tags do not " +
                       "match these values")
+    # We must keep '--nocolor' and '--force-color' in that order, because they store the value in the same destination
+    # and the latest 'default' decides :)
+    # See: https://docs.python.org/2/library/optparse.html#default-values
     parser.add_option('--nocolor', dest='colored',
-                      default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
                       action='store_false',
                       help="disable colored output")
-    parser.add_option('--force-color', dest='force_colored',
-                      default=False,
+    parser.add_option('--force-color', dest='colored',
+                      default=True,
                       action='store_true',
                       help="Try force colored output")
     parser.add_option('--exclude', dest='exclude_paths', action='append',
@@ -87,12 +89,6 @@ def main(args):
 
     if options.parseable:
         formatter = formatters.ParseableFormatter()
-
-    # Try to rely on ansible's ansible.color.stringc mechanism in order to detect the possibility
-    # to type with colors. --force-color takes precedence.
-    colored_output = options.colored
-    if options.force_colored:
-        colored_output = options.force_colored
 
     if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
@@ -129,7 +125,7 @@ def main(args):
         matches.extend(runner.run())
 
     for match in matches:
-        print(formatter.format(match, colored_output))
+        print(formatter.format(match, options.colored))
 
     if len(matches):
         return 2
