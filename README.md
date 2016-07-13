@@ -46,6 +46,8 @@ Options:
   --exclude=EXCLUDE_PATHS
                         path to directories or files to skip. This option is
                         repeatable.
+  --force-color         Try force colored output (relying on ansible's code)
+  --nocolor             disable colored output
 ```
 
 False positives
