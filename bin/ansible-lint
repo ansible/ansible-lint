@@ -73,6 +73,9 @@ def main(args):
                       default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
                       action='store_false',
                       help="disable colored output")
+    parser.add_option('--force-color', dest='colored',
+                      action='store_true',
+                      help="Try force colored output (relying on ansible's code)")
     parser.add_option('--exclude', dest='exclude_paths', action='append',
                       help='path to directories or files to skip. This option'
                            ' is repeatable.')
