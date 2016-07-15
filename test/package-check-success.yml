@@ -1,0 +1,14 @@
+- tasks:
+  - name: install ansible
+    yum: name=ansible-2.1.0.0 state=present
+
+  - name: install ansible-lint
+    pip: name=ansible-lint
+    args:
+      state: present
+      version: 3.1.2
+
+  - name: install some-package
+    package:
+      name: some-package
+      state: present

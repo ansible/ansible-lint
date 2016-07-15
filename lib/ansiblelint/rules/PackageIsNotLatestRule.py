@@ -28,6 +28,10 @@ class PackageIsNotLatestRule(AnsibleLintRule):
                   'with or without a version'
     tags = ['repeatability']
 
+    _package_managers = ['yum', 'apt', 'dnf', 'homebrew', 'pacman', 'openbsd_package', 'pkg5',
+                         'portage', 'pkgutil', 'slackpkg', 'swdepot', 'zypper', 'bundler', 'pip',
+                         'pear', 'npm', 'gem', 'easy_install', 'bower', 'package']
+
     def matchtask(self, file, task):
-        return (task['action']['__ansible_module__'] in ['yum', 'apt', 'package'] and
+        return (task['action']['__ansible_module__'] in self._package_managers and
                 task['action'].get('state') == 'latest')

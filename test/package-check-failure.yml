@@ -1,0 +1,13 @@
+- tasks:
+  - name: install ansible
+    yum: name=ansible state=latest
+
+  - name: install ansible-lint
+    pip: name=ansible-lint
+    args:
+      state: latest
+
+  - name: install some-package
+    package:
+      name: some-package
+      state: latest
