@@ -25,17 +25,21 @@ from ansiblelint import Match, AnsibleLintRule
 from ansiblelint.formatters import Formatter
 
 
-class TestColorFormatter(unittest.TestCase):
+class TestFormatter(unittest.TestCase):
 
     def setUp(self):
-        rule = AnsibleLintRule()
-        rule.id = "TCF0001"
-        self.match = Match(1, "hello", "filename.yml", rule, "message")
+        self.rule = AnsibleLintRule()
+        self.rule.id = "TCF0001"
         self.formatter = Formatter()
 
-    def test_format_colored_string(self):
-        result = self.formatter.format(self.match, True)
+    def test_format_coloured_string(self):
+        match = Match(1, "hello", "filename.yml", self.rule, "message")
+        result = self.formatter.format(match, True)
 
     def test_unicode_format_string(self):
-        self.match.message = u'\U0001f427'
-        result = self.formatter.format(self.match, True)
+        match = Match(1, "hello", "filename.yml", self.rule, u'\U0001f427')
+        result = self.formatter.format(match, False)
+
+    def test_dict_format_line(self):
+        match = Match(1, {'hello': 'world'}, "filename.yml", self.rule, "xyz")
+        result = self.formatter.format(match, True)

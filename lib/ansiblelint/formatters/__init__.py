@@ -13,8 +13,8 @@ class Formatter(object):
             return formatstr.format(color.stringc(u"[{0}]".format(match.rule.id), 'bright red'),
                                     color.stringc(match.message, 'red'),
                                     color.stringc(match.filename, 'blue'),
-                                    color.stringc(match.linenumber, 'cyan'),
-                                    color.stringc(match.line, 'purple'))
+                                    color.stringc(str(match.linenumber), 'cyan'),
+                                    color.stringc(str(match.line), 'purple'))
         else:
             return formatstr.format(match.rule.id,
                                     match.message,
@@ -31,7 +31,7 @@ class QuietFormatter(object):
             color.ANSIBLE_COLOR = True
             return formatstr.format(color.stringc(u"[{0}]".format(match.rule.id), 'bright red'),
                                     color.stringc(match.filename, 'blue'),
-                                    color.stringc(match.linenumber, 'cyan'))
+                                    color.stringc(str(match.linenumber), 'cyan'))
         else:
             return formatstr.format(match.rule.id, match.filename,
                                     match.linenumber)
@@ -44,7 +44,7 @@ class ParseableFormatter(object):
         if colored:
             color.ANSIBLE_COLOR = True
             return formatstr.format(color.stringc(match.filename, 'blue'),
-                                    color.stringc(match.linenumber, 'cyan'),
+                                    color.stringc(str(match.linenumber), 'cyan'),
                                     color.stringc(u"E{0}".format(match.rule.id), 'bright red'),
                                     color.stringc(match.message, 'red'))
         else:
