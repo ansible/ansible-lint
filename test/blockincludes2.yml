@@ -1,0 +1,13 @@
+---
+- hosts: webservers
+  vars:
+    varset: varset
+  tasks:
+    - block:
+        - include: nestedincludes.yml tags=nested
+        - block:
+            - include: "{{ varnotset }}.yml"
+      rescue:
+        - include: "{{ varset }}.yml"
+      always:
+        - include: "directory with spaces/main.yml"

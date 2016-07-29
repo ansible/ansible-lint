@@ -218,6 +218,11 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             })
         elif 'block' in th:
             results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
+            if 'rescue' in th:
+                results.extend(_taskshandlers_children(basedir, k, th['rescue'], parent_type))
+            if 'always' in th:
+                results.extend(_taskshandlers_children(basedir, k, th['always'], parent_type))
+
     return results
 
 
