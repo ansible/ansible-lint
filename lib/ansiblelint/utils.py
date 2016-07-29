@@ -178,6 +178,7 @@ def play_children(basedir, item, parent_type, playbook_dir):
         'tasks': _taskshandlers_children,
         'pre_tasks': _taskshandlers_children,
         'post_tasks': _taskshandlers_children,
+        'block': _taskshandlers_children,
         'include': _include_children,
         'roles': _roles_children,
         'dependencies': _roles_children,
@@ -208,9 +209,16 @@ def _include_children(basedir, k, v, parent_type):
 
 
 def _taskshandlers_children(basedir, k, v, parent_type):
-    return [{'path': path_dwim(basedir, th['include']),
-             'type': 'tasks'}
-            for th in v if 'include' in th]
+    results = []
+    for th in v:
+        if 'include' in th:
+            results.append({
+                'path': path_dwim(basedir, th['include']),
+                'type': 'tasks'
+            })
+        elif 'block' in th:
+            results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
+    return results
 
 
 def _roles_children(basedir, k, v, parent_type):

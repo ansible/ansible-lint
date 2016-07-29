@@ -10,6 +10,12 @@ class TestTaskIncludes(unittest.TestCase):
         rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
         self.rules = RulesCollection.create_from_directory(rulesdir)
 
+    def test_block_included_tasks(self):
+        filename = 'test/blockincludes.yml'
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner.run()
+        self.assertEqual(len(runner.playbooks), 4)
+
     def test_included_tasks(self):
         filename = 'test/taskincludes.yml'
         runner = ansiblelint.Runner(self.rules, filename, [], [], [])
