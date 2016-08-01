@@ -40,6 +40,7 @@ class AnsibleLintRule(object):
     match = None
     matchtask = None
     matchplay = None
+    duplicate_keys = 'ignore'
 
     def matchlines(self, file, text):
         matches = []
@@ -61,7 +62,8 @@ class AnsibleLintRule(object):
         matches = []
         if not self.matchtask:
             return matches
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'],
+                                                        self.duplicate_keys)
         if yaml:
             for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
                 # An empty `tags` block causes `None` to be returned if
@@ -84,7 +86,8 @@ class AnsibleLintRule(object):
         matches = []
         if not self.matchplay:
             return matches
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'],
+                                                        self.duplicate_keys)
         if yaml and hasattr(self, 'matchplay'):
             for play in yaml:
                 result = self.matchplay(file, play)
