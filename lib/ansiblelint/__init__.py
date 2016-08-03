@@ -127,7 +127,7 @@ class RulesCollection(object):
         try:
             with codecs.open(playbookfile['path'], mode='rb', encoding='utf-8') as f:
                 text = f.read()
-        except IOError, e:
+        except IOError as e:
             print("WARNING: Couldn't open %s - %s" %
                   (playbookfile['path'], e.strerror),
                   file=sys.stderr)

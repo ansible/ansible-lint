@@ -147,7 +147,7 @@ def find_children(playbook, playbook_dir):
     else:
         try:
             playbook_ds = parse_yaml_from_file(playbook[0])
-        except AnsibleError, e:
+        except AnsibleError as e:
             raise SystemExit(str(e))
     results = []
     basedir = os.path.dirname(playbook[0])
