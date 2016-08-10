@@ -20,11 +20,11 @@
 
 import unittest
 
-from rules import EMatcherRule
-from rules import UnsetVariableMatcherRule
+from .rules import EMatcherRule
+from .rules import UnsetVariableMatcherRule
 
 
-class TestRule(unittest.TestCase):
+class TestLintRule(unittest.TestCase):
 
     def test_rule_matching(self):
         text = ""

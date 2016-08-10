@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from __future__ import print_function
 import glob
 import imp
 import os
@@ -28,6 +29,7 @@ from ansible.module_utils.splitter import split_args
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
+import six
 
 try:
     from ansible.utils import parse_yaml_from_file
@@ -124,11 +126,11 @@ def tokenize(line):
 
 def _playbook_items(pb_data):
     if isinstance(pb_data, dict):
-        return pb_data.items()
+        return list(pb_data.items())
     elif not pb_data:
         return []
     else:
-        return [item for play in pb_data for item in play.items()]
+        return [item for play in pb_data for item in list(play.items())]
 
 
 def find_children(playbook, playbook_dir):
@@ -248,7 +250,7 @@ def _rolepath(basedir, role):
 
     if C.DEFAULT_ROLES_PATH:
         search_locations = C.DEFAULT_ROLES_PATH
-        if isinstance(search_locations, basestring):
+        if isinstance(search_locations, six.string_types):
             search_locations = search_locations.split(os.pathsep)
         for loc in search_locations:
             loc = os.path.expanduser(loc)
@@ -343,7 +345,7 @@ def normalize_task_v2(task):
 
 def normalize_task_v1(task):
     result = dict()
-    for (k, v) in task.items():
+    for (k, v) in list(task.items()):
         if k in VALID_KEYS or k.startswith('with_'):
             if k == 'local_action' or k == 'action':
                 if not isinstance(v, dict):
@@ -353,7 +355,7 @@ def normalize_task_v1(task):
             else:
                 result[k] = v
         else:
-            if isinstance(v, basestring):
+            if isinstance(v, six.string_types):
                 v = _kv_to_dict(k + ' ' + v)
             elif not v:
                 v = dict(__ansible_module__=k)
@@ -407,7 +409,7 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " " .join(["{0}={1}".format(k, v) for (k, v) in action.items()
+    args = " " .join(["{0}={1}".format(k, v) for (k, v) in list(action.items())
                      if k not in ["__ansible_module__", "__ansible_arguments__"]] +
                      action.get("__ansible_arguments__"))
     return "{0} {1}".format(action["__ansible_module__"], args)

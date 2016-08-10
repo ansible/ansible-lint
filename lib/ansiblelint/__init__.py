@@ -21,6 +21,7 @@
 from __future__ import print_function
 from collections import defaultdict
 import os
+import six
 import sys
 
 import ansiblelint.utils
@@ -73,7 +74,7 @@ class AnsibleLintRule(object):
                     result = self.matchtask(file, task)
                     if result:
                         message = None
-                        if isinstance(result, basestring):
+                        if isinstance(result, six.string_types):
                             message = result
                         taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
                         matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], taskstr,

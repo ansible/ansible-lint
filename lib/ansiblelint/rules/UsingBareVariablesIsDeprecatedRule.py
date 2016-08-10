@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 import re
+import six
 from ansiblelint import AnsibleLintRule
 
 
@@ -36,7 +37,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     def matchtask(self, file, task):
         loop_type = next((key for key in task.keys() if self._loops.match(key)), None)
 
-        if loop_type and isinstance(task[loop_type], basestring):
+        if loop_type and isinstance(task[loop_type], six.string_types):
                 if not self._jinja.match(task[loop_type]):
                     message = "Found a bare variable '{0}' used in a '{1}' loop." + \
                         " You should use the full variable syntax ('{{{{{0}}}}}')"
