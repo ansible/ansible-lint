@@ -42,6 +42,7 @@ except ImportError:
     from ansible.parsing.mod_args import ModuleArgsParser
     from ansible.plugins import module_loader
     from ansible.errors import AnsibleParserError
+    from ansible.playbook.role.requirement import RoleRequirement
     ANSIBLE_VERSION = 2
 
     def parse_yaml_from_file(filepath):
@@ -230,11 +231,11 @@ def _roles_children(basedir, k, v, parent_type):
     results = []
     for role in v:
         if isinstance(role, dict):
-            if 'role' in role:
+            if 'role' in role or 'name' in role:
                 if 'tags' not in role or 'skip_ansible_lint' not in role['tags']:
-                    results.extend(_look_for_role_files(basedir, role['role']))
+                    results.extend(_look_for_role_files(basedir, role.get('role', role.get('name')))
             else:
-                raise SystemExit('role dict {0} does not contain a "role" key'.format(role))
+                raise SystemExit('role dict {0} does not contain a "role" or "name" key'.format(role))
         else:
             results.extend(_look_for_role_files(basedir, role))
     return results
