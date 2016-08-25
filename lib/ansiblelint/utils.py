@@ -42,6 +42,7 @@ except ImportError:
     from ansible.parsing.mod_args import ModuleArgsParser
     from ansible.plugins import module_loader
     from ansible.errors import AnsibleParserError
+    from ansible.playbook.role.requirement import RoleRequirement
     ANSIBLE_VERSION = 2
 
     def parse_yaml_from_file(filepath):
@@ -216,14 +217,27 @@ def _taskshandlers_children(basedir, k, v, parent_type):
 def _roles_children(basedir, k, v, parent_type):
     results = []
     for role in v:
-        if isinstance(role, dict):
-            if 'role' in role:
-                if 'tags' not in role or 'skip_ansible_lint' not in role['tags']:
-                    results.extend(_look_for_role_files(basedir, role['role']))
-            else:
-                raise SystemExit('role dict {0} does not contain a "role" key'.format(role))
-        else:
+        if not isinstance(role, dict):
             results.extend(_look_for_role_files(basedir, role))
+            continue
+
+        if 'role' in role:
+            if 'tags' not in role or 'skip_ansible_lint' not in role['tags']:
+                results.extend(_look_for_role_files(basedir, role['role']))
+            continue
+
+        if k != 'dependencies' or ANSIBLE_VERSION == 1:
+            raise SystemExit('role dict {0} does not contain a "role" key'.format(role))
+
+        # new-style dependencies don't use 'role' and will raise a deprecation warning if used.
+        # see https://github.com/ansible/ansible/blob/5d865ec1efd529db7eb7d02aefbf60b453123d48/lib/ansible/playbook/role/requirement.py#L147
+        if 'name' in role:
+            results.extend(_look_for_role_files(basedir, role['name']))
+        elif 'src' in role:
+            role_name = RoleRequirement.repo_url_to_role_name(role['src'])
+            results.extend(_look_for_role_files(basedir, role_name))
+        else:
+            raise SystemExit('role dict {0} does not contain a "role", "name", or "src" key'.format(role))
     return results
 
 
