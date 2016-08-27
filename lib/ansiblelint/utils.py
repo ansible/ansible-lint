@@ -415,15 +415,14 @@ def task_to_str(task):
 
 def extract_from_list(blocks, candidates):
     results = list()
-    for block in blocks:
-        for candidate in candidates:
-            if candidate in block:
-                if isinstance(block[candidate], list):
-                    results.extend(add_action_type(block[candidate], candidate))
-                elif block[candidate] is not None:
-                    raise RuntimeError(
-                        "Key '%s' defined, but bad value: '%s'" %
-                        (candidate, str(block[candidate])))
+    for candidate in candidates:
+        if candidate in blocks:
+            if isinstance(blocks[candidate], list):
+                results.extend(add_action_type(blocks[candidate], candidate))
+            elif blocks[candidate] is not None:
+                raise RuntimeError(
+                    "Key '%s' defined, but bad value: '%s'" %
+                    (candidate, str(blocks[candidate])))
     return results
 
 
