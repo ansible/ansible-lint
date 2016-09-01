@@ -19,6 +19,9 @@
 # THE SOFTWARE.
 
 import re
+
+from jinja2.defaults import VARIABLE_START_STRING, BLOCK_START_STRING
+
 from ansiblelint import AnsibleLintRule
 
 
@@ -31,13 +34,17 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     tags = ['formatting']
 
     _loops = re.compile(r'^with_.*$')
-    _jinja = re.compile("\{\{[^\}]*\}\}")
 
     def matchtask(self, file, task):
         loop_type = next((key for key in task.keys() if self._loops.match(key)), None)
 
         if loop_type and isinstance(task[loop_type], basestring):
-                if not self._jinja.match(task[loop_type]):
-                    message = "Found a bare variable '{0}' used in a '{1}' loop." + \
-                        " You should use the full variable syntax ('{{{{{0}}}}}')"
-                    return message.format(task[loop_type], loop_type)
+            # Check if the text after "with_" has a '{%' or '{{' to determine if it
+            # is wrapped correctly for Ansible 2. This is a similar approach to how
+            # it's done in Ansible 2.
+            # see https://github.com/ansible/ansible/commit/8716bf8021800a18cb8d6cfea3f296ba4f834692
+            with_text = task[loop_type]
+            if (BLOCK_START_STRING not in with_text) and (VARIABLE_START_STRING not in with_text):
+                message = "Found a bare variable '{0}' used in a '{1}' loop." + \
+                          " You should use the full variable syntax ('{{{{{0}}}}}')"
+                return message.format(task[loop_type], loop_type)

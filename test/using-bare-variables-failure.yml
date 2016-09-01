@@ -19,3 +19,9 @@
       debug:
         msg: "{{ item }}"
       with_dict: my_dict
+
+    ### Testing with_dict with a default empty dictionary
+    - name: with_dict loop using variable and default
+      debug:
+        msg: "{{ item.key }} - {{ item.value }}"
+      with_dict: uwsgi_ini | default({})
