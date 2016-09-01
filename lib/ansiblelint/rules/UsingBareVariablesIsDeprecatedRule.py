@@ -31,7 +31,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     tags = ['formatting']
 
     _loops = re.compile(r'^with_.*$')
-    _jinja = re.compile("\{\{[^\}]*\}\}")
+    _jinja = re.compile("\{\{.*\}\}")
 
     def matchtask(self, file, task):
         loop_type = next((key for key in task.keys() if self._loops.match(key)), None)
