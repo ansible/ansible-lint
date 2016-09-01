@@ -18,4 +18,4 @@ class TestUsingBareVariablesIsDeprecated(unittest.TestCase):
         failure = 'test/using-bare-variables-failure.yml'
         bad_runner = ansiblelint.Runner(self.collection, failure, [], [], [])
         errs = bad_runner.run()
-        self.assertEqual(2, len(errs))
+        self.assertEqual(3, len(errs))
