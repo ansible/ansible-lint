@@ -12,7 +12,7 @@ Setup
 
 Using pip:
 ```
-pip2.7 install ansible-lint
+pip2 install ansible-lint
 ```
 
 From source:
