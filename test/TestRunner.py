@@ -69,3 +69,13 @@ class TestRule(unittest.TestCase):
         filename = 'test/emptytags.yml'
         runner = ansiblelint.Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
+
+    def test_dir_with_trailing_slash(self):
+        filename = 'test/'
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        assert (list(runner.playbooks)[0][1] == 'role')
+
+    def test_dir_with_fullpath(self):
+        filename = os.path.abspath('test')
+        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        assert (list(runner.playbooks)[0][1] == 'role')
