@@ -222,6 +222,22 @@ As of version 2.4.0, ansible-lint now works just on roles (this is useful
 for CI of roles)
 
 
+Pre-commit
+==========
+
+To use ansible-lint with [pre-commit](http://pre-commit.com/), just 
+add the following to your local repo's `.pre-commit-config.yaml` file. 
+Make sure to change `sha:` to be either a git commit sha or tag of 
+ansible-lint containing `hooks.yaml`.
+
+```yaml
+- repo: https://github.com/willthames/ansible-lint.git
+  sha: v3.3.1
+  hooks:
+    - id: ansible-lint
+      files: \.(yaml|yml)$
+```
+
 
 Contributing
 ============
