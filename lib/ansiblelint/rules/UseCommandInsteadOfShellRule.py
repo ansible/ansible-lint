@@ -39,4 +39,4 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
         # rather than pipes
         if task["action"]["__ansible_module__"] == 'shell':
             unjinjad_cmd = unjinja(' '.join(task["action"].get("__ansible_arguments__", [])))
-            return not any([ch in unjinjad_cmd for ch in ['&', '|', '<', '>', ';', '$']])
+            return not any([ch in unjinjad_cmd for ch in ['&', '|', '<', '>', ';', '$', '\n']])
