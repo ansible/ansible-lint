@@ -1,0 +1,11 @@
+---
+
+# For use with pre-commit.
+# See usage instructions at http://pre-commit.com
+
+-   id: ansible-lint
+    name: Ansible-lint
+    description: This hook runs ansible-lint.
+    entry: ansible-lint
+    language: python
+    files: \.(yaml|yml)$
