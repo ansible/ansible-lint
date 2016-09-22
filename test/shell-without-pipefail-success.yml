@@ -1,0 +1,40 @@
+---
+- hosts: localhost
+  become: no
+  tasks:
+    - name: pipeline with pipefail
+      shell: set -o pipefail && false | cat
+
+    - name: pipeline with pipefail, multi-line
+      shell: |
+        set -o pipefail
+        false | cat
+
+    - name: pipeline with pipefail, complex set
+      shell: |
+        set -e -x -o pipefail
+        false | cat
+
+    - name: pipeline with pipefail, complex set
+      shell: |
+        set -e -x -o pipefail
+        false | cat
+
+    - name: pipeline with pipefail, complex set
+      shell: |
+        set -eo pipefail
+        false | cat
+
+    - name: pipeline without pipefail, ignoring errors
+      shell: false | cat
+      ignore_errors: true
+
+    - name: non-pipeline without pipefail
+      shell: "true"
+
+    - name: command without pipefail
+      command: "true"
+
+    - name: shell with or
+      shell:
+        false || true

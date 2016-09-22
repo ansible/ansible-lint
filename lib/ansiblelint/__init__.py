@@ -21,6 +21,7 @@
 from __future__ import print_function
 from collections import defaultdict
 import os
+import re
 import sys
 
 import six
@@ -42,6 +43,10 @@ class AnsibleLintRule(object):
     match = None
     matchtask = None
     matchplay = None
+
+    @staticmethod
+    def unjinja(text):
+        return re.sub(r"{{[^}]*}}", "JINJA_VAR", text)
 
     def matchlines(self, file, text):
         matches = []

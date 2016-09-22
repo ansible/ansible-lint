@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  become: no
+  tasks:
+    - name: pipeline without pipefail
+      shell: false | cat
+
+    - name: pipeline with or and pipe, no pipefail
+      shell: false || true | cat
