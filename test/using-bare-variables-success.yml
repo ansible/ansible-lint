@@ -10,6 +10,16 @@
       - 1
       - 2
 
+    my_list_of_dicts:
+      - foo: 1
+        bar: 2
+      - foo: 3
+        bar: 4
+
+    my_filenames:
+      - foo.txt
+      - bar.txt
+
     my_dict:
       foo: bar
 
@@ -69,6 +79,11 @@
         - foo.txt
         - bar.txt
 
+    - name: with_file loop using list of filenames
+      debug:
+        msg: "{{ item }}"
+      with_file: "{{ my_filenames }}"
+
     ### Testing with_fileglob
     - name: with_fileglob loop using *.txt
       debug:
@@ -83,3 +98,54 @@
       with_together:
         - "{{ my_list }}"
         - "{{ my_list2 }}"
+
+    - name: with_subelements loop
+      debug:
+        msg: "{{ item }}"
+      with_subelements:
+        - "{{ my_list_of_dicts }}"
+        - bar
+
+    - name: with_sequence loop
+      debug:
+        msg: "{{ item }}"
+      with_sequence: count=2
+
+    - name: with_random_choice loop
+      debug:
+        msg: "{{ item }}"
+      with_random_choice: "{{ my_list }}"
+
+    - name: with_first_found loop with static files list
+      debug:
+        msg: "{{ item }}"
+      with_first_found:
+        - foo.txt
+        - bar.txt
+
+    - name: with_first_found loop with list of filenames
+      debug:
+        msg: "{{ item }}"
+      with_first_found: "{{ my_filenames }}"
+
+    - name: with_indexed_items loop
+      debug:
+        msg: "{{ item.0 }} {{ item.1 }}"
+      with_indexed_items: "{{ my_list }}"
+
+    - name: with_ini loop
+      debug:
+        msg: "{{ item }}"
+      with_ini: value[1-2] section=section1 file=foo.ini re=true
+
+    - name: with_flattened loop
+      debug:
+        msg: "{{ item }}"
+      with_flattened:
+        - "{{ my_list }}"
+        - "{{ my_list2 }}"
+
+    - name: with_inventory_hostnames loop
+      debug:
+        msg: "{{ item }}"
+      with_inventory_hostnames: all

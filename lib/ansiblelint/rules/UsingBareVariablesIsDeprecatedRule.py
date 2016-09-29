@@ -30,14 +30,27 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
         'syntax ("{{your_variable}}").'
     tags = ['formatting']
 
-    _loops = re.compile(r'^with_.*$')
     _jinja = re.compile("\{\{.*\}\}")
 
     def matchtask(self, file, task):
-        loop_type = next((key for key in task.keys() if self._loops.match(key)), None)
+        loop_type = next((key for key in task.keys()
+                          if key.startswith("with_")), None)
 
-        if loop_type and isinstance(task[loop_type], basestring):
-                if not self._jinja.match(task[loop_type]):
-                    message = "Found a bare variable '{0}' used in a '{1}' loop." + \
-                        " You should use the full variable syntax ('{{{{{0}}}}}')"
-                    return message.format(task[loop_type], loop_type)
+        if loop_type:
+            if loop_type in ["with_nested", "with_together", "with_flattened"]:
+                for var in task[loop_type]:
+                    return self._matchvar(var, task, loop_type)
+            elif loop_type == "with_subelements":
+                return self._matchvar(task[loop_type][0], task, loop_type)
+            elif loop_type in ["with_sequence", "with_ini",
+                               "with_inventory_hostnames"]:
+                pass
+            else:
+                return self._matchvar(task[loop_type], task, loop_type)
+
+    def _matchvar(self, varstring, task, loop_type):
+        if (isinstance(varstring, basestring) and
+                not self._jinja.match(varstring)):
+            message = "Found a bare variable '{0}' used in a '{1}' loop." + \
+                      " You should use the full variable syntax ('{{{{{0}}}}}')"
+            return message.format(task[loop_type], loop_type)
