@@ -487,6 +487,7 @@ def parse_yaml_linenumbers(data, filename):
     def construct_mapping(node, deep=False):
         mapping = Constructor.construct_mapping(loader, node, deep=deep)
         mapping[LINE_NUMBER_KEY] = node.__line__
+        mapping[FILENAME_KEY] = filename
         return mapping
 
     try:
