@@ -33,12 +33,18 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     _jinja = re.compile("\{\{.*\}\}")
 
     def matchtask(self, file, task):
-        loop_type = next((key for key in task.keys()
+        loop_type = next((key for key in task
                           if key.startswith("with_")), None)
-
         if loop_type:
             if loop_type in ["with_nested", "with_together", "with_flattened"]:
-                for var in task[loop_type]:
+                # These loops can either take a list defined directly in the task
+                # or a variable that is a list itself.  When a single variable is used
+                # we just need to check that one variable, and not iterate over it like
+                # it's a list. Otherwise, loop through and check all items.
+                items = task[loop_type]
+                if not isinstance(items, (list, tuple)):
+                    items = [items]
+                for var in items:
                     return self._matchvar(var, task, loop_type)
             elif loop_type == "with_subelements":
                 return self._matchvar(task[loop_type][0], task, loop_type)

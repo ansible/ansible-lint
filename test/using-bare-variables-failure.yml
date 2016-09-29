@@ -16,6 +16,10 @@
       - foo: 3
         bar: 4
 
+    my_list_of_lists:
+      - "{{ my_list }}"
+      - "{{ my_list2 }}"
+
     my_filenames:
       - foo.txt
       - bar.txt
@@ -92,3 +96,8 @@
       with_flattened:
         - my_list
         - my_list2
+
+    - name: with_flattened loop with a variable
+      debug:
+        msg: "{{ item }}"
+      with_flattened: my_list_of_lists
