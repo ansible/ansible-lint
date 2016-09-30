@@ -69,7 +69,7 @@ VALID_KEYS = [
     'sudo_pass', 'when', 'connection', 'environment', 'args',
     'any_errors_fatal', 'changed_when', 'failed_when', 'always_run', 'delay', 'retries', 'until',
     'su', 'su_user', 'su_pass', 'no_log', 'run_once',
-    'become', 'become_user', 'become_method',
+    'become', 'become_user', 'become_method', FILENAME_KEY,
 ]
 
 BLOCK_NAME_TO_ACTION_TYPE_MAP = {
