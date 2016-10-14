@@ -22,7 +22,7 @@ import os
 import unittest
 
 import ansiblelint
-from ansiblelint import RulesCollection
+from ansiblelint import Runner, RulesCollection
 from ansiblelint.formatters import Formatter
 
 
@@ -34,17 +34,17 @@ class TestRule(unittest.TestCase):
 
     def test_runner_count(self):
         filename = 'test/nomatchestest.yml'
-        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner = Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_unicode_runner_count(self):
         filename = 'test/unicode.yml'
-        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner = Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 1)
 
     def test_unicode_formatting(self):
         filename = 'test/unicode.yml'
-        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
         formatter = Formatter()
         formatter.format(matches[0])
@@ -52,30 +52,30 @@ class TestRule(unittest.TestCase):
     def test_runner_excludes_paths(self):
         filename = 'examples/lots_of_warnings.yml'
         excludes = ['examples/lots_of_warnings.yml']
-        runner = ansiblelint.Runner(self.rules, filename, [], [], excludes)
+        runner = Runner(self.rules, filename, [], [], excludes)
         assert (len(runner.run()) == 0)
 
     def test_runner_block_count(self):
         filename = 'test/block.yml'
-        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner = Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_runner_become_count(self):
         filename = 'test/become.yml'
-        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner = Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_runner_empty_tags_count(self):
         filename = 'test/emptytags.yml'
-        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner = Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
 
     def test_dir_with_trailing_slash(self):
         filename = 'test/'
-        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner = Runner(self.rules, filename, [], [], [])
         assert (list(runner.playbooks)[0][1] == 'role')
 
     def test_dir_with_fullpath(self):
         filename = os.path.abspath('test')
-        runner = ansiblelint.Runner(self.rules, filename, [], [], [])
+        runner = Runner(self.rules, filename, [], [], [])
         assert (list(runner.playbooks)[0][1] == 'role')

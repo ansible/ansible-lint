@@ -23,7 +23,7 @@ import os
 import unittest
 
 import ansiblelint
-from ansiblelint import RulesCollection
+from ansiblelint import Runner, RulesCollection
 
 
 class TestRule(unittest.TestCase):
@@ -35,5 +35,5 @@ class TestRule(unittest.TestCase):
     def test_runner_count(self):
         filename = 'test/skiptasks.yml'
         tags = ['ANSIBLE0004', 'ANSIBLE0005', 'ANSIBLE0006', 'ANSIBLE0007']
-        runner = ansiblelint.Runner(self.rules, filename, tags, [], [])
+        runner = Runner(self.rules, filename, tags, [], [])
         self.assertEqual(len(runner.run()), 6)
