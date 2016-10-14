@@ -1,0 +1,14 @@
+- tasks:
+  - name: execute command
+    command: echo hello
+    register: result
+
+  - name: print helpful error message
+    debug:
+      var: result
+    when: result.failed
+
+  - name: do something when hello is output
+    debug:
+      msg: why isn't this a handler
+    when: result.stdout == "hello"
