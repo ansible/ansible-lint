@@ -1,0 +1,22 @@
+- hosts: localhost
+  name: become_user without become play
+  become_user: root
+
+  tasks:
+  - debug:
+      msg: hello
+
+- hosts: localhost
+
+  tasks:
+  - name: become_user without become task
+    command: whoami
+    become_user: postgres
+
+- hosts: localhost
+  become: true
+
+  tasks:
+  - name: won't work, needs to be explicit
+    command: whoami
+    become_user: postgres

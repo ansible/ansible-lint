@@ -1,0 +1,14 @@
+- hosts: localhost
+  become_user: root
+  become: true
+
+  tasks:
+  - debug:
+      msg: hello
+
+- hosts: localhost
+
+  tasks:
+  - command: whoami
+    become_user: postgres
+    become: true
