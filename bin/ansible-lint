@@ -28,6 +28,7 @@ import sys
 
 import ansiblelint
 import ansiblelint.formatters as formatters
+import six
 from ansiblelint import RulesCollection
 from ansiblelint.version import __version__
 
