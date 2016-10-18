@@ -24,7 +24,15 @@ import os
 
 import ansible.constants as C
 from ansible.errors import AnsibleError
-from ansible.module_utils.splitter import split_args
+
+try:
+    # Try to import the Ansible 2 module first, it's the future-proof one
+    from ansible.parsing.splitter import split_args
+
+except ImportError:
+    # Fallback on the Ansible 1.9 module
+    from ansible.module_utils.splitter import split_args
+
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
