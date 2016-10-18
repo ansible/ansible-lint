@@ -19,7 +19,7 @@ setup(
     package_dir={'': 'lib'},
     packages=find_packages('lib'),
     zip_safe=False,
-    install_requires=['ansible', 'pyyaml'],
+    install_requires=['ansible', 'pyyaml', 'six'],
     scripts=['bin/ansible-lint'],
     license='MIT',
     test_suite="test"
