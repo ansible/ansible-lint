@@ -24,13 +24,11 @@ from __future__ import print_function
 
 import errno
 import optparse
-import os
 import sys
 
 import ansiblelint
 import ansiblelint.formatters as formatters
 from ansiblelint import RulesCollection
-import ansiblelint.utils as utils
 from ansiblelint.version import __version__
 
 
