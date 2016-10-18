@@ -33,7 +33,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     tags = ['oddity']
 
     def matchplay(self, file, data):
-        if _become_user_without_become(data):
+        if file['type'] == 'playbook' and _become_user_without_become(data):
             return ({'become_user': data}, self.shortdesc)
 
     def matchtask(self, file, task):

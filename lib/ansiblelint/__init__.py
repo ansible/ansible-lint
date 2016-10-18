@@ -86,6 +86,8 @@ class AnsibleLintRule(object):
             return matches
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
         if yaml and hasattr(self, 'matchplay'):
+            if isinstance(yaml, dict):
+                yaml = [yaml]
             for play in yaml:
                 result = self.matchplay(file, play)
                 if result:
