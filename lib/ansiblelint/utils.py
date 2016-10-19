@@ -24,7 +24,7 @@ import os
 
 import ansible.constants as C
 from ansible.errors import AnsibleError
-from ansible.module_utils.splitter import split_args
+from ansible.parsing.splitter import split_args
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
