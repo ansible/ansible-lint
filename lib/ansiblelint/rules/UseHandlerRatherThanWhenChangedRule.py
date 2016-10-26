@@ -29,6 +29,10 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     tags = ['behaviour']
 
     def matchtask(self, file, task):
-        if 'when' in task:
-            return any([changed in task['when'] for changed in
-                        ['.changed', '|changed', '["changed"]', "['changed']"]])
+        try:
+            return any(changed in task.get('when') for changed in
+                       ['.changed', '|changed', '["changed"]', "['changed']"])
+        except TypeError:
+            # task['when'] was not iterable -- probably None (i.e.,
+            # it's not there) or boolean
+            pass
