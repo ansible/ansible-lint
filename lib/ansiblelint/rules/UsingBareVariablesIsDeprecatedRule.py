@@ -31,6 +31,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     tags = ['formatting']
 
     _jinja = re.compile("\{\{.*\}\}")
+    _glob = re.compile('[][*?]')
 
     def matchtask(self, file, task):
         loop_type = next((key for key in task
@@ -57,6 +58,8 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     def _matchvar(self, varstring, task, loop_type):
         if (isinstance(varstring, basestring) and
                 not self._jinja.match(varstring)):
-            message = "Found a bare variable '{0}' used in a '{1}' loop." + \
-                      " You should use the full variable syntax ('{{{{{0}}}}}')"
-            return message.format(task[loop_type], loop_type)
+            if loop_type != 'with_fileglob' or not (self._jinja.search(varstring) or
+                                                    self._glob.search(varstring)):
+                message = "Found a bare variable '{0}' used in a '{1}' loop." + \
+                          " You should use the full variable syntax ('{{{{{0}}}}}')"
+                return message.format(task[loop_type], loop_type)
