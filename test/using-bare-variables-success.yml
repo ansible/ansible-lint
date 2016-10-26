@@ -89,11 +89,23 @@
       with_file: "{{ my_filenames }}"
 
     ### Testing with_fileglob
-    - name: with_fileglob loop using *.txt
+    - name: with_fileglob loop using list of *.txt
       debug:
         msg: "{{ item }}"
       with_fileglob:
         - '*.txt'
+
+    ### Testing non-list form of with_fileglob
+    - name: with_fileglob loop using single value *.txt
+      debug:
+        msg: "{{ item }}"
+      with_fileglob: '*.txt'
+
+    ### Testing non-list form of with_fileglob with trailing templated pattern
+    - name: with_fileglob loop using templated pattern
+      debug:
+        msg: "{{ item }}"
+      with_fileglob: 'foo{{glob}}'
 
     ### Testing with_together
     - name: with_together loop using variable lists
