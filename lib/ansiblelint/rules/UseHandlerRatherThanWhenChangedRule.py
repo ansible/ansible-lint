@@ -21,6 +21,11 @@
 from ansiblelint import AnsibleLintRule
 
 
+def _changed_in_when(item):
+    return any(changed in item for changed in
+               ['.changed', '|changed', '["changed"]', "['changed']"])
+
+
 class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     id = 'ANSIBLE0016'
     shortdesc = 'Tasks that run when changed should likely be handlers'
@@ -29,10 +34,10 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     tags = ['behaviour']
 
     def matchtask(self, file, task):
-        try:
-            return any(changed in task.get('when') for changed in
-                       ['.changed', '|changed', '["changed"]', "['changed']"])
-        except TypeError:
-            # task['when'] was not iterable -- probably None (i.e.,
-            # it's not there) or boolean
-            pass
+        when = task.get('when')
+        if isinstance(when, list):
+            for item in when:
+                if _changed_in_when(item):
+                    return True
+        if isinstance(when, basestring):
+            return _changed_in_when(when)
