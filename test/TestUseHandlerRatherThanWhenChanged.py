@@ -18,4 +18,4 @@ class TestUseHandlerRatherThanWhenChanged(unittest.TestCase):
         failure = 'test/use-handler-rather-than-when-changed-failure.yml'
         bad_runner = Runner(self.collection, failure, [], [], [])
         errs = bad_runner.run()
-        self.assertEqual(4, len(errs))
+        self.assertEqual(5, len(errs))

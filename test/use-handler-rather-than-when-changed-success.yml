@@ -14,5 +14,13 @@
     when: result.stdout == "hello"
 
   - name: never actually debug
-    debug: var=result
+    debug:
+      var: result
     when: False
+
+  - name: check when with a list
+    debug:
+      var: result
+    when:
+    - conditionA
+    - conditionB
