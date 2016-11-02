@@ -13,3 +13,15 @@
 
   - name: use variables
     shell: echo $HOME $USER
+
+  - name: use * for globbing
+    shell: ls foo*
+
+  - name: use ? for globbing
+    shell: ls foo?
+
+  - name: use [] for globbing
+    shell: ls foo[1,2,3]
+
+  - name: use shell generator
+    shell: ls foo{.txt,.xml}
