@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import six
+
 from ansiblelint import AnsibleLintRule
 
 
@@ -39,5 +41,5 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
             for item in when:
                 if _changed_in_when(item):
                     return True
-        if isinstance(when, basestring):
+        if isinstance(when, six.string_types):
             return _changed_in_when(when)
