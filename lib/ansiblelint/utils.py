@@ -22,6 +22,8 @@ import glob
 import imp
 import os
 
+import six
+
 import ansible.constants as C
 from ansible.errors import AnsibleError
 
@@ -271,7 +273,7 @@ def _rolepath(basedir, role):
 
     if C.DEFAULT_ROLES_PATH:
         search_locations = C.DEFAULT_ROLES_PATH
-        if isinstance(search_locations, basestring):
+        if isinstance(search_locations, six.string_types):
             search_locations = search_locations.split(os.pathsep)
         for loc in search_locations:
             loc = os.path.expanduser(loc)
@@ -376,7 +378,7 @@ def normalize_task_v1(task):
             else:
                 result[k] = v
         else:
-            if isinstance(v, basestring):
+            if isinstance(v, six.string_types):
                 v = _kv_to_dict(k + ' ' + v)
             elif not v:
                 v = dict(__ansible_module__=k)

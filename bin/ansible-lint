@@ -107,9 +107,9 @@ def main(args):
         print(rules.listtags())
         return 0
 
-    if isinstance(options.tags, basestring):
+    if isinstance(options.tags, six.string_types):
         options.tags = options.tags.split(',')
-    if isinstance(options.skip_list, basestring):
+    if isinstance(options.skip_list, six.string_types):
         options.skip_list = options.skip_list.split(',')
 
     playbooks = set(args)
