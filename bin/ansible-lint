@@ -120,6 +120,8 @@ def main(args):
                                     options.verbosity)
         matches.extend(runner.run())
 
+    matches.sort(key=lambda x: (x.linenumber, x.rule.id))
+
     for match in matches:
         print(formatter.format(match, options.colored))
 
