@@ -23,7 +23,7 @@ import unittest
 
 import ansiblelint
 from ansiblelint import Runner, RulesCollection
-from ansiblelint.formatters import Formatter
+import ansiblelint.formatters
 
 
 class TestRule(unittest.TestCase):
@@ -42,12 +42,33 @@ class TestRule(unittest.TestCase):
         runner = Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 1)
 
-    def test_unicode_formatting(self):
+    def test_unicode_standard_formatting(self):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = Formatter()
+        formatter = ansiblelint.formatters.Formatter()
         formatter.format(matches[0])
+
+    def test_unicode_parseable_colored_formatting(self):
+        filename = 'test/unicode.yml'
+        runner = Runner(self.rules, filename, [], [], [])
+        matches = runner.run()
+        formatter = ansiblelint.formatters.ParseableFormatter()
+        formatter.format(matches[0], colored=True)
+
+    def test_unicode_quiet_colored_formatting(self):
+        filename = 'test/unicode.yml'
+        runner = Runner(self.rules, filename, [], [], [])
+        matches = runner.run()
+        formatter = ansiblelint.formatters.QuietFormatter()
+        formatter.format(matches[0], colored=True)
+
+    def test_unicode_standard_color_formatting(self):
+        filename = 'test/unicode.yml'
+        runner = Runner(self.rules, filename, [], [], [])
+        matches = runner.run()
+        formatter = ansiblelint.formatters.Formatter()
+        formatter.format(matches[0], colored=True)
 
     def test_runner_excludes_paths(self):
         filename = 'examples/lots_of_warnings.yml'
