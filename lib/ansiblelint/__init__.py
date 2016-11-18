@@ -84,7 +84,7 @@ class AnsibleLintRule(object):
 
     def matchyaml(self, file, text):
         matches = []
-        if not self.matchplay or file['type'] != 'playbook':
+        if not self.matchplay:
             return matches
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
         if yaml and hasattr(self, 'matchplay'):
