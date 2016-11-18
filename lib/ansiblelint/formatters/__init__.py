@@ -14,7 +14,7 @@ class Formatter(object):
                                     color.stringc(match.message, 'red'),
                                     color.stringc(match.filename, 'blue'),
                                     color.stringc(str(match.linenumber), 'cyan'),
-                                    color.stringc(str(match.line), 'purple'))
+                                    color.stringc(u"{0}".format(match.line), 'purple'))
         else:
             return formatstr.format(match.rule.id,
                                     match.message,
@@ -46,7 +46,7 @@ class ParseableFormatter(object):
             return formatstr.format(color.stringc(match.filename, 'blue'),
                                     color.stringc(str(match.linenumber), 'cyan'),
                                     color.stringc(u"E{0}".format(match.rule.id), 'bright red'),
-                                    color.stringc(match.message, 'red'))
+                                    color.stringc(u"{0}".format(match.message), 'red'))
         else:
             return formatstr.format(match.filename,
                                     match.linenumber,
