@@ -1,0 +1,6 @@
+---
+- name: restart xyz
+  service: name=xyz state=restarted
+# see Issue #165
+- name: command handler issue 165
+  command: do something
