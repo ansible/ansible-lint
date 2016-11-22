@@ -222,9 +222,14 @@ def _taskshandlers_children(basedir, k, v, parent_type):
     results = []
     for th in v:
         if 'include' in th:
+            # taskshandlers_children only get's called for playbooks, thus the
+            # actual type of the included tasks is the section containing the
+            # include, e.g. tasks, pre_tasks, or handlers.
+            assert(parent_type == 'playbook')
+            playbook_section = k
             results.append({
                 'path': path_dwim(basedir, th['include']),
-                'type': 'tasks'
+                'type': playbook_section
             })
         elif 'block' in th:
             results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
