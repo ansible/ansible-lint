@@ -24,7 +24,11 @@ from ansiblelint import AnsibleLintRule
 try:
     from ansible.utils.boolean import boolean
 except ImportError:
-    from ansible.utils import boolean
+    try:
+        from ansible.utils import boolean
+    except ImportError:
+        from ansible import constants
+        boolean = constants.mk_boolean
 
 
 class CommandsInsteadOfArgumentsRule(AnsibleLintRule):

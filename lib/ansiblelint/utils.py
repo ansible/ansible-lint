@@ -24,7 +24,7 @@ import os
 
 import six
 
-import ansible.constants as C
+from ansible import constants
 from ansible.errors import AnsibleError
 
 try:
@@ -271,8 +271,8 @@ def _rolepath(basedir, role):
         path_dwim(basedir, os.path.join('..', '..', role))
     ]
 
-    if C.DEFAULT_ROLES_PATH:
-        search_locations = C.DEFAULT_ROLES_PATH
+    if constants.DEFAULT_ROLES_PATH:
+        search_locations = constants.DEFAULT_ROLES_PATH
         if isinstance(search_locations, six.string_types):
             search_locations = search_locations.split(os.pathsep)
         for loc in search_locations:
