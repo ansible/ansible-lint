@@ -20,7 +20,11 @@ setup(
     packages=find_packages('lib'),
     zip_safe=False,
     install_requires=['ansible', 'pyyaml', 'six'],
-    scripts=['bin/ansible-lint'],
+    entry_points={
+        'console_scripts': [
+             'ansible-lint = ansiblelint.main:main'
+        ]
+    },
     license='MIT',
     test_suite="test"
 )

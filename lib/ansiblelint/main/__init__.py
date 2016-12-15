@@ -33,7 +33,7 @@ from ansiblelint import RulesCollection
 from ansiblelint.version import __version__
 
 
-def main(args):
+def main():
 
     formatter = formatters.Formatter()
 
@@ -78,7 +78,7 @@ def main(args):
     parser.add_option('--exclude', dest='exclude_paths', action='append',
                       help='path to directories or files to skip. This option'
                            ' is repeatable.')
-    options, args = parser.parse_args(args)
+    options, args = parser.parse_args(sys.argv[1:])
 
     if options.quiet:
         formatter = formatters.QuietFormatter()
@@ -133,7 +133,7 @@ def main(args):
 
 if __name__ == "__main__":
     try:
-        sys.exit(main(sys.argv[1:]))
+        sys.exit(main())
     except IOError as exc:
         if exc.errno != errno.EPIPE:
             raise
