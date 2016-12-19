@@ -26,6 +26,7 @@ import ansible.constants as C
 from ansible.errors import AnsibleError
 from ansible.module_utils.splitter import split_args
 import yaml
+from six import string_types
 from yaml.composer import Composer
 from yaml.constructor import Constructor
 
@@ -121,7 +122,7 @@ def find_children(playbook):
     basedir = os.path.dirname(playbook[0])
     try:
         pb_data = parse_yaml_from_file(playbook[0])
-    except AnsibleError, e:
+    except AnsibleError as e:
         raise SystemExit(str(e))
     items = _playbook_items(pb_data)
     for item in items:
@@ -293,7 +294,7 @@ def normalize_task_v1(task):
             else:
                 result[k] = v
         else:
-            if isinstance(v, basestring):
+            if isinstance(v, string_types):
                 v = _kv_to_dict(k + ' ' + v)
             elif not v:
                 v = dict(module=k)

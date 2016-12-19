@@ -35,7 +35,7 @@ setup(
     package_dir={'': 'lib'},
     packages=find_packages('lib'),
     zip_safe=False,
-    install_requires=['ansible', 'pyyaml'],
+    install_requires=['ansible>=2.2.0', 'pyyaml', 'six'],
     license='MIT',
     include_package_date=True,
     test_suite="test",

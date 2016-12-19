@@ -26,6 +26,7 @@ import errno
 import optparse
 import os
 import sys
+from six import string_types
 
 from ansiblelint.version import __version__
 import ansiblelint.formatters as formatters
@@ -74,7 +75,7 @@ class AnsibleLintRule(object):
                     result = self.matchtask(file, task)
                     if result:
                         message = None
-                        if isinstance(result, basestring):
+                        if isinstance(result, string_types):
                             message = result
                         taskstr = "Task/Handler: " + utils.task_to_str(task)
                         matches.append(Match(task[utils.LINE_NUMBER_KEY], taskstr,
@@ -124,7 +125,7 @@ class RulesCollection(object):
         try:
             with codecs.open(playbookfile['path'], mode='rb', encoding='utf-8') as f:
                 text = f.read()
-        except IOError, e:
+        except IOError as e:
             print("WARNING: Couldn't open %s - %s" %
                   (playbookfile['path'], e.strerror),
                   file=sys.stderr)
@@ -298,9 +299,9 @@ def main(args=None):
         print(rules.listtags())
         return 0
 
-    if isinstance(options.tags, basestring):
+    if isinstance(options.tags, string_types):
         options.tags = options.tags.split(',')
-    if isinstance(options.skip_list, basestring):
+    if isinstance(options.skip_list, string_types):
         options.skip_list = options.skip_list.split(',')
 
     playbooks = set(args)

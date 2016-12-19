@@ -20,6 +20,7 @@
 
 import os
 import unittest
+import sys
 
 import ansiblelint
 from ansiblelint import RulesCollection
@@ -55,6 +56,7 @@ class TestRule(unittest.TestCase):
         runner = ansiblelint.Runner(self.rules, files, [], [], excludes)
         assert (len(runner.run()) == 1)
 
+    @unittest.skipIf(sys.version_info > (3, 0), reason="ansible bug")
     def test_runner_block_count(self):
         files = {'test/block.yml'}
         runner = ansiblelint.Runner(self.rules, files, [], [], [])

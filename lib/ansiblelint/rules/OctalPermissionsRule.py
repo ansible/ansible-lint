@@ -20,6 +20,8 @@
 
 from ansiblelint import AnsibleLintRule
 import re
+import types
+from six import string_types
 
 
 class OctalPermissionsRule(AnsibleLintRule):
@@ -39,7 +41,7 @@ class OctalPermissionsRule(AnsibleLintRule):
     def matchtask(self, file, task):
         if task["action"]["module"] in self._modules:
             mode = task['action'].get('mode', None)
-            if isinstance(mode, basestring) and self.mode_regex.match(mode):
+            if isinstance(mode, string_types) and self.mode_regex.match(mode):
                 return not self.valid_mode_regex.match(mode)
             if isinstance(mode, int):
                 # sensible file permission modes don't
