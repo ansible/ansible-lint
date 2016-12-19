@@ -1,0 +1,5 @@
+---
+
+- block:
+    - include: simpletask.yml
+  tags: ['foo']
