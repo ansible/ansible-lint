@@ -26,3 +26,9 @@ class TestTaskIncludes(unittest.TestCase):
         runner = Runner(self.rules, filename, [], [], [])
         runner.run()
         self.assertEqual(len(runner.playbooks), 4)
+
+    def test_include_tasks_with_block_include(self):
+        filename = 'test/include-in-block.yml'
+        runner = Runner(self.rules, filename, [], [], [])
+        runner.run()
+        self.assertEqual(len(runner.playbooks), 3)
