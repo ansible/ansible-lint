@@ -76,8 +76,8 @@ VALID_KEYS = [
     'name', 'action', 'when', 'async', 'poll', 'notify',
     'first_available_file', 'include', 'tags', 'register', 'ignore_errors',
     'delegate_to', 'local_action', 'transport', 'remote_user', 'sudo', 'sudo_user',
-    'sudo_pass', 'when', 'connection', 'environment', 'args',
-    'any_errors_fatal', 'changed_when', 'failed_when', 'always_run', 'delay', 'retries', 'until',
+    'sudo_pass', 'when', 'connection', 'environment', 'args', 'always_run',
+    'any_errors_fatal', 'changed_when', 'failed_when', 'check_mode', 'delay', 'retries', 'until',
     'su', 'su_user', 'su_pass', 'no_log', 'run_once',
     'become', 'become_user', 'become_method', FILENAME_KEY,
 ]
