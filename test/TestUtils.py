@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (c) 2013-2014 Will Thames <will@thames.id.au>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -119,3 +121,8 @@ class TestUtils(unittest.TestCase):
         v = "{{ hello | to_json }}"
         result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
         self.assertEqual(result, "{{ hello | to_json }}")
+
+    def test_task_to_str_unicode(self):
+        task = dict(fail=dict(msg=u"unicode é ô à"))
+        result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
+        self.assertEqual(result, u"fail msg=unicode é ô à")

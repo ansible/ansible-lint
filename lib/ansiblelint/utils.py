@@ -439,10 +439,10 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " " .join(["{0}={1}".format(k, v) for (k, v) in action.items()
+    args = " " .join([u"{0}={1}".format(k, v) for (k, v) in action.items()
                      if k not in ["__ansible_module__", "__ansible_arguments__"]] +
                      action.get("__ansible_arguments__"))
-    return "{0} {1}".format(action["__ansible_module__"], args)
+    return u"{0} {1}".format(action["__ansible_module__"], args)
 
 
 def extract_from_list(blocks, candidates):
