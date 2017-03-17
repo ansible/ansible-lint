@@ -485,7 +485,17 @@ def get_action_tasks(yaml, file):
 
 def get_normalized_tasks(yaml, file):
     tasks = get_action_tasks(yaml, file)
-    return [normalize_task(task, file['path']) for task in tasks]
+    res = []
+    for task in tasks:
+        # An empty `tags` block causes `None` to be returned if
+        # the `or []` is not present - `task.get('tags', [])`
+        # does not suffice.
+        if 'skip_ansible_lint' in (task.get('tags') or []):
+            # No need to normalize_task is we are skipping it.
+            continue
+        res.append(normalize_task(task, file['path']))
+
+    return res
 
 
 def parse_yaml_linenumbers(data, filename):

@@ -16,6 +16,11 @@
     - name: test ANSIBLE0007
       command: creates=B chmod 644 A
 
+    - name: test invalid action (skip)
+      foo: bar
+      tags:
+        - skip_ansible_lint
+
     - name: test ANSIBLE0004 (skip)
       action: git
       tags:
