@@ -1,0 +1,16 @@
+cache:
+  mount:
+    - .git
+
+build:
+  image: python:$$PYTHON_VERSION-alpine
+  commands:
+    - apk update
+    - apk add gcc build-base
+    # Use the proper Python binary, in case others are installed on the image
+    - python$$PYTHON_VERSION setup.py test
+
+# Add other versions to test against here
+matrix:
+    PYTHON_VERSION:
+        - 2.7
