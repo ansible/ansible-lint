@@ -12,5 +12,3 @@ class TestRoleHandlers(unittest.TestCase):
         success = 'test/252/main.yml'
         good_runner = Runner(self.collection, success, [], [], [])
         self.assertEqual([], good_runner.run())
-        print(dir(good_runner))
-
