@@ -9,6 +9,6 @@ class TestRoleHandlers(unittest.TestCase):
         self.collection.register(UseHandlerRatherThanWhenChangedRule())
 
     def test_role_handler_positive(self):
-        success = 'test/252/main.yml'
+        success = 'test/role-with-handler/main.yml'
         good_runner = Runner(self.collection, success, [], [], [])
         self.assertEqual([], good_runner.run())
