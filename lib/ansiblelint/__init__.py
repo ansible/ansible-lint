@@ -194,7 +194,7 @@ class Runner(object):
         self.skip_list = skip_list
         self._update_exclude_paths(exclude_paths)
         self.verbosity = verbosity
-        if checked_files == None:
+        if checked_files is None:
             checked_files = set()
         self.checked_files = checked_files
 
