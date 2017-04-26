@@ -18,4 +18,4 @@ class TestNoFormattingInWhenRule(unittest.TestCase):
         failure = 'test/jinja2-when-failure.yml'
         bad_runner = Runner(self.collection, failure, [], [], [])
         errs = bad_runner.run()
-        self.assertEqual(1, len(errs))
+        self.assertEqual(2, len(errs))
