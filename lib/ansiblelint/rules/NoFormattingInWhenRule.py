@@ -1,4 +1,9 @@
 from ansiblelint import AnsibleLintRule
+try:
+    from types import StringTypes
+except ImportError:
+    # Python3 removed types.StringTypes
+    StringTypes = str,
 
 
 class NoFormattingInWhenRule(AnsibleLintRule):
@@ -8,7 +13,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
     tags = ['deprecated']
 
     def _is_valid(self, when):
-        if not isinstance(when, (str, unicode)):
+        if not isinstance(when, StringTypes):
             return True
         return when.find('{{') == -1 and when.find('}}') == -1
 
