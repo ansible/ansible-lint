@@ -66,7 +66,7 @@ class AnsibleLintRule(object):
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
         if yaml:
             for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
-                if 'action' in task and task['__ansible_action_type__'] == 'task':
+                if 'action' in task:
                     result = self.matchtask(file, task)
                     if result:
                         message = None

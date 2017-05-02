@@ -36,10 +36,11 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     tags = ['behaviour']
 
     def matchtask(self, file, task):
-        when = task.get('when')
-        if isinstance(when, list):
-            for item in when:
-                if _changed_in_when(item):
-                    return True
-        if isinstance(when, six.string_types):
-            return _changed_in_when(when)
+        if task["__ansible_action_type__"] == 'task':
+            when = task.get('when')
+            if isinstance(when, list):
+                for item in when:
+                    if _changed_in_when(item):
+                        return True
+            if isinstance(when, six.string_types):
+                return _changed_in_when(when)
