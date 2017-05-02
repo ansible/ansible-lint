@@ -37,7 +37,7 @@ except ImportError:
 
 import yaml
 from yaml.composer import Composer
-from yaml.constructor import Constructor
+from yaml.constructor import ConstructorError
 
 try:
     from ansible.utils import parse_yaml_from_file
@@ -54,17 +54,20 @@ except ImportError:
     from ansible.errors import AnsibleParserError
     ANSIBLE_VERSION = 2
 
+    def make_loader():
+        return DataLoader()
+
     def parse_yaml_from_file(filepath):
-        dl = DataLoader()
+        dl = make_loader()
         return dl.load_from_file(filepath)
 
     def path_dwim(basedir, given):
-        dl = DataLoader()
+        dl = make_loader()
         dl.set_basedir(basedir)
         return dl.path_dwim(given)
 
     def ansible_template(basedir, varname, templatevars, **kwargs):
-        dl = DataLoader()
+        dl = make_loader()
         dl.set_basedir(basedir)
         templar = Templar(dl, variables=templatevars)
         return templar.template(varname, **kwargs)
@@ -498,7 +501,7 @@ def get_normalized_tasks(yaml, file):
     return res
 
 
-def parse_yaml_linenumbers(data, filename):
+def parse_yaml_linenumbers(data, filename, duplicate_keys):
     """Parses yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
@@ -512,7 +515,28 @@ def parse_yaml_linenumbers(data, filename):
         return node
 
     def construct_mapping(node, deep=False):
-        mapping = Constructor.construct_mapping(loader, node, deep=deep)
+        if not isinstance(node, yaml.MappingNode):
+            raise ConstructorError(None, None,
+                                   "expected a mapping node, but found %s" % node.id,
+                                   node.start_mark)
+        mapping = {}
+        for key_node, value_node in node.value:
+            key = loader.construct_object(key_node, deep=deep)
+            try:
+                hash(key)
+            except TypeError, exc:
+                raise ConstructorError("while constructing a mapping", node.start_mark,
+                                       "found unacceptable key (%s)" % exc, key_node.start_mark)
+            value = loader.construct_object(value_node, deep=deep)
+
+            if key in mapping:
+                if duplicate_keys in ['warn', 'warning']:
+                    pass
+                elif duplicate_keys in ['error', 'fatal']:
+                    raise ConstructorError("while constructing a mapping", node.start_mark,
+                                           "found duplicate key (%s)" % key, key_node.start_mark)
+
+            mapping[key] = value
         mapping[LINE_NUMBER_KEY] = node.__line__
         mapping[FILENAME_KEY] = filename
         return mapping

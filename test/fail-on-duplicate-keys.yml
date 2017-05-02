@@ -1,0 +1,9 @@
+- hosts: localhost
+  tasks:
+    - debug:
+        msg: task 1
+
+  hosts: localhost
+  tasks:
+    - debug:
+        msg: task 2
