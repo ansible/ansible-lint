@@ -100,3 +100,16 @@ class TestRule(unittest.TestCase):
         filename = os.path.abspath('test')
         runner = Runner(self.rules, filename, [], [], [])
         assert (list(runner.playbooks)[0][1] == 'role')
+
+    def test_files_not_scanned_twice(self):
+        checked_files = set()
+
+        filename = os.path.abspath('test/common-include-1.yml')
+        runner = Runner(self.rules, filename, [], [], [], 0, checked_files)
+        run1 = runner.run()
+
+        filename = os.path.abspath('test/common-include-2.yml')
+        runner = Runner(self.rules, filename, [], [], [], 0, checked_files)
+        run2 = runner.run()
+
+        assert ((len(run1) + len(run2)) == 1)
