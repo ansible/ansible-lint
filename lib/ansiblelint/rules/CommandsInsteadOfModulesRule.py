@@ -39,8 +39,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     tags = ['resources']
 
     _commands = ['command', 'shell']
-    _modules = {'git': 'git', 'hg': 'hg', 'curl': 'get_url or uri', 'wget': 'get_url or uri',
-                'svn': 'subversion', 'service': 'service', 'mount': 'mount',
+    _modules = {'git clone': 'git', 'hg clone': 'hg', 'curl': 'get_url or uri',
+                'wget': 'get_url or uri', 'svn checkout': 'subversion',
+                'svn co': 'subversion', 'service': 'service', 'mount': 'mount',
                 'rpm': 'yum or rpm_key', 'yum': 'yum', 'apt-get': 'apt-get',
                 'unzip': 'unarchive', 'tar': 'unarchive', 'chkconfig': 'service',
                 'rsync': 'synchronize'}
