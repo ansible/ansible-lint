@@ -59,11 +59,11 @@ class AnsibleLintRule(object):
                                file['path'], self, message))
         return matches
 
-    def matchtasks(self, file, text):
+    def matchtasks(self, file, text, vault_password=None):
         matches = []
         if not self.matchtask:
             return matches
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'], vault_password)
         if yaml:
             for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
                 if 'action' in task:
@@ -77,11 +77,11 @@ class AnsibleLintRule(object):
                                        file['path'], self, message))
         return matches
 
-    def matchyaml(self, file, text):
+    def matchyaml(self, file, text, vault_password=None):
         matches = []
         if not self.matchplay:
             return matches
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'], vault_password)
         if yaml and hasattr(self, 'matchplay'):
             if isinstance(yaml, dict):
                 yaml = [yaml]
@@ -117,7 +117,7 @@ class RulesCollection(object):
     def extend(self, more):
         self.rules.extend(more)
 
-    def run(self, playbookfile, tags=set(), skip_list=set()):
+    def run(self, playbookfile, tags=set(), skip_list=set(), vault_password=None):
         text = ""
         matches = list()
 
@@ -136,8 +136,8 @@ class RulesCollection(object):
                 rule_definition.add(rule.id)
                 if set(rule_definition).isdisjoint(skip_list):
                     matches.extend(rule.matchlines(playbookfile, text))
-                    matches.extend(rule.matchtasks(playbookfile, text))
-                    matches.extend(rule.matchyaml(playbookfile, text))
+                    matches.extend(rule.matchtasks(playbookfile, text, vault_password))
+                    matches.extend(rule.matchyaml(playbookfile, text, vault_password))
 
         return matches
 
@@ -180,7 +180,7 @@ class Match(object):
 class Runner(object):
 
     def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
-                 verbosity=0, checked_files=None):
+                 verbosity=0, checked_files=None, vault_password=None):
         self.rules = rules
         self.playbooks = set()
         # assume role if directory
@@ -197,6 +197,7 @@ class Runner(object):
         if checked_files is None:
             checked_files = set()
         self.checked_files = checked_files
+        self.vault_password = vault_password
 
     def _update_exclude_paths(self, exclude_paths):
         if exclude_paths:
@@ -226,7 +227,8 @@ class Runner(object):
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
-                for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
+                for child in ansiblelint.utils.find_children(arg, self.playbook_dir,
+                                                             vault_password=self.vault_password):
                     if self.is_excluded(child['path']):
                         continue
                     self.playbooks.add((child['path'], child['type']))
@@ -240,7 +242,7 @@ class Runner(object):
             if self.verbosity > 0:
                 print("Examining %s of type %s" % (file['path'], file['type']))
             matches.extend(self.rules.run(file, tags=set(self.tags),
-                           skip_list=set(self.skip_list)))
+                           skip_list=set(self.skip_list), vault_password=self.vault_password))
         # update list of checked files
         self.checked_files.update([x['path'] for x in files])
 
