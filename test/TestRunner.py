@@ -91,6 +91,17 @@ class TestRule(unittest.TestCase):
         runner = Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 0)
 
+    def test_runner_encrypted_secrets(self):
+        from pkg_resources import parse_version
+        import ansible
+        # Only run this test for ansible 2.3+
+        # It checks ansible-lint's parsing of yaml files that contain
+        # encrypted secrets.
+        if parse_version(ansible.__version__) >= parse_version('2.3'):
+            filename = 'test/contains_secrets.yml'
+            runner = Runner(self.rules, filename, [], [], [])
+            assert (len(runner.run()) == 0)
+
     def test_dir_with_trailing_slash(self):
         filename = 'test/'
         runner = Runner(self.rules, filename, [], [], [])
