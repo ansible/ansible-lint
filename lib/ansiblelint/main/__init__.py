@@ -78,6 +78,8 @@ def main():
     parser.add_option('--exclude', dest='exclude_paths', action='append',
                       help='path to directories or files to skip. This option'
                            ' is repeatable.')
+    parser.add_option('--ask-vault-pass', default=False, dest='ask_vault_pass', action='store_true',
+                      help='ask for vault password')
     options, args = parser.parse_args(sys.argv[1:])
 
     if options.quiet:
@@ -89,6 +91,13 @@ def main():
     if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
         return 1
+
+    if options.ask_vault_pass:
+        vault_password = ask_vault_password()
+    else:
+        # An incorrect vault password doesn't matter;
+        # it just means encrypted variable contents can't be read.
+        vault_password = "x"
 
     if options.use_default_rules:
         rulesdirs = options.rulesdir + [ansiblelint.default_rulesdir]
@@ -118,7 +127,7 @@ def main():
     for playbook in playbooks:
         runner = ansiblelint.Runner(rules, playbook, options.tags,
                                     options.skip_list, options.exclude_paths,
-                                    options.verbosity, checked_files)
+                                    options.verbosity, checked_files, vault_password)
         matches.extend(runner.run())
 
     matches.sort(key=lambda x: (x.filename, x.linenumber, x.rule.id))
@@ -130,6 +139,26 @@ def main():
         return 2
     else:
         return 0
+
+
+def ask_vault_password():
+    ''' prompt for vault password '''
+
+    vault_pass = None
+    try:
+        import getpass
+        vault_pass = getpass.getpass(prompt="Vault password: ")
+
+    except EOFError:
+        pass
+
+    # enforce no newline chars at the end of passwords
+    if vault_pass:
+        from ansible.module_utils._text import to_bytes
+        vault_pass = to_bytes(vault_pass, errors='surrogate_or_strict',
+                              nonstring='simplerepr').strip()
+
+    return vault_pass
 
 
 if __name__ == "__main__":

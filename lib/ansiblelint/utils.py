@@ -50,12 +50,16 @@ except ImportError:
     from ansible.parsing.dataloader import DataLoader
     from ansible.template import Templar
     from ansible.parsing.mod_args import ModuleArgsParser
+    from ansible.parsing.yaml.constructor import AnsibleConstructor
+    from ansible.parsing.yaml.loader import AnsibleLoader
     from ansible.plugins import module_loader
     from ansible.errors import AnsibleParserError
     ANSIBLE_VERSION = 2
 
-    def parse_yaml_from_file(filepath):
+    def parse_yaml_from_file(filepath, vault_password=None):
         dl = DataLoader()
+        if vault_password:
+            dl.set_vault_password(vault_password)
         return dl.load_from_file(filepath)
 
     def path_dwim(basedir, given):
@@ -141,14 +145,14 @@ def _playbook_items(pb_data):
         return [item for play in pb_data for item in play.items()]
 
 
-def find_children(playbook, playbook_dir):
+def find_children(playbook, playbook_dir, vault_password=None):
     if not os.path.exists(playbook[0]):
         return []
     if playbook[1] == 'role':
         playbook_ds = {'roles': [{'role': playbook[0]}]}
     else:
         try:
-            playbook_ds = parse_yaml_from_file(playbook[0])
+            playbook_ds = parse_yaml_from_file(playbook[0], vault_password=vault_password)
         except AnsibleError as e:
             raise SystemExit(str(e))
     results = []
@@ -498,7 +502,7 @@ def get_normalized_tasks(yaml, file):
     return res
 
 
-def parse_yaml_linenumbers(data, filename):
+def parse_yaml_linenumbers(data, filename, vault_password=None):
     """Parses yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
@@ -512,13 +516,24 @@ def parse_yaml_linenumbers(data, filename):
         return node
 
     def construct_mapping(node, deep=False):
-        mapping = Constructor.construct_mapping(loader, node, deep=deep)
+        if ANSIBLE_VERSION < 2:
+            mapping = Constructor.construct_mapping(loader, node, deep=deep)
+        else:
+            mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
         mapping[LINE_NUMBER_KEY] = node.__line__
         mapping[FILENAME_KEY] = filename
         return mapping
 
     try:
-        loader = yaml.Loader(data)
+        if ANSIBLE_VERSION < 2:
+            loader = yaml.Loader(data)
+        else:
+            import inspect
+            kwargs = {}
+            if 'vault_password' in inspect.getargspec(AnsibleLoader.__init__).args:
+                if vault_password:
+                    kwargs['vault_password'] = vault_password
+            loader = AnsibleLoader(data, **kwargs)
         loader.compose_node = compose_node
         loader.construct_mapping = construct_mapping
         data = loader.get_single_data()
