@@ -43,7 +43,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
                 'svn': 'subversion', 'service': 'service', 'mount': 'mount',
                 'rpm': 'yum or rpm_key', 'yum': 'yum', 'apt-get': 'apt-get',
                 'unzip': 'unarchive', 'tar': 'unarchive', 'chkconfig': 'service',
-                'rsync': 'synchronize'}
+                'rsync': 'synchronize', 'supervisorctl': 'supervisorctl', 'systemctl': 'systemd'}
 
     def matchtask(self, file, task):
         if task["action"]["__ansible_module__"] in self._commands and \
