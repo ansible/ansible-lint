@@ -50,7 +50,6 @@ except ImportError:
     from ansible.parsing.dataloader import DataLoader
     from ansible.template import Templar
     from ansible.parsing.mod_args import ModuleArgsParser
-    from ansible.plugins import module_loader
     from ansible.errors import AnsibleParserError
     ANSIBLE_VERSION = 2
 
@@ -68,6 +67,10 @@ except ImportError:
         dl.set_basedir(basedir)
         templar = Templar(dl, variables=templatevars)
         return templar.template(varname, **kwargs)
+    try:
+        from ansible.plugins import module_loader
+    except ImportError:
+        from ansible.plugins.loader import module_loader
 
 LINE_NUMBER_KEY = '__line__'
 FILENAME_KEY = '__file__'
