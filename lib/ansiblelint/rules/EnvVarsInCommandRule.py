@@ -30,10 +30,14 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     tags = ['bug']
 
     expected_args = ['chdir', 'creates', 'executable', 'removes', 'warn',
-                     '__ansible_module__', '__ansible_arguments__',
+                     'cmd', '__ansible_module__', '__ansible_arguments__',
                      LINE_NUMBER_KEY, FILENAME_KEY]
 
     def matchtask(self, file, task):
         if task["action"]["__ansible_module__"] in ['shell', 'command']:
+            if 'cmd' in task['action']:
+                first_cmd_arg = task['action']['cmd'].split()[0]
+            else:
+                first_cmd_arg = task['action']['__ansible_arguments__'][0]
             return any([arg not in self.expected_args for arg in task['action']] +
-                       ["=" in task['action']['__ansible_arguments__'][0]])
+                       ["=" in first_cmd_arg])

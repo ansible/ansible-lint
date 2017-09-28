@@ -19,6 +19,13 @@
   - name: command with inline removes
     command: removes=Z echo blah
 
+  - name: command with cmd
+    command:
+      cmd:
+        echo blah
+    args:
+      creates: Z
+
   - name: shell with creates check
     shell: echo blah
     args:
@@ -38,6 +45,13 @@
 
   - name: shell with inline removes
     shell: removes=Z echo blah
+
+  - name: shell with cmd
+    shell:
+      cmd:
+        echo blah
+    args:
+      creates: Z
 
 - handlers:
   - name: restart something
