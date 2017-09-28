@@ -22,7 +22,7 @@ setup(
     install_requires=['ansible', 'pyyaml', 'six'],
     entry_points={
         'console_scripts': [
-             'ansible-lint = ansiblelint.main:main'
+             'ansible-lint = ansiblelint.__main__:main'
         ]
     },
     license='MIT',
