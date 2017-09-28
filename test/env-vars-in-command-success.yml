@@ -14,3 +14,8 @@
 
   - name: commands can have equals in them
     command: echo "==========="
+
+  - name: commands with cmd
+    command:
+      cmd:
+        echo "-------"
