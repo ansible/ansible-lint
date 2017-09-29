@@ -20,6 +20,9 @@ From source:
 git clone https://github.com/willthames/ansible-lint
 export PYTHONPATH=$PYTHONPATH:`pwd`/ansible-lint/lib
 export PATH=$PATH:`pwd`/ansible-lint/bin
+cd ansible-lint
+mkdir bin
+ln -s ../lib/ansiblelint/main/__init__.py bin/ansible-lint
 ```
 
 Usage
