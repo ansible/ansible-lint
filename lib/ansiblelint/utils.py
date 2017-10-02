@@ -23,7 +23,6 @@ import imp
 import os
 
 import six
-
 from ansible import constants
 from ansible.errors import AnsibleError
 
@@ -44,6 +43,7 @@ try:
     from ansible.utils import path_dwim
     from ansible.utils.template import template as ansible_template
     from ansible.utils import module_finder
+
     module_loader = module_finder
     ANSIBLE_VERSION = 1
 except ImportError:
@@ -51,6 +51,7 @@ except ImportError:
     from ansible.template import Templar
     from ansible.parsing.mod_args import ModuleArgsParser
     from ansible.errors import AnsibleParserError
+
     ANSIBLE_VERSION = 2
 
     def parse_yaml_from_file(filepath):
@@ -67,6 +68,7 @@ except ImportError:
         dl.set_basedir(basedir)
         templar = Templar(dl, variables=templatevars)
         return templar.template(varname, **kwargs)
+
     try:
         from ansible.plugins import module_loader
     except ImportError:
@@ -77,9 +79,9 @@ FILENAME_KEY = '__file__'
 
 VALID_KEYS = [
     'name', 'action', 'when', 'async', 'poll', 'notify',
-    'first_available_file', 'include', 'tags', 'register', 'ignore_errors',
-    'delegate_to', 'local_action', 'transport', 'remote_user', 'sudo', 'sudo_user',
-    'sudo_pass', 'when', 'connection', 'environment', 'args', 'always_run',
+    'first_available_file', 'include', 'include_tasks', 'import_tasks', 'tags', 'register',
+    'ignore_errors', 'delegate_to', 'local_action', 'transport', 'remote_user', 'sudo',
+    'sudo_user', 'sudo_pass', 'when', 'connection', 'environment', 'args', 'always_run',
     'any_errors_fatal', 'changed_when', 'failed_when', 'check_mode', 'delay', 'retries', 'until',
     'su', 'su_user', 'su_pass', 'no_log', 'run_once',
     'become', 'become_user', 'become_method', FILENAME_KEY,
@@ -193,6 +195,8 @@ def play_children(basedir, item, parent_type, playbook_dir):
         'post_tasks': _taskshandlers_children,
         'block': _taskshandlers_children,
         'include': _include_children,
+        'include_tasks': _include_children,
+        'import_tasks': _include_children,
         'roles': _roles_children,
         'dependencies': _roles_children,
         'handlers': _taskshandlers_children,
@@ -234,6 +238,30 @@ def _taskshandlers_children(basedir, k, v, parent_type):
                 playbook_section = parent_type
             results.append({
                 'path': path_dwim(basedir, th['include']),
+                'type': playbook_section
+            })
+        elif 'include_tasks' in th:
+            # when taskshandlers_children is called for playbooks, the
+            # actual type of the included tasks is the section containing the
+            # include, e.g. tasks, pre_tasks, or handlers.
+            if parent_type == 'playbook':
+                playbook_section = k
+            else:
+                playbook_section = parent_type
+            results.append({
+                'path': path_dwim(basedir, th['include_tasks']),
+                'type': playbook_section
+            })
+        elif 'import_tasks' in th:
+            # when taskshandlers_children is called for playbooks, the
+            # actual type of the included tasks is the section containing the
+            # include, e.g. tasks, pre_tasks, or handlers.
+            if parent_type == 'playbook':
+                playbook_section = k
+            else:
+                playbook_section = parent_type
+            results.append({
+                'path': path_dwim(basedir, th['import_tasks']),
                 'type': playbook_section
             })
         elif 'block' in th:
@@ -320,7 +348,7 @@ def rolename(filepath):
     idx = filepath.find('roles/')
     if idx < 0:
         return ''
-    role = filepath[idx+6:]
+    role = filepath[idx + 6:]
     role = role[:role.find('/')]
     return role
 
@@ -355,7 +383,7 @@ def normalize_task_v2(task):
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
         action = 'shell'
-        del(arguments['_uses_shell'])
+        del (arguments['_uses_shell'])
 
     for (k, v) in list(task.items()):
         if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
@@ -369,7 +397,7 @@ def normalize_task_v2(task):
 
     if '_raw_params' in arguments:
         result['action']['__ansible_arguments__'] = arguments['_raw_params'].split()
-        del(arguments['_raw_params'])
+        del (arguments['_raw_params'])
     else:
         result['action']['__ansible_arguments__'] = list()
     result['action'].update(arguments)
@@ -417,17 +445,17 @@ def normalize_task_v1(task):
         #   module: ec2
         #   etc...
         result['action']['__ansible_module__'] = result['action']['module']
-        del(result['action']['module'])
+        del (result['action']['module'])
     if 'args' in result:
         result['action'].update(result.get('args'))
-        del(result['args'])
+        del (result['args'])
     return result
 
 
 def normalize_task(task, filename):
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
-        del(task['__ansible_action_type__'])
+        del (task['__ansible_action_type__'])
     if ANSIBLE_VERSION < 2:
         task = normalize_task_v1(task)
     else:
@@ -442,9 +470,9 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " " .join([u"{0}={1}".format(k, v) for (k, v) in action.items()
+    args = " ".join([u"{0}={1}".format(k, v) for (k, v) in action.items()
                      if k not in ["__ansible_module__", "__ansible_arguments__"]] +
-                     action.get("__ansible_arguments__"))
+                    action.get("__ansible_arguments__"))
     return u"{0} {1}".format(action["__ansible_module__"], args)
 
 
@@ -483,7 +511,9 @@ def get_action_tasks(yaml, file):
     block_rescue_always = ('block', 'rescue', 'always')
     tasks[:] = [task for task in tasks if all(k not in task for k in block_rescue_always)]
 
-    return [task for task in tasks if 'include' not in task.keys()]
+    return [task for task in tasks if
+            ('include' or 'include_tasks' or 'import_tasks')
+            not in task.keys()]
 
 
 def get_normalized_tasks(yaml, file):
