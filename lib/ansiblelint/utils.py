@@ -43,7 +43,6 @@ try:
     from ansible.utils import path_dwim
     from ansible.utils.template import template as ansible_template
     from ansible.utils import module_finder
-
     module_loader = module_finder
     ANSIBLE_VERSION = 1
 except ImportError:
@@ -53,7 +52,6 @@ except ImportError:
     from ansible.parsing.yaml.constructor import AnsibleConstructor
     from ansible.parsing.yaml.loader import AnsibleLoader
     from ansible.errors import AnsibleParserError
-
     ANSIBLE_VERSION = 2
 
     # ansible-lint doesn't need/want to know about encrypted secrets, but it needs
@@ -77,7 +75,6 @@ except ImportError:
         dl.set_basedir(basedir)
         templar = Templar(dl, variables=templatevars)
         return templar.template(varname, **kwargs)
-
     try:
         from ansible.plugins import module_loader
     except ImportError:
@@ -349,7 +346,7 @@ def rolename(filepath):
     idx = filepath.find('roles/')
     if idx < 0:
         return ''
-    role = filepath[idx + 6:]
+    role = filepath[idx+6:]
     role = role[:role.find('/')]
     return role
 
@@ -384,7 +381,7 @@ def normalize_task_v2(task):
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
         action = 'shell'
-        del (arguments['_uses_shell'])
+        del(arguments['_uses_shell'])
 
     for (k, v) in list(task.items()):
         if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
@@ -446,17 +443,17 @@ def normalize_task_v1(task):
         #   module: ec2
         #   etc...
         result['action']['__ansible_module__'] = result['action']['module']
-        del (result['action']['module'])
+        del(result['action']['module'])
     if 'args' in result:
         result['action'].update(result.get('args'))
-        del (result['args'])
+        del(result['args'])
     return result
 
 
 def normalize_task(task, filename):
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
-        del (task['__ansible_action_type__'])
+        del(task['__ansible_action_type__'])
     if ANSIBLE_VERSION < 2:
         task = normalize_task_v1(task)
     else:
