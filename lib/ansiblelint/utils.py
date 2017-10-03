@@ -43,7 +43,6 @@ try:
     from ansible.utils import path_dwim
     from ansible.utils.template import template as ansible_template
     from ansible.utils import module_finder
-
     module_loader = module_finder
     ANSIBLE_VERSION = 1
 except ImportError:
@@ -51,7 +50,6 @@ except ImportError:
     from ansible.template import Templar
     from ansible.parsing.mod_args import ModuleArgsParser
     from ansible.errors import AnsibleParserError
-
     ANSIBLE_VERSION = 2
 
     def parse_yaml_from_file(filepath):
@@ -68,7 +66,6 @@ except ImportError:
         dl.set_basedir(basedir)
         templar = Templar(dl, variables=templatevars)
         return templar.template(varname, **kwargs)
-
     try:
         from ansible.plugins import module_loader
     except ImportError:
@@ -229,49 +226,32 @@ def _taskshandlers_children(basedir, k, v, parent_type):
     results = []
     for th in v:
         if 'include' in th:
-            # when taskshandlers_children is called for playbooks, the
-            # actual type of the included tasks is the section containing the
-            # include, e.g. tasks, pre_tasks, or handlers.
-            if parent_type == 'playbook':
-                playbook_section = k
-            else:
-                playbook_section = parent_type
-            results.append({
-                'path': path_dwim(basedir, th['include']),
-                'type': playbook_section
-            })
+            append_children(th['include'], basedir, k, parent_type, results)
         elif 'include_tasks' in th:
-            # when taskshandlers_children is called for playbooks, the
-            # actual type of the included tasks is the section containing the
-            # include, e.g. tasks, pre_tasks, or handlers.
-            if parent_type == 'playbook':
-                playbook_section = k
-            else:
-                playbook_section = parent_type
-            results.append({
-                'path': path_dwim(basedir, th['include_tasks']),
-                'type': playbook_section
-            })
+            append_children(th['include_tasks'], basedir, k, parent_type, results)
         elif 'import_tasks' in th:
-            # when taskshandlers_children is called for playbooks, the
-            # actual type of the included tasks is the section containing the
-            # include, e.g. tasks, pre_tasks, or handlers.
-            if parent_type == 'playbook':
-                playbook_section = k
-            else:
-                playbook_section = parent_type
-            results.append({
-                'path': path_dwim(basedir, th['import_tasks']),
-                'type': playbook_section
-            })
+            append_children(th['import_tasks'], basedir, k, parent_type, results)
         elif 'block' in th:
             results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
             if 'rescue' in th:
                 results.extend(_taskshandlers_children(basedir, k, th['rescue'], parent_type))
             if 'always' in th:
                 results.extend(_taskshandlers_children(basedir, k, th['always'], parent_type))
-
     return results
+
+
+def append_children(taskhandler, basedir, k, parent_type, results):
+    # when taskshandlers_children is called for playbooks, the
+    # actual type of the included tasks is the section containing the
+    # include, e.g. tasks, pre_tasks, or handlers.
+    if parent_type == 'playbook':
+        playbook_section = k
+    else:
+        playbook_section = parent_type
+    results.append({
+        'path': path_dwim(basedir, taskhandler),
+        'type': playbook_section
+    })
 
 
 def _roles_children(basedir, k, v, parent_type):
@@ -348,7 +328,7 @@ def rolename(filepath):
     idx = filepath.find('roles/')
     if idx < 0:
         return ''
-    role = filepath[idx + 6:]
+    role = filepath[idx+6:]
     role = role[:role.find('/')]
     return role
 
@@ -383,7 +363,7 @@ def normalize_task_v2(task):
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
         action = 'shell'
-        del (arguments['_uses_shell'])
+        del(arguments['_uses_shell'])
 
     for (k, v) in list(task.items()):
         if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
@@ -397,7 +377,7 @@ def normalize_task_v2(task):
 
     if '_raw_params' in arguments:
         result['action']['__ansible_arguments__'] = arguments['_raw_params'].split()
-        del (arguments['_raw_params'])
+        del(arguments['_raw_params'])
     else:
         result['action']['__ansible_arguments__'] = list()
     result['action'].update(arguments)
@@ -445,17 +425,17 @@ def normalize_task_v1(task):
         #   module: ec2
         #   etc...
         result['action']['__ansible_module__'] = result['action']['module']
-        del (result['action']['module'])
+        del(result['action']['module'])
     if 'args' in result:
         result['action'].update(result.get('args'))
-        del (result['args'])
+        del(result['args'])
     return result
 
 
 def normalize_task(task, filename):
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
-        del (task['__ansible_action_type__'])
+        del(task['__ansible_action_type__'])
     if ANSIBLE_VERSION < 2:
         task = normalize_task_v1(task)
     else:
@@ -512,8 +492,7 @@ def get_action_tasks(yaml, file):
     tasks[:] = [task for task in tasks if all(k not in task for k in block_rescue_always)]
 
     return [task for task in tasks if
-            ('include' or 'include_tasks' or 'import_tasks')
-            not in task.keys()]
+            {'include', 'include_tasks', 'import_tasks'}.isdisjoint(task.keys())]
 
 
 def get_normalized_tasks(yaml, file):
