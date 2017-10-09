@@ -222,6 +222,32 @@ As of version 2.4.0, ansible-lint now works just on roles (this is useful
 for CI of roles)
 
 
+Configuration File
+==================
+
+Ansible-lint supports local configuration via a `.ansible-lint` configuration file.  Ansible-lint checks the working directory for the presence of this file and applies any configuration found there.
+
+The following values are supported and function identically to their CLI counterparts.
+
+```yaml
+exclude:
+  - ./my/excluded/directory/
+  - ./my/other/excluded/directory/
+  - ./last/excluded/directory/
+parseable: true
+quiet: true
+rulesdir:
+  - ./rule/directory/
+skip_list:
+  - skip_this_tag
+  - and_this_one_too
+tags:
+  - run_this_tag
+use_default_rules: true
+verbosity: 1
+```
+
+
 Pre-commit
 ==========
 
