@@ -37,5 +37,6 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
             if task["action"]["__ansible_module__"] in self._commands:
                 return 'changed_when' not in task and \
                     'when' not in task and \
+                    'register' not in task and \
                     'creates' not in task['action'] and \
                     'removes' not in task['action']
