@@ -34,25 +34,32 @@ from ansiblelint.version import __version__
 import yaml
 import os
 
-config = None
 
-if os.path.exists(".ansible-lint"):
-    with open(".ansible-lint", "r") as stream:
-        try:
-            config = yaml.load(stream)
-        except yaml.YAMLError as exc:
-            pass
+class Configuration:
+    def __init__(self):
+        self.config = None
 
+        args = sys.argv[1:]
+        config_path = args[args.index("-F") + 1] if "-F" in args else ".ansible-lint"
 
-def config_or_default(attr, default):
-    if config is not None:
-        if attr in config:
-            return config[attr]
+        if os.path.exists(config_path):
+            with open(config_path, "r") as stream:
+                try:
+                    self.config = yaml.load(stream)
+                except yaml.YAMLError:
+                    pass
 
-    return default
+    def config_or_default(self, attr, default):
+        if self.config is not None:
+            if attr in self.config:
+                return self.config[attr]
+
+        return default
 
 
 def main():
+
+    config = Configuration()
 
     formatter = formatters.Formatter()
 
@@ -62,34 +69,34 @@ def main():
     parser.add_option('-L', dest='listrules', default=False,
                       action='store_true', help="list all the rules")
     parser.add_option('-q', dest='quiet',
-                      default=config_or_default("quiet", False),
+                      default=config.config_or_default("quiet", False),
                       action='store_true',
                       help="quieter, although not silent output")
     parser.add_option('-p', dest='parseable',
-                      default=config_or_default("parseable", False),
+                      default=config.config_or_default("parseable", False),
                       action='store_true',
                       help="parseable output in the format of pep8")
     parser.add_option('-r', action='append', dest='rulesdir',
-                      default=config_or_default("rulesdir", []), type='str',
+                      default=config.config_or_default("rulesdir", []), type='str',
                       help="specify one or more rules directories using "
                            "one or more -r arguments. Any -r flags override "
                            "the default rules in %s, unless -R is also used."
                            % ansiblelint.default_rulesdir)
     parser.add_option('-R', action='store_true',
-                      default=config_or_default("use_default_rules", False),
+                      default=config.config_or_default("use_default_rules", False),
                       dest='use_default_rules',
                       help="Use default rules in %s in addition to any extra "
                            "rules directories specified with -r. There is "
                            "no need to specify this if no -r flags are used"
                            % ansiblelint.default_rulesdir)
     parser.add_option('-t', dest='tags',
-                      default=config_or_default("tags", []),
+                      default=config.config_or_default("tags", []),
                       help="only check rules whose id/tags match these values")
     parser.add_option('-T', dest='listtags', action='store_true',
                       help="list all the tags")
     parser.add_option('-v', dest='verbosity', action='count',
                       help="Increase verbosity level",
-                      default=config_or_default("verbosity", 0))
+                      default=config.config_or_default("verbosity", 0))
     parser.add_option('-x', dest='skip_list', default=[],
                       help="only check rules whose id/tags do not " +
                       "match these values")
@@ -103,7 +110,8 @@ def main():
     parser.add_option('--exclude', dest='exclude_paths', action='append',
                       help='path to directories or files to skip. This option'
                            ' is repeatable.',
-                      default=config_or_default("exclude", []))
+                      default=config.config_or_default("exclude", []))
+    parser.add_option('-F', help='Specify configuration file to use.  Defaults to ".ansible-lint"')
     options, args = parser.parse_args(sys.argv[1:])
 
     if options.quiet:

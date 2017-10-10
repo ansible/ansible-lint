@@ -51,6 +51,8 @@ Options:
                         repeatable.
   --force-color         Try force colored output (relying on ansible's code)
   --nocolor             disable colored output
+  -F F                  Specify configuration file to use.  Defaults to
+                          ".ansible-lint"
 ```
 
 False positives
@@ -225,7 +227,7 @@ for CI of roles)
 Configuration File
 ==================
 
-Ansible-lint supports local configuration via a `.ansible-lint` configuration file.  Ansible-lint checks the working directory for the presence of this file and applies any configuration found there.
+Ansible-lint supports local configuration via a `.ansible-lint` configuration file.  Ansible-lint checks the working directory for the presence of this file and applies any configuration found there.  The configuration file location can also be overridden via the `-F path/to/file` CLI flag.
 
 The following values are supported and function identically to their CLI counterparts.
 

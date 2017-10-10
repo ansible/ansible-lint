@@ -10,7 +10,7 @@ class TestCommandLineInvocationSameAsConfig(unittest.TestCase):
         if os.path.exists(".sandbox"):
             shutil.rmtree(".sandbox")
 
-        os.makedirs(".sandbox")
+        os.makedirs(".sandbox/subdir")
 
     def run_ansible_lint(self, args=False, config=None):
         command = "cd .sandbox; ../bin/ansible-lint ../test/skiptasks.yml"
@@ -63,3 +63,18 @@ class TestCommandLineInvocationSameAsConfig(unittest.TestCase):
 
     def test_exclude(self):
         self.assert_config_for("--exclude ../test/", dict(exclude=["../test/"]))
+
+    def test_config_can_be_overridden(self):
+        no_override = self.run_ansible_lint(args="-t bad_tag")
+        overridden = self.run_ansible_lint(args="-t bad_tag", config=dict(tags=["skip_ansible_lint"]))
+
+        self.assertEqual(no_override, overridden)
+
+    def test_different_config_file(self):
+        with open(".sandbox/subdir/ansible-config.yml", "w") as outfile:
+            yaml.dump(dict(verbosity=1), outfile, default_flow_style=False)
+
+        diff_config = self.run_ansible_lint(args="-F ./subdir/ansible-config.yml")
+        no_config = self.run_ansible_lint(args="-v")
+
+        self.assertEqual(diff_config, no_config)
