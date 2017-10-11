@@ -231,8 +231,10 @@ Ansible-lint supports local configuration via a `.ansible-lint` configuration fi
 
 The following values are supported and function identically to their CLI counterparts.
 
+If a value is provided on both the command line and via a config file, the values will be merged (if a list like `exclude_paths`), or the "True" value will be preferred, in the case of something like `quiet`.
+
 ```yaml
-exclude:
+exclude_paths:
   - ./my/excluded/directory/
   - ./my/other/excluded/directory/
   - ./last/excluded/directory/

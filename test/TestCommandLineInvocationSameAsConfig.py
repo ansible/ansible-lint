@@ -29,7 +29,7 @@ class TestCommandLineInvocationSameAsConfig(unittest.TestCase):
             shell=True
         ).communicate()
 
-        self.assertFalse(err)
+        self.assertFalse(err, "Expected no error but was " + err)
 
         return result
 
@@ -62,7 +62,7 @@ class TestCommandLineInvocationSameAsConfig(unittest.TestCase):
         self.assert_config_for("-x bad_tag", dict(skip_list=["bad_tag"]))
 
     def test_exclude(self):
-        self.assert_config_for("--exclude ../test/", dict(exclude=["../test/"]))
+        self.assert_config_for("--exclude ../test/", dict(exclude_paths=["../test/"]))
 
     def test_config_can_be_overridden(self):
         no_override = self.run_ansible_lint(args="-t bad_tag")

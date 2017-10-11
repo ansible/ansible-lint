@@ -35,31 +35,20 @@ import yaml
 import os
 
 
-class Configuration:
-    def __init__(self):
-        self.config = None
+def load_config(config_file):
+    config_path = config_file if config_file else ".ansible-lint"
 
-        args = sys.argv[1:]
-        config_path = args[args.index("-F") + 1] if "-F" in args else ".ansible-lint"
+    if os.path.exists(config_path):
+        with open(config_path, "r") as stream:
+            try:
+                return yaml.load(stream)
+            except yaml.YAMLError:
+                pass
 
-        if os.path.exists(config_path):
-            with open(config_path, "r") as stream:
-                try:
-                    self.config = yaml.load(stream)
-                except yaml.YAMLError:
-                    pass
-
-    def config_or_default(self, attr, default):
-        if self.config is not None:
-            if attr in self.config:
-                return self.config[attr]
-
-        return default
+    return None
 
 
 def main():
-
-    config = Configuration()
 
     formatter = formatters.Formatter()
 
@@ -69,34 +58,35 @@ def main():
     parser.add_option('-L', dest='listrules', default=False,
                       action='store_true', help="list all the rules")
     parser.add_option('-q', dest='quiet',
-                      default=config.config_or_default("quiet", False),
+                      default=False,
                       action='store_true',
                       help="quieter, although not silent output")
     parser.add_option('-p', dest='parseable',
-                      default=config.config_or_default("parseable", False),
+                      default=False,
                       action='store_true',
                       help="parseable output in the format of pep8")
     parser.add_option('-r', action='append', dest='rulesdir',
-                      default=config.config_or_default("rulesdir", []), type='str',
+                      default=[], type='str',
                       help="specify one or more rules directories using "
                            "one or more -r arguments. Any -r flags override "
                            "the default rules in %s, unless -R is also used."
                            % ansiblelint.default_rulesdir)
     parser.add_option('-R', action='store_true',
-                      default=config.config_or_default("use_default_rules", False),
+                      default=False,
                       dest='use_default_rules',
                       help="Use default rules in %s in addition to any extra "
                            "rules directories specified with -r. There is "
                            "no need to specify this if no -r flags are used"
                            % ansiblelint.default_rulesdir)
     parser.add_option('-t', dest='tags',
-                      default=config.config_or_default("tags", []),
+                      action='append',
+                      default=[],
                       help="only check rules whose id/tags match these values")
     parser.add_option('-T', dest='listtags', action='store_true',
                       help="list all the tags")
     parser.add_option('-v', dest='verbosity', action='count',
                       help="Increase verbosity level",
-                      default=config.config_or_default("verbosity", 0))
+                      default=0)
     parser.add_option('-x', dest='skip_list', default=[],
                       help="only check rules whose id/tags do not " +
                       "match these values")
@@ -110,9 +100,38 @@ def main():
     parser.add_option('--exclude', dest='exclude_paths', action='append',
                       help='path to directories or files to skip. This option'
                            ' is repeatable.',
-                      default=config.config_or_default("exclude", []))
+                      default=[])
     parser.add_option('-F', help='Specify configuration file to use.  Defaults to ".ansible-lint"')
     options, args = parser.parse_args(sys.argv[1:])
+
+    config = load_config(options.F)
+
+    if config:
+        if 'quiet' in config:
+            options.quiet = options.quiet or config['quiet']
+
+        if 'parseable' in config:
+            options.parseable = options.parseable or config['parseable']
+
+        if 'use_default_rules' in config:
+            options.use_default_rules = \
+                options.use_default_rules or config['use_default_rules']
+
+        if 'verbosity' in config:
+            options.verbosity = options.verbosity + config['verbosity']
+
+        if 'exclude_paths' in config:
+            options.exclude_paths = \
+                options.exclude_paths + config['exclude_paths']
+
+        if 'rulesdir' in config:
+            options.rulesdir = options.rulesdir + config['rulesdir']
+
+        if 'skip_list' in config:
+            options.skip_list = options.skip_list + config['skip_list']
+
+        if 'tags' in config:
+            options.tags = options.tags + config['tags']
 
     if options.quiet:
         formatter = formatters.QuietFormatter()
