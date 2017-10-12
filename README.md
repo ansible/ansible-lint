@@ -51,7 +51,7 @@ Options:
                         repeatable.
   --force-color         Try force colored output (relying on ansible's code)
   --nocolor             disable colored output
-  -F F                  Specify configuration file to use.  Defaults to
+  -F /path/to/file      Specify configuration file to use.  Defaults to
                           ".ansible-lint"
 ```
 

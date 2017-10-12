@@ -114,15 +114,13 @@ def main():
             options.parseable = options.parseable or config['parseable']
 
         if 'use_default_rules' in config:
-            options.use_default_rules = \
-                options.use_default_rules or config['use_default_rules']
+            options.use_default_rules = options.use_default_rules or config['use_default_rules']
 
         if 'verbosity' in config:
             options.verbosity = options.verbosity + config['verbosity']
 
         if 'exclude_paths' in config:
-            options.exclude_paths = \
-                options.exclude_paths + config['exclude_paths']
+            options.exclude_paths = options.exclude_paths + config['exclude_paths']
 
         if 'rulesdir' in config:
             options.rulesdir = options.rulesdir + config['rulesdir']
