@@ -1,0 +1,9 @@
+---
+- hosts: webservers
+  vars:
+    varset: varset
+  tasks:
+    - include_tasks: nestedincludes.yml tags=nested
+    - include_tasks: "{{ varnotset }}.yml"
+    - include_tasks: "{{ varset }}.yml"
+    - include_tasks: "directory with spaces/main.yml"
