@@ -29,7 +29,7 @@ class TestCommandLineInvocationSameAsConfig(unittest.TestCase):
             shell=True
         ).communicate()
 
-        self.assertFalse(err, "Expected no error but was " + err)
+        self.assertFalse(err, "Expected no error but was " + str(err))
 
         return result
 
