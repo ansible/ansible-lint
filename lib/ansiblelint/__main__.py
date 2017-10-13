@@ -101,10 +101,10 @@ def main():
                       help='path to directories or files to skip. This option'
                            ' is repeatable.',
                       default=[])
-    parser.add_option('-F', help='Specify configuration file to use.  Defaults to ".ansible-lint"')
+    parser.add_option('-c', help='Specify configuration file to use.  Defaults to ".ansible-lint"')
     options, args = parser.parse_args(sys.argv[1:])
 
-    config = load_config(options.F)
+    config = load_config(options.c)
 
     if config:
         if 'quiet' in config:

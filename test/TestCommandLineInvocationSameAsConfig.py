@@ -74,7 +74,7 @@ class TestCommandLineInvocationSameAsConfig(unittest.TestCase):
         with open(".sandbox/subdir/ansible-config.yml", "w") as outfile:
             yaml.dump(dict(verbosity=1), outfile, default_flow_style=False)
 
-        diff_config = self.run_ansible_lint(args="-F ./subdir/ansible-config.yml")
+        diff_config = self.run_ansible_lint(args="-c ./subdir/ansible-config.yml")
         no_config = self.run_ansible_lint(args="-v")
 
         self.assertEqual(diff_config, no_config)
