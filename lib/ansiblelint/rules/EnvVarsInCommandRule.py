@@ -29,7 +29,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
                   'command through environment argument'
     tags = ['bug']
 
-    expected_args = ['chdir', 'creates', 'executable', 'removes', 'warn',
+    expected_args = ['chdir', 'creates', 'executable', 'removes', 'stdin', 'warn',
                      'cmd', '__ansible_module__', '__ansible_arguments__',
                      LINE_NUMBER_KEY, FILENAME_KEY]
 
