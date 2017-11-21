@@ -19,9 +19,3 @@
     command:
       cmd:
         echo "-------"
-
-  - name: command with stdin
-    command:
-      cmd: /bin/vat
-      args:
-        stdin: "Hello, world!"
