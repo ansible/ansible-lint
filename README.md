@@ -51,6 +51,8 @@ Options:
                         repeatable.
   --force-color         Try force colored output (relying on ansible's code)
   --nocolor             disable colored output
+  -c /path/to/file      Specify configuration file to use.  Defaults to
+                          ".ansible-lint"
 ```
 
 False positives
@@ -220,6 +222,34 @@ action: git a=b c=d
 
 As of version 2.4.0, ansible-lint now works just on roles (this is useful 
 for CI of roles)
+
+
+Configuration File
+==================
+
+Ansible-lint supports local configuration via a `.ansible-lint` configuration file.  Ansible-lint checks the working directory for the presence of this file and applies any configuration found there.  The configuration file location can also be overridden via the `-c path/to/file` CLI flag.
+
+The following values are supported and function identically to their CLI counterparts.
+
+If a value is provided on both the command line and via a config file, the values will be merged (if a list like `exclude_paths`), or the "True" value will be preferred, in the case of something like `quiet`.
+
+```yaml
+exclude_paths:
+  - ./my/excluded/directory/
+  - ./my/other/excluded/directory/
+  - ./last/excluded/directory/
+parseable: true
+quiet: true
+rulesdir:
+  - ./rule/directory/
+skip_list:
+  - skip_this_tag
+  - and_this_one_too
+tags:
+  - run_this_tag
+use_default_rules: true
+verbosity: 1
+```
 
 
 Pre-commit

@@ -25,3 +25,6 @@ pip-log.txt
 
 # Unit test / coverage reports
 .tox
+
+# Needed for CLI tests
+.sandbox
