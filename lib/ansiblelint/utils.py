@@ -315,7 +315,7 @@ def _look_for_role_files(basedir, role):
 
     results = []
 
-    for th in ['tasks', 'handlers', 'meta']:
+    for th in ['tasks', 'handlers', 'meta', 'vars', 'defaults']:
         for ext in ('.yml', '.yaml'):
             thpath = os.path.join(role_path, th, 'main' + ext)
             if os.path.exists(thpath):
