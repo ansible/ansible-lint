@@ -376,7 +376,7 @@ def normalize_task_v2(task):
     result['action'] = dict(__ansible_module__=action)
 
     if '_raw_params' in arguments:
-        result['action']['__ansible_arguments__'] = arguments['_raw_params'].split()
+        result['action']['__ansible_arguments__'] = arguments['_raw_params'].split(' ')
         del(arguments['_raw_params'])
     else:
         result['action']['__ansible_arguments__'] = list()
