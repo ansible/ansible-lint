@@ -52,7 +52,7 @@ def main():
 
     formatter = formatters.Formatter()
 
-    parser = optparse.OptionParser("%prog playbook.yml",
+    parser = optparse.OptionParser("%prog [options] playbook.yml [playbook2 ...]",
                                    version="%prog " + __version__)
 
     parser.add_option('-L', dest='listrules', default=False,
