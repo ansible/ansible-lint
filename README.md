@@ -169,6 +169,7 @@ In ansible-lint 3.0.0 `task['action']['module']` was renamed
 `task['action']['__ansible_module__']` to avoid a clash when a module take
 `module` as an argument. As a precaution, `task['action']['module_arguments']`
 was renamed `task['action']['__ansible_arguments__']`
+
 Examples
 --------
 
