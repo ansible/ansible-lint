@@ -26,8 +26,8 @@ from ansiblelint import AnsibleLintRule
 class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     id = 'ANSIBLE0015'
     shortdesc = 'Using bare variables is deprecated'
-    description = 'Using bare variables is deprecated. Update your' + \
-        'playbooks so that the environment value uses the full variable' + \
+    description = 'Using bare variables is deprecated. Update your ' + \
+        'playbooks so that the environment value uses the full variable ' + \
         'syntax ("{{your_variable}}").'
     tags = ['formatting', 'deprecated']
 
