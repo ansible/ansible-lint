@@ -44,15 +44,16 @@ class OctalPermissionsRule(AnsibleLintRule):
                 return not self.valid_mode_regex.match(mode)
             if isinstance(mode, int):
                 # sensible file permission modes don't
-                # have write or execute bit set when read bit is
-                # not set
+                # have write bit set when read bit is
+                # not set and don't have execute bit set
+                # when user execute bit is not set.
                 # also, user permissions are more generous than
                 # group permissions and user and group permissions
                 # are more generous than world permissions
 
-                result = (mode % 8 and mode % 8 < 4 or
-                          (mode >> 3) % 8 and (mode >> 3) % 8 < 4 or
-                          (mode >> 6) % 8 and (mode >> 6) % 8 < 4 or
+                result = (mode % 8 and mode % 8 < 4 and not (mode % 8 == 1 and (mode >> 6) % 8 == 1) or
+                          (mode >> 3) % 8 and (mode >> 3) % 8 < 4 and not ((mode >> 3) % 8 == 1 and (mode >> 6) % 8 == 1) or
+                          (mode >> 6) % 8 and (mode >> 6) % 8 < 4 and not (mode >> 6) % 8 == 1 or
                           mode & 8 < (mode << 3) & 8 or
                           mode & 8 < (mode << 6) & 8 or
                           (mode << 3) & 8 < (mode << 6) & 8)

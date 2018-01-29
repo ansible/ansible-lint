@@ -21,5 +21,11 @@
     - name: octal permissions test success (0777)
       file: path=baz mode=0777
 
+    - name: octal permissions test success (0711)
+      file: path=baz mode=0711
+
+    - name: octal permissions test success (0710)
+      file: path=baz mode=0710
+
     - name:  permissions test success (0777)
       file: path=baz mode=u+rwx
