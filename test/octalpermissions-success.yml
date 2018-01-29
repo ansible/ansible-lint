@@ -23,3 +23,9 @@
 
     - name:  permissions test success (0777)
       file: path=baz mode=u+rwx
+
+    - name: folder octal permissions success (0711)
+      file:
+        path: baz
+        state: directory
+        mode: 0711

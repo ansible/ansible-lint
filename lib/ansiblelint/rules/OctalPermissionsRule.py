@@ -43,16 +43,20 @@ class OctalPermissionsRule(AnsibleLintRule):
             if isinstance(mode, six.string_types) and self.mode_regex.match(mode):
                 return not self.valid_mode_regex.match(mode)
             if isinstance(mode, int):
-                # sensible file permission modes don't
+                # sensible file (but not dir g/w) permission modes don't
                 # have write or execute bit set when read bit is
                 # not set
                 # also, user permissions are more generous than
                 # group permissions and user and group permissions
                 # are more generous than world permissions
 
-                result = (mode % 8 and mode % 8 < 4 or
-                          (mode >> 3) % 8 and (mode >> 3) % 8 < 4 or
-                          (mode >> 6) % 8 and (mode >> 6) % 8 < 4 or
+                if (task["action"]["__ansible_module__"] != 'file' or
+                        task['action'].get('state', 'file') != 'directory'):
+                    if (mode % 8 and mode % 8 < 4 or
+                            (mode >> 3) % 8 and (mode >> 3) % 8 < 4):
+                        return True
+
+                result = ((mode >> 6) % 8 and (mode >> 6) % 8 < 4 or
                           mode & 8 < (mode << 3) & 8 or
                           mode & 8 < (mode << 6) & 8 or
                           (mode << 3) & 8 < (mode << 6) & 8)
