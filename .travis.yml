@@ -1,6 +1,69 @@
-language: python
-python:
-  - "2.7"
+# Based on https://github.com/pantsbuild/pex/blob/master/.travis.yml
+#
+# Enables support for a docker container-based build
+# which should provide faster startup times and beefier
+# "machines".
+# See: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
+sudo: false
+
+# TRAVIS_PYTHON_VERSION
+
+matrix:
+  include:
+    - language: python
+      python: "2.7"
+      env: TOXENV=py27-flake8
+
+    - language: python
+      python: "2.7"
+      env: TOXENV=py27-ansible19
+
+    - language: python
+      python: "2.7"
+      env: TOXENV=py27-ansible20
+
+    - language: python
+      python: "2.7"
+      env: TOXENV=py27-ansible21
+
+    - language: python
+      python: "2.7"
+      env: TOXENV=py27-ansible22
+
+    - language: python
+      python: "2.7"
+      env: TOXENV=py27-ansible23
+
+    - language: python
+      python: "2.7"
+      env: TOXENV=py27-ansible24
+
+    - language: python
+      python: "2.7"
+      env: TOXENV=py27-ansibledevel
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36-ansible22
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36-ansible23
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36-ansible24
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36-ansibledevel
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36-flake8
+
 install:
   - pip install -r test-deps.txt
-script: tox
+
+script:
+- tox -v
