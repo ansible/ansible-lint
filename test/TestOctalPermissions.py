@@ -18,4 +18,4 @@ class TestOctalPermissionsRuleWithFile(unittest.TestCase):
         failure = 'test/octalpermissions-failure.yml'
         bad_runner = Runner(self.collection, failure, [], [], [])
         errs = bad_runner.run()
-        self.assertEqual(4, len(errs))
+        self.assertEqual(5, len(errs))
