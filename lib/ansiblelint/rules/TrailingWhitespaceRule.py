@@ -28,4 +28,5 @@ class TrailingWhitespaceRule(AnsibleLintRule):
     tags = ['formatting']
 
     def match(self, file, line):
+        line = line.replace("\r", "")
         return line.rstrip() != line
