@@ -76,11 +76,12 @@ FILENAME_KEY = '__file__'
 
 VALID_KEYS = [
     'name', 'action', 'when', 'async', 'poll', 'notify',
-    'first_available_file', 'include', 'include_tasks', 'import_tasks', 'tags', 'register',
-    'ignore_errors', 'delegate_to', 'local_action', 'transport', 'remote_user', 'sudo',
+    'first_available_file', 'include', 'include_tasks', 'import_playbook',
+    'import_tasks', 'tags', 'register', 'ignore_errors', 'delegate_to',
+    'local_action', 'transport', 'remote_user', 'sudo',
     'sudo_user', 'sudo_pass', 'when', 'connection', 'environment', 'args', 'always_run',
-    'any_errors_fatal', 'changed_when', 'failed_when', 'check_mode', 'delay', 'retries', 'until',
-    'su', 'su_user', 'su_pass', 'no_log', 'run_once',
+    'any_errors_fatal', 'changed_when', 'failed_when', 'check_mode', 'delay',
+    'retries', 'until', 'su', 'su_user', 'su_pass', 'no_log', 'run_once',
     'become', 'become_user', 'become_method', FILENAME_KEY,
 ]
 
@@ -193,6 +194,7 @@ def play_children(basedir, item, parent_type, playbook_dir):
         'block': _taskshandlers_children,
         'include': _include_children,
         'include_tasks': _include_children,
+        'import_playbook': _include_children,
         'import_tasks': _include_children,
         'roles': _roles_children,
         'dependencies': _roles_children,
@@ -229,6 +231,8 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             append_children(th['include'], basedir, k, parent_type, results)
         elif 'include_tasks' in th:
             append_children(th['include_tasks'], basedir, k, parent_type, results)
+        elif 'import_playbook' in th:
+            append_children(th['import_playbook'], basedir, k, parent_type, results)
         elif 'import_tasks' in th:
             append_children(th['import_tasks'], basedir, k, parent_type, results)
         elif 'block' in th:
@@ -492,7 +496,8 @@ def get_action_tasks(yaml, file):
     tasks[:] = [task for task in tasks if all(k not in task for k in block_rescue_always)]
 
     return [task for task in tasks if
-            set(['include', 'include_tasks', 'import_tasks']).isdisjoint(task.keys())]
+            set(['include', 'include_tasks',
+                'import_playbook', 'import_tasks']).isdisjoint(task.keys())]
 
 
 def get_normalized_tasks(yaml, file):
