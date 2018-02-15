@@ -1,0 +1,8 @@
+---
+- hosts: hosts
+  tasks:
+    - name: "Package has retry test success"
+      apt:
+        pkg: foo
+      register: result
+      until: result|success
