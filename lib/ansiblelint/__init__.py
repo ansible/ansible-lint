@@ -188,7 +188,13 @@ class Runner(object):
             self.playbooks.add((playbook, 'role'))
             self.playbook_dir = playbook
         else:
-            self.playbooks.add((playbook, 'playbook'))
+            # assume tasks, handlers or meta file if the dir name moved up one is that.
+            dirname = os.path.basename(os.path.dirname(os.path.abspath(playbook)))
+            if dirname in ['tasks', 'handlers', 'meta']:
+                self.playbooks.add((playbook, dirname))
+            else:
+                self.playbooks.add((playbook, 'playbook'))
+
             self.playbook_dir = os.path.dirname(playbook)
         self.tags = tags
         self.skip_list = skip_list
