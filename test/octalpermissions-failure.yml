@@ -25,3 +25,6 @@
 
     - name: octal permissions test fail (777)
       file: path=baz mode=777
+
+    - name: octal permissions test fail (0733)
+      file: path=baz mode=0733

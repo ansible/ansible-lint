@@ -18,6 +18,11 @@
         path: bar
         mode: 02000
 
+    - name: octal permissions test success (02751)
+      file:
+        path: bar
+        mode: 02751
+
     - name: octal permissions test success (0777)
       file: path=baz mode=0777
 
