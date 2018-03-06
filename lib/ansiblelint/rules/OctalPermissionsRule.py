@@ -51,8 +51,8 @@ class OctalPermissionsRule(AnsibleLintRule):
                 # group permissions and user and group permissions
                 # are more generous than world permissions
 
-                result = (mode % 8 and mode % 8 < 4 and not (mode % 8 == 1 and (mode >> 6) % 8 == 1) or
-                          (mode >> 3) % 8 and (mode >> 3) % 8 < 4 and not ((mode >> 3) % 8 == 1 and (mode >> 6) % 8 == 1) or
+                result = (mode % 8 and mode % 8 < 4 and not (mode % 8 == 1 and (mode >> 6) % 2 == 1) or
+                          (mode >> 3) % 8 and (mode >> 3) % 8 < 4 and not ((mode >> 3) % 8 == 1 and (mode >> 6) % 2 == 1) or
                           (mode >> 6) % 8 and (mode >> 6) % 8 < 4 and not (mode >> 6) % 8 == 1 or
                           mode & 8 < (mode << 3) & 8 or
                           mode & 8 < (mode << 6) & 8 or
