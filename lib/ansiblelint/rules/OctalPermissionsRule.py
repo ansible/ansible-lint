@@ -41,7 +41,9 @@ class OctalPermissionsRule(AnsibleLintRule):
         if task["action"]["__ansible_module__"] in self._modules:
             mode = task['action'].get('mode', None)
             if isinstance(mode, six.string_types) and self.mode_regex.match(mode):
-                return not self.valid_mode_regex.match(mode)
+                if not self.valid_mode_regex.match(mode):
+                    return True
+                mode = int(mode.strip(), 8)
             if isinstance(mode, int):
                 # sensible file permission modes don't
                 # have write bit set when read bit is
