@@ -49,11 +49,20 @@ except ImportError:
     from ansible.parsing.dataloader import DataLoader
     from ansible.template import Templar
     from ansible.parsing.mod_args import ModuleArgsParser
+    from ansible.parsing.yaml.constructor import AnsibleConstructor
+    from ansible.parsing.yaml.loader import AnsibleLoader
     from ansible.errors import AnsibleParserError
     ANSIBLE_VERSION = 2
 
+    # ansible-lint doesn't need/want to know about encrypted secrets, but it needs
+    # Ansible 2.3+ allows encrypted secrets within yaml files, so we pass a string
+    # as the password to enable such yaml files to be opened and parsed successfully.
+    DEFAULT_VAULT_PASSWORD = 'x'
+
     def parse_yaml_from_file(filepath):
         dl = DataLoader()
+        if hasattr(dl, 'set_vault_password'):
+            dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
         return dl.load_from_file(filepath)
 
     def path_dwim(basedir, given):
@@ -66,6 +75,7 @@ except ImportError:
         dl.set_basedir(basedir)
         templar = Templar(dl, variables=templatevars)
         return templar.template(varname, **kwargs)
+
     try:
         from ansible.plugins import module_loader
     except ImportError:
@@ -529,13 +539,26 @@ def parse_yaml_linenumbers(data, filename):
         return node
 
     def construct_mapping(node, deep=False):
-        mapping = Constructor.construct_mapping(loader, node, deep=deep)
-        mapping[LINE_NUMBER_KEY] = node.__line__
+        if ANSIBLE_VERSION < 2:
+            mapping = Constructor.construct_mapping(loader, node, deep=deep)
+        else:
+            mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
+        if hasattr(node, '__line__'):
+            mapping[LINE_NUMBER_KEY] = node.__line__
+        else:
+            mapping[LINE_NUMBER_KEY] = mapping._line_number
         mapping[FILENAME_KEY] = filename
         return mapping
 
     try:
-        loader = yaml.Loader(data)
+        if ANSIBLE_VERSION < 2:
+            loader = yaml.Loader(data)
+        else:
+            import inspect
+            kwargs = {}
+            if 'vault_password' in inspect.getargspec(AnsibleLoader.__init__).args:
+                kwargs['vault_password'] = DEFAULT_VAULT_PASSWORD
+            loader = AnsibleLoader(data, **kwargs)
         loader.compose_node = compose_node
         loader.construct_mapping = construct_mapping
         data = loader.get_single_data()
