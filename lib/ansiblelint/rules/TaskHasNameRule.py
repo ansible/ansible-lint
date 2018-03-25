@@ -31,5 +31,5 @@ class TaskHasNameRule(AnsibleLintRule):
     _nameless_tasks = ['meta', 'debug']
 
     def matchtask(self, file, task):
-        return task.get('name', '') == '' and \
-            task["action"]["__ansible_module__"] not in self._nameless_tasks
+        return (not task.get('name') and
+            task["action"]["__ansible_module__"] not in self._nameless_tasks)
