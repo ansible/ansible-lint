@@ -117,7 +117,7 @@ class RulesCollection(object):
     def extend(self, more):
         self.rules.extend(more)
 
-    def run(self, playbookfile, tags=set(), skip_list=set()):
+    def run(self, playbookfile, tags=set(), skip_list=frozenset()):
         text = ""
         matches = list()
 
@@ -240,7 +240,7 @@ class Runner(object):
             if self.verbosity > 0:
                 print("Examining %s of type %s" % (file['path'], file['type']))
             matches.extend(self.rules.run(file, tags=set(self.tags),
-                           skip_list=set(self.skip_list)))
+                           skip_list=self.skip_list))
         # update list of checked files
         self.checked_files.update([x['path'] for x in files])
 
