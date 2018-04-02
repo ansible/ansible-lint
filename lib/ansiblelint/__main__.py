@@ -87,7 +87,7 @@ def main():
     parser.add_option('-v', dest='verbosity', action='count',
                       help="Increase verbosity level",
                       default=0)
-    parser.add_option('-x', dest='skip_list', default=[],
+    parser.add_option('-x', dest='skip_list', default=[], action='append',
                       help="only check rules whose id/tags do not " +
                       "match these values")
     parser.add_option('--nocolor', dest='colored',
@@ -160,8 +160,11 @@ def main():
 
     if isinstance(options.tags, six.string_types):
         options.tags = options.tags.split(',')
-    if isinstance(options.skip_list, six.string_types):
-        options.skip_list = options.skip_list.split(',')
+
+    skip = set()
+    for s in options.skip_list:
+         skip.add(*s.split(','))
+    options.skip_list = frozenset(skip)
 
     playbooks = set(args)
     matches = list()
