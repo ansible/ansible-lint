@@ -1,0 +1,17 @@
+- hosts: all
+  vars:
+    var_is_set: no
+
+  tasks:
+    - import_role:
+        name: test-role
+
+- hosts: all
+  vars:
+    var_is_set: no
+
+  tasks:
+    - include_role:
+        name: test-role
+        tasks_from: world
+      when: "{{ var_is_set }}"

@@ -86,8 +86,8 @@ FILENAME_KEY = '__file__'
 
 VALID_KEYS = [
     'name', 'action', 'when', 'async', 'poll', 'notify',
-    'first_available_file', 'include', 'include_tasks', 'import_playbook',
-    'import_tasks', 'tags', 'register', 'ignore_errors', 'delegate_to',
+    'first_available_file', 'include', 'import_playbook',
+    'tags', 'register', 'ignore_errors', 'delegate_to',
     'local_action', 'transport', 'remote_user', 'sudo',
     'sudo_user', 'sudo_pass', 'when', 'connection', 'environment', 'args', 'always_run',
     'any_errors_fatal', 'changed_when', 'failed_when', 'check_mode', 'delay',
@@ -203,9 +203,7 @@ def play_children(basedir, item, parent_type, playbook_dir):
         'post_tasks': _taskshandlers_children,
         'block': _taskshandlers_children,
         'include': _include_children,
-        'include_tasks': _include_children,
         'import_playbook': _include_children,
-        'import_tasks': _include_children,
         'roles': _roles_children,
         'dependencies': _roles_children,
         'handlers': _taskshandlers_children,
@@ -245,6 +243,12 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             append_children(th['import_playbook'], basedir, k, parent_type, results)
         elif 'import_tasks' in th:
             append_children(th['import_tasks'], basedir, k, parent_type, results)
+        elif 'import_role' in th:
+            results.extend(_roles_children(basedir, k, [th['import_role'].get('name')], parent_type,
+                                           main=th['import_role'].get('tasks_from', 'main')))
+        elif 'include_role' in th:
+            results.extend(_roles_children(basedir, k, [th['include_role'].get('name')], parent_type,
+                                           main=th['include_role'].get('tasks_from', 'main')))
         elif 'block' in th:
             results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
             if 'rescue' in th:
@@ -268,19 +272,20 @@ def append_children(taskhandler, basedir, k, parent_type, results):
     })
 
 
-def _roles_children(basedir, k, v, parent_type):
+def _roles_children(basedir, k, v, parent_type, main='main'):
     results = []
     for role in v:
         if isinstance(role, dict):
             if 'role' in role or 'name' in role:
                 if 'tags' not in role or 'skip_ansible_lint' not in role['tags']:
                     results.extend(_look_for_role_files(basedir,
-                                                        role.get('role', role.get('name'))))
+                                                        role.get('role', role.get('name')),
+                                                        main=main))
             else:
                 raise SystemExit('role dict {0} does not contain a "role" '
                                  'or "name" key'.format(role))
         else:
-            results.extend(_look_for_role_files(basedir, role))
+            results.extend(_look_for_role_files(basedir, role, main=main))
     return results
 
 
@@ -322,7 +327,7 @@ def _rolepath(basedir, role):
     return role_path
 
 
-def _look_for_role_files(basedir, role):
+def _look_for_role_files(basedir, role, main='main'):
     role_path = _rolepath(basedir, role)
     if not role_path:
         return []
@@ -331,7 +336,7 @@ def _look_for_role_files(basedir, role):
 
     for th in ['tasks', 'handlers', 'meta']:
         for ext in ('.yml', '.yaml'):
-            thpath = os.path.join(role_path, th, 'main' + ext)
+            thpath = os.path.join(role_path, th, main + ext)
             if os.path.exists(thpath):
                 results.append({'path': thpath, 'type': th})
                 break
