@@ -4,7 +4,7 @@ Ansible-lint
 ansible-lint checks playbooks for practices and behaviour that could
 potentially be improved
 
-[![PyPI version](https://img.shields.io/pypi/v/ansible-lint.svg)](https://pypi.python.org/pypi/ansible-lint)
+[![PyPI version](https://img.shields.io/pypi/v/ansible-lint.svg)](https://pypi.org/project/ansible-lint/)
 [![Build Status](https://travis-ci.org/willthames/ansible-lint.svg?branch=master)](https://travis-ci.org/willthames/ansible-lint)
 
 Setup
