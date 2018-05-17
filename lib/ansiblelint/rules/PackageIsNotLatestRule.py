@@ -29,6 +29,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     tags = ['repeatability']
 
     _package_managers = [
+        'apk',
         'apt',
         'bower',
         'bundler',
@@ -36,8 +37,10 @@ class PackageIsNotLatestRule(AnsibleLintRule):
         'easy_install',
         'gem',
         'homebrew',
+        'jenkins_plugin',
         'npm',
         'openbsd_package',
+        'openbsd_pkg',
         'package',
         'pacman',
         'pear',
@@ -46,7 +49,10 @@ class PackageIsNotLatestRule(AnsibleLintRule):
         'pkgutil',
         'portage',
         'slackpkg',
+        'sorcery',
         'swdepot',
+        'win_chocolatey',
+        'yarn',
         'yum',
         'zypper',
     ]
