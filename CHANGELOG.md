@@ -1,3 +1,7 @@
+# 3.4.23
+
+Fix bug with using comma-separated `skip_list` arguments
+
 # 3.4.22
 
 * Allow `include_role` and `import_role` (willthames)
