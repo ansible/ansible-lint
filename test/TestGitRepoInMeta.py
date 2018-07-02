@@ -13,6 +13,6 @@ class TestEnvVarsInCommand(unittest.TestCase):
         self.collection.register(EnvVarsInCommandRule())
 
     def test_file_positive(self):
-        success = 'test/git-dependency-in-meta/main.yml.yml'
+        success = 'test/git-dependency-in-meta/main.yml'
         good_runner = Runner(self.collection, success, [], [], [])
         self.assertEqual([], good_runner.run())
