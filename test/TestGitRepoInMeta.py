@@ -13,6 +13,6 @@ class TestGitRepoInMeta(unittest.TestCase):
         self.collection.register(EnvVarsInCommandRule())
 
     def git_in_meta_dependency_is_ok(self):
-        success = 'test/git-dependency-in-meta/main.yml'
+        success = 'test/dependency-in-meta/git.yml'
         good_runner = Runner(self.collection, success, [], [], [])
         self.assertEqual([], good_runner.run())
