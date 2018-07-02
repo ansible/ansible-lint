@@ -280,7 +280,8 @@ def _roles_children(basedir, k, v, parent_type, main='main'):
                     results.extend(_look_for_role_files(basedir,
                                                         role.get('role', role.get('name')),
                                                         main=main))
-            elif 'git+' not in role:
+            # elif 'git+' not in role:
+            else:
                 raise SystemExit('role dict {0} does not contain a "role" '
                                  'or "name" key'.format(role))
         else:
