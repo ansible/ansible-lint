@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  - src: git+ssh://git@someCoolHost:1234/my-super-role/role.git
+    version: master
