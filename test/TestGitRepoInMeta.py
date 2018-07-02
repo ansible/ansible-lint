@@ -6,7 +6,7 @@ from ansiblelint.rules.EnvVarsInCommandRule import EnvVarsInCommandRule
 from pkg_resources import parse_version
 
 
-class TestEnvVarsInCommand(unittest.TestCase):
+class TestGitRepoInMeta(unittest.TestCase):
     collection = RulesCollection()
 
     def setUp(self):
