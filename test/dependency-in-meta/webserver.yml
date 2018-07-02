@@ -1,0 +1,6 @@
+---
+
+dependencies:
+  # from a webserver, where the role is packaged in a tar.gz
+  - src: https://some.webserver.example.com/files/master.tar.gz
+    name: http-role

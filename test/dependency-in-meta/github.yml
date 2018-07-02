@@ -1,0 +1,10 @@
+---
+
+dependencies:
+  # from GitHub
+  - src: https://github.com/bennojoy/nginx
+
+  # from GitHub, overriding the name and specifying a specific tag
+  - src: https://github.com/bennojoy/nginx
+    version: master
+    name: nginx_role

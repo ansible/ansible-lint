@@ -1,0 +1,10 @@
+---
+
+dependencies:
+  # from Bitbucket
+  - src: git+http://bitbucket.org/willthames/git-ansible-galaxy
+    version: v1.4
+
+  # from Bitbucket, alternative syntax and caveats
+  - src: http://bitbucket.org/willthames/hg-ansible-galaxy
+    scm: hg
