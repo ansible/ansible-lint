@@ -273,7 +273,7 @@ def append_children(taskhandler, basedir, k, parent_type, results):
 
 def _roles_children(basedir, k, v, parent_type, main='main'):
     results = []
-    print(parent_type)
+    print(k)
     for role in v:
         if isinstance(role, dict):
             if 'role' in role or 'name' in role:
