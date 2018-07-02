@@ -1,21 +1,19 @@
+import os
 import unittest
-import ansible
 
 from ansiblelint import Runner, RulesCollection
-from ansiblelint.rules.EnvVarsInCommandRule import EnvVarsInCommandRule
-from pkg_resources import parse_version
 
 
 class TestDependenciesInMeta(unittest.TestCase):
     collection = RulesCollection()
 
     def setUp(self):
-        self.collection.register(EnvVarsInCommandRule())
+        rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
+        self.rules = RulesCollection.create_from_directory(rulesdir)
 
     def bitbucket_in_meta_dependency_is_ok(self):
         success = 'test/dependency-in-meta/bitbucket.yml'
-        good_runner = Runner(self.collection, success, [], [], [])
-        self.assertEqual([], good_runner.run())
+        self.assertEqual([], Runner(self.collection, success, [], [], []).run())
 
     def galaxy_dependency_is_ok(self):
         success = 'test/dependency-in-meta/galaxy.yml'
