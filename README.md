@@ -73,7 +73,7 @@ I recommend commenting the reasons why you're skipping the check.
 Unfortunately ansible-lint is unable to check for such comments
 at this time! (patches welcome)
 
-```
+```yaml
 - name: this would typically fire CommandsInsteadOfArgumentRule
   command: warn=no chmod 644 X
 
