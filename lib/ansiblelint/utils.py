@@ -247,7 +247,8 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             results.extend(_roles_children(basedir, k, [th['import_role'].get('name')], parent_type,
                                            main=th['import_role'].get('tasks_from', 'main')))
         elif 'include_role' in th:
-            results.extend(_roles_children(basedir, k, [th['include_role'].get('name')], parent_type,
+            results.extend(_roles_children(basedir, k, [th['include_role'].get('name')],
+                                           parent_type,
                                            main=th['include_role'].get('tasks_from', 'main')))
         elif 'block' in th:
             results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
