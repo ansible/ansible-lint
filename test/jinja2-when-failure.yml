@@ -1,0 +1,10 @@
+- hosts: all
+  tasks:
+    - name: test when with jinja2
+      debug: msg=text
+      when: "{{ false }}"
+
+- hosts: all
+  roles:
+    - role: test
+      when: "{{ '1' = '1' }}"
