@@ -7,7 +7,7 @@ except ImportError:
 class Formatter(object):
 
     def format(self, match, colored=False):
-        formatstr = u"{0} {1}\n{2}:{3}\n{4}\n"
+        formatstr = u"{0} {1}\n{2}:{3}:\n{4}\n"
         if colored:
             color.ANSIBLE_COLOR = True
             return formatstr.format(color.stringc(u"[{0}]".format(match.rule.id), 'bright red'),
