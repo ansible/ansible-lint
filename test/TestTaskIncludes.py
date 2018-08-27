@@ -49,3 +49,10 @@ class TestTaskIncludes(unittest.TestCase):
         runner = Runner(self.rules, filename, [], [], [])
         runner.run()
         self.assertEqual(len(runner.playbooks), 3)
+
+    @unittest.skipIf(parse_version(ansible.__version__) < parse_version('2.4'), "not supported with ansible < 2.4")
+    def test_include_tasks_in_role(self):
+        filename = 'test/include-import-tasks-in-role.yml'
+        runner = Runner(self.rules, filename, [], [], [])
+        runner.run()
+        self.assertEqual(len(runner.playbooks), 4)
