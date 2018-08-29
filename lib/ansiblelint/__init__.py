@@ -185,7 +185,7 @@ class Runner(object):
         self.playbooks = set()
         # assume role if directory
         if os.path.isdir(playbook):
-            self.playbooks.add((playbook, 'role'))
+            self.playbooks.add((os.path.join(playbook, ''), 'role'))
             self.playbook_dir = playbook
         else:
             self.playbooks.add((playbook, 'playbook'))
