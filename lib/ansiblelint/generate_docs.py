@@ -5,6 +5,7 @@ import importlib
 from inspect import getmembers, ismodule, isclass
 import rules
 from ansiblelint import AnsibleLintRule
+from functools import reduce
 
 
 def main():
