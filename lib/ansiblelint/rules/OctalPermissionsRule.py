@@ -24,7 +24,7 @@ import six
 
 
 class OctalPermissionsRule(AnsibleLintRule):
-    id = 'ANSIBLE0009'
+    id = '202'
     shortdesc = 'Octal file permissions must contain leading zero'
     description = 'Numeric file permissions without leading zero can behave ' + \
         'in unexpected ways. See ' + \

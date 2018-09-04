@@ -22,7 +22,7 @@ from ansiblelint import AnsibleLintRule
 
 
 class AlwaysRunRule(AnsibleLintRule):
-    id = 'ANSIBLE0018'
+    id = '101'
     shortdesc = 'Deprecated always_run'
     description = 'Instead of always_run, use check_mode.'
     tags = ['deprecated']

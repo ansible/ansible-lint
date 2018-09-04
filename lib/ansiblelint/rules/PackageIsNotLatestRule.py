@@ -22,11 +22,11 @@ from ansiblelint import AnsibleLintRule
 
 
 class PackageIsNotLatestRule(AnsibleLintRule):
-    id = 'ANSIBLE0010'
+    id = '403'
     shortdesc = 'Package installs should not use latest'
     description = 'Package installs should use state=present ' + \
                   'with or without a version'
-    tags = ['repeatability']
+    tags = ['module', 'repeatability']
 
     _package_managers = ['yum', 'apt', 'dnf', 'homebrew', 'pacman', 'openbsd_package', 'pkg5',
                          'portage', 'pkgutil', 'slackpkg', 'swdepot', 'zypper', 'bundler', 'pip',

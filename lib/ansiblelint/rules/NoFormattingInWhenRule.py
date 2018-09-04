@@ -7,7 +7,7 @@ except ImportError:
 
 
 class NoFormattingInWhenRule(AnsibleLintRule):
-    id = 'ANSIBLE0019'
+    id = '102'
     shortdesc = 'No Jinja2 in when'
     description = '"when" lines should not include Jinja2 variables'
     tags = ['deprecated']
