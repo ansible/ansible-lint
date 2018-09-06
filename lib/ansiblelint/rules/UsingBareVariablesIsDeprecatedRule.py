@@ -29,7 +29,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     description = 'Using bare variables is deprecated. Update your ' + \
         'playbooks so that the environment value uses the full variable ' + \
         'syntax ("{{your_variable}}").'
-    tags = ['deprecated', 'formatting']
+    tags = ['deprecated', 'formatting', 'ANSIBLE0015']
 
     _jinja = re.compile("\{\{.*\}\}")
     _glob = re.compile('[][*?]')

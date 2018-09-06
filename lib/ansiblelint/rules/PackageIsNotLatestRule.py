@@ -26,7 +26,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     shortdesc = 'Package installs should not use latest'
     description = 'Package installs should use state=present ' + \
                   'with or without a version'
-    tags = ['module', 'repeatability']
+    tags = ['module', 'repeatability', 'ANSIBLE0010']
 
     _package_managers = ['yum', 'apt', 'dnf', 'homebrew', 'pacman', 'openbsd_package', 'pkg5',
                          'portage', 'pkgutil', 'slackpkg', 'swdepot', 'zypper', 'bundler', 'pip',

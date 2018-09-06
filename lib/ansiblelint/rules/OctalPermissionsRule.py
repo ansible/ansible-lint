@@ -29,7 +29,7 @@ class OctalPermissionsRule(AnsibleLintRule):
     description = 'Numeric file permissions without leading zero can behave ' + \
         'in unexpected ways. See ' + \
         'http://docs.ansible.com/ansible/file_module.html'
-    tags = ['formatting']
+    tags = ['formatting', 'ANSIBLE0009']
 
     _modules = ['assemble', 'copy', 'file', 'ini_file', 'lineinfile',
                 'replace', 'synchronize', 'template', 'unarchive']

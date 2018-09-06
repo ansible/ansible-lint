@@ -25,7 +25,7 @@ class AlwaysRunRule(AnsibleLintRule):
     id = '101'
     shortdesc = 'Deprecated always_run'
     description = 'Instead of always_run, use check_mode.'
-    tags = ['deprecated']
+    tags = ['deprecated', 'ANSIBLE0018']
 
     def matchtask(self, file, task):
         return 'always_run' in task

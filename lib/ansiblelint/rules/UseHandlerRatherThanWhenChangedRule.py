@@ -33,7 +33,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     shortdesc = 'Tasks that run when changed should likely be handlers'
     description = "If a task has a `when: result.changed` setting, it's effectively " \
                   "acting as a handler"
-    tags = ['task', 'behaviour']
+    tags = ['task', 'behaviour', 'ANSIBLE0016']
 
     def matchtask(self, file, task):
         if task["__ansible_action_type__"] == 'task':
