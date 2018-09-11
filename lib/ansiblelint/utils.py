@@ -106,6 +106,16 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 }
 
 
+def detect_classname(pluginname):
+    # ansible-lint prefers CamelCase.py containing "class CamelCase"
+    if pluginname[0].isupper():
+        return pluginname
+
+    # python standard is snake_case.py containing "class SnakeCase"
+    # https://www.python.org/dev/peps/pep-0008/#package-and-module-names
+    return "".join(x.title() for x in pluginname.split('_'))
+
+
 def load_plugins(directory):
     result = []
     fh = None
@@ -116,7 +126,8 @@ def load_plugins(directory):
         try:
             fh, filename, desc = imp.find_module(pluginname, [directory])
             mod = imp.load_module(pluginname, fh, filename, desc)
-            obj = getattr(mod, pluginname)()
+            classname = detect_classname(pluginname)
+            obj = getattr(mod, classname)()
             result.append(obj)
         finally:
             if fh:
