@@ -104,9 +104,6 @@ Each rule definition should have the following:
   the line doesn't match the test and `True` or a custom message (this
   allows one rule to test multiple behaviours - see e.g. the
   CommandsInsteadOfModulesRule
-  * `matchblock` that takes the details about the file and a block.
-  It returns `None` or `False` if the line doesn't match the test
-  and `True` or a custom message.
   * `matchtask` operates on a single task or handler. Such a task
       get standardized to always contain a `module` key and
       `module_arguments` key. Other common task modifiers such as
