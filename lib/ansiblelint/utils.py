@@ -207,6 +207,8 @@ def play_children(basedir, item, parent_type, playbook_dir):
         'roles': _roles_children,
         'dependencies': _roles_children,
         'handlers': _taskshandlers_children,
+        'include_tasks': _include_children,
+        'import_tasks': _include_children,
     }
     (k, v) = item
     play_library = os.path.join(os.path.abspath(basedir), 'library')
