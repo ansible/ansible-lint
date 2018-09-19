@@ -86,7 +86,7 @@ FILENAME_KEY = '__file__'
 
 VALID_KEYS = [
     'name', 'action', 'when', 'async', 'poll', 'notify',
-    'first_available_file', 'include', 'import_playbook',
+    'first_available_file', 'include', 'include_tasks', 'import_playbook',
     'tags', 'register', 'ignore_errors', 'delegate_to',
     'local_action', 'transport', 'remote_user', 'sudo',
     'sudo_user', 'sudo_pass', 'when', 'connection', 'environment', 'args', 'always_run',
@@ -203,6 +203,7 @@ def play_children(basedir, item, parent_type, playbook_dir):
         'post_tasks': _taskshandlers_children,
         'block': _taskshandlers_children,
         'include': _include_children,
+        'include_tasks': _include_children,
         'import_playbook': _include_children,
         'roles': _roles_children,
         'dependencies': _roles_children,
