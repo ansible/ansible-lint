@@ -75,7 +75,6 @@ except ImportError:
         dl.set_basedir(basedir)
         templar = Templar(dl, variables=templatevars)
         return templar.template(varname, **kwargs)
-
     try:
         from ansible.plugins import module_loader
     except ImportError:
@@ -284,7 +283,7 @@ def _roles_children(basedir, k, v, parent_type, main='main'):
                     results.extend(_look_for_role_files(basedir,
                                                         role.get('role', role.get('name')),
                                                         main=main))
-            else:
+            elif k != 'dependencies':
                 raise SystemExit('role dict {0} does not contain a "role" '
                                  'or "name" key'.format(role))
         else:
