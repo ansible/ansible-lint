@@ -22,10 +22,10 @@ from ansiblelint import AnsibleLintRule
 
 
 class TrailingWhitespaceRule(AnsibleLintRule):
-    id = 'ANSIBLE0002'
+    id = '201'
     shortdesc = 'Trailing whitespace'
     description = 'There should not be any trailing whitespace'
-    tags = ['formatting']
+    tags = ['formatting', 'ANSIBLE0002']
 
     def match(self, file, line):
         return line.rstrip() != line

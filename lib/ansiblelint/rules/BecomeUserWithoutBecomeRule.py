@@ -26,11 +26,11 @@ def _become_user_without_become(data):
 
 
 class BecomeUserWithoutBecomeRule(AnsibleLintRule):
-    id = 'ANSIBLE0017'
+    id = '501'
     shortdesc = 'become_user requires become to work as expected'
     description = 'become_user without become will not actually change ' \
                   'user'
-    tags = ['oddity']
+    tags = ['task', 'oddity', 'ANSIBLE0017']
 
     def matchplay(self, file, data):
         if file['type'] == 'playbook' and _become_user_without_become(data):

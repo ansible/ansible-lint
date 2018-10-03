@@ -22,11 +22,11 @@ from ansiblelint import AnsibleLintRule
 
 
 class TaskHasNameRule(AnsibleLintRule):
-    id = 'ANSIBLE0011'
+    id = '502'
     shortdesc = 'All tasks should be named'
     description = 'All tasks should have a distinct name for readability ' + \
                   'and for --start-at-task to work'
-    tags = ['readability']
+    tags = ['task', 'readability', 'ANSIBLE0011']
 
     _nameless_tasks = ['meta', 'debug', 'include_role', 'import_role',
                        'include_tasks', 'import_tasks']

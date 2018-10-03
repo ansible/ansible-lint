@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+  - name: trailing whitespace on this line         
+    git:
+      repo: '{{ archive_services_repo_url }}'
+      dest: '/home/www'

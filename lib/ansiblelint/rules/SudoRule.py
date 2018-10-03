@@ -2,10 +2,10 @@ from ansiblelint import AnsibleLintRule
 
 
 class SudoRule(AnsibleLintRule):
-    id = 'ANSIBLE0008'
+    id = '103'
     shortdesc = 'Deprecated sudo'
     description = 'Instead of sudo/sudo_user, use become/become_user.'
-    tags = ['deprecated']
+    tags = ['deprecated', 'ANSIBLE0008']
 
     def _check_value(self, play_frag):
         results = []

@@ -24,12 +24,12 @@ from ansiblelint import AnsibleLintRule
 
 
 class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
-    id = 'ANSIBLE0015'
+    id = '104'
     shortdesc = 'Using bare variables is deprecated'
     description = 'Using bare variables is deprecated. Update your ' + \
         'playbooks so that the environment value uses the full variable ' + \
         'syntax ("{{your_variable}}").'
-    tags = ['formatting', 'deprecated']
+    tags = ['deprecated', 'formatting', 'ANSIBLE0015']
 
     _jinja = re.compile("\{\{.*\}\}")
     _glob = re.compile('[][*?]')

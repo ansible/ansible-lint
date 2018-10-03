@@ -22,11 +22,11 @@ from ansiblelint import AnsibleLintRule
 
 
 class GitHasVersionRule(AnsibleLintRule):
-    id = 'ANSIBLE0004'
+    id = '401'
     shortdesc = 'Git checkouts must contain explicit version'
     description = 'All version control checkouts must point to ' + \
                   'an explicit commit or tag, not just "latest"'
-    tags = ['repeatability']
+    tags = ['module', 'repeatability', 'ANSIBLE0004']
 
     def matchtask(self, file, task):
         return (task['action']['__ansible_module__'] == 'git' and
