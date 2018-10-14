@@ -1,3 +1,14 @@
+# 3.5.0
+
+* New ids and tags, add doc generator. Old tag names remain backwardly compatible (awcrosby)
+* Add more package formats to PackageIsNotLatestRule (simon04)
+* Improve handling of meta/main.yml dependencies (MatrixCrawler)
+* Correctly handle role argument trailing slash (zoredache)
+* Handle `include_task` and `import_task` (zeot)
+* Add a new rule to detect jinja in when clauses (greg-hellings)
+* Suggest `replace` as another alternative to `sed` (inponomarev)
+* YAML syntax highlighting for false positives (gundalow)
+
 # 3.4.23
 
 Fix bug with using comma-separated `skip_list` arguments
