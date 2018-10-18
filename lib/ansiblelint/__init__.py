@@ -214,6 +214,11 @@ class Match(object):
         return formatstr.format(self.rule.id, self.message,
                                 self.filename, self.linenumber, self.line)
 
+    def as_dict(self):
+        return dict(rule_id=self.rule.id, message=self.message,
+                    filename=self.filename, linenumber=self.linenumber,
+                    line=self.line)
+
 
 class Runner(object):
 
