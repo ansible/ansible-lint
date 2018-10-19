@@ -6,6 +6,7 @@ except ImportError:
     from ansible.utils import color
 
 from .base import BaseFormatter
+from ._json import JsonFormatter  # flake8: noqa
 
 
 class Formatter(BaseFormatter):
