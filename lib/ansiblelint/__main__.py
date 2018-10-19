@@ -179,11 +179,9 @@ def main():
 
     if matches:
         print(formatter.formats(matches, colored=options.colored))
-
-    if len(matches):
         return 2
-    else:
-        return 0
+
+    return 0
 
 
 if __name__ == "__main__":
