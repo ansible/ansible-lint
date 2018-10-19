@@ -1,10 +1,15 @@
+from __future__ import absolute_import
+
 try:
     from ansible import color
 except ImportError:
     from ansible.utils import color
 
+from .base import BaseFormatter
 
-class Formatter(object):
+
+class Formatter(BaseFormatter):
+    _name = "default"
 
     def format(self, match, colored=False):
         formatstr = u"{0} {1}\n{2}:{3}\n{4}\n"
@@ -23,7 +28,7 @@ class Formatter(object):
                                     match.line)
 
 
-class QuietFormatter(object):
+class QuietFormatter(BaseFormatter):
 
     def format(self, match, colored=False):
         formatstr = u"{0} {1}:{2}"
@@ -37,7 +42,7 @@ class QuietFormatter(object):
                                     match.linenumber)
 
 
-class ParseableFormatter(object):
+class ParseableFormatter(BaseFormatter):
 
     def format(self, match, colored=False):
         formatstr = u"{0}:{1}: [{2}] {3}"
