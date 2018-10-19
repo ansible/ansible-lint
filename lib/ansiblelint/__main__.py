@@ -35,6 +35,13 @@ import yaml
 import os
 
 
+__FORMATTERS = (formatters.Formatter,
+                formatters.QuietFormatter,
+                formatters.ParseableFormatter,
+                formatters.JsonFormatter)
+_FORMATTERS = dict((fmtr.name(), fmtr) for fmtr in __FORMATTERS)
+
+
 def load_config(config_file):
     config_path = config_file if config_file else ".ansible-lint"
 
@@ -101,6 +108,9 @@ def main():
                       help='path to directories or files to skip. This option'
                            ' is repeatable.',
                       default=[])
+    parser.add_option('-F', '--format', default=None,
+                      help='Specify the output format. Choices are: '
+                           '%s [default]' % ', '.join(sorted(_FORMATTERS.keys())))
     parser.add_option('-c', help='Specify configuration file to use.  Defaults to ".ansible-lint"')
     options, args = parser.parse_args(sys.argv[1:])
 
@@ -157,6 +167,9 @@ def main():
     if options.listtags:
         print(rules.listtags())
         return 0
+
+    if options.format:
+        formatter = _FORMATTERS.get(options.format, formatters.Formatter)()
 
     if isinstance(options.tags, six.string_types):
         options.tags = options.tags.split(',')
