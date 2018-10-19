@@ -7,6 +7,7 @@ except ImportError:
 
 from .base import BaseFormatter
 from ._json import JsonFormatter  # flake8: noqa
+from .junitxml import JUnitXmlFormatter  # flake8: noqa
 
 
 class Formatter(BaseFormatter):
