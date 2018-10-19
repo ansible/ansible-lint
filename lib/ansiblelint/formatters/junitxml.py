@@ -13,9 +13,9 @@ from ..version import __version__ as VERSION
 
 
 _JUNIT_XML_TESTCASE = """\
-      <testcase id="{id}" name="{shortdesc}" classname="{filename}">
+<testcase id="{rule_id}" name="{shortdesc}" classname="{filename}">
         <failure type="ERROR" message="{message}">
-            rule_id={id}
+            rule_id={rule_id}
             linenumber={linenumber}
             line={line}
         </failure>
@@ -31,8 +31,7 @@ _JUNIT_XML = """\
         <property name="tool" value="ansible-lint"/>
         <property name="version" value="{version}"/>
       </properties>
-      {testcases}
-    </testsuite>
+      {testcases}</testsuite>
 <testsuites>
 """
 _TIMESTAMP = datetime.datetime.now().isoformat()
