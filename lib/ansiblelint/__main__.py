@@ -38,7 +38,8 @@ import os
 __FORMATTERS = (formatters.Formatter,
                 formatters.QuietFormatter,
                 formatters.ParseableFormatter,
-                formatters.JsonFormatter)
+                formatters.JsonFormatter,
+                formatters.JUnitXmlFormatter)
 _FORMATTERS = dict((fmtr.name(), fmtr) for fmtr in __FORMATTERS)
 
 
