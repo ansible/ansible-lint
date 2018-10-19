@@ -188,8 +188,8 @@ def main():
 
     matches.sort(key=lambda x: (x.filename, x.linenumber, x.rule.id))
 
-    for match in matches:
-        print(formatter.format(match, options.colored))
+    if matches:
+        print(formatter.formats(matches, colored=options.colored))
 
     if len(matches):
         return 2
