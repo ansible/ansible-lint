@@ -70,6 +70,13 @@ class TestRule(unittest.TestCase):
         formatter = ansiblelint.formatters.Formatter()
         formatter.format(matches[0], colored=True)
 
+    def test_unicode_json_formats(self):
+        filename = 'test/unicode.yml'
+        runner = Runner(self.rules, filename, [], [], [])
+        matches = runner.run()
+        formatter = ansiblelint.formatters.JsonFormatter()
+        assert formatter.formats(matches, colored=True)
+
     def test_runner_excludes_paths(self):
         filename = 'examples/lots_of_warnings.yml'
         excludes = ['examples/lots_of_warnings.yml']
