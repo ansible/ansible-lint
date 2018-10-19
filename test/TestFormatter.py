@@ -43,3 +43,9 @@ class TestFormatter(unittest.TestCase):
     def test_dict_format_line(self):
         match = Match(1, {'hello': 'world'}, "filename.yml", self.rule, "xyz")
         result = self.formatter.format(match, True)
+
+    def test_formats(self):
+        matches = (Match(1, "hello", "filename.yml", self.rule, "message"),
+                   Match(1, "hello", "filename.yml", self.rule, u'\U0001f427'),
+                   Match(1, {'hello': 'world'}, "filename.yml", self.rule, "xyz"))
+        result = self.formatter.formats(matches, colored=True)
