@@ -23,7 +23,7 @@ import re
 
 
 def unjinja(text):
-    return re.sub("\{\{[^\}]*\}\}", "JINJA_VAR", text)
+    return re.sub(r"{{[^}]*}}", "JINJA_VAR", text)
 
 
 class UseCommandInsteadOfShellRule(AnsibleLintRule):
