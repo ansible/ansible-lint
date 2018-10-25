@@ -277,4 +277,4 @@ Please read
 Authors
 -------
 
-ansible-lint was created by [Will Thames](https://github.com/willthames) and is not maintained as part of the [Ansible](https://ansible.com) project.
+ansible-lint was created by [Will Thames](https://github.com/willthames) and is now maintained as part of the [Ansible](https://ansible.com) project.
