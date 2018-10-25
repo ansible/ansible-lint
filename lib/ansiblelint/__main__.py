@@ -41,7 +41,7 @@ def load_config(config_file):
     if os.path.exists(config_path):
         with open(config_path, "r") as stream:
             try:
-                return yaml.load(stream)
+                return yaml.safe_load(stream)
             except yaml.YAMLError:
                 pass
 
