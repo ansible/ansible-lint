@@ -271,8 +271,7 @@ ansible-lint containing `hooks.yaml`.
 Contributing
 ------------
 
-Please read
-[CONTRIBUTING.md](https://github.com/ansible/ansible-lint/blob/master/CONTRIBUTING.md) if you wish to contribute.
+Please read [CONTRIBUTING.md](https://github.com/ansible/ansible-lint/blob/master/CONTRIBUTING.md) if you wish to contribute.
 
 Authors
 -------
