@@ -1,3 +1,6 @@
+# 3.5.1
+
+Use `yaml.safe_load` for loading the configuration fil
 # 3.5.0
 
 * New ids and tags, add doc generator. Old tag names remain backwardly compatible (awcrosby)
