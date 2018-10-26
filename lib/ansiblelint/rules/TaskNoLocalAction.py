@@ -6,8 +6,10 @@ from ansiblelint import AnsibleLintRule
 
 class TaskNoLocalAction(AnsibleLintRule):
     id = '504'
-    shortdesc = 'Do not use local_action. use delegate_to: localhost instead'
-    description = ''
+    shortdesc = ("Use 'connection: local' or 'delegate_to: localhost' "
+                 "instead of 'local_action'")
+    description = ("Use 'connection: local' or 'delegate_to: localhost' "
+                   "instead of 'local_action'")
     tags = ['task']
 
     def match(self, file, text):
