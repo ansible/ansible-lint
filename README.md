@@ -5,7 +5,7 @@ ansible-lint checks playbooks for practices and behaviour that could
 potentially be improved
 
 [![PyPI version](https://img.shields.io/pypi/v/ansible-lint.svg)](https://pypi.org/project/ansible-lint/)
-[![Build Status](https://travis-ci.org/ansible/ansible-lint.svg?branch=master)](https://travis-ci.org/ansible/ansible-lint)
+[![Build Status](https://travis-ci.com/ansible/ansible-lint.svg?branch=master)](https://travis-ci.com/ansible/ansible-lint)
 
 Setup
 -----
@@ -191,11 +191,11 @@ Task/Handler: using git module
 
 [ANSIBLE0002] Trailing whitespace
 examples/example.yml:13
-    action: do nothing
+    action: do nothing   
 
 [ANSIBLE0002] Trailing whitespace
 examples/example.yml:35
-    with_items:
+    with_items: 
 
 [ANSIBLE0006] git used in place of git module
 examples/example.yml:24
@@ -276,4 +276,4 @@ Please read [CONTRIBUTING.md](https://github.com/ansible/ansible-lint/blob/maste
 Authors
 -------
 
-ansible-lint was created by [Will Thames](https://github.com/willthames) and is now maintained as part of the [Ansible](https://ansible.com) project.
+ansible-lint was created by [Will Thames](https://github.com/willthames) and is now maintained as part of the [Ansible](https://ansible.com) by Red Hat project.
