@@ -5,19 +5,21 @@ ansible-lint checks playbooks for practices and behaviour that could
 potentially be improved
 
 [![PyPI version](https://img.shields.io/pypi/v/ansible-lint.svg)](https://pypi.org/project/ansible-lint/)
-[![Build Status](https://travis-ci.org/willthames/ansible-lint.svg?branch=master)](https://travis-ci.org/willthames/ansible-lint)
+[![Build Status](https://travis-ci.com/ansible/ansible-lint.svg?branch=master)](https://travis-ci.com/ansible/ansible-lint)
 
 Setup
 -----
 
 Using pip:
+
 ```
 pip2 install ansible-lint
 ```
 
 From source:
+
 ```
-git clone https://github.com/willthames/ansible-lint
+git clone https://github.com/ansible/ansible-lint
 export PYTHONPATH=$PYTHONPATH:`pwd`/ansible-lint/lib
 export PATH=$PATH:`pwd`/ansible-lint/bin
 ```
@@ -56,7 +58,7 @@ Options:
 ```
 
 False positives
-===============
+---------------
 
 Some rules are a bit of a rule of thumb. Advanced git, yum or apt usage,
 for example, is typically difficult to achieve through the modules. In
@@ -83,18 +85,19 @@ at this time! (patches welcome)
     warn: False
 
 - name: this would typically fire GitHasVersionRule
-  git: src=/path/to/git/repo dest=checkout 
+  git: src=/path/to/git/repo dest=checkout
   tags:
   - skip_ansible_lint
 ```
 
 Rules
-=====
+-----
 
 Rules are described using a class file per rule.
 Default rules are named `DeprecatedVariableRule.py`, etc.
 
 Each rule definition should have the following:
+
 * ID: A unique identifier
 * Short description: Brief description of the rule
 * Description: Behaviour the rule is looking for
@@ -109,7 +112,6 @@ Each rule definition should have the following:
       `module_arguments` key. Other common task modifiers such as
       `when`, `with_items` etc. are also available as keys if present
       in the task.
-
 
 An example rule using `match` is:
 
@@ -218,12 +220,11 @@ $ bin/ansible-lint examples/include.yml
 action: git a=b c=d
 ```
 
-As of version 2.4.0, ansible-lint now works just on roles (this is useful 
+As of version 2.4.0, ansible-lint now works just on roles (this is useful
 for CI of roles)
 
-
 Configuration File
-==================
+------------------
 
 Ansible-lint supports local configuration via a `.ansible-lint` configuration file.  Ansible-lint checks the working directory for the presence of this file and applies any configuration found there.  The configuration file location can also be overridden via the `-c path/to/file` CLI flag.
 
@@ -251,26 +252,28 @@ use_default_rules: true
 verbosity: 1
 ```
 
-
 Pre-commit
-==========
+----------
 
-To use ansible-lint with [pre-commit](http://pre-commit.com/), just 
-add the following to your local repo's `.pre-commit-config.yaml` file. 
-Make sure to change `sha:` to be either a git commit sha or tag of 
+To use ansible-lint with [pre-commit](http://pre-commit.com/), just
+add the following to your local repo's `.pre-commit-config.yaml` file.
+Make sure to change `sha:` to be either a git commit sha or tag of
 ansible-lint containing `hooks.yaml`.
 
 ```yaml
-- repo: https://github.com/willthames/ansible-lint.git
+- repo: https://github.com/ansible/ansible-lint.git
   sha: v3.3.1
   hooks:
     - id: ansible-lint
       files: \.(yaml|yml)$
 ```
 
-
 Contributing
-============
+------------
 
-Please read
-[CONTRIBUTING.md](https://github.com/willthames/ansible-lint/blob/master/CONTRIBUTING.md) if you wish to contribute.
+Please read [CONTRIBUTING.md](https://github.com/ansible/ansible-lint/blob/master/CONTRIBUTING.md) if you wish to contribute.
+
+Authors
+-------
+
+ansible-lint was created by [Will Thames](https://github.com/willthames) and is now maintained as part of the [Ansible](https://ansible.com) by Red Hat project.
