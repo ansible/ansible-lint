@@ -42,23 +42,40 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     tags = ['command-shell', 'resources', 'ANSIBLE0006']
 
     _commands = ['command', 'shell']
-    _modules = {'git': 'git', 'hg': 'hg', 'curl': 'get_url or uri', 'wget': 'get_url or uri',
-                'svn': 'subversion', 'service': 'service', 'mount': 'mount',
-                'rpm': 'yum or rpm_key', 'yum': 'yum', 'apt-get': 'apt-get',
-                'unzip': 'unarchive', 'tar': 'unarchive', 'chkconfig': 'service',
-                'rsync': 'synchronize', 'supervisorctl': 'supervisorctl', 'systemctl': 'systemd',
-                'sed': 'template, replace or lineinfile'}
+    _modules = {
+        'apt-get': 'apt-get',
+        'chkconfig': 'service',
+        'curl': 'get_url or uri',
+        'git': 'git',
+        'hg': 'hg',
+        'mount': 'mount',
+        'patch': 'patch',
+        'rpm': 'yum or rpm_key',
+        'rsync': 'synchronize',
+        'sed': 'template, replace or lineinfile',
+        'service': 'service',
+        'supervisorctl': 'supervisorctl',
+        'svn': 'subversion',
+        'systemctl': 'systemd',
+        'tar': 'unarchive',
+        'unzip': 'unarchive',
+        'wget': 'get_url or uri',
+        'yum': 'yum',
+    }
 
     def matchtask(self, file, task):
-        if task["action"]["__ansible_module__"] in self._commands:
-            if 'cmd' in task['action']:
-                first_cmd_arg = task['action']['cmd'].split()[0]
-            else:
-                first_cmd_arg = task["action"]["__ansible_arguments__"][0]
-            if not first_cmd_arg:
-                return
-            executable = os.path.basename(first_cmd_arg)
-            if executable in self._modules and \
-                    boolean(task['action'].get('warn', True)):
-                message = "{0} used in place of {1} module"
-                return message.format(executable, self._modules[executable])
+        if task['action']['__ansible_module__'] not in self._commands:
+            return
+
+        if 'cmd' in task['action']:
+            first_cmd_arg = task['action']['cmd'].split()[0]
+        else:
+            first_cmd_arg = task['action']['__ansible_arguments__'][0]
+        if not first_cmd_arg:
+            return
+
+        executable = os.path.basename(first_cmd_arg)
+        if executable in self._modules and \
+                boolean(task['action'].get('warn', True)):
+            message = '{0} used in place of {1} module'
+            return message.format(executable, self._modules[executable])
