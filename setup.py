@@ -11,10 +11,10 @@ exec(open('lib/ansiblelint/version.py').read())
 setup(
     name='ansible-lint',
     version=__version__,
-    description=('checks playbooks for practices and behaviour that could potentially be improved'),
+    description='checks playbooks for practices and behaviour that could potentially be improved',
     keywords='ansible, lint',
-    author='Ansible by Red Hat',
-    author_email='info@ansible.com',
+    maintainer='Ansible by Red Hat',
+    maintainer_email='info@ansible.com',
     url='https://github.com/ansible/ansible-lint',
     package_dir={'': 'lib'},
     packages=find_packages('lib'),
