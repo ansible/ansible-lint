@@ -433,7 +433,7 @@ def normalize_task_v1(task):
                     else:
                         # Tasks that include playbooks (rather than task files)
                         # can get here
-                        # https://github.com/willthames/ansible-lint/issues/138
+                        # https://github.com/ansible/ansible-lint/issues/138
                         raise RuntimeError("Was not expecting value %s of type %s for key %s\n"
                                            "Task: %s. Check the syntax of your playbook using "
                                            "ansible-playbook --syntax-check" %
