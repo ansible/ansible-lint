@@ -73,5 +73,8 @@ matrix:
 install:
   - pip install -r test-deps.txt
 
+before_script:
+- git fetch --unshallow
+
 script:
 - tox -v
