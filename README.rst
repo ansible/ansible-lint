@@ -2,6 +2,10 @@
    :target: https://pypi.org/project/ansible-lint
    :alt: PyPI version
 
+.. image:: https://img.shields.io/badge/Ansible--lint-rules%20table-blue.svg
+   :target: https://github.com/ansible/ansible-lint/blob/master/RULE_DOCS.md
+   :alt: Ansible-lint rules explanation
+
 .. image:: https://img.shields.io/badge/Code%20of%20Conduct-Ansible-silver.svg
    :target: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html
    :alt: Ansible Code of Conduct
