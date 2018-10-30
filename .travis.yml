@@ -9,6 +9,8 @@ sudo: false
 # TRAVIS_PYTHON_VERSION
 
 jobs:
+  fast_finish: true
+
   include:
     - language: python
       python: "2.7"
