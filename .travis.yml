@@ -8,7 +8,7 @@ sudo: false
 
 # TRAVIS_PYTHON_VERSION
 
-matrix:
+jobs:
   include:
     - language: python
       python: "2.7"
@@ -69,6 +69,25 @@ matrix:
     - language: python
       python: "3.6"
       env: TOXENV=py36-flake8
+
+    - stage: Deploy
+      name: Publishing current Git tagged version of dist to PyPI
+      if: tag IS present
+      language: python
+      python: "3.6"
+      env:
+        TOXENV: metadata-validation
+      deploy:
+        provider: pypi
+        user: any-maintainer-on-pypi  # I recommend having a separate account
+        password:
+          secure: >  # needs real data
+            PLACE_FOR_AN_ENCRYPTED_STRING
+        distributions: dists
+        skip-cleanup: true
+        on:
+          tags: true
+          all_branches: true
 
 install:
   - pip install -r test-deps.txt
