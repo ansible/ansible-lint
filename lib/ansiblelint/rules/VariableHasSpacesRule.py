@@ -6,7 +6,7 @@ import re
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
-    id = '208'
+    id = '206'
     shortdesc = 'Variables should have spaces after {{ and before }}'
     description = 'Variables should be of the form {{ varname }}'
     tags = ['formatting']
