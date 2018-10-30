@@ -28,3 +28,6 @@ pip-log.txt
 
 # Needed for CLI tests
 .sandbox
+
+# pyenv
+.python-version
