@@ -31,3 +31,7 @@ pip-log.txt
 
 # pyenv
 .python-version
+
+# Coverage artifacts
+.coverage
+coverage.xml
