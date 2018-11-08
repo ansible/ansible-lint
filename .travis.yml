@@ -101,7 +101,7 @@ jobs:
 before_install:
 - git fetch --unshallow
 install:
-- pip install -r test-deps.txt
+- pip install -U tox
 - tox --notest  # Pre-populate virtualenv
 
 script:
