@@ -98,11 +98,11 @@ jobs:
         <<: *deploy-step
         server: https://test.pypi.org/legacy/
 
-install:
-  - pip install -r test-deps.txt
-
-before_script:
+before_install:
 - git fetch --unshallow
+install:
+- pip install -r test-deps.txt
+- tox --notest  # Pre-populate virtualenv
 
 script:
 - tox -v
