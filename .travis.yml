@@ -72,14 +72,15 @@ jobs:
       python: "3.6"
       env: TOXENV=py36-flake8
 
-    - stage: Deploy
+    - &deploy-job
+      stage: Deploy
       name: Publishing current Git tagged version of dist to PyPI
       if: tag IS present
       language: python
       python: "3.6"
       env:
         TOXENV: metadata-validation
-      deploy:
+      deploy: &deploy-step
         provider: pypi
         user: any-maintainer-on-pypi  # I recommend having a separate account
         password:
@@ -90,6 +91,12 @@ jobs:
         on:
           tags: true
           all_branches: true
+
+    - <<: *deploy-job
+      if: type != pull_request  # Always run, except if PR
+      deploy:
+        <<: *deploy-step
+        server: https://test.pypi.org/legacy/
 
 install:
   - pip install -r test-deps.txt
