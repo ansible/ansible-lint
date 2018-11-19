@@ -17,6 +17,10 @@ class SudoRule(AnsibleLintRule):
             if 'sudo_user' in play_frag:
                 results.append(({'sudo_user': play_frag['sudo_user']},
                                 'deprecated sudo_user feature'))
+            if 'tasks' in play_frag:
+                output = self._check_value(play_frag['tasks'])
+                if output:
+                    results += output
 
         if isinstance(play_frag, list):
             for item in play_frag:
@@ -28,6 +32,3 @@ class SudoRule(AnsibleLintRule):
 
     def matchplay(self, file, play):
         return self._check_value(play)
-
-    def matchtask(self, file, task):
-        return 'sudo' in task or 'sudo_user' in task
