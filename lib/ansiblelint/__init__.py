@@ -185,13 +185,7 @@ class Runner(object):
         self.playbooks = set()
         # assume role if directory
         if os.path.isdir(playbook):
-            # only have trailing slash when path has multiple dirs
-            playbook = os.path.normpath(playbook)
-            if '/' in playbook.lstrip('/'):
-                self.playbooks.add((os.path.join(playbook, ''), 'role'))
-            else:
-                self.playbooks.add((playbook, 'role'))
-
+            self.playbooks.add((os.path.join(playbook, ''), 'role'))
             self.playbook_dir = playbook
         else:
             self.playbooks.add((playbook, 'playbook'))

@@ -307,7 +307,8 @@ def _rolepath(basedir, role):
         path_dwim(
             basedir, os.path.join('..', '..', '..', 'roles', role)
         ),
-        path_dwim(basedir, os.path.join('..', '..', role))
+        path_dwim(basedir, os.path.join('..', '..', role)),
+        path_dwim(basedir, ''),
     ]
 
     if constants.DEFAULT_ROLES_PATH:
