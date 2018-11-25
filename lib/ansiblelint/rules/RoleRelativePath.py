@@ -14,8 +14,7 @@ class RoleRelativePath(AnsibleLintRule):
     tags = ['module']
 
     def matchplay(self, file, play):
-        # assume if 'roles' in path, inside a role.
-        if 'roles' not in file['path']:
+        if file['type'] == 'playbook':
             return []
         if 'template' in play:
             if not isinstance(play['template'], dict):
