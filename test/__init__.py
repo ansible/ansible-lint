@@ -32,3 +32,14 @@ class RunFromText(object):
             results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results
+
+    def run_role_meta_main(self, meta_main_text):
+        role_path = tempfile.mkdtemp(prefix='role_')
+        meta_path = os.path.join(role_path, 'meta')
+        os.makedirs(meta_path)
+        with open(os.path.join(meta_path, 'main.yml'), 'w') as fp:
+            fp.write(meta_main_text)
+            fp.seek(0)
+            results = self._call_runner(role_path)
+        shutil.rmtree(role_path)
+        return results
