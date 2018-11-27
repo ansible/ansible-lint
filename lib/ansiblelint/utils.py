@@ -299,6 +299,9 @@ def _load_library_if_exists(path):
 def _rolepath(basedir, role):
     role_path = None
 
+    if role is None:
+        raise SystemExit('role name cannot be empty')
+
     possible_paths = [
         # if included from a playbook
         path_dwim(basedir, os.path.join('roles', role)),
