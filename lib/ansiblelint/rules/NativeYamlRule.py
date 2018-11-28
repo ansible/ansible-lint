@@ -7,7 +7,7 @@ class NativeYamlRule(AnsibleLintRule):
     description = ("Instead of using the key=value shorthand, use native YAML syntax.")
     tags = ['task']
 
-    bracket_regex = re.compile('(\s[^ ]*=([^\{\" ]*(\{\{\s[^ ]*\s\}\})?))+$')
+    bracket_regex = re.compile('(\s[^= ]*=([^=\{\" ]*(\{\{\s[^ ]*\s\}\})?))+$')
 
     def match(self, file, line):
         return self.bracket_regex.search(line)
