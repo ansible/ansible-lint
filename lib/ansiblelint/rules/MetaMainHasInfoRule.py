@@ -7,8 +7,13 @@ from ansiblelint import AnsibleLintRule
 class MetaMainHasInfoRule(AnsibleLintRule):
     id = '701'
     shortdesc = 'meta/main.yml should contain relevant info'
-    info = ['author', 'description', 'company',
-            'license', 'min_ansible_version', 'platforms']
+    info = [
+        'author',
+        'description',
+        'license',
+        'min_ansible_version',
+        'platforms',
+    ]
     description = 'meta/main.yml should contain: ' + ', '.join(info)
     tags = ['metadata']
 
