@@ -1,4 +1,4 @@
-. _lint_rules:
+.. _lint_rules:
 
 *****
 Rules
@@ -6,7 +6,7 @@ Rules
 
 .. contents:: Topics
 
-This topic describes Ansible Lint rules.
+This topic describes how to use the deault Ansible Lint rules, as well as how to create and use custom rules.
 
 Specifying Rules at Runtime
 ===========================
@@ -20,7 +20,7 @@ Using Tags to Include Rules
 
 Each rule has an associated set of one or more tags. To view the list of tags for each available rule, use the ``-T`` option. 
 
-The following shows the available tags, and the rules associated with each tag:
+The following shows the available tags in an example set of rules, and the rules associated with each tag:
 
 .. code-block:: bash
 

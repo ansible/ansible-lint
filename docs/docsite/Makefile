@@ -35,6 +35,8 @@ docs: clean htmldocs
 generate_rst: staticmin
 
 htmldocs: generate_rst
+	cd ../../lib/ansiblelint; python ./generate_docs.py; cd ../../docs/docsite
+	cp ../../RULE_DOCS.rst rst/rules/rule_docs.rst
 	CPUS=$(CPUS) $(MAKE) -f Makefile.sphinx html
 
 singlehtmldocs: generate_rst
