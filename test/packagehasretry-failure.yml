@@ -1,0 +1,9 @@
+---
+- hosts: hosts
+  tasks:
+    - name: "Package has retry test failure"
+      apt:
+        pkg: foo
+    - name: "Package has retry test failure"
+      macports:
+        pkg: foo
