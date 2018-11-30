@@ -122,4 +122,4 @@ class TestRule(unittest.TestCase):
         filename = os.path.abspath('test/common-include-2.yml')
         runner = Runner(self.rules, filename, [], [], [], 0, checked_files)
         run2 = runner.run()
-        assert ((len(run1) + len(run2)) == 2)
+        assert ((len(run1) + len(run2)) == 1)

@@ -1,82 +1,70 @@
-# Copyright (c) 2013-2014 Will Thames <will@thames.id.au>
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# Copyright (c) 2016, Will Thames and contributors
+# Copyright (c) 2018, Ansible Project
 
 from ansiblelint import AnsibleLintRule
 
 
 class PackageHasRetryRule(AnsibleLintRule):
-    id = 'ANSIBLE0019'
-    shortdesc = 'Remote package tasks must have a retry'
+    id = '405'
+    shortdesc = 'Remote package tasks should have a retry'
     description = ('Package operations are unreliable as they require'
                    'network communication and the availability of remote'
                    'servers. To mitigate the potential problems, retries '
                    'should be used.')
-    tags = ['reliability']
+    tags = ['module', 'reliability']
 
     # module list generated with:
-    # find lib/ansible/modules/packaging/ -type f \
-    #   |awk -F '/' \
-    #   '/__|dpkg|_repo|_facts|_sub|_chan/{next} {split($NF, words, "."); print "\""words[1]"\","}'
+    # find lib/ansible/modules/packaging/ -type f -printf '%f\n' \
+    #   | sort | awk -F '/' \
+    #   '/__|dpkg|_repo|_facts|_sub|_chan/{next} {split($NF, words, ".");
+    #   print "\""words[1]"\","}'
     package_modules = [
+        "apk",
+        "apt_key",
+        "apt",
+        "apt_rpm",
+        "bower",
         "bundler",
-        "easy_install",
         "composer",
+        "cpanm",
+        "dnf",
+        "easy_install",
+        "flatpak",
+        "flatpak_remote",
+        "gem",
+        "homebrew_cask",
+        "homebrew",
+        "homebrew_tap",
+        "layman",
+        "macports",
         "maven_artifact",
         "npm",
-        "bower",
-        "pear",
-        "cpanm",
-        "pip",
-        "gem",
-        "package",
-        "xbps",
-        "pkgutil",
-        "pacman",
-        "pkgng",
-        "zypper",
-        "swdepot",
-        "layman",
-        "portage",
-        "apk",
-        "homebrew",
         "openbsd_pkg",
-        "urpmi",
-        "apt_key",
-        "swupd",
-        "homebrew_tap",
-        "yum",
-        "dnf",
-        "pkgin",
-        "svr4pkg",
-        "homebrew_cask",
-        "sorcery",
-        "slackpkg",
-        "rpm_key",
-        "apt",
-        "portinstall",
-        "pkg5",
         "opkg",
+        "package",
+        "pacman",
+        "pear",
+        "pip",
         "pkg5_publisher",
+        "pkg5",
+        "pkgin",
+        "pkgng",
+        "pkgutil",
+        "portage",
+        "portinstall",
         "rhn_register",
-        "apt_rpm",
-        "macports"
+        "rpm_key",
+        "slackpkg",
+        "snap",
+        "sorcery",
+        "svr4pkg",
+        "swdepot",
+        "swupd",
+        "urpmi",
+        "xbps",
+        "yarn",
+        "yum",
+        "zypper",
     ]
 
     def matchtask(self, file, task):
