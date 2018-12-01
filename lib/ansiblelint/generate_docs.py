@@ -1,4 +1,4 @@
-'''Script to generate rule table markdown documentation.'''
+'''Script to generate rule table .rst documentation.'''
 
 import os
 import importlib
@@ -7,12 +7,25 @@ import rules
 from ansiblelint import AnsibleLintRule
 from functools import reduce
 
+DOC_HEADER = """
+.. _lint_default_rules:
+
+*************
+Default Rules
+*************
+
+.. contents:: Topics
+
+The table below shows the the default rules used by Ansible Lint to evaluate playbooks and roles:
+
+"""
+
 
 def main():
     import_all_rules()
     all_rules = get_serialized_rules()
 
-    grid = [['id', 'sample message']]
+    grid = [['ID', 'Description']]
     for d in all_rules:
         if d['id'].endswith('01'):
             if not d['id'].endswith('101'):
@@ -21,7 +34,7 @@ def main():
                          '*{}*'.format(d['first_tag'])])
         grid.append(['E{}'.format(d['id']), d['shortdesc']])
 
-    filename = '../../RULE_DOCS.md'
+    filename = '../../RULE_DOCS.rst'
     with open(filename, 'w') as file:
         file.write(make_table(grid))
         print('{} file written'.format(filename))
@@ -53,16 +66,20 @@ def get_serialized_rules():
 
 def make_table(grid):
     cell_width = 2 + max(reduce(lambda x, y: x+y,
-                         [[len(item) for item in row] for row in grid], []))
+                                [[len(item) for item in row] for row in grid], []))
     num_cols = len(grid[0])
-    block = ''
+    block = DOC_HEADER
     header = True
     for row in grid:
-        block = block + '| ' + '| '.join([normalize_cell(x, cell_width-1)
-                                          for x in row]) + '|\n'
         if header:
-            block = block + num_cols*('|' + (cell_width)*'-') + '|\n'
+            block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
+
+        block = block + ''.join([normalize_cell(x, cell_width+1)
+                                 for x in row]) + '\n'
+        if header:
+            block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
         header = False
+    block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
     return block
 
 
