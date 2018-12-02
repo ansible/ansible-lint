@@ -6,4 +6,4 @@
 .. toctree::
    :maxdepth: 2
 
-   rule_docs
+   default_rules
