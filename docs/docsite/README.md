@@ -1,4 +1,4 @@
-# Dcumentation source for Ansible Lint
+# Documentation source for Ansible Lint
 
 Contains the source behind [docs.ansible.com/lint](https://docs.ansible.com/lint)
 
@@ -22,7 +22,7 @@ $ cd docs/docsite
 $ make webdocs
 
 # Open the site in your default browser
-$ open _build/html/index.html
+$ xdg-open _build/html/index.html
 ```
 
 If you do not want to learn the reStructuredText format, you can also [file an issue](https://github.com/ansible/ansible-lint/issues), and let us know how we can improve our documentation.
