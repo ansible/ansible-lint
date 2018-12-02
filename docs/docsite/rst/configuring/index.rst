@@ -1,9 +1,3 @@
-.. _configuring:
-
-***********
-Configuring
-***********
-
 .. toctree::
    :maxdepth: 2
 
