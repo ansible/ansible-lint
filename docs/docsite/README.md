@@ -1,6 +1,6 @@
 # Documentation source for Ansible Lint
 
-Contains the source behind [docs.ansible.com/lint](https://docs.ansible.com/lint)
+Contains the source behind [docs.ansible.com/ansible-lint](https://docs.ansible.com/ansible-lint)
 
 Contributions to documentation are welcome. To make changes, submit a pull request that changes the reStructuredText files found the in the `rst/` directory only, and the Ansible Lint team will build and push the static files.
 
