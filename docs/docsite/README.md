@@ -1,6 +1,6 @@
-# Dcumentation source for Ansible Lint
+# Documentation source for Ansible Lint
 
-Contains the source behind [docs.ansible.com/lint](https://docs.ansible.com/lint)
+Contains the source behind [docs.ansible.com/ansible-lint](https://docs.ansible.com/ansible-lint)
 
 Contributions to documentation are welcome. To make changes, submit a pull request that changes the reStructuredText files found the in the `rst/` directory only, and the Ansible Lint team will build and push the static files.
 
@@ -22,7 +22,7 @@ $ cd docs/docsite
 $ make webdocs
 
 # Open the site in your default browser
-$ open _build/html/index.html
+$ xdg-open _build/html/index.html
 ```
 
 If you do not want to learn the reStructuredText format, you can also [file an issue](https://github.com/ansible/ansible-lint/issues), and let us know how we can improve our documentation.

@@ -39,6 +39,7 @@ E401                                                       Git checkouts must co
 E402                                                       Mercurial checkouts must contain explicit revision         
 E403                                                       Package installs should not use latest                     
 E404                                                       Doesn't need a relative path in role                       
+E405                                                       Remote package tasks should have a retry                   
                                                                                                                       
 **E5**                                                     *task*                                                     
 E501                                                       become_user requires become to work as expected            

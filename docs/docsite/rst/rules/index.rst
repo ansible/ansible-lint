@@ -1,9 +1,3 @@
-.. _rules:
-
-*****
-Rules
-*****
-
 .. toctree::
    :maxdepth: 2
 
@@ -11,5 +5,5 @@ Rules
 
 .. toctree::
    :maxdepth: 2
-  
-   rule_docs
+
+   default_rules

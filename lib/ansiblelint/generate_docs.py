@@ -34,7 +34,7 @@ def main():
                          '*{}*'.format(d['first_tag'])])
         grid.append(['E{}'.format(d['id']), d['shortdesc']])
 
-    filename = '../../RULE_DOCS.rst'
+    filename = '../../docs/docsite/rst/rules/default_rules.rst'
     with open(filename, 'w') as file:
         file.write(make_table(grid))
         print('{} file written'.format(filename))
