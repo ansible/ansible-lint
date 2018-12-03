@@ -13,6 +13,9 @@ SUCCESS = '''
         pkg: foo
       register: result
       until: result|success
+
+    - name: "update apt cache"
+      update_cache: yes
 '''
 
 FAILURE = '''
