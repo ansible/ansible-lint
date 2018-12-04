@@ -82,10 +82,10 @@ jobs:
         TOXENV: metadata-validation
       deploy: &deploy-step
         provider: pypi
-        user: any-maintainer-on-pypi  # I recommend having a separate account
+        user: ansible-lint
         password:
-          secure: >  # needs real data
-            PLACE_FOR_AN_ENCRYPTED_STRING
+          secure: >
+            DanqmulaFEQG3rZwXOpf9w48x15fQzwKAl6cCoqqDp2khJkwZP+VtyakHraHYUn+qRknuh+cCzLC402y9uiXa3MI/Zf6YB0HbEJq8x++LXnDSpZmIzByK75XUt2manvUNdXxrY3jhOpwBQzA9+vdhSM7uSqkpDeqi/8R3OuSV8BhnBS406rQ0zEPbYGpPU+9EaTFu9oRDAe9jTq4TeT2/l7w8J3K5W2CgcgtdpBlw2rRZaKAzJ/Apm5NKX4HibbXZQuslf6pSh+0qyJOUSnEKzdr8HqMMK19oHcgKaDnwBdxK3NdIZHY5tnTrMDYCOkBAXDSKjI2ePPNHD8YkUkh4iRw9C+L0R0D6qz43d9dP8yVb4nrJ+FhoJwZkUA67HJUKQd1SsyYM+dBdvQnUrSAWPlsTPe91xgWR/7JDyiV3In4KLlUy+03H6Aw7BXgumO6ZCQSGeICD+qC2tIksq6GjXhvr08nXPeZPZ/3OUokraiWBtRM3eS6FjeYkAHA+Zf2QDGJK7DsJNWw+fv90SBjLZ9t0zy5RDBpnTrAx937NafGwCaXQiYmHHa6ZasOxL2su6htu5WypBaiIMyhuIiriEEoHRc4dYzOQH1TL8XCj7Ysb2JjydMESWOQRrwZRE7+quo4ZjDjjDNqZz1/rU/J5CkNtJ2KqY7dY6KGaYebSKk=
         distributions: dists
         skip-cleanup: true
         on:
