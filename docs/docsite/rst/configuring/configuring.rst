@@ -39,15 +39,6 @@ The following values are supported, and function identically to their CLI counte
     verbosity: 1
 
 
-Pre-commit
-==========
-
-To use ansible-lint with `pre-commit <http://pre-commit.com>`_, just add the following to your local repo's ``.pre-commit-config.yaml`` file. Make sure to change **sha:** to be either a git commit sha or tag of ansible-lint containing ``hooks.yaml``.
-
-.. code-block:: yaml
-
-    - repo: https://github.com/ansible/ansible-lint.git
-      sha: v3.3.1
-      hooks:
-        - id: ansible-lint
-          files: \.(yaml|yml)$
+.. include:: ../../../../README.rst
+   :start-after: pre-commit-docs-inclusion-marker-do-not-remove
+   :end-before: pre-commit-docs-inclusion-marker-end-do-not-remove

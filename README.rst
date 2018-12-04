@@ -268,8 +268,10 @@ If a value is provided on both the command line and via a config file, the value
     use_default_rules: true
     verbosity: 1
 
+.. pre-commit-docs-inclusion-marker-do-not-remove
+
 Pre-commit
-----------
+==========
 
 To use ansible-lint with pre-commit_, just
 add the following to your local repo's ``.pre-commit-config.yaml`` file.
@@ -282,6 +284,8 @@ ansible-lint containing ``hooks.yaml``.
       sha: v3.3.1
       hooks:
         - id: ansible-lint
+
+.. pre-commit-docs-inclusion-marker-end-do-not-remove
 
 Contributing
 ------------
