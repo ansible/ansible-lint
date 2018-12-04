@@ -3,7 +3,7 @@
    :alt: PyPI version
 
 .. image:: https://img.shields.io/badge/Ansible--lint-rules%20table-blue.svg
-   :target: https://github.com/ansible/ansible-lint/blob/master/RULE_DOCS.md
+   :target: https://docs.ansible.com/ansible-lint/rules/default_rules.html
    :alt: Ansible-lint rules explanation
 
 .. image:: https://img.shields.io/badge/Code%20of%20Conduct-Ansible-silver.svg
