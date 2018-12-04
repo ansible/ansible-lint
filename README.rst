@@ -239,14 +239,16 @@ are also handled:
 As of version 2.4.0, ansible-lint now works just on roles (this is useful
 for CI of roles)
 
+.. config-file-docs-inclusion-marker-do-not-remove
+
 Configuration File
-------------------
+==================
 
 Ansible-lint supports local configuration via a ``.ansible-lint`` configuration file.  Ansible-lint checks the working directory for the presence of this file and applies any configuration found there.  The configuration file location can also be overridden via the ``-c path/to/file`` CLI flag.
 
 The following values are supported and function identically to their CLI counterparts.
 
-If a value is provided on both the command line and via a config file, the values will be merged (if a list like ``exclude_paths``), or the "True" value will be preferred, in the case of something like ``quiet``.
+If a value is provided on both the command line and via a config file, the values will be merged (if a list like **exclude_paths**), or the **True** value will be preferred, in the case of something like **quiet**.
 
 .. code:: yaml
 
@@ -267,6 +269,8 @@ If a value is provided on both the command line and via a config file, the value
       - run_this_tag
     use_default_rules: true
     verbosity: 1
+
+.. config-file-docs-inclusion-marker-end-do-not-remove
 
 .. pre-commit-docs-inclusion-marker-do-not-remove
 
