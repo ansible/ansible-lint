@@ -9,8 +9,6 @@ Configuring
 
 This topic describes how to configure Ansible Lint
 
-.. _installing_with_pip:
-
 Configuration File
 ==================
 
