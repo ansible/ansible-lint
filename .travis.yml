@@ -12,92 +12,92 @@ jobs:
   fast_finish: true
 
   include:
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-flake8
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-flake8
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible19
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible19
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible20
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible20
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible21
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible21
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible22
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible22
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible23
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible23
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible24
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible24
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible25
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible25
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansibledevel
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansibledevel
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansible22
+  - language: python
+    python: "3.6"
+    env: TOXENV=py36-ansible22
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansible23
+  - language: python
+    python: "3.6"
+    env: TOXENV=py36-ansible23
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansible24
+  - language: python
+    python: "3.6"
+    env: TOXENV=py36-ansible24
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansible25
+  - language: python
+    python: "3.6"
+    env: TOXENV=py36-ansible25
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansibledevel
+  - language: python
+    python: "3.6"
+    env: TOXENV=py36-ansibledevel
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-flake8
+  - language: python
+    python: "3.6"
+    env: TOXENV=py36-flake8
 
-    - &deploy-job
-      stage: Deploy
-      name: Publishing current Git tagged version of dist to PyPI
-      if: tag IS present
-      language: python
-      python: "3.6"
-      env:
-        TOXENV: metadata-validation
-      deploy: &deploy-step
-        provider: pypi
-        user: ansible-lint
-        password:
-          secure: >
-            DanqmulaFEQG3rZwXOpf9w48x15fQzwKAl6cCoqqDp2khJkwZP+VtyakHraHYUn+qRknuh+cCzLC402y9uiXa3MI/Zf6YB0HbEJq8x++LXnDSpZmIzByK75XUt2manvUNdXxrY3jhOpwBQzA9+vdhSM7uSqkpDeqi/8R3OuSV8BhnBS406rQ0zEPbYGpPU+9EaTFu9oRDAe9jTq4TeT2/l7w8J3K5W2CgcgtdpBlw2rRZaKAzJ/Apm5NKX4HibbXZQuslf6pSh+0qyJOUSnEKzdr8HqMMK19oHcgKaDnwBdxK3NdIZHY5tnTrMDYCOkBAXDSKjI2ePPNHD8YkUkh4iRw9C+L0R0D6qz43d9dP8yVb4nrJ+FhoJwZkUA67HJUKQd1SsyYM+dBdvQnUrSAWPlsTPe91xgWR/7JDyiV3In4KLlUy+03H6Aw7BXgumO6ZCQSGeICD+qC2tIksq6GjXhvr08nXPeZPZ/3OUokraiWBtRM3eS6FjeYkAHA+Zf2QDGJK7DsJNWw+fv90SBjLZ9t0zy5RDBpnTrAx937NafGwCaXQiYmHHa6ZasOxL2su6htu5WypBaiIMyhuIiriEEoHRc4dYzOQH1TL8XCj7Ysb2JjydMESWOQRrwZRE7+quo4ZjDjjDNqZz1/rU/J5CkNtJ2KqY7dY6KGaYebSKk=
-        distributions: dists
-        skip-cleanup: true
-        on:
-          tags: true
-          all_branches: true
+  - &deploy-job
+    stage: Deploy
+    name: Publishing current Git tagged version of dist to PyPI
+    if: tag IS present
+    language: python
+    python: "3.6"
+    env:
+      TOXENV: metadata-validation
+    deploy: &deploy-step
+      provider: pypi
+      user: ansible-lint
+      password:
+        secure: >
+          DanqmulaFEQG3rZwXOpf9w48x15fQzwKAl6cCoqqDp2khJkwZP+VtyakHraHYUn+qRknuh+cCzLC402y9uiXa3MI/Zf6YB0HbEJq8x++LXnDSpZmIzByK75XUt2manvUNdXxrY3jhOpwBQzA9+vdhSM7uSqkpDeqi/8R3OuSV8BhnBS406rQ0zEPbYGpPU+9EaTFu9oRDAe9jTq4TeT2/l7w8J3K5W2CgcgtdpBlw2rRZaKAzJ/Apm5NKX4HibbXZQuslf6pSh+0qyJOUSnEKzdr8HqMMK19oHcgKaDnwBdxK3NdIZHY5tnTrMDYCOkBAXDSKjI2ePPNHD8YkUkh4iRw9C+L0R0D6qz43d9dP8yVb4nrJ+FhoJwZkUA67HJUKQd1SsyYM+dBdvQnUrSAWPlsTPe91xgWR/7JDyiV3In4KLlUy+03H6Aw7BXgumO6ZCQSGeICD+qC2tIksq6GjXhvr08nXPeZPZ/3OUokraiWBtRM3eS6FjeYkAHA+Zf2QDGJK7DsJNWw+fv90SBjLZ9t0zy5RDBpnTrAx937NafGwCaXQiYmHHa6ZasOxL2su6htu5WypBaiIMyhuIiriEEoHRc4dYzOQH1TL8XCj7Ysb2JjydMESWOQRrwZRE7+quo4ZjDjjDNqZz1/rU/J5CkNtJ2KqY7dY6KGaYebSKk=
+      distributions: dists
+      skip-cleanup: true
+      on:
+        tags: true
+        all_branches: true
 
-    - <<: *deploy-job
-      if: type != pull_request AND tag IS NOT present # Always run, except if PR or tagged commit
-      name: Publishing current (unstable) Git revision of dist to Test PyPI
-      deploy:
-        <<: *deploy-step
-        server: https://test.pypi.org/legacy/
+  - <<: *deploy-job
+    if: type != pull_request AND tag IS NOT present  # Always run, except if PR or tagged commit
+    name: Publishing current (unstable) Git revision of dist to Test PyPI
+    deploy:
+      <<: *deploy-step
+      server: https://test.pypi.org/legacy/
 
 before_install:
 - git fetch --unshallow
