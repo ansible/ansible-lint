@@ -10,6 +10,7 @@ class PlaybookExtension(AnsibleLintRule):
     id = '205'
     shortdesc = 'Use ".yml" or ".yaml" playbook extension'
     description = 'Playbooks should have the ".yml" or ".yaml" extension'
+    severity = 'MEDIUM'
     tags = ['formatting']
     done = []  # already noticed path list
     version_added = 'v4.0.0'

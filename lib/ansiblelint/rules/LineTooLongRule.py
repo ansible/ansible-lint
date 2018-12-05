@@ -11,6 +11,7 @@ class LineTooLongRule(AnsibleLintRule):
         'Long lines make code harder to read and '
         'code review more difficult'
     )
+    severity = 'VERY_LOW'
     tags = ['formatting']
     version_added = 'v4.0.0'
 

@@ -31,6 +31,7 @@ class OctalPermissionsRule(AnsibleLintRule):
         'in unexpected ways. See '
         'http://docs.ansible.com/ansible/file_module.html'
     )
+    severity = 'VERY_HIGH'
     tags = ['formatting', 'ANSIBLE0009']
     version_added = 'historic'
 

@@ -12,6 +12,7 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
         'Use ``when: var`` rather than ``when: var != ""`` (or '
         'conversely ``when: not var`` rather than ``when: var == ""``)'
     )
+    severity = 'HIGH'
     tags = ['idiom']
     version_added = 'v4.0.0'
 

@@ -11,6 +11,7 @@ class MetaTagValidRule(AnsibleLintRule):
         'Tags must contain lowercase letters and digits only, '
         'and ``galaxy_tags`` is expected to be a list'
     )
+    severity = 'HIGH'
     tags = ['metadata']
     version_added = 'v4.0.0'
 

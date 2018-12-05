@@ -41,6 +41,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'Executing a command when there is an Ansible module '
         'is generally a bad idea'
     )
+    severity = 'HIGH'
     tags = ['command-shell', 'resources', 'ANSIBLE0006']
     version_added = 'historic'
 

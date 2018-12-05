@@ -31,6 +31,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
         'playbooks so that the environment value uses the full variable '
         'syntax ``{{ your_variable }}``'
     )
+    severity = 'VERY_HIGH'
     tags = ['deprecated', 'formatting', 'ANSIBLE0015']
     version_added = 'historic'
 

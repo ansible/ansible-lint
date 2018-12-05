@@ -12,6 +12,7 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
         'Use ``when: var`` rather than ``when: var == True`` '
         '(or conversely ``when: not var``)'
     )
+    severity = 'HIGH'
     tags = ['idiom']
     version_added = 'v4.0.0'
 

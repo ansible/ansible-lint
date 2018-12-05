@@ -41,6 +41,7 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
         'Executing a command when there are arguments to modules '
         'is generally a bad idea'
     )
+    severity = 'VERY_HIGH'
     tags = ['command-shell', 'resources', 'ANSIBLE0007']
     version_added = 'historic'
 

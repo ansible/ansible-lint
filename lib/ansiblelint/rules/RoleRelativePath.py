@@ -11,6 +11,7 @@ class RoleRelativePath(AnsibleLintRule):
     id = '404'
     shortdesc = "Doesn't need a relative path in role"
     description = '``copy`` and ``template`` do not need to use relative path for ``src``'
+    severity = 'HIGH'
     tags = ['module']
     version_added = 'v4.0.0'
 
