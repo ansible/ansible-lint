@@ -65,6 +65,10 @@ def main():
                       default=False,
                       action='store_true',
                       help="parseable output in the format of pep8")
+    parser.add_option('--parseable-severity', dest='parseable_severity',
+                      default=False,
+                      action='store_true',
+                      help="parseable output including severity of rule")
     parser.add_option('-r', action='append', dest='rulesdir',
                       default=[], type='str',
                       help="specify one or more rules directories using "
@@ -113,6 +117,10 @@ def main():
         if 'parseable' in config:
             options.parseable = options.parseable or config['parseable']
 
+        if 'parseable_severity' in config:
+            options.parseable_severity = options.parseable_severity or \
+                                         config['parseable_severity']
+
         if 'use_default_rules' in config:
             options.use_default_rules = options.use_default_rules or config['use_default_rules']
 
@@ -136,6 +144,9 @@ def main():
 
     if options.parseable:
         formatter = formatters.ParseableFormatter()
+
+    if options.parseable_severity:
+        formatter = formatters.ParseableSeverityFormatter()
 
     if len(args) == 0 and not (options.listrules or options.listtags):
         parser.print_help(file=sys.stderr)
