@@ -6,6 +6,9 @@
 # See: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
 sudo: false
 
+git:
+  depth: 100
+
 # TRAVIS_PYTHON_VERSION
 
 jobs:
