@@ -1,4 +1,4 @@
-# 4.0.0 (Target Release Date: 07-Dec-2018)
+# 4.0.0 (Target Release Date: 17-Dec-2018)
 
 * Packaging: consistency and automation #389
 * Additional default rules for ansible-lint #384
