@@ -22,6 +22,8 @@ The table below shows the the default rules used by Ansible Lint to evaluate pla
 
 
 def main():
+    id_link = '`E{} <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/{}.py>`_'
+
     import_all_rules()
     all_rules = get_serialized_rules()
 
@@ -32,7 +34,8 @@ def main():
                 grid.append(['', ''])
             grid.append(['**E{}**'.format(d['id'][-3:-2]),
                          '*{}*'.format(d['first_tag'])])
-        grid.append(['E{}'.format(d['id']), d['shortdesc'], d['description']])
+        id_text = id_link.format(d['id'], d['classname'])
+        grid.append([id_text, d['shortdesc'], d['description']])
 
     filename = '../../docs/docsite/rst/rules/default_rules.rst'
     with open(filename, 'w') as file:
@@ -63,6 +66,7 @@ def get_serialized_rules():
             'shortdesc': c.shortdesc,
             'description': c.description,
             'first_tag': c.tags[0],
+            'classname': c.__name__,
         }
         all_rules.append(d)
     all_rules = sorted(all_rules, key=lambda k: k['id'])
