@@ -21,31 +21,15 @@ jobs:
 
   - language: python
     python: "2.7"
-    env: TOXENV=py27-ansible19
-
-  - language: python
-    python: "2.7"
-    env: TOXENV=py27-ansible20
-
-  - language: python
-    python: "2.7"
-    env: TOXENV=py27-ansible21
-
-  - language: python
-    python: "2.7"
-    env: TOXENV=py27-ansible22
-
-  - language: python
-    python: "2.7"
-    env: TOXENV=py27-ansible23
-
-  - language: python
-    python: "2.7"
-    env: TOXENV=py27-ansible24
-
-  - language: python
-    python: "2.7"
     env: TOXENV=py27-ansible25
+
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible26
+
+  - language: python
+    python: "2.7"
+    env: TOXENV=py27-ansible27
 
   - language: python
     python: "2.7"
@@ -53,19 +37,15 @@ jobs:
 
   - language: python
     python: "3.6"
-    env: TOXENV=py36-ansible22
-
-  - language: python
-    python: "3.6"
-    env: TOXENV=py36-ansible23
-
-  - language: python
-    python: "3.6"
-    env: TOXENV=py36-ansible24
-
-  - language: python
-    python: "3.6"
     env: TOXENV=py36-ansible25
+
+  - language: python
+    python: "3.6"
+    env: TOXENV=py36-ansible26
+
+  - language: python
+    python: "3.6"
+    env: TOXENV=py36-ansible27
 
   - language: python
     python: "3.6"
