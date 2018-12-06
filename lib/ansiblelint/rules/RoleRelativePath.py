@@ -10,7 +10,7 @@ format = "{}"
 class RoleRelativePath(AnsibleLintRule):
     id = '404'
     shortdesc = "Doesn't need a relative path in role"
-    description = ''
+    description = '``copy`` and ``template`` do not need to use relative path for ``src``'
     tags = ['module']
 
     def matchplay(self, file, play):

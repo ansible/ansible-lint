@@ -12,8 +12,11 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         ('company', 'your company (optional)'),
         ('license', 'license (GPLv2, CC-BY, etc)'),
     ]
-    description = ('meta/main.yml default values should be changed for: ' +
-                   ', '.join([f[0] for f in field_defaults]))
+    description = (
+        'meta/main.yml default values should be changed for: ``{}``'.format(
+            ', '.join([f[0] for f in field_defaults])
+        )
+    )
     tags = ['metadata']
 
     def matchplay(self, file, data):

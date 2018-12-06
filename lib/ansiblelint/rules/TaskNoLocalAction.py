@@ -7,7 +7,7 @@ from ansiblelint import AnsibleLintRule
 class TaskNoLocalAction(AnsibleLintRule):
     id = '504'
     shortdesc = "Do not use 'local_action', use 'delegate_to: localhost'"
-    description = "Do not use 'local_action', use 'delegate_to: localhost'"
+    description = 'Do not use ``local_action``, use ``delegate_to: localhost``'
     tags = ['task']
 
     def match(self, file, text):

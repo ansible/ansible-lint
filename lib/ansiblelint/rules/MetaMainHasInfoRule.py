@@ -14,7 +14,9 @@ class MetaMainHasInfoRule(AnsibleLintRule):
         'min_ansible_version',
         'platforms',
     ]
-    description = 'meta/main.yml should contain: ' + ', '.join(info)
+    description = (
+        'meta/main.yml should contain: ``{}``'.format(', '.join(info))
+    )
     tags = ['metadata']
 
     def matchplay(self, file, data):
