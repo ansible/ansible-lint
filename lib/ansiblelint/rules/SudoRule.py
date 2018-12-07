@@ -4,8 +4,9 @@ from ansiblelint import AnsibleLintRule
 class SudoRule(AnsibleLintRule):
     id = '103'
     shortdesc = 'Deprecated sudo'
-    description = 'Instead of sudo/sudo_user, use become/become_user.'
+    description = 'Instead of ``sudo``/``sudo_user``, use ``become``/``become_user``.'
     tags = ['deprecated', 'ANSIBLE0008']
+    version_added = 'historic'
 
     def _check_value(self, play_frag):
         results = []
@@ -13,10 +14,10 @@ class SudoRule(AnsibleLintRule):
         if isinstance(play_frag, dict):
             if 'sudo' in play_frag:
                 results.append(({'sudo': play_frag['sudo']},
-                                'deprecated sudo feature'))
+                                'Deprecated sudo feature'))
             if 'sudo_user' in play_frag:
                 results.append(({'sudo_user': play_frag['sudo_user']},
-                                'deprecated sudo_user feature'))
+                                'Deprecated sudo_user feature'))
             if 'tasks' in play_frag:
                 output = self._check_value(play_frag['tasks'])
                 if output:

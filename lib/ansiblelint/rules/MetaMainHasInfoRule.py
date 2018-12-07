@@ -14,8 +14,11 @@ class MetaMainHasInfoRule(AnsibleLintRule):
         'min_ansible_version',
         'platforms',
     ]
-    description = 'meta/main.yml should contain: ' + ', '.join(info)
+    description = (
+        'meta/main.yml should contain: ``{}``'.format(', '.join(info))
+    )
     tags = ['metadata']
+    version_added = 'v4.0.0'
 
     def matchplay(self, file, data):
         if file['type'] != 'meta':

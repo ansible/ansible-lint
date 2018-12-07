@@ -230,3 +230,12 @@ autoclass_content = 'both'
 intersphinx_mapping = {'python': ('https://docs.python.org/2/', (None, '../python2-2.7.13.inv')),
                        'python3': ('https://docs.python.org/3/', (None, '../python3-3.6.2.inv')),
                        'jinja2': ('http://jinja.pocoo.org/docs/', (None, '../jinja2-2.9.7.inv'))}
+
+
+# table width fix via: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
+html_static_path = ['_static']
+html_context = {
+    'css_files': [
+        '_static/theme_overrides.css',  # override wide tables in RTD theme
+        ],
+     }

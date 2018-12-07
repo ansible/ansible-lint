@@ -29,10 +29,13 @@ def unjinja(text):
 class UseCommandInsteadOfShellRule(AnsibleLintRule):
     id = '305'
     shortdesc = 'Use shell only when shell functionality is required'
-    description = 'Shell should only be used when piping, redirecting ' \
-                  'or chaining commands (and Ansible would be preferred ' \
-                  'for some of those!)'
+    description = (
+        'Shell should only be used when piping, redirecting '
+        'or chaining commands (and Ansible would be preferred '
+        'for some of those!)'
+    )
     tags = ['command-shell', 'safety', 'ANSIBLE0013']
+    version_added = 'historic'
 
     def matchtask(self, file, task):
         # Use unjinja so that we don't match on jinja filters

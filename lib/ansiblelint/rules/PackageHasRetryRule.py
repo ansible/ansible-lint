@@ -7,11 +7,15 @@ from ansiblelint import AnsibleLintRule
 class PackageHasRetryRule(AnsibleLintRule):
     id = '405'
     shortdesc = 'Remote package tasks should have a retry'
-    description = ('Package operations are unreliable as they require'
-                   'network communication and the availability of remote'
-                   'servers. To mitigate the potential problems, retries '
-                   'should be used.')
+    description = (
+        'Package operations are unreliable as they require '
+        'network communication and the availability of remote '
+        'servers. To mitigate the potential problems, retries '
+        'should be used via '
+        '``register: my_result`` and ``until: my_result | success``'
+    )
     tags = ['module', 'reliability']
+    version_added = 'v4.0.0'
 
     # module list generated with:
     # find lib/ansible/modules/packaging/ -type f -printf '%f\n' \

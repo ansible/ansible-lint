@@ -7,9 +7,10 @@ import re
 
 class VariableHasSpacesRule(AnsibleLintRule):
     id = '206'
-    shortdesc = 'Variables should have spaces after {{ and before }}'
-    description = 'Variables should be of the form {{ varname }}'
+    shortdesc = 'Variables should have spaces before and after: {{ var_name }}'
+    description = 'Variables should have spaces before and after: ``{{ var_name }}``'
     tags = ['formatting']
+    version_added = 'v4.0.0'
 
     bracket_regex = re.compile("{{[^{ ]|[^ }]}}")
 

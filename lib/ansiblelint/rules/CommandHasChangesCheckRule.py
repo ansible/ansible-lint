@@ -24,11 +24,14 @@ from ansiblelint import AnsibleLintRule
 class CommandHasChangesCheckRule(AnsibleLintRule):
     id = '301'
     shortdesc = 'Commands should not change things if nothing needs doing'
-    description = 'Commands should either read information (and thus set ' \
-                  'changed_when) or not do something if it has already been ' \
-                  'done (using creates/removes) or only do it if another ' \
-                  'check has a particular result (when)'
+    description = (
+        'Commands should either read information (and thus set '
+        '``changed_when``) or not do something if it has already been '
+        'done (using creates/removes) or only do it if another '
+        'check has a particular result (``when``)'
+    )
     tags = ['command-shell', 'idempotency', 'ANSIBLE0012']
+    version_added = 'historic'
 
     _commands = ['command', 'shell', 'raw']
 

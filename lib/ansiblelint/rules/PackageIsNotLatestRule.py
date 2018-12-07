@@ -24,9 +24,12 @@ from ansiblelint import AnsibleLintRule
 class PackageIsNotLatestRule(AnsibleLintRule):
     id = '403'
     shortdesc = 'Package installs should not use latest'
-    description = 'Package installs should use state=present ' + \
-                  'with or without a version'
+    description = (
+        'Package installs should use ``state=present`` '
+        'with or without a version'
+    )
     tags = ['module', 'repeatability', 'ANSIBLE0010']
+    version_added = 'historic'
 
     _package_managers = [
         'apk',

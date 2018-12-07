@@ -22,17 +22,26 @@ The table below shows the the default rules used by Ansible Lint to evaluate pla
 
 
 def main():
+    id_link = ('`E{} <https://github.com/ansible/ansible-lint/blob/'
+               'master/lib/ansiblelint/rules/{}.py>`_')
+
     import_all_rules()
     all_rules = get_serialized_rules()
 
-    grid = [['ID', 'Description']]
+    grid = [['ID', 'Version Added', 'Sample Message', 'Description']]
     for d in all_rules:
         if d['id'].endswith('01'):
             if not d['id'].endswith('101'):
-                grid.append(['', ''])
-            grid.append(['**E{}**'.format(d['id'][-3:-2]),
-                         '*{}*'.format(d['first_tag'])])
-        grid.append(['E{}'.format(d['id']), d['shortdesc']])
+                grid.append(['', '', '', ''])
+            grid.append([
+                '**E{}xx - {}**'.format(d['id'][-3:-2], d['first_tag']),
+                '',
+                '',
+                # '**{}**'.format(d['first_tag']),
+                '',
+            ])
+        id_text = id_link.format(d['id'], d['classname'])
+        grid.append([id_text, d['version_added'], d['shortdesc'], d['description']])
 
     filename = '../../docs/docsite/rst/rules/default_rules.rst'
     with open(filename, 'w') as file:
@@ -58,7 +67,14 @@ def get_serialized_rules():
 
     all_rules = []
     for c in class_list:
-        d = {'id': c.id, 'shortdesc': c.shortdesc, 'first_tag': c.tags[0]}
+        d = {
+            'id': c.id,
+            'shortdesc': c.shortdesc,
+            'description': c.description,
+            'first_tag': c.tags[0],
+            'classname': c.__name__,
+            'version_added': c.version_added,
+        }
         all_rules.append(d)
     all_rules = sorted(all_rules, key=lambda k: k['id'])
     return all_rules

@@ -6,12 +6,15 @@ from ansiblelint import AnsibleLintRule
 class DeprecatedModuleRule(AnsibleLintRule):
     id = '105'
     shortdesc = 'Deprecated module'
-    description = """These are deprecated modules, some modules are
-    kept temporarily for backwards compatibility but usage is discouraged.
-    For more details see:
-     https://docs.ansible.com/ansible/latest/modules/list_of_all_modules.html
-    """
+    description = (
+        'These are deprecated modules, some modules are kept '
+        'temporarily for backwards compatibility but usage is discouraged. '
+        'For more details see: '
+        'https://docs.ansible.com/ansible/latest/modules/list_of_all_modules.html'
+    )
+
     tags = ['deprecated']
+    version_added = 'v4.0.0'
 
     _modules = [
         'accelerate', 'aos_asn_pool', 'aos_blueprint', 'aos_blueprint_param',
