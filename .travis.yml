@@ -82,7 +82,11 @@ jobs:
     language: python
     python: "3.6"
     env:
+      SETUPTOOLS_SCM_PRETEND_VERSION: >
+        $(python -c 'import setuptools_scm; print(setuptools_scm.get_version(local_scheme=lambda v: ""))')
       TOXENV: metadata-validation
+    before_deploy:
+    - echo Dist version is going to be "$SETUPTOOLS_SCM_PRETEND_VERSION"
     deploy: &deploy-step
       provider: pypi
       user: ansible-lint
