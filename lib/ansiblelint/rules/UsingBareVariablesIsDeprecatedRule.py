@@ -32,6 +32,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
         'syntax ``{{ your_variable }}``'
     )
     tags = ['deprecated', 'formatting', 'ANSIBLE0015']
+    version_added = 'historic'
 
     _jinja = re.compile(r"{{.*}}")
     _glob = re.compile('[][*?]')

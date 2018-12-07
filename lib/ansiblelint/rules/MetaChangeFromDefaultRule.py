@@ -18,6 +18,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         )
     )
     tags = ['metadata']
+    version_added = 'v4.0.0'
 
     def matchplay(self, file, data):
         if file['type'] != 'meta':

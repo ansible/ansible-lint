@@ -15,6 +15,7 @@ class PackageHasRetryRule(AnsibleLintRule):
         '``register: my_result`` and ``until: my_result | success``'
     )
     tags = ['module', 'reliability']
+    version_added = 'v4.0.0'
 
     # module list generated with:
     # find lib/ansible/modules/packaging/ -type f -printf '%f\n' \

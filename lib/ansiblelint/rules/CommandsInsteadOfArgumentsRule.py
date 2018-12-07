@@ -42,6 +42,7 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
         'is generally a bad idea'
     )
     tags = ['command-shell', 'resources', 'ANSIBLE0007']
+    version_added = 'historic'
 
     _commands = ['command', 'shell', 'raw']
     _arguments = {'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group',

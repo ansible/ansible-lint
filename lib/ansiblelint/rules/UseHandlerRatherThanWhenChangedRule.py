@@ -36,6 +36,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         'acting as a handler'
     )
     tags = ['task', 'behaviour', 'ANSIBLE0016']
+    version_added = 'historic'
 
     def matchtask(self, file, task):
         if task["__ansible_action_type__"] == 'task':

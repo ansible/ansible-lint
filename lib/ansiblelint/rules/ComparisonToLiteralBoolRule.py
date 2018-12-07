@@ -13,6 +13,8 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
         '(or conversely ``when: not var``)'
     )
     tags = ['idiom']
+    version_added = 'v4.0.0'
+
     literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
 
     def match(self, file, line):

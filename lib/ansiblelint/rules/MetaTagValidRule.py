@@ -12,6 +12,7 @@ class MetaTagValidRule(AnsibleLintRule):
         'and ``galaxy_tags`` is expected to be a list'
     )
     tags = ['metadata']
+    version_added = 'v4.0.0'
 
     TAG_REGEXP = re.compile('^[a-z0-9]+$')
 

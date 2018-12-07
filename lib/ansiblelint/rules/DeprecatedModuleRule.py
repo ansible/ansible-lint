@@ -14,6 +14,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
     )
 
     tags = ['deprecated']
+    version_added = 'v4.0.0'
 
     _modules = [
         'accelerate', 'aos_asn_pool', 'aos_blueprint', 'aos_blueprint_param',

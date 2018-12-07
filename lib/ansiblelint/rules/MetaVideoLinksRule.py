@@ -14,6 +14,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
         'and have a shared link from a supported provider'
     )
     tags = ['metadata']
+    version_added = 'v4.0.0'
 
     VIDEO_REGEXP = {
         'google': re.compile(

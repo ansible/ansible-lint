@@ -28,15 +28,20 @@ def main():
     import_all_rules()
     all_rules = get_serialized_rules()
 
-    grid = [['ID', 'Sample Message', 'Description']]
+    grid = [['ID', 'Version Added', 'Sample Message', 'Description']]
     for d in all_rules:
         if d['id'].endswith('01'):
             if not d['id'].endswith('101'):
-                grid.append(['', ''])
-            grid.append(['**E{}xx**'.format(d['id'][-3:-2]),
-                         '**{}**'.format(d['first_tag'])])
+                grid.append(['', '', '', ''])
+            grid.append([
+                '**E{}xx - {}**'.format(d['id'][-3:-2], d['first_tag']),
+                '',
+                '',
+                # '**{}**'.format(d['first_tag']),
+                '',
+            ])
         id_text = id_link.format(d['id'], d['classname'])
-        grid.append([id_text, d['shortdesc'], d['description']])
+        grid.append([id_text, d['version_added'], d['shortdesc'], d['description']])
 
     filename = '../../docs/docsite/rst/rules/default_rules.rst'
     with open(filename, 'w') as file:
@@ -68,6 +73,7 @@ def get_serialized_rules():
             'description': c.description,
             'first_tag': c.tags[0],
             'classname': c.__name__,
+            'version_added': c.version_added,
         }
         all_rules.append(d)
     all_rules = sorted(all_rules, key=lambda k: k['id'])

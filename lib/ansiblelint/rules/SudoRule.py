@@ -6,6 +6,7 @@ class SudoRule(AnsibleLintRule):
     shortdesc = 'Deprecated sudo'
     description = 'Instead of ``sudo``/``sudo_user``, use ``become``/``become_user``.'
     tags = ['deprecated', 'ANSIBLE0008']
+    version_added = 'historic'
 
     def _check_value(self, play_frag):
         results = []

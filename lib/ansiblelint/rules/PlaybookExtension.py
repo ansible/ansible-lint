@@ -12,6 +12,7 @@ class PlaybookExtension(AnsibleLintRule):
     description = 'Playbooks should have the ".yml" or ".yaml" extension'
     tags = ['formatting']
     done = []  # already noticed path list
+    version_added = 'v4.0.0'
 
     def match(self, file, text):
         if file['type'] != 'playbook':

@@ -30,6 +30,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
         'through environment argument'
     )
     tags = ['command-shell', 'bug', 'ANSIBLE0014']
+    version_added = 'historic'
 
     expected_args = ['chdir', 'creates', 'executable', 'removes', 'stdin', 'warn',
                      'cmd', '__ansible_module__', '__ansible_arguments__',

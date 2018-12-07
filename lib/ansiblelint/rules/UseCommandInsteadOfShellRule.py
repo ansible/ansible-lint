@@ -35,6 +35,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
         'for some of those!)'
     )
     tags = ['command-shell', 'safety', 'ANSIBLE0013']
+    version_added = 'historic'
 
     def matchtask(self, file, task):
         # Use unjinja so that we don't match on jinja filters

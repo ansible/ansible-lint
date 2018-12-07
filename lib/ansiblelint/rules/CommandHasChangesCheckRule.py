@@ -31,6 +31,7 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
         'check has a particular result (``when``)'
     )
     tags = ['command-shell', 'idempotency', 'ANSIBLE0012']
+    version_added = 'historic'
 
     _commands = ['command', 'shell', 'raw']
 

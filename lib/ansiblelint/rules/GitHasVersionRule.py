@@ -29,6 +29,7 @@ class GitHasVersionRule(AnsibleLintRule):
         'an explicit commit or tag, not just ``latest``'
     )
     tags = ['module', 'repeatability', 'ANSIBLE0004']
+    version_added = 'historic'
 
     def matchtask(self, file, task):
         return (task['action']['__ansible_module__'] == 'git' and

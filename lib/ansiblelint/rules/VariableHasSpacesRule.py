@@ -10,6 +10,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     shortdesc = 'Variables should have spaces before and after: {{ var_name }}'
     description = 'Variables should have spaces before and after: ``{{ var_name }}``'
     tags = ['formatting']
+    version_added = 'v4.0.0'
 
     bracket_regex = re.compile("{{[^{ ]|[^ }]}}")
 

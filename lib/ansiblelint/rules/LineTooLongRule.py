@@ -12,6 +12,7 @@ class LineTooLongRule(AnsibleLintRule):
         'code review more difficult'
     )
     tags = ['formatting']
+    version_added = 'v4.0.0'
 
     def match(self, file, line):
         return len(line) > 120

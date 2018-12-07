@@ -13,6 +13,8 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
         'conversely ``when: not var`` rather than ``when: var == ""``)'
     )
     tags = ['idiom']
+    version_added = 'v4.0.0'
+
     empty_string_compare = re.compile("[=!]= ?[\"'][\"']")
 
     def match(self, file, line):

@@ -29,6 +29,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
         'with or without a version'
     )
     tags = ['module', 'repeatability', 'ANSIBLE0010']
+    version_added = 'historic'
 
     _package_managers = [
         'apk',

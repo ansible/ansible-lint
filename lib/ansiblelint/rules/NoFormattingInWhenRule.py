@@ -11,6 +11,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
     shortdesc = 'No Jinja2 in when'
     description = '``when`` lines should not include Jinja2 variables'
     tags = ['deprecated', 'ANSIBLE0019']
+    version_added = 'historic'
 
     def _is_valid(self, when):
         if not isinstance(when, StringTypes):
