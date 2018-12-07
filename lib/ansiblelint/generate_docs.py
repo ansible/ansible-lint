@@ -22,7 +22,8 @@ The table below shows the the default rules used by Ansible Lint to evaluate pla
 
 
 def main():
-    id_link = '`E{} <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/{}.py>`_'
+    id_link = ('`E{} <https://github.com/ansible/ansible-lint/blob/'
+               'master/lib/ansiblelint/rules/{}.py>`_')
 
     import_all_rules()
     all_rules = get_serialized_rules()
