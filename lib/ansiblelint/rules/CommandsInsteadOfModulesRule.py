@@ -65,6 +65,8 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'wget': 'get_url or uri',
         'yum': 'yum',
     }
+    _system_bins = ['/bin', '/usr/bin', '/sbin', '/usr/sbin',
+                    '/usr/local/bin', '/usr/local/sbin', '']
 
     def matchtask(self, file, task):
         if task['action']['__ansible_module__'] not in self._commands:
@@ -78,7 +80,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             return
 
         executable = os.path.basename(first_cmd_arg)
+        path_folder = os.path.split(first_cmd_arg)[0]
         if executable in self._modules and \
-                boolean(task['action'].get('warn', True)):
+                boolean(task['action'].get('warn', True)) and \
+                path_folder in self._system_bins:
             message = '{0} used in place of {1} module'
             return message.format(executable, self._modules[executable])
