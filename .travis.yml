@@ -87,6 +87,7 @@ jobs:
     - pip install setuptools-scm
     - >
         python -c 'import setuptools_scm; print(setuptools_scm.get_version(local_scheme=lambda v: ""))' | read SETUPTOOLS_SCM_PRETEND_VERSION
+    - export SETUPTOOLS_SCM_PRETEND_VERSION
     before_deploy:
     - echo Dist version is going to be "$SETUPTOOLS_SCM_PRETEND_VERSION"
     deploy: &deploy-step
