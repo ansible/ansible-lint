@@ -33,8 +33,8 @@ def main():
         if d['id'].endswith('01'):
             if not d['id'].endswith('101'):
                 grid.append(['', ''])
-            grid.append(['**E{}**'.format(d['id'][-3:-2]),
-                         '*{}*'.format(d['first_tag'])])
+            grid.append(['**E{}xx**'.format(d['id'][-3:-2]),
+                         '**{}**'.format(d['first_tag'])])
         id_text = id_link.format(d['id'], d['classname'])
         grid.append([id_text, d['shortdesc'], d['description']])
 
