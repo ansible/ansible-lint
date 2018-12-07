@@ -151,7 +151,7 @@
           {% block sidebartitle %}
 
           <div style="background-color:#5bbdbf;height=80px;margin:'auto auto auto auto'">
-            <a class="DocSiteProduct-header DocSiteProduct-header--core" href="/docs/">
+            <a class="DocSiteProduct-header DocSiteProduct-header--core" href="{{ pathto(master_doc) }}">
               <div class="DocSiteProduct-productName">
                 <div class="DocSiteProduct-logoText">
                   Ansible Lint
@@ -171,7 +171,7 @@
           </div>
 
 
-          {% endblock %}
+          {% endblock %}{{ pathto(master_doc) }}
         </div>
 
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
