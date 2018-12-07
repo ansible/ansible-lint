@@ -84,6 +84,7 @@ jobs:
     env:
       TOXENV: metadata-validation
     before_install:
+    - pip install setuptools-scm
     - >
         python -c 'import setuptools_scm; print(setuptools_scm.get_version(local_scheme=lambda v: ""))' | read SETUPTOOLS_SCM_PRETEND_VERSION
     before_deploy:
