@@ -81,8 +81,7 @@ jobs:
     if: tag IS present
     language: python
     python: "3.6"
-    env:
-      PYPI_UPLOAD: true
+    env: &deploy-env
       TOXENV: metadata-validation
     deploy: &deploy-step
       provider: pypi
@@ -98,6 +97,9 @@ jobs:
   - <<: *deploy-job
     if: type != pull_request AND tag IS NOT present  # Always run, except if PR or tagged commit
     name: Publishing current (unstable) Git revision of dist to Test PyPI
+    env:
+      <<: *deploy-env
+      PYPI_UPLOAD: true
     deploy:
       <<: *deploy-step
       server: https://test.pypi.org/legacy/
