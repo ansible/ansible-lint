@@ -4,55 +4,46 @@ sudo: required
 git:
   depth: 100
 
+language: python
+
 jobs:
   fast_finish: true
 
   include:
-  - language: python
-    python: "2.7"
+  - python: "2.7"
     env: TOXENV=py27-flake8
 
-  - language: python
-    python: "2.7"
+  - python: "2.7"
     env: TOXENV=py27-ansible25
 
-  - language: python
-    python: "2.7"
+  - python: "2.7"
     env: TOXENV=py27-ansible26
 
-  - language: python
-    python: "2.7"
+  - python: "2.7"
     env: TOXENV=py27-ansible27
 
-  - language: python
-    python: "2.7"
+  - python: "2.7"
     env: TOXENV=py27-ansibledevel
 
-  - language: python
-    python: "3.6"
+  - python: "3.6"
     env: TOXENV=py36-ansible25
 
-  - language: python
-    python: "3.6"
+  - python: "3.6"
     env: TOXENV=py36-ansible26
 
-  - language: python
-    python: "3.6"
+  - python: "3.6"
     env: TOXENV=py36-ansible27
 
-  - language: python
-    python: "3.6"
+  - python: "3.6"
     env: TOXENV=py36-ansibledevel
 
-  - language: python
-    python: "3.6"
+  - python: "3.6"
     env: TOXENV=py36-flake8
 
   - &deploy-job
     stage: Deploy
     name: Publishing current Git tagged version of dist to PyPI
     if: repo == "ansible/ansible-lint" AND tag IS present
-    language: python
     python: "3.6"
     env: &deploy-env
       TOXENV: metadata-validation
