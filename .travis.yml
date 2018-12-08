@@ -1,6 +1,5 @@
 conditions: v1
 dist: xenial
-sudo: required
 
 git:
   depth: 100
