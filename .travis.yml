@@ -1,15 +1,8 @@
-# Based on https://github.com/pantsbuild/pex/blob/master/.travis.yml
-#
-# Enables support for a docker container-based build
-# which should provide faster startup times and beefier
-# "machines".
-# See: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
-sudo: false
+dist: xenial
+sudo: required
 
 git:
   depth: 100
-
-# TRAVIS_PYTHON_VERSION
 
 jobs:
   fast_finish: true
