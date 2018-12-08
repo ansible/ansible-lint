@@ -75,7 +75,7 @@ jobs:
         all_branches: true
 
   - <<: *deploy-job
-    if: fork == false and type IN (cron, pull_request)  # Always run, except if PR or cron
+    if: fork == false and type NOT IN (cron, pull_request)  # Always run, except if PR or cron
     name: Publishing current (unstable) Git revision of dist to Test PyPI
     env:
       <<: *deploy-env
