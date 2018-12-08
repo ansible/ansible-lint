@@ -15,25 +15,25 @@ jobs:
       TOXENV: flake8
 
   - python: "3.6"
-    env: TOXENV=py36-ansible25
+    env: TOXENV=py36-ansible27
+
+  - python: "2.7"
+    env: TOXENV=py27-ansible27
 
   - python: "3.6"
     env: TOXENV=py36-ansible26
 
-  - python: "3.6"
-    env: TOXENV=py36-ansible27
+  - python: "2.7"
+    env: TOXENV=py27-ansible26
 
   - python: "3.6"
-    env: TOXENV=py36-ansibledevel
+    env: TOXENV=py36-ansible25
 
   - python: "2.7"
     env: TOXENV=py27-ansible25
 
-  - python: "2.7"
-    env: TOXENV=py27-ansible26
-
-  - python: "2.7"
-    env: TOXENV=py27-ansible27
+  - python: "3.6"
+    env: TOXENV=py36-ansibledevel
 
   - python: "2.7"
     env: TOXENV=py27-ansibledevel
