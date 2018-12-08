@@ -58,7 +58,7 @@ jobs:
   - &deploy-job
     stage: Deploy
     name: Publishing current Git tagged version of dist to PyPI
-    if: fork IS NOT present and tag IS present
+    if: fork = false and tag IS present
     language: python
     python: "3.6"
     env: &deploy-env
@@ -75,7 +75,7 @@ jobs:
         all_branches: true
 
   - <<: *deploy-job
-    if: fork IS NOT present and type NOT IN (cron, pull_request)  # Always run, except if PR or cron
+    if: fork = false and type NOT IN (cron, pull_request)  # Always run, except if PR or cron
     name: Publishing current (unstable) Git revision of dist to Test PyPI
     env:
       <<: *deploy-env
