@@ -73,7 +73,7 @@ jobs:
     stage: Deploy
     name: Publishing current Git tagged version of dist to PyPI
     if: repo == "ansible/ansible-lint" AND tag IS present
-    python: "3.6"
+    python: "3.7"
     env: &deploy-env
       TOXENV: metadata-validation
     deploy: &deploy-step
