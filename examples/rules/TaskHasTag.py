@@ -12,7 +12,7 @@ class TaskHasTag(AnsibleLintRule):
         if file['type'] in ["meta", "playbooks"]:
             return False
 
-        if isinstance(task, basestring):
+        if isinstance(task, str):
             return False
 
         # If the task include another task or make the playbook fail
