@@ -17,59 +17,75 @@ language: python
 .mixtures:  # is not used by Travis CI, but helps avoid duplication
 - &if-cron-or-manual-run-or-tagged
   if: type IN (cron, api) OR tag IS present
+- &reset-prerequisites
+  before_install: []
 
 jobs:
   fast_finish: true
 
   include:
   - python: "3.7"
+    <<: *reset-prerequisites
     name: Running flake8 linting checks
     env:
       TOXENV: flake8
 
   - python: "3.7"
-    env: TOXENV=py36-ansible27
+    env:
+      ANSIBLE_VERSION: "27"
 
   - python: "3.6"
     <<: *if-cron-or-manual-run-or-tagged
-    env: TOXENV=py36-ansible27
+    env:
+      ANSIBLE_VERSION: "27"
 
   - python: "2.7"
-    env: TOXENV=py27-ansible27
+    env:
+      ANSIBLE_VERSION: "27"
 
   - python: "3.7"
-    env: TOXENV=py36-ansible26
+    env:
+      ANSIBLE_VERSION: "26"
 
   - python: "3.6"
     <<: *if-cron-or-manual-run-or-tagged
-    env: TOXENV=py36-ansible26
+    env:
+      ANSIBLE_VERSION: "26"
 
   - python: "2.7"
-    env: TOXENV=py27-ansible26
+    env:
+      ANSIBLE_VERSION: "26"
 
   - python: "3.7"
-    env: TOXENV=py36-ansible25
+    env:
+      ANSIBLE_VERSION: "25"
 
   - python: "3.6"
     <<: *if-cron-or-manual-run-or-tagged
-    env: TOXENV=py36-ansible25
+    env:
+      ANSIBLE_VERSION: "25"
 
   - python: "2.7"
-    env: TOXENV=py27-ansible25
+    env:
+      ANSIBLE_VERSION: "25"
 
   - python: "3.7"
     <<: *if-cron-or-manual-run-or-tagged
-    env: TOXENV=py36-ansibledevel
+    env:
+      ANSIBLE_VERSION: devel
 
   - python: "3.6"
     <<: *if-cron-or-manual-run-or-tagged
-    env: TOXENV=py36-ansibledevel
+    env:
+      ANSIBLE_VERSION: devel
 
   - python: "2.7"
     <<: *if-cron-or-manual-run-or-tagged
-    env: TOXENV=py27-ansibledevel
+    env:
+      ANSIBLE_VERSION: devel
 
   - &deploy-job
+    <<: *reset-prerequisites
     stage: Deploy
     name: Publishing current Git tagged version of dist to PyPI
     if: repo == "ansible/ansible-lint" AND tag IS present
@@ -97,6 +113,12 @@ jobs:
       <<: *deploy-step
       server: https://test.pypi.org/legacy/
 
+env:
+  global:
+    TOXENV_TMPL: "'ansible${ANSIBLE_VERSION}'"
+
+before_install:
+- export TOXENV=$(echo $TOXENV_TMPL | envsubst)
 install:
 - pip install -U tox
 - tox --notest  # Pre-populate virtualenv
