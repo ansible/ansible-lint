@@ -29,6 +29,11 @@ jobs:
     name: Running flake8 linting checks
     env:
       TOXENV: flake8
+  - python: "3.7"
+    <<: *reset-prerequisites
+    name: Running docs building checks
+    env:
+      TOXENV: docs
 
   - python: "3.7"
     env:
