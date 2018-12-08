@@ -4,6 +4,14 @@ sudo: required
 git:
   depth: 100
 
+cache:
+  pip: true
+  directories:
+  - $HOME/.cache/pre-commit
+  - $HOME/.pre-commit
+  - $HOME/virtualenv/python$(python -c 'import platform; print(platform.python_version())')
+  - $HOME/Library/Caches/Homebrew
+
 language: python
 
 jobs:
