@@ -14,6 +14,10 @@ cache:
 
 language: python
 
+.mixtures:  # is not used by Travis CI, but helps avoid duplication
+- &if-cron-or-manual-run-or-tagged
+  if: type IN (cron, api) OR tag IS present
+
 jobs:
   fast_finish: true
 
@@ -27,6 +31,7 @@ jobs:
     env: TOXENV=py36-ansible27
 
   - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
     env: TOXENV=py36-ansible27
 
   - python: "2.7"
@@ -36,6 +41,7 @@ jobs:
     env: TOXENV=py36-ansible26
 
   - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
     env: TOXENV=py36-ansible26
 
   - python: "2.7"
@@ -45,18 +51,22 @@ jobs:
     env: TOXENV=py36-ansible25
 
   - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
     env: TOXENV=py36-ansible25
 
   - python: "2.7"
     env: TOXENV=py27-ansible25
 
   - python: "3.7"
+    <<: *if-cron-or-manual-run-or-tagged
     env: TOXENV=py36-ansibledevel
 
   - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
     env: TOXENV=py36-ansibledevel
 
   - python: "2.7"
+    <<: *if-cron-or-manual-run-or-tagged
     env: TOXENV=py27-ansibledevel
 
   - &deploy-job
