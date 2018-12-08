@@ -10,21 +10,6 @@ jobs:
   fast_finish: true
 
   include:
-  - python: "2.7"
-    env: TOXENV=py27-flake8
-
-  - python: "2.7"
-    env: TOXENV=py27-ansible25
-
-  - python: "2.7"
-    env: TOXENV=py27-ansible26
-
-  - python: "2.7"
-    env: TOXENV=py27-ansible27
-
-  - python: "2.7"
-    env: TOXENV=py27-ansibledevel
-
   - python: "3.6"
     env: TOXENV=py36-ansible25
 
@@ -39,6 +24,21 @@ jobs:
 
   - python: "3.6"
     env: TOXENV=py36-flake8
+
+  - python: "2.7"
+    env: TOXENV=py27-flake8
+
+  - python: "2.7"
+    env: TOXENV=py27-ansible25
+
+  - python: "2.7"
+    env: TOXENV=py27-ansible26
+
+  - python: "2.7"
+    env: TOXENV=py27-ansible27
+
+  - python: "2.7"
+    env: TOXENV=py27-ansibledevel
 
   - &deploy-job
     stage: Deploy
