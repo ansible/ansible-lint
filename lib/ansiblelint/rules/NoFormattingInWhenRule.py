@@ -10,6 +10,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
     id = '102'
     shortdesc = 'No Jinja2 in when'
     description = '``when`` lines should not include Jinja2 variables'
+    severity = 'HIGH'
     tags = ['deprecated', 'ANSIBLE0019']
     version_added = 'historic'
 

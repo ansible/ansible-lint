@@ -14,6 +14,7 @@ class PackageHasRetryRule(AnsibleLintRule):
         'should be used via '
         '``register: my_result`` and ``until: my_result | success``'
     )
+    severity = 'LOW'
     tags = ['module', 'reliability']
     version_added = 'v4.0.0'
 

@@ -28,6 +28,7 @@ class GitHasVersionRule(AnsibleLintRule):
         'All version control checkouts must point to '
         'an explicit commit or tag, not just ``latest``'
     )
+    severity = 'MEDIUM'
     tags = ['module', 'repeatability', 'ANSIBLE0004']
     version_added = 'historic'
 

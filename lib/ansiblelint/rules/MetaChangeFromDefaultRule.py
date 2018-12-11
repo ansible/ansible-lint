@@ -17,6 +17,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
             ', '.join([f[0] for f in field_defaults])
         )
     )
+    severity = 'HIGH'
     tags = ['metadata']
     version_added = 'v4.0.0'
 

@@ -28,6 +28,7 @@ class TaskHasNameRule(AnsibleLintRule):
         'All tasks should have a distinct name for readability '
         'and for ``--start-at-task`` to work'
     )
+    severity = 'MEDIUM'
     tags = ['task', 'readability', 'ANSIBLE0011']
     version_added = 'historic'
 

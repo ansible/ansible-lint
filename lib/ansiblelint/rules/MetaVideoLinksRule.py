@@ -13,6 +13,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
         'dictionaries, and contain only keys ``url`` and ``title``, '
         'and have a shared link from a supported provider'
     )
+    severity = 'LOW'
     tags = ['metadata']
     version_added = 'v4.0.0'
 

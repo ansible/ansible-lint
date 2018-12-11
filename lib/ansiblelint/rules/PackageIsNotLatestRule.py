@@ -28,6 +28,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
         'Package installs should use ``state=present`` '
         'with or without a version'
     )
+    severity = 'VERY_LOW'
     tags = ['module', 'repeatability', 'ANSIBLE0010']
     version_added = 'historic'
 

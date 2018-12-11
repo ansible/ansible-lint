@@ -34,6 +34,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
         'or chaining commands (and Ansible would be preferred '
         'for some of those!)'
     )
+    severity = 'HIGH'
     tags = ['command-shell', 'safety', 'ANSIBLE0013']
     version_added = 'historic'
 

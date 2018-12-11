@@ -29,6 +29,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
         'Environment variables should be passed to ``shell`` or ``command`` '
         'through environment argument'
     )
+    severity = 'VERY_HIGH'
     tags = ['command-shell', 'bug', 'ANSIBLE0014']
     version_added = 'historic'
 

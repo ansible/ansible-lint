@@ -30,6 +30,7 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
         'done (using creates/removes) or only do it if another '
         'check has a particular result (``when``)'
     )
+    severity = 'HIGH'
     tags = ['command-shell', 'idempotency', 'ANSIBLE0012']
     version_added = 'historic'
 

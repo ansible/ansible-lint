@@ -35,6 +35,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         'If a task has a ``when: result.changed`` setting, it is effectively '
         'acting as a handler'
     )
+    severity = 'MEDIUM'
     tags = ['task', 'behaviour', 'ANSIBLE0016']
     version_added = 'historic'
 

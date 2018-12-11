@@ -28,6 +28,7 @@ class MercurialHasRevisionRule(AnsibleLintRule):
         'All version control checkouts must point to '
         'an explicit commit or tag, not just ``latest``'
     )
+    severity = 'MEDIUM'
     tags = ['module', 'repeatability', 'ANSIBLE0005']
     version_added = 'historic'
 
