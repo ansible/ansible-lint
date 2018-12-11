@@ -217,11 +217,11 @@ Included in ``ansible-lint/examples`` are some example playbooks with undesirabl
 
     [ANSIBLE0002] Trailing whitespace
     examples/example.yml:13
-        action: do nothing
+        action: do nothing   
 
     [ANSIBLE0002] Trailing whitespace
     examples/example.yml:35
-        with_items:
+        with_items: 
 
     [ANSIBLE0006] git used in place of git module
     examples/example.yml:24
