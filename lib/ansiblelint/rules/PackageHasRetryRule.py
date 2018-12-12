@@ -86,21 +86,27 @@ class PackageHasRetryRule(AnsibleLintRule):
     def matchtask(self, file, task):
         module = task["action"]["__ansible_module__"]
 
-        if module not in self._package_modules or 'until' in task:
+        if module not in self._package_modules:
             return False
 
-        if task['action'].get('state') in self._module_ignore_states:
+        is_task_retryable = 'until' in task
+        if is_task_retryable:
             return False
 
+        is_state_whitelisted = task['action'].get('state') in self._module_ignore_states
+        if is_state_whitelisted:
+            return False
+
+        # attempt to check if this is a local package file
         for key in self._package_name_keys:
-            package_name = task['action'].get(key)
-            if package_name:
+            found_package_name = task['action'].get(key)
+            if found_package_name:
                 break
-            package_name = ''
-        is_package_file = '.' in package_name
-        is_package_html = '://' in package_name
-        is_local_package_file = is_package_file and not is_package_html
-        if is_local_package_file:
-            return False
+        if found_package_name:
+            is_package_file = '.' in found_package_name
+            is_package_html = '://' in found_package_name
+            is_local_package_file = is_package_file and not is_package_html
+            if is_local_package_file:
+                return False
 
         return True
