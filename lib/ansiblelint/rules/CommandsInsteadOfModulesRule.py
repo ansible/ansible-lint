@@ -52,6 +52,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'curl': 'get_url or uri',
         'git': 'git',
         'hg': 'hg',
+        'mktemp': 'tempfile',
         'mount': 'mount',
         'patch': 'patch',
         'rpm': 'yum or rpm_key',
