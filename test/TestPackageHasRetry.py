@@ -13,6 +13,11 @@ SUCCESS = '''
         pkg: foo
       register: result
       until: result|success
+
+    - name: remove software
+      package:
+        name: some_package
+        state: absent
 '''
 
 FAILURE = '''

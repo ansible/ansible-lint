@@ -23,7 +23,7 @@ class PackageHasRetryRule(AnsibleLintRule):
     #   | sort | awk -F '/' \
     #   '/__|dpkg|_repo|_facts|_sub|_chan/{next} {split($NF, words, ".");
     #   print "\""words[1]"\","}'
-    package_modules = [
+    _package_modules = [
         "apk",
         "apt_key",
         "apt",
@@ -72,6 +72,16 @@ class PackageHasRetryRule(AnsibleLintRule):
         "zypper",
     ]
 
+    _module_ignore_states = [
+        "absent",
+    ]
+
     def matchtask(self, file, task):
-        return (task['action']['__ansible_module__'] in self.package_modules
-                and 'until' not in task)
+        module = task["action"]["__ansible_module__"]
+        if module in self._package_modules:
+            if 'until' not in task:
+                # Exclude tasks where state is `absent`.
+                if task['action'].get('state') not in self._module_ignore_states:
+                    message = '{0} {1}'
+                    return message.format(self.shortdesc, module)
+                return False
