@@ -76,12 +76,31 @@ class PackageHasRetryRule(AnsibleLintRule):
         "absent",
     ]
 
+    _package_name_keys = [
+        "name",
+        "package",
+        "pkg",
+        "deb",
+    ]
+
     def matchtask(self, file, task):
         module = task["action"]["__ansible_module__"]
-        if module in self._package_modules:
-            if 'until' not in task:
-                # Exclude tasks where state is `absent`.
-                if task['action'].get('state') not in self._module_ignore_states:
-                    message = '{0} {1}'
-                    return message.format(self.shortdesc, module)
-                return False
+
+        if module not in self._package_modules or 'until' in task:
+            return False
+
+        if task['action'].get('state') in self._module_ignore_states:
+            return False
+
+        for key in self._package_name_keys:
+            package_name = task['action'].get(key)
+            if package_name:
+                break
+            package_name = ''
+        is_package_file = '.' in package_name
+        is_package_html = '://' in package_name
+        is_local_package_file = is_package_file and not is_package_html
+        if is_local_package_file:
+            return False
+
+        return True
