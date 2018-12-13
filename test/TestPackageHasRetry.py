@@ -18,6 +18,21 @@ SUCCESS = '''
       package:
         name: some_package
         state: absent
+
+    - name: Install from file - remote
+      apt:
+        deb: https://example.com/python-ppq_0.1-1_all.deb
+        state: present
+      until: result.rc == 0
+
+    - name: Install a .deb package
+      apt:
+        deb: /tmp/mypackage.deb
+
+    - name: install software from a local source
+      package:
+        name: "/tmp/some_package.rpm"
+        state: present
 '''
 
 FAILURE = '''
@@ -26,10 +41,14 @@ FAILURE = '''
   tasks:
     - name: "Package has retry test failure"
       apt:
-        pkg: foo
+        package: foo
     - name: "Package has retry test failure"
       macports:
         pkg: foo
+    - name: Install from file - remote
+      apt:
+        deb: https://example.com/python-ppq_0.1-1_all.deb
+        state: present
 '''
 
 
@@ -46,4 +65,4 @@ class TestPackageHasRetry(unittest.TestCase):
 
     def test_file_negative(self):
         results = self.runner.run_playbook(FAILURE)
-        self.assertEqual(2, len(results))
+        self.assertEqual(3, len(results))
