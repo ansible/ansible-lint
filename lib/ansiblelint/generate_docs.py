@@ -10,9 +10,8 @@ from functools import reduce
 DOC_HEADER = """
 .. _lint_default_rules:
 
-*************
 Default Rules
-*************
+=============
 
 .. contents:: Topics
 
