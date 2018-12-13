@@ -1,9 +1,8 @@
 
 .. _lint_default_rules:
 
-*************
 Default Rules
-*************
+=============
 
 .. contents:: Topics
 
