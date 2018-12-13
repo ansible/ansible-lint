@@ -281,8 +281,8 @@ The following values are supported, and function identically to their CLI counte
     verbosity: 1
 
 
-Pre-commit
-----------
+Pre-commit Setup
+----------------
 
 To use ansible-lint with `pre-commit`_, just add the following to your local repo's ``.pre-commit-config.yaml`` file. Make sure to change **sha:** to be either a git commit sha or tag of ansible-lint containing ``hooks.yaml``.
 
@@ -446,8 +446,6 @@ In ansible-lint 2.0.0, *task['action']['args']* was renamed *task['action']['mod
 In ansible-lint 3.0.0 *task['action']['module']* was renamed *task['action']['__ansible_module__']* to avoid a clash when a module take module as an argument. As a precaution, *task['action']['module_arguments']* was renamed *task['action']['__ansible_arguments__']*.
 
 .. rules-docs-inclusion-marker-end-do-not-remove
-
-.. include:: docs/docsite/rst/rules/default_rules.rst
 
 Contributing
 ============
