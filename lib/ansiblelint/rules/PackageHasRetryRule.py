@@ -83,6 +83,14 @@ class PackageHasRetryRule(AnsibleLintRule):
         "deb",
     ]
 
+    # attempt to find package name
+    def get_package_name(self, action):
+        for key in self._package_name_keys:
+            found_package_name = action.get(key)
+            if found_package_name:
+                break
+        return found_package_name
+
     def matchtask(self, file, task):
         module = task["action"]["__ansible_module__"]
 
@@ -97,16 +105,14 @@ class PackageHasRetryRule(AnsibleLintRule):
         if is_state_whitelisted:
             return False
 
-        # attempt to check if this is a local package file
-        for key in self._package_name_keys:
-            found_package_name = task['action'].get(key)
-            if found_package_name:
-                break
-        if found_package_name:
-            is_package_file = '.' in found_package_name
-            is_package_html = '://' in found_package_name
-            is_local_package_file = is_package_file and not is_package_html
-            if is_local_package_file:
-                return False
+        found_package_name = self.get_package_name(task['action'])
+        if not found_package_name:
+            return True
+
+        is_package_file = '.' in found_package_name
+        is_package_html = '://' in found_package_name
+        is_local_package_file = is_package_file and not is_package_html
+        if is_local_package_file:
+            return False
 
         return True
