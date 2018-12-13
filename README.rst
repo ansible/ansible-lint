@@ -284,7 +284,7 @@ The following values are supported, and function identically to their CLI counte
 Pre-commit
 ----------
 
-To use ansible-lint with `pre-commit <http://pre-commit.com>`_, just add the following to your local repo's ``.pre-commit-config.yaml`` file. Make sure to change **sha:** to be either a git commit sha or tag of ansible-lint containing ``hooks.yaml``.
+To use ansible-lint with `pre-commit`_, just add the following to your local repo's ``.pre-commit-config.yaml`` file. Make sure to change **sha:** to be either a git commit sha or tag of ansible-lint containing ``hooks.yaml``.
 
 .. code-block:: yaml
 
