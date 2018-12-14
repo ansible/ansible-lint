@@ -12,7 +12,7 @@ class PackageHasRetryRule(AnsibleLintRule):
         'network communication and the availability of remote '
         'servers. To mitigate the potential problems, retries '
         'should be used via '
-        '``register: my_result`` and ``until: my_result | success``'
+        '``register: my_result`` and ``until: my_result is succeeded``'
     )
     severity = 'LOW'
     tags = ['module', 'reliability']
