@@ -1,3 +1,18 @@
+4.0.0 - Released 18-Dec-2018
+============================
+
+* New documentation site `docs.ansible.com/ansible-lint <https://docs.ansible.com/ansible-lint/>`_
+* Additional default rules for ansible-lint, listed in `docsite default rules <https://docs.ansible.com/ansible-lint/rules/default_rules.html>`_
+* Fixed running with role path containing single or multiple dirs #390
+* Fixed double sudo rule output #393
+* Severity property added to rules to be used by Galaxy #379
+* Packaging: consistency and automation #389
+* Updated rule TrailingWhitespaceRule.py to remove carriage return char #323
+* Allow snake_case module names for rules #82
+* Suggest tempfile module instead of mktemp command #422
+* Update tox to run with only supported ansible versions #406
+* GitHub repository edits: move to ansible org, add CODE_OF_CONDUCT, add ROADMAP, label edits
+
 3.5.1
 =====
 
