@@ -85,6 +85,7 @@ class PackageHasRetryRule(AnsibleLintRule):
         "package",
         "pkg",
         "deb",
+        "key",
     ]
 
     def get_package_name(self, action):
