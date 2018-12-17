@@ -33,6 +33,12 @@ SUCCESS = '''
       package:
         name: "/tmp/some_package.rpm"
         state: present
+
+    - name: packaging key
+      apt_key:
+        data: "{{ lookup('file', release_key) }}"
+        id: "{{ release_key_id }}"
+        state: present
 '''
 
 FAILURE = '''

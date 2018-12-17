@@ -76,6 +76,10 @@ class PackageHasRetryRule(AnsibleLintRule):
         "absent",
     ]
 
+    _module_ignore_parameters = [
+        "data",
+    ]
+
     _package_name_keys = [
         "name",
         "package",
@@ -103,6 +107,12 @@ class PackageHasRetryRule(AnsibleLintRule):
 
         is_state_whitelisted = task['action'].get('state') in self._module_ignore_states
         if is_state_whitelisted:
+            return False
+
+        has_whitelisted_parameter = (
+            set(self._module_ignore_parameters).intersection(set(task['action']))
+        )
+        if has_whitelisted_parameter:
             return False
 
         found_package_name = self.get_package_name(task['action'])
