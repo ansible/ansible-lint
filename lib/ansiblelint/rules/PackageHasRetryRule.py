@@ -87,12 +87,12 @@ class PackageHasRetryRule(AnsibleLintRule):
         "deb",
     ]
 
-    # attempt to find package name
     def get_package_name(self, action):
+        """Attempt to find package name."""
         for key in self._package_name_keys:
             found_package_name = action.get(key)
             if found_package_name:
-                break
+                return found_package_name
         return found_package_name
 
     def matchtask(self, file, task):
