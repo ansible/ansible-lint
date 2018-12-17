@@ -12,7 +12,7 @@ SUCCESS = '''
       apt:
         pkg: foo
       register: result
-      until: result|success
+      until: result is succeeded
 
     - name: remove software
       package:
