@@ -76,19 +76,24 @@ class PackageHasRetryRule(AnsibleLintRule):
         "absent",
     ]
 
+    _module_ignore_parameters = [
+        "data",
+    ]
+
     _package_name_keys = [
         "name",
         "package",
         "pkg",
         "deb",
+        "key",
     ]
 
-    # attempt to find package name
     def get_package_name(self, action):
+        """Attempt to find package name."""
         for key in self._package_name_keys:
             found_package_name = action.get(key)
             if found_package_name:
-                break
+                return found_package_name
         return found_package_name
 
     def matchtask(self, file, task):
@@ -103,6 +108,12 @@ class PackageHasRetryRule(AnsibleLintRule):
 
         is_state_whitelisted = task['action'].get('state') in self._module_ignore_states
         if is_state_whitelisted:
+            return False
+
+        has_whitelisted_parameter = (
+            set(self._module_ignore_parameters).intersection(set(task['action']))
+        )
+        if has_whitelisted_parameter:
             return False
 
         found_package_name = self.get_package_name(task['action'])

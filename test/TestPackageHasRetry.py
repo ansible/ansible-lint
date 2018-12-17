@@ -12,7 +12,7 @@ SUCCESS = '''
       apt:
         pkg: foo
       register: result
-      until: result|success
+      until: result is succeeded
 
     - name: remove software
       package:
@@ -32,6 +32,12 @@ SUCCESS = '''
     - name: install software from a local source
       package:
         name: "/tmp/some_package.rpm"
+        state: present
+
+    - name: packaging key
+      apt_key:
+        data: "{{ lookup('file', release_key) }}"
+        id: "{{ release_key_id }}"
         state: present
 '''
 
