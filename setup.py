@@ -40,7 +40,7 @@ except ImportError:
         if not d.startswith('file:'):
             return d
         descs = []
-        for fname in map(str.strip, d[5:].split(',')):
+        for fname in map(str.strip, str(d[5:]).split(',')):
             with io.open(fname, encoding='utf-8') as f:
                 descs.append(f.read())
         return ''.join(descs)
@@ -91,13 +91,13 @@ except ImportError:
             opt['package_dir'] = cfg_val_to_dict(opt['package_dir'])
         except KeyError:
             pass
-        opt_package_data = dict(cfg.items('options.package_data'))
         try:
+            opt_package_data = dict(cfg.items('options.package_data'))
             if not opt_package_data.get('', '').strip():
                 opt_package_data[''] = opt_package_data['*']
                 del opt_package_data['*']
-        except KeyError:
-            pass
+        except (KeyError, NoSectionError):
+            opt_package_data = {}
         try:
             opt_extras_require = dict(cfg.items('options.extras_require'))
             opt['extras_require'] = {}
