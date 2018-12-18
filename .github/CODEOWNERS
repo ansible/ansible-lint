@@ -1,0 +1,12 @@
+hooks.yaml @webknjaz
+MANIFEST.in @webknjaz
+setup.cfg @webknjaz
+setup.py @webknjaz
+test-deps.txt @webknjaz
+tox.ini @webknjaz
+.gitattributes @webknjaz
+.github/* @webknjaz
+.gitignore @webknjaz
+.git_archival.txt @webknjaz
+.pre-commit-hooks.yaml @webknjaz
+.travis.yml @webknjaz
