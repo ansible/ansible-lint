@@ -76,9 +76,14 @@ class PackageHasRetryRule(AnsibleLintRule):
         "absent",
     ]
 
-    _module_ignore_parameters = [
-        "data",
-    ]
+    _module_ignore_parameters = {
+        "apt_key": [
+            "data",
+        ],
+        "yum": [
+            "list",
+        ]
+    }
 
     _package_name_keys = [
         "name",
@@ -111,7 +116,7 @@ class PackageHasRetryRule(AnsibleLintRule):
             return False
 
         has_whitelisted_parameter = (
-            set(self._module_ignore_parameters).intersection(set(task['action']))
+            set(self._module_ignore_parameters.get(module, [])).intersection(set(task['action']))
         )
         if has_whitelisted_parameter:
             return False

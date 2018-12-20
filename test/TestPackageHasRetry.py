@@ -39,6 +39,10 @@ SUCCESS = '''
         data: "{{ lookup('file', release_key) }}"
         id: "{{ release_key_id }}"
         state: present
+
+    - name: list packages
+      yum:
+        list: some_package
 '''
 
 FAILURE = '''
