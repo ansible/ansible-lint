@@ -5,16 +5,24 @@ from ansiblelint.rules.VariableHasSpacesRule import VariableHasSpacesRule
 from test import RunFromText
 
 TASK_VARIABLES = '''
-- name: variable example
+- name: good variable format
   debug:
     msg: "{{ good_format }}"
-- name: variable example
+- name: good variable format
+  debug:
+    msg: "Value: {{ good_format }}"
+- name: jijna escaping allowed
+  debug:
+    msg: "{{ '{{' }}"
+- name: jijna escaping allowed
+  shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
+- name: bad variable format
   debug:
     msg: "{{bad_format}}"
-- name: variable example
+- name: bad variable format
   debug:
-    msg: "{{ bad_format}}"
-- name: variable example
+    msg: "Value: {{ bad_format}}"
+- name: bad variable format
   debug:
     msg: "{{bad_format }}"
 '''
