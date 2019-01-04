@@ -1,3 +1,15 @@
+4.0.1 - Released 04-Jan-2019
+============================
+
+Bugfix release
+
+- Allow install with python35 and add to tox testing `#452 <https://github.com/ansible/ansible-lint/pull/452>`_
+- Fix 503 UseHandlerRatherThanWhenChangedRule attempt to iterate on bool `#455 <https://github.com/ansible/ansible-lint/pull/455>`_
+- Improve regex on rule 602 `#454 <https://github.com/ansible/ansible-lint/pull/454>`_
+- Refactor RoleRelativePathRule, fix keyerror `#446 <https://github.com/ansible/ansible-lint/pull/446>`_
+- Rule 405 now ignore case of 'yum: list=package' `#444 <https://github.com/ansible/ansible-lint/pull/444>`_
+- Allow jinja escaping in variables `#440 <https://github.com/ansible/ansible-lint/pull/440>`_
+
 4.0.0 - Released 18-Dec-2018
 ============================
 
