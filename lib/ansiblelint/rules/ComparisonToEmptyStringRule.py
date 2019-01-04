@@ -16,7 +16,7 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
     tags = ['idiom']
     version_added = 'v4.0.0'
 
-    empty_string_compare = re.compile("[=!]= ?[\"'][\"']")
+    empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
 
     def match(self, file, line):
         return self.empty_string_compare.search(line)
