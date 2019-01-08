@@ -21,6 +21,7 @@
 import glob
 import imp
 import os
+import tempfile
 
 import six
 from ansible import constants
@@ -37,6 +38,7 @@ except ImportError:
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
+import ruamel.yaml
 
 try:
     from ansible.utils import parse_yaml_from_file
@@ -592,3 +594,66 @@ def get_first_cmd_arg(task):
     except IndexError:
         return None
     return first_cmd_arg
+
+
+def get_rule_list(task_comment_obj_strs):
+    id_and_tag_list = []
+    for comment_obj_str in task_comment_obj_strs:
+        for line in comment_obj_str.split('\\n'):
+            if '# noqa' in line:
+                noqa_text = line.split('# noqa')[1]
+                id_and_tag_list.extend(noqa_text.split())
+    return id_and_tag_list
+
+
+def add_skipped_rules(file_text, file_type):
+    yaml = ruamel.yaml.YAML()
+    data = yaml.load(file_text)
+
+    if not data:
+        return file_text
+
+    # TODO look into support for meta / matchyaml / matchplay
+    if file_type == 'playbook':
+        tasks = data[0].get('tasks')
+    elif file_type in ('tasks', 'handlers'):
+        tasks = data
+    else:
+        return file_text
+
+    if not tasks:
+        return file_text
+
+    def traverse_yaml(obj):
+        task_comment_obj_strs.append(str(obj.ca.items))
+        if isinstance(obj, dict):
+            for k in obj:
+                if isinstance(obj[k], (dict, list)):
+                    traverse_yaml(obj[k])
+        elif isinstance(obj, list):
+            for e in obj:
+                if isinstance(e, (dict, list)):
+                    traverse_yaml(e)
+        else:
+            return
+
+    any_skipped_rules = False
+    for task in tasks:
+        task_comment_obj_strs = []
+        traverse_yaml(task)
+        skipped_rules = get_rule_list(task_comment_obj_strs)
+        if skipped_rules:
+            task['skipped_rules'] = skipped_rules
+            any_skipped_rules = True
+
+    if not any_skipped_rules:
+        return file_text
+
+    # dump to file with new tags, read file and return new text
+    with tempfile.NamedTemporaryFile('w') as tf:
+        yaml.dump(data, tf)
+        tf.seek(0)
+        with open(tf.name, 'r') as tf_read:
+            file_text_new = tf_read.read()
+
+    return file_text_new

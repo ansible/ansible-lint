@@ -137,13 +137,16 @@ class RulesCollection(object):
                   file=sys.stderr)
             return matches
 
+        # parse comments via ruamel.yaml into skipped_rules list, return as text
+        text_with_skips = ansiblelint.utils.add_skipped_rules(text, playbookfile['type'])
+
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if set(rule_definition).isdisjoint(skip_list):
                     matches.extend(rule.matchlines(playbookfile, text))
-                    matches.extend(rule.matchtasks(playbookfile, text))
+                    matches.extend(rule.matchtasks(playbookfile, text_with_skips))
                     matches.extend(rule.matchyaml(playbookfile, text))
 
         return matches
