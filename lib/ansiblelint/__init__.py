@@ -97,7 +97,7 @@ class AnsibleLintRule(object):
             return matches
 
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
-        if not (yaml and hasattr(self, 'matchplay')):
+        if not yaml:
             return matches
 
         if isinstance(yaml, dict):
