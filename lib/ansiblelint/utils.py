@@ -596,34 +596,47 @@ def get_first_cmd_arg(task):
     return first_cmd_arg
 
 
-def get_rule_list(task_comment_obj_strs):
-    id_and_tag_list = []
-    for comment_obj_str in task_comment_obj_strs:
-        for line in comment_obj_str.split('\\n'):
-            if '# noqa' in line:
-                noqa_text = line.split('# noqa')[1]
-                id_and_tag_list.extend(noqa_text.split())
-    return id_and_tag_list
-
-
-def add_skipped_rules(file_text, file_type):
+def add_skipped_rules(orig_file_text, file_type):
     yaml = ruamel.yaml.YAML()
-    data = yaml.load(file_text)
+    data = yaml.load(orig_file_text)
 
     if not data:
-        return file_text
+        return orig_file_text
 
     # TODO look into support for meta / matchyaml / matchplay
     if file_type == 'playbook':
-        tasks = data[0].get('tasks')
+        if not (isinstance(data, list) and isinstance(data[0], dict)):
+            return orig_file_text
+        tasks = data[0].get('tasks', None)
     elif file_type in ('tasks', 'handlers'):
         tasks = data
     else:
-        return file_text
+        return orig_file_text
 
     if not tasks:
-        return file_text
+        return orig_file_text
 
+    any_skipped_rules = False
+    for task in tasks:
+        skipped_rules = _get_rule_skips_from_task(task)
+        if skipped_rules:
+            task['skipped_rules'] = skipped_rules
+            any_skipped_rules = True
+
+    if not any_skipped_rules:
+        return orig_file_text
+
+    # dump to file with new skipped_rules list(s), read file and return text
+    with tempfile.NamedTemporaryFile('w') as tf:
+        yaml.dump(data, tf)
+        tf.seek(0)
+        with open(tf.name, 'r') as tf_read:
+            new_file_text = tf_read.read()
+
+    return new_file_text
+
+
+def _get_rule_skips_from_task(task):
     def traverse_yaml(obj):
         task_comment_obj_strs.append(str(obj.ca.items))
         if isinstance(obj, dict):
@@ -637,23 +650,20 @@ def add_skipped_rules(file_text, file_type):
         else:
             return
 
-    any_skipped_rules = False
-    for task in tasks:
-        task_comment_obj_strs = []
-        traverse_yaml(task)
-        skipped_rules = get_rule_list(task_comment_obj_strs)
-        if skipped_rules:
-            task['skipped_rules'] = skipped_rules
-            any_skipped_rules = True
+    task_comment_obj_strs = []
+    traverse_yaml(task)
 
-    if not any_skipped_rules:
-        return file_text
+    rule_id_list = []
+    for comment_obj_str in task_comment_obj_strs:
+        for line in comment_obj_str.split('\\n'):
+            rule_id_list.extend(get_rule_skips_from_line(line))
 
-    # dump to file with new tags, read file and return new text
-    with tempfile.NamedTemporaryFile('w') as tf:
-        yaml.dump(data, tf)
-        tf.seek(0)
-        with open(tf.name, 'r') as tf_read:
-            file_text_new = tf_read.read()
+    return rule_id_list
 
-    return file_text_new
+
+def get_rule_skips_from_line(line):
+    rule_id_list = []
+    if '# noqa' in line:
+        noqa_text = line.split('# noqa')[1]
+        rule_id_list = noqa_text.split()
+    return rule_id_list

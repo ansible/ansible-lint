@@ -57,6 +57,11 @@ class AnsibleLintRule(object):
         for (prev_line_no, line) in enumerate(text.split("\n")):
             if line.lstrip().startswith('#'):
                 continue
+
+            rule_id_list = ansiblelint.utils.get_rule_skips_from_line(line)
+            if self.id in rule_id_list:
+                continue
+
             result = self.match(file, line)
             if not result:
                 continue
@@ -77,6 +82,9 @@ class AnsibleLintRule(object):
             return matches
 
         for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
+            if 'skipped_rules' in task and self.id in task['skipped_rules']:
+                continue
+
             if 'action' not in task:
                 continue
             result = self.matchtask(file, task)
