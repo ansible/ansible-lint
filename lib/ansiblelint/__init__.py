@@ -112,6 +112,9 @@ class AnsibleLintRule(object):
             yaml = [yaml]
 
         for play in yaml:
+            if 'skipped_rules' in play and self.id in play['skipped_rules']:
+                continue
+
             result = self.matchplay(file, play)
             if not result:
                 continue
@@ -168,7 +171,7 @@ class RulesCollection(object):
                 if set(rule_definition).isdisjoint(skip_list):
                     matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchtasks(playbookfile, text_with_skips))
-                    matches.extend(rule.matchyaml(playbookfile, text))
+                    matches.extend(rule.matchyaml(playbookfile, text_with_skips))
 
         return matches
 

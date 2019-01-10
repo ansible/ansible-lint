@@ -603,13 +603,19 @@ def add_skipped_rules(orig_file_text, file_type):
     if not data:
         return orig_file_text
 
-    # TODO look into support for meta / matchyaml / matchplay
-    if file_type == 'playbook':
+    if file_type in ('tasks', 'handlers'):
+        tasks = data
+    elif file_type == 'playbook':
+        # this does look at values in top-level dict in playbook.yml
+        # example "sudo: True" outside "tasks" not looked at for skipping
         if not (isinstance(data, list) and isinstance(data[0], dict)):
             return orig_file_text
         tasks = data[0].get('tasks', None)
-    elif file_type in ('tasks', 'handlers'):
-        tasks = data
+    elif file_type == 'meta':
+        if isinstance(data, dict):
+            tasks = [data]
+        else:
+            tasks = data
     else:
         return orig_file_text
 
