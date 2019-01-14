@@ -373,14 +373,6 @@ If the rule is line-based, ``# noqa [rule_id]`` must be at the end of the partic
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa 204
         dest: "{{dest_proj_path}}/foo.conf"  # noqa 206
 
-With the *command* or *shell* module, you can also use the ``warn`` parameter, which **skips all linting** for that task
-
-.. code-block:: yaml
-
-    - name: this would typically fire CommandsInsteadOfModuleRule 303
-      command: git pull --rebase
-      args:
-        warn: False
 
 It's also a good practice to comment the reasons why a task is being skipped.
 
@@ -388,6 +380,23 @@ If you want skip running a rule entirely, you can use either:
 
 * `command-line skip_list`_ via ``-x``
 * `config file skip_list`_
+
+A less-preferred method of skipping is to skip all task-based rules for a task (this does not skip line-based rules). There are two mechanisms for this: the ``skip_ansible_lint`` tag works with all tasks, and the ``warn`` parameter works with the *command* or *shell* modules only. Examples:
+
+.. code-block:: yaml
+
+    - name: this would typically fire CommandsInsteadOfArgumentRule 302
+      command: warn=no chmod 644 X
+
+    - name: this would typically fire CommandsInsteadOfModuleRule 303
+      command: git pull --rebase
+      args:
+        warn: False
+
+    - name: this would typically fire GitHasVersionRule 401
+      git: src=/path/to/git/repo dest=checkout
+      tags:
+      - skip_ansible_lint
 
 Creating Custom Rules
 ---------------------
