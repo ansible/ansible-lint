@@ -341,7 +341,8 @@ def _look_for_role_files(basedir, role, main='main'):
         current_path = os.path.join(role_path, th)
         for dir, subdirs, files in os.walk(current_path):
             for file in files:
-                if file.endswith('.yml' or '.yaml'):
+                file_ignorecase = file.lower()
+                if file_ignorecase.endswith('.yml' or '.yaml'):
                     thpath = os.path.join(dir, file)
                     results.append({'path': thpath, 'type': th})
 
