@@ -174,7 +174,7 @@ def main():
 
     skip = set()
     for s in options.skip_list:
-        skip.update(s.split(','))
+        skip.update(str(s).split(','))
     options.skip_list = frozenset(skip)
 
     playbooks = set(args)
