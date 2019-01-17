@@ -1,21 +1,83 @@
 import unittest
-import ansiblelint.utils
+
 from ansiblelint import RulesCollection
 from ansiblelint.rules.ShellWithoutPipefail import ShellWithoutPipefail
+from test import RunFromText
+
+FAIL_TASKS = '''
+---
+- hosts: localhost
+  become: no
+  tasks:
+    - name: pipeline without pipefail
+      shell: false | cat
+
+    - name: pipeline with or and pipe, no pipefail
+      shell: false || true | cat
+
+    - shell: |
+        df | grep '/dev'
+'''
+
+SUCCESS_TASKS = '''
+---
+- hosts: localhost
+  become: no
+  tasks:
+    - name: pipeline with pipefail
+      shell: set -o pipefail && false | cat
+
+    - name: pipeline with pipefail, multi-line
+      shell: |
+        set -o pipefail
+        false | cat
+
+    - name: pipeline with pipefail, complex set
+      shell: |
+        set -e -x -o pipefail
+        false | cat
+
+    - name: pipeline with pipefail, complex set
+      shell: |
+        set -e -x -o pipefail
+        false | cat
+
+    - name: pipeline with pipefail, complex set
+      shell: |
+        set -eo pipefail
+        false | cat
+
+    - name: pipeline without pipefail, ignoring errors
+      shell: false | cat
+      ignore_errors: true
+
+    - name: non-pipeline without pipefail
+      shell: "true"
+
+    - name: command without pipefail
+      command: "true"
+
+    - name: shell with or
+      shell:
+        false || true
+
+    - shell: |
+        set -o pipefail
+        df | grep '/dev'
+'''
 
 
 class TestShellWithoutPipeFail(unittest.TestCase):
     collection = RulesCollection()
+    collection.register(ShellWithoutPipefail())
 
-    def test_file_positive(self):
-        self.collection.register(ShellWithoutPipefail())
-        success = 'test/shell-without-pipefail-success.yml'
-        good_runner = ansiblelint.Runner(self.collection, success, [], [], [])
-        self.assertEqual([], good_runner.run())
+    def setUp(self):
+        self.runner = RunFromText(self.collection)
 
-    def test_file_negative(self):
-        self.collection.register(ShellWithoutPipefail())
-        failure = 'test/shell-without-pipefail-failure.yml'
-        bad_runner = ansiblelint.Runner(self.collection, failure, [], [], [])
-        errs = bad_runner.run()
-        self.assertEqual(2, len(errs))
+    def test_fail(self):
+        results = self.runner.run_playbook(FAIL_TASKS)
+        self.assertEqual(3, len(results))
+
+    def test_success(self):
+        results = self.runner.run_playbook(SUCCESS_TASKS)
+        self.assertEqual(0, len(results))
