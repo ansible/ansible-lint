@@ -21,7 +21,7 @@
 import glob
 import imp
 import os
-import tempfile
+import io
 
 import six
 from ansible import constants
@@ -632,12 +632,11 @@ def add_skipped_rules(orig_file_text, file_type):
     if not any_skipped_rules:
         return orig_file_text
 
-    # dump to file with new skipped_rules list(s), read file and return text
-    with tempfile.NamedTemporaryFile('w') as tf:
-        yaml.dump(data, tf)
-        tf.seek(0)
-        with open(tf.name, 'r') as tf_read:
-            new_file_text = tf_read.read()
+    # dump to in-memory file with new skipped_rules list(s), return text
+    with io.BytesIO() as in_memory_file:
+        yaml.dump(data, in_memory_file)
+        in_memory_file.seek(0)
+        new_file_text = in_memory_file.read()
 
     return new_file_text
 
