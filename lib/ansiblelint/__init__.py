@@ -66,7 +66,7 @@ class AnsibleLintRule(object):
             if not result:
                 continue
             message = None
-            if isinstance(result, str):
+            if isinstance(result, six.string_types):
                 message = result
             matches.append(Match(prev_line_no+1, line,
                            file['path'], self, message))
@@ -82,7 +82,7 @@ class AnsibleLintRule(object):
             return matches
 
         for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
-            if 'skipped_rules' in task and self.id in task['skipped_rules']:
+            if self.id in task.get('skipped_rules', ()):
                 continue
 
             if 'action' not in task:
@@ -94,8 +94,8 @@ class AnsibleLintRule(object):
             message = None
             if isinstance(result, six.string_types):
                 message = result
-            taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], taskstr,
+            task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
+            matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
                            file['path'], self, message))
         return matches
 
@@ -112,7 +112,7 @@ class AnsibleLintRule(object):
             yaml = [yaml]
 
         for play in yaml:
-            if 'skipped_rules' in play and self.id in play['skipped_rules']:
+            if self.id in play.get('skipped_rules', ()):
                 continue
 
             result = self.matchplay(file, play)
@@ -123,7 +123,7 @@ class AnsibleLintRule(object):
                 result = [result]
 
             if not isinstance(result, list):
-                raise Exception("{} is not a list".format(result))
+                raise TypeError("{} is not a list".format(result))
 
             for section, message in result:
                 matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY],

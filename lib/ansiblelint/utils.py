@@ -645,9 +645,9 @@ def _get_rule_skips_from_task(task):
     def traverse_yaml(obj):
         task_comment_obj_strs.append(str(obj.ca.items))
         if isinstance(obj, dict):
-            for k in obj:
-                if isinstance(obj[k], (dict, list)):
-                    traverse_yaml(obj[k])
+            for key, val in obj.items():
+                if isinstance(val, (dict, list)):
+                    traverse_yaml(val)
         elif isinstance(obj, list):
             for e in obj:
                 if isinstance(e, (dict, list)):
