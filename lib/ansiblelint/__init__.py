@@ -234,6 +234,10 @@ class Runner(object):
                 visited.add(arg)
 
         matches = list()
+
+        # remove duplicates from files list
+        files = [value for n, value in enumerate(files) if value not in files[:n]]
+
         # remove files that have already been checked
         files = [x for x in files if x['path'] not in self.checked_files]
         for file in files:

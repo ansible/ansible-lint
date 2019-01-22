@@ -338,11 +338,14 @@ def _look_for_role_files(basedir, role, main='main'):
     results = []
 
     for th in ['tasks', 'handlers', 'meta']:
-        for ext in ('.yml', '.yaml'):
-            thpath = os.path.join(role_path, th, main + ext)
-            if os.path.exists(thpath):
-                results.append({'path': thpath, 'type': th})
-                break
+        current_path = os.path.join(role_path, th)
+        for dir, subdirs, files in os.walk(current_path):
+            for file in files:
+                file_ignorecase = file.lower()
+                if file_ignorecase.endswith(('.yml', '.yaml')):
+                    thpath = os.path.join(dir, file)
+                    results.append({'path': thpath, 'type': th})
+
     return results
 
 
