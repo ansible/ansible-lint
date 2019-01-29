@@ -11,11 +11,12 @@ class ShellWithoutPipefail(AnsibleLintRule):
         'implements a pipeline can fail and still return 0. If '
         'any part of the pipeline other than the terminal command '
         'fails, the whole pipeline will still return 0, which may '
-        'be consider success by Ansible. '
+        'be considered a success by Ansible. '
         'Pipefail is available in the bash shell.'
     )
     severity = 'MEDIUM'
     tags = ['command-shell']
+    version_added = 'v4.1.0'
 
     _pipefail_re = re.compile(r"^\s*set.*-[A-z]*o\s*pipefail")
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
