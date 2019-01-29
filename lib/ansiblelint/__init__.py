@@ -50,6 +50,8 @@ class AnsibleLintRule(object):
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(text.split("\n")):
+            if line.lstrip().startswith('#'):
+                continue
             result = self.match(file, line)
             if result:
                 message = None
