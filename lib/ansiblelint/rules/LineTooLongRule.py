@@ -6,7 +6,7 @@ from ansiblelint import AnsibleLintRule
 
 class LineTooLongRule(AnsibleLintRule):
     id = '204'
-    shortdesc = 'Lines should be no longer than 120 chars'
+    shortdesc = 'Lines should be no longer than 160 chars'
     description = (
         'Long lines make code harder to read and '
         'code review more difficult'
@@ -16,4 +16,4 @@ class LineTooLongRule(AnsibleLintRule):
     version_added = 'v4.0.0'
 
     def match(self, file, line):
-        return len(line) > 120
+        return len(line) > 160
