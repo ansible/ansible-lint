@@ -11,6 +11,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         ('description', 'your description'),
         ('company', 'your company (optional)'),
         ('license', 'license (GPLv2, CC-BY, etc)'),
+        ('license', 'license (GPL-2.0-or-later, MIT, etc)'),
     ]
     description = (
         'meta/main.yml default values should be changed for: ``{}``'.format(
