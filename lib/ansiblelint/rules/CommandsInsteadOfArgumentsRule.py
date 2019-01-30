@@ -21,6 +21,7 @@
 import os
 
 from ansiblelint import AnsibleLintRule
+from ansiblelint.utils import get_first_cmd_arg
 try:
     from ansible.module_utils.parsing.convert_bool import boolean
 except ImportError:
@@ -52,12 +53,10 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
 
     def matchtask(self, file, task):
         if task["action"]["__ansible_module__"] in self._commands:
-            if 'cmd' in task['action']:
-                first_cmd_arg = task['action']['cmd'].split()[0]
-            else:
-                first_cmd_arg = task["action"]["__ansible_arguments__"][0]
+            first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:
                 return
+
             executable = os.path.basename(first_cmd_arg)
             if executable in self._arguments and \
                     boolean(task['action'].get('warn', True)):
