@@ -19,11 +19,6 @@
 # THE SOFTWARE.
 
 from ansiblelint import AnsibleLintRule
-import re
-
-
-def unjinja(text):
-    return re.sub(r"{{[^}]*}}", "JINJA_VAR", text)
 
 
 class UseCommandInsteadOfShellRule(AnsibleLintRule):
@@ -43,7 +38,8 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
         # rather than pipes
         if task["action"]["__ansible_module__"] == 'shell':
             if 'cmd' in task['action']:
-                unjinjad_cmd = unjinja(task["action"].get("cmd", []))
+                unjinjad_cmd = self.unjinja(task["action"].get("cmd", []))
             else:
-                unjinjad_cmd = unjinja(' '.join(task["action"].get("__ansible_arguments__", [])))
+                unjinjad_cmd = self.unjinja(
+                    ' '.join(task["action"].get("__ansible_arguments__", [])))
             return not any([ch in unjinjad_cmd for ch in '&|<>;$\n*[]{}?'])
