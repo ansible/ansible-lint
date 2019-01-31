@@ -1,30 +1,76 @@
 import unittest
-import ansible
 
-from ansiblelint import Runner, RulesCollection
+from ansiblelint import RulesCollection
 from ansiblelint.rules.EnvVarsInCommandRule import EnvVarsInCommandRule
-from pkg_resources import parse_version
+from test import RunFromText
+
+
+SUCCESS_PLAY_TASKS = '''
+- hosts: localhost
+
+  tasks:
+  - name: actual use of environment
+    shell: echo $HELLO
+    environment:
+      HELLO: hello
+
+  - name: use some key-value pairs
+    command: chdir=/tmp creates=/tmp/bobbins warn=no touch bobbins
+
+  - name: commands can have flags
+    command: abc --xyz=def blah
+
+  - name: commands can have equals in them
+    command: echo "==========="
+
+  - name: commands with cmd
+    command:
+      cmd:
+        echo "-------"
+
+  - name: command with stdin (ansible > 2.4)
+    command: /bin/cat
+    args:
+      stdin: "Hello, world!"
+
+  - name: use argv to send the command as a list
+    command:
+      argv:
+        - /bin/echo
+        - Hello
+        - World
+
+  - name: another use of argv
+    command:
+    args:
+      argv:
+        - echo
+        - testing
+'''
+
+FAIL_PLAY_TASKS = '''
+- hosts: localhost
+
+  tasks:
+  - name: this doesn't work as it appears
+    shell: HELLO=hello echo $HELLO
+
+  - name: typo some stuff
+    command: cerates=/tmp/blah warn=no touch /tmp/blah
+'''
 
 
 class TestEnvVarsInCommand(unittest.TestCase):
     collection = RulesCollection()
+    collection.register(EnvVarsInCommandRule())
 
     def setUp(self):
-        self.collection.register(EnvVarsInCommandRule())
+        self.runner = RunFromText(self.collection)
 
-    def test_file_positive(self):
-        success = 'test/env-vars-in-command-success.yml'
-        good_runner = Runner(self.collection, success, [], [], [])
-        self.assertEqual([], good_runner.run())
+    def test_success(self):
+        results = self.runner.run_playbook(SUCCESS_PLAY_TASKS)
+        self.assertEqual(0, len(results))
 
-    @unittest.skipIf(parse_version(ansible.__version__) < parse_version('2.4'), "not supported with ansible < 2.4")
-    def test_file_positive_2_4(self):
-        success = 'test/env-vars-in-command-success_2_4_style.yml'
-        good_runner = Runner(self.collection, success, [], [], [])
-        self.assertEqual([], good_runner.run())
-
-    def test_file_negative(self):
-        failure = 'test/env-vars-in-command-failure.yml'
-        bad_runner = Runner(self.collection, failure, [], [], [])
-        errs = bad_runner.run()
-        self.assertEqual(2, len(errs))
+    def test_fail(self):
+        results = self.runner.run_playbook(FAIL_PLAY_TASKS)
+        self.assertEqual(2, len(results))

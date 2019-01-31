@@ -1,7 +1,0 @@
-- hosts: localhost
-
-  tasks:
-  - name: command with stdin (ansible > 2.4)
-    command: /bin/cat
-    args:
-      stdin: "Hello, world!"

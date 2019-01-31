@@ -405,6 +405,11 @@ def normalize_task_v2(task):
         del(arguments['_raw_params'])
     else:
         result['action']['__ansible_arguments__'] = list()
+
+    if 'argv' in arguments and not result['action']['__ansible_arguments__']:
+        result['action']['__ansible_arguments__'] = arguments['argv']
+        del(arguments['argv'])
+
     result['action'].update(arguments)
     return result
 
