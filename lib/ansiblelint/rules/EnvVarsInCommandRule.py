@@ -38,7 +38,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
                      LINE_NUMBER_KEY, FILENAME_KEY]
 
     def matchtask(self, file, task):
-        if task["action"]["__ansible_module__"] in ['shell', 'command']:
+        if task["action"]["__ansible_module__"] in ['command']:
             first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:
                 return

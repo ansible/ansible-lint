@@ -46,14 +46,17 @@ SUCCESS_PLAY_TASKS = '''
       argv:
         - echo
         - testing
+
+  - name: environment variable with shell
+    shell: HELLO=hello echo $HELLO
 '''
 
 FAIL_PLAY_TASKS = '''
 - hosts: localhost
 
   tasks:
-  - name: this doesn't work as it appears
-    shell: HELLO=hello echo $HELLO
+  - name: environment variable with command
+    command: HELLO=hello echo $HELLO
 
   - name: typo some stuff
     command: cerates=/tmp/blah warn=no touch /tmp/blah
