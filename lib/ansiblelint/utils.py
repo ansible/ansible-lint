@@ -581,3 +581,14 @@ def parse_yaml_linenumbers(data, filename):
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
         raise SystemExit("Failed to parse YAML in %s: %s" % (filename, str(e)))
     return data
+
+
+def get_first_cmd_arg(task):
+    try:
+        if 'cmd' in task['action']:
+            first_cmd_arg = task['action']['cmd'].split()[0]
+        else:
+            first_cmd_arg = task['action']['__ansible_arguments__'][0]
+    except IndexError:
+        return None
+    return first_cmd_arg
