@@ -21,7 +21,6 @@
 import glob
 import imp
 import os
-import io
 
 import six
 from ansible import constants
@@ -596,49 +595,42 @@ def get_first_cmd_arg(task):
     return first_cmd_arg
 
 
-def add_skipped_rules(orig_file_text, file_type):
+def append_skipped_rules(pyyaml_data, file_text, file_type):
+    """ Uses ruamel.yaml to parse comments then adds a
+        skipped_rules list to the task (or meta yaml block)
+    """
     yaml = ruamel.yaml.YAML()
-    data = yaml.load(orig_file_text)
-
-    if not data:
-        return orig_file_text
+    ruamel_data = yaml.load(file_text)
 
     if file_type in ('tasks', 'handlers'):
-        tasks = data
+        ruamel_tasks = ruamel_data
+        pyyaml_tasks = pyyaml_data
     elif file_type == 'playbook':
-        # this does look at values in top-level dict in playbook.yml
-        # example "sudo: True" outside "tasks" not looked at for skipping
-        if not (isinstance(data, list) and isinstance(data[0], dict)):
-            return orig_file_text
-        tasks = data[0].get('tasks', None)
+        try:
+            ruamel_tasks = []
+            pyyaml_tasks = []
+            for ruamel_play, pyyaml_play in zip(ruamel_data, pyyaml_data):
+                ruamel_tasks.extend(ruamel_play.get('tasks'))
+                pyyaml_tasks.extend(pyyaml_play.get('tasks'))
+        except (AttributeError, TypeError):
+            return pyyaml_data
     elif file_type == 'meta':
-        if isinstance(data, dict):
-            tasks = [data]
-        else:
-            tasks = data
+        if not isinstance(pyyaml_data, list):
+            return pyyaml_data
+        ruamel_tasks = [ruamel_data]
+        pyyaml_tasks = pyyaml_data
     else:
-        return orig_file_text
+        return pyyaml_data
 
-    if not tasks:
-        return orig_file_text
+    if len(ruamel_tasks) != len(pyyaml_tasks):
+        return pyyaml_data
 
-    any_skipped_rules = False
-    for task in tasks:
-        skipped_rules = _get_rule_skips_from_task(task)
+    for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks):
+        skipped_rules = _get_rule_skips_from_task(ruamel_task)
         if skipped_rules:
-            task['skipped_rules'] = skipped_rules
-            any_skipped_rules = True
+            pyyaml_task['skipped_rules'] = skipped_rules
 
-    if not any_skipped_rules:
-        return orig_file_text
-
-    # dump to in-memory file with new skipped_rules list(s), return text
-    with io.BytesIO() as in_memory_file:
-        yaml.dump(data, in_memory_file)
-        in_memory_file.seek(0)
-        new_file_text = in_memory_file.read()
-
-    return new_file_text
+    return pyyaml_data
 
 
 def _get_rule_skips_from_task(task):

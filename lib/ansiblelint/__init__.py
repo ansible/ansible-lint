@@ -81,6 +81,8 @@ class AnsibleLintRule(object):
         if not yaml:
             return matches
 
+        yaml = ansiblelint.utils.append_skipped_rules(yaml, text, file['type'])
+
         for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
             if self.id in task.get('skipped_rules', ()):
                 continue
@@ -110,6 +112,8 @@ class AnsibleLintRule(object):
 
         if isinstance(yaml, dict):
             yaml = [yaml]
+
+        yaml = ansiblelint.utils.append_skipped_rules(yaml, text, file['type'])
 
         for play in yaml:
             if self.id in play.get('skipped_rules', ()):
@@ -161,17 +165,14 @@ class RulesCollection(object):
                   file=sys.stderr)
             return matches
 
-        # parse comments via ruamel.yaml into skipped_rules list, return as text
-        text_with_skips = ansiblelint.utils.add_skipped_rules(text, playbookfile['type'])
-
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if set(rule_definition).isdisjoint(skip_list):
                     matches.extend(rule.matchlines(playbookfile, text))
-                    matches.extend(rule.matchtasks(playbookfile, text_with_skips))
-                    matches.extend(rule.matchyaml(playbookfile, text_with_skips))
+                    matches.extend(rule.matchtasks(playbookfile, text))
+                    matches.extend(rule.matchyaml(playbookfile, text))
 
         return matches
 

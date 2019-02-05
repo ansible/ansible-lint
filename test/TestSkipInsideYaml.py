@@ -62,11 +62,11 @@ PLAYBOOK = '''
 
     - name: test 204 and 206
       get_url:
-        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf
+        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf
         dest: "{{dest_proj_path}}/foo.conf"
     - name: test 204 and 206 (skipped)
       get_url:
-        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa 204
+        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa 204
         dest: "{{dest_proj_path}}/foo.conf"  # noqa 206
 
     - name: test 302
