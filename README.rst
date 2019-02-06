@@ -351,32 +351,49 @@ It's also possible to skip specific rules by passing the rule ID. For example, t
 
     $ ansible-lint -x ANSIBLE0011 playbook.yml
 
-False Positives: Muting Ansible Lint Warnings
----------------------------------------------
+False Positives: Skipping Rules
+-------------------------------
 
 Some rules are a bit of a rule of thumb. Advanced *git*, *yum* or *apt* usage, for example, is typically difficult to achieve through the modules. In this case, you should mark the task so that warnings aren't produced.
 
-There are two mechanisms for this - one works with all tasks, the other works with the command checking modules.
-
-Use the ``warn`` parameter with the *command* or *shell* module.
-
-Use ``skip_ansible_lint`` tag with any task that should be skipped.
-
-It's also a good practice to comment the reasons why a task is being skipped.
-
-Here's an example playbook showing the two techniques for muting Ansible Lint warnings:
+To skip a specific rule for a specific task, inside your ansible yaml add ``# noqa [rule_id]`` at the end of the line. If the rule is task-based (most are), add at the end of any line in the task. You can skip multiple rules via a space-separated list.
 
 .. code-block:: yaml
 
-    - name: this would typically fire CommandsInsteadOfArgumentRule
+    - name: this would typically fire GitHasVersionRule 401 and BecomeUserWithoutBecomeRule 501
+      become_user: alice  # noqa 401 501
+      git: src=/path/to/git/repo dest=checkout
+
+If the rule is line-based, ``# noqa [rule_id]`` must be at the end of the particular line to be skipped
+
+.. code-block:: yaml
+
+    - name: this would typically fire LineTooLongRule 204 and VariableHasSpacesRule 206
+      get_url:
+        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa 204
+        dest: "{{dest_proj_path}}/foo.conf"  # noqa 206
+
+
+It's also a good practice to comment the reasons why a task is being skipped.
+
+If you want skip running a rule entirely, you can use either:
+
+* `command-line skip_list`_ via ``-x``
+* `config file skip_list`_
+
+A less-preferred method of skipping is to skip all task-based rules for a task (this does not skip line-based rules). There are two mechanisms for this: the ``skip_ansible_lint`` tag works with all tasks, and the ``warn`` parameter works with the *command* or *shell* modules only. Examples:
+
+.. code-block:: yaml
+
+    - name: this would typically fire CommandsInsteadOfArgumentRule 302
       command: warn=no chmod 644 X
 
-    - name: this would typically fire CommandsInsteadOfModuleRule
+    - name: this would typically fire CommandsInsteadOfModuleRule 303
       command: git pull --rebase
       args:
         warn: False
 
-    - name: this would typically fire GitHasVersionRule
+    - name: this would typically fire GitHasVersionRule 401
       git: src=/path/to/git/repo dest=checkout
       tags:
       - skip_ansible_lint
@@ -462,3 +479,5 @@ ansible-lint was created by `Will Thames`_ and is now maintained as part of the 
 .. _Will Thames: https://github.com/willthames
 .. _Ansible: https://ansible.com
 .. _Red Hat: https://redhat.com
+.. _command-line skip_list: https://docs.ansible.com/ansible-lint/usage/usage.html#command-line-options
+.. _config file skip_list: https://docs.ansible.com/ansible-lint/configuring/configuring.html#configuration-file

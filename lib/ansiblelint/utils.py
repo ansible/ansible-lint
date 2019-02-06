@@ -37,6 +37,7 @@ except ImportError:
 import yaml
 from yaml.composer import Composer
 from yaml.constructor import Constructor
+import ruamel.yaml
 
 try:
     from ansible.utils import parse_yaml_from_file
@@ -592,3 +593,74 @@ def get_first_cmd_arg(task):
     except IndexError:
         return None
     return first_cmd_arg
+
+
+def append_skipped_rules(pyyaml_data, file_text, file_type):
+    """ Uses ruamel.yaml to parse comments then adds a
+        skipped_rules list to the task (or meta yaml block)
+    """
+    yaml = ruamel.yaml.YAML()
+    ruamel_data = yaml.load(file_text)
+
+    if file_type in ('tasks', 'handlers'):
+        ruamel_tasks = ruamel_data
+        pyyaml_tasks = pyyaml_data
+    elif file_type == 'playbook':
+        try:
+            ruamel_tasks = []
+            pyyaml_tasks = []
+            for ruamel_play, pyyaml_play in zip(ruamel_data, pyyaml_data):
+                ruamel_tasks.extend(ruamel_play.get('tasks'))
+                pyyaml_tasks.extend(pyyaml_play.get('tasks'))
+        except (AttributeError, TypeError):
+            return pyyaml_data
+    elif file_type == 'meta':
+        if not isinstance(pyyaml_data, list):
+            return pyyaml_data
+        ruamel_tasks = [ruamel_data]
+        pyyaml_tasks = pyyaml_data
+    else:
+        return pyyaml_data
+
+    if len(ruamel_tasks) != len(pyyaml_tasks):
+        return pyyaml_data
+
+    for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks):
+        skipped_rules = _get_rule_skips_from_task(ruamel_task)
+        if skipped_rules:
+            pyyaml_task['skipped_rules'] = skipped_rules
+
+    return pyyaml_data
+
+
+def _get_rule_skips_from_task(task):
+    def traverse_yaml(obj):
+        task_comment_obj_strs.append(str(obj.ca.items))
+        if isinstance(obj, dict):
+            for key, val in obj.items():
+                if isinstance(val, (dict, list)):
+                    traverse_yaml(val)
+        elif isinstance(obj, list):
+            for e in obj:
+                if isinstance(e, (dict, list)):
+                    traverse_yaml(e)
+        else:
+            return
+
+    task_comment_obj_strs = []
+    traverse_yaml(task)
+
+    rule_id_list = []
+    for comment_obj_str in task_comment_obj_strs:
+        for line in comment_obj_str.split('\\n'):
+            rule_id_list.extend(get_rule_skips_from_line(line))
+
+    return rule_id_list
+
+
+def get_rule_skips_from_line(line):
+    rule_id_list = []
+    if '# noqa' in line:
+        noqa_text = line.split('# noqa')[1]
+        rule_id_list = noqa_text.split()
+    return rule_id_list
