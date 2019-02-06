@@ -71,7 +71,7 @@ class TestCliRolePaths(unittest.TestCase):
     def test_run_role_three_dir_deep(self):
         cwd = self.local_test_dir
         bin = '../bin/ansible-lint'
-        role_path = 'roles/roles/test-role'
+        role_path = 'testproject/roles/test-role'
 
         result = self.run_ansible_lint(cwd=cwd, bin=bin, role_path=role_path)
         self.assertIn('Use shell only when shell functionality is required',
