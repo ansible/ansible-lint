@@ -36,11 +36,14 @@ SUCCESS_TASKS = '''
     - name: octal permissions test success (0711)
       file: path=baz mode=0711
 
-    - name: octal permissions test success (0710)
-      file: path=baz mode=0710
-
     - name:  permissions test success (0777)
       file: path=baz mode=u+rwx
+
+    - name: octal permissions test success (777)
+      file: path=baz mode=777
+
+    - name: octal permissions test success (733)
+      file: path=baz mode=733
 '''
 
 FAIL_TASKS = '''
@@ -68,12 +71,6 @@ FAIL_TASKS = '''
       file:
         path: bar
         mode: 2000
-
-    - name: octal permissions test fail (777)
-      file: path=baz mode=777
-
-    - name: octal permissions test fail (0733)
-      file: path=baz mode=0733
 '''
 
 
@@ -101,7 +98,7 @@ class TestOctalPermissionsRuleWithFile(unittest.TestCase):
 
     def test_fail(self):
         results = self.runner.run_playbook(FAIL_TASKS)
-        self.assertEqual(5, len(results))
+        self.assertEqual(4, len(results))
 
     def test_valid_modes(self):
         for mode in self.VALID_MODES:
