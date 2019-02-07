@@ -309,7 +309,6 @@ def _rolepath(basedir, role):
             basedir, os.path.join('..', '..', '..', 'roles', role)
         ),
         path_dwim(basedir, os.path.join('..', '..', role)),
-        path_dwim(basedir, ''),
     ]
 
     if constants.DEFAULT_ROLES_PATH:
@@ -319,6 +318,8 @@ def _rolepath(basedir, role):
         for loc in search_locations:
             loc = os.path.expanduser(loc)
             possible_paths.append(path_dwim(loc, role))
+
+    possible_paths.append(path_dwim(basedir, ''))
 
     for path_option in possible_paths:
         if os.path.isdir(path_option):

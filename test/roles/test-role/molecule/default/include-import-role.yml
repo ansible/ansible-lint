@@ -1,0 +1,6 @@
+---
+- name: test
+  gather_facts: no
+  hosts: all
+  roles:
+    - role: test-role
