@@ -1,3 +1,20 @@
+4.1.0 - Released 11-Feb-2019
+============================
+
+- Support skipping specific rule(s) for a specific task `#460 <https://github.com/ansible/ansible-lint/pull/460>`_                                                                                                
+- Lint all yaml in tasks/ and handlers/ regardless of import or include `#462 <https://github.com/ansible/ansible-lint/pull/462>`_                                                                               
+- New rule: shell task uses pipeline without pipefail `#199 <https://github.com/ansible/ansible-lint/pull/199>`_                                                                                                  
+- Remove rule 405 checking for retry on package modules `#465 <https://github.com/ansible/ansible-lint/pull/465>`_                                                                                                
+- Limit env var check to command, not shell `#477 <https://github.com/ansible/ansible-lint/pull/477>`_
+- Extend max line length rule from 120 to 160 `#474 <https://github.com/ansible/ansible-lint/pull/474>`_
+- Do not flag octal file mode permission when it is a string `#480 <https://github.com/ansible/ansible-lint/pull/480>`_                                                                                           
+- Check ANSIBLE_ROLES_PATH before basedir `#478 <https://github.com/ansible/ansible-lint/pull/478>`_
+- Fix crash on indexing empty cmd arguments `#473 <https://github.com/ansible/ansible-lint/pull/473>`_
+- Handle argv syntax for the command module `#424 <https://github.com/ansible/ansible-lint/pull/424>`_
+- Add another possible license default with SPDX `#472 <https://github.com/ansible/ansible-lint/pull/472>`_
+- Ignore comments for line-based rules `#453 <https://github.com/ansible/ansible-lint/pull/453>`_
+- Allow config skip_list to have rule number id not in quotes `#463 <https://github.com/ansible/ansible-lint/pull/463>`_                                                                                          
+
 4.0.1 - Released 04-Jan-2019
 ============================
 

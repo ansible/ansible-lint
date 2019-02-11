@@ -1,11 +1,3 @@
-4.1.0
-=====
-
-- Skip specific rule(s) for a specific task #364
-- Lint all yaml in tasks/ and handlers/ regardless of import or include #373
-- New rule on using pipefail #442, #199
-- Remove rule 405 checking for retry on package modules #456
-
 4.2.0
 =====
 
