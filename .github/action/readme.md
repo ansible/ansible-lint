@@ -7,7 +7,7 @@ To use the action simply add the following lines to your `.github/main.workflow`
 
 ```hcl
 action "Lint Ansible Playbook" {
-  uses = "stoe/actions/ansible-lint@master"
+  uses = "ansible/ansible-lint/.github/action@master"
 }
 ```
 
