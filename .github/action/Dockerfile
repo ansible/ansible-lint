@@ -1,4 +1,4 @@
-FROM python:2.7-slim
+FROM python:3.7-slim
 
 LABEL "maintainer"="Ansible by Red Hat <info@ansible.com>"
 LABEL "repository"="https://github.com/ansible/lint"
