@@ -1,8 +1,8 @@
 FROM python:2.7-slim
 
-LABEL "maintainer"="stoe <stefan@stoelzle.me>"
-LABEL "repository"="https://github.com/stoe/actions"
-LABEL "homepage"="https://github.com/stoe/actions"
+LABEL "maintainer"="Ansible by Red Hat <info@ansible.com>"
+LABEL "repository"="https://github.com/ansible/lint"
+LABEL "homepage"="https://github.com/ansible/lint/tree/master/ansible-lint"
 LABEL "version"="1.0.0"
 
 LABEL "com.github.actions.name"="ansible-lint"
