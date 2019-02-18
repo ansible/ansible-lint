@@ -18,3 +18,8 @@ action "Lint Ansible Playbook" {
 
 ## License
 The Dockerfile and associated scripts and documentation in this project are released under the [MIT](license).
+
+
+## Credits
+The initial GitHub action has been created by [Stefan Stölzle](/stoe) at
+[stoe/actions](https://github.com/stoe/actions).
