@@ -22,7 +22,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
     def matchplay(self, file, play):
         errors = []
         if isinstance(play, dict):
-            if 'roles' not in play:
+            if 'roles' not in play or play['roles'] is None:
                 return errors
             for role in play['roles']:
                 if self.matchtask(file, role):
