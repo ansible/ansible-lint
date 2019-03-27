@@ -11,10 +11,10 @@ TASK_VARIABLES = '''
 - name: good variable format
   debug:
     msg: "Value: {{ good_format }}"
-- name: jijna escaping allowed
+- name: jinja escaping allowed
   debug:
     msg: "{{ '{{' }}"
-- name: jijna escaping allowed
+- name: jinja escaping allowed
   shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
 - name: bad variable format
   debug:
