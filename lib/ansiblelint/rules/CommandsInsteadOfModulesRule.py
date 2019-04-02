@@ -68,6 +68,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'wget': 'get_url or uri',
         'yum': 'yum',
     }
+    _exceptions = ['versionlock']
 
     def matchtask(self, file, task):
         if task['action']['__ansible_module__'] not in self._commands:
@@ -79,6 +80,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
 
         executable = os.path.basename(first_cmd_arg)
         if executable in self._modules and \
-                boolean(task['action'].get('warn', True)):
+                boolean(task['action'].get('warn', True)) and not\
+                any(i in self._exceptions for i in task['action']['__ansible_arguments__']):
             message = '{0} used in place of {1} module'
             return message.format(executable, self._modules[executable])
