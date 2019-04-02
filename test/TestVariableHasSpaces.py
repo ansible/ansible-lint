@@ -21,6 +21,7 @@ TASK_VARIABLES = '''
     msg: |
       {{ good_format }}/
       {{- good_format }}
+      {{- good_format -}}
 - name: bad variable format
   debug:
     msg: "{{bad_format}}"
