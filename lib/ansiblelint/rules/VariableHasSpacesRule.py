@@ -13,7 +13,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     tags = ['formatting']
     version_added = 'v4.0.0'
 
-    bracket_regex = re.compile("{{[^{' ]|[^ '}]}}")
+    bracket_regex = re.compile(r"{{[^{' -]|[^ '}-]}}")
 
     def match(self, file, line):
         return self.bracket_regex.search(line)
