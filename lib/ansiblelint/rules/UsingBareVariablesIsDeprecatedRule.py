@@ -66,5 +66,5 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
             if loop_type != 'with_fileglob' or not (self._jinja.search(varstring) or
                                                     self._glob.search(varstring)):
                 message = "Found a bare variable '{0}' used in a '{1}' loop." + \
-                          " You should use the full variable syntax ('{{{{{0}}}}}')"
+                          " You should use the full variable syntax ('{{{{ {0} }}}}')"
                 return message.format(task[loop_type], loop_type)
