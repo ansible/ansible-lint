@@ -1,7 +1,10 @@
 # Copyright (c) 2018, Ansible Project
 
-from ansiblelint import AnsibleLintRule
 import re
+
+import six
+
+from ansiblelint import AnsibleLintRule
 
 
 class MetaTagValidRule(AnsibleLintRule):
@@ -46,6 +49,11 @@ class MetaTagValidRule(AnsibleLintRule):
 
         for tag in tags:
             msg = self.shortdesc
+            if not isinstance(tag, six.string_types):
+                results.append((
+                    {'meta/main.yml': data},
+                    "Tags must be strings: '{}'".format(tag)))
+                continue
             if not re.match(self.TAG_REGEXP, tag):
                 results.append(({'meta/main.yml': data},
                                 "{}, invalid: '{}'".format(msg, tag)))
