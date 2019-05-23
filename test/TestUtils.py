@@ -141,6 +141,11 @@ class TestUtils(unittest.TestCase):
         result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
         self.assertEqual(result, "{{ hello | to_json }}")
 
+    def test_existing_filter_yaml_on_unknown_var(self):
+        v = "{{ hello | to_nice_yaml }}"
+        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
+        self.assertEqual(result, "{{ hello | to_nice_yaml }}")
+
     def test_task_to_str_unicode(self):
         task = dict(fail=dict(msg=u"unicode é ô à"))
         result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
