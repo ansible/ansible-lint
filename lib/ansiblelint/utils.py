@@ -613,8 +613,8 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
             ruamel_tasks = []
             pyyaml_tasks = []
             for ruamel_play, pyyaml_play in zip(ruamel_data, pyyaml_data):
-                ruamel_tasks.extend(ruamel_play.get('tasks'))
-                pyyaml_tasks.extend(pyyaml_play.get('tasks'))
+                ruamel_tasks.extend(ruamel_play.get('tasks', []))
+                pyyaml_tasks.extend(pyyaml_play.get('tasks', []))
         except (AttributeError, TypeError):
             return pyyaml_data
     elif file_type == 'meta':
