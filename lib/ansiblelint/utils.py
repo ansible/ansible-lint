@@ -602,6 +602,14 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
     """ Uses ruamel.yaml to parse comments then adds a
         skipped_rules list to the task (or meta yaml block)
     """
+
+    PLAYBOOK_TASK_KEYWORDS = [
+        'tasks',
+        'pre_tasks',
+        'post_tasks',
+        'handlers',
+    ]
+
     yaml = ruamel.yaml.YAML()
     ruamel_data = yaml.load(file_text)
 
@@ -613,8 +621,9 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
             ruamel_tasks = []
             pyyaml_tasks = []
             for ruamel_play, pyyaml_play in zip(ruamel_data, pyyaml_data):
-                ruamel_tasks.extend(ruamel_play.get('tasks', []))
-                pyyaml_tasks.extend(pyyaml_play.get('tasks', []))
+                for key in PLAYBOOK_TASK_KEYWORDS:
+                    ruamel_tasks.extend(ruamel_play.get(key, []))
+                    pyyaml_tasks.extend(pyyaml_play.get(key, []))
         except (AttributeError, TypeError):
             return pyyaml_data
     elif file_type == 'meta':
