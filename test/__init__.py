@@ -16,10 +16,11 @@ class RunFromText(object):
         return runner.run()
 
     def run_playbook(self, playbook_text):
-        with tempfile.NamedTemporaryFile() as fp:
-            fp.write(playbook_text.encode())
-            fp.seek(0)
-            results = self._call_runner(fp.name)
+        play_root = tempfile.mkdtemp()
+        with open(os.path.join(play_root, 'playbook.yml'), 'w') as fp:
+            fp.write(playbook_text)
+        results = self._call_runner(fp.name)
+        shutil.rmtree(play_root)
         return results
 
     def run_role_tasks_main(self, tasks_main_text):

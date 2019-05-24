@@ -107,7 +107,7 @@ class TestSkipInsideYaml(unittest.TestCase):
 
     def test_playbook(self):
         results = self.runner.run_playbook(PLAYBOOK)
-        self.assertEqual(8, len(results))
+        self.assertEqual(7, len(results))
 
     def test_role_meta(self):
         results = self.runner.run_role_meta_main(ROLE_META)
