@@ -77,6 +77,9 @@ class AnsibleLintRule(object):
         if not self.matchtask:
             return matches
 
+        if file['type'] == 'meta':
+            return matches
+
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
         if not yaml:
             return matches
