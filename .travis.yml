@@ -37,6 +37,24 @@ jobs:
 
   - python: "3.7"
     env:
+      ANSIBLE_VERSION: "28"
+
+  - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: "28"
+
+  - python: "3.5"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: "28"
+
+  - python: "2.7"
+    env:
+      ANSIBLE_VERSION: "28"
+
+  - python: "3.7"
+    env:
       ANSIBLE_VERSION: "27"
 
   - python: "3.6"
@@ -70,24 +88,6 @@ jobs:
   - python: "2.7"
     env:
       ANSIBLE_VERSION: "26"
-
-  - python: "3.7"
-    env:
-      ANSIBLE_VERSION: "25"
-
-  - python: "3.6"
-    <<: *if-cron-or-manual-run-or-tagged
-    env:
-      ANSIBLE_VERSION: "25"
-
-  - python: "3.5"
-    <<: *if-cron-or-manual-run-or-tagged
-    env:
-      ANSIBLE_VERSION: "25"
-
-  - python: "2.7"
-    env:
-      ANSIBLE_VERSION: "25"
 
   - python: "3.7"
     <<: *if-cron-or-manual-run-or-tagged
