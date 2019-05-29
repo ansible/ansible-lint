@@ -599,9 +599,19 @@ def get_first_cmd_arg(task):
 
 
 def append_skipped_rules(pyyaml_data, file_text, file_type):
-    """ Uses ruamel.yaml to parse comments then adds a
-        skipped_rules list to the task (or meta yaml block)
+    """Append 'skipped_rules' to individual tasks or single metadata block.
+
+    For a file, uses 2nd parser (ruamel.yaml) to pull comments out of
+    yaml subsets, check for '# noqa' skipped rules, and append any skips to the
+    original parser (pyyaml) data relied on by remainder of ansible-lint.
+
+    :param pyyaml_data: file text parsed via ansible and pyyaml.
+    :param file_text: raw file text.
+    :param file_type: type of file: tasks, handlers or meta.
+    :returns: original pyyaml_data altered with a 'skipped_rules' list added
+    to individual tasks, or added to the single metadata block.
     """
+
     # parse file text using 2nd parser library
     yaml = ruamel.yaml.YAML()
     ruamel_data = yaml.load(file_text)
