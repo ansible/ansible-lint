@@ -629,6 +629,10 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
     else:
         raise RuntimeError('Unexpected file type')
 
+    # get tasks from blocks of tasks
+    pyyaml_tasks = _get_tasks_from_blocks(pyyaml_task_blocks)
+    ruamel_tasks = _get_tasks_from_blocks(ruamel_task_blocks)
+
     if len(ruamel_tasks) != len(pyyaml_tasks):
         return pyyaml_data
 
@@ -654,6 +658,24 @@ def _get_task_blocks_from_playbook(playbook):
         for key in PLAYBOOK_TASK_KEYWORDS:
             task_blocks.extend(play.get(key, []))
     return task_blocks
+
+
+def _get_tasks_from_blocks(task_blocks):
+    """Get list of tasks from list made of tasks and nested tasks."""
+    NESTED_TASK_KEYS = [
+        'block',
+        'always',
+        'rescue',
+    ]
+
+    tasks = []
+    for item in task_blocks:
+        for key in NESTED_TASK_KEYS:
+            if item.get(key):
+                tasks.extend(item[key])
+                continue
+        tasks.append(item)
+    return tasks
 
 
 def _get_rule_skips_from_task(task):
