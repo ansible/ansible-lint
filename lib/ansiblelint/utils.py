@@ -608,7 +608,7 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
 
     # if file type is 'meta', add skips to metadata block and return
     if file_type == 'meta':
-        skipped_rules = _get_rule_skips_from_task(ruamel_data)
+        skipped_rules = _get_rule_skips_from_yaml(ruamel_data)
         if skipped_rules:
             pyyaml_data[0]['skipped_rules'] = skipped_rules
         return pyyaml_data
@@ -637,7 +637,7 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
         return pyyaml_data
 
     for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks):
-        skipped_rules = _get_rule_skips_from_task(ruamel_task)
+        skipped_rules = _get_rule_skips_from_yaml(ruamel_task)
         if skipped_rules:
             pyyaml_task['skipped_rules'] = skipped_rules
 
@@ -678,9 +678,10 @@ def _get_tasks_from_blocks(task_blocks):
     return tasks
 
 
-def _get_rule_skips_from_task(task):
+def _get_rule_skips_from_yaml(yaml):
+    """Travese yaml for comments with rule skips and return list of rules."""
     def traverse_yaml(obj):
-        task_comment_obj_strs.append(str(obj.ca.items))
+        yaml_comment_obj_strs.append(str(obj.ca.items))
         if isinstance(obj, dict):
             for key, val in obj.items():
                 if isinstance(val, (dict, list)):
@@ -692,11 +693,11 @@ def _get_rule_skips_from_task(task):
         else:
             return
 
-    task_comment_obj_strs = []
-    traverse_yaml(task)
+    yaml_comment_obj_strs = []
+    traverse_yaml(yaml)
 
     rule_id_list = []
-    for comment_obj_str in task_comment_obj_strs:
+    for comment_obj_str in yaml_comment_obj_strs:
         for line in comment_obj_str.split('\\n'):
             rule_id_list.extend(get_rule_skips_from_line(line))
 
