@@ -613,28 +613,21 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
             pyyaml_data[0]['skipped_rules'] = skipped_rules
         return pyyaml_data
 
-    PLAYBOOK_TASK_KEYWORDS = [
-        'tasks',
-        'pre_tasks',
-        'post_tasks',
-        'handlers',
-    ]
-
+    # create list of blocks of tasks or nested tasks
     if file_type in ('tasks', 'handlers'):
-        ruamel_tasks = ruamel_data
-        pyyaml_tasks = pyyaml_data
+        ruamel_task_blocks = ruamel_data
+        pyyaml_task_blocks = pyyaml_data
     elif file_type == 'playbook':
         try:
-            ruamel_tasks = []
-            pyyaml_tasks = []
-            for ruamel_play, pyyaml_play in zip(ruamel_data, pyyaml_data):
-                for key in PLAYBOOK_TASK_KEYWORDS:
-                    ruamel_tasks.extend(ruamel_play.get(key, []))
-                    pyyaml_tasks.extend(pyyaml_play.get(key, []))
+            pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
+            ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)
         except (AttributeError, TypeError):
+            # TODO(awcrosby): running ansible-lint on any .yml file will
+            # assume it is a playbook, check needs to be added higher in the
+            # call stack, and can remove this except
             return pyyaml_data
     else:
-        return pyyaml_data
+        raise RuntimeError('Unexpected file type')
 
     if len(ruamel_tasks) != len(pyyaml_tasks):
         return pyyaml_data
@@ -645,6 +638,22 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
             pyyaml_task['skipped_rules'] = skipped_rules
 
     return pyyaml_data
+
+
+def _get_task_blocks_from_playbook(playbook):
+    """Return parts of playbook that contains tasks, and nested tasks."""
+    PLAYBOOK_TASK_KEYWORDS = [
+        'tasks',
+        'pre_tasks',
+        'post_tasks',
+        'handlers',
+    ]
+
+    task_blocks = []
+    for play in playbook:
+        for key in PLAYBOOK_TASK_KEYWORDS:
+            task_blocks.extend(play.get(key, []))
+    return task_blocks
 
 
 def _get_rule_skips_from_task(task):
