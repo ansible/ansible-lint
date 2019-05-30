@@ -32,7 +32,10 @@ steps:
 - script: |
     python -m pip install --upgrade tox
     python -m tox --parallel auto --notest
-    .tox/python/bin/python -m pip install pytest pytest-azurepipelines
+    for py_exe in `ls .tox/*/bin/python`
+    do
+        $py_exe -m pip install pytest pytest-azurepipelines
+    done
   displayName: 'Install dependencies using tox'
 
 - script: |
