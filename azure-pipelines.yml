@@ -39,5 +39,5 @@ steps:
   displayName: 'Install dependencies using tox'
 
 - script: |
-    python -m tox --parallel auto
+    python -m tox --parallel 0
   displayName: 'Run test suite via tox'
