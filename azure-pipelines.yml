@@ -31,10 +31,10 @@ steps:
 
 - script: |
     python -m pip install --upgrade tox
-    python -m tox --parallel --notest
+    python -m tox --parallel auto --notest
     .tox/python/bin/python -m pip install pytest pytest-azurepipelines
   displayName: 'Install dependencies using tox'
 
 - script: |
-    python -m tox --parallel
+    python -m tox --parallel auto
   displayName: 'Run test suite via tox'
