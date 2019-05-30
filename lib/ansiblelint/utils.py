@@ -612,6 +612,16 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
     to individual tasks, or added to the single metadata block.
     """
 
+    try:
+        yaml_skip = _append_skipped_rules(pyyaml_data, file_text, file_type)
+    except Exception as exc:
+        # Notify user of skip error, do not stop, do not change exit code
+        print('Error trying to append skipped rules: {}'.format(repr(exc)))
+        return pyyaml_data
+    return yaml_skip
+
+
+def _append_skipped_rules(pyyaml_data, file_text, file_type):
     # parse file text using 2nd parser library
     yaml = ruamel.yaml.YAML()
     ruamel_data = yaml.load(file_text)
