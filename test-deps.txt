@@ -1,5 +1,0 @@
-flake8
-nose
-pep8-naming
-wheel
-ruamel.yaml
