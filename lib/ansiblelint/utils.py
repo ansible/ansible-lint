@@ -21,6 +21,7 @@
 import glob
 import imp
 import os
+from itertools import product
 
 import six
 from ansible import constants
@@ -614,9 +615,9 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
 
     try:
         yaml_skip = _append_skipped_rules(pyyaml_data, file_text, file_type)
-    except Exception as exc:
+    except RuntimeError as exc:
         # Notify user of skip error, do not stop, do not change exit code
-        print('Error trying to append skipped rules: {}'.format(repr(exc)))
+        print('Error trying to append skipped rules: {!r}'.format(exc))
         return pyyaml_data
     return yaml_skip
 
@@ -626,11 +627,8 @@ def _append_skipped_rules(pyyaml_data, file_text, file_type):
     yaml = ruamel.yaml.YAML()
     ruamel_data = yaml.load(file_text)
 
-    # if file type is 'meta', add skips to metadata block and return
     if file_type == 'meta':
-        skipped_rules = _get_rule_skips_from_yaml(ruamel_data)
-        if skipped_rules:
-            pyyaml_data[0]['skipped_rules'] = skipped_rules
+        pyyaml_data[0]['skipped_rules'] = _get_rule_skips_from_yaml(ruamel_data)
         return pyyaml_data
 
     # create list of blocks of tasks or nested tasks
@@ -647,7 +645,7 @@ def _append_skipped_rules(pyyaml_data, file_text, file_type):
             # call stack, and can remove this except
             return pyyaml_data
     else:
-        raise RuntimeError('Unexpected file type')
+        raise RuntimeError('Unexpected file type: {}'.format(file_type))
 
     # get tasks from blocks of tasks
     pyyaml_tasks = _get_tasks_from_blocks(pyyaml_task_blocks)
@@ -665,7 +663,11 @@ def _append_skipped_rules(pyyaml_data, file_text, file_type):
 
 
 def _get_task_blocks_from_playbook(playbook):
-    """Return parts of playbook that contains tasks, and nested tasks."""
+    """Return parts of playbook that contains tasks, and nested tasks.
+
+    :param playbook: playbook yaml from yaml parser.
+    :returns: list of task dictionaries.
+    """
     PLAYBOOK_TASK_KEYWORDS = [
         'tasks',
         'pre_tasks',
@@ -674,9 +676,8 @@ def _get_task_blocks_from_playbook(playbook):
     ]
 
     task_blocks = []
-    for play in playbook:
-        for key in PLAYBOOK_TASK_KEYWORDS:
-            task_blocks.extend(play.get(key, []))
+    for play, key in product(playbook, PLAYBOOK_TASK_KEYWORDS):
+        task_blocks.extend(play.get(key, []))
     return task_blocks
 
 
@@ -688,17 +689,19 @@ def _get_tasks_from_blocks(task_blocks):
         'rescue',
     ]
 
+    def get_nested_tasks(task):
+        return [task[k] for k in NESTED_TASK_KEYS if task.get(k)]
+
     tasks = []
     for item in task_blocks:
-        for key in NESTED_TASK_KEYS:
-            if item.get(key):
-                tasks.extend(item[key])
-                continue
+        for sub_task in get_nested_tasks(item):
+            tasks.extend(sub_task)
         tasks.append(item)
+
     return tasks
 
 
-def _get_rule_skips_from_yaml(yaml):
+def _get_rule_skips_from_yaml(yaml_input):
     """Travese yaml for comments with rule skips and return list of rules."""
     def traverse_yaml(obj):
         yaml_comment_obj_strs.append(str(obj.ca.items))
@@ -714,7 +717,7 @@ def _get_rule_skips_from_yaml(yaml):
             return
 
     yaml_comment_obj_strs = []
-    traverse_yaml(yaml)
+    traverse_yaml(yaml_input)
 
     rule_id_list = []
     for comment_obj_str in yaml_comment_obj_strs:
