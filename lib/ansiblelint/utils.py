@@ -655,9 +655,7 @@ def _append_skipped_rules(pyyaml_data, file_text, file_type):
     for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks):
         if pyyaml_task.get('name') != ruamel_task.get('name'):
             raise RuntimeError('Error in matching skip comment to a task')
-        skipped_rules = _get_rule_skips_from_yaml(ruamel_task)
-        if skipped_rules:
-            pyyaml_task['skipped_rules'] = skipped_rules
+        pyyaml_task['skipped_rules'] = _get_rule_skips_from_yaml(ruamel_task)
 
     return pyyaml_data
 
@@ -690,15 +688,16 @@ def _get_tasks_from_blocks(task_blocks):
     ]
 
     def get_nested_tasks(task):
-        return [task[k] for k in NESTED_TASK_KEYS if task.get(k)]
+        return (
+            subtask
+            for k in NESTED_TASK_KEYS if k in task
+            for subtask in task[k]
+        )
 
-    tasks = []
-    for item in task_blocks:
-        for sub_task in get_nested_tasks(item):
-            tasks.extend(sub_task)
-        tasks.append(item)
-
-    return tasks
+    for task in task_blocks:
+        for sub_task in get_nested_tasks(task):
+            yield sub_task
+        yield task
 
 
 def _get_rule_skips_from_yaml(yaml_input):
