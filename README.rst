@@ -294,6 +294,8 @@ To use ansible-lint with `pre-commit`_, just add the following to your local rep
         - id: ansible-lint
           files: \.(yaml|yml)$
 
+.. _pre-commit: https://pre-commit.com
+
 .. configuring-docs-inclusion-marker-end-do-not-remove
 
 Rules
@@ -474,7 +476,6 @@ Authors
 
 ansible-lint was created by `Will Thames`_ and is now maintained as part of the `Ansible`_ by `Red Hat`_ project.
 
-.. _pre-commit: https://pre-commit.com
 .. _Contribution guidelines: https://github.com/ansible/ansible-lint/blob/master/CONTRIBUTING.md
 .. _Will Thames: https://github.com/willthames
 .. _Ansible: https://ansible.com
