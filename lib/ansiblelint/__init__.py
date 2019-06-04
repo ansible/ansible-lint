@@ -24,6 +24,7 @@ import os
 import re
 
 import ansiblelint.utils
+import ansiblelint.skip_utils
 
 default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
 _logger = logging.getLogger(__name__)
@@ -55,7 +56,7 @@ class AnsibleLintRule(object):
             if line.lstrip().startswith('#'):
                 continue
 
-            rule_id_list = ansiblelint.utils.get_rule_skips_from_line(line)
+            rule_id_list = ansiblelint.skip_utils.get_rule_skips_from_line(line)
             if self.id in rule_id_list:
                 continue
 
@@ -81,7 +82,7 @@ class AnsibleLintRule(object):
         if not yaml:
             return matches
 
-        yaml = ansiblelint.utils.append_skipped_rules(yaml, text, file['type'])
+        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, text, file['type'])
 
         for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
             if self.id in task.get('skipped_rules', ()):
@@ -113,7 +114,7 @@ class AnsibleLintRule(object):
         if isinstance(yaml, dict):
             yaml = [yaml]
 
-        yaml = ansiblelint.utils.append_skipped_rules(yaml, text, file['type'])
+        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, text, file['type'])
 
         for play in yaml:
             if self.id in play.get('skipped_rules', ()):
