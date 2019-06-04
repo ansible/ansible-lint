@@ -13,36 +13,30 @@ ROLE_TASKS = '''
 - name: test 303 (skipped)
   command: git log # noqa 303
   changed_when: False
+'''
 
-- name: test 401 and 501
-  become_user: alice
-  action: git
-- name: test 401 and 501 (skipped)  # noqa 401 501
-  become_user: alice
-  action: git
-- name: test 401 and 501 (skipped via skip_ansible_lint)
-  become_user: alice
-  action: git
-  tags:
-    skip_ansible_lint
-
-- name: test 601
-  debug:
-    msg: testing
-  when: my_var == true
-- name: test 601 (skipped)
-  debug:
-    msg: testing
-  when: my_var == true  # noqa 601
-
-- name: test 303
-  command: git log
-  changed_when: False
-- name: test 303 (skipped via no warn)
-  command: git log
-  args:
-    warn: False
-  changed_when: False
+ROLE_TASKS_WITH_BLOCK = '''
+---
+- name: bad git 1  # noqa 401
+  action: git a=b c=d
+- name: bad git 2
+  action: git a=b c=d
+- name: Block with rescue and always section
+  block:
+    - name: bad git 3  # noqa 401
+      action: git a=b c=d
+    - name: bad git 4
+      action: git a=b c=d
+  rescue:
+    - name: bad git 5  # noqa 401
+      action: git a=b c=d
+    - name: bad git 6
+      action: git a=b c=d
+  always:
+    - name: bad git 7  # noqa 401
+      action: git a=b c=d
+    - name: bad git 8
+      action: git a=b c=d
 '''
 
 PLAYBOOK = '''
@@ -103,7 +97,11 @@ class TestSkipInsideYaml(unittest.TestCase):
 
     def test_role_tasks(self):
         results = self.runner.run_role_tasks_main(ROLE_TASKS)
-        self.assertEqual(5, len(results))
+        self.assertEqual(1, len(results))
+
+    def test_role_tasks_with_block(self):
+        results = self.runner.run_role_tasks_main(ROLE_TASKS_WITH_BLOCK)
+        self.assertEqual(4, len(results))
 
     def test_playbook(self):
         results = self.runner.run_playbook(PLAYBOOK)
