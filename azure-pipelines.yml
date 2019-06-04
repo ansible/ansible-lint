@@ -12,12 +12,16 @@ strategy:
   matrix:
     Python27:
       python.version: '2.7'
+      TOXENV: ansible{28,27,26,devel}
     Python35:
       python.version: '3.5'
+      TOXENV: ansible{28,27,26,devel}
     Python36:
       python.version: '3.6'
+      TOXENV: ansible{28,27,26,devel}
     Python37:
       python.version: '3.7'
+      TOXENV: ansible{28,27,26,devel}
 
 steps:
 - task: UsePythonVersion@0
@@ -27,10 +31,13 @@ steps:
 
 - script: |
     python -m pip install --upgrade tox
-    python -m tox --notest
-    .tox/python/bin/python -m pip install pytest pytest-azurepipelines
+    python -m tox --parallel auto --notest
+    for py_exe in `ls .tox/*/bin/python`
+    do
+        $py_exe -m pip install pytest pytest-azurepipelines
+    done
   displayName: 'Install dependencies using tox'
 
 - script: |
-    python -m tox
+    python -m tox --parallel 0
   displayName: 'Run test suite via tox'
