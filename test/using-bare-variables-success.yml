@@ -166,6 +166,14 @@
         msg: "{{ item }}"
       with_flattened: "{{ my_list_of_lists }}"
 
+    - name: with_flattened loop with a multiline template
+      debug:
+        msg: "{{ item }}"
+      with_flattened: >
+        {{ my_list
+           | union(my_list2)
+           | list }}
+
     - name: with_inventory_hostnames loop
       debug:
         msg: "{{ item }}"

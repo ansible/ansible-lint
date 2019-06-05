@@ -35,7 +35,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     tags = ['deprecated', 'formatting', 'ANSIBLE0015']
     version_added = 'historic'
 
-    _jinja = re.compile(r"{{.*}}")
+    _jinja = re.compile(r"{{.*}}", re.DOTALL)
     _glob = re.compile('[][*?]')
 
     def matchtask(self, file, task):
