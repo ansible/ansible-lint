@@ -1,6 +1,8 @@
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 
+import six
+
 from ansiblelint import AnsibleLintRule
 
 
@@ -36,11 +38,29 @@ class MetaMainHasInfoRule(AnsibleLintRule):
                 results.append(({'meta/main.yml': data},
                                 'Role info should contain %s' % info))
 
+        for info in ['author', 'description']:
+            if not galaxy_info.get(info):
+                continue
+            if not isinstance(galaxy_info.get(info), six.string_types):
+                results.append(({'meta/main.yml': data},
+                                '%s should be a string' % info))
+
         platforms = galaxy_info.get('platforms', None)
-        if platforms:
-            for platform in platforms:
-                if not platform.get('name', None):
-                    results.append(({'meta/main.yml': data},
-                                    'Platform should contain name'))
+        if not platforms:
+            return results
+
+        if not isinstance(platforms, list):
+            results.append(({'meta/main.yml': data},
+                            'Platforms should be a list of dictionaries'))
+            return results
+
+        for platform in platforms:
+            if not isinstance(platform, dict):
+                results.append(({'meta/main.yml': data},
+                                'Platforms should be a list of dictionaries'))
+                continue
+            if not platform.get('name', None):
+                results.append(({'meta/main.yml': data},
+                                'Platform should contain name'))
 
         return results
