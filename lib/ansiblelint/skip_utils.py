@@ -157,7 +157,7 @@ def _get_rule_skips_from_yaml(yaml_input):
 
     rule_id_list = []
     for comment_obj_str in yaml_comment_obj_strs:
-        for line in comment_obj_str.split('\\n'):
+        for line in comment_obj_str.split(r'\n'):
             rule_id_list.extend(get_rule_skips_from_line(line))
 
     return rule_id_list
