@@ -31,6 +31,10 @@ TASK_VARIABLES = '''
 - name: bad variable format
   debug:
     msg: "{{bad_format }}"
+- name: not a jinja variable
+  debug:
+    msg: "test"
+  example: "data = ${lookup{$local_part}lsearch{/etc/aliases}}"
 '''
 
 
