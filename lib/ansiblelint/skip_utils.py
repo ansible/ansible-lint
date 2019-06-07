@@ -24,12 +24,14 @@ from itertools import product
 
 import ruamel.yaml
 
+INLINE_SKIP_FLAG = '# noqa'
+
 
 def get_rule_skips_from_line(line):
     """Return list of rule ids skipped via comment on the line of yaml."""
     rule_id_list = []
-    if '# noqa' in line:
-        noqa_text = line.split('# noqa')[1]
+    if INLINE_SKIP_FLAG in line:
+        noqa_text = line.split(INLINE_SKIP_FLAG)[1]
         rule_id_list = noqa_text.split()
     return rule_id_list
 
