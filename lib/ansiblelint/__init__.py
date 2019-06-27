@@ -21,6 +21,7 @@
 from __future__ import print_function
 from collections import defaultdict
 import os
+import re
 import sys
 
 import six
@@ -43,6 +44,10 @@ class AnsibleLintRule(object):
     matchtask = None
     matchplay = None
 
+    @staticmethod
+    def unjinja(text):
+        return re.sub(r"{{[^}]*}}", "JINJA_VAR", text)
+
     def matchlines(self, file, text):
         matches = []
         if not self.match:
@@ -50,53 +55,86 @@ class AnsibleLintRule(object):
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(text.split("\n")):
+            if line.lstrip().startswith('#'):
+                continue
+
+            rule_id_list = ansiblelint.utils.get_rule_skips_from_line(line)
+            if self.id in rule_id_list:
+                continue
+
             result = self.match(file, line)
-            if result:
-                message = None
-                if isinstance(result, str):
-                    message = result
-                matches.append(Match(prev_line_no+1, line,
-                               file['path'], self, message))
+            if not result:
+                continue
+            message = None
+            if isinstance(result, six.string_types):
+                message = result
+            matches.append(Match(prev_line_no+1, line,
+                           file['path'], self, message))
         return matches
 
     def matchtasks(self, file, text):
         matches = []
         if not self.matchtask:
             return matches
+
+        if file['type'] == 'meta':
+            return matches
+
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
-        if yaml:
-            for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
-                if 'action' in task:
-                    result = self.matchtask(file, task)
-                    if result:
-                        message = None
-                        if isinstance(result, six.string_types):
-                            message = result
-                        taskstr = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-                        matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], taskstr,
-                                       file['path'], self, message))
+        if not yaml:
+            return matches
+
+        yaml = ansiblelint.utils.append_skipped_rules(yaml, text, file['type'])
+
+        for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
+            if self.id in task.get('skipped_rules', ()):
+                continue
+
+            if 'action' not in task:
+                continue
+            result = self.matchtask(file, task)
+            if not result:
+                continue
+
+            message = None
+            if isinstance(result, six.string_types):
+                message = result
+            task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
+            matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
+                           file['path'], self, message))
         return matches
 
     def matchyaml(self, file, text):
         matches = []
         if not self.matchplay:
             return matches
+
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
-        if yaml and hasattr(self, 'matchplay'):
-            if isinstance(yaml, dict):
-                yaml = [yaml]
-            for play in yaml:
-                result = self.matchplay(file, play)
-                if result:
-                    if isinstance(result, tuple):
-                        result = [result]
+        if not yaml:
+            return matches
 
-                    if not isinstance(result, list):
-                        raise Exception("{} is not a list".format(result))
+        if isinstance(yaml, dict):
+            yaml = [yaml]
 
-                    for section, message in result:
-                        matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY],
-                                             section, file['path'], self, message))
+        yaml = ansiblelint.utils.append_skipped_rules(yaml, text, file['type'])
+
+        for play in yaml:
+            if self.id in play.get('skipped_rules', ()):
+                continue
+
+            result = self.matchplay(file, play)
+            if not result:
+                continue
+
+            if isinstance(result, tuple):
+                result = [result]
+
+            if not isinstance(result, list):
+                raise TypeError("{} is not a list".format(result))
+
+            for section, message in result:
+                matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY],
+                                     section, file['path'], self, message))
         return matches
 
 
@@ -234,6 +272,10 @@ class Runner(object):
                 visited.add(arg)
 
         matches = list()
+
+        # remove duplicates from files list
+        files = [value for n, value in enumerate(files) if value not in files[:n]]
+
         # remove files that have already been checked
         files = [x for x in files if x['path'] not in self.checked_files]
         for file in files:

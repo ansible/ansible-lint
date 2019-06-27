@@ -24,6 +24,8 @@ from ansiblelint import AnsibleLintRule
 
 
 def _changed_in_when(item):
+    if not isinstance(item, six.string_types):
+        return False
     return any(changed in item for changed in
                ['.changed', '|changed', '["changed"]', "['changed']"])
 
@@ -31,16 +33,22 @@ def _changed_in_when(item):
 class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     id = '503'
     shortdesc = 'Tasks that run when changed should likely be handlers'
-    description = "If a task has a `when: result.changed` setting, it's effectively " \
-                  "acting as a handler"
+    description = (
+        'If a task has a ``when: result.changed`` setting, it is effectively '
+        'acting as a handler'
+    )
+    severity = 'MEDIUM'
     tags = ['task', 'behaviour', 'ANSIBLE0016']
+    version_added = 'historic'
 
     def matchtask(self, file, task):
-        if task["__ansible_action_type__"] == 'task':
-            when = task.get('when')
-            if isinstance(when, list):
-                for item in when:
-                    if _changed_in_when(item):
-                        return True
-            if isinstance(when, six.string_types):
-                return _changed_in_when(when)
+        if task["__ansible_action_type__"] != 'task':
+            return False
+
+        when = task.get('when')
+
+        if isinstance(when, list):
+            for item in when:
+                return _changed_in_when(item)
+        else:
+            return _changed_in_when(when)

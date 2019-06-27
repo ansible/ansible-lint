@@ -1,66 +1,66 @@
 import unittest
 
+from ansiblelint import RulesCollection
 from ansiblelint.rules.SudoRule import SudoRule
-import ansiblelint.utils
+from test import RunFromText
+
+ROLE_2_ERRORS = '''
+- name: test
+  debug:
+    msg: 'test message'
+  sudo: yes
+  sudo_user: nobody
+'''
+
+ROLE_0_ERRORS = '''
+- name: test
+  debug:
+    msg: 'test message'
+  become: yes
+  become_user: somebody
+'''
+
+PLAY_4_ERRORS = '''
+- hosts: all
+  sudo: yes
+  sudo_user: somebody
+  tasks:
+  - name: test
+    debug:
+      msg: 'test message'
+    sudo: yes
+    sudo_user: nobody
+'''
+
+PLAY_1_ERROR = '''
+- hosts: all
+  tasks:
+  - name: test
+    debug:
+      msg: 'test message'
+    sudo: yes
+'''
 
 
 class TestSudoRule(unittest.TestCase):
-    simple_dict_yaml = {
-        'value1': '{foo}}',
-        'value2': 2,
-        'value3': ['foo', 'bar', '{baz}}'],
-        'value4': '{bar}',
-        'value5': '{{baz}',
-    }
+    collection = RulesCollection()
+    collection.register(SudoRule())
 
     def setUp(self):
-        self.rule = SudoRule()
+        self.runner = RunFromText(self.collection)
 
-    def test_check_value_simple_matching(self):
-        result = self.rule._check_value("sudo: yes")
-        self.assertEquals(0, len(result))
+    def test_run_role_fail(self):
+        results = self.runner.run_role_tasks_main(ROLE_2_ERRORS)
+        self.assertEqual(2, len(results))
 
-    def test_check_value_shallow_dict(self):
-        result = self.rule._check_value({ 'sudo': 'yes', 'sudo_user': 'somebody' })
-        self.assertEquals(2, len(result))
+    def test_run_role_pass(self):
+        results = self.runner.run_role_tasks_main(ROLE_0_ERRORS)
+        self.assertEqual(0, len(results))
 
-    def test_check_value_nested(self):
-        yaml = [
-            {
-                'hosts': 'all',
-                'sudo': 'yes',
-                'sudo_user': 'nobody',
-                'tasks': [
-                   {
-                      'name': 'test',
-                      'debug': 'msg=test',
-                      'sudo': 'yes',
-                      'sudo_user': 'somebody'
-                   }
-                ]
-            }
-        ]
-        result = self.rule._check_value(yaml)
-        self.assertEquals(2, len(result))
+    def test_play_root_and_task_fail(self):
+        results = self.runner.run_playbook(PLAY_4_ERRORS)
+        self.assertEqual(4, len(results))
 
-
-class TestSudoRuleWithFile(unittest.TestCase):
-    file1 = 'test/sudo.yml'
-
-    def setUp(self):
-        self.rule = SudoRule()
-
-    def test_matchplay_sudo(self):
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(open(self.file1).read(), self.file1)
-
-        self.assertTrue(yaml)
-        for play in yaml:
-            result = self.rule.matchplay(self.file1, play)
-            self.assertEquals(2, len(result))
-
-    def test_matchtask_sudo(self):
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(open(self.file1).read(), self.file1)
-        results = []
-        for task in ansiblelint.utils.get_normalized_tasks(yaml, dict(path=self.file1, type='playbook')):
-            results.append(self.rule.matchtask(self.file1, task))
-        self.assertEquals(1, len([result for result in results if result]))
+    def test_play_task_fail(self):
+        results = self.runner.run_playbook(PLAY_1_ERROR)
+        self.assertEqual(1, len(results))

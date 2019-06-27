@@ -1,6 +1,77 @@
 import unittest
-from ansiblelint import Runner, RulesCollection
+
+from ansiblelint import RulesCollection
 from ansiblelint.rules.OctalPermissionsRule import OctalPermissionsRule
+from test import RunFromText
+
+SUCCESS_TASKS = '''
+---
+- hosts: hosts
+  vars:
+    varset: varset
+  tasks:
+    - name: octal permissions test success (0600)
+      file:
+        path: foo
+        mode: 0600
+
+    - name: octal permissions test success (0000)
+      file:
+        path: foo
+        mode: 0000
+
+    - name: octal permissions test success (02000)
+      file:
+        path: bar
+        mode: 02000
+
+    - name: octal permissions test success (02751)
+      file:
+        path: bar
+        mode: 02751
+
+    - name: octal permissions test success (0777)
+      file: path=baz mode=0777
+
+    - name: octal permissions test success (0711)
+      file: path=baz mode=0711
+
+    - name:  permissions test success (0777)
+      file: path=baz mode=u+rwx
+
+    - name: octal permissions test success (777)
+      file: path=baz mode=777
+
+    - name: octal permissions test success (733)
+      file: path=baz mode=733
+'''
+
+FAIL_TASKS = '''
+---
+- hosts: hosts
+  vars:
+    varset: varset
+  tasks:
+    - name: octal permissions test fail (600)
+      file:
+        path: foo
+        mode: 600
+
+    - name: octal permissions test fail (710)
+      file:
+        path: foo
+        mode: 710
+
+    - name: octal permissions test fail (123)
+      file:
+        path: foo
+        mode: 123
+
+    - name: octal permissions test fail (2000)
+      file:
+        path: bar
+        mode: 2000
+'''
 
 
 class TestOctalPermissionsRuleWithFile(unittest.TestCase):
@@ -19,17 +90,15 @@ class TestOctalPermissionsRuleWithFile(unittest.TestCase):
     def setUp(self):
         self.rule = OctalPermissionsRule()
         self.collection.register(self.rule)
+        self.runner = RunFromText(self.collection)
 
-    def test_file_positive(self):
-        success = 'test/octalpermissions-success.yml'
-        good_runner = Runner(self.collection, success, [], [], [])
-        self.assertEqual([], good_runner.run())
+    def test_success(self):
+        results = self.runner.run_playbook(SUCCESS_TASKS)
+        self.assertEqual(0, len(results))
 
-    def test_file_negative(self):
-        failure = 'test/octalpermissions-failure.yml'
-        bad_runner = Runner(self.collection, failure, [], [], [])
-        errs = bad_runner.run()
-        self.assertEqual(5, len(errs))
+    def test_fail(self):
+        results = self.runner.run_playbook(FAIL_TASKS)
+        self.assertEqual(4, len(results))
 
     def test_valid_modes(self):
         for mode in self.VALID_MODES:

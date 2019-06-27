@@ -1,21 +1,86 @@
 import unittest
-from ansiblelint import RulesCollection, Runner
+
+from ansiblelint import RulesCollection
 from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import UseHandlerRatherThanWhenChangedRule
+from test import RunFromText
+
+
+SUCCESS_TASKS = '''
+- name: print helpful error message
+  debug:
+    var: result
+  when: result.failed
+
+- name: do something when hello is output
+  debug:
+    msg: why isn't this a handler
+  when: result.stdout == "hello"
+
+- name: never actually debug
+  debug:
+    var: result
+  when: False
+
+- name: Dont execute this step
+  debug:
+    msg: "debug message"
+  when:
+    - false
+
+- name: check when with a list
+  debug:
+    var: result
+  when:
+  - conditionA
+  - conditionB
+'''
+
+
+FAIL_TASKS = '''
+- name: execute command
+  command: echo hello
+  register: result
+
+- name: this should be a handler
+  debug:
+    msg: why isn't this a handler
+  when: result.changed
+
+- name: this should be a handler 2
+  debug:
+    msg: why isn't this a handler
+  when: result|changed
+
+- name: this should be a handler 3
+  debug:
+    msg: why isn't this a handler
+  when: result.changed == true
+
+- name: this should be a handler 4
+  debug:
+    msg: why isn't this a handler
+  when: result['changed'] == true
+
+- name: this should be a handler 5
+  debug:
+    msg: why isn't this a handler
+  when:
+  - result['changed'] == true
+  - another_condition
+'''
 
 
 class TestUseHandlerRatherThanWhenChanged(unittest.TestCase):
     collection = RulesCollection()
+    collection.register(UseHandlerRatherThanWhenChangedRule())
 
     def setUp(self):
-        self.collection.register(UseHandlerRatherThanWhenChangedRule())
+        self.runner = RunFromText(self.collection)
 
-    def test_file_positive(self):
-        success = 'test/use-handler-rather-than-when-changed-success.yml'
-        good_runner = Runner(self.collection, success, [], [], [])
-        self.assertEqual([], good_runner.run())
+    def test_success(self):
+        results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
+        self.assertEqual(0, len(results))
 
-    def test_file_negative(self):
-        failure = 'test/use-handler-rather-than-when-changed-failure.yml'
-        bad_runner = Runner(self.collection, failure, [], [], [])
-        errs = bad_runner.run()
-        self.assertEqual(5, len(errs))
+    def test_fail(self):
+        results = self.runner.run_role_tasks_main(FAIL_TASKS)
+        self.assertEqual(5, len(results))

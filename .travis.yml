@@ -1,77 +1,152 @@
-# Based on https://github.com/pantsbuild/pex/blob/master/.travis.yml
-#
-# Enables support for a docker container-based build
-# which should provide faster startup times and beefier
-# "machines".
-# See: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
-sudo: false
+conditions: v1
+dist: xenial
 
-# TRAVIS_PYTHON_VERSION
+git:
+  depth: 100
 
-matrix:
+cache:
+  pip: true
+  directories:
+  - $HOME/.cache/pre-commit
+  - $HOME/.pre-commit
+  - $HOME/virtualenv/python$(python -c 'import platform; print(platform.python_version())')
+  - $HOME/Library/Caches/Homebrew
+
+language: python
+
+.mixtures:  # is not used by Travis CI, but helps avoid duplication
+- &if-cron-or-manual-run-or-tagged
+  if: type IN (cron, api) OR tag IS present
+- &reset-prerequisites
+  before_install: []
+
+jobs:
+  fast_finish: true
+
   include:
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-flake8
+  - python: "3.7"
+    <<: *reset-prerequisites
+    name: Running flake8 linting checks
+    env:
+      TOXENV: flake8
+  - python: "3.7"
+    <<: *reset-prerequisites
+    name: Running docs building checks
+    env:
+      TOXENV: docs
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible19
+  - python: "3.7"
+    env:
+      ANSIBLE_VERSION: "28"
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible20
+  - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: "28"
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible21
+  - python: "3.5"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: "28"
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible22
+  - python: "2.7"
+    env:
+      ANSIBLE_VERSION: "28"
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible23
+  - python: "3.7"
+    env:
+      ANSIBLE_VERSION: "27"
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible24
+  - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: "27"
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansible25
+  - python: "3.5"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: "27"
 
-    - language: python
-      python: "2.7"
-      env: TOXENV=py27-ansibledevel
+  - python: "2.7"
+    env:
+      ANSIBLE_VERSION: "27"
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansible22
+  - python: "3.7"
+    env:
+      ANSIBLE_VERSION: "26"
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansible23
+  - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: "26"
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansible24
+  - python: "3.5"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: "26"
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansible25
+  - python: "2.7"
+    env:
+      ANSIBLE_VERSION: "26"
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-ansibledevel
+  - python: "3.7"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: devel
 
-    - language: python
-      python: "3.6"
-      env: TOXENV=py36-flake8
+  - python: "3.6"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: devel
 
+  - python: "3.5"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: devel
+
+  - python: "2.7"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: devel
+
+  - &deploy-job
+    <<: *reset-prerequisites
+    stage: Deploy
+    name: Publishing current Git tagged version of dist to PyPI
+    if: repo == "ansible/ansible-lint" AND tag IS present
+    python: "3.7"
+    env: &deploy-env
+      TOXENV: metadata-validation
+    deploy: &deploy-step
+      provider: pypi
+      user: ansible-lint
+      password:
+        secure: >
+          l4lT2SQmdtNOoOWd4eeozpshpsuSKirvzcJtRf7BhkcUh1T4OPTga8Qe2kQiQ/zOdd9E+Mtlyi1o6pipEVTQkLn2TvVM+lOt9NlpyNxUrDfwJ3dyqp6/rdNm+UWBOJA/sijZik2WyyXq5aN6va7ESSu4ShZtlOUYuLnEfQkgogbkn2IO0EhrAQIjBknvmIFPWpicxwi3aZaV5eEhYFCjxZDlQOq4B0pC9FIvbHQr32DB3Eibv7q0Svn0SuRAvrOKvgFlqcM24PHYV0gu1NAvuX7fj6ICvnHNLlDQ/iPNr90PqDal+zE/bdrGHFehT1Gp4heWEuP+xknysz4UrrO5j4V/MA+A5EfNwzku1lr4LeWPwxHVyv/4UYM3rAJFQLdkKErnChkrLUQaqNf+W9eznTsBKSXGbrkZmDsqT2cAW87Z5PTm5z+FtA3uOd5Ga8UZLoTMUjrHu1f23aC3TOYVvCWu2OKFtAowRdUxrbyJghzk6WORRhQCUAs8JUxObsd7TfeETSodtW3oALMVhrOnDTQF/Iif4X1hjorUlBvZR9vNJmZoyyUKc64FDPmoWLaYhed2iGOBW6QAz4+SolJ3QXdSI5odb7sSIq1uBMxnPMWrDtyHOv4iveOz4+vybCEbZt6xJrJodIQJD/nxlRBPVErrOUiSn3f0KXDqpY/bhFI=
+      distributions: dists
+      skip-cleanup: true
+      on:
+        all_branches: true
+
+  - <<: *deploy-job
+    if: repo == "ansible/ansible-lint" AND type NOT IN (cron, pull_request)  # Always run, except if PR or cron
+    name: Publishing current (unstable) Git revision of dist to Test PyPI
+    env:
+      <<: *deploy-env
+      PYPI_UPLOAD: true
+    deploy:
+      <<: *deploy-step
+      server: https://test.pypi.org/legacy/
+
+env:
+  global:
+    TOXENV_TMPL: "'ansible${ANSIBLE_VERSION}'"
+
+before_install:
+- export TOXENV=$(echo $TOXENV_TMPL | envsubst)
 install:
-  - pip install -r test-deps.txt
+- pip install -U tox
+- tox --notest  # Pre-populate virtualenv
 
 script:
 - tox -v

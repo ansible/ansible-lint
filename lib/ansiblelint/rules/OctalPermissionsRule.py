@@ -19,23 +19,23 @@
 # THE SOFTWARE.
 
 from ansiblelint import AnsibleLintRule
-import re
 import six
 
 
 class OctalPermissionsRule(AnsibleLintRule):
     id = '202'
-    shortdesc = 'Octal file permissions must contain leading zero'
-    description = 'Numeric file permissions without leading zero can behave ' + \
-        'in unexpected ways. See ' + \
+    shortdesc = 'Octal file permissions must contain leading zero or be a string'
+    description = (
+        'Numeric file permissions without leading zero can behave '
+        'in unexpected ways. See '
         'http://docs.ansible.com/ansible/file_module.html'
+    )
+    severity = 'VERY_HIGH'
     tags = ['formatting', 'ANSIBLE0009']
+    version_added = 'historic'
 
     _modules = ['assemble', 'copy', 'file', 'ini_file', 'lineinfile',
                 'replace', 'synchronize', 'template', 'unarchive']
-
-    mode_regex = re.compile(r'^\s*[0-9]+\s*$')
-    valid_mode_regex = re.compile(r'^\s*0[0-7]{3,4}\s*$')
 
     def is_invalid_permission(self, mode):
         # sensible file permission modes don't
@@ -66,7 +66,9 @@ class OctalPermissionsRule(AnsibleLintRule):
     def matchtask(self, file, task):
         if task["action"]["__ansible_module__"] in self._modules:
             mode = task['action'].get('mode', None)
-            if isinstance(mode, six.string_types) and self.mode_regex.match(mode):
-                return not self.valid_mode_regex.match(mode)
+
+            if isinstance(mode, six.string_types):
+                return False
+
             if isinstance(mode, int):
                 return self.is_invalid_permission(mode)

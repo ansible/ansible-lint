@@ -52,3 +52,31 @@ class ParseableFormatter(object):
                                     match.linenumber,
                                     "E" + match.rule.id,
                                     match.message)
+
+
+class ParseableSeverityFormatter(object):
+
+    def format(self, match, colored=False):
+        formatstr = u"{0}:{1}: [{2}] [{3}] {4}"
+
+        filename = match.filename
+        linenumber = str(match.linenumber)
+        rule_id = u"E{0}".format(match.rule.id)
+        severity = match.rule.severity
+        message = str(match.message)
+
+        if colored:
+            color.ANSIBLE_COLOR = True
+            filename = color.stringc(filename, 'blue')
+            linenumber = color.stringc(linenumber, 'cyan')
+            rule_id = color.stringc(rule_id, 'bright red')
+            severity = color.stringc(severity, 'bright red')
+            message = color.stringc(message, 'red')
+
+        return formatstr.format(
+            filename,
+            linenumber,
+            rule_id,
+            severity,
+            message,
+        )
