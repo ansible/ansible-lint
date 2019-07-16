@@ -32,6 +32,8 @@ Installing
 
 .. installing-docs-inclusion-marker-do-not-remove
 
+Installing on windows is not supported because we use symlinks inside python packages.
+
 Using Pip
 ---------
 
