@@ -35,16 +35,18 @@ import yaml
 import os
 
 
-def load_config(config_file):
+def load_config(config_file, verbosity):
     config_path = config_file if config_file else ".ansible-lint"
-
     if os.path.exists(config_path):
         with open(config_path, "r") as stream:
             try:
                 return yaml.safe_load(stream)
-            except yaml.YAMLError:
-                pass
-
+            except yaml.YAMLError as e:
+                if verbosity > 0:
+                    print(('WARNING! Your settings file'
+                           'at {} does not exist'
+                           ' or contains invalid YAML syntax!, {}')
+                          .format(config_file, str(e)))
     return None
 
 
@@ -106,9 +108,13 @@ def main():
                            ' is repeatable.',
                       default=[])
     parser.add_option('-c', help='Specify configuration file to use.  Defaults to ".ansible-lint"')
+    parser.add_option('--noconfig', dest='no_config',
+                      default=False,
+                      action='store_true',
+                      help="Do not try to parse the config file")
     options, args = parser.parse_args(sys.argv[1:])
 
-    config = load_config(options.c)
+    config = None if options.no_config else load_config(options.c, options.verbosity)
 
     if config:
         if 'quiet' in config:
