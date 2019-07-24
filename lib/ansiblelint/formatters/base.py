@@ -13,6 +13,8 @@ class BaseFormatter(object):
 
     def formats(self, matches, colored=False, **kwargs):
         """
+        Return formatted lint results as a string.
+
         :param matches: A list of :class:`ansiblelint.Match` objects or []
         :param colored: Colored output will be returned if True
         :return: Formatted string for matches
@@ -22,6 +24,8 @@ class BaseFormatter(object):
 
     def format(self, match, colored=False, **kwargs):
         """
+        Return a formatted lint result as a string.
+
         :param match: :class:`ansiblelint.Match` object
         :param colored: Colored output will be returned if True
         :return: Formatted string for match
