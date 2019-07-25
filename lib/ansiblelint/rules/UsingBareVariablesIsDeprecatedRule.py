@@ -55,7 +55,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
             elif loop_type == "with_subelements":
                 return self._matchvar(task[loop_type][0], task, loop_type)
             elif loop_type in ["with_sequence", "with_ini",
-                               "with_inventory_hostnames"]:
+                               "with_inventory_hostnames", "with_filetree"]:
                 pass
             else:
                 return self._matchvar(task[loop_type], task, loop_type)
