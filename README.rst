@@ -14,7 +14,7 @@
    :target: https://docs.ansible.com/ansible/latest/community/communication.html#mailing-list-information
    :alt: Ansible mailing lists
 
-.. image:: https://img.shields.io/travis-ci/com/ansible/ansible-lint/master.svg?label=Linux%20builds%20%40%20Travis%20CI
+.. image:: https://img.shields.io/travis/com/ansible/ansible-lint/master.svg?label=Linux%20builds%20%40%20Travis%20CI
    :target: https://travis-ci.com/ansible/ansible-lint
    :alt: Travis CI build status
 
