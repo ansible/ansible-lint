@@ -157,7 +157,7 @@ def find_children(playbook, playbook_dir):
         except AnsibleError as e:
             raise SystemExit(str(e))
     results = []
-    basedir = os.path.dirname(playbook[0])
+    basedir = os.path.abspath(os.path.dirname(playbook[0]))
     items = _playbook_items(playbook_ds)
     for item in items:
         for child in play_children(basedir, item, playbook[1], playbook_dir):

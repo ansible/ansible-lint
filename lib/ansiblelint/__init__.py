@@ -221,9 +221,9 @@ class Runner(object):
         # assume role if directory
         if os.path.isdir(playbook):
             self.playbooks.add((os.path.join(playbook, ''), 'role'))
-            self.playbook_dir = playbook
+            self.playbook_dir = os.path.abspath(playbook)
         else:
-            self.playbooks.add((playbook, 'playbook'))
+            self.playbooks.add((os.path.abspath(playbook), 'playbook'))
             self.playbook_dir = os.path.dirname(playbook)
         self.tags = tags
         self.skip_list = skip_list
