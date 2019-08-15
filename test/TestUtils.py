@@ -157,6 +157,18 @@ def test_expand_paths_vars(monkeypatch):
     assert utils.expand_paths_vars(['~']) == [os.path.expanduser('~')]
     assert utils.expand_paths_vars(['$TEST_PATH']) == [test_path]
 
+@unittest.mock.patch('os.path.exists')
+def test_include_children_relative_from_root(self, mock_exists):
+    # Mock that the file exists relative from root
+    mock_exists.return_value = True
+
+    result = utils._include_children(
+        basedir='/role/tasks/subdir',
+        k='include_tasks',
+        v='includes/main.yml',
+        parent_type='tasks'
+    )
+    self.assertEqual(result, '/role/tasks/includes/main.yml')
 
 @pytest.mark.parametrize(
     ('reset_env_var', 'message_prefix'),

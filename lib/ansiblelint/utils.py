@@ -240,7 +240,10 @@ def _include_children(basedir, k, v, parent_type):
 
     result = path_dwim(basedir, args[0])
     if not os.path.exists(result) and not basedir.endswith('tasks'):
-        result = path_dwim(os.path.join(basedir, '..', 'tasks'), v)
+        tasks_path = basedir.rsplit('tasks/')[0] + 'tasks/'
+        result = path_dwim(tasks_path, args[0])
+        if not os.path.exists(result):
+            result = path_dwim(os.path.join(basedir, '..', 'tasks'), v)
     return [{'path': result, 'type': parent_type}]
 
 
