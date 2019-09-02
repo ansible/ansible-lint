@@ -49,6 +49,17 @@ SUCCESS_PLAY_TASKS = '''
 
   - name: environment variable with shell
     shell: HELLO=hello echo $HELLO
+
+  - name: command with stdin_add_newline (ansible > 2.8)
+    command: /bin/cat
+    args:
+      stdin: "Hello, world!"
+      stdin_add_newline: false
+
+  - name: command with strip_empty_ends (ansible > 2.8)
+    command: echo
+    args:
+      strip_empty_ends: false
 '''
 
 FAIL_PLAY_TASKS = '''
