@@ -1,0 +1,9 @@
+---
+- hosts: webservers
+  vars:
+    varset: varset
+  tasks:
+    - include_tasks:
+        file: "{{ varset }}.yml"
+    - include_tasks:
+        file: "directory with spaces/main.yml"
