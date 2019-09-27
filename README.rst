@@ -415,6 +415,7 @@ Each rule definition should have the following:
 
   * ``match`` that takes a line and returns None or False, if the line doesn't match the test, and True or a custom message, when it does. (This allows one rule to test multiple behaviours - see e.g. the *CommandsInsteadOfModulesRule*.)
   * ``matchtask`` that operates on a single task or handler, such that tasks get standardized to always contain a *module* key and *module_arguments* key. Other common task modifiers, such as *when*, *with_items*, etc., are also available as keys, if present in the task.
+  * ``matchfile`` that operates on a file as a list of lines and returns either None if there is no match, either the line number of the match.
 
 An example rule using ``match`` is:
 
