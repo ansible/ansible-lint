@@ -43,6 +43,7 @@ class AnsibleLintRule(object):
     match = None
     matchtask = None
     matchplay = None
+    matchfile = None
 
     @staticmethod
     def unjinja(text):
@@ -137,6 +138,21 @@ class AnsibleLintRule(object):
                                      section, file['path'], self, message))
         return matches
 
+    def matchfiles(self, file, text):
+        matches = []
+        if not self.matchfile:
+            return matches
+
+        split_text = text.splitlines()
+        line = self.matchfile(file, split_text)
+        if line is None or not isinstance(line, six.integer_types):
+            return matches
+
+        message = None
+        matches.append(Match(line, split_text[line-1],
+                           file['path'], self, message))
+        return matches
+
 
 class RulesCollection(object):
 
@@ -176,6 +192,7 @@ class RulesCollection(object):
                     matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchtasks(playbookfile, text))
                     matches.extend(rule.matchyaml(playbookfile, text))
+                    matches.extend(rule.matchfiles(playbookfile, text))
 
         return matches
 
