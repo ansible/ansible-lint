@@ -150,7 +150,7 @@ class AnsibleLintRule(object):
 
         message = None
         matches.append(Match(line, split_text[line-1],
-                           file['path'], self, message))
+                             file['path'], self, message))
         return matches
 
 
