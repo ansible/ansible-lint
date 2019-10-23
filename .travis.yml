@@ -116,7 +116,9 @@ jobs:
     if: repo == "ansible/ansible-lint" AND tag IS present
     python: "3.7"
     env: &deploy-env
-      TOXENV: metadata-validation
+      TOXENV: build-dists,metadata-validation
+    before_deploy:
+    - echo > setup.py
     deploy: &deploy-step
       provider: pypi
       user: ansible-lint
