@@ -40,6 +40,7 @@ jobs:
       ANSIBLE_VERSION: "28"
 
   - python: "3.7"
+    <<: *if-cron-or-manual-run-or-tagged
     env:
       ANSIBLE_VERSION: "28"
 
@@ -62,6 +63,7 @@ jobs:
       ANSIBLE_VERSION: "27"
 
   - python: "3.7"
+    <<: *if-cron-or-manual-run-or-tagged
     env:
       ANSIBLE_VERSION: "27"
 
@@ -84,6 +86,7 @@ jobs:
       ANSIBLE_VERSION: "26"
 
   - python: "3.7"
+    <<: *if-cron-or-manual-run-or-tagged
     env:
       ANSIBLE_VERSION: "26"
 
