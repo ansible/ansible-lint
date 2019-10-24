@@ -19,11 +19,11 @@ class MetaVideoLinksRule(AnsibleLintRule):
 
     VIDEO_REGEXP = {
         'google': re.compile(
-            r'https://drive.google.com.*file/d/([0-9A-Za-z-_]+)/.*'),
+            r'https://drive\.google\.com.*file/d/([0-9A-Za-z-_]+)/.*'),
         'vimeo': re.compile(
-            r'https://vimeo.com/([0-9]+)'),
+            r'https://vimeo\.com/([0-9]+)'),
         'youtube': re.compile(
-            r'https://youtu.be/([0-9A-Za-z-_]+)'),
+            r'https://youtu\.be/([0-9A-Za-z-_]+)'),
     }
 
     def matchplay(self, file, data):
