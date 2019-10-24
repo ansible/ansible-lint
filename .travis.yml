@@ -24,17 +24,21 @@ jobs:
   fast_finish: true
 
   include:
-  - python: "3.7"
+  - python: "3.8"
     <<: *reset-prerequisites
     name: Running flake8 linting checks
     env:
       TOXENV: flake8
-  - python: "3.7"
+  - python: "3.8"
     <<: *reset-prerequisites
     name: Running docs building checks
     env:
       TOXENV: docs
 
+  - python: "3.8"
+    env:
+      ANSIBLE_VERSION: "28"
+
   - python: "3.7"
     env:
       ANSIBLE_VERSION: "28"
@@ -53,6 +57,10 @@ jobs:
     env:
       ANSIBLE_VERSION: "28"
 
+  - python: "3.8"
+    env:
+      ANSIBLE_VERSION: "27"
+
   - python: "3.7"
     env:
       ANSIBLE_VERSION: "27"
@@ -71,6 +79,10 @@ jobs:
     env:
       ANSIBLE_VERSION: "27"
 
+  - python: "3.8"
+    env:
+      ANSIBLE_VERSION: "26"
+
   - python: "3.7"
     env:
       ANSIBLE_VERSION: "26"
@@ -88,6 +100,11 @@ jobs:
   - python: "2.7"
     env:
       ANSIBLE_VERSION: "26"
+
+  - python: "3.8"
+    <<: *if-cron-or-manual-run-or-tagged
+    env:
+      ANSIBLE_VERSION: devel
 
   - python: "3.7"
     <<: *if-cron-or-manual-run-or-tagged
@@ -114,7 +131,7 @@ jobs:
     stage: Deploy
     name: Publishing current Git tagged version of dist to PyPI
     if: repo == "ansible/ansible-lint" AND tag IS present
-    python: "3.7"
+    python: "3.8"
     env: &deploy-env
       TOXENV: build-dists,metadata-validation
     before_deploy:
