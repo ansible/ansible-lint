@@ -26,10 +26,9 @@ import errno
 import optparse
 import sys
 
-import ansiblelint
 import ansiblelint.formatters as formatters
 import six
-from ansiblelint import RulesCollection
+from ansiblelint import default_rulesdir, RulesCollection, Runner
 from ansiblelint.version import __version__
 import yaml
 import os
@@ -74,14 +73,14 @@ def main():
                       help="specify one or more rules directories using "
                            "one or more -r arguments. Any -r flags override "
                            "the default rules in %s, unless -R is also used."
-                           % ansiblelint.default_rulesdir)
+                           % default_rulesdir)
     parser.add_option('-R', action='store_true',
                       default=False,
                       dest='use_default_rules',
                       help="Use default rules in %s in addition to any extra "
                            "rules directories specified with -r. There is "
                            "no need to specify this if no -r flags are used"
-                           % ansiblelint.default_rulesdir)
+                           % default_rulesdir)
     parser.add_option('-t', dest='tags',
                       action='append',
                       default=[],
@@ -153,9 +152,9 @@ def main():
         return 1
 
     if options.use_default_rules:
-        rulesdirs = options.rulesdir + [ansiblelint.default_rulesdir]
+        rulesdirs = options.rulesdir + [default_rulesdir]
     else:
-        rulesdirs = options.rulesdir or [ansiblelint.default_rulesdir]
+        rulesdirs = options.rulesdir or [default_rulesdir]
 
     rules = RulesCollection()
     for rulesdir in rulesdirs:
@@ -181,9 +180,9 @@ def main():
     matches = list()
     checked_files = set()
     for playbook in playbooks:
-        runner = ansiblelint.Runner(rules, playbook, options.tags,
-                                    options.skip_list, options.exclude_paths,
-                                    options.verbosity, checked_files)
+        runner = Runner(rules, playbook, options.tags,
+                        options.skip_list, options.exclude_paths,
+                        options.verbosity, checked_files)
         matches.extend(runner.run())
 
     matches.sort(key=lambda x: (x.filename, x.linenumber, x.rule.id))
