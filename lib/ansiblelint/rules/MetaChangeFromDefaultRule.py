@@ -15,7 +15,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     ]
     description = (
         'meta/main.yml default values should be changed for: ``{}``'.format(
-            ', '.join([f[0] for f in field_defaults])
+            ', '.join(f[0] for f in field_defaults)
         )
     )
     severity = 'HIGH'
