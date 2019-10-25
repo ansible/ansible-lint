@@ -4,5 +4,12 @@ requires = [
   "setuptools_scm >= 1.15.0",
   "setuptools_scm_git_archive >= 1.0",
   "wheel",
+
+  # needed because setuptools' attr import
+  # machinery (`importlib.import_module`)
+  # imports `__init__` first
+  "ansible",
+  "ruamel.yaml",
+  "six",
 ]
 build-backend = "setuptools.build_meta"
