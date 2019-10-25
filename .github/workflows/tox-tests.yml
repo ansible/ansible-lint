@@ -1,0 +1,60 @@
+name: Test suite 👷
+
+on:
+  push:
+  pull_request:
+  schedule:
+  - cron: 1 0 * * *  # Run daily at 0:01 UTC
+  # Run every Friday at 18:02 UTC
+  # https://crontab.guru/#2_18_*_*_5
+  # - cron: 2 18 * * 5
+
+jobs:
+  tests:
+    name: >-
+      tox👷tests: Ansible ${{ matrix.ansible-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # fail-fast: false
+      # max-parallel: 5
+      matrix:
+        python-version:
+        - 3.7
+        - 3.6
+        - 3.5
+        - 2.7
+        os:
+        - ubuntu-18.04
+        - ubuntu-16.04
+        - macOS-10.14
+        # - windows-2019
+        # - windows-2016
+        ansible-version:
+        - devel
+        - 28
+        - 27
+        - 26
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install tox
+      run: |
+        python -m pip install --upgrade tox
+    - name: Log installed dists
+      run: >-
+        python -m pip freeze --all
+    - name: >-
+        Initialize tox envs: Ansible ${{ matrix.ansible-version }}
+      run: |
+        python -m tox --parallel auto --notest
+      env:
+        TOXENV: ansible${{ matrix.ansible-version }}
+    - name: Test with tox
+      run: |
+        python -m tox --parallel 0
+      env:
+        TOXENV: ansible${{ matrix.ansible-version }}

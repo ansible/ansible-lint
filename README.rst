@@ -18,6 +18,14 @@
    :target: https://travis-ci.com/ansible/ansible-lint
    :alt: Travis CI build status
 
+.. image:: https://github.com/ansible/ansible-lint/workflows/tox-tests/badge.svg
+   :target: https://github.com/ansible/ansible-lint/actions?workflow=tox-tests
+   :alt: GitHub Actions CI/CD build status — tests
+
+.. image:: https://github.com/ansible/ansible-lint/workflows/tox-linters/badge.svg
+   :target: https://github.com/ansible/ansible-lint/actions?workflow=tox-linters
+   :alt: GitHub Actions CI/CD build status — linters
+
 
 Ansible-lint
 ============
