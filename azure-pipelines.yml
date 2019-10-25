@@ -30,7 +30,7 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
-    python -m pip install --upgrade setuptools tox
+    python -m pip install --upgrade tox
     python -m tox --parallel auto --notest
     for py_exe in `ls .tox/*/bin/python`
     do
