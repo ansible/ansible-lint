@@ -12,7 +12,10 @@ on:
 jobs:
   tests:
     name: >-
-      tox👷tests: Ansible ${{ matrix.ansible-version }}
+      tox👷tests:
+      Ansible ${{ matrix.ansible-version }}
+      @ ${{ matrix.python-version }}
+      @ ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       # fail-fast: false
