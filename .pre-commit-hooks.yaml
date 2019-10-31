@@ -6,6 +6,9 @@
 -   id: ansible-lint
     name: Ansible-lint
     description: This hook runs ansible-lint.
-    entry: ansible-lint
+    entry: ansible-lint --force-color .
     language: python
-    files: \.(yaml|yml)$
+    # do not pass files to ansible-lint, see:
+    # https://github.com/ansible/ansible-lint/issues/611
+    pass_filenames: false
+    always_run: true
