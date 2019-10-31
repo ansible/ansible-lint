@@ -1,4 +1,4 @@
-name: Test suite 👷
+name: tox👷test suite
 
 on:
   push:
@@ -12,7 +12,6 @@ on:
 jobs:
   tests:
     name: >-
-      tox👷tests:
       Ansible ${{ matrix.ansible-version }}
       @ ${{ matrix.python-version }}
       @ ${{ matrix.os }}
