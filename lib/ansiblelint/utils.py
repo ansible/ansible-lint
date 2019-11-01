@@ -18,10 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from collections import OrderedDict
 import glob
 import imp
-import os
 from itertools import product
+import os
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
+import subprocess
+
 
 import six
 from ansible import constants
@@ -53,6 +60,7 @@ except ImportError:
     from ansible.parsing.mod_args import ModuleArgsParser
     from ansible.parsing.yaml.constructor import AnsibleConstructor
     from ansible.parsing.yaml.loader import AnsibleLoader
+    from ansible.parsing.yaml.objects import AnsibleSequence
     from ansible.errors import AnsibleParserError
     ANSIBLE_VERSION = 2
 
@@ -742,3 +750,108 @@ def normpath(path):
     make this user configurable.
     """
     return os.path.relpath(path)
+
+
+def is_playbook(filename):
+    """
+    Check if the file is a playbook.
+
+    Given a filename, it should return true if it looks like a playbook. The
+    function is not supposed to raise exceptions.
+    """
+    # we assume is a playbook if we loaded a sequence of dictionaries where
+    # at least one of these keys is present:
+    playbooks_keys = {
+        "gather_facts",
+        "hosts",
+        "import_playbook",
+        "post_tasks",
+        "pre_tasks",
+        "roles"
+        "tasks",
+    }
+
+    # makes it work with Path objects by converting them to strings
+    if not isinstance(filename, six.string_types):
+        filename = str(filename)
+
+    try:
+        f = parse_yaml_from_file(filename)
+    except Exception as e:
+        print(
+            "Warning: Failed to load %s with %s, assuming is not a playbook."
+            % (filename, e))
+    else:
+        if (
+            isinstance(f, AnsibleSequence)
+            and playbooks_keys.intersection(next(iter(f), {}).keys())
+        ):
+            return True
+    return False
+
+
+def get_playbooks_and_roles(options=None):
+    """Find roles and playbooks."""
+    if options is None:
+        options = {}
+
+    # git is preferred as it also considers .gitignore
+    files = OrderedDict.fromkeys(sorted(subprocess.check_output(
+        ["git", "ls-files", "*.yaml", "*.yml"],
+        universal_newlines=True).split()))
+
+    playbooks = []
+    role_dirs = []
+    role_internals = {
+        'defaults',
+        'files',
+        'handlers',
+        'meta',
+        'tasks',
+        'templates',
+        'vars',
+    }
+
+    # detect role in repository root:
+    if 'tasks/main.yml' in files:
+        role_dirs.append('.')
+
+    for p in map(Path, files):
+
+        if any(str(p).startswith(file_path) for file_path in options.exclude_paths):
+            continue
+        elif (next((i for i in p.parts if i.endswith('playbooks')), None)
+                or 'playbook' in p.parts[-1]):
+            playbooks.append(normpath(p))
+            continue
+
+        # ignore if any folder ends with _vars
+        if next((i for i in p.parts if i.endswith('_vars')), None):
+            continue
+        elif 'roles' in p.parts or '.' in role_dirs:
+            if 'tasks' in p.parts and p.parts[-1] == 'main.yaml':
+                role_dirs.append(str(p.parents[1]))
+            elif role_internals.intersection(p.parts):
+                continue
+            elif 'tests' in p.parts:
+                playbooks.append(normpath(p))
+        if 'molecule' in p.parts:
+            if p.parts[-1] != 'molecule.yml':
+                playbooks.append(normpath(p))
+            continue
+        # hidden files are clearly not playbooks, likely config files.
+        if p.parts[-1].startswith('.'):
+            continue
+
+        if is_playbook(p):
+            playbooks.append(normpath(p))
+            continue
+
+        if options.verbosity:
+            print('Unknown file type: %s' % normpath(p))
+
+    if options.verbosity:
+        print('Found roles: ' + ' '.join(role_dirs))
+        print('Found playbooks: ' + ' '.join(playbooks))
+
+    return role_dirs + playbooks

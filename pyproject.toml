@@ -9,6 +9,7 @@ requires = [
   # machinery (`importlib.import_module`)
   # imports `__init__` first
   "ansible",
+  "pathlib2; python_version < '3.2'",
   "ruamel.yaml",
   "six",
 ]
