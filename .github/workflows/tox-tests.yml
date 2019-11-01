@@ -33,9 +33,9 @@ jobs:
         # - windows-2016
         ansible-version:
         - devel
+        - 29
         - 28
         - 27
-        - 26
 
     steps:
     - uses: actions/checkout@master
