@@ -30,7 +30,7 @@ import ansiblelint.formatters as formatters
 import six
 from ansiblelint import default_rulesdir, RulesCollection, Runner
 from ansiblelint.version import __version__
-from ansiblelint.utils import normpath
+from ansiblelint.utils import get_playbooks_and_roles, normpath
 import yaml
 import os
 
@@ -52,7 +52,7 @@ def main():
 
     formatter = formatters.Formatter()
 
-    parser = optparse.OptionParser("%prog [options] playbook.yml [playbook2 ...]",
+    parser = optparse.OptionParser("%prog [options] [playbook.yml [playbook2 ...]]",
                                    version="%prog " + __version__)
 
     parser.add_option('-L', dest='listrules', default=False,
@@ -127,8 +127,8 @@ def main():
         if 'verbosity' in config:
             options.verbosity = options.verbosity + config['verbosity']
 
-        if 'exclude_paths' in config:
-            options.exclude_paths = options.exclude_paths + config['exclude_paths']
+        options.exclude_paths.extend(
+            config.get('exclude_paths', []))
 
         if 'rulesdir' in config:
             options.rulesdir = options.rulesdir + config['rulesdir']
@@ -148,9 +148,9 @@ def main():
     if options.parseable_severity:
         formatter = formatters.ParseableSeverityFormatter()
 
+    # no args triggers auto-detection mode
     if len(args) == 0 and not (options.listrules or options.listtags):
-        parser.print_help(file=sys.stderr)
-        return 1
+        args = get_playbooks_and_roles(options=options)
 
     if options.use_default_rules:
         rulesdirs = options.rulesdir + [default_rulesdir]
