@@ -1,6 +1,8 @@
 import unittest
 from ansiblelint import Runner, RulesCollection
-from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import UseHandlerRatherThanWhenChangedRule
+from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import (
+    UseHandlerRatherThanWhenChangedRule)
+
 
 class TestRoleHandlers(unittest.TestCase):
     collection = RulesCollection()

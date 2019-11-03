@@ -1,7 +1,8 @@
 import unittest
 
 from ansiblelint import RulesCollection
-from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import UseHandlerRatherThanWhenChangedRule
+from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import (
+    UseHandlerRatherThanWhenChangedRule)
 from test import RunFromText
 
 

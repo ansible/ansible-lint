@@ -33,7 +33,7 @@ jobs:
         env:
         - TOXENV: build-dists,metadata-validation
         - TOXENV: docs
-        - TOXENV: flake8
+        - TOXENV: lint
         # - TOXENV: pre-commit
         # - TOXENV: setup-check
         # - TOXENV: pre-commit-failing

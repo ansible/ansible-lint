@@ -26,9 +26,9 @@ jobs:
   include:
   - python: "3.8"
     <<: *reset-prerequisites
-    name: Running flake8 linting checks
+    name: Running linters
     env:
-      TOXENV: flake8
+      TOXENV: lint
   - python: "3.8"
     <<: *reset-prerequisites
     name: Running docs building checks

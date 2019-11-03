@@ -30,14 +30,16 @@ class TestTaskIncludes(unittest.TestCase):
         runner.run()
         self.assertEqual(len(runner.playbooks), 4)
 
-    @unittest.skipIf(parse_version(ansible.__version__) < parse_version('2.4'), "not supported with ansible < 2.4")
+    @unittest.skipIf(parse_version(ansible.__version__) < parse_version('2.4'),
+                     "not supported with ansible < 2.4")
     def test_include_tasks_2_4_style(self):
         filename = 'test/taskincludes_2_4_style.yml'
         runner = Runner(self.rules, filename, [], [], [])
         runner.run()
         self.assertEqual(len(runner.playbooks), 4)
 
-    @unittest.skipIf(parse_version(ansible.__version__) < parse_version('2.4'), "not supported with ansible < 2.4")
+    @unittest.skipIf(parse_version(ansible.__version__) < parse_version('2.4'),
+                     "not supported with ansible < 2.4")
     def test_import_tasks_2_4_style(self):
         filename = 'test/taskimports.yml'
         runner = Runner(self.rules, filename, [], [], [])
@@ -50,7 +52,8 @@ class TestTaskIncludes(unittest.TestCase):
         runner.run()
         self.assertEqual(len(runner.playbooks), 3)
 
-    @unittest.skipIf(parse_version(ansible.__version__) < parse_version('2.4'), "not supported with ansible < 2.4")
+    @unittest.skipIf(parse_version(ansible.__version__) < parse_version('2.4'),
+                     "not supported with ansible < 2.4")
     def test_include_tasks_in_role(self):
         filename = 'test/include-import-tasks-in-role.yml'
         runner = Runner(self.rules, filename, [], [], [])
