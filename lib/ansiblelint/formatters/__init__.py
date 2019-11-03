@@ -1,3 +1,4 @@
+"""Output formatters."""
 try:
     from ansible import color
 except ImportError:

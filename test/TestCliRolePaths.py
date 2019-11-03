@@ -79,7 +79,7 @@ class TestCliRolePaths(unittest.TestCase):
                       str(result))
 
     def test_run_playbook(self):
-        '''Call ansible-lint the way molecule does'''
+        """Call ansible-lint the way molecule does."""
         top_src_dir = os.path.dirname(self.local_test_dir)
         cwd = os.path.join(top_src_dir, 'test/roles/test-role')
         bin = top_src_dir + '/bin/ansible-lint'

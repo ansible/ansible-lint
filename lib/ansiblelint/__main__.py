@@ -119,7 +119,7 @@ def main():
 
         if 'parseable_severity' in config:
             options.parseable_severity = options.parseable_severity or \
-                                         config['parseable_severity']
+                config['parseable_severity']
 
         if 'use_default_rules' in config:
             options.use_default_rules = options.use_default_rules or config['use_default_rules']

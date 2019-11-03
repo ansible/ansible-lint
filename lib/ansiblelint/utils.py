@@ -349,7 +349,7 @@ def rolename(filepath):
     idx = filepath.find('roles/')
     if idx < 0:
         return ''
-    role = filepath[idx+6:]
+    role = filepath[idx + 6:]
     role = role[:role.find('/')]
     return role
 
@@ -360,8 +360,7 @@ def _kv_to_dict(v):
 
 
 def normalize_task_v2(task):
-    '''Ensures tasks have an action key and strings are converted to python objects'''
-
+    """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
     mod_arg_parser = ModuleArgsParser(task)
     try:
@@ -535,11 +534,10 @@ def get_normalized_tasks(yaml, file):
 
 
 def parse_yaml_linenumbers(data, filename):
-    """Parses yaml as ansible.utils.parse_yaml but with linenumbers.
+    """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
-
     def compose_node(parent, index):
         # the line number where the previous token has ended (plus empty lines)
         line = loader.line
@@ -594,7 +592,6 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
     :returns: original pyyaml_data altered with a 'skipped_rules' list added
     to individual tasks, or added to the single metadata block.
     """
-
     try:
         yaml_skip = _append_skipped_rules(pyyaml_data, file_text, file_type)
     except RuntimeError as exc:
@@ -759,8 +756,8 @@ def is_playbook(filename):
             % (filename, e))
     else:
         if (
-            isinstance(f, AnsibleSequence)
-            and playbooks_keys.intersection(next(iter(f), {}).keys())
+            isinstance(f, AnsibleSequence) and
+            playbooks_keys.intersection(next(iter(f), {}).keys())
         ):
             return True
     return False
@@ -796,8 +793,8 @@ def get_playbooks_and_roles(options=None):
 
         if any(str(p).startswith(file_path) for file_path in options.exclude_paths):
             continue
-        elif (next((i for i in p.parts if i.endswith('playbooks')), None)
-                or 'playbook' in p.parts[-1]):
+        elif (next((i for i in p.parts if i.endswith('playbooks')), None) or
+                'playbook' in p.parts[-1]):
             playbooks.append(normpath(p))
             continue
 
