@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import os
 import unittest
 
 from ansiblelint import Match, AnsibleLintRule
@@ -34,12 +33,12 @@ class TestFormatter(unittest.TestCase):
 
     def test_format_coloured_string(self):
         match = Match(1, "hello", "filename.yml", self.rule, "message")
-        result = self.formatter.format(match, True)
+        self.formatter.format(match, True)
 
     def test_unicode_format_string(self):
         match = Match(1, "hello", "filename.yml", self.rule, u'\U0001f427')
-        result = self.formatter.format(match, False)
+        self.formatter.format(match, False)
 
     def test_dict_format_line(self):
         match = Match(1, {'hello': 'world'}, "filename.yml", self.rule, "xyz")
-        result = self.formatter.format(match, True)
+        self.formatter.format(match, True)

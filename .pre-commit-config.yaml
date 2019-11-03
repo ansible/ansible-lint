@@ -1,0 +1,7 @@
+---
+repos:
+- repo: https://gitlab.com/pycqa/flake8.git
+  rev: 3.7.9
+  hooks:
+  - id: flake8
+    language_version: python3

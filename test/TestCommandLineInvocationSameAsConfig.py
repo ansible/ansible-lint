@@ -66,7 +66,9 @@ class TestCommandLineInvocationSameAsConfig(unittest.TestCase):
 
     def test_config_can_be_overridden(self):
         no_override = self.run_ansible_lint(args="-t bad_tag")
-        overridden = self.run_ansible_lint(args="-t bad_tag", config=dict(tags=["skip_ansible_lint"]))
+        overridden = self.run_ansible_lint(
+            args="-t bad_tag",
+            config=dict(tags=["skip_ansible_lint"]))
 
         self.assertEqual(no_override, overridden)
 
