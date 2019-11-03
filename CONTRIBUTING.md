@@ -30,9 +30,9 @@ Standards
 ansible-lint is flake8 compliant with `max-line-length` set to 100
 (see [setup.cfg](setup.cfg)).
 
-ansible-lint works with both Ansible 1.9 and Ansible 2.0 onwards. This will be
-the case for the foreseeable future, so please ensure all contributions work
-with both.
+ansible-lint works only with [supported Ansible versions](
+https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html#release-status
+) at the time it was released.
 
 Automated tests will be run against all PRs for flake8 compliance and Ansible
 compatibility - to check before pushing commits, just use `tox`.

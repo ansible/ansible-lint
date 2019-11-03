@@ -29,66 +29,49 @@ except ImportError:
     from pathlib2 import Path
 import subprocess
 
-
 import six
-from ansible import constants
-from ansible.errors import AnsibleError
-
-try:
-    # Try to import the Ansible 2 module first, it's the future-proof one
-    from ansible.parsing.splitter import split_args
-
-except ImportError:
-    # Fallback on the Ansible 1.9 module
-    from ansible.module_utils.splitter import split_args
-
 import yaml
 from yaml.composer import Composer
-from yaml.constructor import Constructor
 import ruamel.yaml
 
-try:
-    from ansible.utils import parse_yaml_from_file
-    from ansible.utils import path_dwim
-    from ansible.utils.template import template as ansible_template
-    from ansible.utils import module_finder
-    module_loader = module_finder
-    ANSIBLE_VERSION = 1
-except ImportError:
-    from ansible.parsing.dataloader import DataLoader
-    from ansible.template import Templar
-    from ansible.parsing.mod_args import ModuleArgsParser
-    from ansible.parsing.yaml.constructor import AnsibleConstructor
-    from ansible.parsing.yaml.loader import AnsibleLoader
-    from ansible.parsing.yaml.objects import AnsibleSequence
-    from ansible.errors import AnsibleParserError
-    ANSIBLE_VERSION = 2
+from ansible import constants
+from ansible.errors import AnsibleError
+from ansible.errors import AnsibleParserError
+from ansible.parsing.dataloader import DataLoader
+from ansible.parsing.mod_args import ModuleArgsParser
+from ansible.parsing.splitter import split_args
+from ansible.parsing.yaml.constructor import AnsibleConstructor
+from ansible.parsing.yaml.loader import AnsibleLoader
+from ansible.parsing.yaml.objects import AnsibleSequence
+from ansible.plugins.loader import module_loader
+from ansible.template import Templar
 
-    # ansible-lint doesn't need/want to know about encrypted secrets, but it needs
-    # Ansible 2.3+ allows encrypted secrets within yaml files, so we pass a string
-    # as the password to enable such yaml files to be opened and parsed successfully.
-    DEFAULT_VAULT_PASSWORD = 'x'
 
-    def parse_yaml_from_file(filepath):
-        dl = DataLoader()
-        if hasattr(dl, 'set_vault_password'):
-            dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
-        return dl.load_from_file(filepath)
+# ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
+# string as the password to enable such yaml files to be opened and parsed
+# successfully.
+DEFAULT_VAULT_PASSWORD = 'x'
 
-    def path_dwim(basedir, given):
-        dl = DataLoader()
-        dl.set_basedir(basedir)
-        return dl.path_dwim(given)
 
-    def ansible_template(basedir, varname, templatevars, **kwargs):
-        dl = DataLoader()
-        dl.set_basedir(basedir)
-        templar = Templar(dl, variables=templatevars)
-        return templar.template(varname, **kwargs)
-    try:
-        from ansible.plugins import module_loader
-    except ImportError:
-        from ansible.plugins.loader import module_loader
+def parse_yaml_from_file(filepath):
+    dl = DataLoader()
+    if hasattr(dl, 'set_vault_password'):
+        dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
+    return dl.load_from_file(filepath)
+
+
+def path_dwim(basedir, given):
+    dl = DataLoader()
+    dl.set_basedir(basedir)
+    return dl.path_dwim(given)
+
+
+def ansible_template(basedir, varname, templatevars, **kwargs):
+    dl = DataLoader()
+    dl.set_basedir(basedir)
+    templar = Templar(dl, variables=templatevars)
+    return templar.template(varname, **kwargs)
+
 
 LINE_NUMBER_KEY = '__line__'
 FILENAME_KEY = '__file__'
@@ -479,10 +462,7 @@ def normalize_task(task, filename):
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
         del(task['__ansible_action_type__'])
-    if ANSIBLE_VERSION < 2:
-        task = normalize_task_v1(task)
-    else:
-        task = normalize_task_v2(task)
+    task = normalize_task_v2(task)
     task[FILENAME_KEY] = filename
     task['__ansible_action_type__'] = ansible_action_type
     return task
@@ -568,10 +548,7 @@ def parse_yaml_linenumbers(data, filename):
         return node
 
     def construct_mapping(node, deep=False):
-        if ANSIBLE_VERSION < 2:
-            mapping = Constructor.construct_mapping(loader, node, deep=deep)
-        else:
-            mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
+        mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
         if hasattr(node, '__line__'):
             mapping[LINE_NUMBER_KEY] = node.__line__
         else:
@@ -580,14 +557,11 @@ def parse_yaml_linenumbers(data, filename):
         return mapping
 
     try:
-        if ANSIBLE_VERSION < 2:
-            loader = yaml.Loader(data)
-        else:
-            import inspect
-            kwargs = {}
-            if 'vault_password' in inspect.getargspec(AnsibleLoader.__init__).args:
-                kwargs['vault_password'] = DEFAULT_VAULT_PASSWORD
-            loader = AnsibleLoader(data, **kwargs)
+        import inspect
+        kwargs = {}
+        if 'vault_password' in inspect.getargspec(AnsibleLoader.__init__).args:
+            kwargs['vault_password'] = DEFAULT_VAULT_PASSWORD
+        loader = AnsibleLoader(data, **kwargs)
         loader.compose_node = compose_node
         loader.construct_mapping = construct_mapping
         data = loader.get_single_data()
