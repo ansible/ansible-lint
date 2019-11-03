@@ -67,7 +67,9 @@ class TestUtils(unittest.TestCase):
     def test_normalize_simple_command(self):
         task1 = dict(name="hello", action="command chdir=abc echo hello world")
         task2 = dict(name="hello", command="chdir=abc echo hello world")
-        self.assertEqual(utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task2, 'tasks.yml'))
+        self.assertEqual(
+            utils.normalize_task(task1, 'tasks.yml'),
+            utils.normalize_task(task2, 'tasks.yml'))
 
     def test_normalize_complex_command(self):
         task1 = dict(name="hello", action={'module': 'ec2',
@@ -77,26 +79,38 @@ class TestUtils(unittest.TestCase):
                                         'etc': 'whatever'})
         task3 = dict(name="hello", ec2="region=us-east1 etc=whatever")
         task4 = dict(name="hello", action="ec2 region=us-east1 etc=whatever")
-        self.assertEqual(utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task2, 'tasks.yml'))
-        self.assertEqual(utils.normalize_task(task2, 'tasks.yml'), utils.normalize_task(task3, 'tasks.yml'))
-        self.assertEqual(utils.normalize_task(task3, 'tasks.yml'), utils.normalize_task(task4, 'tasks.yml'))
+        self.assertEqual(
+            utils.normalize_task(task1, 'tasks.yml'),
+            utils.normalize_task(task2, 'tasks.yml'))
+        self.assertEqual(
+            utils.normalize_task(task2, 'tasks.yml'),
+            utils.normalize_task(task3, 'tasks.yml'))
+        self.assertEqual(
+            utils.normalize_task(task3, 'tasks.yml'),
+            utils.normalize_task(task4, 'tasks.yml'))
 
     def test_normalize_args(self):
-        task1 = dict(git={'version': 'abc'}, args={'repo': 'blah', 'dest': 'xyz'})
-        task2 = dict(git={'version': 'abc', 'repo': 'blah', 'dest': 'xyz'})
+        task1 = {'git': {'version': 'abc'}, 'args': {'repo': 'blah', 'dest': 'xyz'}}
+        task2 = {'git': {'version': 'abc', 'repo': 'blah', 'dest': 'xyz'}}
 
-        task3 = dict(git='version=abc repo=blah dest=xyz')
-        task4 = dict(git=None, args={'repo': 'blah', 'dest': 'xyz', 'version': 'abc'})
-        self.assertEqual(utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task2, 'tasks.yml'))
-        self.assertEqual(utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task3, 'tasks.yml'))
-        self.assertEqual(utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task4, 'tasks.yml'))
+        task3 = {"git": 'version=abc repo=blah dest=xyz'}
+        task4 = {"git": None, "args": {'repo': 'blah', 'dest': 'xyz', 'version': 'abc'}}
+        self.assertEqual(
+            utils.normalize_task(task1, 'tasks.yml'),
+            utils.normalize_task(task2, 'tasks.yml'))
+        self.assertEqual(
+            utils.normalize_task(task1, 'tasks.yml'),
+            utils.normalize_task(task3, 'tasks.yml'))
+        self.assertEqual(
+            utils.normalize_task(task1, 'tasks.yml'),
+            utils.normalize_task(task4, 'tasks.yml'))
 
     def test_extract_from_list(self):
-        block = dict(
-                block = [dict(tasks=[dict(name="hello",command="whoami")])],
-                test_none = None,
-                test_string = 'foo'
-        )
+        block = {
+                'block': [{'tasks': {'name': 'hello', 'command': 'whoami'}}],
+                'test_none': None,
+                'test_string': 'foo'
+                }
         blocks = [block]
 
         test_list = utils.extract_from_list(blocks, ['block'])

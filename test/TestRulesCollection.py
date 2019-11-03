@@ -76,5 +76,5 @@ class TestRulesCollection(unittest.TestCase):
 
     def test_no_duplicate_rule_ids(self):
         real_rules = RulesCollection.create_from_directory('./lib/ansiblelint/rules')
-        rule_ids = [ rule.id for rule in real_rules ]
+        rule_ids = [rule.id for rule in real_rules]
         self.assertEqual([x for x, y in collections.Counter(rule_ids).items() if y > 1], [])
