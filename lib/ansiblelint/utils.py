@@ -732,3 +732,13 @@ def get_rule_skips_from_line(line):
         noqa_text = line.split('# noqa')[1]
         rule_id_list = noqa_text.split()
     return rule_id_list
+
+
+def normpath(path):
+    """
+    Normalize a path in order to provide a more consistent output.
+
+    Currently it generates a relative path but in the future we may want to
+    make this user configurable.
+    """
+    return os.path.relpath(path)

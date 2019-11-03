@@ -2,6 +2,7 @@ try:
     from ansible import color
 except ImportError:
     from ansible.utils import color
+from ansiblelint.utils import normpath
 
 
 class Formatter(object):
@@ -12,7 +13,7 @@ class Formatter(object):
             color.ANSIBLE_COLOR = True
             return formatstr.format(color.stringc(u"[{0}]".format(match.rule.id), 'bright red'),
                                     color.stringc(match.message, 'red'),
-                                    color.stringc(match.filename, 'blue'),
+                                    color.stringc(normpath(match.filename), 'blue'),
                                     color.stringc(str(match.linenumber), 'cyan'),
                                     color.stringc(u"{0}".format(match.line), 'purple'))
         else:
@@ -30,10 +31,10 @@ class QuietFormatter(object):
         if colored:
             color.ANSIBLE_COLOR = True
             return formatstr.format(color.stringc(u"[{0}]".format(match.rule.id), 'bright red'),
-                                    color.stringc(match.filename, 'blue'),
+                                    color.stringc(normpath(match.filename), 'blue'),
                                     color.stringc(str(match.linenumber), 'cyan'))
         else:
-            return formatstr.format(match.rule.id, match.filename,
+            return formatstr.format(match.rule.id, normpath(match.filename),
                                     match.linenumber)
 
 
@@ -43,12 +44,12 @@ class ParseableFormatter(object):
         formatstr = u"{0}:{1}: [{2}] {3}"
         if colored:
             color.ANSIBLE_COLOR = True
-            return formatstr.format(color.stringc(match.filename, 'blue'),
+            return formatstr.format(color.stringc(normpath(match.filename), 'blue'),
                                     color.stringc(str(match.linenumber), 'cyan'),
                                     color.stringc(u"E{0}".format(match.rule.id), 'bright red'),
                                     color.stringc(u"{0}".format(match.message), 'red'))
         else:
-            return formatstr.format(match.filename,
+            return formatstr.format(normpath(match.filename),
                                     match.linenumber,
                                     "E" + match.rule.id,
                                     match.message)
@@ -59,7 +60,7 @@ class ParseableSeverityFormatter(object):
     def format(self, match, colored=False):
         formatstr = u"{0}:{1}: [{2}] [{3}] {4}"
 
-        filename = match.filename
+        filename = normpath(match.filename)
         linenumber = str(match.linenumber)
         rule_id = u"E{0}".format(match.rule.id)
         severity = match.rule.severity

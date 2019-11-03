@@ -260,7 +260,7 @@ class Runner(object):
                 continue
             if playbook[1] == 'role':
                 continue
-            files.append({'path': playbook[0], 'type': playbook[1]})
+            files.append({'path': ansiblelint.utils.normpath(playbook[0]), 'type': playbook[1]})
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
@@ -280,7 +280,9 @@ class Runner(object):
         files = [x for x in files if x['path'] not in self.checked_files]
         for file in files:
             if self.verbosity > 0:
-                print("Examining %s of type %s" % (file['path'], file['type']))
+                print("Examining %s of type %s" % (
+                    ansiblelint.utils.normpath(file['path']),
+                    file['type']))
             matches.extend(self.rules.run(file, tags=set(self.tags),
                            skip_list=self.skip_list))
         # update list of checked files

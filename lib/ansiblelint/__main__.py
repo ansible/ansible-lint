@@ -30,6 +30,7 @@ import ansiblelint.formatters as formatters
 import six
 from ansiblelint import default_rulesdir, RulesCollection, Runner
 from ansiblelint.version import __version__
+from ansiblelint.utils import normpath
 import yaml
 import os
 
@@ -176,7 +177,7 @@ def main():
         skip.update(str(s).split(','))
     options.skip_list = frozenset(skip)
 
-    playbooks = set(args)
+    playbooks = sorted(set(args))
     matches = list()
     checked_files = set()
     for playbook in playbooks:
@@ -185,7 +186,7 @@ def main():
                         options.verbosity, checked_files)
         matches.extend(runner.run())
 
-    matches.sort(key=lambda x: (x.filename, x.linenumber, x.rule.id))
+    matches.sort(key=lambda x: (normpath(x.filename), x.linenumber, x.rule.id))
 
     for match in matches:
         print(formatter.format(match, options.colored))
