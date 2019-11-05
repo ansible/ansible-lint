@@ -87,14 +87,14 @@ def make_table(grid):
     header = True
     for row in grid:
         if header:
-            block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
+            block = block + (num_cols*((cell_width)*'=' + ' ')).rstrip() + '\n'
 
         block = block + ''.join([normalize_cell(x, cell_width+1)
-                                 for x in row]) + '\n'
+                                 for x in row]).rstrip() + '\n'
         if header:
-            block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
+            block = block + (num_cols*((cell_width)*'=' + ' ')).rstrip() + '\n'
         header = False
-    block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
+    block = block + (num_cols*((cell_width)*'=' + ' ')).rstrip() + '\n'
     return block
 
 

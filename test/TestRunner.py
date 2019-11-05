@@ -38,33 +38,33 @@ class TestRule(unittest.TestCase):
         assert (len(runner.run()) == 0)
 
     def test_unicode_runner_count(self):
-        filename = 'test/unicode.yml'
+        filename = 'test/unicode.yml.raw'
         runner = Runner(self.rules, filename, [], [], [])
         assert (len(runner.run()) == 1)
 
     def test_unicode_standard_formatting(self):
-        filename = 'test/unicode.yml'
+        filename = 'test/unicode.yml.raw'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
         formatter = ansiblelint.formatters.Formatter()
         formatter.format(matches[0])
 
     def test_unicode_parseable_colored_formatting(self):
-        filename = 'test/unicode.yml'
+        filename = 'test/unicode.yml.raw'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
         formatter = ansiblelint.formatters.ParseableFormatter()
         formatter.format(matches[0], colored=True)
 
     def test_unicode_quiet_colored_formatting(self):
-        filename = 'test/unicode.yml'
+        filename = 'test/unicode.yml.raw'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
         formatter = ansiblelint.formatters.QuietFormatter()
         formatter.format(matches[0], colored=True)
 
     def test_unicode_standard_color_formatting(self):
-        filename = 'test/unicode.yml'
+        filename = 'test/unicode.yml.raw'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
         formatter = ansiblelint.formatters.Formatter()

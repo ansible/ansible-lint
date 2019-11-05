@@ -1,5 +1,27 @@
 ---
+# example file contains errors on purpose:
+exclude: 'examples/example.yml|test/with-skip-tag-id.yml|\.raw$'
 repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks.git
+  # NOTE: `https://` Git URLs must be used in this config at all times.
+  # This is because the developers may run linters from behind various
+  # corporate firewalls which often heavily block other ports.
+  # Also, `git://` protocol doesn't use any transport layer encryption.
+  rev: v2.3.0
+  hooks:
+  # auto-fixers
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+  - id: mixed-line-ending
+  # /auto-fixers
+  - id: check-byte-order-marker
+  - id: check-executables-have-shebangs
+  - id: check-merge-conflict
+  - id: check-yaml
+    args:
+    - --unsafe
+  - id: debug-statements
+    language_version: python3
 - repo: https://gitlab.com/pycqa/flake8.git
   rev: 3.7.9
   hooks:

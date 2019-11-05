@@ -4804,7 +4804,7 @@ table {
     margin-top: 0px;
 }
 
-    
+
 .ansibleNav ul li{
     padding: 7px 0px;
     border-bottom: 1px solid #444;
@@ -4824,21 +4824,21 @@ table {
     color: #5bbdbf ;
     background: transparent;
 }
- 
+
 @media screen and (min-width: 768px) {
-    
+
     .DocSite-globalNav{
         display: block
     }
-    
+
     #sideBanner{
         display: block;
     }
-    
+
     .DocSite-sideNav{
         display: none;
     }
-    
+
     .ansibleNav{
         height: 45px;
         width: 100%;
@@ -4852,13 +4852,13 @@ table {
         flex-wrap: nowrap;
         margin-top: 13px;
     }
-    
-        
+
+
     .ansibleNav ul li{
         padding: 0px;
         border-bottom: none;
     }
-    
+
     .ansibleNav ul li a {
         color: #fff;
         text-decoration: none;
