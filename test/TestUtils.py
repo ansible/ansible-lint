@@ -21,6 +21,10 @@
 # THE SOFTWARE.
 
 import unittest
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
 
 import ansiblelint.utils as utils
 
@@ -140,3 +144,13 @@ class TestUtils(unittest.TestCase):
         task = dict(fail=dict(msg=u"unicode é ô à"))
         result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
         self.assertEqual(result, u"fail msg=unicode é ô à")
+
+    def test_normpath_with_path_object(self):
+        self.assertEqual(
+            utils.normpath(Path("a/b/../")),
+            "a")
+
+    def test_normpath_with_string(self):
+        self.assertEqual(
+            utils.normpath("a/b/../"),
+            "a")

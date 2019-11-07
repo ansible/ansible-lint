@@ -749,7 +749,9 @@ def normpath(path):
     Currently it generates a relative path but in the future we may want to
     make this user configurable.
     """
-    return os.path.relpath(path)
+    # convertion to string in order to allow receiving non string objects as
+    # arguments which would have failed under python2
+    return os.path.relpath(str(path))
 
 
 def is_playbook(filename):
