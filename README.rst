@@ -22,7 +22,7 @@
 Ansible-lint
 ============
 
-``ansible-lint`` checks playbooks for practices and behaviour that could
+``ansible-lint`` checks playbooks and roles for practices and behaviour that could
 potentially be improved.
 
 `Visit the Ansible Lint docs site <https://docs.ansible.com/ansible-lint/>`_
