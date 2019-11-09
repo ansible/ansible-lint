@@ -250,7 +250,16 @@ def _taskshandlers_children(basedir, k, v, parent_type):
         if 'include' in th:
             append_children(th['include'], basedir, k, parent_type, results)
         elif 'include_tasks' in th:
-            if 'file' in th['include_tasks']:
+            append_children(
+                th['include_tasks'].get(
+                    'file',
+                    th['include_tasks']
+                ),
+                basedir,
+                k,
+                parent_type,
+                results
+            )
                 append_children(th['include_tasks']['file'], basedir, k, parent_type, results)
             else:
                 append_children(th['include_tasks'], basedir, k, parent_type, results)
