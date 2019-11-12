@@ -111,10 +111,10 @@ class TestUtils(unittest.TestCase):
 
     def test_extract_from_list(self):
         block = {
-                'block': [{'tasks': {'name': 'hello', 'command': 'whoami'}}],
-                'test_none': None,
-                'test_string': 'foo'
-                }
+            'block': [{'tasks': {'name': 'hello', 'command': 'whoami'}}],
+            'test_none': None,
+            'test_string': 'foo',
+        }
         blocks = [block]
 
         test_list = utils.extract_from_list(blocks, ['block'])

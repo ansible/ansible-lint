@@ -1,4 +1,4 @@
-'''Script to generate rule table .rst documentation.'''
+"""Script to generate rule table .rst documentation."""
 
 import os
 import importlib
@@ -80,21 +80,21 @@ def get_serialized_rules():
 
 
 def make_table(grid):
-    cell_width = 2 + max(reduce(lambda x, y: x+y,
+    cell_width = 2 + max(reduce(lambda x, y: x + y,
                                 [[len(item) for item in row] for row in grid], []))
     num_cols = len(grid[0])
     block = DOC_HEADER
     header = True
     for row in grid:
         if header:
-            block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
+            block = block + num_cols * ((cell_width) * '=' + ' ') + '\n'
 
-        block = block + ''.join([normalize_cell(x, cell_width+1)
+        block = block + ''.join([normalize_cell(x, cell_width + 1)
                                  for x in row]) + '\n'
         if header:
-            block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
+            block = block + num_cols * ((cell_width) * '=' + ' ') + '\n'
         header = False
-    block = block + num_cols*((cell_width)*'=' + ' ') + '\n'
+    block = block + num_cols * ((cell_width) * '=' + ' ') + '\n'
     return block
 
 

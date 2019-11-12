@@ -68,7 +68,7 @@ class AnsibleLintRule(object):
             message = None
             if isinstance(result, six.string_types):
                 message = result
-            matches.append(Match(prev_line_no+1, line,
+            matches.append(Match(prev_line_no + 1, line,
                            file['path'], self, message))
         return matches
 
