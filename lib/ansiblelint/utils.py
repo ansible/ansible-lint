@@ -786,7 +786,7 @@ def get_playbooks_and_roles(options=None):
     }
 
     # detect role in repository root:
-    if 'tasks/main.yml' in files:
+    if 'tasks/main.yml' in files or 'tasks/main.yaml' in files:
         role_dirs.append('.')
 
     for p in map(Path, files):
@@ -802,7 +802,7 @@ def get_playbooks_and_roles(options=None):
         if next((i for i in p.parts if i.endswith('_vars')), None):
             continue
         elif 'roles' in p.parts or '.' in role_dirs:
-            if 'tasks' in p.parts and p.parts[-1] == 'main.yaml':
+            if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
                 role_dirs.append(str(p.parents[1]))
             elif role_internals.intersection(p.parts):
                 continue
