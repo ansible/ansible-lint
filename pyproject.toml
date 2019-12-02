@@ -11,6 +11,7 @@ requires = [
   "ansible",
   "pathlib2; python_version < '3.2'",
   "ruamel.yaml",
+  "semver",
   "six",
 ]
 build-backend = "setuptools.build_meta"

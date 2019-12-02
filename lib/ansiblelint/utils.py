@@ -29,6 +29,7 @@ except ImportError:
     from pathlib2 import Path
 import subprocess
 
+import semver
 import six
 import yaml
 from yaml.composer import Composer
@@ -45,6 +46,7 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import module_loader
 from ansible.template import Templar
+from ansible import __version__ as ANSIBLE_VERSION
 
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
@@ -364,7 +366,11 @@ def normalize_task_v2(task):
     result = dict()
     mod_arg_parser = ModuleArgsParser(task)
     try:
-        action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+        if semver.match(ANSIBLE_VERSION, '<2.9.0'):
+            action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+        else:
+            action, arguments, result['delegate_to'] = mod_arg_parser.parse(
+                skip_action_validation=True)
     except AnsibleParserError as e:
         try:
             task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
@@ -461,7 +467,21 @@ def normalize_task(task, filename):
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
         del(task['__ansible_action_type__'])
+
+    # remove added task keys since ModuleArgsParser will
+    # consider them as possible action statements
+    ADDED_TASK_KEYS = ['__line__', '__file__', 'skipped_rules']
+    added_task_data = {}
+    for key in ADDED_TASK_KEYS:
+        added_task_data[key] = task.pop(key, None)
+
     task = normalize_task_v2(task)
+
+    # re-add task keys
+    for key, value in added_task_data.items():
+        if value:
+            task[key] = value
+
     task[FILENAME_KEY] = filename
     task['__ansible_action_type__'] = ansible_action_type
     return task
