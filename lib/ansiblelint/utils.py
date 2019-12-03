@@ -614,7 +614,7 @@ def _append_skipped_rules(pyyaml_data, file_text, file_type):
     if file_type in ('tasks', 'handlers'):
         ruamel_task_blocks = ruamel_data
         pyyaml_task_blocks = pyyaml_data
-    elif file_type == 'playbook':
+    elif file_type in ('playbook', 'pre_tasks', 'post_tasks'):
         try:
             pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
             ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)

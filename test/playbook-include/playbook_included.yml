@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+  - command: echo "no name"  # noqa 502
+  - name: Another task
+    debug:
+      msg: debug message
