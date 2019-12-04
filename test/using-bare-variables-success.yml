@@ -107,6 +107,26 @@
         msg: "{{ item }}"
       with_fileglob: 'foo{{glob}}'
 
+    ### Testing with_filetree
+    - name: with_filetree loop using list of path
+      debug:
+        msg: "{{ item }}"
+      with_filetree:
+        - path/to/dir1/
+        - path/to/dir2/
+
+    ### Testing non-list form of with_filetree
+    - name: with_filetree loop using single path
+      debug:
+        msg: "{{ item }}"
+      with_filetree: path/to/dir/
+
+    ### Testing non-list form of with_filetree with trailing templated pattern
+    - name: with_filetree loop using templated pattern
+      debug:
+        msg: "{{ item }}"
+      with_filetree: 'path/to/{{ directory }}'
+
     ### Testing with_together
     - name: with_together loop using variable lists
       debug:
