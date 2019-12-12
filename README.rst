@@ -44,6 +44,8 @@ Using Pip
 From Source
 -----------
 
+**Note**: pip 19.0+ is required for installation.
+
 .. code-block:: bash
 
     pip install git+https://github.com/ansible/ansible-lint.git
