@@ -62,7 +62,7 @@ The following is the output from ``ansible-lint --help``, providing an overview 
 
 .. code-block:: bash
 
-    Usage: ansible-lint [options] [playbook.yml [playbook2 ...]]
+    Usage: ansible-lint [options] [playbook.yml [playbook2 ...]]|roledirectory
 
     Options:
       --version             show program's version number and exit
@@ -89,7 +89,7 @@ The following is the output from ``ansible-lint --help``, providing an overview 
       --exclude=EXCLUDE_PATHS
                             path to directories or files to skip. This option is
                             repeatable.
-      -c C                  Specify configuration file to use.  Defaults to
+      -c /path/to/file      Specify configuration file to use.  Defaults to
                             ".ansible-lint"
 
 
