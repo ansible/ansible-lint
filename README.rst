@@ -90,7 +90,7 @@ The following is the output from ``ansible-lint --help``, providing an overview 
                             path to directories or files to skip. This option is
                             repeatable.
       -c /path/to/file      Specify configuration file to use.  Defaults to
-                            ".ansible-lint"
+                              ".ansible-lint"
 
 
 
