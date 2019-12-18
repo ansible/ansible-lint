@@ -52,7 +52,7 @@ def main():
 
     formatter = formatters.Formatter()
 
-    parser = optparse.OptionParser("%prog [options] [playbook.yml [playbook2 ...]]",
+    parser = optparse.OptionParser("%prog [options] [playbook.yml [playbook2 ...]]|roledirectory",
                                    version="%prog " + __version__)
 
     parser.add_option('-L', dest='listrules', default=False,
@@ -105,10 +105,11 @@ def main():
                       help='path to directories or files to skip. This option'
                            ' is repeatable.',
                       default=[])
-    parser.add_option('-c', help='Specify configuration file to use.  Defaults to ".ansible-lint"')
+    parser.add_option('-c', dest='config_file',
+                      help='Specify configuration file to use.  Defaults to ".ansible-lint"')
     options, args = parser.parse_args(sys.argv[1:])
 
-    config = load_config(options.c)
+    config = load_config(options.config_file)
 
     if config:
         if 'quiet' in config:
