@@ -763,15 +763,48 @@ def is_playbook(filename):
     return False
 
 
+def get_yaml_files(options=None):
+    """Find all yaml files."""
+    if options is None:
+        options = {}
+
+    # git is preferred as it also considers .gitignore
+    git_command = ['git', 'ls-files', '*.yaml', '*.yml']
+    if options.verbosity:
+        print(
+            "Discovering files to lint: %s" % (' '.join(git_command))
+        )
+
+    try:
+        out = subprocess.check_output(
+            git_command,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True
+        ).split()
+    except subprocess.CalledProcessError as exc:
+        if options.verbosity:
+            print(
+                "Warning: Failed to discover yaml files to lint using git: %s" % (
+                    exc.output.rstrip('\n')
+                )
+            )
+
+        out = [
+            os.path.join(root, name)
+            for root, dirs, files in os.walk('.')
+            for name in files
+            if name.endswith('.yaml') or name.endswith('.yml')
+        ]
+
+    return OrderedDict.fromkeys(sorted(out))
+
+
 def get_playbooks_and_roles(options=None):
     """Find roles and playbooks."""
     if options is None:
         options = {}
 
-    # git is preferred as it also considers .gitignore
-    files = OrderedDict.fromkeys(sorted(subprocess.check_output(
-        ["git", "ls-files", "*.yaml", "*.yml"],
-        universal_newlines=True).split()))
+    files = get_yaml_files(options)
 
     playbooks = []
     role_dirs = []
