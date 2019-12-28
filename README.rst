@@ -18,6 +18,10 @@
    :target: https://travis-ci.com/ansible/ansible-lint
    :alt: Travis CI build status
 
+.. image:: https://img.shields.io/lgtm/grade/python/g/ansible/ansible-lint.svg?logo=lgtm&logoWidth=18
+   :target: https://lgtm.com/projects/g/ansible/ansible-lint/context:python
+   :alt: Language grade: Python
+
 
 Ansible-lint
 ============
