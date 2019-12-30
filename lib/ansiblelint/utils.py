@@ -763,16 +763,15 @@ def is_playbook(filename):
     return False
 
 
-def get_yaml_files(options=None):
+def get_yaml_files(options):
     """Find all yaml files."""
-    if options is None:
-        options = {}
-
     # git is preferred as it also considers .gitignore
     git_command = ['git', 'ls-files', '*.yaml', '*.yml']
     if options.verbosity:
         print(
-            "Discovering files to lint: %s" % (' '.join(git_command))
+            "Discovering files to lint: {command}".format(
+                command=' '.join(git_command)
+            )
         )
 
     try:
@@ -784,8 +783,9 @@ def get_yaml_files(options=None):
     except subprocess.CalledProcessError as exc:
         if options.verbosity:
             print(
-                "Warning: Failed to discover yaml files to lint using git: %s" % (
-                    exc.output.rstrip('\n')
+                "Warning: Failed to discover yaml files to lint using git:"
+                " {error_msg}".format(
+                    error_msg=exc.output.rstrip('\n')
                 )
             )
 
