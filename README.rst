@@ -48,9 +48,14 @@ Using Pip
 From Source
 -----------
 
+**Note**: pip 19.0+ is required for installation. Please consult with the `PyPA User Guide`_
+to learn more about managing Pip versions.
+
 .. code-block:: bash
 
     pip install git+https://github.com/ansible/ansible-lint.git
+
+.. _PyPA User Guide: https://packaging.python.org/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date
 
 .. installing-docs-inclusion-marker-end-do-not-remove
 
