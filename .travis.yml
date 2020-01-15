@@ -158,3 +158,4 @@ install:
 
 script:
 - tox -v
+- pip install -e .  # Validates that project can install in editable mode
