@@ -92,3 +92,10 @@ class TestCliRolePaths(unittest.TestCase):
 
         result = self.run_ansible_lint(cwd=cwd, role_path=role_path, env=env)
         self.assertIn('Use shell only when shell functionality is required', str(result))
+
+    def test_run_role_name_invalid(self):
+        cwd = self.local_test_dir
+        role_path = 'roles/invalid-name'
+
+        result = self.run_ansible_lint(cwd=cwd, role_path=role_path)
+        self.assertIn('106 Role name invalid-name does not match', str(result))
