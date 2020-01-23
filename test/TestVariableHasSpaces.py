@@ -35,6 +35,9 @@ TASK_VARIABLES = '''
   debug:
     msg: "test"
   example: "data = ${lookup{$local_part}lsearch{/etc/aliases}}"
+- name: JSON inside jinja is valid
+  debug:
+    msg: "{{ {'test': {'subtest': variable}} }}"
 '''
 
 
