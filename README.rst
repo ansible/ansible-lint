@@ -18,6 +18,14 @@
    :target: https://travis-ci.com/ansible/ansible-lint
    :alt: Travis CI build status
 
+.. image:: https://github.com/ansible/ansible-lint/workflows/%F0%9F%91%B7/badge.svg
+   :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3A%F0%9F%91%B7
+   :alt: 👷 GitHub Actions CI/CD build status — tests
+
+.. image:: https://github.com/ansible/ansible-lint/workflows/%F0%9F%9A%A8/badge.svg
+   :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3A%F0%9F%9A%A8
+   :alt: 🚨 GitHub Actions CI/CD build status — linters
+
 .. image:: https://img.shields.io/lgtm/grade/python/g/ansible/ansible-lint.svg?logo=lgtm&logoWidth=18
    :target: https://lgtm.com/projects/g/ansible/ansible-lint/context:python
    :alt: Language grade: Python
