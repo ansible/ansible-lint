@@ -1,4 +1,4 @@
-name: tox🚨code quality
+name: 🚨
 
 on:
   push:
@@ -12,9 +12,7 @@ on:
 jobs:
   linters:
     name: >-
-      ${{ matrix.env.TOXENV }}
-      @ ${{ matrix.python-version }}
-      @ ${{ matrix.os }}
+      ${{ matrix.env.TOXENV }}/${{ matrix.python-version }}@${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

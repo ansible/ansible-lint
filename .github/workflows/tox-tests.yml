@@ -1,4 +1,4 @@
-name: tox👷test suite
+name: 👷
 
 on:
   push:
@@ -12,9 +12,7 @@ on:
 jobs:
   tests:
     name: >-
-      Ansible ${{ matrix.ansible-version }}
-      @ ${{ matrix.python-version }}
-      @ ${{ matrix.os }}
+      Ansible ${{ matrix.ansible-version }}/${{ matrix.python-version }}@${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       # fail-fast: false
