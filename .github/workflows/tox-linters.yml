@@ -39,11 +39,6 @@ jobs:
         # - TOXENV: pre-commit-ci
         # - TOXENV: check-docs
         # - TOXENV: build-docs
-        exclude:
-        # Excluded until sphinx bug is fixed
-        # https://github.com/sphinx-doc/sphinx/issues/6803
-        - os: macOS-10.14
-          python-version: 3.8
 
     steps:
     - uses: actions/checkout@master
