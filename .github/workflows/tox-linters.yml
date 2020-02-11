@@ -42,6 +42,9 @@ jobs:
         # - TOXENV: check-docs
         # - TOXENV: build-docs
 
+    env:
+      TOX_PARALLEL_NO_SPINNER: 1
+
     steps:
     - uses: actions/checkout@master
     - name: Set up Python ${{ matrix.python-version }}
@@ -81,5 +84,5 @@ jobs:
     #     test -d .tox/pre-commit-failing && .tox/pre-commit-failing/bin/python -m pre_commit install-hooks || :
     - name: Test with tox
       run: |
-        python -m tox --parallel 0
+        python -m tox --parallel auto
       env: ${{ matrix.env }}
