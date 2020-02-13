@@ -19,9 +19,7 @@ jobs:
       # max-parallel: 5
       matrix:
         python-version:
-        # Excluded until sphinx bug is fixed
-        # https://github.com/tox-dev/tox/issues/1518
-        # - 3.8
+        - 3.8
         - 3.7
         - 3.6
         - 3.5
