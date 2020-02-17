@@ -52,6 +52,8 @@ from ansible.template import Templar
 # successfully.
 DEFAULT_VAULT_PASSWORD = 'x'
 
+PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
+
 
 def parse_yaml_from_file(filepath):
     dl = DataLoader()
@@ -210,7 +212,7 @@ def play_children(basedir, item, parent_type, playbook_dir):
         if v:
             v = template(os.path.abspath(basedir),
                          v,
-                         dict(playbook_dir=os.path.abspath(basedir)),
+                         dict(playbook_dir=PLAYBOOK_DIR or os.path.abspath(basedir)),
                          fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
