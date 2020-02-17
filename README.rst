@@ -30,6 +30,10 @@
    :target: https://lgtm.com/projects/g/ansible/ansible-lint/context:python
    :alt: Language grade: Python
 
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+   :target: https://github.com/pre-commit/pre-commit
+   :alt: pre-commit
+
 
 Ansible-lint
 ============
