@@ -159,8 +159,6 @@ def main():
         rulesdirs = options.rulesdir or [default_rulesdir]
 
     rules = RulesCollection()
-    rulesdirs = [os.path.expanduser(s) for s in rulesdirs]
-    rulesdirs = [os.path.expandvars(s) for s in rulesdirs]
     for rulesdir in rulesdirs:
         rules.extend(RulesCollection.create_from_directory(rulesdir))
 
