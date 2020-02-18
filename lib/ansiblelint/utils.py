@@ -861,3 +861,17 @@ def get_playbooks_and_roles(options=None):
         print('Found playbooks: ' + ' '.join(playbooks))
 
     return role_dirs + playbooks
+
+
+def expand_path_vars(path):
+    """Expand the environment or ~ variables in a path string."""
+    path = path.strip()
+    path = os.path.expanduser(path)
+    path = os.path.expandvars(path)
+    return path
+
+
+def expand_paths_vars(paths):
+    """Expand the environment or ~ variables in a list."""
+    paths = [expand_path_vars(p) for p in paths]
+    return paths

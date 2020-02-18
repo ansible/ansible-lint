@@ -155,8 +155,7 @@ class RulesCollection(object):
         return len(self.rules)
 
     def _update_rulesdirs(self, rulesdirs):
-        rulesdirs = [os.path.expanduser(p) for p in rulesdirs]
-        rulesdirs = [os.path.expandvars(p) for p in rulesdirs]
+        rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
         self.rulesdirs = rulesdirs
 
     def _update_rules(self, rulesdirs):
@@ -252,10 +251,7 @@ class Runner(object):
     def _update_exclude_paths(self, exclude_paths):
         if exclude_paths:
             # These will be (potentially) relative paths
-            paths = [s.strip() for s in exclude_paths]
-            # Expand ~ and other environment vars such as $HOME
-            paths = [os.path.expanduser(s) for s in paths]
-            paths = [os.path.expandvars(s) for s in paths]
+            paths = ansiblelint.utils.expand_paths_vars(exclude_paths)
             # Since ansiblelint.utils.find_children returns absolute paths,
             # and the list of files we create in `Runner.run` can contain both
             # relative and absolute paths, we need to cover both bases.
