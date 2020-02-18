@@ -197,7 +197,7 @@ class RulesCollection(object):
     def create_from_directory(cls, rulesdir):
         result = cls()
         rulesdir = os.path.expanduser(rulesdir)
-        rulesdir = os.path.expanduser(rulesdir)
+        rulesdir = os.path.expandvars(rulesdir)
         result.rules = ansiblelint.utils.load_plugins(rulesdir)
         return result
 
