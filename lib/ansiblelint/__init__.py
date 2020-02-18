@@ -140,8 +140,10 @@ class AnsibleLintRule(object):
 
 class RulesCollection(object):
 
-    def __init__(self):
+    def __init__(self, rulesdirs=[]):
+        self._update_rulesdirs(rulesdirs)
         self.rules = []
+        self._update_rules(self.rulesdirs)
 
     def register(self, obj):
         self.rules.append(obj)
@@ -151,6 +153,15 @@ class RulesCollection(object):
 
     def __len__(self):
         return len(self.rules)
+
+    def _update_rulesdirs(self, rulesdirs):
+        rulesdirs = [os.path.expanduser(p) for p in rulesdirs]
+        rulesdirs = [os.path.expandvars(p) for p in rulesdirs]
+        self.rulesdirs = rulesdirs
+
+    def _update_rules(self, rulesdirs):
+        for rulesdir in rulesdirs:
+            self.extend(ansiblelint.utils.load_plugins(rulesdir))
 
     def extend(self, more):
         self.rules.extend(more)

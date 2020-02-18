@@ -157,10 +157,7 @@ def main():
         rulesdirs = options.rulesdir + [default_rulesdir]
     else:
         rulesdirs = options.rulesdir or [default_rulesdir]
-
-    rules = RulesCollection()
-    for rulesdir in rulesdirs:
-        rules.extend(RulesCollection.create_from_directory(rulesdir))
+    rules = RulesCollection(rulesdirs)
 
     if options.listrules:
         print(rules)
