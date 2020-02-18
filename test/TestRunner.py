@@ -70,6 +70,19 @@ class TestRule(unittest.TestCase):
         formatter = ansiblelint.formatters.Formatter()
         formatter.format(matches[0], colored=True)
 
+    def test_runner_exclude_var_expansion(self):
+        filename = 'example/lots_of_warnings.yml'
+        os.environ['EXCLUDE_PATH'] = filename
+        excludes = ['$EXCLUDE_PATH']
+        runner = Runner(self.rules, filename, [], [], excludes)
+        assert filename in runner.exclude_paths
+
+    def test_runner_exclude_user_expansion(self):
+        filename = 'example/lots_of_warnings.yml'
+        excludes = ['~']
+        runner = Runner(self.rules, filename, [], [], excludes)
+        assert os.path.expanduser('~') in runner.exclude_paths
+
     def test_runner_excludes_paths(self):
         filename = 'examples/lots_of_warnings.yml'
         excludes = ['examples/lots_of_warnings.yml']
