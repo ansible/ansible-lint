@@ -156,14 +156,16 @@ class TestUtils(unittest.TestCase):
             utils.normpath("a/b/../"),
             "a")
 
-    def test_expand_path_vars(self):
-        test_path = '/test/path'
-        os.environ['TEST_PATH'] = test_path
-        self.assertEqual(utils.expand_path_vars('~'), os.path.expanduser('~'))
-        self.assertEqual(utils.expand_path_vars('$TEST_PATH'), test_path)
 
-    def test_expand_paths_vars(self):
-        test_path = '/test/path'
-        os.environ['TEST_PATH'] = test_path
-        self.assertEqual(utils.expand_paths_vars(['~']), [os.path.expanduser('~')])
-        self.assertEqual(utils.expand_paths_vars(['$TEST_PATH']), [test_path])
+def test_expand_path_vars(monkeypatch):
+    test_path = '/test/path'
+    monkeypatch.setenv('TEST_PATH', test_path)
+    assert utils.expand_path_vars('~') == os.path.expanduser('~')
+    assert utils.expand_path_vars('$TEST_PATH') == test_path
+
+
+def test_expand_paths_vars(monkeypatch):
+    test_path = '/test/path'
+    monkeypatch.setenv('TEST_PATH', test_path)
+    assert utils.expand_paths_vars(['~']) == [os.path.expanduser('~')]
+    assert utils.expand_paths_vars(['$TEST_PATH']) == [test_path]

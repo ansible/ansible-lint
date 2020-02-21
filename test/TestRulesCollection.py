@@ -75,18 +75,20 @@ class TestRulesCollection(unittest.TestCase):
         matches = self.rules.run(self.ematchtestfile, skip_list=['DOESNOTEXIST'])
         self.assertEqual(len(matches), 3)
 
-    def test_rulesdir_var_expansion(self):
-        test_path = '/test/path'
-        os.environ['TEST_PATH'] = test_path
-        test_rulesdirs = ['$TEST_PATH']
-        expansion_rules = RulesCollection(test_rulesdirs)
-        self.assertIn(test_path, expansion_rules.rulesdirs)
-
-    def test_rulesdir_user_expansion(self):
-        expansion_rules = RulesCollection(['~'])
-        self.assertIn(os.path.expanduser('~'), expansion_rules.rulesdirs)
-
     def test_no_duplicate_rule_ids(self):
         real_rules = RulesCollection(['./lib/ansiblelint/rules'])
         rule_ids = [rule.id for rule in real_rules]
         self.assertEqual([x for x, y in collections.Counter(rule_ids).items() if y > 1], [])
+
+
+def test_rulesdir_var_expansion(monkeypatch):
+    test_path = '/test/path'
+    monkeypatch.setenv('TEST_PATH', test_path)
+    test_rulesdirs = ['$TEST_PATH']
+    expansion_rules = RulesCollection(test_rulesdirs)
+    assert test_path in expansion_rules.rulesdirs
+
+
+def test_rulesdir_user_expansion():
+    expansion_rules = RulesCollection(['~'])
+    assert os.path.expanduser('~') in expansion_rules.rulesdirs
