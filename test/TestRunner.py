@@ -30,7 +30,7 @@ class TestRule(unittest.TestCase):
 
     def setUp(self):
         rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-        self.rules = RulesCollection.create_from_directory(rulesdir)
+        self.rules = RulesCollection([rulesdir])
 
     def test_runner_count(self):
         filename = 'test/nomatchestest.yml'

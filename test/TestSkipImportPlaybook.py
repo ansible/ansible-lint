@@ -27,7 +27,7 @@ MAIN_PLAYBOOK = '''
 class TestSkipBeforeImport(unittest.TestCase):
     def setUp(self):
         rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-        self.rules = RulesCollection.create_from_directory(rulesdir)
+        self.rules = RulesCollection([rulesdir])
 
         # make dir and write role tasks to import or include
         self.play_root = tempfile.mkdtemp()

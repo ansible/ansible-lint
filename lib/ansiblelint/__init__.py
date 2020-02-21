@@ -198,14 +198,6 @@ class RulesCollection(object):
             results.append("{0} {1}".format(tag, tags[tag]))
         return "\n".join(results)
 
-    @classmethod
-    def create_from_directory(cls, rulesdir):
-        result = cls()
-        rulesdir = os.path.expanduser(rulesdir)
-        rulesdir = os.path.expandvars(rulesdir)
-        result.rules = ansiblelint.utils.load_plugins(rulesdir)
-        return result
-
 
 class Match(object):
 

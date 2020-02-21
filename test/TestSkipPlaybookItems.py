@@ -91,7 +91,7 @@ PLAYBOOK_WITH_BLOCK = '''
 
 class TestSkipPlaybookItems(unittest.TestCase):
     rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-    collection = RulesCollection.create_from_directory(rulesdir)
+    collection = RulesCollection([rulesdir])
 
     def setUp(self):
         self.runner = RunFromText(self.collection)
