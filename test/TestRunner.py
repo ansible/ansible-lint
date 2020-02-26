@@ -22,7 +22,7 @@ import os
 import unittest
 
 import ansiblelint
-from ansiblelint import Runner, RulesCollection
+from ansiblelint import default_rulesdir, Runner, RulesCollection
 import ansiblelint.formatters
 
 
@@ -69,19 +69,6 @@ class TestRule(unittest.TestCase):
         matches = runner.run()
         formatter = ansiblelint.formatters.Formatter()
         formatter.format(matches[0], colored=True)
-
-    def test_runner_exclude_var_expansion(self):
-        filename = 'example/lots_of_warnings.yml'
-        os.environ['EXCLUDE_PATH'] = filename
-        excludes = ['$EXCLUDE_PATH']
-        runner = Runner(self.rules, filename, [], [], excludes)
-        assert filename in runner.exclude_paths
-
-    def test_runner_exclude_user_expansion(self):
-        filename = 'example/lots_of_warnings.yml'
-        excludes = ['~']
-        runner = Runner(self.rules, filename, [], [], excludes)
-        assert os.path.expanduser('~') in runner.exclude_paths
 
     def test_runner_excludes_paths(self):
         filename = 'examples/lots_of_warnings.yml'
@@ -131,3 +118,20 @@ class TestRule(unittest.TestCase):
         run2 = runner.run()
 
         assert ((len(run1) + len(run2)) == 1)
+
+
+def test_runner_exclude_var_expansion(monkeypatch):
+    rules = RulesCollection([default_rulesdir])
+    filename = 'example/lots_of_warnings.yml'
+    monkeypatch.setenv('EXCLUDE_PATH', filename)
+    excludes = ['$EXCLUDE_PATH']
+    runner = Runner(rules, filename, [], [], excludes)
+    assert filename in runner.exclude_paths
+
+
+def test_runner_exclude_user_expansion():
+    rules = RulesCollection([default_rulesdir])
+    filename = 'example/lots_of_warnings.yml'
+    excludes = ['~']
+    runner = Runner(rules, filename, [], [], excludes)
+    assert os.path.expanduser('~') in runner.exclude_paths
