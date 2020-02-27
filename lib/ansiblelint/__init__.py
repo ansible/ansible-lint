@@ -140,8 +140,13 @@ class AnsibleLintRule(object):
 
 class RulesCollection(object):
 
-    def __init__(self):
+    def __init__(self, rulesdirs=None):
+        if rulesdirs is None:
+            rulesdirs = []
+        self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
         self.rules = []
+        for rulesdir in self.rulesdirs:
+            self.extend(ansiblelint.utils.load_plugins(rulesdir))
 
     def register(self, obj):
         self.rules.append(obj)
@@ -193,12 +198,6 @@ class RulesCollection(object):
             results.append("{0} {1}".format(tag, tags[tag]))
         return "\n".join(results)
 
-    @classmethod
-    def create_from_directory(cls, rulesdir):
-        result = cls()
-        result.rules = ansiblelint.utils.load_plugins(os.path.expanduser(rulesdir))
-        return result
-
 
 class Match(object):
 
@@ -239,7 +238,7 @@ class Runner(object):
     def _update_exclude_paths(self, exclude_paths):
         if exclude_paths:
             # These will be (potentially) relative paths
-            paths = [s.strip() for s in exclude_paths]
+            paths = ansiblelint.utils.expand_paths_vars(exclude_paths)
             # Since ansiblelint.utils.find_children returns absolute paths,
             # and the list of files we create in `Runner.run` can contain both
             # relative and absolute paths, we need to cover both bases.

@@ -8,7 +8,7 @@ class TestTaskIncludes(unittest.TestCase):
 
     def setUp(self):
         rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-        self.rules = RulesCollection.create_from_directory(rulesdir)
+        self.rules = RulesCollection([rulesdir])
 
     def test_block_included_tasks(self):
         filename = 'test/blockincludes.yml'
