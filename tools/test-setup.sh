@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -Eeuxo pipefail
 # Used by Zuul CI to perform extra bootstrapping
 
 # Bumping system tox because version from CentOS 7 is too old
