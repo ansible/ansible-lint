@@ -1,0 +1,40 @@
+---
+# zuul.d/layout.yaml
+- job:
+    name: tox-py27-ansible28
+    parent: ansible-tox-py27
+    vars:
+      tox_envlist: py27-ansible28
+
+- job:
+    name: tox-py37-ansible28
+    parent: ansible-tox-py37
+    vars:
+      tox_envlist: py37-ansible28
+
+- project:
+    check:
+      jobs: &defaults
+        - tox-linters:
+            vars:
+              tox_envlist: lint
+        - tox-docs
+        - tox-py27:
+            vars:
+              tox_envlist: py27-ansible29
+        - tox-py27-ansible28
+        - tox-py35:
+            vars:
+              tox_envlist: py35-ansible29
+        - tox-py36:
+            vars:
+              tox_envlist: py36-ansible29
+        - tox-py37:
+            vars:
+              tox_envlist: py37-ansible29
+        - tox-py37-ansible28
+        - tox-py38:
+            vars:
+              tox_envlist: py38-ansible29
+    gate:
+      jobs: *defaults
