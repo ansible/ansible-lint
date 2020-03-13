@@ -1,5 +1,5 @@
-# Copyright (c) 2016, Will Thames and contributors
-# Copyright (c) 2018, Ansible Project
+# Copyright (c) 2020, Joachim Lusiardi
+# Copyright (c) 2020, Ansible Project
 
 from __future__ import print_function
 from ansiblelint import AnsibleLintRule
@@ -16,7 +16,7 @@ class IncludeMissingFileRule(AnsibleLintRule):
     version_added = 'v4.2.0'
 
     def matchplay(self, file, data):
-        abs_path = file.get('abs_path', None)
+        absolute_directory = file.get('absolute_directory', None)
         results = []
         for task in data.get('tasks', []):
 
@@ -26,17 +26,16 @@ class IncludeMissingFileRule(AnsibleLintRule):
 
             # collect information which file was referenced for include / import
             referenced_file = None
-            for key in task.keys():
+            for key, val in task.items():
                 if key.startswith('include_') or key.startswith('import_') or key == 'include':
-                    tmp = task[key]
-                    if isinstance(tmp, ansible.parsing.yaml.objects.AnsibleMapping):
-                        referenced_file = tmp.get('file', None)
+                    if isinstance(val, ansible.parsing.yaml.objects.AnsibleMapping):
+                        referenced_file = val.get('file', None)
                     else:
-                        referenced_file = tmp
+                        referenced_file = val
 
             if referenced_file:
                 # make sure we have a absolute path here and check if it is a file
-                referenced_file = os.path.join(abs_path, referenced_file)
+                referenced_file = os.path.join(absolute_directory, referenced_file)
                 if not os.path.isfile(referenced_file):
                     results.append(({'referenced_file': referenced_file},
                                     'referenced missing file in %s:%i'
