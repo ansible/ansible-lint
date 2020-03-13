@@ -25,10 +25,8 @@ jobs:
         - 2.7
         os:
         - ubuntu-latest
-        - ubuntu-16.04
         - macOS-latest
         # - windows-latest
-        # - windows-2016
         env:
         - TOXENV: build-dists,metadata-validation
         - TOXENV: docs
