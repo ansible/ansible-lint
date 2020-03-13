@@ -239,13 +239,17 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             append_children(th['import_playbook'], basedir, k, parent_type, results)
         elif 'import_tasks' in th:
             append_children(th['import_tasks'], basedir, k, parent_type, results)
-        elif 'import_role' in th:
+        elif 'include_role' in th or 'import_role' in th:
             th = normalize_task_v2(th)
-            results.extend(_roles_children(basedir, k, [th['action'].get('name')], parent_type,
-                                           main=th['action'].get('tasks_from', 'main')))
-        elif 'include_role' in th:
-            th = normalize_task_v2(th)
-            results.extend(_roles_children(basedir, k, [th['action'].get('name')],
+            module = th['action']['__ansible_module__']
+            if "name" not in th['action']:
+                raise RuntimeError(
+                    "Failed to find required 'name' key in %s" % module)
+            if not isinstance(th['action']["name"], six.string_types):
+                raise RuntimeError(
+                    "Value assigned to 'name' key on '%s' is not a string." %
+                    module)
+            results.extend(_roles_children(basedir, k, [th['action'].get("name")],
                                            parent_type,
                                            main=th['action'].get('tasks_from', 'main')))
         elif 'block' in th:
