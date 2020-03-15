@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
+import pathlib
 import unittest
 
 from ansiblelint import Match, AnsibleLintRule
@@ -29,7 +29,7 @@ class TestFormatter(unittest.TestCase):
     def setUp(self):
         self.rule = AnsibleLintRule()
         self.rule.id = "TCF0001"
-        self.formatter = Formatter()
+        self.formatter = Formatter(pathlib.Path.cwd(), True)
 
     def test_format_coloured_string(self):
         match = Match(1, "hello", "filename.yml", self.rule, "message")

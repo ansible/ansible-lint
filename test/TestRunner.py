@@ -46,28 +46,28 @@ class TestRule(unittest.TestCase):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = ansiblelint.formatters.Formatter()
+        formatter = ansiblelint.formatters.Formatter(os.getcwd(), True)
         formatter.format(matches[0])
 
     def test_unicode_parseable_colored_formatting(self):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = ansiblelint.formatters.ParseableFormatter()
+        formatter = ansiblelint.formatters.ParseableFormatter(os.getcwd(), True)
         formatter.format(matches[0], colored=True)
 
     def test_unicode_quiet_colored_formatting(self):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = ansiblelint.formatters.QuietFormatter()
+        formatter = ansiblelint.formatters.QuietFormatter(os.getcwd(), True)
         formatter.format(matches[0], colored=True)
 
     def test_unicode_standard_color_formatting(self):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = ansiblelint.formatters.Formatter()
+        formatter = ansiblelint.formatters.Formatter(os.getcwd(), True)
         formatter.format(matches[0], colored=True)
 
     def test_runner_excludes_paths(self):

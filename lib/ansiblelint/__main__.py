@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import errno
+import pathlib
 import sys
 
 import ansiblelint.formatters as formatters
@@ -29,18 +30,21 @@ from ansiblelint.utils import normpath
 
 
 def main():
+    cwd = pathlib.Path.cwd()
 
-    formatter = formatters.Formatter()
     options, args = cli.get_config(sys.argv[1:])
 
+    formatter_factory = formatters.Formatter
     if options.quiet:
-        formatter = formatters.QuietFormatter()
+        formatter_factory = formatters.QuietFormatter
 
     if options.parseable:
-        formatter = formatters.ParseableFormatter()
+        formatter_factory = formatters.ParseableFormatter
 
     if options.parseable_severity:
-        formatter = formatters.ParseableSeverityFormatter()
+        formatter_factory = formatters.ParseableSeverityFormatter
+
+    formatter = formatter_factory(cwd, options.display_relative_path)
 
     # no args triggers auto-detection mode
     if len(args) == 0 and not (options.listrules or options.listtags):

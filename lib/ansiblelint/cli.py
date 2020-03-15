@@ -98,6 +98,9 @@ def get_cli_parser():
                            "rules directories specified with -r. There is "
                            "no need to specify this if no -r flags are used"
                            % ansiblelint.default_rulesdir)
+    parser.add_option('--show-relpath', dest='display_relative_path', action='store_false',
+                      default=True,
+                      help="Display path relative to CWD")
     parser.add_option('-t', dest='tags',
                       action='append',
                       default=[],
@@ -142,6 +145,10 @@ def merge_config(file_config, cli_config):
     if 'parseable_severity' in file_config:
         cli_config.parseable_severity = (cli_config.parseable_severity or
                                          file_config['parseable_severity'])
+
+    if 'display_relative_path' in file_config:
+        cli_config.display_relative_path = (cli_config.display_relative_path or
+                                            file_config['display_relative_path'])
 
     if 'use_default_rules' in file_config:
         cli_config.use_default_rules = (cli_config.use_default_rules or
