@@ -5,36 +5,49 @@
     parent: ansible-tox-py27
     vars:
       tox_envlist: py27-ansible28
+      tox_executable: "{{ ansible_python.executable }} -m tox"
 
 - job:
     name: tox-py37-ansible28
     parent: ansible-tox-py37
     vars:
       tox_envlist: py37-ansible28
+      tox_executable: "{{ ansible_python.executable }} -m tox"
 
 - project:
     check:
       jobs: &defaults
         - tox-linters:
+            nodeset: centos-8-1vcpu
             vars:
               tox_envlist: lint
-        - tox-docs
+              tox_executable: "{{ ansible_python.executable }} -m tox"
+        - tox-docs:
+            nodeset: centos-8-1vcpu
+            vars:
+              tox_executable: "{{ ansible_python.executable }} -m tox"
         - tox-py27:
             vars:
               tox_envlist: py27-ansible29
+              tox_executable: "{{ ansible_python.executable }} -m tox"
         - tox-py27-ansible28
         - tox-py35:
             vars:
               tox_envlist: py35-ansible29
+              tox_executable: "{{ ansible_python.executable }} -m tox"
+
         - tox-py36:
             vars:
               tox_envlist: py36-ansible29
+              tox_executable: "{{ ansible_python.executable }} -m tox"
         - tox-py37:
             vars:
               tox_envlist: py37-ansible29
+              tox_executable: "{{ ansible_python.executable }} -m tox"
         - tox-py37-ansible28
         - tox-py38:
             vars:
               tox_envlist: py38-ansible29
+              tox_executable: "{{ ansible_python.executable }} -m tox"
     gate:
       jobs: *defaults
