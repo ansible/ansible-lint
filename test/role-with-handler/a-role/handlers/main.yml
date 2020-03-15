@@ -3,4 +3,3 @@
   shell: echo merp | cat
   when:
     - something.changed
-
