@@ -37,6 +37,7 @@ generate_rst: staticmin
 htmldocs: generate_rst
 	cd ../../lib/ansiblelint; python ./generate_docs.py
 	CPUS=$(CPUS) $(MAKE) -f Makefile.sphinx html
+	@sh -c "git diff --quiet || { echo 'ERROR: Building docs changed tracked files, include them in commit to avoid this failure.'; exit 1; }"
 
 singlehtmldocs: generate_rst
 	CPUS=$(CPUS) $(MAKE) -f Makefile.sphinx singlehtml
