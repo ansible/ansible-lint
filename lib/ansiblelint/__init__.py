@@ -263,7 +263,7 @@ class Runner(object):
                           'type': playbook[1],
                           # add an absolute path here, so rules are able to validate if
                           # referenced files exist
-                          'abs_path': os.path.dirname(playbook[0])})
+                          'absolute_directory': os.path.dirname(playbook[0])})
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
