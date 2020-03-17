@@ -66,10 +66,10 @@ def included_playbook(tmp_path):
 
 def test_include_missing_file(linter_rules, including_playbook):
     runner = Runner(linter_rules, including_playbook.name, [], [], [])
-    results = runner.run()
-    assert 'referenced missing file in' in str(results)
-    assert 'playbook.yml:2' in str(results)
-    assert 'some_file.yml' in str(results)
+    results = str(runner.run())
+    assert 'referenced missing file in' in results
+    assert 'playbook.yml:2' in results
+    assert 'some_file.yml' in results
 
 
 def test_include_found_file(linter_rules, including_playbook, included_playbook):
