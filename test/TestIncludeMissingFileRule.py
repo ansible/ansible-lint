@@ -38,39 +38,30 @@ def linter_rules(scope="module"):
 
 @pytest.fixture
 def including_playbook(tmp_path):
-    print('including_playbook', type(tmp_path))
-
-    with open(os.path.join(tmp_path, 'playbook.yml'), 'w') as f_play:
+    with open(os.path.join(str(tmp_path), 'playbook.yml'), 'w') as f_play:
         f_play.write(PLAY_INCLUDING)
-    yield f_play
-    print('-------------------tear down including_playbook')
+    return f_play
 
 
 @pytest.fixture
 def including_playbook_noqa(tmp_path):
-    print('including_playbook', tmp_path)
-    with open(os.path.join(tmp_path, 'playbook.yml'), 'w') as f_play:
+    with open(os.path.join(str(tmp_path), 'playbook.yml'), 'w') as f_play:
         f_play.write(PLAY_INCLUDING_NOQA)
-    yield f_play
-    print('-------------------tear down including_playbook_noqa')
+    return f_play
 
 
 @pytest.fixture
 def including_playbook_jinja2(tmp_path):
-    print('including_playbook', tmp_path)
-    with open(os.path.join(tmp_path, 'playbook.yml'), 'w') as f_play:
+    with open(os.path.join(str(tmp_path), 'playbook.yml'), 'w') as f_play:
         f_play.write(PLAY_INCLUDING_JINJA2)
-    yield f_play
-    print('-------------------tear down including_playbook_jinja')
+    return f_play
 
 
 @pytest.fixture
 def included_playbook(tmp_path):
-    print('included_playbook', tmp_path)
-    with open(os.path.join(tmp_path, 'some_file.yml'), 'w') as f_play:
+    with open(os.path.join(str(tmp_path), 'some_file.yml'), 'w') as f_play:
         f_play.write(PLAY_INCLUDED)
-    yield f_play
-    print('-------------------tear down included_playbook')
+    return f_play
 
 
 def test_include_missing_file(linter_rules, including_playbook):

@@ -34,7 +34,9 @@ class IncludeMissingFileRule(AnsibleLintRule):
             # collect information which file was referenced for include / import
             referenced_file = None
             for key, val in task.items():
-                if not (key.startswith('include_') or key.startswith('import_') or key == 'include'):
+                if not (key.startswith('include_') or
+                        key.startswith('import_') or
+                        key == 'include'):
                     continue
                 if isinstance(val, ansible.parsing.yaml.objects.AnsibleMapping):
                     referenced_file = val.get('file', None)
