@@ -12,3 +12,9 @@
     package:
       name: some-package
       state: present
+
+  - name: Install curl on Windows
+    win_chocolatey:
+      name: curl
+      state: latest
+      version: '7.65.1'

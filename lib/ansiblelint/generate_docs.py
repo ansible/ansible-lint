@@ -95,6 +95,8 @@ def make_table(grid):
             block = block + num_cols * ((cell_width) * '=' + ' ') + '\n'
         header = False
     block = block + num_cols * ((cell_width) * '=' + ' ') + '\n'
+    # remove trailing whitelines from block
+    block = '\n'.join(line.rstrip() for line in block.splitlines()) + '\n'
     return block
 
 

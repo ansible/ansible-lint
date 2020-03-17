@@ -1,4 +1,3 @@
 ---
 - name: test tasks
   action: git a=b c=d
-

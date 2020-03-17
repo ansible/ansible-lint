@@ -1,5 +1,21 @@
 ---
 repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks.git
+  rev: v2.4.0
+  hooks:
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+    exclude: >
+      (?x)^(
+        test/(with-skip-tag-id|unicode).yml|
+        examples/example.yml
+      )$
+  - id: mixed-line-ending
+  - id: check-byte-order-marker
+  - id: check-executables-have-shebangs
+  - id: check-merge-conflict
+  - id: debug-statements
+    language_version: python3
 - repo: https://gitlab.com/pycqa/flake8.git
   rev: 3.7.9
   hooks:

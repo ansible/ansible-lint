@@ -1,4 +1,5 @@
 import os
+import pytest
 import unittest
 import tempfile
 import shutil
@@ -20,6 +21,14 @@ PLAY_IMPORT_ROLE = '''
   tasks:
     - import_role:
         name: test-role
+'''
+
+PLAY_IMPORT_ROLE_INCOMPLETE = '''
+- hosts: all
+
+  tasks:
+    - import_role:
+        foo: bar
 '''
 
 PLAY_IMPORT_ROLE_INLINE = '''
@@ -93,3 +102,9 @@ class TestImportIncludeRole(unittest.TestCase):
         results = runner.run()
         assert 'only when shell functionality is required' in str(results)
         assert 'All tasks should be named' in str(results)
+
+    def test_invalid_import_role(self):
+        fh = self._get_play_file(PLAY_IMPORT_ROLE_INCOMPLETE)
+        runner = Runner(self.rules, fh.name, [], [], [])
+        with pytest.raises(RuntimeError, match="Failed to find required 'name' key in import_role"):
+            runner.run()
