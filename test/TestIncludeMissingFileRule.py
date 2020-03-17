@@ -29,8 +29,8 @@ PLAY_INCLUDED = '''
 '''
 
 
-@pytest.fixture
-def linter_rules(scope="module"):
+@pytest.fixture(scope='module')
+def linter_rules():
     rules_directory = os.path.join('lib', 'ansiblelint', 'rules')
     rules = RulesCollection([rules_directory])
     return rules
