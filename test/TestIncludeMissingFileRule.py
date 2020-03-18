@@ -1,13 +1,12 @@
+from collections import namedtuple
 import os
+
 import pytest
 
 from ansiblelint import Runner, RulesCollection
 
 
-class PlayFile:
-    def __init__(self, name, content):
-        self.name = name
-        self.content = content
+PlayFile = namedtuple('PlayFile', ['name', 'content'])
 
 
 PLAY_INCLUDING_PLAIN = PlayFile('playbook.yml', u'''
