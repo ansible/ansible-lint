@@ -259,7 +259,11 @@ class Runner(object):
                 continue
             if playbook[1] == 'role':
                 continue
-            files.append({'path': ansiblelint.utils.normpath(playbook[0]), 'type': playbook[1]})
+            files.append({'path': ansiblelint.utils.normpath(playbook[0]),
+                          'type': playbook[1],
+                          # add an absolute path here, so rules are able to validate if
+                          # referenced files exist
+                          'absolute_directory': os.path.dirname(playbook[0])})
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
