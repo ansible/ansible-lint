@@ -1,90 +1,85 @@
-from __future__ import print_function
-
 import os
 import pytest
 
 from ansiblelint import Runner, RulesCollection
 
-PLAY_INCLUDING = '''
+
+class PlayFile:
+    def __init__(self, name, content):
+        self.name = name
+        self.content = content
+
+
+PLAY_INCLUDING_PLAIN = PlayFile('playbook.yml', u'''
 - hosts: all
   tasks:
     - include: some_file.yml
-'''
+''')
 
-PLAY_INCLUDING_JINJA2 = '''
+PLAY_INCLUDING_JINJA2 = PlayFile('playbook.yml', u'''
 - hosts: all
   tasks:
     - include: "{{ some_path }}/some_file.yml"
-'''
+''')
 
-PLAY_INCLUDING_NOQA = '''
+PLAY_INCLUDING_NOQA = PlayFile('playbook.yml', u'''
 - hosts: all
   tasks:
     - include: some_file.yml # noqa 505
-'''
+''')
 
-PLAY_INCLUDED = '''
+PLAY_INCLUDED = PlayFile('some_file.yml', u'''
 - debug:
     msg: 'was found & included'
-'''
+''')
 
 
 @pytest.fixture
-def linter_rules(scope="module"):
-    rules_directory = os.path.join('lib', 'ansiblelint', 'rules')
-    rules = RulesCollection([rules_directory])
-    return rules
+def play_file_path(tmp_path):
+    p = tmp_path / 'playbook.yml'
+    return str(p)
 
 
 @pytest.fixture
-def including_playbook(tmp_path):
-    with open(os.path.join(str(tmp_path), 'playbook.yml'), 'w') as f_play:
-        f_play.write(PLAY_INCLUDING)
-    return f_play
+def rules():
+    rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
+    return RulesCollection([rulesdir])
 
 
 @pytest.fixture
-def including_playbook_noqa(tmp_path):
-    with open(os.path.join(str(tmp_path), 'playbook.yml'), 'w') as f_play:
-        f_play.write(PLAY_INCLUDING_NOQA)
-    return f_play
+def runner(play_file_path, rules):
+    return Runner(rules, play_file_path, [], [], [])
 
 
 @pytest.fixture
-def including_playbook_jinja2(tmp_path):
-    with open(os.path.join(str(tmp_path), 'playbook.yml'), 'w') as f_play:
-        f_play.write(PLAY_INCLUDING_JINJA2)
-    return f_play
+def play_files(tmp_path, request):
+    if request.param is None:
+        return
+    for play_file in request.param:
+        p = tmp_path / play_file.name
+        p.write_text(play_file.content)
 
 
-@pytest.fixture
-def included_playbook(tmp_path):
-    with open(os.path.join(str(tmp_path), 'some_file.yml'), 'w') as f_play:
-        f_play.write(PLAY_INCLUDED)
-    return f_play
+@pytest.mark.parametrize(
+    'play_files', [pytest.param([PLAY_INCLUDING_PLAIN], id='referenced file missing')],
+    indirect=['play_files']
+)
+def test_include_file_missing(runner, play_files):
+    results = str(runner.run())
+    assert 'referenced missing file in' in results
+    assert 'playbook.yml' in results
+    assert 'some_file.yml' in results
 
 
-def test_include_missing_file(linter_rules, including_playbook):
-    runner = Runner(linter_rules, including_playbook.name, [], [], [])
-    results = runner.run()
-    assert 'referenced missing file in' in str(results)
-    assert 'playbook.yml:2' in str(results)
-    assert 'some_file.yml' in str(results)
-
-
-def test_include_found_file(linter_rules, including_playbook, included_playbook):
-    runner = Runner(linter_rules, including_playbook.name, [], [], [])
-    results = runner.run()
-    assert 'referenced missing file in' not in str(results)
-
-
-def test_include_noqa_working(linter_rules, including_playbook_noqa):
-    runner = Runner(linter_rules, including_playbook_noqa.name, [], [], [])
-    results = runner.run()
-    assert 'referenced missing file in' not in str(results)
-
-
-def test_include_omit_templated_references(linter_rules, including_playbook_jinja2):
-    runner = Runner(linter_rules, including_playbook_jinja2.name, [], [], [])
-    results = runner.run()
-    assert 'referenced missing file in' not in str(results)
+@pytest.mark.parametrize(
+    'play_files',
+    [
+        pytest.param([PLAY_INCLUDING_PLAIN, PLAY_INCLUDED], id='File Exists'),
+        pytest.param([PLAY_INCLUDING_JINJA2], id='JINJA2 in reference'),
+        pytest.param([PLAY_INCLUDING_NOQA], id='NOQA was used')
+    ],
+    indirect=['play_files']
+)
+def test_cases_that_do_not_report(runner, play_files):
+    results = str(runner.run())
+    assert 'referenced missing file in' not in results
