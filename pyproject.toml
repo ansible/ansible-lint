@@ -1,16 +1,9 @@
 [build-system]
 requires = [
+  "pip >= 19.3.1",
   "setuptools >= 41.4.0",
-  "setuptools_scm >= 1.15.0",
-  "setuptools_scm_git_archive >= 1.0",
-  "wheel",
-
-  # needed because setuptools' attr import
-  # machinery (`importlib.import_module`)
-  # imports `__init__` first
-  "ansible",
-  "pathlib2; python_version < '3.2'",
-  "ruamel.yaml",
-  "six",
+  "setuptools_scm >= 3.3.3",
+  "setuptools_scm_git_archive >= 1.1",
+  "wheel >= 0.33.6",
 ]
 build-backend = "setuptools.build_meta"
