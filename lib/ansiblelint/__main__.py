@@ -28,7 +28,7 @@ import sys
 
 import ansiblelint.formatters as formatters
 import six
-from ansiblelint import default_rulesdir, RulesCollection, Runner
+from ansiblelint.rule import default_rulesdir, RulesCollection, Runner
 from ansiblelint.version import __version__
 from ansiblelint.utils import get_playbooks_and_roles, normpath
 import yaml
