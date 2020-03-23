@@ -32,7 +32,7 @@ class NestedJinjaRule(AnsibleLintRule):
     )
     severity = 'VERY_HIGH'
     tags = ['formatting']
-    version_added = 'v4.2.1'
+    version_added = 'v4.3.0'
 
     nested_jinja_pattern = re.compile(r"{{(?:[^{}]*)?{{")
 
