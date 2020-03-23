@@ -26,9 +26,9 @@ class NestedJinjaRule(AnsibleLintRule):
     id = '207'
     shortdesc = 'Nested jinja pattern'
     description = (
-        'There should not be any nested jinja pattern. '
-        'Example (bad): \'{{ list_one + {{ list_two | max }} }}\', '
-        'example (good): \'{{ list_one + max(list_two) }}\''
+        "There should not be any nested jinja pattern. "
+        "Example (bad): '{{ list_one + {{ list_two | max }} }}', "
+        "example (good): '{{ list_one + max(list_two) }}'"
     )
     severity = 'VERY_HIGH'
     tags = ['formatting']
