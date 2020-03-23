@@ -32,7 +32,6 @@ import subprocess
 import six
 import yaml
 from yaml.composer import Composer
-from yaml.representer import RepresenterError
 import ruamel.yaml
 
 from ansible import constants
@@ -185,7 +184,7 @@ def template(basedir, value, vars, fail_on_undefined=False, **kwargs):
                                  **dict(kwargs, fail_on_undefined=fail_on_undefined))
         # Hack to skip the following exception when using to_json filter on a variable.
         # I guess the filter doesn't like empty vars...
-    except (AnsibleError, ValueError, RepresenterError):
+    except (AnsibleError, ValueError):
         # templating failed, so just keep value as is.
         pass
     return value
