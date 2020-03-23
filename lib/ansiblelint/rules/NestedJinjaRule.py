@@ -1,3 +1,5 @@
+# Author: Adrián Tóth <adtoth@redhat.com>
+#
 # Copyright (c) 2020, Red Hat, Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
