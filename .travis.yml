@@ -135,7 +135,7 @@ jobs:
     name: Publishing current Git tagged version of dist to PyPI
     if: repo == "ansible/ansible-lint" AND tag IS present
     python: "3.8"
-    env: &deploy-env
+    env:
       TOXENV: build-dists,metadata-validation
     before_deploy:
     - echo > setup.py
@@ -153,9 +153,12 @@ jobs:
   - <<: *deploy-job
     if: repo == "ansible/ansible-lint" AND type NOT IN (cron, pull_request)  # Always run, except if PR or cron
     name: Publishing current (unstable) Git revision of dist to Test PyPI
-    env:
-      <<: *deploy-env
-      PYPI_UPLOAD: true
+    before_script:
+    - >-
+      echo
+      'local_scheme = "no-local-version"'
+      >>
+      pyproject.toml
     deploy:
       <<: *deploy-step
       server: https://test.pypi.org/legacy/
