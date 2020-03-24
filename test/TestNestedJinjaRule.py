@@ -30,29 +30,77 @@ from test import RunFromText
 FAIL_TASKS = '''
 - name: one-level nesting
   set_fact:
-    variable_one: "2*(1+2) is {{ 2 * {{ 1 + 2 }} }}"
+    var_one: "2*(1+2) is {{ 2 * {{ 1 + 2 }} }}"
+
+- name: one-level multiline nesting
+  set_fact:
+    var_one_ml: >
+      2*(1+2) is {{ 2 *
+      {{ 1 + 2 }}
+      }}
 
 - name: two-level nesting
   set_fact:
-    variable_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }} }} }}"
+    var_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }} }} }}"
+
+- name: two-level multiline nesting
+  set_fact:
+    var_two_ml: >
+      2*(1+(3-1)) is {{ 2 *
+      {{ 1 +
+      {{ 3 - 1 }}
+      }} }}
 
 - name: five-level wild nesting
   set_fact:
-    variable_three: "{{ {{ {{ {{ {{ 234 }} }} }} }} }}"
+    var_three_wld: "{{ {{ {{ {{ {{ 234 }} }} }} }} }}"
+
+- name: five-level wild multiline nesting
+  set_fact:
+    var_three_wld_ml: >
+      {{
+      {{
+      {{
+      {{
+      {{ 234 }}
+      }}
+      }}
+      }}
+      }}
 '''
 
 SUCCESS_TASKS = '''
-- name: proper nesting
+- name: proper non-nested example
   set_fact:
-    variable_one: "number for 'one' is {{ 2 * 1 }}"
+    var_one: "number for 'one' is {{ 2 * 1 }}"
+
+- name: proper multiline non-nested example
+  set_fact:
+    var_one_ml: >
+      number for 'one' is {{
+      2 * 1 }}
 
 - name: proper nesting far from each other
   set_fact:
-    variable_two: "number for 'two' is {{ 2 * 1 }} and number for 'three' is {{ 4 - 1 }}"
+    var_two: "number for 'two' is {{ 2 * 1 }} and number for 'three' is {{ 4 - 1 }}"
+
+- name: proper multiline nesting far from each other
+  set_fact:
+    var_two_ml: >
+      number for 'two' is {{ 2 * 1
+      }} and number for 'three' is {{
+      4 - 1 }}
 
 - name: proper nesting close to each other
   set_fact:
-    variable_three: "number for 'ten' is {{ 2 - 1 }}{{ 3 - 3 }}"
+    var_three: "number for 'ten' is {{ 2 - 1 }}{{ 3 - 3 }}"
+
+- name: proper multiline nesting close to each other
+  set_fact:
+    var_three_ml: >
+      number for 'ten' is {{
+      2 - 1
+      }}{{ 3 - 3 }}
 '''
 
 
@@ -65,7 +113,7 @@ class TestNestedJinjaRule(unittest.TestCase):
 
     def test_fail(self):
         results = self.runner.run_role_tasks_main(FAIL_TASKS)
-        self.assertEqual(3, len(results))
+        self.assertEqual(6, len(results))
 
     def test_success(self):
         results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
