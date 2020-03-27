@@ -1,0 +1,34 @@
+---
+- name: create user with group, schedule cron and do a one time run of said cron
+  become: true
+  block:
+    - name: Group
+      group:
+        name: test
+        gid: 1001
+
+    - name: User
+      user:
+        name: test
+        uid: 1001
+        groups: test
+
+    - name: script template
+      file:
+        path: /etc/test.sh
+        state: touch
+        mode: "0640"
+        owner: test
+        group: test
+
+    - name: cron conf
+      cron:
+        name: "configure cron"
+        minute: "0"
+        hour: "2"
+        user: test
+        job: "bash /etc/test.sh"
+
+    - name: run .sh once
+      become_user: my_newly_created_user
+      command: "/etc/myshell.sh"
