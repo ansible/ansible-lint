@@ -31,4 +31,4 @@
 
     - name: run .sh once
       become_user: my_newly_created_user
-      command: "/etc/myshell.sh"
+      command: "/etc/test.sh"
