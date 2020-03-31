@@ -260,9 +260,6 @@ def _taskshandlers_children(basedir, k, v, parent_type):
                 parent_type,
                 results
             )
-                append_children(th['include_tasks']['file'], basedir, k, parent_type, results)
-            else:
-                append_children(th['include_tasks'], basedir, k, parent_type, results)
         elif 'import_playbook' in th:
             append_children(th['import_playbook'], basedir, k, parent_type, results)
         elif 'import_tasks' in th:
