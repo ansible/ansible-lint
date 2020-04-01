@@ -26,8 +26,6 @@ from pathlib import Path
 import subprocess
 import sys
 
-from importlib_metadata import version as get_dist_version
-from packaging.version import Version
 import pytest
 
 import ansiblelint.utils as utils
@@ -75,16 +73,6 @@ def test_normalize(reference_form, alternate_forms):
         assert normal_form == utils.normalize_task(form, 'tasks.yml')
 
 
-@pytest.mark.xfail(
-    Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
-    Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
-    reason='Post-split Ansible Core Engine does not have '
-    'the module used in the test playbook.'
-    ' Ref: https://github.com/ansible/ansible-lint/issues/703.'
-    ' Ref: https://github.com/ansible/ansible/pull/68598.',
-    raises=SystemExit,
-    strict=True,
-)
 def test_normalize_complex_command():
     task1 = dict(name="hello", action={'module': 'ec2',
                                        'region': 'us-east1',
