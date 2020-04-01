@@ -46,7 +46,7 @@ class IncludeMissingFileRule(AnsibleLintRule):
                 if referenced_file:
                     break
 
-            if referenced_file is None:
+            if referenced_file is None or absolute_directory is None:
                 continue
 
             # make sure we have a absolute path here and check if it is a file
