@@ -2,7 +2,6 @@
 
 from ansiblelint import AnsibleLintRule
 import re
-import six
 
 
 class MetaVideoLinksRule(AnsibleLintRule):
@@ -53,7 +52,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                                 "only keys 'url' and 'title'"))
                 continue
 
-            for name, expr in six.iteritems(self.VIDEO_REGEXP):
+            for name, expr in self.VIDEO_REGEXP.items():
                 if expr.match(video['url']):
                     break
             else:

@@ -23,13 +23,10 @@ import glob
 import imp
 from itertools import product
 import os
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
+from pathlib import Path
+
 import subprocess
 
-import six
 import yaml
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
@@ -246,7 +243,7 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             if "name" not in th['action']:
                 raise RuntimeError(
                     "Failed to find required 'name' key in %s" % module)
-            if not isinstance(th['action']["name"], six.string_types):
+            if not isinstance(th['action']["name"], str):
                 raise RuntimeError(
                     "Value assigned to 'name' key on '%s' is not a string." %
                     module)
@@ -314,7 +311,7 @@ def _rolepath(basedir, role):
 
     if constants.DEFAULT_ROLES_PATH:
         search_locations = constants.DEFAULT_ROLES_PATH
-        if isinstance(search_locations, six.string_types):
+        if isinstance(search_locations, str):
             search_locations = search_locations.split(os.pathsep)
         for loc in search_locations:
             loc = os.path.expanduser(loc)
@@ -428,7 +425,7 @@ def normalize_task_v1(task):
             else:
                 result[k] = v
         else:
-            if isinstance(v, six.string_types):
+            if isinstance(v, str):
                 v = _kv_to_dict(k + ' ' + v)
             elif not v:
                 v = dict(__ansible_module__=k)
@@ -752,7 +749,7 @@ def is_playbook(filename):
     }
 
     # makes it work with Path objects by converting them to strings
-    if not isinstance(filename, six.string_types):
+    if not isinstance(filename, str):
         filename = str(filename)
 
     try:

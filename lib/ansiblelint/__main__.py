@@ -26,7 +26,6 @@ import errno
 import sys
 
 import ansiblelint.formatters as formatters
-import six
 from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
 from ansiblelint.utils import normpath
 
@@ -64,7 +63,7 @@ def main():
         print(rules.listtags())
         return 0
 
-    if isinstance(options.tags, six.string_types):
+    if isinstance(options.tags, str):
         options.tags = options.tags.split(',')
 
     skip = set()
