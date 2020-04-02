@@ -1,0 +1,20 @@
+[run]
+branch = true
+parallel = true
+
+[report]
+skip_covered = True
+show_missing = True
+exclude_lines =
+    \#\s*pragma: no cover
+    ^\s*raise AssertionError\b
+    ^\s*raise NotImplementedError\b
+    ^\s*return NotImplemented\b
+    ^\s*raise$
+    ^if __name__ == ['"]__main__['"]:$
+
+[paths]
+source = lib/ansiblelint
+         */.tox/*/lib/python*/site-packages/ansiblelint
+         */.tox/pypy*/site-packages/ansiblelint
+         */lib/ansiblelint
