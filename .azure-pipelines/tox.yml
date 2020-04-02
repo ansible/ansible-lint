@@ -1,0 +1,39 @@
+parameters:
+  ansible_versions: []
+  python_envs: []
+
+
+jobs:
+- template: run-tox-env.yml@tox
+  parameters:
+    jobs:
+      docs: null
+      lint:
+        before:
+        - task: CacheBeta@0
+          displayName: cache pre-commit
+          inputs:
+            key: pre-commit | .pre-commit-config.yaml
+            path: $(PRE_COMMIT_HOME)
+      packaging:
+        toxenv: build-dists,metadata-validation
+      ${{ each ansible_version in parameters.ansible_versions }}:
+        ${{ each python_env in parameters.python_envs }}:
+          py${{ python_env.key }}-ansible${{ ansible_version }}:
+            image: ${{ python_env.value }}
+            name: Py${{ python_env.key }}__Ansible_${{ ansible_version }}
+    # coverage:
+    #   with_toxenv: 'coverage' # generate .tox/.coverage, .tox/coverage.xml after test run
+    #   for_envs: [py38, py37, py36, py35, pypy3, pypy]
+    before:
+      - task: UsePythonVersion@0
+        condition: and(succeeded(), in(variables['TOXENV'], 'pypy'))
+        displayName: provision pypy 3
+        inputs:
+          versionSpec: 'pypy3'
+# - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+#   - template: publish-pypi.yml@tox
+#     parameters:
+#       external_feed: 'toxdev'
+#       pypi_remote: 'pypi-toxdev'
+#       dependsOn: [lint, docs, package_description, dev, report_coverage]
