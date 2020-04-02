@@ -1,43 +1,83 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# This is based on the config @ tox-dev/tox ￼
+
+name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
+resources:
+  repositories:
+  - repository: tox
+    type: github
+    endpoint: ansible
+    name: tox-dev/azure-pipelines-template
+    ref: master
+
 
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+    - master
+    - ref/tags/*
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python27:
-      python.version: '2.7'
-      TOXENV: ansible{29,28,27,devel}
-    Python35:
-      python.version: '3.5'
-      TOXENV: ansible{29,28,27,devel}
-    Python36:
-      python.version: '3.6'
-      TOXENV: ansible{29,28,27,devel}
-    Python37:
-      python.version: '3.7'
-      TOXENV: ansible{29,28,27,devel}
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+pr:
+  branches:
+    include:
+    - master
 
-- script: |
-    python -m pip install --upgrade tox
-    python -m tox --parallel auto --notest
-    for py_exe in `ls .tox/*/bin/python`
-    do
-        $py_exe -m pip install pytest pytest-azurepipelines
-    done
-  displayName: 'Install dependencies using tox'
 
-- script: |
-    python -m tox --parallel 0
-  displayName: 'Run test suite via tox'
+variables:
+  # PYTEST_ADDOPTS: "-v -v -ra --showlocals"
+  PYTEST_XDIST_PROC_NR: '0'
+  PRE_COMMIT_HOME: $(Pipeline.Workspace)/pre-commit-cache
+
+
+jobs:
+- template: run-tox-env.yml@tox
+  parameters:
+    tox_version: tox
+    jobs:
+      docs: null
+      lint:
+        before:
+        - task: CacheBeta@0
+          displayName: cache pre-commit
+          inputs:
+            key: pre-commit | .pre-commit-config.yaml
+            path: $(PRE_COMMIT_HOME)
+      packaging:
+        toxenv: build-dists,metadata-validation
+      py38:
+        toxenv: ansible{29,28,27,devel}
+        image: [linux, macOs]
+      py27:
+        toxenv: ansible{29,28,27,devel}
+        image: [linux, macOs]
+      pypy:
+        toxenv: ansible{29,28,27,devel}
+        image: [linux]
+      py37:
+        toxenv: ansible{29,28,27,devel}
+        image: [linux, macOs]
+      py36:
+        toxenv: ansible{29,28,27,devel}
+        image: [linux, macOs]
+      py35:
+        toxenv: ansible{29,28,27,devel}
+        image: [linux, macOs]
+      pypy3:
+        toxenv: ansible{29,28,27,devel}
+        image: [linux]
+    # coverage:
+    #   with_toxenv: 'coverage' # generate .tox/.coverage, .tox/coverage.xml after test run
+    #   for_envs: [py38, py37, py36, py35, py27, pypy3, pypy]
+    before:
+      - task: UsePythonVersion@0
+        condition: and(succeeded(), in(variables['TOXENV'], 'pypy'))
+        displayName: provision pypy 3
+        inputs:
+          versionSpec: 'pypy3'
+# - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+#   - template: publish-pypi.yml@tox
+#     parameters:
+#       external_feed: 'toxdev'
+#       pypi_remote: 'pypi-toxdev'
+#       dependsOn: [lint, docs, package_description, dev, report_coverage]
