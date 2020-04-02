@@ -1,4 +1,4 @@
-# -*- coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 import optparse
 import os
 import sys
@@ -9,7 +9,7 @@ import ansiblelint
 from ansiblelint.version import __version__
 
 
-__PATH_VARS = ['exclude_paths', 'rulesdir', ]
+_PATH_VARS = ['exclude_paths', 'rulesdir', ]
 
 
 def abspath(path, base_dir):
@@ -32,7 +32,7 @@ def abspath(path, base_dir):
 
 def expand_to_normalized_paths(config, base_dir=None):
     base_dir = base_dir or os.getcwd()
-    for paths_var in __PATH_VARS:
+    for paths_var in _PATH_VARS:
         if paths_var not in config:
             continue  # Cause we don't want to add a variable not present
 
