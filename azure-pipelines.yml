@@ -48,9 +48,6 @@ jobs:
       py38:
         toxenv: ansible{29,28,27,devel}
         image: [linux, macOs]
-      py27:
-        toxenv: ansible{29,28,27,devel}
-        image: [linux, macOs]
       pypy:
         toxenv: ansible{29,28,27,devel}
         image: [linux]
