@@ -1,0 +1,6 @@
+---
+rulesdir:
+- ./rules
+use_default_rules: true
+
+# vim: et:sw=2:syntax=yaml:ts=2:
