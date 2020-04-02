@@ -41,7 +41,6 @@ jobs:
     - devel
     python_envs:
       38: [linux, macOs]
-      27: [linux, macOs]
       py3: [linux]
       37: [linux, macOs]
       36: [linux, macOs]
