@@ -24,8 +24,6 @@ import os
 import re
 import sys
 
-import six
-
 import ansiblelint.utils
 import codecs
 
@@ -66,7 +64,7 @@ class AnsibleLintRule(object):
             if not result:
                 continue
             message = None
-            if isinstance(result, six.string_types):
+            if isinstance(result, str):
                 message = result
             matches.append(Match(prev_line_no + 1, line,
                            file['path'], self, message))
@@ -97,7 +95,7 @@ class AnsibleLintRule(object):
                 continue
 
             message = None
-            if isinstance(result, six.string_types):
+            if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
             matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,

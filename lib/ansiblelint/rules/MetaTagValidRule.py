@@ -2,8 +2,6 @@
 
 import re
 
-import six
-
 from ansiblelint import AnsibleLintRule
 
 
@@ -49,7 +47,7 @@ class MetaTagValidRule(AnsibleLintRule):
 
         for tag in tags:
             msg = self.shortdesc
-            if not isinstance(tag, six.string_types):
+            if not isinstance(tag, str):
                 results.append((
                     {'meta/main.yml': data},
                     "Tags must be strings: '{}'".format(tag)))

@@ -1,8 +1,6 @@
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 
-import six
-
 from ansiblelint import AnsibleLintRule
 
 
@@ -41,7 +39,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
         for info in ['author', 'description']:
             if not galaxy_info.get(info):
                 continue
-            if not isinstance(galaxy_info.get(info), six.string_types):
+            if not isinstance(galaxy_info.get(info), str):
                 results.append(({'meta/main.yml': data},
                                 '%s should be a string' % info))
 

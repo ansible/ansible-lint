@@ -20,7 +20,6 @@
 
 import os
 import re
-import six
 from ansiblelint import AnsibleLintRule
 
 
@@ -62,7 +61,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 return self._matchvar(task[loop_type], task, loop_type)
 
     def _matchvar(self, varstring, task, loop_type):
-        if (isinstance(varstring, six.string_types) and
+        if (isinstance(varstring, str) and
                 not self._jinja.match(varstring)):
             valid = loop_type == 'with_fileglob' and bool(self._jinja.search(varstring) or
                                                           self._glob.search(varstring))

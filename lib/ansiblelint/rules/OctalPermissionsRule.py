@@ -19,7 +19,6 @@
 # THE SOFTWARE.
 
 from ansiblelint import AnsibleLintRule
-import six
 
 
 class OctalPermissionsRule(AnsibleLintRule):
@@ -67,7 +66,7 @@ class OctalPermissionsRule(AnsibleLintRule):
         if task["action"]["__ansible_module__"] in self._modules:
             mode = task['action'].get('mode', None)
 
-            if isinstance(mode, six.string_types):
+            if isinstance(mode, str):
                 return False
 
             if isinstance(mode, int):
