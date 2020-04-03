@@ -1,8 +1,6 @@
 # Copyright (c) 2020, Joachim Lusiardi
 # Copyright (c) 2020, Ansible Project
 
-from __future__ import print_function
-
 import os.path
 
 import ansible.parsing.yaml.objects
