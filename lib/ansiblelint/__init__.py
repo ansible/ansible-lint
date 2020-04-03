@@ -22,13 +22,31 @@
 from collections import defaultdict
 import logging
 import os
+import pathlib
+import tempfile
+from typing import List, Set
+
+
+# this code needs to run before any ansible module import happens in order to
+# properly setup additional module paths.
+lib_paths = os.environ.get(
+    'ANSIBLE_LIBRARY',
+    "~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules").split(":")
+# add plugins/modules to module paths if it exists
+p = pathlib.Path.cwd() / "plugins" / "modules"
+if p.exists():
+    lib_paths.append(str(p))
+# creates temporary directory for stub modules (auto-cleaned)
+TMP_DIR = tempfile.TemporaryDirectory()
+lib_paths.append(TMP_DIR.name)
+os.environ['ANSIBLE_LIBRARY'] = ":".join(lib_paths)
+logging.warning(f"Altered module path ANSIBLE_LIBRARY={os.environ['ANSIBLE_LIBRARY']}")
 
 from ansiblelint.rules import AnsibleLintRule  # noqa F401: exposing public API
-import ansiblelint.utils
-import ansiblelint.skip_utils
-from ansiblelint.errors import MatchError
-from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule
-from typing import List, Set
+import ansiblelint.utils  # noqa E402
+import ansiblelint.skip_utils  # noqa E402
+from ansiblelint.errors import MatchError  # noqa E402
+from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule  # noqa E402
 
 
 default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
