@@ -27,8 +27,8 @@ def base_arguments():
                           "test/fixtures/exclude-paths.yml"),
                          (["--show-relpath"],
                           "test/fixtures/show-abspath.yml"),
-                         ([],
-                          "test/fixtures/show-relpath.yml"),
+                         (["--stub-modules", "a_missing_module"],
+                          "test/fixtures/stub-modules.yml"),
                          ))
 def test_ensure_config_are_equal(base_arguments, args, config, monkeypatch):
     command = base_arguments + args

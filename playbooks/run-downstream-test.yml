@@ -1,0 +1,25 @@
+#!/usr/bin/env ansible-playbook -v
+- hosts: localhost
+  connection: local
+  vars:
+    downstream_repos:
+      zuul-jobs: https://opendev.org/zuul/zuul-jobs
+      tripleo-operator-ansible: https://opendev.org/openstack/tripleo-operator-ansible
+    cache_dir: "{{ lookup('env', 'XDG_CACHE_DIR') or '~/.cache' }}/ansible-lint"
+  tasks:
+
+    - debug: var=cache_dir
+
+    - name: Clone downstream repos
+      git:
+        repo: "{{ item.value }}"
+        dest: "{{ cache_dir }}/{{ item.key }}"
+      loop: "{{ downstream_repos | dict2items }}"
+
+    - name: Running ansible-lint on downstream repos
+      shell:
+        cmd: |
+          python -m ansiblelint -p
+        chdir: "{{ cache_dir }}/{{ item.key }}"
+      loop: "{{ downstream_repos | dict2items }}"
+      changed_when: false

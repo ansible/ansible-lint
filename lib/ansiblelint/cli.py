@@ -128,6 +128,10 @@ def get_cli_parser() -> argparse.ArgumentParser:
                         action='append',
                         default=[],
                         help="only check rules whose id/tags match these values")
+    parser.add_argument('--stub-modules', dest='stub_modules',
+                        action='append',
+                        default=[],
+                        help="Generate stub ansible modules to avoid loading failures")
     parser.add_argument('-T', dest='listtags', action='store_true',
                         help="list all the tags")
     parser.add_argument('-v', dest='verbosity', action='count',
@@ -195,6 +199,9 @@ def merge_config(file_config, cli_config) -> NamedTuple:
 
     if 'skip_list' in file_config:
         cli_config.skip_list = cli_config.skip_list + file_config['skip_list']
+
+    if 'stub_modules' in file_config:
+        cli_config.stub_modules = file_config['stub_modules']
 
     if 'tags' in file_config:
         cli_config.tags = cli_config.tags + file_config['tags']

@@ -1,2 +1,4 @@
 exclude_paths:
 - .github/
+stub_modules:
+- a_missing_module

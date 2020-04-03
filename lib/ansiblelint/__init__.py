@@ -22,13 +22,34 @@
 from collections import defaultdict
 import logging
 import os
+import pathlib
+import tempfile
+from typing import List, Set
+
+
+# this code needs to run before any ansible module import happens in order to
+# properly setup additional module paths.
+lib_paths = os.environ.get(
+    'ANSIBLE_LIBRARY',
+    "~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules").split(":")
+# add plugins/modules to module paths if it exists
+p = pathlib.Path.cwd() / "plugins" / "modules"
+if p.exists():
+    lib_paths.append(str(p))
+# add plugins/modules.tmp for fake module/stubs
+TMP_DIR = tempfile.TemporaryDirectory()
+# pathlib.Path.cwd() / "plugins" / "modules.tmp"
+# p.mkdir(parents=True, exist_ok=True)
+lib_paths.append(TMP_DIR.name)
+p = ":".join(lib_paths)
+os.environ['ANSIBLE_LIBRARY'] = p
+logging.warning(f"Altered module path ANSIBLE_LIBRARY={p}")
 
 from ansiblelint.rules import AnsibleLintRule  # noqa F401: exposing public API
-import ansiblelint.utils
-import ansiblelint.skip_utils
-from ansiblelint.errors import MatchError
-from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule
-from typing import List, Set
+import ansiblelint.utils  # noqa E402
+import ansiblelint.skip_utils  # noqa E402
+from ansiblelint.errors import MatchError  # noqa E402
+from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule  # noqa E402
 
 
 default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
@@ -105,10 +126,11 @@ class RulesCollection(object):
 class Runner(object):
 
     def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
-                 verbosity=0, checked_files=None):
+                 verbosity=0, checked_files=None, stub_modules=[]):
         """Initialize a Runner instance."""
         self.rules = rules
         self.playbooks = set()
+        self.stub_modules = stub_modules
         # assume role if directory
         if os.path.isdir(playbook):
             self.playbooks.add((os.path.join(playbook, ''), 'role'))

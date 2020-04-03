@@ -26,7 +26,7 @@ import pathlib
 import sys
 
 import ansiblelint.formatters as formatters
-from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
+from ansiblelint import cli, default_rulesdir, RulesCollection, Runner, TMP_DIR
 from ansiblelint.utils import get_playbooks_and_roles
 from ansiblelint.utils import normpath, initialize_logger
 from ansiblelint.generate_docs import rules_as_rst
@@ -48,6 +48,24 @@ def main():
     formatter_factory: Any = formatters.Formatter
     if options.quiet:
         formatter_factory = formatters.QuietFormatter
+
+    for m in options.stub_modules:
+        with (pathlib.Path(TMP_DIR.name) / f"{m}.py") as f:
+            logging.warning(f"Generating fake module stub: {f.name}")
+            f.write_text("""
+# This is a fake {m} module used to make ansible(-lint) happy
+from ansible.module_utils.basic import AnsibleModule
+
+
+def main():
+    return AnsibleModule(
+        argument_spec=dict(
+            data=dict(default=None),
+            path=dict(default=None, type=str),
+            file=dict(default=None, type=str),
+        )
+    )
+""")
 
     if options.parseable:
         formatter_factory = formatters.ParseableFormatter
