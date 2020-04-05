@@ -22,6 +22,10 @@ def base_arguments():
                           "test/fixtures/skip-tags.yml"),
                          (["--exclude", "test/"],
                           "test/fixtures/exclude-paths.yml"),
+                         (["--show-relpath"],
+                          "test/fixtures/show-abspath.yml"),
+                         ([],
+                          "test/fixtures/show-relpath.yml"),
                          ])
 def test_ensure_config_are_equal(base_arguments, args, config):
     command = base_arguments + args
