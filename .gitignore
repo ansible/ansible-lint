@@ -38,6 +38,3 @@ pip-log.txt
 coverage.xml
 pip-wheel-metadata
 .test-results/
-
-# setup.cfg-based layout
-/setup.py

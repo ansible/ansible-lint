@@ -1,5 +1,23 @@
 ---
 repos:
+- repo: local
+  hooks:
+  - id: immutable-setup-py
+    name: Verify that setup.py stays immutable
+    description: >-
+      This is a sanity check that makes sure that
+      the `setup.py` file isn't changed.
+    # Using Python here because using
+    # shell test does not seem to work in CIs:
+    entry: >-
+      sh -c 'git hash-object setup.py
+      |
+      python -c raise\ SystemExit\(input\(\)\ !=\ \"b72e95ce049c4c67c6487a2171fec8d1b0b958b1\"\)
+      '
+    pass_filenames: false
+    language: system
+    files: >-
+      ^setup\.py$
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v2.4.0
   hooks:
