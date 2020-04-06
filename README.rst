@@ -39,7 +39,8 @@ Ansible-lint
 ============
 
 ``ansible-lint`` checks playbooks for practices and behaviour that could
-potentially be improved.
+potentially be improved. As a community backed project ansible-lint supports
+only the last two major versions of Ansible.
 
 `Visit the Ansible Lint docs site <https://docs.ansible.com/ansible-lint/>`_
 

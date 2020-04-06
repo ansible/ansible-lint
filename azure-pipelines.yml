@@ -37,7 +37,6 @@ jobs:
     ansible_versions:
     - 29
     - 28
-    - 27
     - devel
     python_envs:
       38: [linux, macOs]
