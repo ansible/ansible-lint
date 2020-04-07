@@ -74,3 +74,17 @@ def test_path_from_cli_depend_on_cwd(base_arguments, monkeypatch):  # Issue 572
 
     assert 'test/test' not in options1.exclude_paths[0]
     assert 'test/test' in options2.exclude_paths[0]
+
+
+@pytest.mark.parametrize(
+    "config_file",
+    [
+        pytest.param("test/fixtures/ansible-config-invalid.yml", id="invalid"),
+        pytest.param("/dev/null/ansible-config-missing.yml", id="missing")
+    ]
+)
+def test_config_failure(base_arguments, config_file):
+    """Ensures specific config files produce error code 2."""
+    with pytest.raises(SystemExit, match="^2$"):
+        cli.get_config(base_arguments +
+                       ["-c", config_file])

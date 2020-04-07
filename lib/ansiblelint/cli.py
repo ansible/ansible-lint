@@ -10,6 +10,7 @@ from ansiblelint.version import __version__
 
 
 _PATH_VARS = ['exclude_paths', 'rulesdir', ]
+INVALID_CONFIG_RC = 2
 
 
 def abspath(path, base_dir):
@@ -46,17 +47,33 @@ def expand_to_normalized_paths(config, base_dir=None):
 
 
 def load_config(config_file):
-    config_path = config_file if config_file else ".ansible-lint"
-    config_path = os.path.abspath(config_path)
+    config_path = os.path.abspath(config_file or '.ansible-lint')
 
-    if not os.path.exists(config_path):
+    if config_file:
+        if not os.path.exists(config_path):
+            print(
+                "Config file not found '{cfg!s}'.".format(cfg=config_path),
+                file=sys.stderr,
+            )
+            sys.exit(INVALID_CONFIG_RC)
+    elif not os.path.exists(config_path):
+        # a missing default config file should not trigger an error
         return
 
     try:
         with open(config_path, "r") as stream:
             config = yaml.safe_load(stream)
-    except yaml.YAMLError:
-        return None
+    except yaml.YAMLError as e:
+        print(e, file=sys.stderr)
+        sys.exit(INVALID_CONFIG_RC)
+    # TODO(ssbarnea): implement schema validation for config file
+    if isinstance(config, list):
+        print(
+            "Invalid configuration '{cfg!s}', expected YAML mapping in the config file.".
+            format(cfg=config_path),
+            file=sys.stderr,
+        )
+        sys.exit(INVALID_CONFIG_RC)
 
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
