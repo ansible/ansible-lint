@@ -18,6 +18,26 @@ repos:
     language: system
     files: >-
       ^setup\.py$
+  - id: check-python-packaging
+    name: Check python packaging
+    description: |
+        Performs validations of python packaging using both PEP-517 and old
+        setup.py while also validating metadata. Also verifies that the package
+        can be insalled in editable mode.
+    entry: >
+      bash -c "
+      rm -rf $VIRTUAL_ENV/dist.old $VIRTUAL_ENV/dist.new &&
+      python setup.py sdist bdist_wheel --dist-dir $VIRTUAL_ENV/dist.old &&
+      python -m twine check $VIRTUAL_ENV/dist.old/* &&
+      python -m pep517.build --source --binary --out-dir $VIRTUAL_ENV/dist.new . &&
+      python -m twine check $VIRTUAL_ENV/dist.new/* &&
+      python -m pip install -e ."
+    language: python
+    pass_filenames: false
+    always_run: true
+    additional_dependencies:
+      - pep517>=0.8.2
+      - twine>=3.1.1
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v2.4.0
   hooks:
