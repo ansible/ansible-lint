@@ -1,5 +1,5 @@
 from collections import namedtuple
-import os
+from pathlib import Path
 
 import pytest
 
@@ -28,7 +28,7 @@ def play_file_path(tmp_path):
 
 @pytest.fixture
 def rules():
-    rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
+    rulesdir = str(Path('lib') / 'ansiblelint' / 'rules')
     return RulesCollection([rulesdir])
 
 
