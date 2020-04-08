@@ -7,6 +7,11 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.black]
+skip-string-normalization = true
+# black defaults to 88 but we keep our old 100 to minimize changes
+line-length = 100
+
 # ATTENTION: the following section must be kept last in
 # `pyproject.toml` because Travis CI appends one line in
 # the end when publishing non-tagged versions.

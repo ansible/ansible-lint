@@ -17,12 +17,9 @@ class MetaVideoLinksRule(AnsibleLintRule):
     version_added = 'v4.0.0'
 
     VIDEO_REGEXP = {
-        'google': re.compile(
-            r'https://drive\.google\.com.*file/d/([0-9A-Za-z-_]+)/.*'),
-        'vimeo': re.compile(
-            r'https://vimeo\.com/([0-9]+)'),
-        'youtube': re.compile(
-            r'https://youtu\.be/([0-9A-Za-z-_]+)'),
+        'google': re.compile(r'https://drive\.google\.com.*file/d/([0-9A-Za-z-_]+)/.*'),
+        'vimeo': re.compile(r'https://vimeo\.com/([0-9]+)'),
+        'youtube': re.compile(r'https://youtu\.be/([0-9A-Za-z-_]+)'),
     }
 
     def matchplay(self, file, data):
@@ -41,24 +38,32 @@ class MetaVideoLinksRule(AnsibleLintRule):
 
         for video in video_links:
             if not isinstance(video, dict):
-                results.append(({'meta/main.yml': data},
-                                "Expected item in 'video_links' to be "
-                                "a dictionary"))
+                results.append(
+                    (
+                        {'meta/main.yml': data},
+                        "Expected item in 'video_links' to be " "a dictionary",
+                    )
+                )
                 continue
 
             if set(video) != {'url', 'title', '__file__', '__line__'}:
-                results.append(({'meta/main.yml': data},
-                                "Expected item in 'video_links' to contain "
-                                "only keys 'url' and 'title'"))
+                results.append(
+                    (
+                        {'meta/main.yml': data},
+                        "Expected item in 'video_links' to contain " "only keys 'url' and 'title'",
+                    )
+                )
                 continue
 
             for name, expr in self.VIDEO_REGEXP.items():
                 if expr.match(video['url']):
                     break
             else:
-                msg = ("URL format '{0}' is not recognized. "
-                       "Expected it be a shared link from Vimeo, YouTube, "
-                       "or Google Drive.".format(video['url']))
+                msg = (
+                    "URL format '{0}' is not recognized. "
+                    "Expected it be a shared link from Vimeo, YouTube, "
+                    "or Google Drive.".format(video['url'])
+                )
                 results.append(({'meta/main.yml': data}, msg))
 
         return results

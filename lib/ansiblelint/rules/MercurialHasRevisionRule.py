@@ -33,5 +33,7 @@ class MercurialHasRevisionRule(AnsibleLintRule):
     version_added = 'historic'
 
     def matchtask(self, file, task):
-        return (task['action']['__ansible_module__'] == 'hg' and
-                task['action'].get('revision', 'default') == 'default')
+        return (
+            task['action']['__ansible_module__'] == 'hg'
+            and task['action'].get('revision', 'default') == 'default'
+        )

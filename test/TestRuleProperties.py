@@ -7,9 +7,7 @@ class TestAlwaysRun(unittest.TestCase):
     collection = RulesCollection()
 
     def setUp(self):
-        self.collection.extend(
-            RulesCollection([default_rulesdir])
-        )
+        self.collection.extend(RulesCollection([default_rulesdir]))
 
     def test_serverity_valid(self):
         valid_severity_values = [

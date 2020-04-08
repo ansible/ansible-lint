@@ -20,8 +20,7 @@ class TestMetaTagValid(unittest.TestCase):
 
     def test_valid_tag_rule(self):
         results = self.runner.run_role_meta_main(META_TAG_VALID)
-        self.assertIn("Use 'galaxy_tags' rather than 'categories'",
-                      str(results))
+        self.assertIn("Use 'galaxy_tags' rather than 'categories'", str(results))
         self.assertIn("Expected 'categories' to be a list", str(results))
         self.assertIn("invalid: 'my s q l'", str(results))
         self.assertIn("invalid: 'MYTAG'", str(results))

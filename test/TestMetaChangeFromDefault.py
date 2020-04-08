@@ -1,8 +1,7 @@
 import unittest
 
 from ansiblelint import RulesCollection
-from ansiblelint.rules.MetaChangeFromDefaultRule import (
-    MetaChangeFromDefaultRule)
+from ansiblelint.rules.MetaChangeFromDefaultRule import MetaChangeFromDefaultRule
 from test import RunFromText
 
 DEFAULT_GALAXY_INFO = '''
@@ -23,11 +22,7 @@ class TestMetaChangeFromDefault(unittest.TestCase):
 
     def test_default_galaxy_info(self):
         results = self.runner.run_role_meta_main(DEFAULT_GALAXY_INFO)
-        self.assertIn("Should change default metadata: author",
-                      str(results))
-        self.assertIn("Should change default metadata: description",
-                      str(results))
-        self.assertIn("Should change default metadata: company",
-                      str(results))
-        self.assertIn("Should change default metadata: license",
-                      str(results))
+        self.assertIn("Should change default metadata: author", str(results))
+        self.assertIn("Should change default metadata: description", str(results))
+        self.assertIn("Should change default metadata: company", str(results))
+        self.assertIn("Should change default metadata: license", str(results))

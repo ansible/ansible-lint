@@ -48,8 +48,8 @@ class TestRoleRelativePath(unittest.TestCase):
         self.runner = RunFromText(self.collection)
 
     @pytest.mark.xfail(
-        Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
-        Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
+        Version(get_dist_version('ansible')) >= Version('2.10.dev0')
+        and Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
         reason='Post-split Ansible Core Engine does not have '
         'the module used in the test playbook.'
         ' Ref: https://github.com/ansible/ansible-lint/issues/703.'
@@ -62,8 +62,8 @@ class TestRoleRelativePath(unittest.TestCase):
         self.assertEqual(4, len(results))
 
     @pytest.mark.xfail(
-        Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
-        Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
+        Version(get_dist_version('ansible')) >= Version('2.10.dev0')
+        and Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
         reason='Post-split Ansible Core Engine does not have '
         'the module used in the test playbook.'
         ' Ref: https://github.com/ansible/ansible-lint/issues/703.'

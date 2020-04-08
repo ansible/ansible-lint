@@ -30,8 +30,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'test-role'
 
         result = self.run_ansible_lint(cwd=cwd, bin=bin, role_path=role_path)
-        self.assertIn('Use shell only when shell functionality is required',
-                      str(result))
+        self.assertIn('Use shell only when shell functionality is required', str(result))
 
     def test_run_single_role_path_with_trailing_slash(self):
         cwd = self.local_test_dir
@@ -39,8 +38,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'test-role/'
 
         result = self.run_ansible_lint(cwd=cwd, bin=bin, role_path=role_path)
-        self.assertIn('Use shell only when shell functionality is required',
-                      str(result))
+        self.assertIn('Use shell only when shell functionality is required', str(result))
 
     def test_run_multiple_role_path_no_trailing_slash(self):
         cwd = self.local_test_dir
@@ -48,8 +46,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/test-role'
 
         result = self.run_ansible_lint(cwd=cwd, bin=bin, role_path=role_path)
-        self.assertIn('Use shell only when shell functionality is required',
-                      str(result))
+        self.assertIn('Use shell only when shell functionality is required', str(result))
 
     def test_run_multiple_role_path_with_trailing_slash(self):
         cwd = self.local_test_dir
@@ -57,8 +54,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/test-role/'
 
         result = self.run_ansible_lint(cwd=cwd, bin=bin, role_path=role_path)
-        self.assertIn('Use shell only when shell functionality is required',
-                      str(result))
+        self.assertIn('Use shell only when shell functionality is required', str(result))
 
     def test_run_inside_role_dir(self):
         cwd = os.path.join(self.local_test_dir, 'test-role/')
@@ -66,8 +62,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = '.'
 
         result = self.run_ansible_lint(cwd=cwd, bin=bin, role_path=role_path)
-        self.assertIn('Use shell only when shell functionality is required',
-                      str(result))
+        self.assertIn('Use shell only when shell functionality is required', str(result))
 
     def test_run_role_three_dir_deep(self):
         cwd = self.local_test_dir
@@ -75,8 +70,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'testproject/roles/test-role'
 
         result = self.run_ansible_lint(cwd=cwd, bin=bin, role_path=role_path)
-        self.assertIn('Use shell only when shell functionality is required',
-                      str(result))
+        self.assertIn('Use shell only when shell functionality is required', str(result))
 
     def test_run_playbook(self):
         """Call ansible-lint the way molecule does."""

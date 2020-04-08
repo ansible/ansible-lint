@@ -1,8 +1,7 @@
 import unittest
 
 from ansiblelint import RulesCollection
-from ansiblelint.rules.ComparisonToEmptyStringRule import (
-    ComparisonToEmptyStringRule)
+from ansiblelint.rules.ComparisonToEmptyStringRule import ComparisonToEmptyStringRule
 from test import RunFromText
 
 SUCCESS_TASKS = '''

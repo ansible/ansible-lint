@@ -25,7 +25,6 @@ from .rules import UnsetVariableMatcherRule
 
 
 class TestRule(unittest.TestCase):
-
     def test_rule_matching(self):
         text = ""
         filename = 'test/ematchtest.yml'

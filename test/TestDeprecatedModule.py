@@ -29,7 +29,8 @@ class TestDeprecatedModuleRule(unittest.TestCase):
         ANSIBLE_MAJOR_VERSION > (2, 9),
         reason='Ansible devel has changed so ansible-lint needs fixing. '
         'Ref: https://github.com/ansible/ansible-lint/issues/675',
-        raises=SystemExit, strict=True,
+        raises=SystemExit,
+        strict=True,
     )
     def test_module_deprecated(self):
         results = self.runner.run_role_tasks_main(MODULE_DEPRECATED)

@@ -5,7 +5,6 @@ from ansiblelint import Runner, RulesCollection
 
 
 class TestTaskIncludes(unittest.TestCase):
-
     def setUp(self):
         rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
         self.rules = RulesCollection([rulesdir])

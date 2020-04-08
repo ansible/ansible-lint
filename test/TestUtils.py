@@ -32,7 +32,6 @@ import pytest
 
 
 class TestUtils(unittest.TestCase):
-
     def test_tokenize_blank(self):
         (cmd, args, kwargs) = utils.tokenize("")
         self.assertEqual(cmd, '')
@@ -74,12 +73,12 @@ class TestUtils(unittest.TestCase):
         task1 = dict(name="hello", action="command chdir=abc echo hello world")
         task2 = dict(name="hello", command="chdir=abc echo hello world")
         self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task2, 'tasks.yml'))
+            utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task2, 'tasks.yml'),
+        )
 
     @pytest.mark.xfail(
-        Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
-        Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
+        Version(get_dist_version('ansible')) >= Version('2.10.dev0')
+        and Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
         reason='Post-split Ansible Core Engine does not have '
         'the module used in the test playbook.'
         ' Ref: https://github.com/ansible/ansible-lint/issues/703.'
@@ -88,22 +87,21 @@ class TestUtils(unittest.TestCase):
         strict=True,
     )
     def test_normalize_complex_command(self):
-        task1 = dict(name="hello", action={'module': 'ec2',
-                                           'region': 'us-east1',
-                                           'etc': 'whatever'})
-        task2 = dict(name="hello", ec2={'region': 'us-east1',
-                                        'etc': 'whatever'})
+        task1 = dict(
+            name="hello", action={'module': 'ec2', 'region': 'us-east1', 'etc': 'whatever'},
+        )
+        task2 = dict(name="hello", ec2={'region': 'us-east1', 'etc': 'whatever'})
         task3 = dict(name="hello", ec2="region=us-east1 etc=whatever")
         task4 = dict(name="hello", action="ec2 region=us-east1 etc=whatever")
         self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task2, 'tasks.yml'))
+            utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task2, 'tasks.yml'),
+        )
         self.assertEqual(
-            utils.normalize_task(task2, 'tasks.yml'),
-            utils.normalize_task(task3, 'tasks.yml'))
+            utils.normalize_task(task2, 'tasks.yml'), utils.normalize_task(task3, 'tasks.yml'),
+        )
         self.assertEqual(
-            utils.normalize_task(task3, 'tasks.yml'),
-            utils.normalize_task(task4, 'tasks.yml'))
+            utils.normalize_task(task3, 'tasks.yml'), utils.normalize_task(task4, 'tasks.yml'),
+        )
 
     def test_normalize_args(self):
         task1 = {'git': {'version': 'abc'}, 'args': {'repo': 'blah', 'dest': 'xyz'}}
@@ -112,14 +110,14 @@ class TestUtils(unittest.TestCase):
         task3 = {"git": 'version=abc repo=blah dest=xyz'}
         task4 = {"git": None, "args": {'repo': 'blah', 'dest': 'xyz', 'version': 'abc'}}
         self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task2, 'tasks.yml'))
+            utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task2, 'tasks.yml'),
+        )
         self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task3, 'tasks.yml'))
+            utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task3, 'tasks.yml'),
+        )
         self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task4, 'tasks.yml'))
+            utils.normalize_task(task1, 'tasks.yml'), utils.normalize_task(task4, 'tasks.yml'),
+        )
 
     def test_extract_from_list(self):
         block = {
@@ -163,14 +161,10 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(result, u"fail msg=unicode é ô à")
 
     def test_normpath_with_path_object(self):
-        self.assertEqual(
-            utils.normpath(Path("a/b/../")),
-            "a")
+        self.assertEqual(utils.normpath(Path("a/b/../")), "a")
 
     def test_normpath_with_string(self):
-        self.assertEqual(
-            utils.normpath("a/b/../"),
-            "a")
+        self.assertEqual(utils.normpath("a/b/../"), "a")
 
 
 def test_expand_path_vars(monkeypatch):

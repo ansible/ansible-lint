@@ -22,6 +22,7 @@ import os
 
 from ansiblelint import AnsibleLintRule
 from ansiblelint.utils import get_first_cmd_arg
+
 try:
     from ansible.module_utils.parsing.convert_bool import boolean
 except ImportError:
@@ -32,6 +33,7 @@ except ImportError:
             from ansible.utils import boolean
         except ImportError:
             from ansible import constants
+
             boolean = constants.mk_boolean
 
 
@@ -39,17 +41,22 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     id = '302'
     shortdesc = 'Using command rather than an argument to e.g. file'
     description = (
-        'Executing a command when there are arguments to modules '
-        'is generally a bad idea'
+        'Executing a command when there are arguments to modules ' 'is generally a bad idea'
     )
     severity = 'VERY_HIGH'
     tags = ['command-shell', 'resources', 'ANSIBLE0007']
     version_added = 'historic'
 
     _commands = ['command', 'shell', 'raw']
-    _arguments = {'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group',
-                  'ln': 'state=link', 'mkdir': 'state=directory',
-                  'rmdir': 'state=absent', 'rm': 'state=absent'}
+    _arguments = {
+        'chown': 'owner',
+        'chmod': 'mode',
+        'chgrp': 'group',
+        'ln': 'state=link',
+        'mkdir': 'state=directory',
+        'rmdir': 'state=absent',
+        'rm': 'state=absent',
+    }
 
     def matchtask(self, file, task):
         if task["action"]["__ansible_module__"] in self._commands:
@@ -58,7 +65,6 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
                 return
 
             executable = os.path.basename(first_cmd_arg)
-            if executable in self._arguments and \
-                    boolean(task['action'].get('warn', True)):
+            if executable in self._arguments and boolean(task['action'].get('warn', True)):
                 message = "{0} used in place of argument {1} to file module"
                 return message.format(executable, self._arguments[executable])

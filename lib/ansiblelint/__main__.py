@@ -77,9 +77,15 @@ def main():
     matches = list()
     checked_files = set()
     for playbook in playbooks:
-        runner = Runner(rules, playbook, options.tags,
-                        options.skip_list, options.exclude_paths,
-                        options.verbosity, checked_files)
+        runner = Runner(
+            rules,
+            playbook,
+            options.tags,
+            options.skip_list,
+            options.exclude_paths,
+            options.verbosity,
+            checked_files,
+        )
         matches.extend(runner.run())
 
     matches.sort(key=lambda x: (normpath(x.filename), x.linenumber, x.rule.id))

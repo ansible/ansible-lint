@@ -30,7 +30,6 @@ default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'ru
 
 
 class AnsibleLintRule(object):
-
     def __repr__(self):
         return self.id + ": " + self.shortdesc
 
@@ -65,8 +64,7 @@ class AnsibleLintRule(object):
             message = None
             if isinstance(result, str):
                 message = result
-            matches.append(Match(prev_line_no + 1, line,
-                           file['path'], self, message))
+            matches.append(Match(prev_line_no + 1, line, file['path'], self, message))
         return matches
 
     def matchtasks(self, file, text):
@@ -97,8 +95,11 @@ class AnsibleLintRule(object):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
-                           file['path'], self, message))
+            matches.append(
+                Match(
+                    task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg, file['path'], self, message,
+                )
+            )
         return matches
 
     def matchyaml(self, file, text):
@@ -130,13 +131,19 @@ class AnsibleLintRule(object):
                 raise TypeError("{} is not a list".format(result))
 
             for section, message in result:
-                matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY],
-                                     section, file['path'], self, message))
+                matches.append(
+                    Match(
+                        play[ansiblelint.utils.LINE_NUMBER_KEY],
+                        section,
+                        file['path'],
+                        self,
+                        message,
+                    )
+                )
         return matches
 
 
 class RulesCollection(object):
-
     def __init__(self, rulesdirs=None):
         if rulesdirs is None:
             rulesdirs = []
@@ -165,9 +172,10 @@ class RulesCollection(object):
             with codecs.open(playbookfile['path'], mode='rb', encoding='utf-8') as f:
                 text = f.read()
         except IOError as e:
-            print("WARNING: Couldn't open %s - %s" %
-                  (playbookfile['path'], e.strerror),
-                  file=sys.stderr)
+            print(
+                "WARNING: Couldn't open %s - %s" % (playbookfile['path'], e.strerror),
+                file=sys.stderr,
+            )
             return matches
 
         for rule in self.rules:
@@ -182,8 +190,7 @@ class RulesCollection(object):
         return matches
 
     def __repr__(self):
-        return "\n".join([rule.verbose()
-                          for rule in sorted(self.rules, key=lambda x: x.id)])
+        return "\n".join([rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)])
 
     def listtags(self):
         tags = defaultdict(list)
@@ -197,7 +204,6 @@ class RulesCollection(object):
 
 
 class Match(object):
-
     def __init__(self, linenumber, line, filename, rule, message=None):
         self.linenumber = linenumber
         self.line = line
@@ -207,14 +213,15 @@ class Match(object):
 
     def __repr__(self):
         formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
-        return formatstr.format(self.rule.id, self.message,
-                                self.filename, self.linenumber, self.line)
+        return formatstr.format(
+            self.rule.id, self.message, self.filename, self.linenumber, self.line
+        )
 
 
 class Runner(object):
-
-    def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
-                 verbosity=0, checked_files=None):
+    def __init__(
+        self, rules, playbook, tags, skip_list, exclude_paths, verbosity=0, checked_files=None,
+    ):
         self.rules = rules
         self.playbooks = set()
         # assume role if directory
@@ -256,13 +263,17 @@ class Runner(object):
                 continue
             if playbook[1] == 'role':
                 continue
-            files.append({'path': ansiblelint.utils.normpath(playbook[0]),
-                          'type': playbook[1],
-                          # add an absolute path here, so rules are able to validate if
-                          # referenced files exist
-                          'absolute_directory': os.path.dirname(playbook[0])})
+            files.append(
+                {
+                    'path': ansiblelint.utils.normpath(playbook[0]),
+                    'type': playbook[1],
+                    # add an absolute path here, so rules are able to validate if
+                    # referenced files exist
+                    'absolute_directory': os.path.dirname(playbook[0]),
+                }
+            )
         visited = set()
-        while (visited != self.playbooks):
+        while visited != self.playbooks:
             for arg in self.playbooks - visited:
                 for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
                     if self.is_excluded(child['path']):
@@ -280,11 +291,11 @@ class Runner(object):
         files = [x for x in files if x['path'] not in self.checked_files]
         for file in files:
             if self.verbosity > 0:
-                print("Examining %s of type %s" % (
-                    ansiblelint.utils.normpath(file['path']),
-                    file['type']))
-            matches.extend(self.rules.run(file, tags=set(self.tags),
-                           skip_list=self.skip_list))
+                print(
+                    "Examining %s of type %s"
+                    % (ansiblelint.utils.normpath(file['path']), file['type'])
+                )
+            matches.extend(self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list))
         # update list of checked files
         self.checked_files.update([x['path'] for x in files])
 

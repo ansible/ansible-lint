@@ -15,14 +15,17 @@ Default Rules
 
 .. contents:: Topics
 
-The table below shows the the default rules used by Ansible Lint to evaluate playbooks and roles:
+The table below shows the the default rules used by Ansible Lint to evaluate
+playbooks and roles:
 
 """
 
 
 def main():
-    id_link = ('`E{} <https://github.com/ansible/ansible-lint/blob/'
-               'master/lib/ansiblelint/rules/{}.py>`_')
+    id_link = (
+        '`E{} <https://github.com/ansible/ansible-lint/blob/'
+        'master/lib/ansiblelint/rules/{}.py>`_'
+    )
 
     import_all_rules()
     all_rules = get_serialized_rules()
@@ -32,13 +35,15 @@ def main():
         if d['id'].endswith('01'):
             if not d['id'].endswith('101'):
                 grid.append(['', '', '', ''])
-            grid.append([
-                '**E{}xx - {}**'.format(d['id'][-3:-2], d['first_tag']),
-                '',
-                '',
-                # '**{}**'.format(d['first_tag']),
-                '',
-            ])
+            grid.append(
+                [
+                    '**E{}xx - {}**'.format(d['id'][-3:-2], d['first_tag']),
+                    '',
+                    '',
+                    # '**{}**'.format(d['first_tag']),
+                    '',
+                ]
+            )
         id_text = id_link.format(d['id'], d['classname'])
         grid.append([id_text, d['version_added'], d['shortdesc'], d['description']])
 
@@ -80,8 +85,9 @@ def get_serialized_rules():
 
 
 def make_table(grid):
-    cell_width = 2 + max(reduce(lambda x, y: x + y,
-                                [[len(item) for item in row] for row in grid], []))
+    cell_width = 2 + max(
+        reduce(lambda x, y: x + y, [[len(item) for item in row] for row in grid], [])
+    )
     num_cols = len(grid[0])
     block = DOC_HEADER
     header = True
@@ -89,8 +95,7 @@ def make_table(grid):
         if header:
             block = block + num_cols * ((cell_width) * '=' + ' ') + '\n'
 
-        block = block + ''.join([normalize_cell(x, cell_width + 1)
-                                 for x in row]) + '\n'
+        block = block + ''.join([normalize_cell(x, cell_width + 1) for x in row]) + '\n'
         if header:
             block = block + num_cols * ((cell_width) * '=' + ' ') + '\n'
         header = False

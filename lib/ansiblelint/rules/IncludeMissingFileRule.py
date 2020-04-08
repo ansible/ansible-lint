@@ -25,16 +25,17 @@ class IncludeMissingFileRule(AnsibleLintRule):
         results = []
         for task in data.get('tasks', []):
 
-            # check if the id of the current rule is not in list of skipped rules for this play
+            # check if the id of the current rule is not in list of skipped
+            # rules for this play
             if self.id in task['skipped_rules']:
                 continue
 
             # collect information which file was referenced for include / import
             referenced_file = None
             for key, val in task.items():
-                if not (key.startswith('include_') or
-                        key.startswith('import_') or
-                        key == 'include'):
+                if not (
+                    key.startswith('include_') or key.startswith('import_') or key == 'include'
+                ):
                     continue
                 if isinstance(val, ansible.parsing.yaml.objects.AnsibleMapping):
                     referenced_file = val.get('file', None)
@@ -58,7 +59,10 @@ class IncludeMissingFileRule(AnsibleLintRule):
             if os.path.isfile(referenced_file):
                 continue
 
-            results.append(({'referenced_file': referenced_file},
-                            'referenced missing file in %s:%i'
-                            % (task['__file__'], task['__line__'])))
+            results.append(
+                (
+                    {'referenced_file': referenced_file},
+                    'referenced missing file in %s:%i' % (task['__file__'], task['__line__']),
+                )
+            )
         return results

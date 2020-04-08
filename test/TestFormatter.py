@@ -25,7 +25,6 @@ from ansiblelint.formatters import Formatter
 
 
 class TestFormatter(unittest.TestCase):
-
     def setUp(self):
         self.rule = AnsibleLintRule()
         self.rule.id = "TCF0001"

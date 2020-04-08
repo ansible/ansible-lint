@@ -27,7 +27,6 @@ import ansiblelint.formatters
 
 
 class TestRule(unittest.TestCase):
-
     def setUp(self):
         rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
         self.rules = RulesCollection([rulesdir])
@@ -35,12 +34,12 @@ class TestRule(unittest.TestCase):
     def test_runner_count(self):
         filename = 'test/nomatchestest.yml'
         runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
+        assert len(runner.run()) == 0
 
     def test_unicode_runner_count(self):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 1)
+        assert len(runner.run()) == 1
 
     def test_unicode_standard_formatting(self):
         filename = 'test/unicode.yml'
@@ -74,37 +73,37 @@ class TestRule(unittest.TestCase):
         filename = 'examples/lots_of_warnings.yml'
         excludes = ['examples/lots_of_warnings.yml']
         runner = Runner(self.rules, filename, [], [], excludes)
-        assert (len(runner.run()) == 0)
+        assert len(runner.run()) == 0
 
     def test_runner_block_count(self):
         filename = 'test/block.yml'
         runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
+        assert len(runner.run()) == 0
 
     def test_runner_become_count(self):
         filename = 'test/become.yml'
         runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
+        assert len(runner.run()) == 0
 
     def test_runner_empty_tags_count(self):
         filename = 'test/emptytags.yml'
         runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
+        assert len(runner.run()) == 0
 
     def test_runner_encrypted_secrets(self):
         filename = 'test/contains_secrets.yml'
         runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
+        assert len(runner.run()) == 0
 
     def test_dir_with_trailing_slash(self):
         filename = 'test/'
         runner = Runner(self.rules, filename, [], [], [])
-        assert (list(runner.playbooks)[0][1] == 'role')
+        assert list(runner.playbooks)[0][1] == 'role'
 
     def test_dir_with_fullpath(self):
         filename = os.path.abspath('test')
         runner = Runner(self.rules, filename, [], [], [])
-        assert (list(runner.playbooks)[0][1] == 'role')
+        assert list(runner.playbooks)[0][1] == 'role'
 
     def test_files_not_scanned_twice(self):
         checked_files = set()
@@ -117,7 +116,7 @@ class TestRule(unittest.TestCase):
         runner = Runner(self.rules, filename, [], [], [], 0, checked_files)
         run2 = runner.run()
 
-        assert ((len(run1) + len(run2)) == 1)
+        assert (len(run1) + len(run2)) == 1
 
 
 def test_runner_exclude_var_expansion(monkeypatch):

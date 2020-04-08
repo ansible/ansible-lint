@@ -9,7 +9,10 @@ import ansiblelint
 from ansiblelint.version import __version__
 
 
-_PATH_VARS = ['exclude_paths', 'rulesdir', ]
+_PATH_VARS = [
+    'exclude_paths',
+    'rulesdir',
+]
 INVALID_CONFIG_RC = 2
 
 
@@ -52,8 +55,7 @@ def load_config(config_file):
     if config_file:
         if not os.path.exists(config_path):
             print(
-                "Config file not found '{cfg!s}'.".format(cfg=config_path),
-                file=sys.stderr,
+                "Config file not found '{cfg!s}'.".format(cfg=config_path), file=sys.stderr,
             )
             sys.exit(INVALID_CONFIG_RC)
     elif not os.path.exists(config_path):
@@ -69,8 +71,8 @@ def load_config(config_file):
     # TODO(ssbarnea): implement schema validation for config file
     if isinstance(config, list):
         print(
-            "Invalid configuration '{cfg!s}', expected YAML mapping in the config file.".
-            format(cfg=config_path),
+            "Invalid configuration '{cfg!s}', expected YAML mapping in the "
+            "config file.".format(cfg=config_path),
             file=sys.stderr,
         )
         sys.exit(INVALID_CONFIG_RC)
@@ -85,65 +87,107 @@ def abspath_arg(option, opt_str, value, parser, *args, **kwargs):
 
 
 def get_cli_parser():
-    parser = optparse.OptionParser("%prog [options] [playbook.yml [playbook2 ...]]|roledirectory",
-                                   version="%prog " + __version__)
+    parser = optparse.OptionParser(
+        "%prog [options] [playbook.yml [playbook2 ...]]|roledirectory",
+        version="%prog " + __version__,
+    )
 
-    parser.add_option('-L', dest='listrules', default=False,
-                      action='store_true', help="list all the rules")
-    parser.add_option('-q', dest='quiet',
-                      default=False,
-                      action='store_true',
-                      help="quieter, although not silent output")
-    parser.add_option('-p', dest='parseable',
-                      default=False,
-                      action='store_true',
-                      help="parseable output in the format of pep8")
-    parser.add_option('--parseable-severity', dest='parseable_severity',
-                      default=False,
-                      action='store_true',
-                      help="parseable output including severity of rule")
-    parser.add_option('-r', action='callback', dest='rulesdir',
-                      default=[], type='str', callback=abspath_arg,
-                      help="specify one or more rules directories using "
-                           "one or more -r arguments. Any -r flags override "
-                           "the default rules in %s, unless -R is also used."
-                           % ansiblelint.default_rulesdir)
-    parser.add_option('-R', action='store_true',
-                      default=False,
-                      dest='use_default_rules',
-                      help="Use default rules in %s in addition to any extra "
-                           "rules directories specified with -r. There is "
-                           "no need to specify this if no -r flags are used"
-                           % ansiblelint.default_rulesdir)
-    parser.add_option('--show-relpath', dest='display_relative_path', action='store_false',
-                      default=True,
-                      help="Display path relative to CWD")
-    parser.add_option('-t', dest='tags',
-                      action='append',
-                      default=[],
-                      help="only check rules whose id/tags match these values")
-    parser.add_option('-T', dest='listtags', action='store_true',
-                      help="list all the tags")
-    parser.add_option('-v', dest='verbosity', action='count',
-                      help="Increase verbosity level",
-                      default=0)
-    parser.add_option('-x', dest='skip_list', default=[], action='append',
-                      help="only check rules whose id/tags do not " +
-                      "match these values")
-    parser.add_option('--nocolor', dest='colored',
-                      default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
-                      action='store_false',
-                      help="disable colored output")
-    parser.add_option('--force-color', dest='colored',
-                      action='store_true',
-                      help="Try force colored output (relying on ansible's code)")
-    parser.add_option('--exclude', dest='exclude_paths', action='callback',
-                      callback=abspath_arg, type=str, default=[],
-                      help='path to directories or files to skip. This option'
-                           ' is repeatable.',
-                      )
-    parser.add_option('-c', dest='config_file',
-                      help='Specify configuration file to use.  Defaults to ".ansible-lint"')
+    parser.add_option(
+        '-L', dest='listrules', default=False, action='store_true', help="list all the rules",
+    )
+    parser.add_option(
+        '-q',
+        dest='quiet',
+        default=False,
+        action='store_true',
+        help="quieter, although not silent output",
+    )
+    parser.add_option(
+        '-p',
+        dest='parseable',
+        default=False,
+        action='store_true',
+        help="parseable output in the format of pep8",
+    )
+    parser.add_option(
+        '--parseable-severity',
+        dest='parseable_severity',
+        default=False,
+        action='store_true',
+        help="parseable output including severity of rule",
+    )
+    parser.add_option(
+        '-r',
+        action='callback',
+        dest='rulesdir',
+        default=[],
+        type='str',
+        callback=abspath_arg,
+        help="specify one or more rules directories using "
+        "one or more -r arguments. Any -r flags override "
+        "the default rules in %s, unless -R is also used." % ansiblelint.default_rulesdir,
+    )
+    parser.add_option(
+        '-R',
+        action='store_true',
+        default=False,
+        dest='use_default_rules',
+        help="Use default rules in %s in addition to any extra "
+        "rules directories specified with -r. There is "
+        "no need to specify this if no -r flags are used" % ansiblelint.default_rulesdir,
+    )
+    parser.add_option(
+        '--show-relpath',
+        dest='display_relative_path',
+        action='store_false',
+        default=True,
+        help="Display path relative to CWD",
+    )
+    parser.add_option(
+        '-t',
+        dest='tags',
+        action='append',
+        default=[],
+        help="only check rules whose id/tags match these values",
+    )
+    parser.add_option('-T', dest='listtags', action='store_true', help="list all the tags")
+    parser.add_option(
+        '-v', dest='verbosity', action='count', help="Increase verbosity level", default=0,
+    )
+    parser.add_option(
+        '-x',
+        dest='skip_list',
+        default=[],
+        action='append',
+        help="only check rules whose id/tags do not " + "match these values",
+    )
+    parser.add_option(
+        '--nocolor',
+        dest='colored',
+        default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
+        action='store_false',
+        help="disable colored output",
+    )
+    parser.add_option(
+        '--force-color',
+        dest='colored',
+        action='store_true',
+        help="Try force colored output (relying on ansible's code)",
+    )
+    parser.add_option(
+        '--exclude',
+        dest='exclude_paths',
+        action='callback',
+        callback=abspath_arg,
+        type=str,
+        default=[],
+        help='path to directories or files to skip. This option' ' is repeatable.',
+    )
+    parser.add_option(
+        '-c',
+        dest='config_file',
+        help='Specify configuration file to use.  Defaults to ".ansible-lint"',
+    )
 
     return parser
 
@@ -156,24 +200,25 @@ def merge_config(file_config, cli_config):
         cli_config.quiet = cli_config.quiet or file_config['quiet']
 
     if 'parseable' in file_config:
-        cli_config.parseable = (cli_config.parseable or
-                                file_config['parseable'])
+        cli_config.parseable = cli_config.parseable or file_config['parseable']
 
     if 'parseable_severity' in file_config:
-        cli_config.parseable_severity = (cli_config.parseable_severity or
-                                         file_config['parseable_severity'])
+        cli_config.parseable_severity = (
+            cli_config.parseable_severity or file_config['parseable_severity']
+        )
 
     if 'display_relative_path' in file_config:
-        cli_config.display_relative_path = (cli_config.display_relative_path or
-                                            file_config['display_relative_path'])
+        cli_config.display_relative_path = (
+            cli_config.display_relative_path or file_config['display_relative_path']
+        )
 
     if 'use_default_rules' in file_config:
-        cli_config.use_default_rules = (cli_config.use_default_rules or
-                                        file_config['use_default_rules'])
+        cli_config.use_default_rules = (
+            cli_config.use_default_rules or file_config['use_default_rules']
+        )
 
     if 'verbosity' in file_config:
-        cli_config.verbosity = (cli_config.verbosity +
-                                file_config['verbosity'])
+        cli_config.verbosity = cli_config.verbosity + file_config['verbosity']
 
     cli_config.exclude_paths.extend(file_config.get('exclude_paths', []))
 

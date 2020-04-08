@@ -15,7 +15,9 @@ TASK_VARIABLES = '''
   debug:
     msg: "{{ '{{' }}"
 - name: jinja escaping allowed
-  shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
+  shell: >
+    docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' |
+    tr -d '"'
 - name: jinja whitespace control allowed
   debug:
     msg: |
