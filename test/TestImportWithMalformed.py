@@ -1,42 +1,59 @@
+from collections import namedtuple
 import os
-import unittest
-import tempfile
-import shutil
+
+import pytest
 
 from ansiblelint import Runner, RulesCollection
 
-IMPORT_TASKS_MAIN = '''
+
+PlayFile = namedtuple('PlayFile', ['name', 'content'])
+
+
+IMPORT_TASKS_MAIN = PlayFile('import-tasks-main.yml', '''
 - oops this is invalid
-'''
+''')
 
-PLAY_IMPORT_TASKS = '''
+PLAY_IMPORT_TASKS = PlayFile('playbook.yml', '''
 - hosts: all
-
   tasks:
     - import_tasks: import-tasks-main.yml
-'''
+''')
 
 
-class TestImportIncludeRole(unittest.TestCase):
-    def setUp(self):
-        rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-        self.rules = RulesCollection([rulesdir])
+@pytest.fixture
+def play_file_path(tmp_path):
+    p = tmp_path / 'playbook.yml'
+    return str(p)
 
-        # make dir and write role tasks to import or include
-        self.play_root = tempfile.mkdtemp()
-        with open(os.path.join(self.play_root, 'import-tasks-main.yml'), 'w') as f_main:
-            f_main.write(IMPORT_TASKS_MAIN)
 
-    def tearDown(self):
-        shutil.rmtree(self.play_root)
+@pytest.fixture
+def rules():
+    rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
+    return RulesCollection([rulesdir])
 
-    def _get_play_file(self, playbook_text):
-        with open(os.path.join(self.play_root, 'playbook.yml'), 'w') as f_play:
-            f_play.write(playbook_text)
-        return f_play
 
-    def test_import_tasks_with_malformed_import(self):
-        fh = self._get_play_file(PLAY_IMPORT_TASKS)
-        runner = Runner(self.rules, fh.name, [], [], [])
-        results = runner.run()
-        assert 'only when shell functionality is required' in str(results)
+@pytest.fixture
+def runner(play_file_path, rules):
+    return Runner(rules, play_file_path, [], [], [])
+
+
+
+@pytest.fixture
+def play_files(tmp_path, request):
+    if request.param is None:
+        return
+    for play_file in request.param:
+        p = tmp_path / play_file.name
+        p.write_text(play_file.content)
+
+
+@pytest.mark.parametrize(
+    'play_files',
+    [
+        pytest.param([IMPORT_TASKS_MAIN, PLAY_IMPORT_TASKS], id='import_tasks w/ malformed import')
+    ],
+    indirect=['play_files']
+)
+def test_import_tasks_with_malformed_import(runner, play_files):
+    results = str(runner.run())
+    assert 'only when shell functionality is required' in results
