@@ -37,7 +37,6 @@ def runner(play_file_path, rules):
     return Runner(rules, play_file_path, [], [], [])
 
 
-
 @pytest.fixture
 def play_files(tmp_path, request):
     if request.param is None:
