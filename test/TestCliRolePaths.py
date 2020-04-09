@@ -20,8 +20,6 @@ class TestCliRolePaths(unittest.TestCase):
             env=env,
         ).communicate()
 
-        self.assertFalse(err, 'Expected no error but was ' + str(err))
-
         return result
 
     def test_run_single_role_path_no_trailing_slash(self):

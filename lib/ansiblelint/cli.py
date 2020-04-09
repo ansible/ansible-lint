@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import logging
 import os
 from pathlib import Path
 import sys
@@ -10,8 +11,8 @@ import ansiblelint
 from ansiblelint.version import __version__
 
 
+_logger = logging.getLogger(__name__)
 _PATH_VARS = ['exclude_paths', 'rulesdir', ]
-INVALID_CONFIG_RC = 2
 
 
 def abspath(path, base_dir):
@@ -52,11 +53,8 @@ def load_config(config_file):
 
     if config_file:
         if not os.path.exists(config_path):
-            print(
-                "Config file not found '{cfg!s}'.".format(cfg=config_path),
-                file=sys.stderr,
-            )
-            sys.exit(INVALID_CONFIG_RC)
+            _logger.error("Config file not found '%s'", config_path)
+            sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
     elif not os.path.exists(config_path):
         # a missing default config file should not trigger an error
         return
@@ -65,16 +63,14 @@ def load_config(config_file):
         with open(config_path, "r") as stream:
             config = yaml.safe_load(stream)
     except yaml.YAMLError as e:
-        print(e, file=sys.stderr)
-        sys.exit(INVALID_CONFIG_RC)
+        _logger.error(e)
+        sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
     # TODO(ssbarnea): implement schema validation for config file
     if isinstance(config, list):
-        print(
-            "Invalid configuration '{cfg!s}', expected YAML mapping in the config file.".
-            format(cfg=config_path),
-            file=sys.stderr,
-        )
-        sys.exit(INVALID_CONFIG_RC)
+        _logger.error(
+            "Invalid configuration '%s', expected YAML mapping in the config file.",
+            config_path)
+        sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
 
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)

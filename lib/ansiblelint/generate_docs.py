@@ -3,6 +3,7 @@
 import os
 import importlib
 from inspect import getmembers, ismodule, isclass
+import logging
 import rules
 from ansiblelint import AnsibleLintRule
 from functools import reduce
@@ -18,6 +19,8 @@ Default Rules
 The table below shows the the default rules used by Ansible Lint to evaluate playbooks and roles:
 
 """
+
+_logger = logging.getLogger(__name__)
 
 
 def main():
@@ -45,7 +48,7 @@ def main():
     filename = '../../docs/docsite/rst/rules/default_rules.rst'
     with open(filename, 'w') as file:
         file.write(make_table(grid))
-        print('{} file written'.format(filename))
+        _logger.info('%s file written', filename)
 
 
 def import_all_rules():

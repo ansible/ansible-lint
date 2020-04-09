@@ -19,13 +19,14 @@
 # THE SOFTWARE.
 
 from collections import defaultdict
+import logging
 import os
 import re
-import sys
 
 import ansiblelint.utils
 
 default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
+_logger = logging.getLogger(__name__)
 
 
 class AnsibleLintRule(object):
@@ -164,9 +165,10 @@ class RulesCollection(object):
             with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
                 text = f.read()
         except IOError as e:
-            print("WARNING: Couldn't open %s - %s" %
-                  (playbookfile['path'], e.strerror),
-                  file=sys.stderr)
+            _logger.warning(
+                "Couldn't open %s - %s",
+                playbookfile['path'],
+                e.strerror)
             return matches
 
         for rule in self.rules:
@@ -278,10 +280,10 @@ class Runner(object):
         # remove files that have already been checked
         files = [x for x in files if x['path'] not in self.checked_files]
         for file in files:
-            if self.verbosity > 0:
-                print("Examining %s of type %s" % (
-                    ansiblelint.utils.normpath(file['path']),
-                    file['type']))
+            _logger.debug(
+                "Examining %s of type %s",
+                ansiblelint.utils.normpath(file['path']),
+                file['type'])
             matches.extend(self.rules.run(file, tags=set(self.tags),
                            skip_list=self.skip_list))
         # update list of checked files

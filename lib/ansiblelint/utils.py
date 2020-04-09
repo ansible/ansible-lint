@@ -22,6 +22,7 @@ from collections import OrderedDict
 import glob
 import imp
 from itertools import product
+import logging
 import os
 from pathlib import Path
 import pprint
@@ -51,6 +52,27 @@ from ansible.template import Templar
 DEFAULT_VAULT_PASSWORD = 'x'
 
 PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
+
+INVALID_CONFIG_RC = 2
+ANSIBLE_FAILURE_RC = 3
+
+_logger = logging.getLogger(__name__)
+
+
+def initialize_logger(level=0):
+    """Set up the global logging level based on the verbosity number."""
+    VERBOSITY_MAP = {
+        0: logging.NOTSET,
+        1: logging.INFO,
+        2: logging.DEBUG
+    }
+
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    _logger.addHandler(handler)
+    # unknown logging level is treated as DEBUG
+    _logger.setLevel(VERBOSITY_MAP.get(level, logging.DEBUG))
 
 
 def parse_yaml_from_file(filepath):
@@ -379,7 +401,8 @@ def normalize_task_v2(task):
         pp = pprint.PrettyPrinter(indent=2)
         task_pprint = pp.pformat(task)
 
-        raise SystemExit("Couldn't parse task at %s (%s)\n%s" % (task_info, e.message, task_pprint))
+        _logger.critical("Couldn't parse task at %s (%s)\n%s", task_info, e.message, task_pprint)
+        raise SystemExit(ANSIBLE_FAILURE_RC)
 
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
@@ -597,7 +620,7 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
         yaml_skip = _append_skipped_rules(pyyaml_data, file_text, file_type)
     except RuntimeError as exc:
         # Notify user of skip error, do not stop, do not change exit code
-        print('Error trying to append skipped rules: {!r}'.format(exc))
+        _logger.error('Error trying to append skipped rules: %s', exc)
         return pyyaml_data
     return yaml_skip
 
@@ -751,9 +774,9 @@ def is_playbook(filename):
     try:
         f = parse_yaml_from_file(filename)
     except Exception as e:
-        print(
-            "Warning: Failed to load %s with %s, assuming is not a playbook."
-            % (filename, e))
+        _logger.warning(
+            "Failed to load %s with %s, assuming is not a playbook.",
+            filename, e)
     else:
         if (
             isinstance(f, AnsibleSequence) and
@@ -767,12 +790,7 @@ def get_yaml_files(options):
     """Find all yaml files."""
     # git is preferred as it also considers .gitignore
     git_command = ['git', 'ls-files', '*.yaml', '*.yml']
-    if options.verbosity:
-        print(
-            "Discovering files to lint: {command}".format(
-                command=' '.join(git_command)
-            )
-        )
+    _logger.info("Discovering files to lint: %s", ' '.join(git_command))
 
     out = None
 
@@ -783,19 +801,14 @@ def get_yaml_files(options):
             universal_newlines=True
         ).split()
     except subprocess.CalledProcessError as exc:
-        if options.verbosity:
-            print(
-                "Warning: Failed to discover yaml files to lint using git:"
-                " {error_msg}".format(
-                    error_msg=exc.output.rstrip('\n')
-                )
-            )
+        _logger.warning(
+            "Failed to discover yaml files to lint using git: %s",
+            exc.output.rstrip('\n')
+        )
     except FileNotFoundError as exc:
         if options.verbosity:
-            print(
-                "Warning: Failed to locate command: {error_msg!s}".format(
-                    error_msg=exc
-                )
+            _logger.warning(
+                "Failed to locate command: %s", exc
             )
 
     if out is None:
@@ -863,12 +876,10 @@ def get_playbooks_and_roles(options=None):
             playbooks.append(normpath(p))
             continue
 
-        if options.verbosity:
-            print('Unknown file type: %s' % normpath(p))
+        _logger.info('Unknown file type: %s', normpath(p))
 
-    if options.verbosity:
-        print('Found roles: ' + ' '.join(role_dirs))
-        print('Found playbooks: ' + ' '.join(playbooks))
+    _logger.info('Found roles: %s', ' '.join(role_dirs))
+    _logger.info('Found playbooks: %s', ' '.join(playbooks))
 
     return role_dirs + playbooks
 
