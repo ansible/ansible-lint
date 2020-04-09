@@ -54,10 +54,6 @@ jobs:
     env:
       ANSIBLE_VERSION: "29"
 
-  - python: "2.7"
-    env:
-      ANSIBLE_VERSION: "29"
-
   - python: "3.8"
     env:
       ANSIBLE_VERSION: "28"
@@ -77,33 +73,6 @@ jobs:
     env:
       ANSIBLE_VERSION: "28"
 
-  - python: "2.7"
-    env:
-      ANSIBLE_VERSION: "28"
-
-  - python: "3.8"
-    env:
-      ANSIBLE_VERSION: "27"
-
-  - python: "3.7"
-    <<: *if-cron-or-manual-run-or-tagged
-    env:
-      ANSIBLE_VERSION: "27"
-
-  - python: "3.6"
-    <<: *if-cron-or-manual-run-or-tagged
-    env:
-      ANSIBLE_VERSION: "27"
-
-  - python: "3.5"
-    <<: *if-cron-or-manual-run-or-tagged
-    env:
-      ANSIBLE_VERSION: "27"
-
-  - python: "2.7"
-    env:
-      ANSIBLE_VERSION: "27"
-
   - python: "3.8"
     <<: *if-cron-or-manual-run-or-tagged
     env:
@@ -120,11 +89,6 @@ jobs:
       ANSIBLE_VERSION: devel
 
   - python: "3.5"
-    <<: *if-cron-or-manual-run-or-tagged
-    env:
-      ANSIBLE_VERSION: devel
-
-  - python: "2.7"
     <<: *if-cron-or-manual-run-or-tagged
     env:
       ANSIBLE_VERSION: devel
@@ -135,7 +99,7 @@ jobs:
     name: Publishing current Git tagged version of dist to PyPI
     if: repo == "ansible/ansible-lint" AND tag IS present
     python: "3.8"
-    env: &deploy-env
+    env:
       TOXENV: build-dists,metadata-validation
     before_deploy:
     - echo > setup.py
@@ -153,9 +117,12 @@ jobs:
   - <<: *deploy-job
     if: repo == "ansible/ansible-lint" AND type NOT IN (cron, pull_request)  # Always run, except if PR or cron
     name: Publishing current (unstable) Git revision of dist to Test PyPI
-    env:
-      <<: *deploy-env
-      PYPI_UPLOAD: true
+    before_script:
+    - >-
+      echo
+      'local_scheme = "no-local-version"'
+      >>
+      pyproject.toml
     deploy:
       <<: *deploy-step
       server: https://test.pypi.org/legacy/
@@ -167,7 +134,7 @@ env:
 before_install:
 - export TOXENV=$(echo $TOXENV_TMPL | envsubst)
 install:
-- pip install -U tox
+- pip install -U tox virtualenv  # newer virtualenv has newer pip inside
 - tox --notest  # Pre-populate virtualenv
 
 script:

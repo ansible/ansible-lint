@@ -21,12 +21,14 @@
 # THE SOFTWARE.
 
 import unittest
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
+import os
+from pathlib import Path
 
 import ansiblelint.utils as utils
+
+from importlib_metadata import version as get_dist_version
+from packaging.version import Version
+import pytest
 
 
 class TestUtils(unittest.TestCase):
@@ -75,6 +77,16 @@ class TestUtils(unittest.TestCase):
             utils.normalize_task(task1, 'tasks.yml'),
             utils.normalize_task(task2, 'tasks.yml'))
 
+    @pytest.mark.xfail(
+        Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
+        Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
+        reason='Post-split Ansible Core Engine does not have '
+        'the module used in the test playbook.'
+        ' Ref: https://github.com/ansible/ansible-lint/issues/703.'
+        ' Ref: https://github.com/ansible/ansible/pull/68598.',
+        raises=SystemExit,
+        strict=True,
+    )
     def test_normalize_complex_command(self):
         task1 = dict(name="hello", action={'module': 'ec2',
                                            'region': 'us-east1',
@@ -140,6 +152,11 @@ class TestUtils(unittest.TestCase):
         result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
         self.assertEqual(result, "{{ hello | to_json }}")
 
+    def test_existing_filter_yaml_on_unknown_var(self):
+        v = "{{ hello | to_nice_yaml }}"
+        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
+        self.assertEqual(result, "{{ hello | to_nice_yaml }}")
+
     def test_task_to_str_unicode(self):
         task = dict(fail=dict(msg=u"unicode é ô à"))
         result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
@@ -154,3 +171,17 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(
             utils.normpath("a/b/../"),
             "a")
+
+
+def test_expand_path_vars(monkeypatch):
+    test_path = '/test/path'
+    monkeypatch.setenv('TEST_PATH', test_path)
+    assert utils.expand_path_vars('~') == os.path.expanduser('~')
+    assert utils.expand_path_vars('$TEST_PATH') == test_path
+
+
+def test_expand_paths_vars(monkeypatch):
+    test_path = '/test/path'
+    monkeypatch.setenv('TEST_PATH', test_path)
+    assert utils.expand_paths_vars(['~']) == [os.path.expanduser('~')]
+    assert utils.expand_paths_vars(['$TEST_PATH']) == [test_path]

@@ -4,6 +4,11 @@ from ansiblelint import RulesCollection
 from ansiblelint.rules.RoleRelativePath import RoleRelativePath
 from test import RunFromText
 
+from importlib_metadata import version as get_dist_version
+from packaging.version import Version
+import pytest
+
+
 FAIL_TASKS = '''
 - name: template example
   template:
@@ -42,10 +47,30 @@ class TestRoleRelativePath(unittest.TestCase):
     def setUp(self):
         self.runner = RunFromText(self.collection)
 
+    @pytest.mark.xfail(
+        Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
+        Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
+        reason='Post-split Ansible Core Engine does not have '
+        'the module used in the test playbook.'
+        ' Ref: https://github.com/ansible/ansible-lint/issues/703.'
+        ' Ref: https://github.com/ansible/ansible/pull/68598.',
+        raises=SystemExit,
+        strict=True,
+    )
     def test_fail(self):
         results = self.runner.run_role_tasks_main(FAIL_TASKS)
         self.assertEqual(4, len(results))
 
+    @pytest.mark.xfail(
+        Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
+        Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
+        reason='Post-split Ansible Core Engine does not have '
+        'the module used in the test playbook.'
+        ' Ref: https://github.com/ansible/ansible-lint/issues/703.'
+        ' Ref: https://github.com/ansible/ansible/pull/68598.',
+        raises=SystemExit,
+        strict=True,
+    )
     def test_success(self):
         results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
         self.assertEqual(0, len(results))

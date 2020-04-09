@@ -1,4 +1,4 @@
-name: tox🚨code quality
+name: 🚨
 
 on:
   push:
@@ -12,9 +12,7 @@ on:
 jobs:
   linters:
     name: >-
-      ${{ matrix.env.TOXENV }}
-      @ ${{ matrix.python-version }}
-      @ ${{ matrix.os }}
+      ${{ matrix.env.TOXENV }}/${{ matrix.python-version }}@${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -24,13 +22,10 @@ jobs:
         - 3.7
         - 3.6
         - 3.5
-        - 2.7
         os:
-        - ubuntu-18.04
-        - ubuntu-16.04
-        - macOS-10.14
-        # - windows-2019
-        # - windows-2016
+        - ubuntu-latest
+        - macOS-latest
+        # - windows-latest
         env:
         - TOXENV: build-dists,metadata-validation
         - TOXENV: docs
@@ -41,11 +36,9 @@ jobs:
         # - TOXENV: pre-commit-ci
         # - TOXENV: check-docs
         # - TOXENV: build-docs
-        exclude:
-        # Excluded until sphinx bug is fixed
-        # https://github.com/sphinx-doc/sphinx/issues/6803
-        - os: macOS-10.14
-          python-version: 3.8
+
+    env:
+      TOX_PARALLEL_NO_SPINNER: 1
 
     steps:
     - uses: actions/checkout@master
@@ -53,6 +46,21 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
+    - name: set PY_SHA256
+      run: echo "::set-env name=PY_SHA256::$(python -VV | sha256sum | cut -d' ' -f1)"
+    - name: Pre-commit cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pre-commit
+        key: ${{ runner.os }}-pre-commit-${{ env.PY_SHA256 }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tox.ini') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('pytest.ini') }}
+    - name: Pip cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ env.PY_SHA256 }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tox.ini') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('pytest.ini') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
     - name: Install tox
       run: |
         python -m pip install --upgrade tox
@@ -71,5 +79,5 @@ jobs:
     #     test -d .tox/pre-commit-failing && .tox/pre-commit-failing/bin/python -m pre_commit install-hooks || :
     - name: Test with tox
       run: |
-        python -m tox --parallel 0
+        python -m tox --parallel auto
       env: ${{ matrix.env }}

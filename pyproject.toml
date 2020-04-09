@@ -1,16 +1,13 @@
 [build-system]
 requires = [
-  "setuptools >= 41.4.0",
-  "setuptools_scm >= 1.15.0",
+  "setuptools >= 42.0.0",  # required by pyproject+setuptools_scm integration
+  "setuptools_scm[toml] >= 3.5.0",  # required for "no-local-version" scheme
   "setuptools_scm_git_archive >= 1.0",
   "wheel",
-
-  # needed because setuptools' attr import
-  # machinery (`importlib.import_module`)
-  # imports `__init__` first
-  "ansible",
-  "pathlib2; python_version < '3.2'",
-  "ruamel.yaml",
-  "six",
 ]
 build-backend = "setuptools.build_meta"
+
+# ATTENTION: the following section must be kept last in
+# `pyproject.toml` because Travis CI appends one line in
+# the end when publishing non-tagged versions.
+[tool.setuptools_scm]

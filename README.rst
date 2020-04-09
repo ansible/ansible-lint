@@ -18,12 +18,29 @@
    :target: https://travis-ci.com/ansible/ansible-lint
    :alt: Travis CI build status
 
+.. image:: https://github.com/ansible/ansible-lint/workflows/%F0%9F%91%B7/badge.svg
+   :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3A%F0%9F%91%B7
+   :alt: 👷 GitHub Actions CI/CD build status — tests
+
+.. image:: https://github.com/ansible/ansible-lint/workflows/%F0%9F%9A%A8/badge.svg
+   :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3A%F0%9F%9A%A8
+   :alt: 🚨 GitHub Actions CI/CD build status — linters
+
+.. image:: https://img.shields.io/lgtm/grade/python/g/ansible/ansible-lint.svg?logo=lgtm&logoWidth=18
+   :target: https://lgtm.com/projects/g/ansible/ansible-lint/context:python
+   :alt: Language grade: Python
+
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+   :target: https://github.com/pre-commit/pre-commit
+   :alt: pre-commit
+
 
 Ansible-lint
 ============
 
 ``ansible-lint`` checks playbooks for practices and behaviour that could
-potentially be improved.
+potentially be improved. As a community backed project ansible-lint supports
+only the last two major versions of Ansible.
 
 `Visit the Ansible Lint docs site <https://docs.ansible.com/ansible-lint/>`_
 
@@ -31,6 +48,8 @@ Installing
 ==========
 
 .. installing-docs-inclusion-marker-do-not-remove
+
+Installing on Windows is not supported because we use symlinks inside Python packages.
 
 Using Pip
 ---------
@@ -44,9 +63,14 @@ Using Pip
 From Source
 -----------
 
+**Note**: pip 19.0+ is required for installation. Please consult with the `PyPA User Guide`_
+to learn more about managing Pip versions.
+
 .. code-block:: bash
 
     pip install git+https://github.com/ansible/ansible-lint.git
+
+.. _PyPA User Guide: https://packaging.python.org/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date
 
 .. installing-docs-inclusion-marker-end-do-not-remove
 
@@ -126,15 +150,15 @@ The following lints the role ``geerlingguy.apache``:
 
     $ ansible-lint geerlingguy.apache
 
-    [ANSIBLE0013] Use shell only when shell functionality is required
+    [305] Use shell only when shell functionality is required
     /Users/chouseknecht/.ansible/roles/geerlingguy.apache/tasks/main.yml:19
     Task/Handler: Get installed version of Apache.
 
-    [ANSIBLE0011] All tasks should be named
+    [502] All tasks should be named
     /Users/chouseknecht/.ansible/roles/geerlingguy.apache/tasks/main.yml:29
     Task/Handler: include_vars apache-22.yml
 
-    [ANSIBLE0011] All tasks should be named
+    [502] All tasks should be named
     /Users/chouseknecht/.ansible/roles/geerlingguy.apache/tasks/main.yml:32
     Task/Handler: include_vars apache-24.yml
 
@@ -158,19 +182,19 @@ The following lints ``playbook.yml``, which evaluates both the playbook and the 
 
     $ ansible-lint playbook.yml
 
-    [ANSIBLE0013] Use shell only when shell functionality is required
+    [305] Use shell only when shell functionality is required
     /Users/chouseknecht/roles/geerlingguy.apache/tasks/main.yml:19
     Task/Handler: Get installed version of Apache.
 
-    [ANSIBLE0011] All tasks should be named
+    [502] All tasks should be named
     /Users/chouseknecht/roles/geerlingguy.apache/tasks/main.yml:29
     Task/Handler: include_vars apache-22.yml
 
-    [ANSIBLE0011] All tasks should be named
+    [502] All tasks should be named
     /Users/chouseknecht/roles/geerlingguy.apache/tasks/main.yml:32
     Task/Handler: include_vars apache-24.yml
 
-    [ANSIBLE0011] All tasks should be named
+    [502] All tasks should be named
     /Users/chouseknecht/roles/geerlingguy.elasticsearch/tasks/main.yml:17
     Task/Handler: service state=started name=elasticsearch enabled=yes
 
@@ -180,19 +204,19 @@ Since ``ansible-lint`` accepts a list of roles or playbooks, the following works
 
     $ ansible-lint geerlingguy.apache geerlingguy.elasticsearch
 
-    [ANSIBLE0013] Use shell only when shell functionality is required
+    [305] Use shell only when shell functionality is required
     /Users/chouseknecht/roles/geerlingguy.apache/tasks/main.yml:19
     Task/Handler: Get installed version of Apache.
 
-    [ANSIBLE0011] All tasks should be named
+    [502] All tasks should be named
     /Users/chouseknecht/roles/geerlingguy.apache/tasks/main.yml:29
     Task/Handler: include_vars apache-22.yml
 
-    [ANSIBLE0011] All tasks should be named
+    [502] All tasks should be named
     /Users/chouseknecht/roles/geerlingguy.apache/tasks/main.yml:32
     Task/Handler: include_vars apache-24.yml
 
-    [ANSIBLE0011] All tasks should be named
+    [502] All tasks should be named
     /Users/chouseknecht/roles/geerlingguy.elasticsearch/tasks/main.yml:17
     Task/Handler: service state=started name=elasticsearch enabled=yes
 
@@ -205,46 +229,128 @@ Included in ``ansible-lint/examples`` are some example playbooks with undesirabl
 
     $ ansible-lint examples/example.yml
 
-    [ANSIBLE0004] Git checkouts must contain explicit version
+    [301] Commands should not change things if nothing needs doing
+    examples/example.yml:9
+    Task/Handler: unset variable
+
+    [206] Variables should have spaces before and after: {{ var_name }}
+    examples/example.yml:10
+        action: command echo {{thisvariable}} is not set in this playbook
+
+    [301] Commands should not change things if nothing needs doing
+    examples/example.yml:12
+    Task/Handler: trailing whitespace
+
+    [201] Trailing whitespace
+    examples/example.yml:13
+        action: command echo do nothing
+
+    [401] Git checkouts must contain explicit version
     examples/example.yml:15
     Task/Handler: git check
 
-    [ANSIBLE0004] Git checkouts must contain explicit version
+    [401] Git checkouts must contain explicit version
     examples/example.yml:18
     Task/Handler: git check 2
 
-    [ANSIBLE0004] Git checkouts must contain explicit version
-    examples/example.yml:30
-    Task/Handler: using git module
-
-    [ANSIBLE0002] Trailing whitespace
-    examples/example.yml:13
-        action: do nothing   
-
-    [ANSIBLE0002] Trailing whitespace
-    examples/example.yml:35
-        with_items: 
-
-    [ANSIBLE0006] git used in place of git module
+    [301] Commands should not change things if nothing needs doing
     examples/example.yml:24
     Task/Handler: executing git through command
 
-    [ANSIBLE0006] git used in place of git module
+    [303] git used in place of git module
+    examples/example.yml:24
+    Task/Handler: executing git through command
+
+    [303] git used in place of git module
     examples/example.yml:27
     Task/Handler: executing git through command
 
-    [ANSIBLE0006] git used in place of git module
+    [401] Git checkouts must contain explicit version
     examples/example.yml:30
-    Task/Handler: executing git through command
-    If playbooks include other playbooks, or tasks, or handlers or roles, these are also handled:
+    Task/Handler: using git module
+
+    [206] Variables should have spaces before and after: {{ var_name }}
+    examples/example.yml:34
+        action: debug msg="{{item}}"
+
+    [201] Trailing whitespace
+    examples/example.yml:35
+        with_items:
+
+    [403] Package installs should not use latest
+    examples/example.yml:39
+    Task/Handler: yum latest
+
+    [403] Package installs should not use latest
+    examples/example.yml:44
+    Task/Handler: apt latest
+
+    [101] Deprecated always_run
+    examples/example.yml:47
+    Task/Handler: always run
+
+
+If playbooks include other playbooks, or tasks, or handlers or roles, these are also handled:
 
 .. code-block:: bash
 
-    $ bin/ansible-lint examples/include.yml
+    $ ansible-lint examples/include.yml
 
-    [ANSIBLE0004] Checkouts must contain explicit version
-    /Users/will/src/ansible-lint/examples/roles/bobbins/tasks/main.yml:3
-    action: git a=b c=d
+    [301] Commands should not change things if nothing needs doing
+    examples/play.yml:5
+    Task/Handler: a bad play
+
+    [303] service used in place of service module
+    examples/play.yml:5
+    Task/Handler: a bad play
+
+    [401] Git checkouts must contain explicit version
+    examples/roles/bobbins/tasks/main.yml:2
+    Task/Handler: test tasks
+
+    [701] No 'galaxy_info' found
+    examples/roles/hello/meta/main.yml:1
+    {'meta/main.yml': {'dependencies': [{'role': 'bobbins', '__line__': 3, '__file__': '/Users/akx/build/ansible-lint/examples/roles/hello/meta/main.yml'}], '__line__': 1, '__file__': '/Users/akx/build/ansible-lint/examples/roles/hello/meta/main.yml', 'skipped_rules': []}}
+
+    [303] service used in place of service module
+    examples/roles/morecomplex/handlers/main.yml:1
+    Task/Handler: restart service using command
+
+    [301] Commands should not change things if nothing needs doing
+    examples/roles/morecomplex/tasks/main.yml:1
+    Task/Handler: test bad command
+
+    [302] mkdir used in place of argument state=directory to file module
+    examples/roles/morecomplex/tasks/main.yml:1
+    Task/Handler: test bad command
+
+    [301] Commands should not change things if nothing needs doing
+    examples/roles/morecomplex/tasks/main.yml:4
+    Task/Handler: test bad command v2
+
+    [302] mkdir used in place of argument state=directory to file module
+    examples/roles/morecomplex/tasks/main.yml:4
+    Task/Handler: test bad command v2
+
+    [301] Commands should not change things if nothing needs doing
+    examples/roles/morecomplex/tasks/main.yml:7
+    Task/Handler: test bad local command
+
+    [305] Use shell only when shell functionality is required
+    examples/roles/morecomplex/tasks/main.yml:7
+    Task/Handler: test bad local command
+
+    [504] Do not use 'local_action', use 'delegate_to: localhost'
+    examples/roles/morecomplex/tasks/main.yml:8
+      local_action: shell touch foo
+
+    [201] Trailing whitespace
+    examples/tasks/x.yml:3
+      args:
+
+    [201] Trailing whitespace
+    examples/tasks/x.yml:3
+      args:
 
 .. usage-docs-inclusion-marker-end-do-not-remove
 
@@ -323,16 +429,21 @@ The following shows the available tags in an example set of rules, and the rules
 
     $ ansible-lint -v -T
 
-    behaviour ['[ANSIBLE0016]']
-    bug ['[ANSIBLE0014]']
-    deprecated ['[ANSIBLE0015]', '[ANSIBLE0008]', '[ANSIBLE0018]', '[ANSIBLE0019]']
-    formatting ['[ANSIBLE0015]', '[ANSIBLE0002]', '[ANSIBLE0009]']
-    idempotency ['[ANSIBLE0012]']
-    oddity ['[ANSIBLE0017]']
-    readability ['[ANSIBLE0011]']
-    repeatability ['[ANSIBLE0004]', '[ANSIBLE0010]', '[ANSIBLE0005]']
-    resources ['[ANSIBLE0007]', '[ANSIBLE0006]']
-    safety ['[ANSIBLE0013]']
+    behaviour ['[503]']
+    bug ['[304]']
+    command-shell ['[305]', '[302]', '[304]', '[306]', '[301]', '[303]']
+    deprecated ['[105]', '[104]', '[103]', '[101]', '[102]']
+    formatting ['[104]', '[203]', '[201]', '[204]', '[206]', '[205]', '[202]']
+    idempotency ['[301]']
+    idiom ['[601]', '[602]']
+    metadata ['[701]', '[704]', '[703]', '[702]']
+    module ['[404]', '[401]', '[403]', '[402]']
+    oddity ['[501]']
+    readability ['[502]']
+    repeatability ['[401]', '[403]', '[402]']
+    resources ['[302]', '[303]']
+    safety ['[305]']
+    task ['[502]', '[503]', '[504]', '[501]']
 
 To run just the *idempotency* rules, for example, run the following:
 
@@ -349,11 +460,11 @@ To exclude rules from the available set of rules, use the ``-x SKIP_LIST`` optio
 
     $ ansible-lint -x readability,safety playbook.yml
 
-It's also possible to skip specific rules by passing the rule ID. For example, the following excludes rule *ANSIBLE0011*:
+It's also possible to skip specific rules by passing the rule ID. For example, the following excludes rule *502*:
 
 .. code-block:: bash
 
-    $ ansible-lint -x ANSIBLE0011 playbook.yml
+    $ ansible-lint -x 502 playbook.yml
 
 False Positives: Skipping Rules
 -------------------------------
@@ -426,7 +537,7 @@ An example rule using ``match`` is:
 
     class DeprecatedVariableRule(AnsibleLintRule):
 
-        id = 'ANSIBLE0001'
+        id = 'EXAMPLE002'
         shortdesc = 'Deprecated variable declarations'
         description = 'Check for lines that have old style ${var} ' + \
                       'declarations'
@@ -443,7 +554,7 @@ An example rule using ``matchtask`` is:
     from ansiblelint import AnsibleLintRule
 
     class TaskHasTag(AnsibleLintRule):
-        id = 'ANSIBLE0008'
+        id = 'EXAMPLE001'
         shortdesc = 'Tasks must have tag'
         description = 'Tasks must have tag'
         tags = ['productivity']

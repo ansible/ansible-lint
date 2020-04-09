@@ -22,7 +22,7 @@ import os
 import unittest
 
 import ansiblelint
-from ansiblelint import Runner, RulesCollection
+from ansiblelint import default_rulesdir, Runner, RulesCollection
 import ansiblelint.formatters
 
 
@@ -30,7 +30,7 @@ class TestRule(unittest.TestCase):
 
     def setUp(self):
         rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-        self.rules = RulesCollection.create_from_directory(rulesdir)
+        self.rules = RulesCollection([rulesdir])
 
     def test_runner_count(self):
         filename = 'test/nomatchestest.yml'
@@ -46,28 +46,28 @@ class TestRule(unittest.TestCase):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = ansiblelint.formatters.Formatter()
+        formatter = ansiblelint.formatters.Formatter(os.getcwd(), True)
         formatter.format(matches[0])
 
     def test_unicode_parseable_colored_formatting(self):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = ansiblelint.formatters.ParseableFormatter()
+        formatter = ansiblelint.formatters.ParseableFormatter(os.getcwd(), True)
         formatter.format(matches[0], colored=True)
 
     def test_unicode_quiet_colored_formatting(self):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = ansiblelint.formatters.QuietFormatter()
+        formatter = ansiblelint.formatters.QuietFormatter(os.getcwd(), True)
         formatter.format(matches[0], colored=True)
 
     def test_unicode_standard_color_formatting(self):
         filename = 'test/unicode.yml'
         runner = Runner(self.rules, filename, [], [], [])
         matches = runner.run()
-        formatter = ansiblelint.formatters.Formatter()
+        formatter = ansiblelint.formatters.Formatter(os.getcwd(), True)
         formatter.format(matches[0], colored=True)
 
     def test_runner_excludes_paths(self):
@@ -118,3 +118,20 @@ class TestRule(unittest.TestCase):
         run2 = runner.run()
 
         assert ((len(run1) + len(run2)) == 1)
+
+
+def test_runner_exclude_var_expansion(monkeypatch):
+    rules = RulesCollection([default_rulesdir])
+    filename = 'example/lots_of_warnings.yml'
+    monkeypatch.setenv('EXCLUDE_PATH', filename)
+    excludes = ['$EXCLUDE_PATH']
+    runner = Runner(rules, filename, [], [], excludes)
+    assert filename in runner.exclude_paths
+
+
+def test_runner_exclude_user_expansion():
+    rules = RulesCollection([default_rulesdir])
+    filename = 'example/lots_of_warnings.yml'
+    excludes = ['~']
+    runner = Runner(rules, filename, [], [], excludes)
+    assert os.path.expanduser('~') in runner.exclude_paths

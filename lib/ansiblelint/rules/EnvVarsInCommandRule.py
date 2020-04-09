@@ -34,6 +34,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     version_added = 'historic'
 
     expected_args = ['chdir', 'creates', 'executable', 'removes', 'stdin', 'warn',
+                     'stdin_add_newline', 'strip_empty_ends',
                      'cmd', '__ansible_module__', '__ansible_arguments__',
                      LINE_NUMBER_KEY, FILENAME_KEY]
 

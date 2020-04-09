@@ -11,11 +11,9 @@ cd ansible-lint
 git checkout -b your-branch-name
 DO SOME CODING HERE
 git add your new files
-git commit --signoff
+git commit
 git push origin your-branch-name
 ```
-
-Contributors to ansible-lint must agree to [DCO 1.1](./DCO_1_1.md)
 
 You will then be able to create a pull request from your commit.
 

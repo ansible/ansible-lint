@@ -18,13 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from __future__ import print_function
 from collections import defaultdict
 import os
 import re
 import sys
-
-import six
 
 import ansiblelint.utils
 import codecs
@@ -66,7 +63,7 @@ class AnsibleLintRule(object):
             if not result:
                 continue
             message = None
-            if isinstance(result, six.string_types):
+            if isinstance(result, str):
                 message = result
             matches.append(Match(prev_line_no + 1, line,
                            file['path'], self, message))
@@ -97,7 +94,7 @@ class AnsibleLintRule(object):
                 continue
 
             message = None
-            if isinstance(result, six.string_types):
+            if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
             matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
@@ -140,8 +137,13 @@ class AnsibleLintRule(object):
 
 class RulesCollection(object):
 
-    def __init__(self):
+    def __init__(self, rulesdirs=None):
+        if rulesdirs is None:
+            rulesdirs = []
+        self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
         self.rules = []
+        for rulesdir in self.rulesdirs:
+            self.extend(ansiblelint.utils.load_plugins(rulesdir))
 
     def register(self, obj):
         self.rules.append(obj)
@@ -193,12 +195,6 @@ class RulesCollection(object):
             results.append("{0} {1}".format(tag, tags[tag]))
         return "\n".join(results)
 
-    @classmethod
-    def create_from_directory(cls, rulesdir):
-        result = cls()
-        result.rules = ansiblelint.utils.load_plugins(os.path.expanduser(rulesdir))
-        return result
-
 
 class Match(object):
 
@@ -239,7 +235,7 @@ class Runner(object):
     def _update_exclude_paths(self, exclude_paths):
         if exclude_paths:
             # These will be (potentially) relative paths
-            paths = [s.strip() for s in exclude_paths]
+            paths = ansiblelint.utils.expand_paths_vars(exclude_paths)
             # Since ansiblelint.utils.find_children returns absolute paths,
             # and the list of files we create in `Runner.run` can contain both
             # relative and absolute paths, we need to cover both bases.
@@ -260,7 +256,11 @@ class Runner(object):
                 continue
             if playbook[1] == 'role':
                 continue
-            files.append({'path': ansiblelint.utils.normpath(playbook[0]), 'type': playbook[1]})
+            files.append({'path': ansiblelint.utils.normpath(playbook[0]),
+                          'type': playbook[1],
+                          # add an absolute path here, so rules are able to validate if
+                          # referenced files exist
+                          'absolute_directory': os.path.dirname(playbook[0])})
         visited = set()
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:

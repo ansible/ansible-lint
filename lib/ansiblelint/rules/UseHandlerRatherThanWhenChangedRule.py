@@ -18,13 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import six
-
 from ansiblelint import AnsibleLintRule
 
 
 def _changed_in_when(item):
-    if not isinstance(item, six.string_types):
+    if not isinstance(item, str):
         return False
     return any(changed in item for changed in
                ['.changed', '|changed', '["changed"]', "['changed']"])

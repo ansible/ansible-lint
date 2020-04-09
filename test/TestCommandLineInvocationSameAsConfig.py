@@ -1,82 +1,121 @@
-import unittest
-from subprocess import Popen, PIPE
-import os
-import shutil
-import yaml
+from pathlib import Path
+import sys
+
+import pytest
+
+from ansiblelint import cli
 
 
-class TestCommandLineInvocationSameAsConfig(unittest.TestCase):
-    def setUp(self):
-        if os.path.exists(".sandbox"):
-            shutil.rmtree(".sandbox")
+@pytest.fixture
+def base_arguments():
+    return ['../test/skiptasks.yml']
 
-        os.makedirs(".sandbox/subdir")
 
-    def run_ansible_lint(self, args=False, config=None):
-        command = "cd .sandbox; ../bin/ansible-lint ../test/skiptasks.yml"
-        if args:
-            command += " " + args
+@pytest.mark.parametrize('args,config', [
+                         (["-p"], "test/fixtures/parseable.yml"),
+                         (["-q"], "test/fixtures/quiet.yml"),
+                         (["-r", "test/fixtures/rules/"],
+                          "test/fixtures/rulesdir.yml"),
+                         (["-R", "-r", "test/fixtures/rules/"],
+                          "test/fixtures/rulesdir-defaults.yml"),
+                         (["-t", "skip_ansible_lint"],
+                          "test/fixtures/tags.yml"),
+                         (["-v"], "test/fixtures/verbosity.yml"),
+                         (["-x", "bad_tag"],
+                          "test/fixtures/skip-tags.yml"),
+                         (["--exclude", "test/"],
+                          "test/fixtures/exclude-paths.yml"),
+                         (["--show-relpath"],
+                          "test/fixtures/show-abspath.yml"),
+                         ([],
+                          "test/fixtures/show-relpath.yml"),
+                         ])
+def test_ensure_config_are_equal(base_arguments, args, config, monkeypatch):
+    command = base_arguments + args
+    cli_parser = cli.get_cli_parser()
 
-        if config:
-            with open(".sandbox/.ansible-lint", "w") as outfile:
-                yaml.dump(config, outfile, default_flow_style=False)
+    _real_pathlib_resolve = Path.resolve
 
-        result, err = Popen(
-            [command],
-            stdin=PIPE,
-            stdout=PIPE,
-            stderr=PIPE,
-            shell=True
-        ).communicate()
+    def _fake_pathlib_resolve(self):
+        try:
+            return _real_pathlib_resolve(self)
+        except FileNotFoundError:
+            if self != Path(args[-1]):
+                raise
+            return Path.cwd() / self
 
-        self.assertFalse(err, "Expected no error but was " + str(err))
+    with monkeypatch.context() as mp_ctx:
+        if (
+                sys.version_info[:2] < (3, 6) and
+                args[-2:] == ["-r", "test/fixtures/rules/"]
+        ):
+            mp_ctx.setattr(Path, 'resolve', _fake_pathlib_resolve)
+        options = cli_parser.parse_args(command)
 
-        return result
+    file_config = cli.load_config(config)
 
-    def assert_config_for(self, cli_arg, config):
-        with_arg = self.run_ansible_lint(args=cli_arg)
-        with_config = self.run_ansible_lint(config=config)
+    for key, val in file_config.items():
+        if key in {'exclude_paths', 'rulesdir'}:
+            val = [Path(p) for p in val]
+        assert val == getattr(options, key)
 
-        self.assertEqual(with_arg, with_config)
 
-    def test_parseable_as_config(self):
-        self.assert_config_for("-p", dict(parseable=True))
+def test_config_can_be_overridden(base_arguments):
+    no_override = cli.get_config(base_arguments + ["-t", "bad_tag"])
 
-    def test_quiet_as_config(self):
-        self.assert_config_for("-q", dict(quiet=True))
+    overridden = cli.get_config(base_arguments +
+                                ["-t", "bad_tag",
+                                 "-c", "test/fixtures/tags.yml"])
 
-    def test_rulesdir_as_config(self):
-        self.assert_config_for("-r ../test/rules/", dict(rulesdir=["../test/rules/"]))
+    assert no_override.tags + ["skip_ansible_lint"] == overridden.tags
 
-    def test_use_default_rules(self):
-        self.assert_config_for("-R -r ../test/rules/", dict(rulesdir=["../test/rules"],
-                                                            use_default_rules=True))
 
-    def test_tags(self):
-        self.assert_config_for("-t skip_ansible_lint", dict(tags=["skip_ansible_lint"]))
+def test_different_config_file(base_arguments):
+    """Ensures an alternate config_file can be used."""
+    diff_config = cli.get_config(base_arguments +
+                                 ["-c", "test/fixtures/ansible-config.yml"])
+    no_config = cli.get_config(base_arguments + ["-v"])
 
-    def test_verbosity(self):
-        self.assert_config_for("-v", dict(verbosity=1))
+    assert diff_config.verbosity == no_config.verbosity
 
-    def test_skip_list(self):
-        self.assert_config_for("-x bad_tag", dict(skip_list=["bad_tag"]))
 
-    def test_exclude(self):
-        self.assert_config_for("--exclude ../test/", dict(exclude_paths=["../test/"]))
+def test_path_from_config_do_not_depend_on_cwd(monkeypatch):  # Issue 572
+    config1 = cli.load_config("test/fixtures/config-with-relative-path.yml")
+    monkeypatch.chdir('test')
+    config2 = cli.load_config("fixtures/config-with-relative-path.yml")
 
-    def test_config_can_be_overridden(self):
-        no_override = self.run_ansible_lint(args="-t bad_tag")
-        overridden = self.run_ansible_lint(
-            args="-t bad_tag",
-            config=dict(tags=["skip_ansible_lint"]))
+    assert config1['exclude_paths'].sort() == config2['exclude_paths'].sort()
 
-        self.assertEqual(no_override, overridden)
 
-    def test_different_config_file(self):
-        with open(".sandbox/subdir/ansible-config.yml", "w") as outfile:
-            yaml.dump(dict(verbosity=1), outfile, default_flow_style=False)
+def test_path_from_cli_depend_on_cwd(base_arguments, monkeypatch, tmp_path):
+    # Issue 572
+    arguments = base_arguments + ["--exclude",
+                                  "test/fixtures/config-with-relative-path.yml"]
 
-        diff_config = self.run_ansible_lint(args="-c ./subdir/ansible-config.yml")
-        no_config = self.run_ansible_lint(args="-v")
+    options1 = cli.get_cli_parser().parse_args(arguments)
+    assert 'test/test' not in str(options1.exclude_paths[0])
 
-        self.assertEqual(diff_config, no_config)
+    test_dir = 'test'
+    if sys.version_info[:2] < (3, 6):
+        test_dir = tmp_path / 'test' / 'test' / 'fixtures'
+        test_dir.mkdir(parents=True)
+        (test_dir / 'config-with-relative-path.yml').write_text('')
+        test_dir = test_dir / '..' / '..'
+    monkeypatch.chdir(test_dir)
+    options2 = cli.get_cli_parser().parse_args(arguments)
+
+    assert 'test/test' in str(options2.exclude_paths[0])
+
+
+@pytest.mark.parametrize(
+    "config_file",
+    [
+        pytest.param("test/fixtures/ansible-config-invalid.yml", id="invalid"),
+        pytest.param("/dev/null/ansible-config-missing.yml", id="missing")
+    ]
+)
+def test_config_failure(base_arguments, config_file):
+    """Ensures specific config files produce error code 2."""
+    with pytest.raises(SystemExit, match="^2$"):
+        cli.get_config(base_arguments +
+                       ["-c", config_file])

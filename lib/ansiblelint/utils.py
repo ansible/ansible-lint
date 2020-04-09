@@ -23,15 +23,13 @@ import glob
 import imp
 from itertools import product
 import os
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
+from pathlib import Path
+
 import subprocess
 
-import six
 import yaml
 from yaml.composer import Composer
+from yaml.representer import RepresenterError
 import ruamel.yaml
 
 from ansible import constants
@@ -51,6 +49,8 @@ from ansible.template import Templar
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
 DEFAULT_VAULT_PASSWORD = 'x'
+
+PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
 
 
 def parse_yaml_from_file(filepath):
@@ -182,7 +182,7 @@ def template(basedir, value, vars, fail_on_undefined=False, **kwargs):
                                  **dict(kwargs, fail_on_undefined=fail_on_undefined))
         # Hack to skip the following exception when using to_json filter on a variable.
         # I guess the filter doesn't like empty vars...
-    except (AnsibleError, ValueError):
+    except (AnsibleError, ValueError, RepresenterError):
         # templating failed, so just keep value as is.
         pass
     return value
@@ -210,7 +210,7 @@ def play_children(basedir, item, parent_type, playbook_dir):
         if v:
             v = template(os.path.abspath(basedir),
                          v,
-                         dict(playbook_dir=os.path.abspath(basedir)),
+                         dict(playbook_dir=PLAYBOOK_DIR or os.path.abspath(basedir)),
                          fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
@@ -237,13 +237,17 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             append_children(th['import_playbook'], basedir, k, parent_type, results)
         elif 'import_tasks' in th:
             append_children(th['import_tasks'], basedir, k, parent_type, results)
-        elif 'import_role' in th:
+        elif 'include_role' in th or 'import_role' in th:
             th = normalize_task_v2(th)
-            results.extend(_roles_children(basedir, k, [th['action'].get('name')], parent_type,
-                                           main=th['action'].get('tasks_from', 'main')))
-        elif 'include_role' in th:
-            th = normalize_task_v2(th)
-            results.extend(_roles_children(basedir, k, [th['action'].get('name')],
+            module = th['action']['__ansible_module__']
+            if "name" not in th['action']:
+                raise RuntimeError(
+                    "Failed to find required 'name' key in %s" % module)
+            if not isinstance(th['action']["name"], str):
+                raise RuntimeError(
+                    "Value assigned to 'name' key on '%s' is not a string." %
+                    module)
+            results.extend(_roles_children(basedir, k, [th['action'].get("name")],
                                            parent_type,
                                            main=th['action'].get('tasks_from', 'main')))
         elif 'block' in th:
@@ -307,7 +311,7 @@ def _rolepath(basedir, role):
 
     if constants.DEFAULT_ROLES_PATH:
         search_locations = constants.DEFAULT_ROLES_PATH
-        if isinstance(search_locations, six.string_types):
+        if isinstance(search_locations, str):
             search_locations = search_locations.split(os.pathsep)
         for loc in search_locations:
             loc = os.path.expanduser(loc)
@@ -421,7 +425,7 @@ def normalize_task_v1(task):
             else:
                 result[k] = v
         else:
-            if isinstance(v, six.string_types):
+            if isinstance(v, str):
                 v = _kv_to_dict(k + ' ' + v)
             elif not v:
                 v = dict(__ansible_module__=k)
@@ -745,7 +749,7 @@ def is_playbook(filename):
     }
 
     # makes it work with Path objects by converting them to strings
-    if not isinstance(filename, six.string_types):
+    if not isinstance(filename, str):
         filename = str(filename)
 
     try:
@@ -763,15 +767,48 @@ def is_playbook(filename):
     return False
 
 
+def get_yaml_files(options):
+    """Find all yaml files."""
+    # git is preferred as it also considers .gitignore
+    git_command = ['git', 'ls-files', '*.yaml', '*.yml']
+    if options.verbosity:
+        print(
+            "Discovering files to lint: {command}".format(
+                command=' '.join(git_command)
+            )
+        )
+
+    try:
+        out = subprocess.check_output(
+            git_command,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True
+        ).split()
+    except subprocess.CalledProcessError as exc:
+        if options.verbosity:
+            print(
+                "Warning: Failed to discover yaml files to lint using git:"
+                " {error_msg}".format(
+                    error_msg=exc.output.rstrip('\n')
+                )
+            )
+
+        out = [
+            os.path.join(root, name)
+            for root, dirs, files in os.walk('.')
+            for name in files
+            if name.endswith('.yaml') or name.endswith('.yml')
+        ]
+
+    return OrderedDict.fromkeys(sorted(out))
+
+
 def get_playbooks_and_roles(options=None):
     """Find roles and playbooks."""
     if options is None:
         options = {}
 
-    # git is preferred as it also considers .gitignore
-    files = OrderedDict.fromkeys(sorted(subprocess.check_output(
-        ["git", "ls-files", "*.yaml", "*.yml"],
-        universal_newlines=True).split()))
+    files = get_yaml_files(options)
 
     playbooks = []
     role_dirs = []
@@ -828,3 +865,17 @@ def get_playbooks_and_roles(options=None):
         print('Found playbooks: ' + ' '.join(playbooks))
 
     return role_dirs + playbooks
+
+
+def expand_path_vars(path):
+    """Expand the environment or ~ variables in a path string."""
+    path = path.strip()
+    path = os.path.expanduser(path)
+    path = os.path.expandvars(path)
+    return path
+
+
+def expand_paths_vars(paths):
+    """Expand the environment or ~ variables in a list."""
+    paths = [expand_path_vars(p) for p in paths]
+    return paths

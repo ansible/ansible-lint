@@ -1,43 +1,46 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# This is based on the config @ tox-dev/tox ￼
+
+name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
+resources:
+  repositories:
+  - repository: tox
+    type: github
+    endpoint: ansible
+    name: tox-dev/azure-pipelines-template
+    ref: master
+
 
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+    - master
+    - ref/tags/*
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python27:
-      python.version: '2.7'
-      TOXENV: ansible{29,28,27,devel}
-    Python35:
-      python.version: '3.5'
-      TOXENV: ansible{29,28,27,devel}
-    Python36:
-      python.version: '3.6'
-      TOXENV: ansible{29,28,27,devel}
-    Python37:
-      python.version: '3.7'
-      TOXENV: ansible{29,28,27,devel}
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+pr:
+  branches:
+    include:
+    - master
 
-- script: |
-    python -m pip install --upgrade tox
-    python -m tox --parallel auto --notest
-    for py_exe in `ls .tox/*/bin/python`
-    do
-        $py_exe -m pip install pytest pytest-azurepipelines
-    done
-  displayName: 'Install dependencies using tox'
 
-- script: |
-    python -m tox --parallel 0
-  displayName: 'Run test suite via tox'
+variables:
+  # PYTEST_ADDOPTS: "-v -v -ra --showlocals"
+  PRE_COMMIT_HOME: $(Pipeline.Workspace)/pre-commit-cache
+
+
+
+
+jobs:
+- template: .azure-pipelines/tox.yml
+  parameters:
+    ansible_versions:
+    - 29
+    - 28
+    - devel
+    python_envs:
+      38: [linux, macOs]
+      py3: [linux]
+      37: [linux, macOs]
+      36: [linux, macOs]
+      35: [linux, macOs]
