@@ -13,6 +13,10 @@ IMPORT_TASKS_MAIN = PlayFile('import-tasks-main.yml', '''
 - oops this is invalid
 ''')
 
+IMPORT_PING = PlayFile('import-tasks-main.yml', '''
+- ping:
+''')
+
 PLAY_IMPORT_TASKS = PlayFile('playbook.yml', '''
 - hosts: all
   tasks:
@@ -49,6 +53,7 @@ def play_files(tmp_path, request):
 @pytest.mark.parametrize(
     'play_files',
     [
+        pytest.param([IMPORT_PING, PLAY_IMPORT_TASKS], id='Import ping:'),
         pytest.param([IMPORT_TASKS_MAIN, PLAY_IMPORT_TASKS], id='import_tasks w/ malformed import')
     ],
     indirect=['play_files']
