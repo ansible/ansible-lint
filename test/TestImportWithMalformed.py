@@ -54,7 +54,11 @@ def play_files(tmp_path, request):
     'play_files',
     [
         pytest.param([IMPORT_SHELL_PIP, PLAY_IMPORT_TASKS], id='Import shell w/ pip'),
-        pytest.param([IMPORT_TASKS_MAIN, PLAY_IMPORT_TASKS], id='import_tasks w/ malformed import')
+        pytest.param(
+            [IMPORT_TASKS_MAIN, PLAY_IMPORT_TASKS],
+            id='import_tasks w/ malformed import',
+            marks=pytest.mark.xfail(raises=AttributeError)
+        )
     ],
     indirect=['play_files']
 )
