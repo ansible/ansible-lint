@@ -57,7 +57,12 @@ def play_files(tmp_path, request):
         pytest.param(
             [IMPORT_TASKS_MAIN, PLAY_IMPORT_TASKS],
             id='import_tasks w/ malformed import',
-            marks=pytest.mark.xfail(raises=AttributeError)
+            marks=pytest.mark.xfail(
+                reason='Garbage non-tasks sequence is not being '
+                'properly processed. Ref: '
+                'https://github.com/ansible/ansible-lint/issues/707',
+                raises=AttributeError,
+            ),
         )
     ],
     indirect=['play_files']
