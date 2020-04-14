@@ -20,7 +20,7 @@
 
 from collections import OrderedDict
 import glob
-import imp
+import importlib
 from itertools import product
 import os
 from pathlib import Path
@@ -100,19 +100,14 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 
 def load_plugins(directory):
     result = []
-    fh = None
 
     for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
-
         pluginname = os.path.basename(pluginfile.replace('.py', ''))
-        try:
-            fh, filename, desc = imp.find_module(pluginname, [directory])
-            mod = imp.load_module(pluginname, fh, filename, desc)
-            obj = getattr(mod, pluginname)()
-            result.append(obj)
-        finally:
-            if fh:
-                fh.close()
+        spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        obj = getattr(module, pluginname)()
+        result.append(obj)
     return result
 
 
