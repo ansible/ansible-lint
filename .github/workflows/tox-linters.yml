@@ -19,13 +19,8 @@ jobs:
       matrix:
         python-version:
         - 3.8
-        - 3.7
-        - 3.6
-        - 3.5
         os:
         - ubuntu-latest
-        - macOS-latest
-        # - windows-latest
         env:
         - TOXENV: build-dists,metadata-validation
         - TOXENV: docs
