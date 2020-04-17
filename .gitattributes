@@ -1,5 +1,7 @@
 # Force LF line endings for text files
 * text=auto eol=lf
 
+*.png binary
+
 # Needed for setuptools-scm-git-archive
 .git_archival.txt  export-subst
