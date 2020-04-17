@@ -1,9 +1,4 @@
 from ansiblelint import AnsibleLintRule
-try:
-    from types import StringTypes
-except ImportError:
-    # Python3 removed types.StringTypes
-    StringTypes = str,
 
 
 class NoFormattingInWhenRule(AnsibleLintRule):
@@ -15,7 +10,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
     version_added = 'historic'
 
     def _is_valid(self, when):
-        if not isinstance(when, StringTypes):
+        if not isinstance(when, str):
             return True
         return when.find('{{') == -1 and when.find('}}') == -1
 

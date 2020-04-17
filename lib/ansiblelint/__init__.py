@@ -24,7 +24,6 @@ import re
 import sys
 
 import ansiblelint.utils
-import codecs
 
 default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
 
@@ -162,7 +161,7 @@ class RulesCollection(object):
         matches = list()
 
         try:
-            with codecs.open(playbookfile['path'], mode='rb', encoding='utf-8') as f:
+            with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
                 text = f.read()
         except IOError as e:
             print("WARNING: Couldn't open %s - %s" %

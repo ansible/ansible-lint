@@ -24,7 +24,7 @@ import imp
 from itertools import product
 import os
 from pathlib import Path
-
+import pprint
 import subprocess
 
 import yaml
@@ -376,12 +376,9 @@ def normalize_task_v2(task):
             del task[LINE_NUMBER_KEY]
         except KeyError:
             task_info = "Unknown"
-        try:
-            import pprint
-            pp = pprint.PrettyPrinter(indent=2)
-            task_pprint = pp.pformat(task)
-        except ImportError:
-            task_pprint = task
+        pp = pprint.PrettyPrinter(indent=2)
+        task_pprint = pp.pformat(task)
+
         raise SystemExit("Couldn't parse task at %s (%s)\n%s" % (task_info, e.message, task_pprint))
 
     # denormalize shell -> command conversion
@@ -724,8 +721,7 @@ def normpath(path):
     Currently it generates a relative path but in the future we may want to
     make this user configurable.
     """
-    # convertion to string in order to allow receiving non string objects as
-    # arguments which would have failed under python2
+    # convertion to string in order to allow receiving non string objects
     return os.path.relpath(str(path))
 
 
