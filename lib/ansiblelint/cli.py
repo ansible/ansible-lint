@@ -25,6 +25,8 @@ def abspath(path, base_dir):
        default_drive: Windows drive to use to make the path
            absolute if none is given.
     """
+    path = os.path.expanduser(path)
+    path = os.path.expandvars(path)
     if not os.path.isabs(path):
         # Don't use abspath as it assumes path is relative to cwd.
         # We want it relative to base_dir.
