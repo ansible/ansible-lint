@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
+from pathlib import Path
 from collections import defaultdict
 import logging
 import os
@@ -138,9 +138,8 @@ class AnsibleLintRule(object):
 class RulesCollection(object):
 
     def __init__(self, rulesdirs=None):
-        if rulesdirs is None:
-            rulesdirs = []
-        self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
+        self.rulesdirs = rulesdirs or []
+        assert all(Path(p).is_absolute() for p in self.rulesdirs)  # FIXME: remove before merge
         self.rules = []
         for rulesdir in self.rulesdirs:
             self.extend(ansiblelint.utils.load_plugins(rulesdir))
@@ -216,6 +215,8 @@ class Runner(object):
 
     def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
                  verbosity=0, checked_files=None):
+        self.exclude_paths = exclude_paths or []
+        assert all(Path(p).is_absolute() for p in self.exclude_paths)  # FIXME: remove before merge
         self.rules = rules
         self.playbooks = set()
         # assume role if directory
@@ -227,22 +228,10 @@ class Runner(object):
             self.playbook_dir = os.path.dirname(playbook)
         self.tags = tags
         self.skip_list = skip_list
-        self._update_exclude_paths(exclude_paths)
         self.verbosity = verbosity
         if checked_files is None:
             checked_files = set()
         self.checked_files = checked_files
-
-    def _update_exclude_paths(self, exclude_paths):
-        if exclude_paths:
-            # These will be (potentially) relative paths
-            paths = ansiblelint.utils.expand_paths_vars(exclude_paths)
-            # Since ansiblelint.utils.find_children returns absolute paths,
-            # and the list of files we create in `Runner.run` can contain both
-            # relative and absolute paths, we need to cover both bases.
-            self.exclude_paths = paths + [os.path.abspath(p) for p in paths]
-        else:
-            self.exclude_paths = []
 
     def is_excluded(self, file_path):
         # Any will short-circuit as soon as something returns True, but will

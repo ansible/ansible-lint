@@ -21,7 +21,6 @@
 # THE SOFTWARE.
 
 import logging
-import os
 from pathlib import Path
 
 from importlib_metadata import version as get_dist_version
@@ -142,20 +141,6 @@ def test_task_to_str_unicode():
 ))
 def test_normpath_with_path_object(path):
     assert utils.normpath(path) == "a"
-
-
-def test_expand_path_vars(monkeypatch):
-    test_path = '/test/path'
-    monkeypatch.setenv('TEST_PATH', test_path)
-    assert utils.expand_path_vars('~') == os.path.expanduser('~')
-    assert utils.expand_path_vars('$TEST_PATH') == test_path
-
-
-def test_expand_paths_vars(monkeypatch):
-    test_path = '/test/path'
-    monkeypatch.setenv('TEST_PATH', test_path)
-    assert utils.expand_paths_vars(['~']) == [os.path.expanduser('~')]
-    assert utils.expand_paths_vars(['$TEST_PATH']) == [test_path]
 
 
 @pytest.mark.parametrize(
