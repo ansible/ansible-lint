@@ -19,76 +19,76 @@
 # THE SOFTWARE.
 
 import collections
-import unittest
 import os
+
+import pytest
 
 from ansiblelint import RulesCollection
 
 
-class TestRulesCollection(unittest.TestCase):
-
-    rules = None
-    ematchtestfile = dict(path='test/ematchtest.yml', type='playbook')
-    bracketsmatchtestfile = dict(path='test/bracketsmatchtest.yml', type='playbook')
-
-    def setUp(self):
-        self.rules = RulesCollection(['./test/rules'])
-
-    def test_load_collection_from_directory(self):
-        self.assertEqual(len(self.rules), 2)
-
-    def test_run_collection(self):
-        matches = self.rules.run(self.ematchtestfile)
-        self.assertEqual(len(matches), 3)
-
-    def test_tags(self):
-        matches = self.rules.run(self.ematchtestfile, tags=['test1'])
-        self.assertEqual(len(matches), 3)
-        matches = self.rules.run(self.ematchtestfile, tags=['test2'])
-        self.assertEqual(len(matches), 0)
-        matches = self.rules.run(self.bracketsmatchtestfile, tags=['test1'])
-        self.assertEqual(len(matches), 1)
-        matches = self.rules.run(self.bracketsmatchtestfile, tags=['test2'])
-        self.assertEqual(len(matches), 2)
-
-    def test_skip_tags(self):
-        matches = self.rules.run(self.ematchtestfile, skip_list=['test1'])
-        self.assertEqual(len(matches), 0)
-        matches = self.rules.run(self.ematchtestfile, skip_list=['test2'])
-        self.assertEqual(len(matches), 3)
-        matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['test1'])
-        self.assertEqual(len(matches), 2)
-        matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['test2'])
-        self.assertEqual(len(matches), 1)
-
-    def test_skip_id(self):
-        matches = self.rules.run(self.ematchtestfile, skip_list=['TEST0001'])
-        self.assertEqual(len(matches), 0)
-        matches = self.rules.run(self.ematchtestfile, skip_list=['TEST0002'])
-        self.assertEqual(len(matches), 3)
-        matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['TEST0001'])
-        self.assertEqual(len(matches), 2)
-        matches = self.rules.run(self.bracketsmatchtestfile, skip_list=['TEST0002'])
-        self.assertEqual(len(matches), 1)
-
-    def test_skip_non_existent_id(self):
-        matches = self.rules.run(self.ematchtestfile, skip_list=['DOESNOTEXIST'])
-        self.assertEqual(len(matches), 3)
-
-    def test_no_duplicate_rule_ids(self):
-        real_rules = RulesCollection(['./lib/ansiblelint/rules'])
-        rule_ids = [rule.id for rule in real_rules]
-        self.assertEqual([x for x, y in collections.Counter(rule_ids).items() if y > 1], [])
+@pytest.fixture
+def test_rules_collection():
+    return RulesCollection([os.path.abspath('./test/rules')])
 
 
-def test_rulesdir_var_expansion(monkeypatch):
-    test_path = '/test/path'
-    monkeypatch.setenv('TEST_PATH', test_path)
-    test_rulesdirs = ['$TEST_PATH']
-    expansion_rules = RulesCollection(test_rulesdirs)
-    assert test_path in expansion_rules.rulesdirs
+@pytest.fixture
+def ematchtestfile():
+    return dict(path='test/ematchtest.yml', type='playbook')
 
 
-def test_rulesdir_user_expansion():
-    expansion_rules = RulesCollection(['~'])
-    assert os.path.expanduser('~') in expansion_rules.rulesdirs
+@pytest.fixture
+def bracketsmatchtestfile():
+    return dict(path='test/bracketsmatchtest.yml', type='playbook')
+
+
+def test_load_collection_from_directory(test_rules_collection):
+    assert len(test_rules_collection) == 2
+
+
+def test_run_collection(test_rules_collection, ematchtestfile):
+    matches = test_rules_collection.run(ematchtestfile)
+    assert len(matches) == 3
+
+
+def test_tags(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
+    matches = test_rules_collection.run(ematchtestfile, tags=['test1'])
+    assert len(matches) == 3
+    matches = test_rules_collection.run(ematchtestfile, tags=['test2'])
+    assert len(matches) == 0
+    matches = test_rules_collection.run(bracketsmatchtestfile, tags=['test1'])
+    assert len(matches) == 1
+    matches = test_rules_collection.run(bracketsmatchtestfile, tags=['test2'])
+    assert len(matches) == 2
+
+
+def test_skip_tags(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
+    matches = test_rules_collection.run(ematchtestfile, skip_list=['test1'])
+    assert len(matches) == 0
+    matches = test_rules_collection.run(ematchtestfile, skip_list=['test2'])
+    assert len(matches) == 3
+    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test1'])
+    assert len(matches) == 2
+    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test2'])
+    assert len(matches) == 1
+
+
+def test_skip_id(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
+    matches = test_rules_collection.run(ematchtestfile, skip_list=['TEST0001'])
+    assert len(matches) == 0
+    matches = test_rules_collection.run(ematchtestfile, skip_list=['TEST0002'])
+    assert len(matches) == 3
+    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0001'])
+    assert len(matches) == 2
+    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0002'])
+    assert len(matches) == 1
+
+
+def test_skip_non_existent_id(test_rules_collection, ematchtestfile):
+    matches = test_rules_collection.run(ematchtestfile, skip_list=['DOESNOTEXIST'])
+    assert len(matches) == 3
+
+
+def test_no_duplicate_rule_ids(test_rules_collection):
+    real_rules = RulesCollection([os.path.abspath('./lib/ansiblelint/rules')])
+    rule_ids = [rule.id for rule in real_rules]
+    assert not any(y > 1 for y in collections.Counter(rule_ids).values())

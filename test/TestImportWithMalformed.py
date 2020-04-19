@@ -1,9 +1,8 @@
 from collections import namedtuple
-from pathlib import Path
 
 import pytest
 
-from ansiblelint import Runner, RulesCollection
+from ansiblelint import Runner
 
 
 PlayFile = namedtuple('PlayFile', ['name', 'content'])
@@ -31,14 +30,8 @@ def play_file_path(tmp_path):
 
 
 @pytest.fixture
-def rules():
-    rulesdir = str(Path('lib') / 'ansiblelint' / 'rules')
-    return RulesCollection([rulesdir])
-
-
-@pytest.fixture
-def runner(play_file_path, rules):
-    return Runner(rules, play_file_path, [], [], [])
+def runner(play_file_path, default_rules_collection):
+    return Runner(default_rules_collection, play_file_path, [], [], [])
 
 
 @pytest.fixture

@@ -1,35 +1,20 @@
-import os
-import unittest
+import pytest
 
-from ansiblelint import Runner, RulesCollection
+from ansiblelint import Runner
 
 
-class TestTaskIncludes(unittest.TestCase):
+@pytest.mark.parametrize('stage', ('pre', 'post'))
+def test_task_hook_include_playbook(default_rules_collection, stage):
+    playbook_path = (
+        'test/playbook-include/playbook_{stage}.yml'.
+        format_map(locals())
+    )
+    runner = Runner(default_rules_collection, playbook_path, [], [], [])
+    results = runner.run()
 
-    def setUp(self):
-        rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-        self.rules = RulesCollection([rulesdir])
-
-    def test_pre_task_include_playbook(self):
-        filename = 'test/playbook-include/playbook_pre.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        results = runner.run()
-
-        self.assertEqual(len(runner.playbooks), 2)
-        self.assertEqual(len(results), 3)
-        self.assertIn('Commands should not change things', str(results))
-
-        self.assertNotIn('502', str(results))
-        self.assertNotIn('All tasks should be named', str(results))
-
-    def test_post_task_include_playbook(self):
-        filename = 'test/playbook-include/playbook_post.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        results = runner.run()
-
-        self.assertEqual(len(runner.playbooks), 2)
-        self.assertEqual(len(results), 3)
-        self.assertIn('Commands should not change things', str(results))
-
-        self.assertNotIn('502', str(results))
-        self.assertNotIn('All tasks should be named', str(results))
+    results_text = str(results)
+    assert len(runner.playbooks) == 2
+    assert len(results) == 3
+    assert 'Commands should not change things' in results_text
+    assert '502' not in results_text
+    assert 'All tasks should be named' not in results_text

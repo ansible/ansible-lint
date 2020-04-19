@@ -1,10 +1,3 @@
-import unittest
-import os
-
-from ansiblelint import RulesCollection
-from test import RunFromText
-
-
 ROLE_TASKS = '''
 ---
 - name: test 303
@@ -88,25 +81,21 @@ galaxy_info:  # noqa 701
 '''
 
 
-class TestSkipInsideYaml(unittest.TestCase):
-    rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-    collection = RulesCollection([rulesdir])
+def test_role_tasks(default_text_runner):
+    results = default_text_runner.run_role_tasks_main(ROLE_TASKS)
+    assert len(results) == 1
 
-    def setUp(self):
-        self.runner = RunFromText(self.collection)
 
-    def test_role_tasks(self):
-        results = self.runner.run_role_tasks_main(ROLE_TASKS)
-        self.assertEqual(1, len(results))
+def test_role_tasks_with_block(default_text_runner):
+    results = default_text_runner.run_role_tasks_main(ROLE_TASKS_WITH_BLOCK)
+    assert len(results) == 4
 
-    def test_role_tasks_with_block(self):
-        results = self.runner.run_role_tasks_main(ROLE_TASKS_WITH_BLOCK)
-        self.assertEqual(4, len(results))
 
-    def test_playbook(self):
-        results = self.runner.run_playbook(PLAYBOOK)
-        self.assertEqual(7, len(results))
+def test_playbook(default_text_runner):
+    results = default_text_runner.run_playbook(PLAYBOOK)
+    assert len(results) == 7
 
-    def test_role_meta(self):
-        results = self.runner.run_role_meta_main(ROLE_META)
-        self.assertEqual(0, len(results))
+
+def test_role_meta(default_text_runner):
+    results = default_text_runner.run_role_meta_main(ROLE_META)
+    assert len(results) == 0
