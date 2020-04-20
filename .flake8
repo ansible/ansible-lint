@@ -28,7 +28,7 @@ exclude =
   __pycache__,
   # Temporary build dir
   build,
-  # This contains sdists and wheels of pylibsshext that we don't want to check
+  # This contains sdists and wheels of ansible-lint that we don't want to check
   dist,
   # Occasional virtualenv dir
   env,
