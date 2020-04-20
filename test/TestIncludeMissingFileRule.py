@@ -51,7 +51,7 @@ def runner(play_file_path, rules):
 
 
 @pytest.fixture
-def play_files(tmp_path, request):
+def _play_files(tmp_path, request):
     if request.param is None:
         return
     for play_file in request.param:
@@ -60,10 +60,11 @@ def play_files(tmp_path, request):
 
 
 @pytest.mark.parametrize(
-    'play_files', [pytest.param([PLAY_INCLUDING_PLAIN], id='referenced file missing')],
-    indirect=['play_files']
+    '_play_files', (pytest.param([PLAY_INCLUDING_PLAIN], id='referenced file missing'), ),
+    indirect=['_play_files']
 )
-def test_include_file_missing(runner, play_files):
+@pytest.mark.usefixtures('_play_files')
+def test_include_file_missing(runner):
     results = str(runner.run())
     assert 'referenced missing file in' in results
     assert 'playbook.yml' in results
@@ -71,14 +72,15 @@ def test_include_file_missing(runner, play_files):
 
 
 @pytest.mark.parametrize(
-    'play_files',
-    [
+    '_play_files',
+    (
         pytest.param([PLAY_INCLUDING_PLAIN, PLAY_INCLUDED], id='File Exists'),
         pytest.param([PLAY_INCLUDING_JINJA2], id='JINJA2 in reference'),
         pytest.param([PLAY_INCLUDING_NOQA], id='NOQA was used')
-    ],
-    indirect=['play_files']
+    ),
+    indirect=['_play_files']
 )
-def test_cases_that_do_not_report(runner, play_files):
+@pytest.mark.usefixtures('_play_files')
+def test_cases_that_do_not_report(runner):
     results = str(runner.run())
     assert 'referenced missing file in' not in results

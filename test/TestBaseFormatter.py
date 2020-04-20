@@ -6,7 +6,7 @@ import pytest
 from ansiblelint.formatters import BaseFormatter
 
 
-@pytest.mark.parametrize('base_dir,relative_path', (
+@pytest.mark.parametrize(('base_dir', 'relative_path'), (
     (None, True),
     ('/whatever', False),
     (Path('/whatever'), False),

@@ -8,7 +8,7 @@ def base_arguments():
     return ['../test/skiptasks.yml']
 
 
-@pytest.mark.parametrize('args,config', [
+@pytest.mark.parametrize(('args', 'config'), (
                          (["-p"], "test/fixtures/parseable.yml"),
                          (["-q"], "test/fixtures/quiet.yml"),
                          (["-r", "test/fixtures/rules/"],
@@ -26,7 +26,7 @@ def base_arguments():
                           "test/fixtures/show-abspath.yml"),
                          ([],
                           "test/fixtures/show-relpath.yml"),
-                         ])
+                         ))
 def test_ensure_config_are_equal(base_arguments, args, config):
     command = base_arguments + args
     options, _ = cli.get_cli_parser().parse_args(command)
@@ -78,10 +78,10 @@ def test_path_from_cli_depend_on_cwd(base_arguments, monkeypatch):  # Issue 572
 
 @pytest.mark.parametrize(
     "config_file",
-    [
+    (
         pytest.param("test/fixtures/ansible-config-invalid.yml", id="invalid"),
         pytest.param("/dev/null/ansible-config-missing.yml", id="missing")
-    ]
+    ),
 )
 def test_config_failure(base_arguments, config_file):
     """Ensures specific config files produce error code 2."""

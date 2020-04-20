@@ -40,6 +40,21 @@ exclude =
 # Accessibility/large fonts and PEP8 unfriendly:
 max-line-length = 100
 
+# Allow certain violations in certain files:
+per-file-ignores =
+  # FIXME: drop PT009 once they're fixes
+  # Ref: https://github.com/ansible/ansible-lint/issues/725
+  test/*.py: PT009
+
+# flake8-pytest-style
+# PT001:
+pytest-fixture-no-parentheses = true
+# PT006:
+pytest-parametrize-names-type = tuple
+# PT007:
+pytest-parametrize-values-type = tuple
+pytest-parametrize-values-row-type = tuple
+
 ignore =
   # TODO(ssbarnea): gradually address exceptions below:
   D100  # D100 Missing docstring in public module
