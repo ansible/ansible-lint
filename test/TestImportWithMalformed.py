@@ -42,7 +42,7 @@ def runner(play_file_path, rules):
 
 
 @pytest.fixture
-def play_files(tmp_path, request):
+def _play_files(tmp_path, request):
     if request.param is None:
         return
     for play_file in request.param:
@@ -51,8 +51,8 @@ def play_files(tmp_path, request):
 
 
 @pytest.mark.parametrize(
-    'play_files',
-    [
+    '_play_files',
+    (
         pytest.param([IMPORT_SHELL_PIP, PLAY_IMPORT_TASKS], id='Import shell w/ pip'),
         pytest.param(
             [IMPORT_TASKS_MAIN, PLAY_IMPORT_TASKS],
@@ -63,10 +63,11 @@ def play_files(tmp_path, request):
                 'https://github.com/ansible/ansible-lint/issues/707',
                 raises=AttributeError,
             ),
-        )
-    ],
-    indirect=['play_files']
+        ),
+    ),
+    indirect=['_play_files']
 )
-def test_import_tasks_with_malformed_import(runner, play_files):
+@pytest.mark.usefixtures('_play_files')
+def test_import_tasks_with_malformed_import(runner):
     results = str(runner.run())
     assert 'only when shell functionality is required' in results
