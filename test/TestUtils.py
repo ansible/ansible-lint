@@ -25,6 +25,7 @@ import os
 from pathlib import Path
 
 import ansiblelint.utils as utils
+from ansiblelint import cli
 
 from importlib_metadata import version as get_dist_version
 from packaging.version import Version
@@ -185,3 +186,52 @@ def test_expand_paths_vars(monkeypatch):
     monkeypatch.setenv('TEST_PATH', test_path)
     assert utils.expand_paths_vars(['~']) == [os.path.expanduser('~')]
     assert utils.expand_paths_vars(['$TEST_PATH']) == [test_path]
+
+
+@pytest.mark.parametrize(
+    ('reset_env_var', 'message_prefix'),
+    (
+        ('PATH', 'Warning: Failed to locate command:'),
+        ('GIT_DIR', 'Warning: Failed to discover yaml files to lint using git:')
+    ),
+    ids=('no Git installed', 'outside Git repository'),
+)
+def test_get_yaml_files_git_verbose(
+    reset_env_var,
+    message_prefix,
+    monkeypatch,
+    capsys
+):
+    options, _ = cli.get_config(['-v'])
+    monkeypatch.setenv(reset_env_var, '')
+    utils.get_yaml_files(options)
+    msg1, msg2 = capsys.readouterr().out.splitlines()[:2]
+    assert msg1 == 'Discovering files to lint: git ls-files *.yaml *.yml'
+    assert msg2.startswith(message_prefix)
+
+
+@pytest.mark.parametrize(
+    'is_in_git',
+    (True, False),
+    ids=('in Git', 'outside Git'),
+)
+def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
+    options, _ = cli.get_config([])
+    test_dir = Path(__file__).resolve().parent
+    lint_path = test_dir / 'roles' / 'test-role'
+    if not is_in_git:
+        monkeypatch.setenv('GIT_DIR', '')
+
+    yaml_count = (
+        len(list(lint_path.glob('**/*.yml'))) + len(list(lint_path.glob('**/*.yaml')))
+    )
+
+    monkeypatch.chdir(str(lint_path))
+    files = utils.get_yaml_files(options)
+    stdout = capsys.readouterr().out
+    assert not stdout, 'No output is expected when the verbosity is off'
+    assert len(files) == yaml_count, (
+        "Expected to find {yaml_count} yaml files in {lint_path}".format_map(
+            locals(),
+        )
+    )
