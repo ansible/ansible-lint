@@ -774,6 +774,8 @@ def get_yaml_files(options):
             )
         )
 
+    out = None
+
     try:
         out = subprocess.check_output(
             git_command,
@@ -788,7 +790,15 @@ def get_yaml_files(options):
                     error_msg=exc.output.rstrip('\n')
                 )
             )
+    except FileNotFoundError as exc:
+        if options.verbosity:
+            print(
+                "Warning: Failed to locate command: {error_msg!s}".format(
+                    error_msg=exc
+                )
+            )
 
+    if out is None:
         out = [
             os.path.join(root, name)
             for root, dirs, files in os.walk('.')
