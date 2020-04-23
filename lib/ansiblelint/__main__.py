@@ -24,9 +24,9 @@ import errno
 import pathlib
 import sys
 
+from ansiblelint import cli, RulesCollection, Runner
 import ansiblelint.formatters as formatters
-from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
-from ansiblelint.utils import normpath, initialize_logger
+from ansiblelint.utils import initialize_logger
 
 
 def main():
@@ -48,16 +48,7 @@ def main():
 
     formatter = formatter_factory(cwd, options.display_relative_path)
 
-    # no args triggers auto-detection mode
-    if not options.playbook and not (options.listrules or options.listtags):
-        cli.print_help(file=sys.stderr)
-        return 1
-
-    if options.use_default_rules:
-        rulesdirs = options.rulesdir + [default_rulesdir]
-    else:
-        rulesdirs = options.rulesdir or [default_rulesdir]
-    rules = RulesCollection(rulesdirs)
+    rules = RulesCollection(options.rulesdir)
 
     if options.listrules:
         print(rules)
@@ -84,7 +75,7 @@ def main():
                         options.verbosity, checked_files)
         matches.extend(runner.run())
 
-    matches.sort(key=lambda x: (normpath(x.filename), x.linenumber, x.rule.id))
+    matches.sort(key=lambda x: (x.filename, x.linenumber, x.rule.id))
 
     for match in matches:
         print(formatter.format(match, options.colored))

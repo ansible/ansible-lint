@@ -21,7 +21,6 @@
 # THE SOFTWARE.
 
 import logging
-import os
 from pathlib import Path
 
 from importlib_metadata import version as get_dist_version
@@ -147,15 +146,15 @@ def test_normpath_with_path_object(path):
 def test_expand_path_vars(monkeypatch):
     test_path = '/test/path'
     monkeypatch.setenv('TEST_PATH', test_path)
-    assert utils.expand_path_vars('~') == os.path.expanduser('~')
-    assert utils.expand_path_vars('$TEST_PATH') == test_path
+    assert utils.expand_path_vars('~') == Path.home()
+    assert utils.expand_path_vars('$TEST_PATH') == Path(test_path)
 
 
 def test_expand_paths_vars(monkeypatch):
     test_path = '/test/path'
     monkeypatch.setenv('TEST_PATH', test_path)
-    assert utils.expand_paths_vars(['~']) == [os.path.expanduser('~')]
-    assert utils.expand_paths_vars(['$TEST_PATH']) == [test_path]
+    assert utils.expand_paths_vars(['~']) == [Path.home()]
+    assert utils.expand_paths_vars(['$TEST_PATH']) == [Path(test_path)]
 
 
 @pytest.mark.parametrize(
@@ -174,7 +173,7 @@ def test_get_yaml_files_git_verbose(
     monkeypatch,
     caplog
 ):
-    options = cli.get_config(['-v'])
+    options = cli.get_cli_parser().parse_args(['-v'])
     utils.initialize_logger(options.verbosity)
     monkeypatch.setenv(reset_env_var, '')
     utils.get_yaml_files(options)
@@ -200,7 +199,7 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
 
     Also checks expected number of files are detected.
     """
-    options = cli.get_config([])
+    options = cli.get_cli_parser().parse_args([])
     test_dir = Path(__file__).resolve().parent
     lint_path = test_dir / 'roles' / 'test-role'
     if not is_in_git:

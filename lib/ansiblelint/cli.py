@@ -9,6 +9,7 @@ import yaml
 
 import ansiblelint
 from ansiblelint.version import __version__
+from ansiblelint.utils import get_playbooks_and_roles
 
 
 _logger = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ def load_config(config_file):
             sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
     elif not os.path.exists(config_path):
         # a missing default config file should not trigger an error
-        return
+        return {}
 
     try:
         with open(config_path, "r") as stream:
@@ -156,9 +157,6 @@ def get_cli_parser():
 
 
 def merge_config(file_config, cli_config):
-    if not file_config:
-        return cli_config
-
     if 'quiet' in file_config:
         cli_config.quiet = cli_config.quiet or file_config['quiet']
 
@@ -185,6 +183,8 @@ def merge_config(file_config, cli_config):
     cli_config.exclude_paths.extend(file_config.get('exclude_paths', []))
 
     cli_config.rulesdir.extend(file_config.get('rulesdir', []))
+    if cli_config.use_default_rules or not cli_config.rulesdir:
+        cli_config.rulesdir.extend([Path(ansiblelint.default_rulesdir)])
 
     if 'skip_list' in file_config:
         cli_config.skip_list = cli_config.skip_list + file_config['skip_list']
@@ -200,12 +200,29 @@ def get_config(arguments):
     options = parser.parse_args(arguments)
 
     config = load_config(options.config_file)
+    config = merge_config(config, options)
 
-    return merge_config(config, options)
+    if config.listrules or config.listtags:
+        return config
 
+    # Exclude playbooks according to exclude path.
+    for playbook in list(config.playbook):
+        for excluded in config.exclude_paths:
+            try:
+                playbook.relative_to(excluded)
+            except ValueError:
+                pass
+            else:
+                config.playbook.remove(playbook)
 
-def print_help(file=sys.stdout):
-    get_cli_parser().print_help(file=file)
+    # no args triggers auto-detection mode
+    if not config.playbook:
+        config.playbook = get_playbooks_and_roles(options=config)
+        if not config.playbook:
+            parser.print_help(file=sys.stderr)
+            sys.exit(ansiblelint.utils.ANSIBLE_FAILURE_RC)
+
+    return config
 
 
 # vim: et:sw=4:syntax=python:ts=4:

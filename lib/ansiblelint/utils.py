@@ -19,7 +19,6 @@
 # THE SOFTWARE.
 
 from collections import OrderedDict
-import glob
 import importlib
 from itertools import product
 import logging
@@ -123,14 +122,15 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 def load_plugins(directory):
     result = []
 
-    for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
-
-        pluginname = os.path.basename(pluginfile.replace('.py', ''))
-        spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
+    for pluginfile in directory.glob('[A-Za-z]*.py'):
+        pluginname = pluginfile.with_suffix('').name
+        # FIXME: remove Path cast to str once Py3.5 supoort is dropped.
+        spec = importlib.util.spec_from_file_location(pluginname, str(pluginfile))
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         obj = getattr(module, pluginname)()
         result.append(obj)
+
     return result
 
 
@@ -774,6 +774,8 @@ def is_playbook(filename):
             "Failed to load %s with %s, assuming is not a playbook.",
             filename, e)
     else:
+        if isinstance(f, list):  # A YAML document can be a list
+            return False
         if (
             isinstance(f, AnsibleSequence) and
             playbooks_keys.intersection(next(iter(f), {}).keys())
@@ -783,7 +785,11 @@ def is_playbook(filename):
 
 
 def get_yaml_files(options):
-    """Find all yaml files."""
+    """Find all yaml files in the current working directory.
+
+    Returns:
+        List[str]: a list of absolute path to .yaml or .yml files.
+    """
     # git is preferred as it also considers .gitignore
     git_command = ['git', 'ls-files', '*.yaml', '*.yml']
     _logger.info("Discovering files to lint: %s", ' '.join(git_command))
@@ -795,7 +801,7 @@ def get_yaml_files(options):
             git_command,
             stderr=subprocess.STDOUT,
             universal_newlines=True
-        ).split()
+        ).splitlines()
     except subprocess.CalledProcessError as exc:
         _logger.warning(
             "Failed to discover yaml files to lint using git: %s",
@@ -810,16 +816,23 @@ def get_yaml_files(options):
     if out is None:
         out = [
             os.path.join(root, name)
-            for root, dirs, files in os.walk('.')
+            for root, dirs, files in os.walk(os.getcwd())
             for name in files
             if name.endswith('.yaml') or name.endswith('.yml')
         ]
 
+    # Removes path according to exclude_paths
+    out = [os.path.abspath(p) for p in out
+           if not any(str(p).startswith(file_path) for file_path in options.exclude_paths)]
     return OrderedDict.fromkeys(sorted(out))
 
 
 def get_playbooks_and_roles(options=None):
-    """Find roles and playbooks."""
+    """Find roles and playbooks.
+
+    Returns:
+        List[Path]: a list of path to role directories and playbook files
+    """
     if options is None:
         options = {}
 
@@ -843,11 +856,8 @@ def get_playbooks_and_roles(options=None):
 
     for p in map(Path, files):
 
-        if any(str(p).startswith(file_path) for file_path in options.exclude_paths):
-            continue
-        elif (next((i for i in p.parts if i.endswith('playbooks')), None) or
-                'playbook' in p.parts[-1]):
-            playbooks.append(normpath(p))
+        if (any(i.endswith('playbooks') for i in p.parts) or 'playbook' in p.parts[-1]):
+            playbooks.append(p)
             continue
 
         # ignore if any folder ends with _vars
@@ -855,36 +865,37 @@ def get_playbooks_and_roles(options=None):
             continue
         elif 'roles' in p.parts or '.' in role_dirs:
             if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
-                role_dirs.append(str(p.parents[1]))
+                role_dirs.append(p.parents[1])
             elif role_internals.intersection(p.parts):
                 continue
             elif 'tests' in p.parts:
-                playbooks.append(normpath(p))
+                playbooks.append(p)
         if 'molecule' in p.parts:
             if p.parts[-1] != 'molecule.yml':
-                playbooks.append(normpath(p))
+                playbooks.append(p)
             continue
         # hidden files are clearly not playbooks, likely config files.
         if p.parts[-1].startswith('.'):
             continue
 
         if is_playbook(p):
-            playbooks.append(normpath(p))
+            playbooks.append(p)
             continue
 
         _logger.info('Unknown file type: %s', normpath(p))
 
-    _logger.info('Found roles: %s', ' '.join(role_dirs))
-    _logger.info('Found playbooks: %s', ' '.join(playbooks))
+    _logger.info('Found roles: %s', ' '.join(str(p) for p in role_dirs))
+    _logger.info('Found playbooks: %s', ' '.join(str(p) for p in playbooks))
 
     return role_dirs + playbooks
 
 
 def expand_path_vars(path):
     """Expand the environment or ~ variables in a path string."""
-    path = path.strip()
+    if isinstance(path, Path):
+        path = str(path)
     path = os.path.expanduser(path)
-    path = os.path.expandvars(path)
+    path = Path(os.path.expandvars(str(path)))
     return path
 
 

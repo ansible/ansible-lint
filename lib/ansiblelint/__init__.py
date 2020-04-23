@@ -240,7 +240,7 @@ class Runner(object):
             # Since ansiblelint.utils.find_children returns absolute paths,
             # and the list of files we create in `Runner.run` can contain both
             # relative and absolute paths, we need to cover both bases.
-            self.exclude_paths = paths + [os.path.abspath(p) for p in paths]
+            self.exclude_paths = paths + [os.path.abspath(str(p)) for p in paths]
         else:
             self.exclude_paths = []
 
@@ -248,7 +248,7 @@ class Runner(object):
         # Any will short-circuit as soon as something returns True, but will
         # be poor performance for the case where the path under question is
         # not excluded.
-        return any(file_path.startswith(path) for path in self.exclude_paths)
+        return any(file_path.startswith(str(path)) for path in self.exclude_paths)
 
     def run(self):
         files = list()
