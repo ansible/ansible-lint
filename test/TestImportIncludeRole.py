@@ -1,10 +1,7 @@
-import os
 import pytest
-import unittest
-import tempfile
-import shutil
 
-from ansiblelint import Runner, RulesCollection
+from ansiblelint import Runner
+
 
 ROLE_TASKS_MAIN = '''
 - name: shell instead of command
@@ -55,56 +52,52 @@ PLAY_INCLUDE_ROLE_INLINE = '''
 '''
 
 
-class TestImportIncludeRole(unittest.TestCase):
-    def setUp(self):
-        rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-        self.rules = RulesCollection([rulesdir])
+@pytest.fixture
+def playbook_path(request, tmp_path):
+    playbook_text = request.param
+    role_tasks_dir = tmp_path / 'test-role' / 'tasks'
+    role_tasks_dir.mkdir(parents=True)
+    (role_tasks_dir / 'main.yml').write_text(ROLE_TASKS_MAIN)
+    (role_tasks_dir / 'world.yml').write_text(ROLE_TASKS_WORLD)
+    play_path = tmp_path / 'playbook.yml'
+    play_path.write_text(playbook_text)
+    return str(play_path)
 
-        # make dir and write role tasks to import or include
-        self.play_root = tempfile.mkdtemp()
-        role_path = os.path.join(self.play_root, 'test-role', 'tasks')
-        os.makedirs(role_path)
-        with open(os.path.join(role_path, 'main.yml'), 'w') as f_main:
-            f_main.write(ROLE_TASKS_MAIN)
-        with open(os.path.join(role_path, 'world.yml'), 'w') as f_world:
-            f_world.write(ROLE_TASKS_WORLD)
 
-    def tearDown(self):
-        shutil.rmtree(self.play_root)
+@pytest.mark.parametrize(('playbook_path', 'messages'), (
+    pytest.param(PLAY_IMPORT_ROLE,
+                 ['only when shell functionality is required'],
+                 id='IMPORT_ROLE',
+                 ),
+    pytest.param(PLAY_IMPORT_ROLE_INLINE,
+                 ['only when shell functionality is require'],
+                 id='IMPORT_ROLE_INLINE',
+                 ),
+    pytest.param(PLAY_INCLUDE_ROLE,
+                 ['only when shell functionality is require',
+                  'All tasks should be named'],
+                 id='INCLUDE_ROLE',
+                 ),
+    pytest.param(PLAY_INCLUDE_ROLE_INLINE,
+                 ['only when shell functionality is require',
+                  'All tasks should be named'],
+                 id='INCLUDE_ROLE_INLINE',
+                 ),
+), indirect=('playbook_path', ))
+def test_import_role2(default_rules_collection, playbook_path, messages):
+    runner = Runner(default_rules_collection, playbook_path, [], [], [])
+    results = runner.run()
+    for message in messages:
+        assert message in str(results)
 
-    def _get_play_file(self, playbook_text):
-        with open(os.path.join(self.play_root, 'playbook.yml'), 'w') as f_play:
-            f_play.write(playbook_text)
-        return f_play
 
-    def test_import_role(self):
-        fh = self._get_play_file(PLAY_IMPORT_ROLE)
-        runner = Runner(self.rules, fh.name, [], [], [])
-        results = runner.run()
-        assert 'only when shell functionality is required' in str(results)
-
-    def test_import_role_inline_args(self):
-        fh = self._get_play_file(PLAY_IMPORT_ROLE_INLINE)
-        runner = Runner(self.rules, fh.name, [], [], [])
-        results = runner.run()
-        assert 'only when shell functionality is required' in str(results)
-
-    def test_include_role(self):
-        fh = self._get_play_file(PLAY_INCLUDE_ROLE)
-        runner = Runner(self.rules, fh.name, [], [], [])
-        results = runner.run()
-        assert 'only when shell functionality is required' in str(results)
-        assert 'All tasks should be named' in str(results)
-
-    def test_include_role_inline_args(self):
-        fh = self._get_play_file(PLAY_INCLUDE_ROLE_INLINE)
-        runner = Runner(self.rules, fh.name, [], [], [])
-        results = runner.run()
-        assert 'only when shell functionality is required' in str(results)
-        assert 'All tasks should be named' in str(results)
-
-    def test_invalid_import_role(self):
-        fh = self._get_play_file(PLAY_IMPORT_ROLE_INCOMPLETE)
-        runner = Runner(self.rules, fh.name, [], [], [])
-        with pytest.raises(RuntimeError, match="Failed to find required 'name' key in import_role"):
-            runner.run()
+@pytest.mark.parametrize(('playbook_path', 'error'), (
+    pytest.param(PLAY_IMPORT_ROLE_INCOMPLETE,
+                 "Failed to find required 'name' key in import_role",
+                 id='IMPORT_ROLE_INCOMPLETE',
+                 ),
+), indirect=('playbook_path', ))
+def test_invalid_import_role(default_rules_collection, playbook_path, error):
+    runner = Runner(default_rules_collection, playbook_path, [], [], [])
+    with pytest.raises(RuntimeError, match=error):
+        runner.run()

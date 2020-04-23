@@ -1,8 +1,4 @@
-import unittest
-import os
-
-from ansiblelint import RulesCollection
-from test import RunFromText
+import pytest
 
 
 PLAYBOOK_PRE_TASKS = '''
@@ -89,29 +85,16 @@ PLAYBOOK_WITH_BLOCK = '''
 '''
 
 
-class TestSkipPlaybookItems(unittest.TestCase):
-    rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-    collection = RulesCollection([rulesdir])
+@pytest.mark.parametrize(('playbook', 'length'), (
+    pytest.param(PLAYBOOK_PRE_TASKS, 2, id='PRE_TASKS'),
+    pytest.param(PLAYBOOK_POST_TASKS, 2, id='POST_TASKS'),
+    pytest.param(PLAYBOOK_HANDLERS, 2, id='HANDLERS'),
+    pytest.param(PLAYBOOK_TWO_PLAYS, 2, id='TWO_PLAYS'),
+    pytest.param(PLAYBOOK_WITH_BLOCK, 4, id='WITH_BLOCK'),
+))
+def test_pre_tasks(default_text_runner, playbook, length):
+    # When
+    results = default_text_runner.run_playbook(playbook)
 
-    def setUp(self):
-        self.runner = RunFromText(self.collection)
-
-    def test_pre_tasks(self):
-        results = self.runner.run_playbook(PLAYBOOK_PRE_TASKS)
-        self.assertEqual(2, len(results))
-
-    def test_post_tasks(self):
-        results = self.runner.run_playbook(PLAYBOOK_POST_TASKS)
-        self.assertEqual(2, len(results))
-
-    def test_play_handlers(self):
-        results = self.runner.run_playbook(PLAYBOOK_HANDLERS)
-        self.assertEqual(2, len(results))
-
-    def test_two_plays(self):
-        results = self.runner.run_playbook(PLAYBOOK_TWO_PLAYS)
-        self.assertEqual(2, len(results))
-
-    def test_with_block(self):
-        results = self.runner.run_playbook(PLAYBOOK_WITH_BLOCK)
-        self.assertEqual(4, len(results))
+    # Then
+    assert len(results) == length

@@ -1,24 +1,11 @@
-import unittest
-
-from ansiblelint import RulesCollection, default_rulesdir
-
-
-class TestAlwaysRun(unittest.TestCase):
-    collection = RulesCollection()
-
-    def setUp(self):
-        self.collection.extend(
-            RulesCollection([default_rulesdir])
-        )
-
-    def test_serverity_valid(self):
-        valid_severity_values = [
-            'VERY_HIGH',
-            'HIGH',
-            'MEDIUM',
-            'LOW',
-            'VERY_LOW',
-            'INFO',
-        ]
-        for rule in self.collection:
-            self.assertIn(rule.severity, valid_severity_values)
+def test_serverity_valid(default_rules_collection):
+    valid_severity_values = [
+        'VERY_HIGH',
+        'HIGH',
+        'MEDIUM',
+        'LOW',
+        'VERY_LOW',
+        'INFO',
+    ]
+    for rule in default_rules_collection:
+        assert rule.severity in valid_severity_values

@@ -17,121 +17,70 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
 import os
-import unittest
 
-import ansiblelint
-from ansiblelint import default_rulesdir, Runner, RulesCollection
-import ansiblelint.formatters
+import pytest
 
-
-class TestRule(unittest.TestCase):
-
-    def setUp(self):
-        rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-        self.rules = RulesCollection([rulesdir])
-
-    def test_runner_count(self):
-        filename = 'test/nomatchestest.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
-
-    def test_unicode_runner_count(self):
-        filename = 'test/unicode.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 1)
-
-    def test_unicode_standard_formatting(self):
-        filename = 'test/unicode.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        matches = runner.run()
-        formatter = ansiblelint.formatters.Formatter(os.getcwd(), True)
-        formatter.format(matches[0])
-
-    def test_unicode_parseable_colored_formatting(self):
-        filename = 'test/unicode.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        matches = runner.run()
-        formatter = ansiblelint.formatters.ParseableFormatter(os.getcwd(), True)
-        formatter.format(matches[0], colored=True)
-
-    def test_unicode_quiet_colored_formatting(self):
-        filename = 'test/unicode.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        matches = runner.run()
-        formatter = ansiblelint.formatters.QuietFormatter(os.getcwd(), True)
-        formatter.format(matches[0], colored=True)
-
-    def test_unicode_standard_color_formatting(self):
-        filename = 'test/unicode.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        matches = runner.run()
-        formatter = ansiblelint.formatters.Formatter(os.getcwd(), True)
-        formatter.format(matches[0], colored=True)
-
-    def test_runner_excludes_paths(self):
-        filename = 'examples/lots_of_warnings.yml'
-        excludes = ['examples/lots_of_warnings.yml']
-        runner = Runner(self.rules, filename, [], [], excludes)
-        assert (len(runner.run()) == 0)
-
-    def test_runner_block_count(self):
-        filename = 'test/block.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
-
-    def test_runner_become_count(self):
-        filename = 'test/become.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
-
-    def test_runner_empty_tags_count(self):
-        filename = 'test/emptytags.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
-
-    def test_runner_encrypted_secrets(self):
-        filename = 'test/contains_secrets.yml'
-        runner = Runner(self.rules, filename, [], [], [])
-        assert (len(runner.run()) == 0)
-
-    def test_dir_with_trailing_slash(self):
-        filename = 'test/'
-        runner = Runner(self.rules, filename, [], [], [])
-        assert (list(runner.playbooks)[0][1] == 'role')
-
-    def test_dir_with_fullpath(self):
-        filename = os.path.abspath('test')
-        runner = Runner(self.rules, filename, [], [], [])
-        assert (list(runner.playbooks)[0][1] == 'role')
-
-    def test_files_not_scanned_twice(self):
-        checked_files = set()
-
-        filename = os.path.abspath('test/common-include-1.yml')
-        runner = Runner(self.rules, filename, [], [], [], 0, checked_files)
-        run1 = runner.run()
-
-        filename = os.path.abspath('test/common-include-2.yml')
-        runner = Runner(self.rules, filename, [], [], [], 0, checked_files)
-        run2 = runner.run()
-
-        assert ((len(run1) + len(run2)) == 1)
+from ansiblelint import formatters, Runner
+from ansiblelint.cli import abspath
 
 
-def test_runner_exclude_var_expansion(monkeypatch):
-    rules = RulesCollection([default_rulesdir])
-    filename = 'example/lots_of_warnings.yml'
-    monkeypatch.setenv('EXCLUDE_PATH', filename)
-    excludes = ['$EXCLUDE_PATH']
-    runner = Runner(rules, filename, [], [], excludes)
-    assert filename in runner.exclude_paths
+LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd())
 
 
-def test_runner_exclude_user_expansion():
-    rules = RulesCollection([default_rulesdir])
-    filename = 'example/lots_of_warnings.yml'
-    excludes = ['~']
-    runner = Runner(rules, filename, [], [], excludes)
-    assert os.path.expanduser('~') in runner.exclude_paths
+@pytest.mark.parametrize(('playbook', 'exclude', 'length'), (
+    ('test/nomatchestest.yml', [], 0),
+    ('test/unicode.yml', [], 1),
+    (LOTS_OF_WARNINGS_PLAYBOOK, [LOTS_OF_WARNINGS_PLAYBOOK], 0),
+    ('test/block.yml', [], 0),
+    ('test/become.yml', [], 0),
+    ('test/emptytags.yml', [], 0),
+    ('test/contains_secrets.yml', [], 0),
+))
+def test_runner(default_rules_collection, playbook, exclude, length):
+    runner = Runner(default_rules_collection, playbook, [], [], exclude)
+
+    matches = runner.run()
+
+    assert len(matches) == length
+
+
+@pytest.mark.parametrize(('formatter_cls', 'format_kwargs'), (
+    pytest.param(formatters.Formatter, {}, id='Formatter-plain'),
+    pytest.param(formatters.ParseableFormatter,
+                 {'colored': True},
+                 id='ParseableFormatter-colored'),
+    pytest.param(formatters.QuietFormatter,
+                 {'colored': True},
+                 id='QuietFormatter-colored'),
+    pytest.param(formatters.Formatter,
+                 {'colored': True},
+                 id='Formatter-colored'),
+))
+def test_runner_unicode_format(default_rules_collection, formatter_cls, format_kwargs):
+    formatter = formatter_cls(os.getcwd(), True)
+    runner = Runner(default_rules_collection, 'test/unicode.yml', [], [], [])
+
+    matches = runner.run()
+
+    formatter.format(matches[0], **format_kwargs)
+
+
+@pytest.mark.parametrize('directory_name', ('test/', os.path.abspath('test')))
+def test_runner_with_directory(default_rules_collection, directory_name):
+    runner = Runner(default_rules_collection, directory_name, [], [], [])
+    assert (list(runner.playbooks)[0][1] == 'role')
+
+
+def test_files_not_scanned_twice(default_rules_collection):
+    checked_files = set()
+
+    filename = os.path.abspath('test/common-include-1.yml')
+    runner = Runner(default_rules_collection, filename, [], [], [], 0, checked_files)
+    run1 = runner.run()
+
+    filename = os.path.abspath('test/common-include-2.yml')
+    runner = Runner(default_rules_collection, filename, [], [], [], 0, checked_files)
+    run2 = runner.run()
+
+    assert ((len(run1) + len(run2)) == 1)
