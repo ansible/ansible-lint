@@ -22,9 +22,11 @@ Possible security bugs should be reported via email to `security@ansible.com`
 # Actual Behaviour (Bug report only)
 
 Please give some details of what is actually happening.
-Include a [minimum complete verifiable example](http://stackoverflow.com/help/mcve)
-with:
+Include a [minimum complete verifiable example] with:
 - playbook
 - output of running ansible-lint
 - if you're getting a stack trace, output of
   `ansible-playbook --syntax-check playbook`
+
+
+[minimum complete verifiable example]: http://stackoverflow.com/help/mcve
