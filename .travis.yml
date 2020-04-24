@@ -115,7 +115,11 @@ jobs:
         all_branches: true
 
   - <<: *deploy-job
-    if: repo == "ansible/ansible-lint" AND type NOT IN (cron, pull_request)  # Always run, except if PR or cron
+    if: >-
+      # Always run, except if PR or cron, or non-master pushes:
+      repo == "ansible/ansible-lint"
+      AND branch == "master"
+      AND type NOT IN (cron, pull_request)
     name: Publishing current (unstable) Git revision of dist to Test PyPI
     before_script:
     - >-
