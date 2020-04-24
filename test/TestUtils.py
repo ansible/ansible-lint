@@ -202,7 +202,7 @@ def test_get_yaml_files_git_verbose(
     monkeypatch,
     capsys
 ):
-    options, _ = cli.get_config(['-v'])
+    options = cli.get_config(['-v'])
     monkeypatch.setenv(reset_env_var, '')
     utils.get_yaml_files(options)
     msg1, msg2 = capsys.readouterr().out.splitlines()[:2]
@@ -216,7 +216,7 @@ def test_get_yaml_files_git_verbose(
     ids=('in Git', 'outside Git'),
 )
 def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
-    options, _ = cli.get_config([])
+    options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
     lint_path = test_dir / 'roles' / 'test-role'
     if not is_in_git:

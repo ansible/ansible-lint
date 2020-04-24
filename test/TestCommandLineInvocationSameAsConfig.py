@@ -1,3 +1,6 @@
+from pathlib import Path
+import sys
+
 import pytest
 
 from ansiblelint import cli
@@ -27,31 +30,51 @@ def base_arguments():
                          ([],
                           "test/fixtures/show-relpath.yml"),
                          ))
-def test_ensure_config_are_equal(base_arguments, args, config):
+def test_ensure_config_are_equal(base_arguments, args, config, monkeypatch):
     command = base_arguments + args
-    options, _ = cli.get_cli_parser().parse_args(command)
+    cli_parser = cli.get_cli_parser()
+
+    _real_pathlib_resolve = Path.resolve
+
+    def _fake_pathlib_resolve(self):
+        try:
+            return _real_pathlib_resolve(self)
+        except FileNotFoundError:
+            if self != Path(args[-1]):
+                raise
+            return Path.cwd() / self
+
+    with monkeypatch.context() as mp_ctx:
+        if (
+                sys.version_info[:2] < (3, 6) and
+                args[-2:] == ["-r", "test/fixtures/rules/"]
+        ):
+            mp_ctx.setattr(Path, 'resolve', _fake_pathlib_resolve)
+        options = cli_parser.parse_args(command)
 
     file_config = cli.load_config(config)
 
-    for key in file_config.keys():
-        assert file_config[key] == getattr(options, key)
+    for key, val in file_config.items():
+        if key in {'exclude_paths', 'rulesdir'}:
+            val = [Path(p) for p in val]
+        assert val == getattr(options, key)
 
 
 def test_config_can_be_overridden(base_arguments):
-    no_override, _ = cli.get_config(base_arguments + ["-t", "bad_tag"])
+    no_override = cli.get_config(base_arguments + ["-t", "bad_tag"])
 
-    overridden, _ = cli.get_config(base_arguments +
-                                   ["-t", "bad_tag",
-                                    "-c", "test/fixtures/tags.yml"])
+    overridden = cli.get_config(base_arguments +
+                                ["-t", "bad_tag",
+                                 "-c", "test/fixtures/tags.yml"])
 
     assert no_override.tags + ["skip_ansible_lint"] == overridden.tags
 
 
 def test_different_config_file(base_arguments):
     """Ensures an alternate config_file can be used."""
-    diff_config, _ = cli.get_config(base_arguments +
-                                    ["-c", "test/fixtures/ansible-config.yml"])
-    no_config, _ = cli.get_config(base_arguments + ["-v"])
+    diff_config = cli.get_config(base_arguments +
+                                 ["-c", "test/fixtures/ansible-config.yml"])
+    no_config = cli.get_config(base_arguments + ["-v"])
 
     assert diff_config.verbosity == no_config.verbosity
 
@@ -64,16 +87,24 @@ def test_path_from_config_do_not_depend_on_cwd(monkeypatch):  # Issue 572
     assert config1['exclude_paths'].sort() == config2['exclude_paths'].sort()
 
 
-def test_path_from_cli_depend_on_cwd(base_arguments, monkeypatch):  # Issue 572
+def test_path_from_cli_depend_on_cwd(base_arguments, monkeypatch, tmp_path):
+    # Issue 572
     arguments = base_arguments + ["--exclude",
                                   "test/fixtures/config-with-relative-path.yml"]
 
-    options1, _ = cli.get_cli_parser().parse_args(arguments)
-    monkeypatch.chdir('test')
-    options2, _ = cli.get_cli_parser().parse_args(arguments)
+    options1 = cli.get_cli_parser().parse_args(arguments)
+    assert 'test/test' not in str(options1.exclude_paths[0])
 
-    assert 'test/test' not in options1.exclude_paths[0]
-    assert 'test/test' in options2.exclude_paths[0]
+    test_dir = 'test'
+    if sys.version_info[:2] < (3, 6):
+        test_dir = tmp_path / 'test' / 'test' / 'fixtures'
+        test_dir.mkdir(parents=True)
+        (test_dir / 'config-with-relative-path.yml').write_text('')
+        test_dir = test_dir / '..' / '..'
+    monkeypatch.chdir(test_dir)
+    options2 = cli.get_cli_parser().parse_args(arguments)
+
+    assert 'test/test' in str(options2.exclude_paths[0])
 
 
 @pytest.mark.parametrize(

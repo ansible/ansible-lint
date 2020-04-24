@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import optparse
+import argparse
 import os
+from pathlib import Path
 import sys
 
 import yaml
@@ -80,70 +81,80 @@ def load_config(config_file):
     return config
 
 
-def abspath_arg(option, opt_str, value, parser, *args, **kwargs):
-    getattr(parser.values, option.dest).append(os.path.abspath(value))
+class AbspathArgAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if isinstance(values, (str, Path)):
+            values = [values]
+        normalized_values = [Path(path).resolve() for path in values]
+        previous_values = getattr(namespace, self.dest, [])
+        setattr(namespace, self.dest, previous_values + normalized_values)
 
 
 def get_cli_parser():
-    parser = optparse.OptionParser("%prog [options] [playbook.yml [playbook2 ...]]|roledirectory",
-                                   version="%prog " + __version__)
+    parser = argparse.ArgumentParser()
 
-    parser.add_option('-L', dest='listrules', default=False,
-                      action='store_true', help="list all the rules")
-    parser.add_option('-q', dest='quiet',
-                      default=False,
-                      action='store_true',
-                      help="quieter, although not silent output")
-    parser.add_option('-p', dest='parseable',
-                      default=False,
-                      action='store_true',
-                      help="parseable output in the format of pep8")
-    parser.add_option('--parseable-severity', dest='parseable_severity',
-                      default=False,
-                      action='store_true',
-                      help="parseable output including severity of rule")
-    parser.add_option('-r', action='callback', dest='rulesdir',
-                      default=[], type='str', callback=abspath_arg,
-                      help="specify one or more rules directories using "
-                           "one or more -r arguments. Any -r flags override "
-                           "the default rules in %s, unless -R is also used."
-                           % ansiblelint.default_rulesdir)
-    parser.add_option('-R', action='store_true',
-                      default=False,
-                      dest='use_default_rules',
-                      help="Use default rules in %s in addition to any extra "
-                           "rules directories specified with -r. There is "
-                           "no need to specify this if no -r flags are used"
-                           % ansiblelint.default_rulesdir)
-    parser.add_option('--show-relpath', dest='display_relative_path', action='store_false',
-                      default=True,
-                      help="Display path relative to CWD")
-    parser.add_option('-t', dest='tags',
-                      action='append',
-                      default=[],
-                      help="only check rules whose id/tags match these values")
-    parser.add_option('-T', dest='listtags', action='store_true',
-                      help="list all the tags")
-    parser.add_option('-v', dest='verbosity', action='count',
-                      help="Increase verbosity level",
-                      default=0)
-    parser.add_option('-x', dest='skip_list', default=[], action='append',
-                      help="only check rules whose id/tags do not " +
-                      "match these values")
-    parser.add_option('--nocolor', dest='colored',
-                      default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
-                      action='store_false',
-                      help="disable colored output")
-    parser.add_option('--force-color', dest='colored',
-                      action='store_true',
-                      help="Try force colored output (relying on ansible's code)")
-    parser.add_option('--exclude', dest='exclude_paths', action='callback',
-                      callback=abspath_arg, type=str, default=[],
-                      help='path to directories or files to skip. This option'
-                           ' is repeatable.',
-                      )
-    parser.add_option('-c', dest='config_file',
-                      help='Specify configuration file to use.  Defaults to ".ansible-lint"')
+    parser.add_argument('-L', dest='listrules', default=False,
+                        action='store_true', help="list all the rules")
+    parser.add_argument('-q', dest='quiet',
+                        default=False,
+                        action='store_true',
+                        help="quieter, although not silent output")
+    parser.add_argument('-p', dest='parseable',
+                        default=False,
+                        action='store_true',
+                        help="parseable output in the format of pep8")
+    parser.add_argument('--parseable-severity', dest='parseable_severity',
+                        default=False,
+                        action='store_true',
+                        help="parseable output including severity of rule")
+    parser.add_argument('-r', action=AbspathArgAction, dest='rulesdir',
+                        default=[], type=Path,
+                        help="specify one or more rules directories using "
+                             "one or more -r arguments. Any -r flags override "
+                             "the default rules in %s, unless -R is also used."
+                             % ansiblelint.default_rulesdir)
+    parser.add_argument('-R', action='store_true',
+                        default=False,
+                        dest='use_default_rules',
+                        help="Use default rules in %s in addition to any extra "
+                             "rules directories specified with -r. There is "
+                             "no need to specify this if no -r flags are used"
+                             % ansiblelint.default_rulesdir)
+    parser.add_argument('--show-relpath', dest='display_relative_path', action='store_false',
+                        default=True,
+                        help="Display path relative to CWD")
+    parser.add_argument('-t', dest='tags',
+                        action='append',
+                        default=[],
+                        help="only check rules whose id/tags match these values")
+    parser.add_argument('-T', dest='listtags', action='store_true',
+                        help="list all the tags")
+    parser.add_argument('-v', dest='verbosity', action='count',
+                        help="Increase verbosity level",
+                        default=0)
+    parser.add_argument('-x', dest='skip_list', default=[], action='append',
+                        help="only check rules whose id/tags do not "
+                        "match these values")
+    parser.add_argument('--nocolor', dest='colored',
+                        default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
+                        action='store_false',
+                        help="disable colored output")
+    parser.add_argument('--force-color', dest='colored',
+                        action='store_true',
+                        help="Try force colored output (relying on ansible's code)")
+    parser.add_argument('--exclude', dest='exclude_paths',
+                        action=AbspathArgAction,
+                        type=Path, default=[],
+                        help='path to directories or files to skip. '
+                             'This option is repeatable.',
+                        )
+    parser.add_argument('-c', dest='config_file',
+                        help='Specify configuration file to use.  '
+                             'Defaults to ".ansible-lint"')
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {ver!s}'.format(ver=__version__),
+                        )
+    parser.add_argument('playbook', nargs='*')
 
     return parser
 
@@ -190,11 +201,11 @@ def merge_config(file_config, cli_config):
 
 def get_config(arguments):
     parser = get_cli_parser()
-    options, args = parser.parse_args(arguments)
+    options = parser.parse_args(arguments)
 
     config = load_config(options.config_file)
 
-    return merge_config(config, options), args
+    return merge_config(config, options)
 
 
 def print_help(file=sys.stdout):

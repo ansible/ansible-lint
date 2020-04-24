@@ -32,7 +32,7 @@ from ansiblelint.utils import normpath
 def main():
     cwd = pathlib.Path.cwd()
 
-    options, args = cli.get_config(sys.argv[1:])
+    options = cli.get_config(sys.argv[1:])
 
     formatter_factory = formatters.Formatter
     if options.quiet:
@@ -47,7 +47,7 @@ def main():
     formatter = formatter_factory(cwd, options.display_relative_path)
 
     # no args triggers auto-detection mode
-    if len(args) == 0 and not (options.listrules or options.listtags):
+    if not options.playbook and not (options.listrules or options.listtags):
         cli.print_help(file=sys.stderr)
         return 1
 
@@ -73,7 +73,7 @@ def main():
         skip.update(str(s).split(','))
     options.skip_list = frozenset(skip)
 
-    playbooks = sorted(set(args))
+    playbooks = sorted(set(options.playbook))
     matches = list()
     checked_files = set()
     for playbook in playbooks:
