@@ -20,158 +20,127 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import unittest
 import os
 from pathlib import Path
-
-import ansiblelint.utils as utils
-from ansiblelint import cli
 
 from importlib_metadata import version as get_dist_version
 from packaging.version import Version
 import pytest
 
+import ansiblelint.utils as utils
+from ansiblelint import cli
 
-class TestUtils(unittest.TestCase):
 
-    def test_tokenize_blank(self):
-        (cmd, args, kwargs) = utils.tokenize("")
-        self.assertEqual(cmd, '')
-        self.assertEqual(args, [])
-        self.assertEqual(kwargs, {})
+@pytest.mark.parametrize(('string', 'expected_cmd', 'expected_args', 'expected_kwargs'), (
+    pytest.param('', '', [], {}, id='blank'),
+    pytest.param('vars:', 'vars', [], {}, id='single_word'),
+    pytest.param('hello: a=1', 'hello', [], {'a': '1'}, id='string_module_and_arg'),
+    pytest.param('action: hello a=1', 'hello', [], {'a': '1'}, id='strips_action'),
+    pytest.param('action: whatever bobbins x=y z=x c=3',
+                 'whatever',
+                 ['bobbins', 'x=y', 'z=x', 'c=3'],
+                 {},
+                 id='more_than_one_arg'),
+    pytest.param('action: command chdir=wxy creates=zyx tar xzf zyx.tgz',
+                 'command',
+                 ['tar', 'xzf', 'zyx.tgz'],
+                 {'chdir': 'wxy', 'creates': 'zyx'},
+                 id='command_with_args'),
+))
+def test_tokenize(string, expected_cmd, expected_args, expected_kwargs):
+    (cmd, args, kwargs) = utils.tokenize(string)
+    assert cmd == expected_cmd
+    assert args == expected_args
+    assert kwargs == expected_kwargs
 
-    def test_tokenize_single_word(self):
-        (cmd, args, kwargs) = utils.tokenize("vars:")
-        self.assertEqual(cmd, "vars")
 
-    def test_tokenize_string_module_and_arg(self):
-        (cmd, args, kwargs) = utils.tokenize("hello: a=1")
-        self.assertEqual(cmd, "hello")
-        self.assertEqual(kwargs, {"a": "1"})
+@pytest.mark.parametrize(('reference_form', 'alternate_forms'), (
+    pytest.param(dict(name='hello', action='command chdir=abc echo hello world'),
+                 (dict(name="hello", command="chdir=abc echo hello world"), ),
+                 id='simple_command'),
+    pytest.param({'git': {'version': 'abc'}, 'args': {'repo': 'blah', 'dest': 'xyz'}},
+                 ({'git': {'version': 'abc', 'repo': 'blah', 'dest': 'xyz'}},
+                  {"git": 'version=abc repo=blah dest=xyz'},
+                  {"git": None, "args": {'repo': 'blah', 'dest': 'xyz', 'version': 'abc'}},
+                  ),
+                 id='args')
+))
+def test_normalize(reference_form, alternate_forms):
+    normal_form = utils.normalize_task(reference_form, 'tasks.yml')
 
-    def test_tokenize_strips_action(self):
-        (cmd, args, kwargs) = utils.tokenize("action: hello a=1")
-        self.assertEqual(cmd, "hello")
-        self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"a": "1"})
+    for form in alternate_forms:
+        assert normal_form == utils.normalize_task(form, 'tasks.yml')
 
-    def test_tokenize_more_than_one_arg(self):
-        (cmd, args, kwargs) = utils.tokenize("action: whatever bobbins x=y z=x c=3")
-        self.assertEqual(cmd, "whatever")
-        self.assertEqual(args[0], "bobbins")
-        self.assertEqual(args[1], "x=y")
-        self.assertEqual(args[2], "z=x")
-        self.assertEqual(args[3], "c=3")
 
-    def test_tokenize_command_with_args(self):
-        cmd, args, kwargs = utils.tokenize("action: command chdir=wxy creates=zyx tar xzf zyx.tgz")
-        self.assertEqual(cmd, "command")
-        self.assertEqual(args[0], "tar")
-        self.assertEqual(args[1], "xzf")
-        self.assertEqual(args[2], "zyx.tgz")
-        self.assertEqual(kwargs, {'chdir': 'wxy', 'creates': 'zyx'})
+@pytest.mark.xfail(
+    Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
+    Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
+    reason='Post-split Ansible Core Engine does not have '
+    'the module used in the test playbook.'
+    ' Ref: https://github.com/ansible/ansible-lint/issues/703.'
+    ' Ref: https://github.com/ansible/ansible/pull/68598.',
+    raises=SystemExit,
+    strict=True,
+)
+def test_normalize_complex_command():
+    task1 = dict(name="hello", action={'module': 'ec2',
+                                       'region': 'us-east1',
+                                       'etc': 'whatever'})
+    task2 = dict(name="hello", ec2={'region': 'us-east1',
+                                    'etc': 'whatever'})
+    task3 = dict(name="hello", ec2="region=us-east1 etc=whatever")
+    task4 = dict(name="hello", action="ec2 region=us-east1 etc=whatever")
+    assert utils.normalize_task(task1, 'tasks.yml') == utils.normalize_task(task2, 'tasks.yml')
+    assert utils.normalize_task(task2, 'tasks.yml') == utils.normalize_task(task3, 'tasks.yml')
+    assert utils.normalize_task(task3, 'tasks.yml') == utils.normalize_task(task4, 'tasks.yml')
 
-    def test_normalize_simple_command(self):
-        task1 = dict(name="hello", action="command chdir=abc echo hello world")
-        task2 = dict(name="hello", command="chdir=abc echo hello world")
-        self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task2, 'tasks.yml'))
 
-    @pytest.mark.xfail(
-        Version(get_dist_version('ansible')) >= Version('2.10.dev0') and
-        Version(get_dist_version('ansible-base')) >= Version('2.10.dev0'),
-        reason='Post-split Ansible Core Engine does not have '
-        'the module used in the test playbook.'
-        ' Ref: https://github.com/ansible/ansible-lint/issues/703.'
-        ' Ref: https://github.com/ansible/ansible/pull/68598.',
-        raises=SystemExit,
-        strict=True,
-    )
-    def test_normalize_complex_command(self):
-        task1 = dict(name="hello", action={'module': 'ec2',
-                                           'region': 'us-east1',
-                                           'etc': 'whatever'})
-        task2 = dict(name="hello", ec2={'region': 'us-east1',
-                                        'etc': 'whatever'})
-        task3 = dict(name="hello", ec2="region=us-east1 etc=whatever")
-        task4 = dict(name="hello", action="ec2 region=us-east1 etc=whatever")
-        self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task2, 'tasks.yml'))
-        self.assertEqual(
-            utils.normalize_task(task2, 'tasks.yml'),
-            utils.normalize_task(task3, 'tasks.yml'))
-        self.assertEqual(
-            utils.normalize_task(task3, 'tasks.yml'),
-            utils.normalize_task(task4, 'tasks.yml'))
+def test_extract_from_list():
+    block = {
+        'block': [{'tasks': {'name': 'hello', 'command': 'whoami'}}],
+        'test_none': None,
+        'test_string': 'foo',
+    }
+    blocks = [block]
 
-    def test_normalize_args(self):
-        task1 = {'git': {'version': 'abc'}, 'args': {'repo': 'blah', 'dest': 'xyz'}}
-        task2 = {'git': {'version': 'abc', 'repo': 'blah', 'dest': 'xyz'}}
+    test_list = utils.extract_from_list(blocks, ['block'])
+    test_none = utils.extract_from_list(blocks, ['test_none'])
 
-        task3 = {"git": 'version=abc repo=blah dest=xyz'}
-        task4 = {"git": None, "args": {'repo': 'blah', 'dest': 'xyz', 'version': 'abc'}}
-        self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task2, 'tasks.yml'))
-        self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task3, 'tasks.yml'))
-        self.assertEqual(
-            utils.normalize_task(task1, 'tasks.yml'),
-            utils.normalize_task(task4, 'tasks.yml'))
+    assert list(block['block']) == test_list
+    assert list() == test_none
+    with pytest.raises(RuntimeError):
+        utils.extract_from_list(blocks, ['test_string'])
 
-    def test_extract_from_list(self):
-        block = {
-            'block': [{'tasks': {'name': 'hello', 'command': 'whoami'}}],
-            'test_none': None,
-            'test_string': 'foo',
-        }
-        blocks = [block]
 
-        test_list = utils.extract_from_list(blocks, ['block'])
-        test_none = utils.extract_from_list(blocks, ['test_none'])
+@pytest.mark.parametrize(('template', 'output'), (
+    pytest.param('{{ playbook_dir }}', '/a/b/c', id='simple'),
+    pytest.param("{{ 'hello' | doesnotexist }}",
+                 "{{ 'hello' | doesnotexist }}",
+                 id='unknown_filter'),
+    pytest.param('{{ hello | to_json }}',
+                 '{{ hello | to_json }}',
+                 id='to_json_filter_on_undefined_variable'),
+    pytest.param('{{ hello | to_nice_yaml }}',
+                 '{{ hello | to_nice_yaml }}',
+                 id='to_nice_yaml_filter_on_undefined_variable'),
+))
+def test_template(template, output):
+    result = utils.template('/base/dir', template, dict(playbook_dir='/a/b/c'))
+    assert result == output
 
-        self.assertEqual(list(block['block']), test_list)
-        self.assertEqual(list(), test_none)
-        with self.assertRaises(RuntimeError):
-            utils.extract_from_list(blocks, ['test_string'])
 
-    def test_simple_template(self):
-        v = "{{ playbook_dir }}"
-        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
-        self.assertEqual(result, "/a/b/c")
+def test_task_to_str_unicode():
+    task = dict(fail=dict(msg=u"unicode é ô à"))
+    result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
+    assert result == u"fail msg=unicode é ô à"
 
-    def test_missing_filter(self):
-        v = "{{ 'hello' | doesnotexist }}"
-        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
-        self.assertEqual(result, "{{ 'hello' | doesnotexist }}")
 
-    def test_existing_filter_on_unknown_var(self):
-        v = "{{ hello | to_json }}"
-        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
-        self.assertEqual(result, "{{ hello | to_json }}")
-
-    def test_existing_filter_yaml_on_unknown_var(self):
-        v = "{{ hello | to_nice_yaml }}"
-        result = utils.template('/a/b/c', v, dict(playbook_dir='/a/b/c'))
-        self.assertEqual(result, "{{ hello | to_nice_yaml }}")
-
-    def test_task_to_str_unicode(self):
-        task = dict(fail=dict(msg=u"unicode é ô à"))
-        result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
-        self.assertEqual(result, u"fail msg=unicode é ô à")
-
-    def test_normpath_with_path_object(self):
-        self.assertEqual(
-            utils.normpath(Path("a/b/../")),
-            "a")
-
-    def test_normpath_with_string(self):
-        self.assertEqual(
-            utils.normpath("a/b/../"),
-            "a")
+@pytest.mark.parametrize('path', (
+    pytest.param(Path('a/b/../'), id='pathlib.Path'),
+    pytest.param('a/b/../', id='str'),
+))
+def test_normpath_with_path_object(path):
+    assert utils.normpath(path) == "a"
 
 
 def test_expand_path_vars(monkeypatch):
