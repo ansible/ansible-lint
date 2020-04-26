@@ -19,12 +19,11 @@
 # THE SOFTWARE.
 
 from collections import OrderedDict
-import glob
 import importlib
 from itertools import product
 import logging
 import os
-from pathlib import Path
+from pathlib import Path, PosixPath
 import pprint
 import subprocess
 
@@ -120,12 +119,79 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 }
 
 
+class UnsafePathError(RuntimeError):
+
+    def __init__(self, message, path):
+        super().__init__(message, path)
+        self.path = path
+
+
+def _is_path_safe_posix(path):
+    """Ensure a path is safe for reading sensitive data.
+
+    Safe means only the owner or an administrator can write in the file or directory
+    the path points to, as well as any of its parents.
+
+    Write permission matters if your file contains executable code: if not careful someone can
+    replace the file content with something malicious. Parent directories matter because
+    instead of changing the content, it may allow to replace the file altogether or any
+    filesystem sub-tree containing the file, with a malicious one.
+
+    """
+    while path.name:  # path.name of Path('/') is ''
+        if path.is_symlink():
+            path = path.resolve()
+        stat = path.stat()
+
+        # Some systems have /usr/local/lib/python/dist-packages with groups like staff or admins
+        # Hence we allow system users to have write access but not regular user (uid >= 1000)
+        group_ko = (bool(stat.st_mode & 0o020) and stat.st_gid >= 1000)
+        world_ko = bool(stat.st_mode & 0o002)
+        if group_ko or world_ko:
+            raise UnsafePathError('{} permissions are too broad ! ({}: 0{:03o})'
+                                  .format('Directory' if path.is_dir() else 'File',
+                                          path,
+                                          stat.st_mode & 0o777),
+                                  path)
+        path = path.parent
+    return True
+
+
+def _is_path_safe_windows(path):
+    """Ensure a path is safe for reading sensitive data."""
+    raise NotImplementedError('The windows platform is not supported by ansible-lint')
+
+
+def _is_plugin_safe(path):
+    """Ensure a plugin is reasonably safe to load.
+
+    Checks are platform dependent see :func:`_is_unix_path_safe` and
+    :func:`_is_windows_path_safe()` for details.
+    """
+    path = Path(path)
+    if isinstance(path, PosixPath):  # Simple platform detection
+        return _is_path_safe_posix(path)
+    else:
+        return _is_path_safe_windows(path)
+
+
 def load_plugins(directory):
     result = []
 
-    for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
+    # Cast to Path below is mostly 'cause tests use str not Path
+    for pluginfile in Path(directory).glob('[A-Za-z]*.py'):
+        try:
+            _is_plugin_safe(pluginfile)
+        except UnsafePathError as exc:
+            if exc.path == pluginfile:  # Only a given plugin is
+                print('Skipping unsafe rule plugin: {}'.format(exc))
+                continue
 
-        pluginname = os.path.basename(pluginfile.replace('.py', ''))
+            # If any parent directory is unsafe, then all plugins are unsafe.
+            # There is no point in trying to load any more of them (glob not recursive).
+            return result
+
+        pluginname = pluginfile.with_suffix('').name
         spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
