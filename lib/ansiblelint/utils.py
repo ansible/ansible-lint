@@ -102,6 +102,7 @@ def load_plugins(directory):
     result = []
 
     for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
+
         pluginname = os.path.basename(pluginfile.replace('.py', ''))
         spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
         module = importlib.util.module_from_spec(spec)
