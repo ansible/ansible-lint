@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import logging
 import os
 from pathlib import Path
 
@@ -160,8 +161,10 @@ def test_expand_paths_vars(monkeypatch):
 @pytest.mark.parametrize(
     ('reset_env_var', 'message_prefix'),
     (
-        ('PATH', 'Warning: Failed to locate command:'),
-        ('GIT_DIR', 'Warning: Failed to discover yaml files to lint using git:')
+        ('PATH',
+            "Failed to locate command: "),
+        ('GIT_DIR',
+            "Failed to discover yaml files to lint using git: ")
     ),
     ids=('no Git installed', 'outside Git repository'),
 )
@@ -169,14 +172,20 @@ def test_get_yaml_files_git_verbose(
     reset_env_var,
     message_prefix,
     monkeypatch,
-    capsys
+    caplog
 ):
     options = cli.get_config(['-v'])
+    utils.initialize_logger(options.verbosity)
     monkeypatch.setenv(reset_env_var, '')
     utils.get_yaml_files(options)
-    msg1, msg2 = capsys.readouterr().out.splitlines()[:2]
-    assert msg1 == 'Discovering files to lint: git ls-files *.yaml *.yml'
-    assert msg2.startswith(message_prefix)
+
+    expected_info = (
+        "ansiblelint.utils",
+        logging.INFO,
+        'Discovering files to lint: git ls-files *.yaml *.yml')
+
+    assert expected_info in caplog.record_tuples
+    assert any(m.startswith(message_prefix) for m in caplog.messages)
 
 
 @pytest.mark.parametrize(
@@ -185,6 +194,12 @@ def test_get_yaml_files_git_verbose(
     ids=('in Git', 'outside Git'),
 )
 def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
+    """Verify that no stderr output is displayed while discovering yaml files.
+
+    (when the verbosity is off, regardless of the Git or Git-repo presence)
+
+    Also checks expected number of files are detected.
+    """
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
     lint_path = test_dir / 'roles' / 'test-role'
@@ -197,8 +212,8 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
 
     monkeypatch.chdir(str(lint_path))
     files = utils.get_yaml_files(options)
-    stdout = capsys.readouterr().out
-    assert not stdout, 'No output is expected when the verbosity is off'
+    stderr = capsys.readouterr().err
+    assert not stderr, 'No stderr output is expected when the verbosity is off'
     assert len(files) == yaml_count, (
         "Expected to find {yaml_count} yaml files in {lint_path}".format_map(
             locals(),

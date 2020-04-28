@@ -26,13 +26,15 @@ import sys
 
 import ansiblelint.formatters as formatters
 from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
-from ansiblelint.utils import normpath
+from ansiblelint.utils import normpath, initialize_logger
 
 
 def main():
     cwd = pathlib.Path.cwd()
 
     options = cli.get_config(sys.argv[1:])
+
+    initialize_logger(options.verbosity)
 
     formatter_factory = formatters.Formatter
     if options.quiet:
