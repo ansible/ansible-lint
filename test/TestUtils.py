@@ -196,6 +196,8 @@ def test_get_yaml_files_git_verbose(
 def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     """Verify that no stderr output is displayed while discovering yaml files.
 
+    (when the verbosity is off, regardless of the Git or Git-repo presence)
+
     Also checks expected number of files are detected.
     """
     options = cli.get_config([])
