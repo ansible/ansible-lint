@@ -1,4 +1,4 @@
-# (c) 2012-2019, Ansible by Red Hat
+# (c) 2019, Ansible by Red Hat
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,13 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-"""This module contains utils related to inline skiping of rules."""
-
+"""Utils related to inline skipping of rules."""
 from itertools import product
 
 import ruamel.yaml
 
-INLINE_SKIP_FLAG = '# noqa'
+INLINE_SKIP_FLAG = '# noqa '
 
 
 def get_rule_skips_from_line(line):
@@ -138,7 +137,7 @@ def _get_tasks_from_blocks(task_blocks):
 
 
 def _get_rule_skips_from_yaml(yaml_input):
-    """Travese yaml for comments with rule skips and return list of rules."""
+    """Traverse yaml for comments with rule skips and return list of rules."""
     def traverse_yaml(obj):
         yaml_comment_obj_strs.append(str(obj.ca.items))
         if isinstance(obj, dict):
