@@ -51,7 +51,6 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
     :returns: original pyyaml_data altered with a 'skipped_rules' list added
     to individual tasks, or added to the single metadata block.
     """
-
     try:
         yaml_skip = _append_skipped_rules(pyyaml_data, file_text, file_type)
     except RuntimeError as exc:
