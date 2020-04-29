@@ -20,10 +20,13 @@
 
 """Utils related to inline skipping of rules."""
 from itertools import product
+import logging
 
 import ruamel.yaml
 
 INLINE_SKIP_FLAG = '# noqa '
+
+_logger = logging.getLogger(__name__)
 
 
 def get_rule_skips_from_line(line):
@@ -53,7 +56,7 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
         yaml_skip = _append_skipped_rules(pyyaml_data, file_text, file_type)
     except RuntimeError as exc:
         # Notify user of skip error, do not stop, do not change exit code
-        print('Error trying to append skipped rules: {!r}'.format(exc))
+        _logger.error('Error trying to append skipped rules: %s', exc)
         return pyyaml_data
     return yaml_skip
 
