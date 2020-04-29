@@ -53,9 +53,9 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
     """
     try:
         yaml_skip = _append_skipped_rules(pyyaml_data, file_text, file_type)
-    except RuntimeError as exc:
+    except RuntimeError:
         # Notify user of skip error, do not stop, do not change exit code
-        _logger.error('Error trying to append skipped rules: %s', exc)
+        _logger.error('Error trying to append skipped rules', exc_info=True)
         return pyyaml_data
     return yaml_skip
 
