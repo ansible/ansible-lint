@@ -31,11 +31,8 @@ _logger = logging.getLogger(__name__)
 
 def get_rule_skips_from_line(line):
     """Return list of rule ids skipped via comment on the line of yaml."""
-    rule_id_list = []
-    if INLINE_SKIP_FLAG in line:
-        noqa_text = line.split(INLINE_SKIP_FLAG)[1]
-        rule_id_list = noqa_text.split()
-    return rule_id_list
+    _before_noqa, _noqa_marker, noqa_text = line.partition(INLINE_SKIP_FLAG)
+    return noqa_text.split()
 
 
 def append_skipped_rules(pyyaml_data, file_text, file_type):
