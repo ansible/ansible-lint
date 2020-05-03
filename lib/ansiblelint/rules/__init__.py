@@ -79,6 +79,14 @@ class AnsibleLintRule(object):
                            file['path'], self, message))
         return matches
 
+    def _unpack_result(self, play, result):
+        linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
+        if len(result) == 2:
+            section, message = result
+        else:
+            section, linenumber, message = result
+        return section, linenumber, message
+
     def matchyaml(self, file, text):
         matches = []
         if not self.matchplay:
@@ -107,7 +115,8 @@ class AnsibleLintRule(object):
             if not isinstance(result, list):
                 raise TypeError("{} is not a list".format(result))
 
-            for section, message in result:
-                matches.append(Match(play[ansiblelint.utils.LINE_NUMBER_KEY],
+            for match in result:
+                section, linenumber, message = self._unpack_result(play, match)
+                matches.append(Match(linenumber,
                                      section, file['path'], self, message))
         return matches
