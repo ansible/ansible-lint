@@ -86,10 +86,16 @@ The following is the output from ``ansible-lint --help``, providing an overview 
 
 .. code-block:: bash
 
-    Usage: ansible-lint [options] [playbook.yml [playbook2 ...]]|roledirectory
+    usage: ansible-lint [-h] [-L] [-q] [-p] [--parseable-severity] [-r RULESDIR]
+                        [-R] [--show-relpath] [-t TAGS] [-T] [-v] [-x SKIP_LIST]
+                        [--nocolor] [--force-color] [--exclude EXCLUDE_PATHS]
+                        [-c CONFIG_FILE] [--version]
+                        [playbook [playbook ...]]
 
-    Options:
-      --version             show program's version number and exit
+    positional arguments:
+      playbook
+
+    optional arguments:
       -h, --help            show this help message and exit
       -L                    list all the rules
       -q                    quieter, although not silent output
@@ -97,12 +103,13 @@ The following is the output from ``ansible-lint --help``, providing an overview 
       --parseable-severity  parseable output including severity of rule
       -r RULESDIR           specify one or more rules directories using one or
                             more -r arguments. Any -r flags override the default
-                            rules in ['/path/to/ansible-
-                            lint/lib/ansiblelint/rules'], unless -R is also used.
-      -R                    Use default rules ['/path/to/ansible-
-                            lint/lib/ansiblelint/rules'] in addition to any extra
+                            rules in /path/to/ansible-
+                            lint/lib/ansiblelint/rules, unless -R is also used.
+      -R                    Use default rules in /path/to/ansible-
+                            lint/lib/ansiblelint/rules in addition to any extra
                             rules directories specified with -r. There is no need
                             to specify this if no -r flags are used
+      --show-relpath        Display path relative to CWD
       -t TAGS               only check rules whose id/tags match these values
       -T                    list all the tags
       -v                    Increase verbosity level
@@ -110,12 +117,12 @@ The following is the output from ``ansible-lint --help``, providing an overview 
                             values
       --nocolor             disable colored output
       --force-color         Try force colored output (relying on ansible's code)
-      --exclude=EXCLUDE_PATHS
+      --exclude EXCLUDE_PATHS
                             path to directories or files to skip. This option is
                             repeatable.
-      -c /path/to/file      Specify configuration file to use.  Defaults to
-                              ".ansible-lint"
-
+      -c CONFIG_FILE        Specify configuration file to use. Defaults to
+                            ".ansible-lint"
+      --version             show program's version number and exit
 
 
 Linting Playbooks and Roles
