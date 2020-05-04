@@ -219,3 +219,17 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
             locals(),
         )
     )
+
+
+def test_logger_debug(
+    caplog
+):
+    options = cli.get_config(['-vv'])
+    utils.initialize_logger(options.verbosity)
+
+    expected_info = (
+        "ansiblelint.utils",
+        logging.DEBUG,
+        'Logging initialized to level 10')
+
+    assert expected_info in caplog.record_tuples

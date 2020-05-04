@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import errno
+import logging
 import pathlib
 import sys
 
@@ -29,12 +30,16 @@ from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
 from ansiblelint.utils import normpath, initialize_logger
 
 
+_logger = logging.getLogger(__name__)
+
+
 def main():
     cwd = pathlib.Path.cwd()
 
     options = cli.get_config(sys.argv[1:])
 
     initialize_logger(options.verbosity)
+    _logger.debug("Options: %s", options)
 
     formatter_factory = formatters.Formatter
     if options.quiet:
