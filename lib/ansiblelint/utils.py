@@ -68,9 +68,13 @@ def initialize_logger(level=0):
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(levelname)-8s %(message)s')
     handler.setFormatter(formatter)
-    _logger.addHandler(handler)
-    # unknown logging level is treated as DEBUG
-    _logger.setLevel(VERBOSITY_MAP.get(level, logging.DEBUG))
+    logger = logging.getLogger(__package__)
+    logger.addHandler(handler)
+    # Unknown logging level is treated as DEBUG
+    logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
+    logger.setLevel(logging_level)
+    # Use module-level _logger instance to validate it
+    _logger.debug("Logging initialized to level %s", logging_level)
 
 
 def parse_yaml_from_file(filepath):
