@@ -34,6 +34,7 @@ _logger = logging.getLogger(__name__)
 class AnsibleLintRule(object):
 
     def __repr__(self):
+        """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
 
     def verbose(self):
@@ -152,9 +153,11 @@ class RulesCollection(object):
         self.rules.append(obj)
 
     def __iter__(self):
+        """Return the iterator over the rules in the RulesCollection."""
         return iter(self.rules)
 
     def __len__(self):
+        """Return the length of the RulesCollection data."""
         return len(self.rules)
 
     def extend(self, more):
@@ -186,6 +189,7 @@ class RulesCollection(object):
         return matches
 
     def __repr__(self):
+        """Return a RulesCollection instance representation."""
         return "\n".join([rule.verbose()
                           for rule in sorted(self.rules, key=lambda x: x.id)])
 
@@ -211,6 +215,7 @@ class Match(object):
         self.message = message or rule.shortdesc
 
     def __repr__(self):
+        """Return a Match instance representation."""
         formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
         return formatstr.format(self.rule.id, self.message,
                                 self.filename, self.linenumber, self.line)

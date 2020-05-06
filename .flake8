@@ -42,7 +42,6 @@ ignore =
   D101  # D101 Missing docstring in public class
   D102  # D102 Missing docstring in public method
   D103  # D103 Missing docstring in public function
-  D105  # D105 Missing docstring in magic method
   # W503 is incompatible with W504
   W504  # W504 line break after binary operator
 
