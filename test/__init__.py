@@ -1,3 +1,5 @@
+"""Test suite for ansible-lint."""
+
 import tempfile
 import shutil
 import os
@@ -9,6 +11,7 @@ class RunFromText(object):
     """Use Runner on temp files created from unittest text snippets."""
 
     def __init__(self, collection):
+        """Initialize a RunFromText instance with rules collection."""
         self.collection = collection
 
     def _call_runner(self, path):

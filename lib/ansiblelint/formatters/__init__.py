@@ -19,6 +19,7 @@ class BaseFormatter:
     """
 
     def __init__(self, base_dir, display_relative_path):
+        """Initialize a BaseFormatter instance."""
         if isinstance(base_dir, str):
             base_dir = Path(base_dir)
         if base_dir:  # can be None

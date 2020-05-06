@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+"""Main ansible-lint package."""
 
 from collections import defaultdict
 import logging
@@ -33,6 +34,7 @@ _logger = logging.getLogger(__name__)
 class AnsibleLintRule(object):
 
     def __repr__(self):
+        """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
 
     def verbose(self):
@@ -139,6 +141,7 @@ class AnsibleLintRule(object):
 class RulesCollection(object):
 
     def __init__(self, rulesdirs=None):
+        """Initialize a RulesCollection instance."""
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
@@ -150,9 +153,11 @@ class RulesCollection(object):
         self.rules.append(obj)
 
     def __iter__(self):
+        """Return the iterator over the rules in the RulesCollection."""
         return iter(self.rules)
 
     def __len__(self):
+        """Return the length of the RulesCollection data."""
         return len(self.rules)
 
     def extend(self, more):
@@ -184,6 +189,7 @@ class RulesCollection(object):
         return matches
 
     def __repr__(self):
+        """Return a RulesCollection instance representation."""
         return "\n".join([rule.verbose()
                           for rule in sorted(self.rules, key=lambda x: x.id)])
 
@@ -201,6 +207,7 @@ class RulesCollection(object):
 class Match(object):
 
     def __init__(self, linenumber, line, filename, rule, message=None):
+        """Initialize a Match instance."""
         self.linenumber = linenumber
         self.line = line
         self.filename = filename
@@ -208,6 +215,7 @@ class Match(object):
         self.message = message or rule.shortdesc
 
     def __repr__(self):
+        """Return a Match instance representation."""
         formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
         return formatstr.format(self.rule.id, self.message,
                                 self.filename, self.linenumber, self.line)
@@ -217,6 +225,7 @@ class Runner(object):
 
     def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
                  verbosity=0, checked_files=None):
+        """Initialize a Runner instance."""
         self.rules = rules
         self.playbooks = set()
         # assume role if directory
