@@ -3,17 +3,17 @@
 
 
   pre_tasks:
-  - include: tasks/x.yml
+    - include: tasks/x.yml
 
   roles:
     - hello
     - { role: morecomplex, t: z }
 
   tasks:
-  - include: tasks/x.yml
-  - include: tasks/x.yml y=z
+    - include: tasks/x.yml
+    - include: tasks/x.yml y=z
 
   handlers:
-  - include: handlers/y.yml
+    - include: handlers/y.yml
 
 - include: play.yml

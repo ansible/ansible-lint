@@ -1,5 +1,5 @@
 ---
 - hosts:
-  - localhost
+    - localhost
   roles:
     - name: node

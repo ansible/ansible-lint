@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
   tasks:
-  - command: echo "no name"  # noqa 502
+    - command: echo "no name"  # noqa 502
   pre_tasks:
     - command: echo "no name"  # noqa 502
     - name: Including another playbook
