@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2014 Albin Vass <albin.vass@gmail.com>
+# Copyright (c) 2020 Albin Vass <albin.vass@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,8 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import unittest
-from unittest import mock
+import ansiblelint.utils
 
 from ansiblelint import AnsibleLintRule
 
@@ -38,12 +37,16 @@ class LinenumberRule(AnsibleLintRule):
         return [('Linenumber returned', self.shortdesc, MAGIC_NUMBER)]
 
 
-class TestLineNumber(unittest.TestCase):
+def test_rule_linenumber(monkeypatch):
 
-    @mock.patch('ansiblelint.utils.append_skipped_rules')
-    def test_rule_linenumber(self, append_skipped_rules):
-        append_skipped_rules.return_value = [{'skipped_rules': []}]
-        text = "- debug:\n    msg: a"
-        rule = LinenumberRule()
-        matches = rule.matchyaml(dict(path="", type='tasklist'), text)
-        self.assertEqual(matches[0].linenumber, MAGIC_NUMBER)
+    def mock_response(*args, **kwargs):
+        return [{'skipped_rules': []}]
+
+    monkeypatch.setattr(ansiblelint.utils,
+                        "append_skipped_rules",
+                        mock_response)
+
+    text = "- debug:\n    msg: a"
+    rule = LinenumberRule()
+    matches = rule.matchyaml(dict(path="", type='tasklist'), text)
+    assert matches[0].linenumber == MAGIC_NUMBER
