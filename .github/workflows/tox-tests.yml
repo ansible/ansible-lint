@@ -68,3 +68,8 @@ jobs:
         python -m tox --parallel auto
       env:
         TOXENV: ansible${{ matrix.ansible-version }}
+    - name: Archive logs
+      uses: actions/upload-artifact@v1
+      with:
+        name: logs.zip
+        path: .tox/ansible${{ matrix.ansible-version }}/log/
