@@ -140,6 +140,7 @@ class AnsibleLintRule(object):
 class RulesCollection(object):
 
     def __init__(self, rulesdirs=None):
+        """Initialize a RulesCollection instance."""
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
@@ -202,6 +203,7 @@ class RulesCollection(object):
 class Match(object):
 
     def __init__(self, linenumber, line, filename, rule, message=None):
+        """Initialize a Match instance."""
         self.linenumber = linenumber
         self.line = line
         self.filename = filename
@@ -218,6 +220,7 @@ class Runner(object):
 
     def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
                  verbosity=0, checked_files=None):
+        """Initialize a Runner instance."""
         self.rules = rules
         self.playbooks = set()
         # assume role if directory
