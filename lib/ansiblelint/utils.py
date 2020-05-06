@@ -644,6 +644,7 @@ def is_playbook(filename):
     else:
         if (
             isinstance(f, AnsibleSequence) and
+            hasattr(f, 'keys') and
             playbooks_keys.intersection(next(iter(f), {}).keys())
         ):
             return True

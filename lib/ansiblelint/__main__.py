@@ -27,6 +27,7 @@ import sys
 
 import ansiblelint.formatters as formatters
 from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
+from ansiblelint.utils import get_playbooks_and_roles
 from ansiblelint.utils import normpath, initialize_logger
 
 
@@ -53,11 +54,6 @@ def main():
 
     formatter = formatter_factory(cwd, options.display_relative_path)
 
-    # no args triggers auto-detection mode
-    if not options.playbook and not (options.listrules or options.listtags):
-        cli.print_help(file=sys.stderr)
-        return 1
-
     if options.use_default_rules:
         rulesdirs = options.rulesdir + [default_rulesdir]
     else:
@@ -80,7 +76,12 @@ def main():
         skip.update(str(s).split(','))
     options.skip_list = frozenset(skip)
 
-    playbooks = sorted(set(options.playbook))
+    if not options.playbook:
+        # no args triggers auto-detection mode
+        playbooks = get_playbooks_and_roles(options=options)
+    else:
+        playbooks = sorted(set(options.playbook))
+
     matches = list()
     checked_files = set()
     for playbook in playbooks:

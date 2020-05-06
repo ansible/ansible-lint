@@ -8,10 +8,10 @@ class TestCliRolePaths(unittest.TestCase):
     def setUp(self):
         self.local_test_dir = os.path.dirname(os.path.realpath(__file__))
 
-    def run_ansible_lint(self, cwd, role_path, bin=None, env=None):
-        if not bin:
-            bin = sys.executable + " -m ansiblelint"
-        command = '{} {}'.format(bin, role_path)
+    def run_ansible_lint(self, cwd, role_path=None, bin=None, env=None):
+        command = '{} -v {}'.format(
+            bin or (sys.executable + " -m ansiblelint"),
+            role_path or "")
 
         result, err = subprocess.Popen(
             [command],

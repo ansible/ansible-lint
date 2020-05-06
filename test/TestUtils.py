@@ -23,6 +23,8 @@
 import logging
 import os
 from pathlib import Path
+import subprocess
+import sys
 
 from importlib_metadata import version as get_dist_version
 from packaging.version import Version
@@ -233,3 +235,25 @@ def test_logger_debug(caplog):
     )
 
     assert expected_info in caplog.record_tuples
+
+
+def test_cli_auto_detect(capfd):
+    """Test that run without arguments it will detect and lint the entire repository."""
+    cmd = sys.executable, "-m", "ansiblelint", "-v", "-p", "--nocolor"
+    result = subprocess.run(cmd).returncode
+
+    # We de expect to fail on our own repo due to test examples we have
+    # TODO(ssbarnea) replace it with exact return code once we document them
+    assert result != 0
+
+    out, err = capfd.readouterr()
+
+    # Confirmation that it runs in auto-detect mode
+    assert "Discovering files to lint: git ls-files *.yaml *.yml" in err
+    # Expected failure to detect file type"
+    assert "Unknown file type: docs/docsite/keyword_desc.yml" in err
+    # An expected rule match from our examples
+    assert "examples/roles/bobbins/tasks/main.yml:2: " \
+        "[E401] Git checkouts must contain explicit version" in out
+    # assures that our .ansible-lint exclude was effective in excluding github files
+    assert "Unknown file type: .github/" not in out
