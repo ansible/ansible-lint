@@ -42,7 +42,6 @@ ignore =
   D101  # D101 Missing docstring in public class
   D102  # D102 Missing docstring in public method
   D103  # D103 Missing docstring in public function
-  D104  # D104 Missing docstring in public package
   D105  # D105 Missing docstring in magic method
   D107  # D107 Missing docstring in __init__
   # W503 is incompatible with W504

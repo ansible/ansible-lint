@@ -1,3 +1,5 @@
+"""Test suite for ansible-lint."""
+
 import tempfile
 import shutil
 import os
