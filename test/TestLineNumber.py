@@ -26,6 +26,7 @@ from ansiblelint import AnsibleLintRule
 
 MAGIC_NUMBER = 7007
 
+
 class LinenumberRule(AnsibleLintRule):
     id = 'TEST0003'
     shortdesc = 'Linenumber is returned'
