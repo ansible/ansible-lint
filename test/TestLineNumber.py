@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import ansiblelint.utils
+import ansiblelint.skip_utils
 
 from ansiblelint import AnsibleLintRule
 
@@ -42,7 +42,7 @@ def test_rule_linenumber(monkeypatch):
     def mock_response(*args, **kwargs):
         return [{'skipped_rules': []}]
 
-    monkeypatch.setattr(ansiblelint.utils,
+    monkeypatch.setattr(ansiblelint.skip_utils,
                         "append_skipped_rules",
                         mock_response)
 
