@@ -91,7 +91,7 @@ class AnsibleLintRule(object):
     def _matchplay_linenumber(play, optional_linenumber):
         try:
             linenumber, = optional_linenumber
-        except:
+        except ValueError:
             linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
         return linenumber
 
