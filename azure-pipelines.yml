@@ -43,4 +43,3 @@ jobs:
       py3: [linux]
       37: [linux, macOs]
       36: [linux, macOs]
-      35: [linux, macOs]

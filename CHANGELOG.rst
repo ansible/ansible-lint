@@ -1,3 +1,10 @@
+4.3.0 - Not Released
+====================
+
+Major:
+
+- Require Python 3.6 or newer
+
 4.2.0 - Released 04-Dec-2019
 ============================
 
