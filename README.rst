@@ -93,7 +93,8 @@ The following is the output from ``ansible-lint --help``, providing an overview 
                         [playbook [playbook ...]]
 
     positional arguments:
-      playbook
+      playbook              One or more files or paths. When missing it will
+                            enable auto-detection mode.
 
     optional arguments:
       -h, --help            show this help message and exit
