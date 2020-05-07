@@ -115,8 +115,8 @@ jobs:
         all_branches: true
 
   - <<: *deploy-job
+    # Always run, except if PR or cron, or non-master pushes:
     if: >-
-      # Always run, except if PR or cron, or non-master pushes:
       repo == "ansible/ansible-lint"
       AND branch == "master"
       AND type NOT IN (cron, pull_request)
