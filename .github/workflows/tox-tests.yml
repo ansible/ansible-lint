@@ -22,7 +22,6 @@ jobs:
         - 3.8
         - 3.7
         - 3.6
-        - 3.5
         os:
         - ubuntu-latest
         - ubuntu-16.04
