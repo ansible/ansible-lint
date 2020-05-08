@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 
 import yaml
+from typing import NamedTuple
 
 import ansiblelint
 from ansiblelint.version import __version__
@@ -87,7 +88,7 @@ class AbspathArgAction(argparse.Action):
         setattr(namespace, self.dest, previous_values + normalized_values)
 
 
-def get_cli_parser():
+def get_cli_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-L', dest='listrules', default=False,
@@ -161,7 +162,7 @@ def get_cli_parser():
     return parser
 
 
-def merge_config(file_config, cli_config):
+def merge_config(file_config, cli_config) -> NamedTuple:
     if not file_config:
         return cli_config
 

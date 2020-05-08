@@ -30,6 +30,7 @@ from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
 from ansiblelint.utils import get_playbooks_and_roles
 from ansiblelint.utils import normpath, initialize_logger
 from ansiblelint.generate_docs import rules_as_rst
+from typing import Any, Set
 
 
 _logger = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ def main():
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
 
-    formatter_factory = formatters.Formatter
+    formatter_factory: Any = formatters.Formatter
     if options.quiet:
         formatter_factory = formatters.QuietFormatter
 
@@ -86,7 +87,7 @@ def main():
         playbooks = sorted(set(options.playbook))
 
     matches = list()
-    checked_files = set()
+    checked_files: Set[Any] = set()
     for playbook in playbooks:
         runner = Runner(rules, playbook, options.tags,
                         options.skip_list, options.exclude_paths,

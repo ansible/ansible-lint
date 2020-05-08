@@ -28,6 +28,7 @@ import ansiblelint.utils
 import ansiblelint.skip_utils
 from ansiblelint.errors import MatchError
 from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule
+from typing import List, Set
 
 
 default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
@@ -60,9 +61,9 @@ class RulesCollection(object):
     def extend(self, more):
         self.rules.extend(more)
 
-    def run(self, playbookfile, tags=set(), skip_list=frozenset()):
+    def run(self, playbookfile, tags=set(), skip_list=frozenset()) -> List:
         text = ""
-        matches = list()
+        matches: List = list()
 
         try:
             with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
@@ -140,7 +141,7 @@ class Runner(object):
         # not excluded.
         return any(file_path.startswith(path) for path in self.exclude_paths)
 
-    def run(self):
+    def run(self) -> List:
         files = list()
         for playbook in self.playbooks:
             if self.is_excluded(playbook[0]) or playbook[1] == 'role':
@@ -150,7 +151,7 @@ class Runner(object):
                           # add an absolute path here, so rules are able to validate if
                           # referenced files exist
                           'absolute_directory': os.path.dirname(playbook[0])})
-        visited = set()
+        visited: Set = set()
         matches = list()
 
         while (visited != self.playbooks):
