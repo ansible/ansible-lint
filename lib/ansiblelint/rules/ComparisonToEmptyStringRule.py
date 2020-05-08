@@ -9,8 +9,8 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
     id = '602'
     shortdesc = "Don't compare to empty string"
     description = (
-        'Use ``when: var`` rather than ``when: var != ""`` (or '
-        'conversely ``when: not var`` rather than ``when: var == ""``)'
+        'Use ``when: var|length > 0`` rather than ``when: var != ""`` (or '
+        'conversely ``when: var|length == 0`` rather than ``when: var == ""``)'
     )
     severity = 'HIGH'
     tags = ['idiom']
