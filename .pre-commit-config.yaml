@@ -43,3 +43,21 @@ repos:
     - flake8-2020>=1.6.0
     - flake8-docstrings
     - flake8-pytest-style>=1.0.0
+- repo: local
+  hooks:
+  - id: docs-rebuild
+    name: Checks that generated docs are in-sync with commit
+    description: >-
+      Regenerate rules documentation from source and report failure if the
+      the the result is modified.
+    entry: >-
+      sh -c "
+        pip install . &&
+        python -m ansiblelint -L -f rst > docs/docsite/rst/rules/default_rules.rst
+      "
+    language: python
+    pass_filenames: false
+    stages:
+    - manual
+    - merge-commit
+    - push

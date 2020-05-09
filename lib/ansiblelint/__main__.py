@@ -29,6 +29,7 @@ import ansiblelint.formatters as formatters
 from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
 from ansiblelint.utils import get_playbooks_and_roles
 from ansiblelint.utils import normpath, initialize_logger
+from ansiblelint.generate_docs import rules_as_rst
 
 
 _logger = logging.getLogger(__name__)
@@ -62,7 +63,8 @@ def main():
     rules = RulesCollection(rulesdirs)
 
     if options.listrules:
-        print(rules)
+        formatted_rules = rules if options.format == 'plain' else rules_as_rst(rules)
+        print(formatted_rules)
         return 0
 
     if options.listtags:
