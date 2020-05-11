@@ -257,3 +257,15 @@ def test_cli_auto_detect(capfd):
         "[E401] Git checkouts must contain explicit version" in out
     # assures that our .ansible-lint exclude was effective in excluding github files
     assert "Unknown file type: .github/" not in out
+
+
+def test_auto_detect_exclude(monkeypatch):
+    """Verify that exclude option can be used to narrow down detection."""
+    options = cli.get_config(['--exclude', 'foo'])
+
+    def mockreturn(options):
+        return ['foo/playbook.yml', 'bar/playbook.yml']
+
+    monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
+    result = utils.get_playbooks_and_roles(options)
+    assert result == ['bar/playbook.yml']

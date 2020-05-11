@@ -712,9 +712,16 @@ def get_playbooks_and_roles(options=None):
 
     for p in map(Path, files):
 
-        if any(str(p).startswith(file_path) for file_path in options.exclude_paths):
+        try:
+            for file_path in options.exclude_paths:
+                if str(p.resolve()).startswith(str(file_path)):
+                    raise FileNotFoundError(
+                        f'File {file_path} matched exclusion entry: {p}')
+        except FileNotFoundError as e:
+            _logger.debug('Ignored %s due to: %s', p, e)
             continue
-        elif (next((i for i in p.parts if i.endswith('playbooks')), None) or
+
+        if (next((i for i in p.parts if i.endswith('playbooks')), None) or
                 'playbook' in p.parts[-1]):
             playbooks.append(normpath(p))
             continue
