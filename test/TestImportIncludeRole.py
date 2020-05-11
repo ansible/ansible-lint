@@ -91,13 +91,14 @@ def test_import_role2(default_rules_collection, playbook_path, messages):
         assert message in str(results)
 
 
-@pytest.mark.parametrize(('playbook_path', 'error'), (
+@pytest.mark.parametrize(('playbook_path', 'messages'), (
     pytest.param(PLAY_IMPORT_ROLE_INCOMPLETE,
-                 "Failed to find required 'name' key in import_role",
+                 ["Failed to find required 'name' key in import_role"],
                  id='IMPORT_ROLE_INCOMPLETE',
                  ),
 ), indirect=('playbook_path', ))
-def test_invalid_import_role(default_rules_collection, playbook_path, error):
+def test_invalid_import_role(default_rules_collection, playbook_path, messages):
     runner = Runner(default_rules_collection, playbook_path, [], [], [])
-    with pytest.raises(RuntimeError, match=error):
-        runner.run()
+    results = runner.run()
+    for message in messages:
+        assert message in str(results)

@@ -43,6 +43,7 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import module_loader
 from ansible.template import Templar
+from ansiblelint.errors import MatchError
 
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
@@ -167,6 +168,16 @@ def _playbook_items(pb_data):
         return [item for play in pb_data for item in play.items()]
 
 
+def _rebind_match_filename(filename, func):
+    def func_wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except MatchError as e:
+            e.filename = filename
+            raise e
+    return func_wrapper
+
+
 def find_children(playbook, playbook_dir):
     if not os.path.exists(playbook[0]):
         return []
@@ -181,7 +192,8 @@ def find_children(playbook, playbook_dir):
     basedir = os.path.dirname(playbook[0])
     items = _playbook_items(playbook_ds)
     for item in items:
-        for child in play_children(basedir, item, playbook[1], playbook_dir):
+        for child in _rebind_match_filename(playbook[0], play_children)(
+                basedir, item, playbook[1], playbook_dir):
             if "$" in child['path'] or "{{" in child['path']:
                 continue
             valid_tokens = list()
@@ -262,7 +274,7 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             th = normalize_task_v2(th)
             module = th['action']['__ansible_module__']
             if "name" not in th['action']:
-                raise RuntimeError(
+                raise MatchError(
                     "Failed to find required 'name' key in %s" % module)
             if not isinstance(th['action']["name"], str):
                 raise RuntimeError(

@@ -26,6 +26,9 @@ import os
 from ansiblelint.rules import AnsibleLintRule  # noqa F401: exposing public API
 import ansiblelint.utils
 import ansiblelint.skip_utils
+from ansiblelint.errors import MatchError
+from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule
+
 
 default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
 _logger = logging.getLogger(__name__)
@@ -140,9 +143,7 @@ class Runner(object):
     def run(self):
         files = list()
         for playbook in self.playbooks:
-            if self.is_excluded(playbook[0]):
-                continue
-            if playbook[1] == 'role':
+            if self.is_excluded(playbook[0]) or playbook[1] == 'role':
                 continue
             files.append({'path': ansiblelint.utils.normpath(playbook[0]),
                           'type': playbook[1],
@@ -150,16 +151,20 @@ class Runner(object):
                           # referenced files exist
                           'absolute_directory': os.path.dirname(playbook[0])})
         visited = set()
+        matches = list()
+
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
-                for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
-                    if self.is_excluded(child['path']):
-                        continue
-                    self.playbooks.add((child['path'], child['type']))
-                    files.append(child)
+                try:
+                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
+                        if self.is_excluded(child['path']):
+                            continue
+                        self.playbooks.add((child['path'], child['type']))
+                        files.append(child)
+                except MatchError as e:
+                    e.rule = LoadingFailureRule
+                    matches.append(e.get_match())
                 visited.add(arg)
-
-        matches = list()
 
         # remove duplicates from files list
         files = [value for n, value in enumerate(files) if value not in files[:n]]
