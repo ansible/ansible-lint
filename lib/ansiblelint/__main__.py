@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 # Copyright (c) 2013-2014 Will Thames <will@thames.id.au>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+"""Command line implementation."""
 
 import errno
 import logging
@@ -35,6 +35,7 @@ _logger = logging.getLogger(__name__)
 
 
 def main():
+    """Linter CLI entry point."""
     cwd = pathlib.Path.cwd()
 
     options = cli.get_config(sys.argv[1:])
