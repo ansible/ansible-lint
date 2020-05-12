@@ -2,9 +2,7 @@
 
 import os
 import importlib
-from inspect import getmembers, ismodule, isclass
 import logging
-import rules
 from ansiblelint import AnsibleLintRule
 from functools import reduce
 
@@ -60,15 +58,10 @@ def import_all_rules():
 
 
 def get_serialized_rules():
-    mod_list = [m[1] for m in getmembers(rules) if ismodule(m[1])]
-    class_list = []
-    for mod in mod_list:
-        class_temp = [m[1] for m in getmembers(mod) if isclass(m[1])]
-        class_temp = [c for c in class_temp if c is not AnsibleLintRule]
-        class_list.extend(class_temp)
+    # called after all classes are loaded
 
     all_rules = []
-    for c in class_list:
+    for c in AnsibleLintRule.__subclasses__():
         d = {
             'id': c.id,
             'shortdesc': c.shortdesc,
