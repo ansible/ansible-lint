@@ -79,14 +79,6 @@ class AnsibleLintRule(object):
                            file['path'], self, message))
         return matches
 
-    def _unpack_result(self, play, result):
-        linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
-        if len(result) == 2:
-            section, message = result
-        else:
-            section, linenumber, message = result
-        return section, linenumber, message
-
     @staticmethod
     def _matchplay_linenumber(play, optional_linenumber):
         try:
