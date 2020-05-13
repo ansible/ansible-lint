@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""CLI parser setup and helpers."""
 import argparse
 import logging
 import os

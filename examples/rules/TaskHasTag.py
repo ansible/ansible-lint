@@ -1,13 +1,17 @@
+"""Example implementation of a rule requiring tasks to have tags set."""
 from ansiblelint import AnsibleLintRule
 
 
 class TaskHasTag(AnsibleLintRule):
+    """Tasks must have tag."""
+
     id = 'EXAMPLE001'
     shortdesc = 'Tasks must have tag'
     description = 'Tasks must have tag'
     tags = ['productivity', 'tags']
 
     def matchtask(self, file, task):
+        """Task matching method."""
         # The meta files don't have tags
         if file['type'] in ["meta", "playbooks"]:
             return False

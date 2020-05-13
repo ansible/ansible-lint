@@ -1,4 +1,8 @@
+"""Exceptions and error representations."""
+
+
 class Match(object):
+    """Rule violation detected during linting."""
 
     def __init__(self, linenumber, line, filename, rule, message=None):
         """Initialize a Match instance."""
