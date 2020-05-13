@@ -31,7 +31,7 @@ TEST_TASKLIST = """
 
 
 def test_rule_linenumber(monkeypatch):
-
+    """Check that SudoRule offense contains a line number."""
     rule = SudoRule()
     matches = rule.matchyaml(dict(path="", type='tasklist'), TEST_TASKLIST)
     assert matches[0].linenumber == 5
