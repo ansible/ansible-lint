@@ -20,8 +20,9 @@
 import pathlib
 import unittest
 
-from ansiblelint import Match, AnsibleLintRule
+from ansiblelint.errors import Match
 from ansiblelint.formatters import Formatter
+from ansiblelint.rules import AnsibleLintRule
 
 
 class TestFormatter(unittest.TestCase):
