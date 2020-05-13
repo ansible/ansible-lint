@@ -20,33 +20,21 @@
 
 import ansiblelint.skip_utils
 
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules.SudoRule import SudoRule
 
 
-MAGIC_NUMBER = 7007
+TEST_TASKLIST = """
+- debug:
+    msg: test
 
-
-class LinenumberRule(AnsibleLintRule):
-    id = 'TEST0003'
-    shortdesc = 'Linenumber is returned'
-    description = 'This is a rule that return a linenumber'
-
-    tags = {'fake', 'dummy', 'test3'}
-
-    def matchplay(self, file, play):
-        return [('Linenumber returned', self.shortdesc, MAGIC_NUMBER)]
+- command: echo test
+  sudo: true
+"""
 
 
 def test_rule_linenumber(monkeypatch):
 
-    def mock_response(*args, **kwargs):
-        return [{'skipped_rules': []}]
-
-    monkeypatch.setattr(ansiblelint.skip_utils,
-                        "append_skipped_rules",
-                        mock_response)
-
-    text = "- debug:\n    msg: a"
-    rule = LinenumberRule()
-    matches = rule.matchyaml(dict(path="", type='tasklist'), text)
-    assert matches[0].linenumber == MAGIC_NUMBER
+    rule = SudoRule()
+    matches = rule.matchyaml(dict(path="", type='tasklist'), TEST_TASKLIST)
+    assert matches[0].linenumber == 5
