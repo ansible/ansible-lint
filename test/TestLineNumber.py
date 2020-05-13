@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import ansiblelint.skip_utils
-
-from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.rules.SudoRule import SudoRule
 
 
