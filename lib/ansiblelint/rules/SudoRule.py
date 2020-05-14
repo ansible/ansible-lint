@@ -15,10 +15,10 @@ class SudoRule(AnsibleLintRule):
         if isinstance(play_frag, dict):
             if 'sudo' in play_frag:
                 results.append(({'sudo': play_frag['sudo']},
-                                'Deprecated sudo feature'))
+                                'Deprecated sudo feature', play_frag['__line__']))
             if 'sudo_user' in play_frag:
                 results.append(({'sudo_user': play_frag['sudo_user']},
-                                'Deprecated sudo_user feature'))
+                                'Deprecated sudo_user feature', play_frag['__line__']))
             if 'tasks' in play_frag:
                 output = self._check_value(play_frag['tasks'])
                 if output:
