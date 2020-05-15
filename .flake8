@@ -55,7 +55,6 @@ per-file-ignores =
   lib/ansiblelint/__main__.py: C901
   lib/ansiblelint/__init__.py: D101 D102
   lib/ansiblelint/cli.py: D101 D102 D103
-  lib/ansiblelint/generate_docs.py: D103
   lib/ansiblelint/formatters/__init__.py: D101 D102
   # lib/ansiblelint/utils.py:229:1: C901 '_taskshandlers_children' is too complex (12)
   # lib/ansiblelint/utils.py:413:1: C901 'normalize_task_v1' is too complex (11)

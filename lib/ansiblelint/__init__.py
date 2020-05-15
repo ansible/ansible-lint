@@ -41,6 +41,7 @@ class RulesCollection(object):
         self.rules = []
         for rulesdir in self.rulesdirs:
             self.extend(ansiblelint.utils.load_plugins(rulesdir))
+        self.rules = sorted(self.rules, key=lambda r: r.id)
 
     def register(self, obj):
         self.rules.append(obj)
