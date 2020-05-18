@@ -47,9 +47,10 @@ repos:
   hooks:
   - id: docs-rebuild
     name: Checks that generated docs are in-sync with commit
-    description: >-
-      Regenerate rules documentation from source and report failure if the
       the the result is modified.
+    description: >-
+      Regenerate rules documentation from source and report failure if
+      the result is modified.
     entry: >-
       sh -c "
         pip install . &&
@@ -61,3 +62,9 @@ repos:
     - manual
     - merge-commit
     - push
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v0.770
+  hooks:
+  - id: mypy
+    # empty args needed in order to match mypy cli behavior
+    args: []

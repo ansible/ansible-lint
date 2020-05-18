@@ -44,6 +44,7 @@ from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import module_loader
 from ansible.template import Templar
 from ansiblelint.errors import MatchError
+from typing import List
 
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
@@ -59,7 +60,7 @@ ANSIBLE_FAILURE_RC = 3
 _logger = logging.getLogger(__name__)
 
 
-def initialize_logger(level=0):
+def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
     VERBOSITY_MAP = {
         0: logging.NOTSET,
@@ -614,7 +615,7 @@ def get_first_cmd_arg(task):
     return first_cmd_arg
 
 
-def normpath(path):
+def normpath(path) -> str:
     """
     Normalize a path in order to provide a more consistent output.
 
@@ -700,7 +701,7 @@ def get_yaml_files(options):
     return OrderedDict.fromkeys(sorted(out))
 
 
-def get_playbooks_and_roles(options=None):
+def get_playbooks_and_roles(options=None) -> List[str]:
     """Find roles and playbooks."""
     if options is None:
         options = {}
