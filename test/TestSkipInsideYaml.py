@@ -1,3 +1,6 @@
+import pytest
+
+
 ROLE_TASKS = '''
 ---
 - name: test 303
@@ -80,6 +83,18 @@ galaxy_info:  # noqa 701
   license: MIT
 '''
 
+ROLE_TASKS_WITH_BLOCK_BECOME = '''
+- hosts:
+  tasks:
+    - name: foo
+      become: true
+      block:
+
+        - name: bar
+          become_user: jonhdaa
+          command: "/etc/test.sh"
+'''
+
 
 def test_role_tasks(default_text_runner):
     results = default_text_runner.run_role_tasks_main(ROLE_TASKS)
@@ -98,4 +113,13 @@ def test_playbook(default_text_runner):
 
 def test_role_meta(default_text_runner):
     results = default_text_runner.run_role_meta_main(ROLE_META)
+    assert len(results) == 0
+
+
+@pytest.mark.xfail(
+    reason="Bug: https://github.com/ansible/ansible-lint/issues/705",
+    strict=True,
+)
+def test_block_become_inheritance(default_text_runner):
+    results = default_text_runner.run_playbook(ROLE_TASKS_WITH_BLOCK_BECOME)
     assert len(results) == 0
