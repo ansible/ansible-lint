@@ -105,20 +105,25 @@ def test_role_tasks_with_block(default_text_runner):
     assert len(results) == 4
 
 
-def test_playbook(default_text_runner):
-    results = default_text_runner.run_playbook(PLAYBOOK)
-    assert len(results) == 7
+@pytest.mark.parametrize(
+    ('playbook_src', 'results_num'),
+    (
+        (PLAYBOOK, 7),
+        pytest.param(
+            ROLE_TASKS_WITH_BLOCK_BECOME, 0,
+            marks=pytest.mark.xfail(
+                reason="Bug: "
+                "https://github.com/ansible/ansible-lint/issues/705",
+            ),
+        ),
+    ),
+    ids=('generic', 'with block become inheritance'),
+)
+def test_playbook(default_text_runner, playbook_src, results_num):
+    results = default_text_runner.run_playbook(playbook_src)
+    assert len(results) == results_num
 
 
 def test_role_meta(default_text_runner):
     results = default_text_runner.run_role_meta_main(ROLE_META)
-    assert len(results) == 0
-
-
-@pytest.mark.xfail(
-    reason="Bug: https://github.com/ansible/ansible-lint/issues/705",
-    strict=True,
-)
-def test_block_become_inheritance(default_text_runner):
-    results = default_text_runner.run_playbook(ROLE_TASKS_WITH_BLOCK_BECOME)
     assert len(results) == 0
