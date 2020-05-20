@@ -593,7 +593,7 @@ def parse_yaml_linenumbers(data, filename):
     try:
         import inspect
         kwargs = {}
-        if 'vault_password' in inspect.getargspec(AnsibleLoader.__init__).args:
+        if 'vault_password' in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs['vault_password'] = DEFAULT_VAULT_PASSWORD
         loader = AnsibleLoader(data, **kwargs)
         loader.compose_node = compose_node
