@@ -2,25 +2,25 @@
 - hosts: all
 
   pre_tasks:
-  - { include: 'doesnotexist.yml' }
+    - { include: 'doesnotexist.yml' }
 
   tasks:
-  - block:
-      - name: successful debug message
-        debug: msg='i execute normally'
-      - name: failure command
-        command: /bin/false
-        changed_when: False
-      - name: never reacehd debug message
-        debug: msg='i never execute, cause ERROR!'
-    rescue:
-      - name: exception debug message
-        debug: msg='I caught an error'
-      - name: another failure command
-        command: /bin/false
-        changed_when: False
-      - name: another missed debug message
-        debug: msg='I also never execute :-('
-    always:
-      - name: always reached debug message
-        debug: msg="this always executes"
+    - block:
+        - name: successful debug message
+          debug: msg='i execute normally'
+        - name: failure command
+          command: /bin/false
+          changed_when: False
+        - name: never reacehd debug message
+          debug: msg='i never execute, cause ERROR!'
+      rescue:
+        - name: exception debug message
+          debug: msg='I caught an error'
+        - name: another failure command
+          command: /bin/false
+          changed_when: False
+        - name: another missed debug message
+          debug: msg='I also never execute :-('
+      always:
+        - name: always reached debug message
+          debug: msg="this always executes"

@@ -34,6 +34,13 @@ repos:
   - id: check-merge-conflict
   - id: debug-statements
     language_version: python3
+- repo: https://github.com/adrienverge/yamllint.git
+  rev: v1.23.0
+  hooks:
+  - id: yamllint
+    files: \.(yaml|yml)$
+    types: [file, yaml]
+    entry: yamllint --strict
 - repo: https://gitlab.com/pycqa/flake8.git
   rev: 3.8.1
   hooks:

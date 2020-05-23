@@ -6,44 +6,44 @@
     bracket: "and close bracket"
 
   tasks:
-  - name: unset variable
-    action: command echo {{thisvariable}} is not set in this playbook
+    - name: unset variable
+      action: command echo {{thisvariable}} is not set in this playbook
 
-  - name: trailing whitespace
-    action: command echo do nothing   
+    - name: trailing whitespace
+      action: command echo do nothing   
 
-  - name: git check
-    action: git a=b c=d
+    - name: git check
+      action: git a=b c=d
 
-  - name: git check 2
-    action: git version=HEAD c=d
+    - name: git check 2
+      action: git version=HEAD c=d
 
-  - name: git check 3
-    git: version=a1b2c3d4 repo=xyz bobbins=d
+    - name: git check 3
+      git: version=a1b2c3d4 repo=xyz bobbins=d
 
-  - name: executing git through command
-    action: command git clone blah
+    - name: executing git through command
+      action: command git clone blah
 
-  - name: executing git through command
-    action: command chdir=bobbins creates=whatever /usr/bin/git clone blah
+    - name: executing git through command
+      action: command chdir=bobbins creates=whatever /usr/bin/git clone blah
 
-  - name: using git module
-    action: git repo=blah
+    - name: using git module
+      action: git repo=blah
 
-  - name: passing git as an argument to another task
-    action: debug msg="{{item}}"
-    with_items: 
-      - git
-      - bobbins
+    - name: passing git as an argument to another task
+      action: debug msg="{{item}}"
+      with_items: 
+        - git
+        - bobbins
 
-  - name: yum latest
-    yum: state=latest name=httpd
+    - name: yum latest
+      yum: state=latest name=httpd
 
-  - debug: msg="task without a name"
+    - debug: msg="task without a name"
 
-  - name: apt latest
-    apt: state=latest name=apache2
+    - name: apt latest
+      apt: state=latest name=apache2
 
-  - name: always run
-    debug: msg="always_run is deprecated"
-    always_run: true
+    - name: always run
+      debug: msg="always_run is deprecated"
+      always_run: true
