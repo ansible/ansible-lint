@@ -22,6 +22,7 @@
 from collections import OrderedDict
 import glob
 import importlib
+import inspect
 import logging
 import os
 from pathlib import Path
@@ -591,9 +592,8 @@ def parse_yaml_linenumbers(data, filename):
         return mapping
 
     try:
-        import inspect
         kwargs = {}
-        if 'vault_password' in inspect.getargspec(AnsibleLoader.__init__).args:
+        if 'vault_password' in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs['vault_password'] = DEFAULT_VAULT_PASSWORD
         loader = AnsibleLoader(data, **kwargs)
         loader.compose_node = compose_node
