@@ -4,60 +4,271 @@
 Default Rules
 =============
 
-.. contents:: Topics
+.. contents::
+   :local:
 
-The table below shows the default rules used by Ansible Lint to evaluate playbooks and roles:
+Below you can see the list of default rules Ansible Lint use to evaluate playbooks and roles:
 
-============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================
-ID                                                                                                                                                                                                                                                                                                           Version Added                                                                                                                                                                                                                                                                                                Sample Message                                                                                                                                                                                                                                                                                               Description
-============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================
-**E1xx - deprecated**
-`E101 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/AlwaysRunRule.py>`_                                                                                                                                                                                                         historic                                                                                                                                                                                                                                                                                                     Deprecated always_run                                                                                                                                                                                                                                                                                        Instead of ``always_run``, use ``check_mode``
-`E102 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/NoFormattingInWhenRule.py>`_                                                                                                                                                                                                historic                                                                                                                                                                                                                                                                                                     No Jinja2 in when                                                                                                                                                                                                                                                                                            ``when`` lines should not include Jinja2 variables
-`E103 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/SudoRule.py>`_                                                                                                                                                                                                              historic                                                                                                                                                                                                                                                                                                     Deprecated sudo                                                                                                                                                                                                                                                                                              Instead of ``sudo``/``sudo_user``, use ``become``/``become_user``.
-`E104 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/UsingBareVariablesIsDeprecatedRule.py>`_                                                                                                                                                                                    historic                                                                                                                                                                                                                                                                                                     Using bare variables is deprecated                                                                                                                                                                                                                                                                           Using bare variables is deprecated. Update your playbooks so that the environment value uses the full variable syntax ``{{ your_variable }}``
-`E105 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/DeprecatedModuleRule.py>`_                                                                                                                                                                                                  v4.0.0                                                                                                                                                                                                                                                                                                       Deprecated module                                                                                                                                                                                                                                                                                            These are deprecated modules, some modules are kept temporarily for backwards compatibility but usage is discouraged. For more details see: https://docs.ansible.com/ansible/latest/modules/list_of_all_modules.html
-`E106 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/RoleNames.py>`_                                                                                                                                                                                                             v4.3.0                                                                                                                                                                                                                                                                                                       Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern                                                                                                                                                                                                                                                    Role names are now limited to contain only lowercase alphanumeric characters, plus '_' and start with an alpha character. See `developing collections <https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#roles-directory>`_
 
-**E2xx - formatting**
-`E201 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/TrailingWhitespaceRule.py>`_                                                                                                                                                                                                historic                                                                                                                                                                                                                                                                                                     Trailing whitespace                                                                                                                                                                                                                                                                                          There should not be any trailing whitespace
-`E202 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/OctalPermissionsRule.py>`_                                                                                                                                                                                                  historic                                                                                                                                                                                                                                                                                                     Octal file permissions must contain leading zero or be a string                                                                                                                                                                                                                                              Numeric file permissions without leading zero can behave in unexpected ways. See http://docs.ansible.com/ansible/file_module.html
-`E203 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/NoTabsRule.py>`_                                                                                                                                                                                                            v4.0.0                                                                                                                                                                                                                                                                                                       Most files should not contain tabs                                                                                                                                                                                                                                                                           Tabs can cause unexpected display issues, use spaces
-`E204 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/LineTooLongRule.py>`_                                                                                                                                                                                                       v4.0.0                                                                                                                                                                                                                                                                                                       Lines should be no longer than 160 chars                                                                                                                                                                                                                                                                     Long lines make code harder to read and code review more difficult
-`E205 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/PlaybookExtension.py>`_                                                                                                                                                                                                     v4.0.0                                                                                                                                                                                                                                                                                                       Use ".yml" or ".yaml" playbook extension                                                                                                                                                                                                                                                                     Playbooks should have the ".yml" or ".yaml" extension
-`E206 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/VariableHasSpacesRule.py>`_                                                                                                                                                                                                 v4.0.0                                                                                                                                                                                                                                                                                                       Variables should have spaces before and after: {{ var_name }}                                                                                                                                                                                                                                                Variables should have spaces before and after: ``{{ var_name }}``
 
-**E3xx - command-shell**
-`E301 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/CommandHasChangesCheckRule.py>`_                                                                                                                                                                                            historic                                                                                                                                                                                                                                                                                                     Commands should not change things if nothing needs doing                                                                                                                                                                                                                                                     Commands should either read information (and thus set ``changed_when``) or not do something if it has already been done (using creates/removes) or only do it if another check has a particular result (``when``)
-`E302 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/CommandsInsteadOfArgumentsRule.py>`_                                                                                                                                                                                        historic                                                                                                                                                                                                                                                                                                     Using command rather than an argument to e.g. file                                                                                                                                                                                                                                                           Executing a command when there are arguments to modules is generally a bad idea
-`E303 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/CommandsInsteadOfModulesRule.py>`_                                                                                                                                                                                          historic                                                                                                                                                                                                                                                                                                     Using command rather than module                                                                                                                                                                                                                                                                             Executing a command when there is an Ansible module is generally a bad idea
-`E304 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/EnvVarsInCommandRule.py>`_                                                                                                                                                                                                  historic                                                                                                                                                                                                                                                                                                     Environment variables don't work as part of command                                                                                                                                                                                                                                                          Environment variables should be passed to ``shell`` or ``command`` through environment argument
-`E305 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/UseCommandInsteadOfShellRule.py>`_                                                                                                                                                                                          historic                                                                                                                                                                                                                                                                                                     Use shell only when shell functionality is required                                                                                                                                                                                                                                                          Shell should only be used when piping, redirecting or chaining commands (and Ansible would be preferred for some of those!)
-`E306 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/ShellWithoutPipefail.py>`_                                                                                                                                                                                                  v4.1.0                                                                                                                                                                                                                                                                                                       Shells that use pipes should set the pipefail option                                                                                                                                                                                                                                                         Without the pipefail option set, a shell command that implements a pipeline can fail and still return 0. If any part of the pipeline other than the terminal command fails, the whole pipeline will still return 0, which may be considered a success by Ansible. Pipefail is available in the bash shell.
+Deprecated Rules (1xx)
+----------------------
 
-**E4xx - module**
-`E401 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/GitHasVersionRule.py>`_                                                                                                                                                                                                     historic                                                                                                                                                                                                                                                                                                     Git checkouts must contain explicit version                                                                                                                                                                                                                                                                  All version control checkouts must point to an explicit commit or tag, not just ``latest``
-`E402 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/MercurialHasRevisionRule.py>`_                                                                                                                                                                                              historic                                                                                                                                                                                                                                                                                                     Mercurial checkouts must contain explicit revision                                                                                                                                                                                                                                                           All version control checkouts must point to an explicit commit or tag, not just ``latest``
-`E403 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/PackageIsNotLatestRule.py>`_                                                                                                                                                                                                historic                                                                                                                                                                                                                                                                                                     Package installs should not use latest                                                                                                                                                                                                                                                                       Package installs should use ``state=present`` with or without a version
-`E404 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/RoleRelativePath.py>`_                                                                                                                                                                                                      v4.0.0                                                                                                                                                                                                                                                                                                       Doesn't need a relative path in role                                                                                                                                                                                                                                                                         ``copy`` and ``template`` do not need to use relative path for ``src``
+.. _101:
 
-**E5xx - task**
-`E501 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/BecomeUserWithoutBecomeRule.py>`_                                                                                                                                                                                           historic                                                                                                                                                                                                                                                                                                     become_user requires become to work as expected                                                                                                                                                                                                                                                              ``become_user`` without ``become`` will not actually change user
-`E502 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/TaskHasNameRule.py>`_                                                                                                                                                                                                       historic                                                                                                                                                                                                                                                                                                     All tasks should be named                                                                                                                                                                                                                                                                                    All tasks should have a distinct name for readability and for ``--start-at-task`` to work
-`E503 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/UseHandlerRatherThanWhenChangedRule.py>`_                                                                                                                                                                                   historic                                                                                                                                                                                                                                                                                                     Tasks that run when changed should likely be handlers                                                                                                                                                                                                                                                        If a task has a ``when: result.changed`` setting, it is effectively acting as a handler
-`E504 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/TaskNoLocalAction.py>`_                                                                                                                                                                                                     v4.0.0                                                                                                                                                                                                                                                                                                       Do not use 'local_action', use 'delegate_to: localhost'                                                                                                                                                                                                                                                      Do not use ``local_action``, use ``delegate_to: localhost``
-`E505 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/IncludeMissingFileRule.py>`_                                                                                                                                                                                                v4.3.0                                                                                                                                                                                                                                                                                                       referenced files must exist                                                                                                                                                                                                                                                                                  All files referenced by by include / import tasks must exist. The check excludes files with jinja2 templates in the filename.
+101: Deprecated always_run
+**************************
 
-**E6xx - idiom**
-`E601 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/ComparisonToLiteralBoolRule.py>`_                                                                                                                                                                                           v4.0.0                                                                                                                                                                                                                                                                                                       Don't compare to literal True/False                                                                                                                                                                                                                                                                          Use ``when: var`` rather than ``when: var == True`` (or conversely ``when: not var``)
-`E602 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/ComparisonToEmptyStringRule.py>`_                                                                                                                                                                                           v4.0.0                                                                                                                                                                                                                                                                                                       Don't compare to empty string                                                                                                                                                                                                                                                                                Use ``when: var|length > 0`` rather than ``when: var != ""`` (or conversely ``when: var|length == 0`` rather than ``when: var == ""``)
+Instead of ``always_run``, use ``check_mode``
 
-**E7xx - metadata**
-`E701 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/MetaMainHasInfoRule.py>`_                                                                                                                                                                                                   v4.0.0                                                                                                                                                                                                                                                                                                       meta/main.yml should contain relevant info                                                                                                                                                                                                                                                                   meta/main.yml should contain: ``author, description, license, min_ansible_version, platforms``
-`E702 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/MetaTagValidRule.py>`_                                                                                                                                                                                                      v4.0.0                                                                                                                                                                                                                                                                                                       Tags must contain lowercase letters and digits only                                                                                                                                                                                                                                                          Tags must contain lowercase letters and digits only, and ``galaxy_tags`` is expected to be a list
-`E703 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/MetaChangeFromDefaultRule.py>`_                                                                                                                                                                                             v4.0.0                                                                                                                                                                                                                                                                                                       meta/main.yml default values should be changed                                                                                                                                                                                                                                                               meta/main.yml default values should be changed for: ``author, description, company, license, license``
-`E704 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/MetaVideoLinksRule.py>`_                                                                                                                                                                                                    v4.0.0                                                                                                                                                                                                                                                                                                       meta/main.yml video_links should be formatted correctly                                                                                                                                                                                                                                                      Items in ``video_links`` in meta/main.yml should be dictionaries, and contain only keys ``url`` and ``title``, and have a shared link from a supported provider
+.. _102:
 
-**E9xx - core**
-`E901 <https://github.com/ansible/ansible-lint/blob/master/lib/ansiblelint/rules/LoadingFailureRule.py>`_                                                                                                                                                                                                    v4.3.0                                                                                                                                                                                                                                                                                                       Failed to load or parse file                                                                                                                                                                                                                                                                                 Linter failed to process a YAML file, possible not an Ansible file.
-============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================ ============================================================================================================================================================================================================================================================================================================
+102: No Jinja2 in when
+**********************
+
+``when`` lines should not include Jinja2 variables
+
+.. _103:
+
+103: Deprecated sudo
+********************
+
+Instead of ``sudo``/``sudo_user``, use ``become``/``become_user``.
+
+.. _104:
+
+104: Using bare variables is deprecated
+***************************************
+
+Using bare variables is deprecated. Update your playbooks so that the environment value uses the full variable syntax ``{{ your_variable }}``
+
+.. _105:
+
+105: Deprecated module
+**********************
+
+These are deprecated modules, some modules are kept temporarily for backwards compatibility but usage is discouraged. For more details see: https://docs.ansible.com/ansible/latest/modules/list_of_all_modules.html
+
+.. _106:
+
+106: Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern
+**************************************************************
+
+Role names are now limited to contain only lowercase alphanumeric characters, plus '_' and start with an alpha character. See `developing collections <https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#roles-directory>`_
+
+Formatting Rules (2xx)
+----------------------
+
+.. _201:
+
+201: Trailing whitespace
+************************
+
+There should not be any trailing whitespace
+
+.. _202:
+
+202: Octal file permissions must contain leading zero or be a string
+********************************************************************
+
+Numeric file permissions without leading zero can behave in unexpected ways. See http://docs.ansible.com/ansible/file_module.html
+
+.. _203:
+
+203: Most files should not contain tabs
+***************************************
+
+Tabs can cause unexpected display issues, use spaces
+
+.. _204:
+
+204: Lines should be no longer than 160 chars
+*********************************************
+
+Long lines make code harder to read and code review more difficult
+
+.. _205:
+
+205: Use ".yml" or ".yaml" playbook extension
+*********************************************
+
+Playbooks should have the ".yml" or ".yaml" extension
+
+.. _206:
+
+206: Variables should have spaces before and after: {{ var_name }}
+******************************************************************
+
+Variables should have spaces before and after: ``{{ var_name }}``
+
+Command-Shell Rules (3xx)
+-------------------------
+
+.. _301:
+
+301: Commands should not change things if nothing needs doing
+*************************************************************
+
+Commands should either read information (and thus set ``changed_when``) or not do something if it has already been done (using creates/removes) or only do it if another check has a particular result (``when``)
+
+.. _302:
+
+302: Using command rather than an argument to e.g. file
+*******************************************************
+
+Executing a command when there are arguments to modules is generally a bad idea
+
+.. _303:
+
+303: Using command rather than module
+*************************************
+
+Executing a command when there is an Ansible module is generally a bad idea
+
+.. _304:
+
+304: Environment variables don't work as part of command
+********************************************************
+
+Environment variables should be passed to ``shell`` or ``command`` through environment argument
+
+.. _305:
+
+305: Use shell only when shell functionality is required
+********************************************************
+
+Shell should only be used when piping, redirecting or chaining commands (and Ansible would be preferred for some of those!)
+
+.. _306:
+
+306: Shells that use pipes should set the pipefail option
+*********************************************************
+
+Without the pipefail option set, a shell command that implements a pipeline can fail and still return 0. If any part of the pipeline other than the terminal command fails, the whole pipeline will still return 0, which may be considered a success by Ansible. Pipefail is available in the bash shell.
+
+Module Rules (4xx)
+------------------
+
+.. _401:
+
+401: Git checkouts must contain explicit version
+************************************************
+
+All version control checkouts must point to an explicit commit or tag, not just ``latest``
+
+.. _402:
+
+402: Mercurial checkouts must contain explicit revision
+*******************************************************
+
+All version control checkouts must point to an explicit commit or tag, not just ``latest``
+
+.. _403:
+
+403: Package installs should not use latest
+*******************************************
+
+Package installs should use ``state=present`` with or without a version
+
+.. _404:
+
+404: Doesn't need a relative path in role
+*****************************************
+
+``copy`` and ``template`` do not need to use relative path for ``src``
+
+Task Rules (5xx)
+----------------
+
+.. _501:
+
+501: become_user requires become to work as expected
+****************************************************
+
+``become_user`` without ``become`` will not actually change user
+
+.. _502:
+
+502: All tasks should be named
+******************************
+
+All tasks should have a distinct name for readability and for ``--start-at-task`` to work
+
+.. _503:
+
+503: Tasks that run when changed should likely be handlers
+**********************************************************
+
+If a task has a ``when: result.changed`` setting, it is effectively acting as a handler
+
+.. _504:
+
+504: Do not use 'local_action', use 'delegate_to: localhost'
+************************************************************
+
+Do not use ``local_action``, use ``delegate_to: localhost``
+
+.. _505:
+
+505: referenced files must exist
+********************************
+
+All files referenced by by include / import tasks must exist. The check excludes files with jinja2 templates in the filename.
+
+Idiom Rules (6xx)
+-----------------
+
+.. _601:
+
+601: Don't compare to literal True/False
+****************************************
+
+Use ``when: var`` rather than ``when: var == True`` (or conversely ``when: not var``)
+
+.. _602:
+
+602: Don't compare to empty string
+**********************************
+
+Use ``when: var|length > 0`` rather than ``when: var != ""`` (or conversely ``when: var|length == 0`` rather than ``when: var == ""``)
+
+Metadata Rules (7xx)
+--------------------
+
+.. _701:
+
+701: meta/main.yml should contain relevant info
+***********************************************
+
+meta/main.yml should contain: ``author, description, license, min_ansible_version, platforms``
+
+.. _702:
+
+702: Tags must contain lowercase letters and digits only
+********************************************************
+
+Tags must contain lowercase letters and digits only, and ``galaxy_tags`` is expected to be a list
+
+.. _703:
+
+703: meta/main.yml default values should be changed
+***************************************************
+
+meta/main.yml default values should be changed for: ``author, description, company, license, license``
+
+.. _704:
+
+704: meta/main.yml video_links should be formatted correctly
+************************************************************
+
+Items in ``video_links`` in meta/main.yml should be dictionaries, and contain only keys ``url`` and ``title``, and have a shared link from a supported provider
+
+Core Rules (9xx)
+----------------
+
+.. _901:
+
+901: Failed to load or parse file
+*********************************
+
+Linter failed to process a YAML file, possible not an Ansible file.
