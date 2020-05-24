@@ -49,10 +49,9 @@ class RoleNames(AnsibleLintRule):
         path = file['path'].split("/")
         if "roles" in path:
             role_name = path[path.index("roles") + 1]
-            if role_name not in self.done:
-                self.done.append(role_name)
-                if not re.match(self.ROLE_NAME_REGEXP, role_name):
-                    return self.shortdesc.format(role_name)
-            else:
+            if role_name in self.done:
                 return False
+            self.done.append(role_name)
+            if not re.match(self.ROLE_NAME_REGEXP, role_name):
+                return self.shortdesc.format(role_name)
         return False
