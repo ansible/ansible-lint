@@ -98,4 +98,4 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/invalid-name'
 
         result = self.run_ansible_lint(cwd=cwd, role_path=role_path)
-        self.assertIn('106 Role name invalid-name does not match', str(result))
+        assert '106 Role name invalid-name does not match' in str(result)
