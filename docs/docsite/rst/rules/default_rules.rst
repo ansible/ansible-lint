@@ -101,6 +101,13 @@ Playbooks should have the ".yml" or ".yaml" extension
 
 Variables should have spaces before and after: ``{{ var_name }}``
 
+.. _207:
+
+207: Nested jinja pattern
+*************************
+
+There should not be any nested jinja pattern. Example (bad): ``{{ list_one + {{ list_two | max }} }}``, example (good): ``{{ list_one + max(list_two) }}``
+
 Command-Shell Rules (3xx)
 -------------------------
 

@@ -21,128 +21,148 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import os
-import pytest
 from collections import namedtuple
-from ansiblelint import Runner, RulesCollection
+
+import pytest
+
+from ansiblelint.runner import Runner
+
 
 PlayFile = namedtuple('PlayFile', ['name', 'content'])
 
-FAIL_TASK_1LN = PlayFile('playbook.yml', u'''
-- name: one-level nesting
-  set_fact:
-    var_one: "2*(1+2) is {{ 2 * {{ 1 + 2 }} }}"
+
+FAIL_TASK_1LN = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: one-level nesting
+      set_fact:
+        var_one: "2*(1+2) is {{ 2 * {{ 1 + 2 }} }}"
 ''')
 
-FAIL_TASK_1LN_M = PlayFile('playbook.yml', u'''
-- name: one-level multiline nesting
-  set_fact:
-    var_one_ml: >
-      2*(1+2) is {{ 2 *
-      {{ 1 + 2 }}
-      }}
+FAIL_TASK_1LN_M = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: one-level multiline nesting
+      set_fact:
+        var_one_ml: >
+          2*(1+2) is {{ 2 *
+          {{ 1 + 2 }}
+          }}
 ''')
 
-FAIL_TASK_2LN = PlayFile('playbook.yml', u'''
-- name: two-level nesting
-  set_fact:
-    var_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }} }} }}"
+FAIL_TASK_2LN = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: two-level nesting
+      set_fact:
+        var_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }} }} }}"
 ''')
 
-FAIL_TASK_2LN_M = PlayFile('playbook.yml', u'''
-- name: two-level multiline nesting
-  set_fact:
-    var_two_ml: >
-      2*(1+(3-1)) is {{ 2 *
-      {{ 1 +
-      {{ 3 - 1 }}
-      }} }}
+FAIL_TASK_2LN_M = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: two-level multiline nesting
+      set_fact:
+        var_two_ml: >
+          2*(1+(3-1)) is {{ 2 *
+          {{ 1 +
+          {{ 3 - 1 }}
+          }} }}
 ''')
 
-FAIL_TASK_W_5LN = PlayFile('playbook.yml', u'''
-- name: five-level wild nesting
-  set_fact:
-    var_three_wld: "{{ {{ {{ {{ {{ 234 }} }} }} }} }}"
+FAIL_TASK_W_5LN = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: five-level wild nesting
+      set_fact:
+        var_three_wld: "{{ {{ {{ {{ {{ 234 }} }} }} }} }}"
 ''')
 
-FAIL_TASK_W_5LN_M = PlayFile('playbook.yml', u'''
-- name: five-level wild multiline nesting
-  set_fact:
-    var_three_wld_ml: >
-      {{
-      {{
-      {{
-      {{
-      {{ 234 }}
-      }}
-      }}
-      }}
-      }}
+FAIL_TASK_W_5LN_M = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: five-level wild multiline nesting
+      set_fact:
+        var_three_wld_ml: >
+          {{
+          {{
+          {{
+          {{
+          {{ 234 }}
+          }}
+          }}
+          }}
+          }}
 ''')
 
-SUCCESS_TASK_P = PlayFile('playbook.yml', u'''
-- name: proper non-nested example
-  set_fact:
-    var_one: "number for 'one' is {{ 2 * 1 }}"
+SUCCESS_TASK_P = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: non-nested example
+      set_fact:
+        var_one: "number for 'one' is {{ 2 * 1 }}"
 ''')
 
-SUCCESS_TASK_P_M = PlayFile('playbook.yml', u'''
-- name: proper multiline non-nested example
-  set_fact:
-    var_one_ml: >
-      number for 'one' is {{
-      2 * 1 }}
+SUCCESS_TASK_P_M = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: multiline non-nested example
+      set_fact:
+        var_one_ml: >
+          number for 'one' is {{
+          2 * 1 }}
 ''')
 
-SUCCESS_TASK_2P = PlayFile('playbook.yml', u'''
-- name: proper nesting far from each other
-  set_fact:
-    var_two: "number for 'two' is {{ 2 * 1 }} and number for 'three' is {{ 4 - 1 }}"
+SUCCESS_TASK_2P = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: nesting far from each other
+      set_fact:
+        var_two: "number for 'two' is {{ 2 * 1 }} and number for 'three' is {{ 4 - 1 }}"
 ''')
 
-SUCCESS_TASK_2P_M = PlayFile('playbook.yml', u'''
-- name: proper multiline nesting far from each other
-  set_fact:
-    var_two_ml: >
-      number for 'two' is {{ 2 * 1
-      }} and number for 'three' is {{
-      4 - 1 }}
+SUCCESS_TASK_2P_M = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: multiline nesting far from each other
+      set_fact:
+        var_two_ml: >
+          number for 'two' is {{ 2 * 1
+          }} and number for 'three' is {{
+          4 - 1 }}
 ''')
 
-SUCCESS_TASK_C_2P = PlayFile('playbook.yml', u'''
-- name: proper nesting close to each other
-  set_fact:
-    var_three: "number for 'ten' is {{ 2 - 1 }}{{ 3 - 3 }}"
+SUCCESS_TASK_C_2P = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: nesting close to each other
+      set_fact:
+        var_three: "number for 'ten' is {{ 2 - 1 }}{{ 3 - 3 }}"
 ''')
 
-SUCCESS_TASK_C_2P_M = PlayFile('playbook.yml', u'''
-- name: proper multiline nesting close to each other
-  set_fact:
-    var_three_ml: >
-      number for 'ten' is {{
-      2 - 1
-      }}{{ 3 - 3 }}
+SUCCESS_TASK_C_2P_M = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: multiline nesting close to each other
+      set_fact:
+        var_three_ml: >
+          number for 'ten' is {{
+          2 - 1
+          }}{{ 3 - 3 }}
 ''')
+
 
 @pytest.fixture
-def play_file_path(tmp_path):
-    p = tmp_path / 'playbook.yml'
-    return str(p)
+def runner(tmp_path, default_rules_collection):
+    return Runner(
+        default_rules_collection,
+        str(tmp_path / 'playbook.yml'),
+        [], [], [],
+    )
 
 
 @pytest.fixture
-def rules():
-    rulesdir = os.path.join('lib', 'ansiblelint', 'rules')
-    return RulesCollection([rulesdir])
-
-
-@pytest.fixture
-def runner(play_file_path, rules):
-    return Runner(rules, play_file_path, [], [], [])
-
-
-@pytest.fixture
-def play_files(tmp_path, request):
+def _playbook_file(tmp_path, request):
     if request.param is None:
         return
     for play_file in request.param:
@@ -151,40 +171,39 @@ def play_files(tmp_path, request):
 
 
 @pytest.mark.parametrize(
-    'play_files',
-    [pytest.param(
-        [
-            FAIL_TASK_1LN,
-            FAIL_TASK_1LN_M,
-            FAIL_TASK_2LN,
-            FAIL_TASK_2LN_M,
-            FAIL_TASK_W_5LN,
-            FAIL_TASK_W_5LN_M
-        ],
-        id='file includes nested jinja pattern'
-    )],
-    indirect=['play_files']
+    '_playbook_file',
+    (
+        pytest.param([FAIL_TASK_1LN], id='file includes one-level nesting'),
+        pytest.param([FAIL_TASK_1LN_M], id='file includes one-level multiline nesting'),
+        pytest.param([FAIL_TASK_2LN], id='file includes two-level nesting'),
+        pytest.param([FAIL_TASK_2LN_M], id='file includes two-level multiline nesting'),
+        pytest.param([FAIL_TASK_W_5LN], id='file includes five-level wild nesting'),
+        pytest.param([FAIL_TASK_W_5LN_M], id='file includes five-level wild multiline nesting'),
+    ),
+    indirect=['_playbook_file'],
 )
-def test_including_nested_jinja(runner, play_files):
-    results = str(runner.run())
-    assert 'nested jinja' in results
+@pytest.mark.usefixtures('_playbook_file')
+def test_including_wrong_nested_jinja(runner):
+    rule_violations = runner.run()
+    assert rule_violations[0].rule.id == '207'
 
 
 @pytest.mark.parametrize(
-    'play_files',
-    [pytest.param(
-        [
-            SUCCESS_TASK_P,
-            SUCCESS_TASK_P_M,
-            SUCCESS_TASK_2P,
-            SUCCESS_TASK_2P_M,
-            SUCCESS_TASK_C_2P,
-            SUCCESS_TASK_C_2P_M
-        ],
-        id='file does not include nested jinja pattern'
-    )],
-    indirect=['play_files']
+    '_playbook_file',
+    (
+        pytest.param([SUCCESS_TASK_P], id='file includes non-nested example'),
+        pytest.param([SUCCESS_TASK_P_M], id='file includes multiline non-nested example'),
+        pytest.param([SUCCESS_TASK_2P], id='file includes nesting far from each other'),
+        pytest.param([SUCCESS_TASK_2P_M], id='file includes multiline nesting far from each other'),
+        pytest.param([SUCCESS_TASK_C_2P], id='file includes nesting close to each other'),
+        pytest.param(
+            [SUCCESS_TASK_C_2P_M],
+            id='file includes multiline nesting close to each other',
+        ),
+    ),
+    indirect=['_playbook_file'],
 )
-def test_not_including_nested_jinja(runner, play_files):
-    results = str(runner.run())
-    assert 'nested jinja' not in results
+@pytest.mark.usefixtures('_playbook_file')
+def test_including_proper_nested_jinja(runner):
+    rule_violations = runner.run()
+    assert not rule_violations
