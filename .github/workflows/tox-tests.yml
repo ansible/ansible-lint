@@ -68,7 +68,8 @@ jobs:
       env:
         TOXENV: ansible${{ matrix.ansible-version }}
     - name: Archive logs
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
+      if: ${{ always() }}
       with:
-        name: logs.zip
-        path: .tox/ansible${{ matrix.ansible-version }}/log/
+        name: logs-${{ matrix.python-version }}-${{ matrix.os }}.zip
+        path: .tox/**/log/
