@@ -26,7 +26,9 @@ import pathlib
 import sys
 
 import ansiblelint.formatters as formatters
-from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
+from ansiblelint import cli, default_rulesdir
+from ansiblelint.runner import Runner
+from ansiblelint.rules import RulesCollection
 from ansiblelint.utils import get_playbooks_and_roles
 from ansiblelint.utils import normpath, initialize_logger
 from ansiblelint.generate_docs import rules_as_rst

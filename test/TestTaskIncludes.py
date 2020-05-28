@@ -1,6 +1,6 @@
 import pytest
 
-from ansiblelint import Runner
+from ansiblelint.runner import Runner
 
 
 @pytest.mark.parametrize(

@@ -1,6 +1,6 @@
 import unittest
 
-from ansiblelint import RulesCollection
+from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.ShellWithoutPipefail import ShellWithoutPipefail
 from test import RunFromText
 

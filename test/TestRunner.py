@@ -21,7 +21,8 @@ import os
 
 import pytest
 
-from ansiblelint import formatters, Runner
+import ansiblelint.formatters as formatters
+from ansiblelint.runner import Runner
 from ansiblelint.cli import abspath
 
 

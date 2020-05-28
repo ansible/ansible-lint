@@ -1,5 +1,6 @@
 import unittest
-from ansiblelint import Runner, RulesCollection
+from ansiblelint.runner import Runner
+from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.TaskHasNameRule import TaskHasNameRule
 
 

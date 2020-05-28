@@ -20,7 +20,7 @@
 
 import os
 
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import get_first_cmd_arg
 try:
     from ansible.module_utils.parsing.convert_bool import boolean

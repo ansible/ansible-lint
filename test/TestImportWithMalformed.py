@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import pytest
 
-from ansiblelint import Runner
+from ansiblelint.runner import Runner
 
 
 PlayFile = namedtuple('PlayFile', ['name', 'content'])
