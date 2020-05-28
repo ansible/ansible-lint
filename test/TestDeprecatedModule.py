@@ -3,7 +3,7 @@ import unittest
 from ansible import __version__ as ansible_version_str
 import pytest
 
-from ansiblelint import RulesCollection
+from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.DeprecatedModuleRule import DeprecatedModuleRule
 from test import RunFromText
 

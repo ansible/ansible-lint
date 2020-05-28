@@ -20,8 +20,6 @@
 """Generic utility helpers."""
 
 from collections import OrderedDict
-import glob
-import importlib
 import inspect
 import logging
 import os
@@ -123,20 +121,6 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
     'rescue': 'meta',
     'always': 'meta',
 }
-
-
-def load_plugins(directory):
-    result = []
-
-    for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
-
-        pluginname = os.path.basename(pluginfile.replace('.py', ''))
-        spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        obj = getattr(module, pluginname)()
-        result.append(obj)
-    return result
 
 
 def tokenize(line):
