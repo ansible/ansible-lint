@@ -1,3 +1,7 @@
 ---
 - name: test tasks
   action: git a=b c=d
+
+- name: include missing module white-listed via .ansible-lint
+  a_missing_module:
+    foo: bar
