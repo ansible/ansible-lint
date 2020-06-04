@@ -26,7 +26,8 @@ import pathlib
 import sys
 
 import ansiblelint.formatters as formatters
-from ansiblelint import cli, default_rulesdir, RulesCollection, Runner
+from ansiblelint import cli, RulesCollection, Runner
+from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.utils import get_playbooks_and_roles
 from ansiblelint.utils import normpath, initialize_logger
 from ansiblelint.generate_docs import rules_as_rst
@@ -58,9 +59,9 @@ def main():
     formatter = formatter_factory(cwd, options.display_relative_path)
 
     if options.use_default_rules:
-        rulesdirs = options.rulesdir + [default_rulesdir]
+        rulesdirs = options.rulesdir + [DEFAULT_RULESDIR]
     else:
-        rulesdirs = options.rulesdir or [default_rulesdir]
+        rulesdirs = options.rulesdir or [DEFAULT_RULESDIR]
     rules = RulesCollection(rulesdirs)
 
     if options.listrules:

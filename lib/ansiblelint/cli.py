@@ -9,8 +9,9 @@ import sys
 import yaml
 from typing import NamedTuple
 
-import ansiblelint
+from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.version import __version__
+import ansiblelint.utils
 
 
 _logger = logging.getLogger(__name__)
@@ -110,17 +111,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
                         help="parseable output including severity of rule")
     parser.add_argument('-r', action=AbspathArgAction, dest='rulesdir',
                         default=[], type=Path,
-                        help="specify one or more rules directories using "
-                             "one or more -r arguments. Any -r flags override "
-                             "the default rules in %s, unless -R is also used."
-                             % ansiblelint.default_rulesdir)
+                        help="Specify custom rule directories. Add -R "
+                             f"to keep using embedded rules from {DEFAULT_RULESDIR}")
     parser.add_argument('-R', action='store_true',
                         default=False,
                         dest='use_default_rules',
-                        help="Use default rules in %s in addition to any extra "
-                             "rules directories specified with -r. There is "
-                             "no need to specify this if no -r flags are used"
-                             % ansiblelint.default_rulesdir)
+                        help="Keep default rules when using -r")
     parser.add_argument('--show-relpath', dest='display_relative_path', action='store_false',
                         default=True,
                         help="Display path relative to CWD")
