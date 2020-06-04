@@ -36,6 +36,9 @@ def abspath(path, base_dir):
 
 
 def expand_to_normalized_paths(config, base_dir=None):
+    # config can be None (-c /dev/null)
+    if not config:
+        return
     base_dir = base_dir or os.getcwd()
     for paths_var in _PATH_VARS:
         if paths_var not in config:
