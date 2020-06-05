@@ -84,10 +84,9 @@ def _play_files(tmp_path, request):
     ),
     indirect=['_play_files']
 )
-
 @pytest.mark.usefixtures('_play_files')
 def test_cases_warning_message(runner, caplog):
-    results = str(runner.run())
+    runner.run()
     noexist_message_count = 0
 
     for record in caplog.records:
@@ -96,6 +95,7 @@ def test_cases_warning_message(runner, caplog):
             noexist_message_count += 1
 
     assert (noexist_message_count == 1)
+
 
 @pytest.mark.parametrize(
     '_play_files',
@@ -111,8 +111,6 @@ def test_cases_warning_message(runner, caplog):
     ),
     indirect=['_play_files']
 )
-
-
 @pytest.mark.usefixtures('_play_files')
 def test_cases_that_do_not_report(runner, caplog):
     runner.run()
