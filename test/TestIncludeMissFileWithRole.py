@@ -121,4 +121,3 @@ def test_cases_that_do_not_report(runner, caplog):
             noexist_message_count += 1
 
     assert (noexist_message_count == 0)
-
