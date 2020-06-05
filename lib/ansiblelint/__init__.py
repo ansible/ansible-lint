@@ -31,7 +31,6 @@ from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule
 from typing import List, Set
 
 
-default_rulesdir = os.path.join(os.path.dirname(ansiblelint.utils.__file__), 'rules')
 _logger = logging.getLogger(__name__)
 
 
@@ -44,6 +43,7 @@ class RulesCollection(object):
         self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
         self.rules = []
         for rulesdir in self.rulesdirs:
+            _logger.debug("Loading rules from %s", rulesdir)
             self.extend(ansiblelint.utils.load_plugins(rulesdir))
         self.rules = sorted(self.rules, key=lambda r: r.id)
 
