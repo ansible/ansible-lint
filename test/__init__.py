@@ -4,7 +4,7 @@ import tempfile
 import shutil
 import os
 
-from ansiblelint import Runner
+from ansiblelint.runner import Runner
 
 
 class RunFromText(object):
