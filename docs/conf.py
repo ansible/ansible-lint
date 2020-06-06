@@ -51,6 +51,7 @@ extensions = [
     'myst_parser',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    'sphinxcontrib.programoutput',
     'rules_table_generator_ext',  # in-tree extension
 ]
 

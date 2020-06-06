@@ -35,6 +35,16 @@ https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintena
 Automated tests will be run against all PRs for flake8 compliance and Ansible
 compatibility - to check before pushing commits, just use `tox`.
 
+Module dependency graph
+-----------------------
+
+Extra care should be taken when considering adding any dependency. Removing
+most dependencies on Ansible internals is desired as these can change
+without any warning.
+
+```{command-output} pipdeptree -p ansible-lint
+```
+
 Talk to us
 ----------
 

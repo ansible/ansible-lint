@@ -87,6 +87,11 @@ packaging==20.4 \
     --hash=sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8 \
     --hash=sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181 \
     # via sphinx
+pipdeptree==1.0.0 \
+    --hash=sha256:35a81058c9568a29c5a9569109304b25f11cd9333fa2661a4d4c2c5da0e3939d \
+    --hash=sha256:5fe866a38113d28d527033ececc57b8e86df86b7c29edbacb33f41ee50f75b31 \
+    --hash=sha256:a7e4f744f3ae149cf94dd5e517fae682780c4729f4a279e6fb81a928f57fea23 \
+    # via -r docs/requirements.in
 pygments==2.6.1 \
     --hash=sha256:647344a061c249a3b74e230c739f434d7ea4d8b1d5f3721bc0f3558049b38f44 \
     --hash=sha256:ff7a40b4860b727ab48fad6360eb351cc1b33cbf9b15a0f689ca5353e9463324 \
@@ -139,7 +144,7 @@ sphinx-rtd-theme==0.5.0 \
 sphinx==2.4.4 \
     --hash=sha256:b4c750d546ab6d7e05bdff6ac24db8ae3e8b8253a3569b754e445110a0a12b66 \
     --hash=sha256:fc312670b56cb54920d6cc2ced455a22a547910de10b3142276495ced49231cb \
-    # via -r docs/requirements.in, myst-parser, sphinx-rtd-theme
+    # via -r docs/requirements.in, myst-parser, sphinx-rtd-theme, sphinxcontrib.programoutput
 sphinxcontrib-applehelp==1.0.2 \
     --hash=sha256:806111e5e962be97c29ec4c1e7fe277bfd19e9652fb1a4392105b43e01af885a \
     --hash=sha256:a072735ec80e7675e3f432fcae8610ecf509c5f1869d17e2eecff44389cdbc58 \
@@ -164,6 +169,10 @@ sphinxcontrib-serializinghtml==1.1.4 \
     --hash=sha256:eaa0eccc86e982a9b939b2b82d12cc5d013385ba5eadcc7e4fed23f4405f77bc \
     --hash=sha256:f242a81d423f59617a8e5cf16f5d4d74e28ee9a66f9e5b637a18082991db5a9a \
     # via sphinx
+sphinxcontrib.programoutput==0.16 \
+    --hash=sha256:0caaa216d0ad8d2cfa90a9a9dba76820e376da6e3152be28d10aedc09f82a3b0 \
+    --hash=sha256:8009d1326b89cd029ee477ce32b45c58d92b8504d48811461c3117014a8f4b1e \
+    # via -r docs/requirements.in
 urllib3==1.25.9 \
     --hash=sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527 \
     --hash=sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115 \
@@ -171,4 +180,5 @@ urllib3==1.25.9 \
 
 # WARNING: The following packages were not pinned, but pip requires them to be
 # pinned when the requirements file includes hashes. Consider using the --allow-unsafe flag.
+# pip
 # setuptools
