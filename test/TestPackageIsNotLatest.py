@@ -1,5 +1,6 @@
 import unittest
-from ansiblelint import Runner, RulesCollection
+from ansiblelint import RulesCollection
+from ansiblelint.runner import Runner
 from ansiblelint.rules.PackageIsNotLatestRule import PackageIsNotLatestRule
 
 
