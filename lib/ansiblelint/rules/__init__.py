@@ -120,3 +120,5 @@ class AnsibleLintRule(object):
                 matches.append(Match(linenumber,
                                      section, file['path'], self, message))
         return matches
+
+from ansiblelint import RulesCollection  # noqa F401: new class location

@@ -20,7 +20,7 @@
 
 import os
 import re
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 
 
 class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):

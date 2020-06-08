@@ -2,7 +2,7 @@
 
 import re
 
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 
 
 class MetaTagValidRule(AnsibleLintRule):

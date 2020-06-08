@@ -1,6 +1,6 @@
 """Rule definition for a failure to load a file."""
 
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 
 
 class LoadingFailureRule(AnsibleLintRule):

@@ -1,4 +1,4 @@
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 
 
 class EMatcherRule(AnsibleLintRule):

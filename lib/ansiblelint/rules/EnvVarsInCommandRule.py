@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import LINE_NUMBER_KEY, FILENAME_KEY, get_first_cmd_arg
 
 

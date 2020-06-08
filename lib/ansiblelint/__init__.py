@@ -22,7 +22,6 @@
 from collections import defaultdict
 import logging
 
-from ansiblelint.rules import AnsibleLintRule  # noqa F401: exposing public API
 import ansiblelint.utils
 import ansiblelint.skip_utils
 from typing import List
@@ -97,3 +96,6 @@ class RulesCollection(object):
         for tag in sorted(tags):
             results.append("{0} {1}".format(tag, tags[tag]))
         return "\n".join(results)
+
+
+from ansiblelint.rules import AnsibleLintRule  # noqa F401: exposing public API

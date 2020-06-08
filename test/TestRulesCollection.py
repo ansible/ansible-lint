@@ -23,7 +23,7 @@ import os
 
 import pytest
 
-from ansiblelint import RulesCollection
+from ansiblelint.rules import RulesCollection
 
 
 @pytest.fixture
