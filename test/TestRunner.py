@@ -20,6 +20,7 @@
 import os
 
 import pytest
+
 import ansiblelint.formatters as formatters
 from ansiblelint.runner import Runner
 from ansiblelint.cli import abspath
