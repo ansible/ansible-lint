@@ -74,13 +74,13 @@ def test_normalize(reference_form, alternate_forms):
 
 
 def test_normalize_complex_command():
-    task1 = dict(name="hello", action={'module': 'ec2',
-                                       'region': 'us-east1',
-                                       'etc': 'whatever'})
-    task2 = dict(name="hello", ec2={'region': 'us-east1',
-                                    'etc': 'whatever'})
-    task3 = dict(name="hello", ec2="region=us-east1 etc=whatever")
-    task4 = dict(name="hello", action="ec2 region=us-east1 etc=whatever")
+    task1 = dict(name="hello", action={'module': 'pip',
+                                       'name': 'df',
+                                       'editable': 'false'})
+    task2 = dict(name="hello", pip={'name': 'df',
+                                    'editable': 'false'})
+    task3 = dict(name="hello", pip="name=df editable=false")
+    task4 = dict(name="hello", action="pip name=df editable=false")
     assert utils.normalize_task(task1, 'tasks.yml') == utils.normalize_task(task2, 'tasks.yml')
     assert utils.normalize_task(task2, 'tasks.yml') == utils.normalize_task(task3, 'tasks.yml')
     assert utils.normalize_task(task3, 'tasks.yml') == utils.normalize_task(task4, 'tasks.yml')
