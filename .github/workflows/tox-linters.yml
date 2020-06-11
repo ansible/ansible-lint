@@ -65,7 +65,7 @@ jobs:
     - name: >-
         Initialize tox envs: Ansible ${{ matrix.ansible-version }}
       run: |
-        python -m tox --parallel auto --notest
+        python -m tox --parallel auto --parallel-live --notest -vv
       env: ${{ matrix.env }}
     # - name: Initialize pre-commit envs if needed
     #   run: |
@@ -74,5 +74,5 @@ jobs:
     #     test -d .tox/pre-commit-failing && .tox/pre-commit-failing/bin/python -m pre_commit install-hooks || :
     - name: Test with tox
       run: |
-        python -m tox --parallel auto
+        python -m tox --parallel auto --parallel-live
       env: ${{ matrix.env }}

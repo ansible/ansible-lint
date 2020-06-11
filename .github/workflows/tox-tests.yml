@@ -63,12 +63,12 @@ jobs:
     - name: >-
         Initialize tox envs: Ansible ${{ matrix.ansible-version }}
       run: |
-        python -m tox --parallel auto --notest
+        python -m tox --parallel auto --parallel-live --notest -vv
       env:
         TOXENV: ansible${{ matrix.ansible-version }}
     - name: Test with tox
       run: |
-        python -m tox --parallel auto
+        python -m tox --parallel auto --parallel-live
       env:
         TOXENV: ansible${{ matrix.ansible-version }}
     - name: Archive logs
