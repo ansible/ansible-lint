@@ -1,5 +1,5 @@
 """Example implementation of a rule requiring tasks to have tags set."""
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 
 
 class TaskHasTag(AnsibleLintRule):

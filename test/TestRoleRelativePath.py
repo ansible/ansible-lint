@@ -1,6 +1,6 @@
 import unittest
 
-from ansiblelint import RulesCollection
+from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.RoleRelativePath import RoleRelativePath
 from test import RunFromText
 

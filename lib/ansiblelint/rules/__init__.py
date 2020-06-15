@@ -1,9 +1,34 @@
 """All internal ansible-lint rules."""
 import re
+from collections import defaultdict
+import glob
+import importlib.util
+import logging
+import os
+from typing import List
+
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.skip_utils import append_skipped_rules
 from ansiblelint.errors import Match
 import ansiblelint.utils
+
+
+_logger = logging.getLogger(__name__)
+
+
+def load_plugins(directory):
+    """Return a list of rule classes."""
+    result = []
+
+    for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
+
+        pluginname = os.path.basename(pluginfile.replace('.py', ''))
+        spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        obj = getattr(module, pluginname)()
+        result.append(obj)
+    return result
 
 
 class AnsibleLintRule(object):
@@ -120,3 +145,71 @@ class AnsibleLintRule(object):
                 matches.append(Match(linenumber,
                                      section, file['path'], self, message))
         return matches
+
+
+class RulesCollection(object):
+
+    def __init__(self, rulesdirs=None):
+        """Initialize a RulesCollection instance."""
+        if rulesdirs is None:
+            rulesdirs = []
+        self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
+        self.rules = []
+        for rulesdir in self.rulesdirs:
+            _logger.debug("Loading rules from %s", rulesdir)
+            self.extend(load_plugins(rulesdir))
+        self.rules = sorted(self.rules, key=lambda r: r.id)
+
+    def register(self, obj):
+        self.rules.append(obj)
+
+    def __iter__(self):
+        """Return the iterator over the rules in the RulesCollection."""
+        return iter(self.rules)
+
+    def __len__(self):
+        """Return the length of the RulesCollection data."""
+        return len(self.rules)
+
+    def extend(self, more):
+        self.rules.extend(more)
+
+    def run(self, playbookfile, tags=set(), skip_list=frozenset()) -> List:
+        text = ""
+        matches: List = list()
+
+        try:
+            with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
+                text = f.read()
+        except IOError as e:
+            _logger.warning(
+                "Couldn't open %s - %s",
+                playbookfile['path'],
+                e.strerror)
+            return matches
+
+        for rule in self.rules:
+            if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
+                rule_definition = set(rule.tags)
+                rule_definition.add(rule.id)
+                if set(rule_definition).isdisjoint(skip_list):
+                    matches.extend(rule.matchlines(playbookfile, text))
+                    matches.extend(rule.matchtasks(playbookfile, text))
+                    matches.extend(rule.matchyaml(playbookfile, text))
+
+        return matches
+
+    def __repr__(self):
+        """Return a RulesCollection instance representation."""
+        return "\n".join([rule.verbose()
+                          for rule in sorted(self.rules, key=lambda x: x.id)])
+
+    def listtags(self):
+        tags = defaultdict(list)
+        for rule in self.rules:
+            for tag in rule.tags:
+                tags[tag].append("[{0}]".format(rule.id))
+        results = []
+        for tag in sorted(tags):
+            results.append("{0} {1}".format(tag, tags[tag]))
+        return "\n".join(results)

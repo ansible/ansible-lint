@@ -1,6 +1,6 @@
 import unittest
 
-from ansiblelint import RulesCollection
+from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.OctalPermissionsRule import OctalPermissionsRule
 from test import RunFromText
 
