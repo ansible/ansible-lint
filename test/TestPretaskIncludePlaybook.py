@@ -15,6 +15,6 @@ def test_task_hook_include_playbook(default_rules_collection, stage):
     results_text = str(results)
     assert len(runner.playbooks) == 2
     assert len(results) == 3
-    assert 'Commands should not change things' in results_text
+    assert 'Commands should be idempotent' in results_text
     assert '502' not in results_text
     assert 'All tasks should be named' not in results_text

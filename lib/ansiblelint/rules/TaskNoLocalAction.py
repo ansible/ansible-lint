@@ -6,8 +6,8 @@ from ansiblelint.rules import AnsibleLintRule
 
 class TaskNoLocalAction(AnsibleLintRule):
     id = '504'
-    shortdesc = "Do not use 'local_action', use 'delegate_to: localhost'"
-    description = 'Do not use ``local_action``, use ``delegate_to: localhost``'
+    shortdesc = "Use ``delegate_to: localhost`` instead of ``local_action``"
+    description = shortdesc
     severity = 'MEDIUM'
     tags = ['task']
     version_added = 'v4.0.0'

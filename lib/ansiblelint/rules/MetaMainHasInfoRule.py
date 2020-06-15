@@ -6,7 +6,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 class MetaMainHasInfoRule(AnsibleLintRule):
     id = '701'
-    shortdesc = 'meta/main.yml should contain relevant info'
+    shortdesc = '``meta/main.yml`` should contain relevant info'
     info = [
         'author',
         'description',
@@ -15,7 +15,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
         'platforms',
     ]
     description = (
-        'meta/main.yml should contain: ``{}``'.format(', '.join(info))
+        '``meta/main.yml`` should contain: {}'.format(', '.join(f'``{k}``' for k in info))
     )
     severity = 'HIGH'
     tags = ['metadata']

@@ -10,9 +10,9 @@ from ansiblelint.rules import AnsibleLintRule
 
 class IncludeMissingFileRule(AnsibleLintRule):
     id = '505'
-    shortdesc = 'referenced files must exist'
+    shortdesc = 'Referenced files must exist'
     description = (
-        'All files referenced by by include / import tasks '
+        'All files referenced by ``include_tasks`` or ``import_tasks`` '
         'must exist. The check excludes files with jinja2 '
         'templates in the filename.'
     )

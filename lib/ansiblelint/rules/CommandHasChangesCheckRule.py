@@ -23,18 +23,17 @@ from ansiblelint.rules import AnsibleLintRule
 
 class CommandHasChangesCheckRule(AnsibleLintRule):
     id = '301'
-    shortdesc = 'Commands should not change things if nothing needs doing'
+    shortdesc = 'Commands should be idempotent'
     description = (
-        'Commands should either read information (and thus set '
-        '``changed_when``) or not do something if it has already been '
-        'done (using creates/removes) or only do it if another '
-        'check has a particular result (``when``)'
+        'Commands should either read information and report '
+        '``changed_when: false``. Changing commands should use conditions like ``when``, '
+        '``creates``, ``removes``, or set changed status based on a particular ``result``.'
     )
     severity = 'HIGH'
     tags = ['command-shell', 'idempotency', 'ANSIBLE0012']
     version_added = 'historic'
 
-    _commands = ['command', 'shell', 'raw']
+    _commands = ['command', 'shell', 'raw', 'idempotence']
 
     def matchtask(self, file, task):
         if task["__ansible_action_type__"] == 'task':

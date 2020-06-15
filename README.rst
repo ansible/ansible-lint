@@ -237,7 +237,7 @@ Included in ``ansible-lint/examples`` are some example playbooks with undesirabl
 
     $ ansible-lint examples/example.yml
 
-    [301] Commands should not change things if nothing needs doing
+    [301] Commands should be idempotent
     examples/example.yml:9
     Task/Handler: unset variable
 
@@ -245,7 +245,7 @@ Included in ``ansible-lint/examples`` are some example playbooks with undesirabl
     examples/example.yml:10
         action: command echo {{thisvariable}} is not set in this playbook
 
-    [301] Commands should not change things if nothing needs doing
+    [301] Commands should be idempotent
     examples/example.yml:12
     Task/Handler: trailing whitespace
 
@@ -261,7 +261,7 @@ Included in ``ansible-lint/examples`` are some example playbooks with undesirabl
     examples/example.yml:18
     Task/Handler: git check 2
 
-    [301] Commands should not change things if nothing needs doing
+    [301] Commands should be idempotent
     examples/example.yml:24
     Task/Handler: executing git through command
 
@@ -304,7 +304,7 @@ If playbooks include other playbooks, or tasks, or handlers or roles, these are 
 
     $ ansible-lint examples/include.yml
 
-    [301] Commands should not change things if nothing needs doing
+    [301] Commands should be idempotent
     examples/play.yml:5
     Task/Handler: a bad play
 
@@ -324,7 +324,7 @@ If playbooks include other playbooks, or tasks, or handlers or roles, these are 
     examples/roles/morecomplex/handlers/main.yml:1
     Task/Handler: restart service using command
 
-    [301] Commands should not change things if nothing needs doing
+    [301] Commands should be idempotent
     examples/roles/morecomplex/tasks/main.yml:1
     Task/Handler: test bad command
 
@@ -332,7 +332,7 @@ If playbooks include other playbooks, or tasks, or handlers or roles, these are 
     examples/roles/morecomplex/tasks/main.yml:1
     Task/Handler: test bad command
 
-    [301] Commands should not change things if nothing needs doing
+    [301] Commands should be idempotent
     examples/roles/morecomplex/tasks/main.yml:4
     Task/Handler: test bad command v2
 
@@ -340,7 +340,7 @@ If playbooks include other playbooks, or tasks, or handlers or roles, these are 
     examples/roles/morecomplex/tasks/main.yml:4
     Task/Handler: test bad command v2
 
-    [301] Commands should not change things if nothing needs doing
+    [301] Commands should be idempotent
     examples/roles/morecomplex/tasks/main.yml:7
     Task/Handler: test bad local command
 

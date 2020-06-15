@@ -9,8 +9,8 @@ from typing import List
 
 class PlaybookExtension(AnsibleLintRule):
     id = '205'
-    shortdesc = 'Use ".yml" or ".yaml" playbook extension'
-    description = 'Playbooks should have the ".yml" or ".yaml" extension'
+    shortdesc = 'Use ``.yml`` or ``.yaml`` playbook extension'
+    description = 'Playbooks should have the ``.yml`` or ``.yaml`` extension.'
     severity = 'MEDIUM'
     tags = ['formatting']
     done = []  # type: List  # already noticed path list

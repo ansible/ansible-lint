@@ -6,11 +6,11 @@ import re
 
 class MetaVideoLinksRule(AnsibleLintRule):
     id = '704'
-    shortdesc = "meta/main.yml video_links should be formatted correctly"
+    shortdesc = "``meta/main.yml`` ``video_links`` should be formatted correctly"
     description = (
-        'Items in ``video_links`` in meta/main.yml should be '
-        'dictionaries, and contain only keys ``url`` and ``title``, '
-        'and have a shared link from a supported provider'
+        'Items in ``video_links`` in ``meta/main.yml`` should be '
+        'dictionaries, contain only keys like ``url``, ``title``, '
+        'and have a shared link from a supported provider.'
     )
     severity = 'LOW'
     tags = ['metadata']

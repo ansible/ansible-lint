@@ -5,17 +5,17 @@ from ansiblelint.rules import AnsibleLintRule
 
 class MetaChangeFromDefaultRule(AnsibleLintRule):
     id = '703'
-    shortdesc = 'meta/main.yml default values should be changed'
+    shortdesc = '``meta/main.yml`` default values should be changed'
     field_defaults = [
         ('author', 'your name'),
-        ('description', 'your description'),
         ('company', 'your company (optional)'),
+        ('description', 'your description'),
         ('license', 'license (GPLv2, CC-BY, etc)'),
         ('license', 'license (GPL-2.0-or-later, MIT, etc)'),
     ]
     description = (
-        'meta/main.yml default values should be changed for: ``{}``'.format(
-            ', '.join(f[0] for f in field_defaults)
+        'meta/main.yml default values should be changed for: {}'.format(
+            ', '.join(sorted(set(f'``{f[0]}``' for f in field_defaults)))
         )
     )
     severity = 'HIGH'

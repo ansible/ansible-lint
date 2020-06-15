@@ -16,10 +16,10 @@ Deprecated Rules (1xx)
 
 .. _101:
 
-101: Deprecated always_run
-**************************
+101: Deprecated ``always_run``
+******************************
 
-Instead of ``always_run``, use ``check_mode``
+Use ``check_mode`` instead of ``always_run``.
 
 .. _102:
 
@@ -33,7 +33,7 @@ Instead of ``always_run``, use ``check_mode``
 103: Deprecated sudo
 ********************
 
-Instead of ``sudo``/``sudo_user``, use ``become``/``become_user``.
+Use ``become`` or ``become_user`` instead of ``sudo`` or ``sudo_user``.
 
 .. _104:
 
@@ -89,10 +89,10 @@ Long lines make code harder to read and code review more difficult
 
 .. _205:
 
-205: Use ".yml" or ".yaml" playbook extension
-*********************************************
+205: Use ``.yml`` or ``.yaml`` playbook extension
+*************************************************
 
-Playbooks should have the ".yml" or ".yaml" extension
+Playbooks should have the ``.yml`` or ``.yaml`` extension.
 
 .. _206:
 
@@ -106,10 +106,10 @@ Command-Shell Rules (3xx)
 
 .. _301:
 
-301: Commands should not change things if nothing needs doing
-*************************************************************
+301: Commands should be idempotent
+**********************************
 
-Commands should either read information (and thus set ``changed_when``) or not do something if it has already been done (using creates/removes) or only do it if another check has a particular result (``when``)
+Commands should either read information and report ``changed_when: false``. Changing commands should use conditions like ``when``, ``creates``, ``removes``, or set changed status based on a particular ``result``.
 
 .. _302:
 
@@ -168,7 +168,7 @@ All version control checkouts must point to an explicit commit or tag, not just 
 403: Package installs should not use latest
 *******************************************
 
-Package installs should use ``state=present`` with or without a version
+Package installs should use ``state: present`` with or without a version
 
 .. _404:
 
@@ -203,27 +203,27 @@ If a task has a ``when: result.changed`` setting, it is effectively acting as a 
 
 .. _504:
 
-504: Do not use 'local_action', use 'delegate_to: localhost'
-************************************************************
+504: Use ``delegate_to: localhost`` instead of ``local_action``
+***************************************************************
 
-Do not use ``local_action``, use ``delegate_to: localhost``
+Use ``delegate_to: localhost`` instead of ``local_action``
 
 .. _505:
 
-505: referenced files must exist
+505: Referenced files must exist
 ********************************
 
-All files referenced by by include / import tasks must exist. The check excludes files with jinja2 templates in the filename.
+All files referenced by ``include_tasks`` or ``import_tasks`` must exist. The check excludes files with jinja2 templates in the filename.
 
 Idiom Rules (6xx)
 -----------------
 
 .. _601:
 
-601: Don't compare to literal True/False
-****************************************
+601: Don't compare to literal boolean.
+**************************************
 
-Use ``when: var`` rather than ``when: var == True`` (or conversely ``when: not var``)
+Use ``when: var`` instead of ``when: var == True``, or ``when: not var`` for negative checks.
 
 .. _602:
 
@@ -237,10 +237,10 @@ Metadata Rules (7xx)
 
 .. _701:
 
-701: meta/main.yml should contain relevant info
-***********************************************
+701: ``meta/main.yml`` should contain relevant info
+***************************************************
 
-meta/main.yml should contain: ``author, description, license, min_ansible_version, platforms``
+``meta/main.yml`` should contain: ``author``, ``description``, ``license``, ``min_ansible_version``, ``platforms``
 
 .. _702:
 
@@ -251,17 +251,17 @@ Tags must contain lowercase letters and digits only, and ``galaxy_tags`` is expe
 
 .. _703:
 
-703: meta/main.yml default values should be changed
-***************************************************
+703: ``meta/main.yml`` default values should be changed
+*******************************************************
 
-meta/main.yml default values should be changed for: ``author, description, company, license, license``
+meta/main.yml default values should be changed for: ``author``, ``company``, ``description``, ``license``
 
 .. _704:
 
-704: meta/main.yml video_links should be formatted correctly
-************************************************************
+704: ``meta/main.yml`` ``video_links`` should be formatted correctly
+********************************************************************
 
-Items in ``video_links`` in meta/main.yml should be dictionaries, and contain only keys ``url`` and ``title``, and have a shared link from a supported provider
+Items in ``video_links`` in ``meta/main.yml`` should be dictionaries, contain only keys like ``url``, ``title``, and have a shared link from a supported provider.
 
 Core Rules (9xx)
 ----------------

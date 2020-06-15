@@ -4,7 +4,7 @@ from ansiblelint.rules import AnsibleLintRule
 class SudoRule(AnsibleLintRule):
     id = '103'
     shortdesc = 'Deprecated sudo'
-    description = 'Instead of ``sudo``/``sudo_user``, use ``become``/``become_user``.'
+    description = 'Use ``become`` or ``become_user`` instead of ``sudo`` or ``sudo_user``.'
     severity = 'VERY_HIGH'
     tags = ['deprecated', 'ANSIBLE0008']
     version_added = 'historic'
