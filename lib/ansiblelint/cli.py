@@ -9,9 +9,8 @@ import sys
 import yaml
 from typing import NamedTuple
 
-from ansiblelint.constants import DEFAULT_RULESDIR
+from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.version import __version__
-import ansiblelint.utils
 
 
 _logger = logging.getLogger(__name__)
@@ -60,7 +59,7 @@ def load_config(config_file):
     if config_file:
         if not os.path.exists(config_path):
             _logger.error("Config file not found '%s'", config_path)
-            sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
+            sys.exit(INVALID_CONFIG_RC)
     elif not os.path.exists(config_path):
         # a missing default config file should not trigger an error
         return
@@ -70,13 +69,13 @@ def load_config(config_file):
             config = yaml.safe_load(stream)
     except yaml.YAMLError as e:
         _logger.error(e)
-        sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
+        sys.exit(INVALID_CONFIG_RC)
     # TODO(ssbarnea): implement schema validation for config file
     if isinstance(config, list):
         _logger.error(
             "Invalid configuration '%s', expected YAML mapping in the config file.",
             config_path)
-        sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
+        sys.exit(INVALID_CONFIG_RC)
 
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)

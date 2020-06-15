@@ -44,6 +44,7 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import module_loader
 from ansible.template import Templar
+from ansiblelint.constants import ANSIBLE_FAILURE_RC
 from ansiblelint.errors import MatchError
 from typing import List
 
@@ -55,8 +56,6 @@ DEFAULT_VAULT_PASSWORD = 'x'
 
 PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
 
-INVALID_CONFIG_RC = 2
-ANSIBLE_FAILURE_RC = 3
 
 _logger = logging.getLogger(__name__)
 
