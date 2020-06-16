@@ -41,12 +41,12 @@ class NestedJinjaRule(AnsibleLintRule):
 
     def matchtask(self, file, task):
 
-        command = "".join([
+        command = "".join(
             str(value)
             # task properties are stored in the 'action' key
             for key, value in task['action'].items()
             # exclude useless values of '__file__', '__ansible_module__', '__*__', etc.
             if not key.startswith('__') and not key.endswith('__')
-        ])
+        )
 
         return bool(self.pattern.search(command))
