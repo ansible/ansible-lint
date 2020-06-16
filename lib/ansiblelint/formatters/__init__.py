@@ -1,11 +1,7 @@
 """Output formatters."""
 import os
 from pathlib import Path
-
-try:
-    from ansible import color
-except ImportError:
-    from ansible.utils import color
+from ansiblelint.color import colorize, Color
 
 
 class BaseFormatter:
@@ -15,7 +11,7 @@ class BaseFormatter:
 
     Args:
         base_dir (str|Path): reference directory against which display relative path.
-        display_relative_path (bool): whether to show path as relatvie or absolute
+        display_relative_path (bool): whether to show path as relative or absolute
     """
 
     def __init__(self, base_dir, display_relative_path):
@@ -47,12 +43,11 @@ class Formatter(BaseFormatter):
     def format(self, match, colored=False):
         formatstr = u"{0} {1}\n{2}:{3}\n{4}\n"
         if colored:
-            color.ANSIBLE_COLOR = True
-            return formatstr.format(color.stringc(u"[{0}]".format(match.rule.id), 'bright red'),
-                                    color.stringc(match.message, 'red'),
-                                    color.stringc(self._format_path(match.filename), 'blue'),
-                                    color.stringc(str(match.linenumber), 'cyan'),
-                                    color.stringc(u"{0}".format(match.line), 'purple'))
+            return formatstr.format(colorize(u"[{0}]".format(match.rule.id), Color.error_code),
+                                    colorize(match.message, Color.error_title),
+                                    colorize(self._format_path(match.filename), Color.filename),
+                                    colorize(str(match.linenumber), Color.linenumber),
+                                    colorize(u"{0}".format(match.line), Color.line))
         else:
             return formatstr.format(match.rule.id,
                                     match.message,
@@ -66,12 +61,11 @@ class QuietFormatter(BaseFormatter):
     def format(self, match, colored=False):
         formatstr = u"{0} {1}:{2}"
         if colored:
-            color.ANSIBLE_COLOR = True
-            return formatstr.format(color.stringc(u"[{0}]".format(match.rule.id), 'bright red'),
-                                    color.stringc(self._format_path(match.filename), 'blue'),
-                                    color.stringc(str(match.linenumber), 'cyan'))
+            return formatstr.format(colorize(u"[{0}]".format(match.rule.id), Color.error_code),
+                                    colorize(self._format_path(match.filename), Color.filename),
+                                    colorize(str(match.linenumber), Color.linenumber))
         else:
-            return formatstr.format(match.rule.id, self.f_ormat_path(match.filename),
+            return formatstr.format(match.rule.id, self.format_path(match.filename),
                                     match.linenumber)
 
 
@@ -80,11 +74,10 @@ class ParseableFormatter(BaseFormatter):
     def format(self, match, colored=False):
         formatstr = u"{0}:{1}: [{2}] {3}"
         if colored:
-            color.ANSIBLE_COLOR = True
-            return formatstr.format(color.stringc(self._format_path(match.filename), 'blue'),
-                                    color.stringc(str(match.linenumber), 'cyan'),
-                                    color.stringc(u"E{0}".format(match.rule.id), 'bright red'),
-                                    color.stringc(u"{0}".format(match.message), 'red'))
+            return formatstr.format(colorize(self._format_path(match.filename), Color.filename),
+                                    colorize(str(match.linenumber), Color.linenumber),
+                                    colorize(u"E{0}".format(match.rule.id), Color.error_code),
+                                    colorize(u"{0}".format(match.message), Color.error_title))
         else:
             return formatstr.format(self._format_path(match.filename),
                                     match.linenumber,
@@ -104,12 +97,11 @@ class ParseableSeverityFormatter(BaseFormatter):
         message = str(match.message)
 
         if colored:
-            color.ANSIBLE_COLOR = True
-            filename = color.stringc(filename, 'blue')
-            linenumber = color.stringc(linenumber, 'cyan')
-            rule_id = color.stringc(rule_id, 'bright red')
-            severity = color.stringc(severity, 'bright red')
-            message = color.stringc(message, 'red')
+            filename = colorize(filename, 'blue')
+            linenumber = colorize(linenumber, 'cyan')
+            rule_id = colorize(rule_id, 'bright red')
+            severity = colorize(severity, 'bright red')
+            message = colorize(message, 'red')
 
         return formatstr.format(
             filename,
