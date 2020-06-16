@@ -58,26 +58,6 @@ PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
 _logger = logging.getLogger(__name__)
 
 
-def initialize_logger(level: int = 0) -> None:
-    """Set up the global logging level based on the verbosity number."""
-    VERBOSITY_MAP = {
-        0: logging.NOTSET,
-        1: logging.INFO,
-        2: logging.DEBUG
-    }
-
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(levelname)-8s %(message)s')
-    handler.setFormatter(formatter)
-    logger = logging.getLogger(__package__)
-    logger.addHandler(handler)
-    # Unknown logging level is treated as DEBUG
-    logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
-    logger.setLevel(logging_level)
-    # Use module-level _logger instance to validate it
-    _logger.debug("Logging initialized to level %s", logging_level)
-
-
 def parse_yaml_from_file(filepath):
     dl = DataLoader()
     if hasattr(dl, 'set_vault_password'):

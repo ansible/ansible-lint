@@ -29,6 +29,7 @@ import sys
 import pytest
 
 import ansiblelint.utils as utils
+from ansiblelint.__main__ import initialize_logger
 from ansiblelint import cli
 
 
@@ -165,7 +166,7 @@ def test_get_yaml_files_git_verbose(
     caplog
 ):
     options = cli.get_config(['-v'])
-    utils.initialize_logger(options.verbosity)
+    initialize_logger(options.verbosity)
     monkeypatch.setenv(reset_env_var, '')
     utils.get_yaml_files(options)
 
@@ -214,10 +215,10 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
 def test_logger_debug(caplog):
     """Test that the double verbosity arg causes logger to be DEBUG."""
     options = cli.get_config(['-vv'])
-    utils.initialize_logger(options.verbosity)
+    initialize_logger(options.verbosity)
 
     expected_info = (
-        "ansiblelint.utils",
+        "ansiblelint.__main__",
         logging.DEBUG,
         'Logging initialized to level 10',
     )

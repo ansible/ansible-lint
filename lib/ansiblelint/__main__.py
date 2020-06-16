@@ -24,19 +24,37 @@ import errno
 import logging
 import pathlib
 import sys
-
-import ansiblelint.formatters as formatters
-from ansiblelint import cli
-from ansiblelint.constants import DEFAULT_RULESDIR
-from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
-from ansiblelint.utils import get_playbooks_and_roles
-from ansiblelint.utils import normpath, initialize_logger
-from ansiblelint.generate_docs import rules_as_rst
 from typing import Any, Set
 
+from ansiblelint import cli
+from ansiblelint.constants import DEFAULT_RULESDIR
+from ansiblelint.generate_docs import rules_as_rst
+from ansiblelint.utils import normpath, get_playbooks_and_roles
+import ansiblelint.formatters as formatters
+from ansiblelint.runner import Runner
+from ansiblelint.rules import RulesCollection
 
 _logger = logging.getLogger(__name__)
+
+
+def initialize_logger(level: int = 0) -> None:
+    """Set up the global logging level based on the verbosity number."""
+    VERBOSITY_MAP = {
+        0: logging.NOTSET,
+        1: logging.INFO,
+        2: logging.DEBUG
+    }
+
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    logger = logging.getLogger(__package__)
+    logger.addHandler(handler)
+    # Unknown logging level is treated as DEBUG
+    logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
+    logger.setLevel(logging_level)
+    # Use module-level _logger instance to validate it
+    _logger.debug("Logging initialized to level %s", logging_level)
 
 
 def main():
