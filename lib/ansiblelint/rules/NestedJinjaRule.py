@@ -22,7 +22,7 @@
 # THE SOFTWARE.
 
 import re
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 
 
 class NestedJinjaRule(AnsibleLintRule):
