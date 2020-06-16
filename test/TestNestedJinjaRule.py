@@ -25,6 +25,7 @@ from collections import namedtuple
 
 import pytest
 
+from ansiblelint.rules.NestedJinjaRule import NestedJinjaRule
 from ansiblelint.runner import Runner
 
 
@@ -185,7 +186,7 @@ def _playbook_file(tmp_path, request):
 @pytest.mark.usefixtures('_playbook_file')
 def test_including_wrong_nested_jinja(runner):
     rule_violations = runner.run()
-    assert rule_violations[0].rule.id == '207'
+    assert type(rule_violations[0].rule) is NestedJinjaRule  # avoid matching subclasses
 
 
 @pytest.mark.parametrize(
