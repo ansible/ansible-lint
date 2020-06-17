@@ -20,8 +20,11 @@ jobs:
       matrix:
         python-version:
         - 3.8
+        - 3.9-dev
         - 3.7
         - 3.6
+        # NOTE: Installing ansible under 3.10-dev is currently not
+        # NOTE: possible because compiling cffi explodes.
         os:
         - ubuntu-20.04
         - ubuntu-latest
@@ -33,6 +36,13 @@ jobs:
         - devel
         - 29
         - 28
+        exclude:
+        # There's no nightlies for macOS
+        - os: macOS-latest
+          python-version: 3.9-dev
+        # Ubuntu 16.04 is incompatible with the deadsnakes action
+        - os: ubuntu-16.04
+          python-version: 3.9-dev
 
     env:
       TOX_PARALLEL_NO_SPINNER: 1
@@ -43,10 +53,24 @@ jobs:
       run: |
         git fetch --prune --unshallow
         git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+    - name: Set up stock Python ${{ matrix.python-version }} from GitHub
+      if: >-
+        !endsWith(matrix.python-version, '-dev')
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python-version }} from deadsnakes
+      if: >-
+        endsWith(matrix.python-version, '-dev')
+      uses: deadsnakes/action@v1.0.0
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: >-
+        Log the currently selected Python
+        version info (${{ matrix.python-version }})
+      run: |
+        python --version --version
+        which python
     - name: Pip cache
       uses: actions/cache@v1
       with:
