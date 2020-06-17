@@ -23,6 +23,7 @@ jobs:
         - 3.7
         - 3.6
         os:
+        - ubuntu-20.04
         - ubuntu-latest
         - ubuntu-16.04
         - macOS-latest
