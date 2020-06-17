@@ -9,4 +9,3 @@ tox.ini @webknjaz
 .gitignore @webknjaz
 .git_archival.txt @webknjaz
 .pre-commit-hooks.yaml @webknjaz
-.travis.yml @webknjaz

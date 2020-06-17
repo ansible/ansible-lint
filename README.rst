@@ -14,10 +14,6 @@
    :target: https://docs.ansible.com/ansible/latest/community/communication.html#mailing-list-information
    :alt: Ansible mailing lists
 
-.. image:: https://img.shields.io/travis/com/ansible/ansible-lint/master.svg?label=Linux%20builds%20%40%20Travis%20CI
-   :target: https://travis-ci.com/ansible/ansible-lint
-   :alt: Travis CI build status
-
 .. image:: https://github.com/ansible/ansible-lint/workflows/%F0%9F%91%B7/badge.svg
    :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3A%F0%9F%91%B7
    :alt: 👷 GitHub Actions CI/CD build status — tests
