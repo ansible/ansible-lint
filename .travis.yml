@@ -78,44 +78,6 @@ jobs:
     env:
       ANSIBLE_VERSION: devel
 
-  - &deploy-job
-    <<: *reset-prerequisites
-    stage: Deploy
-    name: Publishing current Git tagged version of dist to PyPI
-    if: repo == "ansible/ansible-lint" AND tag IS present
-    python: "3.8"
-    env:
-      TOXENV: build-dists,metadata-validation
-    before_deploy:
-    - echo > setup.py
-    deploy: &deploy-step
-      provider: pypi
-      user: ansible-lint
-      password:
-        secure: >
-          l4lT2SQmdtNOoOWd4eeozpshpsuSKirvzcJtRf7BhkcUh1T4OPTga8Qe2kQiQ/zOdd9E+Mtlyi1o6pipEVTQkLn2TvVM+lOt9NlpyNxUrDfwJ3dyqp6/rdNm+UWBOJA/sijZik2WyyXq5aN6va7ESSu4ShZtlOUYuLnEfQkgogbkn2IO0EhrAQIjBknvmIFPWpicxwi3aZaV5eEhYFCjxZDlQOq4B0pC9FIvbHQr32DB3Eibv7q0Svn0SuRAvrOKvgFlqcM24PHYV0gu1NAvuX7fj6ICvnHNLlDQ/iPNr90PqDal+zE/bdrGHFehT1Gp4heWEuP+xknysz4UrrO5j4V/MA+A5EfNwzku1lr4LeWPwxHVyv/4UYM3rAJFQLdkKErnChkrLUQaqNf+W9eznTsBKSXGbrkZmDsqT2cAW87Z5PTm5z+FtA3uOd5Ga8UZLoTMUjrHu1f23aC3TOYVvCWu2OKFtAowRdUxrbyJghzk6WORRhQCUAs8JUxObsd7TfeETSodtW3oALMVhrOnDTQF/Iif4X1hjorUlBvZR9vNJmZoyyUKc64FDPmoWLaYhed2iGOBW6QAz4+SolJ3QXdSI5odb7sSIq1uBMxnPMWrDtyHOv4iveOz4+vybCEbZt6xJrJodIQJD/nxlRBPVErrOUiSn3f0KXDqpY/bhFI=
-      distributions: dists
-      skip-cleanup: true
-      on:
-        all_branches: true
-
-  - <<: *deploy-job
-    # Always run, except if PR or cron, or non-master pushes:
-    if: >-
-      repo == "ansible/ansible-lint"
-      AND branch == "master"
-      AND type NOT IN (cron, pull_request)
-    name: Publishing current (unstable) Git revision of dist to Test PyPI
-    before_script:
-    - >-
-      echo
-      'local_scheme = "no-local-version"'
-      >>
-      pyproject.toml
-    deploy:
-      <<: *deploy-step
-      server: https://test.pypi.org/legacy/
-
 env:
   global:
     TOXENV_TMPL: "'ansible${ANSIBLE_VERSION}'"
