@@ -365,18 +365,27 @@ def _kv_to_dict(v):
 def normalize_task_v2(task):
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
-    mod_arg_parser = ModuleArgsParser(task)
+    clean_task = task.copy()
+    # task is an AnsibleMapping which inherits from OrderedDict, so we need
+    # to use `del` to remove unwanted keys.
+    for k in ['skipped_rules', FILENAME_KEY, LINE_NUMBER_KEY]:
+        if k in clean_task:
+            del clean_task[k]
+    if 'always_run' in task:
+        raise MatchError(
+            "Ansible 2.10 and later does not support `always_run`.",
+            filename=task[FILENAME_KEY],
+            linenumber=task[LINE_NUMBER_KEY])
+    mod_arg_parser = ModuleArgsParser(clean_task)
     try:
         action, arguments, result['delegate_to'] = mod_arg_parser.parse()
     except AnsibleParserError as e:
         try:
             task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
-            del task[FILENAME_KEY]
-            del task[LINE_NUMBER_KEY]
         except KeyError:
             task_info = "Unknown"
         pp = pprint.PrettyPrinter(indent=2)
-        task_pprint = pp.pformat(task)
+        task_pprint = pp.pformat(clean_task)
 
         _logger.critical("Couldn't parse task at %s (%s)\n%s", task_info, e.message, task_pprint)
         raise SystemExit(ANSIBLE_FAILURE_RC)

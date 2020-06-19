@@ -10,7 +10,7 @@ from typing import List
 
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.skip_utils import append_skipped_rules
-from ansiblelint.errors import Match
+from ansiblelint.errors import Match, MatchError
 import ansiblelint.utils
 
 
@@ -64,10 +64,7 @@ class AnsibleLintRule(object):
 
     def matchtasks(self, file: str, text: str) -> List[Match]:
         matches: List[Match] = []
-        if not self.matchtask:
-            return matches
-
-        if file['type'] == 'meta':
+        if not self.matchtask or file['type'] == 'meta':
             return matches
 
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
@@ -76,7 +73,12 @@ class AnsibleLintRule(object):
 
         yaml = append_skipped_rules(yaml, text, file['type'])
 
-        for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
+        try:
+            tasks = ansiblelint.utils.get_normalized_tasks(yaml, file)
+        except MatchError as e:
+            return [e]
+
+        for task in tasks:
             if self.id in task.get('skipped_rules', ()):
                 continue
 
@@ -90,8 +92,10 @@ class AnsibleLintRule(object):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
-                           file['path'], self, message))
+            matches.append(
+                Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
+                      file['path'], self, message))
+
         return matches
 
     @staticmethod
@@ -203,8 +207,7 @@ class RulesCollection(object):
                     matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchtasks(playbookfile, text))
                     matches.extend(rule.matchyaml(playbookfile, text))
-
-        return matches
+        return list(set(matches))
 
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""

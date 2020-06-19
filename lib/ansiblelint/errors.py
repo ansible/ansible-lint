@@ -19,19 +19,35 @@ class Match(object):
                                 self.filename, self.linenumber, self.line)
 
 
+class AnsibleLintInternalRule():
+    """Internal error likely caused by parsing failures."""
+
+    id = "999"
+    shortdesc = "Parsing Error"
+    description = "Ansible failed to file."
+
+
 class MatchError(ValueError):
     """Exception that would end-up as linter rule match."""
 
-    def __init__(self, message, rule=None):
+    def __init__(self, message, rule=AnsibleLintInternalRule, filename="", linenumber=0, line=None):
         """Initialize a MatchError instance."""
         super().__init__(message)
 
         self.message = message
-        self.linenumber = 0
-        self.line = None
-        self.filename = None
+        self.linenumber = linenumber
+        self.line = line
+        self.filename = filename
         self.rule = rule
 
     def get_match(self) -> Match:
         """Return a Match instance."""
         return Match(self.linenumber, self.line, self.filename, self.rule, self.message)
+
+    def __eq__(self, other):
+        """Identify duplicate matches."""
+        return self.__hash__() == other.__hash__()
+
+    def __hash__(self):
+        """Perform hash of matches."""
+        return hash((self.message, self.rule, self.filename, self.linenumber))
