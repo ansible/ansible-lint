@@ -69,7 +69,9 @@ class AnsibleLintRule(object):
             matches.append(m)
         return matches
 
-    def matchtasks(self, file: str, text: str) -> List[MatchError]:
+    # TODO(ssbarnea): Reduce mccabe complexity
+    # https://github.com/ansible/ansible-lint/issues/744
+    def matchtasks(self, file: str, text: str) -> List[MatchError]:  # noqa: C901
         matches: List[MatchError] = []
         if not self.matchtask:
             return matches
@@ -83,7 +85,12 @@ class AnsibleLintRule(object):
 
         yaml = append_skipped_rules(yaml, text, file['type'])
 
-        for task in ansiblelint.utils.get_normalized_tasks(yaml, file):
+        try:
+            tasks = ansiblelint.utils.get_normalized_tasks(yaml, file)
+        except MatchError as e:
+            return [e]
+
+        for task in tasks:
             if self.id in task.get('skipped_rules', ()):
                 continue
 
