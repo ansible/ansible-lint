@@ -16,7 +16,7 @@ class Runner(object):
     """Runner class performs the linting process."""
 
     def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
-                 verbosity=0, checked_files=None):
+                 verbosity=0, checked_files=None) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.playbooks = set()
@@ -35,7 +35,7 @@ class Runner(object):
             checked_files = set()
         self.checked_files = checked_files
 
-    def _update_exclude_paths(self, exclude_paths):
+    def _update_exclude_paths(self, exclude_paths: List[str]) -> None:
         if exclude_paths:
             # These will be (potentially) relative paths
             paths = ansiblelint.utils.expand_paths_vars(exclude_paths)
@@ -46,7 +46,7 @@ class Runner(object):
         else:
             self.exclude_paths = []
 
-    def is_excluded(self, file_path):
+    def is_excluded(self, file_path: str) -> bool:
         """Verify if a file path should be excluded."""
         # Any will short-circuit as soon as something returns True, but will
         # be poor performance for the case where the path under question is

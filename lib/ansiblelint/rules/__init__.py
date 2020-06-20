@@ -2,6 +2,7 @@
 import re
 from collections import defaultdict
 import glob
+from importlib.abc import Loader
 import importlib.util
 import logging
 import os
@@ -16,30 +17,19 @@ import ansiblelint.utils
 _logger = logging.getLogger(__name__)
 
 
-def load_plugins(directory):
-    """Return a list of rule classes."""
-    result = []
-
-    for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
-
-        pluginname = os.path.basename(pluginfile.replace('.py', ''))
-        spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        obj = getattr(module, pluginname)()
-        result.append(obj)
-    return result
-
-
 class AnsibleLintRule(object):
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
 
-    def verbose(self):
+    def verbose(self) -> str:
         return self.id + ": " + self.shortdesc + "\n  " + self.description
 
+    id: str = ""
+    tags: List[str] = []
+    shortdesc: str = ""
+    description: str = ""
     match = None
     matchtask = None
     matchplay = None
@@ -48,8 +38,8 @@ class AnsibleLintRule(object):
     def unjinja(text):
         return re.sub(r"{{[^}]*}}", "JINJA_VAR", text)
 
-    def matchlines(self, file, text):
-        matches = []
+    def matchlines(self, file, text) -> List[Match]:
+        matches: List[Match] = []
         if not self.match:
             return matches
         # arrays are 0-based, line numbers are 1-based
@@ -72,8 +62,8 @@ class AnsibleLintRule(object):
                            file['path'], self, message))
         return matches
 
-    def matchtasks(self, file, text):
-        matches = []
+    def matchtasks(self, file: str, text: str) -> List[Match]:
+        matches: List[Match] = []
         if not self.matchtask:
             return matches
 
@@ -112,8 +102,8 @@ class AnsibleLintRule(object):
             linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
         return linenumber
 
-    def matchyaml(self, file, text):
-        matches = []
+    def matchyaml(self, file: str, text: str) -> List[Match]:
+        matches: List[Match] = []
         if not self.matchplay:
             return matches
 
@@ -147,14 +137,31 @@ class AnsibleLintRule(object):
         return matches
 
 
+def load_plugins(directory: str) -> List[AnsibleLintRule]:
+    """Return a list of rule classes."""
+    result = []
+
+    for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
+
+        pluginname = os.path.basename(pluginfile.replace('.py', ''))
+        spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
+        # https://github.com/python/typeshed/issues/2793
+        if spec and isinstance(spec.loader, Loader):
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            obj = getattr(module, pluginname)()
+            result.append(obj)
+    return result
+
+
 class RulesCollection(object):
 
-    def __init__(self, rulesdirs=None):
+    def __init__(self, rulesdirs=None) -> None:
         """Initialize a RulesCollection instance."""
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
-        self.rules = []
+        self.rules: List[AnsibleLintRule] = []
         for rulesdir in self.rulesdirs:
             _logger.debug("Loading rules from %s", rulesdir)
             self.extend(load_plugins(rulesdir))
@@ -171,7 +178,7 @@ class RulesCollection(object):
         """Return the length of the RulesCollection data."""
         return len(self.rules)
 
-    def extend(self, more):
+    def extend(self, more: List[AnsibleLintRule]) -> None:
         self.rules.extend(more)
 
     def run(self, playbookfile, tags=set(), skip_list=frozenset()) -> List:
@@ -199,12 +206,12 @@ class RulesCollection(object):
 
         return matches
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
         return "\n".join([rule.verbose()
                           for rule in sorted(self.rules, key=lambda x: x.id)])
 
-    def listtags(self):
+    def listtags(self) -> str:
         tags = defaultdict(list)
         for rule in self.rules:
             for tag in rule.tags:

@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 """Generic utility helpers."""
 
+from argparse import Namespace
 from collections import OrderedDict
 import inspect
 import logging
@@ -44,7 +45,7 @@ from ansible.plugins.loader import module_loader
 from ansible.template import Templar
 from ansiblelint.constants import ANSIBLE_FAILURE_RC
 from ansiblelint.errors import MatchError
-from typing import List
+from typing import Callable, ItemsView, List, Tuple
 
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
@@ -58,14 +59,14 @@ PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
 _logger = logging.getLogger(__name__)
 
 
-def parse_yaml_from_file(filepath):
+def parse_yaml_from_file(filepath: str) -> dict:
     dl = DataLoader()
     if hasattr(dl, 'set_vault_password'):
         dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
     return dl.load_from_file(filepath)
 
 
-def path_dwim(basedir, given):
+def path_dwim(basedir: str, given: str) -> str:
     dl = DataLoader()
     dl.set_basedir(basedir)
     return dl.path_dwim(given)
@@ -124,7 +125,7 @@ def tokenize(line):
     return (command, args, kwargs)
 
 
-def _playbook_items(pb_data):
+def _playbook_items(pb_data: dict) -> ItemsView:
     if isinstance(pb_data, dict):
         return pb_data.items()
     elif not pb_data:
@@ -133,7 +134,7 @@ def _playbook_items(pb_data):
         return [item for play in pb_data for item in play.items()]
 
 
-def _rebind_match_filename(filename, func):
+def _rebind_match_filename(filename: str, func) -> Callable:
     def func_wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -143,7 +144,7 @@ def _rebind_match_filename(filename, func):
     return func_wrapper
 
 
-def find_children(playbook, playbook_dir):
+def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
     if not os.path.exists(playbook[0]):
         return []
     if playbook[1] == 'role':
@@ -589,7 +590,7 @@ def normpath(path) -> str:
     return os.path.relpath(str(path))
 
 
-def is_playbook(filename):
+def is_playbook(filename: str) -> bool:
     """
     Check if the file is a playbook.
 
@@ -628,7 +629,7 @@ def is_playbook(filename):
     return False
 
 
-def get_yaml_files(options):
+def get_yaml_files(options: Namespace) -> dict:
     """Find all yaml files."""
     # git is preferred as it also considers .gitignore
     git_command = ['git', 'ls-files', '*.yaml', '*.yml']
@@ -721,7 +722,7 @@ def get_playbooks_and_roles(options=None) -> List[str]:
         if p.parts[-1].startswith('.'):
             continue
 
-        if is_playbook(p):
+        if is_playbook(str(p)):
             playbooks.append(normpath(p))
             continue
 
@@ -733,7 +734,7 @@ def get_playbooks_and_roles(options=None) -> List[str]:
     return role_dirs + playbooks
 
 
-def expand_path_vars(path):
+def expand_path_vars(path: str) -> str:
     """Expand the environment or ~ variables in a path string."""
     path = path.strip()
     path = os.path.expanduser(path)
@@ -741,7 +742,7 @@ def expand_path_vars(path):
     return path
 
 
-def expand_paths_vars(paths):
+def expand_paths_vars(paths: List[str]) -> List[str]:
     """Expand the environment or ~ variables in a list."""
     paths = [expand_path_vars(p) for p in paths]
     return paths

@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 
 import yaml
-from typing import NamedTuple
+from typing import List, NamedTuple
 
 from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.version import __version__
@@ -17,7 +17,7 @@ _logger = logging.getLogger(__name__)
 _PATH_VARS = ['exclude_paths', 'rulesdir', ]
 
 
-def abspath(path, base_dir):
+def abspath(path: str, base_dir: str) -> str:
     """Make relative path absolute relative to given directory.
 
     Args:
@@ -35,7 +35,7 @@ def abspath(path, base_dir):
     return os.path.normpath(path)
 
 
-def expand_to_normalized_paths(config, base_dir=None):
+def expand_to_normalized_paths(config: dict, base_dir: str = None) -> None:
     # config can be None (-c /dev/null)
     if not config:
         return
@@ -53,7 +53,7 @@ def expand_to_normalized_paths(config, base_dir=None):
         config[paths_var] = normalized_paths
 
 
-def load_config(config_file):
+def load_config(config_file: str) -> dict:
     config_path = os.path.abspath(config_file or '.ansible-lint')
 
     if config_file:
@@ -62,7 +62,7 @@ def load_config(config_file):
             sys.exit(INVALID_CONFIG_RC)
     elif not os.path.exists(config_path):
         # a missing default config file should not trigger an error
-        return
+        return {}
 
     try:
         with open(config_path, "r") as stream:
@@ -200,7 +200,7 @@ def merge_config(file_config, cli_config) -> NamedTuple:
     return cli_config
 
 
-def get_config(arguments):
+def get_config(arguments: List[str]):
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
 

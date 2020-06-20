@@ -4,7 +4,7 @@
 class Match(object):
     """Rule violation detected during linting."""
 
-    def __init__(self, linenumber, line, filename, rule, message=None):
+    def __init__(self, linenumber, line, filename, rule, message=None) -> None:
         """Initialize a Match instance."""
         self.linenumber = linenumber
         self.line = line
@@ -32,6 +32,6 @@ class MatchError(ValueError):
         self.filename = None
         self.rule = rule
 
-    def get_match(self):
+    def get_match(self) -> Match:
         """Return a Match instance."""
         return Match(self.linenumber, self.line, self.filename, self.rule, self.message)
