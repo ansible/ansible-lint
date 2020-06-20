@@ -57,7 +57,7 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def main():
+def main() -> int:
     """Linter CLI entry point."""
     cwd = pathlib.Path.cwd()
 
