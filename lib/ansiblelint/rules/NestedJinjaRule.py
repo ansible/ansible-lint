@@ -1,4 +1,7 @@
-# Copyright (c) 2016 Will Thames <will@thames.id.au>
+# -*- coding: utf-8 -*-
+# Author: Adrián Tóth <adtoth@redhat.com>
+#
+# Copyright (c) 2020, Red Hat, Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,31 +21,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import re
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY, FILENAME_KEY, get_first_cmd_arg
 
 
-class EnvVarsInCommandRule(AnsibleLintRule):
-    id = '304'
-    shortdesc = "Environment variables don't work as part of command"
+class NestedJinjaRule(AnsibleLintRule):
+    id = '207'
+    shortdesc = 'Nested jinja pattern'
     description = (
-        'Environment variables should be passed to ``shell`` or ``command`` '
-        'through environment argument'
+        "There should not be any nested jinja pattern. "
+        "Example (bad): ``{{ list_one + {{ list_two | max }} }}``, "
+        "example (good): ``{{ list_one + max(list_two) }}``"
     )
     severity = 'VERY_HIGH'
-    tags = ['command-shell', 'bug', 'ANSIBLE0014']
-    version_added = 'historic'
+    tags = ['formatting']
+    version_added = 'v4.3.0'
 
-    expected_args = ['chdir', 'creates', 'executable', 'removes', 'stdin', 'warn',
-                     'stdin_add_newline', 'strip_empty_ends',
-                     'cmd', '__ansible_module__', '__ansible_arguments__',
-                     LINE_NUMBER_KEY, FILENAME_KEY]
+    pattern = re.compile(r"{{(?:[^{}]*)?{{")
 
     def matchtask(self, file, task):
-        if task["action"]["__ansible_module__"] in ['command']:
-            first_cmd_arg = get_first_cmd_arg(task)
-            if not first_cmd_arg:
-                return
 
-            return any([arg not in self.expected_args for arg in task['action']] +
-                       ["=" in first_cmd_arg])
+        command = "".join(
+            str(value)
+            # task properties are stored in the 'action' key
+            for key, value in task['action'].items()
+            # exclude useless values of '__file__', '__ansible_module__', '__*__', etc.
+            if not key.startswith('__') and not key.endswith('__')
+        )
+
+        return bool(self.pattern.search(command))

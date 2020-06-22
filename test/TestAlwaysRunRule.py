@@ -1,8 +1,16 @@
 import unittest
-from ansiblelint import RulesCollection, Runner
+from ansiblelint.rules import RulesCollection
+from ansiblelint.runner import Runner
 from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
+from test import ANSIBLE_MAJOR_VERSION
+import pytest
 
 
+@pytest.mark.skipif(
+    ANSIBLE_MAJOR_VERSION > (2, 9),
+    reason='Ansible 2.10 removed always_run attribute.',
+    raises=SystemExit, strict=True,
+)
 class TestAlwaysRun(unittest.TestCase):
     collection = RulesCollection()
 

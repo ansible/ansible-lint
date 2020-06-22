@@ -1,6 +1,6 @@
 # Copyright (c) 2018, Ansible Project
 
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 
 
 class MetaChangeFromDefaultRule(AnsibleLintRule):

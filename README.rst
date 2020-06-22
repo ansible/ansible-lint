@@ -541,7 +541,7 @@ An example rule using ``match`` is:
 
 .. code-block:: python
 
-    from ansiblelint import AnsibleLintRule
+    from ansiblelint.rules import AnsibleLintRule
 
     class DeprecatedVariableRule(AnsibleLintRule):
 
@@ -559,7 +559,7 @@ An example rule using ``matchtask`` is:
 .. code-block:: python
 
     import ansiblelint.utils
-    from ansiblelint import AnsibleLintRule
+    from ansiblelint.rules import AnsibleLintRule
 
     class TaskHasTag(AnsibleLintRule):
         id = 'EXAMPLE001'

@@ -1,20 +1,35 @@
 """All internal ansible-lint rules."""
 import re
+from collections import defaultdict
+import glob
+from importlib.abc import Loader
+import importlib.util
+import logging
+import os
+from typing import List
+
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.skip_utils import append_skipped_rules
 from ansiblelint.errors import Match
 import ansiblelint.utils
 
 
+_logger = logging.getLogger(__name__)
+
+
 class AnsibleLintRule(object):
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
 
-    def verbose(self):
+    def verbose(self) -> str:
         return self.id + ": " + self.shortdesc + "\n  " + self.description
 
+    id: str = ""
+    tags: List[str] = []
+    shortdesc: str = ""
+    description: str = ""
     match = None
     matchtask = None
     matchplay = None
@@ -23,8 +38,8 @@ class AnsibleLintRule(object):
     def unjinja(text):
         return re.sub(r"{{[^}]*}}", "JINJA_VAR", text)
 
-    def matchlines(self, file, text):
-        matches = []
+    def matchlines(self, file, text) -> List[Match]:
+        matches: List[Match] = []
         if not self.match:
             return matches
         # arrays are 0-based, line numbers are 1-based
@@ -47,8 +62,8 @@ class AnsibleLintRule(object):
                            file['path'], self, message))
         return matches
 
-    def matchtasks(self, file, text):
-        matches = []
+    def matchtasks(self, file: str, text: str) -> List[Match]:
+        matches: List[Match] = []
         if not self.matchtask:
             return matches
 
@@ -87,8 +102,8 @@ class AnsibleLintRule(object):
             linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
         return linenumber
 
-    def matchyaml(self, file, text):
-        matches = []
+    def matchyaml(self, file: str, text: str) -> List[Match]:
+        matches: List[Match] = []
         if not self.matchplay:
             return matches
 
@@ -120,3 +135,88 @@ class AnsibleLintRule(object):
                 matches.append(Match(linenumber,
                                      section, file['path'], self, message))
         return matches
+
+
+def load_plugins(directory: str) -> List[AnsibleLintRule]:
+    """Return a list of rule classes."""
+    result = []
+
+    for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
+
+        pluginname = os.path.basename(pluginfile.replace('.py', ''))
+        spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
+        # https://github.com/python/typeshed/issues/2793
+        if spec and isinstance(spec.loader, Loader):
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            obj = getattr(module, pluginname)()
+            result.append(obj)
+    return result
+
+
+class RulesCollection(object):
+
+    def __init__(self, rulesdirs=None) -> None:
+        """Initialize a RulesCollection instance."""
+        if rulesdirs is None:
+            rulesdirs = []
+        self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
+        self.rules: List[AnsibleLintRule] = []
+        for rulesdir in self.rulesdirs:
+            _logger.debug("Loading rules from %s", rulesdir)
+            self.extend(load_plugins(rulesdir))
+        self.rules = sorted(self.rules, key=lambda r: r.id)
+
+    def register(self, obj):
+        self.rules.append(obj)
+
+    def __iter__(self):
+        """Return the iterator over the rules in the RulesCollection."""
+        return iter(self.rules)
+
+    def __len__(self):
+        """Return the length of the RulesCollection data."""
+        return len(self.rules)
+
+    def extend(self, more: List[AnsibleLintRule]) -> None:
+        self.rules.extend(more)
+
+    def run(self, playbookfile, tags=set(), skip_list=frozenset()) -> List:
+        text = ""
+        matches: List = list()
+
+        try:
+            with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
+                text = f.read()
+        except IOError as e:
+            _logger.warning(
+                "Couldn't open %s - %s",
+                playbookfile['path'],
+                e.strerror)
+            return matches
+
+        for rule in self.rules:
+            if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
+                rule_definition = set(rule.tags)
+                rule_definition.add(rule.id)
+                if set(rule_definition).isdisjoint(skip_list):
+                    matches.extend(rule.matchlines(playbookfile, text))
+                    matches.extend(rule.matchtasks(playbookfile, text))
+                    matches.extend(rule.matchyaml(playbookfile, text))
+
+        return matches
+
+    def __repr__(self) -> str:
+        """Return a RulesCollection instance representation."""
+        return "\n".join([rule.verbose()
+                          for rule in sorted(self.rules, key=lambda x: x.id)])
+
+    def listtags(self) -> str:
+        tags = defaultdict(list)
+        for rule in self.rules:
+            for tag in rule.tags:
+                tags[tag].append("[{0}]".format(rule.id))
+        results = []
+        for tag in sorted(tags):
+            results.append("{0} {1}".format(tag, tags[tag]))
+        return "\n".join(results)

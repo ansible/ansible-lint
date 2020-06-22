@@ -1,6 +1,6 @@
 import unittest
 
-from ansiblelint import RulesCollection
+from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.TaskNoLocalAction import TaskNoLocalAction
 from test import RunFromText
 

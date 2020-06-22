@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 
 import re
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 from typing import List
 
 ROLE_NAME_REGEX = '^[a-z][a-z0-9_]+$'

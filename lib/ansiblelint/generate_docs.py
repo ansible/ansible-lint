@@ -1,5 +1,6 @@
 """Utils to generate rule table .rst documentation."""
 import logging
+from ansiblelint.rules import RulesCollection
 
 
 DOC_HEADER = """
@@ -18,7 +19,7 @@ Below you can see the list of default rules Ansible Lint use to evaluate playboo
 _logger = logging.getLogger(__name__)
 
 
-def rules_as_rst(rules):
+def rules_as_rst(rules: RulesCollection) -> str:
     """Return RST documentation for a list of rules."""
     r = DOC_HEADER
 

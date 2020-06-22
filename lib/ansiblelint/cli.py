@@ -7,9 +7,9 @@ from pathlib import Path
 import sys
 
 import yaml
-from typing import NamedTuple
+from typing import List, NamedTuple
 
-import ansiblelint
+from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.version import __version__
 
 
@@ -17,7 +17,7 @@ _logger = logging.getLogger(__name__)
 _PATH_VARS = ['exclude_paths', 'rulesdir', ]
 
 
-def abspath(path, base_dir):
+def abspath(path: str, base_dir: str) -> str:
     """Make relative path absolute relative to given directory.
 
     Args:
@@ -35,7 +35,10 @@ def abspath(path, base_dir):
     return os.path.normpath(path)
 
 
-def expand_to_normalized_paths(config, base_dir=None):
+def expand_to_normalized_paths(config: dict, base_dir: str = None) -> None:
+    # config can be None (-c /dev/null)
+    if not config:
+        return
     base_dir = base_dir or os.getcwd()
     for paths_var in _PATH_VARS:
         if paths_var not in config:
@@ -50,29 +53,29 @@ def expand_to_normalized_paths(config, base_dir=None):
         config[paths_var] = normalized_paths
 
 
-def load_config(config_file):
+def load_config(config_file: str) -> dict:
     config_path = os.path.abspath(config_file or '.ansible-lint')
 
     if config_file:
         if not os.path.exists(config_path):
             _logger.error("Config file not found '%s'", config_path)
-            sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
+            sys.exit(INVALID_CONFIG_RC)
     elif not os.path.exists(config_path):
         # a missing default config file should not trigger an error
-        return
+        return {}
 
     try:
         with open(config_path, "r") as stream:
             config = yaml.safe_load(stream)
     except yaml.YAMLError as e:
         _logger.error(e)
-        sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
+        sys.exit(INVALID_CONFIG_RC)
     # TODO(ssbarnea): implement schema validation for config file
     if isinstance(config, list):
         _logger.error(
             "Invalid configuration '%s', expected YAML mapping in the config file.",
             config_path)
-        sys.exit(ansiblelint.utils.INVALID_CONFIG_RC)
+        sys.exit(INVALID_CONFIG_RC)
 
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
@@ -110,17 +113,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
                         help="parseable output including severity of rule")
     parser.add_argument('-r', action=AbspathArgAction, dest='rulesdir',
                         default=[], type=Path,
-                        help="specify one or more rules directories using "
-                             "one or more -r arguments. Any -r flags override "
-                             "the default rules in %s, unless -R is also used."
-                             % ansiblelint.default_rulesdir)
+                        help="Specify custom rule directories. Add -R "
+                             f"to keep using embedded rules from {DEFAULT_RULESDIR}")
     parser.add_argument('-R', action='store_true',
                         default=False,
                         dest='use_default_rules',
-                        help="Use default rules in %s in addition to any extra "
-                             "rules directories specified with -r. There is "
-                             "no need to specify this if no -r flags are used"
-                             % ansiblelint.default_rulesdir)
+                        help="Keep default rules when using -r")
     parser.add_argument('--show-relpath', dest='display_relative_path', action='store_false',
                         default=True,
                         help="Display path relative to CWD")
@@ -202,7 +200,7 @@ def merge_config(file_config, cli_config) -> NamedTuple:
     return cli_config
 
 
-def get_config(arguments):
+def get_config(arguments: List[str]):
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
 

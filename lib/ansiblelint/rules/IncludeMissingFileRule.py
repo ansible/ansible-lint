@@ -5,7 +5,7 @@ import os.path
 
 import ansible.parsing.yaml.objects
 
-from ansiblelint import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule
 
 
 class IncludeMissingFileRule(AnsibleLintRule):

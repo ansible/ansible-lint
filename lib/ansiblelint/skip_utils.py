@@ -21,21 +21,36 @@
 """Utils related to inline skipping of rules."""
 from itertools import product
 import logging
+import sys
 
 import ruamel.yaml
+from typing import Any, Generator, List, Sequence
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
 
 INLINE_SKIP_FLAG = '# noqa '
 
 _logger = logging.getLogger(__name__)
 
 
-def get_rule_skips_from_line(line):
+FileType = Literal["playbook", "pre_tasks", "post_tasks"]
+
+# playbook: Sequence currently expects only instances of one of the two
+# classes below but we should consider avoiding this chimera.
+# ruamel.yaml.comments.CommentedSeq
+# ansible.parsing.yaml.objects.AnsibleSequence
+
+
+def get_rule_skips_from_line(line: str) -> List:
     """Return list of rule ids skipped via comment on the line of yaml."""
     _before_noqa, _noqa_marker, noqa_text = line.partition(INLINE_SKIP_FLAG)
     return noqa_text.split()
 
 
-def append_skipped_rules(pyyaml_data, file_text, file_type):
+def append_skipped_rules(pyyaml_data: str, file_text: str, file_type: FileType):
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
     For a file, uses 2nd parser (ruamel.yaml) to pull comments out of
@@ -57,7 +72,7 @@ def append_skipped_rules(pyyaml_data, file_text, file_type):
     return yaml_skip
 
 
-def _append_skipped_rules(pyyaml_data, file_text, file_type):
+def _append_skipped_rules(pyyaml_data: Sequence, file_text: str, file_type: FileType):
     # parse file text using 2nd parser library
     yaml = ruamel.yaml.YAML()
     ruamel_data = yaml.load(file_text)
@@ -95,7 +110,7 @@ def _append_skipped_rules(pyyaml_data, file_text, file_type):
     return pyyaml_data
 
 
-def _get_task_blocks_from_playbook(playbook):
+def _get_task_blocks_from_playbook(playbook: Sequence) -> List:
     """Return parts of playbook that contains tasks, and nested tasks.
 
     :param playbook: playbook yaml from yaml parser.
@@ -114,7 +129,7 @@ def _get_task_blocks_from_playbook(playbook):
     return task_blocks
 
 
-def _get_tasks_from_blocks(task_blocks):
+def _get_tasks_from_blocks(task_blocks: Sequence) -> Generator:
     """Get list of tasks from list made of tasks and nested tasks."""
     NESTED_TASK_KEYS = [
         'block',
@@ -122,7 +137,7 @@ def _get_tasks_from_blocks(task_blocks):
         'rescue',
     ]
 
-    def get_nested_tasks(task):
+    def get_nested_tasks(task: Any):
         return (
             subtask
             for k in NESTED_TASK_KEYS if k in task
@@ -135,9 +150,11 @@ def _get_tasks_from_blocks(task_blocks):
         yield task
 
 
-def _get_rule_skips_from_yaml(yaml_input):
+def _get_rule_skips_from_yaml(yaml_input: Sequence) -> Sequence:
     """Traverse yaml for comments with rule skips and return list of rules."""
-    def traverse_yaml(obj):
+    yaml_comment_obj_strs = []
+
+    def traverse_yaml(obj: Any) -> None:
         yaml_comment_obj_strs.append(str(obj.ca.items))
         if isinstance(obj, dict):
             for key, val in obj.items():
@@ -150,7 +167,6 @@ def _get_rule_skips_from_yaml(yaml_input):
         else:
             return
 
-    yaml_comment_obj_strs = []
     traverse_yaml(yaml_input)
 
     rule_id_list = []
