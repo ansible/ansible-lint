@@ -1,7 +1,6 @@
-name: 👷
+name: gh
 
 on:
-  create:  # branch or tag created, need to filter on publish
   push:
   pull_request:
   schedule:
@@ -11,39 +10,98 @@ on:
   # - cron: 2 18 * * 5
 
 jobs:
-  test-matrix:
+  linters:
     name: >-
-      Ansible ${{ matrix.ansible-version }}/${{ matrix.python-version }}@${{ matrix.os }}
+      ${{ matrix.env.TOXENV }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - 3.8
+        os:
+        - ubuntu-latest
+        env:
+        - TOXENV: lint
+        - TOXENV: docs
+        - TOXENV: build-dists,metadata-validation
+    env:
+      TOX_PARALLEL_NO_SPINNER: 1
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: set PY_SHA256
+      run: echo "::set-env name=PY_SHA256::$(python -VV | sha256sum | cut -d' ' -f1)"
+    - name: Pre-commit cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pre-commit
+        key: ${{ runner.os }}-pre-commit-${{ env.PY_SHA256 }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tox.ini') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('pytest.ini') }}
+    - name: Pip cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ env.PY_SHA256 }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tox.ini') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('pytest.ini') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+    - name: Install tox
+      run: |
+        python -m pip install --upgrade tox
+    - name: Log installed dists
+      run: >-
+        python -m pip freeze --all
+    - name: >-
+        Initialize tox envs
+      run: |
+        python -m tox --parallel auto --parallel-live --notest -vv
+      env: ${{ matrix.env }}
+    - name: Test with tox
+      run: |
+        python -m tox --parallel auto --parallel-live
+      env: ${{ matrix.env }}
+    - name: Archive logs
+      uses: actions/upload-artifact@v2
+      with:
+        name: logs.zip
+        path: .tox/**/log/
+
+  unit:
+    name: >-
+      py${{ matrix.python-version }}@${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       # fail-fast: false
       # max-parallel: 5
+      # The matrix testing goal is to cover the *most likely* environments
+      # which are expected to be used by users in production. Avoid adding a
+      # combination unless there are good reasons to test it, like having
+      # proof that we failed to catch a bug by not running it. Using
+      # distribution should be prefferred instead of custom builds.
       matrix:
         python-version:
-        - 3.8
-        - 3.9-dev
-        - 3.7
+        # keep list sorted as it determines UI order too
         - 3.6
+        - 3.7
+        - 3.8
         # NOTE: Installing ansible under 3.10-dev is currently not
         # NOTE: possible because compiling cffi explodes.
         os:
-        - ubuntu-20.04
-        - ubuntu-latest
-        - ubuntu-16.04
-        - macOS-latest
+        # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
+        - ubuntu-latest  # 18.04
         # - windows-latest
         # - windows-2016
-        ansible-version:
-        - devel
-        - 29
-        - 28
-        exclude:
-        # There's no nightlies for macOS
+        include:
+        - os: ubuntu-20.04
+          python-version: 3.9-dev
         - os: macOS-latest
-          python-version: 3.9-dev
-        # Ubuntu 16.04 is incompatible with the deadsnakes action
-        - os: ubuntu-16.04
-          python-version: 3.9-dev
+          python-version: 3.6
+        - os: macOS-latest
+          python-version: 3.8
 
     env:
       TOX_PARALLEL_NO_SPINNER: 1
@@ -87,26 +145,38 @@ jobs:
       run: >-
         python -m pip freeze --all
     - name: >-
-        Initialize tox envs: Ansible ${{ matrix.ansible-version }}
+        Initialize tox envs
       run: |
         python -m tox --parallel auto --parallel-live --notest -vv
       env:
-        TOXENV: ansible${{ matrix.ansible-version }}
-    - name: Test with tox
+        TOXENV: ansible28,ansible29,ansibledevel
+    - name: "Test with tox: ansible28"
       run: |
-        python -m tox --parallel auto --parallel-live
+        python -m tox
       env:
-        TOXENV: ansible${{ matrix.ansible-version }}
+        TOXENV: ansible28
+    # sequential run improves browsing experience (almost no speed impact)
+    - name: "Test with tox: ansible29"
+      run: |
+        python -m tox
+      env:
+        TOXENV: ansible29
+    - name: "Test with tox: ansibledevel"
+      run: |
+        python -m tox
+      env:
+        TOXENV: ansibledevel
     - name: Archive logs
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: logs.zip
-        path: .tox/ansible${{ matrix.ansible-version }}/log/
+        path: .tox/**/log/
 
-  publish-dists:
-    name: Publish 🐍📦 to (Test)PyPI
+  publish:
+    name: Publish to PyPI registry
     needs:
-    - test-matrix
+    - linters
+    - unit
     runs-on: ubuntu-latest
 
     env:
@@ -119,12 +189,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-    - name: Install tox
-      run: >-
-        python -m
-        pip install
-        --user
-        tox
     - name: Check out src from Git
       uses: actions/checkout@v2
     - name: Get history and tags for SCM versioning to work
@@ -140,11 +204,7 @@ jobs:
       run: |
         echo 'local_scheme = "no-local-version"' >> pyproject.toml
         git update-index --assume-unchanged pyproject.toml
-    - name: Pre-populate tox env
-      run: python -m tox -p auto --parallel-live -vvvv --notest
-    - name: Build dists
-      run: python -m tox -p auto --parallel-live -vvvv
-    - name: Publish 🐍📦 to TestPyPI
+    - name: Publish to test.pypi.org
       if: >-
         github.event_name == 'push' &&
         github.ref == format(
@@ -154,7 +214,7 @@ jobs:
       with:
         password: ${{ secrets.testpypi_password }}
         repository_url: https://test.pypi.org/legacy/
-    - name: Publish 🐍📦 to PyPI
+    - name: Publish to pypi.org
       if: >-  # "create" workflows run separately from "push" & "pull_request"
         github.event_name == 'create' &&
         github.event.ref_type == 'tag'
