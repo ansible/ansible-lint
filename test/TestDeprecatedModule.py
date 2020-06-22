@@ -1,15 +1,10 @@
 import unittest
 
-from ansible import __version__ as ansible_version_str
 import pytest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.DeprecatedModuleRule import DeprecatedModuleRule
-from test import RunFromText
-
-
-ANSIBLE_MAJOR_VERSION = tuple(map(int, ansible_version_str.split('.')[:2]))
-
+from test import RunFromText, ANSIBLE_MAJOR_VERSION
 
 MODULE_DEPRECATED = '''
 - name: task example

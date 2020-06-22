@@ -4,7 +4,12 @@ import tempfile
 import shutil
 import os
 
+from ansible import __version__ as ansible_version_str
+
 from ansiblelint.runner import Runner
+
+
+ANSIBLE_MAJOR_VERSION = tuple(map(int, ansible_version_str.split('.')[:2]))
 
 
 class RunFromText(object):
