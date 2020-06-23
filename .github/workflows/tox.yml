@@ -1,6 +1,7 @@
 name: gh
 
 on:
+  create:  # branch or tag created, need to filter on publish
   push:
   pull_request:
   schedule:
@@ -189,6 +190,12 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    - name: Install tox
+      run: >-
+        python -m
+        pip install
+        --user
+        tox
     - name: Check out src from Git
       uses: actions/checkout@v2
     - name: Get history and tags for SCM versioning to work
@@ -204,6 +211,10 @@ jobs:
       run: |
         echo 'local_scheme = "no-local-version"' >> pyproject.toml
         git update-index --assume-unchanged pyproject.toml
+    - name: Pre-populate tox env
+      run: python -m tox -p auto --parallel-live -vvvv --notest
+    - name: Build dists
+      run: python -m tox -p auto --parallel-live -vvvv
     - name: Publish to test.pypi.org
       if: >-
         github.event_name == 'push' &&
