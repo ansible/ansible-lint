@@ -240,7 +240,7 @@ def test_cli_auto_detect(capfd):
     # Confirmation that it runs in auto-detect mode
     assert "Discovering files to lint: git ls-files *.yaml *.yml" in err
     # Expected failure to detect file type"
-    assert "Unknown file type: docs/docsite/keyword_desc.yml" in err
+    assert "Unknown file type: docs/keyword_desc.yml" in err
     # An expected rule match from our examples
     assert "examples/roles/bobbins/tasks/main.yml:2: " \
         "[E401] Git checkouts must contain explicit version" in out

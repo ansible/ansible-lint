@@ -9,6 +9,6 @@ Configuring
 
 This topic describes how to configure Ansible Lint
 
-.. include:: ../../../../README.rst
+.. include:: ../../../README.rst
    :start-after: configuring-docs-inclusion-marker-do-not-remove
    :end-before: configuring-docs-inclusion-marker-end-do-not-remove

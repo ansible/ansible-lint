@@ -15,8 +15,8 @@ pip install sphinx sphinx_rtd_theme
 Run the following to build the documentation:
 
 ```
-# Within the Galaxy project tree, set your working directory to docs/docsite
-$ cd docs/docsite
+# Within the Galaxy project tree, set your working directory to docs/
+$ cd docs/
 
 # Build a local copy of the static files
 $ make webdocs
