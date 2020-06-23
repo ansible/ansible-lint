@@ -6,7 +6,7 @@
    :target: https://docs.ansible.com/ansible-lint/rules/default_rules.html
    :alt: Ansible-lint rules explanation
 
-.. image:: https://img.shields.io/badge/Code%20of%20Conduct-Ansible-silver.svg
+.. image:: https://img.shields.io/badge/Code%20of%20Conduct-black.svg
    :target: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html
    :alt: Ansible Code of Conduct
 
@@ -14,13 +14,9 @@
    :target: https://docs.ansible.com/ansible/latest/community/communication.html#mailing-list-information
    :alt: Ansible mailing lists
 
-.. image:: https://github.com/ansible/ansible-lint/workflows/%F0%9F%91%B7/badge.svg
-   :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3A%F0%9F%91%B7
-   :alt: 👷 GitHub Actions CI/CD build status — tests
-
-.. image:: https://github.com/ansible/ansible-lint/workflows/%F0%9F%9A%A8/badge.svg
-   :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3A%F0%9F%9A%A8
-   :alt: 🚨 GitHub Actions CI/CD build status — linters
+.. image:: https://github.com/ansible/ansible-lint/workflows/gh/badge.svg
+   :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3Agh+branch%3Amaster+event%3Apush
+   :alt: GitHub Actions CI/CD
 
 .. image:: https://img.shields.io/lgtm/grade/python/g/ansible/ansible-lint.svg?logo=lgtm&logoWidth=18
    :target: https://lgtm.com/projects/g/ansible/ansible-lint/context:python
