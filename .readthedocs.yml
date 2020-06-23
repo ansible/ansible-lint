@@ -36,5 +36,7 @@ build:
 python:
   version: 3.8
   install:
+  - method: pip
+    path: .
   - requirements: docs/requirements.in
   system_packages: false
