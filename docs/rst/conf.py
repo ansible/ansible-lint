@@ -126,7 +126,7 @@ rst_epilog = """
 # -----------------------
 
 html_theme_path = ['../_themes']
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_ansible_theme'
 html_short_title = 'Ansible Documentation'
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
