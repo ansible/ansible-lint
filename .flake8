@@ -62,7 +62,6 @@ per-file-ignores =
   lib/ansiblelint/utils.py: C901 D103
   # lib/ansiblelint/rules/MetaMainHasInfoRule.py:24:5: C901 'MetaMainHasInfoRule.matchplay' is too complex (13)
   lib/ansiblelint/rules/*.py: D100 D101 D102
-  lib/ansiblelint/rules/MetaMainHasInfoRule.py: C901 D100 D101 D102
 
   # FIXME: drop PT009 once they're fixes
   # Ref: https://github.com/ansible/ansible-lint/issues/725
