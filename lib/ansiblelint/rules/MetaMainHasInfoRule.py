@@ -4,15 +4,15 @@
 from ansiblelint.rules import AnsibleLintRule
 
 
-META_STR_INFO = [
+META_STR_INFO = (
     'author',
-    'description',
-]
-META_INFO = META_STR_INFO + [
+    'description'
+)
+META_INFO = tuple(list(META_STR_INFO) + [
     'license',
     'min_ansible_version',
     'platforms',
-]
+])
 
 
 def _platform_info_errors_itr(platforms):
