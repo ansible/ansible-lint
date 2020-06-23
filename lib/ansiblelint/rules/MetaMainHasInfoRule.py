@@ -34,12 +34,12 @@ def _galaxy_info_errors_itr(galaxy_info,
         ginfo = galaxy_info.get(info, False)
         if ginfo:
             if info in str_info_list and not isinstance(ginfo, str):
-                yield '{} should be a string'.format(info)
+                yield '{info} should be a string'.format(info=info)
             elif info == 'platforms':
                 for err in _platform_info_errors_itr(ginfo):
                     yield err
         else:
-            yield 'Role info should contain {}'.format(info)
+            yield 'Role info should contain {info}'.format(info=info)
 
 
 class MetaMainHasInfoRule(AnsibleLintRule):
