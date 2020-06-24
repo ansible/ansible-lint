@@ -36,7 +36,10 @@ class AnsibleLintRule(object):
 
     @staticmethod
     def unjinja(text):
-        return re.sub(r"{{[^}]*}}", "JINJA_VAR", text)
+        text = re.sub(r"{{.+?}}", "JINJA_EXPRESSION", text)
+        text = re.sub(r"{%.+?%}", "JINJA_STATEMENT", text)
+        text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
+        return text
 
     def matchlines(self, file, text) -> List[Match]:
         matches: List[Match] = []
