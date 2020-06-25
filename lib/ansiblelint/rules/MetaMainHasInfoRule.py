@@ -4,16 +4,49 @@
 from ansiblelint.rules import AnsibleLintRule
 
 
+META_STR_INFO = (
+    'author',
+    'description'
+)
+META_INFO = tuple(list(META_STR_INFO) + [
+    'license',
+    'min_ansible_version',
+    'platforms',
+])
+
+
+def _platform_info_errors_itr(platforms):
+    if not isinstance(platforms, list):
+        yield 'Platforms should be a list of dictionaries'
+        return
+
+    for platform in platforms:
+        if not isinstance(platform, dict):
+            yield 'Platforms should be a list of dictionaries'
+        elif 'name' not in platform:
+            yield 'Platform should contain name'
+
+
+def _galaxy_info_errors_itr(galaxy_info,
+                            info_list=META_INFO,
+                            str_info_list=META_STR_INFO):
+    for info in info_list:
+        ginfo = galaxy_info.get(info, False)
+        if ginfo:
+            if info in str_info_list and not isinstance(ginfo, str):
+                yield '{info} should be a string'.format(info=info)
+            elif info == 'platforms':
+                for err in _platform_info_errors_itr(ginfo):
+                    yield err
+        else:
+            yield 'Role info should contain {info}'.format(info=info)
+
+
 class MetaMainHasInfoRule(AnsibleLintRule):
     id = '701'
     shortdesc = 'meta/main.yml should contain relevant info'
-    info = [
-        'author',
-        'description',
-        'license',
-        'min_ansible_version',
-        'platforms',
-    ]
+    str_info = META_STR_INFO
+    info = META_INFO
     description = (
         'meta/main.yml should contain: ``{}``'.format(', '.join(info))
     )
@@ -25,40 +58,10 @@ class MetaMainHasInfoRule(AnsibleLintRule):
         if file['type'] != 'meta':
             return False
 
-        galaxy_info = data.get('galaxy_info', None)
-        if not galaxy_info:
-            return [({'meta/main.yml': data},
-                    "No 'galaxy_info' found")]
+        meta = {'meta/main.yml': data}
+        galaxy_info = data.get('galaxy_info', False)
+        if galaxy_info:
+            return [(meta, err) for err
+                    in _galaxy_info_errors_itr(galaxy_info)]
 
-        results = []
-        for info in self.info:
-            if not galaxy_info.get(info, None):
-                results.append(({'meta/main.yml': data},
-                                'Role info should contain %s' % info))
-
-        for info in ['author', 'description']:
-            if not galaxy_info.get(info):
-                continue
-            if not isinstance(galaxy_info.get(info), str):
-                results.append(({'meta/main.yml': data},
-                                '%s should be a string' % info))
-
-        platforms = galaxy_info.get('platforms', None)
-        if not platforms:
-            return results
-
-        if not isinstance(platforms, list):
-            results.append(({'meta/main.yml': data},
-                            'Platforms should be a list of dictionaries'))
-            return results
-
-        for platform in platforms:
-            if not isinstance(platform, dict):
-                results.append(({'meta/main.yml': data},
-                                'Platforms should be a list of dictionaries'))
-                continue
-            if not platform.get('name', None):
-                results.append(({'meta/main.yml': data},
-                                'Platform should contain name'))
-
-        return results
+        return [(meta, "No 'galaxy_info' found")]
