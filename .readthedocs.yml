@@ -35,5 +35,6 @@ build:
 # to build docs
 python:
   version: 3.8
-  install: []
+  install:
+  - requirements: docs/requirements.in
   system_packages: false
