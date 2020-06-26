@@ -14,6 +14,7 @@
 # serve to show the default value.
 """Documentation Configuration."""
 
+import pathlib
 import sys
 import os
 
