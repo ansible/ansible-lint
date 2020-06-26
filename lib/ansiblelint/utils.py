@@ -228,14 +228,10 @@ def _include_children(basedir, k, v, parent_type):
 def _taskshandlers_children(basedir, k, v, parent_type):
     results = []
     for th in v:
-        if 'include' in th:
-            append_children(th['include'], basedir, k, parent_type, results)
-        elif 'include_tasks' in th:
-            append_children(th['include_tasks'], basedir, k, parent_type, results)
-        elif 'import_playbook' in th:
-            append_children(th['import_playbook'], basedir, k, parent_type, results)
-        elif 'import_tasks' in th:
-            append_children(th['import_tasks'], basedir, k, parent_type, results)
+        children = _maybe_th_children_for_tasks_or_playbooks(th, basedir, k, parent_type)
+        if children is not None:
+            results.append(children)
+
         elif 'include_role' in th or 'import_role' in th:
             th = normalize_task_v2(th)
             module = th['action']['__ansible_module__']
@@ -258,18 +254,19 @@ def _taskshandlers_children(basedir, k, v, parent_type):
     return results
 
 
-def append_children(taskhandler, basedir, k, parent_type, results):
-    # when taskshandlers_children is called for playbooks, the
-    # actual type of the included tasks is the section containing the
-    # include, e.g. tasks, pre_tasks, or handlers.
-    if parent_type == 'playbook':
-        playbook_section = k
-    else:
-        playbook_section = parent_type
-    results.append({
-        'path': path_dwim(basedir, taskhandler),
-        'type': playbook_section
-    })
+def _maybe_th_children_for_tasks_or_playbooks(th, basedir, k, parent_type):
+    """
+    Try to get and return children of taskhandler of type, include,
+    include_tasks, import_playbook and import_tasks.
+    """
+    for tht in ('include', 'include_tasks', 'import_playbook', 'import_tasks'):
+        if tht in th:
+            return {
+                'path': path_dwim(basedir, th[tht]),
+                'type': k if parent_type == 'playbook' else parent_type
+            }
+
+    return None
 
 
 def _roles_children(basedir, k, v, parent_type, main='main'):
