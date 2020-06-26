@@ -129,6 +129,7 @@ rst_epilog = """
 html_theme_path = [
     (pathlib.Path(__file__) / '..' / '..' / '_themes').resolve(),
 ]
+sys.path.insert(0, html_theme_path[0])
 html_theme = 'sphinx_rtd_theme'
 html_short_title = 'Ansible Documentation'
 
