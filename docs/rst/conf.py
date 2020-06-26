@@ -130,7 +130,7 @@ html_theme_path = [
     (pathlib.Path(__file__) / '..' / '..' / '_themes').resolve(),
 ]
 sys.path.insert(0, html_theme_path[0])
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_rtd_theme_1'
 html_short_title = 'Ansible Documentation'
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
