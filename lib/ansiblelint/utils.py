@@ -234,14 +234,7 @@ def _taskshandlers_children(basedir, k, v, parent_type):
 
         elif 'include_role' in th or 'import_role' in th:
             th = normalize_task_v2(th)
-            module = th['action']['__ansible_module__']
-            if "name" not in th['action']:
-                raise MatchError(
-                    "Failed to find required 'name' key in %s" % module)
-            if not isinstance(th['action']["name"], str):
-                raise RuntimeError(
-                    "Value assigned to 'name' key on '%s' is not a string." %
-                    module)
+            _validate_th_action_for_role(th['action'])
             results.extend(_roles_children(basedir, k, [th['action'].get("name")],
                                            parent_type,
                                            main=th['action'].get('tasks_from', 'main')))
@@ -267,6 +260,19 @@ def _maybe_th_children_for_tasks_or_playbooks(th, basedir, k, parent_type):
             }
 
     return None
+
+
+def _validate_th_action_for_role(th_action):
+    name = th_action.get("name", None)
+    module = th_action['__ansible_module__']
+
+    if name is None:
+        raise MatchError("Failed to find required 'name' key in %s" % module)
+
+    if not isinstance(name, str):
+        raise RuntimeError(
+            "Value assigned to 'name' key on '%s' is not a string." % module
+        )
 
 
 def _roles_children(basedir, k, v, parent_type, main='main'):
