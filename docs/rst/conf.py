@@ -138,6 +138,7 @@ html_short_title = 'Ansible Documentation'
 # given in html_static_path.
 # html_style = 'solar.css'
 html_style = 'css/theme.css'
+html_stylesheet = 'css/theme.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
