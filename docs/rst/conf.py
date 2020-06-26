@@ -244,6 +244,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/2/', (None, '../pytho
 html_static_path = ['_static']
 html_context = {
     'css_files': [
+        'css/theme.css',  # override wide tables in RTD theme
         '_static/theme_overrides.css',  # override wide tables in RTD theme
     ],
 }
