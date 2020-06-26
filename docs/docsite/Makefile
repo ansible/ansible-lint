@@ -32,14 +32,12 @@ all: docs
 
 docs: clean htmldocs
 
-generate_rst: staticmin
-
-htmldocs: generate_rst
+htmldocs:
 	python -m ansiblelint -L -f rst > rst/rules/default_rules.rst
 	CPUS=$(CPUS) $(MAKE) -f Makefile.sphinx html
 	@sh -c "git diff --quiet || { echo 'ERROR: Building docs changed tracked files, include them in commit to avoid this failure.'; exit 1; }"
 
-singlehtmldocs: generate_rst
+singlehtmldocs:
 	CPUS=$(CPUS) $(MAKE) -f Makefile.sphinx singlehtml
 
 webdocs: docs
