@@ -495,10 +495,8 @@ If the rule is line-based, ``# noqa [rule_id]`` must be at the end of the partic
 
 It's also a good practice to comment the reasons why a task is being skipped.
 
-If you want skip running a rule entirely, you can use either:
-
-* `command-line skip_list`_ via ``-x``
-* `config file skip_list`_
+If you want skip running a rule entirely, you can use either use ``-x`` command
+line argument, or add it to ``skip_list`` inside the configuration file.
 
 A less-preferred method of skipping is to skip all task-based rules for a task (this does not skip line-based rules). There are two mechanisms for this: the ``skip_ansible_lint`` tag works with all tasks, and the ``warn`` parameter works with the *command* or *shell* modules only. Examples:
 
@@ -597,5 +595,3 @@ ansible-lint was created by `Will Thames`_ and is now maintained as part of the 
 .. _Will Thames: https://github.com/willthames
 .. _Ansible: https://ansible.com
 .. _Red Hat: https://redhat.com
-.. _command-line skip_list: https://docs.ansible.com/ansible-lint/usage/usage.html#command-line-options
-.. _config file skip_list: https://docs.ansible.com/ansible-lint/configuring/configuring.html#configuration-file
