@@ -248,8 +248,7 @@ def _taskshandlers_children(basedir, k, v, parent_type):
 
 
 def _maybe_th_children_for_tasks_or_playbooks(th, basedir, k, parent_type):
-    """
-    Try to get and return children of taskhandler of type, include,
+    """Try to get and return children of taskhandler of type, include,
     include_tasks, import_playbook and import_tasks.
     """
     for tht in ('include', 'include_tasks', 'import_playbook', 'import_tasks'):
