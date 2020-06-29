@@ -58,3 +58,7 @@ repos:
     args: []
     additional_dependencies:
     - Sphinx
+- repo: https://github.com/pre-commit/mirrors-pylint
+  rev: v2.5.3
+  hooks:
+  - id: pylint

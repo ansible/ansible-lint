@@ -68,7 +68,7 @@ class Runner(object):
         visited: Set = set()
         matches = list()
 
-        while (visited != self.playbooks):
+        while visited != self.playbooks:
             for arg in self.playbooks - visited:
                 try:
                     for child in ansiblelint.utils.find_children(arg, self.playbook_dir):

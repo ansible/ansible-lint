@@ -19,23 +19,19 @@
 # THE SOFTWARE.
 """Generic utility helpers."""
 
-from argparse import Namespace
-from collections import OrderedDict
 import inspect
 import logging
 import os
-from pathlib import Path
 import pprint
 import subprocess
+from argparse import Namespace
+from collections import OrderedDict
+from pathlib import Path
+from typing import Callable, ItemsView, List, Tuple
 
 import yaml
-from yaml.composer import Composer
-from yaml.representer import RepresenterError
-
 from ansible import constants
-from ansible.errors import AnsibleError
-from ansible.errors import AnsibleParserError
-from ansiblelint.file_utils import normpath
+from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.splitter import split_args
@@ -44,10 +40,12 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import module_loader
 from ansible.template import Templar
+from yaml.composer import Composer
+from yaml.representer import RepresenterError
+
 from ansiblelint.constants import ANSIBLE_FAILURE_RC
 from ansiblelint.errors import MatchError
-from typing import Callable, ItemsView, List, Tuple
-
+from ansiblelint.file_utils import normpath
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -360,7 +358,7 @@ def rolename(filepath):
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs))
+    return dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs)
 
 
 def normalize_task_v2(task):
@@ -385,7 +383,7 @@ def normalize_task_v2(task):
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
         action = 'shell'
-        del(arguments['_uses_shell'])
+        del arguments['_uses_shell']
 
     for (k, v) in list(task.items()):
         if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
@@ -399,13 +397,13 @@ def normalize_task_v2(task):
 
     if '_raw_params' in arguments:
         result['action']['__ansible_arguments__'] = arguments['_raw_params'].split(' ')
-        del(arguments['_raw_params'])
+        del arguments['_raw_params']
     else:
         result['action']['__ansible_arguments__'] = list()
 
     if 'argv' in arguments and not result['action']['__ansible_arguments__']:
         result['action']['__ansible_arguments__'] = arguments['argv']
-        del(arguments['argv'])
+        del arguments['argv']
 
     result['action'].update(arguments)
     return result
@@ -452,17 +450,17 @@ def normalize_task_v1(task):
         #   module: ec2
         #   etc...
         result['action']['__ansible_module__'] = result['action']['module']
-        del(result['action']['module'])
+        del result['action']['module']
     if 'args' in result:
         result['action'].update(result.get('args'))
-        del(result['args'])
+        del result['args']
     return result
 
 
 def normalize_task(task, filename):
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
-        del(task['__ansible_action_type__'])
+        del task['__ansible_action_type__']
     task = normalize_task_v2(task)
     task[FILENAME_KEY] = filename
     task['__ansible_action_type__'] = ansible_action_type

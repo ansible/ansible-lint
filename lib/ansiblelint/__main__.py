@@ -118,7 +118,7 @@ def main() -> int:
     for match in sorted(matches):
         print(formatter.format(match, options.colored))
 
-    if len(matches):
+    if matches:
         return 2
     else:
         return 0

@@ -230,7 +230,7 @@ def test_logger_debug(caplog):
 def test_cli_auto_detect(capfd):
     """Test that run without arguments it will detect and lint the entire repository."""
     cmd = sys.executable, "-m", "ansiblelint", "-v", "-p", "--nocolor"
-    result = subprocess.run(cmd).returncode
+    result = subprocess.run(cmd, check=False).returncode
 
     # We de expect to fail on our own repo due to test examples we have
     # TODO(ssbarnea) replace it with exact return code once we document them
