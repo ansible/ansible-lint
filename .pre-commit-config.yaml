@@ -61,7 +61,7 @@ repos:
     entry: >-
       sh -c "
         pip install . &&
-        python -m ansiblelint -L -f rst > docs/docsite/rst/rules/default_rules.rst
+        python -m ansiblelint -L -f rst > docs/rst/rules/default_rules.rst
       "
     language: python
     pass_filenames: false
