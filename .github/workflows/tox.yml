@@ -225,7 +225,6 @@ jobs:
       with:
         password: ${{ secrets.testpypi_password }}
         repository_url: https://test.pypi.org/legacy/
-        skip_existing: true
     - name: Publish to pypi.org
       if: >-  # "create" workflows run separately from "push" & "pull_request"
         github.event_name == 'create' &&
