@@ -1,0 +1,11 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: /docs
+  schedule:
+    day: sunday
+    interval: weekly
+  labels:
+  - dependabot-deps-updates
+  versioning-strategy: lockfile-only
+  open-pull-requests-limit: 3
