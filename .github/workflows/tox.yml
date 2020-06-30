@@ -207,7 +207,10 @@ jobs:
       uses: actions/checkout@v2
       with:
         # Get shallow Git history (default) for tag creation events
-        # but have a complete clone for any other workflows
+        # but have a complete clone for any other workflows.
+        # Both options fetch tags but since we're going to remove
+        # one from HEAD in non-create-tag workflows, we need full
+        # history for them.
         fetch-depth: >-
           ${{
             (
@@ -216,9 +219,6 @@ jobs:
             ) &&
             1 || 0
           }}
-    - name: Get Git tags for SCM versioning to work
-      run: >-
-        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
     - name: Drop Git tags from HEAD for non-tag-create events
       if: >-
         github.event_name != 'create' ||
