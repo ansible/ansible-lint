@@ -1,8 +1,15 @@
 name: gh
 
 on:
-  create:  # branch or tag created, need to filter on publish
-  push:
+  create:  # is used for publishing to PyPI and TestPyPI
+    tags:  # any tag regardless of its name, no branches
+  push:  # only publishes pushes to the main branch to TestPyPI
+    branches:  # any branch but not tag
+    - >-
+      **
+    tags-ignore:
+    - >-
+      **
   pull_request:
   schedule:
   - cron: 1 0 * * *  # Run daily at 0:01 UTC
@@ -198,10 +205,28 @@ jobs:
         tox
     - name: Check out src from Git
       uses: actions/checkout@v2
-    - name: Get history and tags for SCM versioning to work
-      run: |
-        git fetch --prune --unshallow
+      with:
+        # Get shallow Git history (default) for tag creation events
+        # but have a complete clone for any other workflows
+        fetch-depth: >-
+          ${{
+            (
+              github.event_name == 'create' &&
+              github.event.ref_type == 'tag'
+            ) &&
+            1 || 0
+          }}
+    - name: Get Git tags for SCM versioning to work
+      run: >-
         git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+    - name: Drop Git tags from HEAD for non-tag-create events
+      if: >-
+        github.event_name != 'create' ||
+        github.event.ref_type != 'tag'
+      run: >-
+        git tag --points-at HEAD
+        |
+        xargs git tag --delete
     - name: Instruct setuptools-scm not to add a local version part
       if: >-
         github.event_name == 'push' &&
