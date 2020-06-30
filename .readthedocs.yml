@@ -10,7 +10,7 @@ version: 2
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
   builder: html
-  configuration: docs/rst/conf.py
+  configuration: docs/conf.py
   # FIXME: enable once no warnings
   # fail_on_warning: true
 

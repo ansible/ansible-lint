@@ -20,22 +20,23 @@ transferred to the Ansible project team.
    :maxdepth: 3
    :caption: Installing
 
-   installing/index
+   installing
 
 .. toctree::
    :maxdepth: 3
    :caption: Usage
 
-   usage/index
+   usage
 
 .. toctree::
    :maxdepth: 3
    :caption: Configuring
 
-   configuring/index
+   configuring
 
 .. toctree::
    :maxdepth: 4
    :caption: Rules
 
-   rules/index
+   rules
+   default_rules
