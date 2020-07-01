@@ -14,8 +14,15 @@
 # serve to show the default value.
 """Documentation Configuration."""
 
+from pathlib import Path
 import sys
 import os
+
+# Make in-tree extension importable in non-tox setups/envs, like RTD.
+# Refs:
+# https://github.com/readthedocs/readthedocs.org/issues/6311
+# https://github.com/readthedocs/readthedocs.org/issues/7182
+sys.path.insert(0, str(Path(__file__).parent.resolve()))
 
 # pip install sphinx_rtd_theme
 # import sphinx_rtd_theme
@@ -40,7 +47,11 @@ AUTHOR = 'Ansible, Inc'
 # They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 # TEST: 'sphinxcontrib.fulltoc'
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
+    'rules_table_generator_ext',  # in-tree extension
+]
 
 # Later on, add 'sphinx.ext.viewcode' to the list if you want to have
 # colorized code generated too for references.
