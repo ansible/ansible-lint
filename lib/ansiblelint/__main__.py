@@ -115,7 +115,11 @@ def main() -> int:
                         options.verbosity, checked_files)
         matches.extend(runner.run())
 
-    matches.sort(key=lambda x: (normpath(x.filename), x.linenumber, x.rule.id))
+    matches.sort(
+        key=lambda x: (
+            normpath(x.filename),
+            x.linenumber,
+            getattr(x.rule, 'id', 0)))
 
     for match in matches:
         print(formatter.format(match, options.colored))
