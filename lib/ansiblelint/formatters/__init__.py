@@ -42,14 +42,15 @@ class Formatter(BaseFormatter):
 
     def format(self, match, colored=False):
         formatstr = u"{0} {1}\n{2}:{3}\n{4}\n"
+        _id = getattr(match.rule, 'id', '000')
         if colored:
-            return formatstr.format(colorize(u"[{0}]".format(match.rule.id), Color.error_code),
+            return formatstr.format(colorize(u"[{0}]".format(_id), Color.error_code),
                                     colorize(match.message, Color.error_title),
                                     colorize(self._format_path(match.filename), Color.filename),
                                     colorize(str(match.linenumber), Color.linenumber),
                                     colorize(u"{0}".format(match.line), Color.line))
         else:
-            return formatstr.format(match.rule.id,
+            return formatstr.format(_id,
                                     match.message,
                                     match.filename,
                                     match.linenumber,
