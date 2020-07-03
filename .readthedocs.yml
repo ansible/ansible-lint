@@ -11,8 +11,7 @@ version: 2
 sphinx:
   builder: html
   configuration: docs/conf.py
-  # FIXME: enable once no warnings
-  # fail_on_warning: true
+  fail_on_warning: true
 
 # Build documentation with MkDocs
 #mkdocs:
@@ -38,5 +37,5 @@ python:
   install:
   - method: pip
     path: .
-  - requirements: docs/requirements.in
+  - requirements: docs/requirements.txt
   system_packages: false
