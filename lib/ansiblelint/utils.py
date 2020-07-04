@@ -35,6 +35,7 @@ from yaml.representer import RepresenterError
 from ansible import constants
 from ansible.errors import AnsibleError
 from ansible.errors import AnsibleParserError
+from ansiblelint.file_utils import normpath
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.splitter import split_args
@@ -577,17 +578,6 @@ def get_first_cmd_arg(task):
     except IndexError:
         return None
     return first_cmd_arg
-
-
-def normpath(path) -> str:
-    """
-    Normalize a path in order to provide a more consistent output.
-
-    Currently it generates a relative path but in the future we may want to
-    make this user configurable.
-    """
-    # convertion to string in order to allow receiving non string objects
-    return os.path.relpath(str(path))
 
 
 def is_playbook(filename: str) -> bool:

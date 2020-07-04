@@ -4,6 +4,7 @@ import os
 from typing import List, Set
 
 import ansiblelint.utils
+import ansiblelint.file_utils
 import ansiblelint.skip_utils
 from .errors import MatchError
 from .rules.LoadingFailureRule import LoadingFailureRule
@@ -59,7 +60,7 @@ class Runner(object):
         for playbook in self.playbooks:
             if self.is_excluded(playbook[0]) or playbook[1] == 'role':
                 continue
-            files.append({'path': ansiblelint.utils.normpath(playbook[0]),
+            files.append({'path': ansiblelint.file_utils.normpath(playbook[0]),
                           'type': playbook[1],
                           # add an absolute path here, so rules are able to validate if
                           # referenced files exist
@@ -88,7 +89,7 @@ class Runner(object):
         for file in files:
             _logger.debug(
                 "Examining %s of type %s",
-                ansiblelint.utils.normpath(file['path']),
+                ansiblelint.file_utils.normpath(file['path']),
                 file['type'])
             matches.extend(self.rules.run(file, tags=set(self.tags),
                            skip_list=self.skip_list))

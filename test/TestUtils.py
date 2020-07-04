@@ -29,6 +29,7 @@ import sys
 import pytest
 
 import ansiblelint.utils as utils
+from ansiblelint.file_utils import normpath
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint import cli
 
@@ -132,7 +133,7 @@ def test_task_to_str_unicode():
     pytest.param('a/b/../', id='str'),
 ))
 def test_normpath_with_path_object(path):
-    assert utils.normpath(path) == "a"
+    assert normpath(path) == "a"
 
 
 def test_expand_path_vars(monkeypatch):
