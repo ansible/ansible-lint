@@ -61,8 +61,13 @@ class AnsibleLintRule(object):
             message = None
             if isinstance(result, str):
                 message = result
-            matches.append(Match(prev_line_no + 1, line,
-                           file['path'], self, message))
+            m = Match(
+                message=message,
+                linenumber=prev_line_no + 1,
+                line=line,
+                filename=file['path'],
+                rule=self)
+            matches.append(m)
         return matches
 
     def matchtasks(self, file: str, text: str) -> List[Match]:
@@ -93,8 +98,13 @@ class AnsibleLintRule(object):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
-                           file['path'], self, message))
+            m = Match(
+                message=message,
+                linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
+                line=task_msg,
+                filename=file['path'],
+                rule=self)
+            matches.append(m)
         return matches
 
     @staticmethod
@@ -135,8 +145,13 @@ class AnsibleLintRule(object):
 
             for section, message, *optional_linenumber in result:
                 linenumber = self._matchplay_linenumber(play, optional_linenumber)
-                matches.append(Match(linenumber,
-                                     section, file['path'], self, message))
+                m = Match(
+                    message=message,
+                    linenumber=linenumber,
+                    line=section,
+                    filename=file['path'],
+                    rule=self)
+                matches.append(m)
         return matches
 
 

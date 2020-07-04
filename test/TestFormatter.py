@@ -33,13 +33,13 @@ class TestFormatter(unittest.TestCase):
         self.formatter = Formatter(pathlib.Path.cwd(), True)
 
     def test_format_coloured_string(self):
-        match = Match(1, "hello", "filename.yml", self.rule, "message")
+        match = Match("message", 1, "hello", "filename.yml", self.rule)
         self.formatter.format(match, True)
 
     def test_unicode_format_string(self):
-        match = Match(1, "hello", "filename.yml", self.rule, u'\U0001f427')
+        match = Match(u'\U0001f427', 1, "hello", "filename.yml", self.rule)
         self.formatter.format(match, False)
 
     def test_dict_format_line(self):
-        match = Match(1, {'hello': 'world'}, "filename.yml", self.rule, "xyz")
+        match = Match("xyz", 1, {'hello': 'world'}, "filename.yml", self.rule,)
         self.formatter.format(match, True)
