@@ -6,7 +6,7 @@ from typing import List, Set
 import ansiblelint.utils
 import ansiblelint.file_utils
 import ansiblelint.skip_utils
-from .errors import MatchError
+from .errors import Match
 from .rules.LoadingFailureRule import LoadingFailureRule
 
 
@@ -76,9 +76,9 @@ class Runner(object):
                             continue
                         self.playbooks.add((child['path'], child['type']))
                         files.append(child)
-                except MatchError as e:
+                except Match as e:
                     e.rule = LoadingFailureRule
-                    matches.append(e.get_match())
+                    matches.append(e)
                 visited.add(arg)
 
         # remove duplicates from files list

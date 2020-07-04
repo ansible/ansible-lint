@@ -1,37 +1,29 @@
 """Exceptions and error representations."""
 
 
-class Match(object):
-    """Rule violation detected during linting."""
+class Match(ValueError):
+    """Rule violation detected during linting.
 
-    def __init__(self, linenumber, line, filename, rule, message=None) -> None:
+    It can be raised as Exception but also just added to the list of found
+    rules violations.
+    """
+
+    def __init__(self, message=None, linenumber=0, line=None, filename=None, rule=None) -> None:
         """Initialize a Match instance."""
+        super().__init__(message)
+
+        self.message = message or getattr(rule, 'shortdesc', "")
         self.linenumber = linenumber
         self.line = line
         self.filename = filename
         self.rule = rule
-        self.message = message or rule.shortdesc
 
     def __repr__(self):
         """Return a Match instance representation."""
         formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
-        return formatstr.format(self.rule.id, self.message,
+        # note that `rule.id` can be int, str or even missing, as users
+        # can defined their own custom rules.
+        _id = getattr(self.rule, "id", "000")
+
+        return formatstr.format(_id, self.message,
                                 self.filename, self.linenumber, self.line)
-
-
-class MatchError(ValueError):
-    """Exception that would end-up as linter rule match."""
-
-    def __init__(self, message, rule=None):
-        """Initialize a MatchError instance."""
-        super().__init__(message)
-
-        self.message = message
-        self.linenumber = 0
-        self.line = None
-        self.filename = None
-        self.rule = rule
-
-    def get_match(self) -> Match:
-        """Return a Match instance."""
-        return Match(self.linenumber, self.line, self.filename, self.rule, self.message)
