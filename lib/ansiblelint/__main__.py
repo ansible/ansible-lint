@@ -29,7 +29,7 @@ from typing import Any, Set
 from ansiblelint import cli
 from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.generate_docs import rules_as_rst
-from ansiblelint.utils import normpath, get_playbooks_and_roles
+from ansiblelint.utils import get_playbooks_and_roles
 import ansiblelint.formatters as formatters
 from ansiblelint.runner import Runner
 from ansiblelint.rules import RulesCollection
@@ -115,13 +115,7 @@ def main() -> int:
                         options.verbosity, checked_files)
         matches.extend(runner.run())
 
-    matches.sort(
-        key=lambda x: (
-            normpath(x.filename),
-            x.linenumber,
-            getattr(x.rule, 'id', 0)))
-
-    for match in matches:
+    for match in sorted(matches):
         print(formatter.format(match, options.colored))
 
     if len(matches):
