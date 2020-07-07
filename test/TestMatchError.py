@@ -25,5 +25,6 @@ def test_matcherror_sort(a, b):
 
 
 def test_matcherror_invalid():
+    """Ensure that MatchError requires message or rule."""
     with pytest.raises(RuntimeError):
         MatchError()
