@@ -33,6 +33,6 @@ def test_matcherror_sort(a, b):
 
 def test_matcherror_invalid():
     """Ensure that MatchError requires message or rule."""
-    expected_err = "^MatchError() missing a required argument: one of 'message' or 'rule'$"
+    expected_err = r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
     with pytest.raises(TypeError, match=expected_err):
         MatchError()
