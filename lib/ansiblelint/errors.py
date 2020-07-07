@@ -16,7 +16,6 @@ class MatchError(ValueError):
         super().__init__(message)
 
         if not (message or rule):
-            self.linenumber = 0
             raise TypeError(
                 f'{self.__class__.__name__}() missing a '
                 "required argument: one of 'message' or 'rule'",
