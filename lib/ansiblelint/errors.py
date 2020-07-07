@@ -1,7 +1,7 @@
 """Exceptions and error representations."""
 
 
-class Match(ValueError):
+class MatchError(ValueError):
     """Rule violation detected during linting.
 
     It can be raised as Exception but also just added to the list of found
@@ -9,7 +9,7 @@ class Match(ValueError):
     """
 
     def __init__(self, message=None, linenumber=0, line=None, filename=None, rule=None) -> None:
-        """Initialize a Match instance."""
+        """Initialize a MatchError instance."""
         super().__init__(message)
 
         self.message = message or getattr(rule, 'shortdesc', "")
@@ -19,7 +19,7 @@ class Match(ValueError):
         self.rule = rule
 
     def __repr__(self):
-        """Return a Match instance representation."""
+        """Return a MatchError instance representation."""
         formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
         # note that `rule.id` can be int, str or even missing, as users
         # can defined their own custom rules.

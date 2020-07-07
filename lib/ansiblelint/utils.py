@@ -45,7 +45,7 @@ from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import module_loader
 from ansible.template import Templar
 from ansiblelint.constants import ANSIBLE_FAILURE_RC
-from ansiblelint.errors import Match
+from ansiblelint.errors import MatchError
 from typing import Callable, ItemsView, List, Tuple
 
 
@@ -139,7 +139,7 @@ def _rebind_match_filename(filename: str, func) -> Callable:
     def func_wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Match as e:
+        except MatchError as e:
             e.filename = filename
             raise e
     return func_wrapper
@@ -241,7 +241,7 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             th = normalize_task_v2(th)
             module = th['action']['__ansible_module__']
             if "name" not in th['action']:
-                raise Match(
+                raise MatchError(
                     "Failed to find required 'name' key in %s" % module)
             if not isinstance(th['action']["name"], str):
                 raise RuntimeError(

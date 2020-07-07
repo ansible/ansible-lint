@@ -20,7 +20,7 @@
 import pathlib
 import unittest
 
-from ansiblelint.errors import Match
+from ansiblelint.errors import MatchError
 from ansiblelint.formatters import Formatter
 from ansiblelint.rules import AnsibleLintRule
 
@@ -33,13 +33,13 @@ class TestFormatter(unittest.TestCase):
         self.formatter = Formatter(pathlib.Path.cwd(), True)
 
     def test_format_coloured_string(self):
-        match = Match("message", 1, "hello", "filename.yml", self.rule)
+        match = MatchError("message", 1, "hello", "filename.yml", self.rule)
         self.formatter.format(match, True)
 
     def test_unicode_format_string(self):
-        match = Match(u'\U0001f427', 1, "hello", "filename.yml", self.rule)
+        match = MatchError(u'\U0001f427', 1, "hello", "filename.yml", self.rule)
         self.formatter.format(match, False)
 
     def test_dict_format_line(self):
-        match = Match("xyz", 1, {'hello': 'world'}, "filename.yml", self.rule,)
+        match = MatchError("xyz", 1, {'hello': 'world'}, "filename.yml", self.rule,)
         self.formatter.format(match, True)

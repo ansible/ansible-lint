@@ -10,7 +10,7 @@ from typing import List
 
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.skip_utils import append_skipped_rules
-from ansiblelint.errors import Match
+from ansiblelint.errors import MatchError
 import ansiblelint.utils
 
 
@@ -41,8 +41,8 @@ class AnsibleLintRule(object):
         text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
         return text
 
-    def matchlines(self, file, text) -> List[Match]:
-        matches: List[Match] = []
+    def matchlines(self, file, text) -> List[MatchError]:
+        matches: List[MatchError] = []
         if not self.match:
             return matches
         # arrays are 0-based, line numbers are 1-based
@@ -61,7 +61,7 @@ class AnsibleLintRule(object):
             message = None
             if isinstance(result, str):
                 message = result
-            m = Match(
+            m = MatchError(
                 message=message,
                 linenumber=prev_line_no + 1,
                 line=line,
@@ -70,8 +70,8 @@ class AnsibleLintRule(object):
             matches.append(m)
         return matches
 
-    def matchtasks(self, file: str, text: str) -> List[Match]:
-        matches: List[Match] = []
+    def matchtasks(self, file: str, text: str) -> List[MatchError]:
+        matches: List[MatchError] = []
         if not self.matchtask:
             return matches
 
@@ -98,7 +98,7 @@ class AnsibleLintRule(object):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            m = Match(
+            m = MatchError(
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
                 line=task_msg,
@@ -115,8 +115,8 @@ class AnsibleLintRule(object):
             linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
         return linenumber
 
-    def matchyaml(self, file: str, text: str) -> List[Match]:
-        matches: List[Match] = []
+    def matchyaml(self, file: str, text: str) -> List[MatchError]:
+        matches: List[MatchError] = []
         if not self.matchplay:
             return matches
 
@@ -145,7 +145,7 @@ class AnsibleLintRule(object):
 
             for section, message, *optional_linenumber in result:
                 linenumber = self._matchplay_linenumber(play, optional_linenumber)
-                m = Match(
+                m = MatchError(
                     message=message,
                     linenumber=linenumber,
                     line=section,
