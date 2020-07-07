@@ -43,7 +43,7 @@ class MatchError(ValueError):
         return self.filename, self.linenumber, self.message, getattr(self.rule, 'id', 0)
 
     def __lt__(self, other):
-        """Enable sorting of MatchError instances."""
+        """Return whether the current object is less than the other."""
         return self._hash_key < other._hash_key
 
     def __hash__(self):
