@@ -47,7 +47,7 @@ class MatchError(ValueError):
         return self._hash_key < other._hash_key
 
     def __hash__(self):
-        """Perform hash of matches."""
+        """Return a hash value of the MatchError instance."""
         return hash(self._hash_key)
 
     def __eq__(self, other):
