@@ -39,7 +39,7 @@ class MatchError(ValueError):
 
     @property
     def _hash_key(self):
-        return self.filename, self.linenumber, self.message, getattr(self.rule, 'id', 0)
+        return self.filename, self.linenumber, str(getattr(self.rule, 'id', 0)), self.message
 
     def __lt__(self, other):
         """Return whether the current object is less than the other."""
