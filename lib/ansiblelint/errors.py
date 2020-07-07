@@ -17,7 +17,10 @@ class MatchError(ValueError):
 
         if not (message or rule):
             self.linenumber = 0
-            raise RuntimeError("Calling MatchError requires either a message or a rule.")
+            raise TypeError(
+                f'{self.__class__.__name__}() missing a '
+                "required argument: one of 'message' or 'rule'",
+            )
 
         self.message = message or getattr(rule, 'shortdesc', "")
         self.linenumber = linenumber
