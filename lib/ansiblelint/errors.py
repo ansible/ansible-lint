@@ -52,4 +52,6 @@ class MatchError(ValueError):
 
     def __eq__(self, other):
         """Identify duplicate matches."""
+        if not isinstance(other, self.__class__):
+            raise NotImplementedError
         return self.__hash__() == other.__hash__()
