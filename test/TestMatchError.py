@@ -14,6 +14,13 @@ class AnsibleLintRuleWithStringId(AnsibleLintRule):
     id = "200"
 
 
+def test_matcherror_invalid():
+    """Ensure that MatchError requires message or rule."""
+    expected_err = r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
+    with pytest.raises(TypeError, match=expected_err):
+        MatchError()
+
+
 @pytest.mark.parametrize(
     ('a', 'b'), (
         # sorting by message
@@ -25,14 +32,13 @@ class AnsibleLintRuleWithStringId(AnsibleLintRule):
         # rule id "200" > rule id 101
         (MatchError(rule=AnsibleLintRuleWithStringId), MatchError(rule=AlwaysRunRule))
     ))
-def test_matcherror_sort(a, b):
-    assert b < a
-    assert a > b
-    assert a != b
+class TestMatchErrorCompare():
 
+    def test_lt(self, a, b):
+        assert b < a
 
-def test_matcherror_invalid():
-    """Ensure that MatchError requires message or rule."""
-    expected_err = r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
-    with pytest.raises(TypeError, match=expected_err):
-        MatchError()
+    def test_gt(self, a, b):
+        assert a > b
+
+    def test_eq(self, a, b):
+        assert a != b
