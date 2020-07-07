@@ -51,7 +51,7 @@ class MatchError(ValueError):
         return hash(self._hash_key)
 
     def __eq__(self, other):
-        """Identify duplicate matches."""
+        """Identify whether the other object represents the same rule match."""
         if not isinstance(other, self.__class__):
             raise NotImplementedError
         return self.__hash__() == other.__hash__()
