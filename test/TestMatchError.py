@@ -6,13 +6,19 @@ from ansiblelint.rules.BecomeUserWithoutBecomeRule import BecomeUserWithoutBecom
 import pytest
 
 
-def test_matcherror_compare():
-"""Check that MatchError instances with similar attrs are equivalent."""
-    assert MatchError("foo") == MatchError("foo")
+@pytest.mark.parametrize(
+    ('a', 'b'), (
+        (MatchError("foo"), MatchError("foo")),
+        # line is ignored in comparisions, even if it may be different
+        (MatchError("a", line={}), MatchError("a", line={"a": "b"}))
+    ))
+def test_matcherror_compare(a, b):
+    """Check that MatchError instances with similar attrs are equivalent."""
+    assert a == b
 
 
 class AnsibleLintRuleWithStringId(AnsibleLintRule):
-    id = "200"
+    id = "ANSIBLE200"
 
 
 def test_matcherror_invalid():
@@ -33,7 +39,7 @@ def test_matcherror_invalid():
         # rule id "200" > rule id 101
         (MatchError(rule=AnsibleLintRuleWithStringId), MatchError(rule=AlwaysRunRule))
     ))
-class TestMatchErrorCompare():
+class TestMatchErrorCompare:
 
     def test_lt(self, a, b):
         assert b < a
@@ -41,5 +47,5 @@ class TestMatchErrorCompare():
     def test_gt(self, a, b):
         assert a > b
 
-    def test_eq(self, a, b):
+    def test_ne(self, a, b):
         assert a != b

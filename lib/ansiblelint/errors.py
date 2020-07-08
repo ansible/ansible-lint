@@ -9,9 +9,18 @@ class MatchError(ValueError):
 
     It can be raised as Exception but also just added to the list of found
     rules violations.
+
+    Note that line argument is not considered when building hash of an
+    instance.
     """
 
-    def __init__(self, message=None, linenumber=0, line=None, filename=None, rule=None) -> None:
+    def __init__(
+            self,
+            message=None,
+            linenumber=0,
+            line: dict = None,
+            filename=None,
+            rule=None) -> None:
         """Initialize a MatchError instance."""
         super().__init__(message)
 
@@ -39,6 +48,7 @@ class MatchError(ValueError):
 
     @property
     def _hash_key(self):
+        # line attr is knowingly excluded, as dict is not hashable
         return self.filename, self.linenumber, str(getattr(self.rule, 'id', 0)), self.message
 
     def __lt__(self, other):
