@@ -7,14 +7,17 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    ('a', 'b'), (
+    ('left_match_error', 'right_match_error'),
+    (
         (MatchError("foo"), MatchError("foo")),
-        # line is ignored in comparisions, even if it may be different
-        (MatchError("a", line={}), MatchError("a", line={"a": "b"}))
-    ))
-def test_matcherror_compare(a, b):
+
+        # `line` is ignored in comparisions, even when it differs:
+        (MatchError("a", line={}), MatchError("a", line={"a": "b"})),
+    ),
+)
+def test_matcherror_compare(left_match_error, right_match_error):
     """Check that MatchError instances with similar attrs are equivalent."""
-    assert a == b
+    assert left_match_error == right_match_error
 
 
 class AnsibleLintRuleWithStringId(AnsibleLintRule):
