@@ -7,6 +7,7 @@ import pytest
 
 
 def test_matcherror_compare():
+"""Check that MatchError instances with similar attrs are equivalent."""
     assert MatchError("foo") == MatchError("foo")
 
 
