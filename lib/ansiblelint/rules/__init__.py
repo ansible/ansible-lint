@@ -221,7 +221,7 @@ class RulesCollection(object):
                     matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchtasks(playbookfile, text))
                     matches.extend(rule.matchyaml(playbookfile, text))
-        return list(set(matches))
+        return matches
 
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
