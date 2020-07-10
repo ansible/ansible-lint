@@ -32,7 +32,7 @@ def test_matcherror_invalid():
 
 
 @pytest.mark.parametrize(
-    ('a', 'b'), (
+    ('left_match_error', 'right_match_error'), (
         # sorting by message
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
@@ -40,15 +40,20 @@ def test_matcherror_invalid():
         # rule id 501 > rule id 101
         (MatchError(rule=BecomeUserWithoutBecomeRule), MatchError(rule=AlwaysRunRule)),
         # rule id "200" > rule id 101
-        (MatchError(rule=AnsibleLintRuleWithStringId), MatchError(rule=AlwaysRunRule))
+        (MatchError(rule=AnsibleLintRuleWithStringId), MatchError(rule=AlwaysRunRule)),
+        # line will not be taken into account
+        (MatchError("b", line={}), MatchError("a", line={"a": "b"})),
     ))
 class TestMatchErrorCompare:
 
-    def test_lt(self, a, b):
-        assert b < a
+    def test_match_error_less_than(self, left_match_error, right_match_error):
+        """Check 'less than' protocol implementation in MatchError."""
+        assert right_match_error < left_match_error
 
-    def test_gt(self, a, b):
-        assert a > b
+    def test_match_error_greater_than(self, left_match_error, right_match_error):
+        """Check 'greater than' protocol implementation in MatchError."""
+        assert left_match_error > right_match_error
 
-    def test_ne(self, a, b):
-        assert a != b
+    def test_match_error_not_equal(self, left_match_error, right_match_error):
+        """Check 'not equals' protocol implementation in MatchError."""
+        assert left_match_error != right_match_error
