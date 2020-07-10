@@ -70,14 +70,14 @@ class TestMatchErrorCompare:
 @pytest.mark.parametrize(
     'operation',
     (
-        '__eq__',
-        '__ne__',
-        '__le__',
-        '__gt__',
+        operator.eq,
+        operator.ne,
+        operator.le,
+        operator.gt,
     ),
     ids=['eq', 'ne', 'le', 'gt']
 )
 def test_matcherror_compare_invalid(other, operation):
     """Check that MatchError comparison with other types raises."""
     with pytest.raises(NotImplementedError):
-        getattr(MatchError("foo"), operation)(other)
+        operation(MatchError("foo"), other)
