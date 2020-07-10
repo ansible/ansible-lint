@@ -59,12 +59,12 @@ class TestMatchErrorCompare:
 
 
 @pytest.mark.parametrize(
-    ('other'),
+    'other',
     (
-        (None),
-        ("foo"),
-        (42),
-        (Exception("foo")),
+        None,
+        "foo",
+        42,
+        Exception("foo"),
     ),
 )
 @pytest.mark.parametrize(
