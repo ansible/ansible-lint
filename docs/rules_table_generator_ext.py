@@ -13,7 +13,6 @@ from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.generate_docs import rules_as_rst
 from ansiblelint.rules import RulesCollection
 
-
 DEFAULT_RULES_RST = (Path(__file__).parent / 'default_rules.rst').resolve()
 
 

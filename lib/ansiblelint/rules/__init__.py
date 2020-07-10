@@ -12,7 +12,6 @@ import ansiblelint.utils
 from ansiblelint.errors import MatchError
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
-
 _logger = logging.getLogger(__name__)
 
 

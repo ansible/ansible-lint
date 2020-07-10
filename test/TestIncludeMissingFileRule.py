@@ -4,7 +4,6 @@ import pytest
 
 from ansiblelint.runner import Runner
 
-
 PlayFile = namedtuple('PlayFile', ['name', 'content'])
 
 

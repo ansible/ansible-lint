@@ -2,7 +2,6 @@ import pytest
 
 from ansiblelint.runner import Runner
 
-
 ROLE_TASKS_MAIN = '''
 - name: shell instead of command
   shell: echo hello world

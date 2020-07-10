@@ -41,6 +41,13 @@ repos:
     files: \.(yaml|yml)$
     types: [file, yaml]
     entry: yamllint --strict
+- repo: https://github.com/pre-commit/mirrors-isort
+  rev: v5.0.8
+  hooks:
+  - id: isort
+    args:
+    # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
+    - --filter-files
 - repo: https://gitlab.com/pycqa/flake8.git
   rev: 3.8.1
   hooks:

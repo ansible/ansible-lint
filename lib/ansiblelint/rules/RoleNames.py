@@ -24,7 +24,6 @@ from typing import List
 
 from ansiblelint.rules import AnsibleLintRule
 
-
 ROLE_NAME_REGEX = '^[a-z][a-z0-9_]+$'
 
 

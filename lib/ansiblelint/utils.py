@@ -400,7 +400,8 @@ def normalize_task_v2(task):  # noqa: C901
     if 'always_run' in task:
         # FIXME(ssbarnea): Delayed import to avoid circular import
         # See https://github.com/ansible/ansible-lint/issues/880
-        from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule  # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
+        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
+        from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
 
         raise MatchError(
             rule=AlwaysRunRule,
