@@ -93,7 +93,7 @@ def test_cases_warning_message(runner, caplog):
         if "Couldn't open" in str(record):
             noexist_message_count += 1
 
-    assert (noexist_message_count == 1)
+    assert noexist_message_count == 1
 
 
 @pytest.mark.parametrize(
@@ -119,4 +119,4 @@ def test_cases_that_do_not_report(runner, caplog):
         if "Couldn't open" in str(record):
             noexist_message_count += 1
 
-    assert (noexist_message_count == 0)
+    assert noexist_message_count == 0

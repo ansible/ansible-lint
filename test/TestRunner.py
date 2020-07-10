@@ -70,7 +70,7 @@ def test_runner_unicode_format(default_rules_collection, formatter_cls, format_k
 @pytest.mark.parametrize('directory_name', ('test/', os.path.abspath('test')))
 def test_runner_with_directory(default_rules_collection, directory_name):
     runner = Runner(default_rules_collection, directory_name, [], [], [])
-    assert (list(runner.playbooks)[0][1] == 'role')
+    assert list(runner.playbooks)[0][1] == 'role'
 
 
 def test_files_not_scanned_twice(default_rules_collection):
@@ -84,4 +84,4 @@ def test_files_not_scanned_twice(default_rules_collection):
     runner = Runner(default_rules_collection, filename, [], [], [], 0, checked_files)
     run2 = runner.run()
 
-    assert ((len(run1) + len(run2)) == 1)
+    assert (len(run1) + len(run2)) == 1

@@ -26,7 +26,7 @@ import sys
 import ruamel.yaml
 from typing import Any, Generator, List, Sequence
 if sys.version_info >= (3, 8):
-    from typing import Literal
+    from typing import Literal  # pylint: disable-msg=E0611
 else:
     from typing_extensions import Literal
 
