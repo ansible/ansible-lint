@@ -68,12 +68,12 @@ class TestMatchErrorCompare:
     ),
 )
 @pytest.mark.parametrize(
-    ('operation'),
+    'operation',
     (
-        ('__eq__'),
-        ('__ne__'),
-        ('__le__'),
-        ('__gt__')
+        '__eq__',
+        '__ne__',
+        '__le__',
+        '__gt__',
     ),
     ids=['eq', 'ne', 'le', 'gt']
 )
