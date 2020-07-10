@@ -10,7 +10,6 @@ import pytest
     ('left_match_error', 'right_match_error'),
     (
         (MatchError("foo"), MatchError("foo")),
-
         # `line` is ignored in comparisions, even when it differs:
         (MatchError("a", line={}), MatchError("a", line={"a": "b"})),
     ),
@@ -57,3 +56,28 @@ class TestMatchErrorCompare:
     def test_match_error_not_equal(self, left_match_error, right_match_error):
         """Check 'not equals' protocol implementation in MatchError."""
         assert left_match_error != right_match_error
+
+
+@pytest.mark.parametrize(
+    ('other'),
+    (
+        (None),
+        ("foo"),
+        (42),
+        (Exception("foo")),
+    ),
+)
+@pytest.mark.parametrize(
+    ('operation'),
+    (
+        ('__eq__'),
+        ('__ne__'),
+        ('__le__'),
+        ('__gt__')
+    ),
+    ids=['eq', 'ne', 'le', 'gt']
+)
+def test_matcherror_compare_invalid(other, operation):
+    """Check that MatchError comparison with other types raises."""
+    with pytest.raises(NotImplementedError):
+        getattr(MatchError("foo"), operation)(other)
