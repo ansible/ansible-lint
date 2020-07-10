@@ -1,3 +1,7 @@
+"""Tests for MatchError."""
+
+import operator
+
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
