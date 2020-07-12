@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 """Utils related to inline skipping of rules."""
+from functools import lru_cache
 from itertools import product
 import logging
 import sys
@@ -72,10 +73,22 @@ def append_skipped_rules(pyyaml_data: str, file_text: str, file_type: FileType):
     return yaml_skip
 
 
+@lru_cache(maxsize=128)
+def load_data(file_text: str) -> Any:
+    """Parse `file_text` as yaml and return parsed structure.
+
+    This is the main culprit for slow performance, each rule asks for loading yaml again and again
+    ideally the `maxsize` on the decorator above MUST be great or equal total number of rules
+    :param file_text: raw text to parse
+    :return: Parsed yaml
+    """
+    yaml = ruamel.yaml.YAML()
+    return yaml.load(file_text)
+
+
 def _append_skipped_rules(pyyaml_data: Sequence, file_text: str, file_type: FileType):
     # parse file text using 2nd parser library
-    yaml = ruamel.yaml.YAML()
-    ruamel_data = yaml.load(file_text)
+    ruamel_data = load_data(file_text)
 
     if file_type == 'meta':
         pyyaml_data[0]['skipped_rules'] = _get_rule_skips_from_yaml(ruamel_data)
