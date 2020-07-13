@@ -26,6 +26,9 @@
   - name: use shell generator
     shell: ls foo{.txt,.xml}
 
+  - name: use backticks
+    shell: ls `ls foo*`
+
   - name: use shell with cmd
     shell:
       cmd: |
