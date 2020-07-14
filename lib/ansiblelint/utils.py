@@ -26,6 +26,7 @@ import pprint
 import subprocess
 from argparse import Namespace
 from collections import OrderedDict
+from functools import lru_cache
 from pathlib import Path
 from typing import Callable, ItemsView, List, Tuple
 
@@ -533,6 +534,7 @@ def get_normalized_tasks(yaml, file):
     return res
 
 
+@lru_cache(maxsize=128)
 def parse_yaml_linenumbers(data, filename):
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
