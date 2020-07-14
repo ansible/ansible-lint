@@ -1,8 +1,10 @@
 import unittest
-from ansiblelint.runner import Runner
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import (
-    UseHandlerRatherThanWhenChangedRule)
+    UseHandlerRatherThanWhenChangedRule,
+)
+from ansiblelint.runner import Runner
 
 
 class TestRoleHandlers(unittest.TestCase):

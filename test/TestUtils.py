@@ -22,16 +22,15 @@
 
 import logging
 import os
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
-import ansiblelint.utils as utils
-from ansiblelint.file_utils import normpath
+from ansiblelint import cli, utils
 from ansiblelint.__main__ import initialize_logger
-from ansiblelint import cli
+from ansiblelint.file_utils import normpath
 
 
 @pytest.mark.parametrize(('string', 'expected_cmd', 'expected_args', 'expected_kwargs'), (

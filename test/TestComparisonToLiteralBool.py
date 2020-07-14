@@ -1,9 +1,9 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.ComparisonToLiteralBoolRule import (
-    ComparisonToLiteralBoolRule)
-from test import RunFromText
+from ansiblelint.rules.ComparisonToLiteralBoolRule import ComparisonToLiteralBoolRule
+
+from . import RunFromText
 
 PASS_WHEN = '''
 - name: example task

@@ -1,9 +1,9 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.ComparisonToEmptyStringRule import (
-    ComparisonToEmptyStringRule)
-from test import RunFromText
+from ansiblelint.rules.ComparisonToEmptyStringRule import ComparisonToEmptyStringRule
+
+from . import RunFromText
 
 SUCCESS_TASKS = '''
 - name: shut down

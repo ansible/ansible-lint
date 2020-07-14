@@ -2,7 +2,8 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.OctalPermissionsRule import OctalPermissionsRule
-from test import RunFromText
+
+from . import RunFromText
 
 SUCCESS_TASKS = '''
 ---

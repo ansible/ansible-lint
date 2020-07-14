@@ -2,7 +2,8 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.SudoRule import SudoRule
-from test import RunFromText
+
+from . import RunFromText
 
 ROLE_2_ERRORS = '''
 - name: test

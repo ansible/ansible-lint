@@ -2,12 +2,12 @@
 
 import operator
 
+import pytest
+
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
 from ansiblelint.rules.BecomeUserWithoutBecomeRule import BecomeUserWithoutBecomeRule
-
-import pytest
 
 
 @pytest.mark.parametrize(

@@ -1,7 +1,8 @@
 import unittest
-from ansiblelint.runner import Runner
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.PackageIsNotLatestRule import PackageIsNotLatestRule
+from ansiblelint.runner import Runner
 
 
 class TestPackageIsNotLatestRule(unittest.TestCase):
