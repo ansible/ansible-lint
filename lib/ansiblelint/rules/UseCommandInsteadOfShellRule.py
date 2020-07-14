@@ -42,4 +42,4 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
             else:
                 unjinjad_cmd = self.unjinja(
                     ' '.join(task["action"].get("__ansible_arguments__", [])))
-            return not any([ch in unjinjad_cmd for ch in '&|<>;$\n*[]{}?'])
+            return not any([ch in unjinjad_cmd for ch in '&|<>;$\n*[]{}?`'])
