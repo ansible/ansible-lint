@@ -19,13 +19,14 @@
 # THE SOFTWARE.
 
 """Utils related to inline skipping of rules."""
-from functools import lru_cache
-from itertools import product
 import logging
 import sys
+from functools import lru_cache
+from itertools import product
+from typing import Any, Generator, List, Sequence
 
 import ruamel.yaml
-from typing import Any, Generator, List, Sequence
+
 if sys.version_info >= (3, 8):
     from typing import Literal  # pylint: disable-msg=E0611
 else:

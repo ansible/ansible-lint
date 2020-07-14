@@ -14,9 +14,9 @@
 # serve to show the default value.
 """Documentation Configuration."""
 
-from pathlib import Path
-import sys
 import os
+import sys
+from pathlib import Path
 
 # Make in-tree extension importable in non-tox setups/envs, like RTD.
 # Refs:
