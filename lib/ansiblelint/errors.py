@@ -14,6 +14,11 @@ class MatchError(ValueError):
     instance.
     """
 
+    # IMPORTANT: any additional comparison protocol methods must return
+    # IMPORTANT: `NotImplemented` singleton to allow the check to use the
+    # IMPORTANT: other object's fallbacks.
+    # Ref: https://docs.python.org/3/reference/datamodel.html#object.__lt__
+
     def __init__(
             self,
             message=None,
@@ -54,7 +59,7 @@ class MatchError(ValueError):
     def __lt__(self, other):
         """Return whether the current object is less than the other."""
         if not isinstance(other, self.__class__):
-            raise NotImplementedError
+            return NotImplemented
         return self._hash_key < other._hash_key
 
     def __hash__(self):
@@ -64,5 +69,5 @@ class MatchError(ValueError):
     def __eq__(self, other):
         """Identify whether the other object represents the same rule match."""
         if not isinstance(other, self.__class__):
-            raise NotImplementedError
+            return NotImplemented
         return self.__hash__() == other.__hash__()
