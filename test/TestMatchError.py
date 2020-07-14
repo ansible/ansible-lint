@@ -10,6 +10,42 @@ from ansiblelint.rules.BecomeUserWithoutBecomeRule import BecomeUserWithoutBecom
 import pytest
 
 
+class DummyTestObject:
+    """A dummy object for equality tests."""
+
+    def __repr__(self):
+        """Return a dummy object representation for parmetrize."""
+        return '{self.__class__.__name__}()'.format(self=self)
+
+    def __eq__(self, other):
+        """Report the equality check failure with any object."""
+        return False
+
+    def __ne__(self, other):
+        """Report the confirmation of inequality with any object."""
+        return True
+
+
+class DummySentinelTestObject:
+    """A dummy object for equality protocol tests with sentinel."""
+
+    def __eq__(self, other):
+        """Return sentinel as result of equality check w/ anything."""
+        return 'EQ_SENTINEL'
+
+    def __ne__(self, other):
+        """Return sentinel as result of inequality check w/ anything."""
+        return 'NE_SENTINEL'
+
+    def __lt__(self, other):
+        """Return sentinel as result of less than check w/ anything."""
+        return 'LT_SENTINEL'
+
+    def __gt__(self, other):
+        """Return sentinel as result of greater than chk w/ anything."""
+        return 'GT_SENTINEL'
+
+
 @pytest.mark.parametrize(
     ('left_match_error', 'right_match_error'),
     (
@@ -70,18 +106,74 @@ class TestMatchErrorCompare:
         42,
         Exception("foo"),
     ),
+    ids=repr,
 )
 @pytest.mark.parametrize(
-    'operation',
+    ('operation', 'operator_char'),
     (
-        operator.eq,
-        operator.ne,
-        operator.le,
-        operator.gt,
+        pytest.param(operator.le, '<=', id='<='),
+        pytest.param(operator.gt, '>', id='>'),
     ),
-    ids=['eq', 'ne', 'le', 'gt']
 )
-def test_matcherror_compare_invalid(other, operation):
-    """Check that MatchError comparison with other types raises."""
-    with pytest.raises(NotImplementedError):
+def test_matcherror_compare_no_other_fallback(other, operation, operator_char):
+    """Check that MatchError comparison with other types causes TypeError."""
+    expected_error = (
+        r'^('
+        r'unsupported operand type\(s\) for {operator!s}:|'
+        r"'{operator!s}' not supported between instances of"
+        r") 'MatchError' and '{other_type!s}'$".
+        format(other_type=type(other).__name__, operator=operator_char)
+    )
+    with pytest.raises(TypeError, match=expected_error):
         operation(MatchError("foo"), other)
+
+
+@pytest.mark.parametrize(
+    'other',
+    (
+        None,
+        'foo',
+        42,
+        Exception('foo'),
+        DummyTestObject(),
+    ),
+    ids=repr,
+)
+@pytest.mark.parametrize(
+    ('operation', 'expected_value'),
+    (
+        (operator.eq, False),
+        (operator.ne, True),
+    ),
+    ids=('==', '!=')
+)
+def test_matcherror_compare_with_other_fallback(
+        other,
+        operation,
+        expected_value,
+):
+    """Check that MatchError comparison runs other types fallbacks."""
+    assert operation(MatchError("foo"), other) is expected_value
+
+
+@pytest.mark.parametrize(
+    ('operation', 'expected_value'),
+    (
+        (operator.eq, 'EQ_SENTINEL'),
+        (operator.ne, 'NE_SENTINEL'),
+        # NOTE: these are swapped because when we do `x < y`, and `x.__lt__(y)`
+        # NOTE: returns `NotImplemented`, Python will reverse the check into
+        # NOTE: `y > x`, and so `y.__gt__(x) is called.
+        # Ref: https://docs.python.org/3/reference/datamodel.html#object.__lt__
+        (operator.lt, 'GT_SENTINEL'),
+        (operator.gt, 'LT_SENTINEL'),
+    ),
+    ids=('==', '!=', '<', '>'),
+)
+def test_matcherror_compare_with_dummy_sentinel(operation, expected_value):
+    """Check that MatchError comparison runs other types fallbacks."""
+    dummy_obj = DummySentinelTestObject()
+    # NOTE: This assertion abuses the CPython property to cache short string
+    # NOTE: objects because the identity check is more presice and we don't
+    # NOTE: want extra operator protocol methods to influence the test.
+    assert operation(MatchError("foo"), dummy_obj) is expected_value
