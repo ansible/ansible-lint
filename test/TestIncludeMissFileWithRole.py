@@ -1,7 +1,7 @@
+import os
 from collections import namedtuple
 
 import pytest
-import os
 
 from ansiblelint.runner import Runner
 

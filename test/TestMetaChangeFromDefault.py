@@ -1,9 +1,9 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.MetaChangeFromDefaultRule import (
-    MetaChangeFromDefaultRule)
-from test import RunFromText
+from ansiblelint.rules.MetaChangeFromDefaultRule import MetaChangeFromDefaultRule
+
+from . import RunFromText
 
 DEFAULT_GALAXY_INFO = '''
 galaxy_info:

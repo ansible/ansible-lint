@@ -21,10 +21,9 @@ import os
 
 import pytest
 
-import ansiblelint.formatters as formatters
-from ansiblelint.runner import Runner
+from ansiblelint import formatters
 from ansiblelint.cli import abspath
-
+from ansiblelint.runner import Runner
 
 LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd())
 

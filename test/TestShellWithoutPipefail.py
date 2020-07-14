@@ -2,7 +2,8 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.ShellWithoutPipefail import ShellWithoutPipefail
-from test import RunFromText
+
+from . import RunFromText
 
 FAIL_TASKS = '''
 ---

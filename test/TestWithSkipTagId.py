@@ -1,7 +1,8 @@
 import unittest
+
 from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
 from ansiblelint.rules.TrailingWhitespaceRule import TrailingWhitespaceRule
+from ansiblelint.runner import Runner
 
 
 class TestWithSkipTagId(unittest.TestCase):

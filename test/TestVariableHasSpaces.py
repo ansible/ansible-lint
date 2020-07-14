@@ -2,7 +2,8 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.VariableHasSpacesRule import VariableHasSpacesRule
-from test import RunFromText
+
+from . import RunFromText
 
 TASK_VARIABLES = '''
 - name: good variable format

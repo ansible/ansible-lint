@@ -2,7 +2,8 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.TaskNoLocalAction import TaskNoLocalAction
-from test import RunFromText
+
+from . import RunFromText
 
 TASK_LOCAL_ACTION = '''
 - name: task example

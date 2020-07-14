@@ -1,7 +1,8 @@
 import unittest
-from ansiblelint.runner import Runner
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.UseCommandInsteadOfShellRule import UseCommandInsteadOfShellRule
+from ansiblelint.runner import Runner
 
 
 class TestUseCommandInsteadOfShell(unittest.TestCase):
