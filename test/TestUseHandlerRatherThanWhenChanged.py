@@ -2,9 +2,10 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import (
-    UseHandlerRatherThanWhenChangedRule)
-from test import RunFromText
+    UseHandlerRatherThanWhenChangedRule,
+)
 
+from . import RunFromText
 
 SUCCESS_TASKS = '''
 - name: print helpful error message

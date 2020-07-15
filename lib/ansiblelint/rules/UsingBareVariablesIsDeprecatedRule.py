@@ -20,6 +20,7 @@
 
 import os
 import re
+
 from ansiblelint.rules import AnsibleLintRule
 
 

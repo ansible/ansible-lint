@@ -20,8 +20,7 @@
 
 import unittest
 
-from .rules import EMatcherRule
-from .rules import UnsetVariableMatcherRule
+from .rules import EMatcherRule, UnsetVariableMatcherRule
 
 
 class TestRule(unittest.TestCase):

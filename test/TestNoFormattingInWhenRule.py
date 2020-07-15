@@ -1,7 +1,8 @@
 import unittest
+
 from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
 from ansiblelint.rules.NoFormattingInWhenRule import NoFormattingInWhenRule
+from ansiblelint.runner import Runner
 
 
 class TestNoFormattingInWhenRule(unittest.TestCase):

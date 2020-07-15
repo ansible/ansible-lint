@@ -1,7 +1,8 @@
 # Copyright (c) 2018, Ansible Project
 
-from ansiblelint.rules import AnsibleLintRule
 import re
+
+from ansiblelint.rules import AnsibleLintRule
 
 
 class MetaVideoLinksRule(AnsibleLintRule):

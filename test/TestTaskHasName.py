@@ -1,7 +1,8 @@
 import unittest
-from ansiblelint.runner import Runner
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.TaskHasNameRule import TaskHasNameRule
+from ansiblelint.runner import Runner
 
 
 class TestTaskHasNameRule(unittest.TestCase):

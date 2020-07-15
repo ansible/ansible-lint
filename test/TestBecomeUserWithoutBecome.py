@@ -1,7 +1,8 @@
 import unittest
+
 from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
 from ansiblelint.rules.BecomeUserWithoutBecomeRule import BecomeUserWithoutBecomeRule
+from ansiblelint.runner import Runner
 
 
 class TestBecomeUserWithoutBecome(unittest.TestCase):

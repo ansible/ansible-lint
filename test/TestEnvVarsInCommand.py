@@ -2,8 +2,8 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.EnvVarsInCommandRule import EnvVarsInCommandRule
-from test import RunFromText
 
+from . import RunFromText
 
 SUCCESS_PLAY_TASKS = '''
 - hosts: localhost

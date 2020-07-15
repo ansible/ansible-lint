@@ -1,9 +1,12 @@
 import unittest
-from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
-from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
-from test import ANSIBLE_MAJOR_VERSION
+
 import pytest
+
+from ansiblelint.rules import RulesCollection
+from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
+from ansiblelint.runner import Runner
+
+from . import ANSIBLE_MAJOR_VERSION
 
 
 @pytest.mark.skipif(

@@ -3,9 +3,9 @@ import logging
 import os
 from typing import List, Set
 
-import ansiblelint.utils
 import ansiblelint.file_utils
 import ansiblelint.skip_utils
+import ansiblelint.utils
 from .errors import MatchError
 from .rules.LoadingFailureRule import LoadingFailureRule
 

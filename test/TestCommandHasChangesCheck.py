@@ -1,7 +1,8 @@
 import unittest
-from ansiblelint.runner import Runner
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.CommandHasChangesCheckRule import CommandHasChangesCheckRule
+from ansiblelint.runner import Runner
 
 
 class TestCommandHasChangesCheck(unittest.TestCase):

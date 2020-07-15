@@ -26,13 +26,13 @@ import pathlib
 import sys
 from typing import Any, Set
 
-from ansiblelint import cli
+from ansiblelint import cli, formatters
 from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.generate_docs import rules_as_rst
-from ansiblelint.utils import get_playbooks_and_roles
-import ansiblelint.formatters as formatters
-from ansiblelint.runner import Runner
 from ansiblelint.rules import RulesCollection
+from ansiblelint.runner import Runner
+from ansiblelint.utils import get_playbooks_and_roles
+
 
 _logger = logging.getLogger(__name__)
 
