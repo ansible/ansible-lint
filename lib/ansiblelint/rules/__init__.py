@@ -1,17 +1,16 @@
 """All internal ansible-lint rules."""
-import re
-from collections import defaultdict
 import glob
-from importlib.abc import Loader
 import importlib.util
 import logging
 import os
+import re
+from collections import defaultdict
+from importlib.abc import Loader
 from typing import List
 
-from ansiblelint.skip_utils import get_rule_skips_from_line
-from ansiblelint.skip_utils import append_skipped_rules
-from ansiblelint.errors import MatchError
 import ansiblelint.utils
+from ansiblelint.errors import MatchError
+from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
 
 _logger = logging.getLogger(__name__)

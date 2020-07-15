@@ -1,5 +1,6 @@
 """Exceptions and error representations."""
 import functools
+
 from ansiblelint.file_utils import normpath
 
 

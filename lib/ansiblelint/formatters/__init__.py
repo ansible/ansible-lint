@@ -1,7 +1,8 @@
 """Output formatters."""
 import os
 from pathlib import Path
-from ansiblelint.color import colorize, Color
+
+from ansiblelint.color import Color, colorize
 
 
 class BaseFormatter:

@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY, FILENAME_KEY, get_first_cmd_arg
+from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY, get_first_cmd_arg
 
 
 class EnvVarsInCommandRule(AnsibleLintRule):

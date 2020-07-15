@@ -3,11 +3,11 @@
 import argparse
 import logging
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
+from typing import List, NamedTuple
 
 import yaml
-from typing import List, NamedTuple
 
 from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.version import __version__

@@ -1,5 +1,6 @@
 """Utils to generate rule table .rst documentation."""
 import logging
+
 from ansiblelint.rules import RulesCollection
 
 
