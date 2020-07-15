@@ -3,6 +3,7 @@ import logging
 
 from ansiblelint.rules import RulesCollection
 
+
 DOC_HEADER = """
 .. _lint_default_rules:
 
