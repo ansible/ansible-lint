@@ -79,9 +79,14 @@ jobs:
         path: .tox/**/log/
 
   unit:
-    name: >-
-      py${{ matrix.python-version }}@${{ matrix.os }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    continue-on-error: >-
+      ${{
+        matrix.experimental
+        && true
+        || false
+      }}
     strategy:
       # fail-fast: false
       # max-parallel: 5
@@ -104,12 +109,61 @@ jobs:
         # - windows-latest
         # - windows-2016
         include:
-        - os: ubuntu-20.04
-          python-version: 3.9-dev
-        - os: macOS-latest
+        - name: py36-ansible28
           python-version: 3.6
-        - os: macOS-latest
+          env:
+            TOXENV: ansible28
+        - name: py36-ansible29
+          python-version: 3.6
+          env:
+            TOXENV: ansible29
+        - name: py36-ansible210
+          python-version: 3.6
+          env:
+            TOXENV: ansible210
+        - name: py36-ansible28@macos
+          os: macOS-latest
+          python-version: 3.6
+          env:
+            TOXENV: ansible28
+        - name: py37-ansible28
+          python-version: 3.7
+          env:
+            TOXENV: ansible28
+        - name: py37-ansible29
+          python-version: 3.7
+          env:
+            TOXENV: ansible29
+        - name: py37-ansible210
+          python-version: 3.7
+          env:
+            TOXENV: ansible210
+        - name: py38-ansible28
           python-version: 3.8
+          env:
+            TOXENV: ansible28
+        - name: py38-ansible29
+          python-version: 3.8
+          env:
+            TOXENV: ansible29
+        - name: py38-ansible210
+          python-version: 3.8
+          env:
+            TOXENV: ansible210
+        - name: py38-ansible210@macos
+          os: macOS-latest
+          python-version: 3.8
+          env:
+            TOXENV: ansible210
+        - name: py38-ansibledevel
+          os: ubuntu-20.04
+          python-version: 3.8
+          env:
+            TOXENV: ansibledevel
+          experimental: true
+        - name: py39
+          os: ubuntu-20.04
+          python-version: 3.9-dev
 
     env:
       TOX_PARALLEL_NO_SPINNER: 1
@@ -157,23 +211,18 @@ jobs:
       run: |
         python -m tox --parallel auto --parallel-live --notest -vv
       env:
-        TOXENV: ansible28,ansible29,ansibledevel
+        TOXENV: ${{ env.TOXENV }}
     - name: "Test with tox: ansible28"
       run: |
         python -m tox
       env:
         TOXENV: ansible28
     # sequential run improves browsing experience (almost no speed impact)
-    - name: "Test with tox: ansible29"
+    - name: "Test with tox: ${{ env.TOXENV }}"
       run: |
         python -m tox
       env:
-        TOXENV: ansible29
-    - name: "Test with tox: ansibledevel"
-      run: |
-        python -m tox
-      env:
-        TOXENV: ansibledevel
+        TOXENV: ${{ env.TOXENV }}
     - name: Archive logs
       uses: actions/upload-artifact@v2
       with:
