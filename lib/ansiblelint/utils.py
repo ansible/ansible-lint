@@ -362,21 +362,45 @@ def _kv_to_dict(v):
     return dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs)
 
 
+def _sanitize_task(task):
+    """Return a stripped-off task structure compatible with new Ansible.
+
+    This helper takes a copy of the incoming task and drops
+    any internally used keys from it.
+    """
+    result = task.copy()
+    # task is an AnsibleMapping which inherits from OrderedDict, so we need
+    # to use `del` to remove unwanted keys.
+    for k in ['skipped_rules', FILENAME_KEY, LINE_NUMBER_KEY]:
+        if k in result:
+            del result[k]
+    return result
+
+
 def normalize_task_v2(task):
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
-    mod_arg_parser = ModuleArgsParser(task)
+    if 'always_run' in task:
+        # FIXME(ssbarnea): Delayed import to avoid circular import
+        # See https://github.com/ansible/ansible-lint/issues/880
+        from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule  # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
+
+        raise MatchError(
+            rule=AlwaysRunRule,
+            filename=task[FILENAME_KEY],
+            linenumber=task[LINE_NUMBER_KEY])
+
+    sanitized_task = _sanitize_task(task)
+    mod_arg_parser = ModuleArgsParser(sanitized_task)
     try:
         action, arguments, result['delegate_to'] = mod_arg_parser.parse()
     except AnsibleParserError as e:
         try:
             task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
-            del task[FILENAME_KEY]
-            del task[LINE_NUMBER_KEY]
         except KeyError:
             task_info = "Unknown"
         pp = pprint.PrettyPrinter(indent=2)
-        task_pprint = pp.pformat(task)
+        task_pprint = pp.pformat(sanitized_task)
 
         _logger.critical("Couldn't parse task at %s (%s)\n%s", task_info, e.message, task_pprint)
         raise SystemExit(ANSIBLE_FAILURE_RC)
