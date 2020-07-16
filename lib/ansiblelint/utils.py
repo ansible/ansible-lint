@@ -363,7 +363,11 @@ def _kv_to_dict(v):
 
 
 def _sanitize_task(task):
-    """Remove internally used data from task arguments."""
+    """Return a stripped-off task structure compatible with new Ansible.
+
+    This helper takes a copy of the incoming task and drops
+    any internally used keys from it.
+    """
     result = task.copy()
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
