@@ -23,7 +23,9 @@ class IncludeMissingFileRule(AnsibleLintRule):
     def matchplay(self, file, data):
         absolute_directory = file.get('absolute_directory', None)
         results = []
-        for task in data.get('tasks', []):
+
+        # avoid failing with a playbook having tasks: null
+        for task in (data.get('tasks', []) or []):
 
             # check if the id of the current rule is not in list of skipped rules for this play
             if self.id in task['skipped_rules']:
