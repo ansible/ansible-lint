@@ -53,7 +53,6 @@ per-file-ignores =
   # Ref: https://github.com/ansible/ansible-lint/issues/744
   # lib/ansiblelint/__main__.py:32:1: C901 'main' is too complex (13)
   lib/ansiblelint/__main__.py: C901
-  lib/ansiblelint/__init__.py: D101 D102
   lib/ansiblelint/cli.py: D101 D102 D103
   lib/ansiblelint/formatters/__init__.py: D101 D102
   # lib/ansiblelint/utils.py:229:1: C901 '_taskshandlers_children' is too complex (12)
@@ -63,9 +62,61 @@ per-file-ignores =
   # lib/ansiblelint/rules/MetaMainHasInfoRule.py:24:5: C901 'MetaMainHasInfoRule.matchplay' is too complex (13)
   lib/ansiblelint/rules/*.py: D100 D101 D102
 
-  # FIXME: drop PT009 once they're fixes
+  # FIXME: drop these once they're fixed
   # Ref: https://github.com/ansible/ansible-lint/issues/725
-  test/*.py: PT009 D100 D101 D102 D103
+  test/__init__.py: D102
+  test/conftest.py: D100 D103
+  test/rules/EMatcherRule.py: D100 D101 D102
+  test/rules/UnsetVariableMatcherRule.py: D100 D101 D102
+  test/TestAlwaysRunRule.py: PT009 D100 D101 D102
+  test/TestAnsibleLintRule.py: D100 D103
+  test/TestBaseFormatter.py: D100 D103
+  test/TestBecomeUserWithoutBecome.py: PT009 D100 D101 D102
+  test/TestCliRolePaths.py: PT009 D100 D101 D102
+  test/TestCommandLineInvocationSameAsConfig.py: D100 D103
+  test/TestCommandHasChangesCheck.py: PT009 D100 D101 D102
+  test/TestComparisonToEmptyString.py: PT009 D100 D101 D102
+  test/TestComparisonToLiteralBool.py: PT009 D100 D101 D102
+  test/TestDependenciesInMeta.py: D100 D103
+  test/TestDeprecatedModule.py: PT009 D100 D101 D102
+  test/TestEnvVarsInCommand.py: PT009 D100 D101 D102
+  test/TestFormatter.py: D100 D101 D102
+  test/TestImportIncludeRole.py: D100 D103
+  test/TestImportWithMalformed.py: D100 D103
+  test/TestIncludeMissingFileRule.py: D100 D103
+  test/TestIncludeMissFileWithRole.py: D100 D103
+  test/TestLineNumber.py: D100
+  test/TestLineTooLong.py: PT009 D100 D101 D102
+  test/TestLintRule.py: PT009 D100 D101 D102
+  test/TestNestedJinjaRule.py: D100 D103
+  test/TestMatchError.py: D101
+  test/TestMetaChangeFromDefault.py: PT009 D100 D101 D102
+  test/TestMetaMainHasInfo.py: PT009 D100 D101 D102
+  test/TestMetaTagValid.py: PT009 D100 D101 D102
+  test/TestMetaVideoLinks.py: PT009 D100 D101 D102
+  test/TestNoFormattingInWhenRule.py: PT009 D100 D101 D102
+  test/TestOctalPermissions.py: PT009 D100 D101 D102
+  test/TestPackageIsNotLatest.py: PT009 D100 D101 D102
+  test/TestPretaskIncludePlaybook.py: D100 D103
+  test/TestRoleHandlers.py: PT009 D100 D101 D102
+  test/TestRoleRelativePath.py: PT009 D100 D101 D102
+  test/TestRuleProperties.py: D100 D103
+  test/TestRulesCollection.py: D100 D103
+  test/TestRunner.py: D100 D103
+  test/TestShellWithoutPipefail.py: PT009 D100 D101 D102
+  test/TestSkipImportPlaybook.py: D100 D103
+  test/TestSkipInsideYaml.py: D100 D103
+  test/TestSkipPlaybookItems.py: D100 D103
+  test/TestSudoRule.py: PT009 D100 D101 D102
+  test/TestTaskHasName.py: PT009 D100 D101 D102
+  test/TestTaskIncludes.py: D100 D103
+  test/TestTaskNoLocalAction.py: PT009 D100 D101 D102
+  test/TestUseCommandInsteadOfShell.py: PT009 D100 D101 D102
+  test/TestUseHandlerRatherThanWhenChanged.py: PT009 D100 D101 D102
+  test/TestUsingBareVariablesIsDeprecated.py: PT009 D100 D101 D102
+  test/TestUtils.py: D100 D103
+  test/TestVariableHasSpaces.py: PT009 D100 D101 D102
+  test/TestWithSkipTagId.py: PT009 D100 D101 D102
 
 # flake8-pytest-style
 # PT001:
