@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 """Generic utility helpers."""
 
+import contextlib
 import inspect
 import logging
 import os
@@ -228,48 +229,62 @@ def _include_children(basedir, k, v, parent_type):
 def _taskshandlers_children(basedir, k, v, parent_type):
     results = []
     for th in v:
-        if 'include' in th:
-            append_children(th['include'], basedir, k, parent_type, results)
-        elif 'include_tasks' in th:
-            append_children(th['include_tasks'], basedir, k, parent_type, results)
-        elif 'import_playbook' in th:
-            append_children(th['import_playbook'], basedir, k, parent_type, results)
-        elif 'import_tasks' in th:
-            append_children(th['import_tasks'], basedir, k, parent_type, results)
-        elif 'include_role' in th or 'import_role' in th:
+        with contextlib.suppress(LookupError):
+            children = _get_task_handler_children_for_tasks_or_playbooks(
+                th, basedir, k, parent_type,
+            )
+            results.append(children)
+            continue
+
+        if 'include_role' in th or 'import_role' in th:  # lgtm [py/unreachable-statement]
             th = normalize_task_v2(th)
-            module = th['action']['__ansible_module__']
-            if "name" not in th['action']:
-                raise MatchError(
-                    "Failed to find required 'name' key in %s" % module)
-            if not isinstance(th['action']["name"], str):
-                raise RuntimeError(
-                    "Value assigned to 'name' key on '%s' is not a string." %
-                    module)
+            _validate_task_handler_action_for_role(th['action'])
             results.extend(_roles_children(basedir, k, [th['action'].get("name")],
                                            parent_type,
                                            main=th['action'].get('tasks_from', 'main')))
-        elif 'block' in th:
-            results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
-            if 'rescue' in th:
-                results.extend(_taskshandlers_children(basedir, k, th['rescue'], parent_type))
-            if 'always' in th:
-                results.extend(_taskshandlers_children(basedir, k, th['always'], parent_type))
+            continue
+
+        if 'block' not in th:
+            continue
+
+        results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
+        if 'rescue' in th:
+            results.extend(_taskshandlers_children(basedir, k, th['rescue'], parent_type))
+        if 'always' in th:
+            results.extend(_taskshandlers_children(basedir, k, th['always'], parent_type))
+
     return results
 
 
-def append_children(taskhandler, basedir, k, parent_type, results):
-    # when taskshandlers_children is called for playbooks, the
-    # actual type of the included tasks is the section containing the
-    # include, e.g. tasks, pre_tasks, or handlers.
-    if parent_type == 'playbook':
-        playbook_section = k
-    else:
-        playbook_section = parent_type
-    results.append({
-        'path': path_dwim(basedir, taskhandler),
-        'type': playbook_section
-    })
+def _get_task_handler_children_for_tasks_or_playbooks(
+        task_handler, basedir, k, parent_type,
+):
+    """Try to get children of taskhandler for include/import tasks/playbooks."""
+    child_type = k if parent_type == 'playbook' else parent_type
+    task_include_keys = 'include', 'include_tasks', 'import_playbook', 'import_tasks'
+    for task_handler_key in task_include_keys:
+        with contextlib.suppress(KeyError):
+            return {
+                'path': path_dwim(basedir, task_handler[task_handler_key]),
+                'type': child_type,
+            }
+
+    raise LookupError(
+        f'The node contains none of: {", ".join(task_include_keys)}',
+    )
+
+
+def _validate_task_handler_action_for_role(th_action):
+    """Verify that the task handler action is valid for role include."""
+    module = th_action['__ansible_module__']
+
+    if 'name' not in th_action:
+        raise MatchError(f"Failed to find required 'name' key in {module!s}")
+
+    if not isinstance(th_action['name'], str):
+        raise RuntimeError(
+            f"Value assigned to 'name' key on '{module!s}' is not a string.",
+        )
 
 
 def _roles_children(basedir, k, v, parent_type, main='main'):
@@ -377,7 +392,9 @@ def _sanitize_task(task):
     return result
 
 
-def normalize_task_v2(task):
+# FIXME: drop noqa once this function is made simpler
+# Ref: https://github.com/ansible/ansible-lint/issues/744
+def normalize_task_v2(task):  # noqa: C901
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
     if 'always_run' in task:
@@ -434,7 +451,9 @@ def normalize_task_v2(task):
     return result
 
 
-def normalize_task_v1(task):
+# FIXME: drop noqa once this function is made simpler
+# Ref: https://github.com/ansible/ansible-lint/issues/744
+def normalize_task_v1(task):  # noqa: C901
     result = dict()
     for (k, v) in task.items():
         if k in VALID_KEYS or k.startswith('with_'):
@@ -679,7 +698,9 @@ def get_yaml_files(options: Namespace) -> dict:
     return OrderedDict.fromkeys(sorted(out))
 
 
-def get_playbooks_and_roles(options=None) -> List[str]:
+# FIXME: drop noqa once this function is made simpler
+# Ref: https://github.com/ansible/ansible-lint/issues/744
+def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
     """Find roles and playbooks."""
     if options is None:
         options = {}

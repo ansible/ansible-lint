@@ -55,11 +55,7 @@ per-file-ignores =
   lib/ansiblelint/__main__.py: C901
   lib/ansiblelint/cli.py: D101 D102 D103
   lib/ansiblelint/formatters/__init__.py: D101 D102
-  # lib/ansiblelint/utils.py:229:1: C901 '_taskshandlers_children' is too complex (12)
-  # lib/ansiblelint/utils.py:413:1: C901 'normalize_task_v1' is too complex (11)
-  # lib/ansiblelint/utils.py:802:1: C901 'get_playbooks_and_roles' is too complex (17)
-  lib/ansiblelint/utils.py: C901 D103
-  # lib/ansiblelint/rules/MetaMainHasInfoRule.py:24:5: C901 'MetaMainHasInfoRule.matchplay' is too complex (13)
+  lib/ansiblelint/utils.py: D103
   lib/ansiblelint/rules/*.py: D100 D101 D102
 
   # FIXME: drop these once they're fixed
