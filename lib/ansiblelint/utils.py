@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 """Generic utility helpers."""
 
+import contextlib
 import inspect
 import logging
 import os
@@ -228,47 +229,61 @@ def _include_children(basedir, k, v, parent_type):
 def _taskshandlers_children(basedir, k, v, parent_type):
     results = []
     for th in v:
-        children = _maybe_th_children_for_tasks_or_playbooks(th, basedir, k, parent_type)
-        if children is not None:
+        with contextlib.suppress(LookupError):
+            children = _get_task_handler_children_for_tasks_or_playbooks(
+                th, basedir, k, parent_type,
+            )
             results.append(children)
+            continue
 
-        elif 'include_role' in th or 'import_role' in th:
+        if 'include_role' in th or 'import_role' in th:
             th = normalize_task_v2(th)
-            _validate_th_action_for_role(th['action'])
+            _validate_task_handler_action_for_role(th['action'])
             results.extend(_roles_children(basedir, k, [th['action'].get("name")],
                                            parent_type,
                                            main=th['action'].get('tasks_from', 'main')))
-        elif 'block' in th:
-            results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
-            if 'rescue' in th:
-                results.extend(_taskshandlers_children(basedir, k, th['rescue'], parent_type))
-            if 'always' in th:
-                results.extend(_taskshandlers_children(basedir, k, th['always'], parent_type))
+            continue
+
+        if 'block' not in th:
+            continue
+
+        results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
+        if 'rescue' in th:
+            results.extend(_taskshandlers_children(basedir, k, th['rescue'], parent_type))
+        if 'always' in th:
+            results.extend(_taskshandlers_children(basedir, k, th['always'], parent_type))
+
     return results
 
 
-def _maybe_th_children_for_tasks_or_playbooks(th, basedir, k, parent_type):
+def _get_task_handler_children_for_tasks_or_playbooks(
+        task_handler, basedir, k, parent_type,
+):
     """Try to get children of taskhandler for include/import tasks/playbooks."""
-    for tht in ('include', 'include_tasks', 'import_playbook', 'import_tasks'):
-        if tht in th:
+    child_type = k if parent_type == 'playbook' else parent_type
+    task_include_keys = 'include', 'include_tasks', 'import_playbook', 'import_tasks'
+    for task_handler_key in task_include_keys:
+        with contextlib.suppress(KeyError):
             return {
-                'path': path_dwim(basedir, th[tht]),
-                'type': k if parent_type == 'playbook' else parent_type
+                'path': path_dwim(basedir, task_handler[task_handler_key]),
+                'type': child_type,
             }
 
-    return None
+    raise LookupError(
+        f'The node contains none of: {", ".join(task_include_keys)}',
+    )
 
 
-def _validate_th_action_for_role(th_action):
-    name = th_action.get("name", None)
+def _validate_task_handler_action_for_role(th_action):
+    """Verify that the task handler action is valid for role include."""
     module = th_action['__ansible_module__']
 
-    if name is None:
-        raise MatchError("Failed to find required 'name' key in %s" % module)
+    if 'name' not in th_action:
+        raise MatchError(f"Failed to find required 'name' key in {module!s}")
 
-    if not isinstance(name, str):
+    if not isinstance(th_action['name'], str):
         raise RuntimeError(
-            "Value assigned to 'name' key on '%s' is not a string." % module
+            f"Value assigned to 'name' key on '{module!s}' is not a string.",
         )
 
 
