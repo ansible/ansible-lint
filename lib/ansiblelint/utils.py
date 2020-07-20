@@ -236,7 +236,7 @@ def _taskshandlers_children(basedir, k, v, parent_type):
             results.append(children)
             continue
 
-        if 'include_role' in th or 'import_role' in th:
+        if 'include_role' in th or 'import_role' in th:  # lgtm [py/unreachable-statement]
             th = normalize_task_v2(th)
             _validate_task_handler_action_for_role(th['action'])
             results.extend(_roles_children(basedir, k, [th['action'].get("name")],
