@@ -416,7 +416,7 @@ Specifying Rules at Runtime
 
 By default, ``ansible-lint`` uses the rules found in ``ansible-lint/lib/ansiblelint/rules``. To override this behavior and use a custom set of rules, use the ``-r /path/to/custom-rules`` option to provide a directory path containing the custom rules. For multiple rule sets, pass multiple ``-r`` options.
 
-It's also possilbe to use the default rules, plus custom rules. This can be done by passing the ``-R`` to indicate that the deault rules are to be used, along with one or more ``-r`` options.
+It's also possible to use the default rules, plus custom rules. This can be done by passing the ``-R`` to indicate that the default rules are to be used, along with one or more ``-r`` options.
 
 Using Tags to Include Rules
 ```````````````````````````
