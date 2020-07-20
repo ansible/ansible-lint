@@ -377,7 +377,9 @@ def _sanitize_task(task):
     return result
 
 
-def normalize_task_v2(task):
+# FIXME: drop noqa once this function is made simpler
+# Ref: https://github.com/ansible/ansible-lint/issues/744
+def normalize_task_v2(task):  # noqa: C901
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
     if 'always_run' in task:
@@ -434,7 +436,9 @@ def normalize_task_v2(task):
     return result
 
 
-def normalize_task_v1(task):
+# FIXME: drop noqa once this function is made simpler
+# Ref: https://github.com/ansible/ansible-lint/issues/744
+def normalize_task_v1(task):  # noqa: C901
     result = dict()
     for (k, v) in task.items():
         if k in VALID_KEYS or k.startswith('with_'):
@@ -679,7 +683,9 @@ def get_yaml_files(options: Namespace) -> dict:
     return OrderedDict.fromkeys(sorted(out))
 
 
-def get_playbooks_and_roles(options=None) -> List[str]:
+# FIXME: drop noqa once this function is made simpler
+# Ref: https://github.com/ansible/ansible-lint/issues/744
+def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
     """Find roles and playbooks."""
     if options is None:
         options = {}
