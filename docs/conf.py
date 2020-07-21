@@ -48,6 +48,7 @@ AUTHOR = 'Ansible, Inc'
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 # TEST: 'sphinxcontrib.fulltoc'
 extensions = [
+    'myst_parser',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'rules_table_generator_ext',  # in-tree extension
@@ -94,7 +95,7 @@ today_fmt = '%B %d, %Y'
 # A list of glob-style patterns that should be excluded when looking
 # for source files.
 # OBSOLETE - removing this - dharmabumstead 2018-02-06
-# exclude_patterns = ['modules']
+exclude_patterns = ['README.md']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.

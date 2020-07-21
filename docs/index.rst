@@ -40,3 +40,8 @@ transferred to the Ansible project team.
 
    rules
    default_rules
+
+.. toctree::
+   :caption: Contributing
+
+   CONTRIBUTING
