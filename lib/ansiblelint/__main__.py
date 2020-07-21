@@ -33,7 +33,6 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.utils import get_playbooks_and_roles
 
-
 _logger = logging.getLogger(__name__)
 
 

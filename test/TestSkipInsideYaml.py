@@ -1,6 +1,5 @@
 import pytest
 
-
 ROLE_TASKS = '''
 ---
 - name: test 303

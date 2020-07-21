@@ -3,7 +3,6 @@
 
 from ansiblelint.rules import AnsibleLintRule
 
-
 META_STR_INFO = (
     'author',
     'description'

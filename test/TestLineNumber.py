@@ -20,7 +20,6 @@
 
 from ansiblelint.rules.SudoRule import SudoRule
 
-
 TEST_TASKLIST = """
 - debug:
     msg: test

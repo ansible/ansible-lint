@@ -12,7 +12,6 @@ import yaml
 from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.version import __version__
 
-
 _logger = logging.getLogger(__name__)
 _PATH_VARS = ['exclude_paths', 'rulesdir', ]
 
