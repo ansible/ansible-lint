@@ -26,7 +26,7 @@ Standards
 ---------
 
 ansible-lint is flake8 compliant with `max-line-length` set to 100
-(see [.flake8][.flake8]).
+(see [.flake8]).
 
 ansible-lint works only with [supported Ansible versions](
 https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html#release-status
