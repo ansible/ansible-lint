@@ -19,7 +19,7 @@ class BaseFormatter:
         display_relative_path (bool): whether to show path as relative or absolute
     """
 
-    def __init__(self, base_dir: Union[str, Path], display_relative_path: str) -> None:
+    def __init__(self, base_dir: Union[str, Path], display_relative_path: bool) -> None:
         """Initialize a BaseFormatter instance."""
         if isinstance(base_dir, str):
             base_dir = Path(base_dir)
@@ -92,6 +92,46 @@ class ParseableFormatter(BaseFormatter):
                                     match.linenumber,
                                     "E" + match.rule.id,
                                     match.message)
+
+
+class AnnotationsFormatter(BaseFormatter):
+    # https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
+    """Formatter for emitting violations as GitHub Workflow Commands.
+
+    These commands trigger the GHA Workflow runners platform to post violations
+    in a form of GitHub Checks API annotations that appear rendered in pull-
+    request files view.
+
+    ::debug file={name},line={line},col={col}::{message}
+    ::warning file={name},line={line},col={col}::{message}
+    ::error file={name},line={line},col={col}::{message}
+
+    Supported levels: debug, warning, error
+    """
+
+    def format(self, match: "MatchError", colored: bool = False) -> str:
+        """Prepare a match instance for reporting as a GitHub Actions annotation."""
+        if colored:
+            raise ValueError('The colored mode is not supported.')
+
+        level = self._severity_to_level(match.rule.severity)
+        file_path = self._format_path(match.filename or "")
+        line_num = match.linenumber
+        rule_id = match.rule.id
+        violation_details = match.message
+        return (
+            f"::{level} file={file_path},line={line_num}"
+            f"::[E{rule_id}] {violation_details}"
+        )
+
+    @staticmethod
+    def _severity_to_level(severity: str) -> str:
+        if severity in ['VERY_LOW', 'LOW']:
+            return 'warning'
+        elif severity in ['INFO']:
+            return 'debug'
+        # ['MEDIUM', 'HIGH', 'VERY_HIGH'] or anything else
+        return 'error'
 
 
 class ParseableSeverityFormatter(BaseFormatter):

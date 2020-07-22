@@ -117,6 +117,15 @@ The following is the output from ``ansible-lint --help``, providing an overview 
                             ".ansible-lint"
       --version             show program's version number and exit
 
+CI/CD
+-----
+
+If executed under `Github Actions`_ is detected via the presence of
+``GITHUB_ACTIONS=true`` and ``GITHUB_WORFLOW=...`` variables, the linter will
+also print errors using their `annotation`_ format.
+
+.. _GitHub Actions: https://github.com/features/actions
+.. _annotation: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
 
 Linting Playbooks and Roles
 ---------------------------
