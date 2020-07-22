@@ -82,3 +82,21 @@ class TestCliRolePaths(unittest.TestCase):
 
         result = run_ansible_lint(cwd=cwd, role_path=role_path)
         assert '106 Role name invalid-name does not match' in str(result)
+
+
+def test_run_playbook_github():
+    """Call ansible-lint simulating GitHub Actions environment."""
+    cwd = os.path.dirname(os.path.realpath(__file__))
+    role_path = '../examples/example.yml'
+
+    env = {
+        "GITHUB_ACTIONS": "true",
+        "GITHUB_WORKFLOW": "foo"
+    }
+
+    result = run_ansible_lint(cwd=cwd, role_path=role_path, env=env)
+    expected = (
+        '::error file=../examples/example.yml,line=47::[E101] '
+        'Deprecated always_run'
+    )
+    assert expected in str(result)
