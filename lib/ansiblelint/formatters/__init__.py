@@ -49,13 +49,13 @@ class Formatter(BaseFormatter):
                                     colorize(match.message, Color.error_title),
                                     colorize(self._format_path(match.filename), Color.filename),
                                     colorize(str(match.linenumber), Color.linenumber),
-                                    colorize(u"{0}".format(match.line), Color.line))
+                                    colorize(u"{0}".format(match.details), Color.line))
         else:
             return formatstr.format(_id,
                                     match.message,
                                     match.filename,
                                     match.linenumber,
-                                    match.line)
+                                    match.details)
 
 
 class QuietFormatter(BaseFormatter):

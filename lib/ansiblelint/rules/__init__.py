@@ -63,7 +63,7 @@ class AnsibleLintRule(object):
             m = MatchError(
                 message=message,
                 linenumber=prev_line_no + 1,
-                line=line,
+                details=line,
                 filename=file['path'],
                 rule=self)
             matches.append(m)
@@ -107,7 +107,7 @@ class AnsibleLintRule(object):
             m = MatchError(
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
-                line=task_msg,
+                details=task_msg,
                 filename=file['path'],
                 rule=self)
             matches.append(m)
@@ -154,7 +154,7 @@ class AnsibleLintRule(object):
                 m = MatchError(
                     message=message,
                     linenumber=linenumber,
-                    line=section,
+                    details=section,
                     filename=file['path'],
                     rule=self)
                 matches.append(m)

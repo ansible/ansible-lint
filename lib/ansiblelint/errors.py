@@ -24,7 +24,7 @@ class MatchError(ValueError):
             self,
             message=None,
             linenumber=0,
-            line: dict = None,
+            details: str = "",
             filename=None,
             rule=None) -> None:
         """Initialize a MatchError instance."""
@@ -38,7 +38,7 @@ class MatchError(ValueError):
 
         self.message = message or getattr(rule, 'shortdesc', "")
         self.linenumber = linenumber
-        self.line = line
+        self.details = details
         self.filename = normpath(filename) if filename else None
         self.rule = rule
 
@@ -50,12 +50,18 @@ class MatchError(ValueError):
         _id = getattr(self.rule, "id", "000")
 
         return formatstr.format(_id, self.message,
-                                self.filename, self.linenumber, self.line)
+                                self.filename, self.linenumber, self.details)
 
     @property
     def _hash_key(self):
         # line attr is knowingly excluded, as dict is not hashable
-        return self.filename, self.linenumber, str(getattr(self.rule, 'id', 0)), self.message
+        return (
+            self.filename,
+            self.linenumber,
+            str(getattr(self.rule, 'id', 0)),
+            self.message,
+            self.details,
+        )
 
     def __lt__(self, other):
         """Return whether the current object is less than the other."""
