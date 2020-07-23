@@ -96,4 +96,4 @@ class Runner(object):
         # update list of checked files
         self.checked_files.update([x['path'] for x in files])
 
-        return matches
+        return sorted(set(matches))

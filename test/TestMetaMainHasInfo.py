@@ -89,6 +89,6 @@ class TestMetaMainHasInfo(unittest.TestCase):
 
     def test_platform_list_of_str(self):
         results = self.runner.run_role_meta_main(PLATFORMS_LIST_OF_STR)
-        assert len(results) == 2
+        assert len(results) == 1
         self.assertIn("Platforms should be a list of dictionaries",
                       str(results))
