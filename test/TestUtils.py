@@ -223,7 +223,7 @@ def test_logger_debug(caplog):
         'Logging initialized to level 10',
     )
 
-    assert expected_info not in caplog.record_tuples
+    assert expected_info in caplog.record_tuples
 
 
 def test_cli_auto_detect(capfd):
