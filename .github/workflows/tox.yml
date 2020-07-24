@@ -182,7 +182,7 @@ jobs:
     - name: Report junit failures
       uses: shyim/junit-report-annotations-action@master
       with:
-        path: .tox/junit*.xml
+        path: .tox/junit.*.xml
       if: always()
 
   publish:
