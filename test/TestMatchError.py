@@ -50,8 +50,7 @@ class DummySentinelTestObject:
     ('left_match_error', 'right_match_error'),
     (
         (MatchError("foo"), MatchError("foo")),
-        # `line` is ignored in comparisions, even when it differs:
-        (MatchError("a", line={}), MatchError("a", line={"a": "b"})),
+        (MatchError("a", details="foo"), MatchError("a", details="foo")),
     ),
 )
 def test_matcherror_compare(left_match_error, right_match_error):
@@ -80,8 +79,8 @@ def test_matcherror_invalid():
         (MatchError(rule=BecomeUserWithoutBecomeRule), MatchError(rule=AlwaysRunRule)),
         # rule id "200" > rule id 101
         (MatchError(rule=AnsibleLintRuleWithStringId), MatchError(rule=AlwaysRunRule)),
-        # line will not be taken into account
-        (MatchError("b", line={}), MatchError("a", line={"a": "b"})),
+        # details are taken into account
+        (MatchError("a", details="foo"), MatchError("a", details="bar")),
     ))
 class TestMatchErrorCompare:
 
