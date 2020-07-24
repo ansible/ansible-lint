@@ -69,8 +69,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'Ansible Documentation'
-copyright = "2013-2018 Ansible, Inc"
+project = 'Ansible Lint Documentation'
+copyright = "2013-2020 Ansible, Inc"
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -140,7 +140,7 @@ rst_epilog = """
 
 html_theme_path = ['../_themes']
 html_theme = 'sphinx_ansible_theme'
-html_short_title = 'Ansible Documentation'
+html_short_title = 'Ansible Lint Documentation'
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
@@ -149,7 +149,7 @@ html_short_title = 'Ansible Documentation'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'Ansible Documentation'
+html_title = 'Ansible Lint Documentation'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
@@ -161,7 +161,7 @@ html_title = 'Ansible Documentation'
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-# html_favicon = 'favicon.ico'
+html_favicon = '_static/ansible-lint.svg'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
