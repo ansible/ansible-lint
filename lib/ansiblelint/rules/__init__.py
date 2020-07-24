@@ -153,7 +153,7 @@ class AnsibleLintRule(object):
                 m = MatchError(
                     message=message,
                     linenumber=linenumber,
-                    details=section,
+                    details=str(section),
                     filename=file['path'],
                     rule=self)
                 matches.append(m)

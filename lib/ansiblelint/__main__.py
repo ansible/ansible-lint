@@ -114,7 +114,7 @@ def main() -> int:
                         options.verbosity, checked_files)
         matches.extend(runner.run())
 
-    for match in sorted(matches):
+    for match in sorted(set(matches)):
         print(formatter.format(match, options.colored))
 
     if matches:
