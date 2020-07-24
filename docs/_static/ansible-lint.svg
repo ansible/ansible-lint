@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,-67.7268,-0.0813272)">
+        <g id="ansible-lint" transform="matrix(0.103624,0,0,0.0970726,-51.3462,16.5365)">
+            <rect x="1149.09" y="-169.514" width="617.619" height="659.3" style="fill:none;"/>
+            <g transform="matrix(-9.64401,0.0125512,-0.0123169,-10.7844,1789.35,505.457)">
+                <path d="M34.404,5.547C56.248,14.75 62.901,29.008 62.864,58.451C48.638,53.766 48.041,53.62 34.295,58.418C19.563,53.502 19.058,53.483 6.355,58.386C6.392,29.206 14.197,15.017 34.404,5.547Z" style="fill:rgb(128,128,128);stroke:rgb(128,128,128);stroke-width:3.91px;"/>
+            </g>
+            <g transform="matrix(2.86444,0,0,3.05775,1016.6,-336.23)">
+                <path d="M154.799,112.893L182.438,181.102L140.692,148.221L154.799,112.893ZM203.895,196.815L161.385,94.514C160.385,91.762 157.727,89.94 154.799,90.001C151.826,89.933 149.113,91.743 148.034,94.514L101.377,206.726L117.338,206.726L135.806,160.458L190.923,204.988C193.142,206.782 194.739,207.593 196.82,207.593C196.88,207.594 196.939,207.595 196.999,207.595C201.181,207.595 204.623,204.153 204.623,199.97C204.623,199.968 204.623,199.966 204.623,199.964C204.551,198.882 204.305,197.819 203.895,196.815" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+        </g>
+    </g>
+</svg>
