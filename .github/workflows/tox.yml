@@ -179,6 +179,11 @@ jobs:
       with:
         name: logs.zip
         path: .tox/**/log/
+    - name: Report junit failures
+      uses: shyim/junit-report-annotations-action@master
+      with:
+        path: .tox/junit*.xml
+      if: always()
 
   publish:
     name: Publish to PyPI registry
