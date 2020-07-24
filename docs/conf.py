@@ -69,8 +69,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'Ansible Documentation'
-copyright = "2013-2018 Ansible, Inc"
+project = 'Ansible Lint Documentation'
+copyright = "2013-2020 Ansible, Inc"
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
