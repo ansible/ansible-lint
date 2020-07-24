@@ -157,7 +157,7 @@ jobs:
       run: |
         python -m tox --parallel auto --parallel-live --notest -vv
       env:
-        TOXENV: ansible28,ansible29,ansibledevel
+        TOXENV: ansible28,ansible29,ansible210,ansibledevel
     - name: "Test with tox: ansible28"
       run: |
         python -m tox
@@ -169,6 +169,11 @@ jobs:
         python -m tox
       env:
         TOXENV: ansible29
+    - name: "Test with tox: ansible210"
+      run: |
+        python -m tox
+      env:
+        TOXENV: ansible210
     - name: "Test with tox: ansibledevel"
       run: |
         python -m tox
