@@ -1,11 +1,12 @@
 """Runner implementation."""
 import logging
 import os
-from typing import List, Set
+from typing import Any, FrozenSet, List, Set
 
 import ansiblelint.file_utils
 import ansiblelint.skip_utils
 import ansiblelint.utils
+from ansiblelint.rules import RulesCollection
 
 from .errors import MatchError
 from .rules.LoadingFailureRule import LoadingFailureRule
@@ -16,8 +17,15 @@ _logger = logging.getLogger(__name__)
 class Runner(object):
     """Runner class performs the linting process."""
 
-    def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
-                 verbosity=0, checked_files=None) -> None:
+    def __init__(
+            self,
+            rules: RulesCollection,
+            playbook: str,
+            tags: FrozenSet[Any],
+            skip_list: FrozenSet[Any],
+            exclude_paths: List,
+            verbosity=0,
+            checked_files=None) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.playbooks = set()
