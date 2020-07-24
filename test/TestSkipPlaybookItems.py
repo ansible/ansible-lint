@@ -1,6 +1,5 @@
 import pytest
 
-
 PLAYBOOK_PRE_TASKS = '''
 - hosts: all
   tasks:
