@@ -44,4 +44,4 @@ transferred to the Ansible project team.
 .. toctree::
    :caption: Contributing
 
-   CONTRIBUTING
+   contributing
