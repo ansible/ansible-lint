@@ -2,10 +2,10 @@
 import os.path
 import sys
 
-# mypy needs this special condition or it may fail to run
+# mypy/pylint idiom for py36-py38 compatibility
 # https://github.com/python/typeshed/issues/3500#issuecomment-560958608
 if sys.version_info >= (3, 8):
-    from typing import Literal
+    from typing import Literal  # pylint: disable=no-name-in-module
 else:
     from typing_extensions import Literal
 
