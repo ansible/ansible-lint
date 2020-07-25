@@ -13,6 +13,6 @@ class Color(Enum):
     line = "0;35"  # purple
 
 
-def colorize(text: str, color: Color):
+def colorize(text: str, color: Color) -> str:
     """Return ANSI formated string."""
     return f"\u001b[{color.value}m{text}\u001b[{Color.reset.value}m"

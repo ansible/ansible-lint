@@ -99,11 +99,11 @@ class ParseableSeverityFormatter(BaseFormatter):
         message = str(match.message)
 
         if colored:
-            filename = colorize(filename, 'blue')
-            linenumber = colorize(linenumber, 'cyan')
-            rule_id = colorize(rule_id, 'bright red')
-            severity = colorize(severity, 'bright red')
-            message = colorize(message, 'red')
+            filename = colorize(filename, Color.filename)
+            linenumber = colorize(linenumber, Color.linenumber)
+            rule_id = colorize(rule_id, Color.error_code)
+            severity = colorize(severity, Color.error_code)
+            message = colorize(message, Color.error_title)
 
         return formatstr.format(
             filename,
