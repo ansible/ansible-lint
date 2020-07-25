@@ -45,15 +45,16 @@ class Formatter(BaseFormatter):
         formatstr = u"{0} {1}\n{2}:{3}\n{4}\n"
         _id = getattr(match.rule, 'id', '000')
         if colored:
-            return formatstr.format(colorize(u"[{0}]".format(_id), Color.error_code),
-                                    colorize(match.message, Color.error_title),
-                                    colorize(self._format_path(match.filename), Color.filename),
-                                    colorize(str(match.linenumber), Color.linenumber),
-                                    colorize(u"{0}".format(match.details), Color.line))
+            return formatstr.format(
+                colorize(u"[{0}]".format(_id), Color.error_code),
+                colorize(match.message, Color.error_title),
+                colorize(self._format_path(match.filename or ""), Color.filename),
+                colorize(str(match.linenumber), Color.linenumber),
+                colorize(u"{0}".format(match.details), Color.line))
         else:
             return formatstr.format(_id,
                                     match.message,
-                                    match.filename,
+                                    match.filename or "",
                                     match.linenumber,
                                     match.details)
 
@@ -63,9 +64,10 @@ class QuietFormatter(BaseFormatter):
     def format(self, match, colored=False):
         formatstr = u"{0} {1}:{2}"
         if colored:
-            return formatstr.format(colorize(u"[{0}]".format(match.rule.id), Color.error_code),
-                                    colorize(self._format_path(match.filename), Color.filename),
-                                    colorize(str(match.linenumber), Color.linenumber))
+            return formatstr.format(
+                colorize(u"[{0}]".format(match.rule.id), Color.error_code),
+                colorize(self._format_path(match.filename or ""), Color.filename),
+                colorize(str(match.linenumber), Color.linenumber))
         else:
             return formatstr.format(match.rule.id, self.format_path(match.filename),
                                     match.linenumber)
@@ -76,12 +78,13 @@ class ParseableFormatter(BaseFormatter):
     def format(self, match, colored=False):
         formatstr = u"{0}:{1}: [{2}] {3}"
         if colored:
-            return formatstr.format(colorize(self._format_path(match.filename), Color.filename),
-                                    colorize(str(match.linenumber), Color.linenumber),
-                                    colorize(u"E{0}".format(match.rule.id), Color.error_code),
-                                    colorize(u"{0}".format(match.message), Color.error_title))
+            return formatstr.format(
+                colorize(self._format_path(match.filename or ""), Color.filename),
+                colorize(str(match.linenumber), Color.linenumber),
+                colorize(u"E{0}".format(match.rule.id), Color.error_code),
+                colorize(u"{0}".format(match.message), Color.error_title))
         else:
-            return formatstr.format(self._format_path(match.filename),
+            return formatstr.format(self._format_path(match.filename or ""),
                                     match.linenumber,
                                     "E" + match.rule.id,
                                     match.message)
@@ -92,7 +95,7 @@ class ParseableSeverityFormatter(BaseFormatter):
     def format(self, match, colored=False):
         formatstr = u"{0}:{1}: [{2}] [{3}] {4}"
 
-        filename = self._format_path(match.filename)
+        filename = self._format_path(match.filename or "")
         linenumber = str(match.linenumber)
         rule_id = u"E{0}".format(match.rule.id)
         severity = match.rule.severity
