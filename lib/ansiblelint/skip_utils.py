@@ -45,7 +45,7 @@ def get_rule_skips_from_line(line: str) -> List:
     return noqa_text.split()
 
 
-def append_skipped_rules(pyyaml_data: str, file_text: str, file_type: FileType):
+def append_skipped_rules(pyyaml_data: str, file_text: str, file_type: FileType) -> Sequence:
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
     For a file, uses 2nd parser (ruamel.yaml) to pull comments out of
@@ -80,7 +80,7 @@ def load_data(file_text: str) -> Any:
     return yaml.load(file_text)
 
 
-def _append_skipped_rules(pyyaml_data: Sequence, file_text: str, file_type: FileType):
+def _append_skipped_rules(pyyaml_data: Sequence, file_text: str, file_type: FileType) -> Sequence:
     # parse file text using 2nd parser library
     ruamel_data = load_data(file_text)
 
@@ -144,7 +144,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence) -> Generator:
         'rescue',
     ]
 
-    def get_nested_tasks(task: Any):
+    def get_nested_tasks(task: Any) -> Generator[Any, None, None]:
         return (
             subtask
             for k in NESTED_TASK_KEYS if k in task
