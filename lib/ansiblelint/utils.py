@@ -29,7 +29,7 @@ from argparse import Namespace
 from collections import OrderedDict
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, ItemsView, List, Tuple
+from typing import Callable, ItemsView, List, Optional, Tuple
 
 import yaml
 from ansible import constants
@@ -45,7 +45,7 @@ from ansible.template import Templar
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-from ansiblelint.constants import ANSIBLE_FAILURE_RC
+from ansiblelint.constants import ANSIBLE_FAILURE_RC, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
 
@@ -226,7 +226,7 @@ def _include_children(basedir, k, v, parent_type):
     return [{'path': result, 'type': parent_type}]
 
 
-def _taskshandlers_children(basedir, k, v, parent_type):
+def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List:
     results = []
     for th in v:
         with contextlib.suppress(LookupError):
@@ -257,8 +257,8 @@ def _taskshandlers_children(basedir, k, v, parent_type):
 
 
 def _get_task_handler_children_for_tasks_or_playbooks(
-        task_handler, basedir, k, parent_type,
-):
+        task_handler, basedir: str, k, parent_type: FileType,
+) -> dict:
     """Try to get children of taskhandler for include/import tasks/playbooks."""
     child_type = k if parent_type == 'playbook' else parent_type
     task_include_keys = 'include', 'include_tasks', 'import_playbook', 'import_tasks'
@@ -274,7 +274,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     )
 
 
-def _validate_task_handler_action_for_role(th_action):
+def _validate_task_handler_action_for_role(th_action: dict) -> None:
     """Verify that the task handler action is valid for role include."""
     module = th_action['__ansible_module__']
 
@@ -287,7 +287,7 @@ def _validate_task_handler_action_for_role(th_action):
         )
 
 
-def _roles_children(basedir, k, v, parent_type, main='main'):
+def _roles_children(basedir: str, k, v, parent_type: FileType, main='main') -> list:
     results = []
     for role in v:
         if isinstance(role, dict):
@@ -304,12 +304,12 @@ def _roles_children(basedir, k, v, parent_type, main='main'):
     return results
 
 
-def _load_library_if_exists(path):
+def _load_library_if_exists(path: str) -> None:
     if os.path.exists(path):
         module_loader.add_directory(path)
 
 
-def _rolepath(basedir, role):
+def _rolepath(basedir: str, role: str) -> Optional[str]:
     role_path = None
 
     possible_paths = [
@@ -344,7 +344,7 @@ def _rolepath(basedir, role):
     return role_path
 
 
-def _look_for_role_files(basedir, role, main='main'):
+def _look_for_role_files(basedir: str, role: str, main='main') -> list:
     role_path = _rolepath(basedir, role)
     if not role_path:
         return []
@@ -377,7 +377,7 @@ def _kv_to_dict(v):
     return dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs)
 
 
-def _sanitize_task(task):
+def _sanitize_task(task: dict) -> dict:
     """Return a stripped-off task structure compatible with new Ansible.
 
     This helper takes a copy of the incoming task and drops
@@ -394,7 +394,7 @@ def _sanitize_task(task):
 
 # FIXME: drop noqa once this function is made simpler
 # Ref: https://github.com/ansible/ansible-lint/issues/744
-def normalize_task_v2(task):  # noqa: C901
+def normalize_task_v2(task: dict) -> dict:  # noqa: C901
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
     if 'always_run' in task:

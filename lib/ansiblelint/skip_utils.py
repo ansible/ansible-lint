@@ -20,25 +20,18 @@
 
 """Utils related to inline skipping of rules."""
 import logging
-import sys
 from functools import lru_cache
 from itertools import product
 from typing import Any, Generator, List, Sequence
 
 import ruamel.yaml
 
-if sys.version_info >= (3, 8):
-    from typing import Literal  # pylint: disable-msg=E0611
-else:
-    from typing_extensions import Literal
-
+from ansiblelint.constants import FileType
 
 INLINE_SKIP_FLAG = '# noqa '
 
 _logger = logging.getLogger(__name__)
 
-
-FileType = Literal["playbook", "pre_tasks", "post_tasks"]
 
 # playbook: Sequence currently expects only instances of one of the two
 # classes below but we should consider avoiding this chimera.
