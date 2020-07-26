@@ -21,6 +21,8 @@
 # pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
 import unittest
 
+from ansiblelint.file_utils import TargetFile
+
 from .rules import EMatcherRule, UnsetVariableMatcherRule
 
 
@@ -32,7 +34,8 @@ class TestRule(unittest.TestCase):
         with open(filename) as f:
             text = f.read()
         ematcher = EMatcherRule.EMatcherRule()
-        matches = ematcher.matchlines(dict(path=filename, type='playbooks'), text)
+        file = TargetFile(path=filename, type='playbooks')
+        matches = ematcher.matchlines(file=file, text=text)
         self.assertEqual(len(matches), 3)
 
     def test_rule_postmatching(self):
@@ -41,5 +44,6 @@ class TestRule(unittest.TestCase):
         with open(filename) as f:
             text = f.read()
         rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
-        matches = rule.matchlines(dict(path=filename, type='playbooks'), text)
+        file = TargetFile(path=filename, type='playbooks')
+        matches = rule.matchlines(file=file, text=text)
         self.assertEqual(len(matches), 2)

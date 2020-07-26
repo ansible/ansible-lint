@@ -1,3 +1,7 @@
+from typing import List, Optional
+
+from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import TargetFile
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -8,5 +12,7 @@ class EMatcherRule(AnsibleLintRule):
     shortdesc = 'The letter "e" is present'
     tags = ['fake', 'dummy', 'test1']
 
-    def match(self, filename, line):
-        return "e" in line
+    def match(self, file: TargetFile, line: str, line_no: Optional[int]) -> List[MatchError]:
+        if "e" in line:
+            return [self.create_matcherror()]
+        return []

@@ -565,8 +565,13 @@ A less-preferred method of skipping is to skip all task-based rules for a task (
       tags:
       - skip_ansible_lint
 
+
 Creating Custom Rules
 ---------------------
+
+TODO: Move the docs outside project readme and make the examples be
+included from source files, so we can test them and avoid having
+broken examples.
 
 Rules are described using a class file per rule. Default rules are named *DeprecatedVariableRule.py*, etc.
 
@@ -595,8 +600,11 @@ An example rule using ``match`` is:
                       'declarations'
         tags = { 'deprecations' }
 
-        def match(self, file, line):
-            return '${' in line
+        def match(self, file: "TargetFile", line: str = "") -> List[MatchError]:
+            result = []
+            if '${' in line:
+              result.append(self.create_matcherror())
+            return result
 
 An example rule using ``matchtask`` is:
 

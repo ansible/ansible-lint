@@ -3,10 +3,10 @@ import logging
 import os
 from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set
 
-import ansiblelint.file_utils
 import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import TargetFile
 from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule
 
 if TYPE_CHECKING:
@@ -66,15 +66,20 @@ class Runner(object):
 
     def run(self) -> List[MatchError]:
         """Execute the linting process."""
-        files = list()
+        files: List[TargetFile] = list()
         for playbook in self.playbooks:
             if self.is_excluded(playbook[0]) or playbook[1] == 'role':
                 continue
-            files.append({'path': ansiblelint.file_utils.normpath(playbook[0]),
-                          'type': playbook[1],
-                          # add an absolute path here, so rules are able to validate if
-                          # referenced files exist
-                          'absolute_directory': os.path.dirname(playbook[0])})
+            if playbook[1] in ("playbook", "pre_tasks", "post_tasks", None):
+                f = TargetFile(
+                        path=ansiblelint.file_utils.normpath(playbook[0]),
+                        type=playbook[1],
+                        # add an absolute path here, so rules are able to validate if
+                        # referenced files exist
+                        absolute_directory=os.path.dirname(playbook[0]))
+                files.append(f)
+            else:
+                raise RuntimeError()
         matches = set(self._emit_matches(files))
 
         # remove duplicates from files list

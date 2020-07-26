@@ -21,15 +21,19 @@
 
 import re
 from pathlib import Path
-from typing import List
+from typing import TYPE_CHECKING, List, Optional
 
+from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import parse_yaml_from_file
+
+if TYPE_CHECKING:
+    from ansiblelint.file_utils import TargetFile
 
 ROLE_NAME_REGEX = '^[a-z][a-z0-9_]+$'
 
 
-def _remove_prefix(text, prefix):
+def _remove_prefix(text: str, prefix: str) -> str:
     return re.sub(r'^{0}'.format(re.escape(prefix)), '', text)
 
 
@@ -51,7 +55,9 @@ class RoleNames(AnsibleLintRule):
 
     ROLE_NAME_REGEXP = re.compile(ROLE_NAME_REGEX)
 
-    def match(self, file, text):
+    def match(self, file: "TargetFile", line: str, line_no: Optional[int]) -> List["MatchError"]:
+        if not file:
+            return []
         path = file['path'].split("/")
         if "tasks" in path:
             role_name = _remove_prefix(path[path.index("tasks") - 1], "ansible-role-")
@@ -67,8 +73,11 @@ class RoleNames(AnsibleLintRule):
                         pass
 
             if role_name in self.done:
-                return False
+                return []
             self.done.append(role_name)
             if not re.match(self.ROLE_NAME_REGEXP, role_name):
-                return self.shortdesc.format(role_name)
-        return False
+                return [MatchError(
+                    message=self.shortdesc.format(role_name),
+                    filename=file,
+                    rule=self.__class__)]
+        return []

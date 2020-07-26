@@ -5,12 +5,14 @@ import logging
 import os
 import re
 from collections import defaultdict
+from collections.abc import Sequence
 from importlib.abc import Loader
 from time import sleep
-from typing import List
+from typing import List, Optional
 
 import ansiblelint.utils
 from ansiblelint.errors import BaseRule, MatchError, RuntimeErrorRule
+from ansiblelint.file_utils import TargetFile
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
 _logger = logging.getLogger(__name__)
@@ -21,6 +23,9 @@ class AnsibleLintRule(BaseRule):
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
+
+    def match(self, file: "TargetFile", line: str, line_no: Optional[int]) -> List[MatchError]:
+        return []
 
     @staticmethod
     def unjinja(text):
@@ -36,14 +41,14 @@ class AnsibleLintRule(BaseRule):
             details: str = "",
             filename: str = None) -> MatchError:
         return MatchError(
-            message=message,
+            message=message or self.shortdesc,
             linenumber=linenumber,
             details=details,
             filename=filename,
             rule=self.__class__
             )
 
-    def matchlines(self, file, text) -> List[MatchError]:
+    def matchlines(self, file: "TargetFile", text: str) -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.match:
             return matches
@@ -57,23 +62,21 @@ class AnsibleLintRule(BaseRule):
             if self.id in rule_id_list:
                 continue
 
-            result = self.match(file, line)
-            if not result:
-                continue
-            message = None
-            if isinstance(result, str):
-                message = result
-            m = self.create_matcherror(
-                message=message,
-                linenumber=prev_line_no + 1,
-                details=line,
-                filename=file['path'])
-            matches.append(m)
+            result = self.match(file, line, line_no=prev_line_no)
+            if not isinstance(result, Sequence) or isinstance(result, str):
+                result = [
+                    MatchError(
+                        message=(
+                            f"Ignored deprecated match() return value: {result!r}, see "
+                            "https://github.com/ansible-community/ansible-lint/pull/1120"),
+                        rule=RuntimeErrorRule)
+                ]
+            matches.extend(result)
         return matches
 
     # TODO(ssbarnea): Reduce mccabe complexity
     # https://github.com/ansible-community/ansible-lint/issues/744
-    def matchtasks(self, file: str, text: str) -> List[MatchError]:  # noqa: C901
+    def matchtasks(self, file: TargetFile, text: str) -> List[MatchError]:  # noqa: C901
         matches: List[MatchError] = []
         if not self.matchtask:
             return matches
@@ -122,7 +125,7 @@ class AnsibleLintRule(BaseRule):
             linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
         return linenumber
 
-    def matchyaml(self, file: str, text: str) -> List[MatchError]:
+    def matchyaml(self, file: TargetFile, text: str) -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.matchplay:
             return matches
@@ -208,7 +211,7 @@ class RulesCollection(object):
     def extend(self, more: List[AnsibleLintRule]) -> None:
         self.rules.extend(more)
 
-    def run(self, playbookfile, tags=set(), skip_list=frozenset()) -> List:
+    def run(self, playbookfile: TargetFile, tags=set(), skip_list=frozenset()) -> List:
         text = ""
         matches: List = list()
 
@@ -233,9 +236,9 @@ class RulesCollection(object):
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if set(rule_definition).isdisjoint(skip_list):
-                    matches.extend(rule.matchlines(playbookfile, text))
-                    matches.extend(rule.matchtasks(playbookfile, text))
-                    matches.extend(rule.matchyaml(playbookfile, text))
+                    matches.extend(rule.matchlines(file=playbookfile, text=text))
+                    matches.extend(rule.matchtasks(file=playbookfile, text=text))
+                    matches.extend(rule.matchyaml(file=playbookfile, text=text))
 
         return matches
 

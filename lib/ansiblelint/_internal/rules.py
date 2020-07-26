@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import TargetFile
 
 
 class BaseRule:
@@ -13,19 +14,22 @@ class BaseRule:
     description: str = ""
     version_added: str = ""
     severity: str = ""
-    match = None
     matchtask = None
     matchplay = None
 
-    def matchlines(self, file, text) -> List["MatchError"]:
+    def match(self, file: "TargetFile", line: str, line_no: Optional[int]) -> List["MatchError"]:
+        """Return matches found for a specific line with line_no."""
+        return []
+
+    def matchlines(self, file: "TargetFile", text: str) -> List["MatchError"]:
         """Return matches found for a specific line."""
         return []
 
-    def matchtasks(self, file: str, text: str) -> List["MatchError"]:
+    def matchtasks(self, file: "TargetFile", text: str) -> List["MatchError"]:
         """Return matches for a tasks file."""
         return []
 
-    def matchyaml(self, file: str, text: str) -> List["MatchError"]:
+    def matchyaml(self, file: "TargetFile", text: str) -> List["MatchError"]:
         """Return matches found for a specific YAML text."""
         return []
 

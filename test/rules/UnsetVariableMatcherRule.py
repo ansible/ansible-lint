@@ -1,3 +1,7 @@
+from typing import List, Optional
+
+from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import TargetFile
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -8,5 +12,7 @@ class UnsetVariableMatcherRule(AnsibleLintRule):
                   'post templating that still contain {{'
     tags = ['fake', 'dummy', 'test2']
 
-    def match(self, filename, line):
-        return "{{" in line
+    def match(self, file: TargetFile, line: str, line_no: Optional[int]) -> List[MatchError]:
+        if "{{" in line:
+            return [self.create_matcherror()]
+        return []
