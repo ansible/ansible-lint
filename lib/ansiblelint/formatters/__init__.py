@@ -1,8 +1,12 @@
 """Output formatters."""
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING, Union
 
 from ansiblelint.color import Color, colorize
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
 
 
 class BaseFormatter:
@@ -15,7 +19,7 @@ class BaseFormatter:
         display_relative_path (bool): whether to show path as relative or absolute
     """
 
-    def __init__(self, base_dir, display_relative_path):
+    def __init__(self, base_dir: Union[str, Path], display_relative_path: str) -> None:
         """Initialize a BaseFormatter instance."""
         if isinstance(base_dir, str):
             base_dir = Path(base_dir)
@@ -28,7 +32,7 @@ class BaseFormatter:
 
         self._base_dir = base_dir if display_relative_path else None
 
-    def _format_path(self, path):
+    def _format_path(self, path: Union[str, Path]) -> str:
         # Required 'cause os.path.relpath() does not accept Path before 3.6
         if isinstance(path, Path):
             path = str(path)  # Drop when Python 3.5 is no longer supported
@@ -41,7 +45,7 @@ class BaseFormatter:
 
 class Formatter(BaseFormatter):
 
-    def format(self, match, colored=False):
+    def format(self, match: "MatchError", colored: bool = False) -> str:
         formatstr = u"{0} {1}\n{2}:{3}\n{4}\n"
         _id = getattr(match.rule, 'id', '000')
         if colored:
@@ -61,7 +65,7 @@ class Formatter(BaseFormatter):
 
 class QuietFormatter(BaseFormatter):
 
-    def format(self, match, colored=False):
+    def format(self, match: "MatchError", colored: bool = False) -> str:
         formatstr = u"{0} {1}:{2}"
         if colored:
             return formatstr.format(
@@ -69,13 +73,13 @@ class QuietFormatter(BaseFormatter):
                 colorize(self._format_path(match.filename or ""), Color.filename),
                 colorize(str(match.linenumber), Color.linenumber))
         else:
-            return formatstr.format(match.rule.id, self.format_path(match.filename),
+            return formatstr.format(match.rule.id, self._format_path(match.filename or ""),
                                     match.linenumber)
 
 
 class ParseableFormatter(BaseFormatter):
 
-    def format(self, match, colored=False):
+    def format(self, match: "MatchError", colored: bool = False) -> str:
         formatstr = u"{0}:{1}: [{2}] {3}"
         if colored:
             return formatstr.format(
@@ -92,7 +96,7 @@ class ParseableFormatter(BaseFormatter):
 
 class ParseableSeverityFormatter(BaseFormatter):
 
-    def format(self, match, colored=False):
+    def format(self, match: "MatchError", colored: bool = False) -> str:
         formatstr = u"{0}:{1}: [{2}] [{3}] {4}"
 
         filename = self._format_path(match.filename or "")

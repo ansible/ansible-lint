@@ -107,7 +107,7 @@ def main() -> int:
         playbooks = sorted(set(options.playbook))
 
     matches = list()
-    checked_files: Set[Any] = set()
+    checked_files: Set[str] = set()
     for playbook in playbooks:
         runner = Runner(rules, playbook, options.tags,
                         options.skip_list, options.exclude_paths,
