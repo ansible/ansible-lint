@@ -6,11 +6,14 @@ import os
 import re
 from collections import defaultdict
 from importlib.abc import Loader
-from typing import List
+from typing import TYPE_CHECKING, List
 
 import ansiblelint.utils
 from ansiblelint.errors import MatchError
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
+
+if TYPE_CHECKING:
+    from ansiblelint.file_utils import TargetFile
 
 _logger = logging.getLogger(__name__)
 
@@ -28,9 +31,11 @@ class AnsibleLintRule(object):
     tags: List[str] = []
     shortdesc: str = ""
     description: str = ""
-    match = None
     matchtask = None
     matchplay = None
+
+    def match(self, file: "TargetFile", line: str = "") -> List[MatchError]:
+        return []
 
     @staticmethod
     def unjinja(text):
@@ -57,15 +62,20 @@ class AnsibleLintRule(object):
             if not result:
                 continue
             message = None
-            if isinstance(result, str):
+            if isinstance(result, list):
+                matches.extend(result)
+            elif isinstance(result, str):
+                # warnings.warn("deprecated", DeprecationWarning)
                 message = result
-            m = MatchError(
-                message=message,
-                linenumber=prev_line_no + 1,
-                details=line,
-                filename=file['path'],
-                rule=self)
-            matches.append(m)
+            else:
+                # warnings.warn("deprecated", DeprecationWarning)
+                m = MatchError(
+                    message=message,
+                    linenumber=prev_line_no + 1,
+                    details=line,
+                    filename=file['path'],
+                    rule=self)
+                matches.append(m)
         return matches
 
     # TODO(ssbarnea): Reduce mccabe complexity

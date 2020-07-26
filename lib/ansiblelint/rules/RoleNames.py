@@ -20,9 +20,14 @@
 # THE SOFTWARE.
 
 import re
-from typing import List
+from typing import TYPE_CHECKING, List
 
+from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from ansiblelint.file_utils import TargetFile
+
 
 ROLE_NAME_REGEX = '^[a-z][a-z0-9_]+$'
 
@@ -45,14 +50,19 @@ class RoleNames(AnsibleLintRule):
 
     ROLE_NAME_REGEXP = re.compile(ROLE_NAME_REGEX)
 
-    def match(self, file, text):
+    def match(self, file: "TargetFile", line: str = "") -> List["MatchError"]:
 
+        if not file:
+            return []
         path = file['path'].split("/")
         if "tasks" in path:
             role_name = path[path.index("tasks") - 1]
             if role_name in self.done:
-                return False
+                return []
             self.done.append(role_name)
             if not re.match(self.ROLE_NAME_REGEXP, role_name):
-                return self.shortdesc.format(role_name)
-        return False
+                return [MatchError(
+                    message=self.shortdesc.format(role_name),
+                    filename=file,
+                    rule=self)]
+        return []
