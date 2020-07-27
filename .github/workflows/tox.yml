@@ -65,8 +65,14 @@ jobs:
         python -m pip freeze --all
     - name: >-
         Initialize tox envs
-      run: |
-        python -m tox --parallel auto --parallel-live --notest -vv
+      run: >-
+        python -m
+        tox
+        --parallel auto
+        --parallel-live
+        --notest
+        --skip-missing-interpreters false
+        -vv
       env: ${{ matrix.env }}
     - name: Test with tox
       run: |
@@ -154,8 +160,14 @@ jobs:
         python -m pip freeze --all
     - name: >-
         Initialize tox envs
-      run: |
-        python -m tox --parallel auto --parallel-live --notest -vv
+      run: >-
+        python -m
+        tox
+        --parallel auto
+        --parallel-live
+        --notest
+        --skip-missing-interpreters false
+        -vv
       env:
         TOXENV: ansible28,ansible29,ansible210,ansibledevel
     - name: "Test with tox: ansible28"
@@ -247,7 +259,14 @@ jobs:
         echo 'local_scheme = "no-local-version"' >> pyproject.toml
         git update-index --assume-unchanged pyproject.toml
     - name: Pre-populate tox env
-      run: python -m tox -p auto --parallel-live -vvvv --notest
+      run: >-
+        python -m
+        tox
+        --parallel auto
+        --parallel-live
+        --notest
+        --skip-missing-interpreters false
+        -vvvv
     - name: Build dists
       run: python -m tox -p auto --parallel-live -vvvv
     - name: Publish to test.pypi.org
