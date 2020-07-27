@@ -2,6 +2,8 @@
 
 import os
 import shutil
+import subprocess
+import sys
 import tempfile
 
 from ansible import __version__ as ansible_version_str
@@ -49,3 +51,22 @@ class RunFromText(object):
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results
+
+
+def run_ansible_lint(cwd, role_path=None, bin=None, env=None):
+    """Run ansible-lint on a given path and returns its output."""
+    command = '{} -v {}'.format(
+        bin or (sys.executable + " -m ansiblelint"),
+        role_path or "")
+
+    result, err = subprocess.Popen(
+        [command],
+        cwd=cwd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True,
+        env=env,
+    ).communicate()
+
+    return result
