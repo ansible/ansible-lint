@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from typing import Dict
 
 from ansible import __version__ as ansible_version_str
 
@@ -53,19 +54,26 @@ class RunFromText(object):
         return results
 
 
-def run_ansible_lint(cwd, role_path=None, bin=None, env=None):
+def run_ansible_lint(
+        cwd: os.PathLike = None,
+        role_path: os.PathLike = None,
+        bin: str = None,
+        env: Dict[str, str] = None):
     """Run ansible-lint on a given path and returns its output."""
-    command = '{} -v {}'.format(
-        bin or (sys.executable + " -m ansiblelint"),
-        role_path or "")
+    if bin:
+        command = [bin, "-v"]
+    else:
+        command = [sys.executable, "-m", "ansiblelint", "-v"]
+    if role_path:
+        command.append(role_path)
 
     result, err = subprocess.Popen(
-        [command],
+        command,
         cwd=cwd,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        shell=True,
+        shell=False,  # needed when command is a list
         env=env,
     ).communicate()
 
