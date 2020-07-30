@@ -24,6 +24,7 @@ import errno
 import logging
 import pathlib
 import sys
+from argparse import Namespace
 from typing import Any, Set
 
 from ansiblelint import cli, formatters
@@ -56,6 +57,20 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
+def initalize_formatter_factory(options_list: Namespace):
+    """Apply options from command line arguments to the formatter_factory."""
+    formatter_factory: Any = formatters.Formatter
+    if options_list.quiet:
+        formatter_factory = formatters.QuietFormatter
+
+    if options_list.parseable:
+        formatter_factory = formatters.ParseableFormatter
+
+    if options_list.parseable_severity:
+        formatter_factory = formatters.ParseableSeverityFormatter
+    return formatter_factory
+
+
 def main() -> int:
     """Linter CLI entry point."""
     cwd = pathlib.Path.cwd()
@@ -65,16 +80,7 @@ def main() -> int:
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
 
-    formatter_factory: Any = formatters.Formatter
-    if options.quiet:
-        formatter_factory = formatters.QuietFormatter
-
-    if options.parseable:
-        formatter_factory = formatters.ParseableFormatter
-
-    if options.parseable_severity:
-        formatter_factory = formatters.ParseableSeverityFormatter
-
+    formatter_factory = initalize_formatter_factory(options)
     formatter = formatter_factory(cwd, options.display_relative_path)
 
     if options.use_default_rules:
