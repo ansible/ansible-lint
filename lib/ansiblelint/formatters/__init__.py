@@ -1,15 +1,17 @@
 """Output formatters."""
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Generic, TypeVar, Union
 
 from ansiblelint.color import Color, colorize
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
+T = TypeVar('T', bound='BaseFormatter')
 
-class BaseFormatter:
+
+class BaseFormatter(Generic[T]):
     """Formatter of ansible-lint output.
 
     Base class for output formatters.
@@ -41,6 +43,9 @@ class BaseFormatter:
             return path
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self._base_dir)
+
+    def format(self, match: "MatchError", colored: bool = False) -> str:
+        return str(match)
 
 
 class Formatter(BaseFormatter):
