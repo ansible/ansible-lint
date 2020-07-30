@@ -24,7 +24,7 @@ import errno
 import logging
 import pathlib
 import sys
-from typing import Any, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Set
 
 if TYPE_CHECKING:
     from argparse import Namespace
