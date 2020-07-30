@@ -82,7 +82,7 @@ def main() -> int:
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
 
-    formatter_factory = initalize_formatter_factory(options)
+    formatter_factory = choose_formatter_factory(options)
     formatter = formatter_factory(cwd, options.display_relative_path)
 
     if options.use_default_rules:
