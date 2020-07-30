@@ -61,7 +61,7 @@ def initialize_logger(level: int = 0) -> None:
 
 def choose_formatter_factory(options_list: Namespace) -> Type[formatters.BaseFormatter]:
     """Select an output formatter based on the incoming command line arguments."""
-    formatter_factory: Any = formatters.Formatter
+    formatter_factory = formatters.Formatter
     if options_list.quiet:
         formatter_factory = formatters.QuietFormatter
 
