@@ -24,8 +24,10 @@ import errno
 import logging
 import pathlib
 import sys
-from argparse import Namespace
-from typing import Any, Set
+from typing import Any, Set, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from argparse import Namespace
 
 from ansiblelint import cli, formatters
 from ansiblelint.constants import DEFAULT_RULESDIR
