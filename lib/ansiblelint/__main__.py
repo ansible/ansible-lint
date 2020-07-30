@@ -24,7 +24,7 @@ import errno
 import logging
 import pathlib
 import sys
-from typing import TYPE_CHECKING, Any, Set
+from typing import TYPE_CHECKING, Set, Type
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -59,7 +59,7 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def choose_formatter_factory(options_list: Namespace) -> Type[formatters.BaseFormatter]:
+def choose_formatter_factory(options_list: "Namespace") -> Type[formatters.BaseFormatter]:
     """Select an output formatter based on the incoming command line arguments."""
     formatter_factory = formatters.Formatter
     if options_list.quiet:
