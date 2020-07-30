@@ -19,15 +19,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """Command line implementation."""
-
 import errno
 import logging
 import pathlib
 import sys
-from typing import TYPE_CHECKING, Set, Type
-
-if TYPE_CHECKING:
-    from argparse import Namespace
+from typing import TYPE_CHECKING, Set, Type, Union
 
 from ansiblelint import cli, formatters
 from ansiblelint.constants import DEFAULT_RULESDIR
@@ -36,16 +32,15 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.utils import get_playbooks_and_roles
 
+if TYPE_CHECKING:
+    from argparse import Namespace
+
 _logger = logging.getLogger(__name__)
 
 
 def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
-    VERBOSITY_MAP = {
-        0: logging.NOTSET,
-        1: logging.INFO,
-        2: logging.DEBUG
-    }
+    VERBOSITY_MAP = {0: logging.NOTSET, 1: logging.INFO, 2: logging.DEBUG}
 
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(levelname)-8s %(message)s')
@@ -59,18 +54,19 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def choose_formatter_factory(options_list: "Namespace") -> Type[formatters.BaseFormatter]:
+def choose_formatter_factory(
+    options_list: "Namespace"
+) -> Union[Type[formatters.Formatter], Type[formatters.QuietFormatter],
+           Type[formatters.ParseableFormatter],
+           Type[formatters.ParseableSeverityFormatter]]:
     """Select an output formatter based on the incoming command line arguments."""
-    formatter_factory = formatters.Formatter
     if options_list.quiet:
-        formatter_factory = formatters.QuietFormatter
-
-    if options_list.parseable:
-        formatter_factory = formatters.ParseableFormatter
-
-    if options_list.parseable_severity:
-        formatter_factory = formatters.ParseableSeverityFormatter
-    return formatter_factory
+        return formatters.QuietFormatter
+    elif options_list.parseable:
+        return formatters.ParseableFormatter
+    elif options_list.parseable_severity:
+        return formatters.ParseableSeverityFormatter
+    return formatters.Formatter
 
 
 def main() -> int:
@@ -92,7 +88,8 @@ def main() -> int:
     rules = RulesCollection(rulesdirs)
 
     if options.listrules:
-        formatted_rules = rules if options.format == 'plain' else rules_as_rst(rules)
+        formatted_rules = rules if options.format == 'plain' else rules_as_rst(
+            rules)
         print(formatted_rules)
         return 0
 
@@ -117,9 +114,9 @@ def main() -> int:
     matches = list()
     checked_files: Set[str] = set()
     for playbook in playbooks:
-        runner = Runner(rules, playbook, options.tags,
-                        options.skip_list, options.exclude_paths,
-                        options.verbosity, checked_files)
+        runner = Runner(rules, playbook, options.tags, options.skip_list,
+                        options.exclude_paths, options.verbosity,
+                        checked_files)
         matches.extend(runner.run())
 
     for match in sorted(set(matches)):
