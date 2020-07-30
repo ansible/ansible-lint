@@ -59,7 +59,7 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def initalize_formatter_factory(options_list: Namespace):
+def choose_formatter_factory(options_list: Namespace) -> Type[formatters.BaseFormatter]:
     """Select an output formatter based on the incoming command line arguments."""
     formatter_factory: Any = formatters.Formatter
     if options_list.quiet:
