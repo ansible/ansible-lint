@@ -1,1 +1,1 @@
-"""placeholder to put custom rules under this dir."""
+"""A placeholder package for putting custom rules under this dir."""
