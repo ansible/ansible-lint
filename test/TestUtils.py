@@ -261,14 +261,18 @@ def test_auto_detect_exclude(monkeypatch):
     assert result == ['bar/playbook.yml']
 
 
-def test_get_rules_dirs():
-    default = [constants.DEFAULT_RULESDIR]
-    uruledirs = ["/tmp/rules/custom/99", "/tmp/rules/custom/10"]
+_DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]
+_URULEDIRS_1 = ["/tmp/rules/custom/99", "/tmp/rules/custom/10"]
 
-    assert utils.get_rules_dirs([], True) == default
-    assert utils.get_rules_dirs([], False) == default
-    assert utils.get_rules_dirs(uruledirs, True) == uruledirs + default
-    assert utils.get_rules_dirs(uruledirs, False) == uruledirs
+
+@pytest.mark.parametrize(("uruledirs", "use_default", "expected"), (
+    pytest.param([], True, _DEFAULT_RULEDIRS),
+    pytest.param([], False, _DEFAULT_RULEDIRS),
+    pytest.param(_URULEDIRS_1, True, _URULEDIRS_1 + _DEFAULT_RULEDIRS),
+    pytest.param(_URULEDIRS_1, False, _URULEDIRS_1),
+))
+def test_get_rules_dirs(uruledirs, use_default, expected):
+    assert utils.get_rules_dirs(uruledirs, use_default) == expected
 
 
 def test_get_rules_dirs_with_custom_rules(monkeypatch):
