@@ -22,13 +22,14 @@
 
 import logging
 import os
+import os.path
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
-from ansiblelint import cli, utils
+from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.file_utils import normpath
 
@@ -258,3 +259,28 @@ def test_auto_detect_exclude(monkeypatch):
     monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
     result = utils.get_playbooks_and_roles(options)
     assert result == ['bar/playbook.yml']
+
+
+def test_get_rules_dirs():
+    default = [constants.DEFAULT_RULESDIR]
+    uruledirs = ["/tmp/rules/custom/99", "/tmp/rules/custom/10"]
+
+    assert utils.get_rules_dirs([], True) == default
+    assert utils.get_rules_dirs([], False) == default
+    assert utils.get_rules_dirs(uruledirs, True) == uruledirs + default
+    assert utils.get_rules_dirs(uruledirs, False) == uruledirs
+
+
+def test_get_rules_dirs_with_custom_rules(monkeypatch):
+    selfdir = os.path.dirname(__file__)
+    crulesdir = os.path.join(selfdir, "custom_rules")
+
+    default = [os.path.join(crulesdir, "foo"), constants.DEFAULT_RULESDIR]
+    uruledirs = ["/tmp/rules/custom/bar"]
+
+    monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, crulesdir)
+
+    assert utils.get_rules_dirs([], True) == default
+    assert utils.get_rules_dirs([], False) == default
+    assert utils.get_rules_dirs(uruledirs, True) == uruledirs + default
+    assert utils.get_rules_dirs(uruledirs, False) == uruledirs

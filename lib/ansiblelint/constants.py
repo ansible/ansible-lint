@@ -10,6 +10,7 @@ else:
     from typing_extensions import Literal
 
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), 'rules')
+CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
 
 INVALID_CONFIG_RC = 2
 ANSIBLE_FAILURE_RC = 3
