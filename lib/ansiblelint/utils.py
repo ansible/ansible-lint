@@ -46,8 +46,7 @@ from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
 from ansiblelint.constants import (
-    ANSIBLE_FAILURE_RC, FileType,
-    DEFAULT_RULESDIR, CUSTOM_RULESDIR_ENVVAR
+    ANSIBLE_FAILURE_RC, CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType,
 )
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
