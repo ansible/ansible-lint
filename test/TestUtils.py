@@ -262,29 +262,30 @@ def test_auto_detect_exclude(monkeypatch):
 
 
 _DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]
-_URULEDIRS_1 = ["/tmp/rules/custom/99", "/tmp/rules/custom/10"]
+_CUSTOM_RULESDIR = Path(__file__).parent / "custom_rules"
+_CUSTOM_RULEDIRS = [
+    str(_CUSTOM_RULESDIR / "example_inc"),
+    str(_CUSTOM_RULESDIR / "example_com")
+]
 
 
 @pytest.mark.parametrize(("uruledirs", "use_default", "expected"), (
     pytest.param([], True, _DEFAULT_RULEDIRS),
     pytest.param([], False, _DEFAULT_RULEDIRS),
-    pytest.param(_URULEDIRS_1, True, _URULEDIRS_1 + _DEFAULT_RULEDIRS),
-    pytest.param(_URULEDIRS_1, False, _URULEDIRS_1),
+    pytest.param(_CUSTOM_RULEDIRS, True, _CUSTOM_RULEDIRS + _DEFAULT_RULEDIRS),
+    pytest.param(_CUSTOM_RULEDIRS, False, _CUSTOM_RULEDIRS)
 ))
 def test_get_rules_dirs(uruledirs, use_default, expected):
     assert utils.get_rules_dirs(uruledirs, use_default) == expected
 
 
-def test_get_rules_dirs_with_custom_rules(monkeypatch):
-    selfdir = os.path.dirname(__file__)
-    crulesdir = os.path.join(selfdir, "custom_rules")
-
-    default = [os.path.join(crulesdir, "foo"), constants.DEFAULT_RULESDIR]
-    uruledirs = ["/tmp/rules/custom/bar"]
-
-    monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, crulesdir)
-
-    assert utils.get_rules_dirs([], True) == default
-    assert utils.get_rules_dirs([], False) == default
-    assert utils.get_rules_dirs(uruledirs, True) == uruledirs + default
-    assert utils.get_rules_dirs(uruledirs, False) == uruledirs
+@pytest.mark.parametrize(("uruledirs", "use_default", "expected"), (
+    pytest.param([], True, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    pytest.param([], False, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    pytest.param(_CUSTOM_RULEDIRS, True,
+                 _CUSTOM_RULEDIRS + sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    pytest.param(_CUSTOM_RULEDIRS, False, _CUSTOM_RULEDIRS)
+))
+def test_get_rules_dirs_with_custom_rules(uruledirs, use_default, expected, monkeypatch):
+    monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, str(_CUSTOM_RULESDIR))
+    assert utils.get_rules_dirs(uruledirs, use_default) == expected
