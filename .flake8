@@ -110,7 +110,6 @@ per-file-ignores =
   test/TestUseCommandInsteadOfShell.py: PT009 D100 D101 D102
   test/TestUseHandlerRatherThanWhenChanged.py: PT009 D100 D101 D102
   test/TestUsingBareVariablesIsDeprecated.py: PT009 D100 D101 D102
-  test/TestUtils.py: D100 D103
   test/TestVariableHasSpaces.py: PT009 D100 D101 D102
   test/TestWithSkipTagId.py: PT009 D100 D101 D102
 

@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+"""Tests for generic utilitary functions."""
 
 import logging
 import os
@@ -50,6 +51,7 @@ from ansiblelint.file_utils import normpath
                  id='command_with_args'),
 ))
 def test_tokenize(string, expected_cmd, expected_args, expected_kwargs):
+    """Test that tokenize works for different input types."""
     (cmd, args, kwargs) = utils.tokenize(string)
     assert cmd == expected_cmd
     assert args == expected_args
@@ -68,6 +70,7 @@ def test_tokenize(string, expected_cmd, expected_args, expected_kwargs):
                  id='args')
 ))
 def test_normalize(reference_form, alternate_forms):
+    """Test that tasks specified differently are normalized same way."""
     normal_form = utils.normalize_task(reference_form, 'tasks.yml')
 
     for form in alternate_forms:
@@ -75,6 +78,7 @@ def test_normalize(reference_form, alternate_forms):
 
 
 def test_normalize_complex_command():
+    """Test that tasks specified differently are normalized same way."""
     task1 = dict(name="hello", action={'module': 'pip',
                                        'name': 'df',
                                        'editable': 'false'})
@@ -88,6 +92,7 @@ def test_normalize_complex_command():
 
 
 def test_extract_from_list():
+    """Check that tasks get extracted from blocks if present."""
     block = {
         'block': [{'tasks': {'name': 'hello', 'command': 'whoami'}}],
         'test_none': None,
@@ -117,11 +122,13 @@ def test_extract_from_list():
                  id='to_nice_yaml_filter_on_undefined_variable'),
 ))
 def test_template(template, output):
+    """Verify that resolvable template vars and filters get rendered."""
     result = utils.template('/base/dir', template, dict(playbook_dir='/a/b/c'))
     assert result == output
 
 
 def test_task_to_str_unicode():
+    """Ensure that extracting messages from tasks preserves Unicode."""
     task = dict(fail=dict(msg=u"unicode é ô à"))
     result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
     assert result == u"fail msg=unicode é ô à"
@@ -132,10 +139,12 @@ def test_task_to_str_unicode():
     pytest.param('a/b/../', id='str'),
 ))
 def test_normpath_with_path_object(path):
+    """Ensure that relative parent dirs are normalized in paths."""
     assert normpath(path) == "a"
 
 
 def test_expand_path_vars(monkeypatch):
+    """Ensure that tilde and env vars are expanded in paths."""
     test_path = '/test/path'
     monkeypatch.setenv('TEST_PATH', test_path)
     assert utils.expand_path_vars('~') == os.path.expanduser('~')
@@ -143,6 +152,7 @@ def test_expand_path_vars(monkeypatch):
 
 
 def test_expand_paths_vars(monkeypatch):
+    """Ensure that tilde and env vars are expanded in paths lists."""
     test_path = '/test/path'
     monkeypatch.setenv('TEST_PATH', test_path)
     assert utils.expand_paths_vars(['~']) == [os.path.expanduser('~')]
@@ -165,6 +175,7 @@ def test_get_yaml_files_git_verbose(
     monkeypatch,
     caplog
 ):
+    """Ensure that autodiscovery lookup failures are logged."""
     options = cli.get_config(['-v'])
     initialize_logger(options.verbosity)
     monkeypatch.setenv(reset_env_var, '')
