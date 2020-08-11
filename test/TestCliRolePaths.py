@@ -1,3 +1,4 @@
+# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
 import os
 import unittest
 from pathlib import Path
