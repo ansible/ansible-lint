@@ -105,4 +105,4 @@ def test_run_playbook_github(result, env):
         '::error file=examples/example.yml,line=47::[E101] '
         'Deprecated always_run'
     )
-    assert (expected in str(result_gh)) == result
+    assert (expected in str(result_gh)) is result
