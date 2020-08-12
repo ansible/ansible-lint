@@ -269,23 +269,25 @@ _CUSTOM_RULEDIRS = [
 ]
 
 
-@pytest.mark.parametrize(("uruledirs", "use_default", "expected"), (
-    pytest.param([], True, _DEFAULT_RULEDIRS),
-    pytest.param([], False, _DEFAULT_RULEDIRS),
-    pytest.param(_CUSTOM_RULEDIRS, True, _CUSTOM_RULEDIRS + _DEFAULT_RULEDIRS),
-    pytest.param(_CUSTOM_RULEDIRS, False, _CUSTOM_RULEDIRS)
+@pytest.mark.parametrize(("user_ruledirs", "use_default", "expected"), (
+    ([], True, _DEFAULT_RULEDIRS),
+    ([], False, _DEFAULT_RULEDIRS),
+    (_CUSTOM_RULEDIRS, True, _CUSTOM_RULEDIRS + _DEFAULT_RULEDIRS),
+    (_CUSTOM_RULEDIRS, False, _CUSTOM_RULEDIRS)
 ))
-def test_get_rules_dirs(uruledirs, use_default, expected):
-    assert utils.get_rules_dirs(uruledirs, use_default) == expected
+def test_get_rules_dirs(user_ruledirs, use_default, expected):
+    """Test it returns expected dir lists."""
+    assert utils.get_rules_dirs(user_ruledirs, use_default) == expected
 
 
-@pytest.mark.parametrize(("uruledirs", "use_default", "expected"), (
-    pytest.param([], True, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
-    pytest.param([], False, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
-    pytest.param(_CUSTOM_RULEDIRS, True,
-                 _CUSTOM_RULEDIRS + sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
-    pytest.param(_CUSTOM_RULEDIRS, False, _CUSTOM_RULEDIRS)
+@pytest.mark.parametrize(("user_ruledirs", "use_default", "expected"), (
+    ([], True, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    ([], False, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    (_CUSTOM_RULEDIRS, True,
+     _CUSTOM_RULEDIRS + sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    (_CUSTOM_RULEDIRS, False, _CUSTOM_RULEDIRS)
 ))
-def test_get_rules_dirs_with_custom_rules(uruledirs, use_default, expected, monkeypatch):
+def test_get_rules_dirs_with_custom_rules(user_ruledirs, use_default, expected, monkeypatch):
+    """Test it returns expected dir lists when custom rules exist."""
     monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, str(_CUSTOM_RULESDIR))
-    assert utils.get_rules_dirs(uruledirs, use_default) == expected
+    assert utils.get_rules_dirs(user_ruledirs, use_default) == expected
