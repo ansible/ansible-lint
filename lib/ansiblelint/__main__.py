@@ -22,6 +22,7 @@
 
 import errno
 import logging
+import os
 import pathlib
 import sys
 from typing import Any, Set
@@ -114,8 +115,17 @@ def main() -> int:
                         options.verbosity, checked_files)
         matches.extend(runner.run())
 
-    for match in sorted(set(matches)):
+    # Assure we do not print duplicates and the order is consistent
+    matches = sorted(set(matches))
+
+    for match in matches:
         print(formatter.format(match, options.colored))
+
+    # If run under GitHub Actions we also want to emit output recognized by it.
+    if os.getenv('GITHUB_ACTIONS') == 'true' and os.getenv('GITHUB_WORKFLOW'):
+        formatter = formatters.AnnotationsFormatter(cwd, True)
+        for match in matches:
+            print(formatter.format(match))
 
     if matches:
         return 2
