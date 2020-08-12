@@ -26,10 +26,18 @@ SUCCESS_TASKS = '''
 ---
 - hosts: hosts
   tasks:
-    - name: permissions not missing
+    - name: permissions not missing and string
       file:
         path: foo
         mode: preserve
+    - name: permissions not missing and numeric
+      file:
+        path: foo
+        mode: 0600
+    - name: permissions missing while state is absent is fine
+      file:
+        path: foo
+        state: absent
 '''
 
 FAIL_TASKS = '''
