@@ -1,7 +1,7 @@
 """Runner implementation."""
 import logging
 import os
-from typing import TYPE_CHECKING, Any, FrozenSet, List, Set
+from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Set
 
 import ansiblelint.file_utils
 import ansiblelint.skip_utils
@@ -64,7 +64,7 @@ class Runner(object):
         # not excluded.
         return any(file_path.startswith(path) for path in self.exclude_paths)
 
-    def run(self) -> List:
+    def run(self) -> List[MatchError]:
         """Execute the linting process."""
         files = list()
         for playbook in self.playbooks:
@@ -75,21 +75,7 @@ class Runner(object):
                           # add an absolute path here, so rules are able to validate if
                           # referenced files exist
                           'absolute_directory': os.path.dirname(playbook[0])})
-        visited: Set = set()
-        matches = list()
-
-        while visited != self.playbooks:
-            for arg in self.playbooks - visited:
-                try:
-                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
-                        if self.is_excluded(child['path']):
-                            continue
-                        self.playbooks.add((child['path'], child['type']))
-                        files.append(child)
-                except MatchError as e:
-                    e.rule = LoadingFailureRule
-                    matches.append(e)
-                visited.add(arg)
+        matches = set(self._emit_matches(files))
 
         # remove duplicates from files list
         files = [value for n, value in enumerate(files) if value not in files[:n]]
@@ -101,9 +87,25 @@ class Runner(object):
                 "Examining %s of type %s",
                 ansiblelint.file_utils.normpath(file['path']),
                 file['type'])
-            matches.extend(self.rules.run(file, tags=set(self.tags),
-                           skip_list=self.skip_list))
+            matches = matches.union(
+                self.rules.run(file, tags=set(self.tags),
+                               skip_list=self.skip_list))
         # update list of checked files
         self.checked_files.update([x['path'] for x in files])
 
-        return sorted(set(matches))
+        return sorted(matches)
+
+    def _emit_matches(self, files: List) -> Generator[MatchError, None, None]:
+        visited: Set = set()
+        while visited != self.playbooks:
+            for arg in self.playbooks - visited:
+                try:
+                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
+                        if self.is_excluded(child['path']):
+                            continue
+                        self.playbooks.add((child['path'], child['type']))
+                        files.append(child)
+                except MatchError as e:
+                    e.rule = LoadingFailureRule
+                    yield e
+                visited.add(arg)
