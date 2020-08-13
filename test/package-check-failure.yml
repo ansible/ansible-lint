@@ -1,4 +1,5 @@
-- tasks:
+- hosts: localhost
+  tasks:
   - name: install ansible
     yum: name=ansible state=latest
 
