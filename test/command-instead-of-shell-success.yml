@@ -1,4 +1,5 @@
-- tasks:
+- hosts: localhost
+  tasks:
   - name: shell with pipe
     shell: echo hello | true
 

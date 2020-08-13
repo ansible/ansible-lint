@@ -1,4 +1,5 @@
-- tasks:
+- hosts: localhost
+  tasks:
   - name: command without checks
     command: echo blah
     args:

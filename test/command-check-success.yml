@@ -1,4 +1,5 @@
-- tasks:
+- hosts: localhost
+  tasks:
   - name: command with creates check
     command: echo blah
     args:
@@ -53,7 +54,8 @@
     args:
       creates: Z
 
-- handlers:
+- hosts: localhost
+  handlers:
   - name: restart something
     command: do something
   - include: included-handlers.yml

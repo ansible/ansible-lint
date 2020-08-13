@@ -3,8 +3,6 @@
     - name: test when
       debug: msg=text
       when: true
-
-- hosts: all
-  roles:
-    - role: role
+    - name: test when 2
+      debug: msg=text2
       when: 1 = 1
