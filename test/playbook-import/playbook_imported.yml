@@ -3,7 +3,7 @@
   connection: local
   gather_facts: no
   tasks:
-  - command: echo "no name"  # noqa 502
+  - command: echo "no name"  # should generate 502
   - name: Another task
     debug:
       msg: debug message
