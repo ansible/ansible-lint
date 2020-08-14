@@ -7,5 +7,16 @@ updates:
     interval: weekly
   labels:
   - dependabot-deps-updates
+  - skip-changelog
+  versioning-strategy: lockfile-only
+  open-pull-requests-limit: 3
+- package-ecosystem: pip
+  directory: /
+  schedule:
+    day: sunday
+    interval: weekly
+  labels:
+  - dependabot-deps-updates
+  - skip-changelog
   versioning-strategy: lockfile-only
   open-pull-requests-limit: 3
