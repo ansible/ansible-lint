@@ -48,5 +48,8 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         if task["action"]["__ansible_module__"] not in self._modules:
             return False
 
+        if task['action'].get('state', None) == "absent":
+            return False
+
         mode = task['action'].get('mode', None)
-        return not isinstance(mode, str)
+        return mode is None
