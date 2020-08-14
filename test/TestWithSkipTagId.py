@@ -2,13 +2,13 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.TrailingWhitespaceRule import TrailingWhitespaceRule
+from ansiblelint.rules.YamllintRule import YamllintRule
 from ansiblelint.runner import Runner
 
 
 class TestWithSkipTagId(unittest.TestCase):
     collection = RulesCollection()
-    collection.register(TrailingWhitespaceRule())
+    collection.register(YamllintRule())
     file = 'test/with-skip-tag-id.yml'
 
     def test_negative_no_param(self) -> None:
@@ -17,7 +17,7 @@ class TestWithSkipTagId(unittest.TestCase):
         self.assertGreater(len(errs), 0)
 
     def test_negative_with_id(self) -> None:
-        with_id = '201'
+        with_id = 'YAML'
         bad_runner = Runner(
             rules=self.collection,
             playbook=self.file,
@@ -35,7 +35,7 @@ class TestWithSkipTagId(unittest.TestCase):
         self.assertGreater(len(errs), 0)
 
     def test_positive_skip_id(self) -> None:
-        skip_id = '201'
+        skip_id = 'YAML'
         good_runner = Runner(
             rules=self.collection,
             playbook=self.file,
