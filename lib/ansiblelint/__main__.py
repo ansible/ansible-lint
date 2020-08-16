@@ -19,6 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """Command line implementation."""
+
 import errno
 import logging
 import pathlib
@@ -40,7 +41,11 @@ _logger = logging.getLogger(__name__)
 
 def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
-    VERBOSITY_MAP = {0: logging.NOTSET, 1: logging.INFO, 2: logging.DEBUG}
+    VERBOSITY_MAP = {
+        0: logging.NOTSET,
+        1: logging.INFO,
+        2: logging.DEBUG
+    }
 
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(levelname)-8s %(message)s')
@@ -88,8 +93,7 @@ def main() -> int:
     rules = RulesCollection(rulesdirs)
 
     if options.listrules:
-        formatted_rules = rules if options.format == 'plain' else rules_as_rst(
-            rules)
+        formatted_rules = rules if options.format == 'plain' else rules_as_rst(rules)
         print(formatted_rules)
         return 0
 
@@ -114,9 +118,9 @@ def main() -> int:
     matches = list()
     checked_files: Set[str] = set()
     for playbook in playbooks:
-        runner = Runner(rules, playbook, options.tags, options.skip_list,
-                        options.exclude_paths, options.verbosity,
-                        checked_files)
+        runner = Runner(rules, playbook, options.tags,
+                        options.skip_list, options.exclude_paths,
+                        options.verbosity, checked_files)
         matches.extend(runner.run())
 
     for match in sorted(set(matches)):
