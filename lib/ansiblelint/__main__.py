@@ -24,7 +24,7 @@ import errno
 import logging
 import pathlib
 import sys
-from typing import TYPE_CHECKING, Set, Type, Union
+from typing import TYPE_CHECKING, Set, Type
 
 from ansiblelint import cli, formatters
 from ansiblelint.constants import DEFAULT_RULESDIR
@@ -61,17 +61,16 @@ def initialize_logger(level: int = 0) -> None:
 
 def choose_formatter_factory(
     options_list: "Namespace"
-) -> Union[Type[formatters.Formatter], Type[formatters.QuietFormatter],
-           Type[formatters.ParseableFormatter],
-           Type[formatters.ParseableSeverityFormatter]]:
+) -> Type[formatters.BaseFormatter]:
     """Select an output formatter based on the incoming command line arguments."""
+    r: Type[formatters.BaseFormatter] = formatters.Formatter
     if options_list.quiet:
-        return formatters.QuietFormatter
+        r = formatters.QuietFormatter
     elif options_list.parseable:
-        return formatters.ParseableFormatter
+        r = formatters.ParseableFormatter
     elif options_list.parseable_severity:
-        return formatters.ParseableSeverityFormatter
-    return formatters.Formatter
+        r = formatters.ParseableSeverityFormatter
+    return r
 
 
 def main() -> int:
