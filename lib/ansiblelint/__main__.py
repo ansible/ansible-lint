@@ -25,7 +25,7 @@ import logging
 import os
 import pathlib
 import sys
-from typing import Any, Set
+from typing import TYPE_CHECKING, Set, Type
 
 from ansiblelint import cli, formatters
 from ansiblelint.constants import DEFAULT_RULESDIR
@@ -33,6 +33,9 @@ from ansiblelint.generate_docs import rules_as_rst
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.utils import get_playbooks_and_roles
+
+if TYPE_CHECKING:
+    from argparse import Namespace
 
 _logger = logging.getLogger(__name__)
 
@@ -57,6 +60,20 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
+def choose_formatter_factory(
+    options_list: "Namespace"
+) -> Type[formatters.BaseFormatter]:
+    """Select an output formatter based on the incoming command line arguments."""
+    r: Type[formatters.BaseFormatter] = formatters.Formatter
+    if options_list.quiet:
+        r = formatters.QuietFormatter
+    elif options_list.parseable:
+        r = formatters.ParseableFormatter
+    elif options_list.parseable_severity:
+        r = formatters.ParseableSeverityFormatter
+    return r
+
+
 def main() -> int:
     """Linter CLI entry point."""
     cwd = pathlib.Path.cwd()
@@ -66,16 +83,7 @@ def main() -> int:
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
 
-    formatter_factory: Any = formatters.Formatter
-    if options.quiet:
-        formatter_factory = formatters.QuietFormatter
-
-    if options.parseable:
-        formatter_factory = formatters.ParseableFormatter
-
-    if options.parseable_severity:
-        formatter_factory = formatters.ParseableSeverityFormatter
-
+    formatter_factory = choose_formatter_factory(options)
     formatter = formatter_factory(cwd, options.display_relative_path)
 
     if options.use_default_rules:

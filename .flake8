@@ -51,7 +51,7 @@ per-file-ignores =
   # FIXME: D103 Missing docstring in public function
   # FIXME: drop these once they're made simpler
   # Ref: https://github.com/ansible/ansible-lint/issues/744
-  # lib/ansiblelint/__main__.py:32:1: C901 'main' is too complex (13)
+  # lib/ansiblelint/__main__.py:32:1: C901 'main' is too complex (12)
   lib/ansiblelint/__main__.py: C901
   lib/ansiblelint/cli.py: D101 D102 D103
   lib/ansiblelint/formatters/__init__.py: D101 D102
