@@ -1,11 +1,74 @@
-4.3.0 - Not Released
-====================
+Current changes can now be accessed from `github releases <https://github.com/ansible/ansible-lint/releases/>`_.
+4.3.0 - Released 2020-08-17
+===========================
 
-Major:
+Major Changes:
 
-- Require Python 3.6 or newer
+* Require Python 3.6 or newer (#775) @ssbarnea
+* Require Ansible 2.8 or newer (#721) @ssbarnea
+* LRU Cache for frequently called functions (#891) @ragne
+* Change documentation website to RTD (#875) @ssbarnea
+* Add rules for verifying the existence of imported and included files (#691) @jlusiardi
+* Add a new rule for detecting nested jinja mustache syntax (#686) @europ
 
-4.2.0 - Released 04-Dec-2019
+Minor Changes:
+
+* Refactored import_playbook tests (#951) @ssbarnea
+* Added MissingFilePermissionsRule (#943) @ssbarnea
+* Enable github actions parsable format (#926) @ssbarnea
+* Add linter branding for docs (#914) @ssbarnea
+* Assure we do not produce duplicated matches (#912) @ssbarnea
+* Enable annotations on failed tests (#910) @ssbarnea
+* Refactor `_taskshandlers_children` complexity (#903) @webknjaz
+* Make import sections consistent (#897) @ssbarnea
+* Allow backticks in shell commands (#894) @turettn
+* Add ansible210 testing (#888) @ssbarnea
+* Enable isort (#887) @ssbarnea
+* Combine MatchError into Match (#884) @ssbarnea
+* Improve MatchError class (#881) @ssbarnea
+* Expose package version (#867) @ssbarnea
+* Replace custom theme with sphinx-ansible-theme (#856) @ssbarnea
+* Improve unjinja function (#853) @ssbarnea
+* Refactor MetaMainHasInfoRule (#846) @ssato
+* Remove dependency on ansible.utils.color (#833) @ssbarnea
+* Moved exit codes to constants (#821) @ssbarnea
+* Document module dependencies (#817) @ssbarnea
+* Refactor Runner out of __init__ (#816) @ssbarnea
+* Added reproducer for become in blocks (#793) @ssbarnea
+* Convert failed to find required 'name' key in include_role into a match (#781) @ssbarnea
+* Fix exclude_paths from get_playbooks_and_roles (#774) @ssbarnea
+* Update ComparisonToEmptyStringRule.py (#770) @vbotka
+* Remove bin/ansible-lint script (#762) @ssbarnea
+* Fix logging configuration (#757) @ssbarnea
+* Allow returning line number in matchplay (#756) @albinvass
+* Update cli output on README (#754) @ssbarnea
+* Migrate some test to pytest (#740) @cans
+* Use python logging (#732) @ssbarnea
+* Make config loading failures visible (#726) @ssbarnea
+* Add a test that fails with `AttributeError` on malformed `import_tasks` file content (#720) @mdaniel
+* Consistent relative path display (#692) @cans
+
+Bugfixes:
+
+* Add missing hosts to test files (#952) @ssbarnea
+* E208: Improve MissingFilePermissionsRule detection (#949) @ssbarnea
+* Make pre-commit hook use auto-detect mode (#932) @ssbarnea
+* Fix severity formatter wrong use of color (#919) @ssbarnea
+* Avoid displaying Null with missing filenames (#918) @ssbarnea
+* Include contributing inside docs (#905) @ssbarnea
+* Fix spelling mistakes in documentation (#901) @MorganGeek
+* Avoid failure with playbooks having tasks key a null value (#899) @ssbarnea
+* Fix `MatchError` comparison fallback implementation (#896) @webknjaz
+* Avoid sorting failure with matches without an id (#879) @ssbarnea
+* Fix broken always_run rule on Ansible 2.10 (#878) @ssbarnea
+* Allow null config file (#814) @ssbarnea
+* Fixed the search method when the file path not exists (#807) @cahlchang
+* Restore playbook auto-detection (#767) @ssbarnea
+* Gracefully process a missing git binary when falling-back to pure-python discovery (#738) @anryko
+* Resurrect support for editable mode installs (#722) @webknjaz
+* Avoid exception from 505 rule (#709) @ssbarnea
+
+4.2.0 - Released 2019-12-04
 ============================
 
 Features:
