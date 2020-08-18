@@ -1,4 +1,5 @@
 Current changes can now be accessed from `github releases <https://github.com/ansible/ansible-lint/releases/>`_.
+
 4.3.0 - Released 2020-08-17
 ===========================
 
@@ -50,6 +51,7 @@ Minor Changes:
 
 Bugfixes:
 
+* E501: Add become_user and become inheritance (#964) @Tompage1994
 * Add missing hosts to test files (#952) @ssbarnea
 * E208: Improve MissingFilePermissionsRule detection (#949) @ssbarnea
 * Make pre-commit hook use auto-detect mode (#932) @ssbarnea
@@ -69,7 +71,7 @@ Bugfixes:
 * Avoid exception from 505 rule (#709) @ssbarnea
 
 4.2.0 - Released 2019-12-04
-============================
+===========================
 
 Features:
 
