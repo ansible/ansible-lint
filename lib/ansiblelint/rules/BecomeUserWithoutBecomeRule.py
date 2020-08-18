@@ -18,8 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from ansiblelint.rules import AnsibleLintRule
 from functools import reduce
+
+from ansiblelint.rules import AnsibleLintRule
 
 
 def _get_subtasks(data):
@@ -52,7 +53,7 @@ def _become_user_without_become(becomeuserabove, data):
         # we must check for a case of a second 'become_user' without a
         # 'become' in its lineage
         subtasks = _get_subtasks(data)
-        return (reduce((lambda x, y: x or _become_user_without_become(False, y)), subtasks, False))
+        return reduce((lambda x, y: x or _become_user_without_become(False, y)), subtasks, False)
     if _nested_search('become_user', data):
         # Keep searching down if 'become_user' exists in the tree below current task
         subtasks = _get_subtasks(data)
