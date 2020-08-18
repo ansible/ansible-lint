@@ -14,9 +14,13 @@
     become_user: postgres
 
 - hosts: localhost
-  become: true
 
   tasks:
-  - name: won't work, needs to be explicit
-    command: whoami
-    become_user: postgres
+  - name: a block with become and become_user on different tasks
+    block:
+    - name: become
+      become: true
+      command: whoami
+    - name: become_user
+      become_user: postgres
+      command: whoami
