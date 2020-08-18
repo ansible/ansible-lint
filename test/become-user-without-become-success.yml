@@ -12,3 +12,19 @@
   - command: whoami
     become_user: postgres
     become: true
+
+- hosts: localhost
+  become: true
+
+  tasks:
+  - name: Accepts a become from higher scope
+    command: whoami
+    become_user: postgres
+
+- hosts: localhost
+  become_user: postgres
+
+  tasks:
+  - name: Accepts a become from a lower scope
+    command: whoami
+    become: true

@@ -108,13 +108,7 @@ def test_role_tasks_with_block(default_text_runner):
     ('playbook_src', 'results_num'),
     (
         (PLAYBOOK, 7),
-        pytest.param(
-            ROLE_TASKS_WITH_BLOCK_BECOME, 0,
-            marks=pytest.mark.xfail(
-                reason="Bug: "
-                "https://github.com/ansible/ansible-lint/issues/705",
-            ),
-        ),
+        (ROLE_TASKS_WITH_BLOCK_BECOME, 0),
     ),
     ids=('generic', 'with block become inheritance'),
 )
