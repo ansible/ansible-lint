@@ -151,12 +151,16 @@ def test_expand_path_vars(monkeypatch):
     assert utils.expand_path_vars('$TEST_PATH') == test_path
 
 
-def test_expand_paths_vars(monkeypatch):
+@pytest.mark.parametrize(('test_path', 'expected'), (
+    pytest.param(Path('$TEST_PATH'), "/test/path", id='pathlib.Path'),
+    pytest.param('$TEST_PATH', "/test/path", id='str'),
+    pytest.param('  $TEST_PATH  ', "/test/path", id='stripped-str'),
+    pytest.param('~', os.path.expanduser('~'), id='home'),
+))
+def test_expand_paths_vars(test_path, expected, monkeypatch):
     """Ensure that tilde and env vars are expanded in paths lists."""
-    test_path = '/test/path'
-    monkeypatch.setenv('TEST_PATH', test_path)
-    assert utils.expand_paths_vars(['~']) == [os.path.expanduser('~')]
-    assert utils.expand_paths_vars(['$TEST_PATH']) == [test_path]
+    monkeypatch.setenv('TEST_PATH', '/test/path')
+    assert utils.expand_paths_vars([test_path]) == [expected]
 
 
 @pytest.mark.parametrize(
