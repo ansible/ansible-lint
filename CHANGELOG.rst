@@ -1,4 +1,5 @@
 Current changes can now be accessed from `github releases <https://github.com/ansible/ansible-lint/releases/>`_.
+
 4.3.0 - Released 2020-08-17
 ===========================
 
@@ -69,7 +70,7 @@ Bugfixes:
 * Avoid exception from 505 rule (#709) @ssbarnea
 
 4.2.0 - Released 2019-12-04
-============================
+===========================
 
 Features:
 
