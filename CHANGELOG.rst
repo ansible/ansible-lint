@@ -51,6 +51,7 @@ Minor Changes:
 
 Bugfixes:
 
+* E501: Add become_user and become inheritance (#964) @Tompage1994
 * Add missing hosts to test files (#952) @ssbarnea
 * E208: Improve MissingFilePermissionsRule detection (#949) @ssbarnea
 * Make pre-commit hook use auto-detect mode (#932) @ssbarnea
