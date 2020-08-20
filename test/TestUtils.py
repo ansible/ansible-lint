@@ -23,13 +23,14 @@
 
 import logging
 import os
+import os.path
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
-from ansiblelint import cli, utils
+from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.file_utils import normpath
 
@@ -273,3 +274,35 @@ def test_auto_detect_exclude(monkeypatch):
     monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
     result = utils.get_playbooks_and_roles(options)
     assert result == ['bar/playbook.yml']
+
+
+_DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]
+_CUSTOM_RULESDIR = Path(__file__).parent / "custom_rules"
+_CUSTOM_RULEDIRS = [
+    str(_CUSTOM_RULESDIR / "example_inc"),
+    str(_CUSTOM_RULESDIR / "example_com")
+]
+
+
+@pytest.mark.parametrize(("user_ruledirs", "use_default", "expected"), (
+    ([], True, _DEFAULT_RULEDIRS),
+    ([], False, _DEFAULT_RULEDIRS),
+    (_CUSTOM_RULEDIRS, True, _CUSTOM_RULEDIRS + _DEFAULT_RULEDIRS),
+    (_CUSTOM_RULEDIRS, False, _CUSTOM_RULEDIRS)
+))
+def test_get_rules_dirs(user_ruledirs, use_default, expected):
+    """Test it returns expected dir lists."""
+    assert utils.get_rules_dirs(user_ruledirs, use_default) == expected
+
+
+@pytest.mark.parametrize(("user_ruledirs", "use_default", "expected"), (
+    ([], True, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    ([], False, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    (_CUSTOM_RULEDIRS, True,
+     _CUSTOM_RULEDIRS + sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
+    (_CUSTOM_RULEDIRS, False, _CUSTOM_RULEDIRS)
+))
+def test_get_rules_dirs_with_custom_rules(user_ruledirs, use_default, expected, monkeypatch):
+    """Test it returns expected dir lists when custom rules exist."""
+    monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, str(_CUSTOM_RULESDIR))
+    assert utils.get_rules_dirs(user_ruledirs, use_default) == expected

@@ -28,11 +28,10 @@ import sys
 from typing import TYPE_CHECKING, Set, Type
 
 from ansiblelint import cli, formatters
-from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.generate_docs import rules_as_rst
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
-from ansiblelint.utils import get_playbooks_and_roles
+from ansiblelint.utils import get_playbooks_and_roles, get_rules_dirs
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -86,10 +85,8 @@ def main() -> int:
     formatter_factory = choose_formatter_factory(options)
     formatter = formatter_factory(cwd, options.display_relative_path)
 
-    if options.use_default_rules:
-        rulesdirs = options.rulesdir + [DEFAULT_RULESDIR]
-    else:
-        rulesdirs = options.rulesdir or [DEFAULT_RULESDIR]
+    rulesdirs = get_rules_dirs([str(rdir) for rdir in options.rulesdir],
+                               options.use_default_rules)
     rules = RulesCollection(rulesdirs)
 
     if options.listrules:
