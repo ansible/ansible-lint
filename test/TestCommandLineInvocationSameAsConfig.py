@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -77,6 +78,21 @@ def test_different_config_file(base_arguments):
     no_config = cli.get_config(base_arguments + ["-v"])
 
     assert diff_config.verbosity == no_config.verbosity
+
+
+def test_expand_path_user_and_vars_config_file(base_arguments):
+    """Ensure user and vars are expanded when specified as exclude_paths."""
+    config1 = cli.get_config(base_arguments +
+                             ["-c", "test/fixtures/exclude-paths-with-expands.yml"])
+    config2 = cli.get_config(base_arguments + [
+        "--exclude", "~/.ansible/roles",
+        "--exclude", "$HOME/.ansible/roles"
+    ])
+
+    assert str(config1.exclude_paths[0]) == os.path.expanduser("~/.ansible/roles")
+    assert str(config2.exclude_paths[0]) == os.path.expanduser("~/.ansible/roles")
+    assert str(config1.exclude_paths[1]) == os.path.expandvars("$HOME/.ansible/roles")
+    assert str(config2.exclude_paths[1]) == os.path.expandvars("$HOME/.ansible/roles")
 
 
 def test_path_from_config_do_not_depend_on_cwd(monkeypatch):  # Issue 572

@@ -10,6 +10,7 @@ from typing import List, NamedTuple
 import yaml
 
 from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
+from ansiblelint.utils import expand_path_vars
 from ansiblelint.version import __version__
 
 _logger = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ def expand_to_normalized_paths(config: dict, base_dir: str = None) -> None:
 
         normalized_paths = []
         for path in config.pop(paths_var):
-            normalized_path = abspath(path, base_dir=base_dir)
+            normalized_path = abspath(expand_path_vars(path), base_dir=base_dir)
 
             normalized_paths.append(normalized_path)
 
@@ -85,7 +86,7 @@ class AbspathArgAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         if isinstance(values, (str, Path)):
             values = [values]
-        normalized_values = [Path(path).resolve() for path in values]
+        normalized_values = [Path(expand_path_vars(path)).resolve() for path in values]
         previous_values = getattr(namespace, self.dest, [])
         setattr(namespace, self.dest, previous_values + normalized_values)
 
