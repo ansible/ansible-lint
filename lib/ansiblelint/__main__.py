@@ -83,7 +83,7 @@ def choose_formatter_factory(
 def hint_about_skips(matches: List["MatchError"]):
     """Display information about how to skip found rules."""
     msg = """\
-If you would prefer to skip some rules, then use the following configuration:
+You can skip specific rules by adding them to the skip_list section of your configuration file:
 ```yaml
 # .ansible-lint
 skip_list:
