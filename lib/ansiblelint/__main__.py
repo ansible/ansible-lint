@@ -25,7 +25,10 @@ import logging
 import os
 import pathlib
 import sys
-from typing import TYPE_CHECKING, Set, Type
+from typing import TYPE_CHECKING, List, Set, Type
+
+from rich.console import Console
+from rich.markdown import Markdown
 
 from ansiblelint import cli, formatters
 from ansiblelint.generate_docs import rules_as_rst
@@ -36,7 +39,10 @@ from ansiblelint.utils import get_playbooks_and_roles, get_rules_dirs
 if TYPE_CHECKING:
     from argparse import Namespace
 
+    from ansiblelint.errors import MatchError
+
 _logger = logging.getLogger(__name__)
+console = Console()
 
 
 def initialize_logger(level: int = 0) -> None:
@@ -71,6 +77,21 @@ def choose_formatter_factory(
     elif options_list.parseable_severity:
         r = formatters.ParseableSeverityFormatter
     return r
+
+
+def hint_about_skips(matches: List["MatchError"]):
+    """Display information about how to skip found rules."""
+    msg = """\
+You can skip specific rules by adding them to the skip_list section of your configuration file:
+```yaml
+# .ansible-lint
+skip_list:
+"""
+    matched_rules = {match.rule.id: match.rule.shortdesc for match in matches}
+    for id in sorted(matched_rules.keys()):
+        msg += f"  - '{id}'  # {matched_rules[id]}'\n"
+    msg += "```"
+    console.print(Markdown(msg))
 
 
 def main() -> int:
@@ -133,6 +154,7 @@ def main() -> int:
             print(formatter.format(match))
 
     if matches:
+        hint_about_skips(matches)
         return 2
     else:
         return 0
