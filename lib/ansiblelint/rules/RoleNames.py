@@ -48,8 +48,8 @@ class RoleNames(AnsibleLintRule):
     def match(self, file, text):
 
         path = file['path'].split("/")
-        if "roles" in path:
-            role_name = path[path.index("roles") + 1]
+        if "tasks" in path:
+            role_name = path[path.index("tasks") - 1]
             if role_name in self.done:
                 return False
             self.done.append(role_name)
