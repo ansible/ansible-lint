@@ -82,8 +82,8 @@ def test_different_config_file(base_arguments):
 
 def test_expand_path_user_and_vars_config_file(base_arguments):
     """Ensure user and vars are expanded when specified as exclude_paths."""
-    config1= cli.get_config(base_arguments +
-                                 ["-c", "test/fixtures/exclude-paths-with-expands.yml"])
+    config1 = cli.get_config(base_arguments +
+                             ["-c", "test/fixtures/exclude-paths-with-expands.yml"])
     config2 = cli.get_config(base_arguments + [
         "--exclude", "~/.ansible/roles",
         "--exclude", "$HOME/.ansible/roles"
