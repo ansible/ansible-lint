@@ -265,7 +265,9 @@ def test_cli_auto_detect(capfd):
     # assures that we can parse playbooks as playbooks
     assert "Unknown file type: test/test/always-run-success.yml" not in err
 
+
 def test_is_playbook():
+    """Verify that we can detect a playbook as a playbook."""
     assert utils.is_playbook("test/test/always-run-success.yml")
 
 
