@@ -51,5 +51,8 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         if task['action'].get('state', None) == "absent":
             return False
 
+        if task['action'].get('state', None) == "link":
+            return False
+
         mode = task['action'].get('mode', None)
         return mode is None
