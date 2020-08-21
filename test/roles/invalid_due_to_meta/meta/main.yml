@@ -1,0 +1,8 @@
+galaxy_info:
+  role_name: invalid-due-to-meta
+  author: foo
+  description: foo
+  license: MIT
+  platforms:
+    - name: foo
+  min_ansible_version: 2.7
