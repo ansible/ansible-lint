@@ -28,6 +28,8 @@ class AnsibleLintRule(object):
     tags: List[str] = []
     shortdesc: str = ""
     description: str = ""
+    version_added: str = ""
+    severity: str = ""
     match = None
     matchtask = None
     matchplay = None

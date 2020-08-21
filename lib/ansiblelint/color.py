@@ -1,5 +1,16 @@
-"""Console coloring support."""
+"""Console coloring and terminal support."""
 from enum import Enum
+
+from rich.console import Console
+from rich.theme import Theme
+
+_theme = Theme({
+    "info": "cyan",
+    "warning": "dim yellow",
+    "danger": "bold red",
+    "title": "yellow"
+})
+console = Console(theme=_theme)
 
 
 class Color(Enum):
