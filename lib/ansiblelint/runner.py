@@ -1,7 +1,7 @@
 """Runner implementation."""
 import logging
 import os
-from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Set
+from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set
 
 import ansiblelint.file_utils
 import ansiblelint.skip_utils
@@ -23,9 +23,9 @@ class Runner(object):
             self,
             rules: "RulesCollection",
             playbook: str,
-            tags: FrozenSet[Any],
-            skip_list: FrozenSet[Any],
-            exclude_paths: List[str],
+            tags: FrozenSet[Any] = frozenset(),
+            skip_list: Optional[FrozenSet[Any]] = frozenset(),
+            exclude_paths: List[str] = [],
             verbosity: int = 0,
             checked_files: Set[str] = None) -> None:
         """Initialize a Runner instance."""

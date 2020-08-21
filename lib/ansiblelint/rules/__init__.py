@@ -190,7 +190,7 @@ class RulesCollection(object):
             self.extend(load_plugins(rulesdir))
         self.rules = sorted(self.rules, key=lambda r: r.id)
 
-    def register(self, obj):
+    def register(self, obj: AnsibleLintRule):
         self.rules.append(obj)
 
     def __iter__(self):

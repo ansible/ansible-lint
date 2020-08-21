@@ -5,11 +5,15 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import Dict
+from typing import TYPE_CHECKING, Dict, List
 
 from ansible import __version__ as ansible_version_str
 
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+
 
 ANSIBLE_MAJOR_VERSION = tuple(map(int, ansible_version_str.split('.')[:2]))
 
@@ -21,8 +25,8 @@ class RunFromText(object):
         """Initialize a RunFromText instance with rules collection."""
         self.collection = collection
 
-    def _call_runner(self, path):
-        runner = Runner(self.collection, path, [], [], [])
+    def _call_runner(self, path) -> List["MatchError"]:
+        runner = Runner(self.collection, path)
         return runner.run()
 
     def run_playbook(self, playbook_text):
@@ -65,7 +69,7 @@ def run_ansible_lint(
     else:
         command = [sys.executable, "-m", "ansiblelint", "-v"]
     if role_path:
-        command.append(role_path)
+        command.append(str(role_path))
 
     result, err = subprocess.Popen(
         command,

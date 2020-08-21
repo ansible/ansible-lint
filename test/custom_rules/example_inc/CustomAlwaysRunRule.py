@@ -22,16 +22,7 @@
 import ansiblelint.rules.AlwaysRunRule
 
 
-def _false(*_args):
-    """Return const False."""
-    return False
-
-
 class CustomAlwaysRunRule(ansiblelint.rules.AlwaysRunRule.AlwaysRunRule):
     """Dummy custom rule class."""
 
     id = '100001'
-
-    match = _false
-    matchtask = _false
-    matchplay = _false
