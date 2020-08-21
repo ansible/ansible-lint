@@ -38,6 +38,11 @@ SUCCESS_TASKS = '''
       file:
         path: foo
         state: absent
+    - name: permissions missing while state is link is fine
+      file:
+        path: foo2
+        src: foo
+        state: link
 '''
 
 FAIL_TASKS = '''
