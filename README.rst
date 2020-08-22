@@ -596,7 +596,7 @@ Authors
 
 ansible-lint was created by `Will Thames`_ and is now maintained as part of the `Ansible`_ by `Red Hat`_ project.
 
-.. _Contribution guidelines: https://github.com/ansible/ansible-lint/blob/master/docs/CONTRIBUTING.md
+.. _Contribution guidelines: https://ansible-lint.readthedocs.io/en/latest/contributing.html
 .. _Will Thames: https://github.com/willthames
 .. _Ansible: https://ansible.com
 .. _Red Hat: https://redhat.com
