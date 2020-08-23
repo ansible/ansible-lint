@@ -40,9 +40,9 @@ jinja2==2.11.2 \
     --hash=sha256:89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0 \
     --hash=sha256:f0a4641d3cf955324a89c04f3d94663aa4d638abe8f733ecd3582848e1c37035 \
     # via sphinx
-markdown-it-py==0.4.9 \
-    --hash=sha256:c6191ba46b84d169d5cffe77a3edea0ef263c016289f9507333587692a295c3a \
-    --hash=sha256:d9c0d117c6e6d8913619f7d5117f74bfb5bc45f096f5c23e29ad75e64a1c5c65 \
+markdown-it-py==0.5.2 \
+    --hash=sha256:2ebce94e49edbc181013715f91e6bc8930f829fcb32c2cb3df86a5006d51c3a4 \
+    --hash=sha256:5ea03a927a03312fc093c5e68149941e4542fad0f1dae864606ca90e883f430d \
     # via myst-parser
 markupsafe==1.1.1 \
     --hash=sha256:00bc623926325b26bb9605ae9eae8a215691f33cae5df11ca5424f06f2d1f473 \
@@ -79,9 +79,9 @@ markupsafe==1.1.1 \
     --hash=sha256:e249096428b3ae81b08327a63a485ad0878de3fb939049038579ac0ef61e17e7 \
     --hash=sha256:e8313f01ba26fbbe36c7be1966a7b7424942f670f38e666995b88d012765b9be \
     # via jinja2
-myst-parser==0.11.2 \
-    --hash=sha256:62e301ee2b89039bf98606ebbe1a4da0bbae56da7563ee929a9cd134bb901237 \
-    --hash=sha256:c0ec268cc53a28eb59a7b29f8b8b25d326da2fdeba3406cb29e519c7a87ebd13 \
+myst-parser==0.12.1 \
+    --hash=sha256:24db037b2c050924c26ea1e49e783fd076734f80654df0874c135e612495f11d \
+    --hash=sha256:ceb2e39ea7d32de1b0151f7426981bbb1e874215e7e4c75d38ceeb0c8d41f44e \
     # via -r requirements.in
 packaging==20.4 \
     --hash=sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8 \
