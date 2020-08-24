@@ -135,6 +135,7 @@ class AnsibleLintRule(object):
         yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, text, file['type'])
 
         for play in yaml:
+            print("JOHN")
             if self.id in play.get('skipped_rules', ()):
                 continue
 

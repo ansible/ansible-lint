@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import List, NamedTuple
 
 import yaml
-
+from ansible import constants
 from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.utils import expand_path_vars
 from ansiblelint.version import __version__
@@ -156,7 +156,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(dest='playbook', nargs='*',
                         help="One or more files or paths. When missing it will "
                         " enable auto-detection mode.")
-
+    parser.add_argument('--ask-vault-pass', dest='ask_vault_pass', 
+                      default=constants.DEFAULT_ASK_VAULT_PASS,
+                      action="store_true", help="prompt for vault password")
+    parser.add_argument('--vault-password-file', dest='vault_password_files',
+                      help="vault password file", action='append')
+    parser.add_argument('--vault-id', default=[], dest='vault_ids', action='append',
+                      help='the vault identity to use')
     return parser
 
 

@@ -42,6 +42,7 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import module_loader
 from ansible.template import Templar
+from ansible.cli import CLI
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
@@ -62,11 +63,24 @@ PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
 _logger = logging.getLogger(__name__)
 
 
-def parse_yaml_from_file(filepath: str) -> dict:
-    dl = DataLoader()
-    if hasattr(dl, 'set_vault_password'):
-        dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
-    return dl.load_from_file(filepath)
+def parse_yaml_from_file(filepath: str, options) -> dict:
+    # dl = DataLoader()
+    # if hasattr(dl, 'set_vault_password'):
+    #     dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
+    # return dl.load_from_file(filepath)
+
+            # if options.vault_password_file:
+            #     vault_pass = CLI.read_vault_password_file(options.vault_password_file, loader=dl)
+            #     dl.set_vault_password(vault_pass)
+            # elif options.ask_vault_pass:
+            #     vault_pass = CLI.ask_vault_passwords()[0]
+            #     dl.set_vault_password(vault_pass)
+            # if hasattr(dl, 'set_vault_password'):
+            #     dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
+    loader = DataLoader()
+    if options.vault_ids or options.vault_password_files or options.ask_vault_pass:
+        CLI.setup_vault_secrets(loader, options.vault_ids, options.vault_password_files, options.ask_vault_pass)
+    return loader.load_from_file(filepath)
 
 
 def path_dwim(basedir: str, given: str) -> str:
@@ -147,14 +161,14 @@ def _rebind_match_filename(filename: str, func) -> Callable:
     return func_wrapper
 
 
-def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
+def find_children(playbook: Tuple[str, str], playbook_dir: str, options) -> List:
     if not os.path.exists(playbook[0]):
         return []
     if playbook[1] == 'role':
         playbook_ds = {'roles': [{'role': playbook[0]}]}
     else:
         try:
-            playbook_ds = parse_yaml_from_file(playbook[0])
+            playbook_ds = parse_yaml_from_file(playbook[0], options)
         except AnsibleError as e:
             raise SystemExit(str(e))
     results = []
@@ -626,7 +640,7 @@ def get_first_cmd_arg(task):
     return first_cmd_arg
 
 
-def is_playbook(filename: str) -> bool:
+def is_playbook(filename: str, options) -> bool:
     """
     Check if the file is a playbook.
 
@@ -650,7 +664,7 @@ def is_playbook(filename: str) -> bool:
         filename = str(filename)
 
     try:
-        f = parse_yaml_from_file(filename)
+        f = parse_yaml_from_file(filename, options)
     except Exception as e:
         _logger.warning(
             "Failed to load %s with %s, assuming is not a playbook.",
@@ -760,7 +774,7 @@ def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
         if p.parts[-1].startswith('.'):
             continue
 
-        if is_playbook(str(p)):
+        if is_playbook(str(p), options):
             playbooks.append(normpath(p))
             continue
 

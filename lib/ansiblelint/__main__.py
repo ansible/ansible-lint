@@ -136,7 +136,7 @@ def main() -> int:
     matches = list()
     checked_files: Set[str] = set()
     for playbook in playbooks:
-        runner = Runner(rules, playbook, options.tags,
+        runner = Runner(rules, playbook, options, options.tags,
                         options.skip_list, options.exclude_paths,
                         options.verbosity, checked_files)
         matches.extend(runner.run())

@@ -23,12 +23,14 @@ class Runner(object):
             self,
             rules: "RulesCollection",
             playbook: str,
+            options: FrozenSet[Any],
             tags: FrozenSet[Any],
             skip_list: FrozenSet[Any],
             exclude_paths: List[str],
             verbosity: int = 0,
             checked_files: Set[str] = None) -> None:
         """Initialize a Runner instance."""
+        self.options = options
         self.rules = rules
         self.playbooks = set()
         # assume role if directory
@@ -100,7 +102,7 @@ class Runner(object):
         while visited != self.playbooks:
             for arg in self.playbooks - visited:
                 try:
-                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
+                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir, self.options):
                         if self.is_excluded(child['path']):
                             continue
                         self.playbooks.add((child['path'], child['type']))
