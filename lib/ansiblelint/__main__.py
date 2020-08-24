@@ -153,7 +153,7 @@ def main() -> int:
         for match in matches:
             print(formatter.format(match))
 
-    if matches:
+    if matches and not (options.quiet or options.parseable or options.parseable_severity):
         hint_about_skips(matches)
         return 2
     else:
