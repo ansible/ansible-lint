@@ -20,11 +20,17 @@
 # THE SOFTWARE.
 
 import re
+from pathlib import Path
 from typing import List
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import parse_yaml_from_file
 
 ROLE_NAME_REGEX = '^[a-z][a-z0-9_]+$'
+
+
+def _remove_prefix(text, prefix):
+    return re.sub(r'^{0}'.format(re.escape(prefix)), '', text)
 
 
 class RoleNames(AnsibleLintRule):
@@ -46,10 +52,17 @@ class RoleNames(AnsibleLintRule):
     ROLE_NAME_REGEXP = re.compile(ROLE_NAME_REGEX)
 
     def match(self, file, text):
-
         path = file['path'].split("/")
         if "tasks" in path:
-            role_name = path[path.index("tasks") - 1]
+            meta = Path(file['path']).parent.parent / "meta" / "main.yml"
+            role_name = _remove_prefix(path[path.index("tasks") - 1], "ansible-role-")
+
+            if meta.is_file():
+                try:
+                    role_name = parse_yaml_from_file(str(meta))['galaxy_info']['role_name']
+                except KeyError:
+                    pass
+
             if role_name in self.done:
                 return False
             self.done.append(role_name)
