@@ -86,6 +86,27 @@ class TestCliRolePaths(unittest.TestCase):
         result = run_ansible_lint(cwd=cwd, role_path=role_path)
         assert '106 Role name invalid-name does not match' in str(result)
 
+    def test_run_role_name_with_prefix(self):
+        cwd = self.local_test_dir
+        role_path = 'roles/ansible-role-foo'
+
+        result = run_ansible_lint(cwd=cwd, role_path=role_path)
+        assert len(result) == 0
+
+    def test_run_role_name_from_meta(self):
+        cwd = self.local_test_dir
+        role_path = 'roles/valid-due-to-meta'
+
+        result = run_ansible_lint(cwd=cwd, role_path=role_path)
+        assert len(result) == 0
+
+    def test_run_invalid_role_name_from_meta(self):
+        cwd = self.local_test_dir
+        role_path = 'roles/invalid_due_to_meta'
+
+        result = run_ansible_lint(cwd=cwd, role_path=role_path)
+        assert '106 Role name invalid-due-to-meta does not match' in str(result)
+
 
 @pytest.mark.parametrize(('result', 'env'), (
     (True, {
