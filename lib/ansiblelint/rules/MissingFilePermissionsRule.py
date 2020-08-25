@@ -35,17 +35,28 @@ class MissingFilePermissionsRule(AnsibleLintRule):
     version_added = 'v4.3.0'
 
     _modules = (
+        'assemble',
+        'archive',
         'copy',
         'file',
-        'ini_file',
-        'lineinfile',
         'replace',
         'template',
         'unarchive',
     )
 
+    _modules_with_create = (
+        'blockinfile',
+        'ini_file',
+        'lineinfile'
+    )
+
     def matchtask(self, file, task):
-        if task["action"]["__ansible_module__"] not in self._modules:
+        if task["action"]["__ansible_module__"] not in self._modules and \
+                task["action"]["__ansible_module__"] not in self._modules_with_create:
+            return False
+
+        if task["action"]["__ansible_module__"] in self._modules_with_create and \
+                not task["action"].get("create", False):
             return False
 
         if task['action'].get('state', None) == "absent":

@@ -43,6 +43,10 @@ SUCCESS_TASKS = '''
         path: foo2
         src: foo
         state: link
+    - name: file edit when create is false
+      lineinfile:
+        path: foo
+        line: some content here
 '''
 
 FAIL_TASKS = '''
@@ -52,6 +56,10 @@ FAIL_TASKS = '''
     - name: permissions missing
       file:
         path: foo
+    - name: permissions needed if create is possible
+      ini_file:
+        path: foo
+        create: true
 '''
 
 
@@ -66,4 +74,4 @@ def test_success(rule_runner):
 def test_fail(rule_runner):
     """Validate that missing mode triggers the rule."""
     results = rule_runner.run_playbook(FAIL_TASKS)
-    assert len(results) == 1
+    assert len(results) == 2
