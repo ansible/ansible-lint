@@ -161,41 +161,33 @@ def get_cli_parser() -> argparse.ArgumentParser:
 
 
 def merge_config(file_config, cli_config) -> NamedTuple:
+    bools = (
+        'display_relative_path',
+        'parseable',
+        'parseable_severity',
+        'quiet',
+        'use_default_rules',
+    )
+    lists = (
+        'exclude_paths',
+        'rulesdir',
+        'skip_list',
+        'tags',
+    )
+
     if not file_config:
         return cli_config
 
-    if 'quiet' in file_config:
-        cli_config.quiet = cli_config.quiet or file_config['quiet']
+    for entry in bools:
+        x = getattr(cli_config, entry) or file_config.get(entry, False)
+        setattr(cli_config, entry, x)
 
-    if 'parseable' in file_config:
-        cli_config.parseable = (cli_config.parseable or
-                                file_config['parseable'])
-
-    if 'parseable_severity' in file_config:
-        cli_config.parseable_severity = (cli_config.parseable_severity or
-                                         file_config['parseable_severity'])
-
-    if 'display_relative_path' in file_config:
-        cli_config.display_relative_path = (cli_config.display_relative_path or
-                                            file_config['display_relative_path'])
-
-    if 'use_default_rules' in file_config:
-        cli_config.use_default_rules = (cli_config.use_default_rules or
-                                        file_config['use_default_rules'])
+    for entry in lists:
+        getattr(cli_config, entry).extend(file_config.get(entry, []))
 
     if 'verbosity' in file_config:
         cli_config.verbosity = (cli_config.verbosity +
                                 file_config['verbosity'])
-
-    cli_config.exclude_paths.extend(file_config.get('exclude_paths', []))
-
-    cli_config.rulesdir.extend(file_config.get('rulesdir', []))
-
-    if 'skip_list' in file_config:
-        cli_config.skip_list = cli_config.skip_list + file_config['skip_list']
-
-    if 'tags' in file_config:
-        cli_config.tags = cli_config.tags + file_config['tags']
 
     return cli_config
 
