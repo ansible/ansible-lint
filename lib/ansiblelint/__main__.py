@@ -155,6 +155,8 @@ def main() -> int:
 
     if matches and not (options.quiet or options.parseable or options.parseable_severity):
         hint_about_skips(matches)
+    
+    if matches:
         return 2
     else:
         return 0
