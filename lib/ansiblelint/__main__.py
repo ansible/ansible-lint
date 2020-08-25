@@ -154,7 +154,8 @@ def main() -> int:
             print(formatter.format(match))
 
     if matches:
-        hint_about_skips(matches)
+        if not options.quiet and not options.parseable:
+            hint_about_skips(matches)
         return 2
     else:
         return 0
