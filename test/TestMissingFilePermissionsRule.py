@@ -38,6 +38,9 @@ SUCCESS_TASKS = '''
       file:
         path: foo
         state: absent
+    - name: permissions missing while state is file (default) is fine
+      file:
+        path: foo
     - name: permissions missing while state is link is fine
       file:
         path: foo2
@@ -53,9 +56,14 @@ FAIL_TASKS = '''
 ---
 - hosts: hosts
   tasks:
-    - name: permissions missing
+    - name: permissions missing and might create file
       file:
         path: foo
+        state: touch
+    - name: permissions missing and might create directory
+      file:
+        path: foo
+        state: directory
     - name: permissions needed if create is possible
       ini_file:
         path: foo
@@ -74,4 +82,4 @@ def test_success(rule_runner):
 def test_fail(rule_runner):
     """Validate that missing mode triggers the rule."""
     results = rule_runner.run_playbook(FAIL_TASKS)
-    assert len(results) == 2
+    assert len(results) == 3

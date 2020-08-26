@@ -59,10 +59,17 @@ class MissingFilePermissionsRule(AnsibleLintRule):
                 not task["action"].get("create", False):
             return False
 
+        # A file that doesn't exist cannot have a mode
         if task['action'].get('state', None) == "absent":
             return False
 
+        # A symlink always has mode 0o777
         if task['action'].get('state', None) == "link":
+            return False
+
+        # The file module does not create anything when state==file (default)
+        if task["action"]["__ansible_module__"] == "file" and \
+                task['action'].get('state', 'file') == 'file':
             return False
 
         mode = task['action'].get('mode', None)
