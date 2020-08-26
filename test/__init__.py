@@ -59,26 +59,24 @@ class RunFromText(object):
 
 
 def run_ansible_lint(
-        cwd: os.PathLike = None,
-        role_path: os.PathLike = None,
+        *argv: str,
+        cwd: str = None,
         bin: str = None,
-        env: Dict[str, str] = None):
+        env: Dict[str, str] = None) -> subprocess.CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
-    if bin:
-        command = [bin, "-v"]
+    if not bin:
+        bin = sys.executable
+        args = [sys.executable, "-m", "ansiblelint", *argv]
     else:
-        command = [sys.executable, "-m", "ansiblelint", "-v"]
-    if role_path:
-        command.append(str(role_path))
+        args = [bin, *argv]
 
-    result, err = subprocess.Popen(
-        command,
-        cwd=cwd,
-        stdin=subprocess.PIPE,
+    return subprocess.run(
+        args,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         shell=False,  # needed when command is a list
+        check=False,
+        cwd=cwd,
         env=env,
-    ).communicate()
-
-    return result
+        universal_newlines=True
+    )
