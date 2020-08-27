@@ -22,7 +22,7 @@ def default_rules_collection():
 
 @pytest.fixture
 def default_text_runner(default_rules_collection):
-    """Return TextRunner."""
+    """Return TextRunner instance."""
     return RunFromText(default_rules_collection)
 
 
