@@ -27,11 +27,11 @@ import pathlib
 import sys
 from typing import TYPE_CHECKING, List, Set, Type
 
-from rich.console import Console
 from rich.markdown import Markdown
 
 from ansiblelint import cli, formatters
-from ansiblelint.generate_docs import rules_as_rst
+from ansiblelint.color import console
+from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.utils import get_playbooks_and_roles, get_rules_dirs
@@ -42,7 +42,12 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
 _logger = logging.getLogger(__name__)
-console = Console()
+
+_rule_format_map = {
+    'plain': str,
+    'rich': rules_as_rich,
+    'rst': rules_as_rst
+}
 
 
 def initialize_logger(level: int = 0) -> None:
@@ -123,8 +128,9 @@ def main() -> int:
     rules = RulesCollection(rulesdirs)
 
     if options.listrules:
-        formatted_rules = rules if options.format == 'plain' else rules_as_rst(rules)
-        print(formatted_rules)
+        console.print(
+            _rule_format_map[options.format](rules),
+            highlight=False)
         return 0
 
     if options.listtags:

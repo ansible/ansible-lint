@@ -96,8 +96,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
 
     parser.add_argument('-L', dest='listrules', default=False,
                         action='store_true', help="list all the rules")
-    parser.add_argument('-f', dest='format', default='plain',
-                        choices=['plain', 'rst'],
+    parser.add_argument('-f', dest='format', default='rich',
+                        choices=['rich', 'plain', 'rst'],
                         help="Format used rules output, (default: %(default)s)")
     parser.add_argument('-q', dest='quiet',
                         default=False,

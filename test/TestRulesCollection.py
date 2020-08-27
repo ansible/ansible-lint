@@ -25,6 +25,8 @@ import pytest
 
 from ansiblelint.rules import RulesCollection
 
+from . import run_ansible_lint
+
 
 @pytest.fixture
 def test_rules_collection():
@@ -92,3 +94,20 @@ def test_no_duplicate_rule_ids(test_rules_collection):
     real_rules = RulesCollection([os.path.abspath('./lib/ansiblelint/rules')])
     rule_ids = [rule.id for rule in real_rules]
     assert not any(y > 1 for y in collections.Counter(rule_ids).values())
+
+
+def test_rich_rule_listing():
+    """Test that rich list format output is rendered as a table.
+
+    This check also offers the contract of having rule id, short and long
+    descriptions in the console output.
+    """
+    rules_path = os.path.abspath('./test/rules')
+    result = run_ansible_lint("-r", rules_path, "-f", "rich", "-L")
+    assert result.returncode == 0
+
+    for rule in RulesCollection([rules_path]):
+        assert rule.id in result.stdout
+        assert rule.shortdesc in result.stdout
+        # description could wrap inside table, so we do not check full length
+        assert rule.description[:30] in result.stdout
