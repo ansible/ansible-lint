@@ -31,3 +31,10 @@ disable =
     unused-variable,
     useless-object-inheritance,
     wrong-import-order,
+
+
+[VARIABLES]
+
+# List of additional names supposed to be defined in builtins.
+additional-builtins =
+    pytest

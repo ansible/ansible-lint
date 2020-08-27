@@ -1,5 +1,9 @@
 [flake8]
 
+# Additional known builtins:
+builtins =
+  pytest,
+
 # Don't even try to analyze these:
 exclude =
   # No need to traverse egg files

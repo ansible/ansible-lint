@@ -19,8 +19,27 @@
 # THE SOFTWARE.
 """Main ansible-lint package."""
 
-from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.version import __version__
+import builtins
+from typing import Any
+
+# NOTE: Importing builtins as _builtins does not allow to redefine the
+# NOTE: type required to trick mypy into thinking that we can set the
+# NOTE: "pytest" attribute:
+_builtins: Any = builtins
+del builtins
+
+try:
+    import pytest as _pytest  # noqa: PT013
+except ImportError:
+    from unittest.mock import MagicMock as _MagicMock
+    _builtins.pytest = _MagicMock()
+else:
+    _builtins.pytest = _pytest
+
+# NOTE: flake8 isn't satisfied with the import positions but we have to
+# NOTE: do the builtin patching before anything else gets into play.
+from .rules import AnsibleLintRule  # noqa: E402
+from .version import __version__  # noqa: E402
 
 __all__ = (
     "__version__",
