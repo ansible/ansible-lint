@@ -14,7 +14,7 @@ def pytest_configure(config):
 
 @pytest.fixture
 def default_rules_collection():
-    """Return default rule collection."""
+    """Return default rules collection."""
     return rules.RulesCollection(rulesdirs=[os.path.abspath(os.path.join('lib',
                                                                          'ansiblelint',
                                                                          'rules'))])
