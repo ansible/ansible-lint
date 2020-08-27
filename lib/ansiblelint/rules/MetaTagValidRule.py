@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2018, Ansible Project
 
 import re
@@ -71,10 +70,6 @@ galaxy_info:
 if "pytest" in sys.modules or __name__ == "__main__":
 
     import pytest
-
-    # Allows us to execute the file to run the tests insite it
-    if __name__ == "__main__":
-        pytest.main()
 
     @pytest.mark.parametrize('rule_runner', (MetaTagValidRule, ), indirect=['rule_runner'])
     def test_valid_tag_rule(rule_runner):
