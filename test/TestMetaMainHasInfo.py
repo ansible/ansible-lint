@@ -2,8 +2,7 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.MetaMainHasInfoRule import MetaMainHasInfoRule
-
-from . import RunFromText
+from ansiblelint.testing import RunFromText
 
 NO_GALAXY_INFO = '''
 author: the author

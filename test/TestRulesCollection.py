@@ -24,8 +24,7 @@ import os
 import pytest
 
 from ansiblelint.rules import RulesCollection
-
-from . import run_ansible_lint
+from ansiblelint.testing import run_ansible_lint
 
 
 @pytest.fixture

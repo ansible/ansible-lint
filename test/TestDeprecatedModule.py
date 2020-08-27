@@ -4,8 +4,7 @@ import pytest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.DeprecatedModuleRule import DeprecatedModuleRule
-
-from . import ANSIBLE_MAJOR_VERSION, RunFromText
+from ansiblelint.testing import ANSIBLE_MAJOR_VERSION, RunFromText
 
 MODULE_DEPRECATED = '''
 - name: task example
