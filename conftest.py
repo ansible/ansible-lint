@@ -7,11 +7,6 @@ import pytest
 import ansiblelint.rules as rules
 
 
-def pytest_configure(config):
-    """Add rule folder to test include for running embedded rule tests."""
-    config.args.append(os.path.dirname(rules.__file__))
-
-
 @pytest.fixture
 def default_rules_collection():
     """Return default rules collection."""
