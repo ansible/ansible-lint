@@ -2,8 +2,7 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.MetaTagValidRule import MetaTagValidRule
-
-from . import RunFromText
+from ansiblelint.testing import RunFromText
 
 META_TAG_VALID = '''
 galaxy_info:

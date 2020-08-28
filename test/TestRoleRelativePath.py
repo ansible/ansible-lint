@@ -2,8 +2,7 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.RoleRelativePath import RoleRelativePath
-
-from . import RunFromText
+from ansiblelint.testing import RunFromText
 
 FAIL_TASKS = '''
 - name: template example

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from . import run_ansible_lint
+from ansiblelint.testing import run_ansible_lint
 
 
 class TestCliRolePaths(unittest.TestCase):

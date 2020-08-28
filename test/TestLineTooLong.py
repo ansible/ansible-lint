@@ -2,8 +2,7 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.LineTooLongRule import LineTooLongRule
-
-from . import RunFromText
+from ansiblelint.testing import RunFromText
 
 LONG_LINE = '''
 - name: task example

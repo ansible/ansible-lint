@@ -3,8 +3,7 @@ import os
 import pytest
 
 from ansiblelint.rules import RulesCollection
-
-from . import RunFromText
+from ansiblelint.testing import RunFromText
 
 
 @pytest.fixture

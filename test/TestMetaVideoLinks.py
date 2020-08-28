@@ -2,8 +2,7 @@ import unittest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.MetaVideoLinksRule import MetaVideoLinksRule
-
-from . import RunFromText
+from ansiblelint.testing import RunFromText
 
 META_VIDEO_LINKS = '''
 galaxy_info:
