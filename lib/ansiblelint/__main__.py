@@ -108,7 +108,7 @@ def main() -> int:
 
     rulesdirs = get_rules_dirs([str(rdir) for rdir in options.rulesdir],
                                options.use_default_rules)
-    rules = RulesCollection(rulesdirs)
+    rules = RulesCollection(rulesdirs, options)
 
     if options.listrules:
         formatted_rules = rules if options.format == 'plain' else rules_as_rst(rules)

@@ -33,6 +33,7 @@ from typing import Callable, ItemsView, List, Optional, Tuple
 
 import yaml
 from ansible import constants
+from ansible.cli import CLI
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
@@ -42,7 +43,6 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import module_loader
 from ansible.template import Templar
-from ansible.cli import CLI
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
@@ -64,24 +64,16 @@ _logger = logging.getLogger(__name__)
 
 
 def parse_yaml_from_file(filepath: str, options) -> dict:
+    loader = DataLoader()
+    if options.vault_ids or options.vault_password_files or options.ask_vault_pass:
+        CLI.setup_vault_secrets(loader, options.vault_ids,
+            options.vault_password_files, options.ask_vault_pass)
+    return loader.load_from_file(filepath)
+
     # dl = DataLoader()
     # if hasattr(dl, 'set_vault_password'):
     #     dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
     # return dl.load_from_file(filepath)
-
-            # if options.vault_password_file:
-            #     vault_pass = CLI.read_vault_password_file(options.vault_password_file, loader=dl)
-            #     dl.set_vault_password(vault_pass)
-            # elif options.ask_vault_pass:
-            #     vault_pass = CLI.ask_vault_passwords()[0]
-            #     dl.set_vault_password(vault_pass)
-            # if hasattr(dl, 'set_vault_password'):
-            #     dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
-    loader = DataLoader()
-    if options.vault_ids or options.vault_password_files or options.ask_vault_pass:
-        CLI.setup_vault_secrets(loader, options.vault_ids, options.vault_password_files, options.ask_vault_pass)
-    return loader.load_from_file(filepath)
-
 
 def path_dwim(basedir: str, given: str) -> str:
     dl = DataLoader()

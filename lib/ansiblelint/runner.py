@@ -23,7 +23,7 @@ class Runner(object):
             self,
             rules: "RulesCollection",
             playbook: str,
-            options: FrozenSet[Any],
+            options: FrozenSet[Any] = frozenset(),
             tags: FrozenSet[Any] = frozenset(),
             skip_list: Optional[FrozenSet[Any]] = frozenset(),
             exclude_paths: List[str] = [],
@@ -77,11 +77,11 @@ class Runner(object):
                           # add an absolute path here, so rules are able to validate if
                           # referenced files exist
                           'absolute_directory': os.path.dirname(playbook[0])})
-        matches = set(self._emit_matches(files))
-
+        matches = set(self._emit_matches(files, self.options))
+        
         # remove duplicates from files list
         files = [value for n, value in enumerate(files) if value not in files[:n]]
-
+        
         # remove files that have already been checked
         files = [x for x in files if x['path'] not in self.checked_files]
         for file in files:
@@ -97,12 +97,12 @@ class Runner(object):
 
         return sorted(matches)
 
-    def _emit_matches(self, files: List) -> Generator[MatchError, None, None]:
+    def _emit_matches(self, files: List, options) -> Generator[MatchError, None, None]:
         visited: Set = set()
         while visited != self.playbooks:
             for arg in self.playbooks - visited:
                 try:
-                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir, self.options):
+                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir, options):
                         if self.is_excluded(child['path']):
                             continue
                         self.playbooks.add((child['path'], child['type']))

@@ -135,7 +135,6 @@ class AnsibleLintRule(object):
         yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, text, file['type'])
 
         for play in yaml:
-            print("JOHN")
             if self.id in play.get('skipped_rules', ()):
                 continue
 
@@ -180,8 +179,9 @@ def load_plugins(directory: str) -> List[AnsibleLintRule]:
 
 class RulesCollection(object):
 
-    def __init__(self, rulesdirs=None) -> None:
+    def __init__(self, rulesdirs=None, options=frozenset()) -> None:
         """Initialize a RulesCollection instance."""
+        self.options = options
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
@@ -210,6 +210,8 @@ class RulesCollection(object):
         matches: List = list()
 
         try:
+            # TODO: Support loading vaulted file and returning text
+            # It appears ansible DataLoader only returns dataset of elements
             with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
                 text = f.read()
         except IOError as e:
@@ -218,7 +220,7 @@ class RulesCollection(object):
                 playbookfile['path'],
                 e.strerror)
             return matches
-
+            
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
                 rule_definition = set(rule.tags)
