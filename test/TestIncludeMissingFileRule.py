@@ -30,6 +30,15 @@ PLAY_INCLUDED = PlayFile('some_file.yml', u'''
     msg: 'was found & included'
 ''')
 
+PLAY_HAVING_TASK = PlayFile('playbook.yml', u'''
+- name: Play
+  hosts: all
+  pre_tasks:
+  tasks:
+    - name: Ping
+      ping:
+''')
+
 
 @pytest.fixture
 def play_file_path(tmp_path):
@@ -68,7 +77,8 @@ def test_include_file_missing(runner):
     (
         pytest.param([PLAY_INCLUDING_PLAIN, PLAY_INCLUDED], id='File Exists'),
         pytest.param([PLAY_INCLUDING_JINJA2], id='JINJA2 in reference'),
-        pytest.param([PLAY_INCLUDING_NOQA], id='NOQA was used')
+        pytest.param([PLAY_INCLUDING_NOQA], id='NOQA was used'),
+        pytest.param([PLAY_HAVING_TASK], id='Having a task')
     ),
     indirect=['_play_files']
 )
