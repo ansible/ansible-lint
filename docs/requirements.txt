@@ -79,10 +79,10 @@ markupsafe==1.1.1 \
     --hash=sha256:e249096428b3ae81b08327a63a485ad0878de3fb939049038579ac0ef61e17e7 \
     --hash=sha256:e8313f01ba26fbbe36c7be1966a7b7424942f670f38e666995b88d012765b9be \
     # via jinja2
-myst-parser==0.12.1 \
-    --hash=sha256:24db037b2c050924c26ea1e49e783fd076734f80654df0874c135e612495f11d \
-    --hash=sha256:ceb2e39ea7d32de1b0151f7426981bbb1e874215e7e4c75d38ceeb0c8d41f44e \
-    # via -r requirements.in
+myst-parser==0.12.5 \
+    --hash=sha256:dc994b74a29efe4396e5f9df1c42442bb334afa33ef7bc5ca2c7740d48879ba0 \
+    --hash=sha256:eed223656915e2239981f02309754d720a2aa84e72987bcc2aa580396a52cdc5 \
+    # via -r docs/requirements.in
 packaging==20.4 \
     --hash=sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8 \
     --hash=sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181 \
@@ -91,7 +91,7 @@ pipdeptree==1.0.0 \
     --hash=sha256:35a81058c9568a29c5a9569109304b25f11cd9333fa2661a4d4c2c5da0e3939d \
     --hash=sha256:5fe866a38113d28d527033ececc57b8e86df86b7c29edbacb33f41ee50f75b31 \
     --hash=sha256:a7e4f744f3ae149cf94dd5e517fae682780c4729f4a279e6fb81a928f57fea23 \
-    # via -r requirements.in
+    # via -r docs/requirements.in
 pygments==2.6.1 \
     --hash=sha256:647344a061c249a3b74e230c739f434d7ea4d8b1d5f3721bc0f3558049b38f44 \
     --hash=sha256:ff7a40b4860b727ab48fad6360eb351cc1b33cbf9b15a0f689ca5353e9463324 \
@@ -132,7 +132,7 @@ snowballstemmer==2.0.0 \
 sphinx-ansible-theme==0.3.2 \
     --hash=sha256:250e46bc318062a2e95cc55db5dfecddb5f847f38d672d487162920f3f3ae205 \
     --hash=sha256:424ec6fbc61bc8bba3e6eb482d3ceb92e6e2d80d7e8e06599e2bbc856026feaf \
-    # via -r requirements.in
+    # via -r docs/requirements.in
 sphinx-notfound-page==0.4 \
     --hash=sha256:0105a40d8a305d3e1003630d8ee99296baa08cf2a4c1ce1db8d91fbbe78f90db \
     --hash=sha256:609fd7cd7f9ea73c030f1b67a3f2bc90f60bff87b30026fbd2bcb19c7c59c484 \
@@ -144,7 +144,7 @@ sphinx-rtd-theme==0.5.0 \
 sphinx==3.2.1 \
     --hash=sha256:321d6d9b16fa381a5306e5a0b76cd48ffbc588e6340059a729c6fdd66087e0e8 \
     --hash=sha256:ce6fd7ff5b215af39e2fcd44d4a321f6694b4530b6f2b2109b64d120773faea0 \
-    # via -r requirements.in, myst-parser, sphinx-rtd-theme, sphinxcontrib.programoutput
+    # via -r docs/requirements.in, myst-parser, sphinx-rtd-theme, sphinxcontrib.programoutput
 sphinxcontrib-applehelp==1.0.2 \
     --hash=sha256:806111e5e962be97c29ec4c1e7fe277bfd19e9652fb1a4392105b43e01af885a \
     --hash=sha256:a072735ec80e7675e3f432fcae8610ecf509c5f1869d17e2eecff44389cdbc58 \
@@ -172,7 +172,7 @@ sphinxcontrib-serializinghtml==1.1.4 \
 sphinxcontrib.programoutput==0.16 \
     --hash=sha256:0caaa216d0ad8d2cfa90a9a9dba76820e376da6e3152be28d10aedc09f82a3b0 \
     --hash=sha256:8009d1326b89cd029ee477ce32b45c58d92b8504d48811461c3117014a8f4b1e \
-    # via -r requirements.in
+    # via -r docs/requirements.in
 urllib3==1.25.9 \
     --hash=sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527 \
     --hash=sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115 \
