@@ -219,6 +219,10 @@ def play_children(basedir, item, parent_type, playbook_dir):
 
 
 def _include_children(basedir, k, v, parent_type):
+    # handle special case include_tasks: name=filename.yml
+    if k == 'include_tasks' and isinstance(v, dict) and 'file' in v:
+        v = v['file']
+
     # handle include: filename.yml tags=blah
     (command, args, kwargs) = tokenize("{0}: {1}".format(k, v))
 
