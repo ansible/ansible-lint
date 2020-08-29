@@ -1,2 +1,6 @@
 - include_tasks: included_tasks.yml
 - import_tasks: imported_tasks.yml
+- include_tasks:
+    file: included_tasks.yml
+    apply:
+      tags: sometag
