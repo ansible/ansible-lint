@@ -58,10 +58,12 @@ class RoleNames(AnsibleLintRule):
             role_name = _remove_prefix(path[path.index("tasks") - 1], "ansible-role-")
 
             if meta.is_file():
-                try:
-                    role_name = parse_yaml_from_file(str(meta))['galaxy_info']['role_name']
-                except KeyError:
-                    pass
+                meta_data = parse_yaml_from_file(str(meta))
+                if meta_data:
+                    try:
+                        role_name = meta_data['galaxy_info']['role_name']
+                    except KeyError:
+                        pass
 
             if role_name in self.done:
                 return False
