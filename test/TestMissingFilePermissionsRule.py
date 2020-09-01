@@ -30,10 +30,12 @@ SUCCESS_TASKS = '''
       file:
         path: foo
         mode: u=rw,go=r
+        state: touch
     - name: permissions not missing and numeric
       file:
         path: foo
         mode: 0600
+        state: touch
     - name: permissions missing while state is absent is fine
       file:
         path: foo
