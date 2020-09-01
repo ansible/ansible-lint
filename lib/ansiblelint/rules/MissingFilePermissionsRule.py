@@ -39,7 +39,6 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         'archive',
         'copy',
         'file',
-        'replace',
         'template',
         'unarchive',
     )
