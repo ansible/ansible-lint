@@ -29,7 +29,7 @@ SUCCESS_TASKS = '''
     - name: permissions not missing and string
       file:
         path: foo
-        mode: preserve
+        mode: u=rw,go=r
     - name: permissions not missing and numeric
       file:
         path: foo
