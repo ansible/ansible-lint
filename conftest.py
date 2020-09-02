@@ -3,12 +3,9 @@ import os
 
 import pytest
 
-try:
-    from ansiblelint.constants import DEFAULT_RULESDIR
-    from ansiblelint.rules import RulesCollection
-    from ansiblelint.testing import RunFromText
-except ImportError:
-    pytest.exit("You need to install ansiblelint to be able to load test fixtures.")
+from ansiblelint.constants import DEFAULT_RULESDIR
+from ansiblelint.rules import RulesCollection
+from ansiblelint.testing import RunFromText
 
 
 @pytest.fixture
