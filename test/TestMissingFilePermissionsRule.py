@@ -26,10 +26,6 @@ SUCCESS_TASKS = '''
 ---
 - hosts: hosts
   tasks:
-    - name: permissions not missing and string
-      file:
-        path: foo
-        mode: preserve
     - name: permissions not missing and numeric
       file:
         path: foo
@@ -49,13 +45,21 @@ SUCCESS_TASKS = '''
     - name: file edit when create is false
       lineinfile:
         path: foo
+        create: false
         line: some content here
+    - name: replace should not require mode
+      replace:
+        path: foo
 '''
 
 FAIL_TASKS = '''
 ---
 - hosts: hosts
   tasks:
+    - name: file does not allow preserve value for mode
+      file:
+        path: foo
+        mode: preserve
     - name: permissions missing and might create file
       file:
         path: foo
@@ -64,10 +68,24 @@ FAIL_TASKS = '''
       file:
         path: foo
         state: directory
-    - name: permissions needed if create is possible
+    - name: permissions needed if create is used
       ini_file:
         path: foo
         create: true
+    - name: lineinfile when create is true
+      lineinfile:
+        path: foo
+        create: true
+        line: some content here
+    - name: replace does not allow preserve mode
+      replace:
+        path: foo
+        mode: preserve
+    - name: ini_file does not accept preserve mode
+      ini_file:
+        path: foo
+        create: true
+        mode: preserve
 '''
 
 
@@ -82,4 +100,11 @@ def test_success(rule_runner):
 def test_fail(rule_runner):
     """Validate that missing mode triggers the rule."""
     results = rule_runner.run_playbook(FAIL_TASKS)
-    assert len(results) == 3
+    assert len(results) == 7
+    assert results[0].linenumber == 5
+    assert results[1].linenumber == 9
+    assert results[2].linenumber == 13
+    assert results[3].linenumber == 17
+    assert results[4].linenumber == 21
+    assert results[5].linenumber == 26
+    assert results[6].linenumber == 30
