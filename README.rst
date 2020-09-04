@@ -76,7 +76,7 @@ Command Line Options
 
 The following is the output from ``ansible-lint --help``, providing an overview of the basic command line options:
 
-.. code-block:: bash
+.. code-block::
 
     usage: ansible-lint [-h] [-L] [-q] [-p] [--parseable-severity] [-r RULESDIR]
                         [-R] [--show-relpath] [-t TAGS] [-T] [-v] [-x SKIP_LIST]
@@ -120,7 +120,7 @@ The following is the output from ``ansible-lint --help``, providing an overview 
 CI/CD
 -----
 
-If executed under `Github Actions`_ is detected via the presence of
+If execution under `Github Actions`_ is detected via the presence of
 ``GITHUB_ACTIONS=true`` and ``GITHUB_WORFLOW=...`` variables, the linter will
 also print errors using their `annotation`_ format.
 
@@ -132,7 +132,7 @@ Linting Playbooks and Roles
 
 It's important to note that ``ansible-lint`` accepts a list of Ansible playbook files or a list of role directories. Starting from a directory that contains the following, the playbook file, ``playbook.yml``, or one of the role subdirectories, such as ``geerlingguy.apache``, can be passed:
 
-.. code-block:: bash
+.. code-block::
 
   playbook.yml
   roles/
@@ -155,7 +155,7 @@ It's important to note that ``ansible-lint`` accepts a list of Ansible playbook 
 
 The following lints the role ``geerlingguy.apache``:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint geerlingguy.apache
 
@@ -187,7 +187,7 @@ Here's the contents of ``playbook.yml``, which references multiples roles:
 
 The following lints ``playbook.yml``, which evaluates both the playbook and the referenced roles:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint playbook.yml
 
@@ -209,7 +209,7 @@ The following lints ``playbook.yml``, which evaluates both the playbook and the 
 
 Since ``ansible-lint`` accepts a list of roles or playbooks, the following works as well, producing the same output as the example above:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint geerlingguy.apache geerlingguy.elasticsearch
 
@@ -234,7 +234,7 @@ Examples
 
 Included in ``ansible-lint/examples`` are some example playbooks with undesirable features. Running ansible-lint on them works, as demonstrated in the following:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint examples/example.yml
 
@@ -301,7 +301,7 @@ Included in ``ansible-lint/examples`` are some example playbooks with undesirabl
 
 If playbooks include other playbooks, or tasks, or handlers or roles, these are also handled:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint examples/include.yml
 
