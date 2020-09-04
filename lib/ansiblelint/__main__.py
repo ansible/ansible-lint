@@ -30,7 +30,7 @@ from typing import TYPE_CHECKING, List, Set, Type
 from rich.markdown import Markdown
 
 from ansiblelint import cli, formatters
-from ansiblelint.color import console
+from ansiblelint.color import console, console_stderr
 from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
@@ -91,21 +91,26 @@ def report_outcome(matches: List["MatchError"], options) -> int:
     """
     failure = False
     msg = """\
-You can skip specific rules by adding them to the skip_list section of your configuration file:
+You can skip specific rules or tags by adding them to your configuration file:
 ```yaml
 # .ansible-lint
 warn_list:  # or 'skip_list' to silence them completely
 """
+
     matched_rules = {match.rule.id: match.rule.shortdesc for match in matches}
     for id in sorted(matched_rules.keys()):
         if id not in options.warn_list:
-            msg += f"  - '{id}'  # {matched_rules[id]}'\n"
+            msg += f"  - '{id}'  # {matched_rules[id]}\n"
             failure = True
+    for match in matches:
+        if "experimental" in match.rule.tags:
+            msg += "  - experimental  # all rules tagged as experimental\n"
+            break
     msg += "```"
 
     if failure:
-        if not options.quiet and not options.parseable:
-            console.print(Markdown(msg))
+        if not options.quiet:
+            console_stderr.print(Markdown(msg))
         return 2
     else:
         return 0
