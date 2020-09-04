@@ -134,8 +134,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument('-x', dest='skip_list', default=[], action='append',
                         help="only check rules whose id/tags do not "
                         "match these values")
-    parser.add_argument('-w', dest='warn_list', default=[], nargs="+",
-                        help="only warn about these rules")
+    parser.add_argument('-w', dest='warn_list', default=[], action='append',
+                        help="only warn about these rules, unless overridden in "
+                             "config file defaults to 'experimental'")
     parser.add_argument('--nocolor', dest='colored',
                         default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
                         action='store_false',
@@ -170,13 +171,14 @@ def merge_config(file_config, cli_config) -> NamedTuple:
         'quiet',
         'use_default_rules',
     )
-    lists = (
-        'exclude_paths',
-        'rulesdir',
-        'skip_list',
-        'tags',
-        'warn_list',
-    )
+    # maps lists to their default config values
+    lists_map = {
+        'exclude_paths': [],
+        'rulesdir': [],
+        'skip_list': [],
+        'tags': [],
+        'warn_list': ['experimental'],
+    }
 
     if not file_config:
         return cli_config
@@ -185,8 +187,8 @@ def merge_config(file_config, cli_config) -> NamedTuple:
         x = getattr(cli_config, entry) or file_config.get(entry, False)
         setattr(cli_config, entry, x)
 
-    for entry in lists:
-        getattr(cli_config, entry).extend(file_config.get(entry, []))
+    for entry, default in lists_map.items():
+        getattr(cli_config, entry).extend(file_config.get(entry, default))
 
     if 'verbosity' in file_config:
         cli_config.verbosity = (cli_config.verbosity +

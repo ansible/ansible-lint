@@ -31,7 +31,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         "https://github.com/ansible/ansible/issues/71200"
     )
     severity = 'VERY_HIGH'
-    tags = ['unpredictability']
+    tags = ['unpredictability', 'experimental']
     version_added = 'v4.3.0'
 
     _modules = (

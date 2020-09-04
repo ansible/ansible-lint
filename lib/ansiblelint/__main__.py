@@ -87,7 +87,7 @@ def choose_formatter_factory(
 def report_outcome(matches: List["MatchError"], options) -> int:
     """Display information about how to skip found rules.
 
-    Returns exit code, 2 if erros were found, 0 when only warnings were found.
+    Returns exit code, 2 if errors were found, 0 when only warnings were found.
     """
     failure = False
     msg = """\
@@ -97,10 +97,10 @@ You can skip specific rules or tags by adding them to your configuration file:
 warn_list:  # or 'skip_list' to silence them completely
 """
 
-    matched_rules = {match.rule.id: match.rule.shortdesc for match in matches}
+    matched_rules = {match.rule.id: match.rule for match in matches}
     for id in sorted(matched_rules.keys()):
-        if id not in options.warn_list:
-            msg += f"  - '{id}'  # {matched_rules[id]}\n"
+        if {id, *matched_rules[id].tags}.isdisjoint(options.warn_list):
+            msg += f"  - '{id}'  # {matched_rules[id].shortdesc}\n"
             failure = True
     for match in matches:
         if "experimental" in match.rule.tags:
@@ -108,9 +108,10 @@ warn_list:  # or 'skip_list' to silence them completely
             break
     msg += "```"
 
+    if matches and not options.quiet:
+        console_stderr.print(Markdown(msg))
+
     if failure:
-        if not options.quiet:
-            console_stderr.print(Markdown(msg))
         return 2
     else:
         return 0
