@@ -1,4 +1,5 @@
 """Console coloring and terminal support."""
+import sys
 from enum import Enum
 
 from rich.console import Console
@@ -11,6 +12,7 @@ _theme = Theme({
     "title": "yellow"
 })
 console = Console(theme=_theme)
+console_stderr = Console(file=sys.stderr, theme=_theme)
 
 
 class Color(Enum):
