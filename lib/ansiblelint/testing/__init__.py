@@ -31,11 +31,10 @@ class RunFromText(object):
 
     def run_playbook(self, playbook_text):
         """Lints received text as a playbook."""
-        play_root = tempfile.mkdtemp()
-        with open(os.path.join(play_root, 'playbook.yml'), 'w') as fp:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix="playbook") as fp:
             fp.write(playbook_text)
-        results = self._call_runner(fp.name)
-        shutil.rmtree(play_root)
+            fp.flush()
+            results = self._call_runner(fp.name)
         return results
 
     def run_role_tasks_main(self, tasks_main_text):
