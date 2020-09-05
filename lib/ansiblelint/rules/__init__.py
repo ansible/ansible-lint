@@ -6,6 +6,7 @@ import os
 import re
 from collections import defaultdict
 from importlib.abc import Loader
+from time import sleep
 from typing import List
 
 import ansiblelint.utils
@@ -210,14 +211,20 @@ class RulesCollection(object):
         text = ""
         matches: List = list()
 
-        try:
-            with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
-                text = f.read()
-        except IOError as e:
-            _logger.warning(
-                "Couldn't open %s - %s",
-                playbookfile['path'],
-                e.strerror)
+        for i in range(3):
+            try:
+                with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
+                    text = f.read()
+                break
+            except IOError as e:
+                _logger.warning(
+                    "Couldn't open %s - %s [try:%s]",
+                    playbookfile['path'],
+                    e.strerror,
+                    i)
+                sleep(1)
+                continue
+        if i and not text:
             return matches
 
         for rule in self.rules:
