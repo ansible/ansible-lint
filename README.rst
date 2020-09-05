@@ -578,6 +578,31 @@ In ansible-lint 2.0.0, *task['action']['args']* was renamed *task['action']['mod
 
 In ansible-lint 3.0.0 *task['action']['module']* was renamed *task['action']['__ansible_module__']* to avoid a clash when a module take module as an argument. As a precaution, *task['action']['module_arguments']* was renamed *task['action']['__ansible_arguments__']*.
 
+Packaging Custom Rules
+``````````````````````
+
+Ansible-lint provides a sub directory named *custom* in its built-in rules,
+``/usr/lib/python3.8/site-packages/ansiblelint/rules/custom/`` for example, to
+install custom rules since v4.3.1. The custom rules which are packaged as an
+usual python package installed into this directory will be loaded and enabled
+automatically by ansible-lint.
+
+To make custom rules loaded automatically, you need the followings:
+
+- Packaging your custom rules as an usual python package named some descriptive ones like ``ansible_lint_custom_rules_foo``.
+- Make it installed into ``<ansible_lint_custom_rules_dir>/custom/<your_custom_rules_subdir>/``.
+
+You may accomplish the second by adding some configurations into the [options]
+section of the ``setup.cfg`` of your custom rules python package like the following.
+
+.. code-block::
+
+    [options]
+    packages =
+        ansiblelint.rules.custom.<your_custom_rules_subdir>
+    package_dir =
+        ansiblelint.rules.custom.<your_custom_rules_subdir> = <your_rules_source_code_subdir>
+
 .. rules-docs-inclusion-marker-end-do-not-remove
 
 Contributing
