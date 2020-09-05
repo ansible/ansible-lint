@@ -78,43 +78,37 @@ The following is the output from ``ansible-lint --help``, providing an overview 
 
 .. code-block::
 
-    usage: ansible-lint [-h] [-L] [-q] [-p] [--parseable-severity] [-r RULESDIR]
-                        [-R] [--show-relpath] [-t TAGS] [-T] [-v] [-x SKIP_LIST]
-                        [--nocolor] [--force-color] [--exclude EXCLUDE_PATHS]
-                        [-c CONFIG_FILE] [--version]
-                        [playbook [playbook ...]]
+    usage: ansible-lint [-h] [-L] [-f {rich,plain,rst}] [-q] [-p] [--parseable-severity] [-r RULESDIR]
+                    [-R] [--show-relpath] [-t TAGS] [-T] [-v] [-x SKIP_LIST]
+                    [-w WARN_LIST [WARN_LIST ...]] [--nocolor] [--force-color]
+                    [--exclude EXCLUDE_PATHS] [-c CONFIG_FILE] [--version]
+                    [playbook [playbook ...]]
 
     positional arguments:
-      playbook              One or more files or paths. When missing it will
-                            enable auto-detection mode.
+      playbook              One or more files or paths. When missing it will enable auto-detection mode.
 
     optional arguments:
       -h, --help            show this help message and exit
       -L                    list all the rules
+      -f {rich,plain,rst}   Format used rules output, (default: rich)
       -q                    quieter, although not silent output
       -p                    parseable output in the format of pep8
       --parseable-severity  parseable output including severity of rule
-      -r RULESDIR           specify one or more rules directories using one or
-                            more -r arguments. Any -r flags override the default
-                            rules in /path/to/ansible-
-                            lint/lib/ansiblelint/rules, unless -R is also used.
-      -R                    Use default rules in /path/to/ansible-
-                            lint/lib/ansiblelint/rules in addition to any extra
-                            rules directories specified with -r. There is no need
-                            to specify this if no -r flags are used
+      -r RULESDIR           Specify custom rule directories. Add -R to keep using embedded rules from
+                            /usr/local/lib/python3.8/site-packages/ansiblelint/rules
+      -R                    Keep default rules when using -r
       --show-relpath        Display path relative to CWD
       -t TAGS               only check rules whose id/tags match these values
       -T                    list all the tags
       -v                    Increase verbosity level
-      -x SKIP_LIST          only check rules whose id/tags do not match these
-                            values
+      -x SKIP_LIST          only check rules whose id/tags do not match these values
+      -w WARN_LIST [WARN_LIST ...]
+                            only warn about these rules
       --nocolor             disable colored output
       --force-color         Try force colored output (relying on ansible's code)
       --exclude EXCLUDE_PATHS
-                            path to directories or files to skip. This option is
-                            repeatable.
-      -c CONFIG_FILE        Specify configuration file to use. Defaults to
-                            ".ansible-lint"
+                            path to directories or files to skip. This option is repeatable.
+      -c CONFIG_FILE        Specify configuration file to use. Defaults to ".ansible-lint"
       --version             show program's version number and exit
 
 CI/CD
