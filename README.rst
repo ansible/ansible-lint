@@ -76,51 +76,45 @@ Command Line Options
 
 The following is the output from ``ansible-lint --help``, providing an overview of the basic command line options:
 
-.. code-block:: bash
+.. code-block::
 
-    usage: ansible-lint [-h] [-L] [-q] [-p] [--parseable-severity] [-r RULESDIR]
-                        [-R] [--show-relpath] [-t TAGS] [-T] [-v] [-x SKIP_LIST]
-                        [--nocolor] [--force-color] [--exclude EXCLUDE_PATHS]
-                        [-c CONFIG_FILE] [--version]
-                        [playbook [playbook ...]]
+    usage: ansible-lint [-h] [-L] [-f {rich,plain,rst}] [-q] [-p] [--parseable-severity] [-r RULESDIR]
+                    [-R] [--show-relpath] [-t TAGS] [-T] [-v] [-x SKIP_LIST]
+                    [-w WARN_LIST [WARN_LIST ...]] [--nocolor] [--force-color]
+                    [--exclude EXCLUDE_PATHS] [-c CONFIG_FILE] [--version]
+                    [playbook [playbook ...]]
 
     positional arguments:
-      playbook              One or more files or paths. When missing it will
-                            enable auto-detection mode.
+      playbook              One or more files or paths. When missing it will enable auto-detection mode.
 
     optional arguments:
       -h, --help            show this help message and exit
       -L                    list all the rules
+      -f {rich,plain,rst}   Format used rules output, (default: rich)
       -q                    quieter, although not silent output
       -p                    parseable output in the format of pep8
       --parseable-severity  parseable output including severity of rule
-      -r RULESDIR           specify one or more rules directories using one or
-                            more -r arguments. Any -r flags override the default
-                            rules in /path/to/ansible-
-                            lint/lib/ansiblelint/rules, unless -R is also used.
-      -R                    Use default rules in /path/to/ansible-
-                            lint/lib/ansiblelint/rules in addition to any extra
-                            rules directories specified with -r. There is no need
-                            to specify this if no -r flags are used
+      -r RULESDIR           Specify custom rule directories. Add -R to keep using embedded rules from
+                            /usr/local/lib/python3.8/site-packages/ansiblelint/rules
+      -R                    Keep default rules when using -r
       --show-relpath        Display path relative to CWD
       -t TAGS               only check rules whose id/tags match these values
       -T                    list all the tags
       -v                    Increase verbosity level
-      -x SKIP_LIST          only check rules whose id/tags do not match these
-                            values
+      -x SKIP_LIST          only check rules whose id/tags do not match these values
+      -w WARN_LIST [WARN_LIST ...]
+                            only warn about these rules
       --nocolor             disable colored output
       --force-color         Try force colored output (relying on ansible's code)
       --exclude EXCLUDE_PATHS
-                            path to directories or files to skip. This option is
-                            repeatable.
-      -c CONFIG_FILE        Specify configuration file to use. Defaults to
-                            ".ansible-lint"
+                            path to directories or files to skip. This option is repeatable.
+      -c CONFIG_FILE        Specify configuration file to use. Defaults to ".ansible-lint"
       --version             show program's version number and exit
 
 CI/CD
 -----
 
-If executed under `Github Actions`_ is detected via the presence of
+If execution under `Github Actions`_ is detected via the presence of
 ``GITHUB_ACTIONS=true`` and ``GITHUB_WORFLOW=...`` variables, the linter will
 also print errors using their `annotation`_ format.
 
@@ -132,7 +126,7 @@ Linting Playbooks and Roles
 
 It's important to note that ``ansible-lint`` accepts a list of Ansible playbook files or a list of role directories. Starting from a directory that contains the following, the playbook file, ``playbook.yml``, or one of the role subdirectories, such as ``geerlingguy.apache``, can be passed:
 
-.. code-block:: bash
+.. code-block::
 
   playbook.yml
   roles/
@@ -155,7 +149,7 @@ It's important to note that ``ansible-lint`` accepts a list of Ansible playbook 
 
 The following lints the role ``geerlingguy.apache``:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint geerlingguy.apache
 
@@ -187,7 +181,7 @@ Here's the contents of ``playbook.yml``, which references multiples roles:
 
 The following lints ``playbook.yml``, which evaluates both the playbook and the referenced roles:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint playbook.yml
 
@@ -209,7 +203,7 @@ The following lints ``playbook.yml``, which evaluates both the playbook and the 
 
 Since ``ansible-lint`` accepts a list of roles or playbooks, the following works as well, producing the same output as the example above:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint geerlingguy.apache geerlingguy.elasticsearch
 
@@ -234,7 +228,7 @@ Examples
 
 Included in ``ansible-lint/examples`` are some example playbooks with undesirable features. Running ansible-lint on them works, as demonstrated in the following:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint examples/example.yml
 
@@ -301,7 +295,7 @@ Included in ``ansible-lint/examples`` are some example playbooks with undesirabl
 
 If playbooks include other playbooks, or tasks, or handlers or roles, these are also handled:
 
-.. code-block:: bash
+.. code-block::
 
     $ ansible-lint examples/include.yml
 
