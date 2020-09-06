@@ -79,9 +79,9 @@ markupsafe==1.1.1 \
     --hash=sha256:e249096428b3ae81b08327a63a485ad0878de3fb939049038579ac0ef61e17e7 \
     --hash=sha256:e8313f01ba26fbbe36c7be1966a7b7424942f670f38e666995b88d012765b9be \
     # via jinja2
-myst-parser==0.12.6 \
-    --hash=sha256:37e70c2dc908aacb391c2c0bd02f0d086921679ec84b8b9a155cbfd96d0123b6 \
-    --hash=sha256:e6a42aab0b9e98b1f5e6b145f743727c9ae7ab3229307109909f752222d1e409 \
+myst-parser==0.12.8 \
+    --hash=sha256:0b255f2c9b397c6f5df7317cc0ea2bb83dbd94d0f9dec41527065b492144463f \
+    --hash=sha256:8faec688fe31d0f0da2de9b5c7130b5814dfbc28e15ce28112a8b187a9c0a43f \
     # via -r requirements.in
 packaging==20.4 \
     --hash=sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8 \
