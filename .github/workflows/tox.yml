@@ -196,6 +196,8 @@ jobs:
       with:
         name: logs.zip
         path: .tox/**/log/
+      # https://github.com/actions/upload-artifact/issues/123
+      continue-on-error: true
     - name: Report junit failures
       uses: shyim/junit-report-annotations-action@3d2e5374f2b13e70f6f3209a21adfdbc42c466ae
       with:
