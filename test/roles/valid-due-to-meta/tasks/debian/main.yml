@@ -1,0 +1,2 @@
+# This empty task file is here to test that roles with tasks organized in subdirectories
+# are handled correctly by ansible-lint.
