@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Callable, ItemsView, List, Optional, Tuple
 
 import yaml
-from ansible import constants
+from ansible import cli, constants
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
@@ -416,8 +416,14 @@ def normalize_task_v2(task: dict) -> dict:  # noqa: C901
 
     sanitized_task = _sanitize_task(task)
     mod_arg_parser = ModuleArgsParser(sanitized_task)
+    ansible_version = cli.CLI.version_info()
     try:
-        action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+        if ansible_version['major'] > 2 or \
+           (ansible_version['major'] == 2 and ansible_version['minor'] >= 9):
+            action, arguments, result['delegate_to'] = \
+                mod_arg_parser.parse(skip_action_validation=True)
+        else:
+            action, arguments, result['delegate_to'] = mod_arg_parser.parse()
     except AnsibleParserError as e:
         try:
             task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
