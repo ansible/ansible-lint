@@ -95,7 +95,6 @@ class TestCliRolePaths(unittest.TestCase):
         assert len(result.stderr) == 0
         assert result.returncode == 0
 
-    @pytest.mark.xfail
     def test_run_role_name_from_meta(self):
         cwd = self.local_test_dir
         role_path = 'roles/valid-due-to-meta'
