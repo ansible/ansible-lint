@@ -57,6 +57,7 @@ from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
 from ansiblelint._internal.rules import AnsibleParserErrorRule
+from ansiblelint.cli import options
 from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
@@ -435,14 +436,16 @@ def _sanitize_task(task: dict) -> dict:
 
 # FIXME: drop noqa once this function is made simpler
 # Ref: https://github.com/ansible-community/ansible-lint/issues/744
-def normalize_task_v2(task: dict) -> dict:  # noqa: C901
+def normalize_task_v2(task: dict, options=options) -> dict:  # noqa: C901
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
 
     sanitized_task = _sanitize_task(task)
     mod_arg_parser = ModuleArgsParser(sanitized_task)
     try:
-        action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+        skip_action_validation = 'skip-action-validation' in options.tags
+        action, arguments, result['delegate_to'] = mod_arg_parser.parse(
+             skip_action_validation=skip_action_validation)
     except AnsibleParserError as e:
         raise MatchError(
             rule=AnsibleParserErrorRule,
@@ -530,13 +533,14 @@ def normalize_task_v1(task):  # noqa: C901
     return result
 
 
-def normalize_task(task, filename):
+def normalize_task(task, filename, options=options):
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
         del task['__ansible_action_type__']
-    task = normalize_task_v2(task)
+    task = normalize_task_v2(task, options)
     task[FILENAME_KEY] = filename
     task['__ansible_action_type__'] = ansible_action_type
+    # print(options)
     return task
 
 
@@ -604,7 +608,7 @@ def get_normalized_tasks(yaml, file):
         if 'skip_ansible_lint' in (task.get('tags') or []):
             # No need to normalize_task is we are skipping it.
             continue
-        res.append(normalize_task(task, file['path']))
+        res.append(normalize_task(task, file['path'], options=options))
 
     return res
 

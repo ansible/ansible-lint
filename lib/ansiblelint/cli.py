@@ -16,6 +16,9 @@ from ansiblelint.version import __version__
 _logger = logging.getLogger(__name__)
 _PATH_VARS = ['exclude_paths', 'rulesdir', ]
 
+# Allow reusing loaded config (options) from other modules
+options = argparse.Namespace(tags=[])
+
 
 def abspath(path: str, base_dir: str) -> str:
     """Make relative path absolute relative to given directory.
@@ -216,5 +219,11 @@ def get_config(arguments: List[str]):
 def print_help(file=sys.stdout):
     get_cli_parser().print_help(file=file)
 
+
+def configure(arguments: List[str]):
+    """Initialize configuration and also return it."""
+    global options  # pylint: disable=global-statement
+    options = get_config(arguments)
+    return options
 
 # vim: et:sw=4:syntax=python:ts=4:

@@ -26,6 +26,7 @@ import os
 import os.path
 import subprocess
 import sys
+from argparse import Namespace
 from pathlib import Path
 
 import pytest
@@ -76,6 +77,20 @@ def test_normalize(reference_form, alternate_forms):
 
     for form in alternate_forms:
         assert normal_form == utils.normalize_task(form, 'tasks.yml')
+
+
+def test_normalize_with_skip_action_validation():
+    """Validates that skip-action-validation is passed to ansible."""
+    # without this tag ansible would fail with a "couldn't resolve module/action"
+    # error but with it it will ignore missing module. Users should be warned
+    # that passing any non empty dictionary to the module will still produce
+    # an error like: this task '...' has extra params, which is only allowed
+    # in the following modules: ...
+
+    fake_options = Namespace(tags=["skip-action-validation"])
+    data = {"missing_module_foo": {}}
+    utils.normalize_task(
+        data, 'tasks.yml', options=fake_options)
 
 
 def test_normalize_complex_command():

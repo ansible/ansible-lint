@@ -19,7 +19,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """Command line implementation."""
-
 import errno
 import logging
 import os
@@ -32,7 +31,8 @@ from typing import TYPE_CHECKING, Any, List, Set, Type, Union
 from rich.markdown import Markdown
 from rich.syntax import Syntax
 
-from ansiblelint import cli, formatters
+from ansiblelint import formatters
+from ansiblelint.cli import configure
 from ansiblelint.color import console, console_stderr
 from ansiblelint.file_utils import cwd
 from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
@@ -122,11 +122,17 @@ warn_list:  # or 'skip_list' to silence them completely
         return 0
 
 
-def main() -> int:
+def main(args=None) -> int:
     """Linter CLI entry point."""
+    # We want to persist loaded config inside the module
+
+    if args is None:
+        args = sys.argv[1:]
+
     cwd = pathlib.Path.cwd()
 
-    options = cli.get_config(sys.argv[1:])
+    # this will also set options
+    options = configure(args)
 
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
