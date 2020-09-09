@@ -1,6 +1,7 @@
 """Runner implementation."""
 import logging
 import os
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set
 
 import ansiblelint.file_utils
@@ -14,6 +15,14 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__name__)
+
+
+@dataclass
+class LintResult:
+    """Class that tracks result of linting."""
+
+    matches: List[MatchError]
+    files: Set[str]
 
 
 class Runner(object):

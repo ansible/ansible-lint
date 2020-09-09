@@ -37,13 +37,11 @@ from ansiblelint.color import console, console_stderr
 from ansiblelint.file_utils import cwd
 from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
 from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
+from ansiblelint.runner import LintResult, Runner
 from ansiblelint.utils import get_playbooks_and_roles, get_rules_dirs
 
 if TYPE_CHECKING:
     from argparse import Namespace
-
-    from ansiblelint.errors import MatchError
 
 _logger = logging.getLogger(__name__)
 
@@ -88,38 +86,48 @@ def choose_formatter_factory(
     return r
 
 
-def report_outcome(matches: List["MatchError"], options) -> int:
+def report_outcome(result: LintResult, options, mark_as_success=False) -> int:
     """Display information about how to skip found rules.
 
     Returns exit code, 2 if errors were found, 0 when only warnings were found.
     """
-    failure = False
+    failures = 0
+    warnings = 0
     msg = """\
 You can skip specific rules or tags by adding them to your configuration file:
 ```yaml
 # .ansible-lint
 warn_list:  # or 'skip_list' to silence them completely
 """
-    matches_unignored = [match for match in matches if not match.ignored]
+    matches_unignored = [match for match in result.matches if not match.ignored]
 
+    # counting
     matched_rules = {match.rule.id: match.rule for match in matches_unignored}
+    for match in result.matches:
+        if {match.rule.id, *match.rule.tags}.isdisjoint(options.warn_list):
+            failures += 1
+        else:
+            warnings += 1
+
     for id in sorted(matched_rules.keys()):
         if {id, *matched_rules[id].tags}.isdisjoint(options.warn_list):
             msg += f"  - '{id}'  # {matched_rules[id].shortdesc}\n"
-            failure = True
-    for match in matches:
+    for match in result.matches:
         if "experimental" in match.rule.tags:
             msg += "  - experimental  # all rules tagged as experimental\n"
             break
     msg += "```"
 
-    if matches and not options.quiet:
+    if result.matches and not options.quiet:
         console_stderr.print(Markdown(msg))
+        console_stderr.print(
+            f"Finished with {failures} failure(s), {warnings} warning(s) "
+            f"on {len(result.files)} files."
+        )
 
-    if failure:
-        return 2
-    else:
+    if mark_as_success or not failures:
         return 0
+    return 2
 
 
 def main(argv: List[str] = None) -> int:
@@ -159,28 +167,25 @@ def main(argv: List[str] = None) -> int:
     options.skip_list = _sanitize_list_options(options.skip_list)
     options.warn_list = _sanitize_list_options(options.warn_list)
 
-    matches = _get_matches(rules, options)
-
-    # Assure we do not print duplicates and the order is consistent
-    matches = sorted(set(matches))
+    result = _get_matches(rules, options)
 
     mark_as_success = False
-    if matches and options.progressive:
+    if result.matches and options.progressive:
         _logger.info(
             "Matches found, running again on previous revision in order to detect regressions")
         with _previous_revision():
-            old_matches = _get_matches(rules, options)
+            old_result = _get_matches(rules, options)
             # remove old matches from current list
-            matches_delta = list(set(matches) - set(old_matches))
+            matches_delta = list(set(result.matches) - set(old_result.matches))
             if len(matches_delta) == 0:
                 _logger.warning(
                     "Total violations not increased since previous "
                     "commit, will mark result as success. (%s -> %s)",
-                    len(old_matches), len(matches_delta))
+                    len(old_result.matches), len(matches_delta))
                 mark_as_success = True
 
             ignored = 0
-            for match in matches:
+            for match in result.matches:
                 # if match is not new, mark is as ignored
                 if match not in matches_delta:
                     match.ignored = True
@@ -190,12 +195,9 @@ def main(argv: List[str] = None) -> int:
                     "Marked %s previously known violation(s) as ignored due to"
                     " progressive mode.", ignored)
 
-    _render_matches(matches, options, formatter, cwd)
+    _render_matches(result.matches, options, formatter, cwd)
 
-    if matches and not mark_as_success:
-        return report_outcome(matches, options=options)
-    else:
-        return 0
+    return report_outcome(result, mark_as_success=mark_as_success, options=options)
 
 
 def _render_matches(
@@ -227,7 +229,7 @@ def _render_matches(
             print(formatter.format(match))
 
 
-def _get_matches(rules: RulesCollection, options: "Namespace") -> list:
+def _get_matches(rules: RulesCollection, options: "Namespace") -> LintResult:
 
     if not options.playbook:
         # no args triggers auto-detection mode
@@ -242,7 +244,11 @@ def _get_matches(rules: RulesCollection, options: "Namespace") -> list:
                         options.skip_list, options.exclude_paths,
                         options.verbosity, checked_files)
         matches.extend(runner.run())
-    return matches
+
+    # Assure we do not print duplicates and the order is consistent
+    matches = sorted(set(matches))
+
+    return LintResult(matches=matches, files=checked_files)
 
 
 @contextmanager
