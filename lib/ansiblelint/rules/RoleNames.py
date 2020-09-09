@@ -54,8 +54,9 @@ class RoleNames(AnsibleLintRule):
     def match(self, file, text):
         path = file['path'].split("/")
         if "tasks" in path:
-            meta = Path(file['path']).parent.parent / "meta" / "main.yml"
             role_name = _remove_prefix(path[path.index("tasks") - 1], "ansible-role-")
+            role_root = path[:path.index("tasks")]
+            meta = Path("/".join(role_root)) / "meta" / "main.yml"
 
             if meta.is_file():
                 meta_data = parse_yaml_from_file(str(meta))
