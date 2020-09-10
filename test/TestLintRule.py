@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
 import unittest
 
 from .rules import EMatcherRule, UnsetVariableMatcherRule

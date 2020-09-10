@@ -1,3 +1,7 @@
+[IMPORTS]
+preferred-modules =
+    unittest:pytest,
+
 [MESSAGES CONTROL]
 
 disable =
