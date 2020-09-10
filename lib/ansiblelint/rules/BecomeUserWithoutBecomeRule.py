@@ -34,14 +34,15 @@ def _get_subtasks(data):
             'always',
             'rescue']
     for name in block_names:
-        if name in data:
+        if data and name in data:
             result += (data[name] or [])
     return result
 
 
 def _nested_search(term, data):
-    return ((term in data) or
-            reduce((lambda x, y: x or _nested_search(term, y)), _get_subtasks(data), False))
+    if data and term in data:
+        return True
+    return reduce((lambda x, y: x or _nested_search(term, y)), _get_subtasks(data), False)
 
 
 def _become_user_without_become(becomeuserabove, data):

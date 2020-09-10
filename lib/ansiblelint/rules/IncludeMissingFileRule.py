@@ -27,8 +27,9 @@ class IncludeMissingFileRule(AnsibleLintRule):
         # avoid failing with a playbook having tasks: null
         for task in (data.get('tasks', []) or []):
 
-            # check if the id of the current rule is not in list of skipped rules for this play
-            if self.id in task.get('skipped_rules', ()):
+            # ignore None tasks or
+            # if the id of the current rule is not in list of skipped rules for this play
+            if not task or self.id in task.get('skipped_rules', ()):
                 continue
 
             # collect information which file was referenced for include / import
