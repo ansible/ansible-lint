@@ -123,10 +123,11 @@ class AnnotationsFormatter(BaseFormatter):
         file_path = self._format_path(match.filename or "")
         line_num = match.linenumber
         rule_id = match.rule.id
+        severity = match.rule.severity
         violation_details = match.message
         return (
             f"::{level} file={file_path},line={line_num}"
-            f"::[E{rule_id}] {violation_details}"
+            f"::[E{rule_id}] [{severity}] {violation_details}"
         )
 
     @staticmethod
