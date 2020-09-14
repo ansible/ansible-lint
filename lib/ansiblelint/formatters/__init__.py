@@ -126,8 +126,8 @@ class AnnotationsFormatter(BaseFormatter):
         severity = match.rule.severity
         violation_details = match.message
         return (
-            f"::{level} file={file_path},line={line_num}"
-            f"::[E{rule_id}] [{severity}] {violation_details}"
+            f"::{level} file={file_path},line={line_num},severity={severity}"
+            f"::[E{rule_id}] {violation_details}"
         )
 
     @staticmethod
