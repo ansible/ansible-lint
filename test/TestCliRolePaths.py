@@ -128,7 +128,7 @@ def test_run_playbook_github(result, env):
     result_gh = run_ansible_lint(role_path, cwd=cwd, env=env)
 
     expected = (
-        '::error file=examples/example.yml,line=47::[E101] '
+        '::error file=examples/example.yml,line=47,severity=MEDIUM::[E101] '
         'Deprecated always_run'
     )
     assert (expected in result_gh.stdout) is result
