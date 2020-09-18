@@ -6,4 +6,4 @@
 
   tasks:
   - name: bonjour, ça va?
-    file: state=touch dest=/tmp/naïve.yml mode=preserve
+    file: state=touch dest=/tmp/naïve.yml mode=0600
