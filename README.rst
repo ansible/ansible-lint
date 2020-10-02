@@ -94,6 +94,8 @@ The following is the output from ``ansible-lint --help``, providing an overview 
       -q                    quieter, although not silent output
       -p                    parseable output in the format of pep8
       --parseable-severity  parseable output including severity of rule
+      --progressive         Return success if it detects a reduction in number of violations compared with
+                            previous git commit. This feature works only on git repository clones.
       -r RULESDIR           Specify custom rule directories. Add -R to keep using embedded rules from
                             /usr/local/lib/python3.8/site-packages/ansiblelint/rules
       -R                    Keep default rules when using -r
@@ -110,6 +112,23 @@ The following is the output from ``ansible-lint --help``, providing an overview 
                             path to directories or files to skip. This option is repeatable.
       -c CONFIG_FILE        Specify configuration file to use. Defaults to ".ansible-lint"
       --version             show program's version number and exit
+
+Progressive mode
+----------------
+
+In order to ease tool adoption, git users can enable the progressive mode using
+``--progressive`` option. This makes the linter return a success even if
+some failures are found, as long the total number of violations did not
+increase since the previous commit.
+
+As expected, this mode makes the linter run twice if it finds any violations.
+The second run is performed against a temporary git working copy that contains
+the previous commit. All the violations that were already present are removed
+from the list and the final result is displayed.
+
+The most notable benefit introduced by this mode it does not prevent merging
+new code while allowing developer to address historical violation at his own
+speed.
 
 CI/CD
 -----

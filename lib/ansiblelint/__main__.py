@@ -24,13 +24,16 @@ import errno
 import logging
 import os
 import pathlib
+import subprocess
 import sys
-from typing import TYPE_CHECKING, List, Set, Type
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, Any, List, Set, Type, Union
 
 from rich.markdown import Markdown
 
 from ansiblelint import cli, formatters
 from ansiblelint.color import console, console_stderr
+from ansiblelint.file_utils import cwd
 from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
@@ -96,8 +99,9 @@ You can skip specific rules or tags by adding them to your configuration file:
 # .ansible-lint
 warn_list:  # or 'skip_list' to silence them completely
 """
+    matches_unignored = [match for match in matches if not match.ignored]
 
-    matched_rules = {match.rule.id: match.rule for match in matches}
+    matched_rules = {match.rule.id: match.rule for match in matches_unignored}
     for id in sorted(matched_rules.keys()):
         if {id, *matched_rules[id].tags}.isdisjoint(options.warn_list):
             msg += f"  - '{id}'  # {matched_rules[id].shortdesc}\n"
@@ -151,6 +155,76 @@ def main() -> int:
         skip.update(str(s).split(','))
     options.skip_list = frozenset(skip)
 
+    matches = _get_matches(rules, options)
+
+    # Assure we do not print duplicates and the order is consistent
+    matches = sorted(set(matches))
+
+    mark_as_success = False
+    if matches and options.progressive:
+        _logger.info(
+            "Matches found, running again on previous revision in order to detect regressions")
+        with _previous_revision():
+            old_matches = _get_matches(rules, options)
+            # remove old matches from current list
+            matches_delta = list(set(matches) - set(old_matches))
+            if len(matches_delta) == 0:
+                _logger.warning(
+                    "Total violations not increased since previous "
+                    "commit, will mark result as success. (%s -> %s)",
+                    len(old_matches), len(matches_delta))
+                mark_as_success = True
+
+            ignored = 0
+            for match in matches:
+                # if match is not new, mark is as ignored
+                if match not in matches_delta:
+                    match.ignored = True
+                    ignored += 1
+            if ignored:
+                _logger.warning(
+                    "Marked %s previously known violation(s) as ignored due to"
+                    " progressive mode.", ignored)
+
+    _render_matches(matches, options, formatter, cwd)
+
+    if matches and not mark_as_success:
+        return report_outcome(matches, options=options)
+    else:
+        return 0
+
+
+def _render_matches(
+        matches: List,
+        options: "Namespace",
+        formatter: Any,
+        cwd: Union[str, pathlib.Path]):
+
+    ignored_matches = [match for match in matches if match.ignored]
+    fatal_matches = [match for match in matches if not match.ignored]
+    # Displayed ignored matches first
+    if ignored_matches:
+        _logger.warning(
+            "Listing %s violation(s) marked as ignored, likely already known",
+            len(ignored_matches))
+        for match in ignored_matches:
+            if match.ignored:
+                print(formatter.format(match, options.colored))
+    if fatal_matches:
+        _logger.warning("Listing %s violation(s) that are fatal", len(fatal_matches))
+        for match in fatal_matches:
+            if not match.ignored:
+                print(formatter.format(match, options.colored))
+
+    # If run under GitHub Actions we also want to emit output recognized by it.
+    if os.getenv('GITHUB_ACTIONS') == 'true' and os.getenv('GITHUB_WORKFLOW'):
+        formatter = formatters.AnnotationsFormatter(cwd, True)
+        for match in matches:
+            print(formatter.format(match))
+
+
+def _get_matches(rules: RulesCollection, options: "Namespace") -> list:
+
     if not options.playbook:
         # no args triggers auto-detection mode
         playbooks = get_playbooks_and_roles(options=options)
@@ -164,23 +238,26 @@ def main() -> int:
                         options.skip_list, options.exclude_paths,
                         options.verbosity, checked_files)
         matches.extend(runner.run())
+    return matches
 
-    # Assure we do not print duplicates and the order is consistent
-    matches = sorted(set(matches))
 
-    for match in matches:
-        print(formatter.format(match, options.colored))
-
-    # If run under GitHub Actions we also want to emit output recognized by it.
-    if os.getenv('GITHUB_ACTIONS') == 'true' and os.getenv('GITHUB_WORKFLOW'):
-        formatter = formatters.AnnotationsFormatter(cwd, True)
-        for match in matches:
-            print(formatter.format(match))
-
-    if matches:
-        return report_outcome(matches, options=options)
-    else:
-        return 0
+@contextmanager
+def _previous_revision():
+    """Create or update a temporary workdir containing the previous revision."""
+    worktree_dir = ".cache/old-rev"
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD^1"],
+        check=True,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        ).stdout
+    p = pathlib.Path(worktree_dir)
+    p.mkdir(parents=True, exist_ok=True)
+    os.system(f"git worktree add -f {worktree_dir} 2>/dev/null")
+    with cwd(worktree_dir):
+        os.system(f"git checkout {revision}")
+        yield
 
 
 if __name__ == "__main__":

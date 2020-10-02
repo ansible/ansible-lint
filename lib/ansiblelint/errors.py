@@ -41,6 +41,7 @@ class MatchError(ValueError):
         self.details = details
         self.filename = normpath(filename) if filename else None
         self.rule = rule
+        self.ignored = False  # If set it will be displayed but not counted as failure
 
     def __repr__(self):
         """Return a MatchError instance representation."""
