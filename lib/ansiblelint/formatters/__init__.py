@@ -107,9 +107,9 @@ class AnnotationsFormatter(BaseFormatter):
     in a form of GitHub Checks API annotations that appear rendered in pull-
     request files view.
 
-    ::debug file={name},line={line},col={col}::{message}
-    ::warning file={name},line={line},col={col}::{message}
-    ::error file={name},line={line},col={col}::{message}
+    ::debug file={name},line={line},col={col},severity={severity}::{message}
+    ::warning file={name},line={line},col={col},severity={severity}::{message}
+    ::error file={name},line={line},col={col},severity={severity}::{message}
 
     Supported levels: debug, warning, error
     """
@@ -123,9 +123,10 @@ class AnnotationsFormatter(BaseFormatter):
         file_path = self._format_path(match.filename or "")
         line_num = match.linenumber
         rule_id = match.rule.id
+        severity = match.rule.severity
         violation_details = match.message
         return (
-            f"::{level} file={file_path},line={line_num}"
+            f"::{level} file={file_path},line={line_num},severity={severity}"
             f"::[E{rule_id}] {violation_details}"
         )
 
