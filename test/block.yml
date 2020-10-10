@@ -11,7 +11,7 @@
         - name: failure command
           command: /bin/false
           changed_when: False
-        - name: never reacehd debug message
+        - name: never reached debug message
           debug: msg='i never execute, cause ERROR!'
       rescue:
         - name: exception debug message
