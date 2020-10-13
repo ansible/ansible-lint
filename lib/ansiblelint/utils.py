@@ -147,7 +147,7 @@ def _rebind_match_filename(filename: str, func) -> Callable:
     return func_wrapper
 
 
-def _set_collections_basedir(basedir):
+def _set_collections_basedir(basedir: str):
     # Sets the playbook directory as playbook_paths for the collection loader
     try:
         # Ansible 2.10+
