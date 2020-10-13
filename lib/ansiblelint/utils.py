@@ -147,21 +147,26 @@ def _rebind_match_filename(filename: str, func) -> Callable:
     return func_wrapper
 
 
+def _set_collections_basedir(basedir):
+    # Sets the playbook directory as playbook_paths for the collection loader
+    try:
+        # Ansible 2.10+
+        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
+        from ansible.utils.collection_loader import AnsibleCollectionConfig
+
+        AnsibleCollectionConfig.playbook_paths = basedir
+    except ImportError:
+        # Ansible 2.8 or 2.9
+        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
+        from ansible.utils.collection_loader import set_collection_playbook_paths
+
+        set_collection_playbook_paths(basedir)
+
+
 def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
     if not os.path.exists(playbook[0]):
         return []
-
-    try:
-        # Ansible 2.10+
-        from ansible.utils.collection_loader import AnsibleCollectionConfig
-
-        AnsibleCollectionConfig.playbook_paths = playbook_dir or '.'
-    except ImportError:
-        # Ansible 2.8 or 2.9
-        from ansible.utils.collection_loader import set_collection_playbook_paths
-
-        set_collection_playbook_paths(playbook_dir or '.')
-
+    _set_collections_basedir(playbook_dir or '.')
     add_all_plugin_dirs(playbook_dir or '.')
     if playbook[1] == 'role':
         playbook_ds = {'roles': [{'role': playbook[0]}]}
