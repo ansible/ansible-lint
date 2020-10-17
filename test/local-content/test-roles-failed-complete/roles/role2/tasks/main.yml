@@ -1,0 +1,11 @@
+---
+- name: Use local module from other role that has been included before this one
+  # If it has not been included before, loading this role fails!
+  test_module_1_failed_complete:
+- name: Use local module from other role that has been included before this one
+  # If it has not been included before, loading this role fails!
+  test_module_3_failed_complete:
+- name: Use local test plugin
+  assert:
+    that:
+      - "'2' is b_test_failed_complete '12345'"

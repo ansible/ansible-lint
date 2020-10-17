@@ -1,0 +1,7 @@
+---
+- name: Use roles with local module in wrong order, so that Ansible fails
+  hosts: localhost
+  roles:
+    - role2
+    - role3
+    - role1
