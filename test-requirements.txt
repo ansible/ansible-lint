@@ -21,4 +21,4 @@ six==1.15.0               # via packaging
 toml==0.10.1              # via pytest
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==50.3.0        # via -r test-requirements.in
+setuptools==50.3.2        # via -r test-requirements.in
