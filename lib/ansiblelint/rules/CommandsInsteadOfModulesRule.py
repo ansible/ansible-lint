@@ -21,19 +21,7 @@
 import os
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import get_first_cmd_arg
-
-try:
-    from ansible.module_utils.parsing.convert_bool import boolean
-except ImportError:
-    try:
-        from ansible.utils.boolean import boolean
-    except ImportError:
-        try:
-            from ansible.utils import boolean
-        except ImportError:
-            from ansible import constants
-            boolean = constants.mk_boolean
+from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
@@ -81,6 +69,6 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
 
         executable = os.path.basename(first_cmd_arg)
         if executable in self._modules and \
-                boolean(task['action'].get('warn', True)):
+                convert_to_boolean(task['action'].get('warn', True)):
             message = '{0} used in place of {1} module'
             return message.format(executable, self._modules[executable])

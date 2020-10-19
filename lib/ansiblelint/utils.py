@@ -29,7 +29,7 @@ from argparse import Namespace
 from collections import OrderedDict
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, ItemsView, List, Optional, Tuple
+from typing import Any, Callable, ItemsView, List, Optional, Tuple
 
 import yaml
 from ansible import constants
@@ -50,6 +50,18 @@ from ansiblelint.constants import (
 )
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
+
+try:
+    from ansible.module_utils.parsing.convert_bool import boolean
+except ImportError:
+    try:
+        from ansible.utils.boolean import boolean
+    except ImportError:
+        try:
+            from ansible.utils import boolean
+        except ImportError:
+            from ansible import constants
+            boolean = constants.mk_boolean
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -834,3 +846,8 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool) -> List[str]:
         return rulesdir + custom_ruledirs + default_ruledirs
 
     return rulesdir or custom_ruledirs + default_ruledirs
+
+
+def convert_to_boolean(value: Any) -> bool:
+    """Use Ansible to convert something to a boolean."""
+    return boolean(value)
