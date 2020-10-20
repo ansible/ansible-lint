@@ -40,7 +40,7 @@ from ansible.parsing.splitter import split_args
 from ansible.parsing.yaml.constructor import AnsibleConstructor
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
-from ansible.plugins.loader import module_loader
+from ansible.plugins.loader import add_all_plugin_dirs
 from ansible.template import Templar
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
@@ -147,9 +147,27 @@ def _rebind_match_filename(filename: str, func) -> Callable:
     return func_wrapper
 
 
+def _set_collections_basedir(basedir: str):
+    # Sets the playbook directory as playbook_paths for the collection loader
+    try:
+        # Ansible 2.10+
+        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
+        from ansible.utils.collection_loader import AnsibleCollectionConfig
+
+        AnsibleCollectionConfig.playbook_paths = basedir
+    except ImportError:
+        # Ansible 2.8 or 2.9
+        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
+        from ansible.utils.collection_loader import set_collection_playbook_paths
+
+        set_collection_playbook_paths(basedir)
+
+
 def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
     if not os.path.exists(playbook[0]):
         return []
+    _set_collections_basedir(playbook_dir or '.')
+    add_all_plugin_dirs(playbook_dir or '.')
     if playbook[1] == 'role':
         playbook_ds = {'roles': [{'role': playbook[0]}]}
     else:
@@ -205,8 +223,7 @@ def play_children(basedir, item, parent_type, playbook_dir):
         'import_tasks': _include_children,
     }
     (k, v) = item
-    play_library = os.path.join(os.path.abspath(basedir), 'library')
-    _load_library_if_exists(play_library)
+    add_all_plugin_dirs(os.path.abspath(basedir))
 
     if k in delegate_map:
         if v:
@@ -310,11 +327,6 @@ def _roles_children(basedir: str, k, v, parent_type: FileType, main='main') -> l
     return results
 
 
-def _load_library_if_exists(path: str) -> None:
-    if os.path.exists(path):
-        module_loader.add_directory(path)
-
-
 def _rolepath(basedir: str, role: str) -> Optional[str]:
     role_path = None
 
@@ -345,7 +357,7 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
             break
 
     if role_path:
-        _load_library_if_exists(os.path.join(role_path, 'library'))
+        add_all_plugin_dirs(role_path)
 
     return role_path
 

@@ -1,0 +1,5 @@
+---
+- name: Include role which expects module that is local to other role which is not loaded
+  hosts: localhost
+  roles:
+    - role2

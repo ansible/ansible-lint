@@ -1,0 +1,3 @@
+---
+- name: Use local module 3
+  test_module_3_success:

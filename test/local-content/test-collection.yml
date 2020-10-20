@@ -1,0 +1,10 @@
+---
+- name: Use module and filter plugin from local collection
+  hosts: localhost
+  tasks:
+    - name: Use module from local collection
+      testns.testcoll.test_module_2:
+    - name: Use filter from local collection
+      assert:
+        that:
+          - 1 | testns.testcoll.test_filter(2) == '1:2'
