@@ -41,3 +41,6 @@ pip-wheel-metadata
 
 # mypy
 .mypy_cache
+
+# .cache is used by progressive mode
+.cache
