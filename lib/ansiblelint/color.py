@@ -1,7 +1,7 @@
 """Console coloring and terminal support."""
-import sys
-from enum import Enum
+from typing import Any, Dict
 
+import rich
 from rich.console import Console
 from rich.theme import Theme
 
@@ -9,23 +9,33 @@ _theme = Theme({
     "info": "cyan",
     "warning": "dim yellow",
     "danger": "bold red",
-    "title": "yellow"
+    "title": "yellow",
+    "error_code": "bright_red",
+    "error_title": "red",
+    "filename": "blue"
 })
-console = Console(theme=_theme)
-console_stderr = Console(file=sys.stderr, theme=_theme)
+console_options: Dict[str, Any] = {
+    "emoji": False,
+    "theme": _theme,
+    "soft_wrap": True
+}
+
+console = rich.get_console()
+console_stderr = Console(**console_options, stderr=True)
 
 
-class Color(Enum):
-    """Color styles."""
+def reconfigure(new_options: Dict[str, Any]):
+    """Reconfigure console options."""
+    global console_options  # pylint: disable=global-statement
+    global console_stderr  # pylint: disable=global-statement
 
-    reset = "0"
-    error_code = "1;31"  # bright red
-    error_title = "0;31"  # red
-    filename = "0;34"  # blue
-    linenumber = "0;36"  # cyan
-    line = "0;35"  # purple
+    console_options = new_options
+    rich.reconfigure(**new_options)
+    # see https://github.com/willmcgugan/rich/discussions/484#discussioncomment-200182
+    tmp_console = Console(**console_options, stderr=True)
+    console_stderr.__dict__ = tmp_console.__dict__
 
 
-def colorize(text: str, color: Color) -> str:
-    """Return ANSI formated string."""
-    return f"\u001b[{color.value}m{text}\u001b[{Color.reset.value}m"
+def render_yaml(text: str):
+    """Colorize YAMl for nice display."""
+    return rich.syntax.Syntax(text, 'yaml', theme="ansi_dark")

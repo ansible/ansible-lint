@@ -31,16 +31,31 @@ class TestFormatter(unittest.TestCase):
     def setUp(self):
         self.rule = AnsibleLintRule()
         self.rule.id = "TCF0001"
-        self.formatter = Formatter(pathlib.Path.cwd(), True)
+        self.formatter = Formatter(pathlib.Path.cwd(), display_relative_path=True)
 
     def test_format_coloured_string(self):
-        match = MatchError("message", 1, "hello", "filename.yml", self.rule)
-        self.formatter.format(match, True)
+        match = MatchError(
+            message="message",
+            linenumber=1,
+            details="hello",
+            filename="filename.yml",
+            rule=self.rule)
+        self.formatter.format(match)
 
     def test_unicode_format_string(self):
-        match = MatchError(u'\U0001f427', 1, "hello", "filename.yml", self.rule)
-        self.formatter.format(match, False)
+        match = MatchError(
+            message=u'\U0001f427',
+            linenumber=1,
+            details="hello",
+            filename="filename.yml",
+            rule=self.rule)
+        self.formatter.format(match)
 
     def test_dict_format_line(self):
-        match = MatchError("xyz", 1, {'hello': 'world'}, "filename.yml", self.rule,)
-        self.formatter.format(match, True)
+        match = MatchError(
+            message="xyz",
+            linenumber=1,
+            details={'hello': 'world'},
+            filename="filename.yml",
+            rule=self.rule,)
+        self.formatter.format(match)

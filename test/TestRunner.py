@@ -45,25 +45,22 @@ def test_runner(default_rules_collection, playbook, exclude, length):
     assert len(matches) == length
 
 
-@pytest.mark.parametrize(('formatter_cls', 'format_kwargs'), (
-    pytest.param(formatters.Formatter, {}, id='Formatter-plain'),
+@pytest.mark.parametrize(('formatter_cls'), (
+    pytest.param(formatters.Formatter, id='Formatter-plain'),
     pytest.param(formatters.ParseableFormatter,
-                 {'colored': True},
                  id='ParseableFormatter-colored'),
     pytest.param(formatters.QuietFormatter,
-                 {'colored': True},
                  id='QuietFormatter-colored'),
     pytest.param(formatters.Formatter,
-                 {'colored': True},
                  id='Formatter-colored'),
 ))
-def test_runner_unicode_format(default_rules_collection, formatter_cls, format_kwargs):
-    formatter = formatter_cls(os.getcwd(), True)
+def test_runner_unicode_format(default_rules_collection, formatter_cls):
+    formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(default_rules_collection, 'test/unicode.yml', [], [], [])
 
     matches = runner.run()
 
-    formatter.format(matches[0], **format_kwargs)
+    formatter.format(matches[0])
 
 
 @pytest.mark.parametrize('directory_name', ('test/', os.path.abspath('test')))
