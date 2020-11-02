@@ -47,3 +47,6 @@
     - name: always run
       debug: msg="always_run is deprecated"
       always_run: true
+
+    # empty task is currently accepted by ansible as valid code:
+    -

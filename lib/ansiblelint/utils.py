@@ -252,6 +252,11 @@ def _include_children(basedir, k, v, parent_type):
 def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List:
     results = []
     for th in v:
+
+        # ignore empty tasks, `-`
+        if not th:
+            continue
+
         with contextlib.suppress(LookupError):
             children = _get_task_handler_children_for_tasks_or_playbooks(
                 th, basedir, k, parent_type,
@@ -284,9 +289,16 @@ def _get_task_handler_children_for_tasks_or_playbooks(
 ) -> dict:
     """Try to get children of taskhandler for include/import tasks/playbooks."""
     child_type = k if parent_type == 'playbook' else parent_type
+
     task_include_keys = 'include', 'include_tasks', 'import_playbook', 'import_tasks'
     for task_handler_key in task_include_keys:
+
         with contextlib.suppress(KeyError):
+
+            # ignore empty tasks
+            if not task_handler:
+                continue
+
             return {
                 'path': path_dwim(basedir, task_handler[task_handler_key]),
                 'type': child_type,
@@ -558,6 +570,9 @@ def extract_from_list(blocks, candidates):
 def add_action_type(actions, action_type):
     results = list()
     for action in actions:
+        # ignore empty task
+        if not action:
+            continue
         action['__ansible_action_type__'] = BLOCK_NAME_TO_ACTION_TYPE_MAP[action_type]
         results.append(action)
     return results
