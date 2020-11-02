@@ -764,6 +764,7 @@ def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
         elif 'roles' in p.parts or '.' in role_dirs:
             if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
                 role_dirs.append(str(p.parents[1]))
+                continue
             elif role_internals.intersection(p.parts):
                 continue
             elif 'tests' in p.parts:
