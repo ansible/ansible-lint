@@ -48,7 +48,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         'file',
         'replace',  # implicit preserve behavior but mode: preserve is invalid
         'template',  # supports preserve
-        'unarchive',
+        # 'unarchive',  # disabled because .tar.gz files can have permissions inside
     }
 
     _modules_with_create = {
