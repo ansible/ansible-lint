@@ -50,6 +50,10 @@ SUCCESS_TASKS = '''
     - name: replace should not require mode
       replace:
         path: foo
+    - name: file with recursive does not require mode
+      file:
+        state: directory
+        recurse: yes
 '''
 
 FAIL_TASKS = '''

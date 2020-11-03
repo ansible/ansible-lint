@@ -81,6 +81,10 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         if task['action'].get('state', None) == "link":
             return False
 
+        # Recurse on a directory does not allow for an uniform mode
+        if task['action'].get('recurse', None):
+            return False
+
         # The file module does not create anything when state==file (default)
         if module == "file" and \
                 task['action'].get('state', 'file') == 'file':
