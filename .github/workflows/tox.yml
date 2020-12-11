@@ -4,9 +4,8 @@ on:
   create:  # is used for publishing to PyPI and TestPyPI
     tags:  # any tag regardless of its name, no branches
   push:  # only publishes pushes to the main branch to TestPyPI
-    branches:  # any branch but not tag
-    - >-
-      **
+    branches:  # any integration branch but not tag
+    - "master"
     tags-ignore:
     - >-
       **
@@ -37,7 +36,10 @@ jobs:
       TOX_PARALLEL_NO_SPINNER: 1
 
     steps:
-    - uses: actions/checkout@master
+    - name: Check out src from Git
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # needed by setuptools-scm
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
@@ -111,8 +113,6 @@ jobs:
         # - windows-latest
         # - windows-2016
         include:
-        - os: ubuntu-20.04
-          python-version: 3.9
         - os: macOS-latest
           python-version: 3.6
         - os: macOS-latest
@@ -122,11 +122,9 @@ jobs:
       TOX_PARALLEL_NO_SPINNER: 1
 
     steps:
-    - uses: actions/checkout@master
-    - name: Get history and tags for SCM versioning to work
-      run: |
-        git fetch --prune --unshallow
-        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # needed by setuptools-scm
     - name: >-
         Log the currently selected Python
         version info (${{ matrix.python-version }})
@@ -219,19 +217,8 @@ jobs:
     - name: Check out src from Git
       uses: actions/checkout@v2
       with:
-        # Get shallow Git history (default) for tag creation events
-        # but have a complete clone for any other workflows.
-        # Both options fetch tags but since we're going to remove
-        # one from HEAD in non-create-tag workflows, we need full
-        # history for them.
-        fetch-depth: >-
-          ${{
-            (
-              github.event_name == 'create' &&
-              github.event.ref_type == 'tag'
-            ) &&
-            1 || 0
-          }}
+        fetch-depth: 0  # needed by setuptools-scm
+
     - name: Drop Git tags from HEAD for non-tag-create events
       if: >-
         github.event_name != 'create' ||
