@@ -43,12 +43,32 @@ Installing
 
 Installing on Windows is not supported because we use symlinks inside Python packages.
 
+.. note::
+
+    The default installation of ansible-lint package no longer installs any
+    specific version of ansible. You need to either install the desired version
+    of Ansible yourself or mention one of the helper extras:
+
+    * ``core`` - will install latest version of ansible-base 2.10
+    * ``community`` - will install latest version of ansible 2.10 with community collections
+    * ``devel`` - will install Ansible from git devel branch (unsupported)
+
 Using Pip
 ---------
 
 .. code-block:: bash
 
+    # Assuming you already installed ansible:
     pip install ansible-lint
+
+    # If you want to install and use latest ansible (w/o community collections)
+    pip install "ansible-lint[core]"
+
+    # If you want to install and use latest ansible with community collections
+    pip install "ansible-lint[community]"
+
+    # If you want to install an older version of Ansible 2.9
+    pip install ansible-lint "ansible>=2.9,<2.10"
 
 .. _installing_from_source:
 

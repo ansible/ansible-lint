@@ -72,10 +72,10 @@ FAIL_TASKS = '''
       file:
         path: foo
         state: directory
-    - name: permissions needed if create is used
-      ini_file:
-        path: foo
-        create: true
+    # - name: permissions needed if create is used
+    #   ini_file:
+    #     path: foo
+    #     create: true
     - name: lineinfile when create is true
       lineinfile:
         path: foo
@@ -85,11 +85,11 @@ FAIL_TASKS = '''
       replace:
         path: foo
         mode: preserve
-    - name: ini_file does not accept preserve mode
-      ini_file:
-        path: foo
-        create: true
-        mode: preserve
+    # - name: ini_file does not accept preserve mode
+    #   ini_file:
+    #     path: foo
+    #     create: true
+    #     mode: preserve
 '''
 
 
@@ -104,11 +104,11 @@ def test_success(rule_runner):
 def test_fail(rule_runner):
     """Validate that missing mode triggers the rule."""
     results = rule_runner.run_playbook(FAIL_TASKS)
-    assert len(results) == 7
+    assert len(results) == 5
     assert results[0].linenumber == 5
     assert results[1].linenumber == 9
     assert results[2].linenumber == 13
-    assert results[3].linenumber == 17
-    assert results[4].linenumber == 21
-    assert results[5].linenumber == 26
-    assert results[6].linenumber == 30
+    # assert results[3].linenumber == 17
+    assert results[3].linenumber == 21
+    assert results[4].linenumber == 26
+    # assert results[6].linenumber == 30
