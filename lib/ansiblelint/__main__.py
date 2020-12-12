@@ -29,12 +29,10 @@ import sys
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, List, Set, Type, Union
 
-from packaging import version
 from rich.markdown import Markdown
 
 from ansiblelint import cli, formatters
 from ansiblelint.color import console, console_stderr
-from ansiblelint.constants import ANSIBLE_FAILURE_RC, ANSIBLE_MIN_VERSION
 from ansiblelint.file_utils import cwd
 from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
 from ansiblelint.rules import RulesCollection
@@ -157,9 +155,6 @@ def main() -> int:
         skip.update(str(s).split(','))
     options.skip_list = frozenset(skip)
 
-    # Validate presence of supported versions of Ansible library
-    check_ansible_presence()
-
     matches = _get_matches(rules, options)
 
     # Assure we do not print duplicates and the order is consistent
@@ -263,28 +258,6 @@ def _previous_revision():
     with cwd(worktree_dir):
         os.system(f"git checkout {revision}")
         yield
-
-
-def check_ansible_presence() -> None:
-    """Assures we stop execution if Ansible is missing."""
-    failed = False
-    try:
-        # pylint: disable=import-outside-toplevel
-        from ansible import __version__ as ansible_version
-        if version.parse(ansible_version) <= version.parse(ANSIBLE_MIN_VERSION):
-            failed = True
-    except ImportError:
-        ansible_version = None
-        failed = True
-    if failed:
-        _logger.error(
-            "ansible-lint requires a version of Ansible package"
-            " >= %s, but %s was found. "
-            "Please install it using the same python interpreter. See "
-            "https://docs.ansible.com/ansible/latest/installation_guide"
-            "/intro_installation.html#installing-ansible-with-pip",
-            ANSIBLE_MIN_VERSION, ansible_version)
-        sys.exit(ANSIBLE_FAILURE_RC)
 
 
 if __name__ == "__main__":
