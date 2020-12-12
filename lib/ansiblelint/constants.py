@@ -15,4 +15,7 @@ CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
 INVALID_CONFIG_RC = 2
 ANSIBLE_FAILURE_RC = 3
 
+# Minimal version of Ansible we support for runtime
+ANSIBLE_MIN_VERSION = "2.9"
+
 FileType = Literal["playbook", "pre_tasks", "post_tasks"]
