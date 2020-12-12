@@ -176,6 +176,7 @@ def merge_config(file_config, cli_config) -> NamedTuple:
         'parseable_severity',
         'quiet',
         'use_default_rules',
+        'progressive',
     )
     # maps lists to their default config values
     lists_map = {
