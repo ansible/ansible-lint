@@ -4,9 +4,8 @@ on:
   create:  # is used for publishing to PyPI and TestPyPI
     tags:  # any tag regardless of its name, no branches
   push:  # only publishes pushes to the main branch to TestPyPI
-    branches:  # any branch but not tag
-    - >-
-      **
+    branches:  # any integration branch but not tag
+    - "master"
     tags-ignore:
     - >-
       **
@@ -28,18 +27,21 @@ jobs:
         python-version:
         - 3.8
         os:
-        - ubuntu-latest
+        - ubuntu-20.04
         env:
         - TOXENV: lint
         - TOXENV: docs
-        - TOXENV: build-dists,metadata-validation
+        - TOXENV: packaging
     env:
       TOX_PARALLEL_NO_SPINNER: 1
 
     steps:
-    - uses: actions/checkout@master
+    - name: Check out src from Git
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # needed by setuptools-scm
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     # - name: set PY_SHA256
@@ -86,7 +88,7 @@ jobs:
 
   unit:
     name: >-
-      py${{ matrix.python-version }}@${{ matrix.os }}
+      ${{ matrix.tox_env }}@${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       # fail-fast: false
@@ -107,26 +109,40 @@ jobs:
         # NOTE: possible because compiling cffi explodes.
         os:
         # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
-        - ubuntu-latest  # 18.04
+        - ubuntu-20.04
         # - windows-latest
         # - windows-2016
         include:
-        - os: ubuntu-20.04
-          python-version: 3.9
-        - os: macOS-latest
+        - tox_env: py36
+          os: ubuntu-20.04
           python-version: 3.6
-        - os: macOS-latest
+        - tox_env: py37
+          os: ubuntu-20.04
+          python-version: 3.7
+        - tox_env: py38
+          os: ubuntu-20.04
+          python-version: 3.8
+        - tox_env: py39
+          os: ubuntu-20.04
+          python-version: 3.9
+        - tox_env: py36
+          os: macOS-latest
+          python-version: 3.6
+        - tox_env: py38
+          os: macOS-latest
           python-version: 3.8
 
     env:
       TOX_PARALLEL_NO_SPINNER: 1
 
     steps:
-    - uses: actions/checkout@master
-    - name: Get history and tags for SCM versioning to work
-      run: |
-        git fetch --prune --unshallow
-        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # needed by setuptools-scm
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
     - name: >-
         Log the currently selected Python
         version info (${{ matrix.python-version }})
@@ -146,7 +162,7 @@ jobs:
         python3 -m pip install --upgrade tox
     - name: Log installed dists
       run: >-
-        python -m pip freeze --all
+        python3 -m pip freeze --all
     - name: >-
         Initialize tox envs
       run: >-
@@ -158,28 +174,23 @@ jobs:
         --skip-missing-interpreters false
         -vv
       env:
-        TOXENV: ansible28,ansible29,ansible210,ansibledevel
-    - name: "Test with tox: ansible28"
-      run: |
-        python3 -m tox
-      env:
-        TOXENV: ansible28
+        TOXENV: ${{ matrix.tox_env }}-core,${{ matrix.tox_env }}-ansible29,${{ matrix.tox_env }}-devel
     # sequential run improves browsing experience (almost no speed impact)
-    - name: "Test with tox: ansible29"
+    - name: "Test with tox: ${{ matrix.tox_env }}-core"
       run: |
         python3 -m tox
       env:
-        TOXENV: ansible29
-    - name: "Test with tox: ansible210"
+        TOXENV: ${{ matrix.tox_env }}-core
+    - name: "Test with tox: ${{ matrix.tox_env }}-ansible29"
       run: |
         python3 -m tox
       env:
-        TOXENV: ansible210
-    - name: "Test with tox: ansibledevel"
+        TOXENV: ${{ matrix.tox_env }}-ansible29
+    - name: "Test with tox: ${{ matrix.tox_env }}-devel"
       run: |
         python3 -m tox
       env:
-        TOXENV: ansibledevel
+        TOXENV: ${{ matrix.tox_env }}-devel
     - name: Archive logs
       uses: actions/upload-artifact@v2
       with:
@@ -198,11 +209,11 @@ jobs:
     needs:
     - linters
     - unit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     env:
       PY_COLORS: 1
-      TOXENV: build-dists,metadata-validation
+      TOXENV: packaging
       TOX_PARALLEL_NO_SPINNER: 1
 
     steps:
@@ -219,19 +230,8 @@ jobs:
     - name: Check out src from Git
       uses: actions/checkout@v2
       with:
-        # Get shallow Git history (default) for tag creation events
-        # but have a complete clone for any other workflows.
-        # Both options fetch tags but since we're going to remove
-        # one from HEAD in non-create-tag workflows, we need full
-        # history for them.
-        fetch-depth: >-
-          ${{
-            (
-              github.event_name == 'create' &&
-              github.event.ref_type == 'tag'
-            ) &&
-            1 || 0
-          }}
+        fetch-depth: 0  # needed by setuptools-scm
+
     - name: Drop Git tags from HEAD for non-tag-create events
       if: >-
         github.event_name != 'create' ||

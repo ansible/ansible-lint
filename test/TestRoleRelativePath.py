@@ -14,14 +14,15 @@ FAIL_TASKS = '''
   copy:
     src: ../files/foo.conf
     dest: /etc/foo.conf
-- name: win_template example
-  win_template:
-    src: ../win_templates/file.conf.j2
-    dest: file.conf
-- name: win_copy example
-  win_copy:
-    src: ../files/foo.conf
-    dest: renamed-foo.conf
+# Removed from test suite as module is no longer part of core
+# - name: win_template example
+#   win_template:
+#     src: ../win_templates/file.conf.j2
+#     dest: file.conf
+# - name: win_copy example
+#   win_copy:
+#     src: ../files/foo.conf
+#     dest: renamed-foo.conf
 '''
 
 SUCCESS_TASKS = '''
@@ -29,10 +30,10 @@ SUCCESS_TASKS = '''
   copy:
     content: '# This file was moved to /etc/other.conf'
     dest: /etc/mine.conf
-- name: content example with no src
-  win_copy:
-    content: '# This file was moved to /etc/other.conf'
-    dest: /etc/mine.conf
+# - name: content example with no src
+#   win_copy:
+#     content: '# This file was moved to /etc/other.conf'
+#     dest: /etc/mine.conf
 '''
 
 
@@ -45,7 +46,7 @@ class TestRoleRelativePath(unittest.TestCase):
 
     def test_fail(self):
         results = self.runner.run_role_tasks_main(FAIL_TASKS)
-        self.assertEqual(4, len(results))
+        self.assertEqual(2, len(results))
 
     def test_success(self):
         results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
