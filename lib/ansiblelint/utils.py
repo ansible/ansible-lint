@@ -29,7 +29,7 @@ from argparse import Namespace
 from collections import OrderedDict
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, ItemsView, List, Optional, Tuple
+from typing import Any, Callable, ItemsView, List, Optional, Tuple
 
 import yaml
 from ansible import constants
@@ -42,6 +42,18 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible.template import Templar
+
+try:
+    from ansible.module_utils.parsing.convert_bool import boolean
+except ImportError:
+    try:
+        from ansible.utils.boolean import boolean
+    except ImportError:
+        try:
+            from ansible.utils import boolean
+        except ImportError:
+            boolean = constants.mk_boolean
+
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
@@ -834,3 +846,8 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool) -> List[str]:
         return rulesdir + custom_ruledirs + default_ruledirs
 
     return rulesdir or custom_ruledirs + default_ruledirs
+
+
+def convert_to_boolean(value: Any) -> bool:
+    """Use Ansible to convert something to a boolean."""
+    return boolean(value)
