@@ -52,7 +52,6 @@ except ImportError:
         try:
             from ansible.utils import boolean
         except ImportError:
-            from ansible import constants
             boolean = constants.mk_boolean
 
 from yaml.composer import Composer
