@@ -42,14 +42,6 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible.template import Templar
-from yaml.composer import Composer
-from yaml.representer import RepresenterError
-
-from ansiblelint.constants import (
-    ANSIBLE_FAILURE_RC, CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType,
-)
-from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import normpath
 
 try:
     from ansible.module_utils.parsing.convert_bool import boolean
@@ -62,6 +54,15 @@ except ImportError:
         except ImportError:
             from ansible import constants
             boolean = constants.mk_boolean
+
+from yaml.composer import Composer
+from yaml.representer import RepresenterError
+
+from ansiblelint.constants import (
+    ANSIBLE_FAILURE_RC, CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType,
+)
+from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import normpath
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
