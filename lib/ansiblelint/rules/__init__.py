@@ -42,6 +42,20 @@ class AnsibleLintRule(object):
         text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
         return text
 
+    def create_matcherror(
+            self,
+            message: str = None,
+            linenumber: int = 0,
+            details: str = "",
+            filename: str = None) -> MatchError:
+        return MatchError(
+            message=message,
+            linenumber=linenumber,
+            details=details,
+            filename=filename,
+            rule=self
+            )
+
     def matchlines(self, file, text) -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.match:
@@ -62,12 +76,11 @@ class AnsibleLintRule(object):
             message = None
             if isinstance(result, str):
                 message = result
-            m = MatchError(
+            m = self.create_matcherror(
                 message=message,
                 linenumber=prev_line_no + 1,
                 details=line,
-                filename=file['path'],
-                rule=self)
+                filename=file['path'])
             matches.append(m)
         return matches
 
@@ -106,12 +119,11 @@ class AnsibleLintRule(object):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            m = MatchError(
+            m = self.create_matcherror(
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
                 details=task_msg,
-                filename=file['path'],
-                rule=self)
+                filename=file['path'])
             matches.append(m)
         return matches
 
@@ -153,13 +165,12 @@ class AnsibleLintRule(object):
 
             for section, message, *optional_linenumber in result:
                 linenumber = self._matchplay_linenumber(play, optional_linenumber)
-                m = MatchError(
+                matches.append(self.create_matcherror(
                     message=message,
                     linenumber=linenumber,
                     details=str(section),
-                    filename=file['path'],
-                    rule=self)
-                matches.append(m)
+                    filename=file['path']
+                    ))
         return matches
 
 
