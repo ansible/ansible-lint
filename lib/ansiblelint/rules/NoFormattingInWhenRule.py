@@ -4,7 +4,7 @@ from ansiblelint.rules import AnsibleLintRule
 class NoFormattingInWhenRule(AnsibleLintRule):
     id = '102'
     shortdesc = 'No Jinja2 in when'
-    description = '``when`` lines should not include Jinja2 variables'
+    description = '``when`` is a raw Jinja2 expression, remove redundant {{ }} from variable(s).'
     severity = 'HIGH'
     tags = ['deprecated', 'ANSIBLE0019']
     version_added = 'historic'
