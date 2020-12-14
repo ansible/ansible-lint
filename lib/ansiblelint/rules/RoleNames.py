@@ -29,7 +29,7 @@ from ansiblelint.utils import parse_yaml_from_file
 ROLE_NAME_REGEX = '^[a-z][a-z0-9_]+$'
 
 
-def _remove_prefix(text, prefix):
+def _remove_prefix(text: str, prefix: str) -> str:
     return re.sub(r'^{0}'.format(re.escape(prefix)), '', text)
 
 

@@ -1,9 +1,16 @@
 """Utility functions related to file operations."""
 import os
 from contextlib import contextmanager
+from typing import TYPE_CHECKING, Any, Iterator, Union
+
+if TYPE_CHECKING:
+    # https://github.com/PyCQA/pylint/issues/3979
+    BasePathLike = os.PathLike[Any]  # pylint: disable=unsubscriptable-object
+else:
+    BasePathLike = os.PathLike
 
 
-def normpath(path) -> str:
+def normpath(path: Union[str, BasePathLike]) -> str:
     """
     Normalize a path in order to provide a more consistent output.
 
@@ -15,7 +22,7 @@ def normpath(path) -> str:
 
 
 @contextmanager
-def cwd(path):
+def cwd(path: Union[str, BasePathLike]) -> Iterator[None]:
     """Context manager for temporary changing current working directory."""
     old_pwd = os.getcwd()
     os.chdir(path)

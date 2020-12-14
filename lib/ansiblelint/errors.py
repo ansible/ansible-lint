@@ -1,6 +1,6 @@
 """Exceptions and error representations."""
 import functools
-from typing import Type
+from typing import Any, Optional, Type
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.file_utils import normpath
@@ -24,10 +24,10 @@ class MatchError(ValueError):
 
     def __init__(
             self,
-            message=None,
-            linenumber=0,
+            message: Optional[str] = None,
+            linenumber: int = 0,
             details: str = "",
-            filename=None,
+            filename: Optional[str] = None,
             rule: Type[BaseRule] = RuntimeErrorRule
             ) -> None:
         """Initialize a MatchError instance."""
@@ -46,7 +46,7 @@ class MatchError(ValueError):
         self.rule = rule
         self.ignored = False  # If set it will be displayed but not counted as failure
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a MatchError instance representation."""
         formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
         # note that `rule.id` can be int, str or even missing, as users
@@ -57,7 +57,7 @@ class MatchError(ValueError):
                                 self.filename, self.linenumber, self.details)
 
     @property
-    def _hash_key(self):
+    def _hash_key(self) -> Any:
         # line attr is knowingly excluded, as dict is not hashable
         return (
             self.filename,
@@ -67,17 +67,17 @@ class MatchError(ValueError):
             self.details,
         )
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         """Return whether the current object is less than the other."""
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self._hash_key < other._hash_key
+        return bool(self._hash_key < other._hash_key)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Return a hash value of the MatchError instance."""
         return hash(self._hash_key)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Identify whether the other object represents the same rule match."""
         if not isinstance(other, self.__class__):
             return NotImplemented
