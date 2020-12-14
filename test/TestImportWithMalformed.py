@@ -52,7 +52,7 @@ def _play_files(tmp_path, request):
             marks=pytest.mark.xfail(
                 reason='Garbage non-tasks sequence is not being '
                 'properly processed. Ref: '
-                'https://github.com/ansible/ansible-lint/issues/707',
+                'https://github.com/ansible-community/ansible-lint/issues/707',
                 raises=AttributeError,
             ),
         ),
