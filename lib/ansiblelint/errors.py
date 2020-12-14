@@ -1,6 +1,8 @@
 """Exceptions and error representations."""
 import functools
+from typing import Type
 
+from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.file_utils import normpath
 
 
@@ -26,11 +28,12 @@ class MatchError(ValueError):
             linenumber=0,
             details: str = "",
             filename=None,
-            rule=None) -> None:
+            rule: Type[BaseRule] = RuntimeErrorRule
+            ) -> None:
         """Initialize a MatchError instance."""
         super().__init__(message)
 
-        if not (message or rule):
+        if rule is RuntimeErrorRule and not message:
             raise TypeError(
                 f'{self.__class__.__name__}() missing a '
                 "required argument: one of 'message' or 'rule'",

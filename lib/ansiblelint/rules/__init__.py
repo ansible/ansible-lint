@@ -10,30 +10,17 @@ from time import sleep
 from typing import List
 
 import ansiblelint.utils
-from ansiblelint.errors import MatchError
+from ansiblelint.errors import BaseRule, MatchError, RuntimeErrorRule
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
 _logger = logging.getLogger(__name__)
 
 
-class AnsibleLintRule(object):
+class AnsibleLintRule(BaseRule):
 
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
-
-    def verbose(self) -> str:
-        return self.id + ": " + self.shortdesc + "\n  " + self.description
-
-    id: str = ""
-    tags: List[str] = []
-    shortdesc: str = ""
-    description: str = ""
-    version_added: str = ""
-    severity: str = ""
-    match = None
-    matchtask = None
-    matchplay = None
 
     @staticmethod
     def unjinja(text):
@@ -53,7 +40,7 @@ class AnsibleLintRule(object):
             linenumber=linenumber,
             details=details,
             filename=filename,
-            rule=self
+            rule=self.__class__
             )
 
     def matchlines(self, file, text) -> List[MatchError]:
@@ -198,7 +185,10 @@ class RulesCollection(object):
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
-        self.rules: List[AnsibleLintRule] = []
+        self.rules: List[BaseRule] = []
+        # internal rules included in order to expose them for docs as they are
+        # not directly loaded by our rule loader.
+        self.rules.append(RuntimeErrorRule())
         for rulesdir in self.rulesdirs:
             _logger.debug("Loading rules from %s", rulesdir)
             self.extend(load_plugins(rulesdir))
