@@ -14,11 +14,11 @@
    :target: https://github.com/ansible-community/ansible-lint/discussions
    :alt: Discussions
 
-.. image:: https://github.com/ansible/ansible-lint/workflows/gh/badge.svg
+.. image:: https://github.com/ansible-community/ansible-lint/workflows/gh/badge.svg
    :target: https://github.com/ansible-community/ansible-lint/actions?query=workflow%3Agh+branch%3Amaster+event%3Apush
    :alt: GitHub Actions CI/CD
 
-.. image:: https://img.shields.io/lgtm/grade/python/g/ansible/ansible-lint.svg?logo=lgtm&logoWidth=18
+.. image:: https://img.shields.io/lgtm/grade/python/g/ansible-community/ansible-lint.svg?logo=lgtm&logoWidth=18
    :target: https://lgtm.com/projects/g/ansible-community/ansible-lint/context:python
    :alt: Language grade: Python
 
@@ -53,7 +53,7 @@ related to containers and use the discussions_ forum instead.
     docker run -h toolset -it quay.io/ansible/toolset ansible-lint --version
 
 .. _toolset: https://github.com/ansible-community/toolset
-.. _discussions: https://github.com/ansible/ansible-lint/discussions
+.. _discussions: https://github.com/ansible-community/ansible-lint/discussions
 
 .. note::
 
@@ -92,7 +92,7 @@ to learn more about managing Pip versions.
 
 .. code-block:: bash
 
-    pip install git+https://github.com/ansible/ansible-lint.git
+    pip install git+https://github.com/ansible-community/ansible-lint.git
 
 .. _PyPA User Guide: https://packaging.python.org/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date
 
@@ -450,7 +450,7 @@ To use ansible-lint with `pre-commit`_, just add the following to your local rep
 
 .. code-block:: yaml
 
-    - repo: https://github.com/ansible/ansible-lint.git
+    - repo: https://github.com/ansible-community/ansible-lint.git
       rev: v4.1.0
       hooks:
         - id: ansible-lint
