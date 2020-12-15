@@ -428,7 +428,7 @@ def _sanitize_task(task: dict) -> dict:
     result = task.copy()
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
-    for k in ['skipped_rules', FILENAME_KEY, LINE_NUMBER_KEY]:
+    for k in ['skipped_rules', FILENAME_KEY, LINE_NUMBER_KEY, 'always_run']:
         if k in result:
             del result[k]
     return result
@@ -439,16 +439,6 @@ def _sanitize_task(task: dict) -> dict:
 def normalize_task_v2(task: dict) -> dict:  # noqa: C901
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
-    if 'always_run' in task:
-        # FIXME(ssbarnea): Delayed import to avoid circular import
-        # See https://github.com/ansible-community/ansible-lint/issues/880
-        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
-        from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
-
-        raise MatchError(
-            rule=AlwaysRunRule,
-            filename=task[FILENAME_KEY],
-            linenumber=task[LINE_NUMBER_KEY])
 
     sanitized_task = _sanitize_task(task)
     mod_arg_parser = ModuleArgsParser(sanitized_task)
