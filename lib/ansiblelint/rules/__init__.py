@@ -85,7 +85,7 @@ class AnsibleLintRule(object):
         return matches
 
     # TODO(ssbarnea): Reduce mccabe complexity
-    # https://github.com/ansible/ansible-lint/issues/744
+    # https://github.com/ansible-community/ansible-lint/issues/744
     def matchtasks(self, file: str, text: str) -> List[MatchError]:  # noqa: C901
         matches: List[MatchError] = []
         if not self.matchtask:

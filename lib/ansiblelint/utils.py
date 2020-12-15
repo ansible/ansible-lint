@@ -435,13 +435,13 @@ def _sanitize_task(task: dict) -> dict:
 
 
 # FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible/ansible-lint/issues/744
+# Ref: https://github.com/ansible-community/ansible-lint/issues/744
 def normalize_task_v2(task: dict) -> dict:  # noqa: C901
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
     if 'always_run' in task:
         # FIXME(ssbarnea): Delayed import to avoid circular import
-        # See https://github.com/ansible/ansible-lint/issues/880
+        # See https://github.com/ansible-community/ansible-lint/issues/880
         # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
         from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
 
@@ -495,7 +495,7 @@ def normalize_task_v2(task: dict) -> dict:  # noqa: C901
 
 
 # FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible/ansible-lint/issues/744
+# Ref: https://github.com/ansible-community/ansible-lint/issues/744
 def normalize_task_v1(task):  # noqa: C901
     result = dict()
     for (k, v) in task.items():
@@ -524,7 +524,7 @@ def normalize_task_v1(task):  # noqa: C901
                     else:
                         # Tasks that include playbooks (rather than task files)
                         # can get here
-                        # https://github.com/ansible/ansible-lint/issues/138
+                        # https://github.com/ansible-community/ansible-lint/issues/138
                         raise RuntimeError("Was not expecting value %s of type %s for key %s\n"
                                            "Task: %s. Check the syntax of your playbook using "
                                            "ansible-playbook --syntax-check" %
@@ -745,7 +745,7 @@ def get_yaml_files(options: Namespace) -> dict:
 
 
 # FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible/ansible-lint/issues/744
+# Ref: https://github.com/ansible-community/ansible-lint/issues/744
 def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
     """Find roles and playbooks."""
     if options is None:

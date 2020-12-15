@@ -24,7 +24,7 @@ class TestDeprecatedModuleRule(unittest.TestCase):
     @pytest.mark.xfail(
         ANSIBLE_MAJOR_VERSION > (2, 9),
         reason='Ansible devel has changed so ansible-lint needs fixing. '
-        'Ref: https://github.com/ansible/ansible-lint/issues/675',
+        'Ref: https://github.com/ansible-community/ansible-lint/issues/675',
         raises=SystemExit, strict=True,
     )
     def test_module_deprecated(self):
