@@ -46,7 +46,7 @@ class RoleNames(AnsibleLintRule):
     )
     severity = 'HIGH'
     done: List[str] = []  # already noticed roles list
-    tags = ['deprecated']
+    tags = ['deprecations']
     version_added = 'v4.3.0'
 
     ROLE_NAME_REGEXP = re.compile(ROLE_NAME_REGEX)
