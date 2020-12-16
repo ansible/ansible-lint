@@ -29,7 +29,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
         'with or without a version'
     )
     severity = 'VERY_LOW'
-    tags = ['module', 'repeatability', 'ANSIBLE0010']
+    tags = ['module', 'repeatability']
     version_added = 'historic'
 
     _package_managers = [

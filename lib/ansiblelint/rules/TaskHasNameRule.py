@@ -29,7 +29,7 @@ class TaskHasNameRule(AnsibleLintRule):
         'and for ``--start-at-task`` to work'
     )
     severity = 'MEDIUM'
-    tags = ['task', 'readability', 'ANSIBLE0011']
+    tags = ['task', 'readability']
     version_added = 'historic'
 
     _nameless_tasks = ['meta', 'debug', 'include_role', 'import_role',

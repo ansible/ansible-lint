@@ -30,7 +30,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
         'through environment argument'
     )
     severity = 'VERY_HIGH'
-    tags = ['command-shell', 'bug', 'ANSIBLE0014']
+    tags = ['command-shell', 'bug']
     version_added = 'historic'
 
     expected_args = ['chdir', 'creates', 'executable', 'removes', 'stdin', 'warn',

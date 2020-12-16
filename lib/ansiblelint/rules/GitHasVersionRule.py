@@ -29,7 +29,7 @@ class GitHasVersionRule(AnsibleLintRule):
         'an explicit commit or tag, not just ``latest``'
     )
     severity = 'MEDIUM'
-    tags = ['module', 'repeatability', 'ANSIBLE0004']
+    tags = ['module', 'repeatability']
     version_added = 'historic'
 
     def matchtask(self, file, task):
