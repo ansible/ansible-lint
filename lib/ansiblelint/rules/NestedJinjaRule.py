@@ -32,13 +32,14 @@ class NestedJinjaRule(AnsibleLintRule):
     description = (
         "There should not be any nested jinja pattern. "
         "Example (bad): ``{{ list_one + {{ list_two | max }} }}``, "
-        "example (good): ``{{ list_one + max(list_two) }}``"
+        "Example (good): ``{{ list_one + max(list_two) }}``, "
+        "Example (allowed): ``--format='{{'{{'}}.Size{{'}}'}}'``"
     )
     severity = 'VERY_HIGH'
     tags = ['formatting']
     version_added = 'v4.3.0'
 
-    pattern = re.compile(r"{{(?:[^{}]*)?{{")
+    pattern = re.compile(r"{{(?:[^{}]*)?[^'\"]{{")
 
     def matchtask(self, file, task):
 
