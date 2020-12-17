@@ -326,11 +326,12 @@ def _validate_task_handler_action_for_role(th_action: dict) -> None:
     module = th_action['__ansible_module__']
 
     if 'name' not in th_action:
-        raise MatchError(f"Failed to find required 'name' key in {module!s}")
+        raise MatchError(
+            message=f"Failed to find required 'name' key in {module!s}")
 
     if not isinstance(th_action['name'], str):
-        raise RuntimeError(
-            f"Value assigned to 'name' key on '{module!s}' is not a string.",
+        raise MatchError(
+            message=f"Value assigned to 'name' key on '{module!s}' is not a string.",
         )
 
 
