@@ -486,7 +486,7 @@ The following shows the available tags in an example set of rules, and the rules
     behaviour ['[503]']
     bug ['[304]']
     command-shell ['[305]', '[302]', '[304]', '[306]', '[301]', '[303]']
-    deprecated ['[105]', '[104]', '[103]', '[101]', '[102]']
+    deprecations ['[105]', '[104]', '[103]', '[101]', '[102]']
     formatting ['[104]', '[203]', '[201]', '[204]', '[206]', '[205]', '[202]']
     idempotency ['[301]']
     idiom ['[601]', '[602]']
@@ -593,7 +593,7 @@ An example rule using ``match`` is:
         shortdesc = 'Deprecated variable declarations'
         description = 'Check for lines that have old style ${var} ' + \
                       'declarations'
-        tags = { 'deprecated' }
+        tags = { 'deprecations' }
 
         def match(self, file, line):
             return '${' in line

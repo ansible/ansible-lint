@@ -13,7 +13,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
         'https://docs.ansible.com/ansible/latest/modules/list_of_all_modules.html'
     )
     severity = 'HIGH'
-    tags = ['deprecated']
+    tags = ['deprecations']
     version_added = 'v4.0.0'
 
     _modules = [

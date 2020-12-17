@@ -6,7 +6,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
     shortdesc = 'No Jinja2 in when'
     description = '``when`` is a raw Jinja2 expression, remove redundant {{ }} from variable(s).'
     severity = 'HIGH'
-    tags = ['deprecated']
+    tags = ['deprecations']
     version_added = 'historic'
 
     def _is_valid(self, when):
