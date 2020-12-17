@@ -153,15 +153,8 @@ def main() -> int:
     if isinstance(options.tags, str):
         options.tags = options.tags.split(',')
 
-    skip = set()
-    for s in options.skip_list:
-        skip.update(str(s).split(','))
-    options.skip_list = frozenset(skip)
-
-    warn = set()
-    for w in options.warn_list:
-        warn.update(str(w).split(','))
-    options.warn_list = frozenset(warn)
+    options.skip_list = _sanitize_list_options(options.skip_list)
+    options.warn_list = _sanitize_list_options(options.warn_list)
 
     matches = _get_matches(rules, options)
 
@@ -266,6 +259,13 @@ def _previous_revision():
     with cwd(worktree_dir):
         os.system(f"git checkout {revision}")
         yield
+
+
+def _sanitize_list_options(tag_list: list):
+    tags = set()
+    for t in tag_list:
+        tags.update(str(t).split(','))
+    return frozenset(tags)
 
 
 if __name__ == "__main__":
