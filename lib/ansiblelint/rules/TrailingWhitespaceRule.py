@@ -26,7 +26,7 @@ class TrailingWhitespaceRule(AnsibleLintRule):
     shortdesc = 'Trailing whitespace'
     description = 'There should not be any trailing whitespace'
     severity = 'INFO'
-    tags = ['formatting', 'ANSIBLE0002']
+    tags = ['formatting']
     version_added = 'historic'
 
     def match(self, file, line):

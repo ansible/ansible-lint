@@ -30,7 +30,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
         'for some of those!)'
     )
     severity = 'HIGH'
-    tags = ['command-shell', 'safety', 'ANSIBLE0013']
+    tags = ['command-shell', 'safety']
     version_added = 'historic'
 
     def matchtask(self, file, task):

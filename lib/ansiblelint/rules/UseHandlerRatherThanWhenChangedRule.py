@@ -36,7 +36,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         'acting as a handler'
     )
     severity = 'MEDIUM'
-    tags = ['task', 'behaviour', 'ANSIBLE0016']
+    tags = ['task', 'behaviour']
     version_added = 'historic'
 
     def matchtask(self, file, task):
