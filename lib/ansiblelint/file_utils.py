@@ -1,7 +1,7 @@
 """Utility functions related to file operations."""
 import os
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Iterator, Union
+from typing import TYPE_CHECKING, Any, Iterator, List, Union
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3979
@@ -30,3 +30,18 @@ def cwd(path: Union[str, BasePathLike]) -> Iterator[None]:
         yield
     finally:
         os.chdir(old_pwd)
+
+
+def expand_path_vars(path: str) -> str:
+    """Expand the environment or ~ variables in a path string."""
+    # It may be possible for function to be called with a Path object
+    path = str(path).strip()
+    path = os.path.expanduser(path)
+    path = os.path.expandvars(path)
+    return path
+
+
+def expand_paths_vars(paths: List[str]) -> List[str]:
+    """Expand the environment or ~ variables in a list."""
+    paths = [expand_path_vars(p) for p in paths]
+    return paths

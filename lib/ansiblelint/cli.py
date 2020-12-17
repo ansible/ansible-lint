@@ -10,7 +10,7 @@ from typing import List, NamedTuple
 import yaml
 
 from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
-from ansiblelint.utils import expand_path_vars
+from ansiblelint.file_utils import expand_path_vars
 from ansiblelint.version import __version__
 
 _logger = logging.getLogger(__name__)
