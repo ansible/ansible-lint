@@ -29,7 +29,7 @@ class MercurialHasRevisionRule(AnsibleLintRule):
         'an explicit commit or tag, not just ``latest``'
     )
     severity = 'MEDIUM'
-    tags = ['module', 'repeatability', 'ANSIBLE0005']
+    tags = ['module', 'repeatability']
     version_added = 'historic'
 
     def matchtask(self, file, task):

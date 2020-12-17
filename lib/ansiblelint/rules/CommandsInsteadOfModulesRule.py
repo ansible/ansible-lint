@@ -32,7 +32,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'is generally a bad idea'
     )
     severity = 'HIGH'
-    tags = ['command-shell', 'resources', 'ANSIBLE0006']
+    tags = ['command-shell', 'resources']
     version_added = 'historic'
 
     _commands = ['command', 'shell']
