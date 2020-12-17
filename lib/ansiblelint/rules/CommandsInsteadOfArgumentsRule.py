@@ -32,7 +32,7 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
         'is generally a bad idea'
     )
     severity = 'VERY_HIGH'
-    tags = ['command-shell', 'resources', 'ANSIBLE0007']
+    tags = ['command-shell', 'resources']
     version_added = 'historic'
 
     _commands = ['command', 'shell', 'raw']
