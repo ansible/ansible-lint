@@ -245,11 +245,37 @@ class RulesCollection(object):
                           for rule in sorted(self.rules, key=lambda x: x.id)])
 
     def listtags(self) -> str:
+        tag_desc = {
+            "behaviour": "Indicates a bad practice or behavior",
+            "bug": "Likely wrong usage pattern",
+            "command-shell": "Specific to use of command and shell modules",
+            "core": "Related to internal implementation of the linter",
+            "deprecations": "Indicate use of features that are removed from Ansible",
+            "experimental": "Newly introduced rules, by default triggering only warnings",
+            "formatting": "Related to code-style",
+            "idempotency":
+                "Possible indication that consequent runs would produce different results",
+            "idiom": "Anti-pattern detected, likely to cause undesired behavior",
+            "metadata": "Invalid metadata, likely related to galaxy, collections or roles",
+            "module": "Incorrect module usage",
+            "readability": "Reduce code readability",
+            "repeatability": "Action that may produce different result between runs",
+            "resources": "Unoptimal feature use",
+            "safety": "Increase security risk",
+            "task": "Rules specific to tasks",
+            "unpredictability": "This will produce unexpected behavior when run",
+        }
+
         tags = defaultdict(list)
         for rule in self.rules:
             for tag in rule.tags:
-                tags[tag].append("[{0}]".format(rule.id))
-        results = []
+                tags[tag].append(rule.id)
+        result = "# List of tags and how they are used\n"
         for tag in sorted(tags):
-            results.append("{0} {1}".format(tag, tags[tag]))
-        return "\n".join(results)
+            desc = tag_desc.get(tag, None)
+            if desc:
+                result += f"{tag}:  # {desc}\n"
+            else:
+                result += f"{tag}:\n"
+            result += f"  rules: [{', '.join(tags[tag])}]\n"
+        return result

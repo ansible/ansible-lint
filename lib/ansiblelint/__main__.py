@@ -30,6 +30,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, List, Set, Type, Union
 
 from rich.markdown import Markdown
+from rich.syntax import Syntax
 
 from ansiblelint import cli, formatters
 from ansiblelint.color import console, console_stderr
@@ -144,7 +145,9 @@ def main() -> int:
         return 0
 
     if options.listtags:
-        print(rules.listtags())
+        console.print(
+            Syntax(rules.listtags(), 'yaml')
+            )
         return 0
 
     if isinstance(options.tags, str):
