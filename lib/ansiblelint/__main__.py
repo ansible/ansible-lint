@@ -158,6 +158,11 @@ def main() -> int:
         skip.update(str(s).split(','))
     options.skip_list = frozenset(skip)
 
+    warn = set()
+    for w in options.warn_list:
+        warn.update(str(w).split(','))
+    options.warn_list = frozenset(warn)
+
     matches = _get_matches(rules, options)
 
     # Assure we do not print duplicates and the order is consistent
