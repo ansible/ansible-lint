@@ -150,6 +150,14 @@ SUCCESS_TASK_C_2P_M = PlayFile('playbook.yml', '''
           }}{{ 3 - 3 }}
 ''')
 
+SUCCESS_TASK_PRINT = PlayFile('playbook.yml', '''
+- hosts: all
+  tasks:
+    - name: print curly braces
+      debug:
+        msg: docker image inspect my_image --format='{{'{{'}}.Size{{'}}'}}'
+''')
+
 
 @pytest.fixture
 def runner(tmp_path, default_rules_collection):
@@ -199,6 +207,7 @@ def test_including_wrong_nested_jinja(runner):
             [SUCCESS_TASK_C_2P_M],
             id='file includes multiline nesting close to each other',
         ),
+        pytest.param([SUCCESS_TASK_PRINT], id='file includes print curly braces'),
     ),
     indirect=['_playbook_file'],
 )
