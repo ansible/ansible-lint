@@ -30,7 +30,7 @@ class OctalPermissionsRule(AnsibleLintRule):
         'http://docs.ansible.com/ansible/file_module.html'
     )
     severity = 'VERY_HIGH'
-    tags = ['formatting', 'ANSIBLE0009']
+    tags = ['formatting']
     version_added = 'historic'
 
     _modules = ['assemble', 'copy', 'file', 'ini_file', 'lineinfile',

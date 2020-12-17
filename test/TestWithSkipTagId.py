@@ -23,7 +23,7 @@ class TestWithSkipTagId(unittest.TestCase):
         self.assertGreater(len(errs), 0)
 
     def test_negative_with_tag(self):
-        with_tag = 'ANSIBLE0002'
+        with_tag = 'formatting'
         bad_runner = Runner(self.collection, self.file, [with_tag], [], [])
         errs = bad_runner.run()
         self.assertGreater(len(errs), 0)
@@ -34,6 +34,6 @@ class TestWithSkipTagId(unittest.TestCase):
         self.assertEqual([], good_runner.run())
 
     def test_positive_skip_tag(self):
-        skip_tag = 'ANSIBLE0002'
+        skip_tag = 'formatting'
         good_runner = Runner(self.collection, self.file, [], [skip_tag], [])
         self.assertEqual([], good_runner.run())
