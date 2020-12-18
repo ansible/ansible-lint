@@ -1,7 +1,7 @@
 ---
 name: 📝 Documentation Report
 about: Ask us about docs
-labels: priority/medium, status/new, documentation
+labels: new, docs
 ---
 <!--- Verify first that your improvement is not already reported on GitHub -->
 <!--- Also test if the latest release and master branch are affected too -->
