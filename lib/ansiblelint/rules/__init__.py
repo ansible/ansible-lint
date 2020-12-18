@@ -184,7 +184,7 @@ class RulesCollection(object):
         """Initialize a RulesCollection instance."""
         if rulesdirs is None:
             rulesdirs = []
-        self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
+        self.rulesdirs = ansiblelint.file_utils.expand_paths_vars(rulesdirs)
         self.rules: List[BaseRule] = []
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.

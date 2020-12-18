@@ -807,21 +807,6 @@ def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
     return role_dirs + playbooks
 
 
-def expand_path_vars(path: str) -> str:
-    """Expand the environment or ~ variables in a path string."""
-    # It may be possible for function to be called with a Path object
-    path = str(path).strip()
-    path = os.path.expanduser(path)
-    path = os.path.expandvars(path)
-    return path
-
-
-def expand_paths_vars(paths: List[str]) -> List[str]:
-    """Expand the environment or ~ variables in a list."""
-    paths = [expand_path_vars(p) for p in paths]
-    return paths
-
-
 def get_rules_dirs(rulesdir: List[str], use_default: bool) -> List[str]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]

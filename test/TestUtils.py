@@ -32,7 +32,7 @@ import pytest
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
-from ansiblelint.file_utils import normpath
+from ansiblelint.file_utils import expand_path_vars, expand_paths_vars, normpath
 
 
 @pytest.mark.parametrize(('string', 'expected_cmd', 'expected_args', 'expected_kwargs'), (
@@ -148,8 +148,8 @@ def test_expand_path_vars(monkeypatch):
     """Ensure that tilde and env vars are expanded in paths."""
     test_path = '/test/path'
     monkeypatch.setenv('TEST_PATH', test_path)
-    assert utils.expand_path_vars('~') == os.path.expanduser('~')
-    assert utils.expand_path_vars('$TEST_PATH') == test_path
+    assert expand_path_vars('~') == os.path.expanduser('~')
+    assert expand_path_vars('$TEST_PATH') == test_path
 
 
 @pytest.mark.parametrize(('test_path', 'expected'), (
@@ -161,7 +161,7 @@ def test_expand_path_vars(monkeypatch):
 def test_expand_paths_vars(test_path, expected, monkeypatch):
     """Ensure that tilde and env vars are expanded in paths lists."""
     monkeypatch.setenv('TEST_PATH', '/test/path')
-    assert utils.expand_paths_vars([test_path]) == [expected]
+    assert expand_paths_vars([test_path]) == [expected]
 
 
 @pytest.mark.parametrize(
