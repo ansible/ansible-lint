@@ -12,7 +12,7 @@ Each rule definition should have the following:
 * ID: A unique identifier
 * Short description: Brief description of the rule
 * Description: Behaviour the rule is looking for
-* Tags: one or more tags that may be used to include or exclude the rule
+* Tags: One or more tags that may be used to include or exclude the rule
 * At least one of the following methods:
 
   * ``match`` that takes a line and returns None or False, if the line doesn't match the test, and True or a custom message, when it does. (This allows one rule to test multiple behaviours - see e.g. the *CommandsInsteadOfModulesRule*.)
@@ -58,7 +58,7 @@ An example rule using ``matchtask`` is:
             if not task.has_key('tags'):
                   return True
 
-        return False
+            return False
 
 The task argument to ``matchtask`` contains a number of keys - the critical one is *action*. The value of *task['action']* contains the module being used, and the arguments passed, both as key-value pairs and a list of other arguments (e.g. the command used with shell).
 
@@ -71,13 +71,13 @@ Packaging Custom Rules
 
 Ansible-lint provides a sub directory named *custom* in its built-in rules,
 ``/usr/lib/python3.8/site-packages/ansiblelint/rules/custom/`` for example, to
-install custom rules since v4.3.1. The custom rules which are packaged as an
-usual python package installed into this directory will be loaded and enabled
+install custom rules since v4.3.1. The custom rules which are packaged as a
+python package installed into this directory will be loaded and enabled
 automatically by ansible-lint.
 
 To make custom rules loaded automatically, you need the followings:
 
-- Packaging your custom rules as an usual python package named some descriptive ones like ``ansible_lint_custom_rules_foo``.
+- Packaging your custom rules as a python package named some descriptive ones like ``ansible_lint_custom_rules_foo``.
 - Make it installed into ``<ansible_lint_custom_rules_dir>/custom/<your_custom_rules_subdir>/``.
 
 You may accomplish the second by adding some configurations into the [options]

@@ -18,7 +18,7 @@ Each rule has an associated set of one or more tags. To view the list of tags fo
 
 The following shows the available tags in an example set of rules, and the rules associated with each tag:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ansible-lint -v -T
 
