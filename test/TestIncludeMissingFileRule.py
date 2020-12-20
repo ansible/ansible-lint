@@ -2,8 +2,6 @@ from collections import namedtuple
 
 import pytest
 
-from ansiblelint.runner import Runner
-
 PlayFile = namedtuple('PlayFile', ['name', 'content'])
 
 
@@ -38,26 +36,6 @@ PLAY_HAVING_TASK = PlayFile('playbook.yml', u'''
     - name: Ping
       ping:
 ''')
-
-
-@pytest.fixture
-def play_file_path(tmp_path):
-    p = tmp_path / 'playbook.yml'
-    return str(p)
-
-
-@pytest.fixture
-def runner(play_file_path, default_rules_collection):
-    return Runner(default_rules_collection, play_file_path, [], [], [])
-
-
-@pytest.fixture
-def _play_files(tmp_path, request):
-    if request.param is None:
-        return
-    for play_file in request.param:
-        p = tmp_path / play_file.name
-        p.write_text(play_file.content)
 
 
 @pytest.mark.parametrize(
