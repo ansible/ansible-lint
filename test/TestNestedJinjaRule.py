@@ -25,8 +25,6 @@ from collections import namedtuple
 
 import pytest
 
-from ansiblelint.runner import Runner
-
 PlayFile = namedtuple('PlayFile', ['name', 'content'])
 
 
@@ -157,15 +155,6 @@ SUCCESS_TASK_PRINT = PlayFile('playbook.yml', '''
       debug:
         msg: docker image inspect my_image --format='{{'{{'}}.Size{{'}}'}}'
 ''')
-
-
-@pytest.fixture
-def runner(tmp_path, default_rules_collection):
-    return Runner(
-        default_rules_collection,
-        str(tmp_path / 'playbook.yml'),
-        [], [], [],
-    )
 
 
 @pytest.fixture
