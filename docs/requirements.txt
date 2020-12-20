@@ -5,7 +5,7 @@
 #    pip-compile --no-annotate --output-file=docs/requirements.txt docs/requirements.in
 #
 alabaster==0.7.12
-ansible-base==2.10.3
+ansible-base==2.10.4
 attrs==19.3.0
 babel==2.8.0
 certifi==2020.6.20
