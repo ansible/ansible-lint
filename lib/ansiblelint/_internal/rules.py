@@ -47,3 +47,15 @@ class RuntimeErrorRule(BaseRule):
     severity = 'VERY_HIGH'
     tags = ['core']
     version_added = 'v5.0.0'
+
+
+class AnsibleParserErrorRule(BaseRule):
+    """Used to mark errors received from Ansible."""
+
+    id = '998'
+    shortdesc = 'AnsibleParserError'
+    description = (
+        'Ansible parser fails, this usually indicate invalid file.')
+    severity = 'VERY_HIGH'
+    tags = ['core']
+    version_added = 'v5.0.0'

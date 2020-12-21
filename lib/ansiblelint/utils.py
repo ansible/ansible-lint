@@ -23,7 +23,6 @@ import contextlib
 import inspect
 import logging
 import os
-import pprint
 import subprocess
 from argparse import Namespace
 from collections import OrderedDict
@@ -57,9 +56,8 @@ except ImportError:
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-from ansiblelint.constants import (
-    ANSIBLE_FAILURE_RC, CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType,
-)
+from ansiblelint._internal.rules import AnsibleParserErrorRule
+from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
 
@@ -446,15 +444,12 @@ def normalize_task_v2(task: dict) -> dict:  # noqa: C901
     try:
         action, arguments, result['delegate_to'] = mod_arg_parser.parse()
     except AnsibleParserError as e:
-        try:
-            task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
-        except KeyError:
-            task_info = "Unknown"
-        pp = pprint.PrettyPrinter(indent=2)
-        task_pprint = pp.pformat(sanitized_task)
-
-        _logger.critical("Couldn't parse task at %s (%s)\n%s", task_info, e.message, task_pprint)
-        raise SystemExit(ANSIBLE_FAILURE_RC)
+        raise MatchError(
+            rule=AnsibleParserErrorRule,
+            message=e.message,
+            filename=task.get(FILENAME_KEY, "Unknown"),
+            linenumber=task.get(LINE_NUMBER_KEY, 0),
+            )
 
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
