@@ -122,11 +122,14 @@ warn_list:  # or 'skip_list' to silence them completely
         return 0
 
 
-def main() -> int:
+def main(argv: List[str] = None) -> int:
     """Linter CLI entry point."""
+    if argv is None:
+        argv = sys.argv
+
     cwd = pathlib.Path.cwd()
 
-    options = cli.get_config(sys.argv[1:])
+    options = cli.get_config(argv[1:])
 
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
@@ -263,11 +266,20 @@ def _previous_revision():
         yield
 
 
-if __name__ == "__main__":
+def _run_cli_entrypoint() -> None:
+    """Invoke the main entrypoint with current CLI args.
+
+    This function also processes the runtime exceptions.
+    """
     try:
-        sys.exit(main())
+        sys.exit(main(sys.argv))
     except IOError as exc:
+        # NOTE: Only "broken pipe" is acceptable to ignore
         if exc.errno != errno.EPIPE:
             raise
     except RuntimeError as e:
         raise SystemExit(str(e))
+
+
+if __name__ == "__main__":
+    _run_cli_entrypoint()
