@@ -1,6 +1,4 @@
 """Test playbooks with local content."""
-import pytest
-
 from ansiblelint.runner import Runner
 
 
@@ -38,5 +36,6 @@ def test_roles_local_content_failure_complete(default_rules_collection):
     """Role with local content that is not found."""
     playbook_path = 'test/local-content/test-roles-failed-complete/test.yml'
     runner = Runner(default_rules_collection, playbook_path, [], [], [])
-    with pytest.raises(SystemExit, match="^3$"):
-        runner.run()
+    x = runner.run()
+    assert len(x) == 1
+    assert "couldn't resolve module" in x[0].message

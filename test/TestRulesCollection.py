@@ -43,8 +43,8 @@ def bracketsmatchtestfile():
 
 
 def test_load_collection_from_directory(test_rules_collection):
-    # two detected rules plus the internal 999 one
-    assert len(test_rules_collection) == 3
+    # two detected rules plus the internal 999 and 998
+    assert len(test_rules_collection) == 4
 
 
 def test_run_collection(test_rules_collection, ematchtestfile):

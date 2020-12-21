@@ -10,6 +10,7 @@ from time import sleep
 from typing import List
 
 import ansiblelint.utils
+from ansiblelint._internal.rules import AnsibleParserErrorRule
 from ansiblelint.errors import BaseRule, MatchError, RuntimeErrorRule
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
@@ -188,7 +189,8 @@ class RulesCollection(object):
         self.rules: List[BaseRule] = []
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
-        self.rules.append(RuntimeErrorRule())
+        self.rules.extend(
+            [RuntimeErrorRule(), AnsibleParserErrorRule()])
         for rulesdir in self.rulesdirs:
             _logger.debug("Loading rules from %s", rulesdir)
             self.extend(load_plugins(rulesdir))
