@@ -441,6 +441,11 @@ The following values are supported, and function identically to their CLI counte
       - run_this_tag
     use_default_rules: true
     verbosity: 1
+    warn_list:
+      - skip_this_tag
+      - and_this_one_too
+      - skip_this_id
+      - '401'
 
 
 Pre-commit Setup

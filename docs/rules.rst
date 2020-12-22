@@ -26,6 +26,7 @@ The following shows the available tags in an example set of rules, and the rules
     bug ['[304]']
     command-shell ['[305]', '[302]', '[304]', '[306]', '[301]', '[303]']
     deprecations ['[105]', '[104]', '[103]', '[101]', '[102]']
+    experimental ['[208]']
     formatting ['[104]', '[203]', '[201]', '[204]', '[206]', '[205]', '[202]']
     idempotency ['[301]']
     idiom ['[601]', '[602]']
@@ -58,6 +59,17 @@ It's also possible to skip specific rules by passing the rule ID. For example, t
 .. code-block:: bash
 
     $ ansible-lint -x 502 playbook.yml
+
+Ignoring Rules
+``````````````
+
+To only warn about rules, use the ``-w WARN_LIST`` option. In this example all rules are run, but if rules with the ``experimental`` tag match they only show an error message but don't change the exit code:
+
+.. code-block:: console
+
+    $ ansible-lint -w experimental playbook.yml
+
+The default value for ``WARN_LIST`` is ``['experimental']`` if you don't define your own either on the cli or in the config file. If you do define your own ``WARN_LIST`` you will need to add ``'experimental'`` to it if you don't want experimental rules to change your exit code.
 
 False Positives: Skipping Rules
 -------------------------------
