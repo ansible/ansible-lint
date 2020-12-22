@@ -188,14 +188,24 @@ def merge_config(file_config, cli_config) -> NamedTuple:
     }
 
     if not file_config:
+        # use defaults if we don't have a config file and the commandline
+        # parameter is not set
+        for entry, default in lists_map.items():
+            if not getattr(cli_config, entry):
+                setattr(cli_config, entry, default)
         return cli_config
 
     for entry in bools:
         x = getattr(cli_config, entry) or file_config.get(entry, False)
         setattr(cli_config, entry, x)
 
+    # if either commandline parameter or config file option is set merge
+    # with the other, if neither is set use the default
     for entry, default in lists_map.items():
-        getattr(cli_config, entry).extend(file_config.get(entry, default))
+        if getattr(cli_config, entry) or entry in file_config.keys():
+            getattr(cli_config, entry).extend(file_config.get(entry, []))
+        else:
+            setattr(cli_config, entry, default)
 
     if 'verbosity' in file_config:
         cli_config.verbosity = (cli_config.verbosity +
