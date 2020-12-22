@@ -41,7 +41,7 @@ Automated tests will be run against all PRs for flake8 compliance
 and Ansible compatibility — to check before pushing commits, just
 use `tox`_.
 
-.. _.flake8: https://github.com/ansible/ansible-lint/blob/master/.flake8
+.. _.flake8: https://github.com/ansible-community/ansible-lint/blob/master/.flake8
 .. _supported Ansible versions:
    https://docs.ansible.com/ansible/devel/reference_appendices
    /release_and_maintenance.html#release-status

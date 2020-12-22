@@ -7,6 +7,7 @@ categories:
     labels:
       - 'feature'  # 006b75
       - 'enhancement'  # ededed
+      - 'refactoring'
   - title: 'Bugfixes'
     labels:
       - 'bug'  # fbca04

@@ -10,30 +10,18 @@ from time import sleep
 from typing import List
 
 import ansiblelint.utils
-from ansiblelint.errors import MatchError
+from ansiblelint._internal.rules import AnsibleParserErrorRule
+from ansiblelint.errors import BaseRule, MatchError, RuntimeErrorRule
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
 _logger = logging.getLogger(__name__)
 
 
-class AnsibleLintRule(object):
+class AnsibleLintRule(BaseRule):
 
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
-
-    def verbose(self) -> str:
-        return self.id + ": " + self.shortdesc + "\n  " + self.description
-
-    id: str = ""
-    tags: List[str] = []
-    shortdesc: str = ""
-    description: str = ""
-    version_added: str = ""
-    severity: str = ""
-    match = None
-    matchtask = None
-    matchplay = None
 
     @staticmethod
     def unjinja(text):
@@ -41,6 +29,20 @@ class AnsibleLintRule(object):
         text = re.sub(r"{%.+?%}", "JINJA_STATEMENT", text)
         text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
         return text
+
+    def create_matcherror(
+            self,
+            message: str = None,
+            linenumber: int = 0,
+            details: str = "",
+            filename: str = None) -> MatchError:
+        return MatchError(
+            message=message,
+            linenumber=linenumber,
+            details=details,
+            filename=filename,
+            rule=self.__class__
+            )
 
     def matchlines(self, file, text) -> List[MatchError]:
         matches: List[MatchError] = []
@@ -62,17 +64,16 @@ class AnsibleLintRule(object):
             message = None
             if isinstance(result, str):
                 message = result
-            m = MatchError(
+            m = self.create_matcherror(
                 message=message,
                 linenumber=prev_line_no + 1,
                 details=line,
-                filename=file['path'],
-                rule=self)
+                filename=file['path'])
             matches.append(m)
         return matches
 
     # TODO(ssbarnea): Reduce mccabe complexity
-    # https://github.com/ansible/ansible-lint/issues/744
+    # https://github.com/ansible-community/ansible-lint/issues/744
     def matchtasks(self, file: str, text: str) -> List[MatchError]:  # noqa: C901
         matches: List[MatchError] = []
         if not self.matchtask:
@@ -106,12 +107,11 @@ class AnsibleLintRule(object):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            m = MatchError(
+            m = self.create_matcherror(
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
                 details=task_msg,
-                filename=file['path'],
-                rule=self)
+                filename=file['path'])
             matches.append(m)
         return matches
 
@@ -153,13 +153,12 @@ class AnsibleLintRule(object):
 
             for section, message, *optional_linenumber in result:
                 linenumber = self._matchplay_linenumber(play, optional_linenumber)
-                m = MatchError(
+                matches.append(self.create_matcherror(
                     message=message,
                     linenumber=linenumber,
                     details=str(section),
-                    filename=file['path'],
-                    rule=self)
-                matches.append(m)
+                    filename=file['path']
+                    ))
         return matches
 
 
@@ -186,8 +185,12 @@ class RulesCollection(object):
         """Initialize a RulesCollection instance."""
         if rulesdirs is None:
             rulesdirs = []
-        self.rulesdirs = ansiblelint.utils.expand_paths_vars(rulesdirs)
-        self.rules: List[AnsibleLintRule] = []
+        self.rulesdirs = ansiblelint.file_utils.expand_paths_vars(rulesdirs)
+        self.rules: List[BaseRule] = []
+        # internal rules included in order to expose them for docs as they are
+        # not directly loaded by our rule loader.
+        self.rules.extend(
+            [RuntimeErrorRule(), AnsibleParserErrorRule()])
         for rulesdir in self.rulesdirs:
             _logger.debug("Loading rules from %s", rulesdir)
             self.extend(load_plugins(rulesdir))
@@ -244,11 +247,37 @@ class RulesCollection(object):
                           for rule in sorted(self.rules, key=lambda x: x.id)])
 
     def listtags(self) -> str:
+        tag_desc = {
+            "behaviour": "Indicates a bad practice or behavior",
+            "bug": "Likely wrong usage pattern",
+            "command-shell": "Specific to use of command and shell modules",
+            "core": "Related to internal implementation of the linter",
+            "deprecations": "Indicate use of features that are removed from Ansible",
+            "experimental": "Newly introduced rules, by default triggering only warnings",
+            "formatting": "Related to code-style",
+            "idempotency":
+                "Possible indication that consequent runs would produce different results",
+            "idiom": "Anti-pattern detected, likely to cause undesired behavior",
+            "metadata": "Invalid metadata, likely related to galaxy, collections or roles",
+            "module": "Incorrect module usage",
+            "readability": "Reduce code readability",
+            "repeatability": "Action that may produce different result between runs",
+            "resources": "Unoptimal feature use",
+            "safety": "Increase security risk",
+            "task": "Rules specific to tasks",
+            "unpredictability": "This will produce unexpected behavior when run",
+        }
+
         tags = defaultdict(list)
         for rule in self.rules:
             for tag in rule.tags:
-                tags[tag].append("[{0}]".format(rule.id))
-        results = []
+                tags[tag].append(rule.id)
+        result = "# List of tags and how they are used\n"
         for tag in sorted(tags):
-            results.append("{0} {1}".format(tag, tags[tag]))
-        return "\n".join(results)
+            desc = tag_desc.get(tag, None)
+            if desc:
+                result += f"{tag}:  # {desc}\n"
+            else:
+                result += f"{tag}:\n"
+            result += f"  rules: [{', '.join(tags[tag])}]\n"
+        return result

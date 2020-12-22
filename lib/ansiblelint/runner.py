@@ -49,7 +49,7 @@ class Runner(object):
     def _update_exclude_paths(self, exclude_paths: List[str]) -> None:
         if exclude_paths:
             # These will be (potentially) relative paths
-            paths = ansiblelint.utils.expand_paths_vars(exclude_paths)
+            paths = ansiblelint.file_utils.expand_paths_vars(exclude_paths)
             # Since ansiblelint.utils.find_children returns absolute paths,
             # and the list of files we create in `Runner.run` can contain both
             # relative and absolute paths, we need to cover both bases.

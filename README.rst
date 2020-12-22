@@ -10,16 +10,16 @@
    :target: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html
    :alt: Ansible Code of Conduct
 
-.. image:: https://img.shields.io/badge/Mailing%20lists-Ansible-orange.svg
-   :target: https://docs.ansible.com/ansible/latest/community/communication.html#mailing-list-information
-   :alt: Ansible mailing lists
+.. image:: https://img.shields.io/badge/Discussions-gray.svg
+   :target: https://github.com/ansible-community/ansible-lint/discussions
+   :alt: Discussions
 
-.. image:: https://github.com/ansible/ansible-lint/workflows/gh/badge.svg
-   :target: https://github.com/ansible/ansible-lint/actions?query=workflow%3Agh+branch%3Amaster+event%3Apush
+.. image:: https://github.com/ansible-community/ansible-lint/workflows/gh/badge.svg
+   :target: https://github.com/ansible-community/ansible-lint/actions?query=workflow%3Agh+branch%3Amaster+event%3Apush
    :alt: GitHub Actions CI/CD
 
-.. image:: https://img.shields.io/lgtm/grade/python/g/ansible/ansible-lint.svg?logo=lgtm&logoWidth=18
-   :target: https://lgtm.com/projects/g/ansible/ansible-lint/context:python
+.. image:: https://img.shields.io/lgtm/grade/python/g/ansible-community/ansible-lint.svg?logo=lgtm&logoWidth=18
+   :target: https://lgtm.com/projects/g/ansible-community/ansible-lint/context:python
    :alt: Language grade: Python
 
 .. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
@@ -43,12 +43,44 @@ Installing
 
 Installing on Windows is not supported because we use symlinks inside Python packages.
 
+While our project does not directly ships a container, the
+tool is part of the toolset_ container.  Please avoid raising any bugs
+related to containers and use the discussions_ forum instead.
+
+.. code-block:: bash
+
+    # replace docker with podman
+    docker run -h toolset -it quay.io/ansible/toolset ansible-lint --version
+
+.. _toolset: https://github.com/ansible-community/toolset
+.. _discussions: https://github.com/ansible-community/ansible-lint/discussions
+
+.. note::
+
+    The default installation of ansible-lint package no longer installs any
+    specific version of ansible. You need to either install the desired version
+    of Ansible yourself or mention one of the helper extras:
+
+    * ``core`` - will install latest version of ansible-base 2.10
+    * ``community`` - will install latest version of ansible 2.10 with community collections
+    * ``devel`` - will install Ansible from git devel branch (unsupported)
+
 Using Pip
 ---------
 
 .. code-block:: bash
 
+    # Assuming you already installed ansible:
     pip install ansible-lint
+
+    # If you want to install and use latest ansible (w/o community collections)
+    pip install "ansible-lint[core]"
+
+    # If you want to install and use latest ansible with community collections
+    pip install "ansible-lint[community]"
+
+    # If you want to install an older version of Ansible 2.9
+    pip install ansible-lint "ansible>=2.9,<2.10"
 
 .. _installing_from_source:
 
@@ -60,7 +92,7 @@ to learn more about managing Pip versions.
 
 .. code-block:: bash
 
-    pip install git+https://github.com/ansible/ansible-lint.git
+    pip install git+https://github.com/ansible-community/ansible-lint.git
 
 .. _PyPA User Guide: https://packaging.python.org/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date
 
@@ -409,6 +441,11 @@ The following values are supported, and function identically to their CLI counte
       - run_this_tag
     use_default_rules: true
     verbosity: 1
+    warn_list:
+      - skip_this_tag
+      - and_this_one_too
+      - skip_this_id
+      - '401'
 
 
 Pre-commit Setup
@@ -418,7 +455,7 @@ To use ansible-lint with `pre-commit`_, just add the following to your local rep
 
 .. code-block:: yaml
 
-    - repo: https://github.com/ansible/ansible-lint.git
+    - repo: https://github.com/ansible-community/ansible-lint.git
       rev: v4.1.0
       hooks:
         - id: ansible-lint
@@ -427,202 +464,6 @@ To use ansible-lint with `pre-commit`_, just add the following to your local rep
 .. _pre-commit: https://pre-commit.com
 
 .. configuring-docs-inclusion-marker-end-do-not-remove
-
-Rules
-=====
-
-.. rules-docs-inclusion-marker-do-not-remove
-
-Specifying Rules at Runtime
----------------------------
-
-By default, ``ansible-lint`` uses the rules found in ``ansible-lint/lib/ansiblelint/rules``. To override this behavior and use a custom set of rules, use the ``-r /path/to/custom-rules`` option to provide a directory path containing the custom rules. For multiple rule sets, pass multiple ``-r`` options.
-
-It's also possible to use the default rules, plus custom rules. This can be done by passing the ``-R`` to indicate that the default rules are to be used, along with one or more ``-r`` options.
-
-Using Tags to Include Rules
-```````````````````````````
-
-Each rule has an associated set of one or more tags. To view the list of tags for each available rule, use the ``-T`` option.
-
-The following shows the available tags in an example set of rules, and the rules associated with each tag:
-
-.. code-block:: bash
-
-    $ ansible-lint -v -T
-
-    behaviour ['[503]']
-    bug ['[304]']
-    command-shell ['[305]', '[302]', '[304]', '[306]', '[301]', '[303]']
-    deprecated ['[105]', '[104]', '[103]', '[101]', '[102]']
-    formatting ['[104]', '[203]', '[201]', '[204]', '[206]', '[205]', '[202]']
-    idempotency ['[301]']
-    idiom ['[601]', '[602]']
-    metadata ['[701]', '[704]', '[703]', '[702]']
-    module ['[404]', '[401]', '[403]', '[402]']
-    oddity ['[501]']
-    readability ['[502]']
-    repeatability ['[401]', '[403]', '[402]']
-    resources ['[302]', '[303]']
-    safety ['[305]']
-    task ['[502]', '[503]', '[504]', '[501]']
-
-To run just the *idempotency* rules, for example, run the following:
-
-.. code-block:: bash
-
-    $ ansible-lint -t idempotency playbook.yml
-
-Excluding Rules
-```````````````
-
-To exclude rules from the available set of rules, use the ``-x SKIP_LIST`` option. For example, the following runs all of the rules except those with the tags *readability* and *safety*:
-
-.. code-block:: bash
-
-    $ ansible-lint -x readability,safety playbook.yml
-
-It's also possible to skip specific rules by passing the rule ID. For example, the following excludes rule *502*:
-
-.. code-block:: bash
-
-    $ ansible-lint -x 502 playbook.yml
-
-False Positives: Skipping Rules
--------------------------------
-
-Some rules are a bit of a rule of thumb. Advanced *git*, *yum* or *apt* usage, for example, is typically difficult to achieve through the modules. In this case, you should mark the task so that warnings aren't produced.
-
-To skip a specific rule for a specific task, inside your ansible yaml add ``# noqa [rule_id]`` at the end of the line. If the rule is task-based (most are), add at the end of any line in the task. You can skip multiple rules via a space-separated list.
-
-.. code-block:: yaml
-
-    - name: this would typically fire GitHasVersionRule 401 and BecomeUserWithoutBecomeRule 501
-      become_user: alice  # noqa 401 501
-      git: src=/path/to/git/repo dest=checkout
-
-If the rule is line-based, ``# noqa [rule_id]`` must be at the end of the particular line to be skipped
-
-.. code-block:: yaml
-
-    - name: this would typically fire LineTooLongRule 204 and VariableHasSpacesRule 206
-      get_url:
-        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa 204
-        dest: "{{dest_proj_path}}/foo.conf"  # noqa 206
-
-
-It's also a good practice to comment the reasons why a task is being skipped.
-
-If you want skip running a rule entirely, you can use either use ``-x`` command
-line argument, or add it to ``skip_list`` inside the configuration file.
-
-A less-preferred method of skipping is to skip all task-based rules for a task (this does not skip line-based rules). There are two mechanisms for this: the ``skip_ansible_lint`` tag works with all tasks, and the ``warn`` parameter works with the *command* or *shell* modules only. Examples:
-
-.. code-block:: yaml
-
-    - name: this would typically fire CommandsInsteadOfArgumentRule 302
-      command: warn=no chmod 644 X
-
-    - name: this would typically fire CommandsInsteadOfModuleRule 303
-      command: git pull --rebase
-      args:
-        warn: False
-
-    - name: this would typically fire GitHasVersionRule 401
-      git: src=/path/to/git/repo dest=checkout
-      tags:
-      - skip_ansible_lint
-
-Creating Custom Rules
----------------------
-
-Rules are described using a class file per rule. Default rules are named *DeprecatedVariableRule.py*, etc.
-
-Each rule definition should have the following:
-
-* ID: A unique identifier
-* Short description: Brief description of the rule
-* Description: Behaviour the rule is looking for
-* Tags: one or more tags that may be used to include or exclude the rule
-* At least one of the following methods:
-
-  * ``match`` that takes a line and returns None or False, if the line doesn't match the test, and True or a custom message, when it does. (This allows one rule to test multiple behaviours - see e.g. the *CommandsInsteadOfModulesRule*.)
-  * ``matchtask`` that operates on a single task or handler, such that tasks get standardized to always contain a *module* key and *module_arguments* key. Other common task modifiers, such as *when*, *with_items*, etc., are also available as keys, if present in the task.
-
-An example rule using ``match`` is:
-
-.. code-block:: python
-
-    from ansiblelint.rules import AnsibleLintRule
-
-    class DeprecatedVariableRule(AnsibleLintRule):
-
-        id = 'EXAMPLE002'
-        shortdesc = 'Deprecated variable declarations'
-        description = 'Check for lines that have old style ${var} ' + \
-                      'declarations'
-        tags = { 'deprecated' }
-
-        def match(self, file, line):
-            return '${' in line
-
-An example rule using ``matchtask`` is:
-
-.. code-block:: python
-
-    import ansiblelint.utils
-    from ansiblelint.rules import AnsibleLintRule
-
-    class TaskHasTag(AnsibleLintRule):
-        id = 'EXAMPLE001'
-        shortdesc = 'Tasks must have tag'
-        description = 'Tasks must have tag'
-        tags = ['productivity']
-
-        def matchtask(self, file, task):
-            # If the task include another task or make the playbook fail
-            # Don't force to have a tag
-            if not set(task.keys()).isdisjoint(['include','fail']):
-                return False
-
-            # Task should have tags
-            if not task.has_key('tags'):
-                  return True
-
-        return False
-
-The task argument to ``matchtask`` contains a number of keys - the critical one is *action*. The value of *task['action']* contains the module being used, and the arguments passed, both as key-value pairs and a list of other arguments (e.g. the command used with shell).
-
-In ansible-lint 2.0.0, *task['action']['args']* was renamed *task['action']['module_arguments']* to avoid a clash when a module actually takes args as a parameter key (e.g. ec2_tag)
-
-In ansible-lint 3.0.0 *task['action']['module']* was renamed *task['action']['__ansible_module__']* to avoid a clash when a module take module as an argument. As a precaution, *task['action']['module_arguments']* was renamed *task['action']['__ansible_arguments__']*.
-
-Packaging Custom Rules
-``````````````````````
-
-Ansible-lint provides a sub directory named *custom* in its built-in rules,
-``/usr/lib/python3.8/site-packages/ansiblelint/rules/custom/`` for example, to
-install custom rules since v4.3.1. The custom rules which are packaged as an
-usual python package installed into this directory will be loaded and enabled
-automatically by ansible-lint.
-
-To make custom rules loaded automatically, you need the followings:
-
-- Packaging your custom rules as an usual python package named some descriptive ones like ``ansible_lint_custom_rules_foo``.
-- Make it installed into ``<ansible_lint_custom_rules_dir>/custom/<your_custom_rules_subdir>/``.
-
-You may accomplish the second by adding some configurations into the [options]
-section of the ``setup.cfg`` of your custom rules python package like the following.
-
-.. code-block::
-
-    [options]
-    packages =
-        ansiblelint.rules.custom.<your_custom_rules_subdir>
-    package_dir =
-        ansiblelint.rules.custom.<your_custom_rules_subdir> = <your_rules_source_code_subdir>
-
-.. rules-docs-inclusion-marker-end-do-not-remove
 
 Contributing
 ============

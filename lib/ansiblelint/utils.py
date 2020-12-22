@@ -23,13 +23,12 @@ import contextlib
 import inspect
 import logging
 import os
-import pprint
 import subprocess
 from argparse import Namespace
 from collections import OrderedDict
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, ItemsView, List, Optional, Tuple
+from typing import Any, Callable, ItemsView, List, Optional, Tuple
 
 import yaml
 from ansible import constants
@@ -42,12 +41,23 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleSequence
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible.template import Templar
+
+try:
+    from ansible.module_utils.parsing.convert_bool import boolean
+except ImportError:
+    try:
+        from ansible.utils.boolean import boolean
+    except ImportError:
+        try:
+            from ansible.utils import boolean
+        except ImportError:
+            boolean = constants.mk_boolean
+
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-from ansiblelint.constants import (
-    ANSIBLE_FAILURE_RC, CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType,
-)
+from ansiblelint._internal.rules import AnsibleParserErrorRule
+from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
 
@@ -252,6 +262,11 @@ def _include_children(basedir, k, v, parent_type):
 def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List:
     results = []
     for th in v:
+
+        # ignore empty tasks, `-`
+        if not th:
+            continue
+
         with contextlib.suppress(LookupError):
             children = _get_task_handler_children_for_tasks_or_playbooks(
                 th, basedir, k, parent_type,
@@ -284,9 +299,16 @@ def _get_task_handler_children_for_tasks_or_playbooks(
 ) -> dict:
     """Try to get children of taskhandler for include/import tasks/playbooks."""
     child_type = k if parent_type == 'playbook' else parent_type
+
     task_include_keys = 'include', 'include_tasks', 'import_playbook', 'import_tasks'
     for task_handler_key in task_include_keys:
+
         with contextlib.suppress(KeyError):
+
+            # ignore empty tasks
+            if not task_handler:
+                continue
+
             return {
                 'path': path_dwim(basedir, task_handler[task_handler_key]),
                 'type': child_type,
@@ -302,11 +324,12 @@ def _validate_task_handler_action_for_role(th_action: dict) -> None:
     module = th_action['__ansible_module__']
 
     if 'name' not in th_action:
-        raise MatchError(f"Failed to find required 'name' key in {module!s}")
+        raise MatchError(
+            message=f"Failed to find required 'name' key in {module!s}")
 
     if not isinstance(th_action['name'], str):
-        raise RuntimeError(
-            f"Value assigned to 'name' key on '{module!s}' is not a string.",
+        raise MatchError(
+            message=f"Value assigned to 'name' key on '{module!s}' is not a string.",
         )
 
 
@@ -404,42 +427,29 @@ def _sanitize_task(task: dict) -> dict:
     result = task.copy()
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
-    for k in ['skipped_rules', FILENAME_KEY, LINE_NUMBER_KEY]:
+    for k in ['skipped_rules', FILENAME_KEY, LINE_NUMBER_KEY, 'always_run']:
         if k in result:
             del result[k]
     return result
 
 
 # FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible/ansible-lint/issues/744
+# Ref: https://github.com/ansible-community/ansible-lint/issues/744
 def normalize_task_v2(task: dict) -> dict:  # noqa: C901
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
-    if 'always_run' in task:
-        # FIXME(ssbarnea): Delayed import to avoid circular import
-        # See https://github.com/ansible/ansible-lint/issues/880
-        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
-        from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
-
-        raise MatchError(
-            rule=AlwaysRunRule,
-            filename=task[FILENAME_KEY],
-            linenumber=task[LINE_NUMBER_KEY])
 
     sanitized_task = _sanitize_task(task)
     mod_arg_parser = ModuleArgsParser(sanitized_task)
     try:
         action, arguments, result['delegate_to'] = mod_arg_parser.parse()
     except AnsibleParserError as e:
-        try:
-            task_info = "%s:%s" % (task[FILENAME_KEY], task[LINE_NUMBER_KEY])
-        except KeyError:
-            task_info = "Unknown"
-        pp = pprint.PrettyPrinter(indent=2)
-        task_pprint = pp.pformat(sanitized_task)
-
-        _logger.critical("Couldn't parse task at %s (%s)\n%s", task_info, e.message, task_pprint)
-        raise SystemExit(ANSIBLE_FAILURE_RC)
+        raise MatchError(
+            rule=AnsibleParserErrorRule,
+            message=e.message,
+            filename=task.get(FILENAME_KEY, "Unknown"),
+            linenumber=task.get(LINE_NUMBER_KEY, 0),
+            )
 
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
@@ -471,7 +481,7 @@ def normalize_task_v2(task: dict) -> dict:  # noqa: C901
 
 
 # FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible/ansible-lint/issues/744
+# Ref: https://github.com/ansible-community/ansible-lint/issues/744
 def normalize_task_v1(task):  # noqa: C901
     result = dict()
     for (k, v) in task.items():
@@ -500,7 +510,7 @@ def normalize_task_v1(task):  # noqa: C901
                     else:
                         # Tasks that include playbooks (rather than task files)
                         # can get here
-                        # https://github.com/ansible/ansible-lint/issues/138
+                        # https://github.com/ansible-community/ansible-lint/issues/138
                         raise RuntimeError("Was not expecting value %s of type %s for key %s\n"
                                            "Task: %s. Check the syntax of your playbook using "
                                            "ansible-playbook --syntax-check" %
@@ -558,6 +568,9 @@ def extract_from_list(blocks, candidates):
 def add_action_type(actions, action_type):
     results = list()
     for action in actions:
+        # ignore empty task
+        if not action:
+            continue
         action['__ansible_action_type__'] = BLOCK_NAME_TO_ACTION_TYPE_MAP[action_type]
         results.append(action)
     return results
@@ -718,7 +731,7 @@ def get_yaml_files(options: Namespace) -> dict:
 
 
 # FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible/ansible-lint/issues/744
+# Ref: https://github.com/ansible-community/ansible-lint/issues/744
 def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
     """Find roles and playbooks."""
     if options is None:
@@ -764,6 +777,7 @@ def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
         elif 'roles' in p.parts or '.' in role_dirs:
             if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
                 role_dirs.append(str(p.parents[1]))
+                continue
             elif role_internals.intersection(p.parts):
                 continue
             elif 'tests' in p.parts:
@@ -788,21 +802,6 @@ def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
     return role_dirs + playbooks
 
 
-def expand_path_vars(path: str) -> str:
-    """Expand the environment or ~ variables in a path string."""
-    # It may be possible for function to be called with a Path object
-    path = str(path).strip()
-    path = os.path.expanduser(path)
-    path = os.path.expandvars(path)
-    return path
-
-
-def expand_paths_vars(paths: List[str]) -> List[str]:
-    """Expand the environment or ~ variables in a list."""
-    paths = [expand_path_vars(p) for p in paths]
-    return paths
-
-
 def get_rules_dirs(rulesdir: List[str], use_default: bool) -> List[str]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
@@ -818,3 +817,8 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool) -> List[str]:
         return rulesdir + custom_ruledirs + default_ruledirs
 
     return rulesdir or custom_ruledirs + default_ruledirs
+
+
+def convert_to_boolean(value: Any) -> bool:
+    """Use Ansible to convert something to a boolean."""
+    return boolean(value)

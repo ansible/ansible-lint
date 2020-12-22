@@ -24,6 +24,7 @@ disable =
     no-self-use,
     not-callable,
     protected-access,
+    raise-missing-from,
     redefined-builtin,
     redefined-outer-name,
     too-few-public-methods,

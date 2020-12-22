@@ -30,6 +30,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, List, Set, Type, Union
 
 from rich.markdown import Markdown
+from rich.syntax import Syntax
 
 from ansiblelint import cli, formatters
 from ansiblelint.color import console, console_stderr
@@ -129,11 +130,14 @@ warn_list:  # or 'skip_list' to silence them completely
     return 2
 
 
-def main() -> int:
+def main(argv: List[str] = None) -> int:
     """Linter CLI entry point."""
+    if argv is None:
+        argv = sys.argv
+
     cwd = pathlib.Path.cwd()
 
-    options = cli.get_config(sys.argv[1:])
+    options = cli.get_config(argv[1:])
 
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
@@ -152,16 +156,16 @@ def main() -> int:
         return 0
 
     if options.listtags:
-        print(rules.listtags())
+        console.print(
+            Syntax(rules.listtags(), 'yaml')
+            )
         return 0
 
     if isinstance(options.tags, str):
         options.tags = options.tags.split(',')
 
-    skip = set()
-    for s in options.skip_list:
-        skip.update(str(s).split(','))
-    options.skip_list = frozenset(skip)
+    options.skip_list = _sanitize_list_options(options.skip_list)
+    options.warn_list = _sanitize_list_options(options.warn_list)
 
     matches = _get_matches(rules, options)
 
@@ -265,11 +269,27 @@ def _previous_revision():
         yield
 
 
-if __name__ == "__main__":
+def _sanitize_list_options(tag_list: list):
+    tags = set()
+    for t in tag_list:
+        tags.update(str(t).split(','))
+    return frozenset(tags)
+
+
+def _run_cli_entrypoint() -> None:
+    """Invoke the main entrypoint with current CLI args.
+
+    This function also processes the runtime exceptions.
+    """
     try:
-        sys.exit(main())
+        sys.exit(main(sys.argv))
     except IOError as exc:
+        # NOTE: Only "broken pipe" is acceptable to ignore
         if exc.errno != errno.EPIPE:
             raise
     except RuntimeError as e:
         raise SystemExit(str(e))
+
+
+if __name__ == "__main__":
+    _run_cli_entrypoint()

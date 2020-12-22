@@ -48,7 +48,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         'file',
         'replace',  # implicit preserve behavior but mode: preserve is invalid
         'template',  # supports preserve
-        'unarchive',
+        # 'unarchive',  # disabled because .tar.gz files can have permissions inside
     }
 
     _modules_with_create = {
@@ -79,6 +79,10 @@ class MissingFilePermissionsRule(AnsibleLintRule):
 
         # A symlink always has mode 0o777
         if task['action'].get('state', None) == "link":
+            return False
+
+        # Recurse on a directory does not allow for an uniform mode
+        if task['action'].get('recurse', None):
             return False
 
         # The file module does not create anything when state==file (default)

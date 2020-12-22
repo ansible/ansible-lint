@@ -18,7 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """Main ansible-lint package."""
-
+# prerun must run before any other imports
+import ansiblelint._prerun  # noqa
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.version import __version__
 

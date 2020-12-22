@@ -39,6 +39,7 @@ transferred to the Ansible project team.
    :caption: Rules
 
    rules
+   custom-rules
    default_rules
 
 .. toctree::

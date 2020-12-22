@@ -24,7 +24,7 @@ from pathlib import Path
 # https://github.com/readthedocs/readthedocs.org/issues/7182
 sys.path.insert(0, str(Path(__file__).parent.resolve()))
 
-# pip install sphinx_rtd_theme
+# pip3 install sphinx_rtd_theme
 # import sphinx_rtd_theme
 # html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 

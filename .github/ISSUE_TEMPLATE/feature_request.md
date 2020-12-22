@@ -1,7 +1,7 @@
 ---
 name: ✨ Feature request
 about: Suggest an idea for this project
-labels: priority/medium, status/new, type/enchancement
+labels: new, enchancement
 ---
 <!--- Verify first that your feature was not already discussed on GitHub -->
 

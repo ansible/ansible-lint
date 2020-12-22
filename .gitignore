@@ -44,3 +44,7 @@ pip-wheel-metadata
 
 # .cache is used by progressive mode
 .cache
+
+# other
+.DS_Store
+.vscode
