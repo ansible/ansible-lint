@@ -242,7 +242,6 @@ def test_logger_debug(caplog):
     assert expected_info in caplog.record_tuples
 
 
-@pytest.mark.xfail
 def test_cli_auto_detect(capfd):
     """Test that run without arguments it will detect and lint the entire repository."""
     cmd = sys.executable, "-m", "ansiblelint", "-v", "-p", "--nocolor"
@@ -267,7 +266,6 @@ def test_cli_auto_detect(capfd):
     assert "Unknown file type: test/test/always-run-success.yml" not in err
 
 
-@pytest.mark.xfail
 def test_is_playbook():
     """Verify that we can detect a playbook as a playbook."""
     assert utils.is_playbook("test/test/always-run-success.yml")
