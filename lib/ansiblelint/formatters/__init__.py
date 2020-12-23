@@ -3,8 +3,6 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Generic, TypeVar, Union
 
-from ansiblelint.color import Color, colorize
-
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
@@ -44,59 +42,34 @@ class BaseFormatter(Generic[T]):
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self._base_dir)
 
-    def format(self, match: "MatchError", colored: bool = False) -> str:
+    def format(self, match: "MatchError") -> str:
         return str(match)
 
 
 class Formatter(BaseFormatter):
 
-    def format(self, match: "MatchError", colored: bool = False) -> str:
-        formatstr = u"{0} {1}\n{2}:{3}\n{4}\n"
+    def format(self, match: "MatchError") -> str:
         _id = getattr(match.rule, 'id', '000')
-        if colored:
-            return formatstr.format(
-                colorize(u"[{0}]".format(_id), Color.error_code),
-                colorize(match.message, Color.error_title),
-                colorize(self._format_path(match.filename or ""), Color.filename),
-                colorize(str(match.linenumber), Color.linenumber),
-                colorize(u"{0}".format(match.details), Color.line))
-        else:
-            return formatstr.format(_id,
-                                    match.message,
-                                    match.filename or "",
-                                    match.linenumber,
-                                    match.details)
+        return (
+            f"[error_code]{_id}[/] [error_title]{match.message}[/]\n"
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}\n"
+            f"[dim]{match.details}[/]\n")
 
 
 class QuietFormatter(BaseFormatter):
 
-    def format(self, match: "MatchError", colored: bool = False) -> str:
-        formatstr = u"{0} {1}:{2}"
-        if colored:
-            return formatstr.format(
-                colorize(u"[{0}]".format(match.rule.id), Color.error_code),
-                colorize(self._format_path(match.filename or ""), Color.filename),
-                colorize(str(match.linenumber), Color.linenumber))
-        else:
-            return formatstr.format(match.rule.id, self._format_path(match.filename or ""),
-                                    match.linenumber)
+    def format(self, match: "MatchError") -> str:
+        return (
+            f"[error_code]{match.rule.id}[/] "
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}")
 
 
 class ParseableFormatter(BaseFormatter):
 
-    def format(self, match: "MatchError", colored: bool = False) -> str:
-        formatstr = u"{0}:{1}: [{2}] {3}"
-        if colored:
-            return formatstr.format(
-                colorize(self._format_path(match.filename or ""), Color.filename),
-                colorize(str(match.linenumber), Color.linenumber),
-                colorize(u"E{0}".format(match.rule.id), Color.error_code),
-                colorize(u"{0}".format(match.message), Color.error_title))
-        else:
-            return formatstr.format(self._format_path(match.filename or ""),
-                                    match.linenumber,
-                                    "E" + match.rule.id,
-                                    match.message)
+    def format(self, match: "MatchError") -> str:
+        return (
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}: "
+            f"[[error_code]E{match.rule.id}[/]] [dim]{match.message}[/]")
 
 
 class AnnotationsFormatter(BaseFormatter):
@@ -114,11 +87,8 @@ class AnnotationsFormatter(BaseFormatter):
     Supported levels: debug, warning, error
     """
 
-    def format(self, match: "MatchError", colored: bool = False) -> str:
+    def format(self, match: "MatchError") -> str:
         """Prepare a match instance for reporting as a GitHub Actions annotation."""
-        if colored:
-            raise ValueError('The colored mode is not supported.')
-
         level = self._severity_to_level(match.rule.severity)
         file_path = self._format_path(match.filename or "")
         line_num = match.linenumber
@@ -142,8 +112,7 @@ class AnnotationsFormatter(BaseFormatter):
 
 class ParseableSeverityFormatter(BaseFormatter):
 
-    def format(self, match: "MatchError", colored: bool = False) -> str:
-        formatstr = u"{0}:{1}: [{2}] [{3}] {4}"
+    def format(self, match: "MatchError") -> str:
 
         filename = self._format_path(match.filename or "")
         linenumber = str(match.linenumber)
@@ -151,17 +120,6 @@ class ParseableSeverityFormatter(BaseFormatter):
         severity = match.rule.severity
         message = str(match.message)
 
-        if colored:
-            filename = colorize(filename, Color.filename)
-            linenumber = colorize(linenumber, Color.linenumber)
-            rule_id = colorize(rule_id, Color.error_code)
-            severity = colorize(severity, Color.error_code)
-            message = colorize(message, Color.error_title)
-
-        return formatstr.format(
-            filename,
-            linenumber,
-            rule_id,
-            severity,
-            message,
-        )
+        return (
+            f"[filename]{filename}[/]:{linenumber}: [[error_code]{rule_id}[/]] "
+            f"[[error_code]{severity}[/]] [dim]{message}[/]")

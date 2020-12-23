@@ -29,11 +29,8 @@ import sys
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, List, Set, Type, Union
 
-from rich.markdown import Markdown
-from rich.syntax import Syntax
-
 from ansiblelint import cli, formatters
-from ansiblelint.color import console, console_stderr
+from ansiblelint.color import console, console_options, console_stderr, reconfigure, render_yaml
 from ansiblelint.file_utils import cwd
 from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
 from ansiblelint.rules import RulesCollection
@@ -94,8 +91,6 @@ def report_outcome(result: LintResult, options, mark_as_success=False) -> int:
     failures = 0
     warnings = 0
     msg = """\
-You can skip specific rules or tags by adding them to your configuration file:
-```yaml
 # .ansible-lint
 warn_list:  # or 'skip_list' to silence them completely
 """
@@ -116,10 +111,12 @@ warn_list:  # or 'skip_list' to silence them completely
         if "experimental" in match.rule.tags:
             msg += "  - experimental  # all rules tagged as experimental\n"
             break
-    msg += "```"
 
     if result.matches and not options.quiet:
-        console_stderr.print(Markdown(msg))
+        console_stderr.print(
+            "You can skip specific rules or tags by adding them to your "
+            "configuration file:")
+        console_stderr.print(render_yaml(msg))
         console_stderr.print(
             f"Finished with {failures} failure(s), {warnings} warning(s) "
             f"on {len(result.files)} files."
@@ -139,6 +136,12 @@ def main(argv: List[str] = None) -> int:
 
     options = cli.get_config(argv[1:])
 
+    if options.colored is None:
+        options.colored = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
+    if options.colored is not None:
+        console_options["force_terminal"] = options.colored
+        reconfigure(console_options)
+
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
 
@@ -157,7 +160,7 @@ def main(argv: List[str] = None) -> int:
 
     if options.listtags:
         console.print(
-            Syntax(rules.listtags(), 'yaml')
+            render_yaml(rules.listtags())
             )
         return 0
 
@@ -215,18 +218,18 @@ def _render_matches(
             len(ignored_matches))
         for match in ignored_matches:
             if match.ignored:
-                print(formatter.format(match, options.colored))
+                console.print(formatter.format(match))
     if fatal_matches:
         _logger.warning("Listing %s violation(s) that are fatal", len(fatal_matches))
         for match in fatal_matches:
             if not match.ignored:
-                print(formatter.format(match, options.colored))
+                console.print(formatter.format(match))
 
     # If run under GitHub Actions we also want to emit output recognized by it.
     if os.getenv('GITHUB_ACTIONS') == 'true' and os.getenv('GITHUB_WORKFLOW'):
         formatter = formatters.AnnotationsFormatter(cwd, True)
         for match in matches:
-            print(formatter.format(match))
+            console.print(formatter.format(match), markup=False)
 
 
 def _get_matches(rules: RulesCollection, options: "Namespace") -> LintResult:
