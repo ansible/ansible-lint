@@ -1,7 +1,9 @@
 """Utility functions related to file operations."""
 import os
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Iterator, List, Union
+from typing import TYPE_CHECKING, Any, Iterator, List, Optional, Union
+
+from ansiblelint.constants import FileType
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3979
@@ -45,3 +47,26 @@ def expand_paths_vars(paths: List[str]) -> List[str]:
     """Expand the environment or ~ variables in a list."""
     paths = [expand_path_vars(p) for p in paths]
     return paths
+
+
+class Lintable:
+    """Defines a file/folder that can be linted.
+
+    Providing file content when creating the object allow creation of in-memory
+    instances that do not need files to be present on disk.
+    """
+
+    def __init__(self, name: str, content: Optional[str] = None, kind: Optional[FileType] = None):
+        """Create a Lintable instance."""
+        self.name = name
+        self._content = content
+        # TODO(ssbarnea): implement kind detection when not provided
+        self.kind = kind
+
+    @property
+    def content(self):
+        """Retried file content, from internal cache or disk."""
+        if self._content is None:
+            with open(self.name, mode='r', encoding='utf-8') as f:
+                self._content = f.read()
+        return self._content
