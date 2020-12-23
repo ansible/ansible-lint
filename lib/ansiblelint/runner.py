@@ -45,8 +45,12 @@ class Runner(object):
             self.playbooks.add((os.path.join(playbook, ''), 'role'))
             self.playbook_dir = playbook
         else:
-            self.playbooks.add((playbook, 'playbook'))
             self.playbook_dir = os.path.dirname(playbook)
+            if playbook.endswith("meta/main.yml"):
+                file_type = "meta"
+            else:
+                file_type = "playbook"
+            self.playbooks.add((playbook, file_type))
         self.tags = tags
         self.skip_list = skip_list
         self._update_exclude_paths(exclude_paths)
