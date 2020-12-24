@@ -1,49 +1,46 @@
-from collections import namedtuple
-
 import pytest
 
-PlayFile = namedtuple('PlayFile', ['name', 'content'])
+from ansiblelint.file_utils import Lintable
 
-
-PLAY_IN_THE_PLACE = PlayFile('playbook.yml', u'''
+PLAY_IN_THE_PLACE = Lintable('playbook.yml', u'''
 - hosts: all
   roles:
     - include_in_the_place
 ''')
 
-PLAY_RELATIVE = PlayFile('playbook.yml', u'''
+PLAY_RELATIVE = Lintable('playbook.yml', u'''
 - hosts: all
   roles:
     - include_relative
 ''')
 
-PLAY_MISS_INCLUDE = PlayFile('playbook.yml', u'''
+PLAY_MISS_INCLUDE = Lintable('playbook.yml', u'''
 - hosts: all
   roles:
     - include_miss
 ''')
 
-PLAY_ROLE_INCLUDED_IN_THE_PLACE = PlayFile('roles/include_in_the_place/tasks/main.yml', u'''
+PLAY_ROLE_INCLUDED_IN_THE_PLACE = Lintable('roles/include_in_the_place/tasks/main.yml', u'''
 ---
 - include_tasks: included_file.yml
 ''')
 
-PLAY_ROLE_INCLUDED_RELATIVE = PlayFile('roles/include_relative/tasks/main.yml', u'''
+PLAY_ROLE_INCLUDED_RELATIVE = Lintable('roles/include_relative/tasks/main.yml', u'''
 ---
 - include_tasks: tasks/included_file.yml
 ''')
 
-PLAY_ROLE_INCLUDED_MISS = PlayFile('roles/include_miss/tasks/main.yml', u'''
+PLAY_ROLE_INCLUDED_MISS = Lintable('roles/include_miss/tasks/main.yml', u'''
 ---
 - include_tasks: tasks/noexist_file.yml
 ''')
 
-PLAY_INCLUDED_IN_THE_PLACE = PlayFile('roles/include_in_the_place/tasks/included_file.yml', u'''
+PLAY_INCLUDED_IN_THE_PLACE = Lintable('roles/include_in_the_place/tasks/included_file.yml', u'''
 - debug:
     msg: 'was found & included'
 ''')
 
-PLAY_INCLUDED_RELATIVE = PlayFile('roles/include_relative/tasks/included_file.yml', u'''
+PLAY_INCLUDED_RELATIVE = Lintable('roles/include_relative/tasks/included_file.yml', u'''
 - debug:
     msg: 'was found & included'
 ''')

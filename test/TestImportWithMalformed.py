@@ -1,19 +1,16 @@
-from collections import namedtuple
-
 import pytest
 
-PlayFile = namedtuple('PlayFile', ['name', 'content'])
+from ansiblelint.file_utils import Lintable
 
-
-IMPORT_TASKS_MAIN = PlayFile('import-tasks-main.yml', '''
+IMPORT_TASKS_MAIN = Lintable('import-tasks-main.yml', '''
 - oops this is invalid
 ''')
 
-IMPORT_SHELL_PIP = PlayFile('import-tasks-main.yml', '''
+IMPORT_SHELL_PIP = Lintable('import-tasks-main.yml', '''
 - shell: pip
 ''')
 
-PLAY_IMPORT_TASKS = PlayFile('playbook.yml', '''
+PLAY_IMPORT_TASKS = Lintable('playbook.yml', '''
 - hosts: all
   tasks:
     - import_tasks: import-tasks-main.yml
