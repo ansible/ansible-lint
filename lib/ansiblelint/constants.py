@@ -19,4 +19,11 @@ ANSIBLE_MISSING_RC = 4
 # Minimal version of Ansible we support for runtime
 ANSIBLE_MIN_VERSION = "2.9"
 
-FileType = Literal["playbook", "pre_tasks", "post_tasks"]
+FileType = Literal[
+    "playbook",
+    "pre_tasks",
+    "post_tasks",
+    "meta",  # role meta
+    "tasks",
+    "handlers",
+    ]

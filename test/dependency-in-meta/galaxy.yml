@@ -1,5 +1,0 @@
----
-
-dependencies:
-  # from galaxy
-  - src: yatesr.timezone
