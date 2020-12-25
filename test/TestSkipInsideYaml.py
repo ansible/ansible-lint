@@ -4,10 +4,10 @@ ROLE_TASKS = '''
 ---
 - name: test 303
   command: git log
-  changed_when: False
+  changed_when: false
 - name: test 303 (skipped)
-  command: git log # noqa 303
-  changed_when: False
+  command: git log  # noqa 303
+  changed_when: false
 '''
 
 ROLE_TASKS_WITH_BLOCK = '''
