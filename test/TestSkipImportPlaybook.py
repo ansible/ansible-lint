@@ -7,7 +7,7 @@ IMPORTED_PLAYBOOK = '''
   tasks:
     - name: success
       fail: msg="fail"
-      when: False
+      when: false
 '''
 
 MAIN_PLAYBOOK = '''
