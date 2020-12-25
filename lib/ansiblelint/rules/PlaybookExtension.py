@@ -4,6 +4,7 @@
 import os
 from typing import List
 
+from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -16,13 +17,11 @@ class PlaybookExtension(AnsibleLintRule):
     done = []  # type: List  # already noticed path list
     version_added = 'v4.0.0'
 
-    def match(self, file, text):
-        if file['type'] != 'playbook':
-            return False
-
+    def matchyaml(self, file: dict, text: str) -> List[MatchError]:
+        result = []
         path = file['path']
         ext = os.path.splitext(path)
         if ext[1] not in ['.yml', '.yaml'] and path not in self.done:
             self.done.append(path)
-            return True
-        return False
+            result.append(self.create_matcherror(filename=path))
+        return result

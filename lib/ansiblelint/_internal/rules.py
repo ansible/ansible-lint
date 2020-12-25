@@ -25,7 +25,7 @@ class BaseRule:
         """Return matches for a tasks file."""
         return []
 
-    def matchyaml(self, file: str, text: str) -> List["MatchError"]:
+    def matchyaml(self, file: dict, text: str) -> List["MatchError"]:
         """Return matches found for a specific YAML text."""
         return []
 
