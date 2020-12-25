@@ -1,6 +1,7 @@
 """Utility functions related to file operations."""
 import os
 from contextlib import contextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Iterator, List, Optional, Union
 
 from ansiblelint.constants import FileType
@@ -59,6 +60,7 @@ class Lintable:
     def __init__(self, name: str, content: Optional[str] = None, kind: Optional[FileType] = None):
         """Create a Lintable instance."""
         self.name = name
+        self.path = Path(name)
         self._content = content
         # TODO(ssbarnea): implement kind detection when not provided
         self.kind = kind

@@ -29,6 +29,6 @@ class TrailingWhitespaceRule(AnsibleLintRule):
     tags = ['formatting']
     version_added = 'historic'
 
-    def match(self, file, line):
+    def match(self, line: str) -> bool:
         line = line.replace("\r", "")
         return line.rstrip() != line

@@ -2,6 +2,7 @@
 # Copyright (c) 2018, Ansible Project
 
 import re
+from typing import Union
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -19,5 +20,5 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
 
     empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
 
-    def match(self, file, line):
-        return self.empty_string_compare.search(line)
+    def match(self, line: str) -> Union[bool, str]:
+        return bool(self.empty_string_compare.search(line))

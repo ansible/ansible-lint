@@ -12,5 +12,5 @@ class NoTabsRule(AnsibleLintRule):
     tags = ['formatting']
     version_added = 'v4.0.0'
 
-    def match(self, file, line):
+    def match(self, line: str) -> bool:
         return '\t' in line

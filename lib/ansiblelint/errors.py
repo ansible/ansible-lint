@@ -1,5 +1,6 @@
 """Exceptions and error representations."""
 import functools
+import os
 from typing import Any, Optional, Type
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
@@ -42,7 +43,10 @@ class MatchError(ValueError):
         self.message = message or getattr(rule, 'shortdesc', "")
         self.linenumber = linenumber
         self.details = details
-        self.filename = normpath(filename) if filename else None
+        if filename:
+            self.filename = normpath(filename)
+        else:
+            self.filename = os.getcwd()
         self.rule = rule
         self.ignored = False  # If set it will be displayed but not counted as failure
 

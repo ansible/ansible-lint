@@ -8,5 +8,5 @@ class EMatcherRule(AnsibleLintRule):
     shortdesc = 'The letter "e" is present'
     tags = ['fake', 'dummy', 'test1']
 
-    def match(self, filename, line):
+    def match(self, line: str) -> bool:
         return "e" in line

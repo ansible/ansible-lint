@@ -32,7 +32,7 @@ An example rule using ``match`` is:
                       'declarations'
         tags = { 'deprecations' }
 
-        def match(self, file, line):
+        def match(self, line: str) -> Union[bool, str]:
             return '${' in line
 
 An example rule using ``matchtask`` is:
