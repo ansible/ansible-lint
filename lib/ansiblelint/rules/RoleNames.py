@@ -21,12 +21,16 @@
 
 import re
 from pathlib import Path
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import parse_yaml_from_file
 
-ROLE_NAME_REGEX = '^[a-z][a-z0-9_]+$'
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+
+
+ROLE_NAME_REGEX = r'^[a-z][a-z0-9_]+$'
 
 
 def _remove_prefix(text: str, prefix: str) -> str:
@@ -36,7 +40,7 @@ def _remove_prefix(text: str, prefix: str) -> str:
 class RoleNames(AnsibleLintRule):
     id = '106'
     shortdesc = (
-        "Role name {} does not match ``%s`` pattern" % ROLE_NAME_REGEX
+        "Role name {0} does not match ``%s`` pattern" % ROLE_NAME_REGEX
     )
     description = (
         "Role names are now limited to contain only lowercase alphanumeric "
@@ -49,9 +53,12 @@ class RoleNames(AnsibleLintRule):
     tags = ['deprecations']
     version_added = 'v4.3.0'
 
-    ROLE_NAME_REGEXP = re.compile(ROLE_NAME_REGEX)
+    def __init__(self):
+        """Save precompiled regex."""
+        self._re = re.compile(ROLE_NAME_REGEX)
 
-    def match(self, file, text):
+    def matchyaml(self, file: dict, text: str) -> List["MatchError"]:
+        result: List["MatchError"] = []
         path = file['path'].split("/")
         if "tasks" in path:
             role_name = _remove_prefix(path[path.index("tasks") - 1], "ansible-role-")
@@ -66,9 +73,10 @@ class RoleNames(AnsibleLintRule):
                     except KeyError:
                         pass
 
-            if role_name in self.done:
-                return False
-            self.done.append(role_name)
-            if not re.match(self.ROLE_NAME_REGEXP, role_name):
-                return self.shortdesc.format(role_name)
-        return False
+            if role_name not in self.done:
+                self.done.append(role_name)
+                if not self._re.match(role_name):
+                    result.append(self.create_matcherror(
+                        filename=file['path'],
+                        message=self.__class__.shortdesc.format(role_name)))
+        return result

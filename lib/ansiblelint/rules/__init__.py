@@ -123,7 +123,7 @@ class AnsibleLintRule(BaseRule):
             linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
         return linenumber
 
-    def matchyaml(self, file: str, text: str) -> List[MatchError]:
+    def matchyaml(self, file: dict, text: str) -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.matchplay:
             return matches
