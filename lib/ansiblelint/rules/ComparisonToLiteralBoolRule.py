@@ -19,5 +19,5 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
 
     literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
 
-    def match(self, file, line):
-        return self.literal_bool_compare.search(line)
+    def match(self, line: str) -> bool:
+        return bool(self.literal_bool_compare.search(line))

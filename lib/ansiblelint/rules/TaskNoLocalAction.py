@@ -12,7 +12,7 @@ class TaskNoLocalAction(AnsibleLintRule):
     tags = ['task']
     version_added = 'v4.0.0'
 
-    def match(self, file, text):
-        if 'local_action' in text:
+    def match(self, line: str) -> bool:
+        if 'local_action' in line:
             return True
         return False

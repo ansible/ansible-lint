@@ -58,7 +58,7 @@ class AnsibleLintRule(BaseRule):
             if self.id in rule_id_list:
                 continue
 
-            result = self.match(file, line)
+            result = self.match(line)
             if not result:
                 continue
             message = None

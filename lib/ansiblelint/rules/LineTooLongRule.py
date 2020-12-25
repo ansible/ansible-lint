@@ -15,5 +15,5 @@ class LineTooLongRule(AnsibleLintRule):
     tags = ['formatting']
     version_added = 'v4.0.0'
 
-    def match(self, file, line):
+    def match(self, line: str) -> bool:
         return len(line) > 160

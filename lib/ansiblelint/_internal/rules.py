@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Union
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
@@ -13,7 +13,6 @@ class BaseRule:
     description: str = ""
     version_added: str = ""
     severity: str = ""
-    match = None
     matchtask = None
     matchplay = None
 
@@ -32,6 +31,10 @@ class BaseRule:
     def verbose(self) -> str:
         """Return a verbose representation of the rule."""
         return self.id + ": " + self.shortdesc + "\n  " + self.description
+
+    def match(self, line: str) -> Union[bool, str]:
+        """Confirm if current rule matches the given string."""
+        return False
 
 
 class RuntimeErrorRule(BaseRule):
