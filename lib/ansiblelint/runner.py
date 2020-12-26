@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set
 import ansiblelint.file_utils
 import ansiblelint.skip_utils
 import ansiblelint.utils
+from ansiblelint._internal.rules import LoadingFailureRule
 from ansiblelint.errors import MatchError
-from ansiblelint.rules.LoadingFailureRule import LoadingFailureRule
 
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection

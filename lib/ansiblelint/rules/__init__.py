@@ -10,7 +10,7 @@ from time import sleep
 from typing import List
 
 import ansiblelint.utils
-from ansiblelint._internal.rules import AnsibleParserErrorRule
+from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule
 from ansiblelint.errors import BaseRule, MatchError, RuntimeErrorRule
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
@@ -129,6 +129,14 @@ class AnsibleLintRule(BaseRule):
             return matches
 
         yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
+        # yaml returned can be an AnsibleUnicode (a string) when the yaml
+        # file contains a single string. YAML spec allows this but we consider
+        # this an fatal error.
+        if isinstance(yaml, str):
+            return [MatchError(
+                filename=file['path'],
+                rule=LoadingFailureRule()
+            )]
         if not yaml:
             return matches
 
@@ -190,7 +198,7 @@ class RulesCollection(object):
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
         self.rules.extend(
-            [RuntimeErrorRule(), AnsibleParserErrorRule()])
+            [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()])
         for rulesdir in self.rulesdirs:
             _logger.debug("Loading rules from %s", rulesdir)
             self.extend(load_plugins(rulesdir))

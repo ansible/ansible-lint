@@ -62,3 +62,14 @@ class AnsibleParserErrorRule(BaseRule):
     severity = 'VERY_HIGH'
     tags = ['core']
     version_added = 'v5.0.0'
+
+
+class LoadingFailureRule(BaseRule):
+    """File loading failure."""
+
+    id = '901'
+    shortdesc = 'Failed to load or parse file'
+    description = 'Linter failed to process a YAML file, possible not an Ansible file.'
+    severity = 'VERY_HIGH'
+    tags = ['core']
+    version_added = 'v4.3.0'

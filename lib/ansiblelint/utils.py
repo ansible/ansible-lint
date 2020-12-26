@@ -56,7 +56,7 @@ except ImportError:
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-from ansiblelint._internal.rules import AnsibleParserErrorRule
+from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule
 from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
@@ -187,6 +187,11 @@ def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
             raise SystemExit(str(e))
     results = []
     basedir = os.path.dirname(playbook[0])
+    # playbook_ds can be an AnsibleUnicode string, which we consider invalid
+    if isinstance(playbook_ds, str):
+        raise MatchError(
+            filename=playbook[0],
+            rule=LoadingFailureRule)
     items = _playbook_items(playbook_ds)
     for item in items:
         for child in _rebind_match_filename(playbook[0], play_children)(
