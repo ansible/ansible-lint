@@ -1,7 +1,10 @@
 ---
-name: 🐛 Bug report
-about: Create a bug report. Please test against the master branch before submitting it.
-labels: new, bug
+name: Bug report
+about: >
+  Create a bug report. Please test against the master branch before
+  submitting it. For anything else, please use discussions
+  link below.
+labels: bug
 ---
 <!--- Verify first that your issue is not already reported on GitHub -->
 <!--- Also test if the latest release and master branch are affected too -->
