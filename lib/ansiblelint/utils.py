@@ -26,9 +26,10 @@ import os
 import subprocess
 from argparse import Namespace
 from collections import OrderedDict
+from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, ItemsView, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 import yaml
 from ansible import constants
@@ -144,7 +145,10 @@ def _playbook_items(pb_data: dict) -> ItemsView:
     elif not pb_data:
         return []
     else:
-        return [item for play in pb_data for item in play.items()]
+        # "if play" prevents failure if the play sequence containes None,
+        # which is weird but currently allowed by Ansible
+        # https://github.com/ansible-community/ansible-lint/issues/849
+        return [item for play in pb_data if play for item in play.items()]
 
 
 def _rebind_match_filename(filename: str, func) -> Callable:
