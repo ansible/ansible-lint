@@ -146,6 +146,11 @@ class AnsibleLintRule(BaseRule):
         yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, text, file['type'])
 
         for play in yaml:
+
+            # Bug #849
+            if play is None:
+                continue
+
             if self.id in play.get('skipped_rules', ()):
                 continue
 
