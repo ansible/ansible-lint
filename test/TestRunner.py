@@ -32,7 +32,7 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd()
     ('test/nomatchestest.yml', [], 0),
     ('test/unicode.yml', [], 1),
     (LOTS_OF_WARNINGS_PLAYBOOK, [LOTS_OF_WARNINGS_PLAYBOOK], 0),
-    ('test/block.yml', [], 0),
+    ('test/block.yml', [], 1),
     ('test/become.yml', [], 0),
     ('test/emptytags.yml', [], 0),
     ('test/contains_secrets.yml', [], 0),
