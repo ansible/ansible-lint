@@ -7,7 +7,7 @@ import re
 from collections import defaultdict
 from importlib.abc import Loader
 from time import sleep
-from typing import List
+from typing import List, Optional
 
 import ansiblelint.utils
 from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule
@@ -226,6 +226,7 @@ class RulesCollection(object):
     def run(self, playbookfile, tags=set(), skip_list=frozenset()) -> List:
         text = ""
         matches: List = list()
+        error: Optional[IOError] = None
 
         for i in range(3):
             try:
@@ -238,10 +239,14 @@ class RulesCollection(object):
                     playbookfile['path'],
                     e.strerror,
                     i)
+                error = e
                 sleep(1)
                 continue
-        if i and not text:
-            return matches
+        else:
+            return [MatchError(
+                message=str(error),
+                filename=playbookfile['path'],
+                rule=LoadingFailureRule)]
 
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
