@@ -57,7 +57,7 @@ except ImportError:
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule
+from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule, RuntimeErrorRule
 from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
@@ -270,6 +270,10 @@ def _include_children(basedir, k, v, parent_type):
 
 def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List:
     results = []
+    if v is None:
+        raise MatchError(
+            message="A malformed block was encountered while loading a block.",
+            rule=RuntimeErrorRule)
     for th in v:
 
         # ignore empty tasks, `-`
