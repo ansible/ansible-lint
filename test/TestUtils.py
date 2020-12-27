@@ -259,7 +259,7 @@ def test_cli_auto_detect(capfd):
     assert "Unknown file type: test/fixtures/unknown-type.yml" in err
     # An expected rule match from our examples
     assert "examples/roles/bobbins/tasks/main.yml:2: " \
-        "[E401] Git checkouts must contain explicit version" in out
+        "E401 Git checkouts must contain explicit version" in out
     # assures that our .ansible-lint exclude was effective in excluding github files
     assert "Unknown file type: .github/" not in out
     # assures that we can parse playbooks as playbooks

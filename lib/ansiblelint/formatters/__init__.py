@@ -56,10 +56,17 @@ class Formatter(BaseFormatter):
 
     def format(self, match: "MatchError") -> str:
         _id = getattr(match.rule, 'id', '000')
-        return (
-            f"[error_code]{_id}[/] [error_title]{self.escape(match.message)}[/]\n"
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}\n"
-            f"[dim]{match.details}[/]\n")
+        result = (
+            f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]")
+        if match.tag:
+            result += f" [dim][error_code]({match.tag})[/][/]"
+        result += (
+            "\n"
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}")
+        if match.details:
+            result += f" [dim]{match.details}[/]"
+        result += "\n"
+        return result
 
 
 class QuietFormatter(BaseFormatter):
@@ -71,11 +78,15 @@ class QuietFormatter(BaseFormatter):
 
 
 class ParseableFormatter(BaseFormatter):
+    """Parseable uses PEP8 compatible format."""
 
     def format(self, match: "MatchError") -> str:
-        return (
+        result = (
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}: "
-            f"[[error_code]E{match.rule.id}[/]] [dim]{self.escape(match.message)}[/]")
+            f"[error_code]E{match.rule.id}[/] [dim]{self.escape(match.message)}[/]")
+        if match.tag:
+            result += f" [dim][error_code]({match.tag})[/][/]"
+        return result
 
 
 class AnnotationsFormatter(BaseFormatter):
@@ -103,7 +114,7 @@ class AnnotationsFormatter(BaseFormatter):
         violation_details = self.escape(match.message)
         return (
             f"::{level} file={file_path},line={line_num},severity={severity}"
-            f"::[E{rule_id}] {violation_details}"
+            f"::E{rule_id} {violation_details}"
         )
 
     @staticmethod

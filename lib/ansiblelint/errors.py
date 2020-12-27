@@ -29,7 +29,8 @@ class MatchError(ValueError):
             linenumber: int = 0,
             details: str = "",
             filename: Optional[str] = None,
-            rule: Type[BaseRule] = RuntimeErrorRule
+            rule: Type[BaseRule] = RuntimeErrorRule,
+            tag: Optional[str] = None  # optional fine-graded tag
             ) -> None:
         """Initialize a MatchError instance."""
         super().__init__(message)
@@ -49,6 +50,7 @@ class MatchError(ValueError):
             self.filename = os.getcwd()
         self.rule = rule
         self.ignored = False  # If set it will be displayed but not counted as failure
+        self.tag = tag
 
     def __repr__(self) -> str:
         """Return a MatchError instance representation."""
