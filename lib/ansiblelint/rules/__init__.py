@@ -35,14 +35,18 @@ class AnsibleLintRule(BaseRule):
             message: str = None,
             linenumber: int = 0,
             details: str = "",
-            filename: str = None) -> MatchError:
-        return MatchError(
+            filename: str = None,
+            tag: str = "") -> MatchError:
+        match = MatchError(
             message=message,
             linenumber=linenumber,
             details=details,
             filename=filename,
             rule=self.__class__
             )
+        if tag:
+            match.tag = tag
+        return match
 
     def matchlines(self, file, text) -> List[MatchError]:
         matches: List[MatchError] = []
