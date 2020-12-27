@@ -26,9 +26,10 @@ import os
 import subprocess
 from argparse import Namespace
 from collections import OrderedDict
+from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, ItemsView, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 import yaml
 from ansible import constants
@@ -56,7 +57,7 @@ except ImportError:
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-from ansiblelint._internal.rules import AnsibleParserErrorRule
+from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule, RuntimeErrorRule
 from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import normpath
@@ -144,7 +145,10 @@ def _playbook_items(pb_data: dict) -> ItemsView:
     elif not pb_data:
         return []
     else:
-        return [item for play in pb_data for item in play.items()]
+        # "if play" prevents failure if the play sequence containes None,
+        # which is weird but currently allowed by Ansible
+        # https://github.com/ansible-community/ansible-lint/issues/849
+        return [item for play in pb_data if play for item in play.items()]
 
 
 def _rebind_match_filename(filename: str, func) -> Callable:
@@ -187,6 +191,11 @@ def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
             raise SystemExit(str(e))
     results = []
     basedir = os.path.dirname(playbook[0])
+    # playbook_ds can be an AnsibleUnicode string, which we consider invalid
+    if isinstance(playbook_ds, str):
+        raise MatchError(
+            filename=playbook[0],
+            rule=LoadingFailureRule)
     items = _playbook_items(playbook_ds)
     for item in items:
         for child in _rebind_match_filename(playbook[0], play_children)(
@@ -261,6 +270,10 @@ def _include_children(basedir, k, v, parent_type):
 
 def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List:
     results = []
+    if v is None:
+        raise MatchError(
+            message="A malformed block was encountered while loading a block.",
+            rule=RuntimeErrorRule)
     for th in v:
 
         # ignore empty tasks, `-`

@@ -28,8 +28,6 @@ import ruamel.yaml
 
 from ansiblelint.constants import FileType
 
-INLINE_SKIP_FLAG = '# noqa '
-
 _logger = logging.getLogger(__name__)
 
 
@@ -41,7 +39,8 @@ _logger = logging.getLogger(__name__)
 
 def get_rule_skips_from_line(line: str) -> List:
     """Return list of rule ids skipped via comment on the line of yaml."""
-    _before_noqa, _noqa_marker, noqa_text = line.partition(INLINE_SKIP_FLAG)
+    _before_noqa, _noqa_marker, noqa_text = line.partition("# noqa")
+    noqa_text = noqa_text.lstrip(" :")
     return noqa_text.split()
 
 
@@ -150,11 +149,10 @@ def _get_tasks_from_blocks(task_blocks: Sequence) -> Generator:
     ]
 
     def get_nested_tasks(task: Any) -> Generator[Any, None, None]:
-        return (
-            subtask
-            for k in NESTED_TASK_KEYS if task and k in task
-            for subtask in task[k]
-        )
+        for k in NESTED_TASK_KEYS:
+            if task and k in task and task[k]:
+                for subtask in task[k]:
+                    yield subtask
 
     for task in task_blocks:
         for sub_task in get_nested_tasks(task):

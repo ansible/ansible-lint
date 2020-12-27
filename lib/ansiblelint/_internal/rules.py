@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Union
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
@@ -13,7 +13,6 @@ class BaseRule:
     description: str = ""
     version_added: str = ""
     severity: str = ""
-    match = None
     matchtask = None
     matchplay = None
 
@@ -25,13 +24,17 @@ class BaseRule:
         """Return matches for a tasks file."""
         return []
 
-    def matchyaml(self, file: str, text: str) -> List["MatchError"]:
+    def matchyaml(self, file: dict, text: str) -> List["MatchError"]:
         """Return matches found for a specific YAML text."""
         return []
 
     def verbose(self) -> str:
         """Return a verbose representation of the rule."""
         return self.id + ": " + self.shortdesc + "\n  " + self.description
+
+    def match(self, line: str) -> Union[bool, str]:
+        """Confirm if current rule matches the given string."""
+        return False
 
 
 class RuntimeErrorRule(BaseRule):
@@ -59,3 +62,14 @@ class AnsibleParserErrorRule(BaseRule):
     severity = 'VERY_HIGH'
     tags = ['core']
     version_added = 'v5.0.0'
+
+
+class LoadingFailureRule(BaseRule):
+    """File loading failure."""
+
+    id = '901'
+    shortdesc = 'Failed to load or parse file'
+    description = 'Linter failed to process a YAML file, possible not an Ansible file.'
+    severity = 'VERY_HIGH'
+    tags = ['core']
+    version_added = 'v4.3.0'

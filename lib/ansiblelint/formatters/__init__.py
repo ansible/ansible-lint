@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Generic, TypeVar, Union
 
+import rich
+
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
@@ -45,13 +47,17 @@ class BaseFormatter(Generic[T]):
     def format(self, match: "MatchError") -> str:
         return str(match)
 
+    def escape(self, text: str) -> str:
+        """Escapes a string to avoid processing it as markup."""
+        return rich.markup.escape(text)
+
 
 class Formatter(BaseFormatter):
 
     def format(self, match: "MatchError") -> str:
         _id = getattr(match.rule, 'id', '000')
         return (
-            f"[error_code]{_id}[/] [error_title]{match.message}[/]\n"
+            f"[error_code]{_id}[/] [error_title]{self.escape(match.message)}[/]\n"
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}\n"
             f"[dim]{match.details}[/]\n")
 
@@ -69,7 +75,7 @@ class ParseableFormatter(BaseFormatter):
     def format(self, match: "MatchError") -> str:
         return (
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}: "
-            f"[[error_code]E{match.rule.id}[/]] [dim]{match.message}[/]")
+            f"[[error_code]E{match.rule.id}[/]] [dim]{self.escape(match.message)}[/]")
 
 
 class AnnotationsFormatter(BaseFormatter):
@@ -94,7 +100,7 @@ class AnnotationsFormatter(BaseFormatter):
         line_num = match.linenumber
         rule_id = match.rule.id
         severity = match.rule.severity
-        violation_details = match.message
+        violation_details = self.escape(match.message)
         return (
             f"::{level} file={file_path},line={line_num},severity={severity}"
             f"::[E{rule_id}] {violation_details}"
@@ -118,7 +124,7 @@ class ParseableSeverityFormatter(BaseFormatter):
         linenumber = str(match.linenumber)
         rule_id = u"E{0}".format(match.rule.id)
         severity = match.rule.severity
-        message = str(match.message)
+        message = self.escape(str(match.message))
 
         return (
             f"[filename]{filename}[/]:{linenumber}: [[error_code]{rule_id}[/]] "

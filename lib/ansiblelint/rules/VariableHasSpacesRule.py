@@ -17,8 +17,8 @@ class VariableHasSpacesRule(AnsibleLintRule):
     variable_syntax = re.compile(r"{{.*}}")
     bracket_regex = re.compile(r"{{[^{' -]|[^ '}-]}}")
 
-    def match(self, file, line):
+    def match(self, line: str) -> bool:
         if not self.variable_syntax.search(line):
-            return
+            return False
         line_exclude_json = re.sub(r"[^{]{'\w+': ?[^{]{.*?}}", "", line)
-        return self.bracket_regex.search(line_exclude_json)
+        return bool(self.bracket_regex.search(line_exclude_json))
