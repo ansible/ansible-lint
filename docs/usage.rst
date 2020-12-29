@@ -1,6 +1,4 @@
-
 .. _using_lint:
-
 
 *****
 Usage
@@ -8,8 +6,87 @@ Usage
 
 .. contents:: Topics
 
-This topic describes how to use ``ansible-lint``.
 
-.. include:: ../README.rst
-   :start-after: usage-docs-inclusion-marker-do-not-remove
-   :end-before: usage-docs-inclusion-marker-end-do-not-remove
+Command Line Options
+--------------------
+
+The tool produces output on both ``stdout`` and ``stderr``, first one being
+used to display any matching rule violations while the second one being used
+for logging and free form messages, like displaying stats.
+
+In most of our examples we will be using the pep8 output format (``-p``) which
+is machine parseable. The default output format is more verbose and likely
+to contain more information, like long description of the rule and its
+associated tags.
+
+.. command-output:: ansible-lint --help
+   :cwd: ..
+   :returncode: 0
+
+Progressive mode
+----------------
+
+In order to ease tool adoption, git users can enable the progressive mode using
+``--progressive`` option. This makes the linter return a success even if
+some failures are found, as long the total number of violations did not
+increase since the previous commit.
+
+As expected, this mode makes the linter run twice if it finds any violations.
+The second run is performed against a temporary git working copy that contains
+the previous commit. All the violations that were already present are removed
+from the list and the final result is displayed.
+
+The most notable benefit introduced by this mode it does not prevent merging
+new code while allowing developer to address historical violation at his own
+speed.
+
+CI/CD
+-----
+
+If execution under `Github Actions`_ is detected via the presence of
+``GITHUB_ACTIONS=true`` and ``GITHUB_WORFLOW=...`` variables, the linter will
+also print errors using their `annotation`_ format.
+
+.. _GitHub Actions: https://github.com/features/actions
+.. _annotation: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
+
+Linting Playbooks and Roles
+---------------------------
+
+We recommend following the `collection structure layout`_ regardless if you
+are planning to build a collection or not. Following that layout assures the
+best integration with all ecosystem tools as it helps them better distinguish
+between random YAML files and files managed by ansible.
+
+When you call ansible-lint without arguments the tool will use its internal
+heuristics to determine file types.
+
+``ansible-lint`` also accepts a list of **roles** or **playbooks** as
+arguments. The following command would linting ``playbook.yml`` and
+``examples/roles/bobbins`` role:
+
+.. command-output:: ansible-lint -p examples/play.yml examples/roles/bobbins
+   :cwd: ..
+   :returncode: 2
+   :nostderr:
+
+.. _collection structure layout: https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#collection-structure
+
+Examples
+--------
+
+Included in ``ansible-lint/examples`` are some example playbooks with
+undesirable features. Running ansible-lint on them works, as demonstrated in
+the following:
+
+.. command-output:: ansible-lint -p examples/example.yml
+   :cwd: ..
+   :returncode: 2
+   :nostderr:
+
+If playbooks include other playbooks, or tasks, or handlers or roles, these are also handled:
+
+.. command-output:: ansible-lint -p examples/include.yml
+   :cwd: ..
+   :returncode: 2
+   :nostderr:
