@@ -4,6 +4,10 @@
 The presence of this file ensures the support
 of pip editable mode *with setuptools only*.
 """
-from setuptools import setup
+import setuptools
 
-__name__ == '__main__' and setup()  # pylint: disable=expression-not-assigned
+# https://github.com/jazzband/pip-tools/issues/1278
+setuptools.setup(
+    use_scm_version={"local_scheme": "no-local-version"},
+    setup_requires=["setuptools_scm[toml]>=3.5.0"],
+)
