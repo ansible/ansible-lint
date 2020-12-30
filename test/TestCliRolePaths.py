@@ -85,7 +85,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/invalid-name'
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert '106 Role name invalid-name does not match' in result.stdout
+        assert '106: Role name invalid-name does not match' in result.stdout
 
     def test_run_role_name_with_prefix(self):
         cwd = self.local_test_dir
@@ -110,7 +110,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/invalid_due_to_meta'
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert '106 Role name invalid-due-to-meta does not match' in result.stdout
+        assert '106: Role name invalid-due-to-meta does not match' in result.stdout
 
     def test_run_single_role_path_with_roles_path_env(self):
         """Test for role name collision with ANSIBLE_ROLES_PATH.
@@ -143,7 +143,7 @@ def test_run_playbook_github(result, env):
     result_gh = run_ansible_lint(role_path, cwd=cwd, env=env)
 
     expected = (
-        '::error file=examples/example.yml,line=47,severity=MEDIUM::[E101] '
+        '::error file=examples/example.yml,line=47,severity=MEDIUM::E101 '
         'Deprecated always_run'
     )
     assert (expected in result_gh.stdout) is result

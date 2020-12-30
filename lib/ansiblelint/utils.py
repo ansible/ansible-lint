@@ -180,7 +180,7 @@ def _set_collections_basedir(basedir: str):
 def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
     if not os.path.exists(playbook[0]):
         return []
-    _set_collections_basedir(playbook_dir or '.')
+    _set_collections_basedir(playbook_dir or os.path.abspath('.'))
     add_all_plugin_dirs(playbook_dir or '.')
     if playbook[1] == 'role':
         playbook_ds = {'roles': [{'role': playbook[0]}]}
