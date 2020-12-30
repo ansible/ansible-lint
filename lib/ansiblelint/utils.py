@@ -273,7 +273,7 @@ def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List:
     if v is None:
         raise MatchError(
             message="A malformed block was encountered while loading a block.",
-            rule=RuntimeErrorRule)
+            rule=RuntimeErrorRule())
     for th in v:
 
         # ignore empty tasks, `-`
@@ -458,7 +458,7 @@ def normalize_task_v2(task: dict) -> dict:  # noqa: C901
         action, arguments, result['delegate_to'] = mod_arg_parser.parse()
     except AnsibleParserError as e:
         raise MatchError(
-            rule=AnsibleParserErrorRule,
+            rule=AnsibleParserErrorRule(),
             message=e.message,
             filename=task.get(FILENAME_KEY, "Unknown"),
             linenumber=task.get(LINE_NUMBER_KEY, 0),

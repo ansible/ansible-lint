@@ -119,6 +119,6 @@ class Runner(object):
                         self.playbooks.add((child['path'], child['type']))
                         files.append(child)
                 except MatchError as e:
-                    e.rule = LoadingFailureRule
+                    e.rule = LoadingFailureRule()
                     yield e
                 visited.add(arg)
