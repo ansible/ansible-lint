@@ -8,7 +8,8 @@ Installing
 
 .. contents:: Topics
 
-Installing on Windows is not supported because we use symlinks inside Python packages.
+Installing on Windows is not supported because we use symlinks inside Python
+packages.
 
 While our project does not directly ships a container, the
 tool is part of the toolset_ container.  Please avoid raising any bugs
@@ -54,8 +55,8 @@ Using Pip
 From Source
 -----------
 
-**Note**: pip 19.0+ is required for installation. Please consult with the `PyPA User Guide`_
-to learn more about managing Pip versions.
+**Note**: pip 19.0+ is required for installation. Please consult with the
+`PyPA User Guide`_ to learn more about managing Pip versions.
 
 .. code-block:: bash
 
