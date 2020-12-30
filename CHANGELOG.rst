@@ -9,7 +9,8 @@ Major Changes:
 * Require Ansible 2.8 or newer (#721) @ssbarnea
 * LRU Cache for frequently called functions (#891) @ragne
 * Change documentation website to RTD (#875) @ssbarnea
-* Add rules for verifying the existence of imported and included files (#691) @jlusiardi
+* Add rules for verifying the existence of imported and included files (#691)
+  @jlusiardi
 * Add a new rule for detecting nested jinja mustache syntax (#686) @europ
 
 Minor Changes:
@@ -36,7 +37,8 @@ Minor Changes:
 * Document module dependencies (#817) @ssbarnea
 * Refactor Runner out of __init__ (#816) @ssbarnea
 * Added reproducer for become in blocks (#793) @ssbarnea
-* Convert failed to find required 'name' key in include_role into a match (#781) @ssbarnea
+* Convert failed to find required 'name' key in include_role into a match
+  (#781) @ssbarnea
 * Fix exclude_paths from get_playbooks_and_roles (#774) @ssbarnea
 * Update ComparisonToEmptyStringRule.py (#770) @vbotka
 * Remove bin/ansible-lint script (#762) @ssbarnea
@@ -46,7 +48,8 @@ Minor Changes:
 * Migrate some test to pytest (#740) @cans
 * Use python logging (#732) @ssbarnea
 * Make config loading failures visible (#726) @ssbarnea
-* Add a test that fails with `AttributeError` on malformed `import_tasks` file content (#720) @mdaniel
+* Add a test that fails with `AttributeError` on malformed `import_tasks` file
+  content (#720) @mdaniel
 * Consistent relative path display (#692) @cans
 
 Bugfixes:
@@ -66,7 +69,8 @@ Bugfixes:
 * Allow null config file (#814) @ssbarnea
 * Fixed the search method when the file path not exists (#807) @cahlchang
 * Restore playbook auto-detection (#767) @ssbarnea
-* Gracefully process a missing git binary when falling-back to pure-python discovery (#738) @anryko
+* Gracefully process a missing git binary when falling-back to pure-python
+  discovery (#738) @anryko
 * Resurrect support for editable mode installs (#722) @webknjaz
 * Avoid exception from 505 rule (#709) @ssbarnea
 
@@ -151,7 +155,8 @@ Bugfix release
 * Allow snake_case module names for rules #82
 * Suggest tempfile module instead of mktemp command #422
 * Update tox to run with only supported ansible versions #406
-* GitHub repository edits: move to ansible org, add CODE_OF_CONDUCT, add ROADMAP, label edits
+* GitHub repository edits: move to ansible org, add CODE_OF_CONDUCT, add
+  ROADMAP, label edits
 
 3.5.1
 =====
@@ -161,7 +166,8 @@ Use ``yaml.safe_load`` for loading the configuration file
 3.5.0
 =====
 
-* New ids and tags, add doc generator. Old tag names remain backwardly compatible (awcrosby)
+* New ids and tags, add doc generator. Old tag names remain backwardly\
+  compatible (awcrosby)
 * Add more package formats to PackageIsNotLatestRule (simon04)
 * Improve handling of meta/main.yml dependencies (MatrixCrawler)
 * Correctly handle role argument trailing slash (zoredache)
