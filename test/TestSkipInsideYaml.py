@@ -1,6 +1,6 @@
 import pytest
 
-ROLE_TASKS = '''
+ROLE_TASKS = '''\
 ---
 - name: test 303
   command: git log
@@ -10,7 +10,7 @@ ROLE_TASKS = '''
   changed_when: false
 '''
 
-ROLE_TASKS_WITH_BLOCK = '''
+ROLE_TASKS_WITH_BLOCK = '''\
 ---
 - name: bad git 1  # noqa 401
   action: git a=b c=d
@@ -34,7 +34,7 @@ ROLE_TASKS_WITH_BLOCK = '''
       action: git a=b c=d
 '''
 
-PLAYBOOK = '''
+PLAYBOOK = '''\
 - hosts: all
   tasks:
     - name: test 402
@@ -75,14 +75,14 @@ PLAYBOOK = '''
         - skip_ansible_lint
 '''
 
-ROLE_META = '''
+ROLE_META = '''\
 galaxy_info:  # noqa 701
   author: your name  # noqa 703
   description: missing min_ansible_version and platforms. author default not changed
   license: MIT
 '''
 
-ROLE_TASKS_WITH_BLOCK_BECOME = '''
+ROLE_TASKS_WITH_BLOCK_BECOME = '''\
 - hosts:
   tasks:
     - name: foo
