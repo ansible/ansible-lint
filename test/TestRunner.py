@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 import os
+from typing import Set
 
 import pytest
 
@@ -38,8 +39,11 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd()
     ('test/emptytags.yml', [], 0),
     ('test/contains_secrets.yml', [], 0),
 ))
-def test_runner(default_rules_collection, playbook, exclude, length):
-    runner = Runner(default_rules_collection, playbook, [], [], exclude)
+def test_runner(default_rules_collection, playbook, exclude, length) -> None:
+    runner = Runner(
+        rules=default_rules_collection,
+        playbook=playbook,
+        exclude_paths=exclude)
 
     matches = runner.run()
 
@@ -55,9 +59,11 @@ def test_runner(default_rules_collection, playbook, exclude, length):
     pytest.param(formatters.Formatter,
                  id='Formatter-colored'),
 ))
-def test_runner_unicode_format(default_rules_collection, formatter_cls):
+def test_runner_unicode_format(default_rules_collection, formatter_cls) -> None:
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
-    runner = Runner(default_rules_collection, 'test/unicode.yml', [], [], [])
+    runner = Runner(
+        rules=default_rules_collection,
+        playbook='test/unicode.yml')
 
     matches = runner.run()
 
@@ -65,20 +71,30 @@ def test_runner_unicode_format(default_rules_collection, formatter_cls):
 
 
 @pytest.mark.parametrize('directory_name', ('test/', os.path.abspath('test')))
-def test_runner_with_directory(default_rules_collection, directory_name):
-    runner = Runner(default_rules_collection, directory_name, [], [], [])
+def test_runner_with_directory(default_rules_collection, directory_name) -> None:
+    runner = Runner(
+        rules=default_rules_collection,
+        playbook=directory_name)
     assert list(runner.playbooks)[0][1] == 'role'
 
 
-def test_files_not_scanned_twice(default_rules_collection):
-    checked_files = set()
+def test_files_not_scanned_twice(default_rules_collection) -> None:
+    checked_files: Set[str] = set()
 
     filename = os.path.abspath('test/common-include-1.yml')
-    runner = Runner(default_rules_collection, filename, [], [], [], 0, checked_files)
+    runner = Runner(
+        rules=default_rules_collection,
+        playbook=filename,
+        verbosity=0,
+        checked_files=checked_files)
     run1 = runner.run()
 
     filename = os.path.abspath('test/common-include-2.yml')
-    runner = Runner(default_rules_collection, filename, [], [], [], 0, checked_files)
+    runner = Runner(
+        rules=default_rules_collection,
+        playbook=filename,
+        verbosity=0,
+        checked_files=checked_files)
     run2 = runner.run()
 
     assert (len(run1) + len(run2)) == 1

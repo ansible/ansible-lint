@@ -94,14 +94,14 @@ FAIL_TASKS = '''
 
 
 @pytest.mark.parametrize('rule_runner', (MissingFilePermissionsRule, ), indirect=['rule_runner'])
-def test_success(rule_runner):
+def test_success(rule_runner) -> None:
     """Validate that mode presence avoids hitting the rule."""
     results = rule_runner.run_playbook(SUCCESS_TASKS)
     assert len(results) == 0
 
 
 @pytest.mark.parametrize('rule_runner', (MissingFilePermissionsRule, ), indirect=['rule_runner'])
-def test_fail(rule_runner):
+def test_fail(rule_runner) -> None:
     """Validate that missing mode triggers the rule."""
     results = rule_runner.run_playbook(FAIL_TASKS)
     assert len(results) == 5

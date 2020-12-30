@@ -8,11 +8,13 @@ import re
 from collections import defaultdict
 from importlib.abc import Loader
 from time import sleep
-from typing import List, Optional
+from typing import Iterator, List, Optional
 
 import ansiblelint.utils
-from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule
-from ansiblelint.errors import BaseRule, MatchError, RuntimeErrorRule
+from ansiblelint._internal.rules import (
+    AnsibleParserErrorRule, BaseRule, LoadingFailureRule, RuntimeErrorRule,
+)
+from ansiblelint.errors import MatchError
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
 _logger = logging.getLogger(__name__)
@@ -33,10 +35,10 @@ class AnsibleLintRule(BaseRule):
 
     def create_matcherror(
             self,
-            message: str = None,
+            message: Optional[str] = None,
             linenumber: int = 0,
             details: str = "",
-            filename: str = None,
+            filename: Optional[str] = None,
             tag: str = "") -> MatchError:
         match = MatchError(
             message=message,
@@ -217,7 +219,7 @@ class RulesCollection(object):
     def register(self, obj: AnsibleLintRule) -> None:
         self.rules.append(obj)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[BaseRule]:
         """Return the iterator over the rules in the RulesCollection."""
         return iter(self.rules)
 

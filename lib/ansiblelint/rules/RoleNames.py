@@ -53,7 +53,7 @@ class RoleNames(AnsibleLintRule):
     tags = ['deprecations']
     version_added = 'v4.3.0'
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Save precompiled regex."""
         self._re = re.compile(ROLE_NAME_REGEX)
 

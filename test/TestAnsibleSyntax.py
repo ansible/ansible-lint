@@ -10,7 +10,7 @@ PB_WITH_NULL_TASKS = '''
 '''
 
 
-def test_null_tasks(default_text_runner):
+def test_null_tasks(default_text_runner) -> None:
     """Assure we do not fail when encountering null tasks."""
     results = default_text_runner.run_playbook(PB_WITH_NULL_TASKS)
     assert not results
