@@ -76,9 +76,9 @@ def test_matcherror_invalid():
         # filenames takes priority in sorting
         (MatchError("a", filename="b"), MatchError("a", filename="a")),
         # rule id 501 > rule id 101
-        (MatchError(rule=BecomeUserWithoutBecomeRule), MatchError(rule=AlwaysRunRule)),
+        (MatchError(rule=BecomeUserWithoutBecomeRule()), MatchError(rule=AlwaysRunRule())),
         # rule id "200" > rule id 101
-        (MatchError(rule=AnsibleLintRuleWithStringId), MatchError(rule=AlwaysRunRule)),
+        (MatchError(rule=AnsibleLintRuleWithStringId()), MatchError(rule=AlwaysRunRule())),
         # details are taken into account
         (MatchError("a", details="foo"), MatchError("a", details="bar")),
     ))

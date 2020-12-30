@@ -1,4 +1,5 @@
 """All internal ansible-lint rules."""
+import copy
 import glob
 import importlib.util
 import logging
@@ -42,7 +43,7 @@ class AnsibleLintRule(BaseRule):
             linenumber=linenumber,
             details=details,
             filename=filename,
-            rule=self.__class__
+            rule=copy.copy(self)
             )
         if tag:
             match.tag = tag
@@ -250,7 +251,7 @@ class RulesCollection(object):
             return [MatchError(
                 message=str(error),
                 filename=playbookfile['path'],
-                rule=LoadingFailureRule)]
+                rule=LoadingFailureRule())]
 
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
