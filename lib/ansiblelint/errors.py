@@ -50,6 +50,8 @@ class MatchError(ValueError):
             self.filename = os.getcwd()
         self.rule = rule
         self.ignored = False  # If set it will be displayed but not counted as failure
+        # This can be used by rules that can report multiple errors type, so
+        # we can still filter by them.
         self.tag = tag
 
     def __repr__(self) -> str:
