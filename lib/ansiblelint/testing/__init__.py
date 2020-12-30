@@ -5,14 +5,20 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from ansible import __version__ as ansible_version_str
 
+from ansiblelint.errors import MatchError
+from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 if TYPE_CHECKING:
-    from ansiblelint.errors import MatchError
+    # https://github.com/PyCQA/pylint/issues/3240
+    # pylint: disable=unsubscriptable-object
+    CompletedProcess = subprocess.CompletedProcess[Any]
+else:
+    CompletedProcess = subprocess.CompletedProcess
 
 
 ANSIBLE_MAJOR_VERSION = tuple(map(int, ansible_version_str.split('.')[:2]))
@@ -21,15 +27,15 @@ ANSIBLE_MAJOR_VERSION = tuple(map(int, ansible_version_str.split('.')[:2]))
 class RunFromText(object):
     """Use Runner on temp files created from unittest text snippets."""
 
-    def __init__(self, collection):
+    def __init__(self, collection: RulesCollection) -> None:
         """Initialize a RunFromText instance with rules collection."""
         self.collection = collection
 
-    def _call_runner(self, path) -> List["MatchError"]:
+    def _call_runner(self, path: str) -> List["MatchError"]:
         runner = Runner(self.collection, path)
         return runner.run()
 
-    def run_playbook(self, playbook_text):
+    def run_playbook(self, playbook_text: str) -> List[MatchError]:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix="playbook") as fp:
             fp.write(playbook_text)
@@ -37,7 +43,7 @@ class RunFromText(object):
             results = self._call_runner(fp.name)
         return results
 
-    def run_role_tasks_main(self, tasks_main_text):
+    def run_role_tasks_main(self, tasks_main_text: str) -> List[MatchError]:
         """Lints received text as tasks."""
         role_path = tempfile.mkdtemp(prefix='role_')
         tasks_path = os.path.join(role_path, 'tasks')
@@ -48,7 +54,7 @@ class RunFromText(object):
         shutil.rmtree(role_path)
         return results
 
-    def run_role_meta_main(self, meta_main_text):
+    def run_role_meta_main(self, meta_main_text: str) -> List[MatchError]:
         """Lints received text as meta."""
         role_path = tempfile.mkdtemp(prefix='role_')
         meta_path = os.path.join(role_path, 'meta')
@@ -62,9 +68,9 @@ class RunFromText(object):
 
 def run_ansible_lint(
         *argv: str,
-        cwd: str = None,
-        bin: str = None,
-        env: Dict[str, str] = None) -> subprocess.CompletedProcess:
+        cwd: Optional[str] = None,
+        bin: Optional[str] = None,
+        env: Optional[Dict[str, str]] = None) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
     if not bin:
         bin = sys.executable
