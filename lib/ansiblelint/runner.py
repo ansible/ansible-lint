@@ -36,7 +36,7 @@ class Runner(object):
             skip_list: Optional[FrozenSet[Any]] = frozenset(),
             exclude_paths: List[str] = [],
             verbosity: int = 0,
-            checked_files: Set[str] = None) -> None:
+            checked_files: Optional[Set[str]] = None) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.playbooks = set()
