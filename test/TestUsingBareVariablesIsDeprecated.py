@@ -21,4 +21,4 @@ class TestUsingBareVariablesIsDeprecated(unittest.TestCase):
         failure = 'test/using-bare-variables-failure.yml'
         bad_runner = Runner(self.collection, failure, [], [], [])
         errs = bad_runner.run()
-        self.assertEqual(14, len(errs))
+        self.assertEqual(11, len(errs))

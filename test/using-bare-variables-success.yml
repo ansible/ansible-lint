@@ -107,26 +107,6 @@
         msg: "{{ item }}"
       with_fileglob: 'foo{{glob}}'
 
-    ### Testing with_filetree
-    - name: with_filetree loop using list of path
-      debug:
-        msg: "{{ item }}"
-      with_filetree:
-        - path/to/dir1/
-        - path/to/dir2/
-
-    ### Testing non-list form of with_filetree
-    - name: with_filetree loop using single path
-      debug:
-        msg: "{{ item }}"
-      with_filetree: path/to/dir/
-
-    ### Testing non-list form of with_filetree with trailing templated pattern
-    - name: with_filetree loop using templated pattern
-      debug:
-        msg: "{{ item }}"
-      with_filetree: 'path/to/{{ directory }}'
-
     ### Testing with_together
     - name: with_together loop using variable lists
       debug:
@@ -173,26 +153,6 @@
       debug:
         msg: "{{ item }}"
       with_ini: value[1-2] section=section1 file=foo.ini re=true
-
-    - name: with_flattened loop
-      debug:
-        msg: "{{ item }}"
-      with_flattened:
-        - "{{ my_list }}"
-        - "{{ my_list2 }}"
-
-    - name: with_flattened loop with a variable
-      debug:
-        msg: "{{ item }}"
-      with_flattened: "{{ my_list_of_lists }}"
-
-    - name: with_flattened loop with a multiline template
-      debug:
-        msg: "{{ item }}"
-      with_flattened: >
-        {{ my_list
-           | union(my_list2)
-           | list }}
 
     - name: with_inventory_hostnames loop
       debug:
