@@ -22,7 +22,7 @@ import pytest
 
 from ansiblelint.rules.MissingFilePermissionsRule import MissingFilePermissionsRule
 
-SUCCESS_TASKS = '''
+SUCCESS_TASKS = '''\
 ---
 - hosts: hosts
   tasks:
@@ -56,7 +56,7 @@ SUCCESS_TASKS = '''
         recurse: yes
 '''
 
-FAIL_TASKS = '''
+FAIL_TASKS = '''\
 ---
 - hosts: hosts
   tasks:
@@ -105,10 +105,10 @@ def test_fail(rule_runner) -> None:
     """Validate that missing mode triggers the rule."""
     results = rule_runner.run_playbook(FAIL_TASKS)
     assert len(results) == 5
-    assert results[0].linenumber == 5
-    assert results[1].linenumber == 9
-    assert results[2].linenumber == 13
-    # assert results[3].linenumber == 17
-    assert results[3].linenumber == 21
-    assert results[4].linenumber == 26
-    # assert results[6].linenumber == 30
+    assert results[0].linenumber == 4
+    assert results[1].linenumber == 8
+    assert results[2].linenumber == 12
+    # assert results[3].linenumber == 16
+    assert results[3].linenumber == 20
+    assert results[4].linenumber == 25
+    # assert results[6].linenumber == 29

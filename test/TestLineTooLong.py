@@ -2,10 +2,10 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.LineTooLongRule import LineTooLongRule
+from ansiblelint.rules.YamllintRule import YamllintRule
 from ansiblelint.testing import RunFromText
 
-LONG_LINE = '''
+LONG_LINE = '''\
 - name: task example
   debug:
     msg: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua tempor incididunt ut labore et dolore'
@@ -14,7 +14,7 @@ LONG_LINE = '''
 
 class TestLineTooLongRule(unittest.TestCase):
     collection = RulesCollection()
-    collection.register(LineTooLongRule())
+    collection.register(YamllintRule())
 
     def setUp(self):
         self.runner = RunFromText(self.collection)
