@@ -61,11 +61,6 @@
         msg: "{{ item }}"
       with_fileglob: my_list
 
-    - name: with_filetree loop using bare variable
-      debug:
-        msg: "{{ item }}"
-      with_filetree: my_list
-
     - name: with_together loop using bare variable
       debug:
         msg: "{{ item.0 }} {{ item.1 }}"
@@ -94,15 +89,3 @@
       debug:
         msg: "{{ item.0 }} {{ item.1 }}"
       with_indexed_items: my_list
-
-    - name: with_flattened loop
-      debug:
-        msg: "{{ item }}"
-      with_flattened:
-        - my_list
-        - my_list2
-
-    - name: with_flattened loop with a variable
-      debug:
-        msg: "{{ item }}"
-      with_flattened: my_list_of_lists
