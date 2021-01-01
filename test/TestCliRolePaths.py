@@ -112,6 +112,21 @@ class TestCliRolePaths(unittest.TestCase):
         result = run_ansible_lint(role_path, cwd=cwd)
         assert '106: Role name invalid-due-to-meta does not match' in result.stdout
 
+    def test_run_single_role_path_with_roles_path_env(self):
+        """Test for role name collision with ANSIBLE_ROLES_PATH.
+
+        Test if ansible-lint chooses the role in the current directory when the role
+        specified as parameter exists in the current directory and the ANSIBLE_ROLES_PATH.
+        """
+        cwd = self.local_test_dir
+        role_path = 'test-role'
+
+        env = os.environ.copy()
+        env['ANSIBLE_ROLES_PATH'] = os.path.join(cwd, 'use-as-default-roles-path')
+
+        result = run_ansible_lint(role_path, cwd=cwd, env=env)
+        assert 'Use shell only when shell functionality is required' in result.stdout
+
 
 @pytest.mark.parametrize(('result', 'env'), (
     (True, {

@@ -1,0 +1,4 @@
+---
+- package:
+    name: bash
+    state: latest

@@ -375,6 +375,8 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
             basedir, os.path.join('..', '..', '..', 'roles', role)
         ),
         path_dwim(basedir, os.path.join('..', '..', role)),
+        # if checking a role in the current directory
+        path_dwim(basedir, os.path.join('..', role)),
     ]
 
     if constants.DEFAULT_ROLES_PATH:
