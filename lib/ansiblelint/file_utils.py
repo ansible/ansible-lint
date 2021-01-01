@@ -65,6 +65,23 @@ class Lintable:
         # TODO(ssbarnea): implement kind detection when not provided
         self.kind = kind
 
+    def __getitem__(self, item):
+        """Provide compatibility subscriptable support."""
+        if item == 'path':
+            return str(self.path)
+        elif item == 'type':
+            return str(self.kind)
+        elif item == 'absolute_directory':
+            return str(self.path)
+        raise NotImplementedError()
+
+    def get(self, item, default=None):
+        """Provide compatibility subscriptable support."""
+        try:
+            return self.__getitem__(item)
+        except NotImplementedError:
+            return default
+
     @property
     def content(self) -> str:
         """Retried file content, from internal cache or disk."""
