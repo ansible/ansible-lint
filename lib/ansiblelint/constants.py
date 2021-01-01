@@ -26,4 +26,6 @@ FileType = Literal[
     "meta",  # role meta
     "tasks",
     "handlers",
+    "role",  # that is a folder!
+    "yaml",  # generic yaml file, previously reported as unknown file type
     ]

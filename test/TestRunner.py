@@ -24,6 +24,7 @@ import pytest
 
 from ansiblelint import formatters
 from ansiblelint.cli import abspath
+from ansiblelint.file_utils import Lintable
 from ansiblelint.runner import Runner
 
 LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd())
@@ -42,7 +43,7 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd()
 def test_runner(default_rules_collection, playbook, exclude, length) -> None:
     runner = Runner(
         rules=default_rules_collection,
-        playbook=playbook,
+        lintable=playbook,
         exclude_paths=exclude)
 
     matches = runner.run()
@@ -63,7 +64,7 @@ def test_runner_unicode_format(default_rules_collection, formatter_cls) -> None:
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(
         rules=default_rules_collection,
-        playbook='test/unicode.yml')
+        lintable=Lintable('test/unicode.yml', "playbook"))
 
     matches = runner.run()
 
@@ -74,7 +75,7 @@ def test_runner_unicode_format(default_rules_collection, formatter_cls) -> None:
 def test_runner_with_directory(default_rules_collection, directory_name) -> None:
     runner = Runner(
         rules=default_rules_collection,
-        playbook=directory_name)
+        lintable=directory_name)
     assert list(runner.playbooks)[0][1] == 'role'
 
 
@@ -84,7 +85,7 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
     filename = os.path.abspath('test/common-include-1.yml')
     runner = Runner(
         rules=default_rules_collection,
-        playbook=filename,
+        lintable=filename,
         verbosity=0,
         checked_files=checked_files)
     run1 = runner.run()
@@ -92,7 +93,7 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
     filename = os.path.abspath('test/common-include-2.yml')
     runner = Runner(
         rules=default_rules_collection,
-        playbook=filename,
+        lintable=filename,
         verbosity=0,
         checked_files=checked_files)
     run2 = runner.run()
