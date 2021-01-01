@@ -82,6 +82,9 @@ class MatchError(ValueError):
             str(getattr(self.rule, 'id', 0)),
             self.message,
             self.details,
+            # -1 is used here to force errors with no column to sort before
+            # all other errors.
+            -1 if self.column is None else self.column,
         )
 
     def __lt__(self, other: object) -> bool:
