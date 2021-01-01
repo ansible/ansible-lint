@@ -12,6 +12,7 @@
   - name: become_user without become task
     command: whoami
     become_user: postgres
+    changed_when: false
 
 - hosts: localhost
 

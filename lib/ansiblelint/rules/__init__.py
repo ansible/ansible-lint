@@ -142,7 +142,7 @@ class AnsibleLintRule(BaseRule):
         # this an fatal error.
         if isinstance(yaml, str):
             return [MatchError(
-                filename=file.path,
+                filename=str(file.path),
                 rule=LoadingFailureRule()
             )]
         if not yaml:
@@ -162,24 +162,8 @@ class AnsibleLintRule(BaseRule):
             if self.id in play.get('skipped_rules', ()):
                 continue
 
-            result = self.matchplay(file, play)
-            if not result:
-                continue
+            matches.extend(self.matchplay(file, play))
 
-            if isinstance(result, tuple):
-                result = [result]
-
-            if not isinstance(result, list):
-                raise TypeError("{} is not a list".format(result))
-
-            for section, message, *optional_linenumber in result:
-                linenumber = self._matchplay_linenumber(play, optional_linenumber)
-                matches.append(self.create_matcherror(
-                    message=message,
-                    linenumber=linenumber,
-                    details=str(section),
-                    filename=file.path
-                    ))
         return matches
 
 

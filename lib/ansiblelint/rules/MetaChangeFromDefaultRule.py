@@ -1,6 +1,12 @@
 # Copyright (c) 2018, Ansible Project
 
+from typing import TYPE_CHECKING, List
+
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 
 class MetaChangeFromDefaultRule(AnsibleLintRule):
@@ -22,19 +28,20 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     tags = ['metadata']
     version_added = 'v4.0.0'
 
-    def matchplay(self, file, data):
+    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
         if file['type'] != 'meta':
-            return False
+            return []
 
         galaxy_info = data.get('galaxy_info', None)
         if not galaxy_info:
-            return False
+            return []
 
         results = []
         for field, default in self.field_defaults:
             value = galaxy_info.get(field, None)
             if value and value == default:
-                results.append(({'meta/main.yml': data},
-                                'Should change default metadata: %s' % field))
+                results.append(
+                    self.create_matcherror(
+                        'Should change default metadata: %s' % field))
 
         return results

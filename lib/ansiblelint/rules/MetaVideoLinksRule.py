@@ -1,8 +1,13 @@
 # Copyright (c) 2018, Ansible Project
 
 import re
+from typing import TYPE_CHECKING, List
 
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 
 class MetaVideoLinksRule(AnsibleLintRule):
@@ -26,31 +31,33 @@ class MetaVideoLinksRule(AnsibleLintRule):
             r'https://youtu\.be/([0-9A-Za-z-_]+)'),
     }
 
-    def matchplay(self, file, data):
+    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
         if file['type'] != 'meta':
-            return False
+            return []
 
         galaxy_info = data.get('galaxy_info', None)
         if not galaxy_info:
-            return False
+            return []
 
         video_links = galaxy_info.get('video_links', None)
         if not video_links:
-            return False
+            return []
 
         results = []
 
         for video in video_links:
             if not isinstance(video, dict):
-                results.append(({'meta/main.yml': data},
-                                "Expected item in 'video_links' to be "
-                                "a dictionary"))
+                results.append(
+                    self.create_matcherror(
+                        "Expected item in 'video_links' to be "
+                        "a dictionary"))
                 continue
 
             if set(video) != {'url', 'title', '__file__', '__line__'}:
-                results.append(({'meta/main.yml': data},
-                                "Expected item in 'video_links' to contain "
-                                "only keys 'url' and 'title'"))
+                results.append(
+                    self.create_matcherror(
+                        "Expected item in 'video_links' to contain "
+                        "only keys 'url' and 'title'"))
                 continue
 
             for name, expr in self.VIDEO_REGEXP.items():
@@ -60,6 +67,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                 msg = ("URL format '{0}' is not recognized. "
                        "Expected it be a shared link from Vimeo, YouTube, "
                        "or Google Drive.".format(video['url']))
-                results.append(({'meta/main.yml': data}, msg))
+                results.append(
+                    self.create_matcherror(msg))
 
         return results
