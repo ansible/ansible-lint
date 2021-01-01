@@ -27,6 +27,7 @@ class MatchError(ValueError):
             self,
             message: Optional[str] = None,
             linenumber: int = 0,
+            column: Optional[int] = None,
             details: str = "",
             filename: Optional[str] = None,
             rule: BaseRule = RuntimeErrorRule(),
@@ -43,6 +44,7 @@ class MatchError(ValueError):
 
         self.message = message or getattr(rule, 'shortdesc', "")
         self.linenumber = linenumber
+        self.column = column
         self.details = details
         if filename:
             self.filename = normpath(filename)
@@ -63,6 +65,13 @@ class MatchError(ValueError):
 
         return formatstr.format(_id, self.message,
                                 self.filename, self.linenumber, self.details)
+
+    @property
+    def position(self) -> str:
+        """Return error positioniong, with column number if available."""
+        if self.column:
+            return f"{self.linenumber}:{self.column}"
+        return str(self.linenumber)
 
     @property
     def _hash_key(self) -> Any:

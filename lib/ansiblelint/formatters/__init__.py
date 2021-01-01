@@ -62,7 +62,7 @@ class Formatter(BaseFormatter):
             result += f" [dim][error_code]({match.tag})[/][/]"
         result += (
             "\n"
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}")
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}")
         if match.details:
             result += f" [dim]{match.details}[/]"
         result += "\n"
@@ -74,7 +74,7 @@ class QuietFormatter(BaseFormatter):
     def format(self, match: "MatchError") -> str:
         return (
             f"[error_code]{match.rule.id}[/] "
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}")
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}")
 
 
 class ParseableFormatter(BaseFormatter):
@@ -82,7 +82,7 @@ class ParseableFormatter(BaseFormatter):
 
     def format(self, match: "MatchError") -> str:
         result = (
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.linenumber}: "
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}: "
             f"[error_code]E{match.rule.id}[/] [dim]{self.escape(match.message)}[/]")
         if match.tag:
             result += f" [dim][error_code]({match.tag})[/][/]"
@@ -112,8 +112,12 @@ class AnnotationsFormatter(BaseFormatter):
         rule_id = match.rule.id
         severity = match.rule.severity
         violation_details = self.escape(match.message)
+        if match.column:
+            col = f",col={match.column}"
+        else:
+            col = ""
         return (
-            f"::{level} file={file_path},line={line_num},severity={severity}"
+            f"::{level} file={file_path},line={line_num}{col},severity={severity}"
             f"::E{rule_id} {violation_details}"
         )
 
@@ -132,11 +136,11 @@ class ParseableSeverityFormatter(BaseFormatter):
     def format(self, match: "MatchError") -> str:
 
         filename = self._format_path(match.filename or "")
-        linenumber = str(match.linenumber)
+        position = match.position
         rule_id = u"E{0}".format(match.rule.id)
         severity = match.rule.severity
         message = self.escape(str(match.message))
 
         return (
-            f"[filename]{filename}[/]:{linenumber}: [[error_code]{rule_id}[/]] "
+            f"[filename]{filename}[/]:{position}: [[error_code]{rule_id}[/]] "
             f"[[error_code]{severity}[/]] [dim]{message}[/]")
