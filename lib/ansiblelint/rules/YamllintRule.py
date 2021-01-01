@@ -3,6 +3,7 @@ import os
 import sys
 from typing import TYPE_CHECKING, List
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
 
@@ -68,23 +69,23 @@ class YamllintRule(AnsibleLintRule):
         # customize id by adding the one reported by yamllint
         self.id = self.__class__.id
 
-    def matchyaml(self, file, text: str) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> List["MatchError"]:
         """Return matches found for a specific YAML text."""
         matches = []
         filtered_matches = []
 
         if YamllintRule.config:
-            for p in run_yamllint(text, YamllintRule.config):
+            for p in run_yamllint(file.content, YamllintRule.config):
                 matches.append(
                     self.create_matcherror(
                         message=p.desc,
                         linenumber=p.line,
                         details="",
-                        filename=file['path'],
+                        filename=str(file.path),
                         tag=p.rule))
 
         if matches:
-            lines = text.splitlines()
+            lines = file.content.splitlines()
             for match in matches:
                 # rule.linenumber starts with 1, not zero
                 skip_list = get_rule_skips_from_line(lines[match.linenumber-1])

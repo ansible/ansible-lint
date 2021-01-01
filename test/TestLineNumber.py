@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules.SudoRule import SudoRule
 
 TEST_TASKLIST = """
@@ -29,8 +30,9 @@ TEST_TASKLIST = """
 """
 
 
-def test_rule_linenumber(monkeypatch):
+def test_rule_linenumber(monkeypatch) -> None:
     """Check that SudoRule offense contains a line number."""
     rule = SudoRule()
-    matches = rule.matchyaml(dict(path="", type='tasklist'), TEST_TASKLIST)
+    lintable = Lintable("", kind="tasks", content=TEST_TASKLIST)
+    matches = rule.matchyaml(lintable)
     assert matches[0].linenumber == 5

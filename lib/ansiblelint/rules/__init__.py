@@ -15,6 +15,7 @@ from ansiblelint._internal.rules import (
     AnsibleParserErrorRule, BaseRule, LoadingFailureRule, RuntimeErrorRule,
 )
 from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
 _logger = logging.getLogger(__name__)
@@ -130,18 +131,18 @@ class AnsibleLintRule(BaseRule):
             linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
         return linenumber
 
-    def matchyaml(self, file: dict, text: str) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.matchplay:
             return matches
 
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(file.content, file.path)
         # yaml returned can be an AnsibleUnicode (a string) when the yaml
         # file contains a single string. YAML spec allows this but we consider
         # this an fatal error.
         if isinstance(yaml, str):
             return [MatchError(
-                filename=file['path'],
+                filename=file.path,
                 rule=LoadingFailureRule()
             )]
         if not yaml:
@@ -150,7 +151,7 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, dict):
             yaml = [yaml]
 
-        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, text, file['type'])
+        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, file.content, file.kind)
 
         for play in yaml:
 
@@ -177,7 +178,7 @@ class AnsibleLintRule(BaseRule):
                     message=message,
                     linenumber=linenumber,
                     details=str(section),
-                    filename=file['path']
+                    filename=file.path
                     ))
         return matches
 
@@ -262,7 +263,11 @@ class RulesCollection(object):
                 if set(rule_definition).isdisjoint(skip_list):
                     matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchtasks(playbookfile, text))
-                    matches.extend(rule.matchyaml(playbookfile, text))
+                    matches.extend(rule.matchyaml(
+                        Lintable(
+                            playbookfile['path'],
+                            content=text,
+                            kind=playbookfile['type'])))
 
         # some rules can produce matches with tags that are inside our
         # skip_list, so we need to cleanse the matches

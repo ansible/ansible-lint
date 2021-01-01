@@ -23,6 +23,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, List
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import parse_yaml_from_file
 
@@ -57,9 +58,9 @@ class RoleNames(AnsibleLintRule):
         """Save precompiled regex."""
         self._re = re.compile(ROLE_NAME_REGEX)
 
-    def matchyaml(self, file: dict, text: str) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> List["MatchError"]:
         result: List["MatchError"] = []
-        path = file['path'].split("/")
+        path = str(file.path).split("/")
         if "tasks" in path:
             role_name = _remove_prefix(path[path.index("tasks") - 1], "ansible-role-")
             role_root = path[:path.index("tasks")]
@@ -77,6 +78,6 @@ class RoleNames(AnsibleLintRule):
                 self.done.append(role_name)
                 if not self._re.match(role_name):
                     result.append(self.create_matcherror(
-                        filename=file['path'],
+                        filename=str(file.path),
                         message=self.__class__.shortdesc.format(role_name)))
         return result

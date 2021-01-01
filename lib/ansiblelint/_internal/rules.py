@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, List, Union
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 
 class BaseRule:
@@ -24,7 +25,7 @@ class BaseRule:
         """Return matches for a tasks file."""
         return []
 
-    def matchyaml(self, file: dict, text: str) -> List["MatchError"]:
+    def matchyaml(self, file: "Lintable") -> List["MatchError"]:
         """Return matches found for a specific YAML text."""
         return []
 
