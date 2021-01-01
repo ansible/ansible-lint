@@ -1,6 +1,6 @@
 ---
 - hosts: localhost
-  become: no
+  become: false
   vars:
     my_list:
       - foo

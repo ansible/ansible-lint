@@ -83,7 +83,7 @@ galaxy_info:  # noqa 701
 '''
 
 ROLE_TASKS_WITH_BLOCK_BECOME = '''\
-- hosts:
+- hosts: localhost
   tasks:
     - name: foo
       become: true
