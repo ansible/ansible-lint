@@ -218,12 +218,14 @@ def _render_matches(
             len(ignored_matches))
         for match in ignored_matches:
             if match.ignored:
-                console.print(formatter.format(match))
+                # highlight must be off or apostrophes may produce unexpected results
+                console.print(
+                    formatter.format(match), highlight=False)
     if fatal_matches:
         _logger.warning("Listing %s violation(s) that are fatal", len(fatal_matches))
         for match in fatal_matches:
             if not match.ignored:
-                console.print(formatter.format(match))
+                console.print(formatter.format(match), highlight=False)
 
     # If run under GitHub Actions we also want to emit output recognized by it.
     if os.getenv('GITHUB_ACTIONS') == 'true' and os.getenv('GITHUB_WORKFLOW'):
