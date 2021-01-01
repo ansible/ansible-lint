@@ -60,7 +60,7 @@ from yaml.representer import RepresenterError
 from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule, RuntimeErrorRule
 from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import normpath
+from ansiblelint.file_utils import Lintable, normpath
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -745,76 +745,91 @@ def get_yaml_files(options: Namespace) -> dict:
     return OrderedDict.fromkeys(sorted(out))
 
 
-# FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible-community/ansible-lint/issues/744
-def get_playbooks_and_roles(options=None) -> List[str]:  # noqa: C901
-    """Find roles and playbooks."""
-    if options is None:
-        options = {}
+def get_lintables(
+        options: Namespace = Namespace(),
+        args: Optional[List[str]] = None) -> List[Lintable]:
+    """Detect files and directories that are lintable."""
+    lintables: List[Lintable] = []
 
-    files = get_yaml_files(options)
+    # passing args bypass auto-detection mode
+    if args:
+        for arg in args:
+            if os.path.isdir(arg):
+                lintables.append(Lintable(arg, kind="role"))
+            elif os.path.isfile(arg):
+                lintables.append(Lintable(arg, kind="playbook"))
+            else:
+                _logger.warning("Unable to access %s", arg)
+    else:
 
-    playbooks = []
-    role_dirs = []
-    role_internals = {
-        'defaults',
-        'files',
-        'handlers',
-        'meta',
-        'tasks',
-        'templates',
-        'vars',
-    }
+        files = get_yaml_files(options)
 
-    # detect role in repository root:
-    if 'tasks/main.yml' in files or 'tasks/main.yaml' in files:
-        role_dirs.append('.')
+        playbooks: List[str] = []
+        role_dirs: List[str] = []
+        role_internals = {
+            'defaults',
+            'files',
+            'handlers',
+            'meta',
+            'tasks',
+            'templates',
+            'vars',
+        }
 
-    for p in map(Path, files):
+        # detect role in repository root:
+        if 'tasks/main.yml' in files or 'tasks/main.yaml' in files:
+            role_dirs.append('.')
 
-        try:
-            for file_path in options.exclude_paths:
-                if str(p.resolve()).startswith(str(file_path)):
-                    raise FileNotFoundError(
-                        f'File {file_path} matched exclusion entry: {p}')
-        except FileNotFoundError as e:
-            _logger.debug('Ignored %s due to: %s', p, e)
-            continue
+        for p in map(Path, files):
 
-        if (next((i for i in p.parts if i.endswith('playbooks')), None) or
-                'playbook' in p.parts[-1]):
-            playbooks.append(normpath(p))
-            continue
-
-        # ignore if any folder ends with _vars
-        if next((i for i in p.parts if i.endswith('_vars')), None):
-            continue
-        elif 'roles' in p.parts or '.' in role_dirs:
-            if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
-                role_dirs.append(str(p.parents[1]))
+            try:
+                for file_path in options.exclude_paths:
+                    if str(p.resolve()).startswith(str(file_path)):
+                        raise FileNotFoundError(
+                            f'File {file_path} matched exclusion entry: {p}')
+            except FileNotFoundError as e:
+                _logger.debug('Ignored %s due to: %s', p, e)
                 continue
-            elif role_internals.intersection(p.parts):
+
+            if (next((i for i in p.parts if i.endswith('playbooks')), None) or
+                    'playbook' in p.parts[-1]):
+                playbooks.append(normpath(p))
                 continue
-            elif 'tests' in p.parts:
+
+            # ignore if any folder ends with _vars
+            if next((i for i in p.parts if i.endswith('_vars')), None):
+                continue
+            elif 'roles' in p.parts or '.' in role_dirs:
+                if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
+                    role_dirs.append(str(p.parents[1]))
+                    continue
+                elif role_internals.intersection(p.parts):
+                    continue
+                elif 'tests' in p.parts:
+                    playbooks.append(normpath(p))
+            if 'molecule' in p.parts:
+                if p.parts[-1] != 'molecule.yml':
+                    playbooks.append(normpath(p))
+                continue
+            # hidden files are clearly not playbooks, likely config files.
+            if p.parts[-1].startswith('.'):
+                continue
+
+            if is_playbook(str(p)):
                 playbooks.append(normpath(p))
-        if 'molecule' in p.parts:
-            if p.parts[-1] != 'molecule.yml':
-                playbooks.append(normpath(p))
-            continue
-        # hidden files are clearly not playbooks, likely config files.
-        if p.parts[-1].startswith('.'):
-            continue
+                continue
 
-        if is_playbook(str(p)):
-            playbooks.append(normpath(p))
-            continue
+            _logger.info('Unknown file type: %s', normpath(p))
 
-        _logger.info('Unknown file type: %s', normpath(p))
+        _logger.info('Found roles: %s', ' '.join(role_dirs))
+        _logger.info('Found playbooks: %s', ' '.join(playbooks))
 
-    _logger.info('Found roles: %s', ' '.join(role_dirs))
-    _logger.info('Found playbooks: %s', ' '.join(playbooks))
+        for role in role_dirs:
+            lintables.append(Lintable(role, kind="role"))
+        for playbook in playbooks:
+            lintables.append(Lintable(playbook, kind="playbook"))
 
-    return role_dirs + playbooks
+    return lintables
 
 
 def get_rules_dirs(rulesdir: List[str], use_default: bool) -> List[str]:

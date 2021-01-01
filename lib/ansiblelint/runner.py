@@ -2,13 +2,14 @@
 import logging
 import os
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set
+from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set, Union
 
 import ansiblelint.file_utils
 import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule
 from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection
@@ -31,7 +32,7 @@ class Runner(object):
     def __init__(
             self,
             rules: "RulesCollection",
-            playbook: str,
+            lintable: Union[Lintable, str],
             tags: FrozenSet[Any] = frozenset(),
             skip_list: Optional[FrozenSet[Any]] = frozenset(),
             exclude_paths: List[str] = [],
@@ -40,6 +41,13 @@ class Runner(object):
         """Initialize a Runner instance."""
         self.rules = rules
         self.playbooks = set()
+
+        # TODO(ssbarnea): Continue refactoring to make use of lintables
+        if isinstance(lintable, Lintable):
+            playbook = str(lintable.path)
+        else:
+            playbook = lintable
+
         # assume role if directory
         if os.path.isdir(playbook):
             self.playbooks.add((os.path.join(playbook, ''), 'role'))

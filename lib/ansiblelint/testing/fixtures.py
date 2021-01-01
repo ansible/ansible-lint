@@ -27,7 +27,7 @@ def runner(play_file_path, default_rules_collection):
     """Fixture to return a Runner() instance."""
     return Runner(
         rules=default_rules_collection,
-        playbook=play_file_path)
+        lintable=play_file_path)
 
 
 @pytest.fixture

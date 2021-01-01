@@ -32,7 +32,7 @@ import pytest
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
-from ansiblelint.file_utils import expand_path_vars, expand_paths_vars, normpath
+from ansiblelint.file_utils import Lintable, expand_path_vars, expand_paths_vars, normpath
 
 
 @pytest.mark.parametrize(('string', 'expected_cmd', 'expected_args', 'expected_kwargs'), (
@@ -279,8 +279,8 @@ def test_auto_detect_exclude(monkeypatch):
         return ['foo/playbook.yml', 'bar/playbook.yml']
 
     monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
-    result = utils.get_playbooks_and_roles(options)
-    assert result == ['bar/playbook.yml']
+    result = utils.get_lintables(options)
+    assert result == [Lintable('bar/playbook.yml', kind='playbook')]
 
 
 _DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]

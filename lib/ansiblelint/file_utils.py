@@ -72,3 +72,17 @@ class Lintable:
             with open(self.name, mode='r', encoding='utf-8') as f:
                 self._content = f.read()
         return self._content
+
+    def __hash__(self) -> int:
+        """Return a hash value of the lintables."""
+        return hash(tuple(self.name,))
+
+    def __eq__(self, other: object) -> bool:
+        """Identify whether the other object represents the same rule match."""
+        if isinstance(other, Lintable):
+            return bool(self.name == other.name)
+        return False
+
+    def __repr__(self) -> str:
+        """Return user friendly representation of a lintable."""
+        return f"{self.name} ({self.kind})"

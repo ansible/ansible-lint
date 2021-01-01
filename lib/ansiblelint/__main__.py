@@ -35,7 +35,7 @@ from ansiblelint.file_utils import cwd
 from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import LintResult, Runner
-from ansiblelint.utils import get_playbooks_and_roles, get_rules_dirs
+from ansiblelint.utils import get_lintables, get_rules_dirs
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -234,16 +234,12 @@ def _render_matches(
 
 def _get_matches(rules: RulesCollection, options: "Namespace") -> LintResult:
 
-    if not options.playbook:
-        # no args triggers auto-detection mode
-        playbooks = get_playbooks_and_roles(options=options)
-    else:
-        playbooks = sorted(set(options.playbook))
+    lintables = get_lintables(options=options, args=options.lintables)
 
     matches = list()
     checked_files: Set[str] = set()
-    for playbook in playbooks:
-        runner = Runner(rules, playbook, options.tags,
+    for lintable in lintables:
+        runner = Runner(rules, lintable, options.tags,
                         options.skip_list, options.exclude_paths,
                         options.verbosity, checked_files)
         matches.extend(runner.run())

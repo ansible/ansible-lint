@@ -12,7 +12,8 @@ class TestWithSkipTagId(unittest.TestCase):
     file = 'test/with-skip-tag-id.yml'
 
     def test_negative_no_param(self) -> None:
-        bad_runner = Runner(rules=self.collection, playbook=self.file)
+        bad_runner = Runner(
+            rules=self.collection, lintable=self.file)
         errs = bad_runner.run()
         self.assertGreater(len(errs), 0)
 
@@ -20,7 +21,7 @@ class TestWithSkipTagId(unittest.TestCase):
         with_id = 'YAML'
         bad_runner = Runner(
             rules=self.collection,
-            playbook=self.file,
+            lintable=self.file,
             tags=frozenset([with_id]))
         errs = bad_runner.run()
         self.assertGreater(len(errs), 0)
@@ -29,7 +30,7 @@ class TestWithSkipTagId(unittest.TestCase):
         with_tag = 'formatting'
         bad_runner = Runner(
             rules=self.collection,
-            playbook=self.file,
+            lintable=self.file,
             tags=frozenset([with_tag]))
         errs = bad_runner.run()
         self.assertGreater(len(errs), 0)
@@ -38,7 +39,7 @@ class TestWithSkipTagId(unittest.TestCase):
         skip_id = 'YAML'
         good_runner = Runner(
             rules=self.collection,
-            playbook=self.file,
+            lintable=self.file,
             skip_list=frozenset([skip_id]))
         self.assertEqual([], good_runner.run())
 
@@ -46,6 +47,6 @@ class TestWithSkipTagId(unittest.TestCase):
         skip_tag = 'formatting'
         good_runner = Runner(
             rules=self.collection,
-            playbook=self.file,
+            lintable=self.file,
             skip_list=frozenset([skip_tag]))
         self.assertEqual([], good_runner.run())
