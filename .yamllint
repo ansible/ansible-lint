@@ -1,4 +1,9 @@
 rules:
+  document-start: disable
   indentation:
     level: error
     indent-sequences: consistent
+ignore: |
+  .tox
+  examples/example.yml
+# ignore added because this file includes on-purpose errors

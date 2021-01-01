@@ -1,4 +1,5 @@
 """All internal ansible-lint rules."""
+import copy
 import glob
 import importlib.util
 import logging
@@ -7,11 +8,13 @@ import re
 from collections import defaultdict
 from importlib.abc import Loader
 from time import sleep
-from typing import List, Optional
+from typing import Iterator, List, Optional
 
 import ansiblelint.utils
-from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule
-from ansiblelint.errors import BaseRule, MatchError, RuntimeErrorRule
+from ansiblelint._internal.rules import (
+    AnsibleParserErrorRule, BaseRule, LoadingFailureRule, RuntimeErrorRule,
+)
+from ansiblelint.errors import MatchError
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
 _logger = logging.getLogger(__name__)
@@ -32,17 +35,17 @@ class AnsibleLintRule(BaseRule):
 
     def create_matcherror(
             self,
-            message: str = None,
+            message: Optional[str] = None,
             linenumber: int = 0,
             details: str = "",
-            filename: str = None,
+            filename: Optional[str] = None,
             tag: str = "") -> MatchError:
         match = MatchError(
             message=message,
             linenumber=linenumber,
             details=details,
             filename=filename,
-            rule=self.__class__
+            rule=copy.copy(self)
             )
         if tag:
             match.tag = tag
@@ -211,12 +214,12 @@ class RulesCollection(object):
         for rulesdir in self.rulesdirs:
             _logger.debug("Loading rules from %s", rulesdir)
             self.extend(load_plugins(rulesdir))
-        self.rules = sorted(self.rules, key=lambda r: r.id)
+        self.rules = sorted(self.rules)
 
-    def register(self, obj: AnsibleLintRule):
+    def register(self, obj: AnsibleLintRule) -> None:
         self.rules.append(obj)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[BaseRule]:
         """Return the iterator over the rules in the RulesCollection."""
         return iter(self.rules)
 
@@ -250,7 +253,7 @@ class RulesCollection(object):
             return [MatchError(
                 message=str(error),
                 filename=playbookfile['path'],
-                rule=LoadingFailureRule)]
+                rule=LoadingFailureRule())]
 
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
@@ -260,6 +263,10 @@ class RulesCollection(object):
                     matches.extend(rule.matchlines(playbookfile, text))
                     matches.extend(rule.matchtasks(playbookfile, text))
                     matches.extend(rule.matchyaml(playbookfile, text))
+
+        # some rules can produce matches with tags that are inside our
+        # skip_list, so we need to cleanse the matches
+        matches = [m for m in matches if m.tag not in skip_list]
 
         return matches
 

@@ -1,6 +1,6 @@
 import pytest
 
-ROLE_TASKS = '''
+ROLE_TASKS = '''\
 ---
 - name: test 303
   command: git log
@@ -10,7 +10,7 @@ ROLE_TASKS = '''
   changed_when: false
 '''
 
-ROLE_TASKS_WITH_BLOCK = '''
+ROLE_TASKS_WITH_BLOCK = '''\
 ---
 - name: bad git 1  # noqa 401
   action: git a=b c=d
@@ -34,7 +34,7 @@ ROLE_TASKS_WITH_BLOCK = '''
       action: git a=b c=d
 '''
 
-PLAYBOOK = '''
+PLAYBOOK = '''\
 - hosts: all
   tasks:
     - name: test 402
@@ -49,13 +49,13 @@ PLAYBOOK = '''
       become_user: alice
       action: git
 
-    - name: test 204 and 206
+    - name: test YAML and 206
       get_url:
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf
         dest: "{{dest_proj_path}}/foo.conf"
-    - name: test 204 and 206 (skipped)
+    - name: test YAML and 206 (skipped)
       get_url:
-        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa 204
+        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa YAML
         dest: "{{dest_proj_path}}/foo.conf"  # noqa 206
 
     - name: test 302
@@ -75,14 +75,14 @@ PLAYBOOK = '''
         - skip_ansible_lint
 '''
 
-ROLE_META = '''
+ROLE_META = '''\
 galaxy_info:  # noqa 701
   author: your name  # noqa 703
   description: missing min_ansible_version and platforms. author default not changed
   license: MIT
 '''
 
-ROLE_TASKS_WITH_BLOCK_BECOME = '''
+ROLE_TASKS_WITH_BLOCK_BECOME = '''\
 - hosts:
   tasks:
     - name: foo

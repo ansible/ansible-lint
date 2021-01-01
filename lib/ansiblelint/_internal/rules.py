@@ -36,6 +36,10 @@ class BaseRule:
         """Confirm if current rule matches the given string."""
         return False
 
+    def __lt__(self, other: "BaseRule") -> bool:
+        """Enable us to sort rules by their id."""
+        return self.id < other.id
+
 
 class RuntimeErrorRule(BaseRule):
     """Used to identify errors."""

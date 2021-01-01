@@ -66,7 +66,7 @@ class Lintable:
         self.kind = kind
 
     @property
-    def content(self):
+    def content(self) -> str:
         """Retried file content, from internal cache or disk."""
         if self._content is None:
             with open(self.name, mode='r', encoding='utf-8') as f:

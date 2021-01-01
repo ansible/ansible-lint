@@ -25,7 +25,9 @@ def play_file_path(tmp_path):
 @pytest.fixture
 def runner(play_file_path, default_rules_collection):
     """Fixture to return a Runner() instance."""
-    return Runner(default_rules_collection, play_file_path, [], [], [])
+    return Runner(
+        rules=default_rules_collection,
+        playbook=play_file_path)
 
 
 @pytest.fixture

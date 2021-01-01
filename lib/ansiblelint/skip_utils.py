@@ -79,7 +79,10 @@ def load_data(file_text: str) -> Any:
     return yaml.load(file_text)
 
 
-def _append_skipped_rules(pyyaml_data: Sequence, file_text: str, file_type: FileType) -> Sequence:
+def _append_skipped_rules(
+        pyyaml_data: Sequence[Any],
+        file_text: str,
+        file_type: FileType) -> Sequence:
     # parse file text using 2nd parser library
     ruamel_data = load_data(file_text)
 

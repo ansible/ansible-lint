@@ -84,7 +84,8 @@ the following:
    :returncode: 2
    :nostderr:
 
-If playbooks include other playbooks, or tasks, or handlers or roles, these are also handled:
+If playbooks include other playbooks, or tasks, or handlers or roles, these
+are also handled:
 
 .. command-output:: ansible-lint -p examples/include.yml
    :cwd: ..

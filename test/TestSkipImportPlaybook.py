@@ -2,7 +2,7 @@ import pytest
 
 from ansiblelint.runner import Runner
 
-IMPORTED_PLAYBOOK = '''
+IMPORTED_PLAYBOOK = '''\
 - hosts: all
   tasks:
     - name: success
@@ -10,7 +10,7 @@ IMPORTED_PLAYBOOK = '''
       when: false
 '''
 
-MAIN_PLAYBOOK = '''
+MAIN_PLAYBOOK = '''\
 - hosts: all
 
   tasks:

@@ -33,8 +33,8 @@
     - name: passing git as an argument to another task
       action: debug msg="{{item}}"
       with_items: 
-        - git
-        - bobbins
+      - git  # yamllint wrong indentation
+      - bobbins
 
     - name: yum latest
       yum: state=latest name=httpd

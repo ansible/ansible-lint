@@ -1,6 +1,6 @@
 import pytest
 
-PLAYBOOK_PRE_TASKS = '''
+PLAYBOOK_PRE_TASKS = '''\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa 401
@@ -14,7 +14,7 @@ PLAYBOOK_PRE_TASKS = '''
       action: git a=b c=d
 '''
 
-PLAYBOOK_POST_TASKS = '''
+PLAYBOOK_POST_TASKS = '''\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa 401
@@ -28,7 +28,7 @@ PLAYBOOK_POST_TASKS = '''
       action: git a=b c=d
 '''
 
-PLAYBOOK_HANDLERS = '''
+PLAYBOOK_HANDLERS = '''\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa 401
@@ -42,7 +42,7 @@ PLAYBOOK_HANDLERS = '''
       action: git a=b c=d
 '''
 
-PLAYBOOK_TWO_PLAYS = '''
+PLAYBOOK_TWO_PLAYS = '''\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa 401
@@ -58,29 +58,29 @@ PLAYBOOK_TWO_PLAYS = '''
       action: git a=b c=d
 '''
 
-PLAYBOOK_WITH_BLOCK = '''
+PLAYBOOK_WITH_BLOCK = '''\
 - hosts: all
   tasks:
-  - name: bad git 1  # noqa 401
-    action: git a=b c=d
-  - name: bad git 2
-    action: git a=b c=d
-  - name: Block with rescue and always section
-    block:
-      - name: bad git 3  # noqa 401
-        action: git a=b c=d
-      - name: bad git 4
-        action: git a=b c=d
-    rescue:
-      - name: bad git 5  # noqa 401
-        action: git a=b c=d
-      - name: bad git 6
-        action: git a=b c=d
-    always:
-      - name: bad git 7  # noqa 401
-        action: git a=b c=d
-      - name: bad git 8
-        action: git a=b c=d
+    - name: bad git 1  # noqa 401
+      action: git a=b c=d
+    - name: bad git 2
+      action: git a=b c=d
+    - name: Block with rescue and always section
+      block:
+        - name: bad git 3  # noqa 401
+          action: git a=b c=d
+        - name: bad git 4
+          action: git a=b c=d
+      rescue:
+        - name: bad git 5  # noqa 401
+          action: git a=b c=d
+        - name: bad git 6
+          action: git a=b c=d
+      always:
+        - name: bad git 7  # noqa 401
+          action: git a=b c=d
+        - name: bad git 8
+          action: git a=b c=d
 '''
 
 
