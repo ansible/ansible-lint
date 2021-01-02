@@ -28,7 +28,7 @@ class TestRule(unittest.TestCase):
 
     def test_rule_matching(self):
         text = ""
-        filename = 'test/ematchtest.yml'
+        filename = 'examples/playbooks/ematcher-rule.yml'
         with open(filename) as f:
             text = f.read()
         ematcher = EMatcherRule.EMatcherRule()
@@ -37,7 +37,7 @@ class TestRule(unittest.TestCase):
 
     def test_rule_postmatching(self):
         text = ""
-        filename = 'test/bracketsmatchtest.yml'
+        filename = 'examples/playbooks/bracketsmatchtest.yml'
         with open(filename) as f:
             text = f.read()
         rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
