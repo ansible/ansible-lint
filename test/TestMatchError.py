@@ -81,6 +81,9 @@ def test_matcherror_invalid():
         (MatchError(rule=AnsibleLintRuleWithStringId()), MatchError(rule=AlwaysRunRule())),
         # details are taken into account
         (MatchError("a", details="foo"), MatchError("a", details="bar")),
+        # columns are taken into account
+        (MatchError("a", column=3), MatchError("a", column=1)),
+        (MatchError("a", column=3), MatchError("a")),
     ))
 class TestMatchErrorCompare:
 
