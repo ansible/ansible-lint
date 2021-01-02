@@ -82,7 +82,7 @@ class AnsibleLintRule(BaseRule):
 
     # TODO(ssbarnea): Reduce mccabe complexity
     # https://github.com/ansible-community/ansible-lint/issues/744
-    def matchtasks(self, file: str, text: str) -> List[MatchError]:  # noqa: C901
+    def matchtasks(self, file: Lintable) -> List[MatchError]:  # noqa: C901
         matches: List[MatchError] = []
         if not self.matchtask:
             return matches
@@ -90,11 +90,11 @@ class AnsibleLintRule(BaseRule):
         if file['type'] == 'meta':
             return matches
 
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(text, file['path'])
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(file.content, file.path)
         if not yaml:
             return matches
 
-        yaml = append_skipped_rules(yaml, text, file['type'])
+        yaml = append_skipped_rules(yaml, file.content, file.kind)
 
         try:
             tasks = ansiblelint.utils.get_normalized_tasks(yaml, file)
@@ -244,14 +244,14 @@ class RulesCollection(object):
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
-                if set(rule_definition).isdisjoint(skip_list):
-                    matches.extend(rule.matchlines(playbookfile, text))
-                    matches.extend(rule.matchtasks(playbookfile, text))
-                    matches.extend(rule.matchyaml(
-                        Lintable(
+                lintable = Lintable(
                             playbookfile['path'],
                             content=text,
-                            kind=playbookfile['type'])))
+                            kind=playbookfile['type'])
+                if set(rule_definition).isdisjoint(skip_list):
+                    matches.extend(rule.matchlines(playbookfile, text))
+                    matches.extend(rule.matchtasks(lintable))
+                    matches.extend(rule.matchyaml(lintable))
 
         # some rules can produce matches with tags that are inside our
         # skip_list, so we need to cleanse the matches
