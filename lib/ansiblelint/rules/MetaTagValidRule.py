@@ -2,8 +2,13 @@
 
 import re
 import sys
+from typing import TYPE_CHECKING, List
 
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 
 class MetaTagValidRule(AnsibleLintRule):
@@ -19,13 +24,13 @@ class MetaTagValidRule(AnsibleLintRule):
 
     TAG_REGEXP = re.compile('^[a-z0-9]+$')
 
-    def matchplay(self, file, data):
+    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
         if file['type'] != 'meta':
-            return False
+            return []
 
         galaxy_info = data.get('galaxy_info', None)
         if not galaxy_info:
-            return False
+            return []
 
         tags = []
         results = []
@@ -34,28 +39,29 @@ class MetaTagValidRule(AnsibleLintRule):
             if isinstance(galaxy_info['galaxy_tags'], list):
                 tags += galaxy_info['galaxy_tags']
             else:
-                results.append(({'meta/main.yml': data},
-                                "Expected 'galaxy_tags' to be a list"))
+                results.append(
+                    self.create_matcherror("Expected 'galaxy_tags' to be a list"))
 
         if 'categories' in galaxy_info:
-            results.append(({'meta/main.yml': data},
-                            "Use 'galaxy_tags' rather than 'categories'"))
+            results.append(
+                self.create_matcherror("Use 'galaxy_tags' rather than 'categories'"))
             if isinstance(galaxy_info['categories'], list):
                 tags += galaxy_info['categories']
             else:
-                results.append(({'meta/main.yml': data},
-                                "Expected 'categories' to be a list"))
+                results.append(
+                    self.create_matcherror("Expected 'categories' to be a list"))
 
         for tag in tags:
             msg = self.shortdesc
             if not isinstance(tag, str):
-                results.append((
-                    {'meta/main.yml': data},
-                    "Tags must be strings: '{}'".format(tag)))
+                results.append(
+                    self.create_matcherror(
+                        "Tags must be strings: '{}'".format(tag)
+                    ))
                 continue
             if not re.match(self.TAG_REGEXP, tag):
-                results.append(({'meta/main.yml': data},
-                                "{}, invalid: '{}'".format(msg, tag)))
+                results.append(
+                    self.create_matcherror(message="{}, invalid: '{}'".format(msg, tag)))
 
         return results
 

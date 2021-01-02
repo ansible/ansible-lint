@@ -1,4 +1,10 @@
+from typing import TYPE_CHECKING, List
+
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 
 class NoFormattingInWhenRule(AnsibleLintRule):
@@ -14,17 +20,17 @@ class NoFormattingInWhenRule(AnsibleLintRule):
             return True
         return when.find('{{') == -1 and when.find('}}') == -1
 
-    def matchplay(self, file, play):
-        errors = []
-        if isinstance(play, dict):
-            if 'roles' not in play or play['roles'] is None:
+    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
+        errors: List["MatchError"] = []
+        if isinstance(data, dict):
+            if 'roles' not in data or data['roles'] is None:
                 return errors
-            for role in play['roles']:
-                if self.matchtask(file, role):
-                    errors.append(({'when': role},
-                                   'role "when" clause has Jinja2 templates'))
-        if isinstance(play, list):
-            for play_item in play:
+            for role in data['roles']:
+                if self.matchtask(file, role):  # type: ignore
+                    errors.append(
+                        self.create_matcherror(details=str({'when': role})))
+        if isinstance(data, list):
+            for play_item in data:
                 sub_errors = self.matchplay(file, play_item)
                 if sub_errors:
                     errors = errors + sub_errors

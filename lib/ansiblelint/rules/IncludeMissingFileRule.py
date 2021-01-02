@@ -2,10 +2,15 @@
 # Copyright (c) 2020, Ansible Project
 
 import os.path
+from typing import TYPE_CHECKING, List
 
 import ansible.parsing.yaml.objects
 
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 
 class IncludeMissingFileRule(AnsibleLintRule):
@@ -20,8 +25,8 @@ class IncludeMissingFileRule(AnsibleLintRule):
     tags = ['task', 'bug']
     version_added = 'v4.3.0'
 
-    def matchplay(self, file, data):
-        absolute_directory = file.get('absolute_directory', None)
+    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
+        absolute_directory = file.get('absolute_directory', None)  # type: ignore
         results = []
 
         # avoid failing with a playbook having tasks: null
@@ -61,7 +66,9 @@ class IncludeMissingFileRule(AnsibleLintRule):
             if os.path.isfile(referenced_file):
                 continue
 
-            results.append(({'referenced_file': referenced_file},
-                            'referenced missing file in %s:%i'
-                            % (task['__file__'], task['__line__'])))
+            results.append(
+                self.create_matcherror(
+                    filename=task['__file__'],
+                    linenumber=task['__line__'],
+                    details=referenced_file))
         return results

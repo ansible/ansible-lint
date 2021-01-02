@@ -22,7 +22,7 @@
 import logging
 from functools import lru_cache
 from itertools import product
-from typing import Any, Generator, List, Sequence
+from typing import Any, Generator, List, Optional, Sequence
 
 import ruamel.yaml
 
@@ -44,7 +44,10 @@ def get_rule_skips_from_line(line: str) -> List:
     return noqa_text.split()
 
 
-def append_skipped_rules(pyyaml_data: str, file_text: str, file_type: FileType) -> Sequence:
+def append_skipped_rules(
+        pyyaml_data: str,
+        file_text: str,
+        file_type: Optional[FileType] = None) -> Sequence:
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
     For a file, uses 2nd parser (ruamel.yaml) to pull comments out of
@@ -82,7 +85,7 @@ def load_data(file_text: str) -> Any:
 def _append_skipped_rules(
         pyyaml_data: Sequence[Any],
         file_text: str,
-        file_type: FileType) -> Sequence:
+        file_type: Optional[FileType] = None) -> Sequence:
     # parse file text using 2nd parser library
     ruamel_data = load_data(file_text)
 

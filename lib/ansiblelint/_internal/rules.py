@@ -15,7 +15,6 @@ class BaseRule:
     version_added: str = ""
     severity: str = ""
     matchtask = None
-    matchplay = None
 
     def matchlines(self, file, text) -> List["MatchError"]:
         """Return matches found for a specific line."""
@@ -27,6 +26,10 @@ class BaseRule:
 
     def matchyaml(self, file: "Lintable") -> List["MatchError"]:
         """Return matches found for a specific YAML text."""
+        return []
+
+    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
+        """Return matches found for a specific playbook."""
         return []
 
     def verbose(self) -> str:

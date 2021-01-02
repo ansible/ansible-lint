@@ -19,12 +19,17 @@
 # THE SOFTWARE.
 
 from functools import reduce
+from typing import TYPE_CHECKING, Any, List
 
 from ansiblelint.rules import AnsibleLintRule
 
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
-def _get_subtasks(data):
-    result = []
+
+def _get_subtasks(data) -> List[Any]:
+    result: List[Any] = []
     block_names = [
             'tasks',
             'pre_tasks',
@@ -39,13 +44,13 @@ def _get_subtasks(data):
     return result
 
 
-def _nested_search(term, data):
+def _nested_search(term, data) -> Any:
     if data and term in data:
         return True
     return reduce((lambda x, y: x or _nested_search(term, y)), _get_subtasks(data), False)
 
 
-def _become_user_without_become(becomeuserabove, data):
+def _become_user_without_become(becomeuserabove, data) -> Any:
     if 'become' in data:
         # If become is in lineage of tree then correct
         return False
@@ -75,6 +80,15 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     tags = ['task', 'unpredictability']
     version_added = 'historic'
 
-    def matchplay(self, file, data):
-        if file['type'] == 'playbook' and _become_user_without_become(False, data):
-            return ({'become_user': data}, self.shortdesc)
+    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
+        if file.kind == 'playbook':
+            result = _become_user_without_become(False, data)
+            if result:
+                print(555, result, data)
+                return [
+                    self.create_matcherror(
+                        message=self.shortdesc,
+                        filename=str(file.path),
+                        linenumber=data['__line__']
+                        )]
+        return []

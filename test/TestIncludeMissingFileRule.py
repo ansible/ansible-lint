@@ -42,7 +42,7 @@ PLAY_HAVING_TASK = Lintable('playbook.yml', u'''\
 @pytest.mark.usefixtures('_play_files')
 def test_include_file_missing(runner):
     results = str(runner.run())
-    assert 'referenced missing file in' in results
+    assert 'referenced files must exist' in results
     assert 'playbook.yml' in results
     assert 'some_file.yml' in results
 
