@@ -34,7 +34,7 @@ PLAY_INCLUDE_ROLE = f"""
 
 
 @pytest.fixture
-def test_rules_collection():
+def test_rules_collection() -> RulesCollection:
     """Instantiate a roles collection for tests."""
     collection = RulesCollection()
     collection.register(RoleNames())

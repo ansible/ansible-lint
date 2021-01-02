@@ -87,15 +87,14 @@ class Runner(object):
 
     def run(self) -> List[MatchError]:
         """Execute the linting process."""
-        files = list()
+        files: List[Lintable] = list()
         for playbook in self.playbooks:
             if self.is_excluded(playbook[0]) or playbook[1] == 'role':
                 continue
-            files.append({'path': ansiblelint.file_utils.normpath(playbook[0]),
-                          'type': playbook[1],
-                          # add an absolute path here, so rules are able to validate if
-                          # referenced files exist
-                          'absolute_directory': os.path.dirname(playbook[0])})
+            files.append(
+                Lintable(
+                    ansiblelint.file_utils.normpath(playbook[0]),
+                    kind=playbook[1]))  # type: ignore
         matches = set(self._emit_matches(files))
 
         # remove duplicates from files list
@@ -116,7 +115,7 @@ class Runner(object):
 
         return sorted(matches)
 
-    def _emit_matches(self, files: List) -> Generator[MatchError, None, None]:
+    def _emit_matches(self, files: List[Lintable]) -> Generator[MatchError, None, None]:
         visited: Set = set()
         while visited != self.playbooks:
             for arg in self.playbooks - visited:
@@ -125,7 +124,8 @@ class Runner(object):
                         if self.is_excluded(child['path']):
                             continue
                         self.playbooks.add((child['path'], child['type']))
-                        files.append(child)
+                        files.append(
+                            Lintable(child['path'], kind=child['type']))
                 except MatchError as e:
                     e.rule = LoadingFailureRule()
                     yield e
