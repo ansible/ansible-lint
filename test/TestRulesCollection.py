@@ -34,12 +34,12 @@ def test_rules_collection():
 
 @pytest.fixture
 def ematchtestfile():
-    return dict(path='test/ematchtest.yml', type='playbook')
+    return dict(path='examples/playbooks/ematcher-rule.yml', type='playbook')
 
 
 @pytest.fixture
 def bracketsmatchtestfile():
-    return dict(path='test/bracketsmatchtest.yml', type='playbook')
+    return dict(path='examples/playbooks/bracketsmatchtest.yml', type='playbook')
 
 
 def test_load_collection_from_directory(test_rules_collection):
@@ -49,7 +49,8 @@ def test_load_collection_from_directory(test_rules_collection):
 
 def test_run_collection(test_rules_collection, ematchtestfile):
     matches = test_rules_collection.run(ematchtestfile)
-    assert len(matches) == 3
+    assert len(matches) == 3  # 3 occurences of BANNED using TEST0001
+    assert matches[0].linenumber == 2
 
 
 def test_tags(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
@@ -58,7 +59,7 @@ def test_tags(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
     matches = test_rules_collection.run(ematchtestfile, tags=['test2'])
     assert len(matches) == 0
     matches = test_rules_collection.run(bracketsmatchtestfile, tags=['test1'])
-    assert len(matches) == 1
+    assert len(matches) == 0
     matches = test_rules_collection.run(bracketsmatchtestfile, tags=['test2'])
     assert len(matches) == 2
 
@@ -71,7 +72,7 @@ def test_skip_tags(test_rules_collection, ematchtestfile, bracketsmatchtestfile)
     matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test1'])
     assert len(matches) == 2
     matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test2'])
-    assert len(matches) == 1
+    assert len(matches) == 0
 
 
 def test_skip_id(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
@@ -82,7 +83,7 @@ def test_skip_id(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
     matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0001'])
     assert len(matches) == 2
     matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0002'])
-    assert len(matches) == 1
+    assert len(matches) == 0
 
 
 def test_skip_non_existent_id(test_rules_collection, ematchtestfile):

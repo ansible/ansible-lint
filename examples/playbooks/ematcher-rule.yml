@@ -1,0 +1,8 @@
+- hosts: localhost
+  name: BANNED
+- hosts: localhost
+  name: Another BANNED line
+  tasks:
+    - name: foo
+      debug:
+        msg: A 3rd BANNED line
