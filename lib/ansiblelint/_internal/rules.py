@@ -20,7 +20,7 @@ class BaseRule:
         """Return matches found for a specific line."""
         return []
 
-    def matchtasks(self, file: str, text: str) -> List["MatchError"]:
+    def matchtasks(self, file: "Lintable") -> List["MatchError"]:
         """Return matches for a tasks file."""
         return []
 
