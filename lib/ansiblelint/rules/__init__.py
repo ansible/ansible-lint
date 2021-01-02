@@ -215,20 +215,18 @@ class RulesCollection(object):
     def extend(self, more: List[AnsibleLintRule]) -> None:
         self.rules.extend(more)
 
-    def run(self, playbookfile, tags=set(), skip_list=frozenset()) -> List:
-        text = ""
-        matches: List = list()
+    def run(self, file: Lintable, tags=set(), skip_list=frozenset()) -> List[MatchError]:
+        matches: List[MatchError] = list()
         error: Optional[IOError] = None
 
         for i in range(3):
             try:
-                with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
-                    text = f.read()
-                break
+                if file.content is not None:  # loads the file content
+                    break
             except IOError as e:
                 _logger.warning(
                     "Couldn't open %s - %s [try:%s]",
-                    playbookfile['path'],
+                    file.path,
                     e.strerror,
                     i)
                 error = e
@@ -237,21 +235,17 @@ class RulesCollection(object):
         else:
             return [MatchError(
                 message=str(error),
-                filename=playbookfile['path'],
+                filename=str(file.path),
                 rule=LoadingFailureRule())]
 
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
-                lintable = Lintable(
-                            playbookfile['path'],
-                            content=text,
-                            kind=playbookfile['type'])
                 if set(rule_definition).isdisjoint(skip_list):
-                    matches.extend(rule.matchlines(lintable))
-                    matches.extend(rule.matchtasks(lintable))
-                    matches.extend(rule.matchyaml(lintable))
+                    matches.extend(rule.matchlines(file))
+                    matches.extend(rule.matchtasks(file))
+                    matches.extend(rule.matchyaml(file))
 
         # some rules can produce matches with tags that are inside our
         # skip_list, so we need to cleanse the matches

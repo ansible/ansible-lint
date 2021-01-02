@@ -23,23 +23,28 @@ import os
 
 import pytest
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import run_ansible_lint
 
 
 @pytest.fixture
-def test_rules_collection():
+def test_rules_collection() -> RulesCollection:
     return RulesCollection([os.path.abspath('./test/rules')])
 
 
 @pytest.fixture
-def ematchtestfile():
-    return dict(path='examples/playbooks/ematcher-rule.yml', type='playbook')
+def ematchtestfile() -> Lintable:
+    return Lintable(
+        'examples/playbooks/ematcher-rule.yml',
+        kind='playbook')
 
 
 @pytest.fixture
-def bracketsmatchtestfile():
-    return dict(path='examples/playbooks/bracketsmatchtest.yml', type='playbook')
+def bracketsmatchtestfile() -> Lintable:
+    return Lintable(
+        'examples/playbooks/bracketsmatchtest.yml',
+        kind='playbook')
 
 
 def test_load_collection_from_directory(test_rules_collection):

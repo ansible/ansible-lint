@@ -1,5 +1,6 @@
 import pytest
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.runner import Runner
 
 
@@ -28,7 +29,7 @@ from ansiblelint.runner import Runner
     ),
 )
 def test_included_tasks(default_rules_collection, filename, playbooks_count):
-    playbook_path = 'test/{filename}.yml'.format(**locals())
-    runner = Runner(default_rules_collection, playbook_path, [], [], [])
+    lintable = Lintable('test/{filename}.yml'.format(**locals()))
+    runner = Runner(default_rules_collection, lintable, [], [], [])
     runner.run()
     assert len(runner.playbooks) == playbooks_count
