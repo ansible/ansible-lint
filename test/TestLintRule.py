@@ -21,25 +21,21 @@
 # pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
 import unittest
 
+from ansiblelint.file_utils import Lintable
+
 from .rules import EMatcherRule, UnsetVariableMatcherRule
 
 
 class TestRule(unittest.TestCase):
 
     def test_rule_matching(self):
-        text = ""
-        filename = 'examples/playbooks/ematcher-rule.yml'
-        with open(filename) as f:
-            text = f.read()
         ematcher = EMatcherRule.EMatcherRule()
-        matches = ematcher.matchlines(dict(path=filename, type='playbooks'), text)
+        lintable = Lintable('examples/playbooks/ematcher-rule.yml', kind="playbook")
+        matches = ematcher.matchlines(lintable)
         self.assertEqual(len(matches), 3)
 
     def test_rule_postmatching(self):
-        text = ""
-        filename = 'examples/playbooks/bracketsmatchtest.yml'
-        with open(filename) as f:
-            text = f.read()
         rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
-        matches = rule.matchlines(dict(path=filename, type='playbooks'), text)
+        lintable = Lintable('examples/playbooks/bracketsmatchtest.yml', kind="playbook")
+        matches = rule.matchlines(lintable)
         self.assertEqual(len(matches), 2)
