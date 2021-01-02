@@ -16,7 +16,7 @@ class BaseRule:
     severity: str = ""
     matchtask = None
 
-    def matchlines(self, file, text) -> List["MatchError"]:
+    def matchlines(self, file: "Lintable") -> List["MatchError"]:
         """Return matches found for a specific line."""
         return []
 

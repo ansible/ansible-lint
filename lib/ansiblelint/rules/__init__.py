@@ -52,13 +52,13 @@ class AnsibleLintRule(BaseRule):
             match.tag = tag
         return match
 
-    def matchlines(self, file, text) -> List[MatchError]:
+    def matchlines(self, file: "Lintable") -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.match:
             return matches
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
-        for (prev_line_no, line) in enumerate(text.split("\n")):
+        for (prev_line_no, line) in enumerate(file.content.split("\n")):
             if line.lstrip().startswith('#'):
                 continue
 
@@ -87,7 +87,7 @@ class AnsibleLintRule(BaseRule):
         if not self.matchtask:
             return matches
 
-        if file['type'] == 'meta':
+        if file.kind == 'meta':
             return matches
 
         yaml = ansiblelint.utils.parse_yaml_linenumbers(file.content, file.path)
@@ -249,7 +249,7 @@ class RulesCollection(object):
                             content=text,
                             kind=playbookfile['type'])
                 if set(rule_definition).isdisjoint(skip_list):
-                    matches.extend(rule.matchlines(playbookfile, text))
+                    matches.extend(rule.matchlines(lintable))
                     matches.extend(rule.matchtasks(lintable))
                     matches.extend(rule.matchyaml(lintable))
 
