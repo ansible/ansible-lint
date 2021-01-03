@@ -722,7 +722,7 @@ def get_yaml_files(options: Namespace) -> dict:
             git_command,
             stderr=subprocess.STDOUT,
             universal_newlines=True
-        ).split()
+        ).splitlines()
     except subprocess.CalledProcessError as exc:
         _logger.warning(
             "Failed to discover yaml files to lint using git: %s",
