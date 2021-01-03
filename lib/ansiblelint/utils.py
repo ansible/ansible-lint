@@ -29,7 +29,7 @@ from collections import OrderedDict
 from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import yaml
 from ansible import constants
@@ -86,7 +86,7 @@ def path_dwim(basedir: str, given: str) -> str:
     return dl.path_dwim(given)
 
 
-def ansible_template(basedir, varname, templatevars, **kwargs):
+def ansible_template(basedir: str, varname: Any, templatevars, **kwargs) -> Any:
     dl = DataLoader()
     dl.set_basedir(basedir)
     templar = Templar(dl, variables=templatevars)
@@ -118,7 +118,7 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 }
 
 
-def tokenize(line):
+def tokenize(line: str) -> Tuple[str, List[str], Dict]:
     tokens = line.lstrip().split(" ")
     if tokens[0] == '-':
         tokens = tokens[1:]
@@ -151,16 +151,6 @@ def _playbook_items(pb_data: dict) -> ItemsView:
         return [item for play in pb_data if play for item in play.items()]
 
 
-def _rebind_match_filename(filename: str, func) -> Callable:
-    def func_wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except MatchError as e:
-            e.filename = filename
-            raise e
-    return func_wrapper
-
-
 def _set_collections_basedir(basedir: str):
     # Sets the playbook directory as playbook_paths for the collection loader
     try:
@@ -177,7 +167,7 @@ def _set_collections_basedir(basedir: str):
         set_collection_playbook_paths(basedir)
 
 
-def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
+def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List[Lintable]:
     if not os.path.exists(playbook[0]):
         return []
     _set_collections_basedir(playbook_dir or os.path.abspath('.'))
@@ -198,24 +188,29 @@ def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
             rule=LoadingFailureRule)
     items = _playbook_items(playbook_ds)
     for item in items:
-        for child in _rebind_match_filename(playbook[0], play_children)(
-                basedir, item, playbook[1], playbook_dir):
-            if "$" in child['path'] or "{{" in child['path']:
+        for child in play_children(basedir, item, playbook[1], playbook_dir):
+            # We avoid processing parametrized children
+            path_str = str(child.path)
+            if "$" in path_str or "{{" in path_str:
                 continue
+
+            # Repair incorrect paths obtained when old syntax was used, like:
+            # - include: simpletask.yml tags=nginx
             valid_tokens = list()
-            for token in split_args(child['path']):
+            for token in split_args(path_str):
                 if '=' in token:
                     break
                 valid_tokens.append(token)
             path = ' '.join(valid_tokens)
-            results.append({
-                'path': path_dwim(basedir, path),
-                'type': child['type']
-            })
+            if path != path_str:
+                child.path = Path(path)
+                child.name = child.path.name
+
+            results.append(child)
     return results
 
 
-def template(basedir, value, vars, fail_on_undefined=False, **kwargs):
+def template(basedir: str, value: Any, vars, fail_on_undefined=False, **kwargs) -> Any:
     try:
         value = ansible_template(os.path.abspath(basedir), value, vars,
                                  **dict(kwargs, fail_on_undefined=fail_on_undefined))
@@ -227,8 +222,11 @@ def template(basedir, value, vars, fail_on_undefined=False, **kwargs):
     return value
 
 
-def play_children(basedir, item, parent_type, playbook_dir):
-    delegate_map = {
+def play_children(
+        basedir: str,
+        item: Tuple[str, Any],
+        parent_type, playbook_dir) -> List[Lintable]:
+    delegate_map: Dict[str, Callable[[str, Any, Any, FileType], List[Lintable]]] = {
         'tasks': _taskshandlers_children,
         'pre_tasks': _taskshandlers_children,
         'post_tasks': _taskshandlers_children,
@@ -254,7 +252,7 @@ def play_children(basedir, item, parent_type, playbook_dir):
     return []
 
 
-def _include_children(basedir, k, v, parent_type):
+def _include_children(basedir: str, k, v, parent_type) -> List[Lintable]:
     # handle special case include_tasks: name=filename.yml
     if k == 'include_tasks' and isinstance(v, dict) and 'file' in v:
         v = v['file']
@@ -265,11 +263,11 @@ def _include_children(basedir, k, v, parent_type):
     result = path_dwim(basedir, args[0])
     if not os.path.exists(result):
         result = path_dwim(os.path.join(os.path.dirname(basedir)), v)
-    return [{'path': result, 'type': parent_type}]
+    return [Lintable(result, kind=parent_type)]
 
 
-def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List:
-    results = []
+def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List[Lintable]:
+    results: List[Lintable] = []
     if v is None:
         raise MatchError(
             message="A malformed block was encountered while loading a block.",
@@ -309,7 +307,7 @@ def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List:
 
 def _get_task_handler_children_for_tasks_or_playbooks(
         task_handler, basedir: str, k, parent_type: FileType,
-) -> dict:
+) -> Lintable:
     """Try to get children of taskhandler for include/import tasks/playbooks."""
     child_type = k if parent_type == 'playbook' else parent_type
 
@@ -322,10 +320,9 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             if not task_handler:
                 continue
 
-            return {
-                'path': path_dwim(basedir, task_handler[task_handler_key]),
-                'type': child_type,
-            }
+            return Lintable(
+                path_dwim(basedir, task_handler[task_handler_key]),
+                kind=child_type)
 
     raise LookupError(
         f'The node contains none of: {", ".join(task_include_keys)}',
@@ -346,8 +343,8 @@ def _validate_task_handler_action_for_role(th_action: dict) -> None:
         )
 
 
-def _roles_children(basedir: str, k, v, parent_type: FileType, main='main') -> list:
-    results = []
+def _roles_children(basedir: str, k, v, parent_type: FileType, main='main') -> List[Lintable]:
+    results: List[Lintable] = []
     for role in v:
         if isinstance(role, dict):
             if 'role' in role or 'name' in role:
@@ -400,21 +397,23 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
     return role_path
 
 
-def _look_for_role_files(basedir: str, role: str, main='main') -> list:
+def _look_for_role_files(basedir: str, role: str, main='main') -> List[Lintable]:
     role_path = _rolepath(basedir, role)
     if not role_path:
         return []
 
     results = []
 
-    for th in ['tasks', 'handlers', 'meta']:
-        current_path = os.path.join(role_path, th)
+    for kind in ['tasks', 'meta', 'handlers']:
+        current_path = os.path.join(role_path, kind)
         for dir, subdirs, files in os.walk(current_path):
             for file in files:
                 file_ignorecase = file.lower()
                 if file_ignorecase.endswith(('.yml', '.yaml')):
                     thpath = os.path.join(dir, file)
-                    results.append({'path': thpath, 'type': th})
+                    # TODO(ssbarnea): Find correct way to pass kind: FileType
+                    results.append(
+                        Lintable(thpath, kind=kind))  # type: ignore
 
     return results
 
