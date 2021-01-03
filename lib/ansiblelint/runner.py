@@ -40,9 +40,10 @@ class Runner(object):
             checked_files: Optional[Set[str]] = None) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
-        self.playbooks = set()
+        self.playbooks: Set[Lintable] = set()
 
         # TODO(ssbarnea): Continue refactoring to make use of lintables
+        playbook: str
         if isinstance(lintable, Lintable):
             playbook = str(lintable.path)
         else:
@@ -50,7 +51,7 @@ class Runner(object):
 
         # assume role if directory
         if os.path.isdir(playbook):
-            self.playbooks.add((os.path.join(playbook, ''), 'role'))
+            self.playbooks.add(Lintable(playbook, kind='role'))
             self.playbook_dir = playbook
         else:
             self.playbook_dir = os.path.dirname(playbook)
@@ -58,7 +59,7 @@ class Runner(object):
                 file_type = "meta"
             else:
                 file_type = "playbook"
-            self.playbooks.add((playbook, file_type))
+            self.playbooks.add(Lintable(playbook, kind=file_type))  # type: ignore
         self.tags = tags
         self.skip_list = skip_list
         self._update_exclude_paths(exclude_paths)
@@ -89,12 +90,12 @@ class Runner(object):
         """Execute the linting process."""
         files: List[Lintable] = list()
         for playbook in self.playbooks:
-            if self.is_excluded(playbook[0]) or playbook[1] == 'role':
+            if self.is_excluded(str(playbook.path)) or playbook.kind == 'role':
                 continue
             files.append(
                 Lintable(
-                    ansiblelint.file_utils.normpath(playbook[0]),
-                    kind=playbook[1]))  # type: ignore
+                    ansiblelint.file_utils.normpath(str(playbook.path)),
+                    kind=playbook.kind))  # type: ignore
         matches = set(self._emit_matches(files))
 
         # remove duplicates from files list
@@ -105,13 +106,13 @@ class Runner(object):
         for file in files:
             _logger.debug(
                 "Examining %s of type %s",
-                ansiblelint.file_utils.normpath(file['path']),
-                file['type'])
+                ansiblelint.file_utils.normpath(file.path),
+                file.kind)
             matches = matches.union(
                 self.rules.run(file, tags=set(self.tags),
                                skip_list=self.skip_list))
         # update list of checked files
-        self.checked_files.update([x['path'] for x in files])
+        self.checked_files.update([str(x.path) for x in files])
 
         return sorted(matches)
 
@@ -121,11 +122,10 @@ class Runner(object):
             for arg in self.playbooks - visited:
                 try:
                     for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
-                        if self.is_excluded(child['path']):
+                        if self.is_excluded(str(child.path)):
                             continue
-                        self.playbooks.add((child['path'], child['type']))
-                        files.append(
-                            Lintable(child['path'], kind=child['type']))
+                        self.playbooks.add(child)
+                        files.append(child)
                 except MatchError as e:
                     e.rule = LoadingFailureRule()
                     yield e

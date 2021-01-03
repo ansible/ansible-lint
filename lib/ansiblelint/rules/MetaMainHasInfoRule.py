@@ -58,7 +58,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
     version_added = 'v4.0.0'
 
     def matchplay(self, file: Lintable, data) -> List[MatchError]:
-        if file['type'] != 'meta':
+        if file.kind != 'meta':
             return []
 
         # since Ansible 2.10 we can add a meta/requirements.yml but

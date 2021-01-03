@@ -13,7 +13,7 @@ class TaskHasTag(AnsibleLintRule):
     def matchtask(self, file, task):
         """Task matching method."""
         # The meta files don't have tags
-        if file['type'] in ["meta", "playbooks"]:
+        if file.kind in ["meta", "playbooks"]:
             return False
 
         if isinstance(task, str):

@@ -167,28 +167,28 @@ def _set_collections_basedir(basedir: str):
         set_collection_playbook_paths(basedir)
 
 
-def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List[Lintable]:
-    if not os.path.exists(playbook[0]):
+def find_children(playbook: Lintable, playbook_dir: str) -> List[Lintable]:
+    if not playbook.path.exists():
         return []
     _set_collections_basedir(playbook_dir or os.path.abspath('.'))
     add_all_plugin_dirs(playbook_dir or '.')
-    if playbook[1] == 'role':
-        playbook_ds = {'roles': [{'role': playbook[0]}]}
+    if playbook.kind == 'role':
+        playbook_ds = {'roles': [{'role': str(playbook.path)}]}
     else:
         try:
-            playbook_ds = parse_yaml_from_file(playbook[0])
+            playbook_ds = parse_yaml_from_file(str(playbook.path))
         except AnsibleError as e:
             raise SystemExit(str(e))
     results = []
-    basedir = os.path.dirname(playbook[0])
+    basedir = os.path.dirname(str(playbook.path))
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
     if isinstance(playbook_ds, str):
         raise MatchError(
-            filename=playbook[0],
+            filename=str(playbook.path),
             rule=LoadingFailureRule)
     items = _playbook_items(playbook_ds)
     for item in items:
-        for child in play_children(basedir, item, playbook[1], playbook_dir):
+        for child in play_children(basedir, item, playbook.kind, playbook_dir):
             # We avoid processing parametrized children
             path_str = str(child.path)
             if "$" in path_str or "{{" in path_str:
@@ -449,7 +449,7 @@ def _sanitize_task(task: dict) -> dict:
 
 # FIXME: drop noqa once this function is made simpler
 # Ref: https://github.com/ansible-community/ansible-lint/issues/744
-def normalize_task_v2(task: dict) -> dict:  # noqa: C901
+def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:  # noqa: C901
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
 
@@ -544,7 +544,7 @@ def normalize_task_v1(task):  # noqa: C901
     return result
 
 
-def normalize_task(task, filename):
+def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
         del task['__ansible_action_type__']
@@ -565,7 +565,7 @@ def task_to_str(task):
     return u"{0} {1}".format(action["__ansible_module__"], args)
 
 
-def extract_from_list(blocks, candidates):
+def extract_from_list(blocks, candidates: List[str]) -> List[Any]:
     results = list()
     for block in blocks:
         for candidate in candidates:
@@ -579,7 +579,7 @@ def extract_from_list(blocks, candidates):
     return results
 
 
-def add_action_type(actions, action_type):
+def add_action_type(actions, action_type: str) -> List[Any]:
     results = list()
     for action in actions:
         # ignore empty task
@@ -590,10 +590,10 @@ def add_action_type(actions, action_type):
     return results
 
 
-def get_action_tasks(yaml, file):
+def get_action_tasks(yaml, file: Lintable) -> List[Any]:
     tasks = list()
-    if file['type'] in ['tasks', 'handlers']:
-        tasks = add_action_type(yaml, file['type'])
+    if file.kind in ['tasks', 'handlers']:
+        tasks = add_action_type(yaml, file.kind)
     else:
         tasks.extend(extract_from_list(yaml, ['tasks', 'handlers', 'pre_tasks', 'post_tasks']))
 
@@ -608,7 +608,7 @@ def get_action_tasks(yaml, file):
                 'import_playbook', 'import_tasks']).isdisjoint(task.keys())]
 
 
-def get_normalized_tasks(yaml, file):
+def get_normalized_tasks(yaml, file: Lintable) -> List[Any]:
     tasks = get_action_tasks(yaml, file)
     res = []
     for task in tasks:
@@ -618,7 +618,7 @@ def get_normalized_tasks(yaml, file):
         if 'skip_ansible_lint' in (task.get('tags') or []):
             # No need to normalize_task is we are skipping it.
             continue
-        res.append(normalize_task(task, file['path']))
+        res.append(normalize_task(task, str(file.path)))
 
     return res
 

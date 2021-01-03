@@ -32,7 +32,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
     }
 
     def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
-        if file['type'] != 'meta':
+        if file.kind != 'meta':
             return []
 
         galaxy_info = data.get('galaxy_info', None)
