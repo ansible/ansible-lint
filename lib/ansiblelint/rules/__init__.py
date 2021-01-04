@@ -8,7 +8,7 @@ import re
 from collections import defaultdict
 from importlib.abc import Loader
 from time import sleep
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Union
 
 import ansiblelint.utils
 from ansiblelint._internal.rules import (
@@ -39,7 +39,7 @@ class AnsibleLintRule(BaseRule):
             message: Optional[str] = None,
             linenumber: int = 0,
             details: str = "",
-            filename: Optional[str] = None,
+            filename: Optional[Union[str, Lintable]] = None,
             tag: str = "") -> MatchError:
         match = MatchError(
             message=message,
@@ -76,7 +76,7 @@ class AnsibleLintRule(BaseRule):
                 message=message,
                 linenumber=prev_line_no + 1,
                 details=line,
-                filename=file['path'])
+                filename=file)
             matches.append(m)
         return matches
 
@@ -119,7 +119,7 @@ class AnsibleLintRule(BaseRule):
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
                 details=task_msg,
-                filename=file['path'])
+                filename=file)
             matches.append(m)
         return matches
 

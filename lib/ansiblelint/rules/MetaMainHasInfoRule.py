@@ -63,7 +63,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
 
         # since Ansible 2.10 we can add a meta/requirements.yml but
         # we only want to match on meta/main.yml
-        if not file['path'].endswith('/main.yml'):
+        if not str(file.path).endswith('/main.yml'):
             return []
 
         galaxy_info = data.get('galaxy_info', False)
@@ -71,7 +71,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
             return [
                 self.create_matcherror(
                     message=err,
-                    filename="'meta/main.yml")
+                    filename=file)
                 for err in _galaxy_info_errors_itr(galaxy_info)]
 
         return [
