@@ -26,7 +26,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     id = '304'
     shortdesc = "Environment variables don't work as part of command"
     description = (
-        'Environment variables should be passed to ``shell`` or ``command`` '
+        'Environment variables should be passed to ``command`` '
         'through environment argument'
     )
     severity = 'VERY_HIGH'
