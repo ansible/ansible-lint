@@ -140,6 +140,9 @@ def test_run_playbook_github(result, env):
     cwd = str(Path(__file__).parent.parent.resolve())
     role_path = 'examples/example.yml'
 
+    if env is None:
+        env = {}
+    env['PATH'] = os.environ['PATH']
     result_gh = run_ansible_lint(role_path, cwd=cwd, env=env)
 
     expected = (

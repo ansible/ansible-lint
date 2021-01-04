@@ -231,7 +231,7 @@ def _render_matches(
     if os.getenv('GITHUB_ACTIONS') == 'true' and os.getenv('GITHUB_WORKFLOW'):
         formatter = formatters.AnnotationsFormatter(cwd, True)
         for match in matches:
-            console.print(formatter.format(match), markup=False)
+            console.print(formatter.format(match), markup=False, highlight=False)
 
 
 def _get_matches(rules: RulesCollection, options: "Namespace") -> LintResult:
