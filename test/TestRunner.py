@@ -76,7 +76,7 @@ def test_runner_with_directory(default_rules_collection, directory_name) -> None
     runner = Runner(
         rules=default_rules_collection,
         lintable=directory_name)
-    assert list(runner.playbooks)[0][1] == 'role'
+    assert list(runner.playbooks)[0].kind == 'role'
 
 
 def test_files_not_scanned_twice(default_rules_collection) -> None:
