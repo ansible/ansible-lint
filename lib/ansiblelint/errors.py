@@ -1,10 +1,10 @@
 """Exceptions and error representations."""
 import functools
 import os
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
-from ansiblelint.file_utils import normpath
+from ansiblelint.file_utils import Lintable, normpath
 
 
 @functools.total_ordering
@@ -29,7 +29,7 @@ class MatchError(ValueError):
             linenumber: int = 0,
             column: Optional[int] = None,
             details: str = "",
-            filename: Optional[str] = None,
+            filename: Optional[Union[str, Lintable]] = None,
             rule: BaseRule = RuntimeErrorRule(),
             tag: Optional[str] = None  # optional fine-graded tag
             ) -> None:
@@ -47,7 +47,10 @@ class MatchError(ValueError):
         self.column = column
         self.details = details
         if filename:
-            self.filename = normpath(filename)
+            if isinstance(filename, Lintable):
+                self.filename = normpath(str(filename.path))
+            else:
+                self.filename = normpath(filename)
         else:
             self.filename = os.getcwd()
         self.rule = rule

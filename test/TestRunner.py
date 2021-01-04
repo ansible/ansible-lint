@@ -98,4 +98,7 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
         checked_files=checked_files)
     run2 = runner.run()
 
-    assert (len(run1) + len(run2)) == 3
+    assert len(run1) == 2
+    assert len(run2) == 2
+    # one error is shared, from included file
+    assert len(set(run1 + run2)) == 3
