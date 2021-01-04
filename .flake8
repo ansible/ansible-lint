@@ -65,7 +65,6 @@ per-file-ignores =
   test/conftest.py: D100 D103
   test/rules/EMatcherRule.py: D100 D101 D102
   test/rules/UnsetVariableMatcherRule.py: D100 D101 D102
-  test/TestAlwaysRunRule.py: PT009 D100 D101 D102
   test/TestAnsibleLintRule.py: D100 D103
   test/TestBaseFormatter.py: D100 D103
   test/TestBecomeUserWithoutBecome.py: PT009 D100 D101 D102

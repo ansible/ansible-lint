@@ -5,7 +5,7 @@ from ansiblelint.runner import Runner
 def test_example(default_rules_collection):
     """example.yml is expected to have 15 match errors inside."""
     result = Runner(default_rules_collection, 'examples/example.yml', [], [], []).run()
-    assert len(result) == 16
+    assert len(result) == 15
 
 
 def test_example_plain_string(default_rules_collection):

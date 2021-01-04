@@ -6,8 +6,8 @@ import pytest
 
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.rules.AlwaysRunRule import AlwaysRunRule
 from ansiblelint.rules.BecomeUserWithoutBecomeRule import BecomeUserWithoutBecomeRule
+from ansiblelint.rules.CommandHasChangesCheckRule import CommandHasChangesCheckRule
 
 
 class DummyTestObject:
@@ -75,10 +75,12 @@ def test_matcherror_invalid():
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
         (MatchError("a", filename="b"), MatchError("a", filename="a")),
-        # rule id 501 > rule id 101
-        (MatchError(rule=BecomeUserWithoutBecomeRule()), MatchError(rule=AlwaysRunRule())),
-        # rule id "200" > rule id 101
-        (MatchError(rule=AnsibleLintRuleWithStringId()), MatchError(rule=AlwaysRunRule())),
+        # rule id 501 > rule id 301
+        (MatchError(rule=BecomeUserWithoutBecomeRule()),
+            MatchError(rule=CommandHasChangesCheckRule())),
+        # rule id 'ANSIBLE200' > rule id 301
+        (MatchError(rule=AnsibleLintRuleWithStringId()),
+            MatchError(rule=CommandHasChangesCheckRule())),
         # details are taken into account
         (MatchError("a", details="foo"), MatchError("a", details="bar")),
         # columns are taken into account

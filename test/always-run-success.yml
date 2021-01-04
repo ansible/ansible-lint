@@ -1,6 +1,0 @@
-- hosts: localhost
-
-  tasks:
-  - name: always_run is deprecated
-    debug: msg="always_run is deprecated"
-    check_mode: yes

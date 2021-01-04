@@ -19,10 +19,10 @@
 # THE SOFTWARE.
 """Dummy custom rule module."""
 
-import ansiblelint.rules.AlwaysRunRule
+from ansiblelint.rules import AnsibleLintRule
 
 
-class CustomAlwaysRunRule(ansiblelint.rules.AlwaysRunRule.AlwaysRunRule):
+class CustomRule(AnsibleLintRule):
     """Dummy custom rule class."""
 
     id = '100001'
