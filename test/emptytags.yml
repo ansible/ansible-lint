@@ -1,7 +1,0 @@
----
-- hosts: all
-
-  tasks:
-  - name: hello world
-    debug: msg="hello world"
-    tags:

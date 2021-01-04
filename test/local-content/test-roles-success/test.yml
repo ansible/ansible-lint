@@ -1,7 +1,0 @@
----
-- name: Use roles with local modules and test plugins
-  hosts: localhost
-  roles:
-    - role1
-    - role3
-    - role2
