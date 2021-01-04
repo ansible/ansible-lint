@@ -103,7 +103,6 @@ per-file-ignores =
   test/TestSkipImportPlaybook.py: D100 D103
   test/TestSkipInsideYaml.py: D100 D103
   test/TestSkipPlaybookItems.py: D100 D103
-  test/TestSudoRule.py: PT009 D100 D101 D102
   test/TestTaskHasName.py: PT009 D100 D101 D102
   test/TestTaskIncludes.py: D100 D103
   test/TestTaskNoLocalAction.py: PT009 D100 D101 D102
