@@ -68,11 +68,6 @@ PLAYBOOK = '''\
       command: creates=B chmod 644 A
       tags:
         - skip_ansible_lint
-
-    - name: test invalid action (skipped)
-      foo: bar
-      tags:
-        - skip_ansible_lint
 '''
 
 ROLE_META = '''\
