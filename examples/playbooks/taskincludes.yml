@@ -1,8 +1,8 @@
 ---
 - hosts: localhost
   vars:
-    varset: varset
+    varset: tasks/simpletask.yml
   tasks:
-    - include_tasks: "{{ varnotset }}.yml"
+    # - include_tasks: "{{ varnotset }}.yml"
     - include_tasks: "{{ varset }}.yml"
     - include_tasks: "tasks/directory with spaces/main.yml"

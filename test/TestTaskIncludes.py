@@ -9,24 +9,24 @@ from ansiblelint.runner import Runner
     (
         pytest.param(
             'examples/playbooks/blockincludes.yml',
-            4, 2, id='block included tasks'),
+            4, 2, id='blockincludes'),
         pytest.param(
             'examples/playbooks/blockincludes2.yml',
-            4, 2, id='block included tasks with rescue and always',
+            4, 2, id='blockincludes2',
         ),
         pytest.param(
             'examples/playbooks/taskincludes.yml',
-            2, 1, id='included tasks'),
+            2, 1, id='taskincludes'),
         pytest.param(
             'examples/playbooks/taskimports.yml',
-            4, 2, id='import tasks 2 4 style'),
+            4, 2, id='taskimports'),
         pytest.param(
             'examples/playbooks/include-in-block.yml',
-            3, 1, id='include tasks with block include',
+            3, 1, id='include-in-block',
         ),
         pytest.param(
             'examples/playbooks/include-import-tasks-in-role.yml',
-            6, 3, id='include tasks in role',
+            5, 2, id='role_with_task_inclusions',
         ),
     ),
 )

@@ -1,0 +1,11 @@
+- hosts: localhost
+  tasks:
+    - name: foo
+      debug:
+        msg: bar
+      command: echo
+# On this file ansible-playbook --syntax-check reports:
+# ERROR! conflicting action statements: debug, command
+#
+# The error appears to be in 'test/conflicting_action.yml': line 3, column 7, but may
+# be elsewhere in the file depending on the exact syntax problem.
