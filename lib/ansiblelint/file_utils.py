@@ -72,7 +72,10 @@ class Lintable:
         elif item == 'type':
             return str(self.kind)
         elif item == 'absolute_directory':
-            return str(self.path)
+            if self.path.is_dir():
+                return str(self.path)
+            else:
+                return str(self.path.parent)
         raise NotImplementedError()
 
     def get(self, item, default=None):

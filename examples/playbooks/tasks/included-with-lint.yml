@@ -1,0 +1,3 @@
+# missing a task name
+- assert:
+    fail_msg: foo
