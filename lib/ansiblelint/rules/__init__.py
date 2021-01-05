@@ -7,7 +7,6 @@ import os
 import re
 from collections import defaultdict
 from importlib.abc import Loader
-from time import sleep
 from typing import Iterator, List, Optional, Union
 
 import ansiblelint.utils
@@ -217,26 +216,17 @@ class RulesCollection(object):
 
     def run(self, file: Lintable, tags=set(), skip_list=frozenset()) -> List[MatchError]:
         matches: List[MatchError] = list()
-        error: Optional[IOError] = None
 
-        for i in range(3):
-            try:
-                if file.content is not None:  # loads the file content
-                    break
-            except IOError as e:
-                _logger.warning(
-                    "Couldn't open %s - %s [try:%s]",
-                    file.path,
-                    e.strerror,
-                    i)
-                error = e
-                sleep(1)
-                continue
-        else:
+        try:
+            if file.content is not None:  # loads the file content
+                pass
+        except IOError as e:
             return [MatchError(
-                message=str(error),
-                filename=str(file.path),
-                rule=LoadingFailureRule())]
+                message=str(e),
+                filename=file,
+                rule=LoadingFailureRule(),
+                tag=e.__class__.__name__.lower()
+                )]
 
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
