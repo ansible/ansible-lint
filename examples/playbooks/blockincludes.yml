@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  vars:
+    varset: varset
+  tasks:
+    - block:
+        - include_tasks: tasks/nestedincludes.yml
+        - block:
+            - include_tasks: "{{ varnotset }}.yml"
+            - block:
+                - include: "{{ varset }}.yml"
+                - block:
+                    - include_tasks: "tasks/directory with spaces/main.yml"

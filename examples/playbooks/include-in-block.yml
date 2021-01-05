@@ -1,0 +1,5 @@
+---
+- hosts: all
+
+  tasks:
+    - include_tasks: tasks/include-in-block-inner.yml

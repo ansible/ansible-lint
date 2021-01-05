@@ -5,31 +5,35 @@ from ansiblelint.runner import Runner
 
 
 @pytest.mark.parametrize(
-    ('filename', 'playbooks_count'),
+    ('filename', 'file_count', "match_count"),
     (
-        pytest.param('blockincludes', 4, id='block included tasks'),
         pytest.param(
-            'blockincludes2', 4,
-            id='block included tasks with rescue and always',
-        ),
-        pytest.param('taskincludes', 4, id='included tasks'),
+            'examples/playbooks/blockincludes.yml',
+            4, 2, id='block included tasks'),
         pytest.param(
-            'taskincludes_2_4_style', 4,
-            id='include tasks 2.4 style',
-        ),
-        pytest.param('taskimports', 4, id='import tasks 2 4 style'),
-        pytest.param(
-            'include-in-block', 3,
-            id='include tasks with block include',
+            'examples/playbooks/blockincludes2.yml',
+            4, 2, id='block included tasks with rescue and always',
         ),
         pytest.param(
-            'include-import-tasks-in-role', 4,
-            id='include tasks in role',
+            'examples/playbooks/taskincludes.yml',
+            2, 1, id='included tasks'),
+        pytest.param(
+            'examples/playbooks/taskimports.yml',
+            4, 2, id='import tasks 2 4 style'),
+        pytest.param(
+            'examples/playbooks/include-in-block.yml',
+            3, 1, id='include tasks with block include',
+        ),
+        pytest.param(
+            'examples/playbooks/include-import-tasks-in-role.yml',
+            6, 3, id='include tasks in role',
         ),
     ),
 )
-def test_included_tasks(default_rules_collection, filename, playbooks_count):
-    lintable = Lintable('test/{filename}.yml'.format(**locals()))
+def test_included_tasks(default_rules_collection, filename, file_count, match_count):
+    """Check if number of loaded files is correct."""
+    lintable = Lintable(filename)
     runner = Runner(default_rules_collection, lintable, [], [], [])
-    runner.run()
-    assert len(runner.playbooks) == playbooks_count
+    result = runner.run()
+    assert len(runner.playbooks) == file_count
+    assert len(result) == match_count
