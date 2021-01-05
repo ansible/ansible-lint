@@ -42,24 +42,12 @@ class Runner(object):
         self.rules = rules
         self.playbooks: Set[Lintable] = set()
 
-        # TODO(ssbarnea): Continue refactoring to make use of lintables
-        playbook: str
-        if isinstance(lintable, Lintable):
-            playbook = str(lintable.path)
-        else:
-            playbook = lintable
+        if isinstance(lintable, str):
+            lintable = Lintable(lintable)
+        self.playbooks.add(lintable)
 
-        # assume role if directory
-        if os.path.isdir(playbook):
-            self.playbooks.add(Lintable(playbook, kind='role'))
-            self.playbook_dir = playbook
-        else:
-            self.playbook_dir = os.path.dirname(playbook)
-            if playbook.endswith("meta/main.yml"):
-                file_type = "meta"
-            else:
-                file_type = "playbook"
-            self.playbooks.add(Lintable(playbook, kind=file_type))  # type: ignore
+        self.playbook_dir = lintable.dir
+
         self.tags = tags
         self.skip_list = skip_list
         self._update_exclude_paths(exclude_paths)
@@ -90,12 +78,9 @@ class Runner(object):
         """Execute the linting process."""
         files: List[Lintable] = list()
         for playbook in self.playbooks:
-            if self.is_excluded(str(playbook.path)) or playbook.kind == 'role':
+            if self.is_excluded(str(playbook.path.resolve())) or playbook.kind == 'role':
                 continue
-            files.append(
-                Lintable(
-                    ansiblelint.file_utils.normpath(str(playbook.path)),
-                    kind=playbook.kind))  # type: ignore
+            files.append(playbook)
         matches = set(self._emit_matches(files))
 
         # remove duplicates from files list

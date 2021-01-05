@@ -62,8 +62,19 @@ class Lintable:
         self.name = name
         self.path = Path(name)
         self._content = content
-        # TODO(ssbarnea): implement kind detection when not provided
+        if not kind:
+            if self.path.is_dir():
+                kind = "role"
+            elif self.path.name in ['main.yml', 'main.yaml'] and self.path.parent.name == 'meta':
+                kind = "meta"
+            else:
+                kind = "playbook"
         self.kind = kind
+        # We store absolute directory in dir
+        if self.kind == "role":
+            self.dir = str(self.path.resolve())
+        else:
+            self.dir = str(self.path.parent.resolve())
 
     def __getitem__(self, item):
         """Provide compatibility subscriptable support."""
@@ -71,11 +82,6 @@ class Lintable:
             return str(self.path)
         elif item == 'type':
             return str(self.kind)
-        elif item == 'absolute_directory':
-            if self.path.is_dir():
-                return str(self.path)
-            else:
-                return str(self.path.parent)
         raise NotImplementedError()
 
     def get(self, item, default=None):
