@@ -26,7 +26,6 @@ class IncludeMissingFileRule(AnsibleLintRule):
     version_added = 'v4.3.0'
 
     def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
-        absolute_directory = file.get('absolute_directory', None)  # type: ignore
         results = []
 
         # avoid failing with a playbook having tasks: null
@@ -52,11 +51,11 @@ class IncludeMissingFileRule(AnsibleLintRule):
                 if referenced_file:
                     break
 
-            if referenced_file is None or absolute_directory is None:
+            if referenced_file is None or file.dir is None:
                 continue
 
             # make sure we have a absolute path here and check if it is a file
-            referenced_file = os.path.join(absolute_directory, referenced_file)
+            referenced_file = os.path.join(file.dir, referenced_file)
 
             # skip if this is a jinja2 templated reference
             if '{{' in referenced_file:
