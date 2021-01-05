@@ -1,4 +1,0 @@
----
-- hosts: webservers
-  tasks:
-    - include: included-with-lint.yml

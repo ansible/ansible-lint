@@ -1,4 +1,0 @@
-# missing a task name
-- yum:
-    name: ansible
-  until: result|success

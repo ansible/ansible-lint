@@ -84,7 +84,6 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
         if file.kind == 'playbook':
             result = _become_user_without_become(False, data)
             if result:
-                print(555, result, data)
                 return [
                     self.create_matcherror(
                         message=self.shortdesc,

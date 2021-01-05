@@ -79,7 +79,7 @@ def test_runner_with_directory(default_rules_collection, directory_name) -> None
 def test_files_not_scanned_twice(default_rules_collection) -> None:
     checked_files: Set[str] = set()
 
-    filename = os.path.abspath('test/common-include-1.yml')
+    filename = os.path.abspath('examples/playbooks/common-include-1.yml')
     runner = Runner(
         rules=default_rules_collection,
         lintable=filename,
@@ -87,7 +87,7 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
         checked_files=checked_files)
     run1 = runner.run()
 
-    filename = os.path.abspath('test/common-include-2.yml')
+    filename = os.path.abspath('examples/playbooks/common-include-2.yml')
     runner = Runner(
         rules=default_rules_collection,
         lintable=filename,
@@ -95,7 +95,7 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
         checked_files=checked_files)
     run2 = runner.run()
 
-    assert len(run1) == 2
-    assert len(run2) == 2
-    # one error is shared, from included file
-    assert len(set(run1 + run2)) == 3
+    assert len(run1) == 1
+    assert len(run2) == 1
+    # the error is shared from included file, so it should be counted once
+    assert len(set(run1 + run2)) == 1
