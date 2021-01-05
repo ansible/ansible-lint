@@ -86,7 +86,7 @@ class Lintable:
     def content(self) -> str:
         """Retried file content, from internal cache or disk."""
         if self._content is None:
-            with open(self.name, mode='r', encoding='utf-8') as f:
+            with open(self.path, mode='r', encoding='utf-8') as f:
                 self._content = f.read()
         return self._content
 
