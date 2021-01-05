@@ -1,0 +1,3 @@
+# this should generate: 502: All tasks should be named
+- assert:
+    fail_msg: tasks in directory with spaces included

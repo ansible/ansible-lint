@@ -1,0 +1,4 @@
+---
+
+- block:
+    - include_tasks: simpletask.yml

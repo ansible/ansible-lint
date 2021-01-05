@@ -1,0 +1,4 @@
+---
+# 502: All tasks should be named
+- assert:
+    fail_msg: foo
