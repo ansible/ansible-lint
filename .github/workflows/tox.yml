@@ -34,6 +34,7 @@ jobs:
         - TOXENV: packaging
     env:
       TOX_PARALLEL_NO_SPINNER: 1
+      FORCE_COLOR: 1
 
     steps:
     - name: Check out src from Git
@@ -134,6 +135,7 @@ jobs:
 
     env:
       TOX_PARALLEL_NO_SPINNER: 1
+      FORCE_COLOR: 1
 
     steps:
     - uses: actions/checkout@v2
@@ -212,6 +214,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     env:
+      FORCE_COLOR: 1
       PY_COLORS: 1
       TOXENV: packaging
       TOX_PARALLEL_NO_SPINNER: 1
