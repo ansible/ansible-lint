@@ -41,6 +41,21 @@ Contributing
 
 Please read `Contribution guidelines`_ if you wish to contribute.
 
+Licensing
+=========
+
+The code in the ansible-lint repository is licensed under the MIT_ license. If
+you contribute to this repository, that license applies to your contributions.
+
+The ansible-lint project also imports the Ansible python module, which is
+licensed under the GPLv3_ license. Because of this import, the GPLv3_ rules
+apply to the full distribution of ansible-lint. We maintain the MIT_ license on
+the repository so we can fully use an MIT_ license in the future if we ever
+remove the runtime dependency on Ansible code.
+
+Installing the `ansible-lint` python package does not install any GPL
+dependencies, all of them are listed as extras.
+
 Authors
 =======
 
@@ -51,3 +66,5 @@ ansible-lint was created by `Will Thames`_ and is now maintained as part of the
 .. _Will Thames: https://github.com/willthames
 .. _Ansible: https://ansible.com
 .. _Red Hat: https://redhat.com
+.. _MIT: https://github.com/ansible-community/ansible-lint/blob/master/LICENSE
+.. _GPLv3: https://github.com/ansible/ansible/blob/devel/COPYING
