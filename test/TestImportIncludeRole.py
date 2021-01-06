@@ -19,14 +19,6 @@ PLAY_IMPORT_ROLE = '''
         name: test-role
 '''
 
-PLAY_IMPORT_ROLE_INCOMPLETE = '''
-- hosts: all
-
-  tasks:
-    - import_role:
-        foo: bar
-'''
-
 PLAY_IMPORT_ROLE_INLINE = '''
 - hosts: all
 
@@ -84,19 +76,6 @@ def playbook_path(request, tmp_path):
                  ),
 ), indirect=('playbook_path', ))
 def test_import_role2(default_rules_collection, playbook_path, messages):
-    runner = Runner(default_rules_collection, playbook_path, [], [], [])
-    results = runner.run()
-    for message in messages:
-        assert message in str(results)
-
-
-@pytest.mark.parametrize(('playbook_path', 'messages'), (
-    pytest.param(PLAY_IMPORT_ROLE_INCOMPLETE,
-                 ["Failed to find required 'name' key in import_role"],
-                 id='IMPORT_ROLE_INCOMPLETE',
-                 ),
-), indirect=('playbook_path', ))
-def test_invalid_import_role(default_rules_collection, playbook_path, messages):
     runner = Runner(default_rules_collection, playbook_path, [], [], [])
     results = runner.run()
     for message in messages:
