@@ -92,9 +92,9 @@ class Runner(object):
             # remove duplicates from files list
             files = [value for n, value in enumerate(files) if value not in files[:n]]
 
-            # remove files that have already been checked
-            files = [x for x in files if x.path not in self.checked_files]
             for file in files:
+                if str(file.path) in self.checked_files:
+                    continue
                 _logger.debug(
                     "Examining %s of type %s",
                     ansiblelint.file_utils.normpath(file.path),
@@ -107,7 +107,7 @@ class Runner(object):
         # update list of checked files
         self.checked_files.update([str(x.path) for x in files])
 
-        return sorted(list(set(matches)))
+        return sorted(set(matches))
 
     def _emit_matches(self, files: List[Lintable]) -> Generator[MatchError, None, None]:
         visited: Set = set()
