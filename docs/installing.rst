@@ -31,21 +31,21 @@ related to containers and use the discussions_ forum instead.
 
     * ``core`` - will install latest version of ansible-base 2.10
     * ``community`` - will install latest version of ansible 2.10 with community collections
-    * ``devel`` - will install Ansible from git devel branch (unsupported)
 
 Using Pip
 ---------
 
 .. code-block:: bash
 
-    # Assuming you already installed ansible:
-    pip install ansible-lint
+    # Assuming you already installed ansible and you also want the optional
+    # yamllint support:
+    pip install "ansible-lint[yamllint]"
 
     # If you want to install and use latest ansible (w/o community collections)
-    pip install "ansible-lint[core]"
+    pip install "ansible-lint[core,yamllint]"
 
     # If you want to install and use latest ansible with community collections
-    pip install "ansible-lint[community]"
+    pip install "ansible-lint[community,yamllint]"
 
     # If you want to install an older version of Ansible 2.9
     pip install ansible-lint "ansible>=2.9,<2.10"
