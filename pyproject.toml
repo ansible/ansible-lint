@@ -11,3 +11,4 @@ build-backend = "setuptools.build_meta"
 # `pyproject.toml` because our CI/CD appends one line in
 # the end when publishing non-tagged versions to test.pypi.org
 [tool.setuptools_scm]
+local_scheme = "no-local-version"
