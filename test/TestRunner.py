@@ -86,6 +86,8 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
         verbosity=0,
         checked_files=checked_files)
     run1 = runner.run()
+    assert len(runner.checked_files) == 2
+    assert len(run1) == 1
 
     filename = os.path.abspath('examples/playbooks/common-include-2.yml')
     runner = Runner(
@@ -94,8 +96,7 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
         verbosity=0,
         checked_files=checked_files)
     run2 = runner.run()
-
-    assert len(run1) == 1
-    assert len(run2) == 1
-    # the error is shared from included file, so it should be counted once
-    assert len(set(run1 + run2)) == 1
+    assert len(runner.checked_files) == 3
+    # this second run should return 0 because the included filed was already
+    # processed and added to checked_files, which acts like a bypass list.
+    assert len(run2) == 0
