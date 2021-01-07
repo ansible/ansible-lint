@@ -1,7 +1,14 @@
 """Validates linter behavior when ansible python package is missing."""
-from subprocess import run
+import os
+import subprocess
 
 if __name__ == "__main__":
     cmd = ["ansible-lint", "--version"]
-    result = run(cmd, check=False)
-    assert result.returncode == 4  # missing ansible
+    result = subprocess.run(
+        cmd,
+        universal_newlines=True,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=os.environ)
+    assert result.returncode == 4, result  # missing ansible
