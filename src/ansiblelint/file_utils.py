@@ -111,4 +111,4 @@ class Lintable:
 
     def __repr__(self) -> str:
         """Return user friendly representation of a lintable."""
-        return f"{self.name} ({self.kind})"
+        return f"[repr.path]{self.name}[/repr.path] ({self.kind})"

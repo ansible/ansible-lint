@@ -30,6 +30,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, List, Set, Type, Union
 
 from enrich.console import should_do_markup
+from enrich.logging import RichHandler
 
 from ansiblelint import cli, formatters
 from ansiblelint.color import console, console_options, console_stderr, reconfigure, render_yaml
@@ -59,16 +60,18 @@ def initialize_logger(level: int = 0) -> None:
         2: logging.DEBUG
     }
 
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(levelname)-8s %(message)s')
-    handler.setFormatter(formatter)
-    logger = logging.getLogger(__package__)
+    handler = RichHandler(
+        console=console_stderr, show_time=False, show_path=False, markup=True
+    )   # type: ignore
+
+    logger = logging.getLogger()  # root logger
     logger.addHandler(handler)
+    logger.propagate = False
     # Unknown logging level is treated as DEBUG
     logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
     logger.setLevel(logging_level)
     # Use module-level _logger instance to validate it
-    _logger.debug("Logging initialized to level %s", logging_level)
+    logger.debug("Logging initialized to level %s", logging_level)
 
 
 def choose_formatter_factory(

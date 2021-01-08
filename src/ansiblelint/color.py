@@ -1,8 +1,10 @@
 """Console coloring and terminal support."""
+import copy
 from typing import Any, Dict
 
 import rich
 from rich.console import Console
+from rich.style import Style
 from rich.theme import Theme
 
 _theme = Theme({
@@ -12,7 +14,9 @@ _theme = Theme({
     "title": "yellow",
     "error_code": "bright_red",
     "error_title": "red",
-    "filename": "blue"
+    "filename": "blue",
+    # overrides rich defaults:
+    "repr.brace": Style(bold=False, dim=True),
 })
 console_options: Dict[str, Any] = {
     "emoji": False,
@@ -32,6 +36,8 @@ def reconfigure(new_options: Dict[str, Any]):
     global console_stderr  # pylint: disable=global-statement
 
     console_options = new_options
+    console_options_stderr = copy.copy(new_options)
+    console_options_stderr.update({'stderr': True})
     rich.reconfigure(**new_options)
     # see https://github.com/willmcgugan/rich/discussions/484#discussioncomment-200182
     console_options_stderr = console_options.copy()

@@ -1,16 +1,14 @@
-import logging
 import os
 import sys
 from typing import TYPE_CHECKING, List
 
 from ansiblelint.file_utils import Lintable
+from ansiblelint.logger import _logger
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
-
-_logger = logging.getLogger(__name__)
 
 # yamllint is a soft-dependency (not installed by default)
 try:

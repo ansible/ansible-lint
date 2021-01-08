@@ -95,10 +95,7 @@ class Runner(object):
             for file in files:
                 if str(file.path) in self.checked_files:
                     continue
-                _logger.debug(
-                    "Examining %s of type %s",
-                    ansiblelint.file_utils.normpath(file.path),
-                    file.kind)
+                _logger.debug("Examining %s", file)
 
                 matches.extend(
                     self.rules.run(file, tags=set(self.tags),

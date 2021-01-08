@@ -71,6 +71,7 @@ repos:
     - Sphinx>=3.1.2
     - enrich
     - yamllint
+    - enrich>=1.2.6
 - repo: https://github.com/pre-commit/mirrors-pylint
   rev: v2.6.0
   hooks:

@@ -37,7 +37,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
         if lintable.kind != 'playbook':
             return []
 
-        with timed_info("Executing syntax check on %s", lintable.path):
+        with timed_info("Executing syntax check on %s", lintable):
             cmd = ['ansible-playbook', '--syntax-check', str(lintable.path)]
             run = subprocess.run(
                 cmd,

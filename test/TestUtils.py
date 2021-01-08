@@ -187,7 +187,7 @@ def test_get_yaml_files_git_verbose(
     utils.get_yaml_files(options)
 
     expected_info = (
-        "ansiblelint.utils",
+        "ansiblelint",
         logging.INFO,
         'Discovering files to lint: git ls-files *.yaml *.yml')
 
@@ -208,6 +208,8 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     Also checks expected number of files are detected.
     """
     options = cli.get_config([])
+    options.vebosity = 0
+    options.quiet = True
     test_dir = Path(__file__).resolve().parent
     lint_path = test_dir / 'roles' / 'test-role'
     if not is_in_git:
@@ -234,7 +236,7 @@ def test_logger_debug(caplog):
     initialize_logger(options.verbosity)
 
     expected_info = (
-        "ansiblelint.__main__",
+        'root',
         logging.DEBUG,
         'Logging initialized to level 10',
     )
