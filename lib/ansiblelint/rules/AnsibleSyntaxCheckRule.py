@@ -32,8 +32,9 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
         if lintable.kind != 'playbook':
             return []
 
+        cmd = ['ansible-playbook', '--syntax-check', str(lintable.path)]
         run = subprocess.run(
-            ['ansible-playbook', '--syntax-check', lintable.path],
+            cmd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -44,7 +45,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
         result = []
         if run.returncode != 0:
             message = None
-            filename = None
+            filename = str(lintable.path)
             linenumber = 0
             column = None
 
@@ -71,8 +72,8 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 rule = RuntimeErrorRule()
                 if not message:
                     message = (
-                        "Ansible --syntax-check reported unexpected "
-                        f"error code {run.returncode}")
+                        f"Unexpected error code {run.returncode} from "
+                        f"execution of: {' '.join(cmd)}")
 
             result.append(MatchError(
                 message=message,
