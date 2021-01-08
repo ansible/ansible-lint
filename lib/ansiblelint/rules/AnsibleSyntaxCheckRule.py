@@ -7,6 +7,7 @@ from typing import List
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
+from ansiblelint.logger import timed_info
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import strip_ansi_escape
 
@@ -32,17 +33,18 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
         if lintable.kind != 'playbook':
             return []
 
-        cmd = ['ansible-playbook', '--syntax-check', str(lintable.path)]
-        run = subprocess.run(
-            cmd,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=False,  # needed when command is a list
-            universal_newlines=True,
-            check=False
-        )
-        result = []
+        with timed_info("Executing syntax check on %s", lintable.path):
+            cmd = ['ansible-playbook', '--syntax-check', str(lintable.path)]
+            run = subprocess.run(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=False,  # needed when command is a list
+                universal_newlines=True,
+                check=False
+            )
+            result = []
         if run.returncode != 0:
             message = None
             filename = str(lintable.path)
