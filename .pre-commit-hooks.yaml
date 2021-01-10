@@ -12,3 +12,9 @@
     # https://github.com/ansible-community/ansible-lint/issues/611
     pass_filenames: false
     always_run: true
+    additional_dependencies:
+        # https://github.com/pre-commit/pre-commit/issues/1526
+        # if you want to use only the base ansible version for linting,
+        # replace 'community' extra with 'core' or just mention the exact
+        # version of Ansible you want to install as a dependency.
+        - .[community,yamllint]
