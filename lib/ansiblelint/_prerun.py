@@ -1,3 +1,4 @@
+import os
 import sys
 
 from packaging import version
@@ -28,4 +29,12 @@ def check_ansible_presence() -> None:
         sys.exit(ANSIBLE_MISSING_RC)
 
 
+def prepare_environment() -> None:
+    """Make custom modules available if needed."""
+    if os.path.exists("plugins/modules") and 'ANSIBLE_LIBRARY' not in os.environ:
+        os.environ['ANSIBLE_LIBRARY'] = "plugins/modules"
+        print("Added ANSIBLE_LIBRARY=plugins/modules", file=sys.stderr)
+
+
 check_ansible_presence()
+prepare_environment()

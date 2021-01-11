@@ -14,3 +14,11 @@ def test_example_plain_string(default_rules_collection):
     assert len(result) == 1
     assert result[0].rule.id == "911"
     assert "A playbook must be a list of plays" in result[0].message
+
+
+def test_example_custom_module(default_rules_collection):
+    """custom_module.yml is expected to pass."""
+    result = Runner(
+        default_rules_collection,
+        'examples/playbooks/custom_module.yml', [], [], []).run()
+    assert len(result) == 0
