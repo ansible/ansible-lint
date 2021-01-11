@@ -29,6 +29,8 @@ import sys
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, List, Set, Type, Union
 
+from enrich.console import should_do_markup
+
 from ansiblelint import cli, formatters
 from ansiblelint.color import console, console_options, console_stderr, reconfigure, render_yaml
 from ansiblelint.file_utils import cwd
@@ -137,10 +139,9 @@ def main(argv: List[str] = None) -> int:
     options = cli.get_config(argv[1:])
 
     if options.colored is None:
-        options.colored = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
-    if options.colored is not None:
-        console_options["force_terminal"] = options.colored
-        reconfigure(console_options)
+        options.colored = should_do_markup()
+    console_options["force_terminal"] = options.colored
+    reconfigure(console_options)
 
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)

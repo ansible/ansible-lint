@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from ansiblelint.testing import run_ansible_lint
+from ansiblelint.text import strip_ansi_escape
 
 
 class TestCliRolePaths(unittest.TestCase):
@@ -85,7 +86,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/invalid-name'
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert '106: Role name invalid-name does not match' in result.stdout
+        assert '106: Role name invalid-name does not match' in strip_ansi_escape(result.stdout)
 
     def test_run_role_name_with_prefix(self):
         cwd = self.local_test_dir
@@ -110,7 +111,8 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/invalid_due_to_meta'
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert '106: Role name invalid-due-to-meta does not match' in result.stdout
+        assert ('106: Role name invalid-due-to-meta does not match' in
+                strip_ansi_escape(result.stdout))
 
     def test_run_single_role_path_with_roles_path_env(self):
         """Test for role name collision with ANSIBLE_ROLES_PATH.

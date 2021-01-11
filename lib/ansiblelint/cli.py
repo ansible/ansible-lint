@@ -143,13 +143,15 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument('-w', dest='warn_list', default=[], action='append',
                         help="only warn about these rules, unless overridden in "
                              "config file defaults to 'experimental'")
+    # Do not use store_true/store_false because they create opposite defaults.
     parser.add_argument('--nocolor', dest='colored',
-                        default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
-                        action='store_false',
-                        help="disable colored output")
+                        action='store_const',
+                        const=False,
+                        help="disable colored output, same as NO_COLOR=1")
     parser.add_argument('--force-color', dest='colored',
-                        action='store_true',
-                        help="Try force colored output (relying on ansible's code)")
+                        action='store_const',
+                        const=True,
+                        help="Force colored output, same as FORCE_COLOR=1")
     parser.add_argument('--exclude', dest='exclude_paths',
                         action=AbspathArgAction,
                         type=Path, default=[],
