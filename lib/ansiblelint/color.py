@@ -19,9 +19,11 @@ console_options: Dict[str, Any] = {
     "theme": _theme,
     "soft_wrap": True
 }
+console_options_stderr = console_options.copy()
+console_options_stderr['stderr'] = True
 
 console = rich.get_console()
-console_stderr = Console(**console_options, stderr=True)
+console_stderr = Console(**console_options_stderr)
 
 
 def reconfigure(new_options: Dict[str, Any]):
@@ -32,7 +34,9 @@ def reconfigure(new_options: Dict[str, Any]):
     console_options = new_options
     rich.reconfigure(**new_options)
     # see https://github.com/willmcgugan/rich/discussions/484#discussioncomment-200182
-    tmp_console = Console(**console_options, stderr=True)
+    console_options_stderr = console_options.copy()
+    console_options_stderr['stderr'] = True
+    tmp_console = Console(**console_options_stderr)
     console_stderr.__dict__ = tmp_console.__dict__
 
 
