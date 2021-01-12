@@ -3,4 +3,4 @@ myst-parser
 pipdeptree
 Sphinx
 sphinx_ansible_theme
-sphinxcontrib.programoutput
+sphinxcontrib-programoutput2>=2.0a1

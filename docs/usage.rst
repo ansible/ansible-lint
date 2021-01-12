@@ -75,10 +75,10 @@ When you call ansible-lint without arguments the tool will use its internal
 heuristics to determine file types.
 
 ``ansible-lint`` also accepts a list of **roles** or **playbooks** as
-arguments. The following command lints ``examples/play.yml`` and
+arguments. The following command lints ``examples/playbooks/play.yml`` and
 ``examples/roles/bobbins`` role:
 
-.. command-output:: ansible-lint -p examples/play.yml examples/roles/bobbins
+.. command-output:: ansible-lint -p examples/playbooks/play.yml examples/roles/bobbins
    :cwd: ..
    :returncode: 2
    :nostderr:
@@ -100,14 +100,14 @@ the following:
 If playbooks include other playbooks, or tasks, or handlers or roles, these
 are also handled:
 
-.. command-output:: ansible-lint --offline -p examples/playbooks/include.yml
+.. command-output:: ansible-lint --force-color --offline -p examples/playbooks/include.yml
    :cwd: ..
    :returncode: 2
    :nostderr:
 
 A codeclimate report in JSON format can be generated with ansible-lint.
 
-.. command-output:: ansible-lint -f codeclimate examples/playbooks/example.yml
+.. command-output:: ansible-lint -f codeclimate examples/playbooks/norole.yml
    :cwd: ..
    :returncode: 2
    :nostderr:
