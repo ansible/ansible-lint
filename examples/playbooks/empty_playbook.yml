@@ -1,0 +1,3 @@
+# an empty playbook which makes ansible-playbook --syntax-check report
+# ERROR! Empty playbook, nothing to do
+# with exit code 4

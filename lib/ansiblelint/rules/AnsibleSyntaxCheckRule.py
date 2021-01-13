@@ -16,6 +16,10 @@ _ansible_syntax_check_re = re.compile(
     r"'(?P<filename>.*)': line (?P<line>\d+), column (?P<column>\d+)",
     re.MULTILINE | re.S | re.DOTALL)
 
+_empty_playbook_re = re.compile(
+    r"^ERROR! Empty playbook, nothing to do",
+    re.MULTILINE | re.S | re.DOTALL)
+
 
 class AnsibleSyntaxCheckRule(AnsibleLintRule):
     """Ansible syntax check report failure."""
@@ -50,6 +54,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             filename = str(lintable.path)
             linenumber = 0
             column = None
+            tag = None
 
             stderr = strip_ansi_escape(run.stderr)
             stdout = strip_ansi_escape(run.stdout)
@@ -67,6 +72,10 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 filename = m.groupdict()['filename']
                 linenumber = int(m.groupdict()['line'])
                 column = int(m.groupdict()['column'])
+            elif _empty_playbook_re.search(stderr):
+                message = "Empty playbook, nothing to do"
+                filename = str(lintable.path)
+                tag = "empty-playbook"
 
             if run.returncode == 4:
                 rule: BaseRule = AnsibleSyntaxCheckRule()
@@ -83,7 +92,8 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 linenumber=linenumber,
                 column=column,
                 rule=rule,
-                details=details
+                details=details,
+                tag=tag
                 ))
         return result
 
@@ -101,4 +111,16 @@ if "pytest" in sys.modules:
         # We internaly convert absolute paths returned by ansible into paths
         # relative to current directory.
         assert result[0].filename.endswith("/conflicting_action.yml")
+        assert len(result) == 1
+
+    def test_empty_playbook() -> None:
+        """Validate detection of empty-playbook."""
+        lintable = Lintable('examples/playbooks/empty_playbook.yml', kind='playbook')
+        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+        assert result[0].linenumber == 0
+        # We internaly convert absolute paths returned by ansible into paths
+        # relative to current directory.
+        assert result[0].filename.endswith("/empty_playbook.yml")
+        assert result[0].tag == "empty-playbook"
+        assert result[0].message == "Empty playbook, nothing to do"
         assert len(result) == 1
