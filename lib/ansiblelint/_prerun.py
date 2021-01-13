@@ -35,6 +35,10 @@ def prepare_environment() -> None:
         os.environ['ANSIBLE_LIBRARY'] = "plugins/modules"
         print("Added ANSIBLE_LIBRARY=plugins/modules", file=sys.stderr)
 
+    if os.path.exists("roles") and "ANSIBLE_ROLES_PATH" not in os.environ:
+        os.environ['ANSIBLE_ROLES_PATH'] = "roles"
+        print("Added ANSIBLE_ROLES_PATH=roles", file=sys.stderr)
+
 
 check_ansible_presence()
 prepare_environment()
