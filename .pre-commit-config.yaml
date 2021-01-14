@@ -19,7 +19,7 @@ repos:
     files: >-
       ^setup\.py$
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
-  rev: v3.3.0
+  rev: v3.4.0
   hooks:
   - id: end-of-file-fixer
   - id: trailing-whitespace
@@ -46,7 +46,7 @@ repos:
     types: [file, yaml]
     entry: yamllint --strict
 - repo: https://github.com/pre-commit/mirrors-isort
-  rev: v5.6.4
+  rev: v5.7.0
   hooks:
   - id: isort
     args:
