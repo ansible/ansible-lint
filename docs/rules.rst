@@ -8,7 +8,7 @@ Specifying Rules at Runtime
 ---------------------------
 
 By default, ``ansible-lint`` uses the rules found in
-``ansible-lint/lib/ansiblelint/rules``. To override this behavior and use a
+``ansible-lint/src/ansiblelint/rules``. To override this behavior and use a
 custom set of rules, use the ``-r /path/to/custom-rules`` option to provide a
 directory path containing the custom rules. For multiple rule sets, pass
 multiple ``-r`` options.
