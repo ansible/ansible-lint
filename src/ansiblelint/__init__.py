@@ -20,10 +20,8 @@
 """Main ansible-lint package."""
 # prerun must run before any other imports
 import ansiblelint._prerun  # noqa
-from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.version import __version__
 
 __all__ = (
     "__version__",
-    "AnsibleLintRule"  # deprecated, import it directly from rules
 )
