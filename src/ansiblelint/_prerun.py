@@ -90,7 +90,3 @@ def prepare_environment() -> None:
                 f".cache/collections:{os.environ['ANSIBLE_COLLECTIONS_PATHS']}"
         else:
             os.environ['ANSIBLE_COLLECTIONS_PATHS'] = ".cache/collections"
-
-
-check_ansible_presence()
-prepare_environment()

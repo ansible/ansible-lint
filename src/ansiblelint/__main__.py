@@ -27,28 +27,23 @@ import pathlib
 import subprocess
 import sys
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, List, Set, Type, Union
+from typing import TYPE_CHECKING, Any, List, Type, Union
 
 from enrich.console import should_do_markup
 
 from ansiblelint import cli, formatters
+from ansiblelint._prerun import check_ansible_presence, prepare_environment
 from ansiblelint.color import console, console_options, console_stderr, reconfigure, render_yaml
 from ansiblelint.file_utils import cwd
-from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
-from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import LintResult, Runner
-from ansiblelint.utils import get_lintables, get_rules_dirs
+from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
     from argparse import Namespace
 
-_logger = logging.getLogger(__name__)
+    from ansiblelint.runner import LintResult
 
-_rule_format_map = {
-    'plain': str,
-    'rich': rules_as_rich,
-    'rst': rules_as_rst
-}
+
+_logger = logging.getLogger(__name__)
 
 
 def initialize_logger(level: int = 0) -> None:
@@ -85,7 +80,7 @@ def choose_formatter_factory(
     return r
 
 
-def report_outcome(result: LintResult, options, mark_as_success=False) -> int:
+def report_outcome(result: "LintResult", options, mark_as_success=False) -> int:
     """Display information about how to skip found rules.
 
     Returns exit code, 2 if errors were found, 0 when only warnings were found.
@@ -129,6 +124,7 @@ warn_list:  # or 'skip_list' to silence them completely
     return 2
 
 
+# pylint: disable=too-many-locals,too-many-statements
 def main(argv: List[str] = None) -> int:
     """Linter CLI entry point."""
     if argv is None:
@@ -137,6 +133,11 @@ def main(argv: List[str] = None) -> int:
     cwd = pathlib.Path.cwd()
 
     options = cli.get_config(argv[1:])
+    if options.version:
+        print('ansible-lint {ver!s}'.format(ver=__version__))
+        # assure we fail if ansible is missing, even for version printing
+        check_ansible_presence()
+        sys.exit(0)
 
     if options.colored is None:
         options.colored = should_do_markup()
@@ -149,11 +150,28 @@ def main(argv: List[str] = None) -> int:
     formatter_factory = choose_formatter_factory(options)
     formatter = formatter_factory(cwd, options.display_relative_path)
 
+    prepare_environment()
+    check_ansible_presence()
+
+    # On purpose lazy-imports to avoid pre-loading Ansible
+    # pylint: disable=import-outside-toplevel
+    from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.utils import get_rules_dirs
+
     rulesdirs = get_rules_dirs([str(rdir) for rdir in options.rulesdir],
                                options.use_default_rules)
+
     rules = RulesCollection(rulesdirs)
 
     if options.listrules:
+
+        _rule_format_map = {
+            'plain': str,
+            'rich': rules_as_rich,
+            'rst': rules_as_rst
+        }
+
         console.print(
             _rule_format_map[options.format](rules),
             highlight=False)
@@ -171,6 +189,7 @@ def main(argv: List[str] = None) -> int:
     options.skip_list = _sanitize_list_options(options.skip_list)
     options.warn_list = _sanitize_list_options(options.warn_list)
 
+    from ansiblelint.runner import _get_matches
     result = _get_matches(rules, options)
 
     mark_as_success = False
@@ -233,24 +252,6 @@ def _render_matches(
         formatter = formatters.AnnotationsFormatter(cwd, True)
         for match in matches:
             console.print(formatter.format(match), markup=False, highlight=False)
-
-
-def _get_matches(rules: RulesCollection, options: "Namespace") -> LintResult:
-
-    lintables = get_lintables(options=options, args=options.lintables)
-
-    matches = list()
-    checked_files: Set[str] = set()
-    for lintable in lintables:
-        runner = Runner(rules, lintable, options.tags,
-                        options.skip_list, options.exclude_paths,
-                        options.verbosity, checked_files)
-        matches.extend(runner.run())
-
-    # Assure we do not print duplicates and the order is consistent
-    matches = sorted(set(matches))
-
-    return LintResult(matches=matches, files=checked_files)
 
 
 @contextmanager

@@ -11,7 +11,6 @@ import yaml
 
 from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.file_utils import expand_path_vars
-from ansiblelint.version import __version__
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = ['exclude_paths', 'rulesdir', ]
@@ -161,8 +160,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument('-c', dest='config_file',
                         help='Specify configuration file to use.  '
                              'Defaults to ".ansible-lint"')
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s {ver!s}'.format(ver=__version__),
+    parser.add_argument('--version',
+                        action='store_true',
                         )
     parser.add_argument(dest='lintables', nargs='*',
                         help="One or more files or paths. When missing it will "

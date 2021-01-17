@@ -75,3 +75,5 @@ repos:
   rev: v2.6.0
   hooks:
   - id: pylint
+    # temporary workaround as pylint is not compatible with 3.9
+    language_version: "3.8"
