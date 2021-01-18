@@ -214,7 +214,7 @@ class RulesCollection(object):
     def extend(self, more: List[AnsibleLintRule]) -> None:
         self.rules.extend(more)
 
-    def run(self, file: Lintable, tags=set(), skip_list=frozenset()) -> List[MatchError]:
+    def run(self, file: Lintable, tags=set(), skip_list: List[str] = []) -> List[MatchError]:
         matches: List[MatchError] = list()
 
         try:
