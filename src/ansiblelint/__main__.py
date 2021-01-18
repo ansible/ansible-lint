@@ -27,19 +27,18 @@ import pathlib
 import subprocess
 import sys
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, List, Type, Union
+from typing import TYPE_CHECKING, List
 
 from enrich.console import should_do_markup
 
-from ansiblelint import cli, formatters
+from ansiblelint import cli
 from ansiblelint._prerun import check_ansible_presence, prepare_environment
+from ansiblelint.app import App
 from ansiblelint.color import console, console_options, console_stderr, reconfigure, render_yaml
 from ansiblelint.file_utils import cwd
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
-    from argparse import Namespace
-
     from ansiblelint.runner import LintResult
 
 
@@ -64,20 +63,6 @@ def initialize_logger(level: int = 0) -> None:
     logger.setLevel(logging_level)
     # Use module-level _logger instance to validate it
     _logger.debug("Logging initialized to level %s", logging_level)
-
-
-def choose_formatter_factory(
-    options_list: "Namespace"
-) -> Type[formatters.BaseFormatter]:
-    """Select an output formatter based on the incoming command line arguments."""
-    r: Type[formatters.BaseFormatter] = formatters.Formatter
-    if options_list.quiet:
-        r = formatters.QuietFormatter
-    elif options_list.parseable:
-        r = formatters.ParseableFormatter
-    elif options_list.parseable_severity:
-        r = formatters.ParseableSeverityFormatter
-    return r
 
 
 def report_outcome(result: "LintResult", options, mark_as_success=False) -> int:
@@ -124,15 +109,15 @@ warn_list:  # or 'skip_list' to silence them completely
     return 2
 
 
-# pylint: disable=too-many-locals,too-many-statements
+# pylint: disable=too-many-locals
 def main(argv: List[str] = None) -> int:
     """Linter CLI entry point."""
     if argv is None:
         argv = sys.argv
 
-    cwd = pathlib.Path.cwd()
-
     options = cli.get_config(argv[1:])
+    options.cwd = pathlib.Path.cwd()
+
     if options.version:
         print('ansible-lint {ver!s}'.format(ver=__version__))
         # assure we fail if ansible is missing, even for version printing
@@ -147,8 +132,7 @@ def main(argv: List[str] = None) -> int:
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
 
-    formatter_factory = choose_formatter_factory(options)
-    formatter = formatter_factory(cwd, options.display_relative_path)
+    app = App(options=options)
 
     prepare_environment()
     check_ansible_presence()
@@ -218,40 +202,9 @@ def main(argv: List[str] = None) -> int:
                     "Marked %s previously known violation(s) as ignored due to"
                     " progressive mode.", ignored)
 
-    _render_matches(result.matches, options, formatter, cwd)
+    app.render_matches(result.matches)
 
     return report_outcome(result, mark_as_success=mark_as_success, options=options)
-
-
-def _render_matches(
-        matches: List,
-        options: "Namespace",
-        formatter: Any,
-        cwd: Union[str, pathlib.Path]):
-
-    ignored_matches = [match for match in matches if match.ignored]
-    fatal_matches = [match for match in matches if not match.ignored]
-    # Displayed ignored matches first
-    if ignored_matches:
-        _logger.warning(
-            "Listing %s violation(s) marked as ignored, likely already known",
-            len(ignored_matches))
-        for match in ignored_matches:
-            if match.ignored:
-                # highlight must be off or apostrophes may produce unexpected results
-                console.print(
-                    formatter.format(match), highlight=False)
-    if fatal_matches:
-        _logger.warning("Listing %s violation(s) that are fatal", len(fatal_matches))
-        for match in fatal_matches:
-            if not match.ignored:
-                console.print(formatter.format(match), highlight=False)
-
-    # If run under GitHub Actions we also want to emit output recognized by it.
-    if os.getenv('GITHUB_ACTIONS') == 'true' and os.getenv('GITHUB_WORKFLOW'):
-        formatter = formatters.AnnotationsFormatter(cwd, True)
-        for match in matches:
-            console.print(formatter.format(match), markup=False, highlight=False)
 
 
 @contextmanager
