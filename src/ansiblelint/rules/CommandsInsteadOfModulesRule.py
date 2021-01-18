@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 import os
+from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg
@@ -59,16 +60,17 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'yum': 'yum',
     }
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task['action']['__ansible_module__'] not in self._commands:
-            return
+            return False
 
         first_cmd_arg = get_first_cmd_arg(task)
         if not first_cmd_arg:
-            return
+            return False
 
         executable = os.path.basename(first_cmd_arg)
         if executable in self._modules and \
                 convert_to_boolean(task['action'].get('warn', True)):
             message = '{0} used in place of {1} module'
             return message.format(executable, self._modules[executable])
+        return False

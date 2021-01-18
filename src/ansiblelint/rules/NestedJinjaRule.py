@@ -22,6 +22,7 @@
 # THE SOFTWARE.
 
 import re
+from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -41,7 +42,7 @@ class NestedJinjaRule(AnsibleLintRule):
 
     pattern = re.compile(r"{{(?:[^{}]*)?[^'\"]{{")
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
 
         command = "".join(
             str(value)

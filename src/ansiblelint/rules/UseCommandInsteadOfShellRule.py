@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -33,7 +35,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
     tags = ['command-shell', 'safety']
     version_added = 'historic'
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         # Use unjinja so that we don't match on jinja filters
         # rather than pipes
         if task["action"]["__ansible_module__"] == 'shell':
@@ -43,3 +45,4 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
                 unjinjad_cmd = self.unjinja(
                     ' '.join(task["action"].get("__ansible_arguments__", [])))
             return not any([ch in unjinjad_cmd for ch in '&|<>;$\n*[]{}?`'])
+        return False

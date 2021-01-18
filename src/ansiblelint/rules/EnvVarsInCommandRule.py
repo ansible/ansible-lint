@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY, get_first_cmd_arg
 
@@ -38,11 +40,12 @@ class EnvVarsInCommandRule(AnsibleLintRule):
                      'cmd', '__ansible_module__', '__ansible_arguments__',
                      LINE_NUMBER_KEY, FILENAME_KEY]
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in ['command']:
             first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:
-                return
+                return False
 
             return any([arg not in self.expected_args for arg in task['action']] +
                        ["=" in first_cmd_arg])
+        return False

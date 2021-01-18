@@ -18,10 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 
 
-def _changed_in_when(item):
+def _changed_in_when(item) -> bool:
     if not isinstance(item, str):
         return False
     return any(changed in item for changed in
@@ -39,7 +41,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     tags = ['task', 'behaviour']
     version_added = 'historic'
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task["__ansible_action_type__"] != 'task':
             return False
 
@@ -48,5 +50,4 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         if isinstance(when, list):
             for item in when:
                 return _changed_in_when(item)
-        else:
-            return _changed_in_when(when)
+        return _changed_in_when(when)

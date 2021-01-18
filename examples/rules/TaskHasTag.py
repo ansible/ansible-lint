@@ -1,4 +1,6 @@
 """Example implementation of a rule requiring tasks to have tags set."""
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -10,12 +12,8 @@ class TaskHasTag(AnsibleLintRule):
     description = 'Tasks must have tag'
     tags = ['productivity', 'tags']
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         """Task matching method."""
-        # The meta files don't have tags
-        if file.kind in ["meta", "playbooks"]:
-            return False
-
         if isinstance(task, str):
             return False
 
