@@ -1,0 +1,37 @@
+# Should raise 206 at lines 25, 28, 31
+- hosts: all
+  tasks:
+    - name: good variable format
+      debug:
+        msg: "{{ good_format }}"
+    - name: good variable format
+      debug:
+        msg: "Value: {{ good_format }}"
+    - name: jinja escaping allowed
+      debug:
+        msg: "{{ '{{' }}"
+    - name: jinja escaping allowed
+      # noqa: 306
+      shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
+      changed_when: false
+    - name: jinja whitespace control allowed
+      debug:
+        msg: |
+          {{ good_format }}/
+          {{- good_format }}
+          {{- good_format -}}
+    - name: bad variable format
+      debug:
+        msg: "{{bad_format}}"
+    - name: bad variable format
+      debug:
+        msg: "Value: {{ bad_format}}"
+    - name: bad variable format
+      debug:
+        msg: "{{bad_format }}"
+    - name: not a jinja variable
+      debug:
+        msg: "data = ${lookup{$local_part}lsearch{/etc/aliases}}"
+    - name: JSON inside jinja is valid
+      debug:
+        msg: "{{ {'test': {'subtest': variable}} }}"

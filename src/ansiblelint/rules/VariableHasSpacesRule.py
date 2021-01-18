@@ -2,6 +2,7 @@
 # Copyright (c) 2018, Ansible Project
 
 import re
+import sys
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -22,3 +23,20 @@ class VariableHasSpacesRule(AnsibleLintRule):
             return False
         line_exclude_json = re.sub(r"[^{]{'\w+': ?[^{]{.*?}}", "", line)
         return bool(self.bracket_regex.search(line_exclude_json))
+
+
+if 'pytest' in sys.modules:
+
+    from ansiblelint.file_utils import Lintable
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
+
+    def test_206():
+        """Verify rule."""
+        collection = RulesCollection()
+        collection.register(VariableHasSpacesRule())
+
+        lintable = Lintable("examples/playbooks/206.yml")
+        results = Runner(collection, lintable=lintable).run()
+
+        assert len(results) == 3
