@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -36,7 +38,7 @@ class OctalPermissionsRule(AnsibleLintRule):
     _modules = ['assemble', 'copy', 'file', 'ini_file', 'lineinfile',
                 'replace', 'synchronize', 'template', 'unarchive']
 
-    def is_invalid_permission(self, mode):
+    def is_invalid_permission(self, mode) -> bool:
         # sensible file permission modes don't
         # have write bit set when read bit is
         # not set and don't have execute bit set
@@ -62,7 +64,7 @@ class OctalPermissionsRule(AnsibleLintRule):
                 other_more_generous_than_user or
                 group_more_generous_than_user)
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in self._modules:
             mode = task['action'].get('mode', None)
 
@@ -71,3 +73,4 @@ class OctalPermissionsRule(AnsibleLintRule):
 
             if isinstance(mode, int):
                 return self.is_invalid_permission(mode)
+        return False

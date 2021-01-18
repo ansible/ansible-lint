@@ -550,14 +550,18 @@ def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
     return task
 
 
-def task_to_str(task):
+def task_to_str(task: Dict[str, Any]) -> str:
     name = task.get("name")
     if name:
-        return name
+        return str(name)
     action = task.get("action")
-    args = " ".join([u"{0}={1}".format(k, v) for (k, v) in action.items()
-                     if k not in ["__ansible_module__", "__ansible_arguments__"]] +
-                    action.get("__ansible_arguments__"))
+    if isinstance(action, str) or not isinstance(action, dict):
+        return str(action)
+    args = " ".join([
+        "{0}={1}".format(k, v) for (k, v) in action.items()
+        if k not in ["__ansible_module__", "__ansible_arguments__"]])
+    for item in action.get("__ansible_arguments__", []):
+        args += f" {item}"
     return u"{0} {1}".format(action["__ansible_module__"], args)
 
 
@@ -604,7 +608,7 @@ def get_action_tasks(yaml, file: Lintable) -> List[Any]:
                 'import_playbook', 'import_tasks']).isdisjoint(task.keys())]
 
 
-def get_normalized_tasks(yaml, file: Lintable) -> List[Any]:
+def get_normalized_tasks(yaml, file: Lintable) -> List[Dict[str, Any]]:
     tasks = get_action_tasks(yaml, file)
     res = []
     for task in tasks:
@@ -654,7 +658,7 @@ def parse_yaml_linenumbers(data, filename):
     return data
 
 
-def get_first_cmd_arg(task):
+def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
     try:
         if 'cmd' in task['action']:
             first_cmd_arg = task['action']['cmd'].split()[0]

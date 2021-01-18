@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -61,7 +63,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
         'zypper',
     ]
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         return (task['action']['__ansible_module__'] in self._package_managers and
                 not task['action'].get('version') and
                 task['action'].get('state') == 'latest')

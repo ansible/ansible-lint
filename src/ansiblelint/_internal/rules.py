@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
@@ -14,11 +14,14 @@ class BaseRule:
     description: str = ""
     version_added: str = ""
     severity: str = ""
-    matchtask = None
 
     def matchlines(self, file: "Lintable") -> List["MatchError"]:
         """Return matches found for a specific line."""
         return []
+
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+        """Confirm if current rule is matching a specific task."""
+        return False
 
     def matchtasks(self, file: "Lintable") -> List["MatchError"]:
         """Return matches for a tasks file."""

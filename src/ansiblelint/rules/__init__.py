@@ -27,7 +27,7 @@ class AnsibleLintRule(BaseRule):
         return self.id + ": " + self.shortdesc
 
     @staticmethod
-    def unjinja(text):
+    def unjinja(text: str) -> str:
         text = re.sub(r"{{.+?}}", "JINJA_EXPRESSION", text)
         text = re.sub(r"{%.+?%}", "JINJA_STATEMENT", text)
         text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
@@ -107,7 +107,7 @@ class AnsibleLintRule(BaseRule):
 
             if 'action' not in task:
                 continue
-            result = self.matchtask(file, task)
+            result = self.matchtask(task)
             if not result:
                 continue
 

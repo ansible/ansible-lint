@@ -20,6 +20,7 @@
 
 import os
 import re
+from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -39,7 +40,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     _jinja = re.compile(r"{{.*}}", re.DOTALL)
     _glob = re.compile('[][*?]')
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         loop_type = next((key for key in task
                           if key.startswith("with_")), None)
         if loop_type:
@@ -60,8 +61,9 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 pass
             else:
                 return self._matchvar(task[loop_type], task, loop_type)
+        return False
 
-    def _matchvar(self, varstring, task, loop_type):
+    def _matchvar(self, varstring, task, loop_type) -> Union[bool, str]:
         if (isinstance(varstring, str) and
                 not self._jinja.match(varstring)):
             valid = loop_type == 'with_fileglob' and bool(self._jinja.search(varstring) or
@@ -73,3 +75,4 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 message = "Found a bare variable '{0}' used in a '{1}' loop." + \
                           " You should use the full variable syntax ('{{{{ {0} }}}}')"
                 return message.format(task[loop_type], loop_type)
+        return False

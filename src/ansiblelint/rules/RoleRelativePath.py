@@ -1,6 +1,8 @@
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
 
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -19,7 +21,7 @@ class RoleRelativePath(AnsibleLintRule):
         'win_template': 'win_templates',
     }
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         module = task['action']['__ansible_module__']
         if module not in self._module_to_path_folder:
             return False
@@ -30,3 +32,5 @@ class RoleRelativePath(AnsibleLintRule):
         path_to_check = '../{}'.format(self._module_to_path_folder[module])
         if path_to_check in task['action']['src']:
             return True
+
+        return False

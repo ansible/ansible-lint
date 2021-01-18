@@ -1,4 +1,5 @@
 import re
+from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -21,7 +22,7 @@ class ShellWithoutPipefail(AnsibleLintRule):
     _pipefail_re = re.compile(r"^\s*set.*[+-][A-z]*o\s*pipefail")
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task["__ansible_action_type__"] != "task":
             return False
 
@@ -34,5 +35,6 @@ class ShellWithoutPipefail(AnsibleLintRule):
         unjinjad_cmd = self.unjinja(
             ' '.join(task["action"].get("__ansible_arguments__", [])))
 
-        return (self._pipe_re.search(unjinjad_cmd) and
-                not self._pipefail_re.match(unjinjad_cmd))
+        return bool(
+            self._pipe_re.search(unjinjad_cmd) and
+            not self._pipefail_re.match(unjinjad_cmd))

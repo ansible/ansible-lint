@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -32,6 +34,6 @@ class GitHasVersionRule(AnsibleLintRule):
     tags = ['module', 'repeatability']
     version_added = 'historic'
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         return (task['action']['__ansible_module__'] == 'git' and
                 task['action'].get('version', 'HEAD') == 'HEAD')

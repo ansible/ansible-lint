@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -15,7 +15,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
     tags = ['deprecations']
     version_added = 'historic'
 
-    def _is_valid(self, when):
+    def _is_valid(self, when) -> bool:
         if not isinstance(when, str):
             return True
         return when.find('{{') == -1 and when.find('}}') == -1
@@ -26,7 +26,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
             if 'roles' not in data or data['roles'] is None:
                 return errors
             for role in data['roles']:
-                if self.matchtask(file, role):  # type: ignore
+                if self.matchtask(role):
                     errors.append(
                         self.create_matcherror(details=str({'when': role})))
         if isinstance(data, list):
@@ -36,5 +36,5 @@ class NoFormattingInWhenRule(AnsibleLintRule):
                     errors = errors + sub_errors
         return errors
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         return 'when' in task and not self._is_valid(task['when'])

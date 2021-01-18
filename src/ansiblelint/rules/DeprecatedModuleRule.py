@@ -1,5 +1,7 @@
 # Copyright (c) 2018, Ansible Project
 
+from typing import Any, Dict, Union
+
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -29,7 +31,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
         'vsphere_guest', 'win_msi', 'include'
     ]
 
-    def matchtask(self, file, task):
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         module = task["action"]["__ansible_module__"]
         if module in self._modules:
             message = '{0} {1}'

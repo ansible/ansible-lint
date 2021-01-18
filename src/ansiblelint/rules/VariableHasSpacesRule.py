@@ -31,7 +31,7 @@ if 'pytest' in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_206():
+    def test_206() -> None:
         """Verify rule."""
         collection = RulesCollection()
         collection.register(VariableHasSpacesRule())
