@@ -109,7 +109,6 @@ warn_list:  # or 'skip_list' to silence them completely
     return 2
 
 
-# pylint: disable=too-many-locals
 def main(argv: List[str] = None) -> int:
     """Linter CLI entry point."""
     if argv is None:
@@ -141,12 +140,8 @@ def main(argv: List[str] = None) -> int:
     # pylint: disable=import-outside-toplevel
     from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
     from ansiblelint.rules import RulesCollection
-    from ansiblelint.utils import get_rules_dirs
 
-    rulesdirs = get_rules_dirs([str(rdir) for rdir in options.rulesdir],
-                               options.use_default_rules)
-
-    rules = RulesCollection(rulesdirs)
+    rules = RulesCollection(options.rulesdirs)
 
     if options.listrules:
 

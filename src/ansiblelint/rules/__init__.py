@@ -185,7 +185,7 @@ def load_plugins(directory: str) -> List[AnsibleLintRule]:
 
 class RulesCollection(object):
 
-    def __init__(self, rulesdirs=None) -> None:
+    def __init__(self, rulesdirs: Optional[List[str]] = None) -> None:
         """Initialize a RulesCollection instance."""
         if rulesdirs is None:
             rulesdirs = []
