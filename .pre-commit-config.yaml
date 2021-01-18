@@ -77,3 +77,12 @@ repos:
   - id: pylint
     # temporary workaround as pylint is not compatible with 3.9
     language_version: "3.8"
+    additional_dependencies:
+    - ansible-base
+    - docutils
+    - enrich
+    - pytest
+    - pyyaml
+    - rich
+    - ruamel.yaml
+    - sphinx

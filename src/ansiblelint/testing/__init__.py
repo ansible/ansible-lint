@@ -20,17 +20,13 @@ else:
 # would be loaded with incomplete module/role/collection list.
 prepare_environment()
 
-# pylint: disable=ungrouped-imports,wrong-import-position
-from ansible import __version__ as ansible_version_str  # noqa: E402
-
+# pylint: disable=wrong-import-position
 from ansiblelint.errors import MatchError  # noqa: E402
 from ansiblelint.rules import RulesCollection  # noqa: E402
 from ansiblelint.runner import Runner  # noqa: E402
 
-ANSIBLE_MAJOR_VERSION = tuple(map(int, ansible_version_str.split('.')[:2]))
 
-
-class RunFromText(object):
+class RunFromText:
     """Use Runner on temp files created from unittest text snippets."""
 
     def __init__(self, collection: RulesCollection) -> None:

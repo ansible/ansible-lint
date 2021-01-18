@@ -23,6 +23,7 @@ class MatchError(ValueError):
     # IMPORTANT: other object's fallbacks.
     # Ref: https://docs.python.org/3/reference/datamodel.html#object.__lt__
 
+    # pylint: disable=too-many-arguments
     def __init__(
             self,
             message: Optional[str] = None,

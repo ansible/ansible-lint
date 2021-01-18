@@ -500,7 +500,7 @@ def normalize_task_v1(task):  # noqa: C901
     result = dict()
     for (k, v) in task.items():
         if k in VALID_KEYS or k.startswith('with_'):
-            if k == 'local_action' or k == 'action':
+            if k in ('local_action', 'action'):
                 if not isinstance(v, dict):
                     v = _kv_to_dict(v)
                 v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
