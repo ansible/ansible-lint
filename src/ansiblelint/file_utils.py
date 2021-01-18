@@ -80,7 +80,7 @@ class Lintable:
         """Provide compatibility subscriptable support."""
         if item == 'path':
             return str(self.path)
-        elif item == 'type':
+        if item == 'type':
             return str(self.kind)
         raise NotImplementedError()
 

@@ -71,14 +71,14 @@ class RunFromText:
 def run_ansible_lint(
         *argv: str,
         cwd: Optional[str] = None,
-        bin: Optional[str] = None,
+        executable: Optional[str] = None,
         env: Optional[Dict[str, str]] = None) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
-    if not bin:
-        bin = sys.executable
+    if not executable:
+        executable = sys.executable
         args = [sys.executable, "-m", "ansiblelint", *argv]
     else:
-        args = [bin, *argv]
+        args = [executable, *argv]
 
     return subprocess.run(
         args,

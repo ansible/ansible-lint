@@ -142,13 +142,12 @@ def tokenize(line: str) -> Tuple[str, List[str], Dict]:
 def _playbook_items(pb_data: dict) -> ItemsView:
     if isinstance(pb_data, dict):
         return pb_data.items()
-    elif not pb_data:
+    if not pb_data:
         return []
-    else:
-        # "if play" prevents failure if the play sequence containes None,
-        # which is weird but currently allowed by Ansible
-        # https://github.com/ansible-community/ansible-lint/issues/849
-        return [item for play in pb_data if play for item in play.items()]
+    # "if play" prevents failure if the play sequence containes None,
+    # which is weird but currently allowed by Ansible
+    # https://github.com/ansible-community/ansible-lint/issues/849
+    return [item for play in pb_data if play for item in play.items()]
 
 
 def _set_collections_basedir(basedir: str):
@@ -210,9 +209,9 @@ def find_children(playbook: Lintable, playbook_dir: str) -> List[Lintable]:
     return results
 
 
-def template(basedir: str, value: Any, vars, fail_on_undefined=False, **kwargs) -> Any:
+def template(basedir: str, value: Any, variables, fail_on_undefined=False, **kwargs) -> Any:
     try:
-        value = ansible_template(os.path.abspath(basedir), value, vars,
+        value = ansible_template(os.path.abspath(basedir), value, variables,
                                  **dict(kwargs, fail_on_undefined=fail_on_undefined))
         # Hack to skip the following exception when using to_json filter on a variable.
         # I guess the filter doesn't like empty vars...
@@ -406,11 +405,11 @@ def _look_for_role_files(basedir: str, role: str, main='main') -> List[Lintable]
 
     for kind in ['tasks', 'meta', 'handlers']:
         current_path = os.path.join(role_path, kind)
-        for dir, subdirs, files in os.walk(current_path):
+        for folder, subdirs, files in os.walk(current_path):
             for file in files:
                 file_ignorecase = file.lower()
                 if file_ignorecase.endswith(('.yml', '.yaml')):
-                    thpath = os.path.join(dir, file)
+                    thpath = os.path.join(folder, file)
                     # TODO(ssbarnea): Find correct way to pass kind: FileType
                     results.append(
                         Lintable(thpath, kind=kind))  # type: ignore
@@ -475,8 +474,7 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:  # noqa: C901
             # we don't want to re-assign these values, which were
             # determined by the ModuleArgsParser() above
             continue
-        else:
-            result[k] = v
+        result[k] = v
 
     result['action'] = dict(__ansible_module__=action)
 
@@ -520,15 +518,13 @@ def normalize_task_v1(task):  # noqa: C901
                         # Keep the line number stored
                         result[k] = v
                         continue
-
-                    else:
-                        # Tasks that include playbooks (rather than task files)
-                        # can get here
-                        # https://github.com/ansible-community/ansible-lint/issues/138
-                        raise RuntimeError("Was not expecting value %s of type %s for key %s\n"
-                                           "Task: %s. Check the syntax of your playbook using "
-                                           "ansible-playbook --syntax-check" %
-                                           (str(v), type(v), k, str(task)))
+                    # Tasks that include playbooks (rather than task files)
+                    # can get here
+                    # https://github.com/ansible-community/ansible-lint/issues/138
+                    raise RuntimeError("Was not expecting value %s of type %s for key %s\n"
+                                       "Task: %s. Check the syntax of your playbook using "
+                                       "ansible-playbook --syntax-check" %
+                                       (str(v), type(v), k, str(task)))
             v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
             result['action'] = v
     if 'module' in result['action']:
@@ -798,13 +794,13 @@ def get_lintables(
             # ignore if any folder ends with _vars
             if next((i for i in p.parts if i.endswith('_vars')), None):
                 continue
-            elif 'roles' in p.parts or '.' in role_dirs:
+            if 'roles' in p.parts or '.' in role_dirs:
                 if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
                     role_dirs.append(str(p.parents[1]))
                     continue
-                elif role_internals.intersection(p.parts):
+                if role_internals.intersection(p.parts):
                     continue
-                elif 'tests' in p.parts:
+                if 'tests' in p.parts:
                     playbooks.append(normpath(p))
             if 'molecule' in p.parts:
                 if p.parts[-1] != 'molecule.yml':
