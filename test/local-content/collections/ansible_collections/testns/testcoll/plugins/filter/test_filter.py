@@ -6,7 +6,7 @@ def a_test_filter(a, b):
     return '{0}:{1}'.format(a, b)
 
 
-class FilterModule(object):
+class FilterModule:
     """Filter plugin."""
 
     def filters(self):

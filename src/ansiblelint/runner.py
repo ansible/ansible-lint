@@ -27,9 +27,10 @@ class LintResult:
     files: Set[str]
 
 
-class Runner(object):
+class Runner:
     """Runner class performs the linting process."""
 
+    # pylint: disable=too-many-arguments
     def __init__(
             self,
             rules: "RulesCollection",

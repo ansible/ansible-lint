@@ -33,6 +33,7 @@ class AnsibleLintRule(BaseRule):
         text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
         return text
 
+    # pylint: disable=too-many-arguments
     def create_matcherror(
             self,
             message: Optional[str] = None,
@@ -183,7 +184,7 @@ def load_plugins(directory: str) -> List[AnsibleLintRule]:
     return result
 
 
-class RulesCollection(object):
+class RulesCollection:
 
     def __init__(self, rulesdirs: Optional[List[str]] = None) -> None:
         """Initialize a RulesCollection instance."""
