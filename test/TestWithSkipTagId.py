@@ -40,7 +40,7 @@ class TestWithSkipTagId(unittest.TestCase):
         good_runner = Runner(
             rules=self.collection,
             lintable=self.file,
-            skip_list=frozenset([skip_id]))
+            skip_list=[skip_id])
         self.assertEqual([], good_runner.run())
 
     def test_positive_skip_tag(self) -> None:
@@ -48,5 +48,5 @@ class TestWithSkipTagId(unittest.TestCase):
         good_runner = Runner(
             rules=self.collection,
             lintable=self.file,
-            skip_list=frozenset([skip_tag]))
+            skip_list=[skip_tag])
         self.assertEqual([], good_runner.run())

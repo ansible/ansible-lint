@@ -170,9 +170,6 @@ def main(argv: List[str] = None) -> int:
     if isinstance(options.tags, str):
         options.tags = options.tags.split(',')
 
-    options.skip_list = _sanitize_list_options(options.skip_list)
-    options.warn_list = _sanitize_list_options(options.warn_list)
-
     from ansiblelint.runner import _get_matches
     result = _get_matches(rules, options)
 
@@ -224,13 +221,6 @@ def _previous_revision():
     with cwd(worktree_dir):
         os.system(f"git checkout {revision}")
         yield
-
-
-def _sanitize_list_options(tag_list: list):
-    tags = set()
-    for t in tag_list:
-        tags.update(str(t).split(','))
-    return frozenset(tags)
 
 
 def _run_cli_entrypoint() -> None:

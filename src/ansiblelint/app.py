@@ -18,7 +18,11 @@ class App:
 
     def __init__(self, options: "Namespace"):
         """Construct app run based on already loaded configuration."""
+        options.skip_list = _sanitize_list_options(options.skip_list)
+        options.warn_list = _sanitize_list_options(options.warn_list)
+
         self.options = options
+
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
 
@@ -61,3 +65,13 @@ def choose_formatter_factory(
     elif options_list.parseable_severity:
         r = formatters.ParseableSeverityFormatter
     return r
+
+
+def _sanitize_list_options(tag_list: List[str]) -> List[str]:
+    """Normalize list options."""
+    # expand comma separated entries
+    tags = set()
+    for t in tag_list:
+        tags.update(str(t).split(','))
+    # remove duplicates, and return as sorted list
+    return sorted(set(tags))

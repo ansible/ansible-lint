@@ -35,7 +35,7 @@ class Runner(object):
             rules: "RulesCollection",
             lintable: Union[Lintable, str],
             tags: FrozenSet[Any] = frozenset(),
-            skip_list: Optional[FrozenSet[Any]] = frozenset(),
+            skip_list: List[str] = [],
             exclude_paths: List[str] = [],
             verbosity: int = 0,
             checked_files: Optional[Set[str]] = None) -> None:
