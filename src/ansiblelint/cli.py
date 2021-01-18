@@ -4,12 +4,13 @@ import argparse
 import logging
 import os
 import sys
+from argparse import Namespace
 from pathlib import Path
-from typing import List, NamedTuple
+from typing import List
 
 import yaml
 
-from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
+from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.file_utils import expand_path_vars
 
 _logger = logging.getLogger(__name__)
@@ -170,7 +171,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def merge_config(file_config, cli_config) -> NamedTuple:
+def merge_config(file_config, cli_config: Namespace) -> Namespace:
     bools = (
         'display_relative_path',
         'parseable',
@@ -215,17 +216,38 @@ def merge_config(file_config, cli_config) -> NamedTuple:
     return cli_config
 
 
-def get_config(arguments: List[str]):
+def get_config(arguments: List[str]) -> Namespace:
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
 
-    config = load_config(options.config_file)
+    file_config = load_config(options.config_file)
 
-    return merge_config(config, options)
+    config = merge_config(file_config, options)
+
+    options.rulesdirs = get_rules_dirs(
+        options.rulesdir,
+        options.use_default_rules)
+
+    return config
 
 
 def print_help(file=sys.stdout):
     get_cli_parser().print_help(file=file)
 
 
-# vim: et:sw=4:syntax=python:ts=4:
+def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
+    """Return a list of rules dirs."""
+    default_ruledirs = [DEFAULT_RULESDIR]
+    default_custom_rulesdir = os.environ.get(
+        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, "custom")
+    )
+    custom_ruledirs = sorted(
+        str(rdir.resolve())
+        for rdir in Path(default_custom_rulesdir).iterdir()
+        if rdir.is_dir() and (rdir / "__init__.py").exists()
+    )
+
+    if use_default:
+        return rulesdir + custom_ruledirs + default_ruledirs
+
+    return rulesdir or custom_ruledirs + default_ruledirs

@@ -32,6 +32,7 @@ import pytest
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
+from ansiblelint.cli import get_rules_dirs
 from ansiblelint.file_utils import Lintable, expand_path_vars, expand_paths_vars, normpath
 
 
@@ -299,7 +300,7 @@ _CUSTOM_RULEDIRS = [
 ))
 def test_get_rules_dirs(user_ruledirs, use_default, expected):
     """Test it returns expected dir lists."""
-    assert utils.get_rules_dirs(user_ruledirs, use_default) == expected
+    assert get_rules_dirs(user_ruledirs, use_default) == expected
 
 
 @pytest.mark.parametrize(("user_ruledirs", "use_default", "expected"), (
@@ -312,4 +313,4 @@ def test_get_rules_dirs(user_ruledirs, use_default, expected):
 def test_get_rules_dirs_with_custom_rules(user_ruledirs, use_default, expected, monkeypatch):
     """Test it returns expected dir lists when custom rules exist."""
     monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, str(_CUSTOM_RULESDIR))
-    assert utils.get_rules_dirs(user_ruledirs, use_default) == expected
+    assert get_rules_dirs(user_ruledirs, use_default) == expected

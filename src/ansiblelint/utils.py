@@ -58,7 +58,7 @@ from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
 from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule, RuntimeErrorRule
-from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, FileType
+from ansiblelint.constants import FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, normpath
 
@@ -829,23 +829,6 @@ def get_lintables(
             lintables.append(Lintable(playbook, kind="playbook"))
 
     return lintables
-
-
-def get_rules_dirs(rulesdir: List[str], use_default: bool) -> List[str]:
-    """Return a list of rules dirs."""
-    default_ruledirs = [DEFAULT_RULESDIR]
-    default_custom_rulesdir = os.environ.get(
-        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, "custom")
-    )
-    custom_ruledirs = sorted(
-        str(rdir.resolve())
-        for rdir in Path(default_custom_rulesdir).iterdir()
-        if rdir.is_dir() and (rdir / "__init__.py").exists()
-    )
-    if use_default:
-        return rulesdir + custom_ruledirs + default_ruledirs
-
-    return rulesdir or custom_ruledirs + default_ruledirs
 
 
 def convert_to_boolean(value: Any) -> bool:
