@@ -755,10 +755,9 @@ def get_lintables(
         matches = []
         for arg in args:
             if os.path.isdir(arg):
-                matches.append(Path(arg).resolve())
-                for p in Path(arg).rglob(".*"):
+                for p in Path(arg).rglob("*"):
                     if p.suffix in [".yaml", ".yml"]:
-                        matches.append(p)
+                        matches.append(str(p))
             elif os.path.isfile(arg):
                 matches.append(arg)
             else:
@@ -800,11 +799,14 @@ def get_lintables(
             playbooks.append(normpath(p))
             continue
 
+        main_files = ['main.yaml', 'main.yml']
+        roles_generator = ('tasks/' + main in str(p) for main in main_files)
+
         # ignore if any folder ends with _vars
         if next((i for i in p.parts if i.endswith('_vars')), None):
             continue
-        elif 'roles' in p.parts or '.' in role_dirs:
-            if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
+        elif 'roles' in p.parts or '.' in role_dirs or any(roles_generator):
+            if 'tasks' in p.parts and p.parts[-1] in main_files:
                 role_dirs.append(str(p.parents[1]))
                 continue
             elif role_internals.intersection(p.parts):
