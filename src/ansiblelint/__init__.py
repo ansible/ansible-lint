@@ -19,7 +19,6 @@
 # THE SOFTWARE.
 """Main ansible-lint package."""
 # prerun must run before any other imports
-import ansiblelint._prerun  # noqa
 from ansiblelint.version import __version__
 
 __all__ = (

@@ -3,6 +3,7 @@ from typing import Any, Dict
 
 import rich
 from rich.console import Console
+from rich.syntax import Syntax
 from rich.theme import Theme
 
 _theme = Theme({
@@ -42,4 +43,4 @@ def reconfigure(new_options: Dict[str, Any]):
 
 def render_yaml(text: str):
     """Colorize YAMl for nice display."""
-    return rich.syntax.Syntax(text, 'yaml', theme="ansi_dark")
+    return Syntax(text, 'yaml', theme="ansi_dark")

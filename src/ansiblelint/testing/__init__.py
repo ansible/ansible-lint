@@ -7,11 +7,7 @@ import sys
 import tempfile
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from ansible import __version__ as ansible_version_str
-
-from ansiblelint.errors import MatchError
-from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
+from ansiblelint._prerun import prepare_environment
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
@@ -20,6 +16,16 @@ if TYPE_CHECKING:
 else:
     CompletedProcess = subprocess.CompletedProcess
 
+# Emulate command line execution initialization as without it Ansible module
+# would be loaded with incomplete module/role/collection list.
+prepare_environment()
+
+# pylint: disable=ungrouped-imports,wrong-import-position
+from ansible import __version__ as ansible_version_str  # noqa: E402
+
+from ansiblelint.errors import MatchError  # noqa: E402
+from ansiblelint.rules import RulesCollection  # noqa: E402
+from ansiblelint.runner import Runner  # noqa: E402
 
 ANSIBLE_MAJOR_VERSION = tuple(map(int, ansible_version_str.split('.')[:2]))
 

@@ -12,8 +12,9 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.rules.AnsibleSyntaxCheckRule import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
-    from ansiblelint.rules import RulesCollection
+    from argparse import Namespace
 
+    from ansiblelint.rules import RulesCollection
 
 _logger = logging.getLogger(__name__)
 
@@ -123,3 +124,21 @@ class Runner(object):
                     e.rule = LoadingFailureRule()
                     yield e
                 visited.add(arg)
+
+
+def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
+
+    lintables = ansiblelint.utils.get_lintables(options=options, args=options.lintables)
+
+    matches = list()
+    checked_files: Set[str] = set()
+    for lintable in lintables:
+        runner = Runner(rules, lintable, options.tags,
+                        options.skip_list, options.exclude_paths,
+                        options.verbosity, checked_files)
+        matches.extend(runner.run())
+
+    # Assure we do not print duplicates and the order is consistent
+    matches = sorted(set(matches))
+
+    return LintResult(matches=matches, files=checked_files)
