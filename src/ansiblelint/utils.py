@@ -752,81 +752,86 @@ def get_lintables(
 
     # passing args bypass auto-detection mode
     if args:
+        matches = []
         for arg in args:
             if os.path.isdir(arg):
-                lintables.append(Lintable(arg, kind="role"))
+                matches.append(Path(arg).resolve())
+                for p in Path(arg).rglob(".*"):
+                    if p.suffix in [".yaml", ".yml"]:
+                        matches.append(p)
             elif os.path.isfile(arg):
-                lintables.append(Lintable(arg, kind="playbook"))
+                matches.append(arg)
             else:
                 _logger.warning("Unable to access %s", arg)
-    else:
 
+        files = OrderedDict.fromkeys(sorted(matches))
+    else:
         files = get_yaml_files(options)
 
-        playbooks: List[str] = []
-        role_dirs: List[str] = []
-        role_internals = {
-            'defaults',
-            'files',
-            'handlers',
-            'meta',
-            'tasks',
-            'templates',
-            'vars',
-        }
+    playbooks: List[str] = []
+    role_dirs: List[str] = []
+    role_internals = {
+        'defaults',
+        'files',
+        'handlers',
+        'meta',
+        'tasks',
+        'templates',
+        'vars',
+    }
 
-        # detect role in repository root:
-        if 'tasks/main.yml' in files or 'tasks/main.yaml' in files:
-            role_dirs.append('.')
+    # detect role in repository root:
+    if 'tasks/main.yml' in files or 'tasks/main.yaml' in files:
+        role_dirs.append('.')
 
-        for p in map(Path, files):
+    for p in map(Path, files):
 
-            try:
-                for file_path in options.exclude_paths:
-                    if str(p.resolve()).startswith(str(file_path)):
-                        raise FileNotFoundError(
-                            f'File {file_path} matched exclusion entry: {p}')
-            except FileNotFoundError as e:
-                _logger.debug('Ignored %s due to: %s', p, e)
+        try:
+            for file_path in options.exclude_paths:
+                if str(p.resolve()).startswith(str(file_path)):
+                    raise FileNotFoundError(
+                        f'File {file_path} matched exclusion entry: {p}')
+        except FileNotFoundError as e:
+            _logger.debug('Ignored %s due to: %s', p, e)
+            continue
+
+        if (next((i for i in p.parts if i.endswith('playbooks')), None) or
+                'playbook' in p.parts[-1]):
+            playbooks.append(normpath(p))
+            continue
+
+        # ignore if any folder ends with _vars
+        if next((i for i in p.parts if i.endswith('_vars')), None):
+            continue
+        elif 'roles' in p.parts or '.' in role_dirs:
+            if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
+                role_dirs.append(str(p.parents[1]))
                 continue
-
-            if (next((i for i in p.parts if i.endswith('playbooks')), None) or
-                    'playbook' in p.parts[-1]):
+            elif role_internals.intersection(p.parts):
+                continue
+            elif 'tests' in p.parts:
                 playbooks.append(normpath(p))
-                continue
-
-            # ignore if any folder ends with _vars
-            if next((i for i in p.parts if i.endswith('_vars')), None):
-                continue
-            elif 'roles' in p.parts or '.' in role_dirs:
-                if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
-                    role_dirs.append(str(p.parents[1]))
-                    continue
-                elif role_internals.intersection(p.parts):
-                    continue
-                elif 'tests' in p.parts:
-                    playbooks.append(normpath(p))
-            if 'molecule' in p.parts:
-                if p.parts[-1] != 'molecule.yml':
-                    playbooks.append(normpath(p))
-                continue
-            # hidden files are clearly not playbooks, likely config files.
-            if p.parts[-1].startswith('.'):
-                continue
-
-            if is_playbook(str(p)):
+        if 'molecule' in p.parts:
+            if p.parts[-1] != 'molecule.yml':
                 playbooks.append(normpath(p))
-                continue
+            continue
+        # hidden files are clearly not playbooks, likely config files.
+        if p.parts[-1].startswith('.'):
+            continue
 
-            _logger.info('Unknown file type: %s', normpath(p))
+        if is_playbook(str(p)):
+            playbooks.append(normpath(p))
+            continue
 
-        _logger.info('Found roles: %s', ' '.join(role_dirs))
-        _logger.info('Found playbooks: %s', ' '.join(playbooks))
+        _logger.info('Unknown file type: %s', normpath(p))
 
-        for role in role_dirs:
-            lintables.append(Lintable(role, kind="role"))
-        for playbook in playbooks:
-            lintables.append(Lintable(playbook, kind="playbook"))
+    _logger.info('Found roles: %s', ' '.join(role_dirs))
+    _logger.info('Found playbooks: %s', ' '.join(playbooks))
+
+    for role in role_dirs:
+        lintables.append(Lintable(role, kind="role"))
+    for playbook in playbooks:
+        lintables.append(Lintable(playbook, kind="playbook"))
 
     return lintables
 
