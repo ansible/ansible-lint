@@ -125,7 +125,7 @@ class AnnotationsFormatter(BaseFormatter):
     def _severity_to_level(severity: str) -> str:
         if severity in ['VERY_LOW', 'LOW']:
             return 'warning'
-        elif severity in ['INFO']:
+        if severity in ['INFO']:
             return 'debug'
         # ['MEDIUM', 'HIGH', 'VERY_HIGH'] or anything else
         return 'error'

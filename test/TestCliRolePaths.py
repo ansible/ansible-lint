@@ -25,7 +25,7 @@ class TestCliRolePaths(unittest.TestCase):
         cwd = self.local_test_dir
         role_path = 'test-role'
 
-        result = run_ansible_lint(role_path, cwd=cwd, bin="ansible-lint")
+        result = run_ansible_lint(role_path, cwd=cwd, executable="ansible-lint")
         self.assertIn('Use shell only when shell functionality is required',
                       result.stdout)
 

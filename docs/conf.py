@@ -70,7 +70,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'Ansible Lint Documentation'
-copyright = "2013-2020 Ansible, Inc"
+copyright = "2013-2020 Ansible, Inc"  # pylint: disable=redefined-builtin
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.

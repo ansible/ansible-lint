@@ -86,9 +86,9 @@ warn_list:  # or 'skip_list' to silence them completely
         else:
             warnings += 1
 
-    for id in sorted(matched_rules.keys()):
-        if {id, *matched_rules[id].tags}.isdisjoint(options.warn_list):
-            msg += f"  - '{id}'  # {matched_rules[id].shortdesc}\n"
+    for key in sorted(matched_rules.keys()):
+        if {key, *matched_rules[key].tags}.isdisjoint(options.warn_list):
+            msg += f"  - '{key}'  # {matched_rules[key].shortdesc}\n"
     for match in result.matches:
         if "experimental" in match.rule.tags:
             msg += "  - experimental  # all rules tagged as experimental\n"
