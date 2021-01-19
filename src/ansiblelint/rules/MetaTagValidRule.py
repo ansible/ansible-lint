@@ -81,7 +81,7 @@ if "pytest" in sys.modules:
     import pytest
 
     @pytest.mark.parametrize('rule_runner', (MetaTagValidRule, ), indirect=['rule_runner'])
-    def test_valid_tag_rule(rule_runner):
+    def test_valid_tag_rule(rule_runner: "Any") -> None:
         """Test rule matches."""
         results = rule_runner.run_role_meta_main(META_TAG_VALID)
         assert "Use 'galaxy_tags' rather than 'categories'" in str(results)

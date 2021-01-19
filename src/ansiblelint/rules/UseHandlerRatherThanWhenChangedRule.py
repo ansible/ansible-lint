@@ -23,7 +23,7 @@ from typing import Any, Dict, Union
 from ansiblelint.rules import AnsibleLintRule
 
 
-def _changed_in_when(item) -> bool:
+def _changed_in_when(item: str) -> bool:
     if not isinstance(item, str):
         return False
     return any(changed in item for changed in
@@ -50,4 +50,6 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         if isinstance(when, list):
             for item in when:
                 return _changed_in_when(item)
-        return _changed_in_when(when)
+        if isinstance(when, str):
+            return _changed_in_when(when)
+        return False

@@ -833,4 +833,4 @@ def get_lintables(
 
 def convert_to_boolean(value: Any) -> bool:
     """Use Ansible to convert something to a boolean."""
-    return boolean(value)
+    return bool(boolean(value))

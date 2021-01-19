@@ -208,7 +208,7 @@ class RulesCollection:
         """Return the iterator over the rules in the RulesCollection."""
         return iter(self.rules)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the length of the RulesCollection data."""
         return len(self.rules)
 
