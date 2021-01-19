@@ -29,3 +29,14 @@ FileType = Literal[
     "role",  # that is a folder!
     "yaml",  # generic yaml file, previously reported as unknown file type
     ]
+
+
+# odict is the base class used to represent data model of Ansible
+# playbooks and tasks.
+odict = dict
+if sys.version_info[:2] < (3, 7):
+    try:
+        # pylint: disable=unused-import
+        from collections import OrderedDict as odict  # noqa: 401
+    except ImportError:
+        pass

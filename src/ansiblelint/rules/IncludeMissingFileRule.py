@@ -9,6 +9,9 @@ import ansible.parsing.yaml.objects
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from typing import Any
+
+    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -25,7 +28,7 @@ class IncludeMissingFileRule(AnsibleLintRule):
     tags = ['task', 'bug']
     version_added = 'v4.3.0'
 
-    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
+    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
         results = []
 
         # avoid failing with a playbook having tasks: null

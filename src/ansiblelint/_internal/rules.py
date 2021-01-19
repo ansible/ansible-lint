@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 if TYPE_CHECKING:
+    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -31,7 +32,7 @@ class BaseRule:
         """Return matches found for a specific YAML text."""
         return []
 
-    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
+    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
         """Return matches found for a specific playbook."""
         return []
 

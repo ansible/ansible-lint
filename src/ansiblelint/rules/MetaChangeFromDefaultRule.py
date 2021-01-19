@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING, List
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from typing import Any
+
+    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -28,7 +31,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     tags = ['metadata']
     version_added = 'v4.0.0'
 
-    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
+    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
         if file.kind != 'meta':
             return []
 
