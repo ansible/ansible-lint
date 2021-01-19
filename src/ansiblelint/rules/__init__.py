@@ -5,9 +5,10 @@ import importlib.util
 import logging
 import os
 import re
+from argparse import Namespace
 from collections import defaultdict
 from importlib.abc import Loader
-from typing import Iterator, List, Optional, Union
+from typing import Iterator, List, Optional, Set, Union
 
 import ansiblelint.utils
 from ansiblelint._internal.rules import (
@@ -130,14 +131,6 @@ class AnsibleLintRule(BaseRule):
             matches.append(m)
         return matches
 
-    @staticmethod
-    def _matchplay_linenumber(play, optional_linenumber):
-        try:
-            (linenumber,) = optional_linenumber
-        except ValueError:
-            linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
-        return linenumber
-
     def matchyaml(self, file: Lintable) -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.matchplay or file.base_kind != 'text/yaml':
@@ -191,7 +184,9 @@ def load_plugins(directory: str) -> List[AnsibleLintRule]:
 
 
 class RulesCollection:
-    def __init__(self, rulesdirs: Optional[List[str]] = None, options=options) -> None:
+    def __init__(
+        self, rulesdirs: Optional[List[str]] = None, options: Namespace = options
+    ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options
         if rulesdirs is None:
@@ -226,7 +221,7 @@ class RulesCollection:
         self.rules.extend(more)
 
     def run(
-        self, file: Lintable, tags=set(), skip_list: List[str] = []
+        self, file: Lintable, tags: Set[str] = set(), skip_list: List[str] = []
     ) -> List[MatchError]:
         matches: List[MatchError] = list()
 

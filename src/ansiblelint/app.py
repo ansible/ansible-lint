@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, List, Type
 
 from ansiblelint import formatters
 from ansiblelint.color import console
+from ansiblelint.errors import MatchError
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -26,7 +27,7 @@ class App:
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
 
-    def render_matches(self, matches: List) -> None:
+    def render_matches(self, matches: List[MatchError]) -> None:
         """Display given matches."""
         if isinstance(self.formatter, formatters.CodeclimateJSONFormatter):
             # If formatter CodeclimateJSONFormatter is chosen,

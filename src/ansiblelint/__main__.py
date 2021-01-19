@@ -26,8 +26,9 @@ import os
 import pathlib
 import subprocess
 import sys
+from argparse import Namespace
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Iterator, List, Optional
 
 from enrich.console import should_do_markup
 
@@ -108,7 +109,9 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     options.configured = True
 
 
-def report_outcome(result: "LintResult", options, mark_as_success=False) -> int:
+def report_outcome(
+    result: "LintResult", options: Namespace, mark_as_success: bool = False
+) -> int:
     """Display information about how to skip found rules.
 
     Returns exit code, 2 if errors were found, 0 when only warnings were found.
@@ -249,7 +252,7 @@ def main(argv: List[str] = None) -> int:
 
 
 @contextmanager
-def _previous_revision():
+def _previous_revision() -> Iterator[None]:
     """Create or update a temporary workdir containing the previous revision."""
     worktree_dir = ".cache/old-rev"
     revision = subprocess.run(

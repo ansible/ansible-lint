@@ -67,7 +67,7 @@ def expand_paths_vars(paths: List[str]) -> List[str]:
     return paths
 
 
-def kind_from_path(path: Path, base=False) -> str:
+def kind_from_path(path: Path, base: bool = False) -> str:
     """Determine the file kind based on its name.
 
     When called with base=True, it will return the base file type instead
