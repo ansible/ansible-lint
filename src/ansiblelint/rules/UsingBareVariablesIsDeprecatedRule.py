@@ -63,7 +63,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 return self._matchvar(task[loop_type], task, loop_type)
         return False
 
-    def _matchvar(self, varstring, task, loop_type) -> Union[bool, str]:
+    def _matchvar(self, varstring: str, task: Dict[str, Any], loop_type: str) -> Union[bool, str]:
         if (isinstance(varstring, str) and
                 not self._jinja.match(varstring)):
             valid = loop_type == 'with_fileglob' and bool(self._jinja.search(varstring) or

@@ -112,7 +112,7 @@ class Runner:
         return sorted(set(matches))
 
     def _emit_matches(self, files: List[Lintable]) -> Generator[MatchError, None, None]:
-        visited: Set = set()
+        visited: Set[Lintable] = set()
         while visited != self.playbooks:
             for arg in self.playbooks - visited:
                 try:

@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
-def _get_subtasks(data) -> List[Any]:
+def _get_subtasks(data: "odict[str, Any]") -> List[Any]:
     result: List[Any] = []
     block_names = [
             'tasks',
@@ -45,13 +45,13 @@ def _get_subtasks(data) -> List[Any]:
     return result
 
 
-def _nested_search(term, data) -> Any:
+def _nested_search(term: str, data: "odict[str, Any]") -> Any:
     if data and term in data:
         return True
     return reduce((lambda x, y: x or _nested_search(term, y)), _get_subtasks(data), False)
 
 
-def _become_user_without_become(becomeuserabove, data) -> Any:
+def _become_user_without_become(becomeuserabove: bool, data: "odict[str, Any]") -> Any:
     if 'become' in data:
         # If become is in lineage of tree then correct
         return False

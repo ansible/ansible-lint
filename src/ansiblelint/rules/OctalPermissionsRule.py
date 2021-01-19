@@ -38,7 +38,7 @@ class OctalPermissionsRule(AnsibleLintRule):
     _modules = ['assemble', 'copy', 'file', 'ini_file', 'lineinfile',
                 'replace', 'synchronize', 'template', 'unarchive']
 
-    def is_invalid_permission(self, mode) -> bool:
+    def is_invalid_permission(self, mode: int) -> bool:
         # sensible file permission modes don't
         # have write bit set when read bit is
         # not set and don't have execute bit set
@@ -57,12 +57,13 @@ class OctalPermissionsRule(AnsibleLintRule):
         other_more_generous_than_user = mode % 8 > (mode >> 6) % 8
         group_more_generous_than_user = (mode >> 3) % 8 > (mode >> 6) % 8
 
-        return (other_write_without_read or
-                group_write_without_read or
-                user_write_without_read or
-                other_more_generous_than_group or
-                other_more_generous_than_user or
-                group_more_generous_than_user)
+        return bool(
+            other_write_without_read or
+            group_write_without_read or
+            user_write_without_read or
+            other_more_generous_than_group or
+            other_more_generous_than_user or
+            group_more_generous_than_user)
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in self._modules:

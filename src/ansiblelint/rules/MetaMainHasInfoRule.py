@@ -8,7 +8,7 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Tuple
 
     from ansiblelint.constants import odict
 
@@ -23,7 +23,7 @@ META_INFO = tuple(list(META_STR_INFO) + [
 ])
 
 
-def _platform_info_errors_itr(platforms) -> Generator[str, None, None]:
+def _platform_info_errors_itr(platforms: "List[odict[str, str]]") -> Generator[str, None, None]:
     if not isinstance(platforms, list):
         yield 'Platforms should be a list of dictionaries'
         return
@@ -35,9 +35,10 @@ def _platform_info_errors_itr(platforms) -> Generator[str, None, None]:
             yield 'Platform should contain name'
 
 
-def _galaxy_info_errors_itr(galaxy_info,
-                            info_list=META_INFO,
-                            str_info_list=META_STR_INFO) -> Generator[str, None, None]:
+def _galaxy_info_errors_itr(
+        galaxy_info: "odict[str, Any]",
+        info_list: "Tuple[str, ...]" = META_INFO,
+        str_info_list: "Tuple[str, ...]" = META_STR_INFO) -> Generator[str, None, None]:
     for info in info_list:
         ginfo = galaxy_info.get(info, False)
         if ginfo:
