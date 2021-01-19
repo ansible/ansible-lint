@@ -1,11 +1,16 @@
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 
-from typing import Generator, List
+from typing import TYPE_CHECKING, Generator, List
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from typing import Any
+
+    from ansiblelint.constants import odict
 
 META_STR_INFO = (
     'author',
@@ -57,7 +62,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
     tags = ['metadata']
     version_added = 'v4.0.0'
 
-    def matchplay(self, file: Lintable, data) -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: "odict[str, Any]") -> List[MatchError]:
         if file.kind != 'meta':
             return []
 

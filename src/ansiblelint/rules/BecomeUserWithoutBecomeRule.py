@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, List
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -80,7 +81,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     tags = ['task', 'unpredictability']
     version_added = 'historic'
 
-    def matchplay(self, file: "Lintable", data) -> List["MatchError"]:
+    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
         if file.kind == 'playbook':
             result = _become_user_without_become(False, data)
             if result:
