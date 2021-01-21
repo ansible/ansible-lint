@@ -106,7 +106,7 @@ class Lintable:
     def __eq__(self, other: object) -> bool:
         """Identify whether the other object represents the same rule match."""
         if isinstance(other, Lintable):
-            return bool(self.name == other.name)
+            return bool(self.name == other.name and self.kind == other.kind)
         return False
 
     def __repr__(self) -> str:
