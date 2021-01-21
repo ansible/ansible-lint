@@ -8,5 +8,5 @@ def test_local_collection(default_rules_collection):
     runner = Runner(default_rules_collection, playbook_path, [], [], [])
     results = runner.run()
 
-    assert len(runner.playbooks) == 1
+    assert len(runner.lintables) == 1
     assert len(results) == 0

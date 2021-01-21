@@ -35,5 +35,5 @@ def test_included_tasks(default_rules_collection, filename, file_count, match_co
     lintable = Lintable(filename)
     runner = Runner(default_rules_collection, lintable, [], [], [])
     result = runner.run()
-    assert len(runner.playbooks) == file_count
+    assert len(runner.lintables) == file_count
     assert len(result) == match_count

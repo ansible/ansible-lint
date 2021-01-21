@@ -42,11 +42,11 @@ class Runner:
             checked_files: Optional[Set[str]] = None) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
-        self.playbooks: Set[Lintable] = set()
+        self.lintables: Set[Lintable] = set()
 
         if isinstance(lintable, str):
             lintable = Lintable(lintable)
-        self.playbooks.add(lintable)
+        self.lintables.add(lintable)
 
         self.playbook_dir = lintable.dir
 
@@ -81,11 +81,11 @@ class Runner:
         files: List[Lintable] = list()
         matches: List[MatchError] = list()
 
-        for playbook in self.playbooks:
-            if self.is_excluded(str(playbook.path.resolve())) or playbook.kind == 'role':
+        for lintable in self.lintables:
+            if self.is_excluded(str(lintable.path.resolve())) or lintable.kind != 'playbook':
                 continue
-            files.append(playbook)
-            matches.extend(AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(playbook))
+            files.append(lintable)
+            matches.extend(AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable))
 
         if not matches:  # do our processing only when ansible syntax check passed
 
@@ -113,13 +113,13 @@ class Runner:
 
     def _emit_matches(self, files: List[Lintable]) -> Generator[MatchError, None, None]:
         visited: Set[Lintable] = set()
-        while visited != self.playbooks:
-            for arg in self.playbooks - visited:
+        while visited != self.lintables:
+            for arg in self.lintables - visited:
                 try:
                     for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
                         if self.is_excluded(str(child.path)):
                             continue
-                        self.playbooks.add(child)
+                        self.lintables.add(child)
                         files.append(child)
                 except MatchError as e:
                     e.rule = LoadingFailureRule()
