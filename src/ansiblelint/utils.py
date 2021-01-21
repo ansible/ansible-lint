@@ -166,28 +166,30 @@ def _set_collections_basedir(basedir: str):
         set_collection_playbook_paths(basedir)
 
 
-def find_children(playbook: Lintable, playbook_dir: str) -> List[Lintable]:
-    if not playbook.path.exists():
+def find_children(lintable: Lintable, playbook_dir: str) -> List[Lintable]:
+    if not lintable.path.exists():
         return []
     _set_collections_basedir(playbook_dir or os.path.abspath('.'))
     add_all_plugin_dirs(playbook_dir or '.')
-    if playbook.kind == 'role':
-        playbook_ds = {'roles': [{'role': str(playbook.path)}]}
+    if lintable.kind == 'role':
+        playbook_ds = {'roles': [{'role': str(lintable.path)}]}
+    elif lintable.kind not in ("playbook", "tasks"):
+        return []
     else:
         try:
-            playbook_ds = parse_yaml_from_file(str(playbook.path))
+            playbook_ds = parse_yaml_from_file(str(lintable.path))
         except AnsibleError as e:
             raise SystemExit(str(e))
     results = []
-    basedir = os.path.dirname(str(playbook.path))
+    basedir = os.path.dirname(str(lintable.path))
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
     if isinstance(playbook_ds, str):
         raise MatchError(
-            filename=str(playbook.path),
+            filename=str(lintable.path),
             rule=LoadingFailureRule)
     items = _playbook_items(playbook_ds)
     for item in items:
-        for child in play_children(basedir, item, playbook.kind, playbook_dir):
+        for child in play_children(basedir, item, lintable.kind, playbook_dir):
             # We avoid processing parametrized children
             path_str = str(child.path)
             if "$" in path_str or "{{" in path_str:
@@ -744,6 +746,7 @@ def get_yaml_files(options: Namespace) -> dict:
     return OrderedDict.fromkeys(sorted(out))
 
 
+# pylint: disable=too-many-statements
 def get_lintables(
         options: Namespace = Namespace(),
         args: Optional[List[str]] = None) -> List[Lintable]:
@@ -792,8 +795,9 @@ def get_lintables(
 
             if (next((i for i in p.parts if i.endswith('playbooks')), None) or
                     'playbook' in p.parts[-1]):
-                playbooks.append(normpath(p))
-                continue
+                if "roles" not in p.parts:
+                    playbooks.append(normpath(p))
+                    continue
 
             # ignore if any folder ends with _vars
             if next((i for i in p.parts if i.endswith('_vars')), None):
@@ -819,6 +823,7 @@ def get_lintables(
                 continue
 
             _logger.info('Unknown file type: %s', normpath(p))
+            lintables.append(Lintable(normpath(p), kind="yaml"))
 
         _logger.info('Found roles: %s', ' '.join(role_dirs))
         _logger.info('Found playbooks: %s', ' '.join(playbooks))

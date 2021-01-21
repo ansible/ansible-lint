@@ -33,6 +33,7 @@ import pytest
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
+from ansiblelint.constants import FileType
 from ansiblelint.file_utils import Lintable, expand_path_vars, expand_paths_vars, normpath
 
 
@@ -270,6 +271,26 @@ def test_cli_auto_detect(capfd):
 def test_is_playbook():
     """Verify that we can detect a playbook as a playbook."""
     assert utils.is_playbook("test/test/always-run-success.yml")
+
+
+@pytest.mark.parametrize(
+    ('path', 'kind'),
+    (
+        ("foo/playbook.yml", "playbook"),
+        ("playbooks/foo.yml", "playbook"),
+        ("playbooks/roles/foo.yml", "yaml"),
+    ),
+)
+def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:
+    """Verify auto-detection logic."""
+    options = cli.get_config([])
+
+    def mockreturn(options):
+        return [path]
+
+    monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
+    result = utils.get_lintables(options)
+    assert result == [Lintable(path, kind=kind)]
 
 
 def test_auto_detect_exclude(monkeypatch):

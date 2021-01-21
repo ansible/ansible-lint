@@ -114,9 +114,9 @@ class Runner:
     def _emit_matches(self, files: List[Lintable]) -> Generator[MatchError, None, None]:
         visited: Set[Lintable] = set()
         while visited != self.lintables:
-            for arg in self.lintables - visited:
+            for lintable in self.lintables - visited:
                 try:
-                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
+                    for child in ansiblelint.utils.find_children(lintable, self.playbook_dir):
                         if self.is_excluded(str(child.path)):
                             continue
                         self.lintables.add(child)
@@ -124,7 +124,7 @@ class Runner:
                 except MatchError as e:
                     e.rule = LoadingFailureRule()
                     yield e
-                visited.add(arg)
+                visited.add(lintable)
 
 
 def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
