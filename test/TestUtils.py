@@ -258,14 +258,14 @@ def test_cli_auto_detect(capfd):
     # Confirmation that it runs in auto-detect mode
     assert "Discovering files to lint: git ls-files *.yaml *.yml" in err
     # Expected failure to detect file type"
-    assert "Unknown file type: test/fixtures/unknown-type.yml" in err
+    assert "Identified: test/fixtures/unknown-type.yml (yaml)" in err
     # An expected rule match from our examples
     assert "examples/roles/bobbins/tasks/main.yml:2: " \
         "E401 Git checkouts must contain explicit version" in out
     # assures that our .ansible-lint exclude was effective in excluding github files
-    assert "Unknown file type: .github/" not in out
+    assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks
-    assert "Unknown file type: test/test/always-run-success.yml" not in err
+    assert "Identified: test/test/always-run-success.yml" not in err
 
 
 def test_is_playbook():
@@ -279,6 +279,11 @@ def test_is_playbook():
         ("foo/playbook.yml", "playbook"),
         ("playbooks/foo.yml", "playbook"),
         ("playbooks/roles/foo.yml", "yaml"),
+        # the only yml file that is not a playbook inside molecule/ folders
+        (".config/molecule/config.yml", "yaml"),  # molecule shared config
+        ("roles/foo/molecule/scen1/molecule.yml", "yaml"),  # molecule scenario config
+        ("roles/foo/molecule/scen2/foobar.yml", "playbook"),  # custom playbook name
+        ("roles/foo/molecule/scen3/converge.yml", "playbook"),  # common playbook name
     ),
 )
 def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:

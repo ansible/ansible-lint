@@ -811,8 +811,10 @@ def get_lintables(
                 if 'tests' in p.parts:
                     playbooks.append(normpath(p))
             if 'molecule' in p.parts:
-                if p.parts[-1] != 'molecule.yml':
+                if p.parts[-1] not in ['molecule.yml', 'config.yml']:
                     playbooks.append(normpath(p))
+                else:
+                    lintables.append(Lintable(normpath(p), kind="yaml"))
                 continue
             # hidden files are clearly not playbooks, likely config files.
             if p.parts[-1].startswith('.'):
@@ -822,8 +824,9 @@ def get_lintables(
                 playbooks.append(normpath(p))
                 continue
 
-            _logger.info('Unknown file type: %s', normpath(p))
-            lintables.append(Lintable(normpath(p), kind="yaml"))
+            lintable = Lintable(normpath(p), kind="yaml")
+            _logger.info('Identified: %s', lintable)
+            lintables.append(lintable)
 
         _logger.info('Found roles: %s', ' '.join(role_dirs))
         _logger.info('Found playbooks: %s', ' '.join(playbooks))
