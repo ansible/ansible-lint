@@ -33,8 +33,8 @@ class Runner:
     # pylint: disable=too-many-arguments
     def __init__(
             self,
+            *lintables: Union[Lintable, str],
             rules: "RulesCollection",
-            lintable: Union[Lintable, str],
             tags: FrozenSet[Any] = frozenset(),
             skip_list: List[str] = [],
             exclude_paths: List[str] = [],
@@ -44,11 +44,11 @@ class Runner:
         self.rules = rules
         self.lintables: Set[Lintable] = set()
 
-        if isinstance(lintable, str):
-            lintable = Lintable(lintable)
-        self.lintables.add(lintable)
-
-        self.playbook_dir = lintable.dir
+        # Assure consistent type
+        for item in lintables:
+            if not isinstance(item, Lintable):
+                item = Lintable(item)
+            self.lintables.add(item)
 
         self.tags = tags
         self.skip_list = skip_list
@@ -116,7 +116,7 @@ class Runner:
         while visited != self.lintables:
             for lintable in self.lintables - visited:
                 try:
-                    for child in ansiblelint.utils.find_children(lintable, self.playbook_dir):
+                    for child in ansiblelint.utils.find_children(lintable):
                         if self.is_excluded(str(child.path)):
                             continue
                         self.lintables.add(child)
@@ -134,9 +134,14 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
     matches = list()
     checked_files: Set[str] = set()
     for lintable in lintables:
-        runner = Runner(rules, lintable, options.tags,
-                        options.skip_list, options.exclude_paths,
-                        options.verbosity, checked_files)
+        runner = Runner(
+            lintable,
+            rules=rules,
+            tags=options.tags,
+            skip_list=options.skip_list,
+            exclude_paths=options.exclude_paths,
+            verbosity=options.verbosity,
+            checked_files=checked_files)
         matches.extend(runner.run())
 
     # Assure we do not print duplicates and the order is consistent

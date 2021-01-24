@@ -33,7 +33,9 @@ from ansiblelint.runner import Runner
 def test_included_tasks(default_rules_collection, filename, file_count, match_count):
     """Check if number of loaded files is correct."""
     lintable = Lintable(filename)
-    runner = Runner(default_rules_collection, lintable, [], [], [])
+    runner = Runner(
+        lintable,
+        rules=default_rules_collection)
     result = runner.run()
     assert len(runner.lintables) == file_count
     assert len(result) == match_count

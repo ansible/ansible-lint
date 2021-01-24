@@ -74,7 +74,9 @@ def playbook_path(request, tmp_path):
 ), indirect=('playbook_path',))
 def test_role_name(test_rules_collection, playbook_path, messages):
     """Lint a playbook and compare the expected messages with the actual messages."""
-    runner = Runner(test_rules_collection, playbook_path, [], [], [])
+    runner = Runner(
+        playbook_path,
+        rules=test_rules_collection)
     results = runner.run()
     assert len(results) == len(messages)
     results_text = str(results)

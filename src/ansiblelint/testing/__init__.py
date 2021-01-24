@@ -34,7 +34,7 @@ class RunFromText:
         self.collection = collection
 
     def _call_runner(self, path: str) -> List["MatchError"]:
-        runner = Runner(self.collection, path)
+        runner = Runner(path, rules=self.collection)
         return runner.run()
 
     def run_playbook(self, playbook_text: str) -> List[MatchError]:
