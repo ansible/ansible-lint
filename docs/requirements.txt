@@ -5,17 +5,14 @@
 #    pip-compile --no-annotate --output-file=docs/requirements.txt docs/requirements.in setup.py
 #
 alabaster==0.7.12
-ansible-base==2.10.4
+ansible-base==2.10.5
 attrs==19.3.0
 babel==2.8.0
 certifi==2020.6.20
 cffi==1.14.4
 chardet==3.0.4
-colorama==0.4.4
-commonmark==0.9.1
 cryptography==3.3.1
 docutils==0.16
-enrich==1.2.6
 idna==2.10
 imagesize==1.2.0
 jinja2==2.11.2
@@ -31,7 +28,6 @@ pyparsing==2.4.7
 pytz==2020.1
 pyyaml==5.3.1
 requests==2.24.0
-rich==9.5.1
 six==1.15.0
 snowballstemmer==2.0.0
 sphinx-ansible-theme==0.3.2
@@ -45,7 +41,6 @@ sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 sphinxcontrib.programoutput==0.16
-typing-extensions==3.7.4.3
 urllib3==1.25.9
 
 # The following packages are considered to be unsafe in a requirements file:
