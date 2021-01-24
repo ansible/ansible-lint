@@ -76,7 +76,9 @@ def playbook_path(request, tmp_path):
                  ),
 ), indirect=('playbook_path', ))
 def test_import_role2(default_rules_collection, playbook_path, messages):
-    runner = Runner(default_rules_collection, playbook_path, [], [], [])
+    runner = Runner(
+      playbook_path,
+      rules=default_rules_collection)
     results = runner.run()
     for message in messages:
         assert message in str(results)

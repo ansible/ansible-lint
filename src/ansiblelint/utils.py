@@ -166,9 +166,10 @@ def _set_collections_basedir(basedir: str):
         set_collection_playbook_paths(basedir)
 
 
-def find_children(lintable: Lintable, playbook_dir: str) -> List[Lintable]:
+def find_children(lintable: Lintable) -> List[Lintable]:
     if not lintable.path.exists():
         return []
+    playbook_dir = str(lintable.path.parent)
     _set_collections_basedir(playbook_dir or os.path.abspath('.'))
     add_all_plugin_dirs(playbook_dir or '.')
     if lintable.kind == 'role':

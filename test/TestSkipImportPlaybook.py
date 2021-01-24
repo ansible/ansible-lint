@@ -30,6 +30,8 @@ def playbook(tmp_path):
 
 
 def test_skip_import_playbook(default_rules_collection, playbook):
-    runner = Runner(default_rules_collection, playbook, [], [], [])
+    runner = Runner(
+      playbook,
+      rules=default_rules_collection)
     results = runner.run()
     assert len(results) == 0

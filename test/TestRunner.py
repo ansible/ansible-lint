@@ -39,8 +39,8 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd()
 ))
 def test_runner(default_rules_collection, playbook, exclude, length) -> None:
     runner = Runner(
+        playbook,
         rules=default_rules_collection,
-        lintable=playbook,
         exclude_paths=exclude)
 
     matches = runner.run()
@@ -60,8 +60,8 @@ def test_runner(default_rules_collection, playbook, exclude, length) -> None:
 def test_runner_unicode_format(default_rules_collection, formatter_cls) -> None:
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(
-        rules=default_rules_collection,
-        lintable=Lintable('test/unicode.yml', "playbook"))
+        Lintable('test/unicode.yml', "playbook"),
+        rules=default_rules_collection)
 
     matches = runner.run()
 
@@ -71,8 +71,8 @@ def test_runner_unicode_format(default_rules_collection, formatter_cls) -> None:
 @pytest.mark.parametrize('directory_name', ('test/', os.path.abspath('test')))
 def test_runner_with_directory(default_rules_collection, directory_name) -> None:
     runner = Runner(
-        rules=default_rules_collection,
-        lintable=directory_name)
+        directory_name,
+        rules=default_rules_collection)
     assert list(runner.lintables)[0].kind == 'role'
 
 
@@ -81,8 +81,8 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
 
     filename = os.path.abspath('examples/playbooks/common-include-1.yml')
     runner = Runner(
+        filename,
         rules=default_rules_collection,
-        lintable=filename,
         verbosity=0,
         checked_files=checked_files)
     run1 = runner.run()
@@ -91,8 +91,8 @@ def test_files_not_scanned_twice(default_rules_collection) -> None:
 
     filename = os.path.abspath('examples/playbooks/common-include-2.yml')
     runner = Runner(
+        filename,
         rules=default_rules_collection,
-        lintable=filename,
         verbosity=0,
         checked_files=checked_files)
     run2 = runner.run()

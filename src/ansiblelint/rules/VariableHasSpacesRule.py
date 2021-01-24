@@ -37,6 +37,8 @@ if 'pytest' in sys.modules:
         collection.register(VariableHasSpacesRule())
 
         lintable = Lintable("examples/playbooks/206.yml")
-        results = Runner(collection, lintable=lintable).run()
+        results = Runner(
+            lintable,
+            rules=collection).run()
 
         assert len(results) == 3
