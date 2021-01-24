@@ -1,3 +1,0 @@
----
-- pre_tasks:
-  - include: "doesnotexist.yml"

@@ -13,14 +13,14 @@ class TestUseCommandInsteadOfShell(unittest.TestCase):
         self.collection.register(UseCommandInsteadOfShellRule())
 
     def test_file_positive(self):
-        success = 'test/command-instead-of-shell-success.yml'
+        success = 'examples/playbooks/command-instead-of-shell-success.yml'
         good_runner = Runner(
             success,
             rules=self.collection)
         self.assertEqual([], good_runner.run())
 
     def test_file_negative(self):
-        failure = 'test/command-instead-of-shell-failure.yml'
+        failure = 'examples/playbooks/command-instead-of-shell-failure.yml'
         bad_runner = Runner(
             failure,
             rules=self.collection)

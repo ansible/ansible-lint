@@ -31,11 +31,11 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd()
 
 
 @pytest.mark.parametrize(('playbook', 'exclude', 'length'), (
-    ('test/nomatchestest.yml', [], 0),
-    ('test/unicode.yml', [], 1),
+    ('examples/playbooks/nomatchestest.yml', [], 0),
+    ('examples/playbooks/unicode.yml', [], 1),
     (LOTS_OF_WARNINGS_PLAYBOOK, [LOTS_OF_WARNINGS_PLAYBOOK], 0),
-    ('test/become.yml', [], 0),
-    ('test/contains_secrets.yml', [], 0),
+    ('examples/playbooks/become.yml', [], 0),
+    ('examples/playbooks/contains_secrets.yml', [], 0),
 ))
 def test_runner(default_rules_collection, playbook, exclude, length) -> None:
     runner = Runner(
@@ -60,7 +60,7 @@ def test_runner(default_rules_collection, playbook, exclude, length) -> None:
 def test_runner_unicode_format(default_rules_collection, formatter_cls) -> None:
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(
-        Lintable('test/unicode.yml', "playbook"),
+        Lintable('examples/playbooks/unicode.yml', "playbook"),
         rules=default_rules_collection)
 
     matches = runner.run()

@@ -13,14 +13,14 @@ class TestPackageIsNotLatestRule(unittest.TestCase):
         self.collection.register(PackageIsNotLatestRule())
 
     def test_package_not_latest_positive(self):
-        success = 'test/package-check-success.yml'
+        success = 'examples/playbooks/package-check-success.yml'
         good_runner = Runner(
             success,
             rules=self.collection)
         self.assertEqual([], good_runner.run())
 
     def test_package_not_latest_negative(self):
-        failure = 'test/package-check-failure.yml'
+        failure = 'examples/playbooks/package-check-failure.yml'
         bad_runner = Runner(
             failure,
             rules=self.collection)

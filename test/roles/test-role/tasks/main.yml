@@ -1,2 +1,0 @@
-- name: shell instead of command
-  shell: echo hello world

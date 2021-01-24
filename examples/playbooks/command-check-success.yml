@@ -58,4 +58,4 @@
   handlers:
   - name: restart something
     command: do something
-  - include: included-handlers.yml
+  - include: handlers/included-handlers.yml
