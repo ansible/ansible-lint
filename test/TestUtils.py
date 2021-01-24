@@ -211,7 +211,7 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     """
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
-    lint_path = test_dir / 'roles' / 'test-role'
+    lint_path = test_dir / '..' / 'examples' / 'roles' / 'test-role'
     if not is_in_git:
         monkeypatch.setenv('GIT_DIR', '')
 

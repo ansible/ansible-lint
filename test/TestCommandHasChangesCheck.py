@@ -13,14 +13,14 @@ class TestCommandHasChangesCheck(unittest.TestCase):
         self.collection.register(CommandHasChangesCheckRule())
 
     def test_command_changes_positive(self):
-        success = 'test/command-check-success.yml'
+        success = 'examples/playbooks/command-check-success.yml'
         good_runner = Runner(
             success,
             rules=self.collection)
         self.assertEqual([], good_runner.run())
 
     def test_command_changes_negative(self):
-        failure = 'test/command-check-failure.yml'
+        failure = 'examples/playbooks/command-check-failure.yml'
         bad_runner = Runner(
             failure,
             rules=self.collection)

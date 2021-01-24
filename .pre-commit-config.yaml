@@ -25,7 +25,7 @@ repos:
   - id: trailing-whitespace
     exclude: >
       (?x)^(
-        test/(with-skip-tag-id|unicode).yml|
+        examples/playbooks/(with-skip-tag-id|unicode).yml|
         examples/example.yml
       )$
   - id: mixed-line-ending

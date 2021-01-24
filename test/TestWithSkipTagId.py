@@ -9,7 +9,7 @@ from ansiblelint.runner import Runner
 class TestWithSkipTagId(unittest.TestCase):
     collection = RulesCollection()
     collection.register(YamllintRule())
-    file = 'test/with-skip-tag-id.yml'
+    file = 'examples/playbooks/with-skip-tag-id.yml'
 
     def test_negative_no_param(self) -> None:
         bad_runner = Runner(
