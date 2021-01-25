@@ -284,6 +284,11 @@ def test_is_playbook():
         ("roles/foo/molecule/scen1/molecule.yml", "yaml"),  # molecule scenario config
         ("roles/foo/molecule/scen2/foobar.yml", "playbook"),  # custom playbook name
         ("roles/foo/molecule/scen3/converge.yml", "playbook"),  # common playbook name
+        # requirements (we do not support includes yet)
+        ("requirements.yml", "requirements"),  # collection requirements
+        ("roles/foo/meta/requirements.yml", "requirements"),  # inside role requirements
+        # Undeterminable files:
+        ("test/fixtures/unknown-type.yml", "yaml"),
     ),
 )
 def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:
@@ -293,9 +298,14 @@ def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:
     def mockreturn(options):
         return [path]
 
+    # assert Lintable is able to determine file type
+    # lintable_detected = Lintable(path)
+    lintable_expected = Lintable(path, kind=kind)
+    # assert lintable_detected == lintable_expected
+
     monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
     result = utils.get_lintables(options)
-    assert result == [Lintable(path, kind=kind)]
+    assert result == [lintable_expected]
 
 
 def test_auto_detect_exclude(monkeypatch):

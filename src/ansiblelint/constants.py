@@ -26,6 +26,8 @@ FileType = Literal[
     "meta",  # role meta
     "tasks",
     "handlers",
+    # https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file
+    "requirements",
     "role",  # that is a folder!
     "yaml",  # generic yaml file, previously reported as unknown file type
     ]
