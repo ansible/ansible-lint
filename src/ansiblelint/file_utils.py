@@ -63,7 +63,9 @@ class Lintable:
         self.path = Path(name)
         self._content = content
         if not kind:
-            if self.path.is_dir():
+            if str(self.path.name) == "requirements.yml":
+                kind = "requirements"
+            elif self.path.is_dir():
                 kind = "role"
             elif self.path.name in ['main.yml', 'main.yaml'] and self.path.parent.name == 'meta':
                 kind = "meta"

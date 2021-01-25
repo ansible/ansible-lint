@@ -785,6 +785,7 @@ def get_lintables(
 
         for p in map(Path, files):
 
+            # skip exclusions
             try:
                 for file_path in options.exclude_paths:
                     if str(p.resolve()).startswith(str(file_path)):
@@ -794,38 +795,44 @@ def get_lintables(
                 _logger.debug('Ignored %s due to: %s', p, e)
                 continue
 
-            if (next((i for i in p.parts if i.endswith('playbooks')), None) or
-                    'playbook' in p.parts[-1]):
-                if "roles" not in p.parts:
+            lintable = Lintable(normpath(p))
+            # TODO(ssbarnea): Remove deprecated detection logic and use only
+            # the one from inside Lintable constructor.
+            if lintable.kind in ('yaml', 'playbook'):
+                # Kept for compatibility until we migrate all into Lintable
+
+                if (next((i for i in p.parts if i.endswith('playbooks')), None) or
+                        'playbook' in p.parts[-1]):
+                    if "roles" not in p.parts:
+                        playbooks.append(normpath(p))
+                        continue
+
+                # ignore if any folder ends with _vars
+                if next((i for i in p.parts if i.endswith('_vars')), None):
+                    continue
+                if 'roles' in p.parts or '.' in role_dirs:
+                    if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
+                        role_dirs.append(str(p.parents[1]))
+                        continue
+                    if role_internals.intersection(p.parts):
+                        continue
+                    if 'tests' in p.parts:
+                        playbooks.append(normpath(p))
+                if 'molecule' in p.parts:
+                    if p.parts[-1] not in ['molecule.yml', 'config.yml']:
+                        playbooks.append(normpath(p))
+                    else:
+                        lintables.append(Lintable(normpath(p), kind="yaml"))
+                    continue
+                # hidden files are clearly not playbooks, likely config files.
+                if p.parts[-1].startswith('.'):
+                    continue
+
+                if is_playbook(str(p)):
                     playbooks.append(normpath(p))
                     continue
 
-            # ignore if any folder ends with _vars
-            if next((i for i in p.parts if i.endswith('_vars')), None):
-                continue
-            if 'roles' in p.parts or '.' in role_dirs:
-                if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
-                    role_dirs.append(str(p.parents[1]))
-                    continue
-                if role_internals.intersection(p.parts):
-                    continue
-                if 'tests' in p.parts:
-                    playbooks.append(normpath(p))
-            if 'molecule' in p.parts:
-                if p.parts[-1] not in ['molecule.yml', 'config.yml']:
-                    playbooks.append(normpath(p))
-                else:
-                    lintables.append(Lintable(normpath(p), kind="yaml"))
-                continue
-            # hidden files are clearly not playbooks, likely config files.
-            if p.parts[-1].startswith('.'):
-                continue
-
-            if is_playbook(str(p)):
-                playbooks.append(normpath(p))
-                continue
-
-            lintable = Lintable(normpath(p), kind="yaml")
+                lintable = Lintable(normpath(p), kind="yaml")
             _logger.info('Identified: %s', lintable)
             lintables.append(lintable)
 
