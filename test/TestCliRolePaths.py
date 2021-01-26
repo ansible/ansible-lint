@@ -145,7 +145,7 @@ class TestCliRolePaths(unittest.TestCase):
 def test_run_playbook_github(result, env):
     """Call ansible-lint simulating GitHub Actions environment."""
     cwd = str(Path(__file__).parent.parent.resolve())
-    role_path = 'examples/example.yml'
+    role_path = 'examples/playbooks/example.yml'
 
     if env is None:
         env = {}
@@ -153,7 +153,7 @@ def test_run_playbook_github(result, env):
     result_gh = run_ansible_lint(role_path, cwd=cwd, env=env)
 
     expected = (
-        '::warning file=examples/example.yml,line=44,severity=VERY_LOW::E403 '
+        '::warning file=examples/playbooks/example.yml,line=44,severity=VERY_LOW::E403 '
         'Package installs should not use latest'
     )
     assert (expected in result_gh.stdout) is result

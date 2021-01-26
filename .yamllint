@@ -5,5 +5,5 @@ rules:
     indent-sequences: consistent
 ignore: |
   .tox
-  examples/example.yml
+  examples/playbooks/example.yml
 # ignore added because this file includes on-purpose errors
