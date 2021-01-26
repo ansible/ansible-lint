@@ -26,7 +26,7 @@ repos:
     exclude: >
       (?x)^(
         examples/playbooks/(with-skip-tag-id|unicode).yml|
-        examples/example.yml
+        examples/playbooks/example.yml
       )$
   - id: mixed-line-ending
   - id: check-byte-order-marker

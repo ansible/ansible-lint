@@ -1,9 +1,5 @@
 ---
-- hosts: localhost
-  connection: local
-  vars:
-    unicode_var: a_b_cö   
-
+- hosts: all
   tasks:
-  - name: bonjour, ça va?
-    file: state=touch dest=/tmp/naïve.yml mode=0600
+    - name: тест
+      command: uname

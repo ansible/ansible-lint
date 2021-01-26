@@ -79,7 +79,7 @@ Included in ``ansible-lint/examples`` are some example playbooks with
 undesirable features. Running ansible-lint on them works, as demonstrated in
 the following:
 
-.. command-output:: ansible-lint -p examples/example.yml
+.. command-output:: ansible-lint -p examples/playbooks/example.yml
    :cwd: ..
    :returncode: 2
    :nostderr:
