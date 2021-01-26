@@ -60,7 +60,7 @@ from yaml.representer import RepresenterError
 from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule, RuntimeErrorRule
 from ansiblelint.constants import FileType
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable, normpath
+from ansiblelint.file_utils import Lintable
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -757,34 +757,20 @@ def get_lintables(
     # passing args bypass auto-detection mode
     if args:
         for arg in args:
-            if os.path.isdir(arg):
-                lintables.append(Lintable(arg, kind="role"))
-            elif os.path.isfile(arg):
-                lintables.append(Lintable(arg, kind="playbook"))
-            else:
-                _logger.warning("Unable to access %s", arg)
+            lintable = Lintable(arg)
+            if lintable.kind in ("yaml", None):
+                _logger.warning(
+                    "Overriding detected file kind '%s' with 'playbook' "
+                    "for given positional argument: %s",
+                    lintable.kind,
+                    arg)
+                lintable = Lintable(arg, kind="playbook")
+            lintables.append(lintable)
     else:
 
-        files = get_yaml_files(options)
+        for filename in get_yaml_files(options):
 
-        playbooks: List[str] = []
-        role_dirs: List[str] = []
-        role_internals = {
-            'defaults',
-            'files',
-            'handlers',
-            'meta',
-            'tasks',
-            'templates',
-            'vars',
-        }
-
-        # detect role in repository root:
-        if 'tasks/main.yml' in files or 'tasks/main.yaml' in files:
-            role_dirs.append('.')
-
-        for p in map(Path, files):
-
+            p = Path(filename)
             # skip exclusions
             try:
                 for file_path in options.exclude_paths:
@@ -795,54 +781,21 @@ def get_lintables(
                 _logger.debug('Ignored %s due to: %s', p, e)
                 continue
 
-            lintable = Lintable(normpath(p))
-            # TODO(ssbarnea): Remove deprecated detection logic and use only
-            # the one from inside Lintable constructor.
-            if lintable.kind in ('yaml', 'playbook'):
-                # Kept for compatibility until we migrate all into Lintable
+            lintables.append(Lintable(p))
 
-                if (next((i for i in p.parts if i.endswith('playbooks')), None) or
-                        'playbook' in p.parts[-1]):
-                    if "roles" not in p.parts:
-                        playbooks.append(normpath(p))
-                        continue
+        # stage 2: guess roles from current lintables, as there is no unique
+        # file that must be present in any kind of role.
 
-                # ignore if any folder ends with _vars
-                if next((i for i in p.parts if i.endswith('_vars')), None):
-                    continue
-                if 'roles' in p.parts or '.' in role_dirs:
-                    if 'tasks' in p.parts and p.parts[-1] in ['main.yaml', 'main.yml']:
-                        role_dirs.append(str(p.parents[1]))
-                        continue
-                    if role_internals.intersection(p.parts):
-                        continue
-                    if 'tests' in p.parts:
-                        playbooks.append(normpath(p))
-                if 'molecule' in p.parts:
-                    if p.parts[-1] not in ['molecule.yml', 'config.yml']:
-                        playbooks.append(normpath(p))
-                    else:
-                        lintables.append(Lintable(normpath(p), kind="yaml"))
-                    continue
-                # hidden files are clearly not playbooks, likely config files.
-                if p.parts[-1].startswith('.'):
-                    continue
-
-                if is_playbook(str(p)):
-                    playbooks.append(normpath(p))
-                    continue
-
-                lintable = Lintable(normpath(p), kind="yaml")
-            _logger.info('Identified: %s', lintable)
-            lintables.append(lintable)
-
-        _logger.info('Found roles: %s', ' '.join(role_dirs))
-        _logger.info('Found playbooks: %s', ' '.join(playbooks))
-
-        for role in role_dirs:
-            lintables.append(Lintable(role, kind="role"))
-        for playbook in playbooks:
-            lintables.append(Lintable(playbook, kind="playbook"))
+        for lintable in lintables:
+            parts = lintable.path.parent.parts
+            if 'roles' in parts:
+                role = lintable.path
+                while role.parent.name != "roles" and role.name:
+                    role = role.parent
+                if role.exists:
+                    lintable = Lintable(role, kind="role")
+                    if lintable not in lintables:
+                        lintables.append(lintable)
 
     return lintables
 
