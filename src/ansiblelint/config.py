@@ -1,6 +1,24 @@
 """Store configuration options as a singleton."""
 from argparse import Namespace
 
+DEFAULT_KINDS = [
+  # Do not sort this list, order matters.
+  {"requirements": "requirements.yml"},  # v2 and v1
+  {"requirements": "**/meta/requirements.yml"},  # v1 only
+  {"playbook": "**/playbooks/*.{yml,yaml}"},
+  {"playbook": "**/*playbook*.{yml,yaml}"},
+  {"role": "**/roles/*/"},
+  {"tasks": "**/tasks/*.{yaml,yml}"},
+  {"handlers": "**/handlers/*.{yaml,yml}"},
+  {"vars": "**/{vars,defaults}/*.{yaml,yml}"},
+  {"meta": "**/meta/main.{yaml,yml}"},
+  {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
+  {"yaml": "**/molecule/*/molecule.{yaml,yml}"},  # molecule config
+  {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
+  {"yaml": "**/*.{yaml,yml}"},
+  {"yaml": "**/.*.{yaml,yml}"},
+]
+
 options = Namespace(
     colored=True,
     cwd=".",
@@ -17,4 +35,5 @@ options = Namespace(
     tags=[],
     verbosity=False,
     warn_list=[],
+    kinds=DEFAULT_KINDS,
 )

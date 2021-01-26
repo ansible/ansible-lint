@@ -257,8 +257,6 @@ def test_cli_auto_detect(capfd):
 
     # Confirmation that it runs in auto-detect mode
     assert "Discovering files to lint: git ls-files *.yaml *.yml" in err
-    # Expected failure to detect file type"
-    assert "Identified: test/fixtures/unknown-type.yml (yaml)" in err
     # An expected rule match from our examples
     assert "examples/roles/bobbins/tasks/main.yml:2: " \
         "E401 Git checkouts must contain explicit version" in out
@@ -299,13 +297,15 @@ def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:
         return [path]
 
     # assert Lintable is able to determine file type
-    # lintable_detected = Lintable(path)
+    lintable_detected = Lintable(path)
     lintable_expected = Lintable(path, kind=kind)
-    # assert lintable_detected == lintable_expected
+    assert lintable_detected == lintable_expected
 
     monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
     result = utils.get_lintables(options)
-    assert result == [lintable_expected]
+    # get_lintable could return additional files and we only care to see
+    # that the given file is among the returned list.
+    assert lintable_expected in result
 
 
 def test_auto_detect_exclude(monkeypatch):

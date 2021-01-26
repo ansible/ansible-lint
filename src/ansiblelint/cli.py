@@ -204,10 +204,12 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
     # if either commandline parameter or config file option is set merge
     # with the other, if neither is set use the default
     for entry, default in lists_map.items():
-        if getattr(cli_config, entry) or entry in file_config.keys():
-            getattr(cli_config, entry).extend(file_config.get(entry, []))
+        if getattr(cli_config, entry, None) or entry in file_config.keys():
+            value = getattr(cli_config, entry, [])
+            value.extend(file_config.get(entry, []))
         else:
-            setattr(cli_config, entry, default)
+            value = default
+        setattr(cli_config, entry, value)
 
     if 'verbosity' in file_config:
         cli_config.verbosity = (cli_config.verbosity +

@@ -71,6 +71,7 @@ repos:
     - Sphinx>=3.1.2
     - enrich
     - yamllint
+    - wcmatch
 - repo: https://github.com/pre-commit/mirrors-pylint
   rev: v2.6.0
   hooks:
@@ -86,3 +87,4 @@ repos:
     - rich
     - ruamel.yaml
     - sphinx
+    - wcmatch
