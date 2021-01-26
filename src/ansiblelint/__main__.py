@@ -35,6 +35,7 @@ from ansiblelint import cli
 from ansiblelint._prerun import check_ansible_presence, prepare_environment
 from ansiblelint.app import App
 from ansiblelint.color import console, console_options, console_stderr, reconfigure, render_yaml
+from ansiblelint.config import options
 from ansiblelint.file_utils import cwd
 from ansiblelint.version import __version__
 
@@ -63,6 +64,25 @@ def initialize_logger(level: int = 0) -> None:
     logger.setLevel(logging_level)
     # Use module-level _logger instance to validate it
     _logger.debug("Logging initialized to level %s", logging_level)
+
+
+def initialize_options(arguments: List[str]):
+    """Load config options and store them inside options module."""
+    new_options = cli.get_config(arguments)
+    new_options.cwd = pathlib.Path.cwd()
+
+    if new_options.version:
+        print('ansible-lint {ver!s}'.format(ver=__version__))
+        # assure we fail if ansible is missing, even for version printing
+        check_ansible_presence()
+        sys.exit(0)
+
+    if new_options.colored is None:
+        new_options.colored = should_do_markup()
+
+    # persist loaded configuration inside options module
+    for k, v in new_options.__dict__.items():
+        setattr(options, k, v)
 
 
 def report_outcome(result: "LintResult", options, mark_as_success=False) -> int:
@@ -113,18 +133,8 @@ def main(argv: List[str] = None) -> int:
     """Linter CLI entry point."""
     if argv is None:
         argv = sys.argv
+    initialize_options(argv[1:])
 
-    options = cli.get_config(argv[1:])
-    options.cwd = pathlib.Path.cwd()
-
-    if options.version:
-        print('ansible-lint {ver!s}'.format(ver=__version__))
-        # assure we fail if ansible is missing, even for version printing
-        check_ansible_presence()
-        sys.exit(0)
-
-    if options.colored is None:
-        options.colored = should_do_markup()
     console_options["force_terminal"] = options.colored
     reconfigure(console_options)
 
