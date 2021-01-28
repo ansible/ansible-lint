@@ -234,9 +234,7 @@ class RulesCollection:
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if set(rule_definition).isdisjoint(skip_list):
-                    matches.extend(rule.matchlines(file))
-                    matches.extend(rule.matchtasks(file))
-                    matches.extend(rule.matchyaml(file))
+                    matches.extend(rule.getmatches(file))
 
         # some rules can produce matches with tags that are inside our
         # skip_list, so we need to cleanse the matches

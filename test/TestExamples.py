@@ -15,11 +15,12 @@ def test_example_plain_string(default_rules_collection):
     result = Runner(
         'examples/playbooks/plain_string.yml',
         rules=default_rules_collection).run()
-    # from ansiblelint.config import options
-    # assert options.kinds == 1
-    assert len(result) == 1
-    assert result[0].rule.id == "911"
-    assert "A playbook must be a list of plays" in result[0].message
+    assert len(result) >= 1
+    passed = False
+    for match in result:
+        if match.rule.id == "911":
+            passed = True
+    assert passed, result
 
 
 def test_example_custom_module(default_rules_collection):

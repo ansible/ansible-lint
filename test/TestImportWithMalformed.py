@@ -32,6 +32,8 @@ PLAY_IMPORT_TASKS = Lintable('playbook.yml', '''\
 @pytest.mark.usefixtures('_play_files')
 def test_import_tasks_with_malformed_import(runner):
     results = runner.run()
-    assert len(results) == 1
-    assert results[0].rule.id == '911'
-    assert results[0].rule.shortdesc == 'Ansible syntax check failed'
+    passed = False
+    for result in results:
+        if result.rule.id == '911':
+            passed = True
+    assert passed, results

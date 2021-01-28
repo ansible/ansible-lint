@@ -1,9 +1,12 @@
+import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 if TYPE_CHECKING:
     from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+
+_logger = logging.getLogger(__name__)
 
 
 class BaseRule:
@@ -15,6 +18,20 @@ class BaseRule:
     description: str = ""
     version_added: str = ""
     severity: str = ""
+
+    def getmatches(self, file: "Lintable") -> List["MatchError"]:
+        """Return all matches while ignoring exceptions."""
+        matches = []
+        for method in [self.matchlines, self.matchtasks, self.matchyaml]:
+            try:
+                matches.extend(method(file))
+            except Exception as e:
+                _logger.debug(
+                    "Ignored exception from %s.%s: %s",
+                    self.__class__.__name__,
+                    method,
+                    e)
+        return matches
 
     def matchlines(self, file: "Lintable") -> List["MatchError"]:
         """Return matches found for a specific line."""

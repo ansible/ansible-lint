@@ -795,6 +795,7 @@ def get_lintables(
                 if role.exists:
                     lintable = Lintable(role, kind="role")
                     if lintable not in lintables:
+                        _logger.debug("Added role: %s", lintable)
                         lintables.append(lintable)
 
     return lintables
