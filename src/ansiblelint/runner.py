@@ -80,34 +80,38 @@ class Runner:
         """Execute the linting process."""
         files: List[Lintable] = list()
         matches: List[MatchError] = list()
+        passed_lintables: List[Lintable] = list()
 
+        # print(555, self.checked_files)
         for lintable in self.lintables:
             if self.is_excluded(str(lintable.path.resolve())) or lintable.kind != 'playbook':
                 continue
             files.append(lintable)
-            matches.extend(AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable))
+            found_matches = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+            if found_matches:
+                matches.extend(found_matches)
+                # We do not want to further process any file that caused a failure
+                for match in found_matches:
+                    self.checked_files.add(match.filename)
+            else:
+                passed_lintables.append(lintable)
 
-        if not matches:  # do our processing only when ansible syntax check passed
+        matches.extend(self._emit_matches(passed_lintables))
 
-            matches.extend(self._emit_matches(files))
+        for file in passed_lintables:
+            if str(file.path) in self.checked_files:
+                continue
+            _logger.debug(
+                "Examining %s of type %s",
+                ansiblelint.file_utils.normpath(file.path),
+                file.kind)
 
-            # remove duplicates from files list
-            files = [value for n, value in enumerate(files) if value not in files[:n]]
-
-            for file in files:
-                if str(file.path) in self.checked_files:
-                    continue
-                _logger.debug(
-                    "Examining %s of type %s",
-                    ansiblelint.file_utils.normpath(file.path),
-                    file.kind)
-
-                matches.extend(
-                    self.rules.run(file, tags=set(self.tags),
-                                   skip_list=self.skip_list))
+            matches.extend(
+                self.rules.run(file, tags=set(self.tags),
+                               skip_list=self.skip_list))
 
         # update list of checked files
-        self.checked_files.update([str(x.path) for x in files])
+        self.checked_files.update([str(x.path) for x in passed_lintables])
 
         return sorted(set(matches))
 
@@ -124,6 +128,11 @@ class Runner:
                 except MatchError as e:
                     e.rule = LoadingFailureRule()
                     yield e
+                except AttributeError:
+                    yield MatchError(
+                        filename=str(lintable.path),
+                        rule=LoadingFailureRule()
+                    )
                 visited.add(lintable)
 
 
@@ -133,16 +142,15 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
 
     matches = list()
     checked_files: Set[str] = set()
-    for lintable in lintables:
-        runner = Runner(
-            lintable,
-            rules=rules,
-            tags=options.tags,
-            skip_list=options.skip_list,
-            exclude_paths=options.exclude_paths,
-            verbosity=options.verbosity,
-            checked_files=checked_files)
-        matches.extend(runner.run())
+    runner = Runner(
+        *lintables,
+        rules=rules,
+        tags=options.tags,
+        skip_list=options.skip_list,
+        exclude_paths=options.exclude_paths,
+        verbosity=options.verbosity,
+        checked_files=checked_files)
+    matches.extend(runner.run())
 
     # Assure we do not print duplicates and the order is consistent
     matches = sorted(set(matches))
