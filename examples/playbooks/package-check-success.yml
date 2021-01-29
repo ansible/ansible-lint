@@ -13,3 +13,9 @@
     package:
       name: some-package
       state: present
+
+  - name: update ansible
+    yum:
+      name: sudo
+      state: latest
+      update_only: yes

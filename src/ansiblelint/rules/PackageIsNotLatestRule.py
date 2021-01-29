@@ -66,4 +66,5 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         return (task['action']['__ansible_module__'] in self._package_managers and
                 not task['action'].get('version') and
+                not task['action'].get('update_only') and
                 task['action'].get('state') == 'latest')
