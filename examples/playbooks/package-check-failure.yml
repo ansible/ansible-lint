@@ -12,3 +12,9 @@
     package:
       name: some-package
       state: latest
+
+  - name: install ansible with update_only to false
+    yum:
+      name: sudo
+      state: latest
+      update_only: no

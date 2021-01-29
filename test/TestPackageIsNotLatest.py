@@ -25,4 +25,4 @@ class TestPackageIsNotLatestRule(unittest.TestCase):
             failure,
             rules=self.collection)
         errs = bad_runner.run()
-        self.assertEqual(3, len(errs))
+        self.assertEqual(4, len(errs))
