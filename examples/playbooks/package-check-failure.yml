@@ -17,4 +17,4 @@
     yum:
       name: sudo
       state: latest
-      update_only: no
+      update_only: false
