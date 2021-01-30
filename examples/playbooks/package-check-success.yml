@@ -18,4 +18,4 @@
     yum:
       name: sudo
       state: latest
-      update_only: yes
+      update_only: false
