@@ -6,7 +6,7 @@ import os
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, List, Optional
 
 import yaml
 
@@ -53,20 +53,25 @@ def expand_to_normalized_paths(config: dict, base_dir: str = None) -> None:
         config[paths_var] = normalized_paths
 
 
-def load_config(config_file: str) -> dict:
-    config_path = os.path.abspath(config_file or '.ansible-lint')
-
+def load_config(config_file: str) -> Dict[Any, Any]:
+    """Load configuration from disk."""
+    config_path = None
     if config_file:
+        config_path = os.path.abspath(config_file)
         if not os.path.exists(config_path):
             _logger.error("Config file not found '%s'", config_path)
             sys.exit(INVALID_CONFIG_RC)
-    elif not os.path.exists(config_path):
+    config_path = config_path or get_config_path()
+    if not config_path or not os.path.exists(config_path):
         # a missing default config file should not trigger an error
         return {}
 
     try:
         with open(config_path, "r") as stream:
             config = yaml.safe_load(stream)
+            if not isinstance(config, dict):
+                _logger.error("Invalid configuration file %s", config_path)
+                sys.exit(INVALID_CONFIG_RC)
     except yaml.YAMLError as e:
         _logger.error(e)
         sys.exit(INVALID_CONFIG_RC)
@@ -80,6 +85,21 @@ def load_config(config_file: str) -> dict:
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
     return config
+
+
+def get_config_path(config_file: str = '.ansible-lint') -> Optional[str]:
+    """Return local config file."""
+    project_filenames = [config_file]
+    parent = tail = os.getcwd()
+    while tail:
+        for project_filename in project_filenames:
+            filename = os.path.abspath(
+                os.path.join(parent, project_filename)
+            )
+            if os.path.exists(filename):
+                return filename
+        (parent, tail) = os.path.split(parent)
+    return None
 
 
 class AbspathArgAction(argparse.Action):
@@ -193,7 +213,7 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
         # use defaults if we don't have a config file and the commandline
         # parameter is not set
         for entry, default in lists_map.items():
-            if not getattr(cli_config, entry):
+            if not getattr(cli_config, entry, None):
                 setattr(cli_config, entry, default)
         return cli_config
 
