@@ -246,7 +246,11 @@ def test_logger_debug(caplog):
 
 def test_cli_auto_detect(capfd):
     """Test that run without arguments it will detect and lint the entire repository."""
-    cmd = sys.executable, "-m", "ansiblelint", "-v", "-p", "--nocolor"
+    cmd = [
+        sys.executable,
+        "-m", "ansiblelint",
+        "-v", "-p", "--nocolor",
+    ]
     result = subprocess.run(cmd, check=False).returncode
 
     # We de expect to fail on our own repo due to test examples we have
@@ -258,8 +262,8 @@ def test_cli_auto_detect(capfd):
     # Confirmation that it runs in auto-detect mode
     assert "Discovering files to lint: git ls-files *.yaml *.yml" in err
     # An expected rule match from our examples
-    assert "examples/roles/bobbins/tasks/main.yml:2: " \
-        "E401 Git checkouts must contain explicit version" in out
+    assert "examples/playbooks/empty_playbook.yml:0: " \
+        "E911 Empty playbook, nothing to do" in out
     # assures that our .ansible-lint exclude was effective in excluding github files
     assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks
