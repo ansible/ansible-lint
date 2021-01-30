@@ -46,6 +46,9 @@ counterparts:
       - and_this_one_too
       - skip_this_id
       - '401'
+    mock_modules:
+      # Mock modules in order to pass ansible-playbook --syntax-check
+      - some_module
 
 
 Pre-commit Setup

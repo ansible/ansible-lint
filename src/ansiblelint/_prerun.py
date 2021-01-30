@@ -1,10 +1,12 @@
 import os
 import subprocess
 import sys
+from typing import List
 
 from packaging import version
 
-from ansiblelint.constants import ANSIBLE_MIN_VERSION, ANSIBLE_MISSING_RC
+from ansiblelint.config import options
+from ansiblelint.constants import ANSIBLE_MIN_VERSION, ANSIBLE_MISSING_RC, ANSIBLE_MOCKED_MODULE
 
 
 def check_ansible_presence() -> None:
@@ -32,9 +34,7 @@ def check_ansible_presence() -> None:
 
 def prepare_environment() -> None:
     """Make custom modules available if needed."""
-    if os.path.exists("plugins/modules") and 'ANSIBLE_LIBRARY' not in os.environ:
-        os.environ['ANSIBLE_LIBRARY'] = "plugins/modules"
-        print("Added ANSIBLE_LIBRARY=plugins/modules", file=sys.stderr)
+    _prepare_library_paths()
 
     if os.path.exists("roles") and "ANSIBLE_ROLES_PATH" not in os.environ:
         os.environ['ANSIBLE_ROLES_PATH'] = "roles"
@@ -90,3 +90,25 @@ def prepare_environment() -> None:
                 f".cache/collections:{os.environ['ANSIBLE_COLLECTIONS_PATHS']}"
         else:
             os.environ['ANSIBLE_COLLECTIONS_PATHS'] = ".cache/collections"
+
+
+def _prepare_library_paths() -> None:
+    """Configure ANSIBLE_LIBRARY."""
+    library_paths: List[str] = []
+    if 'ANSIBLE_LIBRARY' in os.environ:
+        library_paths = os.environ['ANSIBLE_LIBRARY'].split(':')
+
+    if os.path.exists("plugins/modules") and "plugins/modules" not in library_paths:
+        library_paths.append("plugins/modules")
+
+    if options.mock_modules:
+        library_paths.append(".cache/modules")
+        os.makedirs(".cache/modules", exist_ok=True)
+        for module_name in options.mock_modules:
+            with open(f".cache/modules/{module_name}.py", "w") as f:
+                f.write(ANSIBLE_MOCKED_MODULE)
+
+    library_path_str = ":".join(library_paths)
+    if library_path_str != os.environ.get('ANSIBLE_LIBRARY', ""):
+        os.environ['ANSIBLE_LIBRARY'] = library_path_str
+        print("Added ANSIBLE_LIBRARY=%s" % library_path_str, file=sys.stderr)

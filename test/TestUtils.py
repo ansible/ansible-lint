@@ -268,6 +268,9 @@ def test_cli_auto_detect(capfd):
     assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks
     assert "Identified: test/test/always-run-success.yml" not in err
+    # assure that zuul_return missing module is not reported
+    assert "examples/playbooks/mocked_module.yml" not in out
+    assert "Executing syntax check on examples/playbooks/mocked_module.yml" in err
 
 
 def test_is_playbook():

@@ -19,6 +19,21 @@ ANSIBLE_MISSING_RC = 4
 # Minimal version of Ansible we support for runtime
 ANSIBLE_MIN_VERSION = "2.9"
 
+ANSIBLE_MOCKED_MODULE = """\
+# This is a mocked Ansible module
+from ansible.module_utils.basic import AnsibleModule
+
+
+def main():
+    return AnsibleModule(
+        argument_spec=dict(
+            data=dict(default=None),
+            path=dict(default=None, type=str),
+            file=dict(default=None, type=str),
+        )
+    )
+"""
+
 FileType = Literal[
     "playbook",
     "pre_tasks",
