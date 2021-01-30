@@ -207,6 +207,7 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
         'skip_list': [],
         'tags': [],
         'warn_list': ['experimental'],
+        'mock_modules': []
     }
 
     if not file_config:
