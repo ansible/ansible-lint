@@ -71,8 +71,10 @@ class YamllintRule(AnsibleLintRule):
 
     def matchyaml(self, file: Lintable) -> List["MatchError"]:
         """Return matches found for a specific YAML text."""
-        matches = []
+        matches: List["MatchError"] = []
         filtered_matches = []
+        if file.kind == 'role':
+            return matches
 
         if YamllintRule.config:
             for p in run_yamllint(file.content, YamllintRule.config):

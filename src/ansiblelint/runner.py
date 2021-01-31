@@ -110,12 +110,10 @@ class Runner:
         # -- phase 2 ---
         if not matches:  # do our processing only when ansible syntax check passed
 
-            matches.extend(self._emit_matches(files))
-
             # remove duplicates from files list
             files = [value for n, value in enumerate(files) if value not in files[:n]]
 
-            for file in files:
+            for file in self.lintables:
                 if str(file.path) in self.checked_files:
                     continue
                 _logger.debug(
