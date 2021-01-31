@@ -22,15 +22,16 @@ class BaseRule:
     def getmatches(self, file: "Lintable") -> List["MatchError"]:
         """Return all matches while ignoring exceptions."""
         matches = []
-        for method in [self.matchlines, self.matchtasks, self.matchyaml]:
-            try:
-                matches.extend(method(file))
-            except Exception as e:
-                _logger.debug(
-                    "Ignored exception from %s.%s: %s",
-                    self.__class__.__name__,
-                    method,
-                    e)
+        if not file.path.is_dir():
+            for method in [self.matchlines, self.matchtasks, self.matchyaml]:
+                try:
+                    matches.extend(method(file))
+                except Exception as e:
+                    _logger.debug(
+                        "Ignored exception from %s.%s: %s",
+                        self.__class__.__name__,
+                        method,
+                        e)
         return matches
 
     def matchlines(self, file: "Lintable") -> List["MatchError"]:
