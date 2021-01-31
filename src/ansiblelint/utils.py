@@ -562,7 +562,7 @@ def task_to_str(task: Dict[str, Any]) -> str:
         return str(action)
     args = " ".join([
         "{0}={1}".format(k, v) for (k, v) in action.items()
-        if k not in ["__ansible_module__", "__ansible_arguments__"]])
+        if k not in ["__ansible_module__", "__ansible_arguments__", "__line__", "__file__"]])
     for item in action.get("__ansible_arguments__", []):
         args += f" {item}"
     return u"{0} {1}".format(action["__ansible_module__"], args)
