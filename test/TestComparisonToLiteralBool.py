@@ -66,4 +66,4 @@ class TestComparisonToLiteralBoolRule(unittest.TestCase):
 
     def test_literal_false(self):
         results = self.runner.run_role_tasks_main(FAIL_LITERAL_FALSE)
-        self.assertEqual(1, len(results))
+        assert len(results) == 1, results

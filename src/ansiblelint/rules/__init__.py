@@ -218,16 +218,17 @@ class RulesCollection:
     def run(self, file: Lintable, tags=set(), skip_list: List[str] = []) -> List[MatchError]:
         matches: List[MatchError] = list()
 
-        try:
-            if file.content is not None:  # loads the file content
-                pass
-        except IOError as e:
-            return [MatchError(
-                message=str(e),
-                filename=file,
-                rule=LoadingFailureRule(),
-                tag=e.__class__.__name__.lower()
-                )]
+        if not file.path.is_dir():
+            try:
+                if file.content is not None:  # loads the file content
+                    pass
+            except IOError as e:
+                return [MatchError(
+                    message=str(e),
+                    filename=file,
+                    rule=LoadingFailureRule(),
+                    tag=e.__class__.__name__.lower()
+                    )]
 
         for rule in self.rules:
             if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):

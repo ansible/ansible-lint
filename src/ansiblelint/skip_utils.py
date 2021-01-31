@@ -106,7 +106,7 @@ def _append_skipped_rules(
             # assume it is a playbook, check needs to be added higher in the
             # call stack, and can remove this except
             return pyyaml_data
-    elif file_type in ['yaml', 'requirements']:
+    elif file_type in ['yaml', 'requirements', 'vars']:
         return pyyaml_data
     else:
         raise RuntimeError('Unexpected file type: {}'.format(file_type))
