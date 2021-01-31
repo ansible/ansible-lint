@@ -83,13 +83,19 @@ class Runner:
         files: List[Lintable] = list()
         matches: List[MatchError] = list()
 
+        # remove exclusions
+        for lintable in self.lintables.copy():
+            if self.is_excluded(str(lintable.path.resolve())):
+                _logger.debug("Excluded %s", lintable)
+                self.lintables.remove(lintable)
+
         # -- phase 1 : syntax check in parallel --
         def worker(lintable: Lintable) -> List[MatchError]:
             return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
 
         # playbooks: List[Lintable] = []
         for lintable in self.lintables:
-            if self.is_excluded(str(lintable.path.resolve())) or lintable.kind != 'playbook':
+            if lintable.kind != 'playbook':
                 continue
             files.append(lintable)
 
