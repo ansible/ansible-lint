@@ -27,15 +27,15 @@ from ansiblelint.cli import abspath
 from ansiblelint.file_utils import Lintable
 from ansiblelint.runner import Runner
 
-LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd())
+LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/playbooks/lots_of_warnings.yml', os.getcwd())
 
 
 @pytest.mark.parametrize(('playbook', 'exclude', 'length'), (
-    ('examples/playbooks/nomatchestest.yml', [], 0),
-    ('examples/playbooks/unicode.yml', [], 1),
-    (LOTS_OF_WARNINGS_PLAYBOOK, [LOTS_OF_WARNINGS_PLAYBOOK], 0),
-    ('examples/playbooks/become.yml', [], 0),
-    ('examples/playbooks/contains_secrets.yml', [], 0),
+    pytest.param('examples/playbooks/nomatchestest.yml', [], 0, id="nomatchestest"),
+    pytest.param('examples/playbooks/unicode.yml', [], 1, id="unicode"),
+    pytest.param(LOTS_OF_WARNINGS_PLAYBOOK, [LOTS_OF_WARNINGS_PLAYBOOK], 0, id="lots_of_warnings"),
+    pytest.param('examples/playbooks/become.yml', [], 0, id="become"),
+    pytest.param('examples/playbooks/contains_secrets.yml', [], 0, id="contains_secrets"),
 ))
 def test_runner(default_rules_collection, playbook, exclude, length) -> None:
     runner = Runner(
