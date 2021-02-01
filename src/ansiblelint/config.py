@@ -5,6 +5,7 @@ DEFAULT_KINDS = [
   # Do not sort this list, order matters.
   {"requirements": "requirements.yml"},  # v2 and v1
   {"requirements": "**/meta/requirements.yml"},  # v1 only
+  {"reno": "releasenotes/*/*.{yaml,yml}"},  # reno release notes
   {"playbook": "**/playbooks/*.{yml,yaml}"},
   {"playbook": "**/*playbook*.{yml,yaml}"},
   {"role": "**/roles/*/"},

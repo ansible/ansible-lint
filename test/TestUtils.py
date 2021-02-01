@@ -294,6 +294,7 @@ def test_is_playbook():
         ("roles/foo/meta/requirements.yml", "requirements"),  # inside role requirements
         # Undeterminable files:
         ("test/fixtures/unknown-type.yml", "yaml"),
+        ("releasenotes/notes/run-playbooks-refactor.yaml", "reno"),  # reno
     ),
 )
 def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:
