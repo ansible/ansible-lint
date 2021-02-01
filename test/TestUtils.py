@@ -357,3 +357,22 @@ def test_get_rules_dirs_with_custom_rules(user_ruledirs, use_default, expected, 
     """Test it returns expected dir lists when custom rules exist."""
     monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, str(_CUSTOM_RULESDIR))
     assert get_rules_dirs(user_ruledirs, use_default) == expected
+
+
+def test_nested_items():
+    """Verify correct function of nested_items()."""
+    data = {
+        "foo": "text",
+        "bar": {"some": "text2"},
+        "fruits": ["apple", "orange"]
+    }
+
+    items = [
+        ("foo", "text"),
+        ("bar", {"some": "text2"}),
+        ("some", "text2"),
+        ("fruits", ["apple", "orange"]),
+        ("list-item", "apple"),
+        ("list-item", "orange")
+    ]
+    assert list(utils.nested_items(data)) == items
