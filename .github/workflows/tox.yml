@@ -10,6 +10,10 @@ on:
     - >-
       **
   pull_request:
+  release:
+    types:
+    - published  # It seems that you can publish directly without creating
+    - prereleased
   schedule:
   - cron: 1 0 * * *  # Run daily at 0:01 UTC
   # Run every Friday at 18:02 UTC
@@ -263,8 +267,7 @@ jobs:
         repository_url: https://test.pypi.org/legacy/
     - name: Publish to pypi.org
       if: >-  # "create" workflows run separately from "push" & "pull_request"
-        github.event_name == 'create' &&
-        github.event.ref_type == 'tag'
+        github.event_name == 'release'
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.pypi_password }}
