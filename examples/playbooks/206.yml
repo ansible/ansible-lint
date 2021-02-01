@@ -29,7 +29,7 @@
     - name: bad variable format
       debug:
         msg: "{{bad_format }}"
-    - name: not a jinja variable
+    - name: not a jinja variable  # noqa 206
       debug:
         msg: "data = ${lookup{$local_part}lsearch{/etc/aliases}}"
     - name: JSON inside jinja is valid
