@@ -29,7 +29,7 @@ from collections import OrderedDict
 from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, Union
 
 import yaml
 from ansible import constants
@@ -804,3 +804,17 @@ def get_lintables(
 def convert_to_boolean(value: Any) -> bool:
     """Use Ansible to convert something to a boolean."""
     return bool(boolean(value))
+
+
+def nested_items(data: Union[Dict[Any, Any], List[Any]]) -> Generator[Tuple[Any, Any], None, None]:
+    """Iterate a nested data structure."""
+    if isinstance(data, dict):
+        for k, v in data.items():
+            yield k, v
+            for k, v in nested_items(v):
+                yield k, v
+    if isinstance(data, list):
+        for item in data:
+            yield "list-item", item
+            for k, v in nested_items(item):
+                yield k, v
