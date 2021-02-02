@@ -11,21 +11,23 @@ from ansiblelint.utils import nested_items
 
 class VariableHasSpacesRule(AnsibleLintRule):
     id = '206'
-    shortdesc = 'Variables should have spaces before and after: {{ var_name }}'
+    base_msg = 'Variables should have spaces before and after: '
+    shortdesc = base_msg + ' {{ var_name }}'
     description = 'Variables should have spaces before and after: ``{{ var_name }}``'
     severity = 'LOW'
     tags = ['formatting']
     version_added = 'v4.0.0'
 
-    variable_syntax = re.compile(r"{{.*}}")
-    bracket_regex = re.compile(r"{{[^{' -]|[^ '}-]}}")
+    bracket_regex = re.compile(
+        r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
+    exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}")
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         for k, v in nested_items(task):
             if isinstance(v, str):
-                line_exclude_json = re.sub(r"[^{]{'\w+': ?[^{]{.*?}}", "", v)
-                if bool(self.bracket_regex.search(line_exclude_json)):
-                    return True
+                cleaned = self.exclude_json_re.sub("", v)
+                if bool(self.bracket_regex.search(cleaned)):
+                    return self.base_msg + v
         return False
 
 
