@@ -35,3 +35,14 @@
     - name: JSON inside jinja is valid
       debug:
         msg: "{{ {'test': {'subtest': variable}} }}"
+    - name: Avoid false positive on multiline
+      vars:
+        cases:
+          case1: >-
+            http://example.com/{{
+              case1 }}
+          case2: >-
+            http://example.com/{{
+            case2 }}
+      debug:
+        var: cases
