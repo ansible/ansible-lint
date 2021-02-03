@@ -34,12 +34,6 @@ def check_ansible_presence() -> None:
 
 def prepare_environment() -> None:
     """Make custom modules available if needed."""
-    _prepare_library_paths()
-
-    if os.path.exists("roles") and "ANSIBLE_ROLES_PATH" not in os.environ:
-        os.environ['ANSIBLE_ROLES_PATH'] = "roles"
-        print("Added ANSIBLE_ROLES_PATH=roles", file=sys.stderr)
-
     if os.path.exists("requirements.yml"):
 
         cmd = [
@@ -83,13 +77,14 @@ def prepare_environment() -> None:
         if run.returncode != 0:
             sys.exit(run.returncode)
 
-        if 'ANSIBLE_ROLES_PATH' in os.environ:
-            os.environ['ANSIBLE_ROLES_PATH'] = f".cache/roles:{os.environ['ANSIBLE_ROLES_PATH']}"
         if 'ANSIBLE_COLLECTIONS_PATHS' in os.environ:
             os.environ['ANSIBLE_COLLECTIONS_PATHS'] = \
                 f".cache/collections:{os.environ['ANSIBLE_COLLECTIONS_PATHS']}"
         else:
             os.environ['ANSIBLE_COLLECTIONS_PATHS'] = ".cache/collections"
+
+    _prepare_library_paths()
+    _prepare_roles_path()
 
 
 def _prepare_library_paths() -> None:
@@ -112,3 +107,24 @@ def _prepare_library_paths() -> None:
     if library_path_str != os.environ.get('ANSIBLE_LIBRARY', ""):
         os.environ['ANSIBLE_LIBRARY'] = library_path_str
         print("Added ANSIBLE_LIBRARY=%s" % library_path_str, file=sys.stderr)
+
+
+def _prepare_roles_path() -> None:
+    """Configure ANSIBLE_ROLES_PATH."""
+    roles_path: List[str] = []
+    if 'ANSIBLE_ROLES_PATH' in os.environ:
+        roles_path = os.environ['ANSIBLE_ROLES_PATH'].split(':')
+
+    if os.path.exists("roles") and "roles" not in roles_path:
+        roles_path.append("roles")
+
+    if options.mock_roles or os.path.exists(".cache/roles"):
+        for role_name in options.mock_roles:
+            os.makedirs(f".cache/roles/{role_name}", exist_ok=True)
+        if ".cache/roles" not in roles_path:
+            roles_path.append(".cache/roles")
+
+    if roles_path:
+        roles_path_str = ":".join(roles_path)
+        os.environ['ANSIBLE_ROLES_PATH'] = roles_path_str
+        print("Added ANSIBLE_ROLES_PATH=%s" % roles_path_str, file=sys.stderr)

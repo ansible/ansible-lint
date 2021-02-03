@@ -2,3 +2,5 @@ exclude_paths:
 - .github/
 mock_modules:
   - zuul_return
+mock_roles:
+  - mocked_role
