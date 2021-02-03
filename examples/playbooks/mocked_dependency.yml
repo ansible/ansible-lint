@@ -1,4 +1,6 @@
 - hosts: localhost
+  roles:
+    - mocked_role
   tasks:
     - name: some task
       zuul_return: {}

@@ -11,11 +11,11 @@ from ansiblelint.text import strip_ansi_escape
 
 class TestCliRolePaths(unittest.TestCase):
     def setUp(self):
-        self.local_test_dir = os.path.join(
+        self.local_test_dir = os.path.realpath(os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "..",
             "examples"
-            )
+            ))
 
     def test_run_single_role_path_no_trailing_slash_module(self):
         cwd = self.local_test_dir
@@ -99,7 +99,7 @@ class TestCliRolePaths(unittest.TestCase):
 
         result = run_ansible_lint(role_path, cwd=cwd)
         assert len(result.stdout) == 0
-        assert "Added ANSIBLE_ROLES_PATH=roles" in result.stderr
+        assert "Added ANSIBLE_ROLES_PATH=roles:.cache/roles" in result.stderr
         assert result.returncode == 0
 
     def test_run_role_name_from_meta(self):
@@ -108,7 +108,7 @@ class TestCliRolePaths(unittest.TestCase):
 
         result = run_ansible_lint(role_path, cwd=cwd)
         assert len(result.stdout) == 0
-        assert "Added ANSIBLE_ROLES_PATH=roles" in result.stderr
+        assert "Added ANSIBLE_ROLES_PATH=roles:.cache/roles" in result.stderr
         assert result.returncode == 0
 
     def test_run_invalid_role_name_from_meta(self):

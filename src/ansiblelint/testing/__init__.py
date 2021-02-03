@@ -80,6 +80,18 @@ def run_ansible_lint(
     else:
         args = [executable, *argv]
 
+    # It is not safe to pass entire env for testing as other tests would
+    # polute the env, causing weird behaviors, so we pass only a safe list of
+    # vars.
+    if env is None:
+        _env = {}
+        for v in ['PYTHONPATH', 'PATH', 'TERM']:
+            if v in os.environ:
+                _env[v] = os.environ[v]
+
+    else:
+        _env = env
+
     return subprocess.run(
         args,
         stdout=subprocess.PIPE,
@@ -87,6 +99,6 @@ def run_ansible_lint(
         shell=False,  # needed when command is a list
         check=False,
         cwd=cwd,
-        env=env,
+        env=_env,
         universal_newlines=True
     )
