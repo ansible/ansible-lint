@@ -73,7 +73,9 @@ def test_runner_with_directory(default_rules_collection, directory_name) -> None
     runner = Runner(
         directory_name,
         rules=default_rules_collection)
-    assert list(runner.lintables)[0].kind == 'role'
+
+    expected = Lintable(name=directory_name, kind="role")
+    assert expected in runner.lintables
 
 
 def test_files_not_scanned_twice(default_rules_collection) -> None:
