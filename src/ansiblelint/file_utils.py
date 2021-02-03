@@ -1,8 +1,13 @@
 """Utility functions related to file operations."""
+import copy
+import logging
 import os
+import subprocess
+from argparse import Namespace
+from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union
 
 import wcmatch.pathlib
 
@@ -15,6 +20,8 @@ if TYPE_CHECKING:
 else:
     BasePathLike = os.PathLike
 
+_logger = logging.getLogger(__package__)
+
 
 def normpath(path: Union[str, BasePathLike]) -> str:
     """
@@ -24,7 +31,12 @@ def normpath(path: Union[str, BasePathLike]) -> str:
     make this user configurable.
     """
     # convertion to string in order to allow receiving non string objects
-    return os.path.relpath(str(path))
+    relpath = os.path.relpath(str(path))
+    abspath = os.path.abspath(str(path))
+    # we avoid returning relative paths that endup at root level
+    if abspath in relpath:
+        return abspath
+    return relpath
 
 
 @contextmanager
@@ -87,8 +99,8 @@ class Lintable:
             kind: Optional[FileType] = None):
         """Create a Lintable instance."""
         if isinstance(name, str):
-            self.name = name
-            self.path = Path(name)
+            self.name = normpath(name)
+            self.path = Path(self.name)
         else:
             self.name = str(name)
             self.path = name
@@ -137,3 +149,50 @@ class Lintable:
     def __repr__(self) -> str:
         """Return user friendly representation of a lintable."""
         return f"{self.name} ({self.kind})"
+
+
+def get_yaml_files(options: Namespace) -> Dict[str, Any]:
+    """Find all yaml files."""
+    # git is preferred as it also considers .gitignore
+    git_command = ['git', 'ls-files', '*.yaml', '*.yml']
+    _logger.info("Discovering files to lint: %s", ' '.join(git_command))
+
+    out = None
+
+    try:
+        out = subprocess.check_output(
+            git_command,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True
+        ).splitlines()
+    except subprocess.CalledProcessError as exc:
+        _logger.warning(
+            "Failed to discover yaml files to lint using git: %s",
+            exc.output.rstrip('\n')
+        )
+    except FileNotFoundError as exc:
+        if options.verbosity:
+            _logger.warning(
+                "Failed to locate command: %s", exc
+            )
+
+    if out is None:
+        out = [
+            os.path.join(root, name)
+            for root, dirs, files in os.walk('.')
+            for name in files
+            if name.endswith('.yaml') or name.endswith('.yml')
+        ]
+
+    return OrderedDict.fromkeys(sorted(out))
+
+
+def expand_dirs_in_lintables(lintables: Set[Lintable]) -> None:
+    """Return all recognized lintables within given directory."""
+    all_files = get_yaml_files(options)
+
+    for item in copy.copy(lintables):
+        if item.path.is_dir():
+            for filename in all_files:
+                if filename.startswith(str(item.path)):
+                    lintables.add(Lintable(filename))

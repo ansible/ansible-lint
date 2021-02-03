@@ -10,7 +10,7 @@ import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.rules.AnsibleSyntaxCheckRule import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
@@ -51,6 +51,9 @@ class Runner:
             if not isinstance(item, Lintable):
                 item = Lintable(item)
             self.lintables.add(item)
+
+        # Expand folders (roles) to their components
+        expand_dirs_in_lintables(self.lintables)
 
         self.tags = tags
         self.skip_list = skip_list
@@ -126,7 +129,7 @@ class Runner:
                                    skip_list=self.skip_list))
 
         # update list of checked files
-        self.checked_files.update([str(x.path) for x in files])
+        self.checked_files.update([str(x.path) for x in self.lintables])
 
         return sorted(set(matches))
 

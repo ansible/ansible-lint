@@ -129,7 +129,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/test-role'
 
         env = os.environ.copy()
-        env['ANSIBLE_ROLES_PATH'] = os.path.join(cwd, 'use-as-default-roles-path')
+        env['ANSIBLE_ROLES_PATH'] = os.path.realpath(os.path.join(cwd, "../examples/roles"))
 
         result = run_ansible_lint(role_path, cwd=cwd, env=env)
         assert 'Use shell only when shell functionality is required' in result.stdout

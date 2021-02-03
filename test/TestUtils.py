@@ -30,7 +30,7 @@ from pathlib import Path
 
 import pytest
 
-from ansiblelint import cli, constants, utils
+from ansiblelint import cli, constants, file_utils, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
 from ansiblelint.constants import FileType
@@ -186,10 +186,10 @@ def test_get_yaml_files_git_verbose(
     options = cli.get_config(['-v'])
     initialize_logger(options.verbosity)
     monkeypatch.setenv(reset_env_var, '')
-    utils.get_yaml_files(options)
+    file_utils.get_yaml_files(options)
 
     expected_info = (
-        "ansiblelint.utils",
+        "ansiblelint",
         logging.INFO,
         'Discovering files to lint: git ls-files *.yaml *.yml')
 
@@ -220,7 +220,7 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     )
 
     monkeypatch.chdir(str(lint_path))
-    files = utils.get_yaml_files(options)
+    files = file_utils.get_yaml_files(options)
     stderr = capsys.readouterr().err
     assert not stderr, 'No stderr output is expected when the verbosity is off'
     assert len(files) == yaml_count, (

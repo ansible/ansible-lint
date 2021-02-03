@@ -23,9 +23,7 @@ import contextlib
 import inspect
 import logging
 import os
-import subprocess
 from argparse import Namespace
-from collections import OrderedDict
 from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
@@ -60,7 +58,7 @@ from yaml.representer import RepresenterError
 from ansiblelint._internal.rules import AnsibleParserErrorRule, LoadingFailureRule, RuntimeErrorRule
 from ansiblelint.constants import FileType
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, get_yaml_files
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -709,42 +707,6 @@ def is_playbook(filename: str) -> bool:
         ):
             return True
     return False
-
-
-def get_yaml_files(options: Namespace) -> dict:
-    """Find all yaml files."""
-    # git is preferred as it also considers .gitignore
-    git_command = ['git', 'ls-files', '*.yaml', '*.yml']
-    _logger.info("Discovering files to lint: %s", ' '.join(git_command))
-
-    out = None
-
-    try:
-        out = subprocess.check_output(
-            git_command,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True
-        ).splitlines()
-    except subprocess.CalledProcessError as exc:
-        _logger.warning(
-            "Failed to discover yaml files to lint using git: %s",
-            exc.output.rstrip('\n')
-        )
-    except FileNotFoundError as exc:
-        if options.verbosity:
-            _logger.warning(
-                "Failed to locate command: %s", exc
-            )
-
-    if out is None:
-        out = [
-            os.path.join(root, name)
-            for root, dirs, files in os.walk('.')
-            for name in files
-            if name.endswith('.yaml') or name.endswith('.yml')
-        ]
-
-    return OrderedDict.fromkeys(sorted(out))
 
 
 # pylint: disable=too-many-statements
