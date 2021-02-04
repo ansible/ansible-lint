@@ -1,7 +1,9 @@
 """Output formatters."""
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Generic, TypeVar, Union
+from typing import TYPE_CHECKING, Generic, TypeVar, Union, List
+import hashlib
+import json
 
 import rich
 
@@ -144,3 +146,46 @@ class ParseableSeverityFormatter(BaseFormatter):
             f"[filename]{filename}[/]:{position}: [[error_code]{rule_id}[/]] "
             f"[[error_code]{severity}[/]] [dim]{message}[/]"
         )
+
+
+class CodeclimateJSONFormatter(BaseFormatter):
+
+    def format(self, matches: List["MatchError"]) -> str:
+        result = []
+        for match in matches:
+            issue = {}
+            issue['type'] = 'issue'
+            issue['check_name'] = f"[{match.rule.id}] {match.message}"
+            issue['categories'] = match.rule.tags
+            issue['severity'] = self._severity_to_level(match.rule.severity)
+            issue['description'] = self.escape(str(match.rule.description))
+            issue['fingerprint'] = hashlib.sha256(repr(match).encode('utf-8')).hexdigest()
+            issue['location'] = {}
+            issue['location']['path'] = self._format_path(match.filename or "")
+            issue['location']['lines'] = {}
+            if match.column:
+                issue['location']['lines']['begin'] = {}
+                issue['location']['lines']['begin']['line'] = match.linenumber
+                issue['location']['lines']['begin']['column'] = match.column
+            else:
+                issue['location']['lines']['begin'] = match.linenumber
+            if match.details:
+                issue['content'] = {}
+                issue['content']['body'] = match.details
+            # Append issue to result list
+            result.append(issue)
+
+        return json.dumps(result)
+
+    @staticmethod
+    def _severity_to_level(severity: str) -> str:
+        if severity in ['LOW']:
+            return 'minor'
+        if severity in ['MEDIUM']:
+            return 'major'
+        if severity in ['HIGH']:
+            return 'critical'
+        if severity in ['VERY_HIGH']:
+            return 'blocker'
+        # VERY_LOW, INFO or anything else
+        return 'info'
