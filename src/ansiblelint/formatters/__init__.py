@@ -83,7 +83,7 @@ class ParseableFormatter(BaseFormatter):
     def format(self, match: "MatchError") -> str:
         result = (
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}: "
-            f"[error_code]E{match.rule.id}[/] [dim]{self.escape(match.message)}[/]")
+            f"[error_code]{match.rule.id}[/] [dim]{self.escape(match.message)}[/]")
         if match.tag:
             result += f" [dim][error_code]({match.tag})[/][/]"
         return result
@@ -137,7 +137,7 @@ class ParseableSeverityFormatter(BaseFormatter):
 
         filename = self._format_path(match.filename or "")
         position = match.position
-        rule_id = u"E{0}".format(match.rule.id)
+        rule_id = u"{0}".format(match.rule.id)
         severity = match.rule.severity
         message = self.escape(str(match.message))
 
