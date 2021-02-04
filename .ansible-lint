@@ -1,6 +1,35 @@
+# .ansible-lint
 exclude_paths:
 - .github/
+# parseable: true
+# quiet: true
+# verbosity: 1
+
+# Mock modules or roles in order to pass ansible-playbook --syntax-check
 mock_modules:
   - zuul_return
 mock_roles:
   - mocked_role
+
+# Enable checking of loop variable prefixes in roles
+loop_var_prefix: "{role}_"
+
+use_default_rules: true
+# Load custom rules from this specific folder
+# rulesdir:
+#   - ./rule/directory/
+
+# This makes linter to fully ignore rules/tags listed below
+skip_list:
+  - skip_this_tag
+  - '401'
+
+# Report only a subset of tags and fully ignore any others
+# tags:
+#   - '206'
+
+# This makes the linter display but not fail for rules/tags listed below:
+warn_list:
+  - skip_this_tag
+  - '401'
+  - experimetal  # experimental is included in the implicit list

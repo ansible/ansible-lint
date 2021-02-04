@@ -208,7 +208,11 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
         'tags': [],
         'warn_list': ['experimental'],
         'mock_modules': [],
-        'mock_roles': []
+        'mock_roles': [],
+    }
+
+    scalar_map = {
+        "loop_var_prefix": None
     }
 
     if not file_config:
@@ -221,6 +225,10 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
 
     for entry in bools:
         x = getattr(cli_config, entry) or file_config.get(entry, False)
+        setattr(cli_config, entry, x)
+
+    for entry, default in scalar_map.items():
+        x = getattr(cli_config, entry, None) or file_config.get(entry, default)
         setattr(cli_config, entry, x)
 
     # if either commandline parameter or config file option is set merge

@@ -83,9 +83,19 @@ def run_ansible_lint(
     # It is not safe to pass entire env for testing as other tests would
     # polute the env, causing weird behaviors, so we pass only a safe list of
     # vars.
+    safe_list = [
+        'LANG',
+        'LC_ALL',
+        'LC_CTYPE',
+        'PATH',
+        'PYTHONIOENCODING',
+        'PYTHONPATH',
+        'TERM',
+    ]
+
     if env is None:
         _env = {}
-        for v in ['PYTHONPATH', 'PATH', 'TERM']:
+        for v in safe_list:
             if v in os.environ:
                 _env[v] = os.environ[v]
 

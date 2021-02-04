@@ -38,5 +38,6 @@ options = Namespace(
     warn_list=[],
     kinds=DEFAULT_KINDS,
     mock_modules=[],
-    mock_roles=[]
+    mock_roles=[],
+    loop_var_prefix=None
 )

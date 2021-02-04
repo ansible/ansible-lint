@@ -1,0 +1,17 @@
+- hosts: localhost
+  tasks:
+    # validate that we did not trigger loop-var-prefix on playbooks
+    - name: that should pass
+      debug:
+        var: item
+      loop:
+        - foo
+        - bar
+    - name: a block
+      block:
+        - name: that should also pass
+          debug:
+            var: item
+          loop:
+            - apples
+            - oranges
