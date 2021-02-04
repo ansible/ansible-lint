@@ -31,6 +31,7 @@ options = Namespace(
     listtags=False,
     parseable=False,
     parseable_severity=False,
+    parseable_codeclimate=False,
     quiet=False,
     rulesdirs=[],
     skip_list=[],

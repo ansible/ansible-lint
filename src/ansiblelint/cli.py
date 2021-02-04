@@ -131,7 +131,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         '-f',
         dest='format',
         default='rich',
-        choices=['rich', 'plain', 'rst'],
+        choices=['rich', 'plain', 'rst', 'codeclimate'],
         help="Format used rules output, (default: %(default)s)",
     )
     parser.add_argument(
@@ -265,6 +265,7 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
     bools = (
         'display_relative_path',
         'parseable',
+        'parseable_codeclimate',
         'parseable_severity',
         'quiet',
         'use_default_rules',

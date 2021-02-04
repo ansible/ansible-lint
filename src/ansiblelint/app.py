@@ -28,6 +28,12 @@ class App:
 
     def render_matches(self, matches: List) -> None:
         """Display given matches."""
+        if isinstance(self.formatter, formatters.CodeclimateJSONFormatter):
+            # If formatter CodeclimateJSONFormatter is chosen, 
+            # then print only the matches in JSON
+            console.print(self.formatter.format(matches), markup=False, highlight=False)
+            return None
+
         ignored_matches = [match for match in matches if match.ignored]
         fatal_matches = [match for match in matches if not match.ignored]
         # Displayed ignored matches first
@@ -66,6 +72,8 @@ def choose_formatter_factory(
         r = formatters.ParseableFormatter
     elif options_list.parseable_severity:
         r = formatters.ParseableSeverityFormatter
+    elif options_list.parseable_codeclimate:
+        r = formatters.CodeclimateJSONFormatter
     return r
 
 
