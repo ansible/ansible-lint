@@ -24,7 +24,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class CommandHasChangesCheckRule(AnsibleLintRule):
-    id = '301'
+    id = 'no-changed-when'
     shortdesc = 'Commands should not change things if nothing needs doing'
     description = (
         'Commands should either read information (and thus set '

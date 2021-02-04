@@ -17,7 +17,7 @@ PLAY_INCLUDING_JINJA2 = Lintable('playbook.yml', u'''\
 PLAY_INCLUDING_NOQA = Lintable('playbook.yml', u'''\
 - hosts: all
   tasks:
-    - include: some_file.yml # noqa 505
+    - include: some_file.yml # noqa missing-import
 ''')
 
 PLAY_INCLUDED = Lintable('some_file.yml', u'''\

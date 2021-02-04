@@ -24,7 +24,7 @@ _empty_playbook_re = re.compile(
 class AnsibleSyntaxCheckRule(AnsibleLintRule):
     """Ansible syntax check report failure."""
 
-    id = "911"
+    id = "syntax-check"
     shortdesc = "Ansible syntax check failed"
     description = "Running ansible-playbook --syntax-check ... reported an error."
     severity = "VERY_HIGH"

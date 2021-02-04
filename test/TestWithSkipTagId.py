@@ -19,16 +19,17 @@ class TestWithSkipTagId(unittest.TestCase):
         self.assertGreater(len(errs), 0)
 
     def test_negative_with_id(self) -> None:
-        with_id = 'YAML'
+        with_id = 'yaml'
         bad_runner = Runner(
             self.file,
             rules=self.collection,
-            tags=frozenset([with_id]))
+            tags=frozenset([with_id])
+            )
         errs = bad_runner.run()
         self.assertGreater(len(errs), 0)
 
     def test_negative_with_tag(self) -> None:
-        with_tag = 'formatting'
+        with_tag = 'trailing-spaces'
         bad_runner = Runner(
             self.file,
             rules=self.collection,
@@ -37,7 +38,7 @@ class TestWithSkipTagId(unittest.TestCase):
         self.assertGreater(len(errs), 0)
 
     def test_positive_skip_id(self) -> None:
-        skip_id = 'YAML'
+        skip_id = 'yaml'
         good_runner = Runner(
             self.file,
             rules=self.collection,
@@ -45,7 +46,7 @@ class TestWithSkipTagId(unittest.TestCase):
         self.assertEqual([], good_runner.run())
 
     def test_positive_skip_tag(self) -> None:
-        skip_tag = 'formatting'
+        skip_tag = 'trailing-spaces'
         good_runner = Runner(
             self.file,
             rules=self.collection,

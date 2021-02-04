@@ -24,7 +24,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class OctalPermissionsRule(AnsibleLintRule):
-    id = '202'
+    id = 'risky-octal'
     shortdesc = 'Octal file permissions must contain leading zero or be a string'
     description = (
         'Numeric file permissions without leading zero can behave '

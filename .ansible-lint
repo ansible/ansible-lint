@@ -22,14 +22,14 @@ use_default_rules: true
 # This makes linter to fully ignore rules/tags listed below
 skip_list:
   - skip_this_tag
-  - '401'
+  - git-latest
 
 # Report only a subset of tags and fully ignore any others
 # tags:
-#   - '206'
+#   - var-spacing
 
 # This makes the linter display but not fail for rules/tags listed below:
 warn_list:
   - skip_this_tag
-  - '401'
+  - git-latest
   - experimetal  # experimental is included in the implicit list

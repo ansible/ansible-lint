@@ -24,7 +24,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class UseCommandInsteadOfShellRule(AnsibleLintRule):
-    id = '305'
+    id = 'command-instead-of-shell'
     shortdesc = 'Use shell only when shell functionality is required'
     description = (
         'Shell should only be used when piping, redirecting '
@@ -32,7 +32,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
         'for some of those!)'
     )
     severity = 'HIGH'
-    tags = ['command-shell', 'safety']
+    tags = ['command-shell', 'idiom']
     version_added = 'historic'
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:

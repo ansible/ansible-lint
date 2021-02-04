@@ -26,26 +26,11 @@ for each available rule, use the ``-T`` option.
 The following shows the available tags in an example set of rules, and the
 rules associated with each tag:
 
-.. code-block:: console
 
-    $ ansible-lint -v -T
-
-    behaviour ['[503]']
-    bug ['[304]']
-    command-shell ['[305]', '[302]', '[304]', '[306]', '[301]', '[303]']
-    deprecations ['[105]', '[104]', '[103]', '[101]', '[102]']
-    experimental ['[208]']
-    formatting ['[104]', '[203]', '[201]', '[204]', '[206]', '[205]', '[202]']
-    idempotency ['[301]']
-    idiom ['[601]', '[602]']
-    metadata ['[701]', '[704]', '[703]', '[702]']
-    module ['[404]', '[401]', '[403]', '[402]']
-    oddity ['[501]']
-    readability ['[502]']
-    repeatability ['[401]', '[403]', '[402]']
-    resources ['[302]', '[303]']
-    safety ['[305]']
-    task ['[502]', '[503]', '[504]', '[501]']
+.. command-output:: ansible-lint -v -T
+   :cwd: ..
+   :returncode: 0
+   :nostderr:
 
 To run just the *idempotency* rules, for example, run the following:
 
@@ -56,20 +41,13 @@ To run just the *idempotency* rules, for example, run the following:
 Excluding Rules
 ```````````````
 
-To exclude rules from the available set of rules, use the ``-x SKIP_LIST``
+To exclude rules using their identifiers or tags, use the ``-x SKIP_LIST``
 option. For example, the following runs all of the rules except those with the
-tags *readability* and *safety*:
+tags *formatting* and *metadata*:
 
 .. code-block:: bash
 
-    $ ansible-lint -x readability,safety playbook.yml
-
-It's also possible to skip specific rules by passing the rule ID. For example,
-the following excludes rule *502*:
-
-.. code-block:: bash
-
-    $ ansible-lint -x 502 playbook.yml
+    $ ansible-lint -x formatting,metadata playbook.yml
 
 Ignoring Rules
 ``````````````
@@ -101,8 +79,8 @@ a space-separated list.
 
 .. code-block:: yaml
 
-    - name: this would typically fire GitHasVersionRule 401 and BecomeUserWithoutBecomeRule 501
-      become_user: alice  # noqa 401 501
+    - name: this would typically fire git-latest and partial-become
+      become_user: alice  # noqa git-latest partial-become
       git: src=/path/to/git/repo dest=checkout
 
 If the rule is line-based, ``# noqa [rule_id]`` must be at the end of the
@@ -110,10 +88,10 @@ particular line to be skipped
 
 .. code-block:: yaml
 
-    - name: this would typically fire LineTooLongRule 204 and VariableHasSpacesRule 206
+    - name: this would typically fire LineTooLongRule 204 and var-spacing
       get_url:
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa 204
-        dest: "{{dest_proj_path}}/foo.conf"  # noqa 206
+        dest: "{{dest_proj_path}}/foo.conf"  # noqa var-spacing
 
 
 It's also a good practice to comment the reasons why a task is being skipped.
@@ -128,15 +106,15 @@ works with the *command* or *shell* modules only. Examples:
 
 .. code-block:: yaml
 
-    - name: this would typically fire CommandsInsteadOfArgumentRule 302
+    - name: this would typically fire deprecated-command-syntax
       command: warn=no chmod 644 X
 
-    - name: this would typically fire CommandsInsteadOfModuleRule 303
+    - name: this would typically fire command-instead-of-module
       command: git pull --rebase
       args:
         warn: False
 
-    - name: this would typically fire GitHasVersionRule 401
+    - name: this would typically fire git-latest
       git: src=/path/to/git/repo dest=checkout
       tags:
       - skip_ansible_lint

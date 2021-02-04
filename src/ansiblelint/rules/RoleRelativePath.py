@@ -7,11 +7,11 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class RoleRelativePath(AnsibleLintRule):
-    id = '404'
+    id = 'no-relative-paths'
     shortdesc = "Doesn't need a relative path in role"
     description = '``copy`` and ``template`` do not need to use relative path for ``src``'
     severity = 'HIGH'
-    tags = ['module']
+    tags = ['idiom']
     version_added = 'v4.0.0'
 
     _module_to_path_folder = {

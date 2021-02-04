@@ -5,11 +5,11 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class TaskNoLocalAction(AnsibleLintRule):
-    id = '504'
+    id = 'deprecated-local-action'
     shortdesc = "Do not use 'local_action', use 'delegate_to: localhost'"
     description = 'Do not use ``local_action``, use ``delegate_to: localhost``'
     severity = 'MEDIUM'
-    tags = ['task']
+    tags = ['deprecations']
     version_added = 'v4.0.0'
 
     def match(self, line: str) -> bool:

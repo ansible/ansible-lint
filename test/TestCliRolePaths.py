@@ -91,7 +91,8 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/invalid-name'
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert '106: Role name invalid-name does not match' in strip_ansi_escape(result.stdout)
+        assert 'role-name: Role name invalid-name does not match' in strip_ansi_escape(
+            result.stdout)
 
     def test_run_role_name_with_prefix(self):
         cwd = self.local_test_dir
@@ -116,7 +117,7 @@ class TestCliRolePaths(unittest.TestCase):
         role_path = 'roles/invalid_due_to_meta'
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert ('106: Role name invalid-due-to-meta does not match' in
+        assert ('role-name: Role name invalid-due-to-meta does not match' in
                 strip_ansi_escape(result.stdout))
 
     def test_run_single_role_path_with_roles_path_env(self):
@@ -153,7 +154,7 @@ def test_run_playbook_github(result, env):
     result_gh = run_ansible_lint(role_path, cwd=cwd, env=env)
 
     expected = (
-        '::warning file=examples/playbooks/example.yml,line=44,severity=VERY_LOW::E403 '
+        '::warning file=examples/playbooks/example.yml,line=44,severity=VERY_LOW::package-latest '
         'Package installs should not use latest'
     )
     assert (expected in result_gh.stdout) is result

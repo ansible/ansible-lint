@@ -5,7 +5,6 @@ import operator
 import pytest
 
 from ansiblelint.errors import MatchError
-from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.rules.BecomeUserWithoutBecomeRule import BecomeUserWithoutBecomeRule
 from ansiblelint.rules.CommandHasChangesCheckRule import CommandHasChangesCheckRule
 
@@ -58,10 +57,6 @@ def test_matcherror_compare(left_match_error, right_match_error):
     assert left_match_error == right_match_error
 
 
-class AnsibleLintRuleWithStringId(AnsibleLintRule):
-    id = "ANSIBLE200"
-
-
 def test_matcherror_invalid():
     """Ensure that MatchError requires message or rule."""
     expected_err = r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
@@ -75,11 +70,8 @@ def test_matcherror_invalid():
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
         (MatchError("a", filename="b"), MatchError("a", filename="a")),
-        # rule id 501 > rule id 301
+        # rule id partial-become > rule id no-changed-when
         (MatchError(rule=BecomeUserWithoutBecomeRule()),
-            MatchError(rule=CommandHasChangesCheckRule())),
-        # rule id 'ANSIBLE200' > rule id 301
-        (MatchError(rule=AnsibleLintRuleWithStringId()),
             MatchError(rule=CommandHasChangesCheckRule())),
         # details are taken into account
         (MatchError("a", details="foo"), MatchError("a", details="bar")),

@@ -34,6 +34,6 @@ def test_import_tasks_with_malformed_import(runner):
     results = runner.run()
     passed = False
     for result in results:
-        if result.rule.id == '911':
+        if result.rule.id == 'syntax-check':
             passed = True
     assert passed, results

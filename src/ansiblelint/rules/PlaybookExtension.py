@@ -10,7 +10,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class PlaybookExtension(AnsibleLintRule):
-    id = '205'
+    id = 'playbook-extension'
     shortdesc = 'Use ".yml" or ".yaml" playbook extension'
     description = 'Playbooks should have the ".yml" or ".yaml" extension'
     severity = 'MEDIUM'

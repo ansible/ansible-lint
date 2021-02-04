@@ -26,14 +26,14 @@ from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg
 
 
 class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
-    id = '302'
+    id = 'deprecated-command-syntax'
     shortdesc = 'Using command rather than an argument to e.g. file'
     description = (
         'Executing a command when there are arguments to modules '
         'is generally a bad idea'
     )
     severity = 'VERY_HIGH'
-    tags = ['command-shell', 'resources']
+    tags = ['command-shell', 'deprecations']
     version_added = 'historic'
 
     _commands = ['command', 'shell', 'raw']

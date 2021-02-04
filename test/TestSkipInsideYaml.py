@@ -2,33 +2,33 @@ import pytest
 
 ROLE_TASKS = '''\
 ---
-- name: test 303
+- name: test command-instead-of-module
   command: git log
   changed_when: false
-- name: test 303 (skipped)
-  command: git log  # noqa 303
+- name: test command-instead-of-module (skipped)
+  command: git log  # noqa command-instead-of-module
   changed_when: false
 '''
 
 ROLE_TASKS_WITH_BLOCK = '''\
 ---
-- name: bad git 1  # noqa 401
+- name: bad git 1  # noqa git-latest
   action: git a=b c=d
 - name: bad git 2
   action: git a=b c=d
 - name: Block with rescue and always section
   block:
-    - name: bad git 3  # noqa 401
+    - name: bad git 3  # noqa git-latest
       action: git a=b c=d
     - name: bad git 4
       action: git a=b c=d
   rescue:
-    - name: bad git 5  # noqa 401
+    - name: bad git 5  # noqa git-latest
       action: git a=b c=d
     - name: bad git 6
       action: git a=b c=d
   always:
-    - name: bad git 7  # noqa 401
+    - name: bad git 7  # noqa git-latest
       action: git a=b c=d
     - name: bad git 8
       action: git a=b c=d
@@ -37,42 +37,42 @@ ROLE_TASKS_WITH_BLOCK = '''\
 PLAYBOOK = '''\
 - hosts: all
   tasks:
-    - name: test 402
+    - name: test hg-latest
       action: hg
-    - name: test 402 (skipped)  # noqa 402
+    - name: test hg-latest (skipped)  # noqa hg-latest
       action: hg
 
-    - name: test 401 and 501
+    - name: test git-latest and partial-become
       become_user: alice
       action: git
-    - name: test 401 and 501 (skipped)  # noqa 401 501
+    - name: test git-latest and partial-become (skipped)  # noqa git-latest partial-become
       become_user: alice
       action: git
 
-    - name: test YAML and 206
+    - name: test YAML and var-spacing
       get_url:
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf
         dest: "{{dest_proj_path}}/foo.conf"
-    - name: test YAML and 206 (skipped)
+    - name: test YAML and var-spacing (skipped)
       get_url:
-        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa YAML
-        dest: "{{dest_proj_path}}/foo.conf"  # noqa 206
+        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa yaml
+        dest: "{{dest_proj_path}}/foo.conf"  # noqa var-spacing
 
-    - name: test 302
+    - name: test deprecated-command-syntax
       command: creates=B chmod 644 A
-    - name: test 302
+    - name: test deprecated-command-syntax
       command: warn=yes creates=B chmod 644 A
-    - name: test 302 (skipped via no warn)
+    - name: test deprecated-command-syntax (skipped via no warn)
       command: warn=no creates=B chmod 644 A
-    - name: test 302 (skipped via skip_ansible_lint)
+    - name: test deprecated-command-syntax (skipped via skip_ansible_lint)
       command: creates=B chmod 644 A
       tags:
         - skip_ansible_lint
 '''
 
 ROLE_META = '''\
-galaxy_info:  # noqa 701
-  author: your name  # noqa 703
+galaxy_info:  # noqa meta-no-info
+  author: your name  # noqa meta-incorrect
   description: missing min_ansible_version and platforms. author default not changed
   license: MIT
 '''

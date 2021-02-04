@@ -20,6 +20,7 @@
 
 import collections
 import os
+import re
 
 import pytest
 
@@ -117,3 +118,12 @@ def test_rich_rule_listing():
         assert rule.shortdesc in result.stdout
         # description could wrap inside table, so we do not check full length
         assert rule.description[:30] in result.stdout
+
+
+def test_rules_id_format() -> None:
+    """Asure all our rules have consistent format."""
+    rule_id_re = re.compile("^[a-z-]{4,30}$")
+    rules = RulesCollection([os.path.abspath('./src/ansiblelint/rules')])
+    for rule in rules:
+        assert rule_id_re.match(rule.id), f"R rule id {rule.id} did not match our required format."
+    assert len(rules) == 37

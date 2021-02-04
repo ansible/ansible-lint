@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class MetaVideoLinksRule(AnsibleLintRule):
-    id = '704'
+    id = 'meta-video-links'
     shortdesc = "meta/main.yml video_links should be formatted correctly"
     description = (
         'Items in ``video_links`` in meta/main.yml should be '
