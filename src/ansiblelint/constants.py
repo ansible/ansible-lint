@@ -57,3 +57,39 @@ if sys.version_info[:2] < (3, 7):
         from collections import OrderedDict as odict  # noqa: 401
     except ImportError:
         pass
+
+# Deprecated tags/ids and their newer names
+RENAMED_TAGS = {
+    '102': 'no-jinja-when',
+    '104': 'deprecated-bare-vars',
+    '105': 'deprecated-module',
+    '106': 'role-name',
+    '202': 'risky-octal',
+    '203': 'no-tabs',
+    '205': 'playbook-extension',
+    '206': 'var-spacing',
+    '207': 'no-jinja-nesting',
+    '208': 'risky-file-permissions',
+    '301': 'no-changed-when',
+    '302': 'deprecated-command-syntax',
+    '303': 'command-instead-of-module',
+    '304': 'inline-env-var',
+    '305': 'command-instead-of-shell',
+    '306': 'risky-shell-pipe',
+    '401': 'git-latest',
+    '402': 'hg-latest',
+    '403': 'package-latest',
+    '404': 'no-relative-paths',
+    '501': 'partial-become',
+    '502': 'unnamed-task',
+    '503': 'no-handler',
+    '504': 'deprecated-local-action',
+    '505': 'missing-import',
+    '601': 'literal-compare',
+    '602': 'empty-string-compare',
+    '701': 'meta-no-info',
+    '702': 'meta-no-tags',
+    '703': 'meta-incorrect',
+    '704': 'meta-video-links',
+    '911': 'syntax-check',
+}

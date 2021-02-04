@@ -26,7 +26,8 @@ from typing import Any, Generator, List, Optional, Sequence
 
 import ruamel.yaml
 
-from ansiblelint.constants import FileType
+from ansiblelint.config import used_old_tags
+from ansiblelint.constants import RENAMED_TAGS, FileType
 
 _logger = logging.getLogger(__name__)
 
@@ -192,4 +193,12 @@ def _get_rule_skips_from_yaml(yaml_input: Sequence) -> Sequence:
         for line in comment_obj_str.split(r'\n'):
             rule_id_list.extend(get_rule_skips_from_line(line))
 
-    return rule_id_list
+    return [normalize_tag(tag) for tag in rule_id_list]
+
+
+def normalize_tag(tag: str) -> str:
+    """Return current name of tag."""
+    if tag in RENAMED_TAGS:
+        used_old_tags[tag] = RENAMED_TAGS[tag]
+        return RENAMED_TAGS[tag]
+    return tag

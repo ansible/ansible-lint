@@ -29,7 +29,7 @@ _modules_with_preserve = (
 
 
 class MissingFilePermissionsRule(AnsibleLintRule):
-    id = "208"
+    id = "risky-file-permissions"
     shortdesc = 'File permissions unset or incorrect'
     description = (
         "Missing or unsupported mode parameter can cause unexpected file "

@@ -30,26 +30,14 @@ def rules_as_rst(rules: RulesCollection) -> str:
     r = DOC_HEADER
 
     for d in rules:
-        if not hasattr(d, 'id'):
-            _logger.warning(
-                "Rule %s skipped from being documented as it does not have an `id` attribute.",
-                d.__class__.__name__)
-            continue
 
-        if d.id.endswith('01'):
-
-            section = '{} Rules ({}xx)'.format(
-                    d.tags[0].title(),
-                    d.id[-3:-2])
-            r += f'\n\n{section}\n{ "-" * len(section) }'
-
-        title = f"{d.id}: {d.shortdesc}"
+        title = f"{d.id}"
 
         description = d.description
         if d.link:
             description += " `(more) <%s>`_" % d.link
 
-        r += f"\n\n.. _{d.id}:\n\n{title}\n{'*' * len(title)}\n\n{description}"
+        r += f"\n\n.. _{d.id}:\n\n{title}\n{'*' * len(title)}\n\n{d.shortdesc}\n\n{description}"
 
     return r
 

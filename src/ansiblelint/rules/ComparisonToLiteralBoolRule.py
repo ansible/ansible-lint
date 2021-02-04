@@ -7,7 +7,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class ComparisonToLiteralBoolRule(AnsibleLintRule):
-    id = '601'
+    id = 'literal-compare'
     shortdesc = "Don't compare to literal True/False"
     description = (
         'Use ``when: var`` rather than ``when: var == True`` '

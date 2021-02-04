@@ -28,7 +28,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class NestedJinjaRule(AnsibleLintRule):
-    id = '207'
+    id = 'no-jinja-nesting'
     shortdesc = 'Nested jinja pattern'
     description = (
         "There should not be any nested jinja pattern. "

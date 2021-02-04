@@ -31,14 +31,14 @@ def _changed_in_when(item: str) -> bool:
 
 
 class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
-    id = '503'
+    id = 'no-handler'
     shortdesc = 'Tasks that run when changed should likely be handlers'
     description = (
         'If a task has a ``when: result.changed`` setting, it is effectively '
         'acting as a handler'
     )
     severity = 'MEDIUM'
-    tags = ['task', 'behaviour']
+    tags = ['idiom']
     version_added = 'historic'
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:

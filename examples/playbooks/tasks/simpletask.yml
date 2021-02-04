@@ -1,4 +1,4 @@
 ---
-# 502: All tasks should be named
+# unnamed-task: All tasks should be named
 - assert:
     fail_msg: foo

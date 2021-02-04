@@ -10,7 +10,7 @@ from ansiblelint.utils import nested_items
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
-    id = '206'
+    id = 'var-spacing'
     base_msg = 'Variables should have spaces before and after: '
     shortdesc = base_msg + ' {{ var_name }}'
     description = 'Variables should have spaces before and after: ``{{ var_name }}``'
@@ -37,12 +37,12 @@ if 'pytest' in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_206() -> None:
+    def test_var_spacing() -> None:
         """Verify rule."""
         collection = RulesCollection()
         collection.register(VariableHasSpacesRule())
 
-        lintable = Lintable("examples/playbooks/206.yml")
+        lintable = Lintable("examples/playbooks/var-spacing.yml")
         results = Runner(
             lintable,
             rules=collection).run()

@@ -3,68 +3,63 @@
 
   tasks:
 
-    - name: test 401
+    - name: test git-latest
       action: git
 
-    - name: test 402
+    - name: test hg-latest
       action: hg
 
-    - name: test 303
+    - name: test command-instead-of-module
       command: git log
       changed_when: False
 
-    - name: test 302
+    - name: test deprecated-command-syntax
       command: creates=B chmod 644 A
 
-    - name: test invalid action (skip)
-      foo: bar
-      tags:
-        - skip_ansible_lint
-
-    - name: test 401 (skip)
+    - name: test git-latest (skip)
       action: git
       tags:
         - skip_ansible_lint
 
-    - name: test 402 (skip)
+    - name: test hg-latest (skip)
       action: hg
       tags:
         - skip_ansible_lint
 
-    - name: test 303 (skip)
+    - name: test command-instead-of-module (skip)
       command: git log
       tags:
         - skip_ansible_lint
 
-    - name: test 302 (skip)
+    - name: test deprecated-command-syntax (skip)
       command: chmod 644 A
       tags:
         - skip_ansible_lint
 
-    - name: test 401 (don't warn)
+    - name: test git-latest (don't warn)
       command: git log
       args:
         warn: False
       changed_when: False
 
-    - name: test 402 (don't warn)
+    - name: test hg-latest (don't warn)
       command: chmod 644 A
       args:
         warn: False
         creates: B
 
-    - name: test 402 (warn)
+    - name: test hg-latest (warn)
       command: chmod 644 A
       args:
         warn: yes
         creates: B
 
-    - name: test 401 (don't warn single line)
+    - name: test git-latest (don't warn single line)
       command: warn=False chdir=/tmp/blah git log
       changed_when: False
 
-    - name: test 402 (don't warn single line)
+    - name: test hg-latest (don't warn single line)
       command: warn=no creates=B chmod 644 A
 
-    - name: test 402 (warn single line)
+    - name: test hg-latest (warn single line)
       command: warn=yes creates=B chmod 644 A

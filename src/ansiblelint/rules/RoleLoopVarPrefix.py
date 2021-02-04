@@ -25,7 +25,7 @@ class RoleLoopVarPrefix(AnsibleLintRule):
 Looping inside roles has the risk of clashing with loops from user-playbooks.\
 """
 
-    tags = ['no-loop-var-prefix', 'safety']
+    tags = ['idiom']
     prefix = ""
     severity = 'MEDIUM'
 

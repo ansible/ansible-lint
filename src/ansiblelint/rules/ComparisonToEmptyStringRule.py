@@ -8,7 +8,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class ComparisonToEmptyStringRule(AnsibleLintRule):
-    id = '602'
+    id = 'empty-string-compare'
     shortdesc = "Don't compare to empty string"
     description = (
         'Use ``when: var|length > 0`` rather than ``when: var != ""`` (or '

@@ -35,8 +35,9 @@ from ansiblelint import cli
 from ansiblelint._prerun import check_ansible_presence, prepare_environment
 from ansiblelint.app import App
 from ansiblelint.color import console, console_options, console_stderr, reconfigure, render_yaml
-from ansiblelint.config import options
+from ansiblelint.config import options, used_old_tags
 from ansiblelint.file_utils import cwd
+from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
@@ -84,6 +85,11 @@ def initialize_options(arguments: List[str]):
     for k, v in new_options.__dict__.items():
         setattr(options, k, v)
 
+    # rename deprecated ids/tags to newer names
+    options.tags = [normalize_tag(tag) for tag in options.tags]
+    options.skip_list = [normalize_tag(tag) for tag in options.skip_list]
+    options.warn_list = [normalize_tag(tag) for tag in options.warn_list]
+
 
 def report_outcome(result: "LintResult", options, mark_as_success=False) -> int:
     """Display information about how to skip found rules.
@@ -106,13 +112,22 @@ warn_list:  # or 'skip_list' to silence them completely
         else:
             warnings += 1
 
+    entries = []
     for key in sorted(matched_rules.keys()):
         if {key, *matched_rules[key].tags}.isdisjoint(options.warn_list):
-            msg += f"  - '{key}'  # {matched_rules[key].shortdesc}\n"
+            entries.append(f"  - {key}  # {matched_rules[key].shortdesc}\n")
     for match in result.matches:
         if "experimental" in match.rule.tags:
-            msg += "  - experimental  # all rules tagged as experimental\n"
+            entries.append("  - experimental  # all rules tagged as experimental\n")
             break
+    msg += "".join(sorted(entries))
+
+    for k, v in used_old_tags.items():
+        _logger.warning(
+            "Replaced deprecated tag '%s' with '%s' but it will become an "
+            "error in the future.",
+            k,
+            v)
 
     if result.matches and not options.quiet:
         console_stderr.print(

@@ -14,7 +14,7 @@ MAIN_PLAYBOOK = '''\
 - hosts: all
 
   tasks:
-    - name: should be shell  # noqa 305 301
+    - name: should be shell  # noqa command-instead-of-shell no-changed-when
       shell: echo lol
 
 - import_playbook: imported_playbook.yml

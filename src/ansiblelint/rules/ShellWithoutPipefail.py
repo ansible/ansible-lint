@@ -5,7 +5,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class ShellWithoutPipefail(AnsibleLintRule):
-    id = '306'
+    id = 'risky-shell-pipe'
     shortdesc = 'Shells that use pipes should set the pipefail option'
     description = (
         'Without the pipefail option set, a shell command that '

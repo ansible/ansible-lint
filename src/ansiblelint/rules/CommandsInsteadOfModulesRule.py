@@ -26,14 +26,14 @@ from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
-    id = '303'
+    id = 'command-instead-of-module'
     shortdesc = 'Using command rather than module'
     description = (
         'Executing a command when there is an Ansible module '
         'is generally a bad idea'
     )
     severity = 'HIGH'
-    tags = ['command-shell', 'resources']
+    tags = ['command-shell', 'idiom']
     version_added = 'historic'
 
     _commands = ['command', 'shell']

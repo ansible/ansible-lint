@@ -1,5 +1,6 @@
 """Store configuration options as a singleton."""
 from argparse import Namespace
+from typing import Dict
 
 DEFAULT_KINDS = [
   # Do not sort this list, order matters.
@@ -41,3 +42,6 @@ options = Namespace(
     mock_roles=[],
     loop_var_prefix=None
 )
+
+# Used to store detected tag deprecations
+used_old_tags: Dict[str, str] = {}

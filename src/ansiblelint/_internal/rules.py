@@ -19,6 +19,7 @@ class BaseRule:
     version_added: str = ""
     severity: str = ""
     link: str = ""
+    has_dynamic_tags: bool = False
 
     def getmatches(self, file: "Lintable") -> List["MatchError"]:
         """Return all matches while ignoring exceptions."""
@@ -71,7 +72,7 @@ class BaseRule:
 class RuntimeErrorRule(BaseRule):
     """Used to identify errors."""
 
-    id = '999'
+    id = 'internal-error'
     shortdesc = 'Unexpected internal error'
     description = (
         'This error can be caused by internal bugs but also by '
@@ -86,7 +87,7 @@ class RuntimeErrorRule(BaseRule):
 class AnsibleParserErrorRule(BaseRule):
     """Used to mark errors received from Ansible."""
 
-    id = '998'
+    id = 'parser-error'
     shortdesc = 'AnsibleParserError'
     description = (
         'Ansible parser fails, this usually indicate invalid file.')
@@ -98,7 +99,7 @@ class AnsibleParserErrorRule(BaseRule):
 class LoadingFailureRule(BaseRule):
     """File loading failure."""
 
-    id = '901'
+    id = 'load-failure'
     shortdesc = 'Failed to load or parse file'
     description = 'Linter failed to process a YAML file, possible not an Ansible file.'
     severity = 'VERY_HIGH'

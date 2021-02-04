@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class MetaTagValidRule(AnsibleLintRule):
-    id = '702'
+    id = 'meta-no-tags'
     shortdesc = 'Tags must contain lowercase letters and digits only'
     description = (
         'Tags must contain lowercase letters and digits only, '

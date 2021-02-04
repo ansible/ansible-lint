@@ -39,7 +39,7 @@ def _remove_prefix(text: str, prefix: str) -> str:
 
 
 class RoleNames(AnsibleLintRule):
-    id = '106'
+    id = 'role-name'
     shortdesc = (
         "Role name {0} does not match ``%s`` pattern" % ROLE_NAME_REGEX
     )

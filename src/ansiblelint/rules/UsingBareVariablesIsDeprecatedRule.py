@@ -26,7 +26,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
-    id = '104'
+    id = 'deprecated-bare-vars'
     shortdesc = 'Using bare variables is deprecated'
     description = (
         'Using bare variables is deprecated. Update your '
@@ -34,7 +34,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
         'syntax ``{{ your_variable }}``'
     )
     severity = 'VERY_HIGH'
-    tags = ['deprecations', 'formatting']
+    tags = ['deprecations']
     version_added = 'historic'
 
     _jinja = re.compile(r"{{.*}}", re.DOTALL)

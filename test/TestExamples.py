@@ -18,7 +18,7 @@ def test_example_plain_string(default_rules_collection):
     assert len(result) >= 1
     passed = False
     for match in result:
-        if match.rule.id == "911":
+        if match.rule.id == "syntax-check":
             passed = True
     assert passed, result
 

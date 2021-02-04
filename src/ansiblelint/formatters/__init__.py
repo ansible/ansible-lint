@@ -118,7 +118,7 @@ class AnnotationsFormatter(BaseFormatter):
             col = ""
         return (
             f"::{level} file={file_path},line={line_num}{col},severity={severity}"
-            f"::E{rule_id} {violation_details}"
+            f"::{rule_id} {violation_details}"
         )
 
     @staticmethod

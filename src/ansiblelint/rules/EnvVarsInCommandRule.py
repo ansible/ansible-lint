@@ -25,14 +25,14 @@ from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY, get_first_cmd_arg
 
 
 class EnvVarsInCommandRule(AnsibleLintRule):
-    id = '304'
+    id = 'inline-env-var'
     shortdesc = "Command module does not accept setting environment variables inline"
     description = (
         'Use ``environment:`` to set environment variables '
         'or use ``shell`` module which accepts both'
     )
     severity = 'VERY_HIGH'
-    tags = ['command-shell', 'bug']
+    tags = ['command-shell', 'idiom']
     version_added = 'historic'
 
     expected_args = ['chdir', 'creates', 'executable', 'removes', 'stdin', 'warn',

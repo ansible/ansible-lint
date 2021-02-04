@@ -6,7 +6,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class DeprecatedModuleRule(AnsibleLintRule):
-    id = '105'
+    id = 'deprecated-module'
     shortdesc = 'Deprecated module'
     description = (
         'These are deprecated modules, some modules are kept '

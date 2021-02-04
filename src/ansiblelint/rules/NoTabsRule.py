@@ -7,7 +7,7 @@ from ansiblelint.utils import nested_items
 
 
 class NoTabsRule(AnsibleLintRule):
-    id = '203'
+    id = 'no-tabs'
     shortdesc = 'Most files should not contain tabs'
     description = 'Tabs can cause unexpected display issues, use spaces'
     severity = 'LOW'

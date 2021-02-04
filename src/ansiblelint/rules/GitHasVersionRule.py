@@ -24,14 +24,14 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class GitHasVersionRule(AnsibleLintRule):
-    id = '401'
+    id = 'git-latest'
     shortdesc = 'Git checkouts must contain explicit version'
     description = (
         'All version control checkouts must point to '
         'an explicit commit or tag, not just ``latest``'
     )
     severity = 'MEDIUM'
-    tags = ['module', 'repeatability']
+    tags = ['idempotency']
     version_added = 'historic'
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:

@@ -24,14 +24,14 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class PackageIsNotLatestRule(AnsibleLintRule):
-    id = '403'
+    id = 'package-latest'
     shortdesc = 'Package installs should not use latest'
     description = (
         'Package installs should use ``state=present`` '
         'with or without a version'
     )
     severity = 'VERY_LOW'
-    tags = ['module', 'repeatability']
+    tags = ['idempotency']
     version_added = 'historic'
 
     _package_managers = [

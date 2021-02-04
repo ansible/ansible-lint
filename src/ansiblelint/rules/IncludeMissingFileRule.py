@@ -17,15 +17,15 @@ if TYPE_CHECKING:
 
 
 class IncludeMissingFileRule(AnsibleLintRule):
-    id = '505'
+    id = 'missing-import'
     shortdesc = 'referenced files must exist'
     description = (
-        'All files referenced by by include / import tasks '
+        'All files referenced by include / import tasks '
         'must exist. The check excludes files with jinja2 '
         'templates in the filename.'
     )
     severity = 'MEDIUM'
-    tags = ['task', 'bug']
+    tags = ['idiom']
     version_added = 'v4.3.0'
 
     def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
