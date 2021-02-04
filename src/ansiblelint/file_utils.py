@@ -106,6 +106,16 @@ class Lintable:
             self.path = name
         self._content = content
 
+        # if the lintable is part of a role, we save role folder name
+        self.role = ""
+        parts = self.path.parent.parts
+        if 'roles' in parts:
+            role = self.path
+            while role.parent.name != "roles" and role.name:
+                role = role.parent
+            if role.exists:
+                self.role = role.name
+
         self.kind = kind or kind_from_path(self.path)
         # We store absolute directory in dir
         if self.kind == "role":

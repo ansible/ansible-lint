@@ -1,0 +1,23 @@
+# 3 expected no-loop-var-prefix failures at 2, 8, 18
+- name: that should trigger no-loop-var-prefix
+  debug:
+    var: item
+  loop:
+    - foo
+    - bar
+- name: that should fail due to wrong custom
+  debug:
+    var: zz_item
+  loop:
+    - foo
+    - bar
+  loop_control:
+    loop_var: zz_item
+- name: Using a block
+  block:
+    - name: that should also not pass
+      debug:
+        var: item
+      loop:
+        - apples
+        - oranges

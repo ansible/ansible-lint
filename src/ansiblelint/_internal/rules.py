@@ -18,6 +18,7 @@ class BaseRule:
     description: str = ""
     version_added: str = ""
     severity: str = ""
+    link: str = ""
 
     def getmatches(self, file: "Lintable") -> List["MatchError"]:
         """Return all matches while ignoring exceptions."""
