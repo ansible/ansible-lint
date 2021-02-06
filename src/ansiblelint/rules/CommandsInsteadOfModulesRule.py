@@ -29,8 +29,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     id = 'command-instead-of-module'
     shortdesc = 'Using command rather than module'
     description = (
-        'Executing a command when there is an Ansible module '
-        'is generally a bad idea'
+        'Executing a command when there is an Ansible module is generally a bad idea'
     )
     severity = 'HIGH'
     tags = ['command-shell', 'idiom']
@@ -69,8 +68,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             return False
 
         executable = os.path.basename(first_cmd_arg)
-        if executable in self._modules and \
-                convert_to_boolean(task['action'].get('warn', True)):
+        if executable in self._modules and convert_to_boolean(
+            task['action'].get('warn', True)
+        ):
             message = '{0} used in place of {1} module'
             return message.format(executable, self._modules[executable])
         return False

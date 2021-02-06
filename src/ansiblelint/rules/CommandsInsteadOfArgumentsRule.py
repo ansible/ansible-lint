@@ -37,9 +37,15 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     version_added = 'historic'
 
     _commands = ['command', 'shell', 'raw']
-    _arguments = {'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group',
-                  'ln': 'state=link', 'mkdir': 'state=directory',
-                  'rmdir': 'state=absent', 'rm': 'state=absent'}
+    _arguments = {
+        'chown': 'owner',
+        'chmod': 'mode',
+        'chgrp': 'group',
+        'ln': 'state=link',
+        'mkdir': 'state=directory',
+        'rmdir': 'state=absent',
+        'rm': 'state=absent',
+    }
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in self._commands:
@@ -48,8 +54,9 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
                 return False
 
             executable = os.path.basename(first_cmd_arg)
-            if executable in self._arguments and \
-                    convert_to_boolean(task['action'].get('warn', True)):
+            if executable in self._arguments and convert_to_boolean(
+                task['action'].get('warn', True)
+            ):
                 message = "{0} used in place of argument {1} to file module"
                 return message.format(executable, self._arguments[executable])
         return False

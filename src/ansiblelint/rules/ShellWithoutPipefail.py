@@ -33,8 +33,10 @@ class ShellWithoutPipefail(AnsibleLintRule):
             return False
 
         unjinjad_cmd = self.unjinja(
-            ' '.join(task["action"].get("__ansible_arguments__", [])))
+            ' '.join(task["action"].get("__ansible_arguments__", []))
+        )
 
         return bool(
-            self._pipe_re.search(unjinjad_cmd) and
-            not self._pipefail_re.match(unjinjad_cmd))
+            self._pipe_re.search(unjinjad_cmd)
+            and not self._pipefail_re.match(unjinjad_cmd)
+        )

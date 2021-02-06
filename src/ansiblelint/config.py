@@ -3,22 +3,22 @@ from argparse import Namespace
 from typing import Dict
 
 DEFAULT_KINDS = [
-  # Do not sort this list, order matters.
-  {"requirements": "requirements.yml"},  # v2 and v1
-  {"requirements": "**/meta/requirements.yml"},  # v1 only
-  {"reno": "releasenotes/*/*.{yaml,yml}"},  # reno release notes
-  {"playbook": "**/playbooks/*.{yml,yaml}"},
-  {"playbook": "**/*playbook*.{yml,yaml}"},
-  {"role": "**/roles/*/"},
-  {"tasks": "**/tasks/*.{yaml,yml}"},
-  {"handlers": "**/handlers/*.{yaml,yml}"},
-  {"vars": "**/{vars,defaults}/*.{yaml,yml}"},
-  {"meta": "**/meta/main.{yaml,yml}"},
-  {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
-  {"yaml": "**/molecule/*/molecule.{yaml,yml}"},  # molecule config
-  {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
-  {"yaml": "**/*.{yaml,yml}"},
-  {"yaml": "**/.*.{yaml,yml}"},
+    # Do not sort this list, order matters.
+    {"requirements": "requirements.yml"},  # v2 and v1
+    {"requirements": "**/meta/requirements.yml"},  # v1 only
+    {"reno": "releasenotes/*/*.{yaml,yml}"},  # reno release notes
+    {"playbook": "**/playbooks/*.{yml,yaml}"},
+    {"playbook": "**/*playbook*.{yml,yaml}"},
+    {"role": "**/roles/*/"},
+    {"tasks": "**/tasks/*.{yaml,yml}"},
+    {"handlers": "**/handlers/*.{yaml,yml}"},
+    {"vars": "**/{vars,defaults}/*.{yaml,yml}"},
+    {"meta": "**/meta/main.{yaml,yml}"},
+    {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
+    {"yaml": "**/molecule/*/molecule.{yaml,yml}"},  # molecule config
+    {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
+    {"yaml": "**/*.{yaml,yml}"},
+    {"yaml": "**/.*.{yaml,yml}"},
 ]
 
 options = Namespace(
@@ -40,7 +40,7 @@ options = Namespace(
     kinds=DEFAULT_KINDS,
     mock_modules=[],
     mock_roles=[],
-    loop_var_prefix=None
+    loop_var_prefix=None,
 )
 
 # Used to store detected tag deprecations

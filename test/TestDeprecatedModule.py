@@ -24,5 +24,7 @@ class TestDeprecatedModuleRule(unittest.TestCase):
         self.assertEqual(1, len(results))
         # based on version and blend of ansible being used, we may
         # get a missing module, so we future proof the test
-        assert "couldn't resolve module" not in results[0].message or \
-            "Deprecated module" not in results[0].message
+        assert (
+            "couldn't resolve module" not in results[0].message
+            or "Deprecated module" not in results[0].message
+        )

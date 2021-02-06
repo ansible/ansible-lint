@@ -2,58 +2,84 @@ import pytest
 
 from ansiblelint.file_utils import Lintable
 
-PLAY_IN_THE_PLACE = Lintable('playbook.yml', '''\
+PLAY_IN_THE_PLACE = Lintable(
+    'playbook.yml',
+    '''\
 - hosts: all
   roles:
     - include_in_the_place
-''')
+''',
+)
 
-PLAY_RELATIVE = Lintable('playbook.yml', '''\
+PLAY_RELATIVE = Lintable(
+    'playbook.yml',
+    '''\
 - hosts: all
   roles:
     - include_relative
-''')
+''',
+)
 
-PLAY_MISS_INCLUDE = Lintable('playbook.yml', '''\
+PLAY_MISS_INCLUDE = Lintable(
+    'playbook.yml',
+    '''\
 - hosts: all
   roles:
     - include_miss
-''')
+''',
+)
 
-PLAY_ROLE_INCLUDED_IN_THE_PLACE = Lintable('roles/include_in_the_place/tasks/main.yml', '''\
+PLAY_ROLE_INCLUDED_IN_THE_PLACE = Lintable(
+    'roles/include_in_the_place/tasks/main.yml',
+    '''\
 ---
 - include_tasks: included_file.yml
-''')
+''',
+)
 
-PLAY_ROLE_INCLUDED_RELATIVE = Lintable('roles/include_relative/tasks/main.yml', '''\
+PLAY_ROLE_INCLUDED_RELATIVE = Lintable(
+    'roles/include_relative/tasks/main.yml',
+    '''\
 ---
 - include_tasks: tasks/included_file.yml
-''')
+''',
+)
 
-PLAY_ROLE_INCLUDED_MISS = Lintable('roles/include_miss/tasks/main.yml', '''\
+PLAY_ROLE_INCLUDED_MISS = Lintable(
+    'roles/include_miss/tasks/main.yml',
+    '''\
 ---
 - include_tasks: tasks/noexist_file.yml
-''', kind="tasks")
+''',
+    kind="tasks",
+)
 
-PLAY_INCLUDED_IN_THE_PLACE = Lintable('roles/include_in_the_place/tasks/included_file.yml', '''\
+PLAY_INCLUDED_IN_THE_PLACE = Lintable(
+    'roles/include_in_the_place/tasks/included_file.yml',
+    '''\
 - debug:
     msg: 'was found & included'
-''', kind="tasks")
+''',
+    kind="tasks",
+)
 
-PLAY_INCLUDED_RELATIVE = Lintable('roles/include_relative/tasks/included_file.yml', '''\
+PLAY_INCLUDED_RELATIVE = Lintable(
+    'roles/include_relative/tasks/included_file.yml',
+    '''\
 - debug:
     msg: 'was found & included'
-''')
+''',
+)
 
 
 @pytest.mark.parametrize(
     '_play_files',
     (
-         pytest.param([PLAY_MISS_INCLUDE,
-                       PLAY_ROLE_INCLUDED_MISS],
-                      id='no exist file include'),
+        pytest.param(
+            [PLAY_MISS_INCLUDE, PLAY_ROLE_INCLUDED_MISS], id='no exist file include'
+        ),
     ),
-    indirect=['_play_files']
+    indirect=['_play_files'],
 )
 @pytest.mark.usefixtures('_play_files')
 def test_cases_warning_message(runner, caplog):
@@ -66,16 +92,20 @@ def test_cases_warning_message(runner, caplog):
 @pytest.mark.parametrize(
     '_play_files',
     (
-        pytest.param([PLAY_IN_THE_PLACE,
-                      PLAY_ROLE_INCLUDED_IN_THE_PLACE,
-                      PLAY_INCLUDED_IN_THE_PLACE],
-                     id='in the place include'),
-        pytest.param([PLAY_RELATIVE,
-                      PLAY_ROLE_INCLUDED_RELATIVE,
-                      PLAY_INCLUDED_RELATIVE],
-                     id='relative include')
+        pytest.param(
+            [
+                PLAY_IN_THE_PLACE,
+                PLAY_ROLE_INCLUDED_IN_THE_PLACE,
+                PLAY_INCLUDED_IN_THE_PLACE,
+            ],
+            id='in the place include',
+        ),
+        pytest.param(
+            [PLAY_RELATIVE, PLAY_ROLE_INCLUDED_RELATIVE, PLAY_INCLUDED_RELATIVE],
+            id='relative include',
+        ),
     ),
-    indirect=['_play_files']
+    indirect=['_play_files'],
 )
 @pytest.mark.usefixtures('_play_files')
 def test_cases_that_do_not_report(runner, caplog):

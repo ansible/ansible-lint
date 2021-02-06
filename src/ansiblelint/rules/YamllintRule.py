@@ -59,7 +59,8 @@ class YamllintRule(AnsibleLintRule):
                 _logger.warning(
                     "Loading custom %s config file, this extends our "
                     "internal yamllint config.",
-                    file)
+                    file,
+                )
                 config_override = YamlLintConfig(file=file)
                 config_override.extend(config)
                 break
@@ -85,13 +86,15 @@ class YamllintRule(AnsibleLintRule):
                         linenumber=p.line,
                         details="",
                         filename=str(file.path),
-                        tag=p.rule))
+                        tag=p.rule,
+                    )
+                )
 
         if matches:
             lines = file.content.splitlines()
             for match in matches:
                 # rule.linenumber starts with 1, not zero
-                skip_list = get_rule_skips_from_line(lines[match.linenumber-1])
+                skip_list = get_rule_skips_from_line(lines[match.linenumber - 1])
                 # print(skip_list)
                 if match.rule.id not in skip_list and match.tag not in skip_list:
                     filtered_matches.append(match)

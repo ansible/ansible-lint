@@ -27,7 +27,6 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class TestFormatter(unittest.TestCase):
-
     def setUp(self):
         self.rule = AnsibleLintRule()
         self.rule.id = "TCF0001"
@@ -39,7 +38,8 @@ class TestFormatter(unittest.TestCase):
             linenumber=1,
             details="hello",
             filename="filename.yml",
-            rule=self.rule)
+            rule=self.rule,
+        )
         self.formatter.format(match)
 
     def test_unicode_format_string(self):
@@ -48,7 +48,8 @@ class TestFormatter(unittest.TestCase):
             linenumber=1,
             details="hello",
             filename="filename.yml",
-            rule=self.rule)
+            rule=self.rule,
+        )
         self.formatter.format(match)
 
     def test_dict_format_line(self):
@@ -57,5 +58,6 @@ class TestFormatter(unittest.TestCase):
             linenumber=1,
             details={'hello': 'world'},
             filename="filename.yml",
-            rule=self.rule,)
+            rule=self.rule,
+        )
         self.formatter.format(match)

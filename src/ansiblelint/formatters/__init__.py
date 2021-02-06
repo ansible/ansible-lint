@@ -53,16 +53,15 @@ class BaseFormatter(Generic[T]):
 
 
 class Formatter(BaseFormatter):
-
     def format(self, match: "MatchError") -> str:
         _id = getattr(match.rule, 'id', '000')
-        result = (
-            f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]")
+        result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
         if match.tag:
             result += f" [dim][error_code]({match.tag})[/][/]"
         result += (
             "\n"
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}")
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
+        )
         if match.details:
             result += f" [dim]{match.details}[/]"
         result += "\n"
@@ -70,11 +69,11 @@ class Formatter(BaseFormatter):
 
 
 class QuietFormatter(BaseFormatter):
-
     def format(self, match: "MatchError") -> str:
         return (
             f"[error_code]{match.rule.id}[/] "
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}")
+            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
+        )
 
 
 class ParseableFormatter(BaseFormatter):
@@ -83,7 +82,8 @@ class ParseableFormatter(BaseFormatter):
     def format(self, match: "MatchError") -> str:
         result = (
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}: "
-            f"[error_code]{match.rule.id}[/] [dim]{self.escape(match.message)}[/]")
+            f"[error_code]{match.rule.id}[/] [dim]{self.escape(match.message)}[/]"
+        )
         if match.tag:
             result += f" [dim][error_code]({match.tag})[/][/]"
         return result
@@ -132,7 +132,6 @@ class AnnotationsFormatter(BaseFormatter):
 
 
 class ParseableSeverityFormatter(BaseFormatter):
-
     def format(self, match: "MatchError") -> str:
 
         filename = self._format_path(match.filename or "")
@@ -143,4 +142,5 @@ class ParseableSeverityFormatter(BaseFormatter):
 
         return (
             f"[filename]{filename}[/]:{position}: [[error_code]{rule_id}[/]] "
-            f"[[error_code]{severity}[/]] [dim]{message}[/]")
+            f"[[error_code]{severity}[/]] [dim]{message}[/]"
+        )

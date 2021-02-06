@@ -73,12 +73,13 @@ def kind_from_path(path: Path):
     for entry in options.kinds:
         for k, v in entry.items():
             if pathex.globmatch(
-                    v,
-                    flags=(
-                        wcmatch.pathlib.GLOBSTAR |
-                        wcmatch.pathlib.BRACE |
-                        wcmatch.pathlib.DOTGLOB
-                    )):
+                v,
+                flags=(
+                    wcmatch.pathlib.GLOBSTAR
+                    | wcmatch.pathlib.BRACE
+                    | wcmatch.pathlib.DOTGLOB
+                ),
+            ):
                 return k
     if path.is_dir():
         return "role"
@@ -93,10 +94,11 @@ class Lintable:
     """
 
     def __init__(
-            self,
-            name: Union[str, Path],
-            content: Optional[str] = None,
-            kind: Optional[FileType] = None):
+        self,
+        name: Union[str, Path],
+        content: Optional[str] = None,
+        kind: Optional[FileType] = None,
+    ):
         """Create a Lintable instance."""
         if isinstance(name, str):
             self.name = normpath(name)
@@ -171,20 +173,16 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
 
     try:
         out = subprocess.check_output(
-            git_command,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True
+            git_command, stderr=subprocess.STDOUT, universal_newlines=True
         ).splitlines()
     except subprocess.CalledProcessError as exc:
         _logger.warning(
             "Failed to discover yaml files to lint using git: %s",
-            exc.output.rstrip('\n')
+            exc.output.rstrip('\n'),
         )
     except FileNotFoundError as exc:
         if options.verbosity:
-            _logger.warning(
-                "Failed to locate command: %s", exc
-            )
+            _logger.warning("Failed to locate command: %s", exc)
 
     if out is None:
         out = [

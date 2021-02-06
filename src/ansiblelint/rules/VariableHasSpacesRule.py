@@ -18,8 +18,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     tags = ['formatting']
     version_added = 'v4.0.0'
 
-    bracket_regex = re.compile(
-        r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
+    bracket_regex = re.compile(r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
     exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}")
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
@@ -43,8 +42,6 @@ if 'pytest' in sys.modules:
         collection.register(VariableHasSpacesRule())
 
         lintable = Lintable("examples/playbooks/var-spacing.yml")
-        results = Runner(
-            lintable,
-            rules=collection).run()
+        results = Runner(lintable, rules=collection).run()
 
         assert len(results) == 3

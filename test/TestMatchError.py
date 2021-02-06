@@ -59,28 +59,33 @@ def test_matcherror_compare(left_match_error, right_match_error):
 
 def test_matcherror_invalid():
     """Ensure that MatchError requires message or rule."""
-    expected_err = r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
+    expected_err = (
+        r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
+    )
     with pytest.raises(TypeError, match=expected_err):
         MatchError()
 
 
 @pytest.mark.parametrize(
-    ('left_match_error', 'right_match_error'), (
+    ('left_match_error', 'right_match_error'),
+    (
         # sorting by message
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
         (MatchError("a", filename="b"), MatchError("a", filename="a")),
         # rule id partial-become > rule id no-changed-when
-        (MatchError(rule=BecomeUserWithoutBecomeRule()),
-            MatchError(rule=CommandHasChangesCheckRule())),
+        (
+            MatchError(rule=BecomeUserWithoutBecomeRule()),
+            MatchError(rule=CommandHasChangesCheckRule()),
+        ),
         # details are taken into account
         (MatchError("a", details="foo"), MatchError("a", details="bar")),
         # columns are taken into account
         (MatchError("a", column=3), MatchError("a", column=1)),
         (MatchError("a", column=3), MatchError("a")),
-    ))
+    ),
+)
 class TestMatchErrorCompare:
-
     def test_match_error_less_than(self, left_match_error, right_match_error):
         """Check 'less than' protocol implementation in MatchError."""
         assert right_match_error < left_match_error
@@ -117,8 +122,9 @@ def test_matcherror_compare_no_other_fallback(other, operation, operator_char):
         r'^('
         r'unsupported operand type\(s\) for {operator!s}:|'
         r"'{operator!s}' not supported between instances of"
-        r") 'MatchError' and '{other_type!s}'$".
-        format(other_type=type(other).__name__, operator=operator_char)
+        r") 'MatchError' and '{other_type!s}'$".format(
+            other_type=type(other).__name__, operator=operator_char
+        )
     )
     with pytest.raises(TypeError, match=expected_error):
         operation(MatchError("foo"), other)
@@ -141,12 +147,12 @@ def test_matcherror_compare_no_other_fallback(other, operation, operator_char):
         (operator.eq, False),
         (operator.ne, True),
     ),
-    ids=('==', '!=')
+    ids=('==', '!='),
 )
 def test_matcherror_compare_with_other_fallback(
-        other,
-        operation,
-        expected_value,
+    other,
+    operation,
+    expected_value,
 ):
     """Check that MatchError comparison runs other types fallbacks."""
     assert operation(MatchError("foo"), other) is expected_value

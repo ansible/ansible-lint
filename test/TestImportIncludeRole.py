@@ -55,30 +55,34 @@ def playbook_path(request, tmp_path):
     return str(play_path)
 
 
-@pytest.mark.parametrize(('playbook_path', 'messages'), (
-    pytest.param(PLAY_IMPORT_ROLE,
-                 ['only when shell functionality is required'],
-                 id='IMPORT_ROLE',
-                 ),
-    pytest.param(PLAY_IMPORT_ROLE_INLINE,
-                 ['only when shell functionality is require'],
-                 id='IMPORT_ROLE_INLINE',
-                 ),
-    pytest.param(PLAY_INCLUDE_ROLE,
-                 ['only when shell functionality is require',
-                  'All tasks should be named'],
-                 id='INCLUDE_ROLE',
-                 ),
-    pytest.param(PLAY_INCLUDE_ROLE_INLINE,
-                 ['only when shell functionality is require',
-                  'All tasks should be named'],
-                 id='INCLUDE_ROLE_INLINE',
-                 ),
-), indirect=('playbook_path', ))
+@pytest.mark.parametrize(
+    ('playbook_path', 'messages'),
+    (
+        pytest.param(
+            PLAY_IMPORT_ROLE,
+            ['only when shell functionality is required'],
+            id='IMPORT_ROLE',
+        ),
+        pytest.param(
+            PLAY_IMPORT_ROLE_INLINE,
+            ['only when shell functionality is require'],
+            id='IMPORT_ROLE_INLINE',
+        ),
+        pytest.param(
+            PLAY_INCLUDE_ROLE,
+            ['only when shell functionality is require', 'All tasks should be named'],
+            id='INCLUDE_ROLE',
+        ),
+        pytest.param(
+            PLAY_INCLUDE_ROLE_INLINE,
+            ['only when shell functionality is require', 'All tasks should be named'],
+            id='INCLUDE_ROLE_INLINE',
+        ),
+    ),
+    indirect=('playbook_path',),
+)
 def test_import_role2(default_rules_collection, playbook_path, messages):
-    runner = Runner(
-      playbook_path,
-      rules=default_rules_collection)
+    runner = Runner(playbook_path, rules=default_rules_collection)
     results = runner.run()
     for message in messages:
         assert message in str(results)

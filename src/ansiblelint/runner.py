@@ -34,14 +34,15 @@ class Runner:
 
     # pylint: disable=too-many-arguments
     def __init__(
-            self,
-            *lintables: Union[Lintable, str],
-            rules: "RulesCollection",
-            tags: FrozenSet[Any] = frozenset(),
-            skip_list: List[str] = [],
-            exclude_paths: List[str] = [],
-            verbosity: int = 0,
-            checked_files: Optional[Set[str]] = None) -> None:
+        self,
+        *lintables: Union[Lintable, str],
+        rules: "RulesCollection",
+        tags: FrozenSet[Any] = frozenset(),
+        skip_list: List[str] = [],
+        exclude_paths: List[str] = [],
+        verbosity: int = 0,
+        checked_files: Optional[Set[str]] = None
+    ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.lintables: Set[Lintable] = set()
@@ -122,11 +123,12 @@ class Runner:
                 _logger.debug(
                     "Examining %s of type %s",
                     ansiblelint.file_utils.normpath(file.path),
-                    file.kind)
+                    file.kind,
+                )
 
                 matches.extend(
-                    self.rules.run(file, tags=set(self.tags),
-                                   skip_list=self.skip_list))
+                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list)
+                )
 
         # update list of checked files
         self.checked_files.update([str(x.path) for x in self.lintables])
@@ -148,8 +150,7 @@ class Runner:
                     yield e
                 except AttributeError:
                     yield MatchError(
-                        filename=str(lintable.path),
-                        rule=LoadingFailureRule()
+                        filename=str(lintable.path), rule=LoadingFailureRule()
                     )
                 visited.add(lintable)
 
@@ -167,7 +168,8 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
         skip_list=options.skip_list,
         exclude_paths=options.exclude_paths,
         verbosity=options.verbosity,
-        checked_files=checked_files)
+        checked_files=checked_files
+    )
     matches.extend(runner.run())
 
     # Assure we do not print duplicates and the order is consistent

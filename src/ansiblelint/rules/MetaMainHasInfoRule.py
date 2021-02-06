@@ -12,18 +12,20 @@ if TYPE_CHECKING:
 
     from ansiblelint.constants import odict
 
-META_STR_INFO = (
-    'author',
-    'description'
+META_STR_INFO = ('author', 'description')
+META_INFO = tuple(
+    list(META_STR_INFO)
+    + [
+        'license',
+        'min_ansible_version',
+        'platforms',
+    ]
 )
-META_INFO = tuple(list(META_STR_INFO) + [
-    'license',
-    'min_ansible_version',
-    'platforms',
-])
 
 
-def _platform_info_errors_itr(platforms: "List[odict[str, str]]") -> Generator[str, None, None]:
+def _platform_info_errors_itr(
+    platforms: "List[odict[str, str]]",
+) -> Generator[str, None, None]:
     if not isinstance(platforms, list):
         yield 'Platforms should be a list of dictionaries'
         return
@@ -36,9 +38,10 @@ def _platform_info_errors_itr(platforms: "List[odict[str, str]]") -> Generator[s
 
 
 def _galaxy_info_errors_itr(
-        galaxy_info: "odict[str, Any]",
-        info_list: "Tuple[str, ...]" = META_INFO,
-        str_info_list: "Tuple[str, ...]" = META_STR_INFO) -> Generator[str, None, None]:
+    galaxy_info: "odict[str, Any]",
+    info_list: "Tuple[str, ...]" = META_INFO,
+    str_info_list: "Tuple[str, ...]" = META_STR_INFO,
+) -> Generator[str, None, None]:
     for info in info_list:
         ginfo = galaxy_info.get(info, False)
         if ginfo:
@@ -56,9 +59,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
     shortdesc = 'meta/main.yml should contain relevant info'
     str_info = META_STR_INFO
     info = META_INFO
-    description = (
-        'meta/main.yml should contain: ``{}``'.format(', '.join(info))
-    )
+    description = 'meta/main.yml should contain: ``{}``'.format(', '.join(info))
     severity = 'HIGH'
     tags = ['metadata']
     version_added = 'v4.0.0'
@@ -75,10 +76,8 @@ class MetaMainHasInfoRule(AnsibleLintRule):
         galaxy_info = data.get('galaxy_info', False)
         if galaxy_info:
             return [
-                self.create_matcherror(
-                    message=err,
-                    filename=file)
-                for err in _galaxy_info_errors_itr(galaxy_info)]
+                self.create_matcherror(message=err, filename=file)
+                for err in _galaxy_info_errors_itr(galaxy_info)
+            ]
 
-        return [
-            self.create_matcherror(message="No 'galaxy_info' found")]
+        return [self.create_matcherror(message="No 'galaxy_info' found")]

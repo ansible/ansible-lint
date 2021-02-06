@@ -21,6 +21,4 @@
 # prerun must run before any other imports
 from ansiblelint.version import __version__
 
-__all__ = (
-    "__version__",
-)
+__all__ = ("__version__",)

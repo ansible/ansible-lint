@@ -32,42 +32,53 @@ if TYPE_CHECKING:
 def _get_subtasks(data: "odict[str, Any]") -> List[Any]:
     result: List[Any] = []
     block_names = [
-            'tasks',
-            'pre_tasks',
-            'post_tasks',
-            'handlers',
-            'block',
-            'always',
-            'rescue']
+        'tasks',
+        'pre_tasks',
+        'post_tasks',
+        'handlers',
+        'block',
+        'always',
+        'rescue',
+    ]
     for name in block_names:
         if data and name in data:
-            result += (data[name] or [])
+            result += data[name] or []
     return result
 
 
 def _nested_search(term: str, data: "odict[str, Any]") -> Any:
     if data and term in data:
         return True
-    return reduce((lambda x, y: x or _nested_search(term, y)), _get_subtasks(data), False)
+    return reduce(
+        (lambda x, y: x or _nested_search(term, y)), _get_subtasks(data), False
+    )
 
 
 def _become_user_without_become(becomeuserabove: bool, data: "odict[str, Any]") -> Any:
     if 'become' in data:
         # If become is in lineage of tree then correct
         return False
-    if ('become_user' in data and _nested_search('become', data)):
+    if 'become_user' in data and _nested_search('become', data):
         # If 'become_user' on tree and become somewhere below
         # we must check for a case of a second 'become_user' without a
         # 'become' in its lineage
         subtasks = _get_subtasks(data)
-        return reduce((lambda x, y: x or _become_user_without_become(False, y)), subtasks, False)
+        return reduce(
+            (lambda x, y: x or _become_user_without_become(False, y)), subtasks, False
+        )
     if _nested_search('become_user', data):
         # Keep searching down if 'become_user' exists in the tree below current task
         subtasks = _get_subtasks(data)
-        return (len(subtasks) == 0 or
-                reduce((lambda x, y: x or
-                        _become_user_without_become(
-                            becomeuserabove or 'become_user' in data, y)), subtasks, False))
+        return len(subtasks) == 0 or reduce(
+            (
+                lambda x, y: x
+                or _become_user_without_become(
+                    becomeuserabove or 'become_user' in data, y
+                )
+            ),
+            subtasks,
+            False,
+        )
     # If at bottom of tree, flag up if 'become_user' existed in the lineage of the tree and
     # 'become' was not. This is an error if any lineage has a 'become_user' but no become
     return becomeuserabove
@@ -81,7 +92,9 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     tags = ['unpredictability']
     version_added = 'historic'
 
-    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
+    def matchplay(
+        self, file: "Lintable", data: "odict[str, Any]"
+    ) -> List["MatchError"]:
         if file.kind == 'playbook':
             result = _become_user_without_become(False, data)
             if result:
@@ -89,6 +102,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
                     self.create_matcherror(
                         message=self.shortdesc,
                         filename=str(file.path),
-                        linenumber=data['__line__']
-                        )]
+                        linenumber=data['__line__'],
+                    )
+                ]
         return []

@@ -5,6 +5,8 @@ preferred-modules =
 [MESSAGES CONTROL]
 
 disable =
+    # On purpose disabled as we rely on black
+    line-too-long,
     # TODO(ssbarnea): remove temporary skips adding during initial adoption:
     bad-continuation,
     broad-except,

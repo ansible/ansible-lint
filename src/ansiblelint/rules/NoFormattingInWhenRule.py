@@ -11,7 +11,9 @@ if TYPE_CHECKING:
 class NoFormattingInWhenRule(AnsibleLintRule):
     id = 'no-jinja-when'
     shortdesc = 'No Jinja2 in when'
-    description = '``when`` is a raw Jinja2 expression, remove redundant {{ }} from variable(s).'
+    description = (
+        '``when`` is a raw Jinja2 expression, remove redundant {{ }} from variable(s).'
+    )
     severity = 'HIGH'
     tags = ['deprecations']
     version_added = 'historic'
@@ -21,15 +23,16 @@ class NoFormattingInWhenRule(AnsibleLintRule):
             return True
         return when.find('{{') == -1 and when.find('}}') == -1
 
-    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
+    def matchplay(
+        self, file: "Lintable", data: "odict[str, Any]"
+    ) -> List["MatchError"]:
         errors: List["MatchError"] = []
         if isinstance(data, dict):
             if 'roles' not in data or data['roles'] is None:
                 return errors
             for role in data['roles']:
                 if self.matchtask(role):
-                    errors.append(
-                        self.create_matcherror(details=str({'when': role})))
+                    errors.append(self.create_matcherror(details=str({'when': role})))
         if isinstance(data, list):
             for play_item in data:
                 sub_errors = self.matchplay(file, play_item)

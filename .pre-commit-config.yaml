@@ -43,7 +43,7 @@ repos:
   hooks:
   - id: doc8
 - repo: https://github.com/adrienverge/yamllint.git
-  rev: v1.25.0
+  rev: v1.26.0
   hooks:
   - id: yamllint
     files: \.(yaml|yml)$
@@ -56,6 +56,11 @@ repos:
     args:
     # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
     - --filter-files
+- repo: https://github.com/python/black.git
+  rev: 20.8b1
+  hooks:
+  - id: black
+    language_version: python3
 - repo: https://gitlab.com/pycqa/flake8.git
   rev: 3.8.4
   hooks:
@@ -63,10 +68,11 @@ repos:
     language_version: python3
     additional_dependencies:
     - flake8-2020>=1.6.0
+    # - flake8-black>=0.1.1
     - flake8-docstrings>=1.5.0
     - flake8-pytest-style>=1.2.2
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v0.790
+  rev: v0.800
   hooks:
   - id: mypy
     # empty args needed in order to match mypy cli behavior

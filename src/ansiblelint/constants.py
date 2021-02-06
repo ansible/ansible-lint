@@ -45,7 +45,7 @@ FileType = Literal[
     "requirements",
     "role",  # that is a folder!
     "yaml",  # generic yaml file, previously reported as unknown file type
-    ]
+]
 
 
 # odict is the base class used to represent data model of Ansible

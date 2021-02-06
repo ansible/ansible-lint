@@ -5,9 +5,7 @@ from ansiblelint.runner import Runner
 def test_local_collection(default_rules_collection):
     """Assures local collections are found."""
     playbook_path = 'test/local-content/test-collection.yml'
-    runner = Runner(
-        playbook_path,
-        rules=default_rules_collection)
+    runner = Runner(playbook_path, rules=default_rules_collection)
     results = runner.run()
 
     assert len(runner.lintables) == 1

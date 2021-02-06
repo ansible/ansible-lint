@@ -16,7 +16,5 @@ class TestRoleHandlers(unittest.TestCase):
 
     def test_role_handler_positive(self):
         success = 'examples/playbooks/role-with-handler.yml'
-        good_runner = Runner(
-            success,
-            rules=self.collection)
+        good_runner = Runner(success, rules=self.collection)
         self.assertEqual([], good_runner.run())

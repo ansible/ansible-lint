@@ -64,8 +64,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         module = task["action"]["__ansible_module__"]
         mode = task['action'].get('mode', None)
 
-        if module not in self._modules and \
-                module not in self._modules_with_create:
+        if module not in self._modules and module not in self._modules_with_create:
             return False
 
         if mode == 'preserve' and module not in _modules_with_preserve:
@@ -88,8 +87,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
             return False
 
         # The file module does not create anything when state==file (default)
-        if module == "file" and \
-                task['action'].get('state', 'file') == 'file':
+        if module == "file" and task['action'].get('state', 'file') == 'file':
             return False
 
         # replace module is the only one that has a valid default preserve

@@ -35,10 +35,21 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     tags = ['command-shell', 'idiom']
     version_added = 'historic'
 
-    expected_args = ['chdir', 'creates', 'executable', 'removes', 'stdin', 'warn',
-                     'stdin_add_newline', 'strip_empty_ends',
-                     'cmd', '__ansible_module__', '__ansible_arguments__',
-                     LINE_NUMBER_KEY, FILENAME_KEY]
+    expected_args = [
+        'chdir',
+        'creates',
+        'executable',
+        'removes',
+        'stdin',
+        'warn',
+        'stdin_add_newline',
+        'strip_empty_ends',
+        'cmd',
+        '__ansible_module__',
+        '__ansible_arguments__',
+        LINE_NUMBER_KEY,
+        FILENAME_KEY,
+    ]
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in ['command']:
@@ -46,6 +57,8 @@ class EnvVarsInCommandRule(AnsibleLintRule):
             if not first_cmd_arg:
                 return False
 
-            return any([arg not in self.expected_args for arg in task['action']] +
-                       ["=" in first_cmd_arg])
+            return any(
+                [arg not in self.expected_args for arg in task['action']]
+                + ["=" in first_cmd_arg]
+            )
         return False

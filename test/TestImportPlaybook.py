@@ -5,9 +5,7 @@ from ansiblelint.runner import Runner
 def test_task_hook_import_playbook(default_rules_collection):
     """Assures import_playbook includes are recognized."""
     playbook_path = 'test/playbook-import/playbook_parent.yml'
-    runner = Runner(
-        playbook_path,
-        rules=default_rules_collection)
+    runner = Runner(playbook_path, rules=default_rules_collection)
     results = runner.run()
 
     results_text = str(results)

@@ -27,7 +27,6 @@ from .rules import EMatcherRule, UnsetVariableMatcherRule
 
 
 class TestRule(unittest.TestCase):
-
     def test_rule_matching(self):
         ematcher = EMatcherRule.EMatcherRule()
         lintable = Lintable('examples/playbooks/ematcher-rule.yml', kind="playbook")
