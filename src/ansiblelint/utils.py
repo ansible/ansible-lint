@@ -142,7 +142,7 @@ def _playbook_items(pb_data: dict) -> ItemsView:
         return pb_data.items()
     if not pb_data:
         return []
-    # "if play" prevents failure if the play sequence containes None,
+    # "if play" prevents failure if the play sequence contains None,
     # which is weird but currently allowed by Ansible
     # https://github.com/ansible-community/ansible-lint/issues/849
     return [item for play in pb_data if play for item in play.items()]

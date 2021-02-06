@@ -108,7 +108,7 @@ if "pytest" in sys.modules:
         assert result[0].linenumber == 3
         assert result[0].column == 7
         assert result[0].message == "conflicting action statements: debug, command"
-        # We internaly convert absolute paths returned by ansible into paths
+        # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
         assert result[0].filename.endswith("/conflicting_action.yml")
         assert len(result) == 1
@@ -118,7 +118,7 @@ if "pytest" in sys.modules:
         lintable = Lintable('examples/playbooks/empty_playbook.yml', kind='playbook')
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 0
-        # We internaly convert absolute paths returned by ansible into paths
+        # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
         assert result[0].filename.endswith("/empty_playbook.yml")
         assert result[0].tag == "empty-playbook"

@@ -92,7 +92,7 @@ install custom rules since v4.3.1. The custom rules which are packaged as a
 python package installed into this directory will be loaded and enabled
 automatically by ansible-lint.
 
-To make custom rules loaded automatically, you need the followings:
+To make custom rules loaded automatically, you need the following:
 
 - Packaging your custom rules as a python package named some descriptive ones
   like ``ansible_lint_custom_rules_foo``.

@@ -18,7 +18,7 @@ labels: bug
 - Bug Report
 
 ##### Ansible and Ansible Lint details
-<!--- Paste verbatim output between tripple backticks -->
+<!--- Paste verbatim output between triple backticks -->
 ```console (paste below)
 ansible --version
 
@@ -36,7 +36,7 @@ ansible-lint --version
 ##### STEPS TO REPRODUCE
 <!--- Describe exactly how to reproduce the problem, using a minimal test-case -->
 
-<!--- Paste example playbooks or commands between tripple backticks below -->
+<!--- Paste example playbooks or commands between triple backticks below -->
 ```console (paste below)
 
 ```
@@ -59,7 +59,7 @@ Include a [minimum complete verifiable example] with:
   `ansible-playbook --syntax-check playbook`
 
 
-<!--- Paste verbatim command output between tripple backticks -->
+<!--- Paste verbatim command output between triple backticks -->
 ```paste below
 
 ```
