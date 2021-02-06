@@ -110,9 +110,13 @@ class Runner:
         for data in return_list:
             matches.extend(data)
 
-        matches.extend(self._emit_matches(files))
         # -- phase 2 ---
-        if not matches:  # do our processing only when ansible syntax check passed
+        if not matches:
+
+            # do our processing only when ansible syntax check passed in order
+            # to avoid causing runtime exceptions. Our processing is not as
+            # relisient to be able process garbage.
+            matches.extend(self._emit_matches(files))
 
             # remove duplicates from files list
             files = [value for n, value in enumerate(files) if value not in files[:n]]
