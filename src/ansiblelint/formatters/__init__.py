@@ -150,17 +150,20 @@ class ParseableSeverityFormatter(BaseFormatter):
 
 class CodeclimateJSONFormatter(BaseFormatter):
     """Formatter for emitting violations in Codeclimate JSON report format.
-    Reference: https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#data-type
+
+    The formatter expects a list of MatchError objects and returns a JSON formatted string.
+    The spec for the codeclimate report can be found here:
+    https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#data-type
     """
 
-    def format(self, matches: List["MatchError"]) -> str:
+    def format_result(self, matches: List["MatchError"]) -> str:
 
         if not isinstance(matches, list):
             raise RuntimeError("The CodeclimatJSONFormatter was expecting a list of MatchError.")
 
         result = []
         for match in matches:
-            issue = {}
+            issue: Dict[str, Any] = {}
             issue['type'] = 'issue'
             issue['check_name'] = f"[{match.rule.id}] {match.message}"
             issue['categories'] = match.rule.tags

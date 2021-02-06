@@ -31,7 +31,7 @@ class App:
         if isinstance(self.formatter, formatters.CodeclimateJSONFormatter):
             # If formatter CodeclimateJSONFormatter is chosen, 
             # then print only the matches in JSON
-            console.print(self.formatter.format(matches), markup=False, highlight=False)
+            console.print(self.formatter.format_result(matches), markup=False, highlight=False)
             return None
 
         ignored_matches = [match for match in matches if match.ignored]
@@ -72,7 +72,7 @@ def choose_formatter_factory(
         r = formatters.ParseableFormatter
     elif options_list.parseable_severity:
         r = formatters.ParseableSeverityFormatter
-    elif options_list.parseable_codeclimate:
+    elif options_list.format == 'codeclimate':
         r = formatters.CodeclimateJSONFormatter
     return r
 

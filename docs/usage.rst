@@ -91,3 +91,10 @@ are also handled:
    :cwd: ..
    :returncode: 2
    :nostderr:
+
+A codeclimate report in JSON format can be generated with ansible-lint.
+
+.. command-output:: ansible-lint -f codeclimate examples/playbooks/example.yml
+   :cwd: ..
+   :returncode: 2
+   :nostderr:

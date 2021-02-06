@@ -265,7 +265,6 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
     bools = (
         'display_relative_path',
         'parseable',
-        'parseable_codeclimate',
         'parseable_severity',
         'quiet',
         'use_default_rules',
