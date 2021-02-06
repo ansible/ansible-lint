@@ -1,5 +1,8 @@
-import pathlib
+"""Test the codeclimate JSON formatter."""
 import json
+import pathlib
+from typing import List, Optional
+
 import pytest
 
 from ansiblelint.errors import MatchError
@@ -8,49 +11,60 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class TestCodeclimateJSONFormatter:
+    """Unit test for CodeclimateJSONFormatter."""
+
+    rule = AnsibleLintRule()
+    matches: List[MatchError] = []
+    formatter: Optional[CodeclimateJSONFormatter] = None
 
     def setup_class(self):
-        """Sets up few dummy matcherror objects."""
+        """Set up few MatchError objects."""
         self.rule = AnsibleLintRule()
         self.rule.id = "TCF0001"
         self.rule.severity = "VERY_HIGH"
         self.matches = []
-        self.matches.append(MatchError(
-            message="message",
-            linenumber=1,
-            details="hello",
-            filename="filename.yml",
-            rule=self.rule
-        ))
-        self.matches.append(MatchError(
-            message="message",
-            linenumber=2,
-            details="hello",
-            filename="filename.yml",
-            rule=self.rule
-        ))
-        self.formatter = CodeclimateJSONFormatter(pathlib.Path.cwd(), display_relative_path=True)
+        self.matches.append(
+            MatchError(
+                message="message",
+                linenumber=1,
+                details="hello",
+                filename="filename.yml",
+                rule=self.rule,
+            )
+        )
+        self.matches.append(
+            MatchError(
+                message="message",
+                linenumber=2,
+                details="hello",
+                filename="filename.yml",
+                rule=self.rule,
+            )
+        )
+        self.formatter = CodeclimateJSONFormatter(
+            pathlib.Path.cwd(), display_relative_path=True
+        )
 
     def test_format_list(self):
-        """Tests if the return value is a string"""
+        """Test if the return value is a string."""
         assert isinstance(self.formatter.format_result(self.matches), str)
 
     def test_result_is_json(self):
-        """Tests if returnd string value is a JSON"""
+        """Test if returned string value is a JSON."""
         json.loads(self.formatter.format_result(self.matches))
 
     def test_single_match(self):
-        """Only lists are allowed. Otherwise a RuntimeError will be raised"""
+        """Test negative case. Only lists are allowed. Otherwise a RuntimeError will be raised."""
         with pytest.raises(RuntimeError):
             self.formatter.format_result(self.matches[0])
 
     def test_result_is_list(self):
-        """Tests if the return JSON contains a list with a length of 2"""
+        """Test if the return JSON contains a list with a length of 2."""
         result = json.loads(self.formatter.format_result(self.matches))
         assert len(result) == 2
 
     def test_validate_codeclimate_schema(self):
-        """Tests if the returned JSON is a valid codeclimate report"""
+        """Test if the returned JSON is a valid codeclimate report."""
         result = json.loads(self.formatter.format_result(self.matches))
         single_match = result[0]
         assert 'type' in single_match

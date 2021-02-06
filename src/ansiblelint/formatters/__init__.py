@@ -1,9 +1,9 @@
 """Output formatters."""
-import os
-from pathlib import Path
-from typing import TYPE_CHECKING, Generic, TypeVar, Union, List, Dict, Any
 import hashlib
 import json
+import os
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, Generic, List, TypeVar, Union
 
 import rich
 
@@ -159,7 +159,9 @@ class CodeclimateJSONFormatter(BaseFormatter):
     def format_result(self, matches: List["MatchError"]) -> str:
 
         if not isinstance(matches, list):
-            raise RuntimeError("The CodeclimatJSONFormatter was expecting a list of MatchError.")
+            raise RuntimeError(
+                "The CodeclimatJSONFormatter was expecting a list of MatchError."
+            )
 
         result = []
         for match in matches:
@@ -169,7 +171,9 @@ class CodeclimateJSONFormatter(BaseFormatter):
             issue['categories'] = match.rule.tags
             issue['severity'] = self._severity_to_level(match.rule.severity)
             issue['description'] = self.escape(str(match.rule.description))
-            issue['fingerprint'] = hashlib.sha256(repr(match).encode('utf-8')).hexdigest()
+            issue['fingerprint'] = hashlib.sha256(
+                repr(match).encode('utf-8')
+            ).hexdigest()
             issue['location'] = {}
             issue['location']['path'] = self._format_path(match.filename or "")
             issue['location']['lines'] = {}
