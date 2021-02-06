@@ -1,7 +1,7 @@
 """Output formatters."""
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Generic, TypeVar, Union, List
+from typing import TYPE_CHECKING, Generic, TypeVar, Union, List, Dict, Any
 import hashlib
 import json
 
