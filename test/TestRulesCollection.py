@@ -55,7 +55,7 @@ def test_load_collection_from_directory(test_rules_collection):
 
 def test_run_collection(test_rules_collection, ematchtestfile):
     matches = test_rules_collection.run(ematchtestfile)
-    assert len(matches) == 3  # 3 occurences of BANNED using TEST0001
+    assert len(matches) == 3  # 3 occurrences of BANNED using TEST0001
     assert matches[0].linenumber == 2
 
 
@@ -121,7 +121,7 @@ def test_rich_rule_listing():
 
 
 def test_rules_id_format() -> None:
-    """Asure all our rules have consistent format."""
+    """Assure all our rules have consistent format."""
     rule_id_re = re.compile("^[a-z-]{4,30}$")
     rules = RulesCollection([os.path.abspath('./src/ansiblelint/rules')])
     for rule in rules:

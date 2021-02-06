@@ -12,7 +12,7 @@ proven practices, patterns and behaviors while avoiding common pitfals that can
 easily lead to bugs or make code harder to maintain.
 
 Ansible lint is also supposed to help users upgrade their code to work with
-newer versions of Ansible. Due to this reason we recommand using it with
+newer versions of Ansible. Due to this reason we recommend using it with
 the newest version of Ansible, even if the version used in production may be
 older.
 

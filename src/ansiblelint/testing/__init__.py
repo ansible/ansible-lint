@@ -81,7 +81,7 @@ def run_ansible_lint(
         args = [executable, *argv]
 
     # It is not safe to pass entire env for testing as other tests would
-    # polute the env, causing weird behaviors, so we pass only a safe list of
+    # pollute the env, causing weird behaviors, so we pass only a safe list of
     # vars.
     safe_list = [
         'LANG',
