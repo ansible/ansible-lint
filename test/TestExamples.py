@@ -1,4 +1,6 @@
 """Assure samples produced desire outcomes."""
+import pytest
+
 from ansiblelint.runner import Runner
 
 
@@ -10,11 +12,18 @@ def test_example(default_rules_collection):
     assert len(result) == 15
 
 
-def test_example_plain_string(default_rules_collection):
+@pytest.mark.parametrize(
+    "filename",
+    (
+        pytest.param(
+            'examples/playbooks/syntax-error-string.yml', id='syntax-error-string'
+        ),
+        pytest.param('examples/playbooks/syntax-error.yml', id='syntax-error'),
+    ),
+)
+def test_example_syntax_error(default_rules_collection, filename):
     """Validates that loading valid YAML string produce error."""
-    result = Runner(
-        'examples/playbooks/plain_string.yml', rules=default_rules_collection
-    ).run()
+    result = Runner(filename, rules=default_rules_collection).run()
     assert len(result) >= 1
     passed = False
     for match in result:
