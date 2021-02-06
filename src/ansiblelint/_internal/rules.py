@@ -33,7 +33,8 @@ class BaseRule:
                         "Ignored exception from %s.%s: %s",
                         self.__class__.__name__,
                         method,
-                        e)
+                        e,
+                    )
         return matches
 
     def matchlines(self, file: "Lintable") -> List["MatchError"]:
@@ -52,7 +53,9 @@ class BaseRule:
         """Return matches found for a specific YAML text."""
         return []
 
-    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
+    def matchplay(
+        self, file: "Lintable", data: "odict[str, Any]"
+    ) -> List["MatchError"]:
         """Return matches found for a specific playbook."""
         return []
 
@@ -78,7 +81,8 @@ class RuntimeErrorRule(BaseRule):
         'This error can be caused by internal bugs but also by '
         'custom rules. Instead of just stopping linter we generate there errors and '
         'continue processing. This allows users to add this rule to warn list until '
-        'the root cause is fixed.')
+        'the root cause is fixed.'
+    )
     severity = 'VERY_HIGH'
     tags = ['core']
     version_added = 'v5.0.0'
@@ -89,8 +93,7 @@ class AnsibleParserErrorRule(BaseRule):
 
     id = 'parser-error'
     shortdesc = 'AnsibleParserError'
-    description = (
-        'Ansible parser fails, this usually indicate invalid file.')
+    description = 'Ansible parser fails, this usually indicate invalid file.'
     severity = 'VERY_HIGH'
     tags = ['core']
     version_added = 'v5.0.0'

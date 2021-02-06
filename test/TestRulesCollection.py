@@ -36,16 +36,12 @@ def test_rules_collection() -> RulesCollection:
 
 @pytest.fixture
 def ematchtestfile() -> Lintable:
-    return Lintable(
-        'examples/playbooks/ematcher-rule.yml',
-        kind='playbook')
+    return Lintable('examples/playbooks/ematcher-rule.yml', kind='playbook')
 
 
 @pytest.fixture
 def bracketsmatchtestfile() -> Lintable:
-    return Lintable(
-        'examples/playbooks/bracketsmatchtest.yml',
-        kind='playbook')
+    return Lintable('examples/playbooks/bracketsmatchtest.yml', kind='playbook')
 
 
 def test_load_collection_from_directory(test_rules_collection):
@@ -125,5 +121,7 @@ def test_rules_id_format() -> None:
     rule_id_re = re.compile("^[a-z-]{4,30}$")
     rules = RulesCollection([os.path.abspath('./src/ansiblelint/rules')])
     for rule in rules:
-        assert rule_id_re.match(rule.id), f"R rule id {rule.id} did not match our required format."
+        assert rule_id_re.match(
+            rule.id
+        ), f"R rule id {rule.id} did not match our required format."
     assert len(rules) == 37

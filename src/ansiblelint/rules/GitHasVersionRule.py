@@ -35,5 +35,7 @@ class GitHasVersionRule(AnsibleLintRule):
     version_added = 'historic'
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
-        return bool(task['action']['__ansible_module__'] == 'git' and
-                    task['action'].get('version', 'HEAD') == 'HEAD')
+        return bool(
+            task['action']['__ansible_module__'] == 'git'
+            and task['action'].get('version', 'HEAD') == 'HEAD'
+        )

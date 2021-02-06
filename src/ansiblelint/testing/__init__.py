@@ -39,7 +39,9 @@ class RunFromText:
 
     def run_playbook(self, playbook_text: str) -> List[MatchError]:
         """Lints received text as a playbook."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix="playbook") as fp:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".yml", prefix="playbook"
+        ) as fp:
             fp.write(playbook_text)
             fp.flush()
             results = self._call_runner(fp.name)
@@ -69,10 +71,11 @@ class RunFromText:
 
 
 def run_ansible_lint(
-        *argv: str,
-        cwd: Optional[str] = None,
-        executable: Optional[str] = None,
-        env: Optional[Dict[str, str]] = None) -> CompletedProcess:
+    *argv: str,
+    cwd: Optional[str] = None,
+    executable: Optional[str] = None,
+    env: Optional[Dict[str, str]] = None
+) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
     if not executable:
         executable = sys.executable
@@ -110,5 +113,5 @@ def run_ansible_lint(
         check=False,
         cwd=cwd,
         env=_env,
-        universal_newlines=True
+        universal_newlines=True,
     )

@@ -27,8 +27,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     id = 'package-latest'
     shortdesc = 'Package installs should not use latest'
     description = (
-        'Package installs should use ``state=present`` '
-        'with or without a version'
+        'Package installs should use ``state=present`` with or without a version'
     )
     severity = 'VERY_LOW'
     tags = ['idempotency']
@@ -64,7 +63,9 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     ]
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
-        return (task['action']['__ansible_module__'] in self._package_managers and
-                not task['action'].get('version') and
-                not task['action'].get('update_only') and
-                task['action'].get('state') == 'latest')
+        return (
+            task['action']['__ansible_module__'] in self._package_managers
+            and not task['action'].get('version')
+            and not task['action'].get('update_only')
+            and task['action'].get('state') == 'latest'
+        )

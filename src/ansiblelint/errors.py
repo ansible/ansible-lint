@@ -25,15 +25,15 @@ class MatchError(ValueError):
 
     # pylint: disable=too-many-arguments
     def __init__(
-            self,
-            message: Optional[str] = None,
-            linenumber: int = 0,
-            column: Optional[int] = None,
-            details: str = "",
-            filename: Optional[Union[str, Lintable]] = None,
-            rule: BaseRule = RuntimeErrorRule(),
-            tag: Optional[str] = None  # optional fine-graded tag
-            ) -> None:
+        self,
+        message: Optional[str] = None,
+        linenumber: int = 0,
+        column: Optional[int] = None,
+        details: str = "",
+        filename: Optional[Union[str, Lintable]] = None,
+        rule: BaseRule = RuntimeErrorRule(),
+        tag: Optional[str] = None,  # optional fine-graded tag
+    ) -> None:
         """Initialize a MatchError instance."""
         super().__init__(message)
 
@@ -67,8 +67,9 @@ class MatchError(ValueError):
         # can defined their own custom rules.
         _id = getattr(self.rule, "id", "000")
 
-        return formatstr.format(_id, self.message,
-                                self.filename, self.linenumber, self.details)
+        return formatstr.format(
+            _id, self.message, self.filename, self.linenumber, self.details
+        )
 
     @property
     def position(self) -> str:

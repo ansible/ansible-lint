@@ -19,8 +19,8 @@ from ansiblelint.rules import RulesCollection
 
 
 def _nodes_from_rst(
-        state: statemachine.State,
-        rst_source: str,
+    state: statemachine.State,
+    rst_source: str,
 ) -> List[nodes.Node]:
     """Turn an RST string into a list of nodes.
 

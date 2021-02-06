@@ -43,6 +43,9 @@ max-complexity = 10
 # Accessibility/large fonts and PEP8 unfriendly:
 max-line-length = 100
 
+# https://black.readthedocs.io/en/stable/the_black_code_style.html#line-length
+ignore = E203,E501,W503
+
 # Allow certain violations in certain files:
 per-file-ignores =
   # FIXME: D100 Missing docstring in public module

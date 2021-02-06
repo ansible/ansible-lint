@@ -6,20 +6,18 @@ from rich.console import Console
 from rich.syntax import Syntax
 from rich.theme import Theme
 
-_theme = Theme({
-    "info": "cyan",
-    "warning": "dim yellow",
-    "danger": "bold red",
-    "title": "yellow",
-    "error_code": "bright_red",
-    "error_title": "red",
-    "filename": "blue"
-})
-console_options: Dict[str, Any] = {
-    "emoji": False,
-    "theme": _theme,
-    "soft_wrap": True
-}
+_theme = Theme(
+    {
+        "info": "cyan",
+        "warning": "dim yellow",
+        "danger": "bold red",
+        "title": "yellow",
+        "error_code": "bright_red",
+        "error_title": "red",
+        "filename": "blue",
+    }
+)
+console_options: Dict[str, Any] = {"emoji": False, "theme": _theme, "soft_wrap": True}
 console_options_stderr = console_options.copy()
 console_options_stderr['stderr'] = True
 

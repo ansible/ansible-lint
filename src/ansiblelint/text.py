@@ -20,5 +20,6 @@ def toidentifier(text: str) -> str:
     result = re.sub(r"[\s-]+", '_', text)
     if not result.isidentifier:
         raise RuntimeError(
-            "Unable to convert role name '%s' to valid variable name." % text)
+            "Unable to convert role name '%s' to valid variable name." % text
+        )
     return result

@@ -11,7 +11,10 @@ from typing import Iterator, List, Optional, Union
 
 import ansiblelint.utils
 from ansiblelint._internal.rules import (
-    AnsibleParserErrorRule, BaseRule, LoadingFailureRule, RuntimeErrorRule,
+    AnsibleParserErrorRule,
+    BaseRule,
+    LoadingFailureRule,
+    RuntimeErrorRule,
 )
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
@@ -21,7 +24,6 @@ _logger = logging.getLogger(__name__)
 
 
 class AnsibleLintRule(BaseRule):
-
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
@@ -35,19 +37,20 @@ class AnsibleLintRule(BaseRule):
 
     # pylint: disable=too-many-arguments
     def create_matcherror(
-            self,
-            message: Optional[str] = None,
-            linenumber: int = 0,
-            details: str = "",
-            filename: Optional[Union[str, Lintable]] = None,
-            tag: str = "") -> MatchError:
+        self,
+        message: Optional[str] = None,
+        linenumber: int = 0,
+        details: str = "",
+        filename: Optional[Union[str, Lintable]] = None,
+        tag: str = "",
+    ) -> MatchError:
         match = MatchError(
             message=message,
             linenumber=linenumber,
             details=details,
             filename=filename,
-            rule=copy.copy(self)
-            )
+            rule=copy.copy(self),
+        )
         if tag:
             match.tag = tag
         return match
@@ -76,7 +79,8 @@ class AnsibleLintRule(BaseRule):
                 message=message,
                 linenumber=prev_line_no + 1,
                 details=line,
-                filename=file)
+                filename=file,
+            )
             matches.append(m)
         return matches
 
@@ -119,14 +123,15 @@ class AnsibleLintRule(BaseRule):
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
                 details=task_msg,
-                filename=file)
+                filename=file,
+            )
             matches.append(m)
         return matches
 
     @staticmethod
     def _matchplay_linenumber(play, optional_linenumber):
         try:
-            linenumber, = optional_linenumber
+            (linenumber,) = optional_linenumber
         except ValueError:
             linenumber = play[ansiblelint.utils.LINE_NUMBER_KEY]
         return linenumber
@@ -141,17 +146,16 @@ class AnsibleLintRule(BaseRule):
         # file contains a single string. YAML spec allows this but we consider
         # this an fatal error.
         if isinstance(yaml, str):
-            return [MatchError(
-                filename=str(file.path),
-                rule=LoadingFailureRule()
-            )]
+            return [MatchError(filename=str(file.path), rule=LoadingFailureRule())]
         if not yaml:
             return matches
 
         if isinstance(yaml, dict):
             yaml = [yaml]
 
-        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, file.content, file.kind)
+        yaml = ansiblelint.skip_utils.append_skipped_rules(
+            yaml, file.content, file.kind
+        )
 
         for play in yaml:
 
@@ -185,7 +189,6 @@ def load_plugins(directory: str) -> List[AnsibleLintRule]:
 
 
 class RulesCollection:
-
     def __init__(self, rulesdirs: Optional[List[str]] = None) -> None:
         """Initialize a RulesCollection instance."""
         if rulesdirs is None:
@@ -195,7 +198,8 @@ class RulesCollection:
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
         self.rules.extend(
-            [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()])
+            [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()]
+        )
         for rulesdir in self.rulesdirs:
             _logger.debug("Loading rules from %s", rulesdir)
             self.extend(load_plugins(rulesdir))
@@ -215,7 +219,9 @@ class RulesCollection:
     def extend(self, more: List[AnsibleLintRule]) -> None:
         self.rules.extend(more)
 
-    def run(self, file: Lintable, tags=set(), skip_list: List[str] = []) -> List[MatchError]:
+    def run(
+        self, file: Lintable, tags=set(), skip_list: List[str] = []
+    ) -> List[MatchError]:
         matches: List[MatchError] = list()
 
         if not file.path.is_dir():
@@ -223,18 +229,21 @@ class RulesCollection:
                 if file.content is not None:  # loads the file content
                     pass
             except IOError as e:
-                return [MatchError(
-                    message=str(e),
-                    filename=file,
-                    rule=LoadingFailureRule(),
-                    tag=e.__class__.__name__.lower()
-                    )]
+                return [
+                    MatchError(
+                        message=str(e),
+                        filename=file,
+                        rule=LoadingFailureRule(),
+                        tag=e.__class__.__name__.lower(),
+                    )
+                ]
 
         for rule in self.rules:
             if (
-                    not tags or
-                    rule.has_dynamic_tags or
-                    not set(rule.tags).union([rule.id]).isdisjoint(tags)):
+                not tags
+                or rule.has_dynamic_tags
+                or not set(rule.tags).union([rule.id]).isdisjoint(tags)
+            ):
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if set(rule_definition).isdisjoint(skip_list):
@@ -248,8 +257,9 @@ class RulesCollection:
 
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
-        return "\n".join([rule.verbose()
-                          for rule in sorted(self.rules, key=lambda x: x.id)])
+        return "\n".join(
+            [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)]
+        )
 
     def listtags(self) -> str:
         tag_desc = {
@@ -259,11 +269,10 @@ class RulesCollection:
             "deprecations": "Indicate use of features that are removed from Ansible",
             "experimental": "Newly introduced rules, by default triggering only warnings",
             "formatting": "Related to code-style",
-            "idempotency":
-                "Possible indication that consequent runs would produce different results",
+            "idempotency": "Possible indication that consequent runs would produce different results",
             "idiom": "Anti-pattern detected, likely to cause undesired behavior",
             "metadata": "Invalid metadata, likely related to galaxy, collections or roles",
-            "yaml": "External linter which will also produce its own rule codes."
+            "yaml": "External linter which will also produce its own rule codes.",
         }
 
         tags = defaultdict(list)

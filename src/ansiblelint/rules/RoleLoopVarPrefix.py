@@ -20,7 +20,8 @@ class RoleLoopVarPrefix(AnsibleLintRule):
     shortdesc = __doc__
     link = (
         "https://docs.ansible.com/ansible/latest/user_guide/"
-        "playbooks_loops.html#defining-inner-and-outer-variable-names-with-loop-var")
+        "playbooks_loops.html#defining-inner-and-outer-variable-names-with-loop-var"
+    )
     description = """\
 Looping inside roles has the risk of clashing with loops from user-playbooks.\
 """
@@ -29,10 +30,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     prefix = ""
     severity = 'MEDIUM'
 
-    def matchplay(
-            self,
-            file: Lintable,
-            data: "odict[str, Any]") -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: "odict[str, Any]") -> List[MatchError]:
         """Return matches found for a specific playbook."""
         results: List[MatchError] = []
 
@@ -48,9 +46,8 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_play(
-            self,
-            lintable: Lintable,
-            task: "odict[str, Any]") -> List[MatchError]:
+        self, lintable: Lintable, task: "odict[str, Any]"
+    ) -> List[MatchError]:
         """Return matches for a playlist."""
         results = []
         if 'block' in task:
@@ -60,9 +57,8 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_tasks(
-            self,
-            lintable: Lintable,
-            tasks: List["odict[str, Any]"]) -> List[MatchError]:
+        self, lintable: Lintable, tasks: List["odict[str, Any]"]
+    ) -> List[MatchError]:
         """Return matches for a list of tasks."""
         results = []
         for play in tasks:
@@ -70,9 +66,8 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_task(
-            self,
-            lintable: Lintable,
-            task: "odict[str, Any]") -> List[MatchError]:
+        self, lintable: Lintable, task: "odict[str, Any]"
+    ) -> List[MatchError]:
         """Return matches for a specific task."""
         results = []
         has_loop = 'loop' in task
@@ -87,7 +82,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
             if not loop_var or not loop_var.startswith(self.prefix):
                 results.append(
                     self.create_matcherror(
-                        filename=lintable,
-                        linenumber=task['__line__']
-                    ))
+                        filename=lintable, linenumber=task['__line__']
+                    )
+                )
         return results

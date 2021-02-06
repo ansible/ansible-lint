@@ -84,13 +84,16 @@ PLAYBOOK_WITH_BLOCK = '''\
 '''
 
 
-@pytest.mark.parametrize(('playbook', 'length'), (
-    pytest.param(PLAYBOOK_PRE_TASKS, 2, id='PRE_TASKS'),
-    pytest.param(PLAYBOOK_POST_TASKS, 2, id='POST_TASKS'),
-    pytest.param(PLAYBOOK_HANDLERS, 2, id='HANDLERS'),
-    pytest.param(PLAYBOOK_TWO_PLAYS, 2, id='TWO_PLAYS'),
-    pytest.param(PLAYBOOK_WITH_BLOCK, 4, id='WITH_BLOCK'),
-))
+@pytest.mark.parametrize(
+    ('playbook', 'length'),
+    (
+        pytest.param(PLAYBOOK_PRE_TASKS, 2, id='PRE_TASKS'),
+        pytest.param(PLAYBOOK_POST_TASKS, 2, id='POST_TASKS'),
+        pytest.param(PLAYBOOK_HANDLERS, 2, id='HANDLERS'),
+        pytest.param(PLAYBOOK_TWO_PLAYS, 2, id='TWO_PLAYS'),
+        pytest.param(PLAYBOOK_WITH_BLOCK, 4, id='WITH_BLOCK'),
+    ),
+)
 def test_pre_tasks(default_text_runner, playbook, length):
     # When
     results = default_text_runner.run_playbook(playbook)

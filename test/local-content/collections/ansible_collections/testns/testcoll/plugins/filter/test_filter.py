@@ -11,6 +11,4 @@ class FilterModule:
 
     def filters(self):
         """Return filters."""
-        return {
-            'test_filter': a_test_filter
-        }
+        return {'test_filter': a_test_filter}

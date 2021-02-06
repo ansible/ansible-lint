@@ -27,7 +27,9 @@ class MetaTagValidRule(AnsibleLintRule):
 
     TAG_REGEXP = re.compile('^[a-z0-9]+$')
 
-    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
+    def matchplay(
+        self, file: "Lintable", data: "odict[str, Any]"
+    ) -> List["MatchError"]:
         if file.kind != 'meta':
             return []
 
@@ -43,28 +45,31 @@ class MetaTagValidRule(AnsibleLintRule):
                 tags += galaxy_info['galaxy_tags']
             else:
                 results.append(
-                    self.create_matcherror("Expected 'galaxy_tags' to be a list"))
+                    self.create_matcherror("Expected 'galaxy_tags' to be a list")
+                )
 
         if 'categories' in galaxy_info:
             results.append(
-                self.create_matcherror("Use 'galaxy_tags' rather than 'categories'"))
+                self.create_matcherror("Use 'galaxy_tags' rather than 'categories'")
+            )
             if isinstance(galaxy_info['categories'], list):
                 tags += galaxy_info['categories']
             else:
                 results.append(
-                    self.create_matcherror("Expected 'categories' to be a list"))
+                    self.create_matcherror("Expected 'categories' to be a list")
+                )
 
         for tag in tags:
             msg = self.shortdesc
             if not isinstance(tag, str):
                 results.append(
-                    self.create_matcherror(
-                        "Tags must be strings: '{}'".format(tag)
-                    ))
+                    self.create_matcherror("Tags must be strings: '{}'".format(tag))
+                )
                 continue
             if not re.match(self.TAG_REGEXP, tag):
                 results.append(
-                    self.create_matcherror(message="{}, invalid: '{}'".format(msg, tag)))
+                    self.create_matcherror(message="{}, invalid: '{}'".format(msg, tag))
+                )
 
         return results
 
@@ -80,7 +85,9 @@ if "pytest" in sys.modules:
 
     import pytest
 
-    @pytest.mark.parametrize('rule_runner', (MetaTagValidRule, ), indirect=['rule_runner'])
+    @pytest.mark.parametrize(
+        'rule_runner', (MetaTagValidRule,), indirect=['rule_runner']
+    )
     def test_valid_tag_rule(rule_runner: "Any") -> None:
         """Test rule matches."""
         results = rule_runner.run_role_meta_main(META_TAG_VALID)

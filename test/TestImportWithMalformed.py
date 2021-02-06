@@ -2,20 +2,29 @@ import pytest
 
 from ansiblelint.file_utils import Lintable
 
-IMPORT_TASKS_MAIN = Lintable('import-tasks-main.yml', '''\
+IMPORT_TASKS_MAIN = Lintable(
+    'import-tasks-main.yml',
+    '''\
 - oops this is invalid
-''')
+''',
+)
 
-IMPORT_SHELL_PIP = Lintable('import-tasks-main.yml', '''\
+IMPORT_SHELL_PIP = Lintable(
+    'import-tasks-main.yml',
+    '''\
 - shell: pip
   changed: false
-''')
+''',
+)
 
-PLAY_IMPORT_TASKS = Lintable('playbook.yml', '''\
+PLAY_IMPORT_TASKS = Lintable(
+    'playbook.yml',
+    '''\
 - hosts: all
   tasks:
     - import_tasks: import-tasks-main.yml
-''')
+''',
+)
 
 
 @pytest.mark.parametrize(
@@ -27,7 +36,7 @@ PLAY_IMPORT_TASKS = Lintable('playbook.yml', '''\
             id='import_tasks w/ malformed import',
         ),
     ),
-    indirect=['_play_files']
+    indirect=['_play_files'],
 )
 @pytest.mark.usefixtures('_play_files')
 def test_import_tasks_with_malformed_import(runner):

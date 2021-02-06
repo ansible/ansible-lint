@@ -9,7 +9,9 @@ from ansiblelint.rules import AnsibleLintRule
 class RoleRelativePath(AnsibleLintRule):
     id = 'no-relative-paths'
     shortdesc = "Doesn't need a relative path in role"
-    description = '``copy`` and ``template`` do not need to use relative path for ``src``'
+    description = (
+        '``copy`` and ``template`` do not need to use relative path for ``src``'
+    )
     severity = 'HIGH'
     tags = ['idiom']
     version_added = 'v4.0.0'

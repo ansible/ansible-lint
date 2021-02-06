@@ -6,7 +6,11 @@ from typing import List
 from packaging import version
 
 from ansiblelint.config import options
-from ansiblelint.constants import ANSIBLE_MIN_VERSION, ANSIBLE_MISSING_RC, ANSIBLE_MOCKED_MODULE
+from ansiblelint.constants import (
+    ANSIBLE_MIN_VERSION,
+    ANSIBLE_MISSING_RC,
+    ANSIBLE_MOCKED_MODULE,
+)
 
 
 def check_ansible_presence() -> None:
@@ -15,6 +19,7 @@ def check_ansible_presence() -> None:
     try:
         # pylint: disable=import-outside-toplevel
         from ansible import release
+
         if version.parse(release.__version__) <= version.parse(ANSIBLE_MIN_VERSION):
             failed = True
     except (ImportError, ModuleNotFoundError) as e:
@@ -27,8 +32,10 @@ def check_ansible_presence() -> None:
             " >= %s, but %s was found. "
             "Please install a compatible version using the same python interpreter. See "
             "https://docs.ansible.com/ansible/latest/installation_guide"
-            "/intro_installation.html#installing-ansible-with-pip" %
-            (ANSIBLE_MIN_VERSION, __version__), file=sys.stderr)
+            "/intro_installation.html#installing-ansible-with-pip"
+            % (ANSIBLE_MIN_VERSION, __version__),
+            file=sys.stderr,
+        )
         sys.exit(ANSIBLE_MISSING_RC)
 
 
@@ -42,8 +49,8 @@ def prepare_environment() -> None:
             "--roles-path",
             ".cache/roles",
             "-vr",
-            "requirements.yml"
-            ]
+            "requirements.yml",
+        ]
 
         print("Running %s" % " ".join(cmd))
         run = subprocess.run(
@@ -63,8 +70,8 @@ def prepare_environment() -> None:
             "-p",
             ".cache/collections",
             "-vr",
-            "requirements.yml"
-            ]
+            "requirements.yml",
+        ]
 
         print("Running %s" % " ".join(cmd))
         run = subprocess.run(
@@ -78,8 +85,9 @@ def prepare_environment() -> None:
             sys.exit(run.returncode)
 
         if 'ANSIBLE_COLLECTIONS_PATHS' in os.environ:
-            os.environ['ANSIBLE_COLLECTIONS_PATHS'] = \
-                f".cache/collections:{os.environ['ANSIBLE_COLLECTIONS_PATHS']}"
+            os.environ[
+                'ANSIBLE_COLLECTIONS_PATHS'
+            ] = f".cache/collections:{os.environ['ANSIBLE_COLLECTIONS_PATHS']}"
         else:
             os.environ['ANSIBLE_COLLECTIONS_PATHS'] = ".cache/collections"
 

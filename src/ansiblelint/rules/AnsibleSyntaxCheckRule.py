@@ -14,11 +14,12 @@ from ansiblelint.text import strip_ansi_escape
 _ansible_syntax_check_re = re.compile(
     r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in "
     r"'(?P<filename>.*)': line (?P<line>\d+), column (?P<column>\d+)",
-    re.MULTILINE | re.S | re.DOTALL)
+    re.MULTILINE | re.S | re.DOTALL,
+)
 
 _empty_playbook_re = re.compile(
-    r"^ERROR! Empty playbook, nothing to do",
-    re.MULTILINE | re.S | re.DOTALL)
+    r"^ERROR! Empty playbook, nothing to do", re.MULTILINE | re.S | re.DOTALL
+)
 
 
 class AnsibleSyntaxCheckRule(AnsibleLintRule):
@@ -46,7 +47,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 stderr=subprocess.PIPE,
                 shell=False,  # needed when command is a list
                 universal_newlines=True,
-                check=False
+                check=False,
             )
             result = []
         if run.returncode != 0:
@@ -84,17 +85,20 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 if not message:
                     message = (
                         f"Unexpected error code {run.returncode} from "
-                        f"execution of: {' '.join(cmd)}")
+                        f"execution of: {' '.join(cmd)}"
+                    )
 
-            result.append(MatchError(
-                message=message,
-                filename=filename,
-                linenumber=linenumber,
-                column=column,
-                rule=rule,
-                details=details,
-                tag=tag
-                ))
+            result.append(
+                MatchError(
+                    message=message,
+                    filename=filename,
+                    linenumber=linenumber,
+                    column=column,
+                    rule=rule,
+                    details=details,
+                    tag=tag,
+                )
+            )
         return result
 
 
@@ -103,7 +107,9 @@ if "pytest" in sys.modules:
 
     def test_get_ansible_syntax_check_matches() -> None:
         """Validate parsing of ansible output."""
-        lintable = Lintable('examples/playbooks/conflicting_action.yml', kind='playbook')
+        lintable = Lintable(
+            'examples/playbooks/conflicting_action.yml', kind='playbook'
+        )
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 3
         assert result[0].column == 7

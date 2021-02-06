@@ -26,8 +26,10 @@ from ansiblelint.rules import AnsibleLintRule
 def _changed_in_when(item: str) -> bool:
     if not isinstance(item, str):
         return False
-    return any(changed in item for changed in
-               ['.changed', '|changed', '["changed"]', "['changed']"])
+    return any(
+        changed in item
+        for changed in ['.changed', '|changed', '["changed"]', "['changed']"]
+    )
 
 
 class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):

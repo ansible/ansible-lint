@@ -40,9 +40,7 @@ def _remove_prefix(text: str, prefix: str) -> str:
 
 class RoleNames(AnsibleLintRule):
     id = 'role-name'
-    shortdesc = (
-        "Role name {0} does not match ``%s`` pattern" % ROLE_NAME_REGEX
-    )
+    shortdesc = "Role name {0} does not match ``%s`` pattern" % ROLE_NAME_REGEX
     description = (
         "Role names are now limited to contain only lowercase alphanumeric "
         "characters, plus '_' and start with an alpha character. See "
@@ -63,7 +61,7 @@ class RoleNames(AnsibleLintRule):
         path = str(file.path).split("/")
         if "tasks" in path:
             role_name = _remove_prefix(path[path.index("tasks") - 1], "ansible-role-")
-            role_root = path[:path.index("tasks")]
+            role_root = path[: path.index("tasks")]
             meta = Path("/".join(role_root)) / "meta" / "main.yml"
 
             if meta.is_file():
@@ -77,7 +75,10 @@ class RoleNames(AnsibleLintRule):
             if role_name not in self.done:
                 self.done.append(role_name)
                 if not self._re.match(role_name):
-                    result.append(self.create_matcherror(
-                        filename=str(file.path),
-                        message=self.__class__.shortdesc.format(role_name)))
+                    result.append(
+                        self.create_matcherror(
+                            filename=str(file.path),
+                            message=self.__class__.shortdesc.format(role_name),
+                        )
+                    )
         return result

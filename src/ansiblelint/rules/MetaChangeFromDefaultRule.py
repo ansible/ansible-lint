@@ -22,16 +22,16 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         ('license', 'license (GPLv2, CC-BY, etc)'),
         ('license', 'license (GPL-2.0-or-later, MIT, etc)'),
     ]
-    description = (
-        'meta/main.yml default values should be changed for: ``{}``'.format(
-            ', '.join(f[0] for f in field_defaults)
-        )
+    description = 'meta/main.yml default values should be changed for: ``{}``'.format(
+        ', '.join(f[0] for f in field_defaults)
     )
     severity = 'HIGH'
     tags = ['metadata']
     version_added = 'v4.0.0'
 
-    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
+    def matchplay(
+        self, file: "Lintable", data: "odict[str, Any]"
+    ) -> List["MatchError"]:
         if file.kind != 'meta':
             return []
 
@@ -44,7 +44,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
             value = galaxy_info.get(field, None)
             if value and value == default:
                 results.append(
-                    self.create_matcherror(
-                        'Should change default metadata: %s' % field))
+                    self.create_matcherror('Should change default metadata: %s' % field)
+                )
 
         return results

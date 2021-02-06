@@ -10,5 +10,6 @@ if __name__ == "__main__":
         check=False,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        env=os.environ)
+        env=os.environ,
+    )
     assert result.returncode == 4, result  # missing ansible
