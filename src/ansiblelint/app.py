@@ -29,9 +29,11 @@ class App:
     def render_matches(self, matches: List) -> None:
         """Display given matches."""
         if isinstance(self.formatter, formatters.CodeclimateJSONFormatter):
-            # If formatter CodeclimateJSONFormatter is chosen, 
+            # If formatter CodeclimateJSONFormatter is chosen,
             # then print only the matches in JSON
-            console.print(self.formatter.format_result(matches), markup=False, highlight=False)
+            console.print(
+                self.formatter.format_result(matches), markup=False, highlight=False
+            )
             return None
 
         ignored_matches = [match for match in matches if match.ignored]
