@@ -317,7 +317,7 @@ def test_cli_auto_detect(capfd):
 
 def test_is_playbook():
     """Verify that we can detect a playbook as a playbook."""
-    assert utils.is_playbook("test/test/always-run-success.yml")
+    assert utils.is_playbook("examples/playbooks/always-run-success.yml")
 
 
 @pytest.mark.parametrize(
