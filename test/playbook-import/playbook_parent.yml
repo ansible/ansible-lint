@@ -1,3 +1,0 @@
----
-- name: Importing another playbook
-  import_playbook: playbook_imported.yml
