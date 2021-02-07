@@ -80,7 +80,12 @@ class Runner:
         # Any will short-circuit as soon as something returns True, but will
         # be poor performance for the case where the path under question is
         # not excluded.
-        return any(file_path.startswith(path) for path in self.exclude_paths)
+
+        # Exclusions should be evaluated only using absolute paths in order
+        # to work correctly.
+        abs_path = os.path.abspath(file_path)
+
+        return any(abs_path.startswith(path) for path in self.exclude_paths)
 
     def run(self) -> List[MatchError]:
         """Execute the linting process."""
@@ -136,6 +141,11 @@ class Runner:
 
         # update list of checked files
         self.checked_files.update([str(x.path) for x in self.lintables])
+
+        # remove any matches made inside excluded files
+        matches = list(
+            filter(lambda match: not self.is_excluded(match.filename), matches)
+        )
 
         return sorted(set(matches))
 
