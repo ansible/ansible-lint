@@ -201,7 +201,7 @@ def _set_collections_basedir(basedir: str):
         set_collection_playbook_paths(basedir)
 
 
-def find_children(lintable: Lintable) -> List[Lintable]:
+def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
     if not lintable.path.exists():
         return []
     playbook_dir = str(lintable.path.parent)
@@ -221,8 +221,7 @@ def find_children(lintable: Lintable) -> List[Lintable]:
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
     if isinstance(playbook_ds, str):
         raise MatchError(filename=str(lintable.path), rule=LoadingFailureRule)
-    items = _playbook_items(playbook_ds)
-    for item in items:
+    for item in _playbook_items(playbook_ds):
         for child in play_children(basedir, item, lintable.kind, playbook_dir):
             # We avoid processing parametrized children
             path_str = str(child.path)
@@ -510,9 +509,7 @@ def _sanitize_task(task: dict) -> dict:
     return result
 
 
-# FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible-community/ansible-lint/issues/744
-def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:  # noqa: C901
+def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure tasks have an action key and strings are converted to python objects."""
     result = dict()
 
@@ -556,8 +553,6 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:  # noqa: C901
     return result
 
 
-# FIXME: drop noqa once this function is made simpler
-# Ref: https://github.com/ansible-community/ansible-lint/issues/744
 def normalize_task_v1(task):  # noqa: C901
     result = dict()
     for (k, v) in task.items():
@@ -834,20 +829,24 @@ def get_lintables(
 
         # stage 2: guess roles from current lintables, as there is no unique
         # file that must be present in any kind of role.
-
-        for lintable in lintables:
-            parts = lintable.path.parent.parts
-            if 'roles' in parts:
-                role = lintable.path
-                while role.parent.name != "roles" and role.name:
-                    role = role.parent
-                if role.exists:
-                    lintable = Lintable(role, kind="role")
-                    if lintable not in lintables:
-                        _logger.debug("Added role: %s", lintable)
-                        lintables.append(lintable)
+        _extend_with_roles(lintables)
 
     return lintables
+
+
+def _extend_with_roles(lintables: List[Lintable]) -> None:
+    """Detect roles among lintables and adds them to the list."""
+    for lintable in lintables:
+        parts = lintable.path.parent.parts
+        if 'roles' in parts:
+            role = lintable.path
+            while role.parent.name != "roles" and role.name:
+                role = role.parent
+            if role.exists:
+                lintable = Lintable(role, kind="role")
+                if lintable not in lintables:
+                    _logger.debug("Added role: %s", lintable)
+                    lintables.append(lintable)
 
 
 def convert_to_boolean(value: Any) -> bool:
