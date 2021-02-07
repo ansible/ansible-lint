@@ -1,11 +1,11 @@
 import os
 import subprocess
 import sys
-from typing import List
+from typing import List, Optional
 
 from packaging import version
 
-from ansiblelint.config import options
+from ansiblelint.config import ansible_collections_path, collection_list, options
 from ansiblelint.constants import (
     ANSIBLE_MIN_VERSION,
     ANSIBLE_MISSING_RC,
@@ -84,13 +84,6 @@ def prepare_environment() -> None:
         if run.returncode != 0:
             sys.exit(run.returncode)
 
-        if 'ANSIBLE_COLLECTIONS_PATHS' in os.environ:
-            os.environ[
-                'ANSIBLE_COLLECTIONS_PATHS'
-            ] = f".cache/collections:{os.environ['ANSIBLE_COLLECTIONS_PATHS']}"
-        else:
-            os.environ['ANSIBLE_COLLECTIONS_PATHS'] = ".cache/collections"
-
     _prepare_library_paths()
     _prepare_roles_path()
 
@@ -105,16 +98,56 @@ def _prepare_library_paths() -> None:
         library_paths.append("plugins/modules")
 
     if options.mock_modules:
-        library_paths.append(".cache/modules")
-        os.makedirs(".cache/modules", exist_ok=True)
         for module_name in options.mock_modules:
-            with open(f".cache/modules/{module_name}.py", "w") as f:
-                f.write(ANSIBLE_MOCKED_MODULE)
+            _make_module_stub(module_name)
+        if os.path.exists(".cache/collections"):
+            collection_list.append(".cache/collections")
+        if os.path.exists(".cache/modules"):
+            library_paths.append(".cache/modules")
 
-    library_path_str = ":".join(library_paths)
-    if library_path_str != os.environ.get('ANSIBLE_LIBRARY', ""):
-        os.environ['ANSIBLE_LIBRARY'] = library_path_str
-        print("Added ANSIBLE_LIBRARY=%s" % library_path_str, file=sys.stderr)
+    _update_env('ANSIBLE_LIBRARY', library_paths)
+    _update_env(ansible_collections_path(), collection_list)
+
+
+def _make_module_stub(module_name: str) -> None:
+    if "." not in module_name:
+        os.makedirs(".cache/modules", exist_ok=True)
+        _write_module_stub(
+            filename=f".cache/modules/{module_name}.py", name=module_name
+        )
+    else:
+        namespace, collection, module_file = module_name.split(".")
+        path = f".cache/collections/ansible_collections/{ namespace }/{ collection }/plugins/modules"
+        os.makedirs(path, exist_ok=True)
+        _write_module_stub(
+            filename=f"{path}/{module_file}.py",
+            name=module_file,
+            namespace=namespace,
+            collection=collection,
+        )
+
+
+def _write_module_stub(
+    filename: str,
+    name: str,
+    namespace: Optional[str] = None,
+    collection: Optional[str] = None,
+) -> None:
+    """Write module stub to disk."""
+    body = ANSIBLE_MOCKED_MODULE.format(
+        name=name, collection=collection, namespace=namespace
+    )
+    with open(filename, "w") as f:
+        f.write(body)
+
+
+def _update_env(varname: str, value: List[str]) -> None:
+    """Update environment variable if needed."""
+    if value:
+        value_str = ":".join(value)
+        if value_str != os.environ.get(varname, ""):
+            os.environ[varname] = value_str
+            print("Added %s=%s" % (varname, value_str), file=sys.stderr)
 
 
 def _prepare_roles_path() -> None:
