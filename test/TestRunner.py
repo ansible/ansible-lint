@@ -57,6 +57,18 @@ def test_runner(default_rules_collection, playbook, exclude, length) -> None:
     assert len(matches) == length
 
 
+def test_runner_exclude_paths(default_rules_collection) -> None:
+    """Test that exclude paths do work."""
+    runner = Runner(
+        'examples/playbooks/example.yml',
+        rules=default_rules_collection,
+        exclude_paths=['examples/'],
+    )
+
+    matches = runner.run()
+    assert len(matches) == 0
+
+
 @pytest.mark.parametrize(
     ('formatter_cls'),
     (
