@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - shell:
+        cmd: |
+          if [ $FOO != false ]; then

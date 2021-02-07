@@ -1,9 +1,11 @@
 # Copyright (c) 2016, Will Thames and contributors
-# Copyright (c) 2018, Ansible Project
+# Copyright (c) 2018-2021, Ansible Project
 
 import re
+from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import nested_items
 
 
 class ComparisonToLiteralBoolRule(AnsibleLintRule):
@@ -19,5 +21,9 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
 
     literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
 
-    def match(self, line: str) -> bool:
-        return bool(self.literal_bool_compare.search(line))
+    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+        for k, v in nested_items(task):
+            if k == 'when':
+                if self.literal_bool_compare.search(v):
+                    return True
+        return False
