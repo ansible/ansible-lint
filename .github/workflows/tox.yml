@@ -236,9 +236,7 @@ jobs:
     - name: Publish to test.pypi.org
       if: >-
         github.event_name == 'push' &&
-        github.ref == format(
-          'refs/heads/{0}', github.event.repository.default_branch
-        )
+        github.ref == 'refs/heads/${{ github.event.repository.default_branch }}'
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.testpypi_password }}
@@ -247,9 +245,7 @@ jobs:
       if: >-
         github.event_name == 'push' &&
         github.event.ref_type == 'tag' &&
-        github.ref == format(
-          'refs/heads/{0}', github.event.repository.default_branch
-        )
+        github.ref == 'refs/heads/${{ github.event.repository.default_branch }}'
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.pypi_password }}
