@@ -35,6 +35,8 @@ class BaseRule:
                         method,
                         e,
                     )
+        else:
+            matches.extend(self.matchdir(file))
         return matches
 
     def matchlines(self, file: "Lintable") -> List["MatchError"]:
@@ -57,6 +59,10 @@ class BaseRule:
         self, file: "Lintable", data: "odict[str, Any]"
     ) -> List["MatchError"]:
         """Return matches found for a specific playbook."""
+        return []
+
+    def matchdir(self, lintable: "Lintable") -> List["MatchError"]:
+        """Return matches for lintable folders."""
         return []
 
     def verbose(self) -> str:

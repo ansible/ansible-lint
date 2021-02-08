@@ -56,29 +56,41 @@ class RoleNames(AnsibleLintRule):
         """Save precompiled regex."""
         self._re = re.compile(ROLE_NAME_REGEX)
 
+    def matchdir(self, lintable: "Lintable") -> List["MatchError"]:
+        return self.matchyaml(lintable)
+
     def matchyaml(self, file: Lintable) -> List["MatchError"]:
         result: List["MatchError"] = []
-        path = str(file.path).split("/")
-        if "tasks" in path:
-            role_name = _remove_prefix(path[path.index("tasks") - 1], "ansible-role-")
-            role_root = path[: path.index("tasks")]
-            meta = Path("/".join(role_root)) / "meta" / "main.yml"
 
-            if meta.is_file():
-                meta_data = parse_yaml_from_file(str(meta))
-                if meta_data:
-                    try:
-                        role_name = meta_data['galaxy_info']['role_name']
-                    except KeyError:
-                        pass
+        if file.kind not in ('meta', 'role'):
+            return result
+        if file.kind == 'role':
+            role_name = self._infer_role_name(
+                meta=file.path / "meta" / "main.yml", default=file.path.name
+            )
+        else:
+            role_name = self._infer_role_name(
+                meta=file.path, default=file.path.resolve().parents[1].name
+            )
 
-            if role_name not in self.done:
-                self.done.append(role_name)
-                if not self._re.match(role_name):
-                    result.append(
-                        self.create_matcherror(
-                            filename=str(file.path),
-                            message=self.__class__.shortdesc.format(role_name),
-                        )
+        role_name = _remove_prefix(role_name, "ansible-role-")
+        if role_name not in self.done:
+            self.done.append(role_name)
+            if not self._re.match(role_name):
+                result.append(
+                    self.create_matcherror(
+                        filename=str(file.path),
+                        message=self.__class__.shortdesc.format(role_name),
                     )
+                )
         return result
+
+    def _infer_role_name(self, meta: Path, default: str) -> str:
+        if meta.is_file():
+            meta_data = parse_yaml_from_file(str(meta))
+            if meta_data:
+                try:
+                    return str(meta_data['galaxy_info']['role_name'])
+                except KeyError:
+                    pass
+        return default
