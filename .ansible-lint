@@ -8,6 +8,7 @@ exclude_paths:
 # Mock modules or roles in order to pass ansible-playbook --syntax-check
 mock_modules:
   - zuul_return
+  - fake_namespace.fake_collection.fake_module
 mock_roles:
   - mocked_role
 

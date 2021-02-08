@@ -4,3 +4,5 @@
   tasks:
     - name: some task
       zuul_return: {}
+    - name: mocked module from collection
+      fake_namespace.fake_collection.fake_module: {}
