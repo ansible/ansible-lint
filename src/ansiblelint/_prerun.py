@@ -84,29 +84,35 @@ def prepare_environment() -> None:
         if run.returncode != 0:
             sys.exit(run.returncode)
 
-    _prepare_library_paths()
-    _prepare_roles_path()
+    _perform_mockings()
+    _prepare_ansible_paths()
 
 
-def _prepare_library_paths() -> None:
-    """Configure ANSIBLE_LIBRARY."""
+def _prepare_ansible_paths() -> None:
+    """Configure Ansible environment variables."""
     library_paths: List[str] = []
+    roles_path: List[str] = []
+
+    if 'ANSIBLE_ROLES_PATH' in os.environ:
+        roles_path = os.environ['ANSIBLE_ROLES_PATH'].split(':')
     if 'ANSIBLE_LIBRARY' in os.environ:
         library_paths = os.environ['ANSIBLE_LIBRARY'].split(':')
 
     if os.path.exists("plugins/modules") and "plugins/modules" not in library_paths:
         library_paths.append("plugins/modules")
 
-    if options.mock_modules:
-        for module_name in options.mock_modules:
-            _make_module_stub(module_name)
-        if os.path.exists(".cache/collections"):
-            collection_list.append(".cache/collections")
-        if os.path.exists(".cache/modules"):
-            library_paths.append(".cache/modules")
+    if os.path.exists(".cache/collections"):
+        collection_list.append(".cache/collections")
+    if os.path.exists(".cache/modules"):
+        library_paths.append(".cache/modules")
+    if os.path.exists("roles"):
+        roles_path.append("roles")
+    if os.path.exists(".cache/roles"):
+        roles_path.append(".cache/roles")
 
     _update_env('ANSIBLE_LIBRARY', library_paths)
     _update_env(ansible_collections_path(), collection_list)
+    _update_env('ANSIBLE_ROLES_PATH', roles_path)
 
 
 def _make_module_stub(module_name: str) -> None:
@@ -150,22 +156,16 @@ def _update_env(varname: str, value: List[str]) -> None:
             print("Added %s=%s" % (varname, value_str), file=sys.stderr)
 
 
-def _prepare_roles_path() -> None:
-    """Configure ANSIBLE_ROLES_PATH."""
-    roles_path: List[str] = []
-    if 'ANSIBLE_ROLES_PATH' in os.environ:
-        roles_path = os.environ['ANSIBLE_ROLES_PATH'].split(':')
+def _perform_mockings() -> None:
+    """Mock modules and roles."""
+    for role_name in options.mock_roles:
+        if "." in role_name:
+            namespace, collection, role_dir = role_name.split(".")
+            path = f".cache/collections/ansible_collections/{ namespace }/{ collection }/roles/{ role_dir }/"
+        else:
+            path = f".cache/roles/{role_name}"
+        os.makedirs(path, exist_ok=True)
 
-    if os.path.exists("roles") and "roles" not in roles_path:
-        roles_path.append("roles")
-
-    if options.mock_roles or os.path.exists(".cache/roles"):
-        for role_name in options.mock_roles:
-            os.makedirs(f".cache/roles/{role_name}", exist_ok=True)
-        if ".cache/roles" not in roles_path:
-            roles_path.append(".cache/roles")
-
-    if roles_path:
-        roles_path_str = ":".join(roles_path)
-        os.environ['ANSIBLE_ROLES_PATH'] = roles_path_str
-        print("Added ANSIBLE_ROLES_PATH=%s" % roles_path_str, file=sys.stderr)
+    if options.mock_modules:
+        for module_name in options.mock_modules:
+            _make_module_stub(module_name)

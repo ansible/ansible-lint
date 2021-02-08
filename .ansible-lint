@@ -11,6 +11,7 @@ mock_modules:
   - fake_namespace.fake_collection.fake_module
 mock_roles:
   - mocked_role
+  - fake_namespace.fake_collection.fake_role
 
 # Enable checking of loop variable prefixes in roles
 loop_var_prefix: "{role}_"
