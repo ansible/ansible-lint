@@ -248,6 +248,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help='Specify configuration file to use.  ' 'Defaults to ".ansible-lint"',
     )
     parser.add_argument(
+        '--offline',
+        dest='offline',
+        action='store_const',
+        const=True,
+        help='Disable installation of requirements.yml',
+    )
+    parser.add_argument(
         '--version',
         action='store_true',
     )
@@ -269,6 +276,7 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
         'quiet',
         'use_default_rules',
         'progressive',
+        'offline',
     )
     # maps lists to their default config values
     lists_map = {
