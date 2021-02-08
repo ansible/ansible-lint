@@ -13,8 +13,5 @@ skip-string-normalization = true
 [tool.isort]
 profile = "black"
 
-# ATTENTION: the following section must be kept last in
-# `pyproject.toml` because our CI/CD appends one line in
-# the end when publishing non-tagged versions to test.pypi.org
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
