@@ -1,6 +1,7 @@
 - hosts: localhost
   roles:
     - mocked_role
+    - fake_namespace.fake_collection.fake_role
   tasks:
     - name: some task
       zuul_return: {}
