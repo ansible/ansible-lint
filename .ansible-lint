@@ -34,3 +34,6 @@ warn_list:
   - skip_this_tag
   - git-latest
   - experimetal  # experimental is included in the implicit list
+
+# offline mode disables installation of requirements.yml
+offline: false
