@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import sys
 from typing import List, Optional
@@ -10,6 +11,7 @@ from ansiblelint.constants import (
     ANSIBLE_MIN_VERSION,
     ANSIBLE_MISSING_RC,
     ANSIBLE_MOCKED_MODULE,
+    INVALID_CONFIG_RC,
 )
 
 
@@ -116,12 +118,8 @@ def _prepare_ansible_paths() -> None:
 
 
 def _make_module_stub(module_name: str) -> None:
-    if "." not in module_name:
-        os.makedirs(".cache/modules", exist_ok=True)
-        _write_module_stub(
-            filename=f".cache/modules/{module_name}.py", name=module_name
-        )
-    else:
+    # a.b.c is treated a collection
+    if re.match(r"\w+\.\w+\.\w+", module_name):
         namespace, collection, module_file = module_name.split(".")
         path = f".cache/collections/ansible_collections/{ namespace }/{ collection }/plugins/modules"
         os.makedirs(path, exist_ok=True)
@@ -130,6 +128,17 @@ def _make_module_stub(module_name: str) -> None:
             name=module_file,
             namespace=namespace,
             collection=collection,
+        )
+    elif "." in module_name:
+        print(
+            "Config error: %s is not a valid module name." % module_name,
+            file=sys.stderr,
+        )
+        sys.exit(INVALID_CONFIG_RC)
+    else:
+        os.makedirs(".cache/modules", exist_ok=True)
+        _write_module_stub(
+            filename=f".cache/modules/{module_name}.py", name=module_name
         )
 
 
@@ -159,7 +168,7 @@ def _update_env(varname: str, value: List[str]) -> None:
 def _perform_mockings() -> None:
     """Mock modules and roles."""
     for role_name in options.mock_roles:
-        if "." in role_name:
+        if re.match(r"\w+\.\w+\.\w+", role_name):
             namespace, collection, role_dir = role_name.split(".")
             path = f".cache/collections/ansible_collections/{ namespace }/{ collection }/roles/{ role_dir }/"
         else:

@@ -9,9 +9,11 @@ exclude_paths:
 mock_modules:
   - zuul_return
   - fake_namespace.fake_collection.fake_module
+  # note the foo.bar is invalid as being neither a module or a collection
 mock_roles:
   - mocked_role
-  - fake_namespace.fake_collection.fake_role
+  - author.role_name  # old standalone galaxy role
+  - fake_namespace.fake_collection.fake_role  # role within a collection
 
 # Enable checking of loop variable prefixes in roles
 loop_var_prefix: "{role}_"
