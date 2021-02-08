@@ -40,8 +40,8 @@ def check_ansible_presence() -> None:
 
 
 def prepare_environment() -> None:
-    """Make custom modules available if needed."""
-    if os.path.exists("requirements.yml"):
+    """Make dependencies available if needed."""
+    if not options.offline and os.path.exists("requirements.yml"):
 
         cmd = [
             "ansible-galaxy",
