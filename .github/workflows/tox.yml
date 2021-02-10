@@ -236,6 +236,7 @@ jobs:
     - name: Publish to test.pypi.org
       if: >-
         github.event_name == 'push' &&
+        github.event.ref_type == 'tag' &&
         github.ref == 'refs/heads/${{ github.event.repository.default_branch }}'
       uses: pypa/gh-action-pypi-publish@master
       with:
