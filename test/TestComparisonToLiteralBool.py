@@ -10,6 +10,13 @@ PASS_WHEN = '''
   debug:
     msg: test
   when: my_var
+
+- name: another example task
+  debug:
+    msg: test
+  when:
+    - 1 + 1 == 2
+    - true
 '''
 
 PASS_WHEN_NOT_FALSE = '''
@@ -38,6 +45,12 @@ FAIL_LITERAL_FALSE = '''
   debug:
     msg: test
   when: my_var == false
+
+- name: another example task
+  debug:
+    msg: test
+  when:
+    - my_var == false
 '''
 
 
@@ -66,4 +79,4 @@ class TestComparisonToLiteralBoolRule(unittest.TestCase):
 
     def test_literal_false(self):
         results = self.runner.run_role_tasks_main(FAIL_LITERAL_FALSE)
-        assert len(results) == 1, results
+        assert len(results) == 2, results
