@@ -227,7 +227,7 @@ def test_get_yaml_files_git_verbose(reset_env_var, message_prefix, monkeypatch, 
     expected_info = (
         "ansiblelint",
         logging.INFO,
-        'Discovering files to lint: git ls-files *.yaml *.yml',
+        'Discovering files to lint: git ls-files -z *.yaml *.yml',
     )
 
     assert expected_info in caplog.record_tuples
@@ -267,6 +267,18 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     )
 
 
+def test_get_yaml_files_umlaut(monkeypatch):
+    """Verify that filenames containing German umlauts are not garbled by the get_yaml_files."""
+    options = cli.get_config([])
+    test_dir = Path(__file__).resolve().parent
+    lint_path = test_dir / '..' / 'examples' / 'playbooks'
+
+    monkeypatch.chdir(str(lint_path))
+    files = file_utils.get_yaml_files(options)
+    assert '"with-umlaut-\\303\\244.yml"' not in files
+    assert 'with-umlaut-ä.yml' in files
+
+
 def test_logger_debug(caplog):
     """Test that the double verbosity arg causes logger to be DEBUG."""
     options = cli.get_config(['-vv'])
@@ -300,7 +312,7 @@ def test_cli_auto_detect(capfd):
     out, err = capfd.readouterr()
 
     # Confirmation that it runs in auto-detect mode
-    assert "Discovering files to lint: git ls-files *.yaml *.yml" in err
+    assert "Discovering files to lint: git ls-files -z *.yaml *.yml" in err
     # An expected rule match from our examples
     assert (
         "examples/playbooks/empty_playbook.yml:0: "
