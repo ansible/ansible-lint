@@ -33,7 +33,7 @@ rules:
 DESCRIPTION = """\
 Rule violations reported by YamlLint when this is installed.
 
-You can fully disable all of them by adding 'YAML' to the 'skip_list'.
+You can fully disable all of them by adding 'yaml' to the 'skip_list'.
 
 Specific tag identifiers that are printed at the end of rule name,
 like 'trailing-spaces' or 'indentation' can also be be skipped, allowing
