@@ -166,7 +166,7 @@ class Lintable:
 def get_yaml_files(options: Namespace) -> Dict[str, Any]:
     """Find all yaml files."""
     # git is preferred as it also considers .gitignore
-    git_command = ['git', 'ls-files', '*.yaml', '*.yml']
+    git_command = ['git', 'ls-files', '-z', '*.yaml', '*.yml']
     _logger.info("Discovering files to lint: %s", ' '.join(git_command))
 
     out = None
@@ -174,7 +174,7 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
     try:
         out = subprocess.check_output(
             git_command, stderr=subprocess.STDOUT, universal_newlines=True
-        ).splitlines()
+        ).split("\x00")[:-1]
     except subprocess.CalledProcessError as exc:
         _logger.warning(
             "Failed to discover yaml files to lint using git: %s",

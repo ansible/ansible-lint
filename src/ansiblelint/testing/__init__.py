@@ -98,12 +98,11 @@ def run_ansible_lint(
 
     if env is None:
         _env = {}
-        for v in safe_list:
-            if v in os.environ:
-                _env[v] = os.environ[v]
-
     else:
         _env = env
+    for v in safe_list:
+        if v in os.environ and v not in _env:
+            _env[v] = os.environ[v]
 
     return subprocess.run(
         args,
