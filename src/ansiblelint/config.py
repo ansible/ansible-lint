@@ -64,7 +64,7 @@ def ansible_collections_path() -> str:
     """Return collection path variable for current version of Ansible."""
     # respect Ansible behavior, which is to load old name if present
     for env_var in ["ANSIBLE_COLLECTIONS_PATHS", "ANSIBLE_COLLECTIONS_PATH"]:
-        if "ANSIBLE_COLLECTIONS_PATHS" in os.environ:
+        if env_var in os.environ:
             return env_var
 
     # https://github.com/ansible/ansible/pull/70007
