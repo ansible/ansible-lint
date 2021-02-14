@@ -62,7 +62,7 @@ When you call ansible-lint without arguments the tool will use its internal
 heuristics to determine file types.
 
 ``ansible-lint`` also accepts a list of **roles** or **playbooks** as
-arguments. The following command would linting ``playbook.yml`` and
+arguments. The following command lints ``examples/play.yml`` and
 ``examples/roles/bobbins`` role:
 
 .. command-output:: ansible-lint -p examples/play.yml examples/roles/bobbins
