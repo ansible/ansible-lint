@@ -80,7 +80,9 @@ class YamllintRule(AnsibleLintRule):
             return matches
 
         if YamllintRule.config:
-            for p in run_yamllint(file.content, YamllintRule.config, filepath=file.path):
+            for p in run_yamllint(
+                file.content, YamllintRule.config, filepath=file.path
+            ):
                 matches.append(
                     self.create_matcherror(
                         message=p.desc,
