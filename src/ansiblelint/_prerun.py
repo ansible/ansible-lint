@@ -100,17 +100,15 @@ def _prepare_ansible_paths() -> None:
     if 'ANSIBLE_LIBRARY' in os.environ:
         library_paths = os.environ['ANSIBLE_LIBRARY'].split(':')
 
-    if os.path.exists("plugins/modules") and "plugins/modules" not in library_paths:
-        library_paths.append("plugins/modules")
-
-    if os.path.exists(".cache/collections"):
-        collection_list.append(".cache/collections")
-    if os.path.exists(".cache/modules"):
-        library_paths.append(".cache/modules")
-    if os.path.exists("roles"):
-        roles_path.append("roles")
-    if os.path.exists(".cache/roles"):
-        roles_path.append(".cache/roles")
+    for path_list, path in (
+        (library_paths, "plugins/modules"),
+        (library_paths, ".cache/modules"),
+        (collection_list, ".cache/collections"),
+        (roles_path, "roles"),
+        (roles_path, ".cache/roles"),
+    ):
+        if path not in path_list and os.path.exists(path):
+            path_list.append(path)
 
     _update_env('ANSIBLE_LIBRARY', library_paths)
     _update_env(ansible_collections_path(), collection_list)
