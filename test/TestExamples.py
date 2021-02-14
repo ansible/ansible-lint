@@ -1,14 +1,20 @@
 """Assure samples produced desire outcomes."""
+import os
 import pytest
 
 from ansiblelint.runner import Runner
 
 
-def test_example(default_rules_collection):
+@pytest.fixture(scope="function")
+def _change_into_examples_dir(request):
+    os.chdir('examples')
+    yield
+    os.chdir('..')
+
+
+def test_example(default_rules_collection, _change_into_examples_dir):
     """example.yml is expected to have 15 match errors inside."""
-    result = Runner(
-        'examples/playbooks/example.yml', rules=default_rules_collection
-    ).run()
+    result = Runner('playbooks/example.yml', rules=default_rules_collection).run()
     assert len(result) == 15
 
 
