@@ -63,6 +63,7 @@ class YamllintRule(AnsibleLintRule):
                 )
                 config_override = YamlLintConfig(file=file)
                 config_override.extend(config)
+                config = config_override
                 break
         _logger.debug("Effective yamllint rules used: %s", config.rules)
 
@@ -79,7 +80,9 @@ class YamllintRule(AnsibleLintRule):
             return matches
 
         if YamllintRule.config:
-            for p in run_yamllint(file.content, YamllintRule.config):
+            for p in run_yamllint(
+                file.content, YamllintRule.config, filepath=file.path
+            ):
                 matches.append(
                     self.create_matcherror(
                         message=p.desc,
