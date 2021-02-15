@@ -37,7 +37,7 @@ from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.splitter import split_args
 from ansible.parsing.yaml.constructor import AnsibleConstructor
 from ansible.parsing.yaml.loader import AnsibleLoader
-from ansible.parsing.yaml.objects import AnsibleSequence
+from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible.template import Templar
 
@@ -704,7 +704,7 @@ def get_normalized_tasks(yaml, file: Lintable) -> List[Dict[str, Any]]:
 
 
 @lru_cache(maxsize=128)
-def parse_yaml_linenumbers(data, filename):
+def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
@@ -723,19 +723,19 @@ def parse_yaml_linenumbers(data, filename):
             mapping[LINE_NUMBER_KEY] = node.__line__
         else:
             mapping[LINE_NUMBER_KEY] = mapping._line_number
-        mapping[FILENAME_KEY] = filename
+        mapping[FILENAME_KEY] = lintable.path
         return mapping
 
     try:
         kwargs = {}
         if 'vault_password' in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs['vault_password'] = DEFAULT_VAULT_PASSWORD
-        loader = AnsibleLoader(data, **kwargs)
+        loader = AnsibleLoader(lintable.content, **kwargs)
         loader.compose_node = compose_node
         loader.construct_mapping = construct_mapping
         data = loader.get_single_data()
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
-        raise SystemExit("Failed to parse YAML in %s: %s" % (filename, str(e)))
+        raise SystemExit("Failed to parse YAML in %s: %s" % (lintable.path, str(e)))
     return data
 
 

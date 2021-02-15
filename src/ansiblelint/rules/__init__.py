@@ -91,11 +91,11 @@ class AnsibleLintRule(BaseRule):
         if not self.matchtask or file.kind == 'meta':
             return matches
 
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(file.content, file.path)
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
         if not yaml:
             return matches
 
-        yaml = append_skipped_rules(yaml, file.content, file.kind)
+        yaml = append_skipped_rules(yaml, file)
 
         try:
             tasks = ansiblelint.utils.get_normalized_tasks(yaml, file)
@@ -138,7 +138,7 @@ class AnsibleLintRule(BaseRule):
         if not self.matchplay:
             return matches
 
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(file.content, file.path)
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
         # yaml returned can be an AnsibleUnicode (a string) when the yaml
         # file contains a single string. YAML spec allows this but we consider
         # this an fatal error.
@@ -150,9 +150,7 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, dict):
             yaml = [yaml]
 
-        yaml = ansiblelint.skip_utils.append_skipped_rules(
-            yaml, file.content, file.kind
-        )
+        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, file)
 
         for play in yaml:
 
