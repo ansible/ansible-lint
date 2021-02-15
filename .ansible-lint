@@ -43,4 +43,4 @@ offline: false
 
 # Define required Ansible's variables to satisfy syntax check
 extra_vars:
-  - foo: bar
+  foo: bar
