@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tags:
+    - baz
+    - "{{ foo }}"
+  tasks:
+    - name: Show `complex_variable` value loaded from `extra_vars`
+      ansible.builtin.debug:
+        msg: "{{ complex_variable }}"

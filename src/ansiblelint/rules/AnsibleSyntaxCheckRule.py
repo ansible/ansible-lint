@@ -1,10 +1,12 @@
 """Rule definition for ansible syntax check."""
+import json
 import re
 import subprocess
 import sys
 from typing import List
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
+from ansiblelint.config import options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.logger import timed_info
@@ -39,7 +41,15 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             return []
 
         with timed_info("Executing syntax check on %s", lintable.path):
-            cmd = ['ansible-playbook', '--syntax-check', str(lintable.path)]
+            extra_vars_cmd = []
+            if options.extra_vars:
+                extra_vars_cmd = ['--extra-vars', json.dumps(options.extra_vars)]
+            cmd = [
+                'ansible-playbook',
+                '--syntax-check',
+                *extra_vars_cmd,
+                str(lintable.path),
+            ]
             run = subprocess.run(
                 cmd,
                 stdin=subprocess.PIPE,
@@ -130,3 +140,15 @@ if "pytest" in sys.modules:
         assert result[0].tag == "empty-playbook"
         assert result[0].message == "Empty playbook, nothing to do"
         assert len(result) == 1
+
+    def test_extra_vars_passed_to_command(config_options) -> None:
+        """Validate `extra-vars` are passed to syntax check command."""
+        config_options.extra_vars = {
+            'foo': 'bar',
+            'complex_variable': ':{;\t$()',
+        }
+        lintable = Lintable('examples/playbooks/extra_vars.yml', kind='playbook')
+
+        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+
+        assert not result

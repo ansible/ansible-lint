@@ -50,6 +50,7 @@ options = Namespace(
     mock_roles=[],
     loop_var_prefix=None,
     offline=False,
+    extra_vars=None,
 )
 
 # Used to store detected tag deprecations

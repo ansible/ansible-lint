@@ -5,10 +5,12 @@ file:
 
 pytest_plugins = ['ansiblelint.testing']
 """
+import copy
 import os
 
 import pytest
 
+from ansiblelint.config import options  # noqa: F401
 from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
@@ -48,6 +50,15 @@ def rule_runner(request):
     collection = RulesCollection()
     collection.register(rule_class())
     return RunFromText(collection)
+
+
+@pytest.fixture
+def config_options():
+    """Return configuration options that will be restored after testrun."""
+    global options  # pylint: disable=global-statement
+    original_options = copy.deepcopy(options)
+    yield options
+    options = original_options
 
 
 @pytest.fixture

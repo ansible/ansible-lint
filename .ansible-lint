@@ -38,5 +38,13 @@ warn_list:
   - git-latest
   - experimetal  # experimental is included in the implicit list
 
-# offline mode disables installation of requirements.yml
+# Offline mode disables installation of requirements.yml
 offline: false
+
+# Define required Ansible's variables to satisfy syntax check
+extra_vars:
+  foo: bar
+  multiline_string_variable: |
+    line1
+    line2
+  complex_variable: ":{;\t$()"
