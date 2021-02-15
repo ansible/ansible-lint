@@ -143,8 +143,10 @@ if "pytest" in sys.modules:
 
     def test_extra_vars_passed_to_command(config_options) -> None:
         """Validate `extra-vars` are passed to syntax check command."""
-        config_options.extra_vars = {'foo': 'bar', 'additional_var': 'test'}
-        print(options, config_options, options == config_options)
+        config_options.extra_vars = {
+            'foo': 'bar',
+            'complex_variable': ':{;\t$()',
+        }
         lintable = Lintable('examples/playbooks/extra_vars.yml', kind='playbook')
 
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
