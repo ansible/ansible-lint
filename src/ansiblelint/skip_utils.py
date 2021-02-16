@@ -22,12 +22,17 @@
 import logging
 from functools import lru_cache
 from itertools import product
-from typing import Any, Generator, List, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Generator, List, Sequence
 
 import ruamel.yaml
 
 from ansiblelint.config import used_old_tags
-from ansiblelint.constants import RENAMED_TAGS, FileType
+from ansiblelint.constants import RENAMED_TAGS
+from ansiblelint.file_utils import Lintable
+
+if TYPE_CHECKING:
+    from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
+
 
 _logger = logging.getLogger(__name__)
 
@@ -46,7 +51,7 @@ def get_rule_skips_from_line(line: str) -> List:
 
 
 def append_skipped_rules(
-    pyyaml_data: str, file_text: str, file_type: Optional[FileType] = None
+    pyyaml_data: "AnsibleBaseYAMLObject", lintable: Lintable
 ) -> Sequence:
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
@@ -61,7 +66,7 @@ def append_skipped_rules(
     to individual tasks, or added to the single metadata block.
     """
     try:
-        yaml_skip = _append_skipped_rules(pyyaml_data, file_text, file_type)
+        yaml_skip = _append_skipped_rules(pyyaml_data, lintable)
     except RuntimeError:
         # Notify user of skip error, do not stop, do not change exit code
         _logger.error('Error trying to append skipped rules', exc_info=True)
@@ -82,21 +87,19 @@ def load_data(file_text: str) -> Any:
     return yaml.load(file_text)
 
 
-def _append_skipped_rules(
-    pyyaml_data: Sequence[Any], file_text: str, file_type: Optional[FileType] = None
-) -> Sequence:
+def _append_skipped_rules(pyyaml_data: Sequence[Any], lintable: Lintable) -> Sequence:
     # parse file text using 2nd parser library
-    ruamel_data = load_data(file_text)
+    ruamel_data = load_data(lintable.content)
 
-    if file_type == 'meta':
+    if lintable.kind == 'meta':
         pyyaml_data[0]['skipped_rules'] = _get_rule_skips_from_yaml(ruamel_data)
         return pyyaml_data
 
     # create list of blocks of tasks or nested tasks
-    if file_type in ('tasks', 'handlers'):
+    if lintable.kind in ('tasks', 'handlers'):
         ruamel_task_blocks = ruamel_data
         pyyaml_task_blocks = pyyaml_data
-    elif file_type in ('playbook', 'pre_tasks', 'post_tasks'):
+    elif lintable.kind in ('playbook', 'pre_tasks', 'post_tasks'):
         try:
             pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
             ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)
@@ -105,10 +108,10 @@ def _append_skipped_rules(
             # assume it is a playbook, check needs to be added higher in the
             # call stack, and can remove this except
             return pyyaml_data
-    elif file_type in ['yaml', 'requirements', 'vars']:
+    elif lintable.kind in ['yaml', 'requirements', 'vars']:
         return pyyaml_data
     else:
-        raise RuntimeError('Unexpected file type: {}'.format(file_type))
+        raise RuntimeError('Unexpected file type: {}'.format(lintable.kind))
 
     # get tasks from blocks of tasks
     pyyaml_tasks = _get_tasks_from_blocks(pyyaml_task_blocks)

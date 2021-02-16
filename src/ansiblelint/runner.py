@@ -26,7 +26,7 @@ class LintResult:
     """Class that tracks result of linting."""
 
     matches: List[MatchError]
-    files: Set[str]
+    files: Set[Lintable]
 
 
 class Runner:
@@ -41,7 +41,7 @@ class Runner:
         skip_list: List[str] = [],
         exclude_paths: List[str] = [],
         verbosity: int = 0,
-        checked_files: Optional[Set[str]] = None
+        checked_files: Optional[Set[Lintable]] = None
     ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
@@ -127,7 +127,7 @@ class Runner:
             files = [value for n, value in enumerate(files) if value not in files[:n]]
 
             for file in self.lintables:
-                if str(file.path) in self.checked_files:
+                if file in self.checked_files:
                     continue
                 _logger.debug(
                     "Examining %s of type %s",
@@ -140,7 +140,7 @@ class Runner:
                 )
 
         # update list of checked files
-        self.checked_files.update([str(x.path) for x in self.lintables])
+        self.checked_files.update(self.lintables)
 
         # remove any matches made inside excluded files
         matches = list(
@@ -174,7 +174,7 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
     lintables = ansiblelint.utils.get_lintables(options=options, args=options.lintables)
 
     matches = list()
-    checked_files: Set[str] = set()
+    checked_files: Set[Lintable] = set()
     runner = Runner(
         *lintables,
         rules=rules,
@@ -188,5 +188,13 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
 
     # Assure we do not print duplicates and the order is consistent
     matches = sorted(set(matches))
+
+    # Convert reported filenames into human redable ones, so we hide the
+    # fact we used temporary files when processing input from stdin.
+    for match in matches:
+        for lintable in lintables:
+            if match.filename == lintable.filename:
+                match.filename = lintable.name
+                break
 
     return LintResult(matches=matches, files=checked_files)

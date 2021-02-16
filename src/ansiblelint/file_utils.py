@@ -3,10 +3,12 @@ import copy
 import logging
 import os
 import subprocess
+import sys
 from argparse import Namespace
 from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union
 
 import wcmatch.pathlib
@@ -83,6 +85,9 @@ def kind_from_path(path: Path):
                 return k
     if path.is_dir():
         return "role"
+
+    if str(path) == '/dev/stdin':
+        return "playbook"
     raise RuntimeError("Unable to determine file type for %s" % pathex)
 
 
@@ -100,6 +105,10 @@ class Lintable:
         kind: Optional[FileType] = None,
     ):
         """Create a Lintable instance."""
+        # Filename is effective file on disk, for stdin is a namedtempfile
+        self.filename: str = str(name)
+        self.dir: str = ""
+
         if isinstance(name, str):
             self.name = normpath(name)
             self.path = Path(self.name)
@@ -118,12 +127,24 @@ class Lintable:
             if role.exists:
                 self.role = role.name
 
-        self.kind = kind or kind_from_path(self.path)
-        # We store absolute directory in dir
-        if self.kind == "role":
-            self.dir = str(self.path.resolve())
+        if str(self.path) in ['/dev/stdin', '-']:
+            self.file = NamedTemporaryFile(mode="w+", suffix="playbook.yml")
+            self.filename = self.file.name
+            self._content = sys.stdin.read()
+            self.file.write(self._content)
+            self.file.flush()
+            self.path = Path(self.file.name)
+            self.name = 'stdin'
+            self.kind = 'playbook'
+            self.dir = '/'
         else:
-            self.dir = str(self.path.parent.resolve())
+            self.kind = kind or kind_from_path(self.path)
+        # We store absolute directory in dir
+        if not self.dir:
+            if self.kind == "role":
+                self.dir = str(self.path.resolve())
+            else:
+                self.dir = str(self.path.parent.resolve())
 
     def __getitem__(self, item):
         """Provide compatibility subscriptable support."""

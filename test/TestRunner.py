@@ -99,7 +99,7 @@ def test_runner_with_directory(default_rules_collection, directory_name) -> None
 
 
 def test_files_not_scanned_twice(default_rules_collection) -> None:
-    checked_files: Set[str] = set()
+    checked_files: Set[Lintable] = set()
 
     filename = os.path.abspath('examples/playbooks/common-include-1.yml')
     runner = Runner(
