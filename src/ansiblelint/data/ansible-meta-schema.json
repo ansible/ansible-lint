@@ -1,0 +1,144 @@
+{
+  "title": "Ansible Meta Schema",
+  "type": "object",
+  "properties": {
+    "galaxy_info": {
+      "$ref": "#/definitions/GalaxyInfoModel"
+    },
+    "dependencies": {
+      "title": "Dependencies",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/DependencyModel"
+      }
+    },
+    "allow_duplicates": {
+      "title": "Allow Duplicates",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "galaxy_info",
+    "dependencies"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "PlatformModel": {
+      "title": "PlatformModel",
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "title": "Versions",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "versions"
+      ]
+    },
+    "GalaxyInfoModel": {
+      "title": "GalaxyInfoModel",
+      "type": "object",
+      "properties": {
+        "role_name": {
+          "title": "Role Name",
+          "minLength": 2,
+          "pattern": "[a-z][a-z0-9_]+",
+          "type": "string"
+        },
+        "author": {
+          "title": "Author",
+          "minLength": 2,
+          "pattern": "[a-z0-9][a-z0-9_]+",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "company": {
+          "title": "Company",
+          "type": "string"
+        },
+        "license": {
+          "title": "License",
+          "type": "string"
+        },
+        "min_ansible_version": {
+          "title": "Min Ansible Version",
+          "type": "string"
+        },
+        "min_ansible_container_version": {
+          "title": "Min Ansible Container Version",
+          "type": "string"
+        },
+        "platforms": {
+          "title": "Platforms",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PlatformModel"
+          }
+        },
+        "galaxy_tags": {
+          "title": "Galaxy Tags",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "company",
+        "license",
+        "min_ansible_version",
+        "platforms",
+        "galaxy_tags"
+      ],
+      "additionalProperties": false
+    },
+    "DependencyModel": {
+      "title": "DependencyModel",
+      "type": "object",
+      "properties": {
+        "role": {
+          "title": "Role",
+          "type": "string"
+        },
+        "src": {
+          "title": "Src",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "scm": {
+          "title": "Scm",
+          "anyOf": [
+            {
+              "const": "hg",
+              "type": "string"
+            },
+            {
+              "const": "git",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "role"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

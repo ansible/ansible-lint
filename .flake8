@@ -59,6 +59,7 @@ per-file-ignores =
   src/ansiblelint/utils.py: D103
   src/ansiblelint/rules/*.py: D100 D101 D102
   src/ansiblelint/rules/__init__.py: D100 D101 D102
+  src/ansiblelint/schemas/*.py: D100 D101 D102 D103 D106
 
   # FIXME: drop these once they're fixed
   # Ref: https://github.com/ansible-community/ansible-lint/issues/725

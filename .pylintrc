@@ -1,3 +1,7 @@
+[MASTER]
+# https://github.com/samuelcolvin/pydantic/issues/1961
+extension-pkg-whitelist=pydantic
+
 [IMPORTS]
 preferred-modules =
     unittest:pytest,

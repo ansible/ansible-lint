@@ -1,0 +1,5 @@
+{
+  "title": "Ansible Vars Schema",
+  "type": "object",
+  "properties": {}
+}

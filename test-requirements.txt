@@ -16,6 +16,7 @@ iniconfig==1.1.1
 packaging==20.9
 pluggy==0.13.1
 py==1.10.0
+pydantic==1.7.3
 pygments==2.8.0
 pyparsing==2.4.7
 pytest-cov==2.11.1

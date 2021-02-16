@@ -1,0 +1,434 @@
+{
+  "title": "TasksFileModel",
+  "type": "array",
+  "items": {
+    "anyOf": [
+      {
+        "$ref": "#/definitions/TaskModel"
+      },
+      {
+        "$ref": "#/definitions/BlockModel"
+      }
+    ]
+  },
+  "definitions": {
+    "TaskModel": {
+      "title": "TaskModel",
+      "type": "object",
+      "properties": {
+        "any_errors_fatal": {
+          "title": "Any Errors Fatal",
+          "type": "boolean"
+        },
+        "become": {
+          "title": "Become",
+          "type": "boolean"
+        },
+        "become_exe": {
+          "title": "Become Exe",
+          "type": "string"
+        },
+        "become_flags": {
+          "title": "Become Flags",
+          "type": "string"
+        },
+        "become_method": {
+          "title": "Become Method",
+          "type": "string"
+        },
+        "become_user": {
+          "title": "Become User",
+          "type": "string"
+        },
+        "check_mode": {
+          "title": "Check Mode",
+          "type": "boolean"
+        },
+        "collections": {
+          "title": "Collections",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "connection": {
+          "title": "Connection",
+          "type": "string"
+        },
+        "debugger": {
+          "title": "Debugger",
+          "type": "string"
+        },
+        "diff": {
+          "title": "Diff",
+          "type": "boolean"
+        },
+        "environment": {
+          "title": "Environment",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "ignore_errors": {
+          "title": "Ignore Errors",
+          "type": "boolean"
+        },
+        "ignore_unreachable": {
+          "title": "Ignore Unreachable",
+          "type": "boolean"
+        },
+        "module_defaults": {
+          "title": "Module Defaults"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "no_log": {
+          "title": "No Log",
+          "type": "boolean"
+        },
+        "port": {
+          "title": "Port",
+          "type": "integer"
+        },
+        "remote_user": {
+          "title": "Remote User",
+          "type": "string"
+        },
+        "run_once": {
+          "title": "Run Once",
+          "type": "boolean"
+        },
+        "tags": {
+          "title": "Tags",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "throttle": {
+          "title": "Throttle",
+          "type": "integer"
+        },
+        "timeout": {
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        },
+        "when": {
+          "title": "When",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "args": {
+          "title": "Args",
+          "type": "object"
+        },
+        "async": {
+          "title": "Async",
+          "type": "integer"
+        },
+        "changed_when": {
+          "title": "Changed When",
+          "type": "boolean"
+        },
+        "delay": {
+          "title": "Delay",
+          "type": "integer"
+        },
+        "delegate_facts": {
+          "title": "Delegate Facts",
+          "type": "string"
+        },
+        "delegate_to": {
+          "title": "Delegate To",
+          "type": "string"
+        },
+        "failed_when": {
+          "title": "Failed When",
+          "type": "string"
+        },
+        "local_action": {
+          "title": "Local Action",
+          "type": "string"
+        },
+        "notify": {
+          "title": "Notify",
+          "type": "string"
+        },
+        "poll": {
+          "title": "Poll",
+          "type": "integer"
+        },
+        "register": {
+          "title": "Register",
+          "type": "string"
+        },
+        "retries": {
+          "title": "Retries",
+          "type": "integer"
+        },
+        "until": {
+          "title": "Until",
+          "type": "string"
+        },
+        "loop": {
+          "title": "Loop",
+          "type": "string"
+        },
+        "loop_control": {
+          "title": "Loop Control"
+        },
+        "with_items": {
+          "title": "With Items",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "with_dict": {
+          "title": "With Dict"
+        },
+        "with_fileglob": {
+          "title": "With Fileglob"
+        },
+        "with_filetree": {
+          "title": "With Filetree"
+        },
+        "with_first_found": {
+          "title": "With First Found"
+        },
+        "with_together": {
+          "title": "With Together"
+        },
+        "with_subelements": {
+          "title": "With Subelements"
+        },
+        "with_sequence": {
+          "title": "With Sequence"
+        },
+        "with_random_choice": {
+          "title": "With Random Choice"
+        },
+        "with_lines": {
+          "title": "With Lines"
+        },
+        "with_indexed_items": {
+          "title": "With Indexed Items"
+        },
+        "with_ini": {
+          "title": "With Ini"
+        },
+        "with_flattened": {
+          "title": "With Flattened"
+        },
+        "with_inventory_hostnames": {
+          "title": "With Inventory Hostnames"
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "BlockModel": {
+      "title": "BlockModel",
+      "type": "object",
+      "properties": {
+        "any_errors_fatal": {
+          "title": "Any Errors Fatal",
+          "type": "boolean"
+        },
+        "become": {
+          "title": "Become",
+          "type": "boolean"
+        },
+        "become_exe": {
+          "title": "Become Exe",
+          "type": "string"
+        },
+        "become_flags": {
+          "title": "Become Flags",
+          "type": "string"
+        },
+        "become_method": {
+          "title": "Become Method",
+          "type": "string"
+        },
+        "become_user": {
+          "title": "Become User",
+          "type": "string"
+        },
+        "check_mode": {
+          "title": "Check Mode",
+          "type": "boolean"
+        },
+        "collections": {
+          "title": "Collections",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "connection": {
+          "title": "Connection",
+          "type": "string"
+        },
+        "debugger": {
+          "title": "Debugger",
+          "type": "string"
+        },
+        "diff": {
+          "title": "Diff",
+          "type": "boolean"
+        },
+        "environment": {
+          "title": "Environment",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "ignore_errors": {
+          "title": "Ignore Errors",
+          "type": "boolean"
+        },
+        "ignore_unreachable": {
+          "title": "Ignore Unreachable",
+          "type": "boolean"
+        },
+        "module_defaults": {
+          "title": "Module Defaults"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "no_log": {
+          "title": "No Log",
+          "type": "boolean"
+        },
+        "port": {
+          "title": "Port",
+          "type": "integer"
+        },
+        "remote_user": {
+          "title": "Remote User",
+          "type": "string"
+        },
+        "run_once": {
+          "title": "Run Once",
+          "type": "boolean"
+        },
+        "tags": {
+          "title": "Tags",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "throttle": {
+          "title": "Throttle",
+          "type": "integer"
+        },
+        "timeout": {
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        },
+        "when": {
+          "title": "When",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "always": {
+          "title": "Always",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/TaskModel"
+              },
+              {
+                "$ref": "#/definitions/BlockModel"
+              }
+            ]
+          }
+        },
+        "block": {
+          "title": "Block",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/TaskModel"
+              },
+              {
+                "$ref": "#/definitions/BlockModel"
+              }
+            ]
+          }
+        },
+        "rescue": {
+          "title": "Rescue",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/TaskModel"
+              },
+              {
+                "$ref": "#/definitions/BlockModel"
+              }
+            ]
+          }
+        },
+        "delegate_facts": {
+          "title": "Delegate Facts",
+          "type": "string"
+        },
+        "delegate_to": {
+          "title": "Delegate To",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
