@@ -1,0 +1,77 @@
+{
+  "title": "RequiementsModel",
+  "type": "object",
+  "properties": {
+    "collections": {
+      "title": "Collections",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CollectionModel"
+      }
+    },
+    "roles": {
+      "title": "Roles",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/RoleModel"
+      }
+    }
+  },
+  "required": [
+    "collections",
+    "roles"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "CollectionModel": {
+      "title": "CollectionModel",
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2083,
+                "format": "uri"
+              }
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2083,
+              "format": "uri"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "RoleModel": {
+      "title": "RoleModel",
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

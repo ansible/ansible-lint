@@ -7,3 +7,4 @@ pytest-cov >= 2.10.1
 pytest-xdist >= 2.1.0
 # Needed to avoid DeprecationWarning errors in pytest:
 setuptools >= 49.6.0
+pydantic
