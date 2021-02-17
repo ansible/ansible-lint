@@ -1,12 +1,17 @@
 name: gh
 
 on:
+  create:  # is used for publishing to PyPI and TestPyPI
+    tags:  # any tag regardless of its name, no branches
+    - "**"
   push:  # only publishes pushes to the main branch to TestPyPI
     branches:  # any integration branch but not tag
     - "master"
-    tags:
-    - "**"
   pull_request:
+  release:
+    types:
+    - published  # It seems that you can publish directly without creating
+    - prereleased
   schedule:
   - cron: 1 0 * * *  # Run daily at 0:01 UTC
   # Run every Friday at 18:02 UTC
@@ -234,17 +239,15 @@ jobs:
     - name: Build dists
       run: python -m tox -p auto --parallel-live -vvvv
     - name: Publish to test.pypi.org
-      if: >-
-        github.event_name == 'push' &&
-        startsWith(github.ref, 'refs/tags/')
+      if: >-  # "create" workflows run separately from "push" & "pull_request"
+        github.event_name == 'release'
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.testpypi_password }}
         repository_url: https://test.pypi.org/legacy/
     - name: Publish to pypi.org
-      if: >-
-        github.event_name == 'push' &&
-        startsWith(github.ref, 'refs/tags/')
+      if: >-  # "create" workflows run separately from "push" & "pull_request"
+        github.event_name == 'release'
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.pypi_password }}
