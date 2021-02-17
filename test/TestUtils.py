@@ -349,6 +349,10 @@ def test_is_playbook():
         # Undeterminable files:
         ("test/fixtures/unknown-type.yml", "yaml"),
         ("releasenotes/notes/run-playbooks-refactor.yaml", "reno"),  # reno
+        ("examples/host_vars/localhost.yml", "vars"),
+        ("examples/group_vars/all.yml", "vars"),
+        ("examples/playbooks/vars/other.yml", "vars"),
+        ("examples/playbooks/vars/subfolder/settings.yml", "vars"),  # deep vars
     ),
 )
 def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:

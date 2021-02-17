@@ -20,7 +20,7 @@ DEFAULT_KINDS = [
     {"role": "**/roles/*/"},
     {"tasks": "**/tasks/*.{yaml,yml}"},
     {"handlers": "**/handlers/*.{yaml,yml}"},
-    {"vars": "**/{vars,defaults}/*.{yaml,yml}"},
+    {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
     {"meta": "**/meta/main.{yaml,yml}"},
     {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
     {"yaml": "**/molecule/*/molecule.{yaml,yml}"},  # molecule config
