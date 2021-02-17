@@ -1,4 +1,5 @@
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -13,7 +14,19 @@ from ansiblelint.constants import (
     ANSIBLE_MISSING_RC,
     ANSIBLE_MOCKED_MODULE,
     INVALID_CONFIG_RC,
+    INVALID_PREREQUISITES_RC,
 )
+from ansiblelint.loaders import yaml_from_file
+
+MISSING_GALAXY_NAMESPACE = """\
+A valid role namespace is required, edit meta/main.yml and assure that
+author field is also a valid namespace:
+
+galaxy_info:
+  author: your_galaxy_namespace
+
+See: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
+"""
 
 
 def check_ansible_presence() -> None:
@@ -87,8 +100,31 @@ def prepare_environment() -> None:
         if run.returncode != 0:
             sys.exit(run.returncode)
 
+    _install_galaxy_role()
     _perform_mockings()
     _prepare_ansible_paths()
+
+
+def _install_galaxy_role() -> None:
+    """Detect standalone galaxy role and installs it."""
+    if not os.path.exists("meta/main.yml"):
+        return
+    yaml = yaml_from_file("meta/main.yml")
+    if 'galaxy_info' not in 'yaml':
+        return
+    role_name = yaml['galaxy_info'].get('role_name', None)
+    role_author = yaml['galaxy_info'].get('author', None)
+    if not role_name:
+        role_name = os.path.dirname(".")
+        role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
+    if not role_author or not re.match(r"[\w\d_]{2,}", role_name):
+        print(MISSING_GALAXY_NAMESPACE, file=sys.stderr)
+        sys.exit(INVALID_PREREQUISITES_RC)
+    p = pathlib.Path(".cache/roles")
+    p.mkdir(parents=True, exist_ok=True)
+    link_path = p / f"{role_author}.{role_name}"
+    if not link_path.exists:
+        link_path.symlink_to(pathlib.Path("../..", target_is_directory=True))
 
 
 def _prepare_ansible_paths() -> None:
