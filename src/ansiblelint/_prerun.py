@@ -8,6 +8,7 @@ from packaging import version
 
 from ansiblelint.config import ansible_collections_path, collection_list, options
 from ansiblelint.constants import (
+    ANSIBLE_DEFAULT_ROLES_PATH,
     ANSIBLE_MIN_VERSION,
     ANSIBLE_MISSING_RC,
     ANSIBLE_MOCKED_MODULE,
@@ -95,11 +96,6 @@ def _prepare_ansible_paths() -> None:
     library_paths: List[str] = []
     roles_path: List[str] = []
 
-    if 'ANSIBLE_ROLES_PATH' in os.environ:
-        roles_path = os.environ['ANSIBLE_ROLES_PATH'].split(':')
-    if 'ANSIBLE_LIBRARY' in os.environ:
-        library_paths = os.environ['ANSIBLE_LIBRARY'].split(':')
-
     for path_list, path in (
         (library_paths, "plugins/modules"),
         (library_paths, ".cache/modules"),
@@ -112,7 +108,7 @@ def _prepare_ansible_paths() -> None:
 
     _update_env('ANSIBLE_LIBRARY', library_paths)
     _update_env(ansible_collections_path(), collection_list)
-    _update_env('ANSIBLE_ROLES_PATH', roles_path)
+    _update_env('ANSIBLE_ROLES_PATH', roles_path, default=ANSIBLE_DEFAULT_ROLES_PATH)
 
 
 def _make_module_stub(module_name: str) -> None:
@@ -154,9 +150,10 @@ def _write_module_stub(
         f.write(body)
 
 
-def _update_env(varname: str, value: List[str]) -> None:
-    """Update environment variable if needed."""
+def _update_env(varname: str, value: List[str], default: str = "") -> None:
+    """Update colon based environment variable if needed. by appending."""
     if value:
+        value = [*os.environ.get(varname, default=default).split(':'), *value]
         value_str = ":".join(value)
         if value_str != os.environ.get(varname, ""):
             os.environ[varname] = value_str
