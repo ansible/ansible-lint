@@ -1,11 +1,12 @@
 name: gh
 
 on:
+  create:  # is used for publishing to PyPI and TestPyPI
+    tags:  # any tag regardless of its name, no branches
+    - "**"
   push:  # only publishes pushes to the main branch to TestPyPI
     branches:  # any integration branch but not tag
     - "master"
-    tags:
-    - "**"
   pull_request:
   schedule:
   - cron: 1 0 * * *  # Run daily at 0:01 UTC
