@@ -5,7 +5,7 @@ on:
     branches:  # any integration branch but not tag
     - "master"
     tags:
-    - "*"
+    - "**"
   pull_request:
   schedule:
   - cron: 1 0 * * *  # Run daily at 0:01 UTC
