@@ -23,6 +23,9 @@ DEFAULT_KINDS = [
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
     {"meta": "**/meta/main.{yaml,yml}"},
     {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
+    {
+        "requirements": "**/molecule/*/collections.{yaml,yml}"
+    },  # molecule old collection requirements (v1), ansible 2.8 only
     {"yaml": "**/molecule/*/molecule.{yaml,yml}"},  # molecule config
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/*.{yaml,yml}"},
