@@ -1,0 +1,4 @@
+---
+extra_vars:
+  foo: bar
+  knights_favorite_word: NI

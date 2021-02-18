@@ -134,3 +134,12 @@ def test_config_failure(base_arguments, config_file):
     """Ensures specific config files produce error code 2."""
     with pytest.raises(SystemExit, match="^2$"):
         cli.get_config(base_arguments + ["-c", config_file])
+
+
+def test_extra_vars_loaded(base_arguments):
+    """Ensure ``extra_vars`` option is loaded from file config."""
+    config = cli.get_config(
+        base_arguments + ["-c", "test/fixtures/config-with-extra-vars.yml"]
+    )
+
+    assert config.extra_vars == {'foo': 'bar', 'knights_favorite_word': 'NI'}
