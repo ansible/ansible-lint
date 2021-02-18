@@ -60,6 +60,7 @@ from ansiblelint._internal.rules import (
     LoadingFailureRule,
     RuntimeErrorRule,
 )
+from ansiblelint.config import options
 from ansiblelint.constants import FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, get_yaml_files
@@ -516,7 +517,9 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     sanitized_task = _sanitize_task(task)
     mod_arg_parser = ModuleArgsParser(sanitized_task)
     try:
-        action, arguments, result['delegate_to'] = mod_arg_parser.parse()
+        action, arguments, result['delegate_to'] = mod_arg_parser.parse(
+            skip_action_validation=options.skip_action_validation
+        )
     except AnsibleParserError as e:
         raise MatchError(
             rule=AnsibleParserErrorRule(),

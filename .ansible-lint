@@ -48,3 +48,7 @@ extra_vars:
     line1
     line2
   complex_variable: ":{;\t$()"
+
+# Uncomment to enforce action validation with tasks, usually is not
+# needed as Ansible syntax check also covers it.
+# skip_action_validation: false
