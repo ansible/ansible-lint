@@ -22,7 +22,7 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
     literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
-        for k, v in nested_items(task):
+        for k, v, _ in nested_items(task):
             if k == 'when':
                 if isinstance(v, str):
                     if self.literal_bool_compare.search(v):

@@ -22,7 +22,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}")
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
-        for k, v in nested_items(task):
+        for k, v, _ in nested_items(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
                 if bool(self.bracket_regex.search(cleaned)):
