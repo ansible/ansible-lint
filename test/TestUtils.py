@@ -435,11 +435,11 @@ def test_nested_items():
     data = {"foo": "text", "bar": {"some": "text2"}, "fruits": ["apple", "orange"]}
 
     items = [
-        ("foo", "text"),
-        ("bar", {"some": "text2"}),
-        ("some", "text2"),
-        ("fruits", ["apple", "orange"]),
-        ("list-item", "apple"),
-        ("list-item", "orange"),
+        ("foo", "text", ""),
+        ("bar", {"some": "text2"}, ""),
+        ("some", "text2", "bar"),
+        ("fruits", ["apple", "orange"], ""),
+        ("list-item", "apple", "fruits"),
+        ("list-item", "orange", "fruits"),
     ]
     assert list(utils.nested_items(data)) == items

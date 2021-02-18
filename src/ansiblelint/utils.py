@@ -855,16 +855,16 @@ def convert_to_boolean(value: Any) -> bool:
 
 
 def nested_items(
-    data: Union[Dict[Any, Any], List[Any]]
-) -> Generator[Tuple[Any, Any], None, None]:
+    data: Union[Dict[Any, Any], List[Any]], parent: str = ""
+) -> Generator[Tuple[Any, Any, str], None, None]:
     """Iterate a nested data structure."""
     if isinstance(data, dict):
         for k, v in data.items():
-            yield k, v
-            for k, v in nested_items(v):
-                yield k, v
+            yield k, v, parent
+            for k, v, p in nested_items(v, k):
+                yield k, v, p
     if isinstance(data, list):
         for item in data:
-            yield "list-item", item
-            for k, v in nested_items(item):
-                yield k, v
+            yield "list-item", item, parent
+            for k, v, p in nested_items(item):
+                yield k, v, p
