@@ -300,11 +300,11 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
         return cli_config
 
     for entry in bools:
-        x = getattr(cli_config, entry) or file_config.get(entry, False)
+        x = getattr(cli_config, entry) or file_config.pop(entry, False)
         setattr(cli_config, entry, x)
 
     for entry, default in scalar_map.items():
-        x = getattr(cli_config, entry, None) or file_config.get(entry, default)
+        x = getattr(cli_config, entry, None) or file_config.pop(entry, default)
         setattr(cli_config, entry, x)
 
     # if either commandline parameter or config file option is set merge
@@ -312,13 +312,17 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
     for entry, default in lists_map.items():
         if getattr(cli_config, entry, None) or entry in file_config.keys():
             value = getattr(cli_config, entry, [])
-            value.extend(file_config.get(entry, []))
+            value.extend(file_config.pop(entry, []))
         else:
             value = default
         setattr(cli_config, entry, value)
 
     if 'verbosity' in file_config:
-        cli_config.verbosity = cli_config.verbosity + file_config['verbosity']
+        cli_config.verbosity = cli_config.verbosity + file_config.pop('verbosity')
+
+    # merge options that can be set only via a file config
+    for entry, value in file_config.items():
+        setattr(cli_config, entry, value)
 
     return cli_config
 
