@@ -108,10 +108,11 @@ def _append_skipped_rules(pyyaml_data: Sequence[Any], lintable: Lintable) -> Seq
             # assume it is a playbook, check needs to be added higher in the
             # call stack, and can remove this except
             return pyyaml_data
-    elif lintable.kind in ['yaml', 'requirements', 'vars']:
+    elif lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
         return pyyaml_data
     else:
-        raise RuntimeError('Unexpected file type: {}'.format(lintable.kind))
+        # For unsupported file types, we return empty skip lists
+        return []
 
     # get tasks from blocks of tasks
     pyyaml_tasks = _get_tasks_from_blocks(pyyaml_task_blocks)
