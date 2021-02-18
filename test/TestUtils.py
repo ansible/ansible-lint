@@ -353,6 +353,7 @@ def test_is_playbook():
         ("examples/group_vars/all.yml", "vars"),
         ("examples/playbooks/vars/other.yml", "vars"),
         ("examples/playbooks/vars/subfolder/settings.yml", "vars"),  # deep vars
+        ("molecule/scenario/collections.yml", "requirements"),  # deprecated 2.8 format
     ),
 )
 def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:
@@ -434,11 +435,11 @@ def test_nested_items():
     data = {"foo": "text", "bar": {"some": "text2"}, "fruits": ["apple", "orange"]}
 
     items = [
-        ("foo", "text"),
-        ("bar", {"some": "text2"}),
-        ("some", "text2"),
-        ("fruits", ["apple", "orange"]),
-        ("list-item", "apple"),
-        ("list-item", "orange"),
+        ("foo", "text", ""),
+        ("bar", {"some": "text2"}, ""),
+        ("some", "text2", "bar"),
+        ("fruits", ["apple", "orange"], ""),
+        ("list-item", "apple", "fruits"),
+        ("list-item", "orange", "fruits"),
     ]
     assert list(utils.nested_items(data)) == items

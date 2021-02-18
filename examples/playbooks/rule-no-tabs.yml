@@ -1,0 +1,10 @@
+- hosts: localhost
+  tasks:
+    - name: should not trigger no-tabs rules
+      lineinfile:
+        path: some.txt
+        regexp: '^\t$'
+        line: 'string with \t inside'
+    - name: foo
+      debug:
+        msg: "Presence of \t should trigger no-tabs here."
