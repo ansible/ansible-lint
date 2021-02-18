@@ -26,7 +26,7 @@ DEFAULT_KINDS = [
     {
         "requirements": "**/molecule/*/collections.{yaml,yml}"
     },  # molecule old collection requirements (v1), ansible 2.8 only
-    {"yaml": "**/molecule/*/molecule.{yaml,yml}"},  # molecule config
+    {"yaml": "**/molecule/*/{base,molecule}.{yaml,yml}"},  # molecule config
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/*.{yaml,yml}"},
     {"yaml": "**/.*.{yaml,yml}"},
