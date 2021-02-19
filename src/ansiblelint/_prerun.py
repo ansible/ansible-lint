@@ -3,7 +3,8 @@ import pathlib
 import re
 import subprocess
 import sys
-from typing import List, Optional
+from functools import lru_cache
+from typing import List, Optional, Tuple
 
 from packaging import version
 
@@ -29,30 +30,70 @@ See: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespa
 """
 
 
-def check_ansible_presence() -> None:
-    """Assures we stop execution if Ansible is missing."""
-    failed = False
-    try:
-        # pylint: disable=import-outside-toplevel
-        from ansible import release
+def check_ansible_presence(exit_on_error=False) -> Tuple[str, str]:
+    """Assures we stop execution if Ansible is missing or outdated.
 
-        if version.parse(release.__version__) <= version.parse(ANSIBLE_MIN_VERSION):
-            failed = True
-    except (ImportError, ModuleNotFoundError, UnboundLocalError) as e:
-        failed = True
-        __version__ = "none"
-        print(e, file=sys.stderr)
-    if failed:
-        print(
-            "FATAL: ansible-lint requires a version of Ansible package"
-            " >= %s, but %s was found. "
-            "Please install a compatible version using the same python interpreter. See "
-            "https://docs.ansible.com/ansible/latest/installation_guide"
-            "/intro_installation.html#installing-ansible-with-pip"
-            % (ANSIBLE_MIN_VERSION, __version__),
-            file=sys.stderr,
+    Returne found version and an optional exception if something wrong
+    was detected.
+    """
+
+    @lru_cache()
+    def _get_ver_err() -> Tuple[str, str]:
+
+        err = ""
+        failed = False
+        ver = ""
+        result = subprocess.run(
+            args=["ansible", "--version"],
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+            check=False,
         )
+        if result.returncode != 0:
+            return (
+                ver,
+                "FATAL: Unable to retrieve ansible cli version: %s" % result.stdout,
+            )
+
+        match = re.match(r"^ansible ([^\s]+)", result.stdout)
+        if not match:
+            return ver, "FATAL: Unable parse ansible cli version: %s" % result.stdout
+        ver = match.group(1)
+        try:
+            # pylint: disable=import-outside-toplevel
+            from ansible.release import __version__ as ansible_module_version
+
+            if version.parse(ansible_module_version) < version.parse(
+                ANSIBLE_MIN_VERSION
+            ):
+                failed = True
+        except (ImportError, ModuleNotFoundError) as e:
+            failed = True
+            ansible_module_version = "none"
+            err += f"{e}\n"
+        if failed:
+            err += (
+                "FATAL: ansible-lint requires a version of Ansible package"
+                " >= %s, but %s was found. "
+                "Please install a compatible version using the same python interpreter. See "
+                "https://docs.ansible.com/ansible/latest/installation_guide"
+                "/intro_installation.html#installing-ansible-with-pip"
+                % (ANSIBLE_MIN_VERSION, ansible_module_version)
+            )
+
+        elif ver != ansible_module_version:
+            err = (
+                f"FATAL: Ansible CLI ({ver}) and python module"
+                f" ({ansible_module_version}) versions do not match. This "
+                "indicates a broken execution environment."
+            )
+        return ver, err
+
+    ver, err = _get_ver_err()
+    if exit_on_error and err:
+        print(err, file=sys.stderr)
         sys.exit(ANSIBLE_MISSING_RC)
+    return ver, err
 
 
 def prepare_environment() -> None:

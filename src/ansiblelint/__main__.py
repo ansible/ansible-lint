@@ -42,6 +42,7 @@ from ansiblelint.color import (
     render_yaml,
 )
 from ansiblelint.config import options, used_old_tags
+from ansiblelint.constants import ANSIBLE_MISSING_RC
 from ansiblelint.file_utils import cwd
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
@@ -75,9 +76,15 @@ def initialize_options(arguments: List[str]):
     new_options.cwd = pathlib.Path.cwd()
 
     if new_options.version:
-        print('ansible-lint {ver!s}'.format(ver=__version__))
-        # assure we fail if ansible is missing, even for version printing
-        check_ansible_presence()
+        ansible_version, err = check_ansible_presence()
+        print(
+            'ansible-lint {ver!s} using ansible {ansible_ver!s}'.format(
+                ver=__version__, ansible_ver=ansible_version
+            )
+        )
+        if err:
+            print(err, file=sys.stderr)
+            sys.exit(ANSIBLE_MISSING_RC)
         sys.exit(0)
 
     if new_options.colored is None:
@@ -163,7 +170,7 @@ def main(argv: List[str] = None) -> int:
     app = App(options=options)
 
     prepare_environment()
-    check_ansible_presence()
+    check_ansible_presence(exit_on_error=True)
 
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
