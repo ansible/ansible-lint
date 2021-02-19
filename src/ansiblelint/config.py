@@ -54,6 +54,7 @@ options = Namespace(
     loop_var_prefix=None,
     offline=False,
     extra_vars=None,
+    skip_action_validation=True,
 )
 
 # Used to store detected tag deprecations
