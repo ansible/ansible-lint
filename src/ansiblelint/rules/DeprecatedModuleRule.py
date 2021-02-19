@@ -12,7 +12,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
         'These are deprecated modules, some modules are kept '
         'temporarily for backwards compatibility but usage is discouraged. '
         'For more details see: '
-        'https://docs.ansible.com/ansible/latest/modules/list_of_all_modules.html'
+        'https://docs.ansible.com/ansible/latest/collections/index_module.html'
     )
     severity = 'HIGH'
     tags = ['deprecations']
