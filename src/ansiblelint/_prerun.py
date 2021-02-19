@@ -38,7 +38,7 @@ def check_ansible_presence() -> None:
 
         if version.parse(release.__version__) <= version.parse(ANSIBLE_MIN_VERSION):
             failed = True
-    except (ImportError, ModuleNotFoundError) as e:
+    except (ImportError, ModuleNotFoundError, UnboundLocalError) as e:
         failed = True
         __version__ = "none"
         print(e, file=sys.stderr)
