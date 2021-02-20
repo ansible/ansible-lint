@@ -76,7 +76,7 @@ class RoleNames(AnsibleLintRule):
         role_name = _remove_prefix(role_name, "ansible-role-")
         if role_name not in self.done:
             self.done.append(role_name)
-            if not self._re.match(role_name):
+            if role_name and not self._re.match(role_name):
                 result.append(
                     self.create_matcherror(
                         filename=str(file.path),

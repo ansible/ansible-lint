@@ -102,6 +102,7 @@ def prepare_environment() -> None:
 
         cmd = [
             "ansible-galaxy",
+            "role",
             "install",
             "--roles-path",
             ".cache/roles",
@@ -115,31 +116,36 @@ def prepare_environment() -> None:
             universal_newlines=True,
             check=False,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         )
         if run.returncode != 0:
+            print(run.stdout, file=sys.stderr)
             sys.exit(run.returncode)
 
-        cmd = [
-            "ansible-galaxy",
-            "collection",
-            "install",
-            "-p",
-            ".cache/collections",
-            "-vr",
-            "requirements.yml",
-        ]
+        # Run galaxy collection install works on v2 requirements.yml
+        if "collections" in yaml_from_file("requirements.yml"):
 
-        print("Running %s" % " ".join(cmd))
-        run = subprocess.run(
-            cmd,
-            universal_newlines=True,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        if run.returncode != 0:
-            sys.exit(run.returncode)
+            cmd = [
+                "ansible-galaxy",
+                "collection",
+                "install",
+                "-p",
+                ".cache/collections",
+                "-vr",
+                "requirements.yml",
+            ]
+
+            print("Running %s" % " ".join(cmd))
+            run = subprocess.run(
+                cmd,
+                universal_newlines=True,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+            if run.returncode != 0:
+                print(run.stdout, file=sys.stderr)
+                sys.exit(run.returncode)
 
     _install_galaxy_role()
     _perform_mockings()
