@@ -1,3 +1,5 @@
+# Until bug below is sorted we will not allow dependabot to run by itself
+# https://github.com/dependabot/dependabot-core/issues/369
 version: 2
 updates:
 - package-ecosystem: pip
@@ -9,7 +11,7 @@ updates:
   - dependabot-deps-updates
   - skip-changelog
   versioning-strategy: lockfile-only
-  open-pull-requests-limit: 3
+  open-pull-requests-limit: 0  # neutered
 - package-ecosystem: pip
   directory: /
   schedule:
@@ -19,4 +21,4 @@ updates:
   - dependabot-deps-updates
   - skip-changelog
   versioning-strategy: lockfile-only
-  open-pull-requests-limit: 3
+  open-pull-requests-limit: 0  # neutered
