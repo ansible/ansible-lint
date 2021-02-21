@@ -12,8 +12,8 @@ def test_prerun_reqs_v1() -> None:
         )
     )
     result = run_ansible_lint(".", cwd=cwd)
-    assert "Running ansible-galaxy role install" in result.stdout
-    assert "Running ansible-galaxy collection install" not in result.stdout
+    assert "Running ansible-galaxy role install" in result.stderr
+    assert "Running ansible-galaxy collection install" not in result.stderr
     assert result.returncode == 0
 
 
@@ -25,6 +25,6 @@ def test_prerun_reqs_v2() -> None:
         )
     )
     result = run_ansible_lint(".", cwd=cwd)
-    assert "Running ansible-galaxy role install" in result.stdout
-    assert "Running ansible-galaxy collection install" in result.stdout
+    assert "Running ansible-galaxy role install" in result.stderr
+    assert "Running ansible-galaxy collection install" in result.stderr
     assert result.returncode == 0
