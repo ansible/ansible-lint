@@ -110,7 +110,7 @@ def prepare_environment() -> None:
             "requirements.yml",
         ]
 
-        print("Running %s" % " ".join(cmd))
+        print("Running %s" % " ".join(cmd), file=sys.stderr)
         run = subprocess.run(
             cmd,
             universal_newlines=True,
@@ -135,7 +135,7 @@ def prepare_environment() -> None:
                 "requirements.yml",
             ]
 
-            print("Running %s" % " ".join(cmd))
+            print("Running %s" % " ".join(cmd), file=sys.stderr)
             run = subprocess.run(
                 cmd,
                 universal_newlines=True,
@@ -157,7 +157,7 @@ def _install_galaxy_role() -> None:
     if not os.path.exists("meta/main.yml"):
         return
     yaml = yaml_from_file("meta/main.yml")
-    if 'galaxy_info' not in 'yaml':
+    if 'galaxy_info' not in yaml:
         return
     role_name = yaml['galaxy_info'].get('role_name', None)
     role_author = yaml['galaxy_info'].get('author', None)
@@ -170,8 +170,14 @@ def _install_galaxy_role() -> None:
     p = pathlib.Path(".cache/roles")
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / f"{role_author}.{role_name}"
-    if not link_path.exists:
+    # despite documentation stating that is_file() reports true for symlinks,
+    # it appears that is_dir() reports true instead, so we rely on exits().
+    if not link_path.exists():
         link_path.symlink_to(pathlib.Path("../..", target_is_directory=True))
+    print(
+        f"Using {link_path} symlink to current repository in order to enable Ansible to find the role using its expected full name.",
+        file=sys.stderr,
+    )
 
 
 def _prepare_ansible_paths() -> None:
