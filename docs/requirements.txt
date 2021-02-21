@@ -16,10 +16,10 @@ docutils==0.16
 idna==2.10
 imagesize==1.2.0
 jinja2==2.11.2
-markdown-it-py==0.6.0
+markdown-it-py==0.6.2
 markupsafe==1.1.1
-mdit-py-plugins==0.2.4
-myst-parser==0.13.3
+mdit-py-plugins==0.2.5
+myst-parser==0.13.5
 packaging==20.4
 pipdeptree==2.0.0
 pycparser==2.20
