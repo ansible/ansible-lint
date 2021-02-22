@@ -35,7 +35,7 @@ def rules_as_rst(rules: RulesCollection) -> str:
 
         description = d.description
         if d.link:
-            description += " `(more) <%s>`_" % d.link
+            description += " `(more) <%s>`__" % d.link
 
         r += f"\n\n.. _{d.id}:\n\n{title}\n{'*' * len(title)}\n\n{d.shortdesc}\n\n{description}"
 

@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import sys
 from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
@@ -28,7 +29,13 @@ def _changed_in_when(item: str) -> bool:
         return False
     return any(
         changed in item
-        for changed in ['.changed', '|changed', '["changed"]', "['changed']"]
+        for changed in [
+            '.changed',
+            '|changed',
+            '["changed"]',
+            "['changed']",
+            "is changed",
+        ]
     )
 
 
@@ -37,8 +44,10 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     shortdesc = 'Tasks that run when changed should likely be handlers'
     description = (
         'If a task has a ``when: result.changed`` setting, it is effectively '
-        'acting as a handler'
+        'acting as a handler. You could use notify and move that task to '
+        'handlers.'
     )
+    link = "https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html"
     severity = 'MEDIUM'
     tags = ['idiom']
     version_added = 'historic'
@@ -55,3 +64,26 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         if isinstance(when, str):
             return _changed_in_when(when)
         return False
+
+
+if 'pytest' in sys.modules:
+
+    from ansiblelint.file_utils import Lintable
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
+
+    def test_rule_no_handler() -> None:
+        """Verify rule."""
+        collection = RulesCollection()
+        collection.register(UseHandlerRatherThanWhenChangedRule())
+
+        lintable = Lintable('examples/playbooks/rule-no-handler.yml')
+        results = Runner(lintable, rules=collection).run()
+
+        assert len(results) == 3
+        assert results[0].filename == 'examples/playbooks/roles/a-role/tasks/main.yml'
+        assert results[0].linenumber == 3
+        assert results[1].filename == 'examples/playbooks/rule-no-handler.yml'
+        assert results[1].linenumber == 14
+        assert results[2].filename == 'examples/playbooks/rule-no-handler.yml'
+        assert results[2].linenumber == 18

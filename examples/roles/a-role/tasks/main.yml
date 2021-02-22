@@ -1,0 +1,6 @@
+---
+# should trigger no-handler at line 3
+- name: do anything
+  command: echo 123
+  when:
+    - something.changed

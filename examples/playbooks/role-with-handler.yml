@@ -1,4 +1,0 @@
-- hosts: localhost
-  name: foo
-  roles:
-    - {role: a-role}
