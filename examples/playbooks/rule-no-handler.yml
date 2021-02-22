@@ -1,0 +1,20 @@
+# should trigger no-handler rule 3 times
+- hosts: localhost
+  name: foo
+  roles:
+    - {role: a-role}  # 1st from within included role
+
+  tasks:
+
+    - name: execute something
+      command: echo 123
+      register: result
+      changed_when: true
+
+    - name: this should trigger no-handler rule  # 2nd
+      command: echo could be done better
+      when: result is changed
+
+    - name: this should trigger no-handler rule  # 3rd
+      command: echo could be done better too
+      when: result is changed
