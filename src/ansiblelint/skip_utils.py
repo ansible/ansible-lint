@@ -99,7 +99,7 @@ def _append_skipped_rules(pyyaml_data: Sequence[Any], lintable: Lintable) -> Seq
     if lintable.kind in ('tasks', 'handlers'):
         ruamel_task_blocks = ruamel_data
         pyyaml_task_blocks = pyyaml_data
-    elif lintable.kind in ('playbook', 'pre_tasks', 'post_tasks'):
+    elif lintable.kind == 'playbook':
         try:
             pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
             ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)

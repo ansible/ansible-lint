@@ -61,11 +61,9 @@ if __name__ == "__main__":
 
 FileType = Literal[
     "playbook",
-    "pre_tasks",
-    "post_tasks",
     "meta",  # role meta
-    "tasks",
-    "handlers",
+    "tasks",  # includes pre_tasks, post_tasks
+    "handlers",  # very similar to tasks but with some specificts
     # https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file
     "requirements",
     "role",  # that is a folder!
