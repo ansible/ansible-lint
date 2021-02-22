@@ -131,7 +131,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         '-f',
         dest='format',
         default='rich',
-        choices=['rich', 'plain', 'rst', 'codeclimate'],
+        choices=['rich', 'plain', 'rst', 'codeclimate', 'quiet', 'pep8'],
         help="Format used rules output, (default: %(default)s)",
     )
     parser.add_argument(
@@ -146,7 +146,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest='parseable',
         default=False,
         action='store_true',
-        help="parseable output in the format of pep8",
+        help="parseable output, same as '-f pep8'",
     )
     parser.add_argument(
         '--parseable-severity',
