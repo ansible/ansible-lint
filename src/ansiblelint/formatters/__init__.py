@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Any, Dict, Generic, List, TypeVar, Union
 
 import rich
 
+from ansiblelint.config import options
+
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
@@ -84,8 +86,12 @@ class ParseableFormatter(BaseFormatter):
     def format(self, match: "MatchError") -> str:
         result = (
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}: "
-            f"[error_code]{match.rule.id}[/] [dim]{self.escape(match.message)}[/]"
+            f"[error_code]{match.rule.id}[/]"
         )
+
+        if not options.quiet:
+            result += f" [dim]{match.message}[/]"
+
         if match.tag:
             result += f" [dim][error_code]({match.tag})[/][/]"
         return result

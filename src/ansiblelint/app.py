@@ -68,9 +68,9 @@ def choose_formatter_factory(
 ) -> Type[formatters.BaseFormatter]:
     """Select an output formatter based on the incoming command line arguments."""
     r: Type[formatters.BaseFormatter] = formatters.Formatter
-    if options_list.quiet:
+    if options_list.format == 'quiet':
         r = formatters.QuietFormatter
-    elif options_list.parseable:
+    elif options_list.parseable or options_list.format == 'pep8':
         r = formatters.ParseableFormatter
     elif options_list.parseable_severity:
         r = formatters.ParseableSeverityFormatter
