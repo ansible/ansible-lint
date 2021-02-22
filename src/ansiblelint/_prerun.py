@@ -19,16 +19,6 @@ from ansiblelint.constants import (
 )
 from ansiblelint.loaders import yaml_from_file
 
-MISSING_GALAXY_NAMESPACE = """\
-A valid role namespace is required, edit meta/main.yml and assure that
-author field is also a valid namespace:
-
-galaxy_info:
-  author: your_galaxy_namespace
-
-See: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
-"""
-
 
 def check_ansible_presence(exit_on_error=False) -> Tuple[str, str]:
     """Assures we stop execution if Ansible is missing or outdated.
@@ -162,10 +152,24 @@ def _install_galaxy_role() -> None:
     role_name = yaml['galaxy_info'].get('role_name', None)
     role_author = yaml['galaxy_info'].get('author', None)
     if not role_name:
-        role_name = os.path.dirname(".")
+        role_name = pathlib.Path(".").absolute().name
         role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
-    if not role_author or not re.match(r"[\w\d_]{2,}", role_name):
-        print(MISSING_GALAXY_NAMESPACE, file=sys.stderr)
+    fqrn = f"{role_author}.{role_name}"
+    if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
+        print(
+            f"""\
+Computed fully qualified role name of {fqrn} is not valid.
+Please edit meta/main.yml and assure we can correctly determine full role name:
+
+galaxy_info:
+  role_name: my_name  # if absent directory name hosting role is used instead
+  author: my_galaxy_namespace
+
+Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
+Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
+""",
+            file=sys.stderr,
+        )
         sys.exit(INVALID_PREREQUISITES_RC)
     p = pathlib.Path(".cache/roles")
     p.mkdir(parents=True, exist_ok=True)
