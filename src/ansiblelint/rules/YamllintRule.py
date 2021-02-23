@@ -24,6 +24,8 @@ YAMLLINT_CONFIG = """
 extends: default
 rules:
   document-start: disable
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']
   # 160 chars was the default used by old E204 rule, but
   # you can easily change it or disable in your .yamllint file.
   line-length:
