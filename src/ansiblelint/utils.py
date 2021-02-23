@@ -468,15 +468,14 @@ def _look_for_role_files(basedir: str, role: str, main='main') -> List[Lintable]
 
     results = []
 
-    for kind in ['tasks', 'meta', 'handlers']:
+    for kind in ['tasks', 'meta', 'handlers', 'vars', 'defaults']:
         current_path = os.path.join(role_path, kind)
         for folder, subdirs, files in os.walk(current_path):
             for file in files:
                 file_ignorecase = file.lower()
                 if file_ignorecase.endswith(('.yml', '.yaml')):
                     thpath = os.path.join(folder, file)
-                    # TODO(ssbarnea): Find correct way to pass kind: FileType
-                    results.append(Lintable(thpath, kind=kind))  # type: ignore
+                    results.append(Lintable(thpath))
 
     return results
 
