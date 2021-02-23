@@ -344,6 +344,8 @@ def test_is_playbook():
         ("roles/foo/molecule/scen1/molecule.yml", "yaml"),  # molecule scenario config
         ("roles/foo/molecule/scen2/foobar.yml", "playbook"),  # custom playbook name
         ("roles/foo/molecule/scen3/converge.yml", "playbook"),  # common playbook name
+        ("roles/foo/molecule/scen3/requirements.yml", "requirements"),  # requirements
+        ("roles/foo/molecule/scen3/collections.yml", "requirements"),  # requirements
         # requirements (we do not support includes yet)
         ("requirements.yml", "requirements"),  # collection requirements
         ("roles/foo/meta/requirements.yml", "requirements"),  # inside role requirements
