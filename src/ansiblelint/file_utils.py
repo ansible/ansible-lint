@@ -197,10 +197,11 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
             git_command, stderr=subprocess.STDOUT, universal_newlines=True
         ).split("\x00")[:-1]
     except subprocess.CalledProcessError as exc:
-        _logger.warning(
-            "Failed to discover yaml files to lint using git: %s",
-            exc.output.rstrip('\n'),
-        )
+        if options.verbosity:
+            _logger.warning(
+                "Failed to discover yaml files to lint using git: %s",
+                exc.output.rstrip('\n'),
+            )
     except FileNotFoundError as exc:
         if options.verbosity:
             _logger.warning("Failed to locate command: %s", exc)
