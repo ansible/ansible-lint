@@ -21,4 +21,4 @@ class TestTaskHasNameRule(unittest.TestCase):
         failure = 'examples/playbooks/task-has-name-failure.yml'
         bad_runner = Runner(failure, rules=self.collection)
         errs = bad_runner.run()
-        self.assertEqual(2, len(errs))
+        self.assertEqual(4, len(errs))

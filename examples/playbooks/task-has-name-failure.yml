@@ -5,3 +5,6 @@
     - command: echo "no name"
     - name:
       command: echo "empty name"
+    - debug:
+        msg: "Debug without a name"
+    - meta: flush_handlers

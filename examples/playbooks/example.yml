@@ -32,17 +32,18 @@
 
     - name: passing git as an argument to another task
       action: debug msg="{{item}}"
-      with_items: 
+      with_items:
       - git  # yamllint wrong indentation
       - bobbins
 
     - name: yum latest
       yum: state=latest name=httpd
 
-    - debug: msg="task without a name"
+    - debug: msg="debug task without a name"
 
     - name: apt latest
       apt: state=latest name=apache2
 
+    - meta: flush_handlers
     # empty task is currently accepted by ansible as valid code:
     -

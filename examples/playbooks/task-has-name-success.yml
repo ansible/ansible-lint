@@ -4,6 +4,7 @@
   tasks:
     - name: This task has a name
       command: echo "Hello World"
-    - debug:
-        msg: "Hello World"
-    - meta: flush_handlers
+    - name: Debug task with name
+      debug: msg="Hello World"
+    - name: Flush handler with name
+      meta: flush_handlers
