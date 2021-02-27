@@ -34,17 +34,5 @@ class TaskHasNameRule(AnsibleLintRule):
     tags = ['idiom']
     version_added = 'historic'
 
-    _nameless_tasks = [
-        'meta',
-        'debug',
-        'include_role',
-        'import_role',
-        'include_tasks',
-        'import_tasks',
-    ]
-
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
-        return (
-            not task.get('name')
-            and task["action"]["__ansible_module__"] not in self._nameless_tasks
-        )
+        return not task.get('name')
