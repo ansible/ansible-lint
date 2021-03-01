@@ -88,7 +88,7 @@ def parse_ansible_version(stdout: str) -> str:
     match = re.match(r"^ansible ([^\s]+)", stdout)
     if match:
         return match.group(1), None
-    return ver, "FATAL: Unable parse ansible cli version: %s" % stdout
+    return "", "FATAL: Unable parse ansible cli version: %s" % stdout
 
 
 @lru_cache()
