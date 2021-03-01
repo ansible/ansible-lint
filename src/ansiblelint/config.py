@@ -5,7 +5,7 @@ import subprocess
 import sys
 from argparse import Namespace
 from functools import lru_cache
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
 from packaging.version import Version
 
@@ -79,7 +79,8 @@ def ansible_collections_path() -> str:
     return "ANSIBLE_COLLECTIONS_PATHS"
 
 
-def parse_ansible_version(stdout: str) -> str:
+def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
+    """Parse output of 'ansible --version'."""
     # ansible-core 2.11+: 'ansible [core 2.11.3]'
     match = re.match(r"^ansible \[(?:core|base) ([^\]]+)\]", stdout)
     if match:

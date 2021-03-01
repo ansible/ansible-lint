@@ -8,7 +8,12 @@ from typing import List, Optional, Tuple
 
 from packaging import version
 
-from ansiblelint.config import ansible_collections_path, collection_list, options, parse_ansible_version
+from ansiblelint.config import (
+    ansible_collections_path,
+    collection_list,
+    options,
+    parse_ansible_version,
+)
 from ansiblelint.constants import (
     ANSIBLE_DEFAULT_ROLES_PATH,
     ANSIBLE_MIN_VERSION,
