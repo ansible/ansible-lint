@@ -1,5 +1,4 @@
 import os
-import sys
 from pathlib import Path
 
 import pytest
@@ -27,7 +26,7 @@ def base_arguments():
         ([], "test/fixtures/show-relpath.yml"),
     ),
 )
-def test_ensure_config_are_equal(base_arguments, args, config, monkeypatch):
+def test_ensure_config_are_equal(base_arguments, args, config):
     command = base_arguments + args
     cli_parser = cli.get_cli_parser()
 
@@ -41,14 +40,7 @@ def test_ensure_config_are_equal(base_arguments, args, config, monkeypatch):
                 raise
             return Path.cwd() / self
 
-    with monkeypatch.context() as mp_ctx:
-        if sys.version_info[:2] < (3, 6) and args[-2:] == [
-            "-r",
-            "test/fixtures/rules/",
-        ]:
-            mp_ctx.setattr(Path, 'resolve', _fake_pathlib_resolve)
-        options = cli_parser.parse_args(command)
-
+    options = cli_parser.parse_args(command)
     file_config = cli.load_config(config)
 
     for key, val in file_config.items():
@@ -101,7 +93,7 @@ def test_path_from_config_do_not_depend_on_cwd(monkeypatch):  # Issue 572
     assert config1['exclude_paths'].sort() == config2['exclude_paths'].sort()
 
 
-def test_path_from_cli_depend_on_cwd(base_arguments, monkeypatch, tmp_path):
+def test_path_from_cli_depend_on_cwd(base_arguments, monkeypatch):
     # Issue 572
     arguments = base_arguments + [
         "--exclude",
@@ -112,11 +104,6 @@ def test_path_from_cli_depend_on_cwd(base_arguments, monkeypatch, tmp_path):
     assert 'test/test' not in str(options1.exclude_paths[0])
 
     test_dir = 'test'
-    if sys.version_info[:2] < (3, 6):
-        test_dir = tmp_path / 'test' / 'test' / 'fixtures'
-        test_dir.mkdir(parents=True)
-        (test_dir / 'config-with-relative-path.yml').write_text('')
-        test_dir = test_dir / '..' / '..'
     monkeypatch.chdir(test_dir)
     options2 = cli.get_cli_parser().parse_args(arguments)
 
