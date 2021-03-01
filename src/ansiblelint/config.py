@@ -18,7 +18,7 @@ DEFAULT_KINDS = [
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
     {"role": "**/roles/*/"},
-    {"tasks": "**/tasks/*.{yaml,yml}"},
+    {"tasks": "**/tasks/**/*.{yaml,yml}"},
     {"handlers": "**/handlers/*.{yaml,yml}"},
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
     {"meta": "**/meta/main.{yaml,yml}"},
