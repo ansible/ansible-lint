@@ -346,6 +346,9 @@ def test_is_playbook():
         ("roles/foo/molecule/scen3/converge.yml", "playbook"),  # common playbook name
         ("roles/foo/molecule/scen3/requirements.yml", "requirements"),  # requirements
         ("roles/foo/molecule/scen3/collections.yml", "requirements"),  # requirements
+        # tasks files:
+        ("tasks/directory with spaces/main.yml", "tasks"),  # tasks
+        ("tasks/requirements.yml", "tasks"),  # tasks
         # requirements (we do not support includes yet)
         ("requirements.yml", "requirements"),  # collection requirements
         ("roles/foo/meta/requirements.yml", "requirements"),  # inside role requirements
@@ -359,8 +362,8 @@ def test_is_playbook():
         ("molecule/scenario/collections.yml", "requirements"),  # deprecated 2.8 format
     ),
 )
-def test_auto_detect(monkeypatch, path: str, kind: FileType) -> None:
-    """Verify auto-detection logic."""
+def test_default_kinds(monkeypatch, path: str, kind: FileType) -> None:
+    """Verify auto-detection logic based on DEFAULT_KINDS."""
     options = cli.get_config([])
 
     def mockreturn(options):
