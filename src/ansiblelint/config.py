@@ -1,10 +1,11 @@
 """Store configuration options as a singleton."""
 import os
+import re
 import subprocess
 import sys
 from argparse import Namespace
 from functools import lru_cache
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
 from packaging.version import Version
 
@@ -78,6 +79,19 @@ def ansible_collections_path() -> str:
     return "ANSIBLE_COLLECTIONS_PATHS"
 
 
+def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
+    """Parse output of 'ansible --version'."""
+    # ansible-core 2.11+: 'ansible [core 2.11.3]'
+    match = re.match(r"^ansible \[(?:core|base) ([^\]]+)\]", stdout)
+    if match:
+        return match.group(1), None
+    # ansible-base 2.10 and Ansible 2.9: 'ansible 2.x.y'
+    match = re.match(r"^ansible ([^\s]+)", stdout)
+    if match:
+        return match.group(1), None
+    return "", "FATAL: Unable parse ansible cli version: %s" % stdout
+
+
 @lru_cache()
 def ansible_version(version: str = "") -> Version:
     """Return current Version object for Ansible.
@@ -95,7 +109,10 @@ def ansible_version(version: str = "") -> Version:
             stderr=subprocess.PIPE,
         )
         if proc.returncode == 0:
-            version = proc.stdout.splitlines()[0].split()[1]
+            version, error = parse_ansible_version(proc.stdout)
+            if error is not None:
+                print(error)
+                sys.exit(ANSIBLE_MISSING_RC)
         else:
             print(
                 "Unable to find a working copy of ansible executable.",

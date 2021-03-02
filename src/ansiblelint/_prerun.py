@@ -8,7 +8,12 @@ from typing import List, Optional, Tuple
 
 from packaging import version
 
-from ansiblelint.config import ansible_collections_path, collection_list, options
+from ansiblelint.config import (
+    ansible_collections_path,
+    collection_list,
+    options,
+    parse_ansible_version,
+)
 from ansiblelint.constants import (
     ANSIBLE_DEFAULT_ROLES_PATH,
     ANSIBLE_MIN_VERSION,
@@ -45,10 +50,9 @@ def check_ansible_presence(exit_on_error=False) -> Tuple[str, str]:
                 "FATAL: Unable to retrieve ansible cli version: %s" % result.stdout,
             )
 
-        match = re.match(r"^ansible ([^\s]+)", result.stdout)
-        if not match:
-            return ver, "FATAL: Unable parse ansible cli version: %s" % result.stdout
-        ver = match.group(1)
+        ver, error = parse_ansible_version(result.stdout)
+        if error is not None:
+            return "", error
         try:
             # pylint: disable=import-outside-toplevel
             from ansible.release import __version__ as ansible_module_version
