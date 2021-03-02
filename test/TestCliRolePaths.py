@@ -108,7 +108,7 @@ class TestCliRolePaths(unittest.TestCase):
         result = run_ansible_lint(role_path, cwd=cwd)
         assert len(result.stdout) == 0
         assert (
-            "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles:.cache/roles"
+            "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles"
             in result.stderr
         )
         assert result.returncode == 0
@@ -120,7 +120,7 @@ class TestCliRolePaths(unittest.TestCase):
         result = run_ansible_lint(role_path, cwd=cwd)
         assert len(result.stdout) == 0
         assert (
-            "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles:.cache/roles"
+            "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles"
             in result.stderr
         )
         assert result.returncode == 0

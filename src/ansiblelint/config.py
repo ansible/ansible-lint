@@ -54,6 +54,7 @@ options = Namespace(
     mock_roles=[],
     loop_var_prefix=None,
     offline=False,
+    project_dir=None,
     extra_vars=None,
     skip_action_validation=True,
 )

@@ -44,6 +44,11 @@ def test_ensure_config_are_equal(base_arguments, args, config):
     file_config = cli.load_config(config)
 
     for key, val in file_config.items():
+
+        # config_file does not make sense in file_config
+        if key == 'config_file':
+            continue
+
         if key in {'exclude_paths', 'rulesdir'}:
             val = [Path(p) for p in val]
         assert val == getattr(options, key)

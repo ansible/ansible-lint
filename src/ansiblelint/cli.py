@@ -15,7 +15,7 @@ from ansiblelint.constants import (
     DEFAULT_RULESDIR,
     INVALID_CONFIG_RC,
 )
-from ansiblelint.file_utils import expand_path_vars
+from ansiblelint.file_utils import expand_path_vars, guess_project_dir, normpath
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [
@@ -82,6 +82,8 @@ def load_config(config_file: str) -> Dict[Any, Any]:
     except yaml.YAMLError as e:
         _logger.error(e)
         sys.exit(INVALID_CONFIG_RC)
+
+    config['config_file'] = config_path
     # TODO(ssbarnea): implement schema validation for config file
     if isinstance(config, list):
         _logger.error(
@@ -92,6 +94,7 @@ def load_config(config_file: str) -> Dict[Any, Any]:
 
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
+
     return config
 
 
@@ -163,6 +166,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Return success if it detects a reduction in number"
         " of violations compared with previous git commit. This "
         "feature works only in git repositories.",
+    )
+    parser.add_argument(
+        '--project-dir',
+        dest='project_dir',
+        default=None,
+        help="Location of project/repository, autodetected based on location "
+        " of configuration file.",
     )
     parser.add_argument(
         '-r',
@@ -289,7 +299,7 @@ def merge_config(file_config, cli_config: Namespace) -> Namespace:
         'mock_roles': [],
     }
 
-    scalar_map = {"loop_var_prefix": None}
+    scalar_map = {"loop_var_prefix": None, "project_dir": None}
 
     if not file_config:
         # use defaults if we don't have a config file and the commandline
@@ -336,6 +346,14 @@ def get_config(arguments: List[str]) -> Namespace:
     config = merge_config(file_config, options)
 
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
+
+    if not options.project_dir:
+        project_dir = os.path.dirname(
+            os.path.abspath(
+                options.config_file or f"{guess_project_dir()}/.ansiblelint"
+            )
+        )
+        options.project_dir = normpath(project_dir)
 
     return config
 
