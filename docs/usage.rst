@@ -23,6 +23,19 @@ associated tags.
    :cwd: ..
    :returncode: 0
 
+Temporary files
+---------------
+
+As part of the execution, the linter will likely need to create a cache of
+installed or mocked roles, collections and modules. This is done inside
+``{project_dir}/.cache`` folder. The project directory is either given as a
+command line argument, determined by location of the configuration
+file, git project top-level directiory or user home directory as fallback.
+In order to speed-up reruns, the linter does not clean this folder by itself.
+
+If you are using git, you will likely want to add this folder to your
+``.gitignore`` file.
+
 Progressive mode
 ----------------
 

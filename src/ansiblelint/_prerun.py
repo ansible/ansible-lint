@@ -99,7 +99,7 @@ def prepare_environment() -> None:
             "role",
             "install",
             "--roles-path",
-            ".cache/roles",
+            f"{options.project_dir}/.cache/roles",
             "-vr",
             "requirements.yml",
         ]
@@ -124,7 +124,7 @@ def prepare_environment() -> None:
                 "collection",
                 "install",
                 "-p",
-                ".cache/collections",
+                f"{options.project_dir}/.cache/collections",
                 "-vr",
                 "requirements.yml",
             ]
@@ -175,7 +175,7 @@ Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
             file=sys.stderr,
         )
         sys.exit(INVALID_PREREQUISITES_RC)
-    p = pathlib.Path(".cache/roles")
+    p = pathlib.Path(f"{options.project_dir}/.cache/roles")
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / f"{role_author}.{role_name}"
     # despite documentation stating that is_file() reports true for symlinks,
@@ -195,10 +195,10 @@ def _prepare_ansible_paths() -> None:
 
     for path_list, path in (
         (library_paths, "plugins/modules"),
-        (library_paths, ".cache/modules"),
-        (collection_list, ".cache/collections"),
+        (library_paths, f"{options.project_dir}/.cache/modules"),
+        (collection_list, f"{options.project_dir}/.cache/collections"),
         (roles_path, "roles"),
-        (roles_path, ".cache/roles"),
+        (roles_path, f"{options.project_dir}/.cache/roles"),
     ):
         if path not in path_list and os.path.exists(path):
             path_list.append(path)
@@ -212,7 +212,7 @@ def _make_module_stub(module_name: str) -> None:
     # a.b.c is treated a collection
     if re.match(r"\w+\.\w+\.\w+", module_name):
         namespace, collection, module_file = module_name.split(".")
-        path = f".cache/collections/ansible_collections/{ namespace }/{ collection }/plugins/modules"
+        path = f"{ options.project_dir }/.cache/collections/ansible_collections/{ namespace }/{ collection }/plugins/modules"
         os.makedirs(path, exist_ok=True)
         _write_module_stub(
             filename=f"{path}/{module_file}.py",
@@ -227,9 +227,10 @@ def _make_module_stub(module_name: str) -> None:
         )
         sys.exit(INVALID_CONFIG_RC)
     else:
-        os.makedirs(".cache/modules", exist_ok=True)
+        os.makedirs(f"{options.project_dir}/.cache/modules", exist_ok=True)
         _write_module_stub(
-            filename=f".cache/modules/{module_name}.py", name=module_name
+            filename=f"{options.project_dir}/.cache/modules/{module_name}.py",
+            name=module_name,
         )
 
 

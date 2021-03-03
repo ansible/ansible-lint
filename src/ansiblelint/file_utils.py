@@ -216,6 +216,21 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
     return OrderedDict.fromkeys(sorted(out))
 
 
+def guess_project_dir() -> str:
+    """Return detected project dir or user home directory."""
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        universal_newlines=True,
+        check=False,
+    )
+
+    if result.returncode != 0:
+        return str(Path.home())
+    return result.stdout[0]
+
+
 def expand_dirs_in_lintables(lintables: Set[Lintable]) -> None:
     """Return all recognized lintables within given directory."""
     all_files = get_yaml_files(options)
