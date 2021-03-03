@@ -34,7 +34,7 @@ file, git project top-level directiory or user home directory as fallback.
 In order to speed-up reruns, the linter does not clean this folder by itself.
 
 If you are using git, you will likely want to add this folder to your
-``.gitignore`` file by running ``git ignore .cache``.
+``.gitignore`` file.
 
 Progressive mode
 ----------------
