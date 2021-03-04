@@ -69,6 +69,18 @@ def test_runner_exclude_paths(default_rules_collection) -> None:
     assert len(matches) == 0
 
 
+def test_runner_exclude_globs(default_rules_collection) -> None:
+    """Test that globs work."""
+    runner = Runner(
+        'examples/playbooks/example.yml',
+        rules=default_rules_collection,
+        exclude_paths=['**/example.yml'],
+    )
+
+    matches = runner.run()
+    assert len(matches) == 0
+
+
 @pytest.mark.parametrize(
     ('formatter_cls'),
     (

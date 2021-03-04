@@ -4,6 +4,7 @@ import multiprocessing
 import multiprocessing.pool
 import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set, Union
 
 import ansiblelint.skip_utils
@@ -84,8 +85,12 @@ class Runner:
         # Exclusions should be evaluated only using absolute paths in order
         # to work correctly.
         abs_path = os.path.abspath(file_path)
+        _file_path = Path(file_path)
 
-        return any(abs_path.startswith(path) for path in self.exclude_paths)
+        return any(
+            abs_path.startswith(path) or _file_path.match(path)
+            for path in self.exclude_paths
+        )
 
     def run(self) -> List[MatchError]:
         """Execute the linting process."""
