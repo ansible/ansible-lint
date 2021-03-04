@@ -112,7 +112,7 @@ works with the *command* or *shell* modules only. Examples:
     - name: this would typically fire command-instead-of-module
       command: git pull --rebase
       args:
-        warn: False
+        warn: false
 
     - name: this would typically fire git-latest
       git: src=/path/to/git/repo dest=checkout
