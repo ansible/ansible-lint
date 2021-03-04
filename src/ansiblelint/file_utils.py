@@ -228,7 +228,8 @@ def guess_project_dir() -> str:
 
     if result.returncode != 0:
         return str(Path.home())
-    return result.stdout[0]
+
+    return result.stdout.splitlines()[0]
 
 
 def expand_dirs_in_lintables(lintables: Set[Lintable]) -> None:
