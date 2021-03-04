@@ -271,3 +271,19 @@ def _perform_mockings() -> None:
     if options.mock_modules:
         for module_name in options.mock_modules:
             _make_module_stub(module_name)
+
+    # if inside a collection repo, symlink it to simulate its installed state
+    if not os.path.exists("galaxy.yml"):
+        return
+    yaml = yaml_from_file("galaxy.yml")
+    namespace = yaml.get('namespace', None)
+    collection = yaml.get('name', None)
+    if not namespace or not collection:
+        return
+    p = pathlib.Path(
+        f"{options.project_dir}/.cache/collections/ansible_collections/{ namespace }"
+    )
+    p.mkdir(parents=True, exist_ok=True)
+    link_path = p / collection
+    if not link_path.exists():
+        link_path.symlink_to(pathlib.Path("../../../..", target_is_directory=True))
