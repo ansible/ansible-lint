@@ -90,6 +90,7 @@ def run_ansible_lint(
         'LANG',
         'LC_ALL',
         'LC_CTYPE',
+        'NO_COLOR',
         'PATH',
         'PYTHONIOENCODING',
         'PYTHONPATH',

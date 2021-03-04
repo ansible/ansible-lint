@@ -1,7 +1,9 @@
 """PyTest Fixtures."""
+import os
 import re
 import sys
 
+os.environ["NO_COLOR"] = "1"
 pytest_plugins = ["ansiblelint.testing.fixtures"]
 
 
