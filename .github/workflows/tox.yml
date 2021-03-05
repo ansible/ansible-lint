@@ -140,6 +140,11 @@ jobs:
       FORCE_COLOR: 1
 
     steps:
+    - name: MacOS workaround for https://github.com/actions/virtual-environments/issues/1187
+      if: ${{ matrix.os == 'macOS-latest' }}
+      run: |
+        sudo sysctl -w net.link.generic.system.hwcksum_tx=0
+        sudo sysctl -w net.link.generic.system.hwcksum_rx=0
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0  # needed by setuptools-scm
