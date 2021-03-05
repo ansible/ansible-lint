@@ -2,13 +2,13 @@
 import logging
 import time
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, Iterator
 
 _logger = logging.getLogger(__name__)
 
 
 @contextmanager
-def timed_info(msg: Any, *args: Any):
+def timed_info(msg: Any, *args: Any) -> Iterator[None]:
     """Context manager for logging slow operations, mentions duration."""
     start = time.time()
     try:

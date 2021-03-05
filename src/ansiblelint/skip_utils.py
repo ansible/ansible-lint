@@ -43,7 +43,7 @@ _logger = logging.getLogger(__name__)
 # ansible.parsing.yaml.objects.AnsibleSequence
 
 
-def get_rule_skips_from_line(line: str) -> List:
+def get_rule_skips_from_line(line: str) -> List[str]:
     """Return list of rule ids skipped via comment on the line of yaml."""
     _before_noqa, _noqa_marker, noqa_text = line.partition("# noqa")
     noqa_text = noqa_text.lstrip(" :")
@@ -52,7 +52,7 @@ def get_rule_skips_from_line(line: str) -> List:
 
 def append_skipped_rules(
     pyyaml_data: "AnsibleBaseYAMLObject", lintable: Lintable
-) -> Sequence:
+) -> Sequence[Any]:
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
     For a file, uses 2nd parser (ruamel.yaml) to pull comments out of
@@ -87,7 +87,9 @@ def load_data(file_text: str) -> Any:
     return yaml.load(file_text)
 
 
-def _append_skipped_rules(pyyaml_data: Sequence[Any], lintable: Lintable) -> Sequence:
+def _append_skipped_rules(
+    pyyaml_data: Sequence[Any], lintable: Lintable
+) -> Sequence[Any]:
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
 
@@ -132,7 +134,7 @@ def _append_skipped_rules(pyyaml_data: Sequence[Any], lintable: Lintable) -> Seq
     return pyyaml_data
 
 
-def _get_task_blocks_from_playbook(playbook: Sequence) -> List:
+def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> List[Any]:
     """Return parts of playbook that contains tasks, and nested tasks.
 
     :param playbook: playbook yaml from yaml parser.
@@ -151,7 +153,7 @@ def _get_task_blocks_from_playbook(playbook: Sequence) -> List:
     return task_blocks
 
 
-def _get_tasks_from_blocks(task_blocks: Sequence) -> Generator:
+def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, None]:
     """Get list of tasks from list made of tasks and nested tasks."""
     NESTED_TASK_KEYS = [
         'block',
@@ -171,7 +173,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence) -> Generator:
         yield task
 
 
-def _get_rule_skips_from_yaml(yaml_input: Sequence) -> Sequence:
+def _get_rule_skips_from_yaml(yaml_input: Sequence[Any]) -> Sequence[Any]:
     """Traverse yaml for comments with rule skips and return list of rules."""
     yaml_comment_obj_strs = []
 

@@ -67,7 +67,7 @@ def expand_paths_vars(paths: List[str]) -> List[str]:
     return paths
 
 
-def kind_from_path(path: Path):
+def kind_from_path(path: Path) -> str:
     """Determine the file kind based on its name."""
     # pathlib.Path.match patterns are very limited, they do not support *a*.yml
     # glob.glob supports **/foo.yml but not multiple extensions
@@ -82,7 +82,7 @@ def kind_from_path(path: Path):
                     | wcmatch.pathlib.DOTGLOB
                 ),
             ):
-                return k
+                return str(k)
     if path.is_dir():
         return "role"
 
@@ -146,18 +146,18 @@ class Lintable:
             else:
                 self.dir = str(self.path.parent.resolve())
 
-    def __getitem__(self, item):
+    def __getitem__(self, key: Any) -> Any:
         """Provide compatibility subscriptable support."""
-        if item == 'path':
+        if key == 'path':
             return str(self.path)
-        if item == 'type':
+        if key == 'type':
             return str(self.kind)
         raise NotImplementedError()
 
-    def get(self, item, default=None):
+    def get(self, key: Any, default: Any = None) -> Any:
         """Provide compatibility subscriptable support."""
         try:
-            return self.__getitem__(item)
+            return self.__getitem__(key)
         except NotImplementedError:
             return default
 
