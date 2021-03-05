@@ -6,7 +6,7 @@ import os
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 import yaml
 
@@ -42,7 +42,9 @@ def abspath(path: str, base_dir: str) -> str:
     return os.path.normpath(path)
 
 
-def expand_to_normalized_paths(config: dict, base_dir: str = None) -> None:
+def expand_to_normalized_paths(
+    config: Dict[str, Any], base_dir: Optional[str] = None
+) -> None:
     # config can be None (-c /dev/null)
     if not config:
         return
@@ -112,12 +114,21 @@ def get_config_path(config_file: str = '.ansible-lint') -> Optional[str]:
 
 
 class AbspathArgAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: Namespace,
+        values: Union[str, Sequence[Any], None],
+        option_string: Optional[str] = None,
+    ) -> None:
         if isinstance(values, (str, Path)):
             values = [values]
-        normalized_values = [Path(expand_path_vars(path)).resolve() for path in values]
-        previous_values = getattr(namespace, self.dest, [])
-        setattr(namespace, self.dest, previous_values + normalized_values)
+        if values:
+            normalized_values = [
+                Path(expand_path_vars(str(path))).resolve() for path in values
+            ]
+            previous_values = getattr(namespace, self.dest, [])
+            setattr(namespace, self.dest, previous_values + normalized_values)
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
@@ -278,7 +289,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def merge_config(file_config, cli_config: Namespace) -> Namespace:
+def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespace:
     bools = (
         'display_relative_path',
         'parseable',
@@ -358,7 +369,7 @@ def get_config(arguments: List[str]) -> Namespace:
     return config
 
 
-def print_help(file=sys.stdout):
+def print_help(file: Any = sys.stdout) -> None:
     get_cli_parser().print_help(file=file)
 
 

@@ -76,7 +76,7 @@ PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
 _logger = logging.getLogger(__name__)
 
 
-def parse_yaml_from_file(filepath: str) -> dict:
+def parse_yaml_from_file(filepath: str) -> Any:
     dl = DataLoader()
     if hasattr(dl, 'set_vault_password'):
         dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
@@ -86,7 +86,7 @@ def parse_yaml_from_file(filepath: str) -> dict:
 def path_dwim(basedir: str, given: str) -> str:
     dl = DataLoader()
     dl.set_basedir(basedir)
-    return dl.path_dwim(given)
+    return str(dl.path_dwim(given))
 
 
 def ansible_template(basedir: str, varname: Any, templatevars, **kwargs) -> Any:

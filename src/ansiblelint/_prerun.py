@@ -25,7 +25,7 @@ from ansiblelint.constants import (
 from ansiblelint.loaders import yaml_from_file
 
 
-def check_ansible_presence(exit_on_error=False) -> Tuple[str, str]:
+def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
     """Assures we stop execution if Ansible is missing or outdated.
 
     Returne found version and an optional exception if something wrong
