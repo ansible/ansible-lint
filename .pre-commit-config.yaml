@@ -80,6 +80,7 @@ repos:
     additional_dependencies:
     - Sphinx>=3.1.2
     - enrich
+    - flaky
     - yamllint
     - wcmatch
 - repo: https://github.com/pre-commit/mirrors-pylint
@@ -92,6 +93,7 @@ repos:
     - ansible-base
     - docutils
     - enrich
+    - flaky
     - pytest
     - pyyaml
     - rich
