@@ -360,6 +360,10 @@ def test_is_playbook():
         ("examples/playbooks/vars/other.yml", "vars"),
         ("examples/playbooks/vars/subfolder/settings.yml", "vars"),  # deep vars
         ("molecule/scenario/collections.yml", "requirements"),  # deprecated 2.8 format
+        (
+            "../roles/geerlingguy.mysql/tasks/configure.yml",
+            "tasks",
+        ),  # relative path involved
     ),
 )
 def test_default_kinds(monkeypatch, path: str, kind: FileType) -> None:
