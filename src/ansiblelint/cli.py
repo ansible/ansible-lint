@@ -109,6 +109,11 @@ def get_config_path(config_file: str = '.ansible-lint') -> Optional[str]:
             filename = os.path.abspath(os.path.join(parent, project_filename))
             if os.path.exists(filename):
                 return filename
+            if os.path.exists(os.path.abspath(os.path.join(parent, '.git'))):
+                # Avoid looking outside .git folders as we do not want endup
+                # picking config files from upper level projects if current
+                # project has no config.
+                return None
         (parent, tail) = os.path.split(parent)
     return None
 

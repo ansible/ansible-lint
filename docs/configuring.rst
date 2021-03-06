@@ -15,6 +15,10 @@ file. Ansible-lint checks the working directory for the presence of this file
 and applies any configuration found there. The configuration file location can
 also be overridden via the ``-c path/to/file`` CLI flag.
 
+When configuration file is not found in current directory, the tool will try
+to look for one in parent directories but it will not go outside current git
+repository.
+
 If a value is provided on both the command line and via a config file, the
 values will be merged (if a list like **exclude_paths**), or the **True** value
 will be preferred, in the case of something like **quiet**.
