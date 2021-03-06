@@ -71,7 +71,7 @@ def kind_from_path(path: Path) -> str:
     """Determine the file kind based on its name."""
     # pathlib.Path.match patterns are very limited, they do not support *a*.yml
     # glob.glob supports **/foo.yml but not multiple extensions
-    pathex = wcmatch.pathlib.PurePath(path)
+    pathex = wcmatch.pathlib.PurePath(path.absolute().resolve())
     for entry in options.kinds:
         for k, v in entry.items():
             if pathex.globmatch(

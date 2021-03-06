@@ -13,9 +13,8 @@ from ansiblelint.constants import ANSIBLE_MISSING_RC
 
 DEFAULT_KINDS = [
     # Do not sort this list, order matters.
-    {"requirements": "requirements.yml"},  # v2 and v1
     {"requirements": "**/meta/requirements.yml"},  # v1 only
-    {"reno": "releasenotes/*/*.{yaml,yml}"},  # reno release notes
+    {"reno": "**/releasenotes/*/*.{yaml,yml}"},  # reno release notes
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
     {"role": "**/roles/*/"},
@@ -28,6 +27,7 @@ DEFAULT_KINDS = [
         "requirements": "**/molecule/*/{collections,requirements}.{yaml,yml}"
     },  # molecule old collection requirements (v1), ansible 2.8 only
     {"yaml": "**/molecule/*/{base,molecule}.{yaml,yml}"},  # molecule config
+    {"requirements": "**/requirements.yml"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/*.{yaml,yml}"},
     {"yaml": "**/.*.{yaml,yml}"},
