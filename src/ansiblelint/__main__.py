@@ -42,7 +42,7 @@ from ansiblelint.color import (
     render_yaml,
 )
 from ansiblelint.config import options, used_old_tags
-from ansiblelint.constants import ANSIBLE_MISSING_RC
+from ansiblelint.constants import ANSIBLE_MISSING_RC, EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import cwd
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
@@ -263,6 +263,8 @@ def _run_cli_entrypoint() -> None:
         # NOTE: Only "broken pipe" is acceptable to ignore
         if exc.errno != errno.EPIPE:
             raise
+    except KeyboardInterrupt:
+        sys.exit(EXIT_CONTROL_C_RC)
     except RuntimeError as e:
         raise SystemExit(str(e))
 
