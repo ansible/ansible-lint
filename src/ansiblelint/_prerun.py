@@ -276,6 +276,9 @@ def _perform_mockings() -> None:
     if not os.path.exists("galaxy.yml"):
         return
     yaml = yaml_from_file("galaxy.yml")
+    if not yaml:
+        # ignore empty galaxy.yml file
+        return
     namespace = yaml.get('namespace', None)
     collection = yaml.get('name', None)
     if not namespace or not collection:
