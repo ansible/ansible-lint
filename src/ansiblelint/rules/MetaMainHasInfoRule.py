@@ -79,5 +79,4 @@ class MetaMainHasInfoRule(AnsibleLintRule):
                 self.create_matcherror(message=err, filename=file)
                 for err in _galaxy_info_errors_itr(galaxy_info)
             ]
-
-        return [self.create_matcherror(message="No 'galaxy_info' found")]
+        return [self.create_matcherror(message="No 'galaxy_info' found", filename=file)]

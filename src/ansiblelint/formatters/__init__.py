@@ -43,7 +43,7 @@ class BaseFormatter(Generic[T]):
         if isinstance(path, Path):
             path = str(path)  # Drop when Python 3.5 is no longer supported
 
-        if not self._base_dir:
+        if not self._base_dir or not path:
             return path
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self._base_dir)
