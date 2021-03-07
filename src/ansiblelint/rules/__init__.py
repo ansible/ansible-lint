@@ -143,6 +143,8 @@ class AnsibleLintRule(BaseRule):
         # file contains a single string. YAML spec allows this but we consider
         # this an fatal error.
         if isinstance(yaml, str):
+            if yaml.startswith('$ANSIBLE_VAULT'):
+                return []
             return [MatchError(filename=str(file.path), rule=LoadingFailureRule())]
         if not yaml:
             return matches
