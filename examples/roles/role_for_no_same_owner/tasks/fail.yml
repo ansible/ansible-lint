@@ -1,0 +1,59 @@
+- name: block
+  block:
+    - name: synchonize-in-block
+      synchronize:
+        src: dummy
+        dest: dummy
+
+- name: synchronize
+  synchronize:
+    src: dummy
+    dest: dummy
+
+- name: nested-block
+  block:
+    - block:
+        - name: synchonize-in-deep-block
+          synchronize:
+            src: dummy
+            dest: dummy
+
+- name: unarchive-bz2
+  unarchive:
+    src: "{{ file }}.tar.bz2"
+    dest: "dummy"
+
+- name: unarchive delegated
+  unarchive:
+    src: "{{ file }}.tar.bz2"
+    dest: "dummy"
+  delegate_to: localhost
+
+- name: unarchive-gz
+  unarchive:
+    src: "{{ file }}.tar.gz"
+    dest: "dummy"
+
+- name: unarchive-tar
+  unarchive:
+    src: "{{ file }}.tar"
+    dest: "dummy"
+
+- name: unarchive-xz
+  unarchive:
+    src: "{{ file }}.tar.xz"
+    dest: "dummy"
+
+- name: unarchive-zip
+  unarchive:
+    src: "{{ file }}.zip"
+    dest: dummy
+    extra_opts:
+      - '-X'
+
+- name: unarchive-zip-same-owner
+  unarchive:
+    src: "{{ file }}.zip"
+    dest: dummy
+    extra_opts:
+      - '-X'

@@ -56,6 +56,7 @@ options = Namespace(
     offline=False,
     project_dir=None,
     extra_vars=None,
+    enable_list=[],
     skip_action_validation=True,
 )
 
