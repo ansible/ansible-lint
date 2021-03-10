@@ -16,6 +16,7 @@ from ansiblelint._internal.rules import (
     LoadingFailureRule,
     RuntimeErrorRule,
 )
+from ansiblelint.config import options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
@@ -186,8 +187,9 @@ def load_plugins(directory: str) -> List[AnsibleLintRule]:
 
 
 class RulesCollection:
-    def __init__(self, rulesdirs: Optional[List[str]] = None) -> None:
+    def __init__(self, rulesdirs: Optional[List[str]] = None, options=options) -> None:
         """Initialize a RulesCollection instance."""
+        self.options = options
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = ansiblelint.file_utils.expand_paths_vars(rulesdirs)
@@ -199,11 +201,14 @@ class RulesCollection:
         )
         for rulesdir in self.rulesdirs:
             _logger.debug("Loading rules from %s", rulesdir)
-            self.extend(load_plugins(rulesdir))
+            for rule in load_plugins(rulesdir):
+                self.register(rule)
         self.rules = sorted(self.rules)
 
     def register(self, obj: AnsibleLintRule) -> None:
-        self.rules.append(obj)
+        # We skip opt-in rules which were not manually enabled
+        if 'opt-in' not in obj.tags or obj.id in self.options.enable_list:
+            self.rules.append(obj)
 
     def __iter__(self) -> Iterator[BaseRule]:
         """Return the iterator over the rules in the RulesCollection."""

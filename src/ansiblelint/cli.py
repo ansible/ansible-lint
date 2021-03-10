@@ -245,6 +245,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="only warn about these rules, unless overridden in "
         "config file defaults to 'experimental'",
     )
+    parser.add_argument(
+        '--enable-list',
+        dest='enable_list',
+        default=[],
+        action='append',
+        help="activate optional rules by their tag name",
+    )
     # Do not use store_true/store_false because they create opposite defaults.
     parser.add_argument(
         '--nocolor',
@@ -313,6 +320,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         'warn_list': ['experimental'],
         'mock_modules': [],
         'mock_roles': [],
+        'enable_list': [],
     }
 
     scalar_map = {"loop_var_prefix": None, "project_dir": None}

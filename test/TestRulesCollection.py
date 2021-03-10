@@ -24,6 +24,7 @@ import re
 
 import pytest
 
+from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import run_ansible_lint
@@ -119,9 +120,12 @@ def test_rich_rule_listing():
 def test_rules_id_format() -> None:
     """Assure all our rules have consistent format."""
     rule_id_re = re.compile("^[a-z-]{4,30}$")
-    rules = RulesCollection([os.path.abspath('./src/ansiblelint/rules')])
+    options.enable_list = ['no-same-owner']
+    rules = RulesCollection(
+        [os.path.abspath('./src/ansiblelint/rules')], options=options
+    )
     for rule in rules:
         assert rule_id_re.match(
             rule.id
         ), f"R rule id {rule.id} did not match our required format."
-    assert len(rules) == 37
+    assert len(rules) == 38

@@ -1,0 +1,31 @@
+- name: syncronize-delegate
+  synchronize:
+    src: dummy
+    dest: dummy
+  delegate_to: localhost
+
+- name: synchronize-no-same-owner
+  synchronize:
+    src: dummy
+    dest: dummy
+    owner: false
+    group: false
+
+- name: unarchive-no-same-owner
+  unarchive:
+    src: "{{ file }}.tar.gz"
+    dest: dummy
+    extra_opts:
+      - '--no-same-owner'
+
+- name: unarchive-remote-src
+  unarchive:
+    src: "{{ file }}.tar.gz"
+    dest: dummy
+    extra_opts:
+      - '--no-same-owner'
+
+- name: unarchive-unknown-file-ending
+  unarchive:
+    src: "{{ file }}"
+    dest: "dummy"

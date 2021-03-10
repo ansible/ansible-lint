@@ -34,7 +34,9 @@ def runner(play_file_path, default_rules_collection):
 def default_rules_collection():
     """Return default rule collection."""
     assert os.path.isdir(DEFAULT_RULESDIR)
-    return RulesCollection(rulesdirs=[DEFAULT_RULESDIR])
+    # For testing we want to manually enable opt-in rules
+    options.enable_list = ['no-same-owner']
+    return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=options)
 
 
 @pytest.fixture

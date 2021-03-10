@@ -28,6 +28,11 @@ skip_list:
   - skip_this_tag
   - git-latest
 
+# Any rule that has the 'opt-in' tag will not be loaded unless its 'id' is
+# mentioned in the enable_list:
+enable_list:
+  - no-same-owner
+
 # Report only a subset of tags and fully ignore any others
 # tags:
 #   - var-spacing
