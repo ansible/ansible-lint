@@ -46,3 +46,11 @@ def test_example_custom_module(default_rules_collection):
         'examples/playbooks/custom_module.yml', rules=default_rules_collection
     ).run()
     assert len(result) == 0
+
+
+def test_full_vault(default_rules_collection):
+    """custom_module.yml is expected to pass."""
+    result = Runner(
+        'examples/playbooks/vars/not_decryptable.yml', rules=default_rules_collection
+    ).run()
+    assert len(result) == 0
