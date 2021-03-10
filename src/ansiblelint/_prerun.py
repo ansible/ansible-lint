@@ -154,11 +154,13 @@ def _install_galaxy_role() -> None:
     if 'galaxy_info' not in yaml:
         return
     role_name = yaml['galaxy_info'].get('role_name', None)
-    role_author = yaml['galaxy_info'].get('author', None)
+    role_namespace = yaml['galaxy_info'].get('namespace', None)
+    if not role_namespace:
+        role_namespace = yaml['galaxy_info'].get('author', None)
     if not role_name:
         role_name = pathlib.Path(".").absolute().name
         role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
-    fqrn = f"{role_author}.{role_name}"
+    fqrn = f"{role_namespace}.{role_name}"
     if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
         print(
             f"""\
@@ -167,7 +169,7 @@ Please edit meta/main.yml and assure we can correctly determine full role name:
 
 galaxy_info:
   role_name: my_name  # if absent directory name hosting role is used instead
-  author: my_galaxy_namespace
+  namespace: my_galaxy_namespace  # if absent, author is used instead
 
 Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
 Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
@@ -177,7 +179,7 @@ Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
         sys.exit(INVALID_PREREQUISITES_RC)
     p = pathlib.Path(f"{options.project_dir}/.cache/roles")
     p.mkdir(parents=True, exist_ok=True)
-    link_path = p / f"{role_author}.{role_name}"
+    link_path = p / f"{role_namespace}.{role_name}"
     # despite documentation stating that is_file() reports true for symlinks,
     # it appears that is_dir() reports true instead, so we rely on exits().
     if not link_path.exists():
