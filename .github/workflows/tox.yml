@@ -32,6 +32,7 @@ jobs:
         env:
         - TOXENV: lint
         - TOXENV: docs
+        - TOXENV: eco
         - TOXENV: packaging
     env:
       TOX_PARALLEL_NO_SPINNER: 1
