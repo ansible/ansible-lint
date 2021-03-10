@@ -1,0 +1,38 @@
+#!env ansible-playbook
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    cache_dir: "{{ (lookup('env','HOME'), '.cache', 'ansible-lint-eco') | path_join | realpath }}"
+    repos:
+      - name: ansible-role-mysql
+        url: https://github.com/geerlingguy/ansible-role-mysql.git
+        contact: geerlingguy
+      # Enable after: https://review.opendev.org/c/zuul/zuul-jobs/+/773245
+      # - name: zuul-jobs
+      #   url: https://opendev.org/zuul/zuul-jobs
+      #   contact: ssbarnea
+      - name: ansible-role-hardening
+        url: https://github.com/konstruktoid/ansible-role-hardening
+        contact: konstruktoid
+      - name: ansible-docker-rootless
+        url: https://github.com/konstruktoid/ansible-docker-rootless
+        contact: konstruktoid
+      # Enable after: https://github.com/devroles/ansible_collection_system/pull/1
+      - name: ansible_collection_system
+        url: https://github.com/devroles/ansible_collection_system
+        contact: greg-hellings
+  tasks:
+
+    - name: Clone repo
+      git:
+        repo: "{{ item.url }}"
+        dest: "{{ (cache_dir, item.name) | path_join }}"
+      loop: "{{ repos }}"
+
+    - name: Run linter
+      command: ansible-lint -v
+      args:
+        chdir: "{{ (cache_dir, item.name) | path_join }}"
+      loop: "{{ repos }}"
+      changed_when: false
