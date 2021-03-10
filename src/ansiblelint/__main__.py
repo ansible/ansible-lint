@@ -41,7 +41,7 @@ from ansiblelint.color import (
     reconfigure,
     render_yaml,
 )
-from ansiblelint.config import options, used_old_tags
+from ansiblelint.config import options
 from ansiblelint.constants import ANSIBLE_MISSING_RC, EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import cwd
 from ansiblelint.skip_utils import normalize_tag
@@ -131,13 +131,20 @@ warn_list:  # or 'skip_list' to silence them completely
             break
     msg += "".join(sorted(entries))
 
-    for k, v in used_old_tags.items():
-        _logger.warning(
-            "Replaced deprecated tag '%s' with '%s' but it will become an "
-            "error in the future.",
-            k,
-            v,
-        )
+    # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
+    # to migrate old tags to new tags. There are a lot of things out there that still
+    # use ansible-lint 4 (for example, Ansible Galaxy and Automation Hub imports). If we
+    # replace the old tags, those tools will report warnings. If we do not replace them,
+    # ansible-lint 5 will report warnings.
+    #
+    # We can do the deprecation once the ecosystem caught up at least a bit.
+    # for k, v in used_old_tags.items():
+    #     _logger.warning(
+    #         "Replaced deprecated tag '%s' with '%s' but it will become an "
+    #         "error in the future.",
+    #         k,
+    #         v,
+    #     )
 
     if result.matches and not options.quiet:
         console_stderr.print(
