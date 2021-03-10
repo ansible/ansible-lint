@@ -65,6 +65,10 @@ SUCCESS_TASKS = '''
     - shell: |
         set -o pipefail
         df | grep '/dev'
+
+    - name: should not fail due to ignore_errors being true
+      shell: false | cat
+      ignore_errors: true
 '''
 
 

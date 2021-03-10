@@ -2,6 +2,7 @@ import re
 from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import convert_to_boolean
 
 
 class ShellWithoutPipefail(AnsibleLintRule):
@@ -39,4 +40,5 @@ class ShellWithoutPipefail(AnsibleLintRule):
         return bool(
             self._pipe_re.search(unjinjad_cmd)
             and not self._pipefail_re.match(unjinjad_cmd)
+            and not convert_to_boolean(task['action'].get('ignore_errors', False))
         )
