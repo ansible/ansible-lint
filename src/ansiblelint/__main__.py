@@ -56,7 +56,13 @@ _logger = logging.getLogger(__name__)
 
 def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
-    VERBOSITY_MAP = {0: logging.NOTSET, 1: logging.INFO, 2: logging.DEBUG}
+    VERBOSITY_MAP = {
+        -2: logging.ERROR,
+        -1: logging.WARNING,
+        0: logging.NOTSET,
+        1: logging.INFO,
+        2: logging.DEBUG,
+    }
 
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(levelname)-8s %(message)s')
@@ -83,7 +89,7 @@ def initialize_options(arguments: List[str]):
             )
         )
         if err:
-            print(err, file=sys.stderr)
+            _logger.error(err)
             sys.exit(ANSIBLE_MISSING_RC)
         sys.exit(0)
 

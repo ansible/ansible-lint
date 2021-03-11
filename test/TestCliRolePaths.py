@@ -105,7 +105,7 @@ class TestCliRolePaths(unittest.TestCase):
         cwd = self.local_test_dir
         role_path = 'roles/ansible-role-foo'
 
-        result = run_ansible_lint(role_path, cwd=cwd)
+        result = run_ansible_lint("-v", role_path, cwd=cwd)
         assert len(result.stdout) == 0
         assert (
             "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles"
@@ -117,7 +117,7 @@ class TestCliRolePaths(unittest.TestCase):
         cwd = self.local_test_dir
         role_path = 'roles/valid-due-to-meta'
 
-        result = run_ansible_lint(role_path, cwd=cwd)
+        result = run_ansible_lint("-v", role_path, cwd=cwd)
         assert len(result.stdout) == 0
         assert (
             "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles"

@@ -15,7 +15,7 @@ def test_prerun_reqs_v1() -> None:
             os.path.dirname(os.path.realpath(__file__)), "..", "examples", "reqs_v1"
         )
     )
-    result = run_ansible_lint(".", cwd=cwd)
+    result = run_ansible_lint("-v", ".", cwd=cwd)
     assert "Running ansible-galaxy role install" in result.stderr, result.stderr
     assert (
         "Running ansible-galaxy collection install" not in result.stderr
@@ -31,7 +31,7 @@ def test_prerun_reqs_v2() -> None:
             os.path.dirname(os.path.realpath(__file__)), "..", "examples", "reqs_v2"
         )
     )
-    result = run_ansible_lint(".", cwd=cwd)
+    result = run_ansible_lint("-v", ".", cwd=cwd)
     assert "Running ansible-galaxy role install" in result.stderr, result.stderr
     assert "Running ansible-galaxy collection install" in result.stderr, result.stderr
     assert result.returncode == 0, result
