@@ -22,7 +22,7 @@ import os
 from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg
+from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg, get_second_cmd_arg
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
@@ -59,15 +59,30 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'yum': 'yum',
     }
 
+    _executable_options = {
+        'git': 'branch',
+        'systemctl': ['set-default', 'show-environment'],
+    }
+
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         if task['action']['__ansible_module__'] not in self._commands:
             return False
 
         first_cmd_arg = get_first_cmd_arg(task)
+        second_cmd_arg = get_second_cmd_arg(task)
+
         if not first_cmd_arg:
             return False
 
         executable = os.path.basename(first_cmd_arg)
+
+        if (
+            second_cmd_arg
+            and executable in self._executable_options
+            and second_cmd_arg in self._executable_options[executable]
+        ):
+            return False
+
         if executable in self._modules and convert_to_boolean(
             task['action'].get('warn', True)
         ):
