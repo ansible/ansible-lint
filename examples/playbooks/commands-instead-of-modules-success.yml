@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tasks:
+    - name: set systemd runlevel
+      command: systemctl set-default multi-user.target
+
+    - name: show systemd environment
+      command: systemctl show-environment
+
+    - name: print current git branch
+      command: git branch

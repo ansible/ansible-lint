@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tasks:
+    - name: print git log
+      command: git log
+
+    - name: run apt-get update
+      command: apt-get update
+
+    - name: restart sshd
+      command: systemctl restart sshd
