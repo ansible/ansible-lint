@@ -141,7 +141,7 @@ def prepare_environment() -> None:
                 stderr=subprocess.STDOUT,
             )
             if run.returncode != 0:
-                _logger.error(run.stdout, file=sys.stderr)
+                _logger.error(run.stdout)
                 sys.exit(run.returncode)
 
     _install_galaxy_role()
@@ -163,23 +163,34 @@ def _install_galaxy_role() -> None:
     if not role_name:
         role_name = pathlib.Path(".").absolute().name
         role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
-    fqrn = f"{role_namespace}.{role_name}"
-    if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
-        _logger.error(
-            """\
-Computed fully qualified role name of %s is not valid.
-Please edit meta/main.yml and assure we can correctly determine full role name:
 
-galaxy_info:
-  role_name: my_name  # if absent directory name hosting role is used instead
-  namespace: my_galaxy_namespace  # if absent, author is used instead
+    if 'role-name' not in options.skip_list:
+        fqrn = f"{role_namespace}.{role_name}"
+        if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
+            msg = (
+                """\
+    Computed fully qualified role name of %s does not follow current galaxy requirements.
+    Please edit meta/main.yml and assure we can correctly determine full role name:
 
-Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
-Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
-""",
-            fqrn,
-        )
-        sys.exit(INVALID_PREREQUISITES_RC)
+    galaxy_info:
+    role_name: my_name  # if absent directory name hosting role is used instead
+    namespace: my_galaxy_namespace  # if absent, author is used instead
+
+    Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
+    Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
+
+    As an alternative, you can add 'role-name' to either skip_list or warn_list.
+    """,
+                fqrn,
+            )
+            if 'role-name' in options.warn_list:
+                _logger.warning(msg)
+            else:
+                _logger.error(msg)
+                sys.exit(INVALID_PREREQUISITES_RC)
+    else:
+        # when 'role-name' is in skip_list, we stick to plain role names
+        fqrn = role_name
     p = pathlib.Path(f"{options.project_dir}/.cache/roles")
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / f"{role_namespace}.{role_name}"

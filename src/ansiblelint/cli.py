@@ -317,7 +317,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         'rulesdir': [],
         'skip_list': [],
         'tags': [],
-        'warn_list': ['experimental'],
+        'warn_list': ['experimental', 'role-name'],
         'mock_modules': [],
         'mock_roles': [],
         'enable_list': [],
