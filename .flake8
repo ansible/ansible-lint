@@ -70,6 +70,7 @@ per-file-ignores =
   test/TestBaseFormatter.py: D100 D103
   test/TestBecomeUserWithoutBecome.py: PT009 D100 D101 D102
   test/TestCliRolePaths.py: PT009 D100 D101 D102
+  test/TestCommandsInsteadOfModulesRule.py: PT009
   test/TestCommandLineInvocationSameAsConfig.py: D100 D103
   test/TestCommandHasChangesCheck.py: PT009 D100 D101 D102
   test/TestComparisonToEmptyString.py: PT009 D100 D101 D102

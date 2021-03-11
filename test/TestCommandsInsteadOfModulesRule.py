@@ -1,4 +1,5 @@
 # pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
+"""command-instead-of-module rule testing"""
 import unittest
 
 from ansiblelint.rules import RulesCollection
@@ -10,14 +11,17 @@ class TestCommandsInsteadOfModulesRule(unittest.TestCase):
     collection = RulesCollection()
 
     def setUp(self):
+        """Register rule"""
         self.collection.register(CommandsInsteadOfModulesRule())
 
     def test_file_positive(self):
+        """Run tasks that should be successful"""
         success = 'examples/playbooks/commands-instead-of-modules-success.yml'
         good_runner = Runner(success, rules=self.collection)
         self.assertEqual([], good_runner.run())
 
     def test_file_negative(self):
+        """Run tasks that should fail"""
         failure = 'examples/playbooks/commands-instead-of-modules-failure.yml'
         bad_runner = Runner(failure, rules=self.collection)
         errs = bad_runner.run()
