@@ -218,13 +218,17 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
 
 def guess_project_dir() -> str:
     """Return detected project dir or user home directory."""
-    result = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"],
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        universal_newlines=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        # if git is absent we use home directory
+        return str(Path.home())
 
     if result.returncode != 0:
         return str(Path.home())
