@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Unio
 
 import wcmatch.pathlib
 
-from ansiblelint.config import options
+from ansiblelint.config import BASE_KINDS, options
 from ansiblelint.constants import FileType
 
 if TYPE_CHECKING:
@@ -67,12 +67,17 @@ def expand_paths_vars(paths: List[str]) -> List[str]:
     return paths
 
 
-def kind_from_path(path: Path) -> str:
-    """Determine the file kind based on its name."""
+def kind_from_path(path: Path, base=False) -> str:
+    """Determine the file kind based on its name.
+
+    When called with base=True, it will return the base file type instead
+    of the explicit one. That is expected to return 'yaml' for any yaml files.
+    """
     # pathlib.Path.match patterns are very limited, they do not support *a*.yml
     # glob.glob supports **/foo.yml but not multiple extensions
     pathex = wcmatch.pathlib.PurePath(path.absolute().resolve())
-    for entry in options.kinds:
+    kinds = options.kinds if not base else BASE_KINDS
+    for entry in kinds:
         for k, v in entry.items():
             if pathex.globmatch(
                 v,
@@ -83,6 +88,11 @@ def kind_from_path(path: Path) -> str:
                 ),
             ):
                 return str(k)
+
+    if base:
+        # Unknown base file type is default
+        return ""
+
     if path.is_dir():
         return "role"
 
@@ -145,6 +155,9 @@ class Lintable:
                 self.dir = str(self.path.resolve())
             else:
                 self.dir = str(self.path.parent.resolve())
+
+        # determine base file kind (yaml, xml, ini, ...)
+        self.base_kind = kind_from_path(self.path, base=True)
 
     def __getitem__(self, key: Any) -> Any:
         """Provide compatibility subscriptable support."""
