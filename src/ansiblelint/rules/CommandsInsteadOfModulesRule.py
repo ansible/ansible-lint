@@ -60,7 +60,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     }
 
     _executable_options = {
-        'git': 'branch',
+        'git': ['branch', 'log'],
         'systemctl': ['set-default', 'show-environment'],
     }
 
