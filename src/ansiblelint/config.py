@@ -14,6 +14,8 @@ from ansiblelint.constants import ANSIBLE_MISSING_RC
 DEFAULT_KINDS = [
     # Do not sort this list, order matters.
     {"requirements": "**/meta/requirements.yml"},  # v1 only
+    # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
+    {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
     {"reno": "**/releasenotes/*/*.{yaml,yml}"},  # reno release notes
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
@@ -29,9 +31,25 @@ DEFAULT_KINDS = [
     {"yaml": "**/molecule/*/{base,molecule}.{yaml,yml}"},  # molecule config
     {"requirements": "**/requirements.yml"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
+    {"yaml": "**/{.ansible-lint,.yamllint}"},
     {"yaml": "**/*.{yaml,yml}"},
     {"yaml": "**/.*.{yaml,yml}"},
 ]
+
+BASE_KINDS = [
+    # These assignations are only for internal use and are only inspired by
+    # MIME/IANA model. Their purpose is to be able to process a file based on
+    # it type, including generic processing of text files using the prefix.
+    {"text/json": "**/*.json"},  # standardized
+    {"text/markdown": "**/*.md"},  # https://tools.ietf.org/html/rfc7763
+    {"text/rst": "**/*.rst"},  # https://en.wikipedia.org/wiki/ReStructuredText
+    {"text/ini": "**/*.ini"},
+    # YAML has no official IANA assignation
+    {"text/yaml": "**/{.ansible-lint,.yamllint}"},
+    {"text/yaml": "**/*.{yaml,yml}"},
+    {"text/yaml": "**/.*.{yaml,yml}"},
+]
+
 
 options = Namespace(
     colored=True,
