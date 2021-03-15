@@ -76,7 +76,7 @@ class YamllintRule(AnsibleLintRule):
         """Return matches found for a specific YAML text."""
         matches: List["MatchError"] = []
         filtered_matches = []
-        if file.kind == 'role':
+        if file.base_kind != 'text/yaml':
             return matches
 
         if YamllintRule.config:

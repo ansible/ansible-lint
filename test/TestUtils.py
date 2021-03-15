@@ -364,6 +364,7 @@ def test_is_playbook():
             "../roles/geerlingguy.mysql/tasks/configure.yml",
             "tasks",
         ),  # relative path involved
+        ("galaxy.yml", "galaxy"),
     ),
 )
 def test_default_kinds(monkeypatch, path: str, kind: FileType) -> None:
