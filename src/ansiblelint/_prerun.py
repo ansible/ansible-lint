@@ -1,3 +1,4 @@
+import logging
 import os
 import pathlib
 import re
@@ -23,6 +24,8 @@ from ansiblelint.constants import (
     INVALID_PREREQUISITES_RC,
 )
 from ansiblelint.loaders import yaml_from_file
+
+_logger = logging.getLogger(__name__)
 
 
 def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
@@ -85,7 +88,7 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
 
     ver, err = _get_ver_err()
     if exit_on_error and err:
-        print(err, file=sys.stderr)
+        _logger.error(err)
         sys.exit(ANSIBLE_MISSING_RC)
     return ver, err
 
@@ -104,7 +107,7 @@ def prepare_environment() -> None:
             "requirements.yml",
         ]
 
-        print("Running %s" % " ".join(cmd), file=sys.stderr)
+        _logger.info("Running %s", " ".join(cmd))
         run = subprocess.run(
             cmd,
             universal_newlines=True,
@@ -113,7 +116,7 @@ def prepare_environment() -> None:
             stderr=subprocess.STDOUT,
         )
         if run.returncode != 0:
-            print(run.stdout, file=sys.stderr)
+            _logger.error(run.stdout)
             sys.exit(run.returncode)
 
         # Run galaxy collection install works on v2 requirements.yml
@@ -129,7 +132,7 @@ def prepare_environment() -> None:
                 "requirements.yml",
             ]
 
-            print("Running %s" % " ".join(cmd), file=sys.stderr)
+            _logger.info("Running %s", " ".join(cmd))
             run = subprocess.run(
                 cmd,
                 universal_newlines=True,
@@ -138,7 +141,7 @@ def prepare_environment() -> None:
                 stderr=subprocess.STDOUT,
             )
             if run.returncode != 0:
-                print(run.stdout, file=sys.stderr)
+                _logger.error(run.stdout)
                 sys.exit(run.returncode)
 
     _install_galaxy_role()
@@ -160,23 +163,34 @@ def _install_galaxy_role() -> None:
     if not role_name:
         role_name = pathlib.Path(".").absolute().name
         role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
-    fqrn = f"{role_namespace}.{role_name}"
-    if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
-        print(
-            f"""\
-Computed fully qualified role name of {fqrn} is not valid.
-Please edit meta/main.yml and assure we can correctly determine full role name:
 
-galaxy_info:
-  role_name: my_name  # if absent directory name hosting role is used instead
-  namespace: my_galaxy_namespace  # if absent, author is used instead
+    if 'role-name' not in options.skip_list:
+        fqrn = f"{role_namespace}.{role_name}"
+        if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
+            msg = (
+                """\
+    Computed fully qualified role name of %s does not follow current galaxy requirements.
+    Please edit meta/main.yml and assure we can correctly determine full role name:
 
-Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
-Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
-""",
-            file=sys.stderr,
-        )
-        sys.exit(INVALID_PREREQUISITES_RC)
+    galaxy_info:
+    role_name: my_name  # if absent directory name hosting role is used instead
+    namespace: my_galaxy_namespace  # if absent, author is used instead
+
+    Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
+    Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
+
+    As an alternative, you can add 'role-name' to either skip_list or warn_list.
+    """,
+                fqrn,
+            )
+            if 'role-name' in options.warn_list:
+                _logger.warning(msg)
+            else:
+                _logger.error(msg)
+                sys.exit(INVALID_PREREQUISITES_RC)
+    else:
+        # when 'role-name' is in skip_list, we stick to plain role names
+        fqrn = role_name
     p = pathlib.Path(f"{options.project_dir}/.cache/roles")
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / f"{role_namespace}.{role_name}"
@@ -184,9 +198,9 @@ Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
     # it appears that is_dir() reports true instead, so we rely on exits().
     if not link_path.exists():
         link_path.symlink_to(pathlib.Path("../..", target_is_directory=True))
-    print(
-        f"Using {link_path} symlink to current repository in order to enable Ansible to find the role using its expected full name.",
-        file=sys.stderr,
+    _logger.info(
+        "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
+        link_path,
     )
 
 
@@ -223,10 +237,7 @@ def _make_module_stub(module_name: str) -> None:
             collection=collection,
         )
     elif "." in module_name:
-        print(
-            "Config error: %s is not a valid module name." % module_name,
-            file=sys.stderr,
-        )
+        _logger.error("Config error: %s is not a valid module name.", module_name)
         sys.exit(INVALID_CONFIG_RC)
     else:
         os.makedirs(f"{options.project_dir}/.cache/modules", exist_ok=True)
@@ -257,7 +268,7 @@ def _update_env(varname: str, value: List[str], default: str = "") -> None:
         value_str = ":".join(value)
         if value_str != os.environ.get(varname, ""):
             os.environ[varname] = value_str
-            print("Added %s=%s" % (varname, value_str), file=sys.stderr)
+            _logger.info("Added %s=%s", varname, value_str)
 
 
 def _perform_mockings() -> None:

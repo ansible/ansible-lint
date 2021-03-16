@@ -156,9 +156,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '-q',
         dest='quiet',
-        default=False,
-        action='store_true',
-        help="quieter, although not silent output",
+        default=0,
+        action='count',
+        help="quieter, reduce verbosity, can be specified twice.",
     )
     parser.add_argument(
         '-p',
@@ -317,7 +317,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         'rulesdir': [],
         'skip_list': [],
         'tags': [],
-        'warn_list': ['experimental'],
+        'warn_list': ['experimental', 'role-name'],
         'mock_modules': [],
         'mock_roles': [],
         'enable_list': [],
@@ -379,6 +379,9 @@ def get_config(arguments: List[str]) -> Namespace:
         )
         options.project_dir = normpath(project_dir)
 
+    # print(666, options.quiet, options.verbosity)
+    # Compute final verbosity level by subtracting -q counter.
+    options.verbosity -= options.quiet
     return config
 
 

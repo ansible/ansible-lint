@@ -18,6 +18,8 @@ import os
 import sys
 from pathlib import Path
 
+import pkg_resources
+
 # Make in-tree extension importable in non-tox setups/envs, like RTD.
 # Refs:
 # https://github.com/readthedocs/readthedocs.org/issues/6311
@@ -54,6 +56,18 @@ extensions = [
     'sphinxcontrib.programoutput',
     'rules_table_generator_ext',  # in-tree extension
 ]
+
+
+# Fail safe protection to detect conflicting packages
+try:
+    pkg_resources.get_distribution("sphinxcontrib-programoutput")
+    print(
+        "FATAL: We detected presence of sphinxcontrib-programoutput package instead of sphinxcontrib-programoutput2 one. You must be sure the first is not installed.",
+        file=sys.stderr,
+    )
+    sys.exit(2)
+except pkg_resources.DistributionNotFound:
+    pass
 
 # Later on, add 'sphinx.ext.viewcode' to the list if you want to have
 # colorized code generated too for references.
@@ -251,8 +265,8 @@ intersphinx_mapping = {
 
 # table width fix via: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
 html_static_path = ['_static']
-html_context = {
-    'css_files': [
-        '_static/theme_overrides.css',  # override wide tables in RTD theme
-    ],
-}
+
+html_css_files = [
+    'theme_overrides.css',  # override wide tables in RTD theme
+    'ansi.css',
+]
