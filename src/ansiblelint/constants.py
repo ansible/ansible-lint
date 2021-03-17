@@ -43,6 +43,7 @@ author:
 EXAMPLES = '''mocked'''
 RETURN = '''mocked'''
 
+
 def main():
     result = dict(
         changed=False,
