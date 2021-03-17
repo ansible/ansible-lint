@@ -374,7 +374,7 @@ def get_config(arguments: List[str]) -> Namespace:
     if not options.project_dir:
         project_dir = os.path.dirname(
             os.path.abspath(
-                options.config_file or f"{guess_project_dir()}/.ansiblelint"
+                options.config_file or f"{guess_project_dir()}/.ansible-lint"
             )
         )
         options.project_dir = normpath(project_dir)
