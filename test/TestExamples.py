@@ -4,6 +4,7 @@ import os
 import pytest
 
 from ansiblelint.runner import Runner
+from ansiblelint.testing import run_ansible_lint
 
 
 @pytest.fixture
@@ -54,3 +55,12 @@ def test_full_vault(default_rules_collection):
         'examples/playbooks/vars/not_decryptable.yml', rules=default_rules_collection
     ).run()
     assert len(result) == 0
+
+
+def test_custom_kinds():
+    """Check if user defined kinds are used."""
+    result = run_ansible_lint('-vv', '--offline', 'examples/other/')
+    assert result.returncode == 0
+    # .yaml-too is not a recognized extension and unless is manually defined
+    # in our .ansible-lint config, the test would not identify it as yaml file.
+    assert "Examining examples/other/some.yaml-too of type yaml" in result.stderr

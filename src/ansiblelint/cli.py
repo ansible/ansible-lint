@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 
 import yaml
 
+from ansiblelint.config import DEFAULT_KINDS
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
     DEFAULT_RULESDIR,
@@ -357,6 +358,11 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     # merge options that can be set only via a file config
     for entry, value in file_config.items():
         setattr(cli_config, entry, value)
+
+    # append default kinds to the custom list
+    kinds = file_config.get('kinds', [])
+    kinds.extend(DEFAULT_KINDS)
+    setattr(cli_config, 'kinds', kinds)
 
     return cli_config
 
