@@ -59,3 +59,13 @@ extra_vars:
 # Uncomment to enforce action validation with tasks, usually is not
 # needed as Ansible syntax check also covers it.
 # skip_action_validation: false
+
+# List of additional kind:pattern to be added at the top of the default
+# match list, first match determines the file kind.
+kinds:
+  # - playbook: "**/examples/*.{yml,yaml}"
+  # - galaxy: "**/folder/galaxy.yml"
+  # - tasks: "**/tasks/*.yml"
+  # - vars: "**/vars/*.yml"
+  # - meta: "**/meta/main.yml"
+  - yaml: "**/*.yaml-too"

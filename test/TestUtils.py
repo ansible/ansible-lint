@@ -227,7 +227,7 @@ def test_get_yaml_files_git_verbose(reset_env_var, message_prefix, monkeypatch, 
     expected_info = (
         "ansiblelint",
         logging.INFO,
-        'Discovering files to lint: git ls-files -z *.yaml *.yml',
+        'Discovering files to lint: git ls-files -z',
     )
 
     assert expected_info in caplog.record_tuples
@@ -312,7 +312,7 @@ def test_cli_auto_detect(capfd):
     out, err = capfd.readouterr()
 
     # Confirmation that it runs in auto-detect mode
-    assert "Discovering files to lint: git ls-files -z *.yaml *.yml" in err
+    assert "Discovering files to lint: git ls-files -z" in err
     # An expected rule match from our examples
     assert (
         "examples/playbooks/empty_playbook.yml:0: "

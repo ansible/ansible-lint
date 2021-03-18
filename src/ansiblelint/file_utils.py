@@ -98,7 +98,9 @@ def kind_from_path(path: Path, base=False) -> str:
 
     if str(path) == '/dev/stdin':
         return "playbook"
-    raise RuntimeError("Unable to determine file type for %s" % pathex)
+
+    # Unknown file types report a empty string (evaluated as False)
+    return ""
 
 
 class Lintable:
@@ -200,7 +202,7 @@ class Lintable:
 def get_yaml_files(options: Namespace) -> Dict[str, Any]:
     """Find all yaml files."""
     # git is preferred as it also considers .gitignore
-    git_command = ['git', 'ls-files', '-z', '*.yaml', '*.yml']
+    git_command = ['git', 'ls-files', '-z']
     _logger.info("Discovering files to lint: %s", ' '.join(git_command))
 
     out = None

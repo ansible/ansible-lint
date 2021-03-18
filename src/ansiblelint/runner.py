@@ -135,7 +135,7 @@ class Runner:
             files = [value for n, value in enumerate(files) if value not in files[:n]]
 
             for file in self.lintables:
-                if file in self.checked_files:
+                if file in self.checked_files or not file.kind:
                     continue
                 _logger.debug(
                     "Examining %s of type %s",
