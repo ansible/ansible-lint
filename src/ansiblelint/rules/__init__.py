@@ -89,7 +89,7 @@ class AnsibleLintRule(BaseRule):
     # https://github.com/ansible-community/ansible-lint/issues/744
     def matchtasks(self, file: Lintable) -> List[MatchError]:
         matches: List[MatchError] = []
-        if not self.matchtask or file.kind == 'meta':
+        if not self.matchtask or file.kind not in ['handlers', 'tasks', 'playbook']:
             return matches
 
         yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
