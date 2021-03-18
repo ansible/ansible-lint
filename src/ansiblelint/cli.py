@@ -228,7 +228,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         '-v',
         dest='verbosity',
         action='count',
-        help="Increase verbosity level",
+        help="Increase verbosity level (-vv for more)",
         default=0,
     )
     parser.add_argument(
