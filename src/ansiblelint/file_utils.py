@@ -212,10 +212,11 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
             git_command, stderr=subprocess.STDOUT, universal_newlines=True
         ).split("\x00")[:-1]
     except subprocess.CalledProcessError as exc:
-        _logger.warning(
-            "Failed to discover yaml files to lint using git: %s",
-            exc.output.rstrip('\n'),
-        )
+        if not (exc.returncode == 128 and 'fatal: not a git repository' in exc.output):
+            _logger.warning(
+                "Failed to discover yaml files to lint using git: %s",
+                exc.output.rstrip('\n'),
+            )
     except FileNotFoundError as exc:
         if options.verbosity:
             _logger.warning("Failed to locate command: %s", exc)
@@ -253,10 +254,19 @@ def guess_project_dir() -> str:
 
 def expand_dirs_in_lintables(lintables: Set[Lintable]) -> None:
     """Return all recognized lintables within given directory."""
-    all_files = get_yaml_files(options)
+    should_expand = False
 
-    for item in copy.copy(lintables):
+    for item in lintables:
         if item.path.is_dir():
-            for filename in all_files:
-                if filename.startswith(str(item.path)):
-                    lintables.add(Lintable(filename))
+            should_expand = True
+            break
+
+    if should_expand:
+        # this relies on git and we do not want to call unless needed
+        all_files = get_yaml_files(options)
+
+        for item in copy.copy(lintables):
+            if item.path.is_dir():
+                for filename in all_files:
+                    if filename.startswith(str(item.path)):
+                        lintables.add(Lintable(filename))

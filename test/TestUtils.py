@@ -213,9 +213,9 @@ def test_expand_paths_vars(test_path, expected, monkeypatch):
     ('reset_env_var', 'message_prefix'),
     (
         ('PATH', "Failed to locate command: "),
-        ('GIT_DIR', "Failed to discover yaml files to lint using git: "),
+        ('GIT_DIR', "Discovering files to lint: "),
     ),
-    ids=('no Git installed', 'outside Git repository'),
+    ids=('no-git-cli', 'outside-git-repo'),
 )
 def test_get_yaml_files_git_verbose(reset_env_var, message_prefix, monkeypatch, caplog):
     """Ensure that autodiscovery lookup failures are logged."""
