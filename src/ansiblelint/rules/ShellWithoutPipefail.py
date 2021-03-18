@@ -20,7 +20,7 @@ class ShellWithoutPipefail(AnsibleLintRule):
     tags = ['command-shell']
     version_added = 'v4.1.0'
 
-    _pipefail_re = re.compile(r"^\s*set.*[+-][A-z]*o\s*pipefail")
+    _pipefail_re = re.compile(r"^\s*set.*[+-][A-z]*o\s*pipefail", re.M)
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
@@ -39,6 +39,6 @@ class ShellWithoutPipefail(AnsibleLintRule):
 
         return bool(
             self._pipe_re.search(unjinjad_cmd)
-            and not self._pipefail_re.match(unjinjad_cmd)
+            and not self._pipefail_re.search(unjinjad_cmd)
             and not convert_to_boolean(task['action'].get('ignore_errors', False))
         )
