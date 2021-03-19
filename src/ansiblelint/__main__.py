@@ -32,7 +32,6 @@ from typing import TYPE_CHECKING, List
 from enrich.console import should_do_markup
 
 from ansiblelint import cli
-from ansiblelint._prerun import check_ansible_presence, prepare_environment
 from ansiblelint.app import App
 from ansiblelint.color import (
     console,
@@ -44,6 +43,7 @@ from ansiblelint.color import (
 from ansiblelint.config import options
 from ansiblelint.constants import ANSIBLE_MISSING_RC, EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import cwd
+from ansiblelint.prerun import check_ansible_presence, prepare_environment
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 

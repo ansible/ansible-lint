@@ -7,7 +7,7 @@ import sys
 import tempfile
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from ansiblelint._prerun import prepare_environment
+from ansiblelint.prerun import prepare_environment
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
