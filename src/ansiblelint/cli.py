@@ -187,7 +187,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '--project-dir',
         dest='project_dir',
-        default=None,
+        default=".",
         help="Location of project/repository, autodetected based on location "
         " of configuration file.",
     )
@@ -324,7 +324,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         'enable_list': [],
     }
 
-    scalar_map = {"loop_var_prefix": None, "project_dir": None}
+    scalar_map = {"loop_var_prefix": None, "project_dir": "."}
 
     if not file_config:
         # use defaults if we don't have a config file and the commandline
@@ -377,15 +377,18 @@ def get_config(arguments: List[str]) -> Namespace:
 
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
 
-    if not options.project_dir:
+    if options.project_dir == ".":
         project_dir = os.path.dirname(
             os.path.abspath(
                 options.config_file or f"{guess_project_dir()}/.ansible-lint"
             )
         )
         options.project_dir = normpath(project_dir)
+    if not options.project_dir or not os.path.exists(options.project_dir):
+        raise RuntimeError(
+            f"Failed to determine a valid project_dir: {options.project_dir}"
+        )
 
-    # print(666, options.quiet, options.verbosity)
     # Compute final verbosity level by subtracting -q counter.
     options.verbosity -= options.quiet
     return config
