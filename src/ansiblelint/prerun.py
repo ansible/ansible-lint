@@ -181,8 +181,8 @@ def _install_galaxy_role() -> None:
     Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
 
     As an alternative, you can add 'role-name' to either skip_list or warn_list.
-    """,
-                fqrn,
+    """
+                % fqrn
             )
             if 'role-name' in options.warn_list:
                 _logger.warning(msg)
