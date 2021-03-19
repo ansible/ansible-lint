@@ -193,15 +193,16 @@ def _install_galaxy_role() -> None:
         fqrn = role_name
     p = pathlib.Path(f"{options.project_dir}/.cache/roles")
     p.mkdir(parents=True, exist_ok=True)
-    link_path = p / f"{role_namespace}.{role_name}"
-    # despite documentation stating that is_file() reports true for symlinks,
-    # it appears that is_dir() reports true instead, so we rely on exits().
-    if not link_path.exists():
-        link_path.symlink_to(pathlib.Path("../..", target_is_directory=True))
-    _logger.info(
-        "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
-        link_path,
-    )
+    for rolepath in [f"{role_namespace}.{role_name}", f"{role_name}"]:
+        link_path = p / rolepath
+        # despite documentation stating that is_file() reports true for symlinks,
+        # it appears that is_dir() reports true instead, so we rely on exits().
+        if not link_path.exists():
+            link_path.symlink_to(pathlib.Path("../..", target_is_directory=True))
+        _logger.info(
+            "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
+            link_path,
+        )
 
 
 def _prepare_ansible_paths() -> None:
