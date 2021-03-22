@@ -96,6 +96,14 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
 
 def prepare_environment() -> None:
     """Make dependencies available if needed."""
+    if not options.configured:
+        # Allow method to be used without calling the command line, so we can
+        # reuse it in other tools, like molecule.
+        # pylint: disable=import-outside-toplevel,cyclic-import
+        from ansiblelint.__main__ import initialize_options
+
+        initialize_options()
+
     if not options.offline and os.path.exists("requirements.yml"):
 
         cmd = [

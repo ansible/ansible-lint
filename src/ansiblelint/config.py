@@ -53,6 +53,7 @@ BASE_KINDS = [
 
 options = Namespace(
     colored=True,
+    configured=False,
     cwd=".",
     display_relative_path=True,
     exclude_paths=[],
