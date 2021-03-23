@@ -169,7 +169,7 @@ def _install_galaxy_role() -> None:
     role_namespace = yaml['galaxy_info'].get('namespace', None)
     if not role_namespace:
         role_namespace = yaml['galaxy_info'].get('author', None)
-    if not role_name:
+    if not role_name or os.path.exists(".git") or os.path.exists(".hg"):
         role_name = pathlib.Path(".").absolute().name
         role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
 
