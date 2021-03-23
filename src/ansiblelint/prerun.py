@@ -202,7 +202,7 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
         fqrn = role_name
     p = pathlib.Path(f"{options.project_dir}/.cache/roles")
     p.mkdir(parents=True, exist_ok=True)
-    link_path = p / f"{role_namespace}.{role_name}"
+    link_path = p / fqrn
     # despite documentation stating that is_file() reports true for symlinks,
     # it appears that is_dir() reports true instead, so we rely on exits().
     if not link_path.exists():
