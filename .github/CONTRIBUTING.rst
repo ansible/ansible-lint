@@ -52,8 +52,8 @@ use `tox`_.
 Talk to us
 ----------
 
-Discussion around ansible-lint happens in ``#ansible-galaxy`` IRC
-channel on Freenode and the `Ansible Development List`_.
+Use Github `discussions`_ forum or for a live chat experience try
+``#ansible-lint`` IRC channel on Freenode.
 
 For the full list of Ansible IRC and Mailing list, please see the
 `Ansible Communication`_ page.
@@ -64,8 +64,8 @@ to security@ansible.com.
 
 .. _Ansible Announce:
    https://groups.google.com/forum/#!forum/ansible-announce
-.. _Ansible Development List:
-   https://groups.google.com/forum/#!forum/ansible-devel
+.. _discussions:
+   https://github.com/ansible-community/ansible-lint/discussions
 .. _Ansible Communication:
    https://docs.ansible.com/ansible/latest/community/communication.html
 

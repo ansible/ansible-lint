@@ -48,6 +48,12 @@ SUCCESS_TASKS = '''
         set -eo pipefail
         false | cat
 
+    - name: pipeline with pipefail not at first line
+      shell: |
+        echo foo
+        set -eo pipefail
+        false | cat
+
     - name: pipeline without pipefail, ignoring errors
       shell: false | cat
       ignore_errors: true

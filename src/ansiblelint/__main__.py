@@ -27,12 +27,11 @@ import pathlib
 import subprocess
 import sys
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from enrich.console import should_do_markup
 
 from ansiblelint import cli
-from ansiblelint._prerun import check_ansible_presence, prepare_environment
 from ansiblelint.app import App
 from ansiblelint.color import (
     console,
@@ -44,6 +43,7 @@ from ansiblelint.color import (
 from ansiblelint.config import options
 from ansiblelint.constants import ANSIBLE_MISSING_RC, EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import cwd
+from ansiblelint.prerun import check_ansible_presence, prepare_environment
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
@@ -76,9 +76,9 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def initialize_options(arguments: List[str]):
+def initialize_options(arguments: Optional[List[str]] = None) -> None:
     """Load config options and store them inside options module."""
-    new_options = cli.get_config(arguments)
+    new_options = cli.get_config(arguments or [])
     new_options.cwd = pathlib.Path.cwd()
 
     if new_options.version:
@@ -104,6 +104,8 @@ def initialize_options(arguments: List[str]):
     options.tags = [normalize_tag(tag) for tag in options.tags]
     options.skip_list = [normalize_tag(tag) for tag in options.skip_list]
     options.warn_list = [normalize_tag(tag) for tag in options.warn_list]
+
+    options.configured = True
 
 
 def report_outcome(result: "LintResult", options, mark_as_success=False) -> int:

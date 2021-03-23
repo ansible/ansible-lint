@@ -53,6 +53,7 @@ BASE_KINDS = [
 
 options = Namespace(
     colored=True,
+    configured=False,
     cwd=".",
     display_relative_path=True,
     exclude_paths=[],
@@ -72,7 +73,7 @@ options = Namespace(
     mock_roles=[],
     loop_var_prefix=None,
     offline=False,
-    project_dir=None,
+    project_dir=".",  # default should be valid folder (do not use None here)
     extra_vars=None,
     enable_list=[],
     skip_action_validation=True,

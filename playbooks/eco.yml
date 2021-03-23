@@ -8,17 +8,18 @@
       - name: ansible-role-mysql
         url: https://github.com/geerlingguy/ansible-role-mysql.git
         contact: geerlingguy
-      # Enable after: https://review.opendev.org/c/zuul/zuul-jobs/+/773245
-      # - name: zuul-jobs
-      #   url: https://opendev.org/zuul/zuul-jobs
-      #   contact: ssbarnea
+      - name: zuul-jobs
+        url: https://opendev.org/zuul/zuul-jobs
+        contact: ssbarnea
+      - name: tripleo-ansible
+        url: https://opendev.org/openstack/tripleo-ansible
+        contact: ssbarnea
       - name: ansible-role-hardening
         url: https://github.com/konstruktoid/ansible-role-hardening
         contact: konstruktoid
       - name: ansible-docker-rootless
         url: https://github.com/konstruktoid/ansible-docker-rootless
         contact: konstruktoid
-      # Enable after: https://github.com/devroles/ansible_collection_system/pull/1
       - name: ansible_collection_system
         url: https://github.com/devroles/ansible_collection_system
         contact: greg-hellings
