@@ -5,7 +5,7 @@
   vars:
     cache_dir: "{{ (lookup('env','HOME'), '.cache', 'ansible-lint-eco') | path_join | realpath }}"
     repos:
-      - name: ansible-role-mysql
+      - name: geerlingguy.mysql
         url: https://github.com/geerlingguy/ansible-role-mysql.git
         contact: geerlingguy
       - name: zuul-jobs
