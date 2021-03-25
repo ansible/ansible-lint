@@ -64,3 +64,4 @@ def test_custom_kinds():
     # .yaml-too is not a recognized extension and unless is manually defined
     # in our .ansible-lint config, the test would not identify it as yaml file.
     assert "Examining examples/other/some.yaml-too of type yaml" in result.stderr
+    assert "Examining examples/other/some.j2.yaml of type jinja2" in result.stderr

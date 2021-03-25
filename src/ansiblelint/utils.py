@@ -737,6 +737,7 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         loader.construct_mapping = construct_mapping
         data = loader.get_single_data()
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
+        logging.exception(e)
         raise SystemExit("Failed to parse YAML in %s: %s" % (lintable.path, str(e)))
     return data
 

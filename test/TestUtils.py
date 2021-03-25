@@ -365,6 +365,10 @@ def test_is_playbook():
             "tasks",
         ),  # relative path involved
         ("galaxy.yml", "galaxy"),
+        ("foo.j2.yml", "jinja2"),
+        ("foo.yml.j2", "jinja2"),
+        ("foo.j2.yaml", "jinja2"),
+        ("foo.yaml.j2", "jinja2"),
     ),
 )
 def test_default_kinds(monkeypatch, path: str, kind: FileType) -> None:

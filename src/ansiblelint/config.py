@@ -13,6 +13,8 @@ from ansiblelint.constants import ANSIBLE_MISSING_RC
 
 DEFAULT_KINDS = [
     # Do not sort this list, order matters.
+    {"jinja2": "**/*.j2"},  # jinja2 templates are not always parsable as something else
+    {"jinja2": "**/*.j2.*"},
     {"requirements": "**/meta/requirements.yml"},  # v1 only
     # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
     {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
@@ -40,6 +42,10 @@ BASE_KINDS = [
     # These assignations are only for internal use and are only inspired by
     # MIME/IANA model. Their purpose is to be able to process a file based on
     # it type, including generic processing of text files using the prefix.
+    {
+        "text/jinja2": "**/*.j2"
+    },  # jinja2 templates are not always parsable as something else
+    {"text/jinja2": "**/*.j2.*"},
     {"text/json": "**/*.json"},  # standardized
     {"text/markdown": "**/*.md"},  # https://tools.ietf.org/html/rfc7763
     {"text/rst": "**/*.rst"},  # https://en.wikipedia.org/wiki/ReStructuredText
