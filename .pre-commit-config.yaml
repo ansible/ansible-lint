@@ -46,6 +46,10 @@ repos:
   rev: v1.26.0
   hooks:
   - id: yamllint
+    exclude: >
+      (?x)^(
+        examples/other/some.j2.yaml
+      )$
     files: \.(yaml|yml)$
     types: [file, yaml]
     entry: yamllint --strict
