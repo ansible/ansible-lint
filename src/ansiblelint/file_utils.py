@@ -67,7 +67,7 @@ def expand_paths_vars(paths: List[str]) -> List[str]:
     return paths
 
 
-def kind_from_path(path: Path, base: bool = False) -> str:
+def kind_from_path(path: Path, base: bool = False) -> FileType:
     """Determine the file kind based on its name.
 
     When called with base=True, it will return the base file type instead
@@ -87,7 +87,7 @@ def kind_from_path(path: Path, base: bool = False) -> str:
                     | wcmatch.pathlib.DOTGLOB
                 ),
             ):
-                return str(k)
+                return str(k)  # type: ignore
 
     if base:
         # Unknown base file type is default
@@ -120,6 +120,7 @@ class Lintable:
         # Filename is effective file on disk, for stdin is a namedtempfile
         self.filename: str = str(name)
         self.dir: str = ""
+        self.kind: Optional[FileType] = None
 
         if isinstance(name, str):
             self.name = normpath(name)

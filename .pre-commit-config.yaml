@@ -82,10 +82,12 @@ repos:
     # empty args needed in order to match mypy cli behavior
     args: []
     additional_dependencies:
+    - ansible-base
     - Sphinx>=3.1.2
     - enrich
     - flaky
     - pytest
+    - ruamel.yaml
     - types-PyYAML
     - wcmatch
     - yamllint
