@@ -35,7 +35,7 @@ from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.splitter import split_args
-from ansible.parsing.yaml.constructor import AnsibleConstructor
+from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import add_all_plugin_dirs
@@ -89,7 +89,7 @@ def path_dwim(basedir: str, given: str) -> str:
     return str(dl.path_dwim(given))
 
 
-def ansible_template(basedir: str, varname: Any, templatevars, **kwargs) -> Any:
+def ansible_template(basedir: str, varname: Any, templatevars: Any, **kwargs) -> Any:
     dl = DataLoader()
     dl.set_basedir(basedir)
     templar = Templar(dl, variables=templatevars)
@@ -186,7 +186,7 @@ def _playbook_items(pb_data: dict) -> ItemsView:
     return [item for play in pb_data if play for item in play.items()]
 
 
-def _set_collections_basedir(basedir: str):
+def _set_collections_basedir(basedir: str) -> None:
     # Sets the playbook directory as playbook_paths for the collection loader
     try:
         # Ansible 2.10+
@@ -480,16 +480,7 @@ def _look_for_role_files(basedir: str, role: str, main='main') -> List[Lintable]
     return results
 
 
-def rolename(filepath):
-    idx = filepath.find('roles/')
-    if idx < 0:
-        return ''
-    role = filepath[idx + 6 :]
-    role = role[: role.find('/')]
-    return role
-
-
-def _kv_to_dict(v):
+def _kv_to_dict(v: str) -> Dict[str, Any]:
     (command, args, kwargs) = tokenize(v)
     return dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs)
 
@@ -555,12 +546,12 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
-def normalize_task_v1(task):  # noqa: C901
+def normalize_task_v1(task) -> Dict[str, Any]:  # noqa: C901
     result = dict()
     for (k, v) in task.items():
         if k in VALID_KEYS or k.startswith('with_'):
             if k in ('local_action', 'action'):
-                if not isinstance(v, dict):
+                if isinstance(v, str):
                     v = _kv_to_dict(v)
                 v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
                 result['action'] = v
@@ -712,14 +703,18 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
 
-    def compose_node(parent, index):
+    def compose_node(parent: yaml.nodes.Node, index: int) -> yaml.nodes.Node:
         # the line number where the previous token has ended (plus empty lines)
         line = loader.line
-        node = Composer.compose_node(loader, parent, index)
+        node = Composer.compose_node(loader, parent, index)  # type: ignore
         node.__line__ = line + 1
+        if not isinstance(node, yaml.nodes.Node):
+            raise RuntimeError("Unexpected yaml data.")
         return node
 
-    def construct_mapping(node, deep=False):
+    def construct_mapping(
+        node: AnsibleBaseYAMLObject, deep: bool = False
+    ) -> AnsibleMapping:
         mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
         if hasattr(node, '__line__'):
             mapping[LINE_NUMBER_KEY] = node.__line__

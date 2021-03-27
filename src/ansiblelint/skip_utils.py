@@ -22,7 +22,7 @@
 import logging
 from functools import lru_cache
 from itertools import product
-from typing import TYPE_CHECKING, Any, Generator, List, Sequence
+from typing import TYPE_CHECKING, Any, Generator, List, Optional, Sequence
 
 import ruamel.yaml
 
@@ -32,7 +32,6 @@ from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
-
 
 _logger = logging.getLogger(__name__)
 
@@ -52,7 +51,7 @@ def get_rule_skips_from_line(line: str) -> List[str]:
 
 def append_skipped_rules(
     pyyaml_data: "AnsibleBaseYAMLObject", lintable: Lintable
-) -> Sequence[Any]:
+) -> "AnsibleBaseYAMLObject":
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
     For a file, uses 2nd parser (ruamel.yaml) to pull comments out of
@@ -71,6 +70,10 @@ def append_skipped_rules(
         # Notify user of skip error, do not stop, do not change exit code
         _logger.error('Error trying to append skipped rules', exc_info=True)
         return pyyaml_data
+
+    if not yaml_skip:
+        return pyyaml_data
+
     return yaml_skip
 
 
@@ -88,8 +91,8 @@ def load_data(file_text: str) -> Any:
 
 
 def _append_skipped_rules(
-    pyyaml_data: Sequence[Any], lintable: Lintable
-) -> Sequence[Any]:
+    pyyaml_data: "AnsibleBaseYAMLObject", lintable: Lintable
+) -> Optional["AnsibleBaseYAMLObject"]:
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
 
@@ -114,7 +117,7 @@ def _append_skipped_rules(
         return pyyaml_data
     else:
         # For unsupported file types, we return empty skip lists
-        return []
+        return None
 
     # get tasks from blocks of tasks
     pyyaml_tasks = _get_tasks_from_blocks(pyyaml_task_blocks)
