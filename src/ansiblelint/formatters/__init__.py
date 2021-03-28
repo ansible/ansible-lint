@@ -12,7 +12,7 @@ from ansiblelint.config import options
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
-T = TypeVar('T', bound='BaseFormatter')
+T = TypeVar('T', bound='BaseFormatter')  # type: ignore
 
 
 class BaseFormatter(Generic[T]):
@@ -56,7 +56,7 @@ class BaseFormatter(Generic[T]):
         return rich.markup.escape(text)
 
 
-class Formatter(BaseFormatter):
+class Formatter(BaseFormatter):  # type: ignore
     def format(self, match: "MatchError") -> str:
         _id = getattr(match.rule, 'id', '000')
         result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
@@ -72,7 +72,7 @@ class Formatter(BaseFormatter):
         return result
 
 
-class QuietFormatter(BaseFormatter):
+class QuietFormatter(BaseFormatter[Any]):
     def format(self, match: "MatchError") -> str:
         return (
             f"[error_code]{match.rule.id}[/] "
@@ -80,7 +80,7 @@ class QuietFormatter(BaseFormatter):
         )
 
 
-class ParseableFormatter(BaseFormatter):
+class ParseableFormatter(BaseFormatter[Any]):
     """Parseable uses PEP8 compatible format."""
 
     def format(self, match: "MatchError") -> str:
@@ -97,7 +97,7 @@ class ParseableFormatter(BaseFormatter):
         return result
 
 
-class AnnotationsFormatter(BaseFormatter):
+class AnnotationsFormatter(BaseFormatter):  # type: ignore
     # https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
     """Formatter for emitting violations as GitHub Workflow Commands.
 
@@ -139,7 +139,7 @@ class AnnotationsFormatter(BaseFormatter):
         return 'error'
 
 
-class ParseableSeverityFormatter(BaseFormatter):
+class ParseableSeverityFormatter(BaseFormatter[Any]):
     def format(self, match: "MatchError") -> str:
 
         filename = self._format_path(match.filename or "")
@@ -154,7 +154,7 @@ class ParseableSeverityFormatter(BaseFormatter):
         )
 
 
-class CodeclimateJSONFormatter(BaseFormatter):
+class CodeclimateJSONFormatter(BaseFormatter[Any]):
     """Formatter for emitting violations in Codeclimate JSON report format.
 
     The formatter expects a list of MatchError objects and returns a JSON formatted string.

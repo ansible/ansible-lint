@@ -86,7 +86,7 @@ PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
 _logger = logging.getLogger(__name__)
 
 
-def parse_yaml_from_file(filepath: str) -> Any:
+def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
     dl = DataLoader()
     if hasattr(dl, 'set_vault_password'):
         dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
@@ -166,7 +166,7 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 }
 
 
-def tokenize(line: str) -> Tuple[str, List[str], Dict]:
+def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
     tokens = line.lstrip().split(" ")
     if tokens[0] == '-':
         tokens = tokens[1:]
@@ -187,15 +187,16 @@ def tokenize(line: str) -> Tuple[str, List[str], Dict]:
     return (command, args, kwargs)
 
 
-def _playbook_items(pb_data: dict) -> ItemsView:
+def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore
     if isinstance(pb_data, dict):
         return pb_data.items()
     if not pb_data:
-        return []
+        return []  # type: ignore
+
     # "if play" prevents failure if the play sequence contains None,
     # which is weird but currently allowed by Ansible
     # https://github.com/ansible-community/ansible-lint/issues/849
-    return [item for play in pb_data if play for item in play.items()]
+    return [item for play in pb_data if play for item in play.items()]  # type: ignore
 
 
 def _set_collections_basedir(basedir: str) -> None:
@@ -221,7 +222,7 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
     _set_collections_basedir(playbook_dir or os.path.abspath('.'))
     add_all_plugin_dirs(playbook_dir or '.')
     if lintable.kind == 'role':
-        playbook_ds = {'roles': [{'role': str(lintable.path)}]}
+        playbook_ds = AnsibleMapping({'roles': [{'role': str(lintable.path)}]})
     elif lintable.kind not in ("playbook", "tasks"):
         return []
     else:
@@ -233,7 +234,7 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
     basedir = os.path.dirname(str(lintable.path))
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
     if isinstance(playbook_ds, str):
-        raise MatchError(filename=str(lintable.path), rule=LoadingFailureRule)
+        raise MatchError(filename=str(lintable.path), rule=LoadingFailureRule())
     for item in _playbook_items(playbook_ds):
         # if lintable.kind not in ["playbook"]:
         #     continue
@@ -413,7 +414,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     )
 
 
-def _validate_task_handler_action_for_role(th_action: dict) -> None:
+def _validate_task_handler_action_for_role(th_action: Dict[str, Any]) -> None:
     """Verify that the task handler action is valid for role include."""
     module = th_action['__ansible_module__']
 
@@ -510,7 +511,7 @@ def _kv_to_dict(v: str) -> Dict[str, Any]:
     return dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs)
 
 
-def _sanitize_task(task: dict) -> dict:
+def _sanitize_task(task: Dict[str, Any]) -> Dict[str, Any]:
     """Return a stripped-off task structure compatible with new Ansible.
 
     This helper takes a copy of the incoming task and drops
