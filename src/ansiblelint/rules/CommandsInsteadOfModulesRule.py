@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 import os
+import sys
 from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
@@ -89,3 +90,97 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             message = '{0} used in place of {1} module'
             return message.format(executable, self._modules[executable])
         return False
+
+
+if "pytest" in sys.modules:
+    import pytest
+
+    APT_GET = '''
+- hosts: all
+  tasks:
+    - name: run apt-get update
+      command: apt-get update
+'''
+
+    GIT_BRANCH = '''
+- hosts: all
+  tasks:
+    - name: print current git branch
+      command: git branch
+'''
+
+    GIT_LOG = '''
+- hosts: all
+  tasks:
+    - name: print git log
+      command: git log
+'''
+
+    RESTART_SSHD = '''
+- hosts: all
+  tasks:
+    - name: restart sshd
+      command: systemctl restart sshd
+'''
+
+    SYSTEMD_ENVIRONMENT = '''
+- hosts: all
+  tasks:
+    - name: show systemd environment
+      command: systemctl show-environment
+'''
+
+    SYSTEMD_RUNLEVEL = '''
+- hosts: all
+  tasks:
+    - name: set systemd runlevel
+      command: systemctl set-default multi-user.target
+'''
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_apt_get(rule_runner: Any) -> None:
+        """The apt module supports update."""
+        results = rule_runner.run_playbook(APT_GET)
+        assert len(results) == 1
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_restart_sshd(rule_runner: Any) -> None:
+        """Restarting services is supported by the systemd module."""
+        results = rule_runner.run_playbook(RESTART_SSHD)
+        assert len(results) == 1
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_git_log(rule_runner: Any) -> None:
+        """The git log command is not supported by the git module."""
+        results = rule_runner.run_playbook(GIT_LOG)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_git_branch(rule_runner: Any) -> None:
+        """The git branch command is not supported by the git module."""
+        results = rule_runner.run_playbook(GIT_BRANCH)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_systemd_environment(rule_runner: Any) -> None:
+        """Showing the environment is not supported by the systemd module."""
+        results = rule_runner.run_playbook(SYSTEMD_ENVIRONMENT)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_systemd_runlevel(rule_runner: Any) -> None:
+        """Set-default is not supported by the systemd module."""
+        results = rule_runner.run_playbook(SYSTEMD_RUNLEVEL)
+        assert len(results) == 0
