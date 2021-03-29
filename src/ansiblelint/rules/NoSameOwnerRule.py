@@ -109,6 +109,7 @@ if "pytest" in sys.modules:
 
     import pytest
 
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     @pytest.mark.parametrize(
@@ -122,7 +123,9 @@ if "pytest" in sys.modules:
             ),
         ),
     )
-    def test_no_same_owner_rule(default_rules_collection, test_file, failures) -> None:
+    def test_no_same_owner_rule(
+        default_rules_collection: RulesCollection, test_file: str, failures: int
+    ) -> None:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()
         assert len(results) == failures
