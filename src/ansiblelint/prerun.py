@@ -177,7 +177,7 @@ def _install_galaxy_role() -> None:
         role_namespace = f"{role_namespace}."
     if not role_name or os.path.exists(".git") or os.path.exists(".hg"):
         role_name = pathlib.Path(".").absolute().name
-        role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
+        role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name)
 
     if 'role-name' not in options.skip_list:
         fqrn = f"{role_namespace}{role_name}"
