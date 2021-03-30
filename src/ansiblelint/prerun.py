@@ -169,12 +169,18 @@ def _install_galaxy_role() -> None:
     role_namespace = yaml['galaxy_info'].get('namespace', None)
     if not role_namespace:
         role_namespace = yaml['galaxy_info'].get('author', None)
+    # if there's a space in the name space, it's likely author name
+    # and not the galaxy login, so act as if there was no namespace
+    if re.match(r"^\w+ \w+", role_namespace):
+        role_namespace = ""
+    else:
+        role_namespace = f"{role_namespace}."
     if not role_name or os.path.exists(".git") or os.path.exists(".hg"):
         role_name = pathlib.Path(".").absolute().name
         role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
 
     if 'role-name' not in options.skip_list:
-        fqrn = f"{role_namespace}.{role_name}"
+        fqrn = f"{role_namespace}{role_name}"
         if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
             msg = (
                 """\
