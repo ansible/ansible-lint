@@ -160,9 +160,9 @@ def prepare_environment() -> None:
 
 def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
     """Compute role namespace from meta/main.yml, including trailing dot."""
-    role_namespace = galaxy_infos.get('namespace', None)
-    if not role_namespace:
-        role_namespace = galaxy_infos.get('author', None)
+    role_namespace = galaxy_infos.get('namespace', "")
+    if len(role_namespace) == 0:
+        role_namespace = galaxy_infos.get('author', "")
     # if there's a space in the name space, it's likely author name
     # and not the galaxy login, so act as if there was no namespace
     if re.match(r"^\w+ \w+", role_namespace):
@@ -174,14 +174,14 @@ def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
 
 def _get_galaxy_role_name(galaxy_infos: Dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
-    return galaxy_infos.get('role_name', None)
+    return galaxy_infos.get('role_name', "")
 
 
 def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
     """Compute role fqrn."""
     role_namespace = _get_galaxy_role_ns(galaxy_infos)
     role_name = _get_galaxy_role_name(galaxy_infos)
-    if not role_name or os.path.exists(".git") or os.path.exists(".hg"):
+    if len(role_name) == 0 or os.path.exists(".git") or os.path.exists(".hg"):
         role_name = pathlib.Path(".").absolute().name
         role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name)
 
