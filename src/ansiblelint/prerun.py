@@ -205,7 +205,11 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
                 sys.exit(INVALID_PREREQUISITES_RC)
     else:
         # when 'role-name' is in skip_list, we stick to plain role names
-        fqrn = role_name
+        if 'role_name' in yaml['galaxy_info']:
+            role_name = yaml['galaxy_info'].get('role_name', None)
+            fqrn = f"{role_namespace}{role_name}"
+        else:
+            fqrn = pathlib.Path(".").absolute().name
     p = pathlib.Path(f"{options.project_dir}/.cache/roles")
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / fqrn
