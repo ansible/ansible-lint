@@ -23,6 +23,9 @@
       - name: ansible_collection_system
         url: https://github.com/devroles/ansible_collection_system
         contact: greg-hellings
+      - name: debops
+        url: https://github.com/debops/debops
+        contact: drybjed
   tasks:
 
     - name: Clone repo
