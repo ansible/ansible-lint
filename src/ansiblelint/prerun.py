@@ -181,7 +181,7 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
     """Compute role fqrn."""
     role_namespace = _get_galaxy_role_ns(galaxy_infos)
     role_name = _get_galaxy_role_name(galaxy_infos)
-    if len(role_name) == 0 or os.path.exists(".git") or os.path.exists(".hg"):
+    if len(role_name) == 0:
         role_name = pathlib.Path(".").absolute().name
         role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name)
 
