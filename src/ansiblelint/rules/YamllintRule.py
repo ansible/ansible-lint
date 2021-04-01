@@ -75,7 +75,7 @@ class YamllintRule(AnsibleLintRule):
     def matchyaml(self, file: Lintable) -> List["MatchError"]:
         """Return matches found for a specific YAML text."""
         matches: List["MatchError"] = []
-        filtered_matches = []
+        filtered_matches: List["MatchError"] = []
         if file.base_kind != 'text/yaml':
             return matches
 

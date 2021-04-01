@@ -25,7 +25,7 @@ console = rich.get_console()
 console_stderr = Console(**console_options_stderr)
 
 
-def reconfigure(new_options: Dict[str, Any]):
+def reconfigure(new_options: Dict[str, Any]) -> None:
     """Reconfigure console options."""
     global console_options  # pylint: disable=global-statement
     global console_stderr  # pylint: disable=global-statement
@@ -39,6 +39,6 @@ def reconfigure(new_options: Dict[str, Any]):
     console_stderr.__dict__ = tmp_console.__dict__
 
 
-def render_yaml(text: str):
+def render_yaml(text: str) -> Syntax:
     """Colorize YAMl for nice display."""
     return Syntax(text, 'yaml', theme="ansi_dark")

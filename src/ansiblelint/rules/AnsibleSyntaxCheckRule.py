@@ -3,7 +3,7 @@ import json
 import re
 import subprocess
 import sys
-from typing import List
+from typing import Any, List
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.config import options
@@ -141,7 +141,7 @@ if "pytest" in sys.modules:
         assert result[0].message == "Empty playbook, nothing to do"
         assert len(result) == 1
 
-    def test_extra_vars_passed_to_command(config_options) -> None:
+    def test_extra_vars_passed_to_command(config_options: Any) -> None:
         """Validate `extra-vars` are passed to syntax check command."""
         config_options.extra_vars = {
             'foo': 'bar',

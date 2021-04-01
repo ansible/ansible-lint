@@ -36,7 +36,7 @@ def _nodes_from_rst(
         ),
         node=node,
     )
-    return node.children
+    return node.children  # type: ignore
 
 
 class AnsibleLintDefaultRulesDirective(SphinxDirective):

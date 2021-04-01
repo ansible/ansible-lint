@@ -27,7 +27,17 @@ from argparse import Namespace
 from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import yaml
 from ansible import constants
@@ -35,7 +45,7 @@ from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.splitter import split_args
-from ansible.parsing.yaml.constructor import AnsibleConstructor
+from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import add_all_plugin_dirs
@@ -89,7 +99,9 @@ def path_dwim(basedir: str, given: str) -> str:
     return str(dl.path_dwim(given))
 
 
-def ansible_template(basedir: str, varname: Any, templatevars, **kwargs) -> Any:
+def ansible_template(
+    basedir: str, varname: Any, templatevars: Any, **kwargs: Any
+) -> Any:
     dl = DataLoader()
     dl.set_basedir(basedir)
     templar = Templar(dl, variables=templatevars)
@@ -186,7 +198,7 @@ def _playbook_items(pb_data: dict) -> ItemsView:
     return [item for play in pb_data if play for item in play.items()]
 
 
-def _set_collections_basedir(basedir: str):
+def _set_collections_basedir(basedir: str) -> None:
     # Sets the playbook directory as playbook_paths for the collection loader
     try:
         # Ansible 2.10+
@@ -223,6 +235,8 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
     if isinstance(playbook_ds, str):
         raise MatchError(filename=str(lintable.path), rule=LoadingFailureRule)
     for item in _playbook_items(playbook_ds):
+        # if lintable.kind not in ["playbook"]:
+        #     continue
         for child in play_children(basedir, item, lintable.kind, playbook_dir):
             # We avoid processing parametrized children
             path_str = str(child.path)
@@ -246,7 +260,11 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
 
 
 def template(
-    basedir: str, value: Any, variables, fail_on_undefined=False, **kwargs
+    basedir: str,
+    value: Any,
+    variables: Any,
+    fail_on_undefined: bool = False,
+    **kwargs: str,
 ) -> Any:
     try:
         value = ansible_template(
@@ -264,7 +282,7 @@ def template(
 
 
 def play_children(
-    basedir: str, item: Tuple[str, Any], parent_type, playbook_dir
+    basedir: str, item: Tuple[str, Any], parent_type: FileType, playbook_dir: str
 ) -> List[Lintable]:
     delegate_map: Dict[str, Callable[[str, Any, Any, FileType], List[Lintable]]] = {
         'tasks': _taskshandlers_children,
@@ -294,7 +312,9 @@ def play_children(
     return []
 
 
-def _include_children(basedir: str, k, v, parent_type) -> List[Lintable]:
+def _include_children(
+    basedir: str, k: str, v: Any, parent_type: FileType
+) -> List[Lintable]:
     # handle special case include_tasks: name=filename.yml
     if k == 'include_tasks' and isinstance(v, dict) and 'file' in v:
         v = v['file']
@@ -308,7 +328,9 @@ def _include_children(basedir: str, k, v, parent_type) -> List[Lintable]:
     return [Lintable(result, kind=parent_type)]
 
 
-def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List[Lintable]:
+def _taskshandlers_children(
+    basedir: str, k: str, v: Union[None, Any], parent_type: FileType
+) -> List[Lintable]:
     results: List[Lintable] = []
     if v is None:
         raise MatchError(
@@ -364,9 +386,9 @@ def _taskshandlers_children(basedir, k, v, parent_type: FileType) -> List[Lintab
 
 
 def _get_task_handler_children_for_tasks_or_playbooks(
-    task_handler,
+    task_handler: Dict[str, Any],
     basedir: str,
-    k,
+    k: Any,
     parent_type: FileType,
 ) -> Lintable:
     """Try to get children of taskhandler for include/import tasks/playbooks."""
@@ -381,6 +403,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             if not task_handler:
                 continue
 
+            # import pdb; pdb.set_trace()
             return Lintable(
                 path_dwim(basedir, task_handler[task_handler_key]), kind=child_type
             )
@@ -404,7 +427,7 @@ def _validate_task_handler_action_for_role(th_action: dict) -> None:
 
 
 def _roles_children(
-    basedir: str, k, v, parent_type: FileType, main='main'
+    basedir: str, k: str, v: Sequence[Any], parent_type: FileType, main: str = 'main'
 ) -> List[Lintable]:
     results: List[Lintable] = []
     for role in v:
@@ -461,7 +484,9 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
     return role_path
 
 
-def _look_for_role_files(basedir: str, role: str, main='main') -> List[Lintable]:
+def _look_for_role_files(
+    basedir: str, role: str, main: Optional[str] = 'main'
+) -> List[Lintable]:
     role_path = _rolepath(basedir, role)
     if not role_path:
         return []
@@ -480,16 +505,7 @@ def _look_for_role_files(basedir: str, role: str, main='main') -> List[Lintable]
     return results
 
 
-def rolename(filepath):
-    idx = filepath.find('roles/')
-    if idx < 0:
-        return ''
-    role = filepath[idx + 6 :]
-    role = role[: role.find('/')]
-    return role
-
-
-def _kv_to_dict(v):
+def _kv_to_dict(v: str) -> Dict[str, Any]:
     (command, args, kwargs) = tokenize(v)
     return dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs)
 
@@ -555,54 +571,6 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
-def normalize_task_v1(task):  # noqa: C901
-    result = dict()
-    for (k, v) in task.items():
-        if k in VALID_KEYS or k.startswith('with_'):
-            if k in ('local_action', 'action'):
-                if not isinstance(v, dict):
-                    v = _kv_to_dict(v)
-                v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
-                result['action'] = v
-            else:
-                result[k] = v
-        else:
-            if isinstance(v, str):
-                v = _kv_to_dict(k + ' ' + v)
-            elif not v:
-                v = dict(__ansible_module__=k)
-            else:
-                if isinstance(v, dict):
-                    v.update(dict(__ansible_module__=k))
-                else:
-                    if k == '__line__':
-                        # Keep the line number stored
-                        result[k] = v
-                        continue
-                    # Tasks that include playbooks (rather than task files)
-                    # can get here
-                    # https://github.com/ansible-community/ansible-lint/issues/138
-                    raise RuntimeError(
-                        "Was not expecting value %s of type %s for key %s\n"
-                        "Task: %s. Check the syntax of your playbook using "
-                        "ansible-playbook --syntax-check"
-                        % (str(v), type(v), k, str(task))
-                    )
-            v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
-            result['action'] = v
-    if 'module' in result['action']:
-        # this happens when a task uses
-        # local_action:
-        #   module: ec2
-        #   etc...
-        result['action']['__ansible_module__'] = result['action']['module']
-        del result['action']['module']
-    if 'args' in result:
-        result['action'].update(result.get('args'))
-        del result['args']
-    return result
-
-
 def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
@@ -638,7 +606,9 @@ def task_to_str(task: Dict[str, Any]) -> str:
     return u"{0} {1}".format(action["__ansible_module__"], args)
 
 
-def extract_from_list(blocks, candidates: List[str]) -> List[Any]:
+def extract_from_list(
+    blocks: AnsibleBaseYAMLObject, candidates: List[str]
+) -> List[Any]:
     results = list()
     for block in blocks:
         for candidate in candidates:
@@ -653,7 +623,7 @@ def extract_from_list(blocks, candidates: List[str]) -> List[Any]:
     return results
 
 
-def add_action_type(actions, action_type: str) -> List[Any]:
+def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[Any]:
     results = list()
     for action in actions:
         # ignore empty task
@@ -664,7 +634,7 @@ def add_action_type(actions, action_type: str) -> List[Any]:
     return results
 
 
-def get_action_tasks(yaml, file: Lintable) -> List[Any]:
+def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
     tasks = list()
     if file.kind in ['tasks', 'handlers']:
         tasks = add_action_type(yaml, file.kind)
@@ -690,7 +660,9 @@ def get_action_tasks(yaml, file: Lintable) -> List[Any]:
     ]
 
 
-def get_normalized_tasks(yaml, file: Lintable) -> List[Dict[str, Any]]:
+def get_normalized_tasks(
+    yaml: "AnsibleBaseYAMLObject", file: Lintable
+) -> List[Dict[str, Any]]:
     tasks = get_action_tasks(yaml, file)
     res = []
     for task in tasks:
@@ -712,14 +684,18 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
 
-    def compose_node(parent, index):
+    def compose_node(parent: yaml.nodes.Node, index: int) -> yaml.nodes.Node:
         # the line number where the previous token has ended (plus empty lines)
         line = loader.line
-        node = Composer.compose_node(loader, parent, index)
+        node = Composer.compose_node(loader, parent, index)  # type: ignore
         node.__line__ = line + 1
+        if not isinstance(node, yaml.nodes.Node):
+            raise RuntimeError("Unexpected yaml data.")
         return node
 
-    def construct_mapping(node, deep=False):
+    def construct_mapping(
+        node: AnsibleBaseYAMLObject, deep: bool = False
+    ) -> AnsibleMapping:
         mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
         if hasattr(node, '__line__'):
             mapping[LINE_NUMBER_KEY] = node.__line__
