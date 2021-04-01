@@ -26,6 +26,9 @@
       - name: ansible-role-bootstrap
         url: https://github.com/robertdebock/ansible-role-bootstrap
         contact: robertdebock
+      - name: debops
+        url: https://github.com/debops/debops
+        contact: drybjed
   tasks:
 
     - name: Clone repo
