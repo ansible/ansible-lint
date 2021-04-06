@@ -45,8 +45,8 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
             if value and value == default:
                 results.append(
                     self.create_matcherror(
-                        filename=file, 
-                        linenumber=data['__line__'], 
+                        filename=file,
+                        linenumber=data['__line__'],
                         message=self.create_matcherror('Should change default metadata: %s' % field)
                     )
                 )
