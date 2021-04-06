@@ -8,22 +8,7 @@ from ansiblelint.text import toidentifier
 from ansiblelint.utils import parse_yaml_from_file
 import ansible.parsing.yaml.objects
 
-# if TYPE_CHECKING:
-#     from typing import Any, Dict, Union
-#     from ansiblelint.constants import odict
-
-import re # used for regex string validation
-import json
-
-# ---------------------------------------------------------------
-# TODO: Check task for registered variables
-# TODO: Check task for set_facts
-# TODO: Check vars files
-# TODO: Ensure variable names do not match one of the magic variable names
-#       https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html#special-variables
-# TODO: Provide comment on following open issue:
-#       [Ansible-lint does not catch invalid variable names](https://github.com/ansible/ansible-lint/issues/447)
-# ---------------------------------------------------------------
+import re
 
 # properties/parameters are prefixed and postfixed with `__`
 def is_property(k):
