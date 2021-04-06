@@ -1,5 +1,6 @@
-from typing import List, Any, Dict, Union
-
+from typing import TYPE_CHECKING, List, Any, Dict, Union
+if TYPE_CHECKING:
+    from ansiblelint.constants import odict
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
@@ -27,7 +28,7 @@ class VariableNamingRule(AnsibleLintRule):
     base_msg = 'All variables should be named using only lowercase and underscores'
     shortdesc = base_msg
     description = 'All variables should be named using only lowercase and underscores'
-    severity = 'MEDIUM' # ansible-lint displays severity when with --parseable-severity option
+    severity = 'MEDIUM'  # ansible-lint displays severity when with --parseable-severity option
     tags = ['formatting', 'readability']
     version_added = 'v5.0.5'
 
@@ -54,8 +55,8 @@ class VariableNamingRule(AnsibleLintRule):
             if is_invalid_variable_name(key):
                 results.append(
                     self.create_matcherror(
-                        filename=file, 
-                        linenumber=vars['__line__'], 
+                        filename=file,
+                        linenumber=vars['__line__'],
                         message="Play defines variable '" + key + "' within 'vars' section that violates variable naming standards"
                     )
                 )
@@ -98,8 +99,8 @@ class VariableNamingRule(AnsibleLintRule):
                 if is_invalid_variable_name(key):
                     results.append(
                         self.create_matcherror(
-                            filename=file, 
-                            # linenumber=vars['__line__'], 
+                            filename=file,
+                            # linenumber=vars['__line__'],
                             message="File defines variable '" + key + "' that violates variable naming standards"
                         )
                     )
