@@ -1,25 +1,26 @@
-from typing import TYPE_CHECKING, List, Any, Dict, Union
+from typing import List, Any, Dict, Union
 
-from ansiblelint.config import options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.text import toidentifier
 from ansiblelint.utils import parse_yaml_from_file
 import ansible.parsing.yaml.objects
 
 import re
 
+
 # properties/parameters are prefixed and postfixed with `__`
 def is_property(k):
     return (k.startswith('__') and k.endswith('__'))
 
+
 def is_invalid_variable_name(text):
     patterns = '^[a-z0-9_]*$'
     if re.search(patterns, text):
-      return False # string uses acceptable characters
+        return False  # string uses acceptable characters
     else:
-      return True # string uses unacceptable characters
+        return True  # string uses unacceptable characters
+
 
 class VariableNamingRule(AnsibleLintRule):
     id = 'var-naming'
@@ -53,9 +54,9 @@ class VariableNamingRule(AnsibleLintRule):
             if is_invalid_variable_name(key):
                 results.append(
                     self.create_matcherror(
-                          filename=file, 
-                          linenumber=vars['__line__'], 
-                          message="Play defines variable '" + key + "' within 'vars' section that violates variable naming standards"
+                        filename=file, 
+                        linenumber=vars['__line__'], 
+                        message="Play defines variable '" + key + "' within 'vars' section that violates variable naming standards"
                     )
                 )
 
@@ -63,8 +64,6 @@ class VariableNamingRule(AnsibleLintRule):
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         """Return matches for task based variables."""
-
-        results: List["MatchError"] = []
 
         # If the task uses the 'vars' section to set variables
         vars = task.get('vars', {})
@@ -99,9 +98,9 @@ class VariableNamingRule(AnsibleLintRule):
                 if is_invalid_variable_name(key):
                     results.append(
                         self.create_matcherror(
-                              filename=file, 
-                              #linenumber=vars['__line__'], 
-                              message="File defines variable '" + key + "' that violates variable naming standards"
+                            filename=file, 
+                            # linenumber=vars['__line__'], 
+                            message="File defines variable '" + key + "' that violates variable naming standards"
                         )
                     )
         else:
