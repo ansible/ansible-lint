@@ -6,7 +6,7 @@ import re
 import subprocess
 import sys
 from functools import lru_cache
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import tenacity
 from packaging import version
@@ -165,6 +165,36 @@ def prepare_environment() -> None:
     _prepare_ansible_paths()
 
 
+def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
+    """Compute role namespace from meta/main.yml, including trailing dot."""
+    role_namespace = galaxy_infos.get('namespace', "")
+    if len(role_namespace) == 0:
+        role_namespace = galaxy_infos.get('author', "")
+    # if there's a space in the name space, it's likely author name
+    # and not the galaxy login, so act as if there was no namespace
+    if re.match(r"^\w+ \w+", role_namespace):
+        role_namespace = ""
+    else:
+        role_namespace = f"{role_namespace}."
+    return role_namespace
+
+
+def _get_galaxy_role_name(galaxy_infos: Dict[str, Any]) -> str:
+    """Compute role name from meta/main.yml."""
+    return galaxy_infos.get('role_name', "")
+
+
+def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
+    """Compute role fqrn."""
+    role_namespace = _get_galaxy_role_ns(galaxy_infos)
+    role_name = _get_galaxy_role_name(galaxy_infos)
+    if len(role_name) == 0:
+        role_name = pathlib.Path(".").absolute().name
+        role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name)
+
+    return f"{role_namespace}{role_name}"
+
+
 def _install_galaxy_role() -> None:
     """Detect standalone galaxy role and installs it."""
     if not os.path.exists("meta/main.yml"):
@@ -172,16 +202,10 @@ def _install_galaxy_role() -> None:
     yaml = yaml_from_file("meta/main.yml")
     if 'galaxy_info' not in yaml:
         return
-    role_name = yaml['galaxy_info'].get('role_name', None)
-    role_namespace = yaml['galaxy_info'].get('namespace', None)
-    if not role_namespace:
-        role_namespace = yaml['galaxy_info'].get('author', None)
-    if not role_name:
-        role_name = pathlib.Path(".").absolute().name
-        role_name = re.sub(r'^{0}'.format(re.escape('ansible-role-')), '', role_name)
+
+    fqrn = _get_role_fqrn(yaml['galaxy_info'])
 
     if 'role-name' not in options.skip_list:
-        fqrn = f"{role_namespace}.{role_name}"
         if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
             msg = (
                 """\
@@ -206,10 +230,15 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
                 sys.exit(INVALID_PREREQUISITES_RC)
     else:
         # when 'role-name' is in skip_list, we stick to plain role names
-        fqrn = role_name
+        if 'role_name' in yaml['galaxy_info']:
+            role_namespace = _get_galaxy_role_ns(yaml['galaxy_info'])
+            role_name = _get_galaxy_role_name(yaml['galaxy_info'])
+            fqrn = f"{role_namespace}{role_name}"
+        else:
+            fqrn = pathlib.Path(".").absolute().name
     p = pathlib.Path(f"{options.project_dir}/.cache/roles")
     p.mkdir(parents=True, exist_ok=True)
-    link_path = p / f"{role_namespace}.{role_name}"
+    link_path = p / fqrn
     # despite documentation stating that is_file() reports true for symlinks,
     # it appears that is_dir() reports true instead, so we rely on exits().
     if not link_path.exists():

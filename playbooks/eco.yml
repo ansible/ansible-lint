@@ -8,6 +8,11 @@
       - name: ansible-role-mysql
         url: https://github.com/geerlingguy/ansible-role-mysql.git
         contact: geerlingguy
+      - name: geerlingguy.mysql
+        url: https://github.com/geerlingguy/ansible-role-mysql.git
+        contact: geerlingguy
+        # duplicates first one but covers for the case where clone is made in a
+        # folder that uses namespace.rolename pattern (installed galaxy role)
       - name: zuul-jobs
         url: https://opendev.org/zuul/zuul-jobs
         contact: ssbarnea
