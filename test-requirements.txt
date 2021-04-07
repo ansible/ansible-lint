@@ -27,6 +27,8 @@ pyyaml==5.4.1
 rich==10.1.0
 ruamel.yaml.clib==0.2.2
 ruamel.yaml==0.17.2 ; python_version >= "3.7"
+six==1.15.0
+tenacity==7.0.0
 toml==0.10.2
 typing-extensions==3.7.4.3
 wcmatch==8.1.2
