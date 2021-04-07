@@ -35,6 +35,7 @@ requests==2.25.1
 rich==10.1.0
 ruamel.yaml.clib==0.2.2
 ruamel.yaml==0.17.2 ; python_version >= "3.7"
+six==1.15.0
 snowballstemmer==2.1.0
 sphinx-ansible-theme==0.3.2
 sphinx-notfound-page==0.6
@@ -47,6 +48,7 @@ sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-programoutput2==2.0a1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
+tenacity==7.0.0
 typing-extensions==3.7.4.3
 urllib3==1.26.4
 wcmatch==8.1.2

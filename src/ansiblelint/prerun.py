@@ -8,6 +8,7 @@ import sys
 from functools import lru_cache
 from typing import List, Optional, Tuple
 
+import tenacity
 from packaging import version
 
 from ansiblelint.config import (
@@ -94,6 +95,12 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
     return ver, err
 
 
+@tenacity.retry(  # Retry up to 3 times as galaxy server can return errors
+    reraise=True,
+    wait=tenacity.wait_fixed(30),  # type: ignore
+    stop=tenacity.stop_after_attempt(3),  # type: ignore
+    before_sleep=tenacity.after_log(_logger, logging.WARNING),  # type: ignore
+)
 def prepare_environment() -> None:
     """Make dependencies available if needed."""
     if not options.configured:
@@ -151,7 +158,7 @@ def prepare_environment() -> None:
             )
             if run.returncode != 0:
                 _logger.error(run.stdout)
-                sys.exit(run.returncode)
+                raise RuntimeError(run.returncode)
 
     _install_galaxy_role()
     _perform_mockings()
