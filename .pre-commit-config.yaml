@@ -88,6 +88,7 @@ repos:
     - flaky
     - pytest
     - ruamel.yaml
+    - tenacity
     - types-PyYAML
     - wcmatch
     - yamllint
@@ -111,5 +112,6 @@ repos:
     - pyyaml
     - rich
     - ruamel.yaml
+    - tenacity
     - sphinx
     - wcmatch
