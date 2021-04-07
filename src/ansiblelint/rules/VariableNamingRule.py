@@ -1,26 +1,27 @@
-from typing import TYPE_CHECKING, List, Any, Dict, Union
-if TYPE_CHECKING:
-    from ansiblelint.constants import odict
-from ansiblelint.errors import MatchError
+import re
+from typing import TYPE_CHECKING, Any, Dict, Generator, List, Tuple, Union
+
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import parse_yaml_from_file
-import ansible.parsing.yaml.objects
 
-import re
+if TYPE_CHECKING:
+    from ansiblelint.constants import odict
+    from ansiblelint.errors import MatchError
 
 
 # properties/parameters are prefixed and postfixed with `__`
-def is_property(k):
-    return (k.startswith('__') and k.endswith('__'))
+def is_property(k: str) -> bool:
+    """Check if key is a property."""
+    return k.startswith('__') and k.endswith('__')
 
 
-def is_invalid_variable_name(text):
+def is_invalid_variable_name(text: str) -> bool:
+    """Check if variable name is using right pattern."""
     patterns = '^[a-z0-9_]*$'
     if re.search(patterns, text):
         return False  # string uses acceptable characters
-    else:
-        return True  # string uses unacceptable characters
+    return True  # string uses unacceptable characters
 
 
 class VariableNamingRule(AnsibleLintRule):
@@ -28,36 +29,43 @@ class VariableNamingRule(AnsibleLintRule):
     base_msg = 'All variables should be named using only lowercase and underscores'
     shortdesc = base_msg
     description = 'All variables should be named using only lowercase and underscores'
-    severity = 'MEDIUM'  # ansible-lint displays severity when with --parseable-severity option
-    tags = ['formatting', 'readability']
-    version_added = 'v5.0.5'
+    severity = (
+        'MEDIUM'  # ansible-lint displays severity when with --parseable-severity option
+    )
+    tags = ['formatting', 'readability', 'experimental']
+    version_added = 'v5.0.7'
 
-    def recursive_items(self, dictionary):
-        """Return a recursive search for all keys in the dictionary """
-
+    def recursive_items(
+        self, dictionary: Dict[str, Any]
+    ) -> Generator[Tuple[str, Any], None, None]:
+        """Return a recursive search for all keys in the dictionary."""
         for key, value in dictionary.items():
             # Avoid internal properties in the dictionary
             if not is_property(key):
                 # Recurse if value is another ansible dictionary
-                if isinstance(value, ansible.parsing.yaml.objects.AnsibleMapping):
+                if isinstance(value, dict):
                     yield (key, value)
                     yield from self.recursive_items(value)
                 else:
                     yield (key, value)
 
-    def matchplay(self, file: "Lintable", data: "odict[str, Any]") -> List["MatchError"]:
+    def matchplay(
+        self, file: "Lintable", data: "odict[str, Any]"
+    ) -> List["MatchError"]:
         """Return matches found for a specific playbook."""
         results = []
 
         # If the Play uses the 'vars' section to set variables
-        vars = data.get('vars', {})
-        for key, value in self.recursive_items(vars):
+        our_vars = data.get('vars', {})
+        for key, value in self.recursive_items(our_vars):
             if is_invalid_variable_name(key):
                 results.append(
                     self.create_matcherror(
                         filename=file,
-                        linenumber=vars['__line__'],
-                        message="Play defines variable '" + key + "' within 'vars' section that violates variable naming standards"
+                        linenumber=our_vars['__line__'],
+                        message="Play defines variable '"
+                        + key
+                        + "' within 'vars' section that violates variable naming standards",
                     )
                 )
 
@@ -65,10 +73,9 @@ class VariableNamingRule(AnsibleLintRule):
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
         """Return matches for task based variables."""
-
         # If the task uses the 'vars' section to set variables
-        vars = task.get('vars', {})
-        for key, value in self.recursive_items(vars):
+        our_vars = task.get('vars', {})
+        for key, value in self.recursive_items(our_vars):
             if is_invalid_variable_name(key):
                 return "Task defines variables within 'vars' section that violates variable naming standards"
 
@@ -89,9 +96,8 @@ class VariableNamingRule(AnsibleLintRule):
 
     def matchyaml(self, file: Lintable) -> List["MatchError"]:
         """Return matches for variables defined in vars files."""
-
         results: List["MatchError"] = []
-        meta_data = {}
+        meta_data: Dict[str, Any] = {}
 
         if file.kind == "vars":
             meta_data = parse_yaml_from_file(str(file.path))
@@ -101,7 +107,9 @@ class VariableNamingRule(AnsibleLintRule):
                         self.create_matcherror(
                             filename=file,
                             # linenumber=vars['__line__'],
-                            message="File defines variable '" + key + "' that violates variable naming standards"
+                            message="File defines variable '"
+                            + key
+                            + "' that violates variable naming standards",
                         )
                     )
         else:
