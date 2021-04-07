@@ -1,7 +1,7 @@
 """Application."""
 import logging
 import os
-from typing import TYPE_CHECKING, List, Type
+from typing import TYPE_CHECKING, Any, List, Type
 
 from ansiblelint import formatters
 from ansiblelint.color import console
@@ -66,9 +66,9 @@ class App:
 
 def choose_formatter_factory(
     options_list: "Namespace",
-) -> Type[formatters.BaseFormatter]:
+) -> Type[formatters.BaseFormatter[Any]]:
     """Select an output formatter based on the incoming command line arguments."""
-    r: Type[formatters.BaseFormatter] = formatters.Formatter
+    r: Type[formatters.BaseFormatter[Any]] = formatters.Formatter
     if options_list.format == 'quiet':
         r = formatters.QuietFormatter
     elif options_list.parseable or options_list.format == 'pep8':
