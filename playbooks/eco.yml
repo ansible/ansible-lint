@@ -23,6 +23,9 @@
       - name: ansible_collection_system
         url: https://github.com/devroles/ansible_collection_system
         contact: greg-hellings
+      - name: ansible-role-bootstrap
+        url: https://github.com/robertdebock/ansible-role-bootstrap
+        contact: robertdebock
       - name: debops
         url: https://github.com/debops/debops
         contact: drybjed
