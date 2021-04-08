@@ -689,9 +689,9 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         # the line number where the previous token has ended (plus empty lines)
         line = loader.line
         node = Composer.compose_node(loader, parent, index)  # type: ignore
-        node.__line__ = line + 1
         if not isinstance(node, yaml.nodes.Node):
             raise RuntimeError("Unexpected yaml data.")
+        setattr(node, '__line__', line + 1)
         return node
 
     def construct_mapping(
