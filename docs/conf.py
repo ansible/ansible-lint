@@ -84,7 +84,20 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'Ansible Lint Documentation'
-copyright = "2013-2020 Ansible, Inc"  # pylint: disable=redefined-builtin
+copyright = "2013-2021 Ansible, Inc"  # pylint: disable=redefined-builtin
+
+github_url = "https://github.com"
+github_repo_org = "ansible"
+github_repo_name = "ansible-lint"
+github_repo_slug = f"{github_repo_org}/{github_repo_name}"
+github_repo_url = f"{github_url}/{github_repo_slug}"
+
+extlinks = {
+    "issue": (f"{github_repo_url}/issues/%s", "#"),
+    "pr": (f"{github_repo_url}/pull/%s", "PR #"),
+    "commit": (f"{github_repo_url}/commit/%s", ""),
+    "gh": (f"{github_url}/%s", "GitHub: "),
+}
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -154,6 +167,29 @@ rst_epilog = """
 
 html_theme_path = ['../_themes']
 html_theme = 'sphinx_ansible_theme'
+
+html_theme_options = {
+    "collapse_navigation": False,
+    "analytics_id": "UA-128382387-1",
+    "style_nav_header_background": "#5bbdbf",
+    "style_external_links": True,
+    # 'canonical_url': "https://docs.ansible.com/ansible/latest/",
+    'vcs_pageview_mode': 'edit',
+    "navigation_depth": 3,
+}
+
+html_context = {
+    'display_github': 'True',
+    'github_user': 'ansible-community',
+    'github_repo': 'ansible-lint',
+    'github_version': 'master/docs/',
+    'current_version': version,
+    'latest_version': 'latest',
+    # list specifically out of order to make latest work
+    'available_versions': ('latest', 'stable'),
+    'css_files': (),  # overrides to the standard theme
+}
+
 html_short_title = 'Ansible Lint Documentation'
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
