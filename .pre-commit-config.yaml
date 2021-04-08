@@ -48,6 +48,7 @@ repos:
   - id: yamllint
     exclude: >
       (?x)^(
+        examples/playbooks/templates/.*|
         examples/other/some.j2.yaml
       )$
     files: \.(yaml|yml)$
