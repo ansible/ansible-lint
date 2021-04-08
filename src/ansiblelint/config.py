@@ -46,6 +46,7 @@ BASE_KINDS = [
         "text/jinja2": "**/*.j2"
     },  # jinja2 templates are not always parsable as something else
     {"text/jinja2": "**/*.j2.*"},
+    {"text": "**/templates/**/*.*"},  # templates are likely not validable
     {"text/json": "**/*.json"},  # standardized
     {"text/markdown": "**/*.md"},  # https://tools.ietf.org/html/rfc7763
     {"text/rst": "**/*.rst"},  # https://en.wikipedia.org/wiki/ReStructuredText
