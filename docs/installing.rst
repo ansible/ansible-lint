@@ -35,7 +35,7 @@ related to containers and use the discussions_ forum instead.
 Using pip or pipx
 -----------------
 
-You can use either pip3_ or pipx_ to install it, the former one
+You can use either pip3_ or pipx_ to install it; the latter one
 automatically isolates the linter from your current python environment.
 That approach may avoid having to deal with particularities of installing
 python packages, like creating a virtual environment, activating it, installing
