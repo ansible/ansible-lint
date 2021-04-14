@@ -60,6 +60,16 @@ using ``--user`` or fixing potential conflicts if not using virtualenvs.
 .. _pip3: https://pypi.org/project/pip/
 .. _pipx: https://pipxproject.github.io/pipx/
 
+Using Homebrew
+--------------
+
+.. code-block:: bash
+
+    brew install ansible-lint
+
+.. _homebrew: https://brew.sh/
+
+
 From Source
 -----------
 
