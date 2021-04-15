@@ -44,7 +44,11 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
             value = galaxy_info.get(field, None)
             if value and value == default:
                 results.append(
-                    self.create_matcherror('Should change default metadata: %s' % field)
+                    self.create_matcherror(
+                        filename=file,
+                        linenumber=data['__line__'],
+                        message='Should change default metadata: %s' % field,
+                    )
                 )
 
         return results

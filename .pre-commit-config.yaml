@@ -43,18 +43,19 @@ repos:
   hooks:
   - id: doc8
 - repo: https://github.com/adrienverge/yamllint.git
-  rev: v1.26.0
+  rev: v1.26.1
   hooks:
   - id: yamllint
     exclude: >
       (?x)^(
+        examples/playbooks/templates/.*|
         examples/other/some.j2.yaml
       )$
     files: \.(yaml|yml)$
     types: [file, yaml]
     entry: yamllint --strict
 - repo: https://github.com/pre-commit/mirrors-isort
-  rev: v5.7.0
+  rev: v5.8.0
   hooks:
   - id: isort
     args:
@@ -65,8 +66,8 @@ repos:
   hooks:
   - id: black
     language_version: python3
-- repo: https://gitlab.com/pycqa/flake8.git
-  rev: 3.8.4
+- repo: https://github.com/pycqa/flake8.git
+  rev: 3.9.0
   hooks:
   - id: flake8
     language_version: python3
@@ -88,6 +89,7 @@ repos:
     - flaky
     - pytest
     - ruamel.yaml
+    - tenacity
     - types-PyYAML
     - wcmatch
     - yamllint
@@ -111,5 +113,6 @@ repos:
     - pyyaml
     - rich
     - ruamel.yaml
+    - tenacity
     - sphinx
     - wcmatch
