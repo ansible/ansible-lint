@@ -62,7 +62,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
 
     _executable_options = {
         'git': ['branch', 'log'],
-        'systemctl': ['set-default', 'show-environment'],
+        'systemctl': ['set-default', 'show-environment', 'status'],
     }
 
     def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
@@ -123,6 +123,13 @@ if "pytest" in sys.modules:
       command: systemctl restart sshd
 '''
 
+    SYSTEMCTL_STATUS = '''
+- hosts: all
+  tasks:
+    - name: show systemctl service status
+      command: systemctl status systemd-timesyncd
+'''
+
     SYSTEMD_ENVIRONMENT = '''
 - hosts: all
   tasks:
@@ -167,6 +174,14 @@ if "pytest" in sys.modules:
     def test_git_branch(rule_runner: Any) -> None:
         """The git branch command is not supported by the git module."""
         results = rule_runner.run_playbook(GIT_BRANCH)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_systemd_status(rule_runner: Any) -> None:
+        """Set-default is not supported by the systemd module."""
+        results = rule_runner.run_playbook(SYSTEMCTL_STATUS)
         assert len(results) == 0
 
     @pytest.mark.parametrize(
