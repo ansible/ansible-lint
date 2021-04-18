@@ -5,7 +5,7 @@ import subprocess
 import sys
 from argparse import Namespace
 from functools import lru_cache
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from packaging.version import Version
 
@@ -84,6 +84,7 @@ options = Namespace(
     extra_vars=None,
     enable_list=[],
     skip_action_validation=True,
+    rules=dict(),  # Placeholder to set and keep configurations for each rule.
 )
 
 # Used to store detected tag deprecations
@@ -91,6 +92,11 @@ used_old_tags: Dict[str, str] = {}
 
 # Used to store collection list paths (with mock paths if needed)
 collection_list: List[str] = []
+
+
+def get_rule_config(rule_id: str) -> Dict[str, Any]:
+    """Get configurations for the rule ``rule_id``."""
+    return options.rules.get(rule_id, dict())
 
 
 @lru_cache()

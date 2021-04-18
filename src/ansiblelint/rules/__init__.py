@@ -7,8 +7,9 @@ import os
 import re
 from argparse import Namespace
 from collections import defaultdict
+from functools import lru_cache
 from importlib.abc import Loader
-from typing import Iterator, List, Optional, Set, Union
+from typing import Any, Dict, Iterator, List, Optional, Set, Union
 
 import ansiblelint.utils
 from ansiblelint._internal.rules import (
@@ -17,7 +18,7 @@ from ansiblelint._internal.rules import (
     LoadingFailureRule,
     RuntimeErrorRule,
 )
-from ansiblelint.config import options
+from ansiblelint.config import get_rule_config, options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
@@ -26,6 +27,15 @@ _logger = logging.getLogger(__name__)
 
 
 class AnsibleLintRule(BaseRule):
+    @property
+    def rule_config(self) -> Dict[str, Any]:
+        return get_rule_config(self.id)
+
+    @lru_cache()
+    def get_config(self, key: str) -> Any:
+        """Return a configured value for given key string."""
+        return self.rule_config.get(key, None)
+
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
