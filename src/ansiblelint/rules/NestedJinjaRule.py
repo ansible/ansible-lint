@@ -22,9 +22,14 @@
 # THE SOFTWARE.
 
 import re
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 class NestedJinjaRule(AnsibleLintRule):
@@ -42,8 +47,9 @@ class NestedJinjaRule(AnsibleLintRule):
 
     pattern = re.compile(r"{{(?:[^{}]*)?[^'\"]{{")
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
-
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         command = "".join(
             str(value)
             # task properties are stored in the 'action' key

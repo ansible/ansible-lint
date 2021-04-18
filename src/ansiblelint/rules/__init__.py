@@ -114,7 +114,7 @@ class AnsibleLintRule(BaseRule):
 
             if 'action' not in task:
                 continue
-            result = self.matchtask(task)
+            result = self.matchtask(task, file=file)
             if not result:
                 continue
 

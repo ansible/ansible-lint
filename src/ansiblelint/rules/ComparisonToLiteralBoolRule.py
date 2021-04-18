@@ -2,10 +2,15 @@
 # Copyright (c) 2018-2021, Ansible Project
 
 import re
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import nested_items
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 class ComparisonToLiteralBoolRule(AnsibleLintRule):
@@ -21,7 +26,9 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
 
     literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         for k, v, _ in nested_items(task):
             if k == 'when':
                 if isinstance(v, str):

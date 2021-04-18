@@ -1,8 +1,13 @@
 import re
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import convert_to_boolean
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 class ShellWithoutPipefail(AnsibleLintRule):
@@ -23,7 +28,9 @@ class ShellWithoutPipefail(AnsibleLintRule):
     _pipefail_re = re.compile(r"^\s*set.*[+-][A-z]*o\s*pipefail", re.M)
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         if task["__ansible_action_type__"] != "task":
             return False
 
