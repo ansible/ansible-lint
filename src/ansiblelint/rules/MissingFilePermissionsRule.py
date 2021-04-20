@@ -17,9 +17,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
+
 
 # Despite documentation mentioning 'preserve' only these modules support it:
 _modules_with_preserve = (
@@ -60,7 +66,9 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         'lineinfile': False,
     }
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         module = task["action"]["__ansible_module__"]
         mode = task['action'].get('mode', None)
 

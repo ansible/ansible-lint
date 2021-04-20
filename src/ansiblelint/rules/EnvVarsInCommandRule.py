@@ -18,10 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY, get_first_cmd_arg
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 class EnvVarsInCommandRule(AnsibleLintRule):
@@ -51,7 +56,9 @@ class EnvVarsInCommandRule(AnsibleLintRule):
         FILENAME_KEY,
     ]
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in ['command']:
             first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:

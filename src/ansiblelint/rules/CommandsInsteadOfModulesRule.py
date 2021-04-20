@@ -19,10 +19,15 @@
 # THE SOFTWARE.
 
 import os
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
@@ -59,7 +64,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'yum': 'yum',
     }
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         if task['action']['__ansible_module__'] not in self._commands:
             return False
 
