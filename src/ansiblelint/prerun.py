@@ -101,26 +101,44 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
     stop=tenacity.stop_after_attempt(3),  # type: ignore
     before_sleep=tenacity.after_log(_logger, logging.WARNING),  # type: ignore
 )
-def prepare_environment() -> None:
-    """Make dependencies available if needed."""
-    if not options.configured:
-        # Allow method to be used without calling the command line, so we can
-        # reuse it in other tools, like molecule.
-        # pylint: disable=import-outside-toplevel,cyclic-import
-        from ansiblelint.__main__ import initialize_options
+def install_requirements(requirement: str) -> None:
+    """Install dependencies from a requirements.yml."""
+    if not os.path.exists(requirement):
+        return
 
-        initialize_options()
+    cmd = [
+        "ansible-galaxy",
+        "role",
+        "install",
+        "--roles-path",
+        f"{options.project_dir}/.cache/roles",
+        "-vr",
+        f"{requirement}",
+    ]
 
-    if not options.offline and os.path.exists("requirements.yml"):
+    _logger.info("Running %s", " ".join(cmd))
+    run = subprocess.run(
+        cmd,
+        universal_newlines=True,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    if run.returncode != 0:
+        _logger.error(run.stdout)
+        raise RuntimeError(run.returncode)
+
+    # Run galaxy collection install works on v2 requirements.yml
+    if "collections" in yaml_from_file(requirement):
 
         cmd = [
             "ansible-galaxy",
-            "role",
+            "collection",
             "install",
-            "--roles-path",
-            f"{options.project_dir}/.cache/roles",
+            "-p",
+            f"{options.project_dir}/.cache/collections",
             "-vr",
-            "requirements.yml",
+            f"{requirement}",
         ]
 
         _logger.info("Running %s", " ".join(cmd))
@@ -133,32 +151,23 @@ def prepare_environment() -> None:
         )
         if run.returncode != 0:
             _logger.error(run.stdout)
-            sys.exit(run.returncode)
+            raise RuntimeError(run.returncode)
 
-        # Run galaxy collection install works on v2 requirements.yml
-        if "collections" in yaml_from_file("requirements.yml"):
 
-            cmd = [
-                "ansible-galaxy",
-                "collection",
-                "install",
-                "-p",
-                f"{options.project_dir}/.cache/collections",
-                "-vr",
-                "requirements.yml",
-            ]
+def prepare_environment() -> None:
+    """Make dependencies available if needed."""
+    if not options.configured:
+        # Allow method to be used without calling the command line, so we can
+        # reuse it in other tools, like molecule.
+        # pylint: disable=import-outside-toplevel,cyclic-import
+        from ansiblelint.__main__ import initialize_options
 
-            _logger.info("Running %s", " ".join(cmd))
-            run = subprocess.run(
-                cmd,
-                universal_newlines=True,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
-            if run.returncode != 0:
-                _logger.error(run.stdout)
-                raise RuntimeError(run.returncode)
+        initialize_options()
+
+    if not options.offline:
+        install_requirements("requirements.yml")
+        for req in pathlib.Path(".").glob("molecule/*/requirements.yml"):
+            install_requirements(str(req))
 
     _install_galaxy_role()
     _perform_mockings()
