@@ -1,8 +1,13 @@
 # Copyright (c) 2018, Ansible Project
 
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 class DeprecatedModuleRule(AnsibleLintRule):
@@ -60,7 +65,9 @@ class DeprecatedModuleRule(AnsibleLintRule):
         'include',
     ]
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         module = task["action"]["__ansible_module__"]
         if module in self._modules:
             message = '{0} {1}'

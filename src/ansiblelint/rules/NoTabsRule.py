@@ -1,10 +1,15 @@
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 import sys
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import nested_items
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 class NoTabsRule(AnsibleLintRule):
@@ -21,7 +26,9 @@ class NoTabsRule(AnsibleLintRule):
         ("lineinfile", "line"),
     ]
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         for k, v, parent in nested_items(task):
             if isinstance(k, str) and '\t' in k:
                 return True

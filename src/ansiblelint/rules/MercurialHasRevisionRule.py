@@ -18,9 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 class MercurialHasRevisionRule(AnsibleLintRule):
@@ -34,7 +39,9 @@ class MercurialHasRevisionRule(AnsibleLintRule):
     tags = ['idempotency']
     version_added = 'historic'
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+    ) -> Union[bool, str]:
         return bool(
             task['action']['__ansible_module__'] == 'hg'
             and task['action'].get('revision', 'default') == 'default'

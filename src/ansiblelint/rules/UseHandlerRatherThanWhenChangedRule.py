@@ -19,8 +19,9 @@
 # THE SOFTWARE.
 
 import sys
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 
 
@@ -52,7 +53,9 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     tags = ['idiom']
     version_added = 'historic'
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
+    ) -> Union[bool, str]:
         if task["__ansible_action_type__"] != 'task':
             return False
 
@@ -68,7 +71,6 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
 
 if 'pytest' in sys.modules:
 
-    from ansiblelint.file_utils import Lintable
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
