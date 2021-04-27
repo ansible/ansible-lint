@@ -97,6 +97,15 @@ class YamllintRule(AnsibleLintRule):
                         tag=p.rule,
                     )
                 )
+        else:
+            matches.append(
+                self.create_matcherror(
+                    message="yamllint.config module is not present",
+                    details="Install yamllint package so ansiblelint can invoke it.",
+                    filename="YamllintRule.py",
+                    linenumber=15,
+                )
+            )
 
         if matches:
             lines = file.content.splitlines()
