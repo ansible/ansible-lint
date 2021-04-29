@@ -2,6 +2,8 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 if TYPE_CHECKING:
+    from typing import Optional
+
     from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
@@ -43,7 +45,9 @@ class BaseRule:
         """Return matches found for a specific line."""
         return []
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+    ) -> Union[bool, str]:
         """Confirm if current rule is matching a specific task."""
         return False
 

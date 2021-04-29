@@ -3,8 +3,9 @@
 
 import re
 import sys
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import nested_items
 
@@ -21,7 +22,9 @@ class VariableHasSpacesRule(AnsibleLintRule):
     bracket_regex = re.compile(r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
     exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}")
 
-    def matchtask(self, task: Dict[str, Any]) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
+    ) -> Union[bool, str]:
         for k, v, _ in nested_items(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
@@ -32,7 +35,6 @@ class VariableHasSpacesRule(AnsibleLintRule):
 
 if 'pytest' in sys.modules:
 
-    from ansiblelint.file_utils import Lintable
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 

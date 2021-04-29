@@ -83,6 +83,11 @@ class YamllintRule(AnsibleLintRule):
             for p in run_yamllint(
                 file.content, YamllintRule.config, filepath=file.path
             ):
+                self.severity = 'VERY_LOW'
+                if p.level == "error":
+                    self.severity = 'MEDIUM'
+                if p.desc.endswith("(syntax)"):
+                    self.severity = 'VERY_HIGH'
                 matches.append(
                     self.create_matcherror(
                         message=p.desc,
