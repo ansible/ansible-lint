@@ -14,7 +14,7 @@ class IgnoreErrorsRule(AnsibleLintRule):
     """Describe and test the IgnoreErrorsRule."""
 
     id = "ignore-errors"
-    shortdesc = 'Use failed_when and specify error codes instead of ignore_errors'
+    shortdesc = 'Use failed_when and specify error conditions instead of using ignore_errors'
     description = (
         'Instead of ignoring all errors, use ``failed_when:`` '
         'and specify acceptable error codes '
