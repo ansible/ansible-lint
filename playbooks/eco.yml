@@ -16,6 +16,7 @@
       - name: zuul-jobs
         url: https://opendev.org/zuul/zuul-jobs
         contact: ssbarnea
+        args: --progressive
       - name: tripleo-ansible
         url: https://opendev.org/openstack/tripleo-ansible
         contact: ssbarnea
@@ -36,15 +37,21 @@
         contact: drybjed
   tasks:
 
-    - name: Clone repo
+    - name: Clone repo  # noqa: git-latest
       git:
         repo: "{{ item.url }}"
         dest: "{{ (cache_dir, item.name) | path_join }}"
+        version: HEAD
+        update: true
       loop: "{{ repos }}"
+      loop_control:
+        label: "{{ item.name }}"
 
     - name: Run linter
-      command: ansible-lint -v
+      command: ansible-lint -v {{ item.args | default('') }}
       args:
         chdir: "{{ (cache_dir, item.name) | path_join }}"
       loop: "{{ repos }}"
+      loop_control:
+        label: "{{ item.name }}"
       changed_when: false
