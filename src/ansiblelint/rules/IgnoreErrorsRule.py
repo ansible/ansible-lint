@@ -14,10 +14,12 @@ class IgnoreErrorsRule(AnsibleLintRule):
     """Describe and test the IgnoreErrorsRule."""
 
     id = "ignore-errors"
-    shortdesc = 'Use failed_when and specify error conditions instead of using ignore_errors'
+    shortdesc = (
+        'Use failed_when and specify error conditions instead of using ignore_errors'
+    )
     description = (
         'Instead of ignoring all errors, use ``failed_when:`` '
-        'and specify acceptable error codes '
+        'and specify acceptable error conditions '
         'to reduce the risk of ignoring important failures'
     )
     severity = 'LOW'
@@ -28,7 +30,7 @@ class IgnoreErrorsRule(AnsibleLintRule):
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
 
-        if task.get("ignore_errors"):
+        if task.get("ignore_errors") and not task.get("register"):
             return True
 
         return False
@@ -51,6 +53,15 @@ if "pytest" in sys.modules:
     - name: run apt-get update
       command: apt-get update
       ignore_errors: false
+'''
+
+    IGNORE_ERRORS_REGISTER = '''
+- hosts: all
+  tasks:
+    - name: run apt-get update
+      command: apt-get update
+      ignore_errors: true
+      register: ignore_errors_register
 '''
 
     FAILED_WHEN = '''
@@ -81,6 +92,14 @@ if "pytest" in sys.modules:
     def test_ignore_errors_false(rule_runner: Any) -> None:
         """The task uses ignore_errors: false, oddly enough."""
         results = rule_runner.run_playbook(IGNORE_ERRORS_FALSE)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (IgnoreErrorsRule,), indirect=['rule_runner']
+    )
+    def test_ignore_errors_register(rule_runner: Any) -> None:
+        """The task uses ignore_errors: but output is registered and managed."""
+        results = rule_runner.run_playbook(IGNORE_ERRORS_REGISTER)
         assert len(results) == 0
 
     @pytest.mark.parametrize(
