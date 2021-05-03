@@ -3,6 +3,7 @@ import os
 import sys
 from typing import TYPE_CHECKING, List
 
+from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
@@ -17,7 +18,11 @@ try:
     from yamllint.config import YamlLintConfig
     from yamllint.linter import run as run_yamllint
 except ImportError:
-    pass
+    # missing library is ignored unless yaml is exclitely added to enable_list
+    if 'yaml' in options.enable_list:
+        raise RuntimeError(
+            'Failed to load yamllint library and ansible-linted was configured to require it.'
+        )
 
 
 YAMLLINT_CONFIG = """
@@ -38,6 +43,10 @@ You can fully disable all of them by adding 'yaml' to the 'skip_list'.
 Specific tag identifiers that are printed at the end of rule name,
 like 'trailing-spaces' or 'indentation' can also be be skipped, allowing
 you to have a more fine control.
+
+By default this rule is not used hwne yamllint library is missing. If you want
+to make its absence a runtime failure, please add 'yaml' to 'enable_list'
+inside the configuration file.
 """
 
 
