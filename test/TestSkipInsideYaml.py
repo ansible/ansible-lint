@@ -2,12 +2,10 @@ import pytest
 
 ROLE_TASKS = '''\
 ---
-- name: test command-instead-of-module
-  command: git log
-  changed_when: false
-- name: test command-instead-of-module (skipped)
-  command: git log  # noqa command-instead-of-module
-  changed_when: false
+- debug:
+    msg: this should fail linting due lack of name
+- debug:  # noqa unnamed-task
+    msg: this should pass due to noqa comment
 '''
 
 ROLE_TASKS_WITH_BLOCK = '''\
@@ -91,7 +89,9 @@ ROLE_TASKS_WITH_BLOCK_BECOME = '''\
 
 def test_role_tasks(default_text_runner):
     results = default_text_runner.run_role_tasks_main(ROLE_TASKS)
-    assert len(results) == 1
+    assert len(results) == 1, results
+    assert results[0].linenumber == 2
+    assert results[0].rule.id == "unnamed-task"
 
 
 def test_role_tasks_with_block(default_text_runner):

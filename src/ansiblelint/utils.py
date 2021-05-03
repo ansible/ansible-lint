@@ -730,6 +730,17 @@ def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
     return first_cmd_arg
 
 
+def get_second_cmd_arg(task: Dict[str, Any]) -> Any:
+    try:
+        if 'cmd' in task['action']:
+            second_cmd_arg = task['action']['cmd'].split()[1]
+        else:
+            second_cmd_arg = task['action']['__ansible_arguments__'][1]
+    except IndexError:
+        return None
+    return second_cmd_arg
+
+
 def is_playbook(filename: str) -> bool:
     """
     Check if the file is a playbook.
