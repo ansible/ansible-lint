@@ -176,10 +176,13 @@ class AnsibleLintRule(BaseRule):
         return matches
 
 
-def load_plugins(directory: str) -> List[AnsibleLintRule]:
-    """Return a list of rule classes."""
-    result = []
+def is_valid_rule(rule: AnsibleLintRule) -> bool:
+    """Check if given rule is valid or not."""
+    return isinstance(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc)
 
+
+def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
+    """Yield a rule class."""
     for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
 
         pluginname = os.path.basename(pluginfile.replace('.py', ''))
@@ -188,9 +191,13 @@ def load_plugins(directory: str) -> List[AnsibleLintRule]:
         if spec and isinstance(spec.loader, Loader):
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-            obj = getattr(module, pluginname)()
-            result.append(obj)
-    return result
+            try:
+                rule = getattr(module, pluginname)()
+                if is_valid_rule(rule):
+                    yield rule
+
+            except (TypeError, ValueError, AttributeError):
+                _logger.warning("Skipped invalid rule from %s", pluginname)
 
 
 class RulesCollection:
