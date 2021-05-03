@@ -4,3 +4,4 @@ pipdeptree
 Sphinx
 sphinx_ansible_theme
 sphinxcontrib-programoutput2>=2.0a1
+yamllint
