@@ -34,7 +34,9 @@ skip_list:
 # mentioned in the enable_list:
 enable_list:
   - no-same-owner
-
+  # add yaml here if you want to avoid ignoring yaml checks when yamllint
+  # library is missing. Normally its absence just skips using that rule.
+  - yaml
 # Report only a subset of tags and fully ignore any others
 # tags:
 #   - var-spacing
