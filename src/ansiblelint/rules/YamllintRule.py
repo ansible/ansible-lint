@@ -44,7 +44,7 @@ Specific tag identifiers that are printed at the end of rule name,
 like 'trailing-spaces' or 'indentation' can also be be skipped, allowing
 you to have a more fine control.
 
-By default this rule is not used hwne yamllint library is missing. If you want
+By default this rule is not used when yamllint library is missing. If you want
 to make its absence a runtime failure, please add 'yaml' to 'enable_list'
 inside the configuration file.
 """
