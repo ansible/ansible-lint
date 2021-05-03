@@ -65,7 +65,6 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'yum': 'yum',
     }
 
-
     _executable_options = {
         'git': ['branch', 'log'],
         'systemctl': ['set-default', 'show-environment', 'status'],
