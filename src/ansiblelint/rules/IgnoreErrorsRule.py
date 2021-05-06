@@ -18,9 +18,10 @@ class IgnoreErrorsRule(AnsibleLintRule):
         'Use failed_when and specify error conditions instead of using ignore_errors'
     )
     description = (
-        'Instead of ignoring all errors, use ``failed_when:`` '
-        'and specify acceptable error conditions '
-        'to reduce the risk of ignoring important failures'
+        'Instead of ignoring all errors, ignore the errors only when using ``{{ ansible_check_mode }}``, '
+        'register the errors using ``register``, '
+        'or use ``failed_when:`` and specify acceptable error conditions '
+        'to reduce the risk of ignoring important failures.'
     )
     severity = 'LOW'
     tags = ['unpredictability', 'experimental']
