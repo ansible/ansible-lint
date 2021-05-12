@@ -235,11 +235,16 @@ def test_get_yaml_files_git_verbose(reset_env_var, message_prefix, monkeypatch, 
 
 
 @pytest.mark.parametrize(
+    'with_custom_kinds',
+    (True, False),
+    ids=('with custom kinds', 'without custom kinds'),
+)
+@pytest.mark.parametrize(
     'is_in_git',
     (True, False),
     ids=('in Git', 'outside Git'),
 )
-def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
+def test_get_yaml_files_silent(with_custom_kinds, is_in_git, monkeypatch, capsys):
     """Verify that no stderr output is displayed while discovering yaml files.
 
     (when the verbosity is off, regardless of the Git or Git-repo presence)
@@ -248,13 +253,18 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     """
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
-    lint_path = test_dir / '..' / 'examples' / 'roles' / 'test-role'
+    if with_custom_kinds:
+        lint_path = test_dir / '..' / 'examples' / 'other'
+    else:
+        lint_path = test_dir / '..' / 'examples' / 'roles' / 'test-role'
     if not is_in_git:
         monkeypatch.setenv('GIT_DIR', '')
 
-    yaml_count = len(list(lint_path.glob('**/*.yml'))) + len(
-        list(lint_path.glob('**/*.yaml'))
-    )
+    # **/*.yaml-too is configured in .ansible-lint
+    yaml_count = \
+        len(list(lint_path.glob('**/*.yml'))) + \
+        len(list(lint_path.glob('**/*.yaml'))) + \
+        len(list(lint_path.glob('**/*.yaml-too')))
 
     monkeypatch.chdir(str(lint_path))
     files = file_utils.get_yaml_files(options)

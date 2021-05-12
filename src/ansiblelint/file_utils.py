@@ -227,7 +227,6 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
             os.path.join(root, name)
             for root, dirs, files in os.walk('.')
             for name in files
-            if name.endswith('.yaml') or name.endswith('.yml')
         ]
 
     return OrderedDict.fromkeys(sorted(out))
