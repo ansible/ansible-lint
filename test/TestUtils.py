@@ -261,10 +261,11 @@ def test_get_yaml_files_silent(with_custom_kinds, is_in_git, monkeypatch, capsys
         monkeypatch.setenv('GIT_DIR', '')
 
     # **/*.yaml-too is configured in .ansible-lint
-    yaml_count = \
-        len(list(lint_path.glob('**/*.yml'))) + \
-        len(list(lint_path.glob('**/*.yaml'))) + \
-        len(list(lint_path.glob('**/*.yaml-too')))
+    yaml_count = (
+        len(list(lint_path.glob('**/*.yml')))
+        + len(list(lint_path.glob('**/*.yaml')))
+        + len(list(lint_path.glob('**/*.yaml-too')))
+    )
 
     monkeypatch.chdir(str(lint_path))
     files = file_utils.get_yaml_files(options)
