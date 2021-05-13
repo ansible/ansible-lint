@@ -278,6 +278,25 @@ def test_get_yaml_files_silent(with_custom_kinds, is_in_git, monkeypatch, capsys
     )
 
 
+@pytest.mark.parametrize(
+    'is_in_git',
+    (True, False),
+    ids=('in Git', 'outside Git'),
+)
+def test_get_yaml_files_returns_relative_paths(is_in_git, monkeypatch):
+    """Verify that get_yaml_files returns relative paths."""
+    options = cli.get_config([])
+    test_dir = Path(__file__).resolve().parent
+    lint_path = test_dir / '..' / 'examples' / 'roles' / 'test-role'
+
+    if not is_in_git:
+        monkeypatch.setenv('GIT_DIR', '')
+
+    monkeypatch.chdir(str(lint_path))
+    files = file_utils.get_yaml_files(options)
+    assert 'tasks/main.yml' in files
+
+
 def test_get_yaml_files_umlaut(monkeypatch):
     """Verify that filenames containing German umlauts are not garbled by the get_yaml_files."""
     options = cli.get_config([])

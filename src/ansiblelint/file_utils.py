@@ -222,11 +222,35 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
         if options.verbosity:
             _logger.warning("Failed to locate command: %s", exc)
 
+    yaml_patterns = [kind['yaml'] for kind in options.kinds if list(kind) == ['yaml']]
     if out is None:
         out = [
-            os.path.join(root, name)
-            for root, dirs, files in os.walk('.')
-            for name in files
+            str(item)
+            for pattern in yaml_patterns
+            for item in list(
+                wcmatch.pathlib.Path('.').glob(
+                    pattern,
+                    flags=(
+                        wcmatch.pathlib.GLOBSTAR
+                        | wcmatch.pathlib.BRACE
+                        | wcmatch.pathlib.DOTGLOB
+                    ),
+                )
+            )
+        ]
+    else:
+        out = [
+            git_item
+            for git_item in out
+            for pattern in yaml_patterns
+            if wcmatch.pathlib.Path(git_item).match(
+                pattern,
+                flags=(
+                    wcmatch.pathlib.GLOBSTAR
+                    | wcmatch.pathlib.BRACE
+                    | wcmatch.pathlib.DOTGLOB
+                ),
+            )
         ]
 
     return OrderedDict.fromkeys(sorted(out))
