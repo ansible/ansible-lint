@@ -18,9 +18,10 @@ class IgnoreErrorsRule(AnsibleLintRule):
         'Use failed_when and specify error conditions instead of using ignore_errors'
     )
     description = (
-        'Instead of ignoring all errors, use ``failed_when:`` '
-        'and specify acceptable error conditions '
-        'to reduce the risk of ignoring important failures'
+        'Instead of ignoring all errors, ignore the errors only when using ``{{ ansible_check_mode }}``, '
+        'register the errors using ``register``, '
+        'or use ``failed_when:`` and specify acceptable error conditions '
+        'to reduce the risk of ignoring important failures.'
     )
     severity = 'LOW'
     tags = ['unpredictability', 'experimental']
@@ -29,8 +30,11 @@ class IgnoreErrorsRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-
-        if task.get("ignore_errors") and not task.get("register"):
+        if (
+            task.get("ignore_errors")
+            and task.get("ignore_errors") != "{{ ansible_check_mode }}"
+            and not task.get("register")
+        ):
             return True
 
         return False
@@ -53,6 +57,14 @@ if "pytest" in sys.modules:
     - name: run apt-get update
       command: apt-get update
       ignore_errors: false
+'''
+
+    IGNORE_ERRORS_CHECK_MODE = '''
+- hosts: all
+  tasks:
+    - name: run apt-get update
+      command: apt-get update
+      ignore_errors: "{{ ansible_check_mode }}"
 '''
 
     IGNORE_ERRORS_REGISTER = '''
@@ -92,6 +104,15 @@ if "pytest" in sys.modules:
     def test_ignore_errors_false(rule_runner: Any) -> None:
         """The task uses ignore_errors: false, oddly enough."""
         results = rule_runner.run_playbook(IGNORE_ERRORS_FALSE)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (IgnoreErrorsRule,), indirect=['rule_runner']
+    )
+    def test_ignore_errors_check_mode(rule_runner: Any) -> None:
+        """The task uses ignore_errors: "{{ ansible_check_mode }}"."""
+        results = rule_runner.run_playbook(IGNORE_ERRORS_CHECK_MODE)
+        print(results)
         assert len(results) == 0
 
     @pytest.mark.parametrize(
