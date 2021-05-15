@@ -73,7 +73,7 @@ from ansiblelint._internal.rules import (
 from ansiblelint.config import options
 from ansiblelint.constants import FileType
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable, get_yaml_files
+from ansiblelint.file_utils import Lintable, discover_lintables
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -802,7 +802,7 @@ def get_lintables(
             lintables.append(lintable)
     else:
 
-        for filename in get_yaml_files(options):
+        for filename in discover_lintables(options):
 
             p = Path(filename)
             # skip exclusions

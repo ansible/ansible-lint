@@ -201,8 +201,8 @@ class Lintable:
         return f"{self.name} ({self.kind})"
 
 
-def get_yaml_files(options: Namespace) -> Dict[str, Any]:
-    """Find all yaml files."""
+def discover_lintables(options: Namespace) -> Dict[str, Any]:
+    """Find all files that we know how to lint."""
     # git is preferred as it also considers .gitignore
     git_command = ['git', 'ls-files', '-z']
     _logger.info("Discovering files to lint: %s", ' '.join(git_command))
@@ -216,7 +216,7 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
     except subprocess.CalledProcessError as exc:
         if not (exc.returncode == 128 and 'fatal: not a git repository' in exc.output):
             _logger.warning(
-                "Failed to discover yaml files to lint using git: %s",
+                "Failed to discover lintable files using git: %s",
                 exc.output.rstrip('\n'),
             )
     except FileNotFoundError as exc:
@@ -224,6 +224,9 @@ def get_yaml_files(options: Namespace) -> Dict[str, Any]:
             _logger.warning("Failed to locate command: %s", exc)
 
     if out is None:
+        # TODO(ssbarnea): avoid returning only yaml/yml files but be careful
+        # to avoid accidental return of too many files, especiall as some
+        # directories like .cache, .tox may bring undesireble noise.
         out = [
             os.path.join(root, name)
             for root, dirs, files in os.walk('.')
@@ -265,7 +268,7 @@ def expand_dirs_in_lintables(lintables: Set[Lintable]) -> None:
 
     if should_expand:
         # this relies on git and we do not want to call unless needed
-        all_files = get_yaml_files(options)
+        all_files = discover_lintables(options)
 
         for item in copy.copy(lintables):
             if item.path.is_dir():
