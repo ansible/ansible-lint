@@ -19,7 +19,7 @@ repos:
     files: >-
       ^setup\.py$
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
-  rev: v3.4.0
+  rev: v4.0.1
   hooks:
   - id: end-of-file-fixer
   - id: trailing-whitespace
@@ -62,12 +62,12 @@ repos:
     # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
     - --filter-files
 - repo: https://github.com/python/black.git
-  rev: 20.8b1
+  rev: 21.5b1
   hooks:
   - id: black
     language_version: python3
 - repo: https://github.com/pycqa/flake8.git
-  rev: 3.9.0
+  rev: 3.9.2
   hooks:
   - id: flake8
     language_version: python3
@@ -88,6 +88,8 @@ repos:
     - enrich
     - flaky
     - pytest
+    # https://github.com/willmcgugan/rich/discussions/1243
+    - rich>=9.5.1,<10.2
     - ruamel.yaml
     - tenacity
     - types-PyYAML
@@ -99,11 +101,9 @@ repos:
         plugins/.*
       )$
 - repo: https://github.com/pre-commit/mirrors-pylint
-  rev: v2.6.0
+  rev: v3.0.0a3
   hooks:
   - id: pylint
-    # temporary workaround as pylint is not compatible with 3.9
-    language_version: "3.8"
     additional_dependencies:
     - ansible-base
     - docutils
@@ -113,6 +113,7 @@ repos:
     - pyyaml
     - rich
     - ruamel.yaml
-    - tenacity
     - sphinx
+    - tenacity
+    - typing_extensions
     - wcmatch
