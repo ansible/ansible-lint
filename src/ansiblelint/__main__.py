@@ -173,7 +173,7 @@ warn_list:  # or 'skip_list' to silence them completely
     return 2
 
 
-def main(argv: List[str] = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:
     """Linter CLI entry point."""
     if argv is None:
         argv = sys.argv
