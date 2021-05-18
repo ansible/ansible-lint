@@ -321,7 +321,10 @@ def _write_module_stub(
 def _update_env(varname: str, value: List[str], default: str = "") -> None:
     """Update colon based environment variable if needed. by appending."""
     if value:
-        value = [*os.environ.get(varname, default=default).split(':'), *value]
+        orig_value = os.environ.get(varname, default=default)
+        if orig_value:
+            # Prepend original or default variable content to custom content.
+            value = [*orig_value.split(':'), *value]
         value_str = ":".join(value)
         if value_str != os.environ.get(varname, ""):
             os.environ[varname] = value_str
