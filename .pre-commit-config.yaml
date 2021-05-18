@@ -88,8 +88,7 @@ repos:
     - enrich
     - flaky
     - pytest
-    # https://github.com/willmcgugan/rich/discussions/1243
-    - rich>=9.5.1,<10.2
+    - rich>=10.2.1
     - ruamel.yaml
     - tenacity
     - types-PyYAML

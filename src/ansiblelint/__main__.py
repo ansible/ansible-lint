@@ -28,7 +28,7 @@ import subprocess
 import sys
 from argparse import Namespace
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 
 from enrich.console import should_do_markup
 
@@ -192,14 +192,18 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
-    from ansiblelint.generate_docs import rules_as_rich, rules_as_rst
+    from ansiblelint.generate_docs import rules_as_rich, rules_as_rst, rules_as_str
     from ansiblelint.rules import RulesCollection
 
     rules = RulesCollection(options.rulesdirs)
 
     if options.listrules:
 
-        _rule_format_map = {'plain': str, 'rich': rules_as_rich, 'rst': rules_as_rst}
+        _rule_format_map: Dict[str, Callable[..., Any]] = {
+            'plain': rules_as_str,
+            'rich': rules_as_rich,
+            'rst': rules_as_rst,
+        }
 
         console.print(_rule_format_map[options.format](rules), highlight=False)
         return 0
