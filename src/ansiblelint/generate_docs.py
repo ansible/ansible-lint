@@ -25,6 +25,11 @@ Below you can see the list of default rules Ansible Lint use to evaluate playboo
 _logger = logging.getLogger(__name__)
 
 
+def rules_as_str(rules: RulesCollection) -> str:
+    """Return rules as string."""
+    return str(rules)
+
+
 def rules_as_rst(rules: RulesCollection) -> str:
     """Return RST documentation for a list of rules."""
     r = DOC_HEADER
