@@ -16,9 +16,9 @@ class TestLineTooLongRule(unittest.TestCase):
     collection = RulesCollection()
     collection.register(YamllintRule())
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.runner = RunFromText(self.collection)
 
-    def test_long_line(self):
+    def test_long_line(self) -> None:
         results = self.runner.run_role_tasks_main(LONG_LINE)
         self.assertEqual(1, len(results))

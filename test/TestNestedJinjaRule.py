@@ -20,9 +20,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from pathlib import Path
+
 import pytest
+from _pytest.fixtures import SubRequest
 
 from ansiblelint.file_utils import Lintable
+from ansiblelint.runner import Runner
 
 FAIL_TASK_1LN = Lintable(
     'playbook.yml',
@@ -193,7 +197,7 @@ SUCCESS_TASK_PRINT = Lintable(
 
 
 @pytest.fixture
-def _playbook_file(tmp_path, request):
+def _playbook_file(tmp_path: Path, request: SubRequest) -> None:
     if request.param is None:
         return
     for play_file in request.param:
@@ -216,7 +220,7 @@ def _playbook_file(tmp_path, request):
     indirect=['_playbook_file'],
 )
 @pytest.mark.usefixtures('_playbook_file')
-def test_including_wrong_nested_jinja(runner):
+def test_including_wrong_nested_jinja(runner: Runner) -> None:
     rule_violations = runner.run()
     assert rule_violations[0].rule.id == 'no-jinja-nesting'
 
@@ -245,6 +249,6 @@ def test_including_wrong_nested_jinja(runner):
     indirect=['_playbook_file'],
 )
 @pytest.mark.usefixtures('_playbook_file')
-def test_including_proper_nested_jinja(runner):
+def test_including_proper_nested_jinja(runner: Runner) -> None:
     rule_violations = runner.run()
     assert not rule_violations

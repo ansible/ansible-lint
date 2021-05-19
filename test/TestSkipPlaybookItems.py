@@ -1,5 +1,7 @@
 import pytest
 
+from ansiblelint.testing import RunFromText
+
 PLAYBOOK_PRE_TASKS = '''\
 - hosts: all
   tasks:
@@ -94,7 +96,9 @@ PLAYBOOK_WITH_BLOCK = '''\
         pytest.param(PLAYBOOK_WITH_BLOCK, 4, id='WITH_BLOCK'),
     ),
 )
-def test_pre_tasks(default_text_runner, playbook, length):
+def test_pre_tasks(
+    default_text_runner: RunFromText, playbook: str, length: int
+) -> None:
     # When
     results = default_text_runner.run_playbook(playbook)
 

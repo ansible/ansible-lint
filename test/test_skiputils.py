@@ -11,7 +11,7 @@ from ansiblelint.skip_utils import get_rule_skips_from_line
         ("foo # noqa bar", "bar"),
     ),
 )
-def test_get_rule_skips_from_line(line, expected):
+def test_get_rule_skips_from_line(line: str, expected: str) -> None:
     """Validate get_rule_skips_from_line."""
     x = get_rule_skips_from_line(line)
     assert x == [expected]

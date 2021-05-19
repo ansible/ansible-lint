@@ -129,27 +129,27 @@ class TestOctalPermissionsRuleWithFile(unittest.TestCase):
         400,
     ]
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.rule = OctalPermissionsRule()
         self.collection.register(self.rule)
         self.runner = RunFromText(self.collection)
 
-    def test_success(self):
+    def test_success(self) -> None:
         results = self.runner.run_playbook(SUCCESS_TASKS)
         self.assertEqual(0, len(results))
 
-    def test_fail(self):
+    def test_fail(self) -> None:
         results = self.runner.run_playbook(FAIL_TASKS)
         self.assertEqual(4, len(results))
 
-    def test_valid_modes(self):
+    def test_valid_modes(self) -> None:
         for mode in self.VALID_MODES:
             self.assertFalse(
                 self.rule.is_invalid_permission(mode),
                 msg="0o%o should be a valid mode" % mode,
             )
 
-    def test_invalid_modes(self):
+    def test_invalid_modes(self) -> None:
         for mode in self.INVALID_MODES:
             self.assertTrue(
                 self.rule.is_invalid_permission(mode),

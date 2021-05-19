@@ -9,15 +9,15 @@ from ansiblelint.runner import Runner
 class TestPackageIsNotLatestRule(unittest.TestCase):
     collection = RulesCollection()
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.collection.register(PackageIsNotLatestRule())
 
-    def test_package_not_latest_positive(self):
+    def test_package_not_latest_positive(self) -> None:
         success = 'examples/playbooks/package-check-success.yml'
         good_runner = Runner(success, rules=self.collection)
         self.assertEqual([], good_runner.run())
 
-    def test_package_not_latest_negative(self):
+    def test_package_not_latest_negative(self) -> None:
         failure = 'examples/playbooks/package-check-failure.yml'
         bad_runner = Runner(failure, rules=self.collection)
         errs = bad_runner.run()

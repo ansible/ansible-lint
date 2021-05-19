@@ -1,6 +1,10 @@
 """Test the RoleNames rule."""
 
+from pathlib import Path
+from typing import Any, Dict, List
+
 import pytest
+from _pytest.fixtures import SubRequest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.RoleNames import RoleNames
@@ -33,7 +37,7 @@ def test_rules_collection() -> RulesCollection:
     return collection
 
 
-def dict_to_files(parent_dir, file_dict):
+def dict_to_files(parent_dir: Path, file_dict: Dict[str, Any]) -> None:
     """Write a nested dict to a file and directory structure below parent_dir."""
     for file, content in file_dict.items():
         if isinstance(content, dict):
@@ -45,7 +49,7 @@ def dict_to_files(parent_dir, file_dict):
 
 
 @pytest.fixture
-def playbook_path(request, tmp_path):
+def playbook_path(request: SubRequest, tmp_path: Path) -> str:
     """Create a playbook with a role in a temporary directory."""
     playbook_text = request.param[0]
     role_name = request.param[1]
@@ -69,7 +73,9 @@ def playbook_path(request, tmp_path):
     ),
     indirect=('playbook_path',),
 )
-def test_role_name(test_rules_collection, playbook_path, messages):
+def test_role_name(
+    test_rules_collection: RulesCollection, playbook_path: str, messages: List[str]
+) -> None:
     """Lint a playbook and compare the expected messages with the actual messages."""
     runner = Runner(playbook_path, rules=test_rules_collection)
     results = runner.run()

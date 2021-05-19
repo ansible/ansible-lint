@@ -27,12 +27,12 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class TestFormatter(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.rule = AnsibleLintRule()
         self.rule.id = "TCF0001"
         self.formatter = Formatter(pathlib.Path.cwd(), display_relative_path=True)
 
-    def test_format_coloured_string(self):
+    def test_format_coloured_string(self) -> None:
         match = MatchError(
             message="message",
             linenumber=1,
@@ -42,7 +42,7 @@ class TestFormatter(unittest.TestCase):
         )
         self.formatter.format(match)
 
-    def test_unicode_format_string(self):
+    def test_unicode_format_string(self) -> None:
         match = MatchError(
             message=u'\U0001f427',
             linenumber=1,
@@ -52,11 +52,11 @@ class TestFormatter(unittest.TestCase):
         )
         self.formatter.format(match)
 
-    def test_dict_format_line(self):
+    def test_dict_format_line(self) -> None:
         match = MatchError(
             message="xyz",
             linenumber=1,
-            details={'hello': 'world'},
+            details={'hello': 'world'},  # type: ignore
             filename="filename.yml",
             rule=self.rule,
         )

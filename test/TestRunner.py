@@ -18,13 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 import os
-from typing import Set
+from typing import Any, List, Set, Type
 
 import pytest
 
 from ansiblelint import formatters
 from ansiblelint.cli import abspath
 from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 LOTS_OF_WARNINGS_PLAYBOOK = abspath(
@@ -49,7 +50,12 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath(
         ),
     ),
 )
-def test_runner(default_rules_collection, playbook, exclude, length) -> None:
+def test_runner(
+    default_rules_collection: RulesCollection,
+    playbook: str,
+    exclude: List[str],
+    length: int,
+) -> None:
     runner = Runner(playbook, rules=default_rules_collection, exclude_paths=exclude)
 
     matches = runner.run()
@@ -57,7 +63,7 @@ def test_runner(default_rules_collection, playbook, exclude, length) -> None:
     assert len(matches) == length
 
 
-def test_runner_exclude_paths(default_rules_collection) -> None:
+def test_runner_exclude_paths(default_rules_collection: RulesCollection) -> None:
     """Test that exclude paths do work."""
     runner = Runner(
         'examples/playbooks/example.yml',
@@ -69,7 +75,7 @@ def test_runner_exclude_paths(default_rules_collection) -> None:
     assert len(matches) == 0
 
 
-def test_runner_exclude_globs(default_rules_collection) -> None:
+def test_runner_exclude_globs(default_rules_collection: RulesCollection) -> None:
     """Test that globs work."""
     runner = Runner(
         'examples/playbooks/example.yml',
@@ -90,7 +96,10 @@ def test_runner_exclude_globs(default_rules_collection) -> None:
         pytest.param(formatters.Formatter, id='Formatter-colored'),
     ),
 )
-def test_runner_unicode_format(default_rules_collection, formatter_cls) -> None:
+def test_runner_unicode_format(
+    default_rules_collection: RulesCollection,
+    formatter_cls: Type[formatters.BaseFormatter[Any]],
+) -> None:
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(
         Lintable('examples/playbooks/unicode.yml', "playbook"),
@@ -103,14 +112,16 @@ def test_runner_unicode_format(default_rules_collection, formatter_cls) -> None:
 
 
 @pytest.mark.parametrize('directory_name', ('test/', os.path.abspath('test')))
-def test_runner_with_directory(default_rules_collection, directory_name) -> None:
+def test_runner_with_directory(
+    default_rules_collection: RulesCollection, directory_name: str
+) -> None:
     runner = Runner(directory_name, rules=default_rules_collection)
 
     expected = Lintable(name=directory_name, kind="role")
     assert expected in runner.lintables
 
 
-def test_files_not_scanned_twice(default_rules_collection) -> None:
+def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> None:
     checked_files: Set[Lintable] = set()
 
     filename = os.path.abspath('examples/playbooks/common-include-1.yml')

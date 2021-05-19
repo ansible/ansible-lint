@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 from pathlib import Path
+from typing import Any, Union
 
 import pytest
 
@@ -15,9 +16,11 @@ from ansiblelint.formatters import BaseFormatter
     ),
 )
 @pytest.mark.parametrize('path', ('/whatever/string', Path('/whatever/string')))
-def test_base_formatter_when_base_dir(base_dir, relative_path, path):
+def test_base_formatter_when_base_dir(
+    base_dir: Any, relative_path: bool, path: str
+) -> None:
     # Given
-    base_formatter = BaseFormatter(base_dir, relative_path)
+    base_formatter = BaseFormatter(base_dir, relative_path)  # type: ignore
 
     # When
     output_path = base_formatter._format_path(path)
@@ -36,9 +39,11 @@ def test_base_formatter_when_base_dir(base_dir, relative_path, path):
     ),
 )
 @pytest.mark.parametrize('path', ('/whatever/string', Path('/whatever/string')))
-def test_base_formatter_when_base_dir_is_given_and_relative_is_true(path, base_dir):
+def test_base_formatter_when_base_dir_is_given_and_relative_is_true(
+    path: Union[str, Path], base_dir: Union[str, Path]
+) -> None:
     # Given
-    base_formatter = BaseFormatter(base_dir, True)
+    base_formatter = BaseFormatter(base_dir, True)  # type: ignore
 
     # When
     output_path = base_formatter._format_path(path)

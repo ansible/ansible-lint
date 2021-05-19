@@ -1,6 +1,8 @@
 import pytest
+from _pytest.logging import LogCaptureFixture
 
 from ansiblelint.file_utils import Lintable
+from ansiblelint.runner import Runner
 
 PLAY_IN_THE_PLACE = Lintable(
     'playbook.yml',
@@ -82,7 +84,7 @@ PLAY_INCLUDED_RELATIVE = Lintable(
     indirect=['_play_files'],
 )
 @pytest.mark.usefixtures('_play_files')
-def test_cases_warning_message(runner, caplog):
+def test_cases_warning_message(runner: Runner, caplog: LogCaptureFixture) -> None:
     result = runner.run()
 
     assert len(result) == 1
@@ -108,7 +110,7 @@ def test_cases_warning_message(runner, caplog):
     indirect=['_play_files'],
 )
 @pytest.mark.usefixtures('_play_files')
-def test_cases_that_do_not_report(runner, caplog):
+def test_cases_that_do_not_report(runner: Runner, caplog: LogCaptureFixture) -> None:
     runner.run()
     noexist_message_count = 0
 
