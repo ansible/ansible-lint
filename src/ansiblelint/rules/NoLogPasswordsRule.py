@@ -48,6 +48,4 @@ class NoLogPasswordsRule(AnsibleLintRule):
         # No no_log and no_log: False behave the same way
         # and should return a failure (return True), so we
         # need to invert the boolean
-        return bool(
-            has_password and not convert_to_boolean(task.get('no_log', False))
-        )
+        return bool(has_password and not convert_to_boolean(task.get('no_log', False)))
