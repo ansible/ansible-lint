@@ -1,8 +1,9 @@
+# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
 from ansiblelint.rules.NoLogPasswordsRule import NoLogPasswordsRule
+from ansiblelint.runner import Runner
 
 
 class TestNoLogPasswordsRule(unittest.TestCase):
