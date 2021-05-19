@@ -94,6 +94,7 @@ per-file-ignores =
   test/TestMetaTagValid.py: PT009 D100 D101 D102
   test/TestMetaVideoLinks.py: PT009 D100 D101 D102
   test/TestNoFormattingInWhenRule.py: PT009 D100 D101 D102
+  test/TestNoLogPasswordsRule.py: PT009 D100 D101 D102
   test/TestOctalPermissions.py: PT009 D100 D101 D102
   test/TestPackageIsNotLatest.py: PT009 D100 D101 D102
   test/TestPretaskIncludePlaybook.py: D100 D103
