@@ -63,7 +63,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
         if run.returncode != 0:
             message = None
             filename = str(lintable.path)
-            linenumber = 0
+            linenumber = 1
             column = None
             tag = None
 
@@ -133,7 +133,7 @@ if "pytest" in sys.modules:
         """Validate detection of empty-playbook."""
         lintable = Lintable('examples/playbooks/empty_playbook.yml', kind='playbook')
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
-        assert result[0].linenumber == 0
+        assert result[0].linenumber == 1
         # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
         assert result[0].filename.endswith("/empty_playbook.yml")

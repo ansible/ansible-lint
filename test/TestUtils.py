@@ -315,7 +315,7 @@ def test_cli_auto_detect(capfd):
     assert "Discovering files to lint: git ls-files -z" in err
     # An expected rule match from our examples
     assert (
-        "examples/playbooks/empty_playbook.yml:0: "
+        "examples/playbooks/empty_playbook.yml:1: "
         "syntax-check Empty playbook, nothing to do" in out
     )
     # assures that our .ansible-lint exclude was effective in excluding github files
