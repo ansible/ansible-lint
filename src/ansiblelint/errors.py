@@ -26,7 +26,9 @@ class MatchError(ValueError):
     def __init__(
         self,
         message: Optional[str] = None,
-        linenumber: int = 0,
+        # most linters report use (1,1) base, including yamllint and flake8
+        # we should never report line 0 or column 0 in output.
+        linenumber: int = 1,
         column: Optional[int] = None,
         details: str = "",
         filename: Optional[Union[str, Lintable]] = None,
@@ -43,6 +45,17 @@ class MatchError(ValueError):
             )
 
         self.message = message or getattr(rule, 'shortdesc', "")
+
+        # Safety measture to ensure we do not endup with incorrect indexes
+        if linenumber == 0:
+            raise RuntimeError(
+                "MatchError called incorrectly as line numbers start with 1"
+            )
+        if column == 0:
+            raise RuntimeError(
+                "MatchError called incorrectly as column numbers start with 1"
+            )
+
         self.linenumber = linenumber
         self.column = column
         self.details = details

@@ -51,7 +51,7 @@ class AnsibleLintRule(BaseRule):
     def create_matcherror(
         self,
         message: Optional[str] = None,
-        linenumber: int = 0,
+        linenumber: int = 1,
         details: str = "",
         filename: Optional[Union[str, Lintable]] = None,
         tag: str = "",

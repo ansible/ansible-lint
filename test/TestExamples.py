@@ -22,23 +22,23 @@ def test_example(default_rules_collection):
 
 
 @pytest.mark.parametrize(
-    "filename",
+    ("filename", "line", "column"),
     (
         pytest.param(
-            'examples/playbooks/syntax-error-string.yml', id='syntax-error-string'
+            'examples/playbooks/syntax-error-string.yml', 1, 1, id='syntax-error-string'
         ),
-        pytest.param('examples/playbooks/syntax-error.yml', id='syntax-error'),
+        pytest.param('examples/playbooks/syntax-error.yml', 2, 3, id='syntax-error'),
     ),
 )
-def test_example_syntax_error(default_rules_collection, filename):
+def test_example_syntax_error(default_rules_collection, filename, line, column):
     """Validates that loading valid YAML string produce error."""
     result = Runner(filename, rules=default_rules_collection).run()
-    assert len(result) >= 1
-    passed = False
-    for match in result:
-        if match.rule.id == "syntax-check":
-            passed = True
-    assert passed, result
+    assert len(result) == 1
+    assert result[0].rule.id == "syntax-check"
+    # This also ensures that line and column numbers start at 1, so they
+    # match what editors will show (or output from other linters)
+    assert result[0].linenumber == line
+    assert result[0].column == column
 
 
 def test_example_custom_module(default_rules_collection):
