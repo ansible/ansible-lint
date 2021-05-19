@@ -314,7 +314,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     )
     # maps lists to their default config values
     lists_map = {
-        'exclude_paths': [".cache"],
+        'exclude_paths': [".cache", ".git", ".hg", ".svn", ".tox"],
         'rulesdir': [],
         'skip_list': [],
         'tags': [],
