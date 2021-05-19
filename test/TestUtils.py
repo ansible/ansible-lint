@@ -217,12 +217,14 @@ def test_expand_paths_vars(test_path, expected, monkeypatch):
     ),
     ids=('no-git-cli', 'outside-git-repo'),
 )
-def test_get_yaml_files_git_verbose(reset_env_var, message_prefix, monkeypatch, caplog):
+def test_discover_lintables_git_verbose(
+    reset_env_var, message_prefix, monkeypatch, caplog
+):
     """Ensure that autodiscovery lookup failures are logged."""
     options = cli.get_config(['-v'])
     initialize_logger(options.verbosity)
     monkeypatch.setenv(reset_env_var, '')
-    file_utils.get_yaml_files(options)
+    file_utils.discover_lintables(options)
 
     expected_info = (
         "ansiblelint",
@@ -239,7 +241,7 @@ def test_get_yaml_files_git_verbose(reset_env_var, message_prefix, monkeypatch, 
     (True, False),
     ids=('in Git', 'outside Git'),
 )
-def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
+def test_discover_lintables_silent(is_in_git, monkeypatch, capsys):
     """Verify that no stderr output is displayed while discovering yaml files.
 
     (when the verbosity is off, regardless of the Git or Git-repo presence)
@@ -257,7 +259,7 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     )
 
     monkeypatch.chdir(str(lint_path))
-    files = file_utils.get_yaml_files(options)
+    files = file_utils.discover_lintables(options)
     stderr = capsys.readouterr().err
     assert not stderr, 'No stderr output is expected when the verbosity is off'
     assert (
@@ -267,14 +269,14 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     )
 
 
-def test_get_yaml_files_umlaut(monkeypatch):
-    """Verify that filenames containing German umlauts are not garbled by the get_yaml_files."""
+def test_discover_lintables_umlaut(monkeypatch):
+    """Verify that filenames containing German umlauts are not garbled by the discover_lintables."""
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
     lint_path = test_dir / '..' / 'examples' / 'playbooks'
 
     monkeypatch.chdir(str(lint_path))
-    files = file_utils.get_yaml_files(options)
+    files = file_utils.discover_lintables(options)
     assert '"with-umlaut-\\303\\244.yml"' not in files
     assert 'with-umlaut-ä.yml' in files
 
@@ -376,18 +378,19 @@ def test_default_kinds(monkeypatch, path: str, kind: FileType) -> None:
     options = cli.get_config([])
 
     def mockreturn(options):
-        return [path]
+        return {path: kind}
 
     # assert Lintable is able to determine file type
     lintable_detected = Lintable(path)
     lintable_expected = Lintable(path, kind=kind)
     assert lintable_detected == lintable_expected
 
-    monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
-    result = utils.get_lintables(options)
+    monkeypatch.setattr(utils, 'discover_lintables', mockreturn)
+    result = utils.discover_lintables(options)
     # get_lintable could return additional files and we only care to see
     # that the given file is among the returned list.
-    assert lintable_expected in result
+    assert lintable_detected.name in result
+    assert lintable_detected.kind == result[lintable_expected.name]
 
 
 def test_auto_detect_exclude(monkeypatch):
@@ -397,7 +400,7 @@ def test_auto_detect_exclude(monkeypatch):
     def mockreturn(options):
         return ['foo/playbook.yml', 'bar/playbook.yml']
 
-    monkeypatch.setattr(utils, 'get_yaml_files', mockreturn)
+    monkeypatch.setattr(utils, 'discover_lintables', mockreturn)
     result = utils.get_lintables(options)
     assert result == [Lintable('bar/playbook.yml', kind='playbook')]
 
