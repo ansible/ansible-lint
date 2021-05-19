@@ -70,7 +70,7 @@ if "pytest" in sys.modules:
     NO_LOG_UNUSED = '''
 - hosts: all
   tasks:
-    - name: Fail no_log isn't used
+    - name: Fail when no_log is not used
       user:
         name: bidule
         password: "wow"
@@ -134,7 +134,7 @@ if "pytest" in sys.modules:
     PASSWORD_LOCK_YES = '''
 - hosts: all
   tasks:
-    - name: Suceed when only password locking account
+    - name: Succeed when only password locking account
       user:
         name: lint
         password_lock: yes
@@ -143,7 +143,7 @@ if "pytest" in sys.modules:
     PASSWORD_LOCK_FALSE = '''
 - hosts: all
   tasks:
-    - name: Suceed when password_lock is false and password is not used
+    - name: Succeed when password_lock is false and password is not used
       user:
         name: lint
         password_lock: False
@@ -153,7 +153,7 @@ if "pytest" in sys.modules:
         'rule_runner', (NoLogPasswordsRule,), indirect=['rule_runner']
     )
     def test_no_log_unused(rule_runner: Any) -> None:
-        """The task doesnt use no_log."""
+        """The task does not use no_log."""
         results = rule_runner.run_playbook(NO_LOG_UNUSED)
         assert len(results) == 1
 
@@ -209,6 +209,6 @@ if "pytest" in sys.modules:
         'rule_runner', (NoLogPasswordsRule,), indirect=['rule_runner']
     )
     def test_password_lock_false(rule_runner: Any) -> None:
-        """The task doesn't actually lock the user."""
+        """The task does not actually lock the user."""
         results = rule_runner.run_playbook(PASSWORD_LOCK_FALSE)
         assert len(results) == 0
