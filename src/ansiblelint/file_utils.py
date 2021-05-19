@@ -11,7 +11,9 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union
 
+# import wcmatch
 import wcmatch.pathlib
+from wcmatch.wcmatch import RECURSIVE, WcMatch
 
 from ansiblelint.config import BASE_KINDS, options
 from ansiblelint.constants import FileType
@@ -205,14 +207,13 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     """Find all files that we know how to lint."""
     # git is preferred as it also considers .gitignore
     git_command = ['git', 'ls-files', '-z']
-    _logger.info("Discovering files to lint: %s", ' '.join(git_command))
-
     out = None
 
     try:
         out = subprocess.check_output(
             git_command, stderr=subprocess.STDOUT, universal_newlines=True
         ).split("\x00")[:-1]
+        _logger.info("Discovered files to lint using: %s", ' '.join(git_command))
     except subprocess.CalledProcessError as exc:
         if not (exc.returncode == 128 and 'fatal: not a git repository' in exc.output):
             _logger.warning(
@@ -224,15 +225,9 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
             _logger.warning("Failed to locate command: %s", exc)
 
     if out is None:
-        # TODO(ssbarnea): avoid returning only yaml/yml files but be careful
-        # to avoid accidental return of too many files, especiall as some
-        # directories like .cache, .tox may bring undesireble noise.
-        out = [
-            os.path.join(root, name)
-            for root, dirs, files in os.walk('.')
-            for name in files
-            if name.endswith('.yaml') or name.endswith('.yml')
-        ]
+        exclude_pattern = "|".join(options.exclude_paths)
+        _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
+        out = WcMatch('.', exclude_pattern=exclude_pattern, flags=RECURSIVE).match()
 
     return OrderedDict.fromkeys(sorted(out))
 

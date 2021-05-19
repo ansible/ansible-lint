@@ -212,27 +212,23 @@ def test_expand_paths_vars(test_path, expected, monkeypatch):
 @pytest.mark.parametrize(
     ('reset_env_var', 'message_prefix'),
     (
+        # simulate absence of git command
         ('PATH', "Failed to locate command: "),
-        ('GIT_DIR', "Discovering files to lint: "),
+        # simulate a missing git repo
+        ('GIT_DIR', "Looking up for files"),
     ),
     ids=('no-git-cli', 'outside-git-repo'),
 )
 def test_discover_lintables_git_verbose(
-    reset_env_var, message_prefix, monkeypatch, caplog
-):
+    reset_env_var: str, message_prefix: str, monkeypatch, caplog
+) -> None:
     """Ensure that autodiscovery lookup failures are logged."""
     options = cli.get_config(['-v'])
     initialize_logger(options.verbosity)
     monkeypatch.setenv(reset_env_var, '')
     file_utils.discover_lintables(options)
 
-    expected_info = (
-        "ansiblelint",
-        logging.INFO,
-        'Discovering files to lint: git ls-files -z',
-    )
-
-    assert expected_info in caplog.record_tuples
+    assert any(m[2].startswith("Looking up for files") for m in caplog.record_tuples)
     assert any(m.startswith(message_prefix) for m in caplog.messages)
 
 
@@ -314,7 +310,7 @@ def test_cli_auto_detect(capfd):
     out, err = capfd.readouterr()
 
     # Confirmation that it runs in auto-detect mode
-    assert "Discovering files to lint: git ls-files -z" in err
+    assert "Discovered files to lint using: git ls-files -z" in err
     # An expected rule match from our examples
     assert (
         "examples/playbooks/empty_playbook.yml:1: "
