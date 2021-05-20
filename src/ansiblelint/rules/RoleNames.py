@@ -49,7 +49,7 @@ class RoleNames(AnsibleLintRule):
     )
     severity = 'HIGH'
     done: List[str] = []  # already noticed roles list
-    tags = ['deprecations']
+    tags = ['deprecations', 'metadata']
     version_added = 'v4.3.0'
 
     def __init__(self) -> None:
