@@ -59,6 +59,7 @@ BASE_KINDS = [
 
 
 options = Namespace(
+    cache_dir=".cache",
     colored=True,
     configured=False,
     cwd=".",

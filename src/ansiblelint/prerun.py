@@ -111,7 +111,7 @@ def install_requirements(requirement: str) -> None:
         "role",
         "install",
         "--roles-path",
-        f"{options.project_dir}/.cache/roles",
+        f"{options.cache_dir}/roles",
         "-vr",
         f"{requirement}",
     ]
@@ -136,7 +136,7 @@ def install_requirements(requirement: str) -> None:
             "collection",
             "install",
             "-p",
-            f"{options.project_dir}/.cache/collections",
+            f"{options.cache_dir}/collections",
             "-vr",
             f"{requirement}",
         ]
@@ -245,13 +245,16 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
             fqrn = f"{role_namespace}{role_name}"
         else:
             fqrn = pathlib.Path(".").absolute().name
-    p = pathlib.Path(f"{options.project_dir}/.cache/roles")
+    p = pathlib.Path(f"{options.cache_dir}/roles")
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / fqrn
     # despite documentation stating that is_file() reports true for symlinks,
     # it appears that is_dir() reports true instead, so we rely on exits().
-    if not link_path.exists():
-        link_path.symlink_to(pathlib.Path("../..", target_is_directory=True))
+    target = pathlib.Path(options.project_dir).absolute()
+    if not link_path.exists() or os.readlink(link_path) != target:
+        if link_path.exists():
+            link_path.unlink()
+        link_path.symlink_to(target, target_is_directory=True)
     _logger.info(
         "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
         link_path,
@@ -265,10 +268,10 @@ def _prepare_ansible_paths() -> None:
 
     for path_list, path in (
         (library_paths, "plugins/modules"),
-        (library_paths, f"{options.project_dir}/.cache/modules"),
-        (collection_list, f"{options.project_dir}/.cache/collections"),
+        (library_paths, f"{options.cache_dir}/modules"),
+        (collection_list, f"{options.cache_dir}/collections"),
         (roles_path, "roles"),
-        (roles_path, f"{options.project_dir}/.cache/roles"),
+        (roles_path, f"{options.cache_dir}/roles"),
     ):
         if path not in path_list and os.path.exists(path):
             path_list.append(path)
@@ -283,14 +286,14 @@ def _make_module_stub(module_name: str) -> None:
     if re.match(r"^(\w+|\w+\.\w+\.[\.\w]+)$", module_name):
         parts = module_name.split(".")
         if len(parts) < 3:
-            path = f"{options.project_dir}/.cache/modules"
-            module_file = f"{options.project_dir}/.cache/modules/{module_name}.py"
+            path = f"{options.cache_dir}/modules"
+            module_file = f"{options.cache_dir}/modules/{module_name}.py"
             namespace = None
             collection = None
         else:
             namespace = parts[0]
             collection = parts[1]
-            path = f"{ options.project_dir }/.cache/collections/ansible_collections/{ namespace }/{ collection }/plugins/modules/{ '/'.join(parts[2:-1]) }"
+            path = f"{ options.cache_dir }/collections/ansible_collections/{ namespace }/{ collection }/plugins/modules/{ '/'.join(parts[2:-1]) }"
             module_file = f"{path}/{parts[-1]}.py"
         os.makedirs(path, exist_ok=True)
         _write_module_stub(
@@ -336,9 +339,9 @@ def _perform_mockings() -> None:
     for role_name in options.mock_roles:
         if re.match(r"\w+\.\w+\.\w+$", role_name):
             namespace, collection, role_dir = role_name.split(".")
-            path = f".cache/collections/ansible_collections/{ namespace }/{ collection }/roles/{ role_dir }/"
+            path = f"{options.cache_dir}/collections/ansible_collections/{ namespace }/{ collection }/roles/{ role_dir }/"
         else:
-            path = f".cache/roles/{role_name}"
+            path = f"{options.cache_dir}/roles/{role_name}"
         os.makedirs(path, exist_ok=True)
 
     if options.mock_modules:
@@ -357,9 +360,12 @@ def _perform_mockings() -> None:
     if not namespace or not collection:
         return
     p = pathlib.Path(
-        f"{options.project_dir}/.cache/collections/ansible_collections/{ namespace }"
+        f"{options.cache_dir}/collections/ansible_collections/{ namespace }"
     )
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / collection
-    if not link_path.exists():
-        link_path.symlink_to(pathlib.Path("../../../..", target_is_directory=True))
+    target = pathlib.Path(options.project_dir).absolute()
+    if not link_path.exists() or os.readlink(link_path) != target:
+        if link_path.exists():
+            link_path.unlink()
+        link_path.symlink_to(target, target_is_directory=True)
