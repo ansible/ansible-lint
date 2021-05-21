@@ -109,7 +109,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         return mode is None
 
 
-if "pytest" in sys.modules:
+if "pytest" in sys.modules:  # noqa: C901
     import pytest
 
     SUCCESS_PERMISSIONS_PRESENT = '''
