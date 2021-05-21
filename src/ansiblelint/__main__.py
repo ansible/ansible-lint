@@ -21,6 +21,7 @@
 """Command line implementation."""
 
 import errno
+import hashlib
 import logging
 import os
 import pathlib
@@ -107,6 +108,14 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     options.warn_list = [normalize_tag(tag) for tag in options.warn_list]
 
     options.configured = True
+    # 6 chars of entropy should be enough
+    cache_key = hashlib.sha256(
+        os.path.abspath(options.project_dir).encode()
+    ).hexdigest()[:6]
+    options.cache_dir = "%s/ansible-lint/%s" % (
+        os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache")),
+        cache_key,
+    )
 
 
 def report_outcome(
@@ -258,7 +267,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 @contextmanager
 def _previous_revision() -> Iterator[None]:
     """Create or update a temporary workdir containing the previous revision."""
-    worktree_dir = ".cache/old-rev"
+    worktree_dir = f"{options.cache_dir}/old-rev"
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD^1"],
         check=True,
