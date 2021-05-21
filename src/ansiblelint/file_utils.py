@@ -225,7 +225,7 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
             _logger.warning("Failed to locate command: %s", exc)
 
     if out is None:
-        exclude_pattern = "|".join(options.exclude_paths)
+        exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
         _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
         out = WcMatch('.', exclude_pattern=exclude_pattern, flags=RECURSIVE).match()
 
