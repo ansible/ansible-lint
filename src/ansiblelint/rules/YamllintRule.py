@@ -28,6 +28,8 @@ except ImportError:
 YAMLLINT_CONFIG = """
 extends: default
 rules:
+  # https://github.com/adrienverge/yamllint/issues/384
+  comments-indentation: false
   document-start: disable
   # 160 chars was the default used by old E204 rule, but
   # you can easily change it or disable in your .yamllint file.
