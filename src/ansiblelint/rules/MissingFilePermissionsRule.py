@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 """MissingFilePermissionsRule used with ansible-lint."""
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Set, Union
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -34,6 +34,33 @@ _modules_with_preserve = (
     'copy',
     'template',
 )
+
+_MODULES: Set[str] = {
+    'archive',
+    'community.general.archive',
+    'assemble',
+    'ansible.builtin.assemble',
+    'copy',  # supports preserve
+    'ansible.builtin.copy',
+    'file',
+    'ansible.builtin.file',
+    'replace',  # implicit preserve behavior but mode: preserve is invalid
+    'ansible.builtin.replace',
+    'template',  # supports preserve
+    'ansible.builtin.template',
+    # 'unarchive',  # disabled because .tar.gz files can have permissions inside
+}
+
+_MODULES_WITH_CREATE: Dict[str, bool] = {
+    'blockinfile': False,
+    'ansible.builtin.blockinfile': False,
+    'htpasswd': True,
+    'community.general.htpasswd': True,
+    'ini_file': True,
+    'community.general.ini_file': True,
+    'lineinfile': False,
+    'ansible.builtin.lineinfile': False,
+}
 
 
 class MissingFilePermissionsRule(AnsibleLintRule):
@@ -51,22 +78,8 @@ class MissingFilePermissionsRule(AnsibleLintRule):
     tags = ['unpredictability', 'experimental']
     version_added = 'v4.3.0'
 
-    _modules = {
-        'archive',
-        'assemble',
-        'copy',  # supports preserve
-        'file',
-        'replace',  # implicit preserve behavior but mode: preserve is invalid
-        'template',  # supports preserve
-        # 'unarchive',  # disabled because .tar.gz files can have permissions inside
-    }
-
-    _modules_with_create = {
-        'blockinfile': False,
-        'htpasswd': True,
-        'ini_file': True,
-        'lineinfile': False,
-    }
+    _modules = _MODULES
+    _modules_with_create = _MODULES_WITH_CREATE
 
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
@@ -173,6 +186,15 @@ if "pytest" in sys.modules:  # noqa: C901
       file:
         state: directory
         recurse: yes
+    - name: permissions not missing and numeric (fqcn)
+      ansible.builtin.file:
+        path: bar
+        mode: 755
+    - name: file edit when create is false (fqcn)
+      ansible.builtin.lineinfile:
+        path: foo
+        create: false
+        line: some content here
 '''
 
     FAIL_PRESERVE_MODE = '''
@@ -219,6 +241,14 @@ if "pytest" in sys.modules:  # noqa: C901
       replace:
         path: foo
         mode: preserve
+    - name: permissions are missing (fqcn)
+      ansible.builtin.file:
+        path: bar
+    - name: lineinfile when create is true (fqcn)
+      ansible.builtin.lineinfile:
+        path: foo
+        create: true
+        line: some content here
 '''
 
     FAIL_PERMISSION_COMMENT = '''
@@ -346,7 +376,7 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_fail_replace_preserve(rule_runner: Any) -> None:
         """Replace does not allow preserve mode."""
         results = rule_runner.run_playbook(FAIL_REPLACE_PRESERVE)
-        assert len(results) == 1
+        assert len(results) == 3
 
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
