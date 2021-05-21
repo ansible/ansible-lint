@@ -138,6 +138,7 @@ if "pytest" in sys.modules:
       user:
         name: lint
         password_lock: yes
+        # user_password: "this is a comment, not a password"
 '''
 
     PASSWORD_LOCK_FALSE = '''
