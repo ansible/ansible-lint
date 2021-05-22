@@ -22,6 +22,7 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, Set, Union
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.testing import RunFromText
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -285,7 +286,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_success_permissions_present(rule_runner: Any) -> None:
+    def test_success_permissions_present(rule_runner: RunFromText) -> None:
         """Permissions present and numeric."""
         results = rule_runner.run_playbook(SUCCESS_PERMISSIONS_PRESENT)
         assert len(results) == 0
@@ -293,7 +294,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_success_absent_state(rule_runner: Any) -> None:
+    def test_success_absent_state(rule_runner: RunFromText) -> None:
         """No permissions required if file is absent."""
         results = rule_runner.run_playbook(SUCCESS_ABSENT_STATE)
         assert len(results) == 0
@@ -301,7 +302,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_success_default_state(rule_runner: Any) -> None:
+    def test_success_default_state(rule_runner: RunFromText) -> None:
         """No permissions required if default state."""
         results = rule_runner.run_playbook(SUCCESS_DEFAULT_STATE)
         assert len(results) == 0
@@ -309,7 +310,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_success_link_state(rule_runner: Any) -> None:
+    def test_success_link_state(rule_runner: RunFromText) -> None:
         """No permissions required if it is a link."""
         results = rule_runner.run_playbook(SUCCESS_LINK_STATE)
         assert len(results) == 0
@@ -317,7 +318,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_success_create_false(rule_runner: Any) -> None:
+    def test_success_create_false(rule_runner: RunFromText) -> None:
         """No permissions required if file is not created."""
         results = rule_runner.run_playbook(SUCCESS_CREATE_FALSE)
         assert len(results) == 0
@@ -325,7 +326,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_success_replace(rule_runner: Any) -> None:
+    def test_success_replace(rule_runner: RunFromText) -> None:
         """Replacing a file do not require mode."""
         results = rule_runner.run_playbook(SUCCESS_REPLACE)
         assert len(results) == 0
@@ -333,7 +334,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_success_recurse(rule_runner: Any) -> None:
+    def test_success_recurse(rule_runner: RunFromText) -> None:
         """Do not require mode when recursing."""
         results = rule_runner.run_playbook(SUCCESS_RECURSE)
         assert len(results) == 0
@@ -341,7 +342,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_fail_preserve_mode(rule_runner: Any) -> None:
+    def test_fail_preserve_mode(rule_runner: RunFromText) -> None:
         """File does not allow preserve value for mode."""
         results = rule_runner.run_playbook(FAIL_PRESERVE_MODE)
         assert len(results) == 1
@@ -349,7 +350,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_fail_missing_permissions_touch(rule_runner: Any) -> None:
+    def test_fail_missing_permissions_touch(rule_runner: RunFromText) -> None:
         """Missing permissions when possibly creating file."""
         results = rule_runner.run_playbook(FAIL_MISSING_PERMISSIONS_TOUCH)
         assert len(results) == 1
@@ -357,7 +358,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_fail_missing_permissions_directory(rule_runner: Any) -> None:
+    def test_fail_missing_permissions_directory(rule_runner: RunFromText) -> None:
         """Missing permissions when possibly creating a directory."""
         results = rule_runner.run_playbook(FAIL_MISSING_PERMISSIONS_DIRECTORY)
         assert len(results) == 1
@@ -365,7 +366,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_fail_lineinfile_create(rule_runner: Any) -> None:
+    def test_fail_lineinfile_create(rule_runner: RunFromText) -> None:
         """Lineinfile might create a file."""
         results = rule_runner.run_playbook(FAIL_LINEINFILE_CREATE)
         assert len(results) == 1
@@ -373,7 +374,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_fail_replace_preserve(rule_runner: Any) -> None:
+    def test_fail_replace_preserve(rule_runner: RunFromText) -> None:
         """Replace does not allow preserve mode."""
         results = rule_runner.run_playbook(FAIL_REPLACE_PRESERVE)
         assert len(results) == 3
@@ -381,7 +382,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_fail_permission_comment(rule_runner: Any) -> None:
+    def test_fail_permission_comment(rule_runner: RunFromText) -> None:
         """Permissions is only a comment."""
         results = rule_runner.run_playbook(FAIL_PERMISSION_COMMENT)
         assert len(results) == 1
@@ -389,7 +390,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_fail_ini_permission(rule_runner: Any) -> None:
+    def test_fail_ini_permission(rule_runner: RunFromText) -> None:
         """Permissions needed if create is used."""
         results = rule_runner.run_playbook(FAIL_INI_PERMISSION)
         assert len(results) == 1
@@ -397,7 +398,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
     )
-    def test_fail_ini_preserve(rule_runner: Any) -> None:
+    def test_fail_ini_preserve(rule_runner: RunFromText) -> None:
         """The ini_file module does not accept preserve mode."""
         results = rule_runner.run_playbook(FAIL_INI_PRESERVE)
         assert len(results) == 1
