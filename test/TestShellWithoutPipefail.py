@@ -82,13 +82,13 @@ class TestShellWithoutPipeFail(unittest.TestCase):
     collection = RulesCollection()
     collection.register(ShellWithoutPipefail())
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.runner = RunFromText(self.collection)
 
-    def test_fail(self):
+    def test_fail(self) -> None:
         results = self.runner.run_playbook(FAIL_TASKS)
         self.assertEqual(3, len(results))
 
-    def test_success(self):
+    def test_success(self) -> None:
         results = self.runner.run_playbook(SUCCESS_TASKS)
         self.assertEqual(0, len(results))

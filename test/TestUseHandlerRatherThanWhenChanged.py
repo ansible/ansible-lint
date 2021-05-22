@@ -76,13 +76,13 @@ class TestUseHandlerRatherThanWhenChanged(unittest.TestCase):
     collection = RulesCollection()
     collection.register(UseHandlerRatherThanWhenChangedRule())
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.runner = RunFromText(self.collection)
 
-    def test_success(self):
+    def test_success(self) -> None:
         results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
         self.assertEqual(0, len(results))
 
-    def test_fail(self):
+    def test_fail(self) -> None:
         results = self.runner.run_role_tasks_main(FAIL_TASKS)
         self.assertEqual(5, len(results))

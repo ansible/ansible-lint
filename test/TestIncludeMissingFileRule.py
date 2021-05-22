@@ -1,6 +1,7 @@
 import pytest
 
 from ansiblelint.file_utils import Lintable
+from ansiblelint.runner import Runner
 
 PLAY_INCLUDING_PLAIN = Lintable(
     'playbook.yml',
@@ -56,7 +57,7 @@ PLAY_HAVING_TASK = Lintable(
     indirect=['_play_files'],
 )
 @pytest.mark.usefixtures('_play_files')
-def test_include_file_missing(runner):
+def test_include_file_missing(runner: Runner) -> None:
     results = str(runner.run())
     assert 'referenced files must exist' in results
     assert 'playbook.yml' in results
@@ -74,6 +75,6 @@ def test_include_file_missing(runner):
     indirect=['_play_files'],
 )
 @pytest.mark.usefixtures('_play_files')
-def test_cases_that_do_not_report(runner):
+def test_cases_that_do_not_report(runner: Runner) -> None:
     results = str(runner.run())
     assert 'referenced missing file in' not in results

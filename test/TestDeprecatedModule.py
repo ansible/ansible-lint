@@ -16,10 +16,10 @@ class TestDeprecatedModuleRule(unittest.TestCase):
     collection = RulesCollection()
     collection.register(DeprecatedModuleRule())
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.runner = RunFromText(self.collection)
 
-    def test_module_deprecated(self):
+    def test_module_deprecated(self) -> None:
         results = self.runner.run_role_tasks_main(MODULE_DEPRECATED)
         self.assertEqual(1, len(results))
         # based on version and blend of ansible being used, we may

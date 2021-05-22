@@ -1,5 +1,10 @@
-import pytest
+from pathlib import Path
+from typing import List
 
+import pytest
+from _pytest.fixtures import SubRequest
+
+from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 ROLE_TASKS_MAIN = '''
@@ -44,7 +49,7 @@ PLAY_INCLUDE_ROLE_INLINE = '''
 
 
 @pytest.fixture
-def playbook_path(request, tmp_path):
+def playbook_path(request: SubRequest, tmp_path: Path) -> str:
     playbook_text = request.param
     role_tasks_dir = tmp_path / 'test-role' / 'tasks'
     role_tasks_dir.mkdir(parents=True)
@@ -81,7 +86,9 @@ def playbook_path(request, tmp_path):
     ),
     indirect=('playbook_path',),
 )
-def test_import_role2(default_rules_collection, playbook_path, messages):
+def test_import_role2(
+    default_rules_collection: RulesCollection, playbook_path: str, messages: List[str]
+) -> None:
     runner = Runner(playbook_path, rules=default_rules_collection)
     results = runner.run()
     for message in messages:

@@ -1,11 +1,14 @@
 """Testing file path evaluation when using import_tasks / include_tasks."""
 import textwrap
+from pathlib import Path
+from typing import Dict
 
 import pytest
 
+from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
-LAYOUT_IMPORTS = {
+LAYOUT_IMPORTS: Dict[str, str] = {
     'main.yml': textwrap.dedent(
         """\
         ---
@@ -48,7 +51,7 @@ LAYOUT_IMPORTS = {
     ),
 }
 
-LAYOUT_INCLUDES = {
+LAYOUT_INCLUDES: Dict[str, str] = {
     'main.yml': textwrap.dedent(
         """\
         ---
@@ -103,8 +106,10 @@ LAYOUT_INCLUDES = {
     reason='https://github.com/ansible-community/ansible-lint/issues/1446'
 )
 def test_file_path_evaluation(
-    tmp_path, default_rules_collection, ansible_project_layout
-):
+    tmp_path: Path,
+    default_rules_collection: RulesCollection,
+    ansible_project_layout: Dict[str, str],
+) -> None:
     """Test file path evaluation when using import_tasks / include_tasks in the project.
 
     Usage of import_tasks / include_tasks may introduce false positive load-failure due

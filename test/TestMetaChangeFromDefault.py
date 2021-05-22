@@ -18,10 +18,10 @@ class TestMetaChangeFromDefault(unittest.TestCase):
     collection = RulesCollection()
     collection.register(MetaChangeFromDefaultRule())
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.runner = RunFromText(self.collection)
 
-    def test_default_galaxy_info(self):
+    def test_default_galaxy_info(self) -> None:
         results = self.runner.run_role_meta_main(DEFAULT_GALAXY_INFO)
         self.assertIn("Should change default metadata: author", str(results))
         self.assertIn("Should change default metadata: description", str(results))

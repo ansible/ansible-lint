@@ -1,21 +1,24 @@
 """Assure samples produced desire outcomes."""
 import os
+from typing import Generator
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 
+from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.testing import run_ansible_lint
 
 
 @pytest.fixture
-def _change_into_examples_dir(request):
+def _change_into_examples_dir(request: FixtureRequest) -> Generator[None, None, None]:
     os.chdir('examples')
     yield
     os.chdir('..')
 
 
 @pytest.mark.usefixtures('_change_into_examples_dir')
-def test_example(default_rules_collection):
+def test_example(default_rules_collection: RulesCollection) -> None:
     """example.yml is expected to have 16 match errors inside."""
     result = Runner('playbooks/example.yml', rules=default_rules_collection).run()
     assert len(result) == 16
@@ -30,7 +33,9 @@ def test_example(default_rules_collection):
         pytest.param('examples/playbooks/syntax-error.yml', 2, 3, id='syntax-error'),
     ),
 )
-def test_example_syntax_error(default_rules_collection, filename, line, column):
+def test_example_syntax_error(
+    default_rules_collection: RulesCollection, filename: str, line: int, column: int
+) -> None:
     """Validates that loading valid YAML string produce error."""
     result = Runner(filename, rules=default_rules_collection).run()
     assert len(result) == 1
@@ -41,7 +46,7 @@ def test_example_syntax_error(default_rules_collection, filename, line, column):
     assert result[0].column == column
 
 
-def test_example_custom_module(default_rules_collection):
+def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
     result = Runner(
         'examples/playbooks/custom_module.yml', rules=default_rules_collection
@@ -49,7 +54,7 @@ def test_example_custom_module(default_rules_collection):
     assert len(result) == 0
 
 
-def test_full_vault(default_rules_collection):
+def test_full_vault(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
     result = Runner(
         'examples/playbooks/vars/not_decryptable.yml', rules=default_rules_collection
@@ -57,7 +62,7 @@ def test_full_vault(default_rules_collection):
     assert len(result) == 0
 
 
-def test_custom_kinds():
+def test_custom_kinds() -> None:
     """Check if user defined kinds are used."""
     result = run_ansible_lint('-vv', '--offline', 'examples/other/')
     assert result.returncode == 0

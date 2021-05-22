@@ -9,15 +9,15 @@ from ansiblelint.runner import Runner
 class TestBecomeUserWithoutBecome(unittest.TestCase):
     collection = RulesCollection()
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.collection.register(BecomeUserWithoutBecomeRule())
 
-    def test_file_positive(self):
+    def test_file_positive(self) -> None:
         success = 'examples/playbooks/become-user-without-become-success.yml'
         good_runner = Runner(success, rules=self.collection)
         self.assertEqual([], good_runner.run())
 
-    def test_file_negative(self):
+    def test_file_negative(self) -> None:
         failure = 'examples/playbooks/become-user-without-become-failure.yml'
         bad_runner = Runner(failure, rules=self.collection)
         errs = bad_runner.run()

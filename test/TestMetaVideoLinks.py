@@ -22,10 +22,10 @@ class TestMetaVideoLinks(unittest.TestCase):
     collection = RulesCollection()
     collection.register(MetaVideoLinksRule())
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.runner = RunFromText(self.collection)
 
-    def test_video_links(self):
+    def test_video_links(self) -> None:
         results = self.runner.run_role_meta_main(META_VIDEO_LINKS)
         self.assertIn("Expected item in 'video_links' to be a dictionary", str(results))
         self.assertIn(

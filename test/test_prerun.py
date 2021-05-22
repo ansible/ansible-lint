@@ -1,7 +1,9 @@
 """Tests related to prerun part of the linter."""
 import os
+from typing import List
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from flaky import flaky
 
 from ansiblelint import prerun
@@ -39,7 +41,7 @@ def test_prerun_reqs_v2() -> None:
     assert result.returncode == 0, result
 
 
-def test__update_env_no_old_value_no_default_no_value(monkeypatch):
+def test__update_env_no_old_value_no_default_no_value(monkeypatch: MonkeyPatch) -> None:
     """Make sure empty value does not touch environment."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
 
@@ -48,7 +50,7 @@ def test__update_env_no_old_value_no_default_no_value(monkeypatch):
     assert "DUMMY_VAR" not in os.environ
 
 
-def test__update_env_no_old_value_no_value(monkeypatch):
+def test__update_env_no_old_value_no_value(monkeypatch: MonkeyPatch) -> None:
     """Make sure empty value does not touch environment."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
 
@@ -57,7 +59,7 @@ def test__update_env_no_old_value_no_value(monkeypatch):
     assert "DUMMY_VAR" not in os.environ
 
 
-def test__update_env_no_default_no_value(monkeypatch):
+def test__update_env_no_default_no_value(monkeypatch: MonkeyPatch) -> None:
     """Make sure empty value does not touch environment."""
     monkeypatch.setenv("DUMMY_VAR", "a:b")
 
@@ -74,7 +76,9 @@ def test__update_env_no_default_no_value(monkeypatch):
         (["a", "b", "c"], "a:b:c"),
     ),
 )
-def test__update_env_no_old_value_no_default(monkeypatch, value, result):
+def test__update_env_no_old_value_no_default(
+    monkeypatch: MonkeyPatch, value: List[str], result: str
+) -> None:
     """Values are concatenated using : as the separator."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
 
@@ -90,7 +94,9 @@ def test__update_env_no_old_value_no_default(monkeypatch, value, result):
         ("a:b", ["c:d"], "a:b:c:d"),
     ),
 )
-def test__update_env_no_old_value(monkeypatch, default, value, result):
+def test__update_env_no_old_value(
+    monkeypatch: MonkeyPatch, default: str, value: List[str], result: str
+) -> None:
     """Values are appended to default value."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
 
@@ -106,7 +112,9 @@ def test__update_env_no_old_value(monkeypatch, default, value, result):
         ("a:b", ["c:d"], "a:b:c:d"),
     ),
 )
-def test__update_env_no_default(monkeypatch, old_value, value, result):
+def test__update_env_no_default(
+    monkeypatch: MonkeyPatch, old_value: str, value: List[str], result: str
+) -> None:
     """Values are appended to preexisting value."""
     monkeypatch.setenv("DUMMY_VAR", old_value)
 
@@ -124,7 +132,13 @@ def test__update_env_no_default(monkeypatch, old_value, value, result):
         ("a", "c", ["e:f"], "a:e:f"),
     ),
 )
-def test__update_env(monkeypatch, old_value, default, value, result):
+def test__update_env(
+    monkeypatch: MonkeyPatch,
+    old_value: str,
+    default: str,
+    value: List[str],
+    result: str,
+) -> None:
     """Defaults are ignored when preexisting value is present."""
     monkeypatch.setenv("DUMMY_VAR", old_value)
 

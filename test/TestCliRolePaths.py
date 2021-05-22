@@ -2,6 +2,7 @@
 import os
 import unittest
 from pathlib import Path
+from typing import Dict
 
 import pytest
 
@@ -10,12 +11,12 @@ from ansiblelint.text import strip_ansi_escape
 
 
 class TestCliRolePaths(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.local_test_dir = os.path.realpath(
             os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "examples")
         )
 
-    def test_run_single_role_path_no_trailing_slash_module(self):
+    def test_run_single_role_path_no_trailing_slash_module(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/test-role'
 
@@ -24,7 +25,7 @@ class TestCliRolePaths(unittest.TestCase):
             'Use shell only when shell functionality is required', result.stdout
         )
 
-    def test_run_single_role_path_no_trailing_slash_script(self):
+    def test_run_single_role_path_no_trailing_slash_script(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/test-role'
 
@@ -33,7 +34,7 @@ class TestCliRolePaths(unittest.TestCase):
             'Use shell only when shell functionality is required', result.stdout
         )
 
-    def test_run_single_role_path_with_trailing_slash(self):
+    def test_run_single_role_path_with_trailing_slash(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/test-role/'
 
@@ -42,7 +43,7 @@ class TestCliRolePaths(unittest.TestCase):
             'Use shell only when shell functionality is required', result.stdout
         )
 
-    def test_run_multiple_role_path_no_trailing_slash(self):
+    def test_run_multiple_role_path_no_trailing_slash(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/test-role'
 
@@ -51,7 +52,7 @@ class TestCliRolePaths(unittest.TestCase):
             'Use shell only when shell functionality is required', result.stdout
         )
 
-    def test_run_multiple_role_path_with_trailing_slash(self):
+    def test_run_multiple_role_path_with_trailing_slash(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/test-role/'
 
@@ -60,7 +61,7 @@ class TestCliRolePaths(unittest.TestCase):
             'Use shell only when shell functionality is required', result.stdout
         )
 
-    def test_run_inside_role_dir(self):
+    def test_run_inside_role_dir(self) -> None:
         cwd = os.path.join(self.local_test_dir, 'roles/test-role/')
         role_path = '.'
 
@@ -69,7 +70,7 @@ class TestCliRolePaths(unittest.TestCase):
             'Use shell only when shell functionality is required', result.stdout
         )
 
-    def test_run_role_three_dir_deep(self):
+    def test_run_role_three_dir_deep(self) -> None:
         cwd = self.local_test_dir
         role_path = 'testproject/roles/test-role'
 
@@ -78,7 +79,7 @@ class TestCliRolePaths(unittest.TestCase):
             'Use shell only when shell functionality is required', result.stdout
         )
 
-    def test_run_playbook(self):
+    def test_run_playbook(self) -> None:
         """Call ansible-lint the way molecule does."""
         cwd = os.path.abspath(os.path.join(self.local_test_dir, 'roles/test-role'))
         lintable = 'molecule/default/include-import-role.yml'
@@ -92,7 +93,7 @@ class TestCliRolePaths(unittest.TestCase):
             'Use shell only when shell functionality is required', result.stdout
         )
 
-    def test_run_role_name_invalid(self):
+    def test_run_role_name_invalid(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/invalid-name'
 
@@ -101,7 +102,7 @@ class TestCliRolePaths(unittest.TestCase):
             result.stdout
         )
 
-    def test_run_role_name_with_prefix(self):
+    def test_run_role_name_with_prefix(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/ansible-role-foo'
 
@@ -113,7 +114,7 @@ class TestCliRolePaths(unittest.TestCase):
         )
         assert result.returncode == 0
 
-    def test_run_role_name_from_meta(self):
+    def test_run_role_name_from_meta(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/valid-due-to-meta'
 
@@ -125,7 +126,7 @@ class TestCliRolePaths(unittest.TestCase):
         )
         assert result.returncode == 0
 
-    def test_run_invalid_role_name_from_meta(self):
+    def test_run_invalid_role_name_from_meta(self) -> None:
         cwd = self.local_test_dir
         role_path = 'roles/invalid_due_to_meta'
 
@@ -135,7 +136,7 @@ class TestCliRolePaths(unittest.TestCase):
             in strip_ansi_escape(result.stdout)
         )
 
-    def test_run_single_role_path_with_roles_path_env(self):
+    def test_run_single_role_path_with_roles_path_env(self) -> None:
         """Test for role name collision with ANSIBLE_ROLES_PATH.
 
         Test if ansible-lint chooses the role in the current directory when the role
@@ -158,7 +159,7 @@ class TestCliRolePaths(unittest.TestCase):
     ((True, {"GITHUB_ACTIONS": "true", "GITHUB_WORKFLOW": "foo"}), (False, None)),
     ids=("on", "off"),
 )
-def test_run_playbook_github(result, env):
+def test_run_playbook_github(result: bool, env: Dict[str, str]) -> None:
     """Call ansible-lint simulating GitHub Actions environment."""
     cwd = str(Path(__file__).parent.parent.resolve())
     role_path = 'examples/playbooks/example.yml'

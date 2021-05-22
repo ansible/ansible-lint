@@ -1,6 +1,7 @@
 """Tests for MatchError."""
 
 import operator
+from typing import Any, Callable
 
 import pytest
 
@@ -12,15 +13,15 @@ from ansiblelint.rules.CommandHasChangesCheckRule import CommandHasChangesCheckR
 class DummyTestObject:
     """A dummy object for equality tests."""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a dummy object representation for parmetrize."""
         return '{self.__class__.__name__}()'.format(self=self)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Report the equality check failure with any object."""
         return False
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """Report the confirmation of inequality with any object."""
         return True
 
@@ -28,21 +29,21 @@ class DummyTestObject:
 class DummySentinelTestObject:
     """A dummy object for equality protocol tests with sentinel."""
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Return sentinel as result of equality check w/ anything."""
-        return 'EQ_SENTINEL'
+        return 'EQ_SENTINEL'  # type: ignore
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """Return sentinel as result of inequality check w/ anything."""
-        return 'NE_SENTINEL'
+        return 'NE_SENTINEL'  # type: ignore
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         """Return sentinel as result of less than check w/ anything."""
-        return 'LT_SENTINEL'
+        return 'LT_SENTINEL'  # type: ignore
 
-    def __gt__(self, other):
+    def __gt__(self, other: object) -> bool:
         """Return sentinel as result of greater than chk w/ anything."""
-        return 'GT_SENTINEL'
+        return 'GT_SENTINEL'  # type: ignore
 
 
 @pytest.mark.parametrize(
@@ -52,12 +53,14 @@ class DummySentinelTestObject:
         (MatchError("a", details="foo"), MatchError("a", details="foo")),
     ),
 )
-def test_matcherror_compare(left_match_error, right_match_error):
+def test_matcherror_compare(
+    left_match_error: MatchError, right_match_error: MatchError
+) -> None:
     """Check that MatchError instances with similar attrs are equivalent."""
     assert left_match_error == right_match_error
 
 
-def test_matcherror_invalid():
+def test_matcherror_invalid() -> None:
     """Ensure that MatchError requires message or rule."""
     expected_err = (
         r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
@@ -86,15 +89,21 @@ def test_matcherror_invalid():
     ),
 )
 class TestMatchErrorCompare:
-    def test_match_error_less_than(self, left_match_error, right_match_error):
+    def test_match_error_less_than(
+        self, left_match_error: MatchError, right_match_error: MatchError
+    ) -> None:
         """Check 'less than' protocol implementation in MatchError."""
         assert right_match_error < left_match_error
 
-    def test_match_error_greater_than(self, left_match_error, right_match_error):
+    def test_match_error_greater_than(
+        self, left_match_error: MatchError, right_match_error: MatchError
+    ) -> None:
         """Check 'greater than' protocol implementation in MatchError."""
         assert left_match_error > right_match_error
 
-    def test_match_error_not_equal(self, left_match_error, right_match_error):
+    def test_match_error_not_equal(
+        self, left_match_error: MatchError, right_match_error: MatchError
+    ) -> None:
         """Check 'not equals' protocol implementation in MatchError."""
         assert left_match_error != right_match_error
 
@@ -116,7 +125,9 @@ class TestMatchErrorCompare:
         pytest.param(operator.gt, '>', id='>'),
     ),
 )
-def test_matcherror_compare_no_other_fallback(other, operation, operator_char):
+def test_matcherror_compare_no_other_fallback(
+    other: Any, operation: Callable[..., bool], operator_char: str
+) -> None:
     """Check that MatchError comparison with other types causes TypeError."""
     expected_error = (
         r'^('
@@ -150,10 +161,10 @@ def test_matcherror_compare_no_other_fallback(other, operation, operator_char):
     ids=('==', '!='),
 )
 def test_matcherror_compare_with_other_fallback(
-    other,
-    operation,
-    expected_value,
-):
+    other: object,
+    operation: Callable[..., bool],
+    expected_value: bool,
+) -> None:
     """Check that MatchError comparison runs other types fallbacks."""
     assert operation(MatchError("foo"), other) is expected_value
 
@@ -172,7 +183,9 @@ def test_matcherror_compare_with_other_fallback(
     ),
     ids=('==', '!=', '<', '>'),
 )
-def test_matcherror_compare_with_dummy_sentinel(operation, expected_value):
+def test_matcherror_compare_with_dummy_sentinel(
+    operation: Callable[..., bool], expected_value: str
+) -> None:
     """Check that MatchError comparison runs other types fallbacks."""
     dummy_obj = DummySentinelTestObject()
     # NOTE: This assertion abuses the CPython property to cache short string

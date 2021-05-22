@@ -96,7 +96,7 @@ repos:
     - yamllint
     exclude: >
       (?x)^(
-        test/.*|
+        test/local-content/.*|
         plugins/.*
       )$
 - repo: https://github.com/pre-commit/mirrors-pylint

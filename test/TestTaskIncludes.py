@@ -1,6 +1,7 @@
 import pytest
 
 from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 
@@ -30,7 +31,12 @@ from ansiblelint.runner import Runner
         ),
     ),
 )
-def test_included_tasks(default_rules_collection, filename, file_count, match_count):
+def test_included_tasks(
+    default_rules_collection: RulesCollection,
+    filename: str,
+    file_count: int,
+    match_count: int,
+) -> None:
     """Check if number of loaded files is correct."""
     lintable = Lintable(filename)
     runner = Runner(lintable, rules=default_rules_collection)

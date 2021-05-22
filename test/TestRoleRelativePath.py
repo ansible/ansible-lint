@@ -41,13 +41,13 @@ class TestRoleRelativePath(unittest.TestCase):
     collection = RulesCollection()
     collection.register(RoleRelativePath())
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.runner = RunFromText(self.collection)
 
-    def test_fail(self):
+    def test_fail(self) -> None:
         results = self.runner.run_role_tasks_main(FAIL_TASKS)
         self.assertEqual(2, len(results))
 
-    def test_success(self):
+    def test_success(self) -> None:
         results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
         self.assertEqual(0, len(results))
