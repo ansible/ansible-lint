@@ -6,6 +6,7 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.testing import RunFromText
 from ansiblelint.utils import nested_items
 
 if TYPE_CHECKING:
@@ -76,7 +77,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (ComparisonToEmptyStringRule,), indirect=['rule_runner']
     )
-    def test_rule_empty_string_compare_fail(rule_runner: Any) -> None:
+    def test_rule_empty_string_compare_fail(rule_runner: RunFromText) -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(FAIL_PLAY)
         assert len(results) == 2
@@ -86,7 +87,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (ComparisonToEmptyStringRule,), indirect=['rule_runner']
     )
-    def test_rule_empty_string_compare_pass(rule_runner: Any) -> None:
+    def test_rule_empty_string_compare_pass(rule_runner: RunFromText) -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(SUCCESS_PLAY)
         assert len(results) == 0, results

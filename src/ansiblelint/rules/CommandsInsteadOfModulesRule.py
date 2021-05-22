@@ -103,6 +103,8 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
+    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
+
     APT_GET = '''
 - hosts: all
   tasks:
@@ -155,7 +157,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
     )
-    def test_apt_get(rule_runner: Any) -> None:
+    def test_apt_get(rule_runner: RunFromText) -> None:
         """The apt module supports update."""
         results = rule_runner.run_playbook(APT_GET)
         assert len(results) == 1
@@ -163,7 +165,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
     )
-    def test_restart_sshd(rule_runner: Any) -> None:
+    def test_restart_sshd(rule_runner: RunFromText) -> None:
         """Restarting services is supported by the systemd module."""
         results = rule_runner.run_playbook(RESTART_SSHD)
         assert len(results) == 1
@@ -171,7 +173,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
     )
-    def test_git_log(rule_runner: Any) -> None:
+    def test_git_log(rule_runner: RunFromText) -> None:
         """The git log command is not supported by the git module."""
         results = rule_runner.run_playbook(GIT_LOG)
         assert len(results) == 0
@@ -179,7 +181,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
     )
-    def test_git_branch(rule_runner: Any) -> None:
+    def test_git_branch(rule_runner: RunFromText) -> None:
         """The git branch command is not supported by the git module."""
         results = rule_runner.run_playbook(GIT_BRANCH)
         assert len(results) == 0
@@ -187,7 +189,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
     )
-    def test_systemd_status(rule_runner: Any) -> None:
+    def test_systemd_status(rule_runner: RunFromText) -> None:
         """Set-default is not supported by the systemd module."""
         results = rule_runner.run_playbook(SYSTEMCTL_STATUS)
         assert len(results) == 0
@@ -195,7 +197,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
     )
-    def test_systemd_environment(rule_runner: Any) -> None:
+    def test_systemd_environment(rule_runner: RunFromText) -> None:
         """Showing the environment is not supported by the systemd module."""
         results = rule_runner.run_playbook(SYSTEMD_ENVIRONMENT)
         assert len(results) == 0
@@ -203,7 +205,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
     )
-    def test_systemd_runlevel(rule_runner: Any) -> None:
+    def test_systemd_runlevel(rule_runner: RunFromText) -> None:
         """Set-default is not supported by the systemd module."""
         results = rule_runner.run_playbook(SYSTEMD_RUNLEVEL)
         assert len(results) == 0

@@ -140,10 +140,12 @@ if "pytest" in sys.modules:
 
     import pytest
 
+    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
+
     @pytest.mark.parametrize(
         'rule_runner', (VariableNamingRule,), indirect=['rule_runner']
     )
-    def test_invalid_var_name_playbook(rule_runner: Any) -> None:
+    def test_invalid_var_name_playbook(rule_runner: RunFromText) -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(FAIL_PLAY)
         assert len(results) == 2
