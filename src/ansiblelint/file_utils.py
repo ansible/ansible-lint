@@ -227,7 +227,9 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     if out is None:
         exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
         _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
-        out = WcMatch('.', exclude_pattern=exclude_pattern, flags=RECURSIVE).match()
+        out = WcMatch(
+            '.', exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
+        ).match()
 
     return OrderedDict.fromkeys(sorted(out))
 
