@@ -103,7 +103,7 @@ class AnsibleLintRule(BaseRule):
         if (
             not self.matchtask
             or file.kind not in ['handlers', 'tasks', 'playbook']
-            or file.base_kind != 'text/yaml'
+            or str(file.base_kind) != 'text/yaml'
         ):
             return matches
 
@@ -143,7 +143,7 @@ class AnsibleLintRule(BaseRule):
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
         matches: List[MatchError] = []
-        if not self.matchplay or file.base_kind != 'text/yaml':
+        if not self.matchplay or str(file.base_kind) != 'text/yaml':
             return matches
 
         yaml = ansiblelint.utils.parse_yaml_linenumbers(file)

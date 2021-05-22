@@ -189,6 +189,6 @@ def test_matcherror_compare_with_dummy_sentinel(
     """Check that MatchError comparison runs other types fallbacks."""
     dummy_obj = DummySentinelTestObject()
     # NOTE: This assertion abuses the CPython property to cache short string
-    # NOTE: objects because the identity check is more presice and we don't
+    # NOTE: objects because the identity check is more precise and we don't
     # NOTE: want extra operator protocol methods to influence the test.
-    assert operation(MatchError("foo"), dummy_obj) is expected_value
+    assert operation(MatchError("foo"), dummy_obj) is expected_value  # type: ignore
