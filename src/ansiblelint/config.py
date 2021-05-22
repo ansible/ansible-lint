@@ -98,7 +98,10 @@ collection_list: List[str] = []
 
 def get_rule_config(rule_id: str) -> Dict[str, Any]:
     """Get configurations for the rule ``rule_id``."""
-    return options.rules.get(rule_id, dict())
+    rule_config = options.rules.get(rule_id, dict())
+    if not isinstance(rule_config, dict):
+        raise RuntimeError("Invalid rule config for %s: %s" % (rule_id, rule_config))
+    return rule_config
 
 
 @lru_cache()

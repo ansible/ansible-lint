@@ -400,8 +400,8 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
     lintable_expected = Lintable(path, kind=kind)
     assert lintable_detected == lintable_expected
 
-    monkeypatch.setattr(utils, 'discover_lintables', mockreturn)
-    result = utils.discover_lintables(options)
+    monkeypatch.setattr(file_utils, 'discover_lintables', mockreturn)
+    result = file_utils.discover_lintables(options)
     # get_lintable could return additional files and we only care to see
     # that the given file is among the returned list.
     assert lintable_detected.name in result

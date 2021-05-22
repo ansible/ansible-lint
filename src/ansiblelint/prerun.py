@@ -185,6 +185,8 @@ def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
         role_namespace = ""
     else:
         role_namespace = f"{role_namespace}."
+    if not isinstance(role_namespace, str):
+        raise RuntimeError("Role namespace must be string, not %s" % role_namespace)
     return role_namespace
 
 
@@ -251,7 +253,7 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
     # despite documentation stating that is_file() reports true for symlinks,
     # it appears that is_dir() reports true instead, so we rely on exits().
     target = pathlib.Path(options.project_dir).absolute()
-    if not link_path.exists() or os.readlink(link_path) != target:
+    if not link_path.exists() or os.readlink(link_path) != str(target):
         if link_path.exists():
             link_path.unlink()
         link_path.symlink_to(target, target_is_directory=True)

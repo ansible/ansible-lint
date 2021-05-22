@@ -117,7 +117,7 @@ class VariableNamingRule(AnsibleLintRule):
         results: List["MatchError"] = []
         meta_data: Dict[str, Any] = {}
 
-        if file.kind == "vars":
+        if str(file.kind) == "vars":
             meta_data = parse_yaml_from_file(str(file.path))
             for key in meta_data.keys():
                 if self.is_invalid_variable_name(key):

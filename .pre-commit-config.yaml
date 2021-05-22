@@ -81,7 +81,7 @@ repos:
   hooks:
   - id: mypy
     # empty args needed in order to match mypy cli behavior
-    args: []
+    args: ["--strict"]
     additional_dependencies:
     - ansible-base
     - Sphinx>=3.1.2

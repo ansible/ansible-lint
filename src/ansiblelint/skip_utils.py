@@ -24,7 +24,8 @@ from functools import lru_cache
 from itertools import product
 from typing import TYPE_CHECKING, Any, Generator, List, Optional, Sequence
 
-import ruamel.yaml
+# Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
+from ruamel.yaml import YAML  # type: ignore
 
 from ansiblelint.config import used_old_tags
 from ansiblelint.constants import RENAMED_TAGS
@@ -86,7 +87,7 @@ def load_data(file_text: str) -> Any:
     :param file_text: raw text to parse
     :return: Parsed yaml
     """
-    yaml = ruamel.yaml.YAML()
+    yaml = YAML()
     return yaml.load(file_text)
 
 
