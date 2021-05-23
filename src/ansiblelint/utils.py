@@ -74,6 +74,7 @@ from ansiblelint.config import options
 from ansiblelint.constants import FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
+from ansiblelint.text import removeprefix
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -527,7 +528,7 @@ def _sanitize_task(task: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
-    """Ensure tasks have an action key and strings are converted to python objects."""
+    """Ensure tasks have a normalized action key and strings are converted to python objects."""
     result = dict()
 
     sanitized_task = _sanitize_task(task)
@@ -556,6 +557,13 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
             continue
         result[k] = v
 
+    if not isinstance(action, str):
+        raise RuntimeError("Task actions can only be strings, got %s" % action)
+    # convert builtin fqn calls to short forms because most rules know only
+    # about short calls but in the future we may switch the normalization to do
+    # the opposite. Mainly we currently consider normalized the module listing
+    # used by `ansible-doc -t module -l 2>/dev/null`
+    action = removeprefix(action, "ansible.builtin.")
     result['action'] = dict(__ansible_module__=action)
 
     if '_raw_params' in arguments:
