@@ -18,15 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+"""UseHandlerRatherThanWhenChangedRule used with ansible-lint."""
 import sys
-from typing import Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from ansiblelint.file_utils import Lintable
 
 
 def _changed_in_when(item: str) -> bool:
-    if not isinstance(item, str):
+    item_list = item.split()
+
+    if not isinstance(item, str) or 'and' in item_list:
         return False
     return any(
         changed in item
@@ -54,7 +61,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     version_added = 'historic'
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
         if task["__ansible_action_type__"] != 'task':
             return False
@@ -69,23 +76,81 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         return False
 
 
-if 'pytest' in sys.modules:
+if "pytest" in sys.modules:
+    import pytest
 
-    from ansiblelint.rules import RulesCollection
-    from ansiblelint.runner import Runner
+    SUCCEED_CHANGED_WHEN = '''
+- hosts: all
+  tasks:
+    - name: execute something
+      command: echo 123
+      register: result
+      changed_when: true
+'''
 
-    def test_rule_no_handler() -> None:
-        """Verify rule."""
-        collection = RulesCollection()
-        collection.register(UseHandlerRatherThanWhenChangedRule())
+    SUCCEED_WHEN_AND = '''
+- hosts: all
+  tasks:
+    - name: registering task 1
+      command: echo Hello
+      register: r1
+      changed_when: true
 
-        lintable = Lintable('examples/playbooks/rule-no-handler.yml')
-        results = Runner(lintable, rules=collection).run()
+    - name: registering task 2
+      command: echo Hello
+      register: r2
+      changed_when: true
 
-        assert len(results) == 3
-        assert results[0].filename == 'examples/playbooks/roles/a-role/tasks/main.yml'
-        assert results[0].linenumber == 3
-        assert results[1].filename == 'examples/playbooks/rule-no-handler.yml'
-        assert results[1].linenumber == 14
-        assert results[2].filename == 'examples/playbooks/rule-no-handler.yml'
-        assert results[2].linenumber == 18
+    - name: when task
+      command: echo Hello
+      when: r1.changed and r2.changed
+'''
+
+    FAIL_RESULT_IS_CHANGED = '''
+- hosts: all
+  tasks:
+    - name: this should trigger no-handler rule
+      command: echo could be done better
+      when: result is changed
+'''
+
+    FAILED_SOMETHING_CHANGED = '''
+- hosts: all
+  tasks:
+    - name: do anything
+      command: echo 123
+      when:
+        - something.changed
+'''
+
+    @pytest.mark.parametrize(
+        'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']
+    )
+    def test_succeed_changed_when(rule_runner: Any) -> None:
+        """Using changed_when is acceptable."""
+        results = rule_runner.run_playbook(SUCCEED_CHANGED_WHEN)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']
+    )
+    def test_succeed_when_and(rule_runner: Any) -> None:
+        """See https://github.com/ansible-community/ansible-lint/issues/1526."""
+        results = rule_runner.run_playbook(SUCCEED_WHEN_AND)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']
+    )
+    def test_fail_result_is_changed(rule_runner: Any) -> None:
+        """This task uses 'is changed'."""
+        results = rule_runner.run_playbook(FAIL_RESULT_IS_CHANGED)
+        assert len(results) == 1
+
+    @pytest.mark.parametrize(
+        'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']
+    )
+    def test_failed_something_changed(rule_runner: Any) -> None:
+        """This task uses '.changed'."""
+        results = rule_runner.run_playbook(FAILED_SOMETHING_CHANGED)
+        assert len(results) == 1
