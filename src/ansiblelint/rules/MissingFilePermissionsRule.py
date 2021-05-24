@@ -214,6 +214,10 @@ if "pytest" in sys.modules:  # noqa: C901
       file:
         path: foo
         state: touch
+    - name: permissions missing and might create file (fqcn)
+      ansible.builtin.file:
+        path: foo
+        state: touch
 '''
 
     FAIL_MISSING_PERMISSIONS_DIRECTORY = '''
@@ -223,6 +227,11 @@ if "pytest" in sys.modules:  # noqa: C901
       file:
         path: foo
         state: directory
+    - name: lineinfile when create is true (fqcn)
+      ansible.builtin.lineinfile:
+        path: foo
+        create: true
+        line: some content here
 '''
 
     FAIL_LINEINFILE_CREATE = '''
@@ -242,14 +251,6 @@ if "pytest" in sys.modules:  # noqa: C901
       replace:
         path: foo
         mode: preserve
-    - name: permissions are missing (fqcn)
-      ansible.builtin.file:
-        path: bar
-    - name: lineinfile when create is true (fqcn)
-      ansible.builtin.lineinfile:
-        path: foo
-        create: true
-        line: some content here
 '''
 
     FAIL_PERMISSION_COMMENT = '''
@@ -353,7 +354,7 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_fail_missing_permissions_touch(rule_runner: RunFromText) -> None:
         """Missing permissions when possibly creating file."""
         results = rule_runner.run_playbook(FAIL_MISSING_PERMISSIONS_TOUCH)
-        assert len(results) == 1
+        assert len(results) == 2
 
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
@@ -361,7 +362,7 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_fail_missing_permissions_directory(rule_runner: RunFromText) -> None:
         """Missing permissions when possibly creating a directory."""
         results = rule_runner.run_playbook(FAIL_MISSING_PERMISSIONS_DIRECTORY)
-        assert len(results) == 1
+        assert len(results) == 2
 
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
@@ -377,7 +378,7 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_fail_replace_preserve(rule_runner: RunFromText) -> None:
         """Replace does not allow preserve mode."""
         results = rule_runner.run_playbook(FAIL_REPLACE_PRESERVE)
-        assert len(results) == 3
+        assert len(results) == 1
 
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']
