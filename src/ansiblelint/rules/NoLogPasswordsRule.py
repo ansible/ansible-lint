@@ -59,10 +59,15 @@ class NoLogPasswordsRule(AnsibleLintRule):
             else:
                 has_password = False
 
+        has_loop = [key for key in task if key.startswith("with_") or key == 'loop']
         # No no_log and no_log: False behave the same way
         # and should return a failure (return True), so we
         # need to invert the boolean
-        return bool(has_password and not convert_to_boolean(task.get('no_log', False)))
+        return bool(
+            has_password
+            and not convert_to_boolean(task.get('no_log', False))
+            and len(has_loop) > 0
+        )
 
 
 if "pytest" in sys.modules:
@@ -71,7 +76,7 @@ if "pytest" in sys.modules:
     NO_LOG_UNUSED = '''
 - hosts: all
   tasks:
-    - name: Fail when no_log is not used
+    - name: Succeed when no_log is not used but no loop present
       user:
         name: bidule
         password: "wow"
@@ -84,8 +89,11 @@ if "pytest" in sys.modules:
     - name: Fail when no_log is set to False
       user:
         name: bidule
-        user_password: "wow"
+        user_password: "{{ item }}"
         state: absent
+      with_items:
+        - wow
+        - now
       no_log: False
 '''
 
@@ -95,9 +103,12 @@ if "pytest" in sys.modules:
     - name: Fail when no_log is set to no
       user:
         name: bidule
-        password: "wow"
+        password: "{{ item }}"
         state: absent
       no_log: no
+      loop:
+        - wow
+        - now
 '''
 
     PASSWORD_WITH_LOCK = '''
@@ -105,18 +116,26 @@ if "pytest" in sys.modules:
   tasks:
     - name: Fail when password is set and password_lock is true
       user:
-        name: lint
+        name: "{{ item }}"
         password: "wow"
         password_lock: true
+      with_random_choice:
+        - ansible
+        - lint
 '''
 
     NO_LOG_YES = '''
 - hosts: all
   tasks:
     - name: Succeed when no_log is set to yes
+      with_list:
+        - name: user
+          password: wow
+        - password: now
+          name: ansible
       user:
-        name: bidule
-        password: "wow"
+        name: "{{ item.name }}"
+        password: "{{ item.password }}"
         state: absent
       no_log: yes
 '''
@@ -127,9 +146,12 @@ if "pytest" in sys.modules:
     - name: Succeed when no_log is set to True
       user:
         name: bidule
-        user_password: "wow"
+        user_password: "{{ item }}"
         state: absent
       no_log: True
+      loop:
+        - wow
+        - now
 '''
 
     PASSWORD_LOCK_YES = '''
@@ -137,9 +159,12 @@ if "pytest" in sys.modules:
   tasks:
     - name: Succeed when only password locking account
       user:
-        name: lint
+        name: "{{ item }}"
         password_lock: yes
         # user_password: "this is a comment, not a password"
+        with_list:
+          - ansible
+          - lint
 '''
 
     PASSWORD_LOCK_FALSE = '''
@@ -155,9 +180,9 @@ if "pytest" in sys.modules:
         'rule_runner', (NoLogPasswordsRule,), indirect=['rule_runner']
     )
     def test_no_log_unused(rule_runner: RunFromText) -> None:
-        """The task does not use no_log."""
+        """The task does not use no_log but also no loop."""
         results = rule_runner.run_playbook(NO_LOG_UNUSED)
-        assert len(results) == 1
+        assert len(results) == 0
 
     @pytest.mark.parametrize(
         'rule_runner', (NoLogPasswordsRule,), indirect=['rule_runner']
