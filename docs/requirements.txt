@@ -5,11 +5,11 @@
 #    pip-compile --no-annotate --output-file=docs/requirements.txt docs/requirements.in setup.py
 #
 alabaster==0.7.12
-ansible-base==2.10.8
-attrs==20.3.0
+ansible-base==2.10.10
+attrs==21.2.0
 babel==2.9.1
 bracex==2.1.1
-certifi==2020.12.5
+certifi==2021.5.30
 cffi==1.14.5
 chardet==4.0.0
 colorama==0.4.4
@@ -19,40 +19,38 @@ docutils==0.16
 enrich==1.2.6
 idna==2.10
 imagesize==1.2.0
-jinja2==2.11.3
-markdown-it-py==0.6.2
-markupsafe==1.1.1
-mdit-py-plugins==0.2.6
-myst-parser==0.13.7
+jinja2==3.0.1
+markdown-it-py==1.1.0
+markupsafe==2.0.1
+mdit-py-plugins==0.2.8
+myst-parser==0.14.0
 packaging==20.9
 pathspec==0.8.1
 pipdeptree==2.0.0
 pycparser==2.20
-pygments==2.8.1
+pygments==2.9.0
 pyparsing==2.4.7
 pytz==2021.1
 pyyaml==5.4.1
 requests==2.25.1
-rich==10.1.0
+rich==10.2.2
 ruamel.yaml.clib==0.2.2
-ruamel.yaml==0.17.4 ; python_version >= "3.7"
-six==1.15.0
+ruamel.yaml==0.17.7 ; python_version >= "3.7"
+six==1.16.0
 snowballstemmer==2.1.0
-sphinx-ansible-theme==0.3.2
-sphinx-notfound-page==0.6
+sphinx-ansible-theme==0.5.0
 sphinx-rtd-theme==0.5.2
 sphinx==3.5.4
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
-sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-htmlhelp==2.0.0
 sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-programoutput2==2.0a1
 sphinxcontrib-qthelp==1.0.3
-sphinxcontrib-serializinghtml==1.1.4
+sphinxcontrib-serializinghtml==1.1.5
 tenacity==7.0.0
-typing-extensions==3.10.0.0
-urllib3==1.26.4
-wcmatch==8.1.2
+urllib3==1.26.5
+wcmatch==8.2
 yamllint==1.26.1
 
 # The following packages are considered to be unsafe in a requirements file:
