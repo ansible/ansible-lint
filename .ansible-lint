@@ -50,7 +50,7 @@ enable_list:
 warn_list:
   - skip_this_tag
   - git-latest
-  - experimetal  # experimental is included in the implicit list
+  - experimental  # experimental is included in the implicit list
   # - role-name
 
 # Offline mode disables installation of requirements.yml
