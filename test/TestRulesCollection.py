@@ -144,4 +144,4 @@ def test_rules_id_format() -> None:
         assert rule_id_re.match(
             rule.id
         ), f"R rule id {rule.id} did not match our required format."
-    assert len(rules) == 41
+    assert len(rules) == 40
