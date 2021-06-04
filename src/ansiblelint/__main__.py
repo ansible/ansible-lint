@@ -118,7 +118,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     )
 
 
-def report_outcome(
+def report_outcome(  # noqa: C901
     result: "LintResult", options: Namespace, mark_as_success: bool = False
 ) -> int:
     """Display information about how to skip found rules.
@@ -127,10 +127,7 @@ def report_outcome(
     """
     failures = 0
     warnings = 0
-    msg = """\
-# .ansible-lint
-warn_list:  # or 'skip_list' to silence them completely
-"""
+    msg = ""
     matches_unignored = [match for match in result.matches if not match.ignored]
 
     # counting
@@ -141,6 +138,11 @@ warn_list:  # or 'skip_list' to silence them completely
         else:
             warnings += 1
 
+    # remove unskippable rules from the list
+    for rule_id in list(matched_rules.keys()):
+        if 'unskippable' in matched_rules[rule_id].tags:
+            matched_rules.pop(rule_id)
+
     entries = []
     for key in sorted(matched_rules.keys()):
         if {key, *matched_rules[key].tags}.isdisjoint(options.warn_list):
@@ -149,7 +151,16 @@ warn_list:  # or 'skip_list' to silence them completely
         if "experimental" in match.rule.tags:
             entries.append("  - experimental  # all rules tagged as experimental\n")
             break
-    msg += "".join(sorted(entries))
+    if entries:
+        console_stderr.print(
+            "You can skip specific rules or tags by adding them to your "
+            "configuration file:"
+        )
+        msg += """\
+# .ansible-lint
+warn_list:  # or 'skip_list' to silence them completely
+"""
+        msg += "".join(sorted(entries))
 
     # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
     # to migrate old tags to new tags. There are a lot of things out there that still
@@ -167,10 +178,6 @@ warn_list:  # or 'skip_list' to silence them completely
     #     )
 
     if result.matches and not options.quiet:
-        console_stderr.print(
-            "You can skip specific rules or tags by adding them to your "
-            "configuration file:"
-        )
         console_stderr.print(render_yaml(msg))
         console_stderr.print(
             f"Finished with {failures} failure(s), {warnings} warning(s) "

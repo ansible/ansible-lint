@@ -13,6 +13,18 @@ from ansiblelint.logger import timed_info
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import strip_ansi_escape
 
+DESCRIPTION = """\
+Running ``ansible-playbook --syntax-check ...`` failed.
+
+This error **cannot be disabled** due to being a prerequisite for other steps.
+You can either exclude these files from linting or better assure they can be
+loaded by Ansible. This is often achieved by editing inventory file and/or
+``ansible.cfg`` so ansible can load required variables.
+
+If undefined variables are the failure reason you could use jinja default()
+filter in order to provide fallback values.
+"""
+
 _ansible_syntax_check_re = re.compile(
     r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in "
     r"'(?P<filename>.*)': line (?P<line>\d+), column (?P<column>\d+)",
@@ -29,9 +41,9 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
 
     id = "syntax-check"
     shortdesc = "Ansible syntax check failed"
-    description = "Running ansible-playbook --syntax-check ... reported an error."
+    description = DESCRIPTION
     severity = "VERY_HIGH"
-    tags = ["core"]
+    tags = ["core", "unskippable"]
     version_added = "v5.0.0"
 
     @staticmethod
