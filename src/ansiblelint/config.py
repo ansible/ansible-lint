@@ -120,12 +120,14 @@ def ansible_collections_path() -> str:
 
 def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
     """Parse output of 'ansible --version'."""
+    # Ansible can produce extra output before displaying version in debug mode.
+
     # ansible-core 2.11+: 'ansible [core 2.11.3]'
-    match = re.match(r"^ansible \[(?:core|base) ([^\]]+)\]", stdout)
+    match = re.search(r"^ansible \[(?:core|base) ([^\]]+)\]", stdout, re.MULTILINE)
     if match:
         return match.group(1), None
     # ansible-base 2.10 and Ansible 2.9: 'ansible 2.x.y'
-    match = re.match(r"^ansible ([^\s]+)", stdout)
+    match = re.search(r"^ansible ([^\s]+)", stdout, re.MULTILINE)
     if match:
         return match.group(1), None
     return "", "FATAL: Unable parse ansible cli version: %s" % stdout
