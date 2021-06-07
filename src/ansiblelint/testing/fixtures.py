@@ -53,10 +53,11 @@ def default_text_runner(default_rules_collection: RulesCollection) -> RunFromTex
 
 
 @pytest.fixture
-def rule_runner(request: SubRequest) -> RunFromText:
+def rule_runner(request: SubRequest, config_options: Namespace) -> RunFromText:
     """Return runner for a specific rule class."""
     rule_class = request.param
-    collection = RulesCollection()
+    config_options.enable_list.append(rule_class().id)
+    collection = RulesCollection(options=config_options)
     collection.register(rule_class())
     return RunFromText(collection)
 
