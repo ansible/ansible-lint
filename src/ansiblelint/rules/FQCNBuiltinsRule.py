@@ -82,7 +82,7 @@ class FQCNBuiltinsRule(AnsibleLintRule):
     id = "fqcn-builtins"
     shortdesc = "Use fqcn for builtins"
     description = (
-        'Check whether the long version starting with ``ansible-builtin`` '
+        'Check whether the long version starting with ``ansible.builtin`` '
         'is used in the playbook'
     )
     tags = ["opt-in", "formatting", "experimental"]
@@ -90,12 +90,7 @@ class FQCNBuiltinsRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
-        if task["action"]["__ansible_module_original__"] in builtins:
-            return True
-            # return (f"{task['__file__']}:{task['action']['__line__'] - 1}: "
-            #         f"{task['action']['__ansible_module__']}")
-
-        return False
+        return task["action"]["__ansible_module_original__"] in builtins
 
 
 # testing code to be loaded only with pytest or when executed the rule file
