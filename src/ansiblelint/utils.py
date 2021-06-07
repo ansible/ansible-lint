@@ -559,12 +559,15 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
 
     if not isinstance(action, str):
         raise RuntimeError("Task actions can only be strings, got %s" % action)
+    action_unnormalized = action
     # convert builtin fqn calls to short forms because most rules know only
     # about short calls but in the future we may switch the normalization to do
     # the opposite. Mainly we currently consider normalized the module listing
     # used by `ansible-doc -t module -l 2>/dev/null`
     action = removeprefix(action, "ansible.builtin.")
-    result['action'] = dict(__ansible_module__=action)
+    result['action'] = dict(
+        __ansible_module__=action, __ansible_module_original__=action_unnormalized
+    )
 
     if '_raw_params' in arguments:
         result['action']['__ansible_arguments__'] = arguments['_raw_params'].split(' ')
@@ -604,6 +607,7 @@ def task_to_str(task: Dict[str, Any]) -> str:
             if k
             not in [
                 "__ansible_module__",
+                "__ansible_module_original__",
                 "__ansible_arguments__",
                 "__line__",
                 "__file__",
