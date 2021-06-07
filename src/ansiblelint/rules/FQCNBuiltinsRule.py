@@ -80,7 +80,7 @@ builtins = [
 
 class FQCNBuiltinsRule(AnsibleLintRule):
     id = "fqcn-builtins"
-    shortdesc = "Use fqcn for builtins"
+    shortdesc = "Use FQCN for builtin actions"
     description = (
         'Check whether the long version starting with ``ansible.builtin`` '
         'is used in the playbook'
