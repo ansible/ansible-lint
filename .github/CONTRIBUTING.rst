@@ -53,7 +53,7 @@ Talk to us
 ----------
 
 Use Github `discussions`_ forum or for a live chat experience try
-``#ansible-lint`` IRC channel on Freenode.
+``#ansible-lint`` IRC channel on libera.chat.
 
 For the full list of Ansible IRC and Mailing list, please see the
 `Ansible Communication`_ page.
