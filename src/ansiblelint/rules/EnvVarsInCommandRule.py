@@ -51,6 +51,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
         'strip_empty_ends',
         'cmd',
         '__ansible_module__',
+        '__ansible_module_original__',
         '__ansible_arguments__',
         LINE_NUMBER_KEY,
         FILENAME_KEY,
