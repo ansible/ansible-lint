@@ -39,7 +39,7 @@ either a git commit sha or tag of ansible-lint containing ``hooks.yaml``.
 .. code-block:: yaml
 
     - repo: https://github.com/ansible-community/ansible-lint.git
-      rev: v4.1.0
+      rev: ...  # put latest release tag from https://github.com/ansible-community/ansible-lint/releases/
       hooks:
         - id: ansible-lint
           files: \.(yaml|yml)$
