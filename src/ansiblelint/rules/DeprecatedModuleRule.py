@@ -63,6 +63,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
         'vsphere_guest',
         'win_msi',
         'include',
+        'apt_key',
     ]
 
     def matchtask(
