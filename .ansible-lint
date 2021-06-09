@@ -38,7 +38,9 @@ skip_list:
 # Any rule that has the 'opt-in' tag will not be loaded unless its 'id' is
 # mentioned in the enable_list:
 enable_list:
-  - no-same-owner
+  - fqcn-builtins  # opt-in
+  - no-log-password  # opt-in
+  - no-same-owner  # opt-in
   # add yaml here if you want to avoid ignoring yaml checks when yamllint
   # library is missing. Normally its absence just skips using that rule.
   - yaml
