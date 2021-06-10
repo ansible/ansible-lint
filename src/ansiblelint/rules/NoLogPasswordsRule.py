@@ -36,7 +36,7 @@ class NoLogPasswordsRule(AnsibleLintRule):
         "to a non False value to avoid accidental leaking of secrets."
     )
     severity = 'LOW'
-    tags = ["security", "experimental"]
+    tags = ["opt-in", "security", "experimental"]
     version_added = "v5.0.9"
 
     def matchtask(
