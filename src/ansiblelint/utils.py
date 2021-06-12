@@ -103,6 +103,8 @@ def path_dwim(basedir: str, given: str) -> str:
 def ansible_template(
     basedir: str, varname: Any, templatevars: Any, **kwargs: Any
 ) -> Any:
+    if os.path.basename(basedir) == 'tasks':
+        basedir = os.path.dirname(basedir)
     dl = DataLoader()
     dl.set_basedir(basedir)
     templar = Templar(dl, variables=templatevars)

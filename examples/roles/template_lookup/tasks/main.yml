@@ -1,0 +1,4 @@
+- block:
+    - name: bug demo
+      ansible.builtin.debug:
+        msg: '{{ lookup("file", "a_file") }}'
