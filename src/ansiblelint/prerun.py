@@ -1,4 +1,5 @@
 """Utilities for configuring ansible runtime environment."""
+import json
 import logging
 import os
 import pathlib
@@ -6,8 +7,9 @@ import re
 import subprocess
 import sys
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
+import packaging
 import tenacity
 from packaging import version
 
@@ -371,3 +373,71 @@ def _perform_mockings() -> None:
         if link_path.exists():
             link_path.unlink()
         link_path.symlink_to(target, target_is_directory=True)
+
+
+def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str], None]:
+    """Return configuration item from ansible config."""
+    env = os.environ.copy()
+    # Avoid possible ANSI garbage
+    env["ANSIBLE_FORCE_COLOR"] = "0"
+    # Avoid our own override as this prevents returning system paths.
+    colpathvar = ansible_collections_path()
+    if colpathvar in env:
+        env.pop(colpathvar)
+
+    config = subprocess.check_output(
+        ["ansible-config", "dump"], universal_newlines=True, env=env
+    )
+
+    if kind == str:
+        result = re.search(rf"^{key}.* = (.*)$", config, re.MULTILINE)
+        if result:
+            return result.groups()[0]
+    elif kind == list:
+        result = re.search(rf"^{key}.* = (\[.*\])$", config, re.MULTILINE)
+        if result:
+            val = eval(result.groups()[0])  # pylint: disable=eval-used
+            if not isinstance(val, list):
+                raise RuntimeError(f"Unexpected data read for {key}: {val}")
+            return val
+    else:
+        raise RuntimeError("Unknown data type.")
+    return None
+
+
+def require_collection(name: str, version: Optional[str] = None) -> None:
+    """Check if a minimal collection version is present or exits.
+
+    In the future this method may attempt to install a missing or outdated
+    collection before failing.
+    """
+    try:
+        ns, coll = name.split('.', 1)
+    except ValueError:
+        sys.exit("Invalid collection name supplied: %s" % name)
+
+    paths = ansible_config_get('COLLECTIONS_PATHS', list)
+    if not paths or not isinstance(paths, list):
+        sys.exit(f"Unable to determine ansible collection paths. ({paths})")
+    for path in paths:
+        collpath = os.path.join(path, 'ansible_collections', ns, coll)
+        if os.path.exists(collpath):
+            mpath = os.path.join(collpath, 'MANIFEST.json')
+            if not os.path.exists(mpath):
+                sys.exit(
+                    "Found collection at '%s' but missing MANIFEST.json, cannot get info."
+                    % collpath
+                )
+
+            with open(mpath, 'r') as f:
+                manifest = json.loads(f.read())
+                found_version = packaging.version.parse(
+                    manifest['collection_info']['version']
+                )
+                if version and found_version < packaging.version.parse(version):
+                    sys.exit(
+                        f"Found {name} collection {found_version} but {version} or newer is required."
+                    )
+            break
+    else:
+        sys.exit("Collection '%s' not found in '%s'" % (name, paths))
