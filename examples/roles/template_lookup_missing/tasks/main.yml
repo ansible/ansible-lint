@@ -1,3 +1,5 @@
+# See comments in `examples/roles/template_lookup/tasks/main.yml`
+# for why the task is in a block.
 - block:
     - name: bug demo
       ansible.builtin.debug:

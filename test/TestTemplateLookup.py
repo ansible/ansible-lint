@@ -13,10 +13,11 @@ from ansiblelint.testing import run_ansible_lint
     ),
 )
 def test_template_lookup(role: str, expect_warning: bool) -> None:
-    role_path = os.path.realpath(
+    """Assure lookup plugins used in templates does not trigger Ansible warnings."""
+    task_path = os.path.realpath(
         os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "..", "examples", "roles", role
+            os.path.dirname(os.path.realpath(__file__)), "..", "examples", "roles", role, "tasks", "main.yml"
         )
     )
-    result = run_ansible_lint("-v", role_path)
+    result = run_ansible_lint("-v", task_path)
     assert ("Unable to find" in result.stderr) == expect_warning
