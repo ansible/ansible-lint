@@ -4,7 +4,7 @@ about: >
   Create a bug report. Please test against the master branch before
   submitting it. For anything else, please use discussions
   link below.
-labels: bug
+labels: bug, new
 ---
 <!--- Verify first that your issue is not already reported on GitHub -->
 <!--- Also test if the latest release and master branch are affected too -->
