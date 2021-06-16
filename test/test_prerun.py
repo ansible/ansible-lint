@@ -1,5 +1,6 @@
 """Tests related to prerun part of the linter."""
 import os
+import subprocess
 from typing import List
 
 import pytest
@@ -145,3 +146,44 @@ def test__update_env(
     prerun._update_env("DUMMY_VAR", value)
 
     assert os.environ["DUMMY_VAR"] == result
+
+
+def test_require_collection_wrong_version() -> None:
+    """Tests behaviour of require_collection."""
+    subprocess.check_output(
+        [
+            "ansible-galaxy",
+            "collection",
+            "install",
+            "containers.podman",
+            "-p",
+            "~/.ansible/collections",
+        ]
+    )
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        prerun.require_collection("containers.podman", '9999.9.9')
+    assert pytest_wrapped_e.type == SystemExit
+    assert 'Found containers.podman collection' in pytest_wrapped_e.value.code  # type: ignore
+    assert 'but 9999.9.9 or newer is required.' in pytest_wrapped_e.value.code  # type: ignore
+
+
+@pytest.mark.parametrize(
+    ("name", "version"),
+    (
+        ("this.is.sparta", None),
+        ("this.is.sparta", "9999.9.9"),
+    ),
+)
+def test_require_collection_missing(name: str, version: str) -> None:
+    """Tests behaviour of require_collection, missing case."""
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        prerun.require_collection(name, version)
+    assert pytest_wrapped_e.type == SystemExit
+    assert f"Collection '{name}' not found in" in pytest_wrapped_e.value.code  # type: ignore
+
+
+def test_ansible_config_get() -> None:
+    """Check test_ansible_config_get."""
+    paths = prerun.ansible_config_get("COLLECTIONS_PATHS", list)
+    assert isinstance(paths, list)
+    assert len(paths) > 0
