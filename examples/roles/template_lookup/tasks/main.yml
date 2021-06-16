@@ -1,0 +1,9 @@
+# Place tasks in a block as templates are not rendered for top-level tasks
+# in roles. Specifically, in `play_children()` of src/ansiblelint/utils.py,
+# tasks in blocks go through `delegate_map['block']`, while top-level tasks
+# in a role is not handled by `delegate_map`.
+# Ref: https://github.com/ansible-community/ansible-lint/blob/v5.0.12/src/ansiblelint/utils.py#L305
+- block:
+    - name: bug demo
+      ansible.builtin.debug:
+        msg: '{{ lookup("file", "a_file") }}'

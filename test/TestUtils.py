@@ -45,6 +45,7 @@ from ansiblelint.file_utils import (
     expand_paths_vars,
     normpath,
 )
+from ansiblelint.testing import run_ansible_lint
 
 
 @pytest.mark.parametrize(
@@ -177,6 +178,30 @@ def test_template(template: str, output: str) -> None:
     """Verify that resolvable template vars and filters get rendered."""
     result = utils.template('/base/dir', template, dict(playbook_dir='/a/b/c'))
     assert result == output
+
+
+@pytest.mark.parametrize(
+    ("role", "expect_warning"),
+    (
+        ("template_lookup", False),
+        ("template_lookup_missing", True),
+    ),
+)
+def test_template_lookup(role: str, expect_warning: bool) -> None:
+    """Assure lookup plugins used in templates does not trigger Ansible warnings."""
+    task_path = os.path.realpath(
+        os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "..",
+            "examples",
+            "roles",
+            role,
+            "tasks",
+            "main.yml",
+        )
+    )
+    result = run_ansible_lint("-v", task_path)
+    assert ("Unable to find" in result.stderr) == expect_warning
 
 
 def test_task_to_str_unicode() -> None:

@@ -103,6 +103,14 @@ def path_dwim(basedir: str, given: str) -> str:
 def ansible_template(
     basedir: str, varname: Any, templatevars: Any, **kwargs: Any
 ) -> Any:
+    # `basedir` is the directory containing the lintable file.
+    # Therefore, for tasks in a role, `basedir` has the form
+    # `roles/some_role/tasks`. On the other hand, the search path
+    # is `roles/some_role/{files,templates}`. As a result, the
+    # `tasks` part in the basedir should be stripped stripped.
+    if os.path.basename(basedir) == 'tasks':
+        basedir = os.path.dirname(basedir)
+
     dl = DataLoader()
     dl.set_basedir(basedir)
     templar = Templar(dl, variables=templatevars)
