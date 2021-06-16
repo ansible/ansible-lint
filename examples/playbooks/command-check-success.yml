@@ -54,6 +54,11 @@
     args:
       creates: Z
 
+  - name: async task
+    command: echo blah
+    async: 600
+    poll: 0
+
 - hosts: localhost
   handlers:
   - name: restart something

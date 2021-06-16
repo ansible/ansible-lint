@@ -21,4 +21,4 @@ class TestCommandHasChangesCheck(unittest.TestCase):
         failure = 'examples/playbooks/command-check-failure.yml'
         bad_runner = Runner(failure, rules=self.collection)
         errs = bad_runner.run()
-        self.assertEqual(2, len(errs))
+        self.assertEqual(3, len(errs))
