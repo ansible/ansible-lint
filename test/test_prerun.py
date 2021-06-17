@@ -8,6 +8,7 @@ from _pytest.monkeypatch import MonkeyPatch
 from flaky import flaky
 
 from ansiblelint import prerun
+from ansiblelint.constants import INVALID_PREREQUISITES_RC
 from ansiblelint.testing import run_ansible_lint
 
 
@@ -163,15 +164,14 @@ def test_require_collection_wrong_version() -> None:
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         prerun.require_collection("containers.podman", '9999.9.9')
     assert pytest_wrapped_e.type == SystemExit
-    assert 'Found containers.podman collection' in pytest_wrapped_e.value.code  # type: ignore
-    assert 'but 9999.9.9 or newer is required.' in pytest_wrapped_e.value.code  # type: ignore
+    assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 
 
 @pytest.mark.parametrize(
     ("name", "version"),
     (
-        ("this.is.sparta", None),
-        ("this.is.sparta", "9999.9.9"),
+        ("fake_namespace.fake_name", None),
+        ("fake_namespace.fake_name", "9999.9.9"),
     ),
 )
 def test_require_collection_missing(name: str, version: str) -> None:
@@ -179,7 +179,7 @@ def test_require_collection_missing(name: str, version: str) -> None:
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         prerun.require_collection(name, version)
     assert pytest_wrapped_e.type == SystemExit
-    assert f"Collection '{name}' not found in" in pytest_wrapped_e.value.code  # type: ignore
+    assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 
 
 def test_ansible_config_get() -> None:
@@ -187,3 +187,16 @@ def test_ansible_config_get() -> None:
     paths = prerun.ansible_config_get("COLLECTIONS_PATHS", list)
     assert isinstance(paths, list)
     assert len(paths) > 0
+
+
+def test_install_collection() -> None:
+    """Check that valid collection installs do not fail."""
+    prerun.install_collection("containers.podman:>=1.0")
+
+
+def test_install_collection_fail() -> None:
+    """Check that invalid collection install fails."""
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        prerun.install_collection("containers.podman:>=9999.0")
+    assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC

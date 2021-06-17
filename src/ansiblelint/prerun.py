@@ -97,6 +97,34 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
     return ver, err
 
 
+def install_collection(collection: str) -> None:
+    """Install an Ansible collection.
+
+    Can accept version constraints like 'foo.bar:>=1.2.3'
+    """
+    cmd = [
+        "ansible-galaxy",
+        "collection",
+        "install",
+        "-p",
+        f"{options.cache_dir}/collections",
+        "-v",
+        f"{collection}",
+    ]
+
+    _logger.info("Running %s", " ".join(cmd))
+    run = subprocess.run(
+        cmd,
+        universal_newlines=True,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    if run.returncode != 0:
+        _logger.error("Command returned %s code:\n%s", run.returncode, run.stdout)
+        sys.exit(INVALID_PREREQUISITES_RC)
+
+
 @tenacity.retry(  # Retry up to 3 times as galaxy server can return errors
     reraise=True,
     wait=tenacity.wait_fixed(30),  # type: ignore
@@ -156,7 +184,7 @@ def install_requirements(requirement: str) -> None:
             raise RuntimeError(run.returncode)
 
 
-def prepare_environment() -> None:
+def prepare_environment(required_collections: Optional[Dict[str, str]] = None) -> None:
     """Make dependencies available if needed."""
     if not options.configured:
         # Allow method to be used without calling the command line, so we can
@@ -170,6 +198,10 @@ def prepare_environment() -> None:
         install_requirements("requirements.yml")
         for req in pathlib.Path(".").glob("molecule/*/requirements.yml"):
             install_requirements(str(req))
+
+    if required_collections:
+        for name, min_version in required_collections.items():
+            install_collection(f"{name}:>={min_version}")
 
     _install_galaxy_role()
     _perform_mockings()
@@ -405,7 +437,9 @@ def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str],
     return None
 
 
-def require_collection(name: str, version: Optional[str] = None) -> None:
+def require_collection(
+    name: str, version: Optional[str] = None, install: bool = True
+) -> None:
     """Check if a minimal collection version is present or exits.
 
     In the future this method may attempt to install a missing or outdated
@@ -424,10 +458,11 @@ def require_collection(name: str, version: Optional[str] = None) -> None:
         if os.path.exists(collpath):
             mpath = os.path.join(collpath, 'MANIFEST.json')
             if not os.path.exists(mpath):
-                sys.exit(
-                    "Found collection at '%s' but missing MANIFEST.json, cannot get info."
-                    % collpath
+                _logger.fatal(
+                    "Found collection at '%s' but missing MANIFEST.json, cannot get info.",
+                    collpath,
                 )
+                sys.exit(INVALID_PREREQUISITES_RC)
 
             with open(mpath, 'r') as f:
                 manifest = json.loads(f.read())
@@ -435,9 +470,22 @@ def require_collection(name: str, version: Optional[str] = None) -> None:
                     manifest['collection_info']['version']
                 )
                 if version and found_version < packaging.version.parse(version):
-                    sys.exit(
-                        f"Found {name} collection {found_version} but {version} or newer is required."
-                    )
+                    if install:
+                        install_collection(f"{name}:>={version}")
+                        require_collection(name, version, install=False)
+                    else:
+                        _logger.fatal(
+                            "Found %s collection %s but %s or newer is required.",
+                            name,
+                            found_version,
+                            version,
+                        )
+                        sys.exit(INVALID_PREREQUISITES_RC)
             break
     else:
-        sys.exit("Collection '%s' not found in '%s'" % (name, paths))
+        if install:
+            install_collection(f"{name}:>={version}")
+            require_collection(name, version, install=False)
+        else:
+            _logger.fatal("Collection '%s' not found in '%s'", name, paths)
+            sys.exit(INVALID_PREREQUISITES_RC)
