@@ -97,7 +97,7 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
     return ver, err
 
 
-def install_collection(collection: str) -> None:
+def install_collection(collection: str, destination: Optional[str] = None) -> None:
     """Install an Ansible collection.
 
     Can accept version constraints like 'foo.bar:>=1.2.3'
@@ -106,11 +106,11 @@ def install_collection(collection: str) -> None:
         "ansible-galaxy",
         "collection",
         "install",
-        "-p",
-        f"{options.cache_dir}/collections",
         "-v",
-        f"{collection}",
     ]
+    if destination:
+        cmd.extend(["-p", destination])
+    cmd.append(f"{collection}")
 
     _logger.info("Running %s", " ".join(cmd))
     run = subprocess.run(
@@ -201,7 +201,12 @@ def prepare_environment(required_collections: Optional[Dict[str, str]] = None) -
 
     if required_collections:
         for name, min_version in required_collections.items():
-            install_collection(f"{name}:>={min_version}")
+            install_collection(
+                f"{name}:>={min_version}",
+                destination=f"{options.cache_dir}/collections"
+                if options.cache_dir
+                else None,
+            )
 
     _install_galaxy_role()
     _perform_mockings()
@@ -437,7 +442,7 @@ def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str],
     return None
 
 
-def require_collection(
+def require_collection(  # noqa: C901
     name: str, version: Optional[str] = None, install: bool = True
 ) -> None:
     """Check if a minimal collection version is present or exits.
@@ -453,6 +458,12 @@ def require_collection(
     paths = ansible_config_get('COLLECTIONS_PATHS', list)
     if not paths or not isinstance(paths, list):
         sys.exit(f"Unable to determine ansible collection paths. ({paths})")
+
+    if options.cache_dir:
+        # if we have a cache dir, we want to be use that would be preferred
+        # destination when installing a missing collection
+        paths.insert(0, f"{options.cache_dir}/collections")
+
     for path in paths:
         collpath = os.path.join(path, 'ansible_collections', ns, coll)
         if os.path.exists(collpath):
