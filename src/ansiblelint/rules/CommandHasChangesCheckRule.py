@@ -53,6 +53,5 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
                     and 'when' not in task
                     and 'creates' not in task['action']
                     and 'removes' not in task['action']
-                    and not ('async' in task and task.get('poll') == 0)
                 )
         return False
