@@ -15,7 +15,7 @@ DEFAULT_KINDS = [
     # Do not sort this list, order matters.
     {"jinja2": "**/*.j2"},  # jinja2 templates are not always parsable as something else
     {"jinja2": "**/*.j2.*"},
-    {"inventory": "**/inventory.yml"},
+    {"inventory": "**/inventory/**.yml"},
     {"requirements": "**/meta/requirements.yml"},  # v1 only
     # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
     {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
