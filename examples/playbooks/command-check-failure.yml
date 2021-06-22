@@ -9,10 +9,3 @@
     shell: echo blah
     args:
       chdir: X
-
-  - name: shell without checks
-    shell: echo blah
-    args:
-      chdir: X
-    async: 600
-    poll: 30
