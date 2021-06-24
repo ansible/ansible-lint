@@ -47,6 +47,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     tags = ["core", "unskippable"]
     version_added = "v5.0.0"
 
+    # pylint: disable=too-many-locals
     @staticmethod
     def _get_ansible_syntax_check_matches(lintable: Lintable) -> List[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
