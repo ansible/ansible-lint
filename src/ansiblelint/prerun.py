@@ -198,7 +198,7 @@ def prepare_environment(
 
         initialize_options()
 
-    if not cache_dir is None:
+    if cache_dir is not None:
         options.cache_dir = cache_dir
 
     if not options.offline:
