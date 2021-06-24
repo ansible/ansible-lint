@@ -50,7 +50,9 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible.template import Templar
-from ansible.utils.collection_loader._collection_finder import _get_collection_playbook_path
+from ansible.utils.collection_loader._collection_finder import (
+    _get_collection_playbook_path,
+)
 
 try:
     from ansible.module_utils.parsing.convert_bool import boolean
@@ -248,9 +250,9 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
     for item in _playbook_items(playbook_ds):
         # if lintable.kind not in ["playbook"]:
         #     continue
-        
+
         if item[0] == 'import_playbook':
-            
+
             if _get_collection_playbook_path(item[1]) is not None:
                 continue
         for child in play_children(basedir, item, lintable.kind, playbook_dir):

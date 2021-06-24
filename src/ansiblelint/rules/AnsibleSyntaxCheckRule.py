@@ -1,9 +1,9 @@
 """Rule definition for ansible syntax check."""
 import json
+import os
 import re
 import subprocess
 import sys
-import os
 from typing import Any, List
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
@@ -64,7 +64,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 str(lintable.path),
             ]
             env = os.environ
-            
+
             run = subprocess.run(
                 cmd,
                 stdin=subprocess.PIPE,

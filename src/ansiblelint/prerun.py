@@ -183,8 +183,12 @@ def install_requirements(requirement: str) -> None:
             _logger.error(run.stdout)
             raise RuntimeError(run.returncode)
 
-#TODO: cache_dir should probably be a full options dict but i don't have time to do that ;)
-def prepare_environment(required_collections: Optional[Dict[str, str]] = None,cache_dir: Optional[str] = None) -> None:
+
+# TODO: cache_dir should probably be a full options dict but i don't have time to do that ;)
+def prepare_environment(
+    required_collections: Optional[Dict[str, str]] = None,
+    cache_dir: Optional[str] = None,
+) -> None:
     """Make dependencies available if needed."""
     if not options.configured:
         # Allow method to be used without calling the command line, so we can
@@ -202,9 +206,8 @@ def prepare_environment(required_collections: Optional[Dict[str, str]] = None,ca
         for req in pathlib.Path(".").glob("molecule/*/requirements.yml"):
             install_requirements(str(req))
 
-
     # I'm not sure why this code was added if _install_galaxy_role and your _perform_mockings handle for collection requirements?
-    # _perform_mockings actauly handles for a core issue with ansible-collections inadvertently BTW 
+    # _perform_mockings actauly handles for a core issue with ansible-collections inadvertently BTW
     # it copy's the current folder if its a collection to the collections folder.
     if required_collections:
         for name, min_version in required_collections.items():
