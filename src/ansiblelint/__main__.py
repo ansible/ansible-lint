@@ -113,7 +113,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
         os.path.abspath(options.project_dir).encode()
     ).hexdigest()[:6]
     options.cache_dir = "%s/ansible-lint/%s" % (
-        os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache")),
+        os.getenv("XDG_CACHE_HOME", os.path.expanduser(options.cache_dir)),
         cache_key,
     )
 

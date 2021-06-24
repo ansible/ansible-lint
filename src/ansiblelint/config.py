@@ -60,7 +60,7 @@ BASE_KINDS = [
 
 
 options = Namespace(
-    cache_dir=None,
+    cache_dir=os.path.expanduser("~/") + ".cache",
     colored=True,
     configured=False,
     cwd=".",

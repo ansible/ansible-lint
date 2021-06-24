@@ -3,6 +3,7 @@ import json
 import re
 import subprocess
 import sys
+import os
 from typing import Any, List
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
@@ -62,12 +63,15 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 *extra_vars_cmd,
                 str(lintable.path),
             ]
+            env = os.environ
+            
             run = subprocess.run(
                 cmd,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 shell=False,  # needed when command is a list
+                env=env,
                 universal_newlines=True,
                 check=False,
             )
