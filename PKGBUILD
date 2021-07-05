@@ -19,7 +19,7 @@ optdepends=('yamllint: check for yaml syntax mistakes' 'ansible: check playbooks
             'ansible: check official ansible collections')
 provides=('ansible-lint')
 conflicts=('ansible-lint')
-source=(".")
+source=("")
 sha256sums=('SKIP')
 
 pkgver() {
