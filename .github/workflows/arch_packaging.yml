@@ -28,7 +28,7 @@ jobs:
     - name: Run a container of devel image and mount package on it.
       run: |
         container_id=$(mktemp)
-        docker run --detach --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v "${PWD}":/ansible-lint-src archlinux:base-devel > "${container_id}"
+        docker run --detach --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v "${PWD}":/ansible-lint-src quay.io/aminvakil/archlinux:devel > "${container_id}"
         echo "container_id=$container_id" >> $GITHUB_ENV
 
     - name: Upgrade all packages.
