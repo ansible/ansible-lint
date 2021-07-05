@@ -23,7 +23,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Pull devel image
-      run: docker pull archlinux:base-devel
+      run: docker pull quay.io/aminvakil/archlinux:devel
 
     - name: Run a container of devel image and mount package on it.
       run: |
