@@ -1,0 +1,52 @@
+name: gh
+
+on:
+  create:  # is used for publishing to PyPI and TestPyPI
+    tags:  # any tag regardless of its name, no branches
+    - "**"
+  push:  # only publishes pushes to the main branch to TestPyPI
+    branches:  # any integration branch but not tag
+    - "master"
+  pull_request:
+  release:
+    types:
+    - published  # It seems that you can publish directly without creating
+  schedule:
+  - cron: 1 0 * * *  # Run daily at 0:01 UTC
+  # Run every Friday at 18:02 UTC
+  # https://crontab.guru/#2_18_*_*_5
+  # - cron: 2 18 * * 5
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out src from Git
+      uses: actions/checkout@v2
+
+    - name: Pull devel image
+      run: docker pull archlinux:base-devel
+
+    - name: Run a container of devel image and mount package on it.
+      run: |
+        container_id=$(mktemp)
+        docker run --detach -v "${PWD}":/ansible-lint-src archlinux:base-devel > "${container_id}"
+        echo "container_id=$container_id" >> $GITHUB_ENV
+
+    - name: Upgrade all packages.
+      run: docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
+
+    - name: Execute stuff before makepkg.
+      run: "docker exec $(cat ${container_id}) sh -c useradd -m devel && echo 'devel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/01_devel"
+
+    - name: Change ownership of package folder.
+      run: "docker exec $(cat ${container_id}) chown -R devel: /ansible-lint-src"
+
+    - name: Makepkg!
+      run: docker exec "$(cat ${container_id})" su devel sh -c "cd /ansible-lint-src && makepkg -sri --noconfirm"
+
+    - name: Run ansible-lint --version.
+      run: docker exec "$(cat ${container_id})" ansible-lint --version
+
+    - name: Stop and remove container forcefully.
+      run: docker rm -f "$(cat ${container_id})"
