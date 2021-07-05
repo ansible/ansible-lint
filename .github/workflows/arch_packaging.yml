@@ -34,9 +34,6 @@ jobs:
     - name: Upgrade all packages.
       run: docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
 
-    - name: Execute stuff before makepkg.
-      run: "docker exec $(cat ${container_id}) sh -c useradd -m devel && echo 'devel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/01_devel"
-
     - name: Change ownership of package folder.
       run: "docker exec $(cat ${container_id}) chown -R devel: /ansible-lint-src"
 
