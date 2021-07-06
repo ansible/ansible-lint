@@ -4,11 +4,6 @@
   gather_facts: false
 
   tasks:
-    - name: Install docker using pip
-      pip:
-        name: docker
-        state: present
-
     - name: Pull docker image
       community.docker.docker_image:
         name: quay.io/aminvakil/archlinux:devel
