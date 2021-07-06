@@ -15,9 +15,10 @@
         image: quay.io/aminvakil/archlinux:devel
         state: started
         privileged: true
+        container_default_behavior: no_defaults
         volumes:
           - /sys/fs/cgroup:/sys/fs/cgroup:ro
-          - "${PWD}:/ansible-lint-src"
+          - .:/ansible-lint-src
 
     - name: Upgrade all packages
       community.docker.docker_container_exec:
@@ -43,3 +44,4 @@
       community.docker.docker_container:
         name: archlinux
         state: absent
+        container_default_behavior: no_defaults
