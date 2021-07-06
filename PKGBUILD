@@ -5,7 +5,7 @@
 
 _pkgname=ansible-lint
 pkgname=ansible-lint-test
-pkgver=5.0.7.r73.gfef55b6
+pkgver=5.0.8.dev74
 pkgrel=1
 pkgdesc="Checks playbooks for practices and behaviour that could potentially be improved."
 arch=('any')
@@ -25,9 +25,7 @@ conflicts=('ansible-lint')
 pkgver() {
   cd ..
   # Get the version number.
-git describe --long --tags 2>/dev/null | sed 's/[^[:digit:]]*\(.\+\)-\([[:digit:]]\+\)-g\([[:xdigit:]]\{7\}\)/\1.r\2.g\3/;t;q1'
-  [ ${PIPESTATUS[0]} -eq 0 ] || \
-printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  python setup.py --version
 }
 
 build() {
