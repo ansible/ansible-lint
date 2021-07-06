@@ -25,23 +25,5 @@ jobs:
     - name: Pull devel image
       run: docker pull quay.io/aminvakil/archlinux:devel
 
-    - name: Run a container of devel image and mount package on it.
-      run: |
-        container_id=$(mktemp)
-        docker run --detach --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v "${PWD}":/ansible-lint-src quay.io/aminvakil/archlinux:devel > "${container_id}"
-        echo "container_id=$container_id" >> $GITHUB_ENV
-
-    - name: Upgrade all packages.
-      run: docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
-
-    - name: Change ownership of package folder.
-      run: "docker exec $(cat ${container_id}) chown -R devel: /ansible-lint-src"
-
-    - name: Makepkg!
-      run: docker exec "$(cat ${container_id})" su devel sh -c "cd /ansible-lint-src && makepkg -sri --noconfirm"
-
-    - name: Run ansible-lint --version.
-      run: docker exec "$(cat ${container_id})" ansible-lint --version
-
-    - name: Stop and remove container forcefully.
-      run: docker rm -f "$(cat ${container_id})"
+    - name: Test on official archlinux.
+      run: docker run -it -v $PWD:/ansible-lint-src archlinux:base-devel bash -c "pacman -Syu --noconfirm && useradd -m devel && echo 'devel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/01_devel && su devel sh -c 'cd /ansible-lint-src && makepkg -sri --noconfirm' && ansible-lint --version"
