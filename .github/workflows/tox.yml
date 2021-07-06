@@ -33,6 +33,7 @@ jobs:
         - TOXENV: lint
         - TOXENV: docs
         - TOXENV: eco
+        - TOXENV: archlinux
         - TOXENV: packaging
     env:
       TOX_PARALLEL_NO_SPINNER: 1
