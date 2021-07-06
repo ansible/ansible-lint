@@ -1,0 +1,45 @@
+#!env ansible-playbook
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Pull docker image
+      community.docker.docker_image:
+        name: quay.io/aminvakil/archlinux:devel
+        source: pull
+
+    - name: Run container of archlinux devel image
+      community.docker.docker_container:
+        name: archlinux
+        image: quay.io/aminvakil/archlinux:devel
+        state: started
+        privileged: true
+        volumes:
+          - /sys/fs/cgroup:/sys/fs/cgroup:ro
+          - "${PWD}:/ansible-lint-src"
+
+    - name: Upgrade all packages
+      community.docker.docker_container_exec:
+        container: archlinux
+        command: pacman -Syu --noconfirm
+
+    - name: Change ownership to devel user
+      community.docker.docker_container_exec:
+        container: archlinux
+        command: "chown -R devel: /ansible-lint-src"
+
+    - name: Makepkg
+      community.docker.docker_container_exec:
+        container: archlinux
+        command: su devel sh -c "cd /ansible-lint-src && makepkg -sri --noconfirm"
+
+    - name: Run ansible-lint --version
+      community.docker.docker_container_exec:
+        container: archlinux
+        command: ansible-lint --version
+
+    - name: Stop and remove container
+      community.docker.docker_container:
+        name: archlinux
+        state: absent
