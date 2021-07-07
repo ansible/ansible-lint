@@ -1,0 +1,36 @@
+--- PKGBUILD    2021-06-04 16:09:12.000000000 +0430
++++ PKGBUILD_customized 2021-07-07 12:28:24.423314223 +0430
+@@ -9,30 +9,20 @@
+ arch=('any')
+ url="https://github.com/ansible/ansible-lint"
+ license=('MIT')
++makedepends=('python-setuptools' 'python-setuptools-scm' 'python-toml')
+ depends=('python' 'ansible-base' 'python-ruamel-yaml' 'python-pyaml' 'python-rich' 'python-packaging'
+           'python-wcmatch' 'python-enrich' 'python-tenacity')
+ checkdepends=('python-pytest')
+ optdepends=('yamllint: check for yaml syntax mistakes'
+             'ansible: check official ansible collections')
+-source=(https://github.com/ansible/ansible-lint/archive/v${pkgver}/${pkgname}-${pkgver}.tar.gz
+-        disable_use_scm_version.patch)
+-b2sums=('b3a79edd1a77be80cee690b02ef1679af3bf332bb8ba18f98b5a016f0ce4b35289c5b19a9a4fa247bd3210e170a661a6605b3efa011b0934df902c5e4650679a'
+-        'a090862e657bfc29c89b23b2ecc8c585e15f098310b997e39600b6bdf0cd433e1045e2da348ce27dc2d3c0f9ef01950cf0ec5e7b071bc43d85161faabd8a1f60')
+-
+-prepare() {
+-  cd ${pkgname}-${pkgver}
+-  # stop setuptools from using the scm version which doesn't exist in this context
+-  patch -Np1 < "${srcdir}"/disable_use_scm_version.patch
+-  sed -i "/^\[metadata\]/a version = ${pkgver}" setup.cfg
+-}
+ 
+ build() {
+-  cd ${pkgname}-${pkgver}
++  cd ..
+   python setup.py build
+ }
+ 
+ package() {
+-  cd ${pkgname}-${pkgver}
++  cd ..
+   PYTHONHASHSEED=0 python setup.py install --root="${pkgdir}" --optimize=1
+   install -Dm 644 LICENSE -t "${pkgdir}"/usr/share/licenses/${pkgname}
+ }
