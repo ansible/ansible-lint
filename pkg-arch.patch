@@ -21,13 +21,13 @@
 -  patch -Np1 < "${srcdir}"/disable_use_scm_version.patch
 -  sed -i "/^\[metadata\]/a version = ${pkgver}" setup.cfg
 -}
- 
+
  build() {
 -  cd ${pkgname}-${pkgver}
 +  cd ..
    python setup.py build
  }
- 
+
  package() {
 -  cd ${pkgname}-${pkgver}
 +  cd ..
