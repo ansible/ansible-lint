@@ -16,7 +16,7 @@ on:
   # - cron: 2 18 * * 5
 
 jobs:
-  build:
+  pkg-arch:
     runs-on: ubuntu-latest
     steps:
     - name: Check out src from Git
