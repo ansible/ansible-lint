@@ -13,7 +13,7 @@ url="https://github.com/ansible-community/ansible-lint"
 license=('MIT')
 depends=('python' 'python-ruamel-yaml' 'python-pyaml' 'python-rich' 'python-packaging'
           'python-wcmatch' 'python-enrich' 'python-tenacity' 'ansible-core')
-makedepends=('python-setuptools' 'python-setuptools-scm' 'python-toml')
+makedepends=('git' 'python-setuptools' 'python-setuptools-scm' 'python-toml')
 optdepends=('yamllint: check for yaml syntax mistakes' 'ansible: check playbooks'
             'ansible: check official ansible collections')
 provides=('ansible-lint')
