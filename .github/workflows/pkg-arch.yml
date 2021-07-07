@@ -35,5 +35,6 @@ jobs:
         mv ansible-lint/PKGBUILD . &&
         rm -rf ansible-lint &&
         patch PKGBUILD < pkg-arch.patch &&
+        sudo pacman -Rnsc asp --noconfirm &&
         makepkg -sri --noconfirm' &&
         ansible-lint --version"
