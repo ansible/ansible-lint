@@ -1,6 +1,6 @@
 --- PKGBUILD    2021-07-07 13:04:52.099980762 +0430
-+++ PKGBUILD_customized 2021-07-07 13:06:13.676647420 +0430
-@@ -9,30 +9,20 @@
++++ PKGBUILD_customized 2021-07-07 13:09:30.256647408 +0430
+@@ -9,30 +9,25 @@
  arch=('any')
  url="https://github.com/ansible/ansible-lint"
  license=('MIT')
@@ -14,13 +14,16 @@
 -        disable_use_scm_version.patch)
 -b2sums=('b3a79edd1a77be80cee690b02ef1679af3bf332bb8ba18f98b5a016f0ce4b35289c5b19a9a4fa247bd3210e170a661a6605b3efa011b0934df902c5e4650679a'
 -        'a090862e657bfc29c89b23b2ecc8c585e15f098310b997e39600b6bdf0cd433e1045e2da348ce27dc2d3c0f9ef01950cf0ec5e7b071bc43d85161faabd8a1f60')
--
+
 -prepare() {
 -  cd ${pkgname}-${pkgver}
 -  # stop setuptools from using the scm version which doesn't exist in this context
 -  patch -Np1 < "${srcdir}"/disable_use_scm_version.patch
 -  sed -i "/^\[metadata\]/a version = ${pkgver}" setup.cfg
--}
++pkgver() {
++  cd ..
++  python setup.py --version
+ }
 
  build() {
 -  cd ${pkgname}-${pkgver}
