@@ -24,7 +24,7 @@ jobs:
     - name: Check out src from Git
       uses: actions/checkout@v2
 
-    - name: Test on official archlinux.
+    - name: Test on official archlinux
       run: >
         docker run -v $PWD:/ansible-lint-src archlinux:base-devel bash -c "pacman -Syu asp --noconfirm &&
         useradd -m devel &&
