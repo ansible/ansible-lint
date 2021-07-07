@@ -24,4 +24,14 @@ jobs:
 
     - name: Test on official archlinux.
       run: >
-        docker run -v $PWD:/ansible-lint-src archlinux:base-devel bash -c "pacman -Syu asp --noconfirm && useradd -m devel && echo 'devel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/01_devel && chown -R devel:devel /ansible-lint-src && su devel sh -c 'cd /ansible-lint-src && asp export ansible-lint && mv ansible-lint/PKGBUILD . && rm -rf ansible-lint && patch PKGBUILD < pkg-arch.patch && makepkg -sri --noconfirm' && ansible-lint --version"
+        docker run -v $PWD:/ansible-lint-src archlinux:base-devel bash -c "pacman -Syu asp --noconfirm &&
+        useradd -m devel &&
+        echo 'devel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/01_devel &&
+        chown -R devel:devel /ansible-lint-src &&
+        su devel sh -c 'cd /ansible-lint-src &&
+        asp export ansible-lint &&
+        mv ansible-lint/PKGBUILD . &&
+        rm -rf ansible-lint &&
+        patch PKGBUILD < pkg-arch.patch &&
+        makepkg -sri --noconfirm' &&
+        ansible-lint --version"
