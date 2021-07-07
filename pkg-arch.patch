@@ -1,10 +1,10 @@
---- PKGBUILD    2021-06-04 16:09:12.000000000 +0430
-+++ PKGBUILD_customized 2021-07-07 12:28:24.423314223 +0430
+--- PKGBUILD    2021-07-07 13:04:52.099980762 +0430
++++ PKGBUILD_customized 2021-07-07 13:06:13.676647420 +0430
 @@ -9,30 +9,20 @@
  arch=('any')
  url="https://github.com/ansible/ansible-lint"
  license=('MIT')
-+makedepends=('python-setuptools' 'python-setuptools-scm' 'python-toml')
++makedepends=('git' 'python-setuptools' 'python-setuptools-scm' 'python-toml')
  depends=('python' 'ansible-base' 'python-ruamel-yaml' 'python-pyaml' 'python-rich' 'python-packaging'
            'python-wcmatch' 'python-enrich' 'python-tenacity')
  checkdepends=('python-pytest')
