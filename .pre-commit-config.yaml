@@ -103,7 +103,7 @@ repos:
         plugins/.*
       )$
 - repo: https://github.com/PyCQA/pylint
-  rev: v3.0.0a3
+  rev: pylint-3.0.0a3
   hooks:
   - id: pylint
     additional_dependencies:
