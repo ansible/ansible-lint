@@ -102,7 +102,7 @@ repos:
         test/local-content/.*|
         plugins/.*
       )$
-- repo: https://github.com/pre-commit/mirrors-pylint
+- repo: https://github.com/PyCQA/pylint
   rev: v3.0.0a3
   hooks:
   - id: pylint
