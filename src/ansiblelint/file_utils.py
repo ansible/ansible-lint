@@ -206,7 +206,14 @@ class Lintable:
 def discover_lintables(options: Namespace) -> Dict[str, Any]:
     """Find all files that we know how to lint."""
     # git is preferred as it also considers .gitignore
-    git_command_present = ['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z']
+    git_command_present = [
+        'git',
+        'ls-files',
+        '--cached',
+        '--others',
+        '--exclude-standard',
+        '-z',
+    ]
     git_command_absent = ['git', 'ls-files', '--deleted', '-z']
     out = None
 
@@ -214,7 +221,9 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
         out_present = subprocess.check_output(
             git_command_present, stderr=subprocess.STDOUT, universal_newlines=True
         ).split("\x00")[:-1]
-        _logger.info("Discovered files to lint using: %s", ' '.join(git_command_present))
+        _logger.info(
+            "Discovered files to lint using: %s", ' '.join(git_command_present)
+        )
 
         out_absent = subprocess.check_output(
             git_command_absent, stderr=subprocess.STDOUT, universal_newlines=True
