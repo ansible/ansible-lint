@@ -13,9 +13,6 @@ on:
     - published  # It seems that you can publish directly without creating
   schedule:
   - cron: 1 0 * * *  # Run daily at 0:01 UTC
-  # Run every Friday at 18:02 UTC
-  # https://crontab.guru/#2_18_*_*_5
-  # - cron: 2 18 * * 5
 
 jobs:
   pkg-arch:
