@@ -258,9 +258,10 @@ def _symlink_galaxy_install(link_path) -> None:
 
 def _install_galaxy_role() -> None:
     """Detect standalone galaxy role and installs it."""
-    if not os.path.exists("meta/main.yml"):
+    galaxy_path = "%s/meta/main.yml" % options.project_dir
+    if not os.path.exists(galaxy_path):
         return
-    yaml = yaml_from_file("meta/main.yml")
+    yaml = yaml_from_file(galaxy_path)
     if 'galaxy_info' not in yaml:
         return
 
@@ -309,21 +310,17 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
 
 def _install_galaxy_collection() -> None:
     """Detect standalone galaxy collection and installs it."""
-    if not os.path.exists("galaxy.yml"):
+    galaxy_path = "%s/galaxy.yml" % options.project_dir
+    if not os.path.exists(galaxy_path):
         return
-    yaml = yaml_from_file("galaxy.yml")
-    if not yaml:
-        # ignore empty galaxy.yml file
-        return
-    namespace = yaml.get('namespace', None)
-    collection = yaml.get('name', None)
-    if not namespace or not collection:
+    yaml = yaml_from_file(galaxy_path)
+    if 'namespace' not in yaml or 'name' not in yaml:
         return
     p = pathlib.Path(
-        f"{options.cache_dir}/collections/ansible_collections/{ namespace }"
+        f"{options.cache_dir}/collections/ansible_collections/{yaml['namespace']}"
     )
     p.mkdir(parents=True, exist_ok=True)
-    link_path = p / collection
+    link_path = p / yaml['name']
     _symlink_galaxy_install(link_path)
     _logger.info(
         "Using %s symlink to current repository in order to enable Ansible to find the collection using its expected full name.",
