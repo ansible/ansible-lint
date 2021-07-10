@@ -209,6 +209,7 @@ def prepare_environment(required_collections: Optional[Dict[str, str]] = None) -
             )
 
     _install_galaxy_role()
+    _install_galaxy_collection()
     _perform_mockings()
     _prepare_ansible_paths()
 
@@ -243,6 +244,16 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
         role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name)
 
     return f"{role_namespace}{role_name}"
+
+
+def _symlink_galaxy_install(link_path) -> None:
+    # despite documentation stating that is_file() reports true for symlinks,
+    # it appears that is_dir() reports true instead, so we rely on exits().
+    target = pathlib.Path(options.project_dir).absolute()
+    if not link_path.exists() or os.readlink(link_path) != target:
+        if link_path.exists():
+            link_path.unlink()
+    link_path.symlink_to(target, target_is_directory=True)
 
 
 def _install_galaxy_role() -> None:
@@ -289,15 +300,33 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
     p = pathlib.Path(f"{options.cache_dir}/roles")
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / fqrn
-    # despite documentation stating that is_file() reports true for symlinks,
-    # it appears that is_dir() reports true instead, so we rely on exits().
-    target = pathlib.Path(options.project_dir).absolute()
-    if not link_path.exists() or os.readlink(link_path) != str(target):
-        if link_path.exists():
-            link_path.unlink()
-        link_path.symlink_to(target, target_is_directory=True)
+    _symlink_galaxy_install(link_path)
     _logger.info(
         "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
+        link_path,
+    )
+
+
+def _install_galaxy_collection() -> None:
+    """Detect standalone galaxy collection and installs it."""
+    if not os.path.exists("galaxy.yml"):
+        return
+    yaml = yaml_from_file("galaxy.yml")
+    if not yaml:
+        # ignore empty galaxy.yml file
+        return
+    namespace = yaml.get('namespace', None)
+    collection = yaml.get('name', None)
+    if not namespace or not collection:
+        return
+    p = pathlib.Path(
+        f"{options.cache_dir}/collections/ansible_collections/{ namespace }"
+    )
+    p.mkdir(parents=True, exist_ok=True)
+    link_path = p / collection
+    _symlink_galaxy_install(link_path)
+    _logger.info(
+        "Using %s symlink to current repository in order to enable Ansible to find the collection using its expected full name.",
         link_path,
     )
 
@@ -388,28 +417,6 @@ def _perform_mockings() -> None:
     if options.mock_modules:
         for module_name in options.mock_modules:
             _make_module_stub(module_name)
-
-    # if inside a collection repo, symlink it to simulate its installed state
-    if not os.path.exists("galaxy.yml"):
-        return
-    yaml = yaml_from_file("galaxy.yml")
-    if not yaml:
-        # ignore empty galaxy.yml file
-        return
-    namespace = yaml.get('namespace', None)
-    collection = yaml.get('name', None)
-    if not namespace or not collection:
-        return
-    p = pathlib.Path(
-        f"{options.cache_dir}/collections/ansible_collections/{ namespace }"
-    )
-    p.mkdir(parents=True, exist_ok=True)
-    link_path = p / collection
-    target = pathlib.Path(options.project_dir).absolute()
-    if not link_path.exists() or os.readlink(link_path) != target:
-        if link_path.exists():
-            link_path.unlink()
-        link_path.symlink_to(target, target_is_directory=True)
 
 
 def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str], None]:
