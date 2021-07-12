@@ -246,13 +246,18 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
     return f"{role_namespace}{role_name}"
 
 
-def _symlink_galaxy_install(link_path) -> None:
-    # despite documentation stating that is_file() reports true for symlinks,
-    # it appears that is_dir() reports true instead, so we rely on exits().
-    target = pathlib.Path(options.project_dir).absolute()
-    if not link_path.exists() or os.readlink(link_path) != target:
-        if link_path.exists():
+def _symlink_galaxy_install(link_path: pathlib.Path) -> None:
+    target = str(pathlib.Path(options.project_dir).absolute())
+    if link_path.exists():
+        if link_path.is_symlink():
+            if os.readlink(str(link_path.absolute())) == target:
+                return
             link_path.unlink()
+        else:
+            raise RuntimeError(
+                "Can't replace non-symlink path '%s'" % link_path.absolute()
+            )
+
     link_path.symlink_to(target, target_is_directory=True)
 
 
