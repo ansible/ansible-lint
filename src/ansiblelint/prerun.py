@@ -334,10 +334,10 @@ def _prepare_ansible_paths() -> None:
     roles_path: List[str] = []
 
     for path_list, path in (
-        (library_paths, "plugins/modules"),
+        (library_paths, f"{options.project_dir}/plugins/modules"),
         (library_paths, f"{options.cache_dir}/modules"),
         (collection_list, f"{options.cache_dir}/collections"),
-        (roles_path, "roles"),
+        (roles_path, f"{options.project_dir}/roles"),
         (roles_path, f"{options.cache_dir}/roles"),
     ):
         if path not in path_list and os.path.exists(path):
