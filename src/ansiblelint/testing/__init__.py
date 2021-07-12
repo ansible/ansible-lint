@@ -77,11 +77,22 @@ def run_ansible_lint(
     env: Optional[Dict[str, str]] = None
 ) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
+    project_dir = cwd
+    if project_dir is None:
+        project_dir = os.getcwd()
+
     if not executable:
         executable = sys.executable
-        args = [sys.executable, "-m", "ansiblelint", *argv]
+        args = [
+            sys.executable,
+            "-m",
+            "ansiblelint",
+            "--project-dir",
+            project_dir,
+            *argv,
+        ]
     else:
-        args = [executable, *argv]
+        args = [executable, "--project-dir", project_dir, *argv]
 
     # It is not safe to pass entire env for testing as other tests would
     # pollute the env, causing weird behaviors, so we pass only a safe list of
