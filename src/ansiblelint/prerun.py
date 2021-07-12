@@ -263,7 +263,7 @@ def _symlink_galaxy_install(link_path: pathlib.Path) -> None:
 
 def _install_galaxy_role() -> None:
     """Detect standalone galaxy role and installs it."""
-    galaxy_path = "%s/meta/main.yml" % options.project_dir
+    galaxy_path = f"{options.project_dir}/meta/main.yml"
     if not os.path.exists(galaxy_path):
         return
     yaml = yaml_from_file(galaxy_path)
@@ -274,9 +274,8 @@ def _install_galaxy_role() -> None:
 
     if 'role-name' not in options.skip_list:
         if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
-            msg = (
-                """\
-Computed fully qualified role name of %s does not follow current galaxy requirements.
+            msg = f"""
+Computed fully qualified role name of {fqrn} does not follow current galaxy requirements.
 Please edit meta/main.yml and assure we can correctly determine full role name:
 
 galaxy_info:
@@ -288,8 +287,6 @@ Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
 
 As an alternative, you can add 'role-name' to either skip_list or warn_list.
 """
-                % fqrn
-            )
             if 'role-name' in options.warn_list:
                 _logger.warning(msg)
             else:
@@ -315,7 +312,7 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
 
 def _install_galaxy_collection() -> None:
     """Detect standalone galaxy collection and installs it."""
-    galaxy_path = "%s/galaxy.yml" % options.project_dir
+    galaxy_path = f"{options.project_dir}/galaxy.yml"
     if not os.path.exists(galaxy_path):
         return
     yaml = yaml_from_file(galaxy_path)
