@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# pylint:disable=cyclic-import
+# pylint: disable=cyclic-import
 """A module."""
 
 from ansible.module_utils.basic import AnsibleModule
