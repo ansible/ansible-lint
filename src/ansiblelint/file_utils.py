@@ -2,6 +2,7 @@
 import copy
 import logging
 import os
+import pathlib
 import subprocess
 import sys
 from argparse import Namespace
@@ -251,24 +252,45 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     return OrderedDict.fromkeys(sorted(out))
 
 
-def guess_project_dir() -> str:
-    """Return detected project dir or user home directory."""
-    try:
-        result = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            stderr=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            universal_newlines=True,
-            check=False,
-        )
-    except FileNotFoundError:
-        # if git is absent we use home directory
-        return str(Path.home())
+def guess_project_dir(config_file: str) -> str:
+    """Return detected project dir or current working directory."""
+    path = None
+    if config_file is not None:
+        target = pathlib.Path(config_file)
+        if target.exists():
+            path = str(target.parent.absolute())
 
-    if result.returncode != 0:
-        return str(Path.home())
+    if path is None:
+        try:
+            result = subprocess.run(
+                ["git", "rev-parse", "--show-toplevel"],
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                universal_newlines=True,
+                check=False,
+            )
 
-    return result.stdout.splitlines()[0]
+            path = result.stdout.splitlines()[0]
+        except subprocess.CalledProcessError as exc:
+            if not (
+                exc.returncode == 128 and 'fatal: not a git repository' in exc.output
+            ):
+                _logger.warning(
+                    "Failed to guess project directory using git: %s",
+                    exc.output.rstrip('\n'),
+                )
+        except FileNotFoundError as exc:
+            _logger.warning("Failed to locate command: %s", exc)
+
+    if path is None:
+        path = os.getcwd()
+
+    _logger.info(
+        "Guessed %s as project root directory",
+        path,
+    )
+
+    return path
 
 
 def expand_dirs_in_lintables(lintables: Set[Lintable]) -> None:

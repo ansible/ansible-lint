@@ -382,11 +382,7 @@ def get_config(arguments: List[str]) -> Namespace:
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
 
     if options.project_dir == ".":
-        project_dir = os.path.dirname(
-            os.path.abspath(
-                options.config_file or f"{guess_project_dir()}/.ansible-lint"
-            )
-        )
+        project_dir = guess_project_dir(options.config_file)
         options.project_dir = normpath(project_dir)
     if not options.project_dir or not os.path.exists(options.project_dir):
         raise RuntimeError(
