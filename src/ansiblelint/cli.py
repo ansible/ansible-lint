@@ -327,7 +327,6 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     scalar_map = {
         "loop_var_prefix": None,
         "project_dir": ".",
-        "var_naming_pattern": "^[a-z_][a-z0-9_]*$",
     }
 
     if not file_config:
