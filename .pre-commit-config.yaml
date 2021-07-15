@@ -20,28 +20,28 @@ repos:
       ^setup\.py$
   - id: pip-compile
     name: pip-compile
-    entry: pip-compile -q --no-annotate --output-file=test-requirements.txt setup.py test-requirements.in
+    entry: pip-compile -q --no-annotate --output-file=test-requirements.txt setup.cfg test-requirements.in
     language: system
-    files: ^(test-requirements\.(txt|in)|)$
+    files: ^(test-requirements\.(txt|in)|setup\.cfg)$
     pass_filenames: false
   - id: pip-compile-docs
     name: pip-compile-docs
-    entry: pip-compile -q --no-annotate --output-file=docs/requirements.txt docs/requirements.in setup.py
+    entry: pip-compile -q --no-annotate --output-file=docs/requirements.txt docs/requirements.in setup.cfg
     language: system
-    files: ^(docs\/requirements\.(txt|in)|)$
+    files: ^(docs\/requirements\.(txt|in)|setup\.cfg)$
     pass_filenames: false
   - id: pip-compile-upgrade
     name: pip-compile-upgrade
-    entry: pip-compile -q --upgrade --no-annotate --output-file=test-requirements.txt setup.py test-requirements.in
+    entry: pip-compile -q --upgrade --no-annotate --output-file=test-requirements.txt setup.cfg test-requirements.in
     language: system
-    files: ^(test-requirements\.(txt|in)|)$
+    files: ^(test-requirements\.(txt|in)|setup\.cfg)$
     pass_filenames: false
     stages: [manual]
   - id: pip-compile-docs-upgrade
     name: pip-compile-docs-upgrade
-    entry: pip-compile -q --upgrade --no-annotate --output-file=docs/requirements.txt docs/requirements.in setup.py
+    entry: pip-compile -q --upgrade --no-annotate --output-file=docs/requirements.txt docs/requirements.in setup.cfg
     language: system
-    files: ^(docs\/requirements\.(txt|in)|)$
+    files: ^(docs\/requirements\.(txt|in)|setup\.cfg)$
     pass_filenames: false
     stages: [manual]
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
