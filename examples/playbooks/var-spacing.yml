@@ -1,4 +1,4 @@
-# Should raise var-spacing at lines 25, 28, 31
+# Should raise var-spacing at tasks line 23, 26, 29
 - hosts: all
   tasks:
     - name: good variable format
