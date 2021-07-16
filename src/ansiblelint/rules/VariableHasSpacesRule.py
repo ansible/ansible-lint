@@ -20,7 +20,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     version_added = 'v4.0.0'
 
     bracket_regex = re.compile(r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
-    exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}")
+    exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}", re.MULTILINE | re.DOTALL)
 
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
