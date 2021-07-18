@@ -3,7 +3,7 @@
 
 import re
 import sys
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
@@ -20,7 +20,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     version_added = 'v4.0.0'
 
     bracket_regex = re.compile(r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
-    exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}")
+    exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}", re.MULTILINE | re.DOTALL)
 
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
@@ -35,15 +35,36 @@ class VariableHasSpacesRule(AnsibleLintRule):
 
 if 'pytest' in sys.modules:
 
-    from ansiblelint.rules import RulesCollection
-    from ansiblelint.runner import Runner
+    import pytest
 
-    def test_var_spacing() -> None:
-        """Verify rule."""
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.fixture
+    def error_expected_lines() -> List[int]:
+        """Return list of expected error lines."""
+        return [23, 26, 29, 54, 65]
+
+    @pytest.fixture
+    def test_playbook() -> str:
+        """Return test cases playbook path."""
+        return "examples/playbooks/var-spacing.yml"
+
+    @pytest.fixture
+    def lint_error_lines(test_playbook: str) -> List[int]:
+        """Get VarHasSpacesRules linting results on test_playbook."""
         collection = RulesCollection()
         collection.register(VariableHasSpacesRule())
-
-        lintable = Lintable("examples/playbooks/var-spacing.yml")
+        lintable = Lintable(test_playbook)
         results = Runner(lintable, rules=collection).run()
+        return list(map(lambda item: item.linenumber, results))
 
-        assert len(results) == 3
+    def test_var_spacing(
+        error_expected_lines: List[int], lint_error_lines: List[int]
+    ) -> None:
+        """Ensure that expected error lines are matching found linting error lines."""
+        # list unexpected error lines or non-matching error lines
+        error_lines_difference = list(
+            set(error_expected_lines).symmetric_difference(set(lint_error_lines))
+        )
+        assert len(error_lines_difference) == 0
