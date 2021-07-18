@@ -252,7 +252,7 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     return OrderedDict.fromkeys(sorted(out))
 
 
-def guess_project_dir(config_file: str) -> str:
+def guess_project_dir(config_file: Optional[str]) -> str:
     """Return detected project dir or current working directory."""
     path = None
     if config_file is not None:
@@ -267,7 +267,7 @@ def guess_project_dir(config_file: str) -> str:
                 stderr=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
-                check=False,
+                check=True,
             )
 
             path = result.stdout.splitlines()[0]
