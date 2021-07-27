@@ -8,8 +8,8 @@ About Ansible Lint
 
 Ansible Lint is a command-line tool for linting **playbooks, roles and
 collections** aimed towards any Ansible users. Its main goal is to promote
-proven practices, patterns and behaviors while avoiding common pitfals that can
-easily lead to bugs or make code harder to maintain.
+proven practices, patterns and behaviors while avoiding common pitfalls that
+can easily lead to bugs or make code harder to maintain.
 
 Ansible lint is also supposed to help users upgrade their code to work with
 newer versions of Ansible. Due to this reason we recommend using it with
