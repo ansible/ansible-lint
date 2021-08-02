@@ -182,7 +182,7 @@ html_context = {
     'display_github': 'True',
     'github_user': 'ansible-community',
     'github_repo': 'ansible-lint',
-    'github_version': 'master/docs/',
+    'github_version': 'main/docs/',
     'current_version': version,
     'latest_version': 'latest',
     # list specifically out of order to make latest work
