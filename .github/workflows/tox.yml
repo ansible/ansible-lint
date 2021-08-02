@@ -6,7 +6,7 @@ on:
     - "**"
   push:  # only publishes pushes to the main branch to TestPyPI
     branches:  # any integration branch but not tag
-    - "master"
+    - "main"
   pull_request:
   release:
     types:

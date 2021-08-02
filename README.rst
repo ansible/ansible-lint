@@ -15,7 +15,7 @@
    :alt: Discussions
 
 .. image:: https://github.com/ansible-community/ansible-lint/workflows/gh/badge.svg
-   :target: https://github.com/ansible-community/ansible-lint/actions?query=workflow%3Agh+branch%3Amaster+event%3Apush
+   :target: https://github.com/ansible-community/ansible-lint/actions?query=workflow%3Agh+branch%3Amain+event%3Apush
    :alt: GitHub Actions CI/CD
 
 .. image:: https://img.shields.io/lgtm/grade/python/g/ansible-community/ansible-lint.svg?logo=lgtm&logoWidth=18
@@ -66,5 +66,5 @@ ansible-lint was created by `Will Thames`_ and is now maintained as part of the
 .. _Will Thames: https://github.com/willthames
 .. _Ansible: https://ansible.com
 .. _Red Hat: https://redhat.com
-.. _MIT: https://github.com/ansible-community/ansible-lint/blob/master/LICENSE
+.. _MIT: https://github.com/ansible-community/ansible-lint/blob/main/LICENSE
 .. _GPLv3: https://github.com/ansible/ansible/blob/devel/COPYING
