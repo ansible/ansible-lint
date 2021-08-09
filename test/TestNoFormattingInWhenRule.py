@@ -15,10 +15,10 @@ class TestNoFormattingInWhenRule(unittest.TestCase):
     def test_file_positive(self) -> None:
         success = 'examples/playbooks/jinja2-when-success.yml'
         good_runner = Runner(success, rules=self.collection)
-        self.assertEqual([], good_runner.run())
+        assert [] == good_runner.run()
 
     def test_file_negative(self) -> None:
         failure = 'examples/playbooks/jinja2-when-failure.yml'
         bad_runner = Runner(failure, rules=self.collection)
         errs = bad_runner.run()
-        self.assertEqual(2, len(errs))
+        assert len(errs) == 2

@@ -66,23 +66,23 @@ class TestMetaMainHasInfo(unittest.TestCase):
     def test_no_galaxy_info(self) -> None:
         results = self.runner.run_role_meta_main(NO_GALAXY_INFO)
         assert len(results) == 1
-        self.assertIn("No 'galaxy_info' found", str(results))
+        assert "No 'galaxy_info' found" in str(results)
 
     def test_missing_info(self) -> None:
         results = self.runner.run_role_meta_main(MISSING_INFO)
         assert len(results) == 3
-        self.assertIn("Role info should contain author", str(results))
-        self.assertIn("Role info should contain min_ansible_version", str(results))
-        self.assertIn("Platform should contain name", str(results))
+        assert "Role info should contain author" in str(results)
+        assert "Role info should contain min_ansible_version" in str(results)
+        assert "Platform should contain name" in str(results)
 
     def test_bad_types(self) -> None:
         results = self.runner.run_role_meta_main(BAD_TYPES)
         assert len(results) == 3
-        self.assertIn("author should be a string", str(results))
-        self.assertIn("description should be a string", str(results))
-        self.assertIn("Platforms should be a list of dictionaries", str(results))
+        assert "author should be a string" in str(results)
+        assert "description should be a string" in str(results)
+        assert "Platforms should be a list of dictionaries" in str(results)
 
     def test_platform_list_of_str(self) -> None:
         results = self.runner.run_role_meta_main(PLATFORMS_LIST_OF_STR)
         assert len(results) == 1
-        self.assertIn("Platforms should be a list of dictionaries", str(results))
+        assert "Platforms should be a list of dictionaries" in str(results)

@@ -27,8 +27,15 @@ class TestMetaVideoLinks(unittest.TestCase):
 
     def test_video_links(self) -> None:
         results = self.runner.run_role_meta_main(META_VIDEO_LINKS)
-        self.assertIn("Expected item in 'video_links' to be a dictionary", str(results))
-        self.assertIn(
-            "'video_links' to contain only keys 'url' and 'title'", str(results)
+        assert (
+            "Expected item in 'video_links' to be a dictionary"
+            in str(results)
         )
-        self.assertIn("URL format 'www.myvid.com/vid' is not recognized", str(results))
+        assert (
+            "'video_links' to contain only keys 'url' and 'title'"
+            in str(results)
+        )
+        assert (
+            "URL format 'www.myvid.com/vid' is not recognized"
+            in str(results)
+        )

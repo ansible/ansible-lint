@@ -87,8 +87,8 @@ class TestShellWithoutPipeFail(unittest.TestCase):
 
     def test_fail(self) -> None:
         results = self.runner.run_playbook(FAIL_TASKS)
-        self.assertEqual(3, len(results))
+        assert len(results) == 3
 
     def test_success(self) -> None:
         results = self.runner.run_playbook(SUCCESS_TASKS)
-        self.assertEqual(0, len(results))
+        assert len(results) == 0

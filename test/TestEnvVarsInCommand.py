@@ -83,8 +83,8 @@ class TestEnvVarsInCommand(unittest.TestCase):
 
     def test_success(self) -> None:
         results = self.runner.run_playbook(SUCCESS_PLAY_TASKS)
-        self.assertEqual(0, len(results))
+        assert len(results) == 0
 
     def test_fail(self) -> None:
         results = self.runner.run_playbook(FAIL_PLAY_TASKS)
-        self.assertEqual(2, len(results))
+        assert len(results) == 2
