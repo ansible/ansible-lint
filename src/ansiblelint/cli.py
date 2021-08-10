@@ -46,6 +46,7 @@ def abspath(path: str, base_dir: str) -> str:
 def expand_to_normalized_paths(
     config: Dict[str, Any], base_dir: Optional[str] = None
 ) -> None:
+    """Mutate given config normalizing any path values in it."""
     # config can be None (-c /dev/null)
     if not config:
         return
@@ -138,6 +139,7 @@ class AbspathArgAction(argparse.Action):
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
+    """Initialize an argument parser."""
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -303,6 +305,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
 
 
 def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespace:
+    """Combine the file config with the CLI args."""
     bools = (
         'display_relative_path',
         'parseable',
@@ -371,6 +374,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
 
 
 def get_config(arguments: List[str]) -> Namespace:
+    """Extract the config based on given args."""
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
 
@@ -394,6 +398,7 @@ def get_config(arguments: List[str]) -> Namespace:
 
 
 def print_help(file: Any = sys.stdout) -> None:
+    """Print help test to the given stream."""
     get_cli_parser().print_help(file=file)
 
 

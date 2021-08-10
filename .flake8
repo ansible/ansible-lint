@@ -53,41 +53,39 @@ per-file-ignores =
   # FIXME: D100 Missing docstring in public module
   # FIXME: D101 Missing docstring in public class
   # FIXME: D102 Missing docstring in public method
-  # FIXME: D103 Missing docstring in public function
   # FIXME: drop these once they're made simpler
   # Ref: https://github.com/ansible-community/ansible-lint/issues/744
-  src/ansiblelint/cli.py: D101 D102 D103
+  src/ansiblelint/cli.py: D101 D102
   src/ansiblelint/formatters/__init__.py: D101 D102
-  src/ansiblelint/utils.py: D103
   src/ansiblelint/rules/*.py: D100 D101 D102
   src/ansiblelint/rules/__init__.py: D100 D101 D102
 
   # FIXME: drop these once they're fixed
   # Ref: https://github.com/ansible-community/ansible-lint/issues/725
   test/__init__.py: D102
-  test/conftest.py: D100 D103
+  test/conftest.py: D100
   test/rules/EMatcherRule.py: D100 D101 D102
   test/rules/UnsetVariableMatcherRule.py: D100 D101 D102
-  test/TestAnsibleLintRule.py: D100 D103
-  test/TestBaseFormatter.py: D100 D103
+  test/TestAnsibleLintRule.py: D100
+  test/TestBaseFormatter.py: D100
   test/TestBecomeUserWithoutBecome.py: PT009 D100 D101 D102
   test/TestCliRolePaths.py: PT009 D100 D101 D102
-  test/TestCommandLineInvocationSameAsConfig.py: D100 D103
+  test/TestCommandLineInvocationSameAsConfig.py: D100
   test/TestCommandHasChangesCheck.py: PT009 D100 D101 D102
   test/TestComparisonToEmptyString.py: PT009 D100 D101 D102
   test/TestComparisonToLiteralBool.py: PT009 D100 D101 D102
-  test/TestDependenciesInMeta.py: D100 D103
+  test/TestDependenciesInMeta.py: D100
   test/TestDeprecatedModule.py: PT009 D100 D101 D102
   test/TestEnvVarsInCommand.py: PT009 D100 D101 D102
   test/TestFormatter.py: D100 D101 D102
-  test/TestImportIncludeRole.py: D100 D103
-  test/TestImportWithMalformed.py: D100 D103
-  test/TestIncludeMissingFileRule.py: D100 D103
-  test/TestIncludeMissFileWithRole.py: D100 D103
+  test/TestImportIncludeRole.py: D100
+  test/TestImportWithMalformed.py: D100
+  test/TestIncludeMissingFileRule.py: D100
+  test/TestIncludeMissFileWithRole.py: D100
   test/TestLineNumber.py: D100
   test/TestLineTooLong.py: PT009 D100 D101 D102
   test/TestLintRule.py: PT009 D100 D101 D102
-  test/TestNestedJinjaRule.py: D100 D103
+  test/TestNestedJinjaRule.py: D100
   test/TestMatchError.py: D101
   test/TestMetaChangeFromDefault.py: PT009 D100 D101 D102
   test/TestMetaMainHasInfo.py: PT009 D100 D101 D102
@@ -97,18 +95,18 @@ per-file-ignores =
   test/TestNoLogPasswordsRule.py: PT009 D100 D101 D102
   test/TestOctalPermissions.py: PT009 D100 D101 D102
   test/TestPackageIsNotLatest.py: PT009 D100 D101 D102
-  test/TestPretaskIncludePlaybook.py: D100 D103
+  test/TestPretaskIncludePlaybook.py: D100
   test/TestRoleHandlers.py: PT009 D100 D101 D102
   test/TestRoleRelativePath.py: PT009 D100 D101 D102
-  test/TestRuleProperties.py: D100 D103
-  test/TestRulesCollection.py: D100 D103
-  test/TestRunner.py: D100 D103
+  test/TestRuleProperties.py: D100
+  test/TestRulesCollection.py: D100
+  test/TestRunner.py: D100
   test/TestShellWithoutPipefail.py: PT009 D100 D101 D102
-  test/TestSkipImportPlaybook.py: D100 D103
-  test/TestSkipInsideYaml.py: D100 D103
-  test/TestSkipPlaybookItems.py: D100 D103
+  test/TestSkipImportPlaybook.py: D100
+  test/TestSkipInsideYaml.py: D100
+  test/TestSkipPlaybookItems.py: D100
   test/TestTaskHasName.py: PT009 D100 D101 D102
-  test/TestTaskIncludes.py: D100 D103
+  test/TestTaskIncludes.py: D100
   test/TestTaskNoLocalAction.py: PT009 D100 D101 D102
   test/TestUseCommandInsteadOfShell.py: PT009 D100 D101 D102
   test/TestUseHandlerRatherThanWhenChanged.py: PT009 D100 D101 D102

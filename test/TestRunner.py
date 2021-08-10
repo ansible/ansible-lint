@@ -56,6 +56,7 @@ def test_runner(
     exclude: List[str],
     length: int,
 ) -> None:
+    """Test that runner can go through any corner cases."""
     runner = Runner(playbook, rules=default_rules_collection, exclude_paths=exclude)
 
     matches = runner.run()
@@ -100,6 +101,7 @@ def test_runner_unicode_format(
     default_rules_collection: RulesCollection,
     formatter_cls: Type[formatters.BaseFormatter[Any]],
 ) -> None:
+    """Check that all formatters are unicode-friendly."""
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(
         Lintable('examples/playbooks/unicode.yml', "playbook"),
@@ -115,6 +117,7 @@ def test_runner_unicode_format(
 def test_runner_with_directory(
     default_rules_collection: RulesCollection, directory_name: str
 ) -> None:
+    """Check that runner detects a directory as role."""
     runner = Runner(directory_name, rules=default_rules_collection)
 
     expected = Lintable(name=directory_name, kind="role")
@@ -122,6 +125,7 @@ def test_runner_with_directory(
 
 
 def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> None:
+    """Ensure that lintables aren't double-checked."""
     checked_files: Set[Lintable] = set()
 
     filename = os.path.abspath('examples/playbooks/common-include-1.yml')
