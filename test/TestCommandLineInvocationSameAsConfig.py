@@ -10,6 +10,7 @@ from ansiblelint import cli
 
 @pytest.fixture
 def base_arguments() -> List[str]:
+    """Define reusable base arguments for tests in current module."""
     return ['../test/skiptasks.yml']
 
 
@@ -31,6 +32,7 @@ def base_arguments() -> List[str]:
 def test_ensure_config_are_equal(
     base_arguments: List[str], args: List[str], config: str
 ) -> None:
+    """Check equality of the CLI options to config files."""
     command = base_arguments + args
     cli_parser = cli.get_cli_parser()
 
@@ -49,6 +51,7 @@ def test_ensure_config_are_equal(
 
 
 def test_config_can_be_overridden(base_arguments: List[str]) -> None:
+    """Check that config can be overridden from CLI."""
     no_override = cli.get_config(base_arguments + ["-t", "bad_tag"])
 
     overridden = cli.get_config(
@@ -87,6 +90,7 @@ def test_expand_path_user_and_vars_config_file(base_arguments: List[str]) -> Non
 def test_path_from_config_do_not_depend_on_cwd(
     monkeypatch: MonkeyPatch,
 ) -> None:  # Issue 572
+    """Check that config-provided paths are decoupled from CWD."""
     config1 = cli.load_config("test/fixtures/config-with-relative-path.yml")
     monkeypatch.chdir('test')
     config2 = cli.load_config("fixtures/config-with-relative-path.yml")
@@ -97,6 +101,7 @@ def test_path_from_config_do_not_depend_on_cwd(
 def test_path_from_cli_depend_on_cwd(
     base_arguments: List[str], monkeypatch: MonkeyPatch
 ) -> None:
+    """Check that CLI-provided paths are relative to CWD."""
     # Issue 572
     arguments = base_arguments + [
         "--exclude",

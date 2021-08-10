@@ -88,6 +88,7 @@ _logger = logging.getLogger(__name__)
 
 
 def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
+    """Extract a decrypted YAML object from file."""
     dl = DataLoader()
     if hasattr(dl, 'set_vault_password'):
         dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
@@ -95,6 +96,7 @@ def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
 
 
 def path_dwim(basedir: str, given: str) -> str:
+    """Convert a given path do-what-I-mean style."""
     dl = DataLoader()
     dl.set_basedir(basedir)
     return str(dl.path_dwim(given))
@@ -103,6 +105,7 @@ def path_dwim(basedir: str, given: str) -> str:
 def ansible_template(
     basedir: str, varname: Any, templatevars: Any, **kwargs: Any
 ) -> Any:
+    """Render a templated string."""
     # `basedir` is the directory containing the lintable file.
     # Therefore, for tasks in a role, `basedir` has the form
     # `roles/some_role/tasks`. On the other hand, the search path
@@ -176,6 +179,7 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 
 
 def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
+    """Parse a string task invocation."""
     tokens = line.lstrip().split(" ")
     if tokens[0] == '-':
         tokens = tokens[1:]
@@ -225,6 +229,7 @@ def _set_collections_basedir(basedir: str) -> None:
 
 
 def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
+    """Traverse children of a single file or folder."""
     if not lintable.path.exists():
         return []
     playbook_dir = str(lintable.path.parent)
@@ -276,6 +281,7 @@ def template(
     fail_on_undefined: bool = False,
     **kwargs: str,
 ) -> Any:
+    """Attempt rendering a value with known vars."""
     try:
         value = ansible_template(
             os.path.abspath(basedir),
@@ -294,6 +300,7 @@ def template(
 def play_children(
     basedir: str, item: Tuple[str, Any], parent_type: FileType, playbook_dir: str
 ) -> List[Lintable]:
+    """Flatten the traversed play tasks."""
     delegate_map: Dict[str, Callable[[str, Any, Any, FileType], List[Lintable]]] = {
         'tasks': _taskshandlers_children,
         'pre_tasks': _taskshandlers_children,
@@ -592,6 +599,7 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
+    """Unify task-like object structures."""
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
         del task['__ansible_action_type__']
@@ -602,6 +610,7 @@ def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
 
 
 def task_to_str(task: Dict[str, Any]) -> str:
+    """Make a string identifier for the given task."""
     name = task.get("name")
     if name:
         return str(name)
@@ -630,6 +639,7 @@ def task_to_str(task: Dict[str, Any]) -> str:
 def extract_from_list(
     blocks: AnsibleBaseYAMLObject, candidates: List[str]
 ) -> List[Any]:
+    """Get action tasks from block structures."""
     results = list()
     for block in blocks:
         for candidate in candidates:
@@ -645,6 +655,7 @@ def extract_from_list(
 
 
 def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[Any]:
+    """Add action markers to task objects."""
     results = list()
     for action in actions:
         # ignore empty task
@@ -656,6 +667,7 @@ def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[An
 
 
 def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
+    """Get a flattened list of action tasks from the file."""
     tasks = list()
     if file.kind in ['tasks', 'handlers']:
         tasks = add_action_type(yaml, file.kind)
@@ -684,6 +696,7 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
 def get_normalized_tasks(
     yaml: "AnsibleBaseYAMLObject", file: Lintable
 ) -> List[Dict[str, Any]]:
+    """Extract normalized tasks from a file."""
     tasks = get_action_tasks(yaml, file)
     res = []
     for task in tasks:
@@ -740,6 +753,7 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
 
 
 def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
+    """Extract the first arg from a cmd task."""
     try:
         if 'cmd' in task['action']:
             first_cmd_arg = task['action']['cmd'].split()[0]
@@ -751,6 +765,7 @@ def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
 
 
 def get_second_cmd_arg(task: Dict[str, Any]) -> Any:
+    """Extract the second arg from a cmd task."""
     try:
         if 'cmd' in task['action']:
             second_cmd_arg = task['action']['cmd'].split()[1]
