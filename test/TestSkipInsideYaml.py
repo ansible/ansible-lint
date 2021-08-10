@@ -90,6 +90,7 @@ ROLE_TASKS_WITH_BLOCK_BECOME = '''\
 
 
 def test_role_tasks(default_text_runner: RunFromText) -> None:
+    """Check that role tasks can contain skips."""
     results = default_text_runner.run_role_tasks_main(ROLE_TASKS)
     assert len(results) == 1, results
     assert results[0].linenumber == 2
@@ -97,6 +98,7 @@ def test_role_tasks(default_text_runner: RunFromText) -> None:
 
 
 def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:
+    """Check that blocks in role tasks can contain skips."""
     results = default_text_runner.run_role_tasks_main(ROLE_TASKS_WITH_BLOCK)
     assert len(results) == 4
 
@@ -112,10 +114,12 @@ def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:
 def test_playbook(
     default_text_runner: RunFromText, playbook_src: str, results_num: int
 ) -> None:
+    """Check that playbooks can contain skips."""
     results = default_text_runner.run_playbook(playbook_src)
     assert len(results) == results_num
 
 
 def test_role_meta(default_text_runner: RunFromText) -> None:
+    """Check that role meta can contain skips."""
     results = default_text_runner.run_role_meta_main(ROLE_META)
     assert len(results) == 0

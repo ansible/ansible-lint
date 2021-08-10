@@ -50,6 +50,7 @@ PLAY_INCLUDE_ROLE_INLINE = '''
 
 @pytest.fixture
 def playbook_path(request: SubRequest, tmp_path: Path) -> str:
+    """Create a reusable per-test role skeleton."""
     playbook_text = request.param
     role_tasks_dir = tmp_path / 'test-role' / 'tasks'
     role_tasks_dir.mkdir(parents=True)
@@ -89,6 +90,7 @@ def playbook_path(request: SubRequest, tmp_path: Path) -> str:
 def test_import_role2(
     default_rules_collection: RulesCollection, playbook_path: str, messages: List[str]
 ) -> None:
+    """Test that include_role digs deeper than import_role."""
     runner = Runner(playbook_path, rules=default_rules_collection)
     results = runner.run()
     for message in messages:

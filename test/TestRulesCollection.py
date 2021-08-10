@@ -32,20 +32,24 @@ from ansiblelint.testing import run_ansible_lint
 
 @pytest.fixture
 def test_rules_collection() -> RulesCollection:
+    """Create a shared rules collection test instance."""
     return RulesCollection([os.path.abspath('./test/rules')])
 
 
 @pytest.fixture
 def ematchtestfile() -> Lintable:
+    """Produce a test lintable with an id violation."""
     return Lintable('examples/playbooks/ematcher-rule.yml', kind='playbook')
 
 
 @pytest.fixture
 def bracketsmatchtestfile() -> Lintable:
+    """Produce a test lintable with matching brackets."""
     return Lintable('examples/playbooks/bracketsmatchtest.yml', kind='playbook')
 
 
 def test_load_collection_from_directory(test_rules_collection: RulesCollection) -> None:
+    """Test that custom rules extend the default ones."""
     # two detected rules plus the internal ones
     assert len(test_rules_collection) == 5
 
@@ -53,6 +57,7 @@ def test_load_collection_from_directory(test_rules_collection: RulesCollection) 
 def test_run_collection(
     test_rules_collection: RulesCollection, ematchtestfile: Lintable
 ) -> None:
+    """Test that default rules match pre-meditated violations."""
     matches = test_rules_collection.run(ematchtestfile)
     assert len(matches) == 3  # 3 occurrences of BANNED using TEST0001
     assert matches[0].linenumber == 2
@@ -63,6 +68,7 @@ def test_tags(
     ematchtestfile: Lintable,
     bracketsmatchtestfile: Lintable,
 ) -> None:
+    """Test that tags are treated as skip markers."""
     matches = test_rules_collection.run(ematchtestfile, tags={'test1'})
     assert len(matches) == 3
     matches = test_rules_collection.run(ematchtestfile, tags={'test2'})
@@ -78,6 +84,7 @@ def test_skip_tags(
     ematchtestfile: Lintable,
     bracketsmatchtestfile: Lintable,
 ) -> None:
+    """Test that tags can be skipped."""
     matches = test_rules_collection.run(ematchtestfile, skip_list=['test1'])
     assert len(matches) == 0
     matches = test_rules_collection.run(ematchtestfile, skip_list=['test2'])
@@ -93,6 +100,7 @@ def test_skip_id(
     ematchtestfile: Lintable,
     bracketsmatchtestfile: Lintable,
 ) -> None:
+    """Check that skipping valid IDs excludes their violations."""
     matches = test_rules_collection.run(ematchtestfile, skip_list=['TEST0001'])
     assert len(matches) == 0
     matches = test_rules_collection.run(ematchtestfile, skip_list=['TEST0002'])
@@ -106,11 +114,13 @@ def test_skip_id(
 def test_skip_non_existent_id(
     test_rules_collection: RulesCollection, ematchtestfile: Lintable
 ) -> None:
+    """Check that skipping invalid IDs changes nothing."""
     matches = test_rules_collection.run(ematchtestfile, skip_list=['DOESNOTEXIST'])
     assert len(matches) == 3
 
 
 def test_no_duplicate_rule_ids(test_rules_collection: RulesCollection) -> None:
+    """Check that rules of the collection don't have duplicate IDs."""
     real_rules = RulesCollection([os.path.abspath('./src/ansiblelint/rules')])
     rule_ids = [rule.id for rule in real_rules]
     assert not any(y > 1 for y in collections.Counter(rule_ids).values())

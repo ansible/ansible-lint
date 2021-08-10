@@ -41,6 +41,7 @@ PLAY_IMPORT_TASKS = Lintable(
 )
 @pytest.mark.usefixtures('_play_files')
 def test_import_tasks_with_malformed_import(runner: Runner) -> None:
+    """Test that malformed tasks/imports don't fail parsing."""
     results = runner.run()
     passed = False
     for result in results:
