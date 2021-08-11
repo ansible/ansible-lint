@@ -53,7 +53,10 @@ extensions = [
     'myst_parser',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    # Third-party extensions:
+    'sphinxcontrib.apidoc',
     'sphinxcontrib.programoutput',
+    # Tree-local extensions:
     'rules_table_generator_ext',  # in-tree extension
 ]
 
@@ -82,6 +85,17 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
+apidoc_excluded_paths = []
+apidoc_extra_args = [
+    '--implicit-namespaces',
+    '--private',  # include “_private” modules
+]
+apidoc_module_dir = '../src/ansiblelint'
+apidoc_module_first = False
+apidoc_output_dir = 'pkg'
+apidoc_separate_modules = True
+apidoc_toc_file = None
+
 # General substitutions.
 project = 'Ansible Lint Documentation'
 copyright = "2013-2021 Ansible, Inc"  # pylint: disable=redefined-builtin
@@ -97,6 +111,14 @@ extlinks = {
     "pr": (f"{github_repo_url}/pull/%s", "PR #"),
     "commit": (f"{github_repo_url}/commit/%s", ""),
     "gh": (f"{github_url}/%s", "GitHub: "),
+}
+
+intersphinx_mapping = {
+    'packaging': ('https://packaging.rtfd.io/en/latest', None),
+    'pytest': ('https://docs.pytest.org/en/latest', None),
+    'python': ('https://docs.python.org/3', None),
+    'python2': ('https://docs.python.org/2', None),
+    'rich': ('https://rich.rtfd.io/en/latest', None),
 }
 
 # The default replacements for |version| and |release|, also used in various
@@ -298,4 +320,27 @@ html_static_path = ['_static']
 html_css_files = [
     'theme_overrides.css',  # override wide tables in RTD theme
     'ansi.css',
+]
+
+nitpicky = True
+nitpick_ignore = [
+    ('py:class', 'ansible.parsing.yaml.objects.AnsibleBaseYAMLObject'),
+    ('py:class', 'Lintable'),
+    ('py:class', 'yaml'),
+    ('py:class', 'role'),
+    ('py:class', 'requirements'),
+    ('py:class', 'handlers'),
+    ('py:class', 'tasks'),
+    ('py:class', 'meta'),
+    ('py:class', 'playbook'),
+    ('py:class', 'AnsibleBaseYAMLObject'),
+    ('py:class', 'Namespace'),
+    ('py:class', 'RulesCollection'),
+    ('py:class', '_pytest.fixtures.SubRequest'),
+    ('py:class', 'MatchError'),
+    ('py:class', 'Pattern'),
+    ('py:class', 'odict'),
+    ('py:class', 'LintResult'),
+    ('py:obj', 'Any'),
+    ('py:obj', 'ansiblelint.formatters.T'),
 ]

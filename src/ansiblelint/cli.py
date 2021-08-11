@@ -30,10 +30,8 @@ def abspath(path: str, base_dir: str) -> str:
 
     Args:
        path (str): the path to make absolute
-       base_dir (str): the directory from which make relative paths
-           absolute
-       default_drive: Windows drive to use to make the path
-           absolute if none is given.
+       base_dir (str): the directory from which make \
+                       relative paths absolute
     """
     if not os.path.isabs(path):
         # Don't use abspath as it assumes path is relative to cwd.
