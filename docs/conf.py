@@ -17,6 +17,7 @@
 import os
 import sys
 from pathlib import Path
+from typing import List
 
 import pkg_resources
 
@@ -85,7 +86,7 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
-apidoc_excluded_paths = []
+apidoc_excluded_paths: List[str] = []
 apidoc_extra_args = [
     '--implicit-namespaces',
     '--private',  # include “_private” modules
