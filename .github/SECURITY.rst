@@ -5,8 +5,12 @@ Supported Versions
 ==================
 
 Ansible applies security fixes according to the 3-versions-back support
-policy. Please find more information in `our docs
-<https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html#release-status>`_.
+policy. Please find more information in `our docs`_.
+
+.. _our docs:
+   https://docs.ansible.com/ansible-core/devel/reference_appendices
+   /release_and_maintenance.html#ansible-core-release-cycle
+
 
 Reporting a Vulnerability
 =========================

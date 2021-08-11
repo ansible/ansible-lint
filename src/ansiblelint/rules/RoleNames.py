@@ -44,8 +44,8 @@ class RoleNames(AnsibleLintRule):
     description = (
         "Role names are now limited to contain only lowercase alphanumeric "
         "characters, plus '_' and start with an alpha character. See "
-        "`developing collections <https://docs.ansible.com/ansible/devel/dev_guide/developing_"
-        "collections.html#roles-directory>`_"
+        "`developing collections <https://docs.ansible.com/ansible/devel/dev_guide/"
+        "developing_collections_structure.html#roles-directory>`_"
     )
     severity = 'HIGH'
     done: List[str] = []  # already noticed roles list
