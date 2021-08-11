@@ -325,6 +325,8 @@ html_css_files = [
     'ansi.css',
 ]
 
+linkcheck_workers = 25
+
 nitpicky = True
 nitpick_ignore = [
     ('py:class', 'ansible.parsing.yaml.objects.AnsibleBaseYAMLObject'),
