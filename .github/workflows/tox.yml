@@ -32,6 +32,7 @@ jobs:
         env:
         - TOXENV: lint
         - TOXENV: docs
+        - TOXENV: linkcheck-docs
         - TOXENV: eco
         - TOXENV: packaging
     env:

@@ -43,8 +43,8 @@ use `tox`_.
 
 .. _.flake8: https://github.com/ansible-community/ansible-lint/blob/main/.flake8
 .. _supported Ansible versions:
-   https://docs.ansible.com/ansible/devel/reference_appendices
-   /release_and_maintenance.html#release-status
+   https://docs.ansible.com/ansible-core/devel/reference_appendices
+   /release_and_maintenance.html#ansible-core-release-cycle
 .. _tox: https://tox.readthedocs.io
 
 .. DO-NOT-REMOVE-deps-snippet-PLACEHOLDER

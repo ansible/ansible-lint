@@ -115,6 +115,8 @@ extlinks = {
 }
 
 intersphinx_mapping = {
+    'ansible': ('https://docs.ansible.com/ansible/devel/', None),
+    'ansible-core': ('https://docs.ansible.com/ansible-core/devel/', None),
     'packaging': ('https://packaging.rtfd.io/en/latest', None),
     'pytest': ('https://docs.pytest.org/en/latest', None),
     'python': ('https://docs.python.org/3', None),
@@ -322,6 +324,8 @@ html_css_files = [
     'theme_overrides.css',  # override wide tables in RTD theme
     'ansi.css',
 ]
+
+linkcheck_workers = 25
 
 nitpicky = True
 nitpick_ignore = [

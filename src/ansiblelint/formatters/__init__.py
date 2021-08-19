@@ -159,7 +159,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
 
     The formatter expects a list of MatchError objects and returns a JSON formatted string.
     The spec for the codeclimate report can be found here:
-    https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#data-type
+    https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#user-content-data-types
     """
 
     def format_result(self, matches: List["MatchError"]) -> str:
