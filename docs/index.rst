@@ -62,3 +62,4 @@ Ansible teams.
    :caption: Contributing
 
    contributing
+   Private unsupported (dev) API autodoc <pkg/modules>
