@@ -21,4 +21,4 @@ class TestLineTooLongRule(unittest.TestCase):
 
     def test_long_line(self) -> None:
         results = self.runner.run_role_tasks_main(LONG_LINE)
-        self.assertEqual(1, len(results))
+        assert len(results) == 1

@@ -21,7 +21,7 @@ class TestDeprecatedModuleRule(unittest.TestCase):
 
     def test_module_deprecated(self) -> None:
         results = self.runner.run_role_tasks_main(MODULE_DEPRECATED)
-        self.assertEqual(1, len(results))
+        assert len(results) == 1
         # based on version and blend of ansible being used, we may
         # get a missing module, so we future proof the test
         assert (

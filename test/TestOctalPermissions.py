@@ -136,22 +136,20 @@ class TestOctalPermissionsRuleWithFile(unittest.TestCase):
 
     def test_success(self) -> None:
         results = self.runner.run_playbook(SUCCESS_TASKS)
-        self.assertEqual(0, len(results))
+        assert len(results) == 0
 
     def test_fail(self) -> None:
         results = self.runner.run_playbook(FAIL_TASKS)
-        self.assertEqual(4, len(results))
+        assert len(results) == 4
 
     def test_valid_modes(self) -> None:
         for mode in self.VALID_MODES:
-            self.assertFalse(
-                self.rule.is_invalid_permission(mode),
-                msg="0o%o should be a valid mode" % mode,
+            assert not self.rule.is_invalid_permission(mode), (
+                "0o%o should be a valid mode" % mode
             )
 
     def test_invalid_modes(self) -> None:
         for mode in self.INVALID_MODES:
-            self.assertTrue(
-                self.rule.is_invalid_permission(mode),
-                msg="%d should be an invalid mode" % mode,
+            assert self.rule.is_invalid_permission(mode), (
+                "%d should be an invalid mode" % mode
             )

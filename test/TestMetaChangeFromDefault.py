@@ -23,7 +23,7 @@ class TestMetaChangeFromDefault(unittest.TestCase):
 
     def test_default_galaxy_info(self) -> None:
         results = self.runner.run_role_meta_main(DEFAULT_GALAXY_INFO)
-        self.assertIn("Should change default metadata: author", str(results))
-        self.assertIn("Should change default metadata: description", str(results))
-        self.assertIn("Should change default metadata: company", str(results))
-        self.assertIn("Should change default metadata: license", str(results))
+        assert "Should change default metadata: author" in str(results)
+        assert "Should change default metadata: description" in str(results)
+        assert "Should change default metadata: company" in str(results)
+        assert "Should change default metadata: license" in str(results)
