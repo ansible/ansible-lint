@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
@@ -53,5 +54,109 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
                     and 'when' not in task
                     and 'creates' not in task['action']
                     and 'removes' not in task['action']
+                    and not task.get("register")
                 )
         return False
+
+
+if "pytest" in sys.modules:
+    import pytest
+
+    NO_CHANGE_COMMAND_RC = '''
+- hosts: all
+  tasks:
+    - name: handle command output with _when
+      ansible.builtin.command: cat {{ myfile|quote }}
+      register: myoutput
+      changed_when: myoutput.rc != 0
+      failed_when: myoutput.rc != 0
+'''
+
+    NO_CHANGE_SHELL_RC = '''
+- hosts: all
+  tasks:
+    - name: handle shell output with _when
+      ansible.builtin.shell: cat {{ myfile|quote }}
+      register: myoutput
+      changed_when: myoutput.rc != 0
+      failed_when: myoutput.rc != 0
+'''
+
+    NO_CHANGE_REGISTER = '''
+- hosts: all
+  tasks:
+    - name: register command output, handle elsewhere
+      ansible.builtin.command: cat {{ myfile|quote }}
+      register: myoutput
+'''
+
+    NO_CHANGE_ARGS = '''
+- hosts: all
+  tasks:
+    - name: command with argument
+      command: createfile.sh
+      args:
+        creates: /tmp/????unknown_files????
+'''
+
+    NO_CHANGE_COMMAND_FAIL = '''
+- hosts: all
+  tasks:
+    - name: basic command task, should fail
+      ansible.builtin.command: cat myfile
+'''
+
+    NO_CHANGE_SHELL_FAIL = '''
+- hosts: all
+  tasks:
+    - name: basic shell task, should fail
+      shell: cat myfile
+'''
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_command_rc(rule_runner: Any) -> None:
+        """This should pass since *_when is used."""
+        results = rule_runner.run_playbook(NO_CHANGE_COMMAND_RC)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_shell_rc(rule_runner: Any) -> None:
+        """This should pass since *_when is used."""
+        results = rule_runner.run_playbook(NO_CHANGE_SHELL_RC)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_register(rule_runner: Any) -> None:
+        """This test should pass since we register the command output."""
+        results = rule_runner.run_playbook(NO_CHANGE_REGISTER)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_args(rule_runner: Any) -> None:
+        """This test should pass since we manage output with create et al."""
+        results = rule_runner.run_playbook(NO_CHANGE_ARGS)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_command_fail(rule_runner: Any) -> None:
+        """This test should fail because command isn't handled."""
+        results = rule_runner.run_playbook(NO_CHANGE_COMMAND_FAIL)
+        assert len(results) == 1
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_shell_fail(rule_runner: Any) -> None:
+        """This test should fail because shell isn't handled.."""
+        results = rule_runner.run_playbook(NO_CHANGE_SHELL_FAIL)
+        assert len(results) == 1
