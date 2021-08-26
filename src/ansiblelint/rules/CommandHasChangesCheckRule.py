@@ -32,12 +32,30 @@ if TYPE_CHECKING:
 class CommandHasChangesCheckRule(AnsibleLintRule):
     id = 'no-changed-when'
     shortdesc = 'Commands should not change things if nothing needs doing'
-    description = (
-        'Commands should either read information (and thus set '
-        '``changed_when``) or not do something if it has already been '
-        'done (using creates/removes) or only do it if another '
-        'check has a particular result (``when``)'
-    )
+    description = """
+Commands should either read information (and thus set
+``changed_when``) or not do something if it has already been
+done (using ``creates`` or ``removes`` argument) or only do it if another
+check has a particular result (``when``).
+
+An example where the ``shell`` output is registered and the return code
+is used to define when the task has changed.
+
+.. code:: yaml
+
+    - name: handle shell output with return code
+      ansible.builtin.shell: cat {{ myfile|quote }}
+      register: myoutput
+      changed_when: myoutput.rc != 0
+
+The following example will trigger the rule since the task does not
+handle the output of the ``command``.
+
+.. code:: yaml
+
+    - name: does not handle any output or return codes
+      ansible.builtin.command: cat {{ myfile|quote }}
+    """
     severity = 'HIGH'
     tags = ['command-shell', 'idempotency']
     version_added = 'historic'
