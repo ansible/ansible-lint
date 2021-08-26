@@ -64,7 +64,7 @@ if "pytest" in sys.modules:
     NO_CHANGE_COMMAND_RC = '''
 - hosts: all
   tasks:
-    - name: handle command output with _when
+    - name: handle command output with return code
       ansible.builtin.command: cat {{ myfile|quote }}
       register: myoutput
       changed_when: myoutput.rc != 0
@@ -73,7 +73,7 @@ if "pytest" in sys.modules:
     NO_CHANGE_SHELL_RC = '''
 - hosts: all
   tasks:
-    - name: handle shell output with _when
+    - name: handle shell output with return code
       ansible.builtin.shell: cat {{ myfile|quote }}
       register: myoutput
       changed_when: myoutput.rc != 0
@@ -82,10 +82,19 @@ if "pytest" in sys.modules:
     NO_CHANGE_SHELL_FALSE = '''
 - hosts: all
   tasks:
-    - name: handle shell output with changed_when
+    - name: handle shell output with false changed_when
       ansible.builtin.shell: cat {{ myfile|quote }}
       register: myoutput
       changed_when: false
+'''
+
+    NO_CHANGE_ARGS = '''
+- hosts: all
+  tasks:
+    - name: command with argument
+      command: createfile.sh
+      args:
+        creates: /tmp/????unknown_files????
 '''
 
     NO_CHANGE_REGISTER_FAIL = '''
@@ -94,15 +103,6 @@ if "pytest" in sys.modules:
     - name: register command output, but cat still does not change anything
       ansible.builtin.command: cat {{ myfile|quote }}
       register: myoutput
-'''
-
-    NO_CHANGE_ARGS_FAIL = '''
-- hosts: all
-  tasks:
-    - name: command with argument
-      command: createfile.sh
-      args:
-        creates: /tmp/????unknown_files????
 '''
 
     NO_CHANGE_COMMAND_FAIL = '''
@@ -146,17 +146,17 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
     )
-    def test_no_change_register_fail(rule_runner: Any) -> None:
-        """This test should not pass since cat still doesn't do anything."""
-        results = rule_runner.run_playbook(NO_CHANGE_REGISTER_FAIL)
-        assert len(results) == 1
+    def test_no_change_args(rule_runner: Any) -> None:
+        """This test should not pass since the command doesn't do anything."""
+        results = rule_runner.run_playbook(NO_CHANGE_ARGS)
+        assert len(results) == 0
 
     @pytest.mark.parametrize(
         'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
     )
-    def test_no_change_args_fail(rule_runner: Any) -> None:
-        """This test should not pass since the command doesn't do anything."""
-        results = rule_runner.run_playbook(NO_CHANGE_ARGS_FAIL)
+    def test_no_change_register_fail(rule_runner: Any) -> None:
+        """This test should not pass since cat still doesn't do anything."""
+        results = rule_runner.run_playbook(NO_CHANGE_REGISTER_FAIL)
         assert len(results) == 1
 
     @pytest.mark.parametrize(
