@@ -38,8 +38,8 @@ Commands should either read information (and thus set
 done (using ``creates`` or ``removes`` argument) or only do it if another
 check has a particular result (``when``).
 
-An example where the ``shell`` output is registered and the return code
-is used to define when the task has changed.
+For example, this task registers the ``shell`` output and uses the return code
+to define when the task has changed.
 
 .. code:: yaml
 
