@@ -77,13 +77,11 @@ def test_runner_exclude_paths(default_rules_collection: RulesCollection) -> None
 
 
 @pytest.mark.parametrize(
-    ('exclude_path'),
-    (
-        '**/example.yml',
-        'examples/**/example.yml'
-    )
+    ('exclude_path'), ('**/example.yml', 'examples/**/example.yml')
 )
-def test_runner_exclude_globs(default_rules_collection: RulseCollection, exclude_path) -> None:
+def test_runner_exclude_globs(
+    default_rules_collection: RulesCollection, exclude_path: str
+) -> None:
     """Test that globs work."""
     runner = Runner(
         'examples/playbooks/example.yml',
