@@ -33,10 +33,10 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
     id = 'no-changed-when'
     shortdesc = 'Commands should not change things if nothing needs doing'
     description = """
-Commands should either read information (and thus set
-``changed_when``) or not do something if it has already been
-done (using ``creates`` or ``removes`` argument) or only do it if another
-check has a particular result (``when``).
+Tasks should tell Ansible when to return ``changed``, unless the task only reads
+information. To do this, set ``changed_when``, use the ``creates`` or
+``removes`` argument, or use ``when`` to run the task only if another check has
+a particular result.
 
 For example, this task registers the ``shell`` output and uses the return code
 to define when the task has changed.
