@@ -57,7 +57,7 @@ CI/CD
 -----
 
 If execution under `Github Actions`_ is detected via the presence of
-``GITHUB_ACTIONS=true`` and ``GITHUB_WORFLOW=...`` variables, the linter will
+``GITHUB_ACTIONS=true`` and ``GITHUB_WORKFLOW=...`` variables, the linter will
 also print errors using their `annotation`_ format.
 
 .. _GitHub Actions: https://github.com/features/actions
