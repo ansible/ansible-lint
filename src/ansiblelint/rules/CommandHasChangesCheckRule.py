@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
@@ -31,12 +32,30 @@ if TYPE_CHECKING:
 class CommandHasChangesCheckRule(AnsibleLintRule):
     id = 'no-changed-when'
     shortdesc = 'Commands should not change things if nothing needs doing'
-    description = (
-        'Commands should either read information (and thus set '
-        '``changed_when``) or not do something if it has already been '
-        'done (using creates/removes) or only do it if another '
-        'check has a particular result (``when``)'
-    )
+    description = """
+Tasks should tell Ansible when to return ``changed``, unless the task only reads
+information. To do this, set ``changed_when``, use the ``creates`` or
+``removes`` argument, or use ``when`` to run the task only if another check has
+a particular result.
+
+For example, this task registers the ``shell`` output and uses the return code
+to define when the task has changed.
+
+.. code:: yaml
+
+    - name: handle shell output with return code
+      ansible.builtin.shell: cat {{ myfile|quote }}
+      register: myoutput
+      changed_when: myoutput.rc != 0
+
+The following example will trigger the rule since the task does not
+handle the output of the ``command``.
+
+.. code:: yaml
+
+    - name: does not handle any output or return codes
+      ansible.builtin.command: cat {{ myfile|quote }}
+    """
     severity = 'HIGH'
     tags = ['command-shell', 'idempotency']
     version_added = 'historic'
@@ -55,3 +74,121 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
                     and 'removes' not in task['action']
                 )
         return False
+
+
+if "pytest" in sys.modules:
+    import pytest
+
+    NO_CHANGE_COMMAND_RC = '''
+- hosts: all
+  tasks:
+    - name: handle command output with return code
+      ansible.builtin.command: cat {{ myfile|quote }}
+      register: myoutput
+      changed_when: myoutput.rc != 0
+'''
+
+    NO_CHANGE_SHELL_RC = '''
+- hosts: all
+  tasks:
+    - name: handle shell output with return code
+      ansible.builtin.shell: cat {{ myfile|quote }}
+      register: myoutput
+      changed_when: myoutput.rc != 0
+'''
+
+    NO_CHANGE_SHELL_FALSE = '''
+- hosts: all
+  tasks:
+    - name: handle shell output with false changed_when
+      ansible.builtin.shell: cat {{ myfile|quote }}
+      register: myoutput
+      changed_when: false
+'''
+
+    NO_CHANGE_ARGS = '''
+- hosts: all
+  tasks:
+    - name: command with argument
+      command: createfile.sh
+      args:
+        creates: /tmp/????unknown_files????
+'''
+
+    NO_CHANGE_REGISTER_FAIL = '''
+- hosts: all
+  tasks:
+    - name: register command output, but cat still does not change anything
+      ansible.builtin.command: cat {{ myfile|quote }}
+      register: myoutput
+'''
+
+    NO_CHANGE_COMMAND_FAIL = '''
+- hosts: all
+  tasks:
+    - name: basic command task, should fail
+      ansible.builtin.command: cat myfile
+'''
+
+    NO_CHANGE_SHELL_FAIL = '''
+- hosts: all
+  tasks:
+    - name: basic shell task, should fail
+      shell: cat myfile
+'''
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_command_rc(rule_runner: Any) -> None:
+        """This should pass since *_when is used."""
+        results = rule_runner.run_playbook(NO_CHANGE_COMMAND_RC)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_shell_rc(rule_runner: Any) -> None:
+        """This should pass since *_when is used."""
+        results = rule_runner.run_playbook(NO_CHANGE_SHELL_RC)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_shell_false(rule_runner: Any) -> None:
+        """This should pass since *_when is used."""
+        results = rule_runner.run_playbook(NO_CHANGE_SHELL_FALSE)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_args(rule_runner: Any) -> None:
+        """This test should not pass since the command doesn't do anything."""
+        results = rule_runner.run_playbook(NO_CHANGE_ARGS)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_register_fail(rule_runner: Any) -> None:
+        """This test should not pass since cat still doesn't do anything."""
+        results = rule_runner.run_playbook(NO_CHANGE_REGISTER_FAIL)
+        assert len(results) == 1
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_command_fail(rule_runner: Any) -> None:
+        """This test should fail because command isn't handled."""
+        results = rule_runner.run_playbook(NO_CHANGE_COMMAND_FAIL)
+        assert len(results) == 1
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']
+    )
+    def test_no_change_shell_fail(rule_runner: Any) -> None:
+        """This test should fail because shell isn't handled.."""
+        results = rule_runner.run_playbook(NO_CHANGE_SHELL_FAIL)
+        assert len(results) == 1
