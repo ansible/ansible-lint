@@ -58,7 +58,7 @@ using ``--user`` or fixing potential conflicts if not using virtualenvs.
 
 .. _installing_from_source:
 .. _pip3: https://pypi.org/project/pip/
-.. _pipx: https://pipxproject.github.io/pipx/
+.. _pipx: https://pypa.github.io/pipx/
 
 From Source
 -----------
