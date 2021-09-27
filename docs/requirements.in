@@ -1,4 +1,4 @@
-ansible-base  # needed by rules_table_generator
+ansible-core  # needed by rules_table_generator
 myst-parser
 pipdeptree
 pytest
