@@ -13,7 +13,7 @@ class NoSameOwnerRule(AnsibleLintRule):
     id = 'no-same-owner'
     shortdesc = 'Owner should not be kept between different hosts'
     description = """
-Optional rule that hihglight dangers of assuming that user/group on the remote
+Optional rule that highlights dangers of assuming that user/group on the remote
 machines may not exist on ansible controller or vice versa. Owner and group
 should not be preserved when transferring files between them.
 

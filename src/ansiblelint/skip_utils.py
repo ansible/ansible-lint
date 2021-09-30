@@ -62,8 +62,8 @@ def append_skipped_rules(
     :param pyyaml_data: file text parsed via ansible and pyyaml.
     :param file_text: raw file text.
     :param file_type: type of file: tasks, handlers or meta.
-    :returns: original pyyaml_data altered with a 'skipped_rules' list added
-    to individual tasks, or added to the single metadata block.
+    :returns: original pyyaml_data altered with a 'skipped_rules' list added \
+              to individual tasks, or added to the single metadata block.
     """
     try:
         yaml_skip = _append_skipped_rules(pyyaml_data, lintable)
@@ -80,10 +80,10 @@ def append_skipped_rules(
 
 @lru_cache(maxsize=128)
 def load_data(file_text: str) -> Any:
-    """Parse `file_text` as yaml and return parsed structure.
+    """Parse ``file_text`` as yaml and return parsed structure.
 
     This is the main culprit for slow performance, each rule asks for loading yaml again and again
-    ideally the `maxsize` on the decorator above MUST be great or equal total number of rules
+    ideally the ``maxsize`` on the decorator above MUST be great or equal total number of rules
     :param file_text: raw text to parse
     :return: Parsed yaml
     """

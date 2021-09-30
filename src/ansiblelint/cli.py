@@ -30,10 +30,8 @@ def abspath(path: str, base_dir: str) -> str:
 
     Args:
        path (str): the path to make absolute
-       base_dir (str): the directory from which make relative paths
-           absolute
-       default_drive: Windows drive to use to make the path
-           absolute if none is given.
+       base_dir (str): the directory from which make \
+                       relative paths absolute
     """
     if not os.path.isabs(path):
         # Don't use abspath as it assumes path is relative to cwd.
@@ -46,6 +44,7 @@ def abspath(path: str, base_dir: str) -> str:
 def expand_to_normalized_paths(
     config: Dict[str, Any], base_dir: Optional[str] = None
 ) -> None:
+    """Mutate given config normalizing any path values in it."""
     # config can be None (-c /dev/null)
     if not config:
         return
@@ -138,6 +137,7 @@ class AbspathArgAction(argparse.Action):
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
+    """Initialize an argument parser."""
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -303,6 +303,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
 
 
 def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespace:
+    """Combine the file config with the CLI args."""
     bools = (
         'display_relative_path',
         'parseable',
@@ -327,7 +328,6 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     scalar_map = {
         "loop_var_prefix": None,
         "project_dir": ".",
-        "var_naming_pattern": "^[a-z_][a-z0-9_]*$",
     }
 
     if not file_config:
@@ -372,6 +372,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
 
 
 def get_config(arguments: List[str]) -> Namespace:
+    """Extract the config based on given args."""
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
 
@@ -382,11 +383,7 @@ def get_config(arguments: List[str]) -> Namespace:
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
 
     if options.project_dir == ".":
-        project_dir = os.path.dirname(
-            os.path.abspath(
-                options.config_file or f"{guess_project_dir()}/.ansible-lint"
-            )
-        )
+        project_dir = guess_project_dir(options.config_file)
         options.project_dir = normpath(project_dir)
     if not options.project_dir or not os.path.exists(options.project_dir):
         raise RuntimeError(
@@ -399,6 +396,7 @@ def get_config(arguments: List[str]) -> Namespace:
 
 
 def print_help(file: Any = sys.stdout) -> None:
+    """Print help test to the given stream."""
     get_cli_parser().print_help(file=file)
 
 

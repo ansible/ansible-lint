@@ -1,4 +1,4 @@
-# Should raise var-spacing at lines 25, 28, 31
+# Should raise var-spacing at tasks line 23, 26, 29, 54, 65
 - hosts: all
   tasks:
     - name: good variable format
@@ -46,3 +46,25 @@
             case2 }}
       debug:
         var: cases
+
+    - name: Valid single line nested JSON false positive
+      debug:
+        msg: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1) }}"
+
+    - name: Invalid single line nested JSON
+      debug:
+        msg: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1)}}"
+
+    - name: Valid multiline nested JSON false positive
+      debug:
+        msg: >-
+          {{ {'dummy_2': {'nested_dummy_1': value_1,
+                          'nested_dummy_2': value_2}} |
+          combine(dummy_1) }}
+
+    - name: Invalid multiline nested JSON
+      debug:
+        msg: >-
+          {{ {'dummy_2': {'nested_dummy_1': value_1,
+                          'nested_dummy_2': value_2}} |
+          combine(dummy_1)}}

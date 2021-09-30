@@ -43,9 +43,12 @@ from ansiblelint.file_utils import (
     Lintable,
     expand_path_vars,
     expand_paths_vars,
+    guess_project_dir,
     normpath,
 )
 from ansiblelint.testing import run_ansible_lint
+
+from .conftest import cwd
 
 
 @pytest.mark.parametrize(
@@ -354,7 +357,11 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     out, err = capfd.readouterr()
 
     # Confirmation that it runs in auto-detect mode
-    assert "Discovered files to lint using: git ls-files -z" in err
+    assert (
+        "Discovered files to lint using: git ls-files --cached --others --exclude-standard -z"
+        in err
+    )
+    assert "Excluded removed files using: git ls-files --deleted -z" in err
     # An expected rule match from our examples
     assert (
         "examples/playbooks/empty_playbook.yml:1: "
@@ -506,3 +513,10 @@ def test_nested_items() -> None:
         ("list-item", "orange", "fruits"),
     ]
     assert list(utils.nested_items(data)) == items
+
+
+def test_guess_project_dir(tmp_path: Path) -> None:
+    """Verify guess_project_dir()."""
+    with cwd(str(tmp_path)):
+        result = guess_project_dir(None)
+        assert result == str(tmp_path)

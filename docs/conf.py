@@ -17,6 +17,7 @@
 import os
 import sys
 from pathlib import Path
+from typing import List
 
 import pkg_resources
 
@@ -53,7 +54,10 @@ extensions = [
     'myst_parser',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    # Third-party extensions:
+    'sphinxcontrib.apidoc',
     'sphinxcontrib.programoutput',
+    # Tree-local extensions:
     'rules_table_generator_ext',  # in-tree extension
 ]
 
@@ -82,6 +86,17 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
+apidoc_excluded_paths: List[str] = []
+apidoc_extra_args = [
+    '--implicit-namespaces',
+    '--private',  # include “_private” modules
+]
+apidoc_module_dir = '../src/ansiblelint'
+apidoc_module_first = False
+apidoc_output_dir = 'pkg'
+apidoc_separate_modules = True
+apidoc_toc_file = None
+
 # General substitutions.
 project = 'Ansible Lint Documentation'
 copyright = "2013-2021 Ansible, Inc"  # pylint: disable=redefined-builtin
@@ -97,6 +112,16 @@ extlinks = {
     "pr": (f"{github_repo_url}/pull/%s", "PR #"),
     "commit": (f"{github_repo_url}/commit/%s", ""),
     "gh": (f"{github_url}/%s", "GitHub: "),
+}
+
+intersphinx_mapping = {
+    'ansible': ('https://docs.ansible.com/ansible/devel/', None),
+    'ansible-core': ('https://docs.ansible.com/ansible-core/devel/', None),
+    'packaging': ('https://packaging.rtfd.io/en/latest', None),
+    'pytest': ('https://docs.pytest.org/en/latest', None),
+    'python': ('https://docs.python.org/3', None),
+    'python2': ('https://docs.python.org/2', None),
+    'rich': ('https://rich.rtfd.io/en/latest', None),
 }
 
 # The default replacements for |version| and |release|, also used in various
@@ -182,7 +207,7 @@ html_context = {
     'display_github': 'True',
     'github_user': 'ansible-community',
     'github_repo': 'ansible-lint',
-    'github_version': 'master/docs/',
+    'github_version': 'main/docs/',
     'current_version': version,
     'latest_version': 'latest',
     # list specifically out of order to make latest work
@@ -292,17 +317,35 @@ latex_documents = [
 
 autoclass_content = 'both'
 
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/2/', (None, '../python2-2.7.13.inv')),
-    'python3': ('https://docs.python.org/3/', (None, '../python3-3.6.2.inv')),
-    'jinja2': ('http://jinja.pocoo.org/docs/', (None, '../jinja2-2.9.7.inv')),
-}
-
-
 # table width fix via: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
 html_static_path = ['_static']
 
 html_css_files = [
     'theme_overrides.css',  # override wide tables in RTD theme
     'ansi.css',
+]
+
+linkcheck_workers = 25
+
+nitpicky = True
+nitpick_ignore = [
+    ('py:class', 'ansible.parsing.yaml.objects.AnsibleBaseYAMLObject'),
+    ('py:class', 'Lintable'),
+    ('py:class', 'yaml'),
+    ('py:class', 'role'),
+    ('py:class', 'requirements'),
+    ('py:class', 'handlers'),
+    ('py:class', 'tasks'),
+    ('py:class', 'meta'),
+    ('py:class', 'playbook'),
+    ('py:class', 'AnsibleBaseYAMLObject'),
+    ('py:class', 'Namespace'),
+    ('py:class', 'RulesCollection'),
+    ('py:class', '_pytest.fixtures.SubRequest'),
+    ('py:class', 'MatchError'),
+    ('py:class', 'Pattern'),
+    ('py:class', 'odict'),
+    ('py:class', 'LintResult'),
+    ('py:obj', 'Any'),
+    ('py:obj', 'ansiblelint.formatters.T'),
 ]

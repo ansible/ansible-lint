@@ -46,8 +46,8 @@ class TestRoleRelativePath(unittest.TestCase):
 
     def test_fail(self) -> None:
         results = self.runner.run_role_tasks_main(FAIL_TASKS)
-        self.assertEqual(2, len(results))
+        assert len(results) == 2
 
     def test_success(self) -> None:
         results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
-        self.assertEqual(0, len(results))
+        assert len(results) == 0

@@ -106,6 +106,7 @@ def install_collection(collection: str, destination: Optional[str] = None) -> No
         "ansible-galaxy",
         "collection",
         "install",
+        "--force",  # required for ansible 2.9
         "-v",
     ]
     if destination:
@@ -140,6 +141,7 @@ def install_requirements(requirement: str) -> None:
         "ansible-galaxy",
         "role",
         "install",
+        "--force",  # required for ansible 2.9
         "--roles-path",
         f"{options.cache_dir}/roles",
         "-vr",
@@ -165,6 +167,7 @@ def install_requirements(requirement: str) -> None:
             "ansible-galaxy",
             "collection",
             "install",
+            "--force",  # required for ansible 2.9
             "-p",
             f"{options.cache_dir}/collections",
             "-vr",

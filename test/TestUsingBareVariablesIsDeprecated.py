@@ -17,10 +17,10 @@ class TestUsingBareVariablesIsDeprecated(unittest.TestCase):
     def test_file_positive(self) -> None:
         success = 'examples/playbooks/using-bare-variables-success.yml'
         good_runner = Runner(success, rules=self.collection)
-        self.assertEqual([], good_runner.run())
+        assert [] == good_runner.run()
 
     def test_file_negative(self) -> None:
         failure = 'examples/playbooks/using-bare-variables-failure.yml'
         bad_runner = Runner(failure, rules=self.collection)
         errs = bad_runner.run()
-        self.assertEqual(11, len(errs))
+        assert len(errs) == 11

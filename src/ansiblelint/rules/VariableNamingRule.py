@@ -44,7 +44,7 @@ class VariableNamingRule(AnsibleLintRule):
 
     @lru_cache()
     def re_pattern(self) -> Pattern[str]:
-        return re.compile(options.var_naming_pattern)
+        return re.compile(options.var_naming_pattern or "^[a-z_][a-z0-9_]*$")
 
     def is_invalid_variable_name(self, ident: str) -> bool:
         """Check if variable name is using right pattern."""

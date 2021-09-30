@@ -221,6 +221,7 @@ def _playbook_file(tmp_path: Path, request: SubRequest) -> None:
 )
 @pytest.mark.usefixtures('_playbook_file')
 def test_including_wrong_nested_jinja(runner: Runner) -> None:
+    """Check that broken Jinja nesting produces a violation."""
     rule_violations = runner.run()
     assert rule_violations[0].rule.id == 'no-jinja-nesting'
 
@@ -250,5 +251,6 @@ def test_including_wrong_nested_jinja(runner: Runner) -> None:
 )
 @pytest.mark.usefixtures('_playbook_file')
 def test_including_proper_nested_jinja(runner: Runner) -> None:
+    """Check that properly balanced Jinja nesting doesn't fail."""
     rule_violations = runner.run()
     assert not rule_violations

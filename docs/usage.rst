@@ -30,7 +30,7 @@ As part of the execution, the linter will likely need to create a cache of
 installed or mocked roles, collections and modules. This is done inside
 ``{project_dir}/.cache`` folder. The project directory is either given as a
 command line argument, determined by location of the configuration
-file, git project top-level directiory or user home directory as fallback.
+file, git project top-level directory or user home directory as fallback.
 In order to speed-up reruns, the linter does not clean this folder by itself.
 
 If you are using git, you will likely want to add this folder to your
@@ -57,7 +57,7 @@ CI/CD
 -----
 
 If execution under `Github Actions`_ is detected via the presence of
-``GITHUB_ACTIONS=true`` and ``GITHUB_WORFLOW=...`` variables, the linter will
+``GITHUB_ACTIONS=true`` and ``GITHUB_WORKFLOW=...`` variables, the linter will
 also print errors using their `annotation`_ format.
 
 .. _GitHub Actions: https://github.com/features/actions
@@ -66,10 +66,11 @@ also print errors using their `annotation`_ format.
 Linting Playbooks and Roles
 ---------------------------
 
-We recommend following the `collection structure layout`_ regardless if you
-are planning to build a collection or not. Following that layout assures the
-best integration with all ecosystem tools as it helps them better distinguish
-between random YAML files and files managed by ansible.
+We recommend following the :ref:`collection structure layout
+<collection_structure>` regardless if you are planning to build a
+collection or not. Following that layout assures the best integration
+with all ecosystem tools as it helps them better distinguish between
+random YAML files and files managed by ansible.
 
 When you call ansible-lint without arguments the tool will use its internal
 heuristics to determine file types.
@@ -82,8 +83,6 @@ arguments. The following command lints ``examples/playbooks/play.yml`` and
    :cwd: ..
    :returncode: 2
    :nostderr:
-
-.. _collection structure layout: https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#collection-structure
 
 Examples
 --------

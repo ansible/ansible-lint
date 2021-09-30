@@ -26,6 +26,7 @@ MAIN_PLAYBOOK = '''\
 
 @pytest.fixture
 def playbook(tmp_path: Path) -> str:
+    """Create a reusable per-test playbook."""
     playbook_path = tmp_path / 'playbook.yml'
     playbook_path.write_text(MAIN_PLAYBOOK)
     (tmp_path / 'imported_playbook.yml').write_text(IMPORTED_PLAYBOOK)
@@ -35,6 +36,7 @@ def playbook(tmp_path: Path) -> str:
 def test_skip_import_playbook(
     default_rules_collection: RulesCollection, playbook: str
 ) -> None:
+    """Verify that a playbook import is skipped after a failure."""
     runner = Runner(playbook, rules=default_rules_collection)
     results = runner.run()
     assert len(results) == 0

@@ -81,8 +81,8 @@ class TestUseHandlerRatherThanWhenChanged(unittest.TestCase):
 
     def test_success(self) -> None:
         results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
-        self.assertEqual(0, len(results))
+        assert len(results) == 0
 
     def test_fail(self) -> None:
         results = self.runner.run_role_tasks_main(FAIL_TASKS)
-        self.assertEqual(5, len(results))
+        assert len(results) == 5

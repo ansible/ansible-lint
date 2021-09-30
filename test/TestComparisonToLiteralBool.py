@@ -63,20 +63,20 @@ class TestComparisonToLiteralBoolRule(unittest.TestCase):
 
     def test_when(self) -> None:
         results = self.runner.run_role_tasks_main(PASS_WHEN)
-        self.assertEqual(0, len(results))
+        assert len(results) == 0
 
     def test_when_not_false(self) -> None:
         results = self.runner.run_role_tasks_main(PASS_WHEN_NOT_FALSE)
-        self.assertEqual(0, len(results))
+        assert len(results) == 0
 
     def test_when_not_null(self) -> None:
         results = self.runner.run_role_tasks_main(PASS_WHEN_NOT_NULL)
-        self.assertEqual(0, len(results))
+        assert len(results) == 0
 
     def test_literal_true(self) -> None:
         results = self.runner.run_role_tasks_main(FAIL_LITERAL_TRUE)
-        self.assertEqual(1, len(results))
+        assert len(results) == 1
 
     def test_literal_false(self) -> None:
         results = self.runner.run_role_tasks_main(FAIL_LITERAL_FALSE)
-        assert len(results) == 2, results
+        assert len(results) == 2

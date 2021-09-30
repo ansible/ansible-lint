@@ -151,7 +151,7 @@ def report_outcome(  # noqa: C901
         if "experimental" in match.rule.tags:
             entries.append("  - experimental  # all rules tagged as experimental\n")
             break
-    if entries:
+    if entries and not options.quiet:
         console_stderr.print(
             "You can skip specific rules or tags by adding them to your "
             "configuration file:"

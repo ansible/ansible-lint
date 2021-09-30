@@ -21,4 +21,4 @@ class TestTaskNoLocalAction(unittest.TestCase):
 
     def test_local_action(self) -> None:
         results = self.runner.run_role_tasks_main(TASK_LOCAL_ACTION)
-        self.assertEqual(1, len(results))
+        assert len(results) == 1

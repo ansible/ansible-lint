@@ -29,7 +29,7 @@ repos:
         examples/playbooks/example.yml
       )$
   - id: mixed-line-ending
-  - id: check-byte-order-marker
+  - id: fix-byte-order-marker
   - id: check-executables-have-shebangs
   - id: check-merge-conflict
   - id: debug-statements
@@ -43,7 +43,7 @@ repos:
   hooks:
   - id: doc8
 - repo: https://github.com/adrienverge/yamllint.git
-  rev: v1.26.1
+  rev: v1.26.2
   hooks:
   - id: yamllint
     exclude: >
@@ -77,14 +77,14 @@ repos:
     - flake8-docstrings>=1.5.0
     - flake8-pytest-style>=1.2.2
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v0.902
+  rev: v0.910
   hooks:
   - id: mypy
     # empty args needed in order to match mypy cli behavior
     args: ["--strict"]
     additional_dependencies:
     - Sphinx>=3.1.2
-    - ansible-base
+    - ansible-core
     - enrich
     - flaky
     - pytest
@@ -107,7 +107,7 @@ repos:
   hooks:
   - id: pylint
     additional_dependencies:
-    - ansible-base
+    - ansible-core
     - docutils
     - enrich
     - flaky
@@ -119,3 +119,32 @@ repos:
     - tenacity
     - typing_extensions
     - wcmatch
+- # keep at bottom as these are slower
+  repo: local
+  hooks:
+  - id: pip-compile
+    name: pip-compile
+    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint
+    language: system
+    files: ^(setup\.cfg|=constraints\.txt)$
+    pass_filenames: false
+  - id: pip-compile-docs
+    name: pip-compile-docs
+    entry: pip-compile -q --no-annotate --output-file=docs/requirements.txt --extra yamllint docs/requirements.in setup.cfg
+    language: system
+    files: ^(docs\/requirements\.(txt|in)|)$
+    pass_filenames: false
+  - id: pip-compile-upgrade
+    name: pip-compile-upgrade
+    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint
+    language: system
+    files: ^(setup\.cfg|=constraints\.txt)$
+    pass_filenames: false
+    stages: [manual]
+  - id: pip-compile-docs-upgrade
+    name: pip-compile-docs-upgrade
+    entry: pip-compile -q --upgrade --no-annotate  --extra yamllint --output-file=docs/requirements.txt docs/requirements.in setup.cfg
+    language: system
+    files: ^(docs\/requirements\.(txt|in)|)$
+    pass_filenames: false
+    stages: [manual]
