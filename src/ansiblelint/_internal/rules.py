@@ -103,7 +103,7 @@ class AnsibleParserErrorRule(BaseRule):
 
     id = 'parser-error'
     shortdesc = 'AnsibleParserError'
-    description = 'Ansible parser fails, this usually indicate invalid file.'
+    description = 'Ansible parser fails; this usually indicates an invalid file.'
     severity = 'VERY_HIGH'
     tags = ['core']
     version_added = 'v5.0.0'

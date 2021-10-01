@@ -73,10 +73,10 @@ def choose_formatter_factory(
         r = formatters.QuietFormatter
     elif options_list.parseable_severity:
         r = formatters.ParseableSeverityFormatter
-    elif options_list.parseable or options_list.format == 'pep8':
-        r = formatters.ParseableFormatter
     elif options_list.format == 'codeclimate':
         r = formatters.CodeclimateJSONFormatter
+    elif options_list.parseable or options_list.format == 'pep8':
+        r = formatters.ParseableFormatter
     return r
 
 

@@ -84,7 +84,7 @@ repos:
     args: ["--strict"]
     additional_dependencies:
     - Sphinx>=3.1.2
-    - ansible-base
+    - ansible-core
     - enrich
     - flaky
     - pytest
@@ -107,7 +107,7 @@ repos:
   hooks:
   - id: pylint
     additional_dependencies:
-    - ansible-base
+    - ansible-core
     - docutils
     - enrich
     - flaky

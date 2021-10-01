@@ -29,8 +29,8 @@ related to containers and use the discussions_ forum instead.
     specific version of Ansible. You need to either install the desired version
     of Ansible yourself or mention one of the helper extras:
 
-    * ``core`` - will install the latest version of ansible-base 2.10
-    * ``community`` - will install the latest version of ansible 2.10 with community collections
+    * ``core`` - will install the latest version of ansible-core 2.11+
+    * ``community`` - will install the latest version of ansible community edition
 
 Using pip or pipx
 -----------------
@@ -58,7 +58,7 @@ using ``--user`` or fixing potential conflicts if not using virtualenvs.
 
 .. _installing_from_source:
 .. _pip3: https://pypi.org/project/pip/
-.. _pipx: https://pipxproject.github.io/pipx/
+.. _pipx: https://pypa.github.io/pipx/
 
 From Source
 -----------

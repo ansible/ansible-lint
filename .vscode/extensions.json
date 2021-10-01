@@ -2,6 +2,6 @@
     "recommendations": [
         "ms-python.python",
         "redhat.vscode-yaml",
-        "zbr.vscode-ansible",
+        "redhat.ansible",
     ]
 }
