@@ -1,6 +1,8 @@
 """Test the codeclimate JSON formatter."""
 import json
 import pathlib
+import subprocess
+import sys
 from typing import List, Optional
 
 import pytest
@@ -86,3 +88,20 @@ class TestCodeclimateJSONFormatter:
         assert single_match['location']['path'] == self.matches[0].filename
         assert 'lines' in single_match['location']
         assert single_match['location']['lines']['begin'] == self.matches[0].linenumber
+
+
+def test_code_climate_parsable_ignored() -> None:
+    """Test that -p option does not alter codeclimate format."""
+    cmd = [
+        sys.executable,
+        "-m",
+        "ansiblelint",
+        "-v",
+        "-p",
+    ]
+    file = "examples/playbooks/empty_playbook.yml"
+    result = subprocess.run([*cmd, file], check=False)
+    result2 = subprocess.run([*cmd, "-p", file], check=False)
+
+    assert result.returncode == result2.returncode
+    assert result.stdout == result2.stdout
