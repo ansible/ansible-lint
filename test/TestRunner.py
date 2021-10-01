@@ -88,9 +88,9 @@ def test_runner_exclude_globs(
         rules=default_rules_collection,
         exclude_paths=[exclude_path],
     )
-    # breakpoint()
 
     matches = runner.run()
+    # we expect to find one error from the only .yaml file we have there.
     assert len(matches) == 1
 
 
