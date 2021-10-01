@@ -4,6 +4,7 @@ import multiprocessing
 import multiprocessing.pool
 import os
 from dataclasses import dataclass
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set, Union
 
@@ -91,7 +92,10 @@ class Runner:
         _file_path = Path(file_path)
 
         return any(
-            abs_path.startswith(path) or _file_path.match(path)
+            abs_path.startswith(path)
+            or _file_path.match(path)
+            or fnmatch(str(abs_path), path)
+            or fnmatch(str(_file_path), path)
             for path in self.exclude_paths
         )
 

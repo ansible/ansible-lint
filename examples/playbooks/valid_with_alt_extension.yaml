@@ -1,0 +1,5 @@
+# Used to validate that we also accept .yaml extension on playbooks
+- hosts: localhost
+  tasks:
+    - debug:  # <-- should notify about missing 'name'
+        msg: "hello!"
