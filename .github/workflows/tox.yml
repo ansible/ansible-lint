@@ -109,8 +109,7 @@ jobs:
         - 3.7
         - 3.8
         - 3.9
-        # NOTE: Installing ansible under 3.10-dev is currently not
-        # NOTE: possible because compiling cffi explodes.
+        - "3.10"
         os:
         # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
         - ubuntu-20.04
@@ -131,12 +130,18 @@ jobs:
           os: ubuntu-20.04
           python-version: 3.9
           devel: true
+        - tox_env: py310
+          os: ubuntu-20.04
+          python-version: "3.10"
+          devel: true
+          skip_ansible29: true
         - tox_env: py36
           os: macOS-latest
           python-version: 3.6
-        - tox_env: py38
+        - tox_env: py310
           os: macOS-latest
-          python-version: 3.8
+          python-version: "3.10"
+          skip_ansible29: true
 
     env:
       TOX_PARALLEL_NO_SPINNER: 1
@@ -194,6 +199,7 @@ jobs:
       env:
         TOXENV: ${{ matrix.tox_env }}-core
     - name: "Test with tox: ${{ matrix.tox_env }}-ansible29"
+      if: ${{ !matrix.skip_ansible29 }}
       run: |
         python3 -m tox
       env:
