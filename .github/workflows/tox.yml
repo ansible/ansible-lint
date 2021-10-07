@@ -65,6 +65,7 @@ jobs:
     #       ${{ runner.os }}-
     - name: Install tox
       run: |
+        python3 -m pip install --upgrade pip
         python3 -m pip install --upgrade tox
     - name: Log installed dists
       run: >-
