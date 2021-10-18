@@ -273,11 +273,11 @@ def guess_project_dir(config_file: Optional[str]) -> str:
             path = result.stdout.splitlines()[0]
         except subprocess.CalledProcessError as exc:
             if not (
-                exc.returncode == 128 and 'fatal: not a git repository' in exc.output
+                exc.returncode == 128 and 'fatal: not a git repository' in exc.stderr
             ):
                 _logger.warning(
                     "Failed to guess project directory using git: %s",
-                    exc.output.rstrip('\n'),
+                    exc.stderr.rstrip('\n'),
                 )
         except FileNotFoundError as exc:
             _logger.warning("Failed to locate command: %s", exc)
