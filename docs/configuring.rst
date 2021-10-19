@@ -34,7 +34,8 @@ Pre-commit Setup
 
 To use ansible-lint with `pre-commit`_, just add the following to your local
 repo's ``.pre-commit-config.yaml`` file. Make sure to change **rev:** to be
-either a git commit sha or tag of ansible-lint containing ``hooks.yaml``.
+either a git commit sha or tag of ansible-lint containing
+``.pre-commit-hooks.yaml``.
 
 .. code-block:: yaml
 
@@ -42,6 +43,5 @@ either a git commit sha or tag of ansible-lint containing ``hooks.yaml``.
       rev: ...  # put latest release tag from https://github.com/ansible-community/ansible-lint/releases/
       hooks:
         - id: ansible-lint
-          files: \.(yaml|yml)$
 
 .. _pre-commit: https://pre-commit.com
