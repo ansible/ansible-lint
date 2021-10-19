@@ -53,11 +53,11 @@ repos:
   hooks:
   - id: codespell
 - repo: https://github.com/PyCQA/doc8
-  rev: 0.9.0a1
+  rev: 0.9.1
   hooks:
   - id: doc8
 - repo: https://github.com/adrienverge/yamllint.git
-  rev: v1.26.2
+  rev: v1.26.3
   hooks:
   - id: yamllint
     exclude: >
@@ -69,14 +69,14 @@ repos:
     types: [file, yaml]
     entry: yamllint --strict
 - repo: https://github.com/PyCQA/isort
-  rev: 5.9.1
+  rev: 5.9.3
   hooks:
   - id: isort
     args:
     # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
     - --filter-files
 - repo: https://github.com/psf/black
-  rev: 21.6b0
+  rev: 21.9b0
   hooks:
   - id: black
     language_version: python3
@@ -91,7 +91,7 @@ repos:
     - flake8-docstrings>=1.5.0
     - flake8-pytest-style>=1.2.2
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v0.910
+  rev: v0.910-1
   hooks:
   - id: mypy
     # empty args needed in order to match mypy cli behavior
@@ -117,7 +117,7 @@ repos:
         plugins/.*
       )$
 - repo: https://github.com/pre-commit/mirrors-pylint
-  rev: v3.0.0a3
+  rev: v3.0.0a4
   hooks:
   - id: pylint
     additional_dependencies:
@@ -138,26 +138,26 @@ repos:
   hooks:
   - id: pip-compile
     name: pip-compile
-    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint
+    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
   - id: pip-compile-docs
     name: pip-compile-docs
-    entry: pip-compile -q --no-annotate --output-file=docs/requirements.txt --extra yamllint docs/requirements.in setup.cfg
+    entry: pip-compile -q --no-annotate --output-file=docs/requirements.txt --extra yamllint --strip-extras docs/requirements.in setup.cfg
     language: system
     files: ^(docs\/requirements\.(txt|in)|)$
     pass_filenames: false
   - id: pip-compile-upgrade
     name: pip-compile-upgrade
-    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint
+    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
     stages: [manual]
   - id: pip-compile-docs-upgrade
     name: pip-compile-docs-upgrade
-    entry: pip-compile -q --upgrade --no-annotate  --extra yamllint --output-file=docs/requirements.txt docs/requirements.in setup.cfg
+    entry: pip-compile -q --upgrade --no-annotate  --extra yamllint --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
     language: system
     files: ^(docs\/requirements\.(txt|in)|)$
     pass_filenames: false
