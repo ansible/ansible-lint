@@ -1,4 +1,18 @@
 ---
+ci:
+  # format compatible with commitlint
+  autoupdate_commit_msg: "chore: pre-commit autoupdate"
+  autoupdate_schedule: monthly
+  autofix_commit_msg: |
+    chore: auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  skip:
+  # https://github.com/pre-commit-ci/issues/issues/55
+  - pip-compile
+  - pip-compile-docs
+  - pip-compile-docs-upgrade
+  - pip-compile-upgrade
 repos:
 - repo: local
   hooks:
@@ -124,26 +138,26 @@ repos:
   hooks:
   - id: pip-compile
     name: pip-compile
-    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint
+    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
   - id: pip-compile-docs
     name: pip-compile-docs
-    entry: pip-compile -q --no-annotate --output-file=docs/requirements.txt --extra yamllint docs/requirements.in setup.cfg
+    entry: pip-compile -q --no-annotate --output-file=docs/requirements.txt --extra yamllint --strip-extras docs/requirements.in setup.cfg
     language: system
     files: ^(docs\/requirements\.(txt|in)|)$
     pass_filenames: false
   - id: pip-compile-upgrade
     name: pip-compile-upgrade
-    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint
+    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
     stages: [manual]
   - id: pip-compile-docs-upgrade
     name: pip-compile-docs-upgrade
-    entry: pip-compile -q --upgrade --no-annotate  --extra yamllint --output-file=docs/requirements.txt docs/requirements.in setup.cfg
+    entry: pip-compile -q --upgrade --no-annotate  --extra yamllint --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
     language: system
     files: ^(docs\/requirements\.(txt|in)|)$
     pass_filenames: false
