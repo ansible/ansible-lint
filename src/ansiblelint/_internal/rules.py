@@ -89,8 +89,8 @@ class RuntimeErrorRule(BaseRule):
     shortdesc = 'Unexpected internal error'
     description = (
         'This error can be caused by internal bugs but also by '
-        'custom rules. Instead of just stopping linter we generate there errors and '
-        'continue processing. This allows users to add this rule to warn list until '
+        'custom rules. Instead of just stopping linter we generate the errors and '
+        'continue processing. This allows users to add this rule to their warn list until '
         'the root cause is fixed.'
     )
     severity = 'VERY_HIGH'
