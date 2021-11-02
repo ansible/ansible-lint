@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  tasks:
+    - name: one
+      ansible.builtin.command: echo hello
+      when: true

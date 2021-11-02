@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  tasks:
+    - name: one
+      when: true
+      ansible.builtin.command: echo hello
+
+    - name: two
+      ansible.builtin.command: echo hello
+
+    - ansible.builtin.command:
+        cmd: echo hello
+
+    - name: four
+      ansible.builtin.command:
+        cmd:
+          echo blah
+      args:
+        creates: Z
+
+    - name: five
+      when: 1 = 1
+      debug: msg=text2
+
+    - name: six
+      ansible.builtin.command:
+        cmd: echo hello
+      tags:
+        - test
+
+    - name: seven
+      ansible.builtin.command:
+        cmd: echo hello
+      tags: test
