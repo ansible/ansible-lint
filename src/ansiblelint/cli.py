@@ -197,6 +197,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Keep default rules when using -r",
     )
     parser.add_argument(
+        "--fmt", dest="do_transforms", action="store_true", help="Reformat/Transform files to fix issues where possible"
+    )
+    parser.add_argument(
         "--show-relpath",
         dest="display_relative_path",
         action="store_false",
