@@ -235,8 +235,9 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     result = _get_matches(rules, options)
 
-    do_transforms = True  # TODO: expose as a flag
-    if do_transforms:
+    # TODO: options.listtransforms
+
+    if options.do_transforms:
         from ansiblelint.transforms import TransformsCollection
         from ansiblelint.transformer import Transformer
 

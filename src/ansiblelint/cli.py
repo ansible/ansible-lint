@@ -24,6 +24,7 @@ _logger = logging.getLogger(__name__)
 _PATH_VARS = [
     'exclude_paths',
     'rulesdir',
+    'transformsdir',
 ]
 
 
@@ -210,7 +211,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Keep default rules when using -r",
     )
     parser.add_argument(
-        '-s',
+        '-s',  # TODO: find a flag that makes more sense for fmt/transforms
         action=AbspathArgAction,
         dest='transformsdir',
         default=[],
@@ -219,11 +220,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
              f"to keep using embedded rules from {DEFAULT_TRANSFORMSDIR}",
     )
     parser.add_argument(
-        '-S',  # -T is used
+        '-S',  # TODO: find a flag that makes more sense for fmt/transforms
         action='store_true',
         default=False,
         dest='use_default_transforms',
         help="Keep default transforms when using -s",
+    )
+    parser.add_argument(
+        '--fmt', dest='do_transforms', action='store_true', help="Reformat/Transform files to fix issues where possible"
     )
     parser.add_argument(
         '--show-relpath',
