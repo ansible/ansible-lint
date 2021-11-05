@@ -13,6 +13,8 @@ from ..config import options as ansiblelint_options
 from ..errors import MatchError
 from .._internal.rules import BaseRule
 
+__all__ = ["Transform", "TransformsCollection"]
+
 _logger = logging.getLogger(__name__)
 
 
