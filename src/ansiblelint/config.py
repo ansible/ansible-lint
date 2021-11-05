@@ -73,6 +73,7 @@ options = Namespace(
     parseable_severity=False,
     quiet=False,
     rulesdirs=[],
+    transformsdirs=[],
     skip_list=[],
     tags=[],
     verbosity=False,

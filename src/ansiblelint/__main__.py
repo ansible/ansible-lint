@@ -235,6 +235,19 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     result = _get_matches(rules, options)
 
+    do_transforms = True  # TODO: expose as a flag
+    if do_transforms:
+        from ansiblelint.transforms import TransformsCollection
+        from ansiblelint.transformer import Transformer
+
+        transforms = TransformsCollection(options.transformsdirs)
+
+        # future: maybe pass options to Transformer
+        transformer = Transformer(result, transforms)
+
+        # this will mark any matches as fixed if the transforms repaired the issue
+        transformer.run()
+
     mark_as_success = False
     if result.matches and options.progressive:
         _logger.info(

@@ -13,7 +13,9 @@ import yaml
 from ansiblelint.config import DEFAULT_KINDS
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
+    CUSTOM_TRANSFORMSDIR_ENVVAR,
     DEFAULT_RULESDIR,
+    DEFAULT_TRANSFORMSDIR,
     INVALID_CONFIG_RC,
 )
 from ansiblelint.file_utils import expand_path_vars, guess_project_dir, normpath
@@ -208,6 +210,22 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Keep default rules when using -r",
     )
     parser.add_argument(
+        '-s',
+        action=AbspathArgAction,
+        dest='transformsdir',
+        default=[],
+        type=Path,
+        help="Specify custom transform directories. Add -S "
+             f"to keep using embedded rules from {DEFAULT_TRANSFORMSDIR}",
+    )
+    parser.add_argument(
+        '-S',  # -T is used
+        action='store_true',
+        default=False,
+        dest='use_default_transforms',
+        help="Keep default transforms when using -s",
+    )
+    parser.add_argument(
         '--show-relpath',
         dest='display_relative_path',
         action='store_false',
@@ -310,6 +328,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         'parseable_severity',
         'quiet',
         'use_default_rules',
+        'use_default_transforms',
         'progressive',
         'offline',
     )
@@ -317,6 +336,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     lists_map = {
         'exclude_paths': [".cache", ".git", ".hg", ".svn", ".tox"],
         'rulesdir': [],
+        'transformsdir': [],
         'skip_list': [],
         'tags': [],
         'warn_list': ['experimental', 'role-name'],
@@ -381,6 +401,7 @@ def get_config(arguments: List[str]) -> Namespace:
     config = merge_config(file_config, options)
 
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
+    options.transformsdirs = get_transforms_dirs(options.transformsdir, options.use_default_transforms)
 
     if options.project_dir == ".":
         project_dir = guess_project_dir(options.config_file)
@@ -416,3 +437,21 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
         return rulesdir + custom_ruledirs + default_ruledirs
 
     return rulesdir or custom_ruledirs + default_ruledirs
+
+
+def get_transforms_dirs(transformsdir: List[str], use_default: bool = True) -> List[str]:
+    """Return a list of transforms dirs."""
+    default_transformdirs = [DEFAULT_TRANSFORMSDIR]
+    default_custom_transformsdir = os.environ.get(
+        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_TRANSFORMSDIR, "custom")
+    )
+    custom_transformdirs = sorted(
+        str(rdir.resolve())
+        for rdir in Path(default_custom_transformsdir).iterdir()
+        if rdir.is_dir() and (rdir / "__init__.py").exists()
+    )
+
+    if use_default:
+        return transformsdir + custom_transformdirs + default_transformdirs
+
+    return transformsdir or custom_transformdirs + default_transformdirs
