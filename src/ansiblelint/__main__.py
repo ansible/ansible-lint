@@ -255,6 +255,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     # TODO: options.listtransforms
 
     if options.do_transforms:
+        # On purpose lazy-imports to avoid loading transforms unless requested
+        # pylint: disable=import-outside-toplevel
         from ansiblelint.transformer import Transformer
 
         # future: maybe pass options to Transformer
