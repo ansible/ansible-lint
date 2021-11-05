@@ -189,6 +189,22 @@ warn_list:  # or 'skip_list' to silence them completely
     return 2
 
 
+def _do_transform(result: "LintResult", options: Namespace) -> None:
+    """Create and run fmt Transformer."""
+    # On purpose lazy-imports to avoid loading transforms unless requested
+    # pylint: disable=import-outside-toplevel
+    from ansiblelint.transformer import Transformer
+    from ansiblelint.transforms import TransformsCollection
+
+    transforms = TransformsCollection(options.transformsdirs)
+
+    # future: maybe pass options to Transformer
+    transformer = Transformer(result, transforms)
+
+    # this will mark any matches as fixed if the transforms repaired the issue
+    transformer.run()
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     """Linter CLI entry point."""
     if argv is None:
@@ -238,18 +254,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     # TODO: options.listtransforms
 
     if options.do_transforms:
-        # On purpose lazy-imports to avoid loading transforms unless requested
-        # pylint: disable=import-outside-toplevel
-        from ansiblelint.transformer import Transformer
-        from ansiblelint.transforms import TransformsCollection
-
-        transforms = TransformsCollection(options.transformsdirs)
-
-        # future: maybe pass options to Transformer
-        transformer = Transformer(result, transforms)
-
-        # this will mark any matches as fixed if the transforms repaired the issue
-        transformer.run()
+        _do_transform(result, options)
 
     mark_as_success = False
     if result.matches and options.progressive:
