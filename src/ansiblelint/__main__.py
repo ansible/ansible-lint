@@ -137,6 +137,19 @@ def _do_list(rules: "RulesCollection") -> int:
     return 1
 
 
+def _do_transform(result: "LintResult", options: Namespace) -> None:
+    """Create and run fmt Transformer."""
+    # On purpose lazy-imports to avoid loading transforms unless requested
+    # pylint: disable=import-outside-toplevel
+    from ansiblelint.transformer import Transformer
+
+    # future: maybe pass options to Transformer
+    transformer = Transformer(result)
+
+    # this will mark any matches as fixed if the transforms repaired the issue
+    transformer.run()
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
@@ -177,15 +190,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     # TODO: options.listtransforms
 
     if options.do_transforms:
-        # On purpose lazy-imports to avoid loading transforms unless requested
-        # pylint: disable=import-outside-toplevel
-        from ansiblelint.transformer import Transformer
-
-        # future: maybe pass options to Transformer
-        transformer = Transformer(result)
-
-        # this will mark any matches as fixed if the transforms repaired the issue
-        transformer.run()
+        _do_transform(result, options)
 
     mark_as_success = False
     if result.matches and options.progressive:
