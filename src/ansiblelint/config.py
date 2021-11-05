@@ -69,6 +69,7 @@ options = Namespace(
     lintables=[],
     listrules=False,
     listtags=False,
+    do_transforms=False,
     parseable=False,
     parseable_severity=False,
     quiet=False,
