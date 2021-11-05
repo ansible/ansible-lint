@@ -1,17 +1,19 @@
+"""All internal ansible-lint transforms."""
 import glob
 import importlib.util
 import logging
 import os
 from argparse import Namespace
 from importlib.abc import Loader
-from typing import Iterator, Dict, List, Optional, Type, Union
+from typing import Dict, Iterator, List, Optional, Type, Union
 
-from ruamel.yaml.comments import CommentedSeq, CommentedMap
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 import ansiblelint.file_utils
+
+from .._internal.rules import BaseRule
 from ..config import options as ansiblelint_options
 from ..errors import MatchError
-from .._internal.rules import BaseRule
 
 __all__ = ["Transform", "TransformsCollection"]
 
@@ -20,6 +22,7 @@ _logger = logging.getLogger(__name__)
 
 # loosely based on AnsibleLintRule
 class Transform:
+    """Root class used by Transforms."""
 
     id: str = ""
     tags: List[str] = []
@@ -29,15 +32,18 @@ class Transform:
     link: str = ""
 
     """wants is the class that this Transform handles"""
-    wants: Type[BaseRule] = None
+    wants: Type[BaseRule]
 
     @staticmethod
-    def _fixed(match: MatchError):
+    def _fixed(match: MatchError) -> None:
+        """Mark a match as fixed (transform was successful, so issue should be resolved)."""
         match.fixed = True
 
-    def __call__(self, match: MatchError, data: Union[CommentedMap, CommentedSeq]):
+    def __call__(
+        self, match: MatchError, data: Union[CommentedMap, CommentedSeq]
+    ) -> None:
+        """Transform data to fix the MatchError."""
         # call self._fixed(match) when data has been transformed to fix the error.
-        pass
 
     def verbose(self) -> str:
         """Return a verbose representation of the transform."""
@@ -51,13 +57,14 @@ class Transform:
 # TODO: is_valid_transform and load_plugins are essentially the same as is_valid_rule and load_plugins
 #       refactor so both rules and transforms can use the same functions
 
+
 def is_valid_transform(transform: Transform) -> bool:
     """Check if given transform is valid or not."""
     return (
         isinstance(transform, Transform)
         and bool(transform.id)
         and bool(transform.shortdesc)
-        and transform.wants is not None
+        and getattr(transform, "wants", None) is not None
     )
 
 
@@ -81,8 +88,12 @@ def load_plugins(directory: str) -> Iterator[Transform]:
 
 
 class TransformsCollection:
+    """A container to load and register and retrieve transforms."""
+
     def __init__(
-            self, transformsdirs: Optional[List[str]] = None, options: Namespace = ansiblelint_options
+        self,
+        transformsdirs: Optional[List[str]] = None,
+        options: Namespace = ansiblelint_options,
     ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options
@@ -104,8 +115,11 @@ class TransformsCollection:
             self.transforms_by_rule[rule].append(transform)
 
     def register(self, obj: Transform) -> None:
+        """Register a new transform."""
         # We skip opt-in transforms which were not manually enabled
-        if 'opt-in' not in obj.tags or obj.id in self.options.enable_list:  # TODO: adjust for transforms
+        if (
+            'opt-in' not in obj.tags or obj.id in self.options.enable_list
+        ):  # TODO: adjust for transforms
             self.transforms.append(obj)
 
     def __iter__(self) -> Iterator[Transform]:
@@ -117,14 +131,19 @@ class TransformsCollection:
         return len(self.transforms)
 
     def extend(self, more: List[Transform]) -> None:
+        """Register multiple new transforms."""
         self.transforms.extend(more)
 
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
         return "\n".join(
-            [transform.verbose() for transform in sorted(self.transforms, key=lambda x: x.id)]
+            [
+                transform.verbose()
+                for transform in sorted(self.transforms, key=lambda x: x.id)
+            ]
         )
 
     def get_transforms_for(self, match: MatchError) -> List[Transform]:
+        """Lookup any relevant transforms to resolve a MatchError."""
         transforms = self.transforms_by_rule.get(type(match.rule), default=[])
         return transforms

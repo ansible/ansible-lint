@@ -217,7 +217,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         default=[],
         type=Path,
         help="Specify custom transform directories. Add -S "
-             f"to keep using embedded rules from {DEFAULT_TRANSFORMSDIR}",
+        f"to keep using embedded rules from {DEFAULT_TRANSFORMSDIR}",
     )
     parser.add_argument(
         '-S',  # TODO: find a flag that makes more sense for fmt/transforms
@@ -227,7 +227,10 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Keep default transforms when using -s",
     )
     parser.add_argument(
-        '--fmt', dest='do_transforms', action='store_true', help="Reformat/Transform files to fix issues where possible"
+        '--fmt',
+        dest='do_transforms',
+        action='store_true',
+        help="Reformat/Transform files to fix issues where possible",
     )
     parser.add_argument(
         '--show-relpath',
@@ -405,7 +408,9 @@ def get_config(arguments: List[str]) -> Namespace:
     config = merge_config(file_config, options)
 
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
-    options.transformsdirs = get_transforms_dirs(options.transformsdir, options.use_default_transforms)
+    options.transformsdirs = get_transforms_dirs(
+        options.transformsdir, options.use_default_transforms
+    )
 
     if options.project_dir == ".":
         project_dir = guess_project_dir(options.config_file)
@@ -443,7 +448,9 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
     return rulesdir or custom_ruledirs + default_ruledirs
 
 
-def get_transforms_dirs(transformsdir: List[str], use_default: bool = True) -> List[str]:
+def get_transforms_dirs(
+    transformsdir: List[str], use_default: bool = True
+) -> List[str]:
     """Return a list of transforms dirs."""
     default_transformdirs = [DEFAULT_TRANSFORMSDIR]
     default_custom_transformsdir = os.environ.get(

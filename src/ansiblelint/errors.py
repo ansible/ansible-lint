@@ -71,6 +71,8 @@ class MatchError(ValueError):
         # we can still filter by them.
         self.tag = tag
 
+        self.fixed = False  # Transforms set this to true if they have resolved the Error
+
     def __repr__(self) -> str:
         """Return a MatchError instance representation."""
         formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
