@@ -203,7 +203,7 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
     # Assure we do not print duplicates and the order is consistent
     matches = sorted(set(matches))
 
-    # Convert reported filenames into human redable ones, so we hide the
+    # Convert reported filenames into human readable ones, so we hide the
     # fact we used temporary files when processing input from stdin.
     for match in matches:
         for lintable in lintables:
