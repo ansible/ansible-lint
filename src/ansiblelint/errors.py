@@ -71,7 +71,8 @@ class MatchError(ValueError):
         # we can still filter by them.
         self.tag = tag
 
-        self.fixed = False  # Transforms set this to true if they have resolved the Error
+        # True when a fmt transform resolves this issue
+        self.fixed = False
 
     def __repr__(self) -> str:
         """Return a MatchError instance representation."""
