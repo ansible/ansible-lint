@@ -3,18 +3,18 @@
   tasks:
     - name: one
       when: true
-      ansible.builtin.command: echo hello
+      ansible.builtin.command: echo one
 
     - name: two
-      ansible.builtin.command: echo hello
+      ansible.builtin.command: echo two
 
     - ansible.builtin.command:
-        cmd: echo hello
+        cmd: echo three
 
     - name: four
       ansible.builtin.command:
         cmd:
-          echo blah
+          echo four
       args:
         creates: Z
 
@@ -24,11 +24,35 @@
 
     - name: six
       ansible.builtin.command:
-        cmd: echo hello
+        cmd: echo six
       tags:
         - test
 
     - name: seven
       ansible.builtin.command:
-        cmd: echo hello
+        cmd: echo seven
+      tags: test
+
+    - name: eight
+      ansible.builtin.command:
+        cmd: echo {{ item }}
+      loop:
+        - hi
+        - hello
+        - bonjour
+        - aloha
+      loop_control:
+        loop_var: eight
+
+    - name: nine
+      when: false
+      ansible.builtin.command:
+        cmd: echo {{ item }}
+      loop:
+        - hi
+        - hello
+        - bonjour
+        - aloha
+      loop_control:
+        loop_var: eight
       tags: test

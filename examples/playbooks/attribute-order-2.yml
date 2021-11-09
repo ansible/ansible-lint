@@ -1,6 +1,8 @@
 ---
 - hosts: localhost
   tasks:
-    - name: one
-      ansible.builtin.command: echo hello
+    - ansible.builtin.command: ech one
+      name: one
+    - name: two
+      ansible.builtin.command: echo two
       when: true
