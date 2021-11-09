@@ -454,7 +454,7 @@ def get_transforms_dirs(
     """Return a list of transforms dirs."""
     default_transformdirs = [DEFAULT_TRANSFORMSDIR]
     default_custom_transformsdir = os.environ.get(
-        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_TRANSFORMSDIR, "custom")
+        CUSTOM_TRANSFORMSDIR_ENVVAR, os.path.join(DEFAULT_TRANSFORMSDIR, "custom")
     )
     custom_transformdirs = sorted(
         str(rdir.resolve())
