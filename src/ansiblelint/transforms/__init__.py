@@ -145,5 +145,5 @@ class TransformsCollection:
 
     def get_transforms_for(self, match: MatchError) -> List[Transform]:
         """Lookup any relevant transforms to resolve a MatchError."""
-        transforms = self.transforms_by_rule.get(type(match.rule), default=[])
+        transforms = self.transforms_by_rule.get(type(match.rule), [])
         return transforms
