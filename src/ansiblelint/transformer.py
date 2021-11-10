@@ -41,7 +41,7 @@ class Transformer:
                 self.matches_per_file[lintable] = []
             self.matches_per_file[lintable].append(match)
 
-    def run(self) -> None:
+    def run(self, fmt_all_files=True) -> None:
         """Execute the fmt transforms."""
         # ruamel.yaml rt=round trip (preserves comments while allowing for modification)
         yaml = YAML(typ="rt")
@@ -66,6 +66,10 @@ class Transformer:
         #   - item1
 
         for file, matches in self.matches_per_file.items():
+            # matches can be empty if no LintErrors were found.
+            # However, we can still fmt the yaml file
+            if not fmt_all_files and not matches:
+                continue
             # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
             ruamel_data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
             for match in sorted(matches):

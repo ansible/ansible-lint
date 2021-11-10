@@ -233,6 +233,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Reformat/Transform files to fix issues where possible",
     )
     parser.add_argument(
+        '--only-fmt-errors',
+        dest='fmt_all_files',
+        default=True,
+        action='store_false',
+        help="Only reformat YAML files with lint errors. Otherwise reformat all YAML files.",
+    )
+    parser.add_argument(
         '--show-relpath',
         dest='display_relative_path',
         action='store_false',

@@ -26,6 +26,7 @@ def runner_result(
 ) -> LintResult:
     config_options.lintables = [playbook]
     config_options.exclude_paths = exclude
+    # config_options.fmt_all_files = True  # TODO: make configurable
     result = _get_matches(rules=default_rules_collection, options=config_options)
     return result
 

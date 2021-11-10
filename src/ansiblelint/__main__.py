@@ -202,7 +202,7 @@ def _do_transform(result: "LintResult", options: Namespace) -> None:
     transformer = Transformer(result, transforms)
 
     # this will mark any matches as fixed if the transforms repaired the issue
-    transformer.run()
+    transformer.run(fmt_all_files=options.fmt_all_files)
 
 
 def main(argv: Optional[List[str]] = None) -> int:
