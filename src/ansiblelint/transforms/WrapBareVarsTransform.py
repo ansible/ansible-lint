@@ -1,10 +1,10 @@
-from typing import Dict, Iterator, List, Optional, Type, Union
+from typing import Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-from ..errors import MatchError
-from ..rules.UsingBareVariablesIsDeprecatedRule import UsingBareVariablesIsDeprecatedRule
-from . import Transform
+from ansiblelint.errors import MatchError
+from ansiblelint.rules.UsingBareVariablesIsDeprecatedRule import UsingBareVariablesIsDeprecatedRule
+from ansiblelint.transforms import Transform
 
 
 class WrapBareVarsTransform(Transform):
@@ -25,3 +25,4 @@ class WrapBareVarsTransform(Transform):
     ) -> None:
         """Transform data to fix the MatchError."""
         # call self._fixed(match) when data has been transformed to fix the error.
+        self._fixed(match)
