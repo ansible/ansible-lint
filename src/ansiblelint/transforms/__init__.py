@@ -107,9 +107,10 @@ class TransformsCollection:
                 self.register(transform)
         self.transforms = sorted(self.transforms)
 
-        self.transforms_by_rule: Dict[Type[BaseRule], List[Transform]] = {}
+        # key is rule's id (rule class loading prevents keying on class)
+        self.transforms_by_rule: Dict[str, List[Transform]] = {}
         for transform in self.transforms:
-            rule = transform.wants
+            rule = transform.wants.id
             if rule not in self.transforms_by_rule:
                 self.transforms_by_rule[rule] = []
             self.transforms_by_rule[rule].append(transform)
@@ -145,5 +146,5 @@ class TransformsCollection:
 
     def get_transforms_for(self, match: MatchError) -> List[Transform]:
         """Lookup any relevant transforms to resolve a MatchError."""
-        transforms = self.transforms_by_rule.get(type(match.rule), [])
+        transforms = self.transforms_by_rule.get(match.rule.id, [])
         return transforms
