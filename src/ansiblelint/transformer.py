@@ -1,4 +1,6 @@
 """Transformer implementation."""
+import logging
+import re
 from textwrap import dedent
 from typing import Dict, List, Set, Union
 
@@ -11,6 +13,10 @@ from .file_utils import Lintable
 from .runner import LintResult
 from .skip_utils import load_data  # TODO: move load_data out of skip_utils
 
+_logger = logging.getLogger(__name__)
+
+_comment_line_re = re.compile(r"^ *#")
+
 
 # Transformer is for transforms like runner is for rules
 class Transformer:
@@ -21,7 +27,9 @@ class Transformer:
         result: LintResult,
     ):
         """Initialize a Transformer instance."""
+        # TODO: options for explict_start, indent_sequences
         self.explicit_start = True
+        self.indent_sequences = True
 
         self.matches: List[MatchError] = result.matches
         self.files: Set[Lintable] = result.files
@@ -56,7 +64,7 @@ class Transformer:
         yaml.compact_seq_map = True  # key after dash
         # yaml.indent() obscures the purpose of these vars:
         yaml.map_indent = 2
-        yaml.sequence_indent = 4
+        yaml.sequence_indent = 4 if self.indent_sequences else 2
         yaml.sequence_dash_offset = yaml.sequence_indent - 2
 
         # explicit_start=True + map_indent=2 + sequence_indent=2 + sequence_dash_offset=0
@@ -76,7 +84,7 @@ class Transformer:
             ruamel_data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
             yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
 
-    def _final_yaml_transform(self, text):
+    def _final_yaml_transform(self, text: str) -> str:
         """
         This ensures that top-level sequences are not over-indented.
 
@@ -84,7 +92,15 @@ class Transformer:
         to ruamel.yaml or dedent() won't have anything to work with.
         Instead, we add the explicit_start here.
         """
-        text = dedent(text)
+        text_lines = text.splitlines(keepends=True)
+        dedented_lines = dedent(text).splitlines(keepends=True)
+
+        # preserve the indents for comment lines (do not dedent them)
+        for i, line in enumerate(text_lines):
+            if _comment_line_re.match(line):
+                dedented_lines[i] = line
+
+        text = "".join(dedented_lines)
         if self.explicit_start:
             text = "---\n" + text
         return text
