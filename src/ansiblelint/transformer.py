@@ -43,6 +43,25 @@ class Transformer:
         # ruamel.yaml rt=round trip (preserves comments while allowing for modification)
         yaml = YAML(typ="rt")
 
+        # configure yaml dump formatting
+        yaml.explicit_start = True
+        yaml.explicit_end = False
+        mapping_indent = sequence_indent = 2
+        offset_indent = sequence_indent - 2
+        yaml.indent(mapping=mapping_indent, sequence=sequence_indent, offset=offset_indent)
+
+        # explicit_start=True + indent(mapping=2, sequence=2, offset=0):
+        # ---
+        # - name: playbook
+        #   loop:
+        #
+        # explicit_start=True + indent(mapping=2, sequence=4, offset=2):
+        # ---
+        #   - name: playbook
+        #     loop:
+        #       - item1
+        #   - item1
+
         for file, matches in self.matches_per_file.items():
             # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
             ruamel_data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
