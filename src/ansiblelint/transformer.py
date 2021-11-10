@@ -54,13 +54,13 @@ class Transformer:
         # ---
         # - name: playbook
         #   loop:
+        #   - item1
         #
         # explicit_start=True + indent(mapping=2, sequence=4, offset=2):
         # ---
         #   - name: playbook
         #     loop:
         #       - item1
-        #   - item1
 
         for file, matches in self.matches_per_file.items():
             # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
