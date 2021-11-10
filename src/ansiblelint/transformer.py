@@ -1,4 +1,5 @@
 """Transformer implementation."""
+from textwrap import dedent
 from typing import Dict, List, Set, Union
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
@@ -22,6 +23,8 @@ class Transformer:
         transforms: TransformsCollection,
     ):
         """Initialize a Transformer instance."""
+        self.explicit_start = True
+
         self.matches: List[MatchError] = result.matches
         self.files: Set[Lintable] = result.files
         self.transforms = transforms
@@ -47,19 +50,25 @@ class Transformer:
         yaml = YAML(typ="rt")
 
         # configure yaml dump formatting
-        yaml.explicit_start = True
+        yaml.explicit_start = (
+            False  # explicit_start is handled in self._final_yaml_transform()
+        )
         yaml.explicit_end = False
-        mapping_indent = sequence_indent = 2
-        offset_indent = sequence_indent - 2
-        yaml.indent(mapping=mapping_indent, sequence=sequence_indent, offset=offset_indent)
+        yaml.default_flow_style = False
+        yaml.compact_seq_seq = True  # dash after dash
+        yaml.compact_seq_map = True  # key after dash
+        # yaml.indent() obscures the purpose of these vars:
+        yaml.map_indent = 2
+        yaml.sequence_indent = 4
+        yaml.sequence_dash_offset = yaml.sequence_indent - 2
 
-        # explicit_start=True + indent(mapping=2, sequence=2, offset=0):
+        # explicit_start=True + map_indent=2 + sequence_indent=2 + sequence_dash_offset=0
         # ---
         # - name: playbook
         #   loop:
         #   - item1
         #
-        # explicit_start=True + indent(mapping=2, sequence=4, offset=2):
+        # explicit_start=True + map_indent=2 + sequence_indent=4 + sequence_dash_offset=2
         # ---
         #   - name: playbook
         #     loop:
@@ -78,4 +87,17 @@ class Transformer:
                     continue
                 for transform in transforms:
                     transform(match, ruamel_data)
-            yaml.dump(ruamel_data, file.path)
+            yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
+
+    def _final_yaml_transform(self, text):
+        """
+        This ensures that top-level sequences are not over-indented.
+
+        In order to make that work, we cannot delegate adding the yaml explict_start
+        to ruamel.yaml or dedent() won't have anything to work with.
+        Instead, we add the explicit_start here.
+        """
+        text = dedent(text)
+        if self.explicit_start:
+            text = "---\n" + text
+        return text
