@@ -26,7 +26,6 @@ def runner_result(
 ) -> LintResult:
     config_options.lintables = [playbook]
     config_options.exclude_paths = exclude
-    # config_options.fmt_all_files = True  # TODO: make configurable
     result = _get_matches(rules=default_rules_collection, options=config_options)
     return result
 
@@ -52,6 +51,7 @@ def runner_result(
     ),
 )
 def test_transformer(
+    config_options: Namespace,
     default_transforms_collection: TransformsCollection,
     runner_result: LintResult,
     matches_count: int,
@@ -62,11 +62,12 @@ def test_transformer(
 
     Based on TestRunner::test_runner
     """
+    config_options.fmt_all_files = True  # TODO: make configurable
 
     transformer = Transformer(
         result=runner_result, transforms=default_transforms_collection
     )
-    transformer.run()
+    transformer.run(fmt_all_files=config_options.fmt_all_files)
 
     matches = runner_result.matches
     assert len(matches) == matches_count
