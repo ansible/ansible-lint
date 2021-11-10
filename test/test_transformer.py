@@ -32,6 +32,7 @@ def runner_result(
 @pytest.mark.parametrize(
     ('playbook', 'exclude', 'matches_count'),
     (
+        # reuse TestRunner::test_runner test cases to ensure transformer does not mangle matches
         pytest.param(
             'examples/playbooks/nomatchestest.yml', [], 0, id="nomatchestest"
         ),
