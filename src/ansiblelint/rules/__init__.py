@@ -138,6 +138,7 @@ class AnsibleLintRule(BaseRule):
                 details=task_msg,
                 filename=file,
             )
+            m.task = task
             matches.append(m)
         return matches
 

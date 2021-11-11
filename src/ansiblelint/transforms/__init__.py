@@ -5,7 +5,7 @@ import logging
 import os
 from argparse import Namespace
 from importlib.abc import Loader
-from typing import Dict, Iterator, List, Optional, Type, Union
+from typing import Any, Dict, Iterator, List, Optional, Type, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -14,6 +14,7 @@ import ansiblelint.file_utils
 from .._internal.rules import BaseRule
 from ..config import options as ansiblelint_options
 from ..errors import MatchError
+from ..file_utils import Lintable
 
 __all__ = ["Transform", "TransformsCollection"]
 
@@ -40,10 +41,17 @@ class Transform:
         match.fixed = True
 
     def __call__(
-        self, match: MatchError, data: Union[CommentedMap, CommentedSeq]
+        self, match: MatchError, lintable: Lintable, data: Union[CommentedMap, CommentedSeq]
     ) -> None:
         """Transform data to fix the MatchError."""
         # call self._fixed(match) when data has been transformed to fix the error.
+
+    @staticmethod
+    def _seek(yaml_path: List[Union[int, str]], data: Union[CommentedMap, CommentedSeq]) -> Any:
+        target = data
+        for segment in yaml_path:
+            target = target[segment]
+        return target
 
     def verbose(self) -> str:
         """Return a verbose representation of the transform."""

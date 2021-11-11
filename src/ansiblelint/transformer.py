@@ -2,7 +2,11 @@
 import logging
 import re
 from textwrap import dedent
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Set, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # noinspection PyProtectedMember
+    from ruamel.yaml.comments import LineCol
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML  # type: ignore
@@ -17,6 +21,18 @@ from .transforms import Transform, TransformsCollection
 _logger = logging.getLogger(__name__)
 
 _comment_line_re = re.compile(r"^ *#")
+
+PLAYBOOK_TASK_KEYWORDS = [
+    'tasks',
+    'pre_tasks',
+    'post_tasks',
+    'handlers',
+]
+NESTED_TASK_KEYS = [
+    'block',
+    'always',
+    'rescue',
+]
 
 
 # Transformer is for transforms like runner is for rules
@@ -93,9 +109,52 @@ class Transformer:
                 transforms: List[Transform] = self.transforms.get_transforms_for(match)
                 if not transforms:
                     continue
+                if match.task:
+                    match.yaml_path = self._get_task_path(file, match.linenumber, ruamel_data)
                 for transform in transforms:
-                    transform(match, ruamel_data)
+                    transform(match, file, ruamel_data)
             yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
+
+    def _get_task_path(
+        self,
+        lintable: Lintable,
+        linenumber: int,
+        ruamel_data: Union[CommentedMap, CommentedSeq],
+    ) -> List[Union[str, int]]:
+        if lintable.kind in ("tasks", "handlers"):
+            return self._get_task_path_in_tasks_block(linenumber, ruamel_data)
+        elif lintable.kind == "playbook":
+            ruamel_data: CommentedSeq
+            for i_play, play in enumerate(ruamel_data):
+                for tasks_keyword in PLAYBOOK_TASK_KEYWORDS:
+                    tasks_block = play.get(tasks_keyword, [])
+                    if not tasks_block:
+                        continue
+                    tasks_yaml_path = self._get_task_path_in_tasks_block(linenumber, tasks_block)
+                    if tasks_yaml_path:
+                        return [i_play, tasks_keyword] + tasks_yaml_path
+        # elif lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
+
+        return []
+
+    def _get_task_path_in_tasks_block(
+        self, linenumber: int, tasks_block: CommentedSeq
+    ) -> List[Union[str, int]]:
+        task: CommentedMap
+        subtask: CommentedMap
+        lc: LineCol  # lc uses 0-based counts
+        linenumber_0 = linenumber - 1  # linenumber is 1-based
+        for i_task, task in enumerate(tasks_block):
+            lc = task.lc
+            if lc.line == linenumber_0:
+                return [i_task]
+            for block_key in NESTED_TASK_KEYS:
+                if block_key in task and task[block_key]:
+                    for i_subtask, subtask in enumerate(task[block_key]):
+                        lc = subtask.lc
+                        if lc.line == linenumber_0:
+                            return [i_task, block_key, i_subtask]
+        return []
 
     def _final_yaml_transform(self, text: str) -> str:
         """

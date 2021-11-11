@@ -3,6 +3,7 @@ from typing import Union
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules.UsingBareVariablesIsDeprecatedRule import UsingBareVariablesIsDeprecatedRule
 from ansiblelint.transforms import Transform
 
@@ -21,7 +22,7 @@ class WrapBareVarsTransform(Transform):
     tags = UsingBareVariablesIsDeprecatedRule.tags
 
     def __call__(
-            self, match: MatchError, data: Union[CommentedMap, CommentedSeq]
+        self, match: MatchError, lintable: Lintable, data: Union[CommentedMap, CommentedSeq]
     ) -> None:
         """Transform data to fix the MatchError."""
         # call self._fixed(match) when data has been transformed to fix the error.
