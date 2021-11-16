@@ -39,28 +39,35 @@ def runner_result(
 
 
 @pytest.mark.parametrize(
-    ('playbook', 'exclude', 'matches_count'),
+    ('playbook', 'exclude', 'matches_count', 'transformed'),
     (
         # reuse TestRunner::test_runner test cases to ensure transformer does not mangle matches
         pytest.param(
-            'examples/playbooks/nomatchestest.yml', [], 0, id="nomatchestest"
+            'examples/playbooks/nomatchestest.yml', [], 0, False, id="nomatchestest"
         ),
-        pytest.param('examples/playbooks/unicode.yml', [], 1, id="unicode"),
+        pytest.param('examples/playbooks/unicode.yml', [], 1, False, id="unicode"),
         pytest.param(
             'examples/playbooks/lots_of_warnings.yml',
             ['examples/playbooks/lots_of_warnings.yml'],
             0,
+            False,
             id="lots_of_warnings",
         ),
-        pytest.param('examples/playbooks/become.yml', [], 0, id="become"),
+        pytest.param('examples/playbooks/become.yml', [], 0, True, id="become"),
         pytest.param(
-            'examples/playbooks/contains_secrets.yml', [], 0, id="contains_secrets"
+            'examples/playbooks/contains_secrets.yml',
+            [],
+            0,
+            True,
+            id="contains_secrets",
         ),
     ),
 )
 def test_transformer(
     copy_examples_dir: Tuple[py.path.local, py.path.local],
+    playbook: str,
     runner_result: LintResult,
+    transformed: bool,
     matches_count: int,
 ) -> None:
     """
@@ -74,3 +81,19 @@ def test_transformer(
 
     matches = runner_result.matches
     assert len(matches) == matches_count
+
+    orig_dir, tmp_dir = copy_examples_dir
+    orig_playbook = orig_dir / playbook
+    expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
+    transformed_playbook = tmp_dir / playbook
+
+    orig_playbook_content = orig_playbook.read()
+    expected_playbook_content = expected_playbook.read()
+    transformed_playbook_content = transformed_playbook.read()
+
+    if transformed:
+        assert orig_playbook_content != transformed_playbook_content
+    else:
+        assert orig_playbook_content == transformed_playbook_content
+
+    assert transformed_playbook_content == expected_playbook_content
