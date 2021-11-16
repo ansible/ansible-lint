@@ -1,7 +1,8 @@
 import os
 from argparse import Namespace
-from typing import Any, List, Set, Type
+from typing import List, Tuple
 
+import py
 import pytest
 
 from ansiblelint.cli import abspath
@@ -12,9 +13,17 @@ from ansiblelint.runner import _get_matches, LintResult
 from ansiblelint.transformer import Transformer
 from ansiblelint.transforms import TransformsCollection
 
-LOTS_OF_WARNINGS_PLAYBOOK = abspath(
-    'examples/playbooks/lots_of_warnings.yml', os.getcwd()
-)
+
+@pytest.fixture
+def copy_examples_dir(
+    tmpdir: py.path.local, config_options: Namespace
+) -> Tuple[py.path.local, py.path.local]:
+    examples_dir = py.path.local("examples")
+    examples_dir.copy(tmpdir / "examples")
+    oldcwd = tmpdir.chdir()
+    config_options.cwd = tmpdir
+    yield oldcwd, tmpdir
+    oldcwd.chdir()
 
 
 @pytest.fixture
@@ -39,8 +48,8 @@ def runner_result(
         ),
         pytest.param('examples/playbooks/unicode.yml', [], 1, 0, id="unicode"),
         pytest.param(
-            LOTS_OF_WARNINGS_PLAYBOOK,
-            [LOTS_OF_WARNINGS_PLAYBOOK],
+            'examples/playbooks/lots_of_warnings.yml',
+            ['examples/playbooks/lots_of_warnings.yml'],
             0,
             0,
             id="lots_of_warnings",
@@ -53,6 +62,7 @@ def runner_result(
     ),
 )
 def test_transformer(
+    copy_examples_dir: Tuple[py.path.local, py.path.local],
     config_options: Namespace,
     default_transforms_collection: TransformsCollection,
     runner_result: LintResult,
