@@ -1,0 +1,9 @@
+---
+- hosts: whatever
+
+  tasks:
+    - name: hello world
+      action: debug msg="Hello!"
+
+    - name: this should be fine too
+      action: file state=touch dest=./wherever mode=0600
