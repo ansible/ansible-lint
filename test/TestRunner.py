@@ -76,16 +76,20 @@ def test_runner_exclude_paths(default_rules_collection: RulesCollection) -> None
     assert len(matches) == 0
 
 
-def test_runner_exclude_globs(default_rules_collection: RulesCollection) -> None:
+@pytest.mark.parametrize(('exclude_path'), ('**/playbooks/*.yml',))
+def test_runner_exclude_globs(
+    default_rules_collection: RulesCollection, exclude_path: str
+) -> None:
     """Test that globs work."""
     runner = Runner(
-        'examples/playbooks/example.yml',
+        'examples/playbooks',
         rules=default_rules_collection,
-        exclude_paths=['**/example.yml'],
+        exclude_paths=[exclude_path],
     )
 
     matches = runner.run()
-    assert len(matches) == 0
+    # we expect to find one error from the only .yaml file we have there.
+    assert len(matches) == 1
 
 
 @pytest.mark.parametrize(

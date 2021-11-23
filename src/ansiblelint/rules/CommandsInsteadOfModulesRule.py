@@ -68,6 +68,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     _executable_options = {
         'git': ['branch', 'log'],
         'systemctl': ['set-default', 'show-environment', 'status'],
+        'yum': ['clean'],
     }
 
     def matchtask(
@@ -100,7 +101,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         return False
 
 
-if "pytest" in sys.modules:
+if "pytest" in sys.modules:  # noqa: C901
     import pytest
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
@@ -152,6 +153,20 @@ if "pytest" in sys.modules:
   tasks:
     - name: set systemd runlevel
       command: systemctl set-default multi-user.target
+'''
+
+    YUM_UPDATE = '''
+- hosts: all
+  tasks:
+    - name: run yum update
+      command: yum update
+'''
+
+    YUM_CLEAN = '''
+- hosts: all
+  tasks:
+    - name: clear yum cache
+      command: yum clean all
 '''
 
     @pytest.mark.parametrize(
@@ -208,4 +223,20 @@ if "pytest" in sys.modules:
     def test_systemd_runlevel(rule_runner: RunFromText) -> None:
         """Set-default is not supported by the systemd module."""
         results = rule_runner.run_playbook(SYSTEMD_RUNLEVEL)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_yum_update(rule_runner: RunFromText) -> None:
+        """Using yum update should fail."""
+        results = rule_runner.run_playbook(YUM_UPDATE)
+        assert len(results) == 1
+
+    @pytest.mark.parametrize(
+        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+    )
+    def test_yum_clean(rule_runner: RunFromText) -> None:
+        """The yum module does not support clearing yum cache."""
+        results = rule_runner.run_playbook(YUM_CLEAN)
         assert len(results) == 0
