@@ -200,6 +200,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
+    _logger.debug(os.getcwd())
 
     app = App(options=options)
 
@@ -241,6 +242,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             "Matches found, running again on previous revision in order to detect regressions"
         )
         with _previous_revision():
+            _logger.debug("Options: %s", options)
+            _logger.debug(os.getcwd())
             old_result = _get_matches(rules, options)
             # remove old matches from current list
             matches_delta = list(set(result.matches) - set(old_result.matches))
