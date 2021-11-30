@@ -16,29 +16,18 @@ from ansiblelint.constants import (
     DEFAULT_RULESDIR,
     INVALID_CONFIG_RC,
 )
-from ansiblelint.file_utils import expand_path_vars, guess_project_dir, normpath
+from ansiblelint.file_utils import (
+    abspath,
+    expand_path_vars,
+    guess_project_dir,
+    normpath,
+)
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [
     'exclude_paths',
     'rulesdir',
 ]
-
-
-def abspath(path: str, base_dir: str) -> str:
-    """Make relative path absolute relative to given directory.
-
-    Args:
-       path (str): the path to make absolute
-       base_dir (str): the directory from which make \
-                       relative paths absolute
-    """
-    if not os.path.isabs(path):
-        # Don't use abspath as it assumes path is relative to cwd.
-        # We want it relative to base_dir.
-        path = os.path.join(base_dir, path)
-
-    return os.path.normpath(path)
 
 
 def expand_to_normalized_paths(
