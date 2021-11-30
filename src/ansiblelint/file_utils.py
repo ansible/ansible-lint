@@ -78,7 +78,7 @@ def kind_from_path(path: Path, base: bool = False) -> FileType:
     """
     # pathlib.Path.match patterns are very limited, they do not support *a*.yml
     # glob.glob supports **/foo.yml but not multiple extensions
-    pathex = wcmatch.pathlib.PurePath(path.absolute().resolve())
+    pathex = wcmatch.pathlib.PurePath(str(path.absolute().resolve()))
     kinds = options.kinds if not base else BASE_KINDS
     for entry in kinds:
         for k, v in entry.items():
@@ -245,9 +245,11 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     if out is None:
         exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
         _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
-        out = WcMatch(
-            '.', exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
-        ).match()
+        out = set(
+            WcMatch(
+                '.', exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
+            ).match()
+        )
 
     return OrderedDict.fromkeys(sorted(out))
 
