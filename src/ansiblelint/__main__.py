@@ -278,7 +278,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 def _previous_revision() -> Iterator[None]:
     """Create or update a temporary workdir containing the previous revision."""
     worktree_dir = f"{options.cache_dir}/old-rev"
-    """ Update options.exclude_paths to include use the temporary workdir."""
+    # Update options.exclude_paths to include use the temporary workdir.
     rel_exclude_paths = []
     for exclude_path in options.exclude_paths:
         rel_exclude_paths.append(normpath(exclude_path))
