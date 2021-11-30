@@ -46,10 +46,15 @@ An example rule using ``matchtask`` is:
 
 .. code-block:: python
 
-    from typing import Any, Dict
+    from typing import TYPE_CHECKING, Any, Dict, Union
 
     import ansiblelint.utils
     from ansiblelint.rules import AnsibleLintRule
+
+    if TYPE_CHECKING:
+        from typing import Optional
+
+        from ansiblelint.file_utils import Lintable
 
     class TaskHasTag(AnsibleLintRule):
         id = 'EXAMPLE001'
@@ -57,7 +62,7 @@ An example rule using ``matchtask`` is:
         description = 'Tasks must have tag'
         tags = ['productivity']
 
-        def matchtask(self, task: Dict[str, Any]) -> Union[bool,str]:
+        def matchtask(self, task: Dict[str, Any], file: 'Optional[Lintable]' = None) -> Union[bool,str]:
             # If the task include another task or make the playbook fail
             # Don't force to have a tag
             if not set(task.keys()).isdisjoint(['include','fail']):
