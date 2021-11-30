@@ -279,12 +279,8 @@ def _previous_revision() -> Iterator[None]:
     """Create or update a temporary workdir containing the previous revision."""
     worktree_dir = f"{options.cache_dir}/old-rev"
     # Update options.exclude_paths to include use the temporary workdir.
-    rel_exclude_paths = []
-    for exclude_path in options.exclude_paths:
-        rel_exclude_paths.append(normpath(exclude_path))
-    options.exclude_paths = []
-    for exclude_path in rel_exclude_paths:
-        options.exclude_paths.append(abspath(exclude_path, worktree_dir))
+    rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
+    options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD^1"],
         check=True,
@@ -300,9 +296,7 @@ def _previous_revision() -> Iterator[None]:
             os.system(f"git checkout {revision}")
             yield
     finally:
-        options.exclude_paths = []
-        for exclude_path in rel_exclude_paths:
-            options.exclude_paths.append(abspath(exclude_path, os.getcwd()))
+        options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
 
 
 def _run_cli_entrypoint() -> None:
