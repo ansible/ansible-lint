@@ -14,24 +14,6 @@ ci:
   - pip-compile-docs-upgrade
   - pip-compile-upgrade
 repos:
-- repo: local
-  hooks:
-  - id: immutable-setup-py
-    name: Verify that setup.py stays immutable
-    description: >-
-      This is a sanity check that makes sure that
-      the `setup.py` file isn't changed.
-    # Using Python here because using
-    # shell test does not seem to work in CIs:
-    entry: >-
-      sh -c 'git hash-object setup.py
-      |
-      python -c raise\ SystemExit\(input\(\)\ !=\ \"f6d1010b609cbe816d3ef652eee452d09d52979f\"\)
-      '
-    pass_filenames: false
-    language: system
-    files: >-
-      ^setup\.py$
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v4.0.1
   hooks:
@@ -138,7 +120,7 @@ repos:
   hooks:
   - id: pip-compile
     name: pip-compile
-    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint --strip-extras
+    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
@@ -150,7 +132,7 @@ repos:
     pass_filenames: false
   - id: pip-compile-upgrade
     name: pip-compile-upgrade
-    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint --strip-extras
+    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
