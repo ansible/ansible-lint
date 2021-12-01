@@ -1,11 +1,12 @@
 """Tests related to our logging/verbosity setup."""
 
 import os
-import pytest
-
 from typing import List, Tuple
 
+import pytest
+
 from ansiblelint.testing import run_ansible_lint
+
 
 # substrs is a list of tuples, where:
 #    component 1 is the substring in question
@@ -76,7 +77,7 @@ from ansiblelint.testing import run_ansible_lint
     ),
 )
 def test_default_verbosity(verbosity: str, substrs: List[Tuple[str, bool]]) -> None:
-    """Checks that our default verbosity displays (only) warnings"""
+    """Checks that our default verbosity displays (only) warnings."""
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture, to produce a warning.
     cwd = os.path.realpath(

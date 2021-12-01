@@ -58,7 +58,6 @@ _logger = logging.getLogger(__name__)
 
 def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
-
     # We are about to act on the root logger, which defaults to logging.WARNING.
     # That is where our 0 (default) value comes from.
     VERBOSITY_MAP = {
