@@ -44,7 +44,7 @@ from ansiblelint.color import (
 )
 from ansiblelint.config import options
 from ansiblelint.constants import ANSIBLE_MISSING_RC, EXIT_CONTROL_C_RC
-from ansiblelint.file_utils import cwd
+from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.prerun import check_ansible_presence, prepare_environment
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
@@ -200,6 +200,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
+    _logger.debug(os.getcwd())
 
     app = App(options=options)
 
@@ -241,6 +242,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             "Matches found, running again on previous revision in order to detect regressions"
         )
         with _previous_revision():
+            _logger.debug("Options: %s", options)
+            _logger.debug(os.getcwd())
             old_result = _get_matches(rules, options)
             # remove old matches from current list
             matches_delta = list(set(result.matches) - set(old_result.matches))
@@ -275,6 +278,9 @@ def main(argv: Optional[List[str]] = None) -> int:
 def _previous_revision() -> Iterator[None]:
     """Create or update a temporary workdir containing the previous revision."""
     worktree_dir = f"{options.cache_dir}/old-rev"
+    # Update options.exclude_paths to include use the temporary workdir.
+    rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
+    options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD^1"],
         check=True,
@@ -285,9 +291,12 @@ def _previous_revision() -> Iterator[None]:
     p = pathlib.Path(worktree_dir)
     p.mkdir(parents=True, exist_ok=True)
     os.system(f"git worktree add -f {worktree_dir} 2>/dev/null")
-    with cwd(worktree_dir):
-        os.system(f"git checkout {revision}")
-        yield
+    try:
+        with cwd(worktree_dir):
+            os.system(f"git checkout {revision}")
+            yield
+    finally:
+        options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
 
 
 def _run_cli_entrypoint() -> None:
