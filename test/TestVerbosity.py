@@ -19,24 +19,24 @@ from ansiblelint.testing import run_ansible_lint
             [
                 ('WARNING  Loading custom .yamllint config file,', False),
                 ('WARNING  Listing 1 violation(s) that are fatal', False),
-                ('DEBUG', True),
-                ('INFO', True),
+                ('DEBUG ', True),
+                ('INFO ', True),
             ],
         ),
         (
             '-q',
             [
-                ('WARNING', True),
-                ('DEBUG', True),
-                ('INFO', True),
+                ('WARNING ', True),
+                ('DEBUG ', True),
+                ('INFO ', True),
             ],
         ),
         (
             '-qq',
             [
-                ('WARNING', True),
-                ('DEBUG', True),
-                ('INFO', True),
+                ('WARNING ', True),
+                ('DEBUG ', True),
+                ('INFO ', True),
             ],
         ),
         (
@@ -45,7 +45,7 @@ from ansiblelint.testing import run_ansible_lint
                 ('WARNING  Loading custom .yamllint config file,', False),
                 ('WARNING  Listing 1 violation(s) that are fatal', False),
                 ('INFO     Added ANSIBLE_LIBRARY=', False),
-                ('DEBUG', True),
+                ('DEBUG ', True),
             ],
         ),
         (
