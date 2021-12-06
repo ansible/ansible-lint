@@ -35,7 +35,7 @@ repos:
   hooks:
   - id: codespell
 - repo: https://github.com/PyCQA/doc8
-  rev: 0.9.1
+  rev: 0.10.1
   hooks:
   - id: doc8
 - repo: https://github.com/adrienverge/yamllint.git
@@ -51,14 +51,14 @@ repos:
     types: [file, yaml]
     entry: yamllint --strict
 - repo: https://github.com/PyCQA/isort
-  rev: 5.9.3
+  rev: 5.10.1
   hooks:
   - id: isort
     args:
     # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
     - --filter-files
 - repo: https://github.com/psf/black
-  rev: 21.10b0
+  rev: 21.12b0
   hooks:
   - id: black
     language_version: python3
