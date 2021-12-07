@@ -58,10 +58,12 @@ _logger = logging.getLogger(__name__)
 
 def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
+    # We are about to act on the root logger, which defaults to logging.WARNING.
+    # That is where our 0 (default) value comes from.
     VERBOSITY_MAP = {
-        -2: logging.ERROR,
-        -1: logging.WARNING,
-        0: logging.NOTSET,
+        -2: logging.CRITICAL,
+        -1: logging.ERROR,
+        0: logging.WARNING,
         1: logging.INFO,
         2: logging.DEBUG,
     }
@@ -69,7 +71,7 @@ def initialize_logger(level: int = 0) -> None:
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(levelname)-8s %(message)s')
     handler.setFormatter(formatter)
-    logger = logging.getLogger(__package__)
+    logger = logging.getLogger()
     logger.addHandler(handler)
     # Unknown logging level is treated as DEBUG
     logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
