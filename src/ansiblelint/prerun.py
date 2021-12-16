@@ -328,7 +328,7 @@ def _prepare_ansible_paths() -> None:
     # Ansible warnings which could slip through, namely the devel branch
     # warning.
     if options.verbosity < 0:
-        _update_env("ANSIBLE_DEVEL_WARNING", "False")
+        _update_env("ANSIBLE_DEVEL_WARNING", ["False"])
 
 def _make_module_stub(module_name: str) -> None:
     # a.b.c is treated a collection
