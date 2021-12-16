@@ -330,6 +330,7 @@ def _prepare_ansible_paths() -> None:
     if options.verbosity < 0:
         _update_env("ANSIBLE_DEVEL_WARNING", ["False"])
 
+
 def _make_module_stub(module_name: str) -> None:
     # a.b.c is treated a collection
     if re.match(r"^(\w+|\w+\.\w+\.[\.\w]+)$", module_name):
