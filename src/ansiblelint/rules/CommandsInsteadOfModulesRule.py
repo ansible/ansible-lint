@@ -69,7 +69,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         'git': ['branch', 'log'],
         'systemctl': ['set-default', 'show-environment', 'status'],
         'yum': ['clean'],
-        'rpm': ['-e'],
+        'rpm': ['--nodeps'],
     }
 
     def matchtask(
