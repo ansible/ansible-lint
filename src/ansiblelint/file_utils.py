@@ -28,6 +28,22 @@ else:
 _logger = logging.getLogger(__package__)
 
 
+def abspath(path: str, base_dir: str) -> str:
+    """Make relative path absolute relative to given directory.
+
+    Args:
+       path (str): the path to make absolute
+       base_dir (str): the directory from which make \
+                       relative paths absolute
+    """
+    if not os.path.isabs(path):
+        # Don't use abspath as it assumes path is relative to cwd.
+        # We want it relative to base_dir.
+        path = os.path.join(base_dir, path)
+
+    return os.path.normpath(path)
+
+
 def normpath(path: Union[str, BasePathLike]) -> str:
     """
     Normalize a path in order to provide a more consistent output.
@@ -78,7 +94,7 @@ def kind_from_path(path: Path, base: bool = False) -> FileType:
     """
     # pathlib.Path.match patterns are very limited, they do not support *a*.yml
     # glob.glob supports **/foo.yml but not multiple extensions
-    pathex = wcmatch.pathlib.PurePath(path.absolute().resolve())
+    pathex = wcmatch.pathlib.PurePath(str(path.absolute().resolve()))
     kinds = options.kinds if not base else BASE_KINDS
     for entry in kinds:
         for k, v in entry.items():
@@ -185,7 +201,7 @@ class Lintable:
     def content(self) -> str:
         """Retried file content, from internal cache or disk."""
         if self._content is None:
-            with open(self.path, mode='r', encoding='utf-8') as f:
+            with open(self.path.resolve(), mode='r', encoding='utf-8') as f:
                 self._content = f.read()
         return self._content
 
@@ -245,9 +261,11 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     if out is None:
         exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
         _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
-        out = WcMatch(
-            '.', exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
-        ).match()
+        out = set(
+            WcMatch(
+                '.', exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
+            ).match()
+        )
 
     return OrderedDict.fromkeys(sorted(out))
 

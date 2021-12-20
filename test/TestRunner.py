@@ -23,8 +23,7 @@ from typing import Any, List, Set, Type
 import pytest
 
 from ansiblelint import formatters
-from ansiblelint.cli import abspath
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, abspath
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
