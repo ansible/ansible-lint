@@ -95,6 +95,9 @@ def kind_from_path(path: Path, base: bool = False) -> FileType:
     # pathlib.Path.match patterns are very limited, they do not support *a*.yml
     # glob.glob supports **/foo.yml but not multiple extensions
     pathex = wcmatch.pathlib.PurePath(str(path.absolute().resolve()))
+    cwd = Path.cwd()
+    if pathex.is_relative_to(cwd):
+        pathex = pathex.relative_to(cwd)
     kinds = options.kinds if not base else BASE_KINDS
     for entry in kinds:
         for k, v in entry.items():
