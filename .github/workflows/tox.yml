@@ -39,6 +39,8 @@ jobs:
       TOX_PARALLEL_NO_SPINNER: 1
       FORCE_COLOR: 1
 
+    continue-on-error: ${{ matrix.env.TOXENV == 'eco' }}
+
     steps:
     - name: Check out src from Git
       uses: actions/checkout@v2
