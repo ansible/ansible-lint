@@ -324,6 +324,12 @@ def _prepare_ansible_paths() -> None:
     _update_env(ansible_collections_path(), collection_list)
     _update_env('ANSIBLE_ROLES_PATH', roles_path, default=ANSIBLE_DEFAULT_ROLES_PATH)
 
+    # If we are asking to run without warnings, then also silence certain
+    # Ansible warnings which could slip through, namely the devel branch
+    # warning.
+    if options.verbosity < 0:
+        _update_env("ANSIBLE_DEVEL_WARNING", ["False"])
+
 
 def _make_module_stub(module_name: str) -> None:
     # a.b.c is treated a collection
