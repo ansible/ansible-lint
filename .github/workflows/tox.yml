@@ -39,6 +39,8 @@ jobs:
       TOX_PARALLEL_NO_SPINNER: 1
       FORCE_COLOR: 1
 
+    continue-on-error: ${{ matrix.env.TOXENV == 'eco' }}
+
     steps:
     - name: Check out src from Git
       uses: actions/checkout@v2
@@ -223,3 +225,18 @@ jobs:
       with:
         path: .tox/junit.*.xml
       if: always()
+
+  check:  # This job does nothing and is only used for the branch protection
+    if: always()
+
+    needs:
+    - linters
+    - unit
+
+    runs-on: Ubuntu-latest
+
+    steps:
+    - name: Decide whether the needed jobs succeeded or failed
+      uses: re-actors/alls-green@release/v1
+      with:
+        jobs: ${{ toJSON(needs) }}
