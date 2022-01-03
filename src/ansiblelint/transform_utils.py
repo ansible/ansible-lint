@@ -7,6 +7,30 @@ from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor
 
 
+def dump(
+    node: nodes.Template,
+    environment: Environment,
+    name: Optional[str],
+    filename: Optional[str],
+    stream: Optional[TextIO] = None,
+):
+    """Dump a jinja2 ast back into a jinja2 template.
+    This is based on jinja2.compiler.generate
+    """
+    if not isinstance(node, nodes.Template):
+        raise TypeError("Can't dump non template nodes")
+
+    dumper = TemplateDumper(
+        environment, name, filename, stream
+    )
+    dumper.visit(node)
+
+    if stream is None:
+        return dumper.stream.getvalue()  # type: ignore
+
+    return None
+
+
 class TemplateDumper(NodeVisitor):
     """Dump a jinja2 AST back into a jinja2 template.
     This facilitates AST-based template modification.
@@ -18,7 +42,7 @@ class TemplateDumper(NodeVisitor):
         environment: Environment,
         name: Optional[str],
         filename: Optional[str],
-        stream: Optional[TextIO],
+        stream: Optional[TextIO] = None,
     ):
         if stream is None:
             stream = StringIO()
@@ -92,10 +116,14 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Output(self, node: nodes.Template) -> None:
         # Output is a {{ }} statement (aka `print` or output statement)
-        self.write(f"{self.environment.variable_start_string} ")
         for child_node in node.iter_child_nodes():
+            # child_node might be TemplateData which is outside {{ }}
+            do_var_wrap = not isinstance(child_node, nodes.TemplateData)
+            if do_var_wrap:
+                self.write(f"{self.environment.variable_start_string} ")
             self.visit(child_node)
-        self.write(f" {self.environment.variable_end_string}")
+            if do_var_wrap:
+                self.write(f" {self.environment.variable_end_string}")
 
     def visit_Block(self, node: nodes.Block) -> None:
         """
@@ -325,7 +353,7 @@ class TemplateDumper(NodeVisitor):
     def visit_Const(self, node: nodes.Const) -> None:
         # constant values (int, str, etc)
         # TODO: handle quoting, escaping (maybe repr it?)
-        self.write(node.value)
+        self.write(repr(node.value))
 
     def visit_TemplateData(self, node: nodes.TemplateData) -> None:
         # constant template string
