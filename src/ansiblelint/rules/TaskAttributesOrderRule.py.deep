@@ -1,25 +1,33 @@
+"""Optional rule to enforce task attributes order."""
 import logging
 import sys
-from collections import OrderedDict as odict
+# from collections import OrderedDict as odict
+from ansiblelint.constants import odict
 from pprint import pp, pprint
 from typing import TYPE_CHECKING, Any, Dict, Union, List
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.testing import RunFromText
+from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Any
 
     from ansiblelint.file_utils import Lintable
     from ansiblelint.errors import MatchError
+    from ansiblelint.constants import odict
+
 
 # _logger = logging.getLogger(__name__)
-# logging.basicConfig(filename='example.log', level=logging.DEBUG)
+logging.basicConfig(filename='example.log', level=logging.DEBUG)
 
 
 class TaskAttributesOrderRule(AnsibleLintRule):
+    """Enforce task attribute order."""
+
     id = 'attribute-order'
-    shortdesc = 'All task attributes should be in order'
+    shortdesc = __doc__
     description = 'Task attributes should be in the same order across all lintables'
     severity = 'LOW'
     tags = ['opt-in', 'formatting', 'experimental']
@@ -76,14 +84,52 @@ class TaskAttributesOrderRule(AnsibleLintRule):
     ordered_expected_attrs = odict((key, idx) for idx, key in enumerate(possible_attrs))
 
 
-    def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
-    ) -> Union[bool, str]:
+    def matchplay(self, file: Lintable, data: "odict[str, Any]") -> List[MatchError]:
+        """Return matches found for a specific playbook."""
+        results: List[MatchError] = []
+        logging(file)
+
+        if file.kind not in ('tasks', 'handlers'):
+            return results
+
+        results.extend(self.handle_play(file, data))
+        return results
+
+    def handle_play(
+        self, lintable: Lintable, task: "odict[str, Any]"
+    ) -> List[MatchError]:
+        """Return matches for a playlist."""
+        results = []
+        if 'block' in task:
+            results.extend(self.handle_tasks(lintable, task['block']))
+        else:
+            results.extend(self.handle_task(lintable, task))
+        return results
+
+    def handle_tasks(
+        self, lintable: Lintable, tasks: List["odict[str, Any]"]
+    ) -> List[MatchError]:
+        """Return matches for a list of tasks."""
+        results = []
+        for play in tasks:
+            results.extend(self.handle_play(lintable, play))
+        return results
+
+    def handle_task(
+        self, lintable: Lintable, task: "odict[str, Any]"
+    ) -> List[MatchError]:
+        """Return matches for a specific task."""
+        results = []
+
+        # pprint(task['name'])
+        logging.info(task['name'])
+
         attrs = []
         for k in task.keys():
             if not k.startswith('__') and (k not in self.removed_attributes):
                 attrs.append(k)
 
+        # loop through actual attrs and look up their position in the expected order
         actual_attrs = odict()
         for attr in attrs:
             actual_attrs[attr] = self.ordered_expected_attrs[attr]
@@ -92,56 +138,11 @@ class TaskAttributesOrderRule(AnsibleLintRule):
             sorted(actual_attrs.items(), key=lambda item: item[1])
         )
 
-        pprint(task)
-        # logging.info(task)
-        # logging.info((task.get('name'), actual_attrs))
+        logging.info((task.get('name'), actual_attrs))
         # logging.info(('sorted:', sorted_actual_attrs))
         # logging.info(sorted_actual_attrs != actual_attrs)
 
-        # if sorted_actual_attrs != actual_attrs:
-        #     return "Please verify the order of the attributes in this task."
-        # return False
-        return sorted_actual_attrs != actual_attrs
+        if sorted_actual_attrs != actual_attrs:
+            return "Please verify the order of the attributes in this task."
 
-
-
-if "pytest" in sys.modules:
-    import pytest
-
-    PLAY_FAIL = """---
-- hosts: localhost
-  tasks:
-    - shell: echo hello
-      name: task with name on bottom
-      when: true
-"""
-
-    PLAY_SUCCESS = """---
-- hosts: localhost
-  tasks:
-    - name: task with when on top
-      when: true
-      shell: echo hello
-    - shell: echo hello
-    - delegate_to: localhost
-      shell: echo hello
-    - shell: echo hello
-      name: test
-"""
-
-    @pytest.mark.parametrize(
-        'rule_runner', (TaskAttributesOrderRule,), indirect=['rule_runner']
-    )
-    def test_task_attribute_order_rule_pass(rule_runner: RunFromText) -> None:
-        """The task has when second."""
-        results = rule_runner.run_playbook(PLAY_SUCCESS)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        'rule_runner', (TaskAttributesOrderRule,), indirect=['rule_runner']
-    )
-    def test_task_attribute_order_rule_fail(rule_runner: RunFromText) -> None:
-        """The task has when last."""
-        results = rule_runner.run_playbook(PLAY_FAIL)
-        # pprint(results)
-        assert len(results) == 1
+        return results

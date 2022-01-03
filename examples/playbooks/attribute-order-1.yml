@@ -55,4 +55,6 @@
         - aloha
       loop_control:
         loop_var: eight
-      tags: test
+      tags:
+        - test1
+        - test2
