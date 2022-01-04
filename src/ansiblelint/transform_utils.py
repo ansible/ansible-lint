@@ -1,5 +1,5 @@
 from io import StringIO
-from typing import Any, Mapping, Optional, TextIO, Union
+from typing import Optional, TextIO, Union
 
 from jinja2 import nodes
 from jinja2.compiler import operators
