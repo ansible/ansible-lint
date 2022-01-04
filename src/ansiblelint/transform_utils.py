@@ -388,10 +388,22 @@ class TemplateDumper(NodeVisitor):
             self.visit(item.value)
         self.write("}")
 
+    def _visit_possible_binop(self, node: nodes.Expr):
+        """Wrap binops in parentheses if needed.
+        This is not in _binop so that the outermost
+        binop does not get wrapped in parentheses.
+        """
+        if isinstance(node, nodes.BinExpr):
+            self.write("(")
+            self.visit(node)
+            self.write(")")
+        else:
+            self.visit(node)
+
     def _binop(self, node: nodes.BinExpr) -> None:
-        self.visit(node.left)
+        self._visit_possible_binop(node.left)
         self.write(f" {node.operator} ")
-        self.visit(node.right)
+        self._visit_possible_binop(node.right)
 
     visit_Add = _binop
     visit_Sub = _binop
@@ -405,7 +417,7 @@ class TemplateDumper(NodeVisitor):
 
     def _unop(self, node: nodes.UnaryExpr) -> None:
         self.write(f"{node.operator} ")
-        self.visit(node.node)
+        self._visit_possible_binop(node.node)
 
     visit_Pos = _unop
     visit_Neg = _unop
@@ -426,15 +438,15 @@ class TemplateDumper(NodeVisitor):
             self.visit(expr)
 
     def visit_Compare(self, node: nodes.Compare) -> None:
-        self.write("(")
-        self.visit(node.expr)
+        self._visit_possible_binop(node.expr)
         for op in node.ops:
+            # node.ops: List[Operand]
+            # op.op: eq, ne, gt, gteq, lt, lteq, in, notin
             self.visit(op)
-        self.write(")")
 
     def visit_Operand(self, node: nodes.Operand) -> None:
         self.write(f" {operators[node.op]} ")
-        self.visit(node.expr)
+        self._visit_possible_binop(node.expr)
 
     def visit_Getattr(self, node: nodes.Getattr) -> None:
         # node.ctx is only ever "load". Not sure this would change if it wasn't.
