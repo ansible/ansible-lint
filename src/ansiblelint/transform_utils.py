@@ -286,6 +286,7 @@ class TemplateDumper(NodeVisitor):
         self.visit(node.node)
         self.write(f" {self.environment.block_end_string}")
 
+    # noinspection DuplicatedCode
     def visit_AssignBlock(self, node: nodes.AssignBlock) -> None:
         """{% set var %}value{% endset %}"""
         self.write(f"{self.environment.block_start_string} set ")
@@ -297,6 +298,7 @@ class TemplateDumper(NodeVisitor):
             f"{self.environment.block_start_string} endset {self.environment.block_end_string}"
         )
 
+    # noinspection DuplicatedCode
     def visit_FilterBlock(self, node: nodes.FilterBlock) -> None:
         """{% filter <filter> %}block{% endfilter %}"""
         self.write(f"{self.environment.block_start_string} filter ")
@@ -541,12 +543,14 @@ class TemplateDumper(NodeVisitor):
     # def visit_DerivedContextReference(self, node: nodes.DerivedContextReference) -> None:
     #     """could be added by extensions. like debug block but w/ locals"""
 
+    # noinspection PyUnusedLocal
     def visit_Continue(self, node: nodes.Continue) -> None:
         """LoopControlExtension"""
         self.write(
             f"{self.environment.block_start_string} continue {self.environment.block_end_string}"
         )
 
+    # noinspection PyUnusedLocal
     def visit_Break(self, node: nodes.Break) -> None:
         """LoopControlExtension"""
         self.write(
