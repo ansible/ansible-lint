@@ -13,7 +13,7 @@ def dump(
     name: Optional[str],
     filename: Optional[str],
     stream: Optional[TextIO] = None,
-):
+) -> Optional[str]:
     """Dump a jinja2 ast back into a jinja2 template.
     This is based on jinja2.compiler.generate
     """
@@ -26,7 +26,7 @@ def dump(
     dumper.visit(node)
 
     if stream is None:
-        return dumper.stream.getvalue()  # type: ignore
+        return dumper.stream.getvalue()
 
     return None
 
