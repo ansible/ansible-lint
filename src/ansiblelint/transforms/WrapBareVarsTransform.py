@@ -5,7 +5,9 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules.UsingBareVariablesIsDeprecatedRule import UsingBareVariablesIsDeprecatedRule
+from ansiblelint.rules.UsingBareVariablesIsDeprecatedRule import (
+    UsingBareVariablesIsDeprecatedRule,
+)
 from ansiblelint.transforms import Transform
 
 
@@ -27,7 +29,10 @@ class WrapBareVarsTransform(Transform):
     _glob = UsingBareVariablesIsDeprecatedRule._glob
 
     def __call__(
-        self, match: MatchError, lintable: Lintable, data: Union[CommentedMap, CommentedSeq]
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq],
     ) -> None:
         """Transform data to fix the MatchError."""
         target_task = self._seek(match.yaml_path, data)
@@ -65,7 +70,9 @@ class WrapBareVarsTransform(Transform):
         if self._jinja.match(loop_item):
             return False
         if loop_type == "with_fileglob":
-            return not bool(self._jinja.search(loop_item) or self._glob.search(loop_item))
+            return not bool(
+                self._jinja.search(loop_item) or self._glob.search(loop_item)
+            )
         if loop_type == 'with_filetree':
             return not bool(self._jinja.search(loop_item) or loop_item.endswith(os.sep))
         return True

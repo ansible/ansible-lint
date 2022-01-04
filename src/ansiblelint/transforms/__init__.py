@@ -41,13 +41,18 @@ class Transform:
         match.fixed = True
 
     def __call__(
-        self, match: MatchError, lintable: Lintable, data: Union[CommentedMap, CommentedSeq]
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq],
     ) -> None:
         """Transform data to fix the MatchError."""
         # call self._fixed(match) when data has been transformed to fix the error.
 
     @staticmethod
-    def _seek(yaml_path: List[Union[int, str]], data: Union[CommentedMap, CommentedSeq]) -> Any:
+    def _seek(
+        yaml_path: List[Union[int, str]], data: Union[CommentedMap, CommentedSeq]
+    ) -> Any:
         target = data
         for segment in yaml_path:
             target = target[segment]

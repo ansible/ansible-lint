@@ -134,9 +134,11 @@ class SimplifyLiteralBoolComparisonTransform(Transform):
                 delete_start_index = last[0] if last else i
                 last = None
                 continue
-            elif found_op and token_type == TOKEN_NAME and value.lower() == right.lower():
+            elif (
+                found_op and token_type == TOKEN_NAME and value.lower() == right.lower()
+            ):
                 found_right = True
-                delete_stop_index = i
+                delete_stop_index = i + 1
                 break
             elif found_op and token_type == TOKEN_NAME:
                 found_op = False
@@ -145,7 +147,7 @@ class SimplifyLiteralBoolComparisonTransform(Transform):
         if not found_right:
             # this should not happen
             return tokens
-        tokens = tokens[:delete_start_index] + tokens[delete_stop_index+1:]
+        tokens = tokens[:delete_start_index] + tokens[delete_stop_index:]
         if negate:
             tokens.insert(left_index, (1, TOKEN_WHITESPACE, " "))
             tokens.insert(left_index, (1, TOKEN_NAME, "not"))
