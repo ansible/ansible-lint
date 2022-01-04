@@ -53,6 +53,42 @@ from ansiblelint.transform_utils import TemplateDumper, dump
             "{{ lookup('file', 'a_file') }}",
             id="LookupFuncArgQuotes",
         ),
+        pytest.param(
+            "{{ true and (false or true) }}",
+            # repr() on bools...
+            "{{ True and (False or True) }}",
+            id="OrderedOperations",
+        ),
+        pytest.param(
+            "{{ '1' == '1' }}",
+            "{{ '1' == '1' }}",
+            id="SimpleComparison",
+        ),
+        pytest.param(
+            "{{ 1 == 1 and (1 > 2 or 2 != 3) }}",
+            "{{ 1 == 1 and (1 > 2 or 2 != 3) }}",
+            id="ComplexComparison",
+        ),
+        pytest.param(
+            "{{ not foobar }}",
+            "{{ not foobar }}",
+            id="NotExpr",
+        ),
+        pytest.param(
+            "{{ not (foobar and baz) }}",
+            "{{ not (foobar and baz) }}",
+            id="ComplexNotExpr",
+        ),
+        pytest.param(
+            "{{ 4 not in [1, 2, 3] }}",
+            "{{ 4 not in [1, 2, 3] }}",
+            id="NotInComparison",
+        ),
+        pytest.param(
+            "{{ (4 or 3) in ([] or [1, 2, 3]) }}",
+            "{{ (4 or 3) in ([] or [1, 2, 3]) }}",
+            id="InOrComparison",
+        ),
     ),
 )
 def test_dump(in_template, expected_template):
