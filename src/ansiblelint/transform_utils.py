@@ -10,8 +10,6 @@ from jinja2.visitor import NodeVisitor
 def dump(
     node: nodes.Template,
     environment: Environment,
-    name: Optional[str],
-    filename: Optional[str],
     stream: Optional[TextIO] = None,
 ) -> Optional[str]:
     """Dump a jinja2 ast back into a jinja2 template.
@@ -21,7 +19,7 @@ def dump(
         raise TypeError("Can't dump non template nodes")
 
     dumper = TemplateDumper(
-        environment, name, filename, stream
+        environment, stream
     )
     dumper.visit(node)
 
@@ -40,15 +38,11 @@ class TemplateDumper(NodeVisitor):
     def __init__(
         self,
         environment: Environment,
-        name: Optional[str],
-        filename: Optional[str],
         stream: Optional[TextIO] = None,
     ):
         if stream is None:
             stream = StringIO()
         self.environment = environment
-        self.name = name
-        self.filename = filename
         self.stream = stream
 
     # -- Various compilation helpers

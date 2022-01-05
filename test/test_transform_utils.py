@@ -97,8 +97,6 @@ def test_dump(in_template, expected_template):
     out_template = dump(
         node=in_ast,
         environment=environment,
-        name=None,
-        filename=None,
         stream=None,
     )
     out_ast = environment.parse(out_template)
