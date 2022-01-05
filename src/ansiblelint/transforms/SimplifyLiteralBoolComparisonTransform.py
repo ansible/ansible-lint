@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import py
 from ansible.template import Templar
@@ -70,11 +70,26 @@ class SimplifyLiteralBoolComparisonTransform(Transform):
         """Transform data to fix the MatchError."""
 
         target_task: dict = self._seek(match.yaml_path, data)
-        ast = self._parse_when(lintable.path, target_task["when"])
+        when = target_task["when"]
+        when_is_list = isinstance(when, List)
 
-        updated_ast = CompareNodeTransformer().visit(ast)
+        if not when_is_list:
+            when = [when]
 
-        target_task["when"] = self._dump_when(lintable.path, updated_ast)
+        new_when = []
+        for when_expr in when:
+            ast = self._parse_when_expr(lintable.path, when_expr)
+            updated_ast = CompareNodeTransformer().visit(ast)
+            new_when.append(self._dump_when(lintable.path, updated_ast))
+
+        if when_is_list:
+            # This is not just a list. It is a ruamel.yaml CommentedSeq
+            # Replacing the entire list and setting [:] both remove comments.
+            # So, we replace each item in the list separately to preserve comments.
+            for index, when_expr in enumerate(new_when):
+                target_task["when"][index] = when_expr
+        else:
+            target_task["when"] = new_when[0]
         self._fixed(match)
 
     @staticmethod
@@ -84,7 +99,7 @@ class SimplifyLiteralBoolComparisonTransform(Transform):
         jinja_env: Environment = templar.environment
         return jinja_env
 
-    def _parse_when(self, path: py.path.local, when: str) -> nodes.Template:
+    def _parse_when_expr(self, path: py.path.local, when: str) -> nodes.Template:
         expression = "{{" + when + "}}"
         ast = self._jinja_env(path).parse(expression)
         return ast
