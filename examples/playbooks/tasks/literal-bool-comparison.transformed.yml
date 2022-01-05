@@ -1,3 +1,4 @@
+---
 - name: task when equals true
   debug:
     msg: test
