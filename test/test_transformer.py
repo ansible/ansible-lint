@@ -43,36 +43,36 @@ def runner_result(
     ('playbook', 'exclude', 'matches_count', 'fixed_count', 'transformed'),
     (
         # reuse TestRunner::test_runner test cases to ensure transformer does not mangle matches
-        # pytest.param(
-        #     'examples/playbooks/nomatchestest.yml', [], 0, 0, False, id="nomatchestest"
-        # ),
-        # pytest.param('examples/playbooks/unicode.yml', [], 1, 0, False, id="unicode"),
-        # pytest.param(
-        #     'examples/playbooks/lots_of_warnings.yml',
-        #     ['examples/playbooks/lots_of_warnings.yml'],
-        #     0,
-        #     0,
-        #     False,
-        #     id="lots_of_warnings",
-        # ),
-        # pytest.param('examples/playbooks/become.yml', [], 0, 0, True, id="become"),
-        # pytest.param(
-        #     'examples/playbooks/contains_secrets.yml',
-        #     [],
-        #     0,
-        #     0,
-        #     True,
-        #     id="contains_secrets",
-        # ),
+        pytest.param(
+            'examples/playbooks/nomatchestest.yml', [], 0, 0, False, id="nomatchestest"
+        ),
+        pytest.param('examples/playbooks/unicode.yml', [], 1, 0, False, id="unicode"),
+        pytest.param(
+            'examples/playbooks/lots_of_warnings.yml',
+            ['examples/playbooks/lots_of_warnings.yml'],
+            0,
+            0,
+            False,
+            id="lots_of_warnings",
+        ),
+        pytest.param('examples/playbooks/become.yml', [], 0, 0, True, id="become"),
+        pytest.param(
+            'examples/playbooks/contains_secrets.yml',
+            [],
+            0,
+            0,
+            True,
+            id="contains_secrets",
+        ),
         # Transformer specific test cases
-        # pytest.param(
-        #     'examples/playbooks/using-bare-variables-failure.yml',
-        #     [],
-        #     11,
-        #     11,
-        #     True,
-        #     id="bare_vars_failure",
-        # ),
+        pytest.param(
+            'examples/playbooks/using-bare-variables-failure.yml',
+            [],
+            11,
+            11,
+            True,
+            id="bare_vars_failure",
+        ),
         pytest.param(
             'examples/playbooks/tasks/literal-bool-comparison.yml',
             [],
