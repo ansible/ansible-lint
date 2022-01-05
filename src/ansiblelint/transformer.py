@@ -110,7 +110,9 @@ class Transformer:
                 if not transforms:
                     continue
                 if match.task:
-                    match.yaml_path = self._get_task_path(file, match.linenumber, ruamel_data)
+                    match.yaml_path = self._get_task_path(
+                        file, match.linenumber, ruamel_data
+                    )
                 for transform in transforms:
                     transform(match, file, ruamel_data)
             yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
@@ -130,7 +132,9 @@ class Transformer:
                     tasks_block = play.get(tasks_keyword, [])
                     if not tasks_block:
                         continue
-                    tasks_yaml_path = self._get_task_path_in_tasks_block(linenumber, tasks_block)
+                    tasks_yaml_path = self._get_task_path_in_tasks_block(
+                        linenumber, tasks_block
+                    )
                     if tasks_yaml_path:
                         return [i_play, tasks_keyword] + tasks_yaml_path
         # elif lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
