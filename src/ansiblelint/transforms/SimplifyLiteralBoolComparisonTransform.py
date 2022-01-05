@@ -32,11 +32,11 @@ class CompareNodeTransformer(NodeTransformer):
         if not isinstance(right, nodes.Const):
             return node
 
-        exp = (op, right.value.lower())
-        if exp == (TOKEN_EQ, "true") or exp == (TOKEN_NE, "false"):
+        exp = (op, right.value)
+        if exp == (TOKEN_EQ, True) or exp == (TOKEN_NE, False):
             # var
             negate = False
-        elif exp == (TOKEN_NE, "true") or exp == (TOKEN_EQ, "false"):
+        elif exp == (TOKEN_NE, True) or exp == (TOKEN_EQ, False):
             # not var
             negate = True
         else:
