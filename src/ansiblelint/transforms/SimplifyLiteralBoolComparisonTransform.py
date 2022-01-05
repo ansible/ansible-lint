@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional, Union
+from typing import MutableSequence, Optional, Union
 
 import py
 from ansible.template import Templar
@@ -71,7 +71,7 @@ class SimplifyLiteralBoolComparisonTransform(Transform):
 
         target_task: dict = self._seek(match.yaml_path, data)
         when = target_task["when"]
-        when_is_list = isinstance(when, List)
+        when_is_list = isinstance(when, MutableSequence)
 
         if not when_is_list:
             when = [when]
