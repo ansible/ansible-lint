@@ -81,6 +81,14 @@ def runner_result(
             True,
             id="literal_bool_comparison",
         ),
+        pytest.param(
+            'examples/playbooks/tasks/local_action.yml',
+            [],
+            2,
+            2,
+            True,
+            id="local_action_replacement",
+        ),
     ),
 )
 def test_transformer(

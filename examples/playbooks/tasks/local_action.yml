@@ -1,0 +1,11 @@
+- name: local action shorthand
+  local_action: command echo {{ inventory_hostname }}  # eol comment 1
+  changed_when: false
+
+- name: local action dict
+  local_action:  # eol comment 2
+    module: mail  # eol comment 3
+    subject: "Summary Mail"
+    to: "{{ mail_recipient }}"  # eol comment 4
+    body: "{{ mail_body }}"
+  run_once: true
