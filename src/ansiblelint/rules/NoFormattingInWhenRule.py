@@ -34,7 +34,11 @@ class NoFormattingInWhenRule(AnsibleLintRule):
                 return errors
             for role in data['roles']:
                 if self.matchtask(role, file=file):
-                    errors.append(self.create_matcherror(details=str({'when': role})))
+                    errors.append(
+                        self.create_matcherror(
+                            details=str({'when': role}), filename=file
+                        )
+                    )
         if isinstance(data, list):
             for play_item in data:
                 sub_errors = self.matchplay(file, play_item)
