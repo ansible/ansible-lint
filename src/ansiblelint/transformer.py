@@ -2,7 +2,7 @@
 import logging
 import re
 from textwrap import dedent
-from typing import Dict, List, Set, Union, TYPE_CHECKING
+from typing import Dict, List, Optional, Set, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -109,7 +109,7 @@ class Transformer:
                 transforms: List[Transform] = self.transforms.get_transforms_for(match)
                 if not transforms:
                     continue
-                if match.task:
+                if match.task or file.kind in ("tasks", "handlers", "playbook"):
                     match.yaml_path = self._get_task_path(
                         file, match.linenumber, ruamel_data
                     )
@@ -120,20 +120,44 @@ class Transformer:
     def _get_task_path(
         self,
         lintable: Lintable,
-        linenumber: int,
+        linenumber: int,  # 1-based
         ruamel_data: Union[CommentedMap, CommentedSeq],
     ) -> List[Union[str, int]]:
         if lintable.kind in ("tasks", "handlers"):
             return self._get_task_path_in_tasks_block(linenumber, ruamel_data)
         elif lintable.kind == "playbook":
             ruamel_data: CommentedSeq
+            play_count = len(ruamel_data)
             for i_play, play in enumerate(ruamel_data):
+                i_next_play = i_play + 1
+                if play_count > i_next_play:
+                    next_play_line = ruamel_data[i_next_play].lc.line
+                else:
+                    next_play_line = None
+
+                play_keys = list(play.keys())
+                play_keys_by_index = dict(enumerate(play_keys))
                 for tasks_keyword in PLAYBOOK_TASK_KEYWORDS:
                     tasks_block = play.get(tasks_keyword, [])
                     if not tasks_block:
                         continue
+
+                    play_index = play_keys.index(tasks_keyword)
+                    next_keyword = play_keys_by_index.get(play_index + 1, None)
+                    if next_keyword is not None:
+                        next_block_line = play.lc.data[next_keyword][0]
+                    else:
+                        next_block_line = None
+                    # last_line_in_block is 1-based; next_*_line is 0-based
+                    if next_block_line is not None:
+                        last_line_in_block = next_block_line
+                    elif next_play_line is not None:
+                        last_line_in_block = next_play_line
+                    else:
+                        last_line_in_block = None
+
                     tasks_yaml_path = self._get_task_path_in_tasks_block(
-                        linenumber, tasks_block
+                        linenumber, tasks_block, last_line_in_block
                     )
                     if tasks_yaml_path:
                         return [i_play, tasks_keyword] + tasks_yaml_path
@@ -142,22 +166,82 @@ class Transformer:
         return []
 
     def _get_task_path_in_tasks_block(
-        self, linenumber: int, tasks_block: CommentedSeq
+        self,
+        linenumber: int,  # 1-based
+        tasks_block: CommentedSeq,
+        last_line: Optional[int] = None,  # 1-based
     ) -> List[Union[str, int]]:
         task: CommentedMap
         subtask: CommentedMap
         lc: LineCol  # lc uses 0-based counts
-        linenumber_0 = linenumber - 1  # linenumber is 1-based
+        # linenumber and last_line are 1-based. Convert to 0-based.
+        linenumber_0 = linenumber - 1
+        last_line_0 = None if last_line is None else last_line - 1
+
+        prev_task_line = prev_subtask_line = tasks_block.lc.line
+        tasks_count = len(tasks_block)
         for i_task, task in enumerate(tasks_block):
+            i_next_task = i_task + 1
+            if tasks_count > i_next_task:
+                next_task_line = tasks_block[i_next_task].lc.line
+            else:
+                next_task_line = None
+
             lc = task.lc
             if lc.line == linenumber_0:
                 return [i_task]
+            elif i_task > 0 and prev_task_line < linenumber_0 < lc.line:
+                return [i_task - 1]
+
+            task_keys = list(task.keys())
+            task_keys_by_index = dict(enumerate(task_keys))
             for block_key in NESTED_TASK_KEYS:
                 if block_key in task and task[block_key]:
+                    task_index = task_keys.index(block_key)
+                    next_play_keyword = task_keys_by_index.get(task_index + 1, None)
+                    if next_play_keyword is not None:
+                        next_play_keyword_line = task.lc.data[next_play_keyword][0]
+                    else:
+                        next_play_keyword_line = None
+                    subtasks_count = len(task[block_key])
                     for i_subtask, subtask in enumerate(task[block_key]):
                         lc = subtask.lc
                         if lc.line == linenumber_0:
                             return [i_task, block_key, i_subtask]
+                        elif (
+                            i_subtask > 0 and prev_subtask_line < linenumber_0 < lc.line
+                        ):
+                            # part of previous subtask
+                            return [i_task, block_key, i_subtask - 1]
+                        # The previous subtask check can't catch the last task,
+                        # so, handle the last task separately.
+                        elif (
+                            i_subtask + 1 == subtasks_count  # last subtask
+                            and linenumber_0 > lc.line
+                            and (
+                                next_play_keyword_line is None
+                                or linenumber_0 < next_play_keyword_line
+                            )
+                            and (
+                                next_task_line is None or linenumber_0 < next_task_line
+                            )
+                            and (last_line_0 is None or linenumber_0 <= last_line_0)
+                        ):
+                            # part of this (last) subtask
+                            return [i_task, block_key, i_subtask]
+                        prev_subtask_line = lc.line
+
+            # The previous task check (above) can't catch the last task,
+            # so, handle the last task separately (also after subtask checks).
+            if (
+                i_task + 1 == tasks_count
+                and linenumber_0 > lc.line
+                and (next_task_line is None or linenumber_0 < next_task_line)
+                and (last_line_0 is None or linenumber_0 <= last_line_0)
+            ):
+                # part of this (last) task
+                return [i_task]
+            prev_task_line = task.lc.line
         return []
 
     def _final_yaml_transform(self, text: str) -> str:
