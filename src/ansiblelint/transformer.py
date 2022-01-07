@@ -109,13 +109,55 @@ class Transformer:
                 transforms: List[Transform] = self.transforms.get_transforms_for(match)
                 if not transforms:
                     continue
-                if match.task or file.kind in ("tasks", "handlers", "playbook"):
+                if match.match_type == "play":
+                    match.yaml_path = self._get_play_path(
+                        file, match.linenumber, ruamel_data
+                    )
+                elif match.task or file.kind in ("tasks", "handlers", "playbook"):
                     match.yaml_path = self._get_task_path(
                         file, match.linenumber, ruamel_data
                     )
                 for transform in transforms:
                     transform(match, file, ruamel_data)
             yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
+
+    def _get_play_path(
+        self,
+        lintable: Lintable,
+        linenumber: int,  # 1-based
+        ruamel_data: Union[CommentedMap, CommentedSeq],
+    ) -> List[Union[str, int]]:
+        if lintable.kind == "playbook":
+            ruamel_data: CommentedSeq
+            lc: LineCol  # lc uses 0-based counts
+            # linenumber and last_line are 1-based. Convert to 0-based.
+            linenumber_0 = linenumber - 1
+
+            prev_play_line = ruamel_data.lc.line
+            play_count = len(ruamel_data)
+            for i_play, play in enumerate(ruamel_data):
+                i_next_play = i_play + 1
+                if play_count > i_next_play:
+                    next_play_line = ruamel_data[i_next_play].lc.line
+                else:
+                    next_play_line = None
+
+                lc = play.lc
+                if lc.line == linenumber_0:
+                    return [i_play]
+                elif i_play > 0 and prev_play_line < linenumber_0 < lc.line:
+                    return [i_play - 1]
+                # The previous play check (above) can't catch the last play,
+                # so, handle the last play separately.
+                elif (
+                        i_play + 1 == play_count
+                        and linenumber_0 > lc.line
+                        and (next_play_line is None or linenumber_0 < next_play_line)
+                ):
+                    # part of this (last) play
+                    return [i_play]
+                prev_play_line = play.lc.line
+        return []
 
     def _get_task_path(
         self,

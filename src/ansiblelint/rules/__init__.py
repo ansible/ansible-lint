@@ -138,6 +138,7 @@ class AnsibleLintRule(BaseRule):
                 details=task_msg,
                 filename=file,
             )
+            m.match_type = "task"
             m.task = task
             matches.append(m)
         return matches
@@ -172,7 +173,9 @@ class AnsibleLintRule(BaseRule):
             if self.id in play.get('skipped_rules', ()):
                 continue
 
-            matches.extend(self.matchplay(file, play))
+            for match in self.matchplay(file, play):
+                match.match_type = "play"
+                matches.append(match)
 
         return matches
 

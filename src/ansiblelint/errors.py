@@ -73,6 +73,8 @@ class MatchError(ValueError):
 
         # True when a fmt transform resolves this issue
         self.fixed = False
+        # optional indicator on how this error was found (play, task, etc)
+        self.match_type: Optional[str] = None
         # for task matches, save the normalized task object (useful for transforms)
         self.task: Optional[dict] = None
         # path to the problem area, like: [0,"pre_tasks",3] for [0].pre_tasks[3]

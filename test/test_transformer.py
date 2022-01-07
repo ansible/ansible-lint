@@ -89,6 +89,14 @@ def runner_result(
             True,
             id="local_action_replacement",
         ),
+        pytest.param(
+            'examples/playbooks/jinja2-when-failure.yml',
+            ["examples/playbooks/roles/"],
+            2,
+            2,
+            True,
+            id="unwrap_jinja_when",
+        ),
     ),
 )
 def test_transformer(
