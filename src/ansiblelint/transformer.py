@@ -150,9 +150,9 @@ class Transformer:
                 # The previous play check (above) can't catch the last play,
                 # so, handle the last play separately.
                 elif (
-                        i_play + 1 == play_count
-                        and linenumber_0 > lc.line
-                        and (next_play_line is None or linenumber_0 < next_play_line)
+                    i_play + 1 == play_count
+                    and linenumber_0 > lc.line
+                    and (next_play_line is None or linenumber_0 < next_play_line)
                 ):
                     # part of this (last) play
                     return [i_play]

@@ -83,7 +83,10 @@ class ReplaceLocalActionTransform(Transform):
 
         # move any comments to the new location
         comments = []
-        for possible_comment in [target_task.ca.items.pop("local_action", None), local_action_module_comment]:
+        for possible_comment in [
+            target_task.ca.items.pop("local_action", None),
+            local_action_module_comment,
+        ]:
             if not possible_comment:
                 continue
             # post_key, pre_key, post_value, pre_value

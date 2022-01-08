@@ -22,6 +22,8 @@ class UnwrapJinjaWhenExpressionsTransform(Transform):
 
     wants = NoFormattingInWhenRule
     tags = NoFormattingInWhenRule.tags
+    # noinspection PyProtectedMember
+    _is_valid = NoFormattingInWhenRule._is_valid
 
     def __call__(
         self,
@@ -40,7 +42,7 @@ class UnwrapJinjaWhenExpressionsTransform(Transform):
             target_play = self._seek(match.yaml_path, data)
             for role in target_play.get("roles", []):
                 # noinspection PyProtectedMember
-                if "when" in role and not NoFormattingInWhenRule._is_valid(role["when"]):
+                if "when" in role and not self._is_valid(role["when"]):
                     target = role
                     break
         else:
