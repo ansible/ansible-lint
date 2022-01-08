@@ -105,6 +105,14 @@ def runner_result(
             True,
             id="fix_relative_role_paths",
         ),
+        pytest.param(
+            'examples/playbooks/task-has-name-failure.yml',
+            [],
+            4 + 2,  # 4 unnamed-task, 2 no-changed-when
+            0,  # should not fix any unnamed-task
+            True,
+            id="stub_task_names",
+        ),
     ),
 )
 def test_transformer(

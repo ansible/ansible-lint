@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  tasks:
+    - name:  # TODO: Name this task
+      command: echo "no name"
+    - name:  # TODO: Name this task
+      command: echo "empty name"
+    - name:  # TODO: Name this task
+      debug:
+        msg: Debug without a name
+    - name:  # TODO: Name this task
+      meta: flush_handlers
