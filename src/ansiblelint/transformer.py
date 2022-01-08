@@ -59,6 +59,8 @@ class Transformer:
             False  # explicit_start is handled in self._final_yaml_transform()
         )
         yaml.explicit_end = False
+        # TODO: make the width configurable
+        yaml.width = 120  # defaults to 80 which wraps longer lines in tests
         yaml.default_flow_style = False
         yaml.compact_seq_seq = True  # dash after dash
         yaml.compact_seq_map = True  # key after dash
