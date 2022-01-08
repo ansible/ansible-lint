@@ -18,9 +18,7 @@ def dump(
     if not isinstance(node, nodes.Template):
         raise TypeError("Can't dump non template nodes")
 
-    dumper = TemplateDumper(
-        environment, stream
-    )
+    dumper = TemplateDumper(environment, stream)
     dumper.visit(node)
 
     if stream is None:
