@@ -295,7 +295,11 @@ class Transformer:
         Instead, we add the explicit_start here.
         """
         text_lines = text.splitlines(keepends=True)
-        dedented_lines = dedent(text).splitlines(keepends=True)
+        # dedent() does not handle cases where there is a comment at column 0
+        text_without_comments = "".join(
+            ["\n" if _comment_line_re.match(line) else line for line in text_lines]
+        )
+        dedented_lines = dedent(text_without_comments).splitlines(keepends=True)
 
         # preserve the indents for comment lines (do not dedent them)
         for i, line in enumerate(text_lines):
