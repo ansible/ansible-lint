@@ -113,6 +113,14 @@ def runner_result(
             True,
             id="stub_task_names",
         ),
+        pytest.param(
+            'examples/playbooks/var-spacing.yml',
+            [],
+            5,
+            5,
+            True,
+            id="jinja_var_spacing",
+        ),
     ),
 )
 def test_transformer(

@@ -900,3 +900,22 @@ def nested_items(
             yield "list-item", item, parent
             for k, v, p in nested_items(item):
                 yield k, v, p
+
+
+def nested_items_path(
+    data: Union[Dict[Any, Any], List[Any]],
+    parent_path: Optional[List[Union[str, int]]] = None
+) -> Generator[Tuple[Any, Any, List[Union[str, int]]], None, None]:
+    """Iterate a nested data structure."""
+    if parent_path is None:
+        parent_path = []
+    if isinstance(data, dict):
+        for key, value in data.items():
+            yield key, value, parent_path
+            for k, v, p in nested_items_path(value, parent_path + [key]):
+                yield k, v, p
+    if isinstance(data, list):
+        for index, item in enumerate(data):
+            yield index, item, parent_path
+            for k, v, p in nested_items_path(item, parent_path + [index]):
+                yield k, v, p
