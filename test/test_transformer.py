@@ -97,6 +97,14 @@ def runner_result(
             True,
             id="unwrap_jinja_when",
         ),
+        pytest.param(
+            'examples/playbooks/tasks/role-relative-paths.yml',
+            [],
+            4,
+            4,
+            True,
+            id="fix_relative_role_paths",
+        ),
     ),
 )
 def test_transformer(

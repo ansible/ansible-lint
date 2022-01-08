@@ -1,0 +1,20 @@
+---
+# Copied from test/TestRoleRelativePath.py FAIL_TASKS
+- name: template example
+  template:
+    src: foo.j2
+    dest: /etc/file.conf
+    mode: 0600
+- name: copy example
+  copy:
+    src: foo.conf
+    dest: /etc/foo.conf
+    mode: 0600
+- name: win_template example
+  win_template:
+    src: file.conf.j2
+    dest: file.conf
+- name: win_copy example
+  win_copy:
+    src: foo.conf
+    dest: renamed-foo.conf
