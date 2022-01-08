@@ -69,7 +69,7 @@ class SimplifyLiteralBoolComparisonTransform(Transform):
     ) -> None:
         """Transform data to fix the MatchError."""
 
-        target_task: dict = self._seek(match.yaml_path, data)
+        target_task: CommentedMap = self._seek(match.yaml_path, data)
         when = target_task["when"]
         when_is_list = isinstance(when, MutableSequence)
 
