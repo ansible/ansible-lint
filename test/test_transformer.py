@@ -1,11 +1,9 @@
-import os
 from argparse import Namespace
 from typing import List, Tuple
 
 import py
 import pytest
 
-from ansiblelint.cli import abspath
 from ansiblelint.rules import RulesCollection
 
 # noinspection PyProtectedMember
