@@ -23,7 +23,7 @@ class UnwrapJinjaWhenExpressionsTransform(Transform):
     wants = NoFormattingInWhenRule
     tags = NoFormattingInWhenRule.tags
     # noinspection PyProtectedMember
-    _is_valid = NoFormattingInWhenRule._is_valid
+    _is_valid = staticmethod(NoFormattingInWhenRule._is_valid)
 
     def __call__(
         self,
