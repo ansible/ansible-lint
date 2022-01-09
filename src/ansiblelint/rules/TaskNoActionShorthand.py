@@ -1,0 +1,101 @@
+"""Rule that flags action shorthand."""
+import sys
+from typing import Any, Dict, Optional, Union
+
+import ansiblelint.utils
+from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import AnsibleLintRule
+
+
+FREE_FORM_MODULES = {
+    "command",
+    "shell",
+    "script",
+    "raw",
+    "meta",
+    "win_command",
+    "win_shell",
+}
+
+
+class TaskNoActionShorthand(AnsibleLintRule):
+
+    id = "no-action-shorthand"
+    shortdesc = "Use YAML args instead of action shorthand."
+    description = (
+        "Use YAML args instead of action shorthand.\n"
+        "Instead of ``module: arg1=value arg2=42``, use:\n"
+        "  module:\n"
+        "    arg1: value\n"
+        "    arg2: 42\n"
+        "Early versions of Ansible used a shorthand to define args, but "
+        "(1) action shorthand relies on Ansible's magic type casting "
+        "which is the source of many obscure, difficult-to-debug issues; and "
+        "(2) schema based linting cannot detect issues when args are hidden "
+        "in the action shorthand. "
+    )
+    # Action shorthand was removed from ansible's documentation after v2.9
+    # https://docs.ansible.com/ansible/2.9/user_guide/playbooks_intro.html#action-shorthand
+    severity = 'MEDIUM'
+    tags = ['idiom']
+    version_added = "5.3"
+
+    def matchtask(
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
+    ) -> Union[bool, str]:
+        if task["action"]["__ansible_module__"] in FREE_FORM_MODULES:
+            return False
+
+        if not file:
+            file = Lintable(task["__file__"])
+
+        # get the more raw yaml version of the task (this func has lru_cache).
+        yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
+        raw_tasks = ansiblelint.utils.get_action_tasks(yaml, file)
+
+        orig_task: Optional[Dict[str, Any]] = None
+        for raw_task in raw_tasks:
+            if task["__line__"] == raw_task["__line__"]:
+                orig_task = raw_task
+                break
+
+        if not orig_task:
+            return False
+
+        module = task["action"]["__ansible_module_original__"]
+        raw_action_block = orig_task[module]
+        if isinstance(raw_action_block, dict):
+            return False
+        elif isinstance(raw_action_block, str):
+            return True
+
+        return False
+
+
+# testing code to be loaded only with pytest or when executed the rule file
+if "pytest" in sys.modules:
+
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("test_file", "failures"),
+        (
+            pytest.param(
+                'examples/roles/role_for_no_action_shorthand/tasks/fail.yml', 3, id='fail'
+            ),
+            pytest.param(
+                'examples/roles/role_for_no_action_shorthand/tasks/pass.yml', 0, id='pass'
+            ),
+        ),
+    )
+    def test_no_action_shorthand_rule(
+        default_rules_collection: RulesCollection, test_file: str, failures: int
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(test_file, rules=default_rules_collection).run()
+        assert len(results) == failures
+        for result in results:
+            assert result.message == TaskNoActionShorthand.shortdesc

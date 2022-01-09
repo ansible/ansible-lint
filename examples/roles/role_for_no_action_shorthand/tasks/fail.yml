@@ -1,0 +1,13 @@
+- name: block
+  block:
+    - name: shorthand-in-block
+      template: src=config.file.j2 dest=/etc/{{ service }}/config.cfg mode=0600
+
+- name: shorthand
+  template: src=config.file.j2 dest=/etc/{{ service }}/config.cfg mode=0600
+
+- name: nested-block
+  block:
+    - block:
+        - name: shorthand-in-deep-block
+          template: src=config.file.j2 dest=/etc/{{ service }}/config.cfg mode=0600

@@ -1,0 +1,22 @@
+- name: block
+  block:
+    - name: yaml-args-in-block
+      template:
+        src: config.file.j2
+        dest: etc/{{ service }}/config.cfg
+        mode: 0600
+
+- name: yaml-args
+  template:
+    src: config.file.j2
+    dest: etc/{{ service }}/config.cfg
+    mode: 0600
+
+- name: nested-block
+  block:
+    - block:
+        - name: yaml-args-in-deep-block
+          template:
+            src: config.file.j2
+            dest: etc/{{ service }}/config.cfg
+            mode: 0600
