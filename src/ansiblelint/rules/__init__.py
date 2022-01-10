@@ -117,7 +117,10 @@ class AnsibleLintRule(BaseRule):
             if skipped or 'action' not in task:
                 continue
 
-            result = self.matchtask(task, file=file)
+            if self.needs_raw_task:
+                result = self.matchrawtask(raw_task, task, file=file)
+            else:
+                result = self.matchtask(task, file=file)
 
             if not result:
                 continue

@@ -22,6 +22,7 @@ class BaseRule:
     severity: str = ""
     link: str = ""
     has_dynamic_tags: bool = False
+    needs_raw_task: bool = False
 
     def getmatches(self, file: "Lintable") -> List["MatchError"]:
         """Return all matches while ignoring exceptions."""
@@ -44,6 +45,20 @@ class BaseRule:
     def matchlines(self, file: "Lintable") -> List["MatchError"]:
         """Return matches found for a specific line."""
         return []
+
+    def matchrawtask(
+        self,
+        raw_task: Dict[str, Any],
+        task: Dict[str, Any],
+        file: "Optional[Lintable]" = None,
+    ) -> Union[bool, str]:
+        """Confirm if current rule is matching a specific raw task.
+
+        `raw_task` is a task that has not been normalized.
+        `task` is the normalized task (as parsed by ansible).
+        This will run instead of matchtask if needs_raw_task is True.
+        """
+        return False
 
     def matchtask(
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
