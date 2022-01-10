@@ -84,7 +84,7 @@ repos:
     - enrich
     - flaky
     - pytest
-    - rich>=10.2.1
+    - rich>=11.0.0
     - ruamel.yaml
     - tenacity
     - types-PyYAML
@@ -109,7 +109,7 @@ repos:
     - flaky
     - pytest
     - pyyaml
-    - rich
+    - rich>=11.0.0
     - ruamel.yaml
     - sphinx
     - tenacity
