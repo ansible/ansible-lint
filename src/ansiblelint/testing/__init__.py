@@ -87,6 +87,7 @@ def run_ansible_lint(
     # pollute the env, causing weird behaviors, so we pass only a safe list of
     # vars.
     safe_list = [
+        'HOME',
         'LANG',
         'LC_ALL',
         'LC_CTYPE',

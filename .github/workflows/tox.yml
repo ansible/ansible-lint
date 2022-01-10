@@ -96,7 +96,7 @@ jobs:
       ${{ matrix.tox_env }}@${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      # fail-fast: false
+      fail-fast: false
       # max-parallel: 5
       # The matrix testing goal is to cover the *most likely* environments
       # which are expected to be used by users in production. Avoid adding a
@@ -223,3 +223,18 @@ jobs:
       with:
         path: .tox/junit.*.xml
       if: always()
+
+  check:  # This job does nothing and is only used for the branch protection
+    if: always()
+
+    needs:
+    - linters
+    - unit
+
+    runs-on: Ubuntu-latest
+
+    steps:
+    - name: Decide whether the needed jobs succeeded or failed
+      uses: re-actors/alls-green@release/v1
+      with:
+        jobs: ${{ toJSON(needs) }}

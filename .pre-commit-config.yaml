@@ -14,24 +14,6 @@ ci:
   - pip-compile-docs-upgrade
   - pip-compile-upgrade
 repos:
-- repo: local
-  hooks:
-  - id: immutable-setup-py
-    name: Verify that setup.py stays immutable
-    description: >-
-      This is a sanity check that makes sure that
-      the `setup.py` file isn't changed.
-    # Using Python here because using
-    # shell test does not seem to work in CIs:
-    entry: >-
-      sh -c 'git hash-object setup.py
-      |
-      python -c raise\ SystemExit\(input\(\)\ !=\ \"f6d1010b609cbe816d3ef652eee452d09d52979f\"\)
-      '
-    pass_filenames: false
-    language: system
-    files: >-
-      ^setup\.py$
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v4.0.1
   hooks:
@@ -53,7 +35,7 @@ repos:
   hooks:
   - id: codespell
 - repo: https://github.com/PyCQA/doc8
-  rev: 0.9.1
+  rev: 0.10.1
   hooks:
   - id: doc8
 - repo: https://github.com/adrienverge/yamllint.git
@@ -69,14 +51,14 @@ repos:
     types: [file, yaml]
     entry: yamllint --strict
 - repo: https://github.com/PyCQA/isort
-  rev: 5.9.3
+  rev: 5.10.1
   hooks:
   - id: isort
     args:
     # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
     - --filter-files
 - repo: https://github.com/psf/black
-  rev: 21.10b0
+  rev: 21.12b0
   hooks:
   - id: black
     language_version: python3
@@ -102,7 +84,7 @@ repos:
     - enrich
     - flaky
     - pytest
-    - rich>=10.2.1
+    - rich>=11.0.0
     - ruamel.yaml
     - tenacity
     - types-PyYAML
@@ -127,7 +109,7 @@ repos:
     - flaky
     - pytest
     - pyyaml
-    - rich
+    - rich>=11.0.0
     - ruamel.yaml
     - sphinx
     - tenacity
@@ -138,7 +120,7 @@ repos:
   hooks:
   - id: pip-compile
     name: pip-compile
-    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint --strip-extras
+    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
@@ -150,7 +132,7 @@ repos:
     pass_filenames: false
   - id: pip-compile-upgrade
     name: pip-compile-upgrade
-    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.py setup.cfg --extra test --extra yamllint --strip-extras
+    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
