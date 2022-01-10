@@ -98,7 +98,7 @@ jobs:
       ${{ matrix.tox_env }}@${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      # fail-fast: false
+      fail-fast: false
       # max-parallel: 5
       # The matrix testing goal is to cover the *most likely* environments
       # which are expected to be used by users in production. Avoid adding a
