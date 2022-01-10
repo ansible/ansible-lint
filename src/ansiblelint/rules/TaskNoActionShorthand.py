@@ -2,7 +2,6 @@
 import sys
 from typing import Any, Dict, Optional, Union
 
-import ansiblelint.utils
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 
@@ -40,34 +39,24 @@ class TaskNoActionShorthand(AnsibleLintRule):
     tags = ['idiom']
     version_added = "5.3"
 
-    def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
+    needs_raw_task = True
+
+    def matchrawtask(
+        self,
+        raw_task: Dict[str, Any],
+        task: Dict[str, Any],
+        file: Optional[Lintable] = None,
     ) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in FREE_FORM_MODULES:
             return False
 
-        if not file:
-            file = Lintable(task["__file__"])
-
-        # get the more raw yaml version of the task (this func has lru_cache).
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
-        raw_tasks = ansiblelint.utils.get_action_tasks(yaml, file)
-
-        orig_task: Optional[Dict[str, Any]] = None
-        for raw_task in raw_tasks:
-            if task["__line__"] == raw_task["__line__"]:
-                orig_task = raw_task
-                break
-
-        if not orig_task:
-            return False
-
         module = task["action"]["__ansible_module_original__"]
-        raw_action_block = orig_task[module]
-        if isinstance(raw_action_block, dict):
-            return False
-        elif isinstance(raw_action_block, str):
+        raw_action_block = raw_task[module]
+        if isinstance(raw_action_block, str):
             return True
+        # raw_action_block should be a dict, which is what we want.
+        # if isinstance(raw_action_block, dict):
+        #     return False
 
         return False
 
@@ -84,10 +73,14 @@ if "pytest" in sys.modules:
         ("test_file", "failures"),
         (
             pytest.param(
-                'examples/roles/role_for_no_action_shorthand/tasks/fail.yml', 3, id='fail'
+                'examples/roles/role_for_no_action_shorthand/tasks/fail.yml',
+                3,
+                id='fail',
             ),
             pytest.param(
-                'examples/roles/role_for_no_action_shorthand/tasks/pass.yml', 0, id='pass'
+                'examples/roles/role_for_no_action_shorthand/tasks/pass.yml',
+                0,
+                id='pass',
             ),
         ),
     )
