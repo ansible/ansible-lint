@@ -8,7 +8,7 @@ from rich import box
 try:
     from rich.console import group
 except ImportError:
-    from rich.console import render_group as group
+    from rich.console import render_group as group  # type: ignore
 
 from rich.markdown import Markdown
 from rich.table import Table
