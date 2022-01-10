@@ -3,7 +3,13 @@ import logging
 from typing import Iterable
 
 from rich import box
-from rich.console import render_group
+
+# Remove this compatibility try-catch block once we drop support for rich < 10.7.0
+try:
+    from rich.console import group
+except ImportError:
+    from rich.console import render_group as group
+
 from rich.markdown import Markdown
 from rich.table import Table
 
@@ -47,7 +53,7 @@ def rules_as_rst(rules: RulesCollection) -> str:
     return r
 
 
-@render_group()
+@group()
 def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
     """Print documentation for a list of rules, returns empty string."""
     width = max(16, *[len(rule.id) for rule in rules])
