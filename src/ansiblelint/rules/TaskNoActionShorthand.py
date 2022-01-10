@@ -14,7 +14,19 @@ FREE_FORM_MODULES = {
     "meta",
     "win_command",
     "win_shell",
+    "include",
+    "import_playbook",
+    "import_tasks",
+    "include_tasks",
+    "include_vars",
 }
+FREE_FORM_MODULES = {
+    m for mod in FREE_FORM_MODULES for m in (mod, f"ansible.builtin.{mod}", f"ansible.legacy.{mod}")
+} | {
+    "ansible.windows.win_command",
+    "ansible.windows.win_shell",
+}
+# set_fact and add_host use _raw_params for a dict of vars. They are not free-form.
 
 
 class TaskNoActionShorthand(AnsibleLintRule):

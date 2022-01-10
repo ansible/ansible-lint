@@ -1,4 +1,4 @@
-from typing import MutableMapping, Union
+from typing import MutableSequence, MutableMapping, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -52,9 +52,16 @@ class ReplaceLocalActionTransform(Transform):
         position = list(target_task.keys()).index("local_action")
 
         params = None
-        # TODO: would I ever need both args and params?
-        if arguments:
+        if arguments and isinstance(arguments, MutableMapping):
+            # this can happen with set_fact and add_host modules
+            action.update(arguments)
+            params = action
+        elif arguments and isinstance(arguments, MutableSequence):
+            # a _raw_params module like command, shell, script, etc
             params = " ".join(arguments)
+        elif arguments and isinstance(arguments, str):
+            # str() to drop AnsibleUnicode
+            params = str(arguments)
         elif action:
             params = action
 
