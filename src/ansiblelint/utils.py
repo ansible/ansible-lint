@@ -626,8 +626,8 @@ def task_to_str(task: Dict[str, Any]) -> str:
                 "__ansible_module__",
                 "__ansible_module_original__",
                 "__ansible_arguments__",
-                "__line__",
-                "__file__",
+                LINE_NUMBER_KEY,
+                FILENAME_KEY,
             ]
         ]
     )

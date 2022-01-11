@@ -22,6 +22,7 @@ from functools import reduce
 from typing import TYPE_CHECKING, Any, List
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
     from ansiblelint.constants import odict
@@ -102,7 +103,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
                     self.create_matcherror(
                         message=self.shortdesc,
                         filename=str(file.path),
-                        linenumber=data['__line__'],
+                        linenumber=data[LINE_NUMBER_KEY],
                     )
                 ]
         return []

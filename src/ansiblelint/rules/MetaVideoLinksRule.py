@@ -4,6 +4,7 @@ import re
 from typing import TYPE_CHECKING, List
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
     from typing import Any
@@ -57,7 +58,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                 )
                 continue
 
-            if set(video) != {'url', 'title', '__file__', '__line__'}:
+            if set(video) != {'url', 'title', FILENAME_KEY, LINE_NUMBER_KEY}:
                 results.append(
                     self.create_matcherror(
                         "Expected item in 'video_links' to contain "
