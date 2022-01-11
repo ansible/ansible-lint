@@ -119,6 +119,14 @@ def runner_result(
             True,
             id="jinja_var_spacing",
         ),
+        pytest.param(
+            'examples/roles/role_for_no_action_shorthand/tasks/fail.yml',
+            [],
+            3,
+            3,
+            True,
+            id="no_action_shorthand",
+        ),
     ),
 )
 def test_transformer(
