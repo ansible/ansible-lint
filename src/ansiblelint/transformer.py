@@ -249,7 +249,11 @@ class Transformer:
                     # 0-based next_line - 1 to get line before next_line.
                     # Then + 1 to make it a 1-based number.
                     # So, next_task*_0 - 1 + 1 = last_block_line
-                    last_block_line = next_task_key_line_0 if next_task_key_line_0 is not None else next_task_line_0
+                    last_block_line = (
+                        next_task_key_line_0
+                        if next_task_key_line_0 is not None
+                        else next_task_line_0
+                    )
                     subtask_path = self._get_task_path_in_tasks_block(
                         linenumber,
                         nested_task_block,
