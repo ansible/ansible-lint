@@ -222,65 +222,53 @@ class Transformer:
         linenumber_0 = linenumber - 1
         last_line_0 = None if last_line is None else last_line - 1
 
-        prev_task_line = prev_subtask_line = tasks_block.lc.line
+        prev_task_line = tasks_block.lc.line
         tasks_count = len(tasks_block)
         for i_task, task in enumerate(tasks_block):
             i_next_task = i_task + 1
             if tasks_count > i_next_task:
-                next_task_line = tasks_block[i_next_task].lc.line
+                next_task_line_0 = tasks_block[i_next_task].lc.line
             else:
-                next_task_line = None
+                next_task_line_0 = None
+
+            nested_task_keys = set(task.keys()).intersection(set(NESTED_TASK_KEYS))
+            if nested_task_keys:
+                # loop through the keys in line order
+                task_keys = list(task.keys())
+                task_keys_by_index = dict(enumerate(task_keys))
+                for task_key in task_keys:
+                    nested_task_block = task[task_key]
+                    if task_key not in nested_task_keys or not nested_task_block:
+                        continue
+                    task_index = task_keys.index(task_key)
+                    next_task_key = task_keys_by_index.get(task_index + 1, None)
+                    if next_task_key is not None:
+                        next_task_key_line_0 = task.lc.data[next_task_key][0]
+                    else:
+                        next_task_key_line_0 = None
+                    # 0-based next_line - 1 to get line before next_line.
+                    # Then + 1 to make it a 1-based number.
+                    # So, next_task*_0 - 1 + 1 = last_block_line
+                    last_block_line = next_task_key_line_0 if next_task_key_line_0 is not None else next_task_line_0
+                    subtask_path = self._get_task_path_in_tasks_block(
+                        linenumber,
+                        nested_task_block,
+                        last_block_line,  # 1-based
+                    )
+                    if subtask_path:
+                        return [i_task, task_key] + subtask_path
 
             lc = task.lc
             if lc.line == linenumber_0:
                 return [i_task]
             elif i_task > 0 and prev_task_line < linenumber_0 < lc.line:
                 return [i_task - 1]
-
-            task_keys = list(task.keys())
-            task_keys_by_index = dict(enumerate(task_keys))
-            for block_key in NESTED_TASK_KEYS:
-                if block_key in task and task[block_key]:
-                    task_index = task_keys.index(block_key)
-                    next_play_keyword = task_keys_by_index.get(task_index + 1, None)
-                    if next_play_keyword is not None:
-                        next_play_keyword_line = task.lc.data[next_play_keyword][0]
-                    else:
-                        next_play_keyword_line = None
-                    subtasks_count = len(task[block_key])
-                    for i_subtask, subtask in enumerate(task[block_key]):
-                        lc = subtask.lc
-                        if lc.line == linenumber_0:
-                            return [i_task, block_key, i_subtask]
-                        elif (
-                            i_subtask > 0 and prev_subtask_line < linenumber_0 < lc.line
-                        ):
-                            # part of previous subtask
-                            return [i_task, block_key, i_subtask - 1]
-                        # The previous subtask check can't catch the last task,
-                        # so, handle the last task separately.
-                        elif (
-                            i_subtask + 1 == subtasks_count  # last subtask
-                            and linenumber_0 > lc.line
-                            and (
-                                next_play_keyword_line is None
-                                or linenumber_0 < next_play_keyword_line
-                            )
-                            and (
-                                next_task_line is None or linenumber_0 < next_task_line
-                            )
-                            and (last_line_0 is None or linenumber_0 <= last_line_0)
-                        ):
-                            # part of this (last) subtask
-                            return [i_task, block_key, i_subtask]
-                        prev_subtask_line = lc.line
-
-            # The previous task check (above) can't catch the last task,
+            # The previous task check can't catch the last task,
             # so, handle the last task separately (also after subtask checks).
-            if (
+            elif (
                 i_task + 1 == tasks_count
                 and linenumber_0 > lc.line
-                and (next_task_line is None or linenumber_0 < next_task_line)
+                and (next_task_line_0 is None or linenumber_0 < next_task_line_0)
                 and (last_line_0 is None or linenumber_0 <= last_line_0)
             ):
                 # part of this (last) task
