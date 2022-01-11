@@ -26,7 +26,6 @@ pip-log.txt
 
 # Unit test / coverage reports
 .tox
-.pytest_cache
 
 # Needed for CLI tests
 .sandbox
@@ -49,4 +48,3 @@ pip-wheel-metadata
 # other
 .DS_Store
 .vscode
-.idea
