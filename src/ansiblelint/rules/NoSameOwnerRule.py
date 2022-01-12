@@ -6,6 +6,7 @@ from typing import Any, List
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import LINE_NUMBER_KEY
 
 
 class NoSameOwnerRule(AnsibleLintRule):
@@ -58,14 +59,14 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
                 print(task)
                 results.append(
                     self.create_matcherror(
-                        filename=lintable, linenumber=task['__line__']
+                        filename=lintable, linenumber=task[LINE_NUMBER_KEY]
                     )
                 )
         elif 'unarchive' in task:
             if self.handle_unarchive(task):
                 results.append(
                     self.create_matcherror(
-                        filename=lintable, linenumber=task['__line__']
+                        filename=lintable, linenumber=task[LINE_NUMBER_KEY]
                     )
                 )
 

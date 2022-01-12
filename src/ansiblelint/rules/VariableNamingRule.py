@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Pattern, Union
 from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import parse_yaml_from_file
+from ansiblelint.utils import LINE_NUMBER_KEY, parse_yaml_from_file
 
 if TYPE_CHECKING:
     from ansiblelint.constants import odict
@@ -78,7 +78,7 @@ class VariableNamingRule(AnsibleLintRule):
                 results.append(
                     self.create_matcherror(
                         filename=file,
-                        linenumber=our_vars['__line__'],
+                        linenumber=our_vars[LINE_NUMBER_KEY],
                         message="Play defines variable '"
                         + key
                         + "' within 'vars' section that violates variable naming standards",
@@ -124,7 +124,7 @@ class VariableNamingRule(AnsibleLintRule):
                     results.append(
                         self.create_matcherror(
                             filename=file,
-                            # linenumber=vars['__line__'],
+                            # linenumber=vars[LINE_NUMBER_KEY],
                             message="File defines variable '"
                             + key
                             + "' that violates variable naming standards",
