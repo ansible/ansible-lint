@@ -21,7 +21,9 @@ FREE_FORM_MODULES = {
     "include_vars",
 }
 FREE_FORM_MODULES = {
-    m for mod in FREE_FORM_MODULES for m in (mod, f"ansible.builtin.{mod}", f"ansible.legacy.{mod}")
+    m
+    for mod in FREE_FORM_MODULES
+    for m in (mod, f"ansible.builtin.{mod}", f"ansible.legacy.{mod}")
 } | {
     "ansible.windows.win_command",
     "ansible.windows.win_shell",
