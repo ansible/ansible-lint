@@ -86,6 +86,7 @@ ROLE_TASKS_WITH_BLOCK_BECOME = '''\
         - name: bar
           become_user: jonhdaa
           command: "/etc/test.sh"
+          changed_when: false
 '''
 
 
