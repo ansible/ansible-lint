@@ -65,7 +65,8 @@ handle the output of the ``command``.
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        if task["__ansible_action_type__"] == 'task':
+        # tasks in a block are "meta" type
+        if task["__ansible_action_type__"] in ['task', 'meta']:
             if task["action"]["__ansible_module__"] in self._commands:
                 return (
                     'changed_when' not in task
@@ -123,11 +124,14 @@ if "pytest" in sys.modules:
       register: myoutput
 '''
 
+    # also test to ensure it catches tasks in nested blocks.
     NO_CHANGE_COMMAND_FAIL = '''
 - hosts: all
   tasks:
-    - name: basic command task, should fail
-      ansible.builtin.command: cat myfile
+    - block:
+        - block:
+            - name: basic command task, should fail
+              ansible.builtin.command: cat myfile
 '''
 
     NO_CHANGE_SHELL_FAIL = '''
@@ -182,6 +186,7 @@ if "pytest" in sys.modules:
     )
     def test_no_change_command_fail(rule_runner: Any) -> None:
         """This test should fail because command isn't handled."""
+        # this also ensures that this catches tasks in nested blocks
         results = rule_runner.run_playbook(NO_CHANGE_COMMAND_FAIL)
         assert len(results) == 1
 

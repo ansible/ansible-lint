@@ -156,6 +156,20 @@ def test_extract_from_list() -> None:
         utils.extract_from_list(blocks, ['test_string'])
 
 
+def test_extract_from_list_recursive() -> None:
+    """Check that tasks get extracted from blocks if present."""
+    block = {
+        'block': [{'block': [{'name': 'hello', 'command': 'whoami'}]}],
+    }
+    blocks = [block]
+
+    test_list = utils.extract_from_list(blocks, ['block'])
+    assert list(block['block']) == test_list
+
+    test_list_recursive = utils.extract_from_list(blocks, ['block'], recursive=True)
+    assert block['block'] + block['block'][0]['block'] == test_list_recursive  # type: ignore
+
+
 @pytest.mark.parametrize(
     ('template', 'output'),
     (

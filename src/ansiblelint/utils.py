@@ -637,7 +637,7 @@ def task_to_str(task: Dict[str, Any]) -> str:
 
 
 def extract_from_list(
-    blocks: AnsibleBaseYAMLObject, candidates: List[str]
+    blocks: AnsibleBaseYAMLObject, candidates: List[str], recursive: bool = False
 ) -> List[Any]:
     """Get action tasks from block structures."""
     results = list()
@@ -645,7 +645,12 @@ def extract_from_list(
         for candidate in candidates:
             if isinstance(block, dict) and candidate in block:
                 if isinstance(block[candidate], list):
-                    results.extend(add_action_type(block[candidate], candidate))
+                    subresults = add_action_type(block[candidate], candidate)
+                    if recursive:
+                        subresults.extend(
+                            extract_from_list(subresults, candidates, recursive)
+                        )
+                    results.extend(subresults)
                 elif block[candidate] is not None:
                     raise RuntimeError(
                         "Key '%s' defined, but bad value: '%s'"
@@ -677,7 +682,9 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
         )
 
     # Add sub-elements of block/rescue/always to tasks list
-    tasks.extend(extract_from_list(tasks, ['block', 'rescue', 'always']))
+    tasks.extend(
+        extract_from_list(tasks, ['block', 'rescue', 'always'], recursive=True)
+    )
     # Remove block/rescue/always elements from tasks list
     block_rescue_always = ('block', 'rescue', 'always')
     tasks[:] = [
