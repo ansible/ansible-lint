@@ -1,3 +1,4 @@
+---
 # based in part on https://docs.ansible.com/ansible/2.4/playbooks_tests.html
 - name: hello world
   changed_when: false
@@ -10,22 +11,22 @@
       the fox {{ var0 }} jumped {{ var1 }}
       over {{ var2 }} the {{ var3 }} wall {{ var4 }}
   vars:
-    var0: "{{ hello | succeeded }}"
-    var1: "{{ hello | failed }}"
-    var2: "{{ not hello | changed }}"
-    var3: "{{ hello | skipped }}"
-    var4: "{{ not hello | success }}"
-    var5: "{{ not hello | skip }}"
-    var6: "{{ hello | change }}"
+    var0: '{{ hello is successful }}'
+    var1: '{{ hello is failed }}'
+    var2: '{{ hello is not changed }}'
+    var3: '{{ hello is skipped }}'
+    var4: '{{ hello is not successful }}'
+    var5: '{{ hello is not skipped }}'
+    var6: '{{ hello is changed }}'
 
 - name: version test
   debug:
-    msg: "{{ ansible_facts.distribution_version | version_compare('12.04', '>=') }}"
+    msg: "{{ ansible_facts.distribution_version is version('12.04', '>=') }}"
 
 - name: superset test
   debug:
     msg: A includes B
-  when: a|issuperset(b)
+  when: a is superset(b)
   vars:
     a: [1, 2, 3, 4, 5]
     b: [2, 3]
@@ -33,7 +34,7 @@
 - name: subset test
   debug:
     msg: B is included in A
-  when: b|issubset(a)
+  when: b is subset(a)
   vars:
     a: [1, 2, 3, 4, 5]
     b: [2, 3]
@@ -41,7 +42,7 @@
 - name: all test
   debug:
     msg: all are true!
-  when: mylist|all
+  when: mylist is all
   vars:
     mylist:
       - 1
@@ -51,7 +52,7 @@
 - name: any test
   debug:
     msg: at least one is true
-  when: myotherlist|any
+  when: myotherlist is any
   vars:
     myotherlist:
       - true
@@ -59,34 +60,34 @@
 
 - name: is_dir test
   debug:
-    msg: "path is a directory"
-  when: mypath|is_dir
+    msg: path is a directory
+  when: mypath is directory
 
 - name: is_file test
   debug:
-    msg: "path is a file"
-  when: mypath|is_file
+    msg: path is a file
+  when: mypath is file
 
 - name: is_link test
   debug:
-    msg: "path is a symlink"
-  when: mypath|is_link
+    msg: path is a symlink
+  when: mypath is link
 
 - name: exists test
   debug:
-    msg: "path already exists"
-  when: mypath|exists
+    msg: path already exists
+  when: mypath is exists
 
 - name: is_abs test
   debug:
-    msg: "path is {{ (mypath|is_abs)|ternary('absolute','relative') }}"
+    msg: path is {{ mypath is abs | ternary('absolute', 'relative') }}
 
 - name: is_same_file test
   debug:
-    msg: "path is the same file as path2"
-  when: mypath|is_same_file(path2)
+    msg: path is the same file as path2
+  when: mypath is same_file(path2)
 
 - name: is_mount test
   debug:
-    msg: "path is a mount"
-  when: mypath|is_mount
+    msg: path is a mount
+  when: mypath is mount

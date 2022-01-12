@@ -55,7 +55,7 @@ class Transform:
         self,
         match: MatchError,
         lintable: Lintable,
-        data: Union[CommentedMap, CommentedSeq],
+        data: Union[CommentedMap, CommentedSeq, str],
     ) -> None:
         """Transform data to fix the MatchError."""
         # call self._fixed(match) when data has been transformed to fix the error.

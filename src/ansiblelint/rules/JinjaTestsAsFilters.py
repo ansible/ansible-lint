@@ -31,8 +31,9 @@ class JinjaTestsAsFilters(AnsibleLintRule):
     tags = ["deprecations"]
     version_added = "5.3"
 
+    @staticmethod
     @lru_cache
-    def ansible_tests(self):
+    def ansible_tests():
         # inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
         return (
             list(ansible.plugins.test.core.TestModule().tests().keys())
@@ -129,7 +130,7 @@ if "pytest" in sys.modules:
         (
             pytest.param(
                 'examples/roles/role_for_jinja_tests_as_filters/tasks/fail.yml',
-                17,
+                19,
                 id='tasks',
             ),
             pytest.param(

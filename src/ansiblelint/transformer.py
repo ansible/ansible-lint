@@ -105,23 +105,32 @@ class Transformer:
             # However, we can still fmt the yaml file
             if not fmt_all_files and not matches:
                 continue
-            # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
-            ruamel_data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
+
+            data: str = file.content
+            if file.base_kind == "text/yaml":
+                # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
+                data: Union[CommentedMap, CommentedSeq] = load_data(data)
+
             for match in sorted(matches):
                 transforms: List[Transform] = self.transforms.get_transforms_for(match)
                 if not transforms:
                     continue
-                if match.match_type == "play":
-                    match.yaml_path = self._get_play_path(
-                        file, match.linenumber, ruamel_data
-                    )
-                elif match.task or file.kind in ("tasks", "handlers", "playbook"):
-                    match.yaml_path = self._get_task_path(
-                        file, match.linenumber, ruamel_data
-                    )
+                if file.base_kind == "text/yaml" and not match.yaml_path:
+                    if match.match_type == "play":
+                        match.yaml_path = self._get_play_path(
+                            file, match.linenumber, data
+                        )
+                    elif match.task or file.kind in ("tasks", "handlers", "playbook"):
+                        match.yaml_path = self._get_task_path(
+                            file, match.linenumber, data
+                        )
                 for transform in transforms:
-                    transform(match, file, ruamel_data)
-            yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
+                    transform(match, file, data)
+
+            if file.base_kind == "text/yaml":
+                # YAML transforms modify data in-place. Now write it to file.
+                yaml.dump(data, file.path, transform=self._final_yaml_transform)
+            # transforms for other filetypes must handle writing it to file.
 
     def _get_play_path(
         self,

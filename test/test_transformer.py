@@ -127,6 +127,22 @@ def runner_result(
             True,
             id="no_action_shorthand",
         ),
+        pytest.param(
+            'examples/roles/role_for_jinja_tests_as_filters/tasks/fail.yml',
+            [],
+            19,
+            19,
+            True,
+            id="jinja_tests_are_not_filters_in_tasks",
+        ),
+        pytest.param(
+            'examples/roles/role_for_jinja_tests_as_filters/templates/sample.ini.j2',
+            [],
+            2,
+            2,
+            True,
+            id="jinja_tests_are_not_filters_in_template",
+        ),
     ),
 )
 def test_transformer(
