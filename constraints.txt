@@ -21,7 +21,6 @@ py==1.11.0
 pygments==2.11.2
 pyparsing==3.0.6
 pytest==6.2.5
-pytest-cov==3.0.0
 pytest-forked==1.4.0
 pytest-xdist==2.5.0
 pyyaml==6.0
@@ -30,7 +29,6 @@ ruamel.yaml==0.17.20 ; python_version >= "3.7"
 ruamel.yaml.clib==0.2.6
 tenacity==8.0.1
 toml==0.10.2
-tomli==1.2.1
 wcmatch==8.3
 yamllint==1.26.3
 
