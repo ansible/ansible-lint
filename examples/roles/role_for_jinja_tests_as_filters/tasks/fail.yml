@@ -1,0 +1,90 @@
+# based in part on https://docs.ansible.com/ansible/2.4/playbooks_tests.html
+- name: hello world
+  changed_when: false
+  command: echo hello world
+  register: hello
+
+- name: check it out
+  debug:
+    msg: |
+      the fox {{ var0 }} jumped {{ var1 }}
+      over {{ var2 }} the {{ var3 }} wall {{ var4 }}
+  vars:
+    var0: "{{ hello | succeeded }}"
+    var1: "{{ hello | failed }}"
+    var2: "{{ hello | changed }}"
+    var3: "{{ hello | skipped }}"
+    var4: "{{ hello | success }}"
+
+- name: version test
+  debug:
+    msg: "{{ ansible_facts.distribution_version | version_compare('12.04', '>=') }}"
+
+- name: superset test
+  debug:
+    msg: A includes B
+  when: a|issuperset(b)
+  vars:
+    a: [1, 2, 3, 4, 5]
+    b: [2, 3]
+
+- name: subset test
+  debug:
+    msg: B is included in A
+  when: b|issubset(a)
+  vars:
+    a: [1, 2, 3, 4, 5]
+    b: [2, 3]
+
+- name: all test
+  debug:
+    msg: all are true!
+  when: mylist|all
+  vars:
+    mylist:
+      - 1
+      - 3 == 3
+      - true
+
+- name: any test
+  debug:
+    msg: at least one is true
+  when: myotherlist|any
+  vars:
+    myotherlist:
+      - true
+      - false
+
+- name: is_dir test
+  debug:
+    msg: "path is a directory"
+  when: mypath|is_dir
+
+- name: is_file test
+  debug:
+    msg: "path is a file"
+  when: mypath|is_file
+
+- name: is_link test
+  debug:
+    msg: "path is a symlink"
+  when: mypath|is_link
+
+- name: exists test
+  debug:
+    msg: "path already exists"
+  when: mypath|exists
+
+- name: is_abs test
+  debug:
+    msg: "path is {{ (mypath|is_abs)|ternary('absolute','relative') }}"
+
+- name: is_same_file test
+  debug:
+    msg: "path is the same file as path2"
+  when: mypath|is_same_file(path2)
+
+- name: is_mount test
+  debug:
+    msg: "path is a mount"
+  when: mypath|is_mount
