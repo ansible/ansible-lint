@@ -17,7 +17,7 @@ class ReformatJinjaTransform(Transform):
     id = "reformat-jinja"
     shortdesc = "Reformat Jinja2 expressions to add spaces."
     description = VariableHasSpacesRule.base_msg + (
-        " {{ var_name }}. " "This re-formats expressions to add the spaces."
+        " {{ var_name }}. This re-formats expressions to add the spaces."
     )
     version_added = "5.3"
 
