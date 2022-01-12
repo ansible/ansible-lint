@@ -11,6 +11,7 @@ from functools import lru_cache
 from importlib.abc import Loader
 from typing import Any, Dict, Iterator, List, Optional, Set, Union
 
+import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
@@ -21,7 +22,6 @@ from ansiblelint._internal.rules import (
 from ansiblelint.config import get_rule_config, options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.skip_utils import append_skipped_rules, get_rule_skips_from_line
 
 _logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ class AnsibleLintRule(BaseRule):
             if line.lstrip().startswith('#'):
                 continue
 
-            rule_id_list = get_rule_skips_from_line(line)
+            rule_id_list = ansiblelint.skip_utils.get_rule_skips_from_line(line)
             if self.id in rule_id_list:
                 continue
 
@@ -111,7 +111,7 @@ class AnsibleLintRule(BaseRule):
         if not yaml:
             return matches
 
-        yaml = append_skipped_rules(yaml, file)
+        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, file)
 
         try:
             tasks = ansiblelint.utils.get_normalized_tasks(yaml, file)
