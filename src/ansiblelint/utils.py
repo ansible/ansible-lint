@@ -688,7 +688,9 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
         )
 
     # Add sub-elements of block/rescue/always to tasks list
-    tasks.extend(extract_from_list(tasks, ['block', 'rescue', 'always'], recursive=True))
+    tasks.extend(
+        extract_from_list(tasks, ['block', 'rescue', 'always'], recursive=True)
+    )
     # Remove block/rescue/always elements from tasks list
     block_rescue_always = ('block', 'rescue', 'always')
     tasks[:] = [
