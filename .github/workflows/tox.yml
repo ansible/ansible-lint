@@ -177,7 +177,7 @@ jobs:
     #       ${{ runner.os }}-
     - name: Install tox
       run: |
-        python3 -m pip install --upgrade tox
+        python3 -m pip install --upgrade tox 'coverage[toml]'
     - name: Log installed dists
       run: >-
         python3 -m pip freeze --all
@@ -211,6 +211,15 @@ jobs:
         python3 -m tox
       env:
         TOXENV: ${{ matrix.tox_env }}-devel
+    - name: Combine coverage data
+      # produce a single .coverage file at repo root
+      run: coverage combine .tox/.coverage.*
+    - name: Upload coverage data
+      uses: codecov/codecov-action@v1
+      with:
+        name: ${{ matrix.tox_env }}
+        fail_ci_if_error: true  # optional (default = false)
+        verbose: true  # optional (default = false)
     - name: Archive logs
       uses: actions/upload-artifact@v2
       with:
