@@ -6,6 +6,7 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import toidentifier
+from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
     from typing import Any
@@ -82,7 +83,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
             if not loop_var or not loop_var.startswith(self.prefix):
                 results.append(
                     self.create_matcherror(
-                        filename=lintable, linenumber=task['__line__']
+                        filename=lintable, linenumber=task[LINE_NUMBER_KEY]
                     )
                 )
         return results

@@ -45,30 +45,40 @@ class MetaTagValidRule(AnsibleLintRule):
                 tags += galaxy_info['galaxy_tags']
             else:
                 results.append(
-                    self.create_matcherror("Expected 'galaxy_tags' to be a list")
+                    self.create_matcherror(
+                        "Expected 'galaxy_tags' to be a list", filename=file
+                    )
                 )
 
         if 'categories' in galaxy_info:
             results.append(
-                self.create_matcherror("Use 'galaxy_tags' rather than 'categories'")
+                self.create_matcherror(
+                    "Use 'galaxy_tags' rather than 'categories'", filename=file
+                )
             )
             if isinstance(galaxy_info['categories'], list):
                 tags += galaxy_info['categories']
             else:
                 results.append(
-                    self.create_matcherror("Expected 'categories' to be a list")
+                    self.create_matcherror(
+                        "Expected 'categories' to be a list", filename=file
+                    )
                 )
 
         for tag in tags:
             msg = self.shortdesc
             if not isinstance(tag, str):
                 results.append(
-                    self.create_matcherror("Tags must be strings: '{}'".format(tag))
+                    self.create_matcherror(
+                        "Tags must be strings: '{}'".format(tag), filename=file
+                    )
                 )
                 continue
             if not re.match(self.TAG_REGEXP, tag):
                 results.append(
-                    self.create_matcherror(message="{}, invalid: '{}'".format(msg, tag))
+                    self.create_matcherror(
+                        message="{}, invalid: '{}'".format(msg, tag), filename=file
+                    )
                 )
 
         return results

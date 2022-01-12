@@ -4,6 +4,7 @@ import re
 from typing import TYPE_CHECKING, List
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
     from typing import Any
@@ -51,16 +52,18 @@ class MetaVideoLinksRule(AnsibleLintRule):
             if not isinstance(video, dict):
                 results.append(
                     self.create_matcherror(
-                        "Expected item in 'video_links' to be " "a dictionary"
+                        "Expected item in 'video_links' to be " "a dictionary",
+                        filename=file,
                     )
                 )
                 continue
 
-            if set(video) != {'url', 'title', '__file__', '__line__'}:
+            if set(video) != {'url', 'title', FILENAME_KEY, LINE_NUMBER_KEY}:
                 results.append(
                     self.create_matcherror(
                         "Expected item in 'video_links' to contain "
-                        "only keys 'url' and 'title'"
+                        "only keys 'url' and 'title'",
+                        filename=file,
                     )
                 )
                 continue
@@ -74,6 +77,6 @@ class MetaVideoLinksRule(AnsibleLintRule):
                     "Expected it be a shared link from Vimeo, YouTube, "
                     "or Google Drive.".format(video['url'])
                 )
-                results.append(self.create_matcherror(msg))
+                results.append(self.create_matcherror(msg, filename=file))
 
         return results

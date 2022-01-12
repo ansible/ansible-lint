@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -34,7 +35,13 @@ class NoFormattingInWhenRule(AnsibleLintRule):
                 return errors
             for role in data['roles']:
                 if self.matchtask(role, file=file):
-                    errors.append(self.create_matcherror(details=str({'when': role})))
+                    errors.append(
+                        self.create_matcherror(
+                            details=str({'when': role}),
+                            filename=file,
+                            linenumber=role[LINE_NUMBER_KEY],
+                        )
+                    )
         if isinstance(data, list):
             for play_item in data:
                 sub_errors = self.matchplay(file, play_item)
