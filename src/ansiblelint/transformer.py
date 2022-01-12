@@ -82,9 +82,10 @@ class Transformer:
         #       - item1
 
         for file, matches in self.matches_per_file.items():
-            # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
-            ruamel_data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
-            yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
+            if file.base_kind == "text/yaml":
+                # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
+                ruamel_data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
+                yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
 
     def _final_yaml_transform(self, text: str) -> str:
         """
