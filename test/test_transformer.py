@@ -175,7 +175,9 @@ def test_transformer(
 
     orig_dir, tmp_dir = copy_examples_dir
     orig_playbook = orig_dir / playbook
-    expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
+    expected_playbook = orig_dir / playbook.replace(
+        orig_playbook.ext, f".transformed{orig_playbook.ext}"
+    )
     transformed_playbook = tmp_dir / playbook
 
     orig_playbook_content = orig_playbook.read()
