@@ -101,8 +101,6 @@ class JinjaTestsAreTestsTransform(Transform):
         elif str(lintable.base_kind) == 'text/jinja2':
             target_parent = target_key = None
             target_template = data  # the whole file
-            # TODO: mark subsequent matches for the same file as fixed
-            #       as we will be fixing the entire file.
         else:  # unknown file type
             return
 
