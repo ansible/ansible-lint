@@ -40,6 +40,20 @@ extend-ignore =
   E203,
   E501,
   H,
+# WPS:
+  B,
+  C,
+  DAR101,
+  DAR201,
+  DAR301,
+  DAR401,
+  E800,
+  N806,
+  P101,
+  P103,
+  Q,
+  S,
+  WPS,
 
 # Allow certain violations in certain files:
 per-file-ignores =

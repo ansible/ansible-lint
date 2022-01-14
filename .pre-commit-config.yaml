@@ -72,6 +72,7 @@ repos:
     # - flake8-black>=0.1.1
     - flake8-docstrings >= 1.5.0
     - flake8-pytest-style >= 1.2.2
+    - wemake-python-styleguide ~= 0.16.0
 - repo: https://github.com/pre-commit/mirrors-mypy.git
   rev: v0.910-1
   hooks:
