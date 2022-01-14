@@ -3,7 +3,7 @@
 import re
 import sys
 from functools import lru_cache
-from typing import List, MutableMapping, Set, Union
+from typing import List, MutableMapping, Optional, Union
 
 from ansible.constants import MAGIC_VARIABLE_MAPPING
 
@@ -172,14 +172,101 @@ FACT_NAMES_BY_COLLECTOR = {
     # 'facter': ['facter_*'],  # facts namespaced under facter
     # 'ohai': ['ohai_*'],  # facts namespaced under ohai
 }
-KNOWN_FACT_NAMES = {fact for facts in FACT_NAMES_BY_COLLECTOR.values() for fact in facts}
+KNOWN_FACT_NAMES = {
+    fact for facts in FACT_NAMES_BY_COLLECTOR.values() for fact in facts
+}
 KNOWN_FACT_NAME_PREFIXES = ['facter_', 'ohai_']
+
+# from https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+PREFIXLESS_MAGIC_VARS = {  # without the "ansible_" prefix
+    # Documented Fact Dicts
+    "facts",
+    "local",
+    # Documented Magic Vars
+    "check_mode",
+    "config_file",
+    "dependent_role_names",
+    "diff_mode",
+    "forks",
+    "inventory_sources",
+    "limit",
+    "loop",
+    "loop_var",
+    "index_var",
+    "parent_role_names",
+    "parent_role_paths",
+    "play_batch",
+    "play_hosts",
+    "play_hosts_hall",
+    "play_role_names",
+    "playbook_python",
+    "role_names",
+    "role_name",
+    "collection_name",
+    "run_tags",
+    "search_path",
+    "skip_tags",
+    "verbosity",
+    "version",
+    "play_name",
+    # Not documented and not included in MAGIC_VARIABLE_MAPPING (below)
+    "delegated_vars",
+    "python_interpreter",
+}
+# MAGIC_VARIABLE_MAPPING has lists of magic vars that are, for the most part,
+# not listed in the Special Variables doc. It does not include vars listed
+# above. It includes vars for connection, shell, become, etc.
+# key is property name, value is tuple of magic var names
+_prefix_len = len("ansible_")
+PREFIXLESS_MAGIC_VARS.update(
+    {
+        v[_prefix_len:]
+        for k, magic_vars in MAGIC_VARIABLE_MAPPING.items()
+        for v in magic_vars
+    }
+)
+MAGIC_VAR_SUFFIXES = ["_host", "_port", "_user", "_interpreter"]
+
+
+@lru_cache
+def _re_possible_net_interface() -> re.Pattern[str]:
+    # Based on (MIT licensed):
+    # https://github.com/bosun-monitor/bosun/blob/db70a05b517710cbf39e000c497155cb6b178e34/cmd/scollector/collectors/ifstat_linux.go#L54-L58
+    return re.compile(
+        r"eth\d+|em\d+_\d+|em\d+|"
+        r"bond\d+|team\d+|p\d+p\d+|"  # simplified the p\d+p\d+ cases. Just use as a prefix.
+        r"en[a-zA-Z0-9]+|wl[a-zA-Z0-9]+|ww[a-zA-Z0-9]+"  # Systemd predictable interface names
+    )
+
+
+def is_fact_name(name: str) -> Optional[bool]:
+    if name in PREFIXLESS_MAGIC_VARS:
+        # confident: node_name IS NOT a fact
+        return False
+
+    if (
+        name in KNOWN_FACT_NAMES
+        or any(name.startswith(prefix) for prefix in KNOWN_FACT_NAME_PREFIXES)
+        # try to guess if this is a network interface "ansible_<interface>"
+        or _re_possible_net_interface().match(name)
+    ):
+        # confident: node_name IS a fact
+        return True
+
+    # ignore remaining possible magic vars (must be after the prefix check)
+    if any(name.endswith(suffix) for suffix in MAGIC_VAR_SUFFIXES):
+        return False
+
+    # ambiguous: node_name MIGHT BE a fact
+    return None  # use None to signal ambiguity
 
 
 class AnsibleFactsNamespacingRule(AnsibleLintRule):
 
     id = "facts-namespacing"
-    shortdesc = "Facts are now namespaced. Look for them in the special ansible_facts var."
+    shortdesc = (
+        "Facts are now namespaced. Look for them in the special ansible_facts var."
+    )
     description = (
         "Ansible facts are available under the ``ansible_facts.*`` namespace. "
         "Accessing the ``ansible_*`` vars was deprecated in Ansible 2.5. "
@@ -194,67 +281,11 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule):
     def _error_message(self, legacy_facts: List[str]) -> str:
         # legacy_facts is a list of in-use fact names without the "ansible_" prefix.
         msg = self.shortdesc + (
-            " "
             "\nMake these changes (original --> use this instead):\n"
         )
         for fact in legacy_facts:
             msg += f"  ansible_{fact} --> ansible_facts.{fact}\n"
         return msg
-
-    magic_var_suffixes = ["_host", "_port", "_user", "_interpreter"]
-
-    @staticmethod
-    @lru_cache
-    def prefixless_magic_vars() -> Set[str]:
-        prefix_len = len("ansible_")
-        # from https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
-        allowed_vars = {  # without the "ansible_" prefix
-            # Documented Fact Dicts
-            "facts",
-            "local",
-            # Documented Magic Vars
-            "check_mode",
-            "config_file",
-            "dependent_role_names",
-            "diff_mode",
-            "forks",
-            "inventory_sources",
-            "limit",
-            "loop",
-            "loop_var",
-            "index_var",
-            "parent_role_names",
-            "parent_role_paths",
-            "play_batch",
-            "play_hosts",
-            "play_hosts_hall",
-            "play_role_names",
-            "playbook_python",
-            "role_names",
-            "role_name",
-            "collection_name",
-            "run_tags",
-            "search_path",
-            "skip_tags",
-            "verbosity",
-            "version",
-            "play_name",
-            # Not documented and not included in MAGIC_VARIABLE_MAPPING (below)
-            "delegated_vars",
-            "python_interpreter",
-        }
-        # MAGIC_VARIABLE_MAPPING has lists of magic vars that are, for the most part,
-        # not listed in the Special Variables doc. It does not include vars listed
-        # above. It includes vars for connection, shell, become, etc.
-        # key is property name, value is tuple of magic var names
-        allowed_vars.update(
-            {
-                v[prefix_len:]
-                for k, magic_vars in MAGIC_VARIABLE_MAPPING.items()
-                for v in magic_vars
-            }
-        )
-        return allowed_vars
 
     @lru_cache
     def _re_possible_facts(self) -> re.Pattern[str]:
@@ -266,19 +297,9 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule):
         return re.compile(
             r"\bansible_"  # match word that starts with "ansible_"
             + r"(?!"  # Non-capturing group
-            + r"\b|".join(self.prefixless_magic_vars())  # do not match non-fact vars
+            + r"\b|".join(PREFIXLESS_MAGIC_VARS)  # do not match non-fact vars
             + r"\b)"  # only full word matches, not prefixes
             + r"([a-zA-Z0-9_]+)\b"  # any valid var chars till the end of the word
-        )
-
-    @lru_cache
-    def _re_possible_net_interface(self) -> re.Pattern[str]:
-        # Based on (MIT licensed):
-        # https://github.com/bosun-monitor/bosun/blob/db70a05b517710cbf39e000c497155cb6b178e34/cmd/scollector/collectors/ifstat_linux.go#L54-L58
-        return re.compile(
-            r"eth\d+|em\d+_\d+|em\d+|"
-            r"bond\d+|team\d+|p\d+p\d+|"  # simplified the p\d+p\d+ cases. Just use as a prefix.
-            r"en[a-zA-Z0-9]+|wl[a-zA-Z0-9]+|ww[a-zA-Z0-9]+"  # Systemd predictable interface names
         )
 
     def _uses_ansible_facts_as_vars(self, value: str) -> List[str]:
@@ -290,34 +311,16 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule):
         possible_facts: List[str] = self._re_possible_facts().findall(value)
 
         for possible_fact in possible_facts:
-            if possible_fact in KNOWN_FACT_NAMES:
+            is_a_fact = is_fact_name(possible_fact)
+            might_be_a_fact = is_a_fact is None  # None signals ambiguity
+            if is_a_fact:
                 found_facts.add(possible_fact)
                 # found a fact. stop looking.
                 continue
-
-            for prefix in KNOWN_FACT_NAME_PREFIXES:
-                if possible_fact.startswith(prefix):
-                    found_facts.add(possible_fact)
-                    break
-            else:
-                # found a fact. stop looking.
-                continue
-
-            for suffix in self.magic_var_suffixes:
-                if possible_fact.endswith(suffix):
-                    break
-            else:
-                # not a fact. stop looking.
-                continue
-
-            # try to guess if this is a network interface "ansible_<interface>"
-            if self._re_possible_net_interface().match(possible_fact):
-                # found an interface fact
+            if might_be_a_fact:
+                # This is very ambiguous. It might be a fact or it might not.
+                # Maybe add a config var to determine whether to add this.
                 found_facts.add(possible_fact)
-                continue
-            # This is very ambiguous. It might be a fact or it might not.
-            # Maybe add a config var to determine whether to add this.
-            found_facts.add(possible_fact)
 
         return list(found_facts)
 
