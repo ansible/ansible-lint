@@ -62,7 +62,7 @@ repos:
   hooks:
   - id: black
     language_version: python3
-- repo: https://github.com/pycqa/flake8.git
+- repo: https://github.com/PyCQA/flake8.git
   rev: 4.0.1
   hooks:
   - id: flake8
@@ -72,7 +72,7 @@ repos:
     # - flake8-black>=0.1.1
     - flake8-docstrings>=1.5.0
     - flake8-pytest-style>=1.2.2
-- repo: https://github.com/pre-commit/mirrors-mypy
+- repo: https://github.com/pre-commit/mirrors-mypy.git
   rev: v0.910-1
   hooks:
   - id: mypy
