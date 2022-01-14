@@ -1,0 +1,10 @@
+[config]
+{% if ansible_distribution_version is version('12.04', '>=') %}
+use the new thing = of course
+{% endif %}
+[dmi]
+board_asset_tag = {{ ansible_board_asset_tag }}
+board_name = {{ ansible_board_name }}
+board_serial = {{ ansible_board_serial }}
+board_vendor = {{ ansible_board_vendor }}
+board_version = {{ ansible_board_version }}
