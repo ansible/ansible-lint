@@ -411,7 +411,7 @@ if "pytest" in sys.modules:
         (
             pytest.param(
                 'examples/roles/role_for_facts_namespacing/tasks/fail.yml',
-                6,
+                7,
                 id='fail_tasks',
             ),
             pytest.param(

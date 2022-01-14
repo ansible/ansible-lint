@@ -143,6 +143,22 @@ def runner_result(
             True,
             id="jinja_tests_are_not_filters_in_template",
         ),
+        pytest.param(
+            'examples/roles/role_for_facts_namespacing/tasks/fail.yml',
+            [],
+            6,
+            6,
+            True,
+            id="facts_namespacing_tasks",
+        ),
+        pytest.param(
+            'examples/roles/role_for_facts_namespacing/templates/sample.ini.j2',
+            [],
+            6,
+            6,
+            True,
+            id="facts_namespacing_template",
+        ),
     ),
 )
 def test_transformer(

@@ -14,7 +14,7 @@
     state: present
   when: is_el_8
   vars:
-    is_el_8: ansible_os_family == "RedHat" and ansible_distribution_major_version == '8'
+    is_el_8: "{{ ansible_os_family == 'RedHat' and ansible_distribution_major_version == '8' }}"
 
 - name: configure something
   lineinfile:

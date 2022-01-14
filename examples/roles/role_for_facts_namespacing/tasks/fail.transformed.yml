@@ -7,7 +7,7 @@
   yum:
     name: foobar
     state: present
-  when: ansible_facts.os_family == "RedHat"
+  when: ansible_facts.os_family == 'RedHat'
 
 - name: install something (EL 8)
   yum:
@@ -15,23 +15,23 @@
     state: present
   when: is_el_8
   vars:
-    is_el_8: ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version == '8'
+    is_el_8: "{{ ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_major_version == '8' }}"
 
 - name: configure something
   lineinfile:
     dest: /etc/{{ 'default' if ansible_facts.pkg_mgr == 'apt' else 'sysconfig' }}/something.conf
     create: true
-    regexp: '^answer='
+    regexp: ^answer=
     line: answer=42
     state: present
     mode: 0600
 
 - name: debug proxy var
   debug:
-    msg: "http_proxy={{ ansible_facts.env.get('http_proxy') }}"
+    msg: http_proxy={{ ansible_facts.env.get('http_proxy') }}
 
 - name: some command that needs the uid
-  command: "echo uid={{ ansible_facts.user_uid }}"
+  command: echo uid={{ ansible_facts.user_uid }}
   changed_when: false
 
 - name: record product_serial
@@ -45,8 +45,8 @@
 
 - name: valid magic vars
   debug:
-    msg: "{{ ansible_loop.index }}"
-  loop: "{{ ansible_play_batch }}"
+    msg: '{{ ansible_loop.index }}'
+  loop: '{{ ansible_play_batch }}'
   loop_control:
     loop_var: role_for_facts_namespacing_item
   run_once: true
