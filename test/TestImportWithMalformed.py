@@ -5,26 +5,26 @@ from ansiblelint.runner import Runner
 
 IMPORT_TASKS_MAIN = Lintable(
     'import-tasks-main.yml',
-    '''\
+    """\
 - oops this is invalid
-''',
+""",
 )
 
 IMPORT_SHELL_PIP = Lintable(
     'import-tasks-main.yml',
-    '''\
+    """\
 - shell: pip
   changed: false
-''',
+""",
 )
 
 PLAY_IMPORT_TASKS = Lintable(
     'playbook.yml',
-    '''\
+    """\
 - hosts: all
   tasks:
     - import_tasks: import-tasks-main.yml
-''',
+""",
 )
 
 

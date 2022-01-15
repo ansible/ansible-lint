@@ -28,8 +28,8 @@ class MetaTagValidRule(AnsibleLintRule):
     TAG_REGEXP = re.compile('^[a-z0-9]+$')
 
     def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+        self, file: 'Lintable', data: 'odict[str, Any]'
+    ) -> List['MatchError']:
         if file.kind != 'meta':
             return []
 
@@ -84,21 +84,21 @@ class MetaTagValidRule(AnsibleLintRule):
         return results
 
 
-META_TAG_VALID = '''
+META_TAG_VALID = """
 galaxy_info:
     galaxy_tags: ['database', 'my s q l', 'MYTAG']
     categories: 'my_category_not_in_a_list'
-'''
+"""
 
 # testing code to be loaded only with pytest or when executed the rule file
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
 
     import pytest
 
     @pytest.mark.parametrize(
         'rule_runner', (MetaTagValidRule,), indirect=['rule_runner']
     )
-    def test_valid_tag_rule(rule_runner: "Any") -> None:
+    def test_valid_tag_rule(rule_runner: 'Any') -> None:
         """Test rule matches."""
         results = rule_runner.run_role_meta_main(META_TAG_VALID)
         assert "Use 'galaxy_tags' rather than 'categories'" in str(results)

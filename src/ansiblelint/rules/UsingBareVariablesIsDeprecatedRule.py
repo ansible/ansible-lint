@@ -42,19 +42,19 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     tags = ['deprecations']
     version_added = 'historic'
 
-    _jinja = re.compile(r"{[{%].*[%}]}", re.DOTALL)
+    _jinja = re.compile(r'{[{%].*[%}]}', re.DOTALL)
     _glob = re.compile('[][*?]')
 
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        loop_type = next((key for key in task if key.startswith("with_")), None)
+        loop_type = next((key for key in task if key.startswith('with_')), None)
         if loop_type:
             if loop_type in [
-                "with_nested",
-                "with_together",
-                "with_flattened",
-                "with_filetree",
+                'with_nested',
+                'with_together',
+                'with_flattened',
+                'with_filetree',
             ]:
                 # These loops can either take a list defined directly in the task
                 # or a variable that is a list itself.  When a single variable is used
@@ -65,9 +65,9 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                     items = [items]
                 for var in items:
                     return self._matchvar(var, task, loop_type)
-            elif loop_type == "with_subelements":
+            elif loop_type == 'with_subelements':
                 return self._matchvar(task[loop_type][0], task, loop_type)
-            elif loop_type in ["with_sequence", "with_ini", "with_inventory_hostnames"]:
+            elif loop_type in ['with_sequence', 'with_ini', 'with_inventory_hostnames']:
                 pass
             else:
                 return self._matchvar(task[loop_type], task, loop_type)

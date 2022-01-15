@@ -68,7 +68,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        module = task["action"]["__ansible_module__"]
+        module = task['action']['__ansible_module__']
         if module in self._modules:
             message = '{0} {1}'
             return message.format(self.shortdesc, module)

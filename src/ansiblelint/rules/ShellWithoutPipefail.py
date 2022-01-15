@@ -25,23 +25,23 @@ class ShellWithoutPipefail(AnsibleLintRule):
     tags = ['command-shell']
     version_added = 'v4.1.0'
 
-    _pipefail_re = re.compile(r"^\s*set.*[+-][A-z]*o\s*pipefail", re.M)
-    _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
+    _pipefail_re = re.compile(r'^\s*set.*[+-][A-z]*o\s*pipefail', re.M)
+    _pipe_re = re.compile(r'(?<!\|)\|(?!\|)')
 
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        if task["__ansible_action_type__"] != "task":
+        if task['__ansible_action_type__'] != 'task':
             return False
 
-        if task["action"]["__ansible_module__"] != "shell":
+        if task['action']['__ansible_module__'] != 'shell':
             return False
 
-        if task.get("ignore_errors"):
+        if task.get('ignore_errors'):
             return False
 
         unjinjad_cmd = self.unjinja(
-            ' '.join(task["action"].get("__ansible_arguments__", []))
+            ' '.join(task['action'].get('__ansible_arguments__', []))
         )
 
         return bool(

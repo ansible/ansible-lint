@@ -20,10 +20,10 @@ class NoTabsRule(AnsibleLintRule):
     tags = ['formatting']
     version_added = 'v4.0.0'
     allow_list = [
-        ("lineinfile", "insertafter"),
-        ("lineinfile", "insertbefore"),
-        ("lineinfile", "regexp"),
-        ("lineinfile", "line"),
+        ('lineinfile', 'insertafter'),
+        ('lineinfile', 'insertbefore'),
+        ('lineinfile', 'regexp'),
+        ('lineinfile', 'line'),
     ]
 
     def matchtask(
@@ -37,7 +37,7 @@ class NoTabsRule(AnsibleLintRule):
         return False
 
 
-RULE_EXAMPLE = r'''---
+RULE_EXAMPLE = r"""---
 - hosts: localhost
   tasks:
     - name: should not trigger no-tabs rules
@@ -48,15 +48,15 @@ RULE_EXAMPLE = r'''---
     - name: foo
       debug:
         msg: "Presence of \t should trigger no-tabs here."
-'''
+"""
 
 # testing code to be loaded only with pytest or when executed the rule file
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
 
     import pytest
 
     @pytest.mark.parametrize('rule_runner', (NoTabsRule,), indirect=['rule_runner'])
-    def test_no_tabs_rule(rule_runner: "Any") -> None:
+    def test_no_tabs_rule(rule_runner: 'Any') -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(RULE_EXAMPLE)
         assert results[0].linenumber == 9

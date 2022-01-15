@@ -11,4 +11,4 @@ class UnsetVariableMatcherRule(AnsibleLintRule):
     tags = ['fake', 'dummy', 'test2']
 
     def match(self, line: str) -> bool:
-        return "{{" in line
+        return '{{' in line

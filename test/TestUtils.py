@@ -92,17 +92,17 @@ def test_tokenize(
     (
         pytest.param(
             dict(name='hello', action='command chdir=abc echo hello world'),
-            (dict(name="hello", command="chdir=abc echo hello world"),),
+            (dict(name='hello', command='chdir=abc echo hello world'),),
             id='simple_command',
         ),
         pytest.param(
             {'git': {'version': 'abc'}, 'args': {'repo': 'blah', 'dest': 'xyz'}},
             (
                 {'git': {'version': 'abc', 'repo': 'blah', 'dest': 'xyz'}},
-                {"git": 'version=abc repo=blah dest=xyz'},
+                {'git': 'version=abc repo=blah dest=xyz'},
                 {
-                    "git": None,
-                    "args": {'repo': 'blah', 'dest': 'xyz', 'version': 'abc'},
+                    'git': None,
+                    'args': {'repo': 'blah', 'dest': 'xyz', 'version': 'abc'},
                 },
             ),
             id='args',
@@ -122,11 +122,11 @@ def test_normalize(
 def test_normalize_complex_command() -> None:
     """Test that tasks specified differently are normalized same way."""
     task1 = dict(
-        name="hello", action={'module': 'pip', 'name': 'df', 'editable': 'false'}
+        name='hello', action={'module': 'pip', 'name': 'df', 'editable': 'false'}
     )
-    task2 = dict(name="hello", pip={'name': 'df', 'editable': 'false'})
-    task3 = dict(name="hello", pip="name=df editable=false")
-    task4 = dict(name="hello", action="pip name=df editable=false")
+    task2 = dict(name='hello', pip={'name': 'df', 'editable': 'false'})
+    task3 = dict(name='hello', pip='name=df editable=false')
+    task4 = dict(name='hello', action='pip name=df editable=false')
     assert utils.normalize_task(task1, 'tasks.yml') == utils.normalize_task(
         task2, 'tasks.yml'
     )
@@ -198,10 +198,10 @@ def test_template(template: str, output: str) -> None:
 
 
 @pytest.mark.parametrize(
-    ("role", "expect_warning"),
+    ('role', 'expect_warning'),
     (
-        ("template_lookup", False),
-        ("template_lookup_missing", True),
+        ('template_lookup', False),
+        ('template_lookup_missing', True),
     ),
 )
 def test_template_lookup(role: str, expect_warning: bool) -> None:
@@ -209,23 +209,23 @@ def test_template_lookup(role: str, expect_warning: bool) -> None:
     task_path = os.path.realpath(
         os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
-            "..",
-            "examples",
-            "roles",
+            '..',
+            'examples',
+            'roles',
             role,
-            "tasks",
-            "main.yml",
+            'tasks',
+            'main.yml',
         )
     )
-    result = run_ansible_lint("-v", task_path)
-    assert ("Unable to find" in result.stderr) == expect_warning
+    result = run_ansible_lint('-v', task_path)
+    assert ('Unable to find' in result.stderr) == expect_warning
 
 
 def test_task_to_str_unicode() -> None:
     """Ensure that extracting messages from tasks preserves Unicode."""
-    task = dict(fail=dict(msg=u"unicode é ô à"))
+    task = dict(fail=dict(msg=u'unicode é ô à'))
     result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
-    assert result == u"fail msg=unicode é ô à"
+    assert result == u'fail msg=unicode é ô à'
 
 
 @pytest.mark.parametrize(
@@ -237,7 +237,7 @@ def test_task_to_str_unicode() -> None:
 )
 def test_normpath_with_path_object(path: str) -> None:
     """Ensure that relative parent dirs are normalized in paths."""
-    assert normpath(path) == "a"
+    assert normpath(path) == 'a'
 
 
 def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
@@ -251,9 +251,9 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
 @pytest.mark.parametrize(
     ('test_path', 'expected'),
     (
-        pytest.param(Path('$TEST_PATH'), "/test/path", id='pathlib.Path'),
-        pytest.param('$TEST_PATH', "/test/path", id='str'),
-        pytest.param('  $TEST_PATH  ', "/test/path", id='stripped-str'),
+        pytest.param(Path('$TEST_PATH'), '/test/path', id='pathlib.Path'),
+        pytest.param('$TEST_PATH', '/test/path', id='str'),
+        pytest.param('  $TEST_PATH  ', '/test/path', id='stripped-str'),
         pytest.param('~', os.path.expanduser('~'), id='home'),
     ),
 )
@@ -269,9 +269,9 @@ def test_expand_paths_vars(
     ('reset_env_var', 'message_prefix'),
     (
         # simulate absence of git command
-        ('PATH', "Failed to locate command: "),
+        ('PATH', 'Failed to locate command: '),
         # simulate a missing git repo
-        ('GIT_DIR', "Looking up for files"),
+        ('GIT_DIR', 'Looking up for files'),
     ),
     ids=('no-git-cli', 'outside-git-repo'),
 )
@@ -287,7 +287,7 @@ def test_discover_lintables_git_verbose(
     monkeypatch.setenv(reset_env_var, '')
     file_utils.discover_lintables(options)
 
-    assert any(m[2].startswith("Looking up for files") for m in caplog.record_tuples)
+    assert any(m[2].startswith('Looking up for files') for m in caplog.record_tuples)
     assert any(m.startswith(message_prefix) for m in caplog.messages)
 
 
@@ -321,7 +321,7 @@ def test_discover_lintables_silent(
     assert not stderr, 'No stderr output is expected when the verbosity is off'
     assert (
         len(files) == yaml_count
-    ), "Expected to find {yaml_count} yaml files in {lint_path}".format_map(
+    ), 'Expected to find {yaml_count} yaml files in {lint_path}'.format_map(
         locals(),
     )
 
@@ -344,7 +344,7 @@ def test_logger_debug(caplog: LogCaptureFixture) -> None:
     initialize_logger(options.verbosity)
 
     expected_info = (
-        "ansiblelint.__main__",
+        'ansiblelint.__main__',
         logging.DEBUG,
         'Logging initialized to level 10',
     )
@@ -356,11 +356,11 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     """Test that run without arguments it will detect and lint the entire repository."""
     cmd = [
         sys.executable,
-        "-m",
-        "ansiblelint",
-        "-v",
-        "-p",
-        "--nocolor",
+        '-m',
+        'ansiblelint',
+        '-v',
+        '-p',
+        '--nocolor',
     ]
     result = subprocess.run(cmd, check=False).returncode
 
@@ -372,66 +372,66 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
 
     # Confirmation that it runs in auto-detect mode
     assert (
-        "Discovered files to lint using: git ls-files --cached --others --exclude-standard -z"
+        'Discovered files to lint using: git ls-files --cached --others --exclude-standard -z'
         in err
     )
-    assert "Excluded removed files using: git ls-files --deleted -z" in err
+    assert 'Excluded removed files using: git ls-files --deleted -z' in err
     # An expected rule match from our examples
     assert (
-        "examples/playbooks/empty_playbook.yml:1: "
-        "syntax-check Empty playbook, nothing to do" in out
+        'examples/playbooks/empty_playbook.yml:1: '
+        'syntax-check Empty playbook, nothing to do' in out
     )
     # assures that our .ansible-lint exclude was effective in excluding github files
-    assert "Identified: .github/" not in out
+    assert 'Identified: .github/' not in out
     # assures that we can parse playbooks as playbooks
-    assert "Identified: test/test/always-run-success.yml" not in err
+    assert 'Identified: test/test/always-run-success.yml' not in err
     # assure that zuul_return missing module is not reported
-    assert "examples/playbooks/mocked_dependency.yml" not in out
-    assert "Executing syntax check on examples/playbooks/mocked_dependency.yml" in err
+    assert 'examples/playbooks/mocked_dependency.yml' not in out
+    assert 'Executing syntax check on examples/playbooks/mocked_dependency.yml' in err
 
 
 def test_is_playbook() -> None:
     """Verify that we can detect a playbook as a playbook."""
-    assert utils.is_playbook("examples/playbooks/always-run-success.yml")
+    assert utils.is_playbook('examples/playbooks/always-run-success.yml')
 
 
 @pytest.mark.parametrize(
     ('path', 'kind'),
     (
-        ("foo/playbook.yml", "playbook"),
-        ("playbooks/foo.yml", "playbook"),
-        ("playbooks/roles/foo.yml", "yaml"),
+        ('foo/playbook.yml', 'playbook'),
+        ('playbooks/foo.yml', 'playbook'),
+        ('playbooks/roles/foo.yml', 'yaml'),
         # the only yml file that is not a playbook inside molecule/ folders
-        (".config/molecule/config.yml", "yaml"),  # molecule shared config
-        ("roles/foo/molecule/scen1/base.yml", "yaml"),  # molecule scenario base config
-        ("roles/foo/molecule/scen1/molecule.yml", "yaml"),  # molecule scenario config
-        ("roles/foo/molecule/scen2/foobar.yml", "playbook"),  # custom playbook name
-        ("roles/foo/molecule/scen3/converge.yml", "playbook"),  # common playbook name
-        ("roles/foo/molecule/scen3/requirements.yml", "requirements"),  # requirements
-        ("roles/foo/molecule/scen3/collections.yml", "requirements"),  # requirements
+        ('.config/molecule/config.yml', 'yaml'),  # molecule shared config
+        ('roles/foo/molecule/scen1/base.yml', 'yaml'),  # molecule scenario base config
+        ('roles/foo/molecule/scen1/molecule.yml', 'yaml'),  # molecule scenario config
+        ('roles/foo/molecule/scen2/foobar.yml', 'playbook'),  # custom playbook name
+        ('roles/foo/molecule/scen3/converge.yml', 'playbook'),  # common playbook name
+        ('roles/foo/molecule/scen3/requirements.yml', 'requirements'),  # requirements
+        ('roles/foo/molecule/scen3/collections.yml', 'requirements'),  # requirements
         # tasks files:
-        ("tasks/directory with spaces/main.yml", "tasks"),  # tasks
-        ("tasks/requirements.yml", "tasks"),  # tasks
+        ('tasks/directory with spaces/main.yml', 'tasks'),  # tasks
+        ('tasks/requirements.yml', 'tasks'),  # tasks
         # requirements (we do not support includes yet)
-        ("requirements.yml", "requirements"),  # collection requirements
-        ("roles/foo/meta/requirements.yml", "requirements"),  # inside role requirements
+        ('requirements.yml', 'requirements'),  # collection requirements
+        ('roles/foo/meta/requirements.yml', 'requirements'),  # inside role requirements
         # Undeterminable files:
-        ("test/fixtures/unknown-type.yml", "yaml"),
-        ("releasenotes/notes/run-playbooks-refactor.yaml", "reno"),  # reno
-        ("examples/host_vars/localhost.yml", "vars"),
-        ("examples/group_vars/all.yml", "vars"),
-        ("examples/playbooks/vars/other.yml", "vars"),
-        ("examples/playbooks/vars/subfolder/settings.yml", "vars"),  # deep vars
-        ("molecule/scenario/collections.yml", "requirements"),  # deprecated 2.8 format
+        ('test/fixtures/unknown-type.yml', 'yaml'),
+        ('releasenotes/notes/run-playbooks-refactor.yaml', 'reno'),  # reno
+        ('examples/host_vars/localhost.yml', 'vars'),
+        ('examples/group_vars/all.yml', 'vars'),
+        ('examples/playbooks/vars/other.yml', 'vars'),
+        ('examples/playbooks/vars/subfolder/settings.yml', 'vars'),  # deep vars
+        ('molecule/scenario/collections.yml', 'requirements'),  # deprecated 2.8 format
         (
-            "../roles/geerlingguy.mysql/tasks/configure.yml",
-            "tasks",
+            '../roles/geerlingguy.mysql/tasks/configure.yml',
+            'tasks',
         ),  # relative path involved
-        ("galaxy.yml", "galaxy"),
-        ("foo.j2.yml", "jinja2"),
-        ("foo.yml.j2", "jinja2"),
-        ("foo.j2.yaml", "jinja2"),
-        ("foo.yaml.j2", "jinja2"),
+        ('galaxy.yml', 'galaxy'),
+        ('foo.j2.yml', 'jinja2'),
+        ('foo.yml.j2', 'jinja2'),
+        ('foo.j2.yaml', 'jinja2'),
+        ('foo.yaml.j2', 'jinja2'),
     ),
 )
 def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:
@@ -467,15 +467,15 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
 
 
 _DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]
-_CUSTOM_RULESDIR = Path(__file__).parent / "custom_rules"
+_CUSTOM_RULESDIR = Path(__file__).parent / 'custom_rules'
 _CUSTOM_RULEDIRS = [
-    str(_CUSTOM_RULESDIR / "example_inc"),
-    str(_CUSTOM_RULESDIR / "example_com"),
+    str(_CUSTOM_RULESDIR / 'example_inc'),
+    str(_CUSTOM_RULESDIR / 'example_com'),
 ]
 
 
 @pytest.mark.parametrize(
-    ("user_ruledirs", "use_default", "expected"),
+    ('user_ruledirs', 'use_default', 'expected'),
     (
         ([], True, _DEFAULT_RULEDIRS),
         ([], False, _DEFAULT_RULEDIRS),
@@ -491,7 +491,7 @@ def test_get_rules_dirs(
 
 
 @pytest.mark.parametrize(
-    ("user_ruledirs", "use_default", "expected"),
+    ('user_ruledirs', 'use_default', 'expected'),
     (
         ([], True, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
         ([], False, sorted(_CUSTOM_RULEDIRS) + _DEFAULT_RULEDIRS),
@@ -516,15 +516,15 @@ def test_get_rules_dirs_with_custom_rules(
 
 def test_nested_items() -> None:
     """Verify correct function of nested_items()."""
-    data = {"foo": "text", "bar": {"some": "text2"}, "fruits": ["apple", "orange"]}
+    data = {'foo': 'text', 'bar': {'some': 'text2'}, 'fruits': ['apple', 'orange']}
 
     items = [
-        ("foo", "text", ""),
-        ("bar", {"some": "text2"}, ""),
-        ("some", "text2", "bar"),
-        ("fruits", ["apple", "orange"], ""),
-        ("list-item", "apple", "fruits"),
-        ("list-item", "orange", "fruits"),
+        ('foo', 'text', ''),
+        ('bar', {'some': 'text2'}, ''),
+        ('some', 'text2', 'bar'),
+        ('fruits', ['apple', 'orange'], ''),
+        ('list-item', 'apple', 'fruits'),
+        ('list-item', 'orange', 'fruits'),
     ]
     assert list(utils.nested_items(data)) == items
 

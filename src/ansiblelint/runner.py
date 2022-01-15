@@ -38,7 +38,7 @@ class Runner:
     def __init__(
         self,
         *lintables: Union[Lintable, str],
-        rules: "RulesCollection",
+        rules: 'RulesCollection',
         tags: FrozenSet[Any] = frozenset(),
         skip_list: List[str] = [],
         exclude_paths: List[str] = [],
@@ -107,7 +107,7 @@ class Runner:
         # remove exclusions
         for lintable in self.lintables.copy():
             if self.is_excluded(str(lintable.path.resolve())):
-                _logger.debug("Excluded %s", lintable)
+                _logger.debug('Excluded %s', lintable)
                 self.lintables.remove(lintable)
 
         # -- phase 1 : syntax check in parallel --
@@ -142,7 +142,7 @@ class Runner:
                 if file in self.checked_files or not file.kind:
                     continue
                 _logger.debug(
-                    "Examining %s of type %s",
+                    'Examining %s of type %s',
                     ansiblelint.file_utils.normpath(file.path),
                     file.kind,
                 )
@@ -183,7 +183,7 @@ class Runner:
                 visited.add(lintable)
 
 
-def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
+def _get_matches(rules: 'RulesCollection', options: 'Namespace') -> LintResult:
 
     lintables = ansiblelint.utils.get_lintables(options=options, args=options.lintables)
 

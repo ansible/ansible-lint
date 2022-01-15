@@ -38,13 +38,13 @@ class AnsibleLintRule(BaseRule):
 
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
-        return self.id + ": " + self.shortdesc
+        return self.id + ': ' + self.shortdesc
 
     @staticmethod
     def unjinja(text: str) -> str:
-        text = re.sub(r"{{.+?}}", "JINJA_EXPRESSION", text)
-        text = re.sub(r"{%.+?%}", "JINJA_STATEMENT", text)
-        text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
+        text = re.sub(r'{{.+?}}', 'JINJA_EXPRESSION', text)
+        text = re.sub(r'{%.+?%}', 'JINJA_STATEMENT', text)
+        text = re.sub(r'{#.+?#}', 'JINJA_COMMENT', text)
         return text
 
     # pylint: disable=too-many-arguments
@@ -52,9 +52,9 @@ class AnsibleLintRule(BaseRule):
         self,
         message: Optional[str] = None,
         linenumber: int = 1,
-        details: str = "",
+        details: str = '',
         filename: Optional[Union[str, Lintable]] = None,
-        tag: str = "",
+        tag: str = '',
     ) -> MatchError:
         match = MatchError(
             message=message,
@@ -67,13 +67,13 @@ class AnsibleLintRule(BaseRule):
             match.tag = tag
         return match
 
-    def matchlines(self, file: "Lintable") -> List[MatchError]:
+    def matchlines(self, file: 'Lintable') -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.match:
             return matches
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
-        for (prev_line_no, line) in enumerate(file.content.split("\n")):
+        for (prev_line_no, line) in enumerate(file.content.split('\n')):
             if line.lstrip().startswith('#'):
                 continue
 
@@ -131,7 +131,7 @@ class AnsibleLintRule(BaseRule):
             message = None
             if isinstance(result, str):
                 message = result
-            task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
+            task_msg = 'Task/Handler: ' + ansiblelint.utils.task_to_str(task)
             m = self.create_matcherror(
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
@@ -197,7 +197,7 @@ def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
                     yield rule
 
             except (TypeError, ValueError, AttributeError):
-                _logger.warning("Skipped invalid rule from %s", pluginname)
+                _logger.warning('Skipped invalid rule from %s', pluginname)
 
 
 class RulesCollection:
@@ -216,7 +216,7 @@ class RulesCollection:
             [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()]
         )
         for rulesdir in self.rulesdirs:
-            _logger.debug("Loading rules from %s", rulesdir)
+            _logger.debug('Loading rules from %s', rulesdir)
             for rule in load_plugins(rulesdir):
                 self.register(rule)
         self.rules = sorted(self.rules)
@@ -275,36 +275,36 @@ class RulesCollection:
 
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
-        return "\n".join(
+        return '\n'.join(
             [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)]
         )
 
     def listtags(self) -> str:
         tag_desc = {
-            "behaviour": "Indicates a bad practice or behavior",
-            "command-shell": "Specific to use of command and shell modules",
-            "core": "Related to internal implementation of the linter",
-            "deprecations": "Indicate use of features that are removed from Ansible",
-            "experimental": "Newly introduced rules, by default triggering only warnings",
-            "formatting": "Related to code-style",
-            "idempotency": "Possible indication that consequent runs would produce different results",
-            "idiom": "Anti-pattern detected, likely to cause undesired behavior",
-            "metadata": "Invalid metadata, likely related to galaxy, collections or roles",
-            "yaml": "External linter which will also produce its own rule codes.",
+            'behaviour': 'Indicates a bad practice or behavior',
+            'command-shell': 'Specific to use of command and shell modules',
+            'core': 'Related to internal implementation of the linter',
+            'deprecations': 'Indicate use of features that are removed from Ansible',
+            'experimental': 'Newly introduced rules, by default triggering only warnings',
+            'formatting': 'Related to code-style',
+            'idempotency': 'Possible indication that consequent runs would produce different results',
+            'idiom': 'Anti-pattern detected, likely to cause undesired behavior',
+            'metadata': 'Invalid metadata, likely related to galaxy, collections or roles',
+            'yaml': 'External linter which will also produce its own rule codes.',
         }
 
         tags = defaultdict(list)
         for rule in self.rules:
             for tag in rule.tags:
                 tags[tag].append(rule.id)
-        result = "# List of tags and rules they cover\n"
+        result = '# List of tags and rules they cover\n'
         for tag in sorted(tags):
             desc = tag_desc.get(tag, None)
             if desc:
-                result += f"{tag}:  # {desc}\n"
+                result += f'{tag}:  # {desc}\n'
             else:
-                result += f"{tag}:\n"
+                result += f'{tag}:\n'
             # result += f"  rules:\n"
             for name in tags[tag]:
-                result += f"  - {name}\n"
+                result += f'  - {name}\n'
         return result

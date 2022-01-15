@@ -45,14 +45,14 @@ _logger = logging.getLogger(__name__)
 
 def get_rule_skips_from_line(line: str) -> List[str]:
     """Return list of rule ids skipped via comment on the line of yaml."""
-    _before_noqa, _noqa_marker, noqa_text = line.partition("# noqa")
-    noqa_text = noqa_text.lstrip(" :")
+    _before_noqa, _noqa_marker, noqa_text = line.partition('# noqa')
+    noqa_text = noqa_text.lstrip(' :')
     return noqa_text.split()
 
 
 def append_skipped_rules(
-    pyyaml_data: "AnsibleBaseYAMLObject", lintable: Lintable
-) -> "AnsibleBaseYAMLObject":
+    pyyaml_data: 'AnsibleBaseYAMLObject', lintable: Lintable
+) -> 'AnsibleBaseYAMLObject':
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
     For a file, uses 2nd parser (ruamel.yaml) to pull comments out of
@@ -92,8 +92,8 @@ def load_data(file_text: str) -> Any:
 
 
 def _append_skipped_rules(
-    pyyaml_data: "AnsibleBaseYAMLObject", lintable: Lintable
-) -> Optional["AnsibleBaseYAMLObject"]:
+    pyyaml_data: 'AnsibleBaseYAMLObject', lintable: Lintable
+) -> Optional['AnsibleBaseYAMLObject']:
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
 

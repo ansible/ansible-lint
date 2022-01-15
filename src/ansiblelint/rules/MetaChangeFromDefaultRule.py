@@ -31,8 +31,8 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     version_added = 'v4.0.0'
 
     def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+        self, file: 'Lintable', data: 'odict[str, Any]'
+    ) -> List['MatchError']:
         if file.kind != 'meta':
             return []
 

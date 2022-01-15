@@ -61,32 +61,32 @@ class YamllintRule(AnsibleLintRule):
     version_added = 'v5.0.0'
     config = None
     has_dynamic_tags = True
-    if "yamllint.config" in sys.modules:
+    if 'yamllint.config' in sys.modules:
         config = YamlLintConfig(content=YAMLLINT_CONFIG)
         # if we detect local yamllint config we use it but raise a warning
         # as this is likely to get out of sync with our internal config.
         for file in ['.yamllint', '.yamllint.yaml', '.yamllint.yml']:
             if os.path.isfile(file):
                 _logger.warning(
-                    "Loading custom %s config file, this extends our "
-                    "internal yamllint config.",
+                    'Loading custom %s config file, this extends our '
+                    'internal yamllint config.',
                     file,
                 )
                 config_override = YamlLintConfig(file=file)
                 config_override.extend(config)
                 config = config_override
                 break
-        _logger.debug("Effective yamllint rules used: %s", config.rules)
+        _logger.debug('Effective yamllint rules used: %s', config.rules)
 
     def __init__(self) -> None:
         """Construct a rule instance."""
         # customize id by adding the one reported by yamllint
         self.id = self.__class__.id
 
-    def matchyaml(self, file: Lintable) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> List['MatchError']:
         """Return matches found for a specific YAML text."""
-        matches: List["MatchError"] = []
-        filtered_matches: List["MatchError"] = []
+        matches: List['MatchError'] = []
+        filtered_matches: List['MatchError'] = []
         if str(file.base_kind) != 'text/yaml':
             return matches
 
@@ -95,15 +95,15 @@ class YamllintRule(AnsibleLintRule):
                 file.content, YamllintRule.config, filepath=file.path
             ):
                 self.severity = 'VERY_LOW'
-                if p.level == "error":
+                if p.level == 'error':
                     self.severity = 'MEDIUM'
-                if p.desc.endswith("(syntax)"):
+                if p.desc.endswith('(syntax)'):
                     self.severity = 'VERY_HIGH'
                 matches.append(
                     self.create_matcherror(
                         message=p.desc,
                         linenumber=p.line,
-                        details="",
+                        details='',
                         filename=str(file.path),
                         tag=p.rule,
                     )

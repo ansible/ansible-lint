@@ -49,11 +49,11 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
 
 
 # testing code to be loaded only with pytest or when executed the rule file
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
 
     import pytest
 
-    SUCCESS_PLAY = '''
+    SUCCESS_PLAY = """
 - hosts: all
   tasks:
     - name: shut down
@@ -61,9 +61,9 @@ if "pytest" in sys.modules:
         /sbin/shutdown -t now
         echo $var == ""
       when: ansible_os_family
-'''
+"""
 
-    FAIL_PLAY = '''
+    FAIL_PLAY = """
 - hosts: all
   tasks:
   - name: shut down
@@ -72,7 +72,7 @@ if "pytest" in sys.modules:
   - name: shut down
     command: /sbin/shutdown -t now
     when: ansible_os_family !=""
-'''
+"""
 
     @pytest.mark.parametrize(
         'rule_runner', (ComparisonToEmptyStringRule,), indirect=['rule_runner']

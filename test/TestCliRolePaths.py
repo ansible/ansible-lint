@@ -13,7 +13,7 @@ from ansiblelint.text import strip_ansi_escape
 class TestCliRolePaths(unittest.TestCase):
     def setUp(self) -> None:
         self.local_test_dir = os.path.realpath(
-            os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "examples")
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'examples')
         )
 
     def test_run_single_role_path_no_trailing_slash_module(self) -> None:
@@ -27,7 +27,7 @@ class TestCliRolePaths(unittest.TestCase):
         cwd = self.local_test_dir
         role_path = 'roles/test-role'
 
-        result = run_ansible_lint(role_path, cwd=cwd, executable="ansible-lint")
+        result = run_ansible_lint(role_path, cwd=cwd, executable='ansible-lint')
         assert 'Use shell only when shell functionality is required' in result.stdout
 
     def test_run_single_role_path_with_trailing_slash(self) -> None:
@@ -90,10 +90,10 @@ class TestCliRolePaths(unittest.TestCase):
         cwd = self.local_test_dir
         role_path = 'roles/ansible-role-foo'
 
-        result = run_ansible_lint("-v", role_path, cwd=cwd)
+        result = run_ansible_lint('-v', role_path, cwd=cwd)
         assert len(result.stdout) == 0
         assert (
-            "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles"
+            'Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles'
             in result.stderr
         )
         assert result.returncode == 0
@@ -102,10 +102,10 @@ class TestCliRolePaths(unittest.TestCase):
         cwd = self.local_test_dir
         role_path = 'roles/valid-due-to-meta'
 
-        result = run_ansible_lint("-v", role_path, cwd=cwd)
+        result = run_ansible_lint('-v', role_path, cwd=cwd)
         assert len(result.stdout) == 0
         assert (
-            "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles"
+            'Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles'
             in result.stderr
         )
         assert result.returncode == 0
@@ -131,7 +131,7 @@ class TestCliRolePaths(unittest.TestCase):
 
         env = os.environ.copy()
         env['ANSIBLE_ROLES_PATH'] = os.path.realpath(
-            os.path.join(cwd, "../examples/roles")
+            os.path.join(cwd, '../examples/roles')
         )
 
         result = run_ansible_lint(role_path, cwd=cwd, env=env)
@@ -140,8 +140,8 @@ class TestCliRolePaths(unittest.TestCase):
 
 @pytest.mark.parametrize(
     ('result', 'env'),
-    ((True, {"GITHUB_ACTIONS": "true", "GITHUB_WORKFLOW": "foo"}), (False, None)),
-    ids=("on", "off"),
+    ((True, {'GITHUB_ACTIONS': 'true', 'GITHUB_WORKFLOW': 'foo'}), (False, None)),
+    ids=('on', 'off'),
 )
 def test_run_playbook_github(result: bool, env: Dict[str, str]) -> None:
     """Call ansible-lint simulating GitHub Actions environment."""

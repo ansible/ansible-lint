@@ -2,8 +2,8 @@
 import os
 import subprocess
 
-if __name__ == "__main__":
-    cmd = ["ansible-lint", "--version"]
+if __name__ == '__main__':
+    cmd = ['ansible-lint', '--version']
     result = subprocess.run(
         cmd,
         universal_newlines=True,

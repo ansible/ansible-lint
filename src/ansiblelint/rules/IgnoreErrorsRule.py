@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class IgnoreErrorsRule(AnsibleLintRule):
     """Describe and test the IgnoreErrorsRule."""
 
-    id = "ignore-errors"
+    id = 'ignore-errors'
     shortdesc = (
         'Use failed_when and specify error conditions instead of using ignore_errors'
     )
@@ -32,52 +32,52 @@ class IgnoreErrorsRule(AnsibleLintRule):
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
         if (
-            task.get("ignore_errors")
-            and task.get("ignore_errors") != "{{ ansible_check_mode }}"
-            and not task.get("register")
+            task.get('ignore_errors')
+            and task.get('ignore_errors') != '{{ ansible_check_mode }}'
+            and not task.get('register')
         ):
             return True
 
         return False
 
 
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
     import pytest
 
-    IGNORE_ERRORS_TRUE = '''
+    IGNORE_ERRORS_TRUE = """
 - hosts: all
   tasks:
     - name: run apt-get update
       command: apt-get update
       ignore_errors: true
-'''
+"""
 
-    IGNORE_ERRORS_FALSE = '''
+    IGNORE_ERRORS_FALSE = """
 - hosts: all
   tasks:
     - name: run apt-get update
       command: apt-get update
       ignore_errors: false
-'''
+"""
 
-    IGNORE_ERRORS_CHECK_MODE = '''
+    IGNORE_ERRORS_CHECK_MODE = """
 - hosts: all
   tasks:
     - name: run apt-get update
       command: apt-get update
       ignore_errors: "{{ ansible_check_mode }}"
-'''
+"""
 
-    IGNORE_ERRORS_REGISTER = '''
+    IGNORE_ERRORS_REGISTER = """
 - hosts: all
   tasks:
     - name: run apt-get update
       command: apt-get update
       ignore_errors: true
       register: ignore_errors_register
-'''
+"""
 
-    FAILED_WHEN = '''
+    FAILED_WHEN = """
 - hosts: all
   tasks:
     - name: disable apport
@@ -89,7 +89,7 @@ if "pytest" in sys.modules:
         state: present
       register: default_apport
       failed_when: default_apport.rc !=0 and not default_apport.rc == 257
-'''
+"""
 
     @pytest.mark.parametrize(
         'rule_runner', (IgnoreErrorsRule,), indirect=['rule_runner']

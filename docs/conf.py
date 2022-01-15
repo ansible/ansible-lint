@@ -64,9 +64,9 @@ extensions = [
 
 # Fail safe protection to detect conflicting packages
 try:
-    pkg_resources.get_distribution("sphinxcontrib-programoutput")
+    pkg_resources.get_distribution('sphinxcontrib-programoutput')
     print(
-        "FATAL: We detected presence of sphinxcontrib-programoutput package instead of sphinxcontrib-programoutput2 one. You must be sure the first is not installed.",
+        'FATAL: We detected presence of sphinxcontrib-programoutput package instead of sphinxcontrib-programoutput2 one. You must be sure the first is not installed.',
         file=sys.stderr,
     )
     sys.exit(2)
@@ -99,19 +99,19 @@ apidoc_toc_file = None
 
 # General substitutions.
 project = 'Ansible Lint Documentation'
-copyright = "2013-2021 Ansible, Inc"  # pylint: disable=redefined-builtin
+copyright = '2013-2021 Ansible, Inc'  # pylint: disable=redefined-builtin
 
-github_url = "https://github.com"
-github_repo_org = "ansible"
-github_repo_name = "ansible-lint"
-github_repo_slug = f"{github_repo_org}/{github_repo_name}"
-github_repo_url = f"{github_url}/{github_repo_slug}"
+github_url = 'https://github.com'
+github_repo_org = 'ansible'
+github_repo_name = 'ansible-lint'
+github_repo_slug = f'{github_repo_org}/{github_repo_name}'
+github_repo_url = f'{github_url}/{github_repo_slug}'
 
 extlinks = {
-    "issue": (f"{github_repo_url}/issues/%s", "#"),
-    "pr": (f"{github_repo_url}/pull/%s", "PR #"),
-    "commit": (f"{github_repo_url}/commit/%s", ""),
-    "gh": (f"{github_url}/%s", "GitHub: "),
+    'issue': (f'{github_repo_url}/issues/%s', '#'),
+    'pr': (f'{github_repo_url}/pull/%s', 'PR #'),
+    'commit': (f'{github_repo_url}/commit/%s', ''),
+    'gh': (f'{github_url}/%s', 'GitHub: '),
 }
 
 intersphinx_mapping = {
@@ -194,13 +194,13 @@ html_theme_path = ['../_themes']
 html_theme = 'sphinx_ansible_theme'
 
 html_theme_options = {
-    "collapse_navigation": False,
-    "analytics_id": "UA-128382387-1",
-    "style_nav_header_background": "#5bbdbf",
-    "style_external_links": True,
+    'collapse_navigation': False,
+    'analytics_id': 'UA-128382387-1',
+    'style_nav_header_background': '#5bbdbf',
+    'style_external_links': True,
     # 'canonical_url': "https://docs.ansible.com/ansible/latest/",
     'vcs_pageview_mode': 'edit',
-    "navigation_depth": 3,
+    'navigation_depth': 3,
 }
 
 html_context = {

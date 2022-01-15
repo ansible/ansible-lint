@@ -44,7 +44,7 @@ class VariableNamingRule(AnsibleLintRule):
 
     @lru_cache()
     def re_pattern(self) -> Pattern[str]:
-        return re.compile(options.var_naming_pattern or "^[a-z_][a-z0-9_]*$")
+        return re.compile(options.var_naming_pattern or '^[a-z_][a-z0-9_]*$')
 
     def is_invalid_variable_name(self, ident: str) -> bool:
         """Check if variable name is using right pattern."""
@@ -66,8 +66,8 @@ class VariableNamingRule(AnsibleLintRule):
         return not bool(self.re_pattern().match(ident))
 
     def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+        self, file: 'Lintable', data: 'odict[str, Any]'
+    ) -> List['MatchError']:
         """Return matches found for a specific playbook."""
         results = []
 
@@ -108,16 +108,16 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task registers a variable
         registered_var = task.get('register', None)
         if registered_var and self.is_invalid_variable_name(registered_var):
-            return "Task registers a variable that violates variable naming standards"
+            return 'Task registers a variable that violates variable naming standards'
 
         return False
 
-    def matchyaml(self, file: Lintable) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> List['MatchError']:
         """Return matches for variables defined in vars files."""
-        results: List["MatchError"] = []
+        results: List['MatchError'] = []
         meta_data: Dict[str, Any] = {}
 
-        if str(file.kind) == "vars":
+        if str(file.kind) == 'vars':
             meta_data = parse_yaml_from_file(str(file.path))
             for key in meta_data.keys():
                 if self.is_invalid_variable_name(key):
@@ -136,7 +136,7 @@ class VariableNamingRule(AnsibleLintRule):
 
 
 # testing code to be loaded only with pytest or when executed the rule file
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
 
     import pytest
 

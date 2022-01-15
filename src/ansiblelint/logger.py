@@ -15,4 +15,4 @@ def timed_info(msg: Any, *args: Any) -> Iterator[None]:
         yield
     finally:
         elapsed = time.time() - start
-        _logger.info(msg + " (%.2fs)", *(*args, elapsed))
+        _logger.info(msg + ' (%.2fs)', *(*args, elapsed))

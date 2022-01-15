@@ -5,10 +5,10 @@ from ansiblelint.skip_utils import get_rule_skips_from_line
 
 
 @pytest.mark.parametrize(
-    ("line", "expected"),
+    ('line', 'expected'),
     (
-        ("foo # noqa: bar", "bar"),
-        ("foo # noqa bar", "bar"),
+        ('foo # noqa: bar', 'bar'),
+        ('foo # noqa bar', 'bar'),
     ),
 )
 def test_get_rule_skips_from_line(line: str, expected: str) -> None:

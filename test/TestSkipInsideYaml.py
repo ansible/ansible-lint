@@ -2,15 +2,15 @@ import pytest
 
 from ansiblelint.testing import RunFromText
 
-ROLE_TASKS = '''\
+ROLE_TASKS = """\
 ---
 - debug:
     msg: this should fail linting due lack of name
 - debug:  # noqa unnamed-task
     msg: this should pass due to noqa comment
-'''
+"""
 
-ROLE_TASKS_WITH_BLOCK = '''\
+ROLE_TASKS_WITH_BLOCK = """\
 ---
 - name: bad git 1  # noqa git-latest
   action: git a=b c=d
@@ -32,9 +32,9 @@ ROLE_TASKS_WITH_BLOCK = '''\
       action: git a=b c=d
     - name: bad git 8
       action: git a=b c=d
-'''
+"""
 
-PLAYBOOK = '''\
+PLAYBOOK = """\
 - hosts: all
   tasks:
     - name: test hg-latest
@@ -68,16 +68,16 @@ PLAYBOOK = '''\
       command: creates=B chmod 644 A
       tags:
         - skip_ansible_lint
-'''
+"""
 
-ROLE_META = '''\
+ROLE_META = """\
 galaxy_info:  # noqa meta-no-info
   author: your name  # noqa meta-incorrect
   description: missing min_ansible_version and platforms. author default not changed
   license: MIT
-'''
+"""
 
-ROLE_TASKS_WITH_BLOCK_BECOME = '''\
+ROLE_TASKS_WITH_BLOCK_BECOME = """\
 - hosts: localhost
   tasks:
     - name: foo
@@ -87,7 +87,7 @@ ROLE_TASKS_WITH_BLOCK_BECOME = '''\
           become_user: jonhdaa
           command: "/etc/test.sh"
           changed_when: false
-'''
+"""
 
 
 def test_role_tasks(default_text_runner: RunFromText) -> None:
@@ -95,7 +95,7 @@ def test_role_tasks(default_text_runner: RunFromText) -> None:
     results = default_text_runner.run_role_tasks_main(ROLE_TASKS)
     assert len(results) == 1, results
     assert results[0].linenumber == 2
-    assert results[0].rule.id == "unnamed-task"
+    assert results[0].rule.id == 'unnamed-task'
 
 
 def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:

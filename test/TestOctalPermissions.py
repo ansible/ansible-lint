@@ -5,7 +5,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.OctalPermissionsRule import OctalPermissionsRule
 from ansiblelint.testing import RunFromText
 
-SUCCESS_TASKS = '''
+SUCCESS_TASKS = """
 ---
 - hosts: hosts
   vars:
@@ -45,9 +45,9 @@ SUCCESS_TASKS = '''
 
     - name: octal permissions test success (733)
       file: path=baz mode=733
-'''
+"""
 
-FAIL_TASKS = '''
+FAIL_TASKS = """
 ---
 - hosts: hosts
   vars:
@@ -72,7 +72,7 @@ FAIL_TASKS = '''
       file:
         path: bar
         mode: 2000
-'''
+"""
 
 
 class TestOctalPermissionsRuleWithFile(unittest.TestCase):
@@ -145,11 +145,11 @@ class TestOctalPermissionsRuleWithFile(unittest.TestCase):
     def test_valid_modes(self) -> None:
         for mode in self.VALID_MODES:
             assert not self.rule.is_invalid_permission(mode), (
-                "0o%o should be a valid mode" % mode
+                '0o%o should be a valid mode' % mode
             )
 
     def test_invalid_modes(self) -> None:
         for mode in self.INVALID_MODES:
             assert self.rule.is_invalid_permission(mode), (
-                "%d should be an invalid mode" % mode
+                '%d should be an invalid mode' % mode
             )

@@ -65,15 +65,15 @@ _MODULES_WITH_CREATE: Dict[str, bool] = {
 
 
 class MissingFilePermissionsRule(AnsibleLintRule):
-    id = "risky-file-permissions"
+    id = 'risky-file-permissions'
     shortdesc = 'File permissions unset or incorrect'
     description = (
-        "Missing or unsupported mode parameter can cause unexpected file "
-        "permissions based "
-        "on version of Ansible being used. Be explicit, like ``mode: 0644`` to "
-        "avoid hitting this rule. Special ``preserve`` value is accepted "
+        'Missing or unsupported mode parameter can cause unexpected file '
+        'permissions based '
+        'on version of Ansible being used. Be explicit, like ``mode: 0644`` to '
+        'avoid hitting this rule. Special ``preserve`` value is accepted '
         f"only by {', '.join(_modules_with_preserve)} modules. "
-        "See https://github.com/ansible/ansible/issues/71200"
+        'See https://github.com/ansible/ansible/issues/71200'
     )
     severity = 'VERY_HIGH'
     tags = ['unpredictability', 'experimental']
@@ -85,7 +85,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        module = task["action"]["__ansible_module__"]
+        module = task['action']['__ansible_module__']
         mode = task['action'].get('mode', None)
 
         if module not in self._modules and module not in self._modules_with_create:
@@ -95,15 +95,15 @@ class MissingFilePermissionsRule(AnsibleLintRule):
             return True
 
         if module in self._modules_with_create:
-            create = task["action"].get("create", self._modules_with_create[module])
+            create = task['action'].get('create', self._modules_with_create[module])
             return create and mode is None
 
         # A file that doesn't exist cannot have a mode
-        if task['action'].get('state', None) == "absent":
+        if task['action'].get('state', None) == 'absent':
             return False
 
         # A symlink always has mode 0777
-        if task['action'].get('state', None) == "link":
+        if task['action'].get('state', None) == 'link':
             return False
 
         # Recurse on a directory does not allow for an uniform mode
@@ -111,7 +111,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
             return False
 
         # The file module does not create anything when state==file (default)
-        if module == "file" and task['action'].get('state', 'file') == 'file':
+        if module == 'file' and task['action'].get('state', 'file') == 'file':
             return False
 
         # replace module is the only one that has a valid default preserve
@@ -123,36 +123,36 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         return mode is None
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if 'pytest' in sys.modules:  # noqa: C901
     import pytest
 
-    SUCCESS_PERMISSIONS_PRESENT = '''
+    SUCCESS_PERMISSIONS_PRESENT = """
 - hosts: all
   tasks:
     - name: permissions not missing and numeric
       file:
         path: foo
         mode: 0600
-'''
+"""
 
-    SUCCESS_ABSENT_STATE = '''
+    SUCCESS_ABSENT_STATE = """
 - hosts: all
   tasks:
     - name: permissions missing while state is absent is fine
       file:
         path: foo
         state: absent
-'''
+"""
 
-    SUCCESS_DEFAULT_STATE = '''
+    SUCCESS_DEFAULT_STATE = """
 - hosts: all
   tasks:
     - name: permissions missing while state is file (default) is fine
       file:
         path: foo
-'''
+"""
 
-    SUCCESS_LINK_STATE = '''
+    SUCCESS_LINK_STATE = """
 - hosts: all
   tasks:
     - name: permissions missing while state is link is fine
@@ -160,9 +160,9 @@ if "pytest" in sys.modules:  # noqa: C901
         path: foo2
         src: foo
         state: link
-'''
+"""
 
-    SUCCESS_CREATE_FALSE = '''
+    SUCCESS_CREATE_FALSE = """
 - hosts: all
   tasks:
     - name: file edit when create is false
@@ -170,17 +170,17 @@ if "pytest" in sys.modules:  # noqa: C901
         path: foo
         create: false
         line: some content here
-'''
+"""
 
-    SUCCESS_REPLACE = '''
+    SUCCESS_REPLACE = """
 - hosts: all
   tasks:
     - name: replace should not require mode
       replace:
         path: foo
-'''
+"""
 
-    SUCCESS_RECURSE = '''
+    SUCCESS_RECURSE = """
 - hosts: all
   tasks:
     - name: file with recursive does not require mode
@@ -196,18 +196,18 @@ if "pytest" in sys.modules:  # noqa: C901
         path: foo
         create: false
         line: some content here
-'''
+"""
 
-    FAIL_PRESERVE_MODE = '''
+    FAIL_PRESERVE_MODE = """
 - hosts: all
   tasks:
     - name: file does not allow preserve value for mode
       file:
         path: foo
         mode: preserve
-'''
+"""
 
-    FAIL_MISSING_PERMISSIONS_TOUCH = '''
+    FAIL_MISSING_PERMISSIONS_TOUCH = """
 - hosts: all
   tasks:
     - name: permissions missing and might create file
@@ -218,9 +218,9 @@ if "pytest" in sys.modules:  # noqa: C901
       ansible.builtin.file:
         path: foo
         state: touch
-'''
+"""
 
-    FAIL_MISSING_PERMISSIONS_DIRECTORY = '''
+    FAIL_MISSING_PERMISSIONS_DIRECTORY = """
 - hosts: all
   tasks:
     - name: permissions missing and might create directory
@@ -232,9 +232,9 @@ if "pytest" in sys.modules:  # noqa: C901
         path: foo
         create: true
         line: some content here
-'''
+"""
 
-    FAIL_LINEINFILE_CREATE = '''
+    FAIL_LINEINFILE_CREATE = """
 - hosts: all
   tasks:
     - name: lineinfile when create is true
@@ -242,18 +242,18 @@ if "pytest" in sys.modules:  # noqa: C901
         path: foo
         create: true
         line: some content here
-'''
+"""
 
-    FAIL_REPLACE_PRESERVE = '''
+    FAIL_REPLACE_PRESERVE = """
 - hosts: all
   tasks:
     - name: replace does not allow preserve mode
       replace:
         path: foo
         mode: preserve
-'''
+"""
 
-    FAIL_PERMISSION_COMMENT = '''
+    FAIL_PERMISSION_COMMENT = """
 - hosts: all
   tasks:
     - name: permissions is only a comment
@@ -263,18 +263,18 @@ if "pytest" in sys.modules:  # noqa: C901
         group: root
         state: directory
         # mode: 0755
-'''
+"""
 
-    FAIL_INI_PERMISSION = '''
+    FAIL_INI_PERMISSION = """
 - hosts: all
     tasks:
      - name: permissions needed if create is used
        ini_file:
          path: foo
          create: true
-'''
+"""
 
-    FAIL_INI_PRESERVE = '''
+    FAIL_INI_PRESERVE = """
 - hosts: all
   tasks:
     - name: ini_file does not accept preserve mode
@@ -282,7 +282,7 @@ if "pytest" in sys.modules:  # noqa: C901
         path: foo
         create: true
         mode: preserve
-'''
+"""
 
     @pytest.mark.parametrize(
         'rule_runner', (MissingFilePermissionsRule,), indirect=['rule_runner']

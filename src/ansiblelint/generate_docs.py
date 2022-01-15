@@ -42,11 +42,11 @@ def rules_as_rst(rules: RulesCollection) -> str:
 
     for d in rules:
 
-        title = f"{d.id}"
+        title = f'{d.id}'
 
         description = d.description
         if d.link:
-            description += " `(more) <%s>`__" % d.link
+            description += ' `(more) <%s>`__' % d.link
 
         r += f"\n\n.. _{d.id}:\n\n{title}\n{'*' * len(title)}\n\n{d.shortdesc}\n\n{description}"
 
@@ -58,17 +58,17 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
     """Print documentation for a list of rules, returns empty string."""
     width = max(16, *[len(rule.id) for rule in rules])
     for rule in rules:
-        table = Table(show_header=True, header_style="title", box=box.MINIMAL)
-        table.add_column(rule.id, style="dim", width=width)
+        table = Table(show_header=True, header_style='title', box=box.MINIMAL)
+        table.add_column(rule.id, style='dim', width=width)
         table.add_column(Markdown(rule.shortdesc))
         description = rule.description
         if rule.link:
-            description += " [(more)](%s)" % rule.link
-        table.add_row("description", Markdown(description))
+            description += ' [(more)](%s)' % rule.link
+        table.add_row('description', Markdown(description))
         if rule.version_added:
-            table.add_row("version_added", rule.version_added)
+            table.add_row('version_added', rule.version_added)
         if rule.tags:
-            table.add_row("tags", ", ".join(rule.tags))
+            table.add_row('tags', ', '.join(rule.tags))
         if rule.severity:
-            table.add_row("severity", rule.severity)
+            table.add_row('severity', rule.severity)
         yield table

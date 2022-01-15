@@ -17,7 +17,7 @@ _logger = logging.getLogger(__package__)
 class App:
     """App class represents an execution of the linter."""
 
-    def __init__(self, options: "Namespace"):
+    def __init__(self, options: 'Namespace'):
         """Construct app run based on already loaded configuration."""
         options.skip_list = _sanitize_list_options(options.skip_list)
         options.warn_list = _sanitize_list_options(options.warn_list)
@@ -42,7 +42,7 @@ class App:
         # Displayed ignored matches first
         if ignored_matches:
             _logger.warning(
-                "Listing %s violation(s) marked as ignored, likely already known",
+                'Listing %s violation(s) marked as ignored, likely already known',
                 len(ignored_matches),
             )
             for match in ignored_matches:
@@ -51,7 +51,7 @@ class App:
                     console.print(self.formatter.format(match), highlight=False)
         if fatal_matches:
             _logger.warning(
-                "Listing %s violation(s) that are fatal", len(fatal_matches)
+                'Listing %s violation(s) that are fatal', len(fatal_matches)
             )
             for match in fatal_matches:
                 if not match.ignored:
@@ -65,7 +65,7 @@ class App:
 
 
 def choose_formatter_factory(
-    options_list: "Namespace",
+    options_list: 'Namespace',
 ) -> Type[formatters.BaseFormatter[Any]]:
     """Select an output formatter based on the incoming command line arguments."""
     r: Type[formatters.BaseFormatter[Any]] = formatters.Formatter

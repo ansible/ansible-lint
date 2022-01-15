@@ -66,8 +66,8 @@ handle the output of the ``command``.
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
         # tasks in a block are "meta" type
-        if task["__ansible_action_type__"] in ['task', 'meta']:
-            if task["action"]["__ansible_module__"] in self._commands:
+        if task['__ansible_action_type__'] in ['task', 'meta']:
+            if task['action']['__ansible_module__'] in self._commands:
                 return (
                     'changed_when' not in task
                     and 'when' not in task
@@ -77,69 +77,69 @@ handle the output of the ``command``.
         return False
 
 
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
     import pytest
 
-    NO_CHANGE_COMMAND_RC = '''
+    NO_CHANGE_COMMAND_RC = """
 - hosts: all
   tasks:
     - name: handle command output with return code
       ansible.builtin.command: cat {{ myfile|quote }}
       register: myoutput
       changed_when: myoutput.rc != 0
-'''
+"""
 
-    NO_CHANGE_SHELL_RC = '''
+    NO_CHANGE_SHELL_RC = """
 - hosts: all
   tasks:
     - name: handle shell output with return code
       ansible.builtin.shell: cat {{ myfile|quote }}
       register: myoutput
       changed_when: myoutput.rc != 0
-'''
+"""
 
-    NO_CHANGE_SHELL_FALSE = '''
+    NO_CHANGE_SHELL_FALSE = """
 - hosts: all
   tasks:
     - name: handle shell output with false changed_when
       ansible.builtin.shell: cat {{ myfile|quote }}
       register: myoutput
       changed_when: false
-'''
+"""
 
-    NO_CHANGE_ARGS = '''
+    NO_CHANGE_ARGS = """
 - hosts: all
   tasks:
     - name: command with argument
       command: createfile.sh
       args:
         creates: /tmp/????unknown_files????
-'''
+"""
 
-    NO_CHANGE_REGISTER_FAIL = '''
+    NO_CHANGE_REGISTER_FAIL = """
 - hosts: all
   tasks:
     - name: register command output, but cat still does not change anything
       ansible.builtin.command: cat {{ myfile|quote }}
       register: myoutput
-'''
+"""
 
     # also test to ensure it catches tasks in nested blocks.
-    NO_CHANGE_COMMAND_FAIL = '''
+    NO_CHANGE_COMMAND_FAIL = """
 - hosts: all
   tasks:
     - block:
         - block:
             - name: basic command task, should fail
               ansible.builtin.command: cat myfile
-'''
+"""
 
-    NO_CHANGE_SHELL_FAIL = '''
+    NO_CHANGE_SHELL_FAIL = """
 - hosts: all
   tasks:
     - name: basic shell task, should fail
       shell: cat myfile
-'''
+"""
 
     @pytest.mark.parametrize(
         'rule_runner', (CommandHasChangesCheckRule,), indirect=['rule_runner']

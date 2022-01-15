@@ -77,7 +77,7 @@ def initialize_logger(level: int = 0) -> None:
     logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
     logger.setLevel(logging_level)
     # Use module-level _logger instance to validate it
-    _logger.debug("Logging initialized to level %s", logging_level)
+    _logger.debug('Logging initialized to level %s', logging_level)
 
 
 def initialize_options(arguments: Optional[List[str]] = None) -> None:
@@ -114,14 +114,14 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     cache_key = hashlib.sha256(
         os.path.abspath(options.project_dir).encode()
     ).hexdigest()[:6]
-    options.cache_dir = "%s/ansible-lint/%s" % (
-        os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache")),
+    options.cache_dir = '%s/ansible-lint/%s' % (
+        os.getenv('XDG_CACHE_HOME', os.path.expanduser('~/.cache')),
         cache_key,
     )
 
 
 def report_outcome(  # noqa: C901
-    result: "LintResult", options: Namespace, mark_as_success: bool = False
+    result: 'LintResult', options: Namespace, mark_as_success: bool = False
 ) -> int:
     """Display information about how to skip found rules.
 
@@ -129,7 +129,7 @@ def report_outcome(  # noqa: C901
     """
     failures = 0
     warnings = 0
-    msg = ""
+    msg = ''
     matches_unignored = [match for match in result.matches if not match.ignored]
 
     # counting
@@ -148,21 +148,21 @@ def report_outcome(  # noqa: C901
     entries = []
     for key in sorted(matched_rules.keys()):
         if {key, *matched_rules[key].tags}.isdisjoint(options.warn_list):
-            entries.append(f"  - {key}  # {matched_rules[key].shortdesc}\n")
+            entries.append(f'  - {key}  # {matched_rules[key].shortdesc}\n')
     for match in result.matches:
-        if "experimental" in match.rule.tags:
-            entries.append("  - experimental  # all rules tagged as experimental\n")
+        if 'experimental' in match.rule.tags:
+            entries.append('  - experimental  # all rules tagged as experimental\n')
             break
     if entries and not options.quiet:
         console_stderr.print(
-            "You can skip specific rules or tags by adding them to your "
-            "configuration file:"
+            'You can skip specific rules or tags by adding them to your '
+            'configuration file:'
         )
         msg += """\
 # .ansible-lint
 warn_list:  # or 'skip_list' to silence them completely
 """
-        msg += "".join(sorted(entries))
+        msg += ''.join(sorted(entries))
 
     # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
     # to migrate old tags to new tags. There are a lot of things out there that still
@@ -182,8 +182,8 @@ warn_list:  # or 'skip_list' to silence them completely
     if result.matches and not options.quiet:
         console_stderr.print(render_yaml(msg))
         console_stderr.print(
-            f"Finished with {failures} failure(s), {warnings} warning(s) "
-            f"on {len(result.files)} files."
+            f'Finished with {failures} failure(s), {warnings} warning(s) '
+            f'on {len(result.files)} files.'
         )
 
     if mark_as_success or not failures:
@@ -197,11 +197,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         argv = sys.argv
     initialize_options(argv[1:])
 
-    console_options["force_terminal"] = options.colored
+    console_options['force_terminal'] = options.colored
     reconfigure(console_options)
 
     initialize_logger(options.verbosity)
-    _logger.debug("Options: %s", options)
+    _logger.debug('Options: %s', options)
     _logger.debug(os.getcwd())
 
     app = App(options=options)
@@ -241,18 +241,18 @@ def main(argv: Optional[List[str]] = None) -> int:
     mark_as_success = False
     if result.matches and options.progressive:
         _logger.info(
-            "Matches found, running again on previous revision in order to detect regressions"
+            'Matches found, running again on previous revision in order to detect regressions'
         )
         with _previous_revision():
-            _logger.debug("Options: %s", options)
+            _logger.debug('Options: %s', options)
             _logger.debug(os.getcwd())
             old_result = _get_matches(rules, options)
             # remove old matches from current list
             matches_delta = list(set(result.matches) - set(old_result.matches))
             if len(matches_delta) == 0:
                 _logger.warning(
-                    "Total violations not increased since previous "
-                    "commit, will mark result as success. (%s -> %s)",
+                    'Total violations not increased since previous '
+                    'commit, will mark result as success. (%s -> %s)',
                     len(old_result.matches),
                     len(matches_delta),
                 )
@@ -266,8 +266,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                     ignored += 1
             if ignored:
                 _logger.warning(
-                    "Marked %s previously known violation(s) as ignored due to"
-                    " progressive mode.",
+                    'Marked %s previously known violation(s) as ignored due to'
+                    ' progressive mode.',
                     ignored,
                 )
 
@@ -279,12 +279,12 @@ def main(argv: Optional[List[str]] = None) -> int:
 @contextmanager
 def _previous_revision() -> Iterator[None]:
     """Create or update a temporary workdir containing the previous revision."""
-    worktree_dir = f"{options.cache_dir}/old-rev"
+    worktree_dir = f'{options.cache_dir}/old-rev'
     # Update options.exclude_paths to include use the temporary workdir.
     rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
     options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
     revision = subprocess.run(
-        ["git", "rev-parse", "HEAD^1"],
+        ['git', 'rev-parse', 'HEAD^1'],
         check=True,
         universal_newlines=True,
         stdout=subprocess.PIPE,
@@ -292,10 +292,10 @@ def _previous_revision() -> Iterator[None]:
     ).stdout
     p = pathlib.Path(worktree_dir)
     p.mkdir(parents=True, exist_ok=True)
-    os.system(f"git worktree add -f {worktree_dir} 2>/dev/null")
+    os.system(f'git worktree add -f {worktree_dir} 2>/dev/null')
     try:
         with cwd(worktree_dir):
-            os.system(f"git checkout {revision}")
+            os.system(f'git checkout {revision}')
             yield
     finally:
         options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
@@ -318,5 +318,5 @@ def _run_cli_entrypoint() -> None:
         raise SystemExit(str(e))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     _run_cli_entrypoint()

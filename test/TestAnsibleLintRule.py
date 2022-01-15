@@ -9,8 +9,8 @@ from ansiblelint.rules import AnsibleLintRule
 
 def test_unjinja() -> None:
     """Verify that unjinja understands nested mustache."""
-    text = "{{ a }} {% b %} {# try to confuse parsing inside a comment { {{}} } #}"
-    output = "JINJA_EXPRESSION JINJA_STATEMENT JINJA_COMMENT"
+    text = '{{ a }} {% b %} {# try to confuse parsing inside a comment { {{}} } #}'
+    output = 'JINJA_EXPRESSION JINJA_STATEMENT JINJA_COMMENT'
     assert AnsibleLintRule.unjinja(text) == output
 
 

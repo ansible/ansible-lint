@@ -55,7 +55,7 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        if task["action"]["__ansible_module__"] in self._commands:
+        if task['action']['__ansible_module__'] in self._commands:
             first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:
                 return False
@@ -64,6 +64,6 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
             if executable in self._arguments and convert_to_boolean(
                 task['action'].get('warn', True)
             ):
-                message = "{0} used in place of argument {1} to file module"
+                message = '{0} used in place of argument {1} to file module'
                 return message.format(executable, self._arguments[executable])
         return False

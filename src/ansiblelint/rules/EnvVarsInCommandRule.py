@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 
 class EnvVarsInCommandRule(AnsibleLintRule):
     id = 'inline-env-var'
-    shortdesc = "Command module does not accept setting environment variables inline"
+    shortdesc = 'Command module does not accept setting environment variables inline'
     description = (
         'Use ``environment:`` to set environment variables '
         'or use ``shell`` module which accepts both'
@@ -60,13 +60,13 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        if task["action"]["__ansible_module__"] in ['command']:
+        if task['action']['__ansible_module__'] in ['command']:
             first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:
                 return False
 
             return any(
                 [arg not in self.expected_args for arg in task['action']]
-                + ["=" in first_cmd_arg]
+                + ['=' in first_cmd_arg]
             )
         return False

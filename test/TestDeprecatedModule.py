@@ -5,11 +5,11 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.DeprecatedModuleRule import DeprecatedModuleRule
 from ansiblelint.testing import RunFromText
 
-MODULE_DEPRECATED = '''
+MODULE_DEPRECATED = """
 - name: task example
   docker:
     debug: test
-'''
+"""
 
 
 class TestDeprecatedModuleRule(unittest.TestCase):
@@ -26,5 +26,5 @@ class TestDeprecatedModuleRule(unittest.TestCase):
         # get a missing module, so we future proof the test
         assert (
             "couldn't resolve module" not in results[0].message
-            or "Deprecated module" not in results[0].message
+            or 'Deprecated module' not in results[0].message
         )

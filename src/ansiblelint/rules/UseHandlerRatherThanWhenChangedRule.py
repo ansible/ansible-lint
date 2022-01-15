@@ -42,7 +42,7 @@ def _changed_in_when(item: str) -> bool:
             '|changed',
             '["changed"]',
             "['changed']",
-            "is changed",
+            'is changed',
         ]
     )
 
@@ -55,7 +55,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         'acting as a handler. You could use notify and move that task to '
         'handlers.'
     )
-    link = "https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html"
+    link = 'https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html'
     severity = 'MEDIUM'
     tags = ['idiom']
     version_added = 'historic'
@@ -63,7 +63,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        if task["__ansible_action_type__"] != 'task':
+        if task['__ansible_action_type__'] != 'task':
             return False
 
         when = task.get('when')
@@ -76,19 +76,19 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         return False
 
 
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
     import pytest
 
-    SUCCEED_CHANGED_WHEN = '''
+    SUCCEED_CHANGED_WHEN = """
 - hosts: all
   tasks:
     - name: execute something
       command: echo 123
       register: result
       changed_when: true
-'''
+"""
 
-    SUCCEED_WHEN_AND = '''
+    SUCCEED_WHEN_AND = """
 - hosts: all
   tasks:
     - name: registering task 1
@@ -104,24 +104,24 @@ if "pytest" in sys.modules:
     - name: when task
       command: echo Hello
       when: r1.changed and r2.changed
-'''
+"""
 
-    FAIL_RESULT_IS_CHANGED = '''
+    FAIL_RESULT_IS_CHANGED = """
 - hosts: all
   tasks:
     - name: this should trigger no-handler rule
       command: echo could be done better
       when: result is changed
-'''
+"""
 
-    FAILED_SOMETHING_CHANGED = '''
+    FAILED_SOMETHING_CHANGED = """
 - hosts: all
   tasks:
     - name: do anything
       command: echo 123
       when:
         - something.changed
-'''
+"""
 
     @pytest.mark.parametrize(
         'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']

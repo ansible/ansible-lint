@@ -24,7 +24,7 @@ META_INFO = tuple(
 
 
 def _platform_info_errors_itr(
-    platforms: "List[odict[str, str]]",
+    platforms: 'List[odict[str, str]]',
 ) -> Generator[str, None, None]:
     if not isinstance(platforms, list):
         yield 'Platforms should be a list of dictionaries'
@@ -38,9 +38,9 @@ def _platform_info_errors_itr(
 
 
 def _galaxy_info_errors_itr(
-    galaxy_info: "odict[str, Any]",
-    info_list: "Tuple[str, ...]" = META_INFO,
-    str_info_list: "Tuple[str, ...]" = META_STR_INFO,
+    galaxy_info: 'odict[str, Any]',
+    info_list: 'Tuple[str, ...]' = META_INFO,
+    str_info_list: 'Tuple[str, ...]' = META_STR_INFO,
 ) -> Generator[str, None, None]:
     for info in info_list:
         ginfo = galaxy_info.get(info, False)
@@ -64,7 +64,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
     tags = ['metadata']
     version_added = 'v4.0.0'
 
-    def matchplay(self, file: Lintable, data: "odict[str, Any]") -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: 'odict[str, Any]') -> List[MatchError]:
         if file.kind != 'meta':
             return []
 

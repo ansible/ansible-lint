@@ -20,25 +20,25 @@ class RoleLoopVarPrefix(AnsibleLintRule):
     id = 'no-loop-var-prefix'
     shortdesc = __doc__
     link = (
-        "https://docs.ansible.com/ansible/latest/user_guide/"
-        "playbooks_loops.html#defining-inner-and-outer-variable-names-with-loop-var"
+        'https://docs.ansible.com/ansible/latest/user_guide/'
+        'playbooks_loops.html#defining-inner-and-outer-variable-names-with-loop-var'
     )
     description = """\
 Looping inside roles has the risk of clashing with loops from user-playbooks.\
 """
 
     tags = ['idiom']
-    prefix = ""
+    prefix = ''
     severity = 'MEDIUM'
 
-    def matchplay(self, file: Lintable, data: "odict[str, Any]") -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: 'odict[str, Any]') -> List[MatchError]:
         """Return matches found for a specific playbook."""
         results: List[MatchError] = []
 
         if not options.loop_var_prefix:
             return results
         self.prefix = options.loop_var_prefix.format(role=toidentifier(file.role))
-        self.shortdesc = f"{self.__class__.shortdesc}: {self.prefix}"
+        self.shortdesc = f'{self.__class__.shortdesc}: {self.prefix}'
 
         if file.kind not in ('tasks', 'handlers'):
             return results
@@ -47,7 +47,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_play(
-        self, lintable: Lintable, task: "odict[str, Any]"
+        self, lintable: Lintable, task: 'odict[str, Any]'
     ) -> List[MatchError]:
         """Return matches for a playlist."""
         results = []
@@ -58,7 +58,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_tasks(
-        self, lintable: Lintable, tasks: List["odict[str, Any]"]
+        self, lintable: Lintable, tasks: List['odict[str, Any]']
     ) -> List[MatchError]:
         """Return matches for a list of tasks."""
         results = []
@@ -67,7 +67,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_task(
-        self, lintable: Lintable, task: "odict[str, Any]"
+        self, lintable: Lintable, task: 'odict[str, Any]'
     ) -> List[MatchError]:
         """Return matches for a specific task."""
         results = []
@@ -78,7 +78,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
 
         if has_loop:
             loop_control = task.get('loop_control', {})
-            loop_var = loop_control.get('loop_var', "")
+            loop_var = loop_control.get('loop_var', '')
 
             if not loop_var or not loop_var.startswith(self.prefix):
                 results.append(

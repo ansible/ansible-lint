@@ -51,7 +51,6 @@ extend-ignore =
   N806,
   P101,
   P103,
-  Q,
   S,
   WPS,
 
@@ -120,3 +119,8 @@ pytest-parametrize-names-type = tuple
 # PT007:
 pytest-parametrize-values-type = tuple
 pytest-parametrize-values-row-type = tuple
+
+# flake8-quotes
+avoid-escape = true
+inline-quotes = '
+multiline-quotes = """

@@ -7,7 +7,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main() -> None:
     """Execute module."""
     module = AnsibleModule(dict())
-    module.exit_json(msg="Hello 1!")
+    module.exit_json(msg='Hello 1!')
 
 
 if __name__ == '__main__':

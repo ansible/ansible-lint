@@ -40,12 +40,12 @@ def _remove_prefix(text: str, prefix: str) -> str:
 
 class RoleNames(AnsibleLintRule):
     id = 'role-name'
-    shortdesc = "Role name {0} does not match ``%s`` pattern" % ROLE_NAME_REGEX
+    shortdesc = 'Role name {0} does not match ``%s`` pattern' % ROLE_NAME_REGEX
     description = (
-        "Role names are now limited to contain only lowercase alphanumeric "
+        'Role names are now limited to contain only lowercase alphanumeric '
         "characters, plus '_' and start with an alpha character. See "
-        "`developing collections <https://docs.ansible.com/ansible/devel/dev_guide/"
-        "developing_collections_structure.html#roles-directory>`_"
+        '`developing collections <https://docs.ansible.com/ansible/devel/dev_guide/'
+        'developing_collections_structure.html#roles-directory>`_'
     )
     severity = 'HIGH'
     done: List[str] = []  # already noticed roles list
@@ -56,24 +56,24 @@ class RoleNames(AnsibleLintRule):
         """Save precompiled regex."""
         self._re = re.compile(ROLE_NAME_REGEX)
 
-    def matchdir(self, lintable: "Lintable") -> List["MatchError"]:
+    def matchdir(self, lintable: 'Lintable') -> List['MatchError']:
         return self.matchyaml(lintable)
 
-    def matchyaml(self, file: Lintable) -> List["MatchError"]:
-        result: List["MatchError"] = []
+    def matchyaml(self, file: Lintable) -> List['MatchError']:
+        result: List['MatchError'] = []
 
         if file.kind not in ('meta', 'role'):
             return result
         if file.kind == 'role':
             role_name = self._infer_role_name(
-                meta=file.path / "meta" / "main.yml", default=file.path.name
+                meta=file.path / 'meta' / 'main.yml', default=file.path.name
             )
         else:
             role_name = self._infer_role_name(
                 meta=file.path, default=file.path.resolve().parents[1].name
             )
 
-        role_name = _remove_prefix(role_name, "ansible-role-")
+        role_name = _remove_prefix(role_name, 'ansible-role-')
         if role_name not in self.done:
             self.done.append(role_name)
             if role_name and not self._re.match(role_name):

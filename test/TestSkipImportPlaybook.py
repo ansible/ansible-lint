@@ -5,15 +5,15 @@ import pytest
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
-IMPORTED_PLAYBOOK = '''\
+IMPORTED_PLAYBOOK = """\
 - hosts: all
   tasks:
     - name: success
       fail: msg="fail"
       when: false
-'''
+"""
 
-MAIN_PLAYBOOK = '''\
+MAIN_PLAYBOOK = """\
 - hosts: all
 
   tasks:
@@ -21,7 +21,7 @@ MAIN_PLAYBOOK = '''\
       shell: echo lol
 
 - import_playbook: imported_playbook.yml
-'''
+"""
 
 
 @pytest.fixture

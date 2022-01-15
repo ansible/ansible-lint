@@ -88,7 +88,7 @@ class OctalPermissionsRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        if task["action"]["__ansible_module__"] in self._modules:
+        if task['action']['__ansible_module__'] in self._modules:
             mode = task['action'].get('mode', None)
 
             if isinstance(mode, str):

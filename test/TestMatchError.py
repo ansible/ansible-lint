@@ -49,8 +49,8 @@ class DummySentinelTestObject:
 @pytest.mark.parametrize(
     ('left_match_error', 'right_match_error'),
     (
-        (MatchError("foo"), MatchError("foo")),
-        (MatchError("a", details="foo"), MatchError("a", details="foo")),
+        (MatchError('foo'), MatchError('foo')),
+        (MatchError('a', details='foo'), MatchError('a', details='foo')),
     ),
 )
 def test_matcherror_compare(
@@ -73,19 +73,19 @@ def test_matcherror_invalid() -> None:
     ('left_match_error', 'right_match_error'),
     (
         # sorting by message
-        (MatchError("z"), MatchError("a")),
+        (MatchError('z'), MatchError('a')),
         # filenames takes priority in sorting
-        (MatchError("a", filename="b"), MatchError("a", filename="a")),
+        (MatchError('a', filename='b'), MatchError('a', filename='a')),
         # rule id partial-become > rule id no-changed-when
         (
             MatchError(rule=BecomeUserWithoutBecomeRule()),
             MatchError(rule=CommandHasChangesCheckRule()),
         ),
         # details are taken into account
-        (MatchError("a", details="foo"), MatchError("a", details="bar")),
+        (MatchError('a', details='foo'), MatchError('a', details='bar')),
         # columns are taken into account
-        (MatchError("a", column=3), MatchError("a", column=1)),
-        (MatchError("a", column=3), MatchError("a")),
+        (MatchError('a', column=3), MatchError('a', column=1)),
+        (MatchError('a', column=3), MatchError('a')),
     ),
 )
 class TestMatchErrorCompare:
@@ -112,9 +112,9 @@ class TestMatchErrorCompare:
     'other',
     (
         None,
-        "foo",
+        'foo',
         42,
-        Exception("foo"),
+        Exception('foo'),
     ),
     ids=repr,
 )
@@ -138,7 +138,7 @@ def test_matcherror_compare_no_other_fallback(
         )
     )
     with pytest.raises(TypeError, match=expected_error):
-        operation(MatchError("foo"), other)
+        operation(MatchError('foo'), other)
 
 
 @pytest.mark.parametrize(
@@ -166,7 +166,7 @@ def test_matcherror_compare_with_other_fallback(
     expected_value: bool,
 ) -> None:
     """Check that MatchError comparison runs other types fallbacks."""
-    assert operation(MatchError("foo"), other) is expected_value
+    assert operation(MatchError('foo'), other) is expected_value
 
 
 @pytest.mark.parametrize(
@@ -191,4 +191,4 @@ def test_matcherror_compare_with_dummy_sentinel(
     # NOTE: This assertion abuses the CPython property to cache short string
     # NOTE: objects because the identity check is more precise and we don't
     # NOTE: want extra operator protocol methods to influence the test.
-    assert operation(MatchError("foo"), dummy_obj) is expected_value  # type: ignore
+    assert operation(MatchError('foo'), dummy_obj) is expected_value  # type: ignore

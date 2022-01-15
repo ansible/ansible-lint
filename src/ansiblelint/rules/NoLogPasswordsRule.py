@@ -29,21 +29,21 @@ if TYPE_CHECKING:
 class NoLogPasswordsRule(AnsibleLintRule):
     """Describe and test the NoLogPasswordsRule."""
 
-    id = "no-log-password"
-    shortdesc = "password should not be logged."
+    id = 'no-log-password'
+    shortdesc = 'password should not be logged.'
     description = (
-        "When passing password argument you should have no_log configured "
-        "to a non False value to avoid accidental leaking of secrets."
+        'When passing password argument you should have no_log configured '
+        'to a non False value to avoid accidental leaking of secrets.'
     )
     severity = 'LOW'
-    tags = ["opt-in", "security", "experimental"]
-    version_added = "v5.0.9"
+    tags = ['opt-in', 'security', 'experimental']
+    version_added = 'v5.0.9'
 
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
 
-        if task["action"]["__ansible_module__"] == 'user' and (
+        if task['action']['__ansible_module__'] == 'user' and (
             (
                 task['action'].get('password_lock')
                 or task['action'].get('password_lock') is False
@@ -52,14 +52,14 @@ class NoLogPasswordsRule(AnsibleLintRule):
         ):
             has_password = False
         else:
-            for param in task["action"].keys():
+            for param in task['action'].keys():
                 if 'password' in param:
                     has_password = True
                     break
             else:
                 has_password = False
 
-        has_loop = [key for key in task if key.startswith("with_") or key == 'loop']
+        has_loop = [key for key in task if key.startswith('with_') or key == 'loop']
         # No no_log and no_log: False behave the same way
         # and should return a failure (return True), so we
         # need to invert the boolean
@@ -70,10 +70,10 @@ class NoLogPasswordsRule(AnsibleLintRule):
         )
 
 
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
     import pytest
 
-    NO_LOG_UNUSED = '''
+    NO_LOG_UNUSED = """
 - hosts: all
   tasks:
     - name: Succeed when no_log is not used but no loop present
@@ -81,9 +81,9 @@ if "pytest" in sys.modules:
         name: bidule
         password: "wow"
         state: absent
-'''
+"""
 
-    NO_LOG_FALSE = '''
+    NO_LOG_FALSE = """
 - hosts: all
   tasks:
     - name: Fail when no_log is set to False
@@ -95,9 +95,9 @@ if "pytest" in sys.modules:
         - wow
         - now
       no_log: False
-'''
+"""
 
-    NO_LOG_NO = '''
+    NO_LOG_NO = """
 - hosts: all
   tasks:
     - name: Fail when no_log is set to no
@@ -109,9 +109,9 @@ if "pytest" in sys.modules:
       loop:
         - wow
         - now
-'''
+"""
 
-    PASSWORD_WITH_LOCK = '''
+    PASSWORD_WITH_LOCK = """
 - hosts: all
   tasks:
     - name: Fail when password is set and password_lock is true
@@ -122,9 +122,9 @@ if "pytest" in sys.modules:
       with_random_choice:
         - ansible
         - lint
-'''
+"""
 
-    NO_LOG_YES = '''
+    NO_LOG_YES = """
 - hosts: all
   tasks:
     - name: Succeed when no_log is set to yes
@@ -138,9 +138,9 @@ if "pytest" in sys.modules:
         password: "{{ item.password }}"
         state: absent
       no_log: yes
-'''
+"""
 
-    NO_LOG_TRUE = '''
+    NO_LOG_TRUE = """
 - hosts: all
   tasks:
     - name: Succeed when no_log is set to True
@@ -152,9 +152,9 @@ if "pytest" in sys.modules:
       loop:
         - wow
         - now
-'''
+"""
 
-    PASSWORD_LOCK_YES = '''
+    PASSWORD_LOCK_YES = """
 - hosts: all
   tasks:
     - name: Succeed when only password locking account
@@ -165,16 +165,16 @@ if "pytest" in sys.modules:
         with_list:
           - ansible
           - lint
-'''
+"""
 
-    PASSWORD_LOCK_FALSE = '''
+    PASSWORD_LOCK_FALSE = """
 - hosts: all
   tasks:
     - name: Succeed when password_lock is false and password is not used
       user:
         name: lint
         password_lock: False
-'''
+"""
 
     @pytest.mark.parametrize(
         'rule_runner', (NoLogPasswordsRule,), indirect=['rule_runner']

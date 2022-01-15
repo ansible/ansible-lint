@@ -22,24 +22,24 @@ class TestCodeclimateJSONFormatter:
     def setup_class(self) -> None:
         """Set up few MatchError objects."""
         self.rule = AnsibleLintRule()
-        self.rule.id = "TCF0001"
-        self.rule.severity = "VERY_HIGH"
+        self.rule.id = 'TCF0001'
+        self.rule.severity = 'VERY_HIGH'
         self.matches = []
         self.matches.append(
             MatchError(
-                message="message",
+                message='message',
                 linenumber=1,
-                details="hello",
-                filename="filename.yml",
+                details='hello',
+                filename='filename.yml',
                 rule=self.rule,
             )
         )
         self.matches.append(
             MatchError(
-                message="message",
+                message='message',
                 linenumber=2,
-                details="hello",
-                filename="filename.yml",
+                details='hello',
+                filename='filename.yml',
                 rule=self.rule,
             )
         )
@@ -94,14 +94,14 @@ def test_code_climate_parsable_ignored() -> None:
     """Test that -p option does not alter codeclimate format."""
     cmd = [
         sys.executable,
-        "-m",
-        "ansiblelint",
-        "-v",
-        "-p",
+        '-m',
+        'ansiblelint',
+        '-v',
+        '-p',
     ]
-    file = "examples/playbooks/empty_playbook.yml"
+    file = 'examples/playbooks/empty_playbook.yml'
     result = subprocess.run([*cmd, file], check=False)
-    result2 = subprocess.run([*cmd, "-p", file], check=False)
+    result2 = subprocess.run([*cmd, '-p', file], check=False)
 
     assert result.returncode == result2.returncode
     assert result.stdout == result2.stdout

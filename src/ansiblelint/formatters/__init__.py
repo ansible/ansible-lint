@@ -48,7 +48,7 @@ class BaseFormatter(Generic[T]):
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self._base_dir)
 
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: 'MatchError') -> str:
         return str(match)
 
     def escape(self, text: str) -> str:
@@ -57,25 +57,25 @@ class BaseFormatter(Generic[T]):
 
 
 class Formatter(BaseFormatter):  # type: ignore
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: 'MatchError') -> str:
         _id = getattr(match.rule, 'id', '000')
-        result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
+        result = f'[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]'
         if match.tag:
-            result += f" [dim][error_code]({match.tag})[/][/]"
+            result += f' [dim][error_code]({match.tag})[/][/]'
         result += (
-            "\n"
+            '\n'
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
         )
         if match.details:
-            result += f" [dim]{match.details}[/]"
-        result += "\n"
+            result += f' [dim]{match.details}[/]'
+        result += '\n'
         return result
 
 
 class QuietFormatter(BaseFormatter[Any]):
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: 'MatchError') -> str:
         return (
-            f"[error_code]{match.rule.id}[/] "
+            f'[error_code]{match.rule.id}[/] '
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
         )
 
@@ -83,17 +83,17 @@ class QuietFormatter(BaseFormatter[Any]):
 class ParseableFormatter(BaseFormatter[Any]):
     """Parseable uses PEP8 compatible format."""
 
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: 'MatchError') -> str:
         result = (
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}: "
-            f"[error_code]{match.rule.id}[/]"
+            f'[error_code]{match.rule.id}[/]'
         )
 
         if not options.quiet:
-            result += f" [dim]{match.message}[/]"
+            result += f' [dim]{match.message}[/]'
 
         if match.tag:
-            result += f" [dim][error_code]({match.tag})[/][/]"
+            result += f' [dim][error_code]({match.tag})[/][/]'
         return result
 
 
@@ -112,21 +112,21 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
     Supported levels: debug, warning, error
     """
 
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: 'MatchError') -> str:
         """Prepare a match instance for reporting as a GitHub Actions annotation."""
         level = self._severity_to_level(match.rule.severity)
-        file_path = self._format_path(match.filename or "")
+        file_path = self._format_path(match.filename or '')
         line_num = match.linenumber
         rule_id = match.rule.id
         severity = match.rule.severity
         violation_details = self.escape(match.message)
         if match.column:
-            col = f",col={match.column}"
+            col = f',col={match.column}'
         else:
-            col = ""
+            col = ''
         return (
-            f"::{level} file={file_path},line={line_num}{col},severity={severity}"
-            f"::{rule_id} {violation_details}"
+            f'::{level} file={file_path},line={line_num}{col},severity={severity}'
+            f'::{rule_id} {violation_details}'
         )
 
     @staticmethod
@@ -140,17 +140,17 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
 
 
 class ParseableSeverityFormatter(BaseFormatter[Any]):
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: 'MatchError') -> str:
 
-        filename = self._format_path(match.filename or "")
+        filename = self._format_path(match.filename or '')
         position = match.position
-        rule_id = u"{0}".format(match.rule.id)
+        rule_id = u'{0}'.format(match.rule.id)
         severity = match.rule.severity
         message = self.escape(str(match.message))
 
         return (
-            f"[filename]{filename}[/]:{position}: [[error_code]{rule_id}[/]] "
-            f"[[error_code]{severity}[/]] [dim]{message}[/]"
+            f'[filename]{filename}[/]:{position}: [[error_code]{rule_id}[/]] '
+            f'[[error_code]{severity}[/]] [dim]{message}[/]'
         )
 
 
@@ -162,18 +162,18 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
     https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#user-content-data-types
     """
 
-    def format_result(self, matches: List["MatchError"]) -> str:
+    def format_result(self, matches: List['MatchError']) -> str:
 
         if not isinstance(matches, list):
             raise RuntimeError(
-                "The CodeclimatJSONFormatter was expecting a list of MatchError."
+                'The CodeclimatJSONFormatter was expecting a list of MatchError.'
             )
 
         result = []
         for match in matches:
             issue: Dict[str, Any] = {}
             issue['type'] = 'issue'
-            issue['check_name'] = f"[{match.rule.id}] {match.message}"
+            issue['check_name'] = f'[{match.rule.id}] {match.message}'
             issue['categories'] = match.rule.tags
             issue['severity'] = self._severity_to_level(match.rule.severity)
             issue['description'] = self.escape(str(match.rule.description))
@@ -181,7 +181,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
                 repr(match).encode('utf-8')
             ).hexdigest()
             issue['location'] = {}
-            issue['location']['path'] = self._format_path(match.filename or "")
+            issue['location']['path'] = self._format_path(match.filename or '')
             issue['location']['lines'] = {}
             if match.column:
                 issue['location']['lines']['begin'] = {}

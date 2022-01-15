@@ -106,7 +106,7 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
 
 
 # testing code to be loaded only with pytest or when executed the rule file
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
 
     import pytest
 
@@ -114,7 +114,7 @@ if "pytest" in sys.modules:
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     @pytest.mark.parametrize(
-        ("test_file", "failures"),
+        ('test_file', 'failures'),
         (
             pytest.param(
                 'examples/roles/role_for_no_same_owner/tasks/fail.yml', 10, id='fail'

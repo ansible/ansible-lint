@@ -29,12 +29,12 @@ from .rules import EMatcherRule, UnsetVariableMatcherRule
 class TestRule(unittest.TestCase):
     def test_rule_matching(self) -> None:
         ematcher = EMatcherRule.EMatcherRule()
-        lintable = Lintable('examples/playbooks/ematcher-rule.yml', kind="playbook")
+        lintable = Lintable('examples/playbooks/ematcher-rule.yml', kind='playbook')
         matches = ematcher.matchlines(lintable)
         assert len(matches) == 3
 
     def test_rule_postmatching(self) -> None:
         rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
-        lintable = Lintable('examples/playbooks/bracketsmatchtest.yml', kind="playbook")
+        lintable = Lintable('examples/playbooks/bracketsmatchtest.yml', kind='playbook')
         matches = rule.matchlines(lintable)
         assert len(matches) == 2

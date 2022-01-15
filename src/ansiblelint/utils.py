@@ -180,19 +180,19 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 
 def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
     """Parse a string task invocation."""
-    tokens = line.lstrip().split(" ")
+    tokens = line.lstrip().split(' ')
     if tokens[0] == '-':
         tokens = tokens[1:]
     if tokens[0] == 'action:' or tokens[0] == 'local_action:':
         tokens = tokens[1:]
-    command = tokens[0].replace(":", "")
+    command = tokens[0].replace(':', '')
 
     args = list()
     kwargs = dict()
     nonkvfound = False
     for arg in tokens[1:]:
-        if "=" in arg and not nonkvfound:
-            kv = arg.split("=", 1)
+        if '=' in arg and not nonkvfound:
+            kv = arg.split('=', 1)
             kwargs[kv[0]] = kv[1]
         else:
             nonkvfound = True
@@ -237,7 +237,7 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
     add_all_plugin_dirs(playbook_dir or '.')
     if lintable.kind == 'role':
         playbook_ds = AnsibleMapping({'roles': [{'role': str(lintable.path)}]})
-    elif lintable.kind not in ("playbook", "tasks"):
+    elif lintable.kind not in ('playbook', 'tasks'):
         return []
     else:
         try:
@@ -255,7 +255,7 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
         for child in play_children(basedir, item, lintable.kind, playbook_dir):
             # We avoid processing parametrized children
             path_str = str(child.path)
-            if "$" in path_str or "{{" in path_str:
+            if '$' in path_str or '{{' in path_str:
                 continue
 
             # Repair incorrect paths obtained when old syntax was used, like:
@@ -337,7 +337,7 @@ def _include_children(
         v = v['file']
 
     # handle include: filename.yml tags=blah
-    (command, args, kwargs) = tokenize("{0}: {1}".format(k, v))
+    (command, args, kwargs) = tokenize('{0}: {1}'.format(k, v))
 
     result = path_dwim(basedir, args[0])
     if not os.path.exists(result):
@@ -351,7 +351,7 @@ def _taskshandlers_children(
     results: List[Lintable] = []
     if v is None:
         raise MatchError(
-            message="A malformed block was encountered while loading a block.",
+            message='A malformed block was encountered while loading a block.',
             rule=RuntimeErrorRule(),
         )
     for th in v:
@@ -379,7 +379,7 @@ def _taskshandlers_children(
                 _roles_children(
                     basedir,
                     k,
-                    [th['action'].get("name")],
+                    [th['action'].get('name')],
                     parent_type,
                     main=th['action'].get('tasks_from', 'main'),
                 )
@@ -556,7 +556,7 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         raise MatchError(
             rule=AnsibleParserErrorRule(),
             message=e.message,
-            filename=task.get(FILENAME_KEY, "Unknown"),
+            filename=task.get(FILENAME_KEY, 'Unknown'),
             linenumber=task.get(LINE_NUMBER_KEY, 0),
         )
 
@@ -573,13 +573,13 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         result[k] = v
 
     if not isinstance(action, str):
-        raise RuntimeError("Task actions can only be strings, got %s" % action)
+        raise RuntimeError('Task actions can only be strings, got %s' % action)
     action_unnormalized = action
     # convert builtin fqn calls to short forms because most rules know only
     # about short calls but in the future we may switch the normalization to do
     # the opposite. Mainly we currently consider normalized the module listing
     # used by `ansible-doc -t module -l 2>/dev/null`
-    action = removeprefix(action, "ansible.builtin.")
+    action = removeprefix(action, 'ansible.builtin.')
     result['action'] = dict(
         __ansible_module__=action, __ansible_module_original__=action_unnormalized
     )
@@ -611,29 +611,29 @@ def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
 
 def task_to_str(task: Dict[str, Any]) -> str:
     """Make a string identifier for the given task."""
-    name = task.get("name")
+    name = task.get('name')
     if name:
         return str(name)
-    action = task.get("action")
+    action = task.get('action')
     if isinstance(action, str) or not isinstance(action, dict):
         return str(action)
-    args = " ".join(
+    args = ' '.join(
         [
-            "{0}={1}".format(k, v)
+            '{0}={1}'.format(k, v)
             for (k, v) in action.items()
             if k
             not in [
-                "__ansible_module__",
-                "__ansible_module_original__",
-                "__ansible_arguments__",
+                '__ansible_module__',
+                '__ansible_module_original__',
+                '__ansible_arguments__',
                 LINE_NUMBER_KEY,
                 FILENAME_KEY,
             ]
         ]
     )
-    for item in action.get("__ansible_arguments__", []):
-        args += f" {item}"
-    return u"{0} {1}".format(action["__ansible_module__"], args)
+    for item in action.get('__ansible_arguments__', []):
+        args += f' {item}'
+    return u'{0} {1}'.format(action['__ansible_module__'], args)
 
 
 def extract_from_list(
@@ -701,7 +701,7 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
 
 
 def get_normalized_tasks(
-    yaml: "AnsibleBaseYAMLObject", file: Lintable
+    yaml: 'AnsibleBaseYAMLObject', file: Lintable
 ) -> List[Dict[str, Any]]:
     """Extract normalized tasks from a file."""
     tasks = get_action_tasks(yaml, file)
@@ -730,7 +730,7 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         line = loader.line
         node = Composer.compose_node(loader, parent, index)
         if not isinstance(node, yaml.nodes.Node):
-            raise RuntimeError("Unexpected yaml data.")
+            raise RuntimeError('Unexpected yaml data.')
         setattr(node, '__line__', line + 1)
         return node
 
@@ -755,7 +755,7 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         data = loader.get_single_data()
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
         logging.exception(e)
-        raise SystemExit("Failed to parse YAML in %s: %s" % (lintable.path, str(e)))
+        raise SystemExit('Failed to parse YAML in %s: %s' % (lintable.path, str(e)))
     return data
 
 
@@ -793,13 +793,13 @@ def is_playbook(filename: str) -> bool:
     # we assume is a playbook if we loaded a sequence of dictionaries where
     # at least one of these keys is present:
     playbooks_keys = {
-        "gather_facts",
-        "hosts",
-        "import_playbook",
-        "post_tasks",
-        "pre_tasks",
-        "roles",
-        "tasks",
+        'gather_facts',
+        'hosts',
+        'import_playbook',
+        'post_tasks',
+        'pre_tasks',
+        'roles',
+        'tasks',
     }
 
     # makes it work with Path objects by converting them to strings
@@ -810,7 +810,7 @@ def is_playbook(filename: str) -> bool:
         f = parse_yaml_from_file(filename)
     except Exception as e:
         _logger.warning(
-            "Failed to load %s with %s, assuming is not a playbook.", filename, e
+            'Failed to load %s with %s, assuming is not a playbook.', filename, e
         )
     else:
         if (
@@ -833,14 +833,14 @@ def get_lintables(
     if args:
         for arg in args:
             lintable = Lintable(arg)
-            if lintable.kind in ("yaml", None):
+            if lintable.kind in ('yaml', None):
                 _logger.warning(
                     "Overriding detected file kind '%s' with 'playbook' "
-                    "for given positional argument: %s",
+                    'for given positional argument: %s',
                     lintable.kind,
                     arg,
                 )
-                lintable = Lintable(arg, kind="playbook")
+                lintable = Lintable(arg, kind='playbook')
             lintables.append(lintable)
     else:
 
@@ -873,12 +873,12 @@ def _extend_with_roles(lintables: List[Lintable]) -> None:
         parts = lintable.path.parent.parts
         if 'roles' in parts:
             role = lintable.path
-            while role.parent.name != "roles" and role.name:
+            while role.parent.name != 'roles' and role.name:
                 role = role.parent
             if role.exists and not role.is_file():
-                lintable = Lintable(role, kind="role")
+                lintable = Lintable(role, kind='role')
                 if lintable not in lintables:
-                    _logger.debug("Added role: %s", lintable)
+                    _logger.debug('Added role: %s', lintable)
                     lintables.append(lintable)
 
 
@@ -888,7 +888,7 @@ def convert_to_boolean(value: Any) -> bool:
 
 
 def nested_items(
-    data: Union[Dict[Any, Any], List[Any]], parent: str = ""
+    data: Union[Dict[Any, Any], List[Any]], parent: str = ''
 ) -> Generator[Tuple[Any, Any, str], None, None]:
     """Iterate a nested data structure."""
     if isinstance(data, dict):
@@ -898,6 +898,6 @@ def nested_items(
                 yield k, v, p
     if isinstance(data, list):
         for item in data:
-            yield "list-item", item, parent
+            yield 'list-item', item, parent
             for k, v, p in nested_items(item):
                 yield k, v, p

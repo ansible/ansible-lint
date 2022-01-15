@@ -33,14 +33,14 @@ class RunFromText:
         """Initialize a RunFromText instance with rules collection."""
         self.collection = collection
 
-    def _call_runner(self, path: str) -> List["MatchError"]:
+    def _call_runner(self, path: str) -> List['MatchError']:
         runner = Runner(path, rules=self.collection)
         return runner.run()
 
     def run_playbook(self, playbook_text: str) -> List[MatchError]:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yml", prefix="playbook"
+            mode='w', suffix='.yml', prefix='playbook'
         ) as fp:
             fp.write(playbook_text)
             fp.flush()
@@ -79,7 +79,7 @@ def run_ansible_lint(
     """Run ansible-lint on a given path and returns its output."""
     if not executable:
         executable = sys.executable
-        args = [sys.executable, "-m", "ansiblelint", *argv]
+        args = [sys.executable, '-m', 'ansiblelint', *argv]
     else:
         args = [executable, *argv]
 

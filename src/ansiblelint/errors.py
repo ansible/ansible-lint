@@ -30,7 +30,7 @@ class MatchError(ValueError):
         # we should never report line 0 or column 0 in output.
         linenumber: int = 1,
         column: Optional[int] = None,
-        details: str = "",
+        details: str = '',
         filename: Optional[Union[str, Lintable]] = None,
         rule: BaseRule = RuntimeErrorRule(),
         tag: Optional[str] = None,  # optional fine-graded tag
@@ -44,22 +44,22 @@ class MatchError(ValueError):
                 "required argument: one of 'message' or 'rule'",
             )
 
-        self.message = message or getattr(rule, 'shortdesc', "")
+        self.message = message or getattr(rule, 'shortdesc', '')
 
         # Safety measture to ensure we do not endup with incorrect indexes
         if linenumber == 0:
             raise RuntimeError(
-                "MatchError called incorrectly as line numbers start with 1"
+                'MatchError called incorrectly as line numbers start with 1'
             )
         if column == 0:
             raise RuntimeError(
-                "MatchError called incorrectly as column numbers start with 1"
+                'MatchError called incorrectly as column numbers start with 1'
             )
 
         self.linenumber = linenumber
         self.column = column
         self.details = details
-        self.filename = ""
+        self.filename = ''
         if filename:
             if isinstance(filename, Lintable):
                 self.filename = normpath(str(filename.path))
@@ -73,10 +73,10 @@ class MatchError(ValueError):
 
     def __repr__(self) -> str:
         """Return a MatchError instance representation."""
-        formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
+        formatstr = u'[{0}] ({1}) matched {2}:{3} {4}'
         # note that `rule.id` can be int, str or even missing, as users
         # can defined their own custom rules.
-        _id = getattr(self.rule, "id", "000")
+        _id = getattr(self.rule, 'id', '000')
 
         return formatstr.format(
             _id, self.message, self.filename, self.linenumber, self.details
@@ -86,7 +86,7 @@ class MatchError(ValueError):
     def position(self) -> str:
         """Return error positioniong, with column number if available."""
         if self.column:
-            return f"{self.linenumber}:{self.column}"
+            return f'{self.linenumber}:{self.column}'
         return str(self.linenumber)
 
     @property

@@ -14,16 +14,16 @@ _logger = logging.getLogger(__name__)
 class BaseRule:
     """Root class used by Rules."""
 
-    id: str = ""
+    id: str = ''
     tags: List[str] = []
-    shortdesc: str = ""
-    description: str = ""
-    version_added: str = ""
-    severity: str = ""
-    link: str = ""
+    shortdesc: str = ''
+    description: str = ''
+    version_added: str = ''
+    severity: str = ''
+    link: str = ''
     has_dynamic_tags: bool = False
 
-    def getmatches(self, file: "Lintable") -> List["MatchError"]:
+    def getmatches(self, file: 'Lintable') -> List['MatchError']:
         """Return all matches while ignoring exceptions."""
         matches = []
         if not file.path.is_dir():
@@ -32,7 +32,7 @@ class BaseRule:
                     matches.extend(method(file))
                 except Exception as e:
                     _logger.debug(
-                        "Ignored exception from %s.%s: %s",
+                        'Ignored exception from %s.%s: %s',
                         self.__class__.__name__,
                         method,
                         e,
@@ -41,43 +41,43 @@ class BaseRule:
             matches.extend(self.matchdir(file))
         return matches
 
-    def matchlines(self, file: "Lintable") -> List["MatchError"]:
+    def matchlines(self, file: 'Lintable') -> List['MatchError']:
         """Return matches found for a specific line."""
         return []
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
         """Confirm if current rule is matching a specific task."""
         return False
 
-    def matchtasks(self, file: "Lintable") -> List["MatchError"]:
+    def matchtasks(self, file: 'Lintable') -> List['MatchError']:
         """Return matches for a tasks file."""
         return []
 
-    def matchyaml(self, file: "Lintable") -> List["MatchError"]:
+    def matchyaml(self, file: 'Lintable') -> List['MatchError']:
         """Return matches found for a specific YAML text."""
         return []
 
     def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+        self, file: 'Lintable', data: 'odict[str, Any]'
+    ) -> List['MatchError']:
         """Return matches found for a specific playbook."""
         return []
 
-    def matchdir(self, lintable: "Lintable") -> List["MatchError"]:
+    def matchdir(self, lintable: 'Lintable') -> List['MatchError']:
         """Return matches for lintable folders."""
         return []
 
     def verbose(self) -> str:
         """Return a verbose representation of the rule."""
-        return self.id + ": " + self.shortdesc + "\n  " + self.description
+        return self.id + ': ' + self.shortdesc + '\n  ' + self.description
 
     def match(self, line: str) -> Union[bool, str]:
         """Confirm if current rule matches the given string."""
         return False
 
-    def __lt__(self, other: "BaseRule") -> bool:
+    def __lt__(self, other: 'BaseRule') -> bool:
         """Enable us to sort rules by their id."""
         return self.id < other.id
 

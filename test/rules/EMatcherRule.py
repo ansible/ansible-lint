@@ -10,4 +10,4 @@ class EMatcherRule(AnsibleLintRule):
     tags = ['fake', 'dummy', 'test1']
 
     def match(self, line: str) -> bool:
-        return "BANNED" in line
+        return 'BANNED' in line

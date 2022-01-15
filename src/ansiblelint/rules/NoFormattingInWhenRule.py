@@ -27,9 +27,9 @@ class NoFormattingInWhenRule(AnsibleLintRule):
         return when.find('{{') == -1 and when.find('}}') == -1
 
     def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
-        errors: List["MatchError"] = []
+        self, file: 'Lintable', data: 'odict[str, Any]'
+    ) -> List['MatchError']:
+        errors: List['MatchError'] = []
         if isinstance(data, dict):
             if 'roles' not in data or data['roles'] is None:
                 return errors

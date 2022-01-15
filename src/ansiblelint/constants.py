@@ -10,7 +10,7 @@ else:
     from typing_extensions import Literal
 
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), 'rules')
-CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
+CUSTOM_RULESDIR_ENVVAR = 'ANSIBLE_LINT_CUSTOM_RULESDIR'
 
 INVALID_CONFIG_RC = 2
 ANSIBLE_FAILURE_RC = 3
@@ -19,11 +19,11 @@ INVALID_PREREQUISITES_RC = 10
 EXIT_CONTROL_C_RC = 130
 
 # Minimal version of Ansible we support for runtime
-ANSIBLE_MIN_VERSION = "2.9"
+ANSIBLE_MIN_VERSION = '2.9'
 
 # Based on https://docs.ansible.com/ansible/latest/reference_appendices/config.html
 ANSIBLE_DEFAULT_ROLES_PATH = (
-    "~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles"
+    '~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles'
 )
 
 ANSIBLE_MOCKED_MODULE = """\
@@ -62,15 +62,15 @@ if __name__ == "__main__":
 """
 
 FileType = Literal[
-    "playbook",
-    "meta",  # role meta
-    "tasks",  # includes pre_tasks, post_tasks
-    "handlers",  # very similar to tasks but with some specificts
+    'playbook',
+    'meta',  # role meta
+    'tasks',  # includes pre_tasks, post_tasks
+    'handlers',  # very similar to tasks but with some specificts
     # https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file
-    "requirements",
-    "role",  # that is a folder!
-    "yaml",  # generic yaml file, previously reported as unknown file type
-    "",  # unknown file type
+    'requirements',
+    'role',  # that is a folder!
+    'yaml',  # generic yaml file, previously reported as unknown file type
+    '',  # unknown file type
 ]
 
 

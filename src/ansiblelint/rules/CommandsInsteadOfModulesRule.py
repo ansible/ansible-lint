@@ -102,73 +102,73 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         return False
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if 'pytest' in sys.modules:  # noqa: C901
     import pytest
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
-    APT_GET = '''
+    APT_GET = """
 - hosts: all
   tasks:
     - name: run apt-get update
       command: apt-get update
-'''
+"""
 
-    GIT_BRANCH = '''
+    GIT_BRANCH = """
 - hosts: all
   tasks:
     - name: print current git branch
       command: git branch
-'''
+"""
 
-    GIT_LOG = '''
+    GIT_LOG = """
 - hosts: all
   tasks:
     - name: print git log
       command: git log
-'''
+"""
 
-    RESTART_SSHD = '''
+    RESTART_SSHD = """
 - hosts: all
   tasks:
     - name: restart sshd
       command: systemctl restart sshd
-'''
+"""
 
-    SYSTEMCTL_STATUS = '''
+    SYSTEMCTL_STATUS = """
 - hosts: all
   tasks:
     - name: show systemctl service status
       command: systemctl status systemd-timesyncd
-'''
+"""
 
-    SYSTEMD_ENVIRONMENT = '''
+    SYSTEMD_ENVIRONMENT = """
 - hosts: all
   tasks:
     - name: show systemd environment
       command: systemctl show-environment
-'''
+"""
 
-    SYSTEMD_RUNLEVEL = '''
+    SYSTEMD_RUNLEVEL = """
 - hosts: all
   tasks:
     - name: set systemd runlevel
       command: systemctl set-default multi-user.target
-'''
+"""
 
-    YUM_UPDATE = '''
+    YUM_UPDATE = """
 - hosts: all
   tasks:
     - name: run yum update
       command: yum update
-'''
+"""
 
-    YUM_CLEAN = '''
+    YUM_CLEAN = """
 - hosts: all
   tasks:
     - name: clear yum cache
       command: yum clean all
-'''
+"""
 
     @pytest.mark.parametrize(
         'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']

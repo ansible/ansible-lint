@@ -7,7 +7,7 @@ from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import (
 )
 from ansiblelint.testing import RunFromText
 
-SUCCESS_TASKS = '''
+SUCCESS_TASKS = """
 - name: print helpful error message
   debug:
     var: result
@@ -35,10 +35,10 @@ SUCCESS_TASKS = '''
   when:
   - conditionA
   - conditionB
-'''
+"""
 
 
-FAIL_TASKS = '''
+FAIL_TASKS = """
 - name: execute command
   command: echo hello
   register: result
@@ -69,7 +69,7 @@ FAIL_TASKS = '''
   when:
   - result['changed'] == true
   - another_condition
-'''
+"""
 
 
 class TestUseHandlerRatherThanWhenChanged(unittest.TestCase):

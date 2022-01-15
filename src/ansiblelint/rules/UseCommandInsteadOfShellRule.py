@@ -113,19 +113,19 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
     ) -> Union[bool, str]:
         # Use unjinja so that we don't match on jinja filters
         # rather than pipes
-        if task["action"]["__ansible_module__"] in ['shell', 'ansible.builtin.shell']:
+        if task['action']['__ansible_module__'] in ['shell', 'ansible.builtin.shell']:
             if 'cmd' in task['action']:
-                unjinjad_cmd = self.unjinja(task["action"].get("cmd", []))
+                unjinjad_cmd = self.unjinja(task['action'].get('cmd', []))
             else:
                 unjinjad_cmd = self.unjinja(
-                    ' '.join(task["action"].get("__ansible_arguments__", []))
+                    ' '.join(task['action'].get('__ansible_arguments__', []))
                 )
             return not any(ch in unjinjad_cmd for ch in '&|<>;$\n*[]{}?`')
         return False
 
 
 # testing code to be loaded only with pytest or when executed the rule file
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
 
     import pytest
 

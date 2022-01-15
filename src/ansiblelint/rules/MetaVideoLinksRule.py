@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class MetaVideoLinksRule(AnsibleLintRule):
     id = 'meta-video-links'
-    shortdesc = "meta/main.yml video_links should be formatted correctly"
+    shortdesc = 'meta/main.yml video_links should be formatted correctly'
     description = (
         'Items in ``video_links`` in meta/main.yml should be '
         'dictionaries, and contain only keys ``url`` and ``title``, '
@@ -33,8 +33,8 @@ class MetaVideoLinksRule(AnsibleLintRule):
     }
 
     def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+        self, file: 'Lintable', data: 'odict[str, Any]'
+    ) -> List['MatchError']:
         if file.kind != 'meta':
             return []
 
@@ -52,7 +52,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
             if not isinstance(video, dict):
                 results.append(
                     self.create_matcherror(
-                        "Expected item in 'video_links' to be " "a dictionary",
+                        "Expected item in 'video_links' to be " 'a dictionary',
                         filename=file,
                     )
                 )
@@ -74,8 +74,8 @@ class MetaVideoLinksRule(AnsibleLintRule):
             else:
                 msg = (
                     "URL format '{0}' is not recognized. "
-                    "Expected it be a shared link from Vimeo, YouTube, "
-                    "or Google Drive.".format(video['url'])
+                    'Expected it be a shared link from Vimeo, YouTube, '
+                    'or Google Drive.'.format(video['url'])
                 )
                 results.append(self.create_matcherror(msg, filename=file))
 

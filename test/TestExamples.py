@@ -25,7 +25,7 @@ def test_example(default_rules_collection: RulesCollection) -> None:
 
 
 @pytest.mark.parametrize(
-    ("filename", "line", "column"),
+    ('filename', 'line', 'column'),
     (
         pytest.param(
             'examples/playbooks/syntax-error-string.yml', 1, 1, id='syntax-error-string'
@@ -39,7 +39,7 @@ def test_example_syntax_error(
     """Validates that loading valid YAML string produce error."""
     result = Runner(filename, rules=default_rules_collection).run()
     assert len(result) == 1
-    assert result[0].rule.id == "syntax-check"
+    assert result[0].rule.id == 'syntax-check'
     # This also ensures that line and column numbers start at 1, so they
     # match what editors will show (or output from other linters)
     assert result[0].linenumber == line
@@ -68,5 +68,5 @@ def test_custom_kinds() -> None:
     assert result.returncode == 0
     # .yaml-too is not a recognized extension and unless is manually defined
     # in our .ansible-lint config, the test would not identify it as yaml file.
-    assert "Examining examples/other/some.yaml-too of type yaml" in result.stderr
-    assert "Examining examples/other/some.j2.yaml of type jinja2" in result.stderr
+    assert 'Examining examples/other/some.yaml-too of type yaml' in result.stderr
+    assert 'Examining examples/other/some.j2.yaml of type jinja2' in result.stderr

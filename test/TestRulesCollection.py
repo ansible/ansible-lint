@@ -133,7 +133,7 @@ def test_rich_rule_listing() -> None:
     descriptions in the console output.
     """
     rules_path = os.path.abspath('./test/rules')
-    result = run_ansible_lint("-r", rules_path, "-f", "rich", "-L")
+    result = run_ansible_lint('-r', rules_path, '-f', 'rich', '-L')
     assert result.returncode == 0
 
     for rule in RulesCollection([rules_path]):
@@ -145,7 +145,7 @@ def test_rich_rule_listing() -> None:
 
 def test_rules_id_format() -> None:
     """Assure all our rules have consistent format."""
-    rule_id_re = re.compile("^[a-z-]{4,30}$")
+    rule_id_re = re.compile('^[a-z-]{4,30}$')
     options.enable_list = ['no-same-owner', 'no-log-password', 'no-same-owner']
     rules = RulesCollection(
         [os.path.abspath('./src/ansiblelint/rules')], options=options
@@ -153,5 +153,5 @@ def test_rules_id_format() -> None:
     for rule in rules:
         assert rule_id_re.match(
             rule.id
-        ), f"Rule id {rule.id} did not match our required format."
+        ), f'Rule id {rule.id} did not match our required format.'
     assert len(rules) == 40

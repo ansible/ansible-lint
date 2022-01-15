@@ -35,17 +35,17 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath(
 @pytest.mark.parametrize(
     ('playbook', 'exclude', 'length'),
     (
-        pytest.param('examples/playbooks/nomatchestest.yml', [], 0, id="nomatchestest"),
-        pytest.param('examples/playbooks/unicode.yml', [], 1, id="unicode"),
+        pytest.param('examples/playbooks/nomatchestest.yml', [], 0, id='nomatchestest'),
+        pytest.param('examples/playbooks/unicode.yml', [], 1, id='unicode'),
         pytest.param(
             LOTS_OF_WARNINGS_PLAYBOOK,
             [LOTS_OF_WARNINGS_PLAYBOOK],
             0,
-            id="lots_of_warnings",
+            id='lots_of_warnings',
         ),
-        pytest.param('examples/playbooks/become.yml', [], 0, id="become"),
+        pytest.param('examples/playbooks/become.yml', [], 0, id='become'),
         pytest.param(
-            'examples/playbooks/contains_secrets.yml', [], 0, id="contains_secrets"
+            'examples/playbooks/contains_secrets.yml', [], 0, id='contains_secrets'
         ),
     ),
 )
@@ -107,7 +107,7 @@ def test_runner_unicode_format(
     """Check that all formatters are unicode-friendly."""
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(
-        Lintable('examples/playbooks/unicode.yml', "playbook"),
+        Lintable('examples/playbooks/unicode.yml', 'playbook'),
         rules=default_rules_collection,
     )
 
@@ -123,7 +123,7 @@ def test_runner_with_directory(
     """Check that runner detects a directory as role."""
     runner = Runner(directory_name, rules=default_rules_collection)
 
-    expected = Lintable(name=directory_name, kind="role")
+    expected = Lintable(name=directory_name, kind='role')
     assert expected in runner.lintables
 
 

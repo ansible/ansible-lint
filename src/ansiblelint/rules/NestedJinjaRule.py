@@ -36,9 +36,9 @@ class NestedJinjaRule(AnsibleLintRule):
     id = 'no-jinja-nesting'
     shortdesc = 'Nested jinja pattern'
     description = (
-        "There should not be any nested jinja pattern. "
-        "Example (bad): ``{{ list_one + {{ list_two | max }} }}``, "
-        "Example (good): ``{{ list_one + max(list_two) }}``, "
+        'There should not be any nested jinja pattern. '
+        'Example (bad): ``{{ list_one + {{ list_two | max }} }}``, '
+        'Example (good): ``{{ list_one + max(list_two) }}``, '
         "Example (allowed): ``--format='{{'{{'}}.Size{{'}}'}}'``"
     )
     severity = 'VERY_HIGH'
@@ -50,7 +50,7 @@ class NestedJinjaRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        command = "".join(
+        command = ''.join(
             str(value)
             # task properties are stored in the 'action' key
             for key, value in task['action'].items()

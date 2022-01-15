@@ -26,25 +26,25 @@ filter in order to provide fallback values.
 """
 
 _ansible_syntax_check_re = re.compile(
-    r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in "
+    r'^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in '
     r"'(?P<filename>.*)': line (?P<line>\d+), column (?P<column>\d+)",
     re.MULTILINE | re.S | re.DOTALL,
 )
 
 _empty_playbook_re = re.compile(
-    r"^ERROR! Empty playbook, nothing to do", re.MULTILINE | re.S | re.DOTALL
+    r'^ERROR! Empty playbook, nothing to do', re.MULTILINE | re.S | re.DOTALL
 )
 
 
 class AnsibleSyntaxCheckRule(AnsibleLintRule):
     """Ansible syntax check report failure."""
 
-    id = "syntax-check"
-    shortdesc = "Ansible syntax check failed"
+    id = 'syntax-check'
+    shortdesc = 'Ansible syntax check failed'
     description = DESCRIPTION
-    severity = "VERY_HIGH"
-    tags = ["core", "unskippable"]
-    version_added = "v5.0.0"
+    severity = 'VERY_HIGH'
+    tags = ['core', 'unskippable']
+    version_added = 'v5.0.0'
 
     @staticmethod
     def _get_ansible_syntax_check_matches(lintable: Lintable) -> List[MatchError]:
@@ -52,7 +52,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
         if lintable.kind != 'playbook':
             return []
 
-        with timed_info("Executing syntax check on %s", lintable.path):
+        with timed_info('Executing syntax check on %s', lintable.path):
             extra_vars_cmd = []
             if options.extra_vars:
                 extra_vars_cmd = ['--extra-vars', json.dumps(options.extra_vars)]
@@ -84,7 +84,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             if stderr:
                 details = stderr
                 if stdout:
-                    details += "\n" + stdout
+                    details += '\n' + stdout
             else:
                 details = stdout
 
@@ -96,9 +96,9 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 linenumber = int(m.groupdict()['line'])
                 column = int(m.groupdict()['column'])
             elif _empty_playbook_re.search(stderr):
-                message = "Empty playbook, nothing to do"
+                message = 'Empty playbook, nothing to do'
                 filename = str(lintable.path)
-                tag = "empty-playbook"
+                tag = 'empty-playbook'
 
             if run.returncode == 4:
                 rule: BaseRule = AnsibleSyntaxCheckRule()
@@ -106,7 +106,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 rule = RuntimeErrorRule()
                 if not message:
                     message = (
-                        f"Unexpected error code {run.returncode} from "
+                        f'Unexpected error code {run.returncode} from '
                         f"execution of: {' '.join(cmd)}"
                     )
 
@@ -125,7 +125,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
 
 
 # testing code to be loaded only with pytest or when executed the rule file
-if "pytest" in sys.modules:
+if 'pytest' in sys.modules:
 
     def test_get_ansible_syntax_check_matches() -> None:
         """Validate parsing of ansible output."""
@@ -135,10 +135,10 @@ if "pytest" in sys.modules:
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 3
         assert result[0].column == 7
-        assert result[0].message == "conflicting action statements: debug, command"
+        assert result[0].message == 'conflicting action statements: debug, command'
         # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
-        assert result[0].filename.endswith("/conflicting_action.yml")
+        assert result[0].filename.endswith('/conflicting_action.yml')
         assert len(result) == 1
 
     def test_empty_playbook() -> None:
@@ -148,9 +148,9 @@ if "pytest" in sys.modules:
         assert result[0].linenumber == 1
         # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
-        assert result[0].filename.endswith("/empty_playbook.yml")
-        assert result[0].tag == "empty-playbook"
-        assert result[0].message == "Empty playbook, nothing to do"
+        assert result[0].filename.endswith('/empty_playbook.yml')
+        assert result[0].tag == 'empty-playbook'
+        assert result[0].message == 'Empty playbook, nothing to do'
         assert len(result) == 1
 
     def test_extra_vars_passed_to_command(config_options: Any) -> None:

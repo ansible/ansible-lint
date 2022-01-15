@@ -5,7 +5,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.MetaVideoLinksRule import MetaVideoLinksRule
 from ansiblelint.testing import RunFromText
 
-META_VIDEO_LINKS = '''
+META_VIDEO_LINKS = """
 galaxy_info:
   video_links:
   - url: https://youtu.be/aWmRepTSFKs
@@ -15,7 +15,7 @@ galaxy_info:
     title: This has a bad key
   - url: www.myvid.com/vid
     title: Bad format of url
-'''
+"""
 
 
 class TestMetaVideoLinks(unittest.TestCase):

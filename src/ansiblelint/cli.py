@@ -65,10 +65,10 @@ def load_config(config_file: str) -> Dict[Any, Any]:
         return {}
 
     try:
-        with open(config_path, "r") as stream:
+        with open(config_path, 'r') as stream:
             config = yaml.safe_load(stream)
             if not isinstance(config, dict):
-                _logger.error("Invalid configuration file %s", config_path)
+                _logger.error('Invalid configuration file %s', config_path)
                 sys.exit(INVALID_CONFIG_RC)
     except yaml.YAMLError as e:
         _logger.error(e)
@@ -134,21 +134,21 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest='listrules',
         default=False,
         action='store_true',
-        help="list all the rules",
+        help='list all the rules',
     )
     parser.add_argument(
         '-f',
         dest='format',
         default='rich',
         choices=['rich', 'plain', 'rst', 'codeclimate', 'quiet', 'pep8'],
-        help="Format used rules output, (default: %(default)s)",
+        help='Format used rules output, (default: %(default)s)',
     )
     parser.add_argument(
         '-q',
         dest='quiet',
         default=0,
         action='count',
-        help="quieter, reduce verbosity, can be specified twice.",
+        help='quieter, reduce verbosity, can be specified twice.',
     )
     parser.add_argument(
         '-p',
@@ -162,23 +162,23 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest='parseable_severity',
         default=False,
         action='store_true',
-        help="parseable output including severity of rule",
+        help='parseable output including severity of rule',
     )
     parser.add_argument(
         '--progressive',
         dest='progressive',
         default=False,
         action='store_true',
-        help="Return success if it detects a reduction in number"
-        " of violations compared with previous git commit. This "
-        "feature works only in git repositories.",
+        help='Return success if it detects a reduction in number'
+        ' of violations compared with previous git commit. This '
+        'feature works only in git repositories.',
     )
     parser.add_argument(
         '--project-dir',
         dest='project_dir',
-        default=".",
-        help="Location of project/repository, autodetected based on location "
-        " of configuration file.",
+        default='.',
+        help='Location of project/repository, autodetected based on location '
+        ' of configuration file.',
     )
     parser.add_argument(
         '-r',
@@ -186,38 +186,38 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest='rulesdir',
         default=[],
         type=Path,
-        help="Specify custom rule directories. Add -R "
-        f"to keep using embedded rules from {DEFAULT_RULESDIR}",
+        help='Specify custom rule directories. Add -R '
+        f'to keep using embedded rules from {DEFAULT_RULESDIR}',
     )
     parser.add_argument(
         '-R',
         action='store_true',
         default=False,
         dest='use_default_rules',
-        help="Keep default rules when using -r",
+        help='Keep default rules when using -r',
     )
     parser.add_argument(
         '--show-relpath',
         dest='display_relative_path',
         action='store_false',
         default=True,
-        help="Display path relative to CWD",
+        help='Display path relative to CWD',
     )
     parser.add_argument(
         '-t',
         dest='tags',
         action='append',
         default=[],
-        help="only check rules whose id/tags match these values",
+        help='only check rules whose id/tags match these values',
     )
     parser.add_argument(
-        '-T', dest='listtags', action='store_true', help="list all the tags"
+        '-T', dest='listtags', action='store_true', help='list all the tags'
     )
     parser.add_argument(
         '-v',
         dest='verbosity',
         action='count',
-        help="Increase verbosity level (-vv for more)",
+        help='Increase verbosity level (-vv for more)',
         default=0,
     )
     parser.add_argument(
@@ -225,14 +225,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest='skip_list',
         default=[],
         action='append',
-        help="only check rules whose id/tags do not " "match these values",
+        help='only check rules whose id/tags do not ' 'match these values',
     )
     parser.add_argument(
         '-w',
         dest='warn_list',
         default=[],
         action='append',
-        help="only warn about these rules, unless overridden in "
+        help='only warn about these rules, unless overridden in '
         "config file defaults to 'experimental'",
     )
     parser.add_argument(
@@ -240,7 +240,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest='enable_list',
         default=[],
         action='append',
-        help="activate optional rules by their tag name",
+        help='activate optional rules by their tag name',
     )
     # Do not use store_true/store_false because they create opposite defaults.
     parser.add_argument(
@@ -248,14 +248,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest='colored',
         action='store_const',
         const=False,
-        help="disable colored output, same as NO_COLOR=1",
+        help='disable colored output, same as NO_COLOR=1',
     )
     parser.add_argument(
         '--force-color',
         dest='colored',
         action='store_const',
         const=True,
-        help="Force colored output, same as FORCE_COLOR=1",
+        help='Force colored output, same as FORCE_COLOR=1',
     )
     parser.add_argument(
         '--exclude',
@@ -284,8 +284,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         dest='lintables',
         nargs='*',
-        help="One or more files or paths. When missing it will "
-        " enable auto-detection mode.",
+        help='One or more files or paths. When missing it will '
+        ' enable auto-detection mode.',
     )
 
     return parser
@@ -304,7 +304,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     )
     # maps lists to their default config values
     lists_map = {
-        'exclude_paths': [".cache", ".git", ".hg", ".svn", ".tox"],
+        'exclude_paths': ['.cache', '.git', '.hg', '.svn', '.tox'],
         'rulesdir': [],
         'skip_list': [],
         'tags': [],
@@ -315,8 +315,8 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     }
 
     scalar_map = {
-        "loop_var_prefix": None,
-        "project_dir": ".",
+        'loop_var_prefix': None,
+        'project_dir': '.',
     }
 
     if not file_config:
@@ -371,12 +371,12 @@ def get_config(arguments: List[str]) -> Namespace:
 
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
 
-    if options.project_dir == ".":
+    if options.project_dir == '.':
         project_dir = guess_project_dir(options.config_file)
         options.project_dir = normpath(project_dir)
     if not options.project_dir or not os.path.exists(options.project_dir):
         raise RuntimeError(
-            f"Failed to determine a valid project_dir: {options.project_dir}"
+            f'Failed to determine a valid project_dir: {options.project_dir}'
         )
 
     # Compute final verbosity level by subtracting -q counter.
@@ -393,12 +393,12 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
     default_custom_rulesdir = os.environ.get(
-        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, "custom")
+        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, 'custom')
     )
     custom_ruledirs = sorted(
         str(rdir.resolve())
         for rdir in Path(default_custom_rulesdir).iterdir()
-        if rdir.is_dir() and (rdir / "__init__.py").exists()
+        if rdir.is_dir() and (rdir / '__init__.py').exists()
     )
 
     if use_default:

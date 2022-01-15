@@ -27,7 +27,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     ) -> Union[bool, str]:
         for k, v, _ in nested_items(task):
             if isinstance(v, str):
-                cleaned = self.exclude_json_re.sub("", v)
+                cleaned = self.exclude_json_re.sub('', v)
                 if bool(self.bracket_regex.search(cleaned)):
                     return self.base_msg + v
         return False
@@ -48,7 +48,7 @@ if 'pytest' in sys.modules:
     @pytest.fixture
     def test_playbook() -> str:
         """Return test cases playbook path."""
-        return "examples/playbooks/var-spacing.yml"
+        return 'examples/playbooks/var-spacing.yml'
 
     @pytest.fixture
     def lint_error_lines(test_playbook: str) -> List[int]:

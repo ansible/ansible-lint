@@ -6,71 +6,71 @@ from ansiblelint.runner import Runner
 
 PLAY_IN_THE_PLACE = Lintable(
     'playbook.yml',
-    '''\
+    """\
 - hosts: all
   roles:
     - include_in_the_place
-''',
+""",
 )
 
 PLAY_RELATIVE = Lintable(
     'playbook.yml',
-    '''\
+    """\
 - hosts: all
   roles:
     - include_relative
-''',
+""",
 )
 
 PLAY_MISS_INCLUDE = Lintable(
     'playbook.yml',
-    '''\
+    """\
 - hosts: all
   roles:
     - include_miss
-''',
+""",
 )
 
 PLAY_ROLE_INCLUDED_IN_THE_PLACE = Lintable(
     'roles/include_in_the_place/tasks/main.yml',
-    '''\
+    """\
 ---
 - include_tasks: included_file.yml
-''',
+""",
 )
 
 PLAY_ROLE_INCLUDED_RELATIVE = Lintable(
     'roles/include_relative/tasks/main.yml',
-    '''\
+    """\
 ---
 - include_tasks: tasks/included_file.yml
-''',
+""",
 )
 
 PLAY_ROLE_INCLUDED_MISS = Lintable(
     'roles/include_miss/tasks/main.yml',
-    '''\
+    """\
 ---
 - include_tasks: tasks/noexist_file.yml
-''',
-    kind="tasks",
+""",
+    kind='tasks',
 )
 
 PLAY_INCLUDED_IN_THE_PLACE = Lintable(
     'roles/include_in_the_place/tasks/included_file.yml',
-    '''\
+    """\
 - debug:
     msg: 'was found & included'
-''',
-    kind="tasks",
+""",
+    kind='tasks',
 )
 
 PLAY_INCLUDED_RELATIVE = Lintable(
     'roles/include_relative/tasks/included_file.yml',
-    '''\
+    """\
 - debug:
     msg: 'was found & included'
-''',
+""",
 )
 
 
@@ -89,7 +89,7 @@ def test_cases_warning_message(runner: Runner, caplog: LogCaptureFixture) -> Non
     result = runner.run()
 
     assert len(result) == 1
-    assert "No such file or directory" in result[0].message
+    assert 'No such file or directory' in result[0].message
 
 
 @pytest.mark.parametrize(
