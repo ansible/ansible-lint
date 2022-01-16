@@ -60,7 +60,104 @@ extend-ignore =
   N806,
   P101,
   P103,
-  WPS,
+  WPS100,  # Found wrong module name
+  WPS102,  # Found incorrect module name pattern
+  WPS110,  # Found wrong variable name
+  WPS111,  # Found too short name
+  WPS114,  # Found underscored number name pattern
+  WPS115,  # Found upper-case constant in a class
+  WPS116,  # Found consecutive underscores name
+  WPS118,  # Found too long name
+  WPS121,  # Found usage of a variable marked as unused
+  WPS122,  # Found all unused variables definition
+  WPS201,  # Found module with too many imports
+  WPS202,  # Found too many module members
+  WPS204,  # Found overused expression
+  WPS210,  # Found too many local variables
+  WPS211,  # Found too many arguments
+  WPS212,  # Found too many return statements
+  WPS213,  # Found too many expressions
+  WPS214,  # Found too many methods
+  WPS218,  # Found too many `assert` statements
+  WPS220,  # Found too deep nesting
+  WPS221,  # Found line with high Jones Complexity
+  WPS222,  # Found a condition with too much logic
+  WPS226,  # Found string literal over-use
+  WPS227,  # Found too long function output tuple
+  WPS229,  # Found too long ``try`` body length
+  WPS230,  # Found too many public instance attributes
+  WPS231,  # Found function with too much cognitive complexity
+  WPS232,  # Found module cognitive complexity that is too high
+  WPS234,  # Found overly complex annotation
+  WPS235,  # Found too many imported names from a module
+  WPS237,  # Found a too complex `f` string
+  WPS300,  # Found local folder import
+  WPS301,  # Found dotted raw import
+  WPS302,  # Found unicode string prefix
+  WPS305,  # Found `f` string
+  WPS306,  # Found class without a base class
+  WPS309,  # Found reversed compare order
+  WPS317,  # Found incorrect multi-line parameters
+  WPS318,  # Found extra indentation
+  WPS323,  # Found `%` string formatting
+  WPS324,  # Found inconsistent `return` statement
+  WPS326,  # Found implicit string concatenation
+  WPS328,  # Found useless node
+  WPS331,  # Found variables that are only used for `return`
+  WPS335,  # Found incorrect `for` loop iter type
+  WPS336,  # Found explicit string concatenation
+  WPS337,  # Found multiline conditions
+  WPS338,  # Found incorrect order of methods in a class
+  WPS342,  # Found implicit raw string
+  WPS350,  # Found usable augmented assign pattern
+  WPS352,  # Found multiline loop
+  WPS355,  # Found an unnecessary blank line before a bracket
+  WPS360,  # Found an unnecessary use of a raw string
+  WPS361,  # Found an inconsistently structured comprehension
+  WPS362,  # Found assignment to a subscript slice
+  WPS400,  # Found wrong magic comment
+  WPS404,  # Found complex default value
+  WPS407,  # Found mutable module constant
+  WPS410,  # Found wrong metadata variable
+  WPS412,  # Found `__init__.py` module with logic
+  WPS414,  # Found incorrect unpacking target
+  WPS417,  # Found non-unique item in hash
+  WPS420,  # Found wrong keyword
+  WPS421,  # Found wrong function call
+  WPS425,  # Found boolean non-keyword argument
+  WPS429,  # Found multiple assign targets
+  WPS430,  # Found nested function
+  WPS432,  # Found magic number
+  WPS433,  # Found nested import
+  WPS436,  # Found protected module import
+  WPS437,  # Found protected attribute usage
+  WPS440,  # Found block variables overlap
+  WPS441,  # Found control variable used after block
+  WPS442,  # Found outer scope names shadowing
+  WPS448,  # Found incorrect exception order
+  WPS450,  # Found protected object import
+  WPS453,  # Found executable mismatch
+  WPS458,  # Found imports collision
+  WPS462,  # Wrong multiline string usage
+  WPS464,  # Found empty comment
+  WPS504,  # Found negated condition
+  WPS505,  # Found nested `try` block
+  WPS507,  # Found useless `len()` compare
+  WPS508,  # Found incorrect `not` with compare usage
+  WPS510,  # Found `in` used with a non-set container
+  WPS514,  # Found implicit `in` condition
+  WPS517,  # Found pointless starred expression
+  WPS519,  # Found implicit `sum()` call
+  WPS520,  # Found compare with falsy constant
+  WPS525,  # Found wrong `in` compare with single item container
+  WPS526,  # Found implicit `yield from` usage
+  WPS527,  # Found not a tuple used as an argument
+  WPS529,  # Found implicit `.get()` dict usage
+  WPS531,  # Found simplifiable returning `if` condition in a function
+  WPS601,  # Found shadowed class attribute
+  WPS602,  # Found using `@staticmethod`
+  WPS604,  # Found incorrect node inside `class` body
+  WPS609,  # Found direct magic attribute usage
 
 # Allow certain violations in certain files:
 per-file-ignores =
@@ -73,6 +170,8 @@ per-file-ignores =
   src/ansiblelint/testing/__init__.py: S404, S603
   src/ansiblelint/testing/fixtures.py: S101
   test/**.py: S101, S404, S603, WPS202, WPS442
+  test/custom_rules/**.py: WPS
+  test/local-content/**.py: WPS
 
   # FIXME: D100 Missing docstring in public module
   # FIXME: D101 Missing docstring in public class
