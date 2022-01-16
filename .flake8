@@ -41,7 +41,11 @@ extend-ignore =
   E501,
   H,
 # WPS:
-  B,
+  B006,  # Do not use mutable data structures for argument defaults.  They are created during function definition time. All calls to the function reuse this one instance of that data structure, persisting changes between them.
+  B007,  # Loop control variable 'subdirs' not used within the loop body. If this is intended, start the name with an underscore.
+  B008,  # Do not perform function calls in argument defaults.  The call is performed only once at function definition time. All calls to your function will reuse the result of that definition-time function call.  If this is intended, assign the function call to a module-level variable and use that variable as a default value.
+  B010,  # Do not call setattr with a constant attribute value, it is not any safer than normal property access.
+  B014,  # Redundant exception types in `except (ImportError, ModuleNotFoundError) as e:`.  Write `except ImportError as e:`, which catches exactly the same exceptions.
   C,
   DAR101,
   DAR201,
