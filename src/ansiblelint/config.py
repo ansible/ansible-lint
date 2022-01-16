@@ -1,7 +1,7 @@
 """Store configuration options as a singleton."""
 import os
 import re
-import subprocess
+import subprocess  # noqa: S404
 import sys
 from argparse import Namespace
 from functools import lru_cache
@@ -143,7 +143,7 @@ def ansible_version(version: str = '') -> Version:
     to Version object in order to make it usable in comparisons.
     """
     if not version:
-        proc = subprocess.run(
+        proc = subprocess.run(  # noqa: S603, S607
             ['ansible', '--version'],
             universal_newlines=True,
             check=False,

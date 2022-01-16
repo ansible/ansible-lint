@@ -151,7 +151,7 @@ def test__update_env(
 
 def test_require_collection_wrong_version() -> None:
     """Tests behaviour of require_collection."""
-    subprocess.check_output(
+    subprocess.check_output(  # noqa: S607
         [
             'ansible-galaxy',
             'collection',

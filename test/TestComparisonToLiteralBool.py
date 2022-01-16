@@ -17,21 +17,21 @@ PASS_WHEN = """
   when:
     - 1 + 1 == 2
     - true
-"""
+"""  # noqa: S105
 
 PASS_WHEN_NOT_FALSE = """
 - name: example task
   debug:
     msg: test
   when: not my_var
-"""
+"""  # noqa: S105
 
 PASS_WHEN_NOT_NULL = """
 - name: example task
   debug:
     msg: test
   when: my_var not None
-"""
+"""  # noqa: S105
 
 FAIL_LITERAL_TRUE = """
 - name: example task

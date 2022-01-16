@@ -1,7 +1,7 @@
 """Rule definition for ansible syntax check."""
 import json
 import re
-import subprocess
+import subprocess  # noqa: S404
 import sys
 from typing import Any, List
 
@@ -67,7 +67,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                shell=False,  # needed when command is a list
+                shell=False,  # noqa: S603  # needed when command is a list
                 universal_newlines=True,
                 check=False,
             )

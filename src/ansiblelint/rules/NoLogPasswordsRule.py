@@ -122,7 +122,7 @@ if 'pytest' in sys.modules:
       with_random_choice:
         - ansible
         - lint
-"""
+"""  # noqa: S105
 
     NO_LOG_YES = """
 - hosts: all
@@ -165,7 +165,7 @@ if 'pytest' in sys.modules:
         with_list:
           - ansible
           - lint
-"""
+"""  # noqa: S105
 
     PASSWORD_LOCK_FALSE = """
 - hosts: all
@@ -174,7 +174,7 @@ if 'pytest' in sys.modules:
       user:
         name: lint
         password_lock: False
-"""
+"""  # noqa: S105
 
     @pytest.mark.parametrize(
         'rule_runner', (NoLogPasswordsRule,), indirect=['rule_runner']

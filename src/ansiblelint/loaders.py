@@ -7,4 +7,4 @@ import yaml
 def yaml_from_file(filepath: str) -> Any:
     """Return a loaded YAML file."""
     with open(filepath) as content:
-        return yaml.load(content, Loader=yaml.FullLoader)
+        return yaml.load(content, Loader=yaml.FullLoader)  # noqa: S506

@@ -3,7 +3,7 @@ import copy
 import logging
 import os
 import pathlib
-import subprocess
+import subprocess  # noqa: S404
 import sys
 from argparse import Namespace
 from collections import OrderedDict
@@ -235,14 +235,14 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     out = None
 
     try:
-        out_present = subprocess.check_output(
+        out_present = subprocess.check_output(  # noqa: S603
             git_command_present, stderr=subprocess.STDOUT, universal_newlines=True
         ).split('\x00')[:-1]
         _logger.info(
             'Discovered files to lint using: %s', ' '.join(git_command_present)
         )
 
-        out_absent = subprocess.check_output(
+        out_absent = subprocess.check_output(  # noqa: S603
             git_command_absent, stderr=subprocess.STDOUT, universal_newlines=True
         ).split('\x00')[:-1]
         _logger.info('Excluded removed files using: %s', ' '.join(git_command_absent))
@@ -280,7 +280,7 @@ def guess_project_dir(config_file: Optional[str]) -> str:
 
     if path is None:
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603, S607
                 ['git', 'rev-parse', '--show-toplevel'],
                 stderr=subprocess.PIPE,
                 stdout=subprocess.PIPE,

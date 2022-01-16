@@ -4,7 +4,7 @@ import logging
 import os
 import pathlib
 import re
-import subprocess
+import subprocess  # noqa: S404
 import sys
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
@@ -45,7 +45,7 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
         err = ''
         failed = False
         ver = ''
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603
             args=['ansible', '--version'],
             stdout=subprocess.PIPE,
             universal_newlines=True,
@@ -114,7 +114,7 @@ def install_collection(collection: str, destination: Optional[str] = None) -> No
     cmd.append(f'{collection}')
 
     _logger.info('Running %s', ' '.join(cmd))
-    run = subprocess.run(
+    run = subprocess.run(  # noqa: S603
         cmd,
         universal_newlines=True,
         check=False,
@@ -149,7 +149,7 @@ def install_requirements(requirement: str) -> None:
     ]
 
     _logger.info('Running %s', ' '.join(cmd))
-    run = subprocess.run(
+    run = subprocess.run(  # noqa: S603
         cmd,
         universal_newlines=True,
         check=False,
@@ -175,7 +175,7 @@ def install_requirements(requirement: str) -> None:
         ]
 
         _logger.info('Running %s', ' '.join(cmd))
-        run = subprocess.run(
+        run = subprocess.run(  # noqa: S603
             cmd,
             universal_newlines=True,
             check=False,
@@ -431,7 +431,7 @@ def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str],
     if colpathvar in env:
         env.pop(colpathvar)
 
-    config = subprocess.check_output(
+    config = subprocess.check_output(  # noqa: S603, S607
         ['ansible-config', 'dump'], universal_newlines=True, env=env
     )
 
@@ -442,7 +442,8 @@ def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str],
     elif kind == list:
         result = re.search(rf'^{key}.* = (\[.*\])$', config, re.MULTILINE)
         if result:
-            val = eval(result.groups()[0])  # pylint: disable=eval-used
+            # pylint: disable=eval-used
+            val = eval(result.groups()[0])  # noqa: S307
             if not isinstance(val, list):
                 raise RuntimeError(f'Unexpected data read for {key}: {val}')
             return val

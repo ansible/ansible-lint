@@ -25,7 +25,7 @@ import hashlib
 import logging
 import os
 import pathlib
-import subprocess
+import subprocess  # noqa: S404
 import sys
 from argparse import Namespace
 from contextlib import contextmanager
@@ -283,7 +283,7 @@ def _previous_revision() -> Iterator[None]:
     # Update options.exclude_paths to include use the temporary workdir.
     rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
     options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
-    revision = subprocess.run(
+    revision = subprocess.run(  # noqa: S603, S607
         ['git', 'rev-parse', 'HEAD^1'],
         check=True,
         universal_newlines=True,
@@ -292,10 +292,10 @@ def _previous_revision() -> Iterator[None]:
     ).stdout
     p = pathlib.Path(worktree_dir)
     p.mkdir(parents=True, exist_ok=True)
-    os.system(f'git worktree add -f {worktree_dir} 2>/dev/null')
+    os.system(f'git worktree add -f {worktree_dir} 2>/dev/null')  # noqa: S605
     try:
         with cwd(worktree_dir):
-            os.system(f'git checkout {revision}')
+            os.system(f'git checkout {revision}')  # noqa: S605
             yield
     finally:
         options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]

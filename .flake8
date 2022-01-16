@@ -51,11 +51,20 @@ extend-ignore =
   N806,
   P101,
   P103,
-  S,
   WPS,
 
 # Allow certain violations in certain files:
 per-file-ignores =
+  # There are multiple `assert`s (S101)
+  # and subprocesses (import – S404; call – S603) in tests;
+  # plus, some of the rules may have embeded tests;
+  # also, using fixtures looks like shadowing the outer scope (WPS442);
+  # and finally it's impossible to have <= members in tests (WPS202):
+  src/ansiblelint/rules/**.py: S101
+  src/ansiblelint/testing/__init__.py: S404, S603
+  src/ansiblelint/testing/fixtures.py: S101
+  test/**.py: S101, S404, S603, WPS202, WPS442
+
   # FIXME: D100 Missing docstring in public module
   # FIXME: D101 Missing docstring in public class
   # FIXME: D102 Missing docstring in public method
@@ -65,6 +74,42 @@ per-file-ignores =
   src/ansiblelint/formatters/__init__.py: D101 D102
   src/ansiblelint/rules/*.py: D100 D101 D102
   src/ansiblelint/rules/__init__.py: D100 D101 D102
+  src/ansiblelint/rules/BecomeUserWithoutBecomeRule.py: D100 D101 D102
+  src/ansiblelint/rules/CommandHasChangesCheckRule.py: D100 D101 D102 S101
+  src/ansiblelint/rules/CommandsInsteadOfArgumentsRule.py: D100 D101 D102
+  src/ansiblelint/rules/CommandsInsteadOfModulesRule.py: D100 D101 D102 S101
+  src/ansiblelint/rules/ComparisonToEmptyStringRule.py: D100 D101 D102 S101
+  src/ansiblelint/rules/ComparisonToLiteralBoolRule.py: D100 D101 D102
+  src/ansiblelint/rules/DeprecatedModuleRule.py: D100 D101 D102
+  src/ansiblelint/rules/EnvVarsInCommandRule.py: D100 D101 D102
+  src/ansiblelint/rules/FQCNBuiltinsRule.py: D101 D102 S101
+  src/ansiblelint/rules/GitHasVersionRule.py: D100 D101 D102
+  src/ansiblelint/rules/IgnoreErrorsRule.py: D102 S101
+  src/ansiblelint/rules/MercurialHasRevisionRule.py: D100 D101 D102
+  src/ansiblelint/rules/MetaChangeFromDefaultRule.py: D100 D101 D102
+  src/ansiblelint/rules/MetaMainHasInfoRule.py: D100 D101 D102
+  src/ansiblelint/rules/MetaTagValidRule.py: D100 D101 D102 S101
+  src/ansiblelint/rules/MetaVideoLinksRule.py: D100 D101 D102
+  src/ansiblelint/rules/MissingFilePermissionsRule.py: D101 D102 S101
+  src/ansiblelint/rules/NestedJinjaRule.py: D100 D101 D102
+  src/ansiblelint/rules/NoFormattingInWhenRule.py: D100 D101 D102
+  src/ansiblelint/rules/NoLogPasswordsRule.py: D102 S101
+  src/ansiblelint/rules/NoSameOwnerRule.py: D101 S101
+  src/ansiblelint/rules/NoTabsRule.py: D100 D101 D102 S101
+  src/ansiblelint/rules/OctalPermissionsRule.py: D100 D101 D102
+  src/ansiblelint/rules/PackageIsNotLatestRule.py: D100 D101 D102
+  src/ansiblelint/rules/PlaybookExtension.py: D100 D101 D102
+  src/ansiblelint/rules/RoleNames.py: D100 D101 D102
+  src/ansiblelint/rules/RoleRelativePath.py: D100 D101 D102
+  src/ansiblelint/rules/ShellWithoutPipefail.py: D100 D101 D102
+  src/ansiblelint/rules/TaskHasNameRule.py: D100 D101 D102
+  src/ansiblelint/rules/TaskNoLocalAction.py: D100 D101 D102
+  src/ansiblelint/rules/UseCommandInsteadOfShellRule.py: D100 D101 D102 S101
+  src/ansiblelint/rules/UseHandlerRatherThanWhenChangedRule.py: D101 D102 S101
+  src/ansiblelint/rules/UsingBareVariablesIsDeprecatedRule.py: D100 D101 D102
+  src/ansiblelint/rules/VariableHasSpacesRule.py: D100 D101 D102 S101
+  src/ansiblelint/rules/VariableNamingRule.py: D100 D101 D102 S101
+  src/ansiblelint/rules/YamllintRule.py: D100 D101
 
   # FIXME: drop these once they're fixed
   # Ref: https://github.com/ansible-community/ansible-lint/issues/725
@@ -72,44 +117,44 @@ per-file-ignores =
   test/conftest.py: D100
   test/rules/EMatcherRule.py: D100 D101 D102
   test/rules/UnsetVariableMatcherRule.py: D100 D101 D102
-  test/TestAnsibleLintRule.py: D100
-  test/TestBaseFormatter.py: D100
-  test/TestBecomeUserWithoutBecome.py: D100 D101 D102
-  test/TestCliRolePaths.py: D100 D101 D102
-  test/TestCommandLineInvocationSameAsConfig.py: D100
-  test/TestCommandHasChangesCheck.py: D100 D101 D102
-  test/TestComparisonToLiteralBool.py: D100 D101 D102
-  test/TestDependenciesInMeta.py: D100
-  test/TestDeprecatedModule.py: D100 D101 D102
-  test/TestEnvVarsInCommand.py: D100 D101 D102
+  test/TestAnsibleLintRule.py: D100 S101
+  test/TestBaseFormatter.py: D100 S101
+  test/TestBecomeUserWithoutBecome.py: D100 D101 D102 S101
+  test/TestCliRolePaths.py: D100 D101 D102 S101
+  test/TestCommandLineInvocationSameAsConfig.py: D100 S101
+  test/TestCommandHasChangesCheck.py: D100 D101 D102 S101
+  test/TestComparisonToLiteralBool.py: D100 D101 D102 S101
+  test/TestDependenciesInMeta.py: D100 S101
+  test/TestDeprecatedModule.py: D100 D101 D102 S101
+  test/TestEnvVarsInCommand.py: D100 D101 D102 S101
   test/TestFormatter.py: D100 D101 D102
-  test/TestImportIncludeRole.py: D100
-  test/TestImportWithMalformed.py: D100
-  test/TestIncludeMissFileWithRole.py: D100
-  test/TestLineTooLong.py: D100 D101 D102
-  test/TestLintRule.py: D100 D101 D102
-  test/TestNestedJinjaRule.py: D100
-  test/TestMatchError.py: D101
-  test/TestMetaChangeFromDefault.py: D100 D101 D102
-  test/TestMetaMainHasInfo.py: D100 D101 D102
-  test/TestMetaVideoLinks.py: D100 D101 D102
-  test/TestNoFormattingInWhenRule.py: D100 D101 D102
-  test/TestOctalPermissions.py: D100 D101 D102
-  test/TestPackageIsNotLatest.py: D100 D101 D102
-  test/TestRoleRelativePath.py: D100 D101 D102
-  test/TestRuleProperties.py: D100
-  test/TestRulesCollection.py: D100
-  test/TestRunner.py: D100
-  test/TestShellWithoutPipefail.py: D100 D101 D102
-  test/TestSkipImportPlaybook.py: D100
-  test/TestSkipInsideYaml.py: D100
-  test/TestSkipPlaybookItems.py: D100
-  test/TestTaskHasName.py: D100 D101 D102
-  test/TestTaskIncludes.py: D100
-  test/TestTaskNoLocalAction.py: D100 D101 D102
-  test/TestUseHandlerRatherThanWhenChanged.py: D100 D101 D102
-  test/TestUsingBareVariablesIsDeprecated.py: D100 D101 D102
-  test/TestWithSkipTagId.py: D100 D101 D102
+  test/TestImportIncludeRole.py: D100 S101
+  test/TestImportWithMalformed.py: D100 S101
+  test/TestIncludeMissFileWithRole.py: D100 S101
+  test/TestLineTooLong.py: D100 D101 D102 S101
+  test/TestLintRule.py: D100 D101 D102 S101
+  test/TestNestedJinjaRule.py: D100 S101
+  test/TestMatchError.py: D101 S101
+  test/TestMetaChangeFromDefault.py: D100 D101 D102 S101
+  test/TestMetaMainHasInfo.py: D100 D101 D102 S101
+  test/TestMetaVideoLinks.py: D100 D101 D102 S101
+  test/TestNoFormattingInWhenRule.py: D100 D101 D102 S101
+  test/TestOctalPermissions.py: D100 D101 D102 S101
+  test/TestPackageIsNotLatest.py: D100 D101 D102 S101
+  test/TestRoleRelativePath.py: D100 D101 D102 S101
+  test/TestRuleProperties.py: D100 S101
+  test/TestRulesCollection.py: D100 S101
+  test/TestRunner.py: D100 S101
+  test/TestShellWithoutPipefail.py: D100 D101 D102 S101
+  test/TestSkipImportPlaybook.py: D100 S101
+  test/TestSkipInsideYaml.py: D100 S101
+  test/TestSkipPlaybookItems.py: D100 S101
+  test/TestTaskHasName.py: D100 D101 D102 S101
+  test/TestTaskIncludes.py: D100 S101
+  test/TestTaskNoLocalAction.py: D100 D101 D102 S101
+  test/TestUseHandlerRatherThanWhenChanged.py: D100 D101 D102 S101
+  test/TestUsingBareVariablesIsDeprecated.py: D100 D101 D102 S101
+  test/TestWithSkipTagId.py: D100 D101 D102 S101
 
 # flake8-pytest-style
 # PT001:
