@@ -165,6 +165,10 @@ per-file-ignores =
   test/TestUsingBareVariablesIsDeprecated.py: D100 D101 D102 S101
   test/TestWithSkipTagId.py: D100 D101 D102 S101
 
+# flake8-eradicate
+# E800:
+eradicate-whitelist-extend = isort:\s+\w+
+
 # flake8-pytest-style
 # PT001:
 pytest-fixture-no-parentheses = true
