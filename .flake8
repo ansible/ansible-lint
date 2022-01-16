@@ -177,6 +177,8 @@ pytest-parametrize-names-type = tuple
 # PT007:
 pytest-parametrize-values-type = tuple
 pytest-parametrize-values-row-type = tuple
+# PT023:
+pytest-mark-no-parentheses = true
 
 # flake8-quotes
 avoid-escape = true
