@@ -13,7 +13,7 @@ from ansiblelint.text import strip_ansi_escape
 class TestCliRolePaths(unittest.TestCase):
     def setUp(self) -> None:
         self.local_test_dir = os.path.realpath(
-            os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'examples')
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'examples'),
         )
 
     def test_run_single_role_path_no_trailing_slash_module(self) -> None:
@@ -83,7 +83,7 @@ class TestCliRolePaths(unittest.TestCase):
 
         result = run_ansible_lint(role_path, cwd=cwd)
         assert 'role-name: Role name invalid-name does not match' in strip_ansi_escape(
-            result.stdout
+            result.stdout,
         )
 
     def test_run_role_name_with_prefix(self) -> None:
@@ -131,7 +131,7 @@ class TestCliRolePaths(unittest.TestCase):
 
         env = os.environ.copy()
         env['ANSIBLE_ROLES_PATH'] = os.path.realpath(
-            os.path.join(cwd, '../examples/roles')
+            os.path.join(cwd, '../examples/roles'),
         )
 
         result = run_ansible_lint(role_path, cwd=cwd, env=env)

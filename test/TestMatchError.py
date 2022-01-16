@@ -54,7 +54,8 @@ class DummySentinelTestObject:
     ),
 )
 def test_matcherror_compare(
-    left_match_error: MatchError, right_match_error: MatchError
+    left_match_error: MatchError,
+    right_match_error: MatchError,
 ) -> None:
     """Check that MatchError instances with similar attrs are equivalent."""
     assert left_match_error == right_match_error
@@ -90,19 +91,25 @@ def test_matcherror_invalid() -> None:
 )
 class TestMatchErrorCompare:
     def test_match_error_less_than(
-        self, left_match_error: MatchError, right_match_error: MatchError
+        self,
+        left_match_error: MatchError,
+        right_match_error: MatchError,
     ) -> None:
         """Check 'less than' protocol implementation in MatchError."""
         assert right_match_error < left_match_error
 
     def test_match_error_greater_than(
-        self, left_match_error: MatchError, right_match_error: MatchError
+        self,
+        left_match_error: MatchError,
+        right_match_error: MatchError,
     ) -> None:
         """Check 'greater than' protocol implementation in MatchError."""
         assert left_match_error > right_match_error
 
     def test_match_error_not_equal(
-        self, left_match_error: MatchError, right_match_error: MatchError
+        self,
+        left_match_error: MatchError,
+        right_match_error: MatchError,
     ) -> None:
         """Check 'not equals' protocol implementation in MatchError."""
         assert left_match_error != right_match_error
@@ -126,7 +133,9 @@ class TestMatchErrorCompare:
     ),
 )
 def test_matcherror_compare_no_other_fallback(
-    other: Any, operation: Callable[..., bool], operator_char: str
+    other: Any,
+    operation: Callable[..., bool],
+    operator_char: str,
 ) -> None:
     """Check that MatchError comparison with other types causes TypeError."""
     expected_error = (
@@ -134,7 +143,8 @@ def test_matcherror_compare_no_other_fallback(
         r'unsupported operand type\(s\) for {operator!s}:|'
         r"'{operator!s}' not supported between instances of"
         r") 'MatchError' and '{other_type!s}'$".format(
-            other_type=type(other).__name__, operator=operator_char
+            other_type=type(other).__name__,
+            operator=operator_char,
         )
     )
     with pytest.raises(TypeError, match=expected_error):
@@ -184,7 +194,8 @@ def test_matcherror_compare_with_other_fallback(
     ids=('==', '!=', '<', '>'),
 )
 def test_matcherror_compare_with_dummy_sentinel(
-    operation: Callable[..., bool], expected_value: str
+    operation: Callable[..., bool],
+    expected_value: str,
 ) -> None:
     """Check that MatchError comparison runs other types fallbacks."""
     dummy_obj = DummySentinelTestObject()

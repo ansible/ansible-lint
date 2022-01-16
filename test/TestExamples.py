@@ -28,13 +28,19 @@ def test_example(default_rules_collection: RulesCollection) -> None:
     ('filename', 'line', 'column'),
     (
         pytest.param(
-            'examples/playbooks/syntax-error-string.yml', 1, 1, id='syntax-error-string'
+            'examples/playbooks/syntax-error-string.yml',
+            1,
+            1,
+            id='syntax-error-string',
         ),
         pytest.param('examples/playbooks/syntax-error.yml', 2, 3, id='syntax-error'),
     ),
 )
 def test_example_syntax_error(
-    default_rules_collection: RulesCollection, filename: str, line: int, column: int
+    default_rules_collection: RulesCollection,
+    filename: str,
+    line: int,
+    column: int,
 ) -> None:
     """Validates that loading valid YAML string produce error."""
     result = Runner(filename, rules=default_rules_collection).run()
@@ -49,7 +55,8 @@ def test_example_syntax_error(
 def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
     result = Runner(
-        'examples/playbooks/custom_module.yml', rules=default_rules_collection
+        'examples/playbooks/custom_module.yml',
+        rules=default_rules_collection,
     ).run()
     assert len(result) == 0
 
@@ -57,7 +64,8 @@ def test_example_custom_module(default_rules_collection: RulesCollection) -> Non
 def test_full_vault(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
     result = Runner(
-        'examples/playbooks/vars/not_decryptable.yml', rules=default_rules_collection
+        'examples/playbooks/vars/not_decryptable.yml',
+        rules=default_rules_collection,
     ).run()
     assert len(result) == 0
 

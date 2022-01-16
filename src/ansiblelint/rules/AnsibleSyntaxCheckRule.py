@@ -32,7 +32,8 @@ _ansible_syntax_check_re = re.compile(
 )
 
 _empty_playbook_re = re.compile(
-    r'^ERROR! Empty playbook, nothing to do', re.MULTILINE | re.S | re.DOTALL
+    r'^ERROR! Empty playbook, nothing to do',
+    re.MULTILINE | re.S | re.DOTALL,
 )
 
 
@@ -119,7 +120,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                     rule=rule,
                     details=details,
                     tag=tag,
-                )
+                ),
             )
         return result
 
@@ -130,7 +131,8 @@ if 'pytest' in sys.modules:
     def test_get_ansible_syntax_check_matches() -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(
-            'examples/playbooks/conflicting_action.yml', kind='playbook'
+            'examples/playbooks/conflicting_action.yml',
+            kind='playbook',
         )
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 3

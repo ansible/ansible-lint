@@ -46,7 +46,9 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     _glob = re.compile('[][*?]')
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         loop_type = next((key for key in task if key.startswith('with_')), None)
         if loop_type:
@@ -74,15 +76,18 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
         return False
 
     def _matchvar(
-        self, varstring: str, task: Dict[str, Any], loop_type: str
+        self,
+        varstring: str,
+        task: Dict[str, Any],
+        loop_type: str,
     ) -> Union[bool, str]:
         if isinstance(varstring, str) and not self._jinja.match(varstring):
             valid = loop_type == 'with_fileglob' and bool(
-                self._jinja.search(varstring) or self._glob.search(varstring)
+                self._jinja.search(varstring) or self._glob.search(varstring),
             )
 
             valid |= loop_type == 'with_filetree' and bool(
-                self._jinja.search(varstring) or varstring.endswith(os.sep)
+                self._jinja.search(varstring) or varstring.endswith(os.sep),
             )
             if not valid:
                 message = (

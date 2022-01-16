@@ -109,7 +109,9 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
     version_added = 'historic'
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         # Use unjinja so that we don't match on jinja filters
         # rather than pipes
@@ -118,7 +120,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
                 unjinjad_cmd = self.unjinja(task['action'].get('cmd', []))
             else:
                 unjinjad_cmd = self.unjinja(
-                    ' '.join(task['action'].get('__ansible_arguments__', []))
+                    ' '.join(task['action'].get('__ansible_arguments__', [])),
                 )
             return not any(ch in unjinjad_cmd for ch in '&|<>;$\n*[]{}?`')
         return False
@@ -133,7 +135,9 @@ if 'pytest' in sys.modules:
 
     @pytest.mark.parametrize(('text', 'expected'), ((SUCCESS_PLAY, 0), (FAIL_PLAY, 3)))
     def test_rule_command_instead_of_shell(
-        default_text_runner: RunFromText, text: str, expected: int
+        default_text_runner: RunFromText,
+        text: str,
+        expected: int,
     ) -> None:
         """Validate that rule works as intended."""
         results = default_text_runner.run_playbook(text)

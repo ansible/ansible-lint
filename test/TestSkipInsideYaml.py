@@ -113,7 +113,9 @@ def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:
     ids=('generic', 'with block become inheritance'),
 )
 def test_playbook(
-    default_text_runner: RunFromText, playbook_src: str, results_num: int
+    default_text_runner: RunFromText,
+    playbook_src: str,
+    results_num: int,
 ) -> None:
     """Check that playbooks can contain skips."""
     results = default_text_runner.run_playbook(playbook_src)

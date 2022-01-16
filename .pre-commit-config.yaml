@@ -14,6 +14,10 @@ ci:
   - pip-compile-docs-upgrade
   - pip-compile-upgrade
 repos:
+- repo: https://github.com/asottile/add-trailing-comma.git
+  rev: v2.2.1
+  hooks:
+  - id: add-trailing-comma
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v4.0.1
   hooks:

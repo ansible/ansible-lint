@@ -66,7 +66,9 @@ class VariableNamingRule(AnsibleLintRule):
         return not bool(self.re_pattern().match(ident))
 
     def matchplay(
-        self, file: 'Lintable', data: 'odict[str, Any]'
+        self,
+        file: 'Lintable',
+        data: 'odict[str, Any]',
     ) -> List['MatchError']:
         """Return matches found for a specific playbook."""
         results = []
@@ -82,13 +84,15 @@ class VariableNamingRule(AnsibleLintRule):
                         message="Play defines variable '"
                         + key
                         + "' within 'vars' section that violates variable naming standards",
-                    )
+                    ),
                 )
 
         return results
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
+        self,
+        task: Dict[str, Any],
+        file: Optional[Lintable] = None,
     ) -> Union[bool, str]:
         """Return matches for task based variables."""
         # If the task uses the 'vars' section to set variables
@@ -128,7 +132,7 @@ class VariableNamingRule(AnsibleLintRule):
                             message="File defines variable '"
                             + key
                             + "' that violates variable naming standards",
-                        )
+                        ),
                     )
         else:
             results.extend(super().matchyaml(file))
@@ -143,7 +147,9 @@ if 'pytest' in sys.modules:
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
     @pytest.mark.parametrize(
-        'rule_runner', (VariableNamingRule,), indirect=['rule_runner']
+        'rule_runner',
+        (VariableNamingRule,),
+        indirect=['rule_runner'],
     )
     def test_invalid_var_name_playbook(rule_runner: RunFromText) -> None:
         """Test rule matches."""

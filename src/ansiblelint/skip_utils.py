@@ -51,7 +51,8 @@ def get_rule_skips_from_line(line: str) -> List[str]:
 
 
 def append_skipped_rules(
-    pyyaml_data: 'AnsibleBaseYAMLObject', lintable: Lintable
+    pyyaml_data: 'AnsibleBaseYAMLObject',
+    lintable: Lintable,
 ) -> 'AnsibleBaseYAMLObject':
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
@@ -92,7 +93,8 @@ def load_data(file_text: str) -> Any:
 
 
 def _append_skipped_rules(
-    pyyaml_data: 'AnsibleBaseYAMLObject', lintable: Lintable
+    pyyaml_data: 'AnsibleBaseYAMLObject',
+    lintable: Lintable,
 ) -> Optional['AnsibleBaseYAMLObject']:
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)

@@ -81,7 +81,7 @@ def test_default_verbosity(verbosity: str, substrs: List[Tuple[str, bool]]) -> N
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture, to produce a warning.
     cwd = os.path.realpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'),
     )
 
     fakerole = os.path.join('test', 'fixtures', 'verbosity-tests')

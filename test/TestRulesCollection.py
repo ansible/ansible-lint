@@ -55,7 +55,8 @@ def test_load_collection_from_directory(test_rules_collection: RulesCollection) 
 
 
 def test_run_collection(
-    test_rules_collection: RulesCollection, ematchtestfile: Lintable
+    test_rules_collection: RulesCollection,
+    ematchtestfile: Lintable,
 ) -> None:
     """Test that default rules match pre-meditated violations."""
     matches = test_rules_collection.run(ematchtestfile)
@@ -112,7 +113,8 @@ def test_skip_id(
 
 
 def test_skip_non_existent_id(
-    test_rules_collection: RulesCollection, ematchtestfile: Lintable
+    test_rules_collection: RulesCollection,
+    ematchtestfile: Lintable,
 ) -> None:
     """Check that skipping invalid IDs changes nothing."""
     matches = test_rules_collection.run(ematchtestfile, skip_list=['DOESNOTEXIST'])
@@ -148,10 +150,11 @@ def test_rules_id_format() -> None:
     rule_id_re = re.compile('^[a-z-]{4,30}$')
     options.enable_list = ['no-same-owner', 'no-log-password', 'no-same-owner']
     rules = RulesCollection(
-        [os.path.abspath('./src/ansiblelint/rules')], options=options
+        [os.path.abspath('./src/ansiblelint/rules')],
+        options=options,
     )
     for rule in rules:
         assert rule_id_re.match(
-            rule.id
+            rule.id,
         ), f'Rule id {rule.id} did not match our required format.'
     assert len(rules) == 40

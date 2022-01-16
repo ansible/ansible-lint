@@ -25,7 +25,9 @@ class TestWithSkipTagId(unittest.TestCase):
     def test_negative_with_tag(self) -> None:
         with_tag = 'trailing-spaces'
         bad_runner = Runner(
-            self.file, rules=self.collection, tags=frozenset([with_tag])
+            self.file,
+            rules=self.collection,
+            tags=frozenset([with_tag]),
         )
         errs = bad_runner.run()
         assert len(errs) > 0

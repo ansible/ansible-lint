@@ -47,7 +47,9 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_play(
-        self, lintable: Lintable, task: 'odict[str, Any]'
+        self,
+        lintable: Lintable,
+        task: 'odict[str, Any]',
     ) -> List[MatchError]:
         """Return matches for a playlist."""
         results = []
@@ -58,7 +60,9 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_tasks(
-        self, lintable: Lintable, tasks: List['odict[str, Any]']
+        self,
+        lintable: Lintable,
+        tasks: List['odict[str, Any]'],
     ) -> List[MatchError]:
         """Return matches for a list of tasks."""
         results = []
@@ -67,7 +71,9 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         return results
 
     def handle_task(
-        self, lintable: Lintable, task: 'odict[str, Any]'
+        self,
+        lintable: Lintable,
+        task: 'odict[str, Any]',
     ) -> List[MatchError]:
         """Return matches for a specific task."""
         results = []
@@ -83,7 +89,8 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
             if not loop_var or not loop_var.startswith(self.prefix):
                 results.append(
                     self.create_matcherror(
-                        filename=lintable, linenumber=task[LINE_NUMBER_KEY]
-                    )
+                        filename=lintable,
+                        linenumber=task[LINE_NUMBER_KEY],
+                    ),
                 )
         return results

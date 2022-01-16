@@ -48,10 +48,6 @@ extend-ignore =
   B014,  # Redundant exception types in `except (ImportError, ModuleNotFoundError) as e:`.  Write `except ImportError as e:`, which catches exactly the same exceptions.
   C405,  # Unnecessary list literal - rewrite as a set literal.
   C408,  # Unnecessary dict call - rewrite as a literal.
-  C812,  # missing trailing comma
-  C813,  # missing trailing comma in Python 3
-  C815,  # missing trailing comma in Python 3.5+
-  C816,  # missing trailing comma in Python 3.6+
   DAR101,
   DAR201,
   DAR301,

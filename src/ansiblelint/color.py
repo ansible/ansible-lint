@@ -15,7 +15,7 @@ _theme = Theme(
         'error_code': 'bright_red',
         'error_title': 'red',
         'filename': 'blue',
-    }
+    },
 )
 console_options: Dict[str, Any] = {'emoji': False, 'theme': _theme, 'soft_wrap': True}
 console_options_stderr = console_options.copy()

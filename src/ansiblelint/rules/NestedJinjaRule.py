@@ -48,7 +48,9 @@ class NestedJinjaRule(AnsibleLintRule):
     pattern = re.compile(r"{{(?:[^{}]*)?[^'\"]{{")
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         command = ''.join(
             str(value)

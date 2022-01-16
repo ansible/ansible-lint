@@ -43,7 +43,7 @@ class Runner:
         skip_list: List[str] = [],
         exclude_paths: List[str] = [],
         verbosity: int = 0,
-        checked_files: Optional[Set[Lintable]] = None
+        checked_files: Optional[Set[Lintable]] = None,
     ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
@@ -148,7 +148,7 @@ class Runner:
                 )
 
                 matches.extend(
-                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list)
+                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list),
                 )
 
         # update list of checked files
@@ -156,7 +156,7 @@ class Runner:
 
         # remove any matches made inside excluded files
         matches = list(
-            filter(lambda match: not self.is_excluded(match.filename), matches)
+            filter(lambda match: not self.is_excluded(match.filename), matches),
         )
 
         return sorted(set(matches))
@@ -178,7 +178,8 @@ class Runner:
                     yield e
                 except AttributeError:
                     yield MatchError(
-                        filename=str(lintable.path), rule=LoadingFailureRule()
+                        filename=str(lintable.path),
+                        rule=LoadingFailureRule(),
                     )
                 visited.add(lintable)
 
@@ -196,7 +197,7 @@ def _get_matches(rules: 'RulesCollection', options: 'Namespace') -> LintResult:
         skip_list=options.skip_list,
         exclude_paths=options.exclude_paths,
         verbosity=options.verbosity,
-        checked_files=checked_files
+        checked_files=checked_files,
     )
     matches.extend(runner.run())
 

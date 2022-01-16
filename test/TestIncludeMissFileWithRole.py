@@ -78,7 +78,8 @@ PLAY_INCLUDED_RELATIVE = Lintable(
     '_play_files',
     (
         pytest.param(
-            [PLAY_MISS_INCLUDE, PLAY_ROLE_INCLUDED_MISS], id='no exist file include'
+            [PLAY_MISS_INCLUDE, PLAY_ROLE_INCLUDED_MISS],
+            id='no exist file include',
         ),
     ),
     indirect=['_play_files'],

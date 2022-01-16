@@ -202,7 +202,9 @@ def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
 
 class RulesCollection:
     def __init__(
-        self, rulesdirs: Optional[List[str]] = None, options: Namespace = options
+        self,
+        rulesdirs: Optional[List[str]] = None,
+        options: Namespace = options,
     ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options
@@ -213,7 +215,7 @@ class RulesCollection:
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
         self.rules.extend(
-            [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()]
+            [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()],
         )
         for rulesdir in self.rulesdirs:
             _logger.debug('Loading rules from %s', rulesdir)
@@ -238,7 +240,10 @@ class RulesCollection:
         self.rules.extend(more)
 
     def run(
-        self, file: Lintable, tags: Set[str] = set(), skip_list: List[str] = []
+        self,
+        file: Lintable,
+        tags: Set[str] = set(),
+        skip_list: List[str] = [],
     ) -> List[MatchError]:
         matches: List[MatchError] = list()
 
@@ -253,7 +258,7 @@ class RulesCollection:
                         filename=file,
                         rule=LoadingFailureRule(),
                         tag=e.__class__.__name__.lower(),
-                    )
+                    ),
                 ]
 
         for rule in self.rules:
@@ -276,7 +281,7 @@ class RulesCollection:
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
         return '\n'.join(
-            [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)]
+            [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)],
         )
 
     def listtags(self) -> str:

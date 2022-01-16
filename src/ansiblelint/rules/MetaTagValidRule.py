@@ -28,7 +28,9 @@ class MetaTagValidRule(AnsibleLintRule):
     TAG_REGEXP = re.compile('^[a-z0-9]+$')
 
     def matchplay(
-        self, file: 'Lintable', data: 'odict[str, Any]'
+        self,
+        file: 'Lintable',
+        data: 'odict[str, Any]',
     ) -> List['MatchError']:
         if file.kind != 'meta':
             return []
@@ -46,23 +48,26 @@ class MetaTagValidRule(AnsibleLintRule):
             else:
                 results.append(
                     self.create_matcherror(
-                        "Expected 'galaxy_tags' to be a list", filename=file
-                    )
+                        "Expected 'galaxy_tags' to be a list",
+                        filename=file,
+                    ),
                 )
 
         if 'categories' in galaxy_info:
             results.append(
                 self.create_matcherror(
-                    "Use 'galaxy_tags' rather than 'categories'", filename=file
-                )
+                    "Use 'galaxy_tags' rather than 'categories'",
+                    filename=file,
+                ),
             )
             if isinstance(galaxy_info['categories'], list):
                 tags += galaxy_info['categories']
             else:
                 results.append(
                     self.create_matcherror(
-                        "Expected 'categories' to be a list", filename=file
-                    )
+                        "Expected 'categories' to be a list",
+                        filename=file,
+                    ),
                 )
 
         for tag in tags:
@@ -70,15 +75,17 @@ class MetaTagValidRule(AnsibleLintRule):
             if not isinstance(tag, str):
                 results.append(
                     self.create_matcherror(
-                        "Tags must be strings: '{}'".format(tag), filename=file
-                    )
+                        "Tags must be strings: '{}'".format(tag),
+                        filename=file,
+                    ),
                 )
                 continue
             if not re.match(self.TAG_REGEXP, tag):
                 results.append(
                     self.create_matcherror(
-                        message="{}, invalid: '{}'".format(msg, tag), filename=file
-                    )
+                        message="{}, invalid: '{}'".format(msg, tag),
+                        filename=file,
+                    ),
                 )
 
         return results
@@ -96,7 +103,9 @@ if 'pytest' in sys.modules:
     import pytest
 
     @pytest.mark.parametrize(
-        'rule_runner', (MetaTagValidRule,), indirect=['rule_runner']
+        'rule_runner',
+        (MetaTagValidRule,),
+        indirect=['rule_runner'],
     )
     def test_valid_tag_rule(rule_runner: 'Any') -> None:
         """Test rule matches."""

@@ -236,14 +236,19 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
 
     try:
         out_present = subprocess.check_output(  # noqa: S603
-            git_command_present, stderr=subprocess.STDOUT, universal_newlines=True
+            git_command_present,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
         ).split('\x00')[:-1]
         _logger.info(
-            'Discovered files to lint using: %s', ' '.join(git_command_present)
+            'Discovered files to lint using: %s',
+            ' '.join(git_command_present),
         )
 
         out_absent = subprocess.check_output(  # noqa: S603
-            git_command_absent, stderr=subprocess.STDOUT, universal_newlines=True
+            git_command_absent,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
         ).split('\x00')[:-1]
         _logger.info('Excluded removed files using: %s', ' '.join(git_command_absent))
 
@@ -263,8 +268,11 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
         _logger.info('Looking up for files, excluding %s ...', exclude_pattern)
         out = set(
             WcMatch(
-                '.', exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
-            ).match()
+                '.',
+                exclude_pattern=exclude_pattern,
+                flags=RECURSIVE,
+                limit=256,
+            ).match(),
         )
 
     return OrderedDict.fromkeys(sorted(out))

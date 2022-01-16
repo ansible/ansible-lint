@@ -49,11 +49,11 @@ class MatchError(ValueError):
         # Safety measture to ensure we do not endup with incorrect indexes
         if linenumber == 0:
             raise RuntimeError(
-                'MatchError called incorrectly as line numbers start with 1'
+                'MatchError called incorrectly as line numbers start with 1',
             )
         if column == 0:
             raise RuntimeError(
-                'MatchError called incorrectly as column numbers start with 1'
+                'MatchError called incorrectly as column numbers start with 1',
             )
 
         self.linenumber = linenumber
@@ -79,7 +79,11 @@ class MatchError(ValueError):
         _id = getattr(self.rule, 'id', '000')
 
         return formatstr.format(
-            _id, self.message, self.filename, self.linenumber, self.details
+            _id,
+            self.message,
+            self.filename,
+            self.linenumber,
+            self.details,
         )
 
     @property

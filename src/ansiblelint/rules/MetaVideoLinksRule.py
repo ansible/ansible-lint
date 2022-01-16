@@ -33,7 +33,9 @@ class MetaVideoLinksRule(AnsibleLintRule):
     }
 
     def matchplay(
-        self, file: 'Lintable', data: 'odict[str, Any]'
+        self,
+        file: 'Lintable',
+        data: 'odict[str, Any]',
     ) -> List['MatchError']:
         if file.kind != 'meta':
             return []
@@ -54,7 +56,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                     self.create_matcherror(
                         "Expected item in 'video_links' to be " 'a dictionary',
                         filename=file,
-                    )
+                    ),
                 )
                 continue
 
@@ -64,7 +66,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                         "Expected item in 'video_links' to contain "
                         "only keys 'url' and 'title'",
                         filename=file,
-                    )
+                    ),
                 )
                 continue
 

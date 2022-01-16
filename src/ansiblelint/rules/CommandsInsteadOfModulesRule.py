@@ -73,7 +73,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     }
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
 
         if task['action']['__ansible_module__'] not in self._commands:
@@ -95,7 +97,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             return False
 
         if executable in self._modules and convert_to_boolean(
-            task['action'].get('warn', True)
+            task['action'].get('warn', True),
         ):
             message = '{0} used in place of {1} module'
             return message.format(executable, self._modules[executable])
@@ -171,7 +173,9 @@ if 'pytest' in sys.modules:  # noqa: C901
 """
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_apt_get(rule_runner: RunFromText) -> None:
         """The apt module supports update."""
@@ -179,7 +183,9 @@ if 'pytest' in sys.modules:  # noqa: C901
         assert len(results) == 1
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_restart_sshd(rule_runner: RunFromText) -> None:
         """Restarting services is supported by the systemd module."""
@@ -187,7 +193,9 @@ if 'pytest' in sys.modules:  # noqa: C901
         assert len(results) == 1
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_git_log(rule_runner: RunFromText) -> None:
         """The git log command is not supported by the git module."""
@@ -195,7 +203,9 @@ if 'pytest' in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_git_branch(rule_runner: RunFromText) -> None:
         """The git branch command is not supported by the git module."""
@@ -203,7 +213,9 @@ if 'pytest' in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_systemd_status(rule_runner: RunFromText) -> None:
         """Set-default is not supported by the systemd module."""
@@ -211,7 +223,9 @@ if 'pytest' in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_systemd_environment(rule_runner: RunFromText) -> None:
         """Showing the environment is not supported by the systemd module."""
@@ -219,7 +233,9 @@ if 'pytest' in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_systemd_runlevel(rule_runner: RunFromText) -> None:
         """Set-default is not supported by the systemd module."""
@@ -227,7 +243,9 @@ if 'pytest' in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_yum_update(rule_runner: RunFromText) -> None:
         """Using yum update should fail."""
@@ -235,7 +253,9 @@ if 'pytest' in sys.modules:  # noqa: C901
         assert len(results) == 1
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        'rule_runner',
+        (CommandsInsteadOfModulesRule,),
+        indirect=['rule_runner'],
     )
     def test_yum_clean(rule_runner: RunFromText) -> None:
         """The yum module does not support clearing yum cache."""

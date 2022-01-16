@@ -89,8 +89,9 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
         ansible_version, err = check_ansible_presence()
         print(
             'ansible-lint {ver!s} using ansible {ansible_ver!s}'.format(
-                ver=__version__, ansible_ver=ansible_version
-            )
+                ver=__version__,
+                ansible_ver=ansible_version,
+            ),
         )
         if err:
             _logger.error(err)
@@ -112,7 +113,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     options.configured = True
     # 6 chars of entropy should be enough
     cache_key = hashlib.sha256(
-        os.path.abspath(options.project_dir).encode()
+        os.path.abspath(options.project_dir).encode(),
     ).hexdigest()[:6]
     options.cache_dir = '%s/ansible-lint/%s' % (
         os.getenv('XDG_CACHE_HOME', os.path.expanduser('~/.cache')),
@@ -121,7 +122,9 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
 
 
 def report_outcome(  # noqa: C901
-    result: 'LintResult', options: Namespace, mark_as_success: bool = False
+    result: 'LintResult',
+    options: Namespace,
+    mark_as_success: bool = False,
 ) -> int:
     """Display information about how to skip found rules.
 
@@ -156,7 +159,7 @@ def report_outcome(  # noqa: C901
     if entries and not options.quiet:
         console_stderr.print(
             'You can skip specific rules or tags by adding them to your '
-            'configuration file:'
+            'configuration file:',
         )
         msg += """\
 # .ansible-lint
@@ -183,7 +186,7 @@ warn_list:  # or 'skip_list' to silence them completely
         console_stderr.print(render_yaml(msg))
         console_stderr.print(
             f'Finished with {failures} failure(s), {warnings} warning(s) '
-            f'on {len(result.files)} files.'
+            f'on {len(result.files)} files.',
         )
 
     if mark_as_success or not failures:
@@ -241,7 +244,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     mark_as_success = False
     if result.matches and options.progressive:
         _logger.info(
-            'Matches found, running again on previous revision in order to detect regressions'
+            'Matches found, running again on previous revision in order to detect regressions',
         )
         with _previous_revision():
             _logger.debug('Options: %s', options)

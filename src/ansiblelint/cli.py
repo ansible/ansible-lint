@@ -31,7 +31,8 @@ _PATH_VARS = [
 
 
 def expand_to_normalized_paths(
-    config: Dict[str, Any], base_dir: Optional[str] = None
+    config: Dict[str, Any],
+    base_dir: Optional[str] = None,
 ) -> None:
     """Mutate given config normalizing any path values in it."""
     # config can be None (-c /dev/null)
@@ -211,7 +212,10 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help='only check rules whose id/tags match these values',
     )
     parser.add_argument(
-        '-T', dest='listtags', action='store_true', help='list all the tags'
+        '-T',
+        dest='listtags',
+        action='store_true',
+        help='list all the tags',
     )
     parser.add_argument(
         '-v',
@@ -376,7 +380,7 @@ def get_config(arguments: List[str]) -> Namespace:
         options.project_dir = normpath(project_dir)
     if not options.project_dir or not os.path.exists(options.project_dir):
         raise RuntimeError(
-            f'Failed to determine a valid project_dir: {options.project_dir}'
+            f'Failed to determine a valid project_dir: {options.project_dir}',
         )
 
     # Compute final verbosity level by subtracting -q counter.
@@ -393,7 +397,8 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
     default_custom_rulesdir = os.environ.get(
-        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, 'custom')
+        CUSTOM_RULESDIR_ENVVAR,
+        os.path.join(DEFAULT_RULESDIR, 'custom'),
     )
     custom_ruledirs = sorted(
         str(rdir.resolve())

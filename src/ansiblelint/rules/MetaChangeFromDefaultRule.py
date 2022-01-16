@@ -24,14 +24,16 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         ('license', 'license (GPL-2.0-or-later, MIT, etc)'),
     ]
     description = 'meta/main.yml default values should be changed for: ``{}``'.format(
-        ', '.join(f[0] for f in field_defaults)
+        ', '.join(f[0] for f in field_defaults),
     )
     severity = 'HIGH'
     tags = ['metadata']
     version_added = 'v4.0.0'
 
     def matchplay(
-        self, file: 'Lintable', data: 'odict[str, Any]'
+        self,
+        file: 'Lintable',
+        data: 'odict[str, Any]',
     ) -> List['MatchError']:
         if file.kind != 'meta':
             return []
@@ -49,7 +51,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
                         filename=file,
                         linenumber=data[LINE_NUMBER_KEY],
                         message='Should change default metadata: %s' % field,
-                    )
+                    ),
                 )
 
         return results

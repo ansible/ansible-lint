@@ -23,7 +23,9 @@ class VariableHasSpacesRule(AnsibleLintRule):
     exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}", re.MULTILINE | re.DOTALL)
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
+        self,
+        task: Dict[str, Any],
+        file: Optional[Lintable] = None,
     ) -> Union[bool, str]:
         for k, v, _ in nested_items(task):
             if isinstance(v, str):
@@ -60,11 +62,12 @@ if 'pytest' in sys.modules:
         return list(map(lambda item: item.linenumber, results))
 
     def test_var_spacing(
-        error_expected_lines: List[int], lint_error_lines: List[int]
+        error_expected_lines: List[int],
+        lint_error_lines: List[int],
     ) -> None:
         """Ensure that expected error lines are matching found linting error lines."""
         # list unexpected error lines or non-matching error lines
         error_lines_difference = list(
-            set(error_expected_lines).symmetric_difference(set(lint_error_lines))
+            set(error_expected_lines).symmetric_difference(set(lint_error_lines)),
         )
         assert len(error_lines_difference) == 0

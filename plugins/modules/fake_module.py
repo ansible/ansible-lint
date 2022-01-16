@@ -12,5 +12,5 @@ def main():
             data=dict(default=None),
             path=dict(default=None, type=str),
             file=dict(default=None, type=str),
-        )
+        ),
     )

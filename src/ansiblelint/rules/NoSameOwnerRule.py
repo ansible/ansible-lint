@@ -59,15 +59,17 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
                 print(task)
                 results.append(
                     self.create_matcherror(
-                        filename=lintable, linenumber=task[LINE_NUMBER_KEY]
-                    )
+                        filename=lintable,
+                        linenumber=task[LINE_NUMBER_KEY],
+                    ),
                 )
         elif 'unarchive' in task:
             if self.handle_unarchive(task):
                 results.append(
                     self.create_matcherror(
-                        filename=lintable, linenumber=task[LINE_NUMBER_KEY]
-                    )
+                        filename=lintable,
+                        linenumber=task[LINE_NUMBER_KEY],
+                    ),
                 )
 
         return results
@@ -117,15 +119,21 @@ if 'pytest' in sys.modules:
         ('test_file', 'failures'),
         (
             pytest.param(
-                'examples/roles/role_for_no_same_owner/tasks/fail.yml', 10, id='fail'
+                'examples/roles/role_for_no_same_owner/tasks/fail.yml',
+                10,
+                id='fail',
             ),
             pytest.param(
-                'examples/roles/role_for_no_same_owner/tasks/pass.yml', 0, id='pass'
+                'examples/roles/role_for_no_same_owner/tasks/pass.yml',
+                0,
+                id='pass',
             ),
         ),
     )
     def test_no_same_owner_rule(
-        default_rules_collection: RulesCollection, test_file: str, failures: int
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: int,
     ) -> None:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()

@@ -166,7 +166,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
 
         if not isinstance(matches, list):
             raise RuntimeError(
-                'The CodeclimatJSONFormatter was expecting a list of MatchError.'
+                'The CodeclimatJSONFormatter was expecting a list of MatchError.',
             )
 
         result = []
@@ -178,7 +178,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             issue['severity'] = self._severity_to_level(match.rule.severity)
             issue['description'] = self.escape(str(match.rule.description))
             issue['fingerprint'] = hashlib.sha256(
-                repr(match).encode('utf-8')
+                repr(match).encode('utf-8'),
             ).hexdigest()
             issue['location'] = {}
             issue['location']['path'] = self._format_path(match.filename or '')

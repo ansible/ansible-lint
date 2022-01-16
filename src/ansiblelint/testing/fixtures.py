@@ -31,7 +31,8 @@ def play_file_path(tmp_path: Path) -> str:
 
 @pytest.fixture
 def runner(
-    play_file_path: Union[Lintable, str], default_rules_collection: RulesCollection
+    play_file_path: Union[Lintable, str],
+    default_rules_collection: RulesCollection,
 ) -> Runner:
     """Fixture to return a Runner() instance."""
     return Runner(play_file_path, rules=default_rules_collection)

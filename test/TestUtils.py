@@ -110,7 +110,8 @@ def test_tokenize(
     ),
 )
 def test_normalize(
-    reference_form: Dict[str, Any], alternate_forms: Tuple[Dict[str, Any]]
+    reference_form: Dict[str, Any],
+    alternate_forms: Tuple[Dict[str, Any]],
 ) -> None:
     """Test that tasks specified differently are normalized same way."""
     normal_form = utils.normalize_task(reference_form, 'tasks.yml')
@@ -122,19 +123,23 @@ def test_normalize(
 def test_normalize_complex_command() -> None:
     """Test that tasks specified differently are normalized same way."""
     task1 = dict(
-        name='hello', action={'module': 'pip', 'name': 'df', 'editable': 'false'}
+        name='hello',
+        action={'module': 'pip', 'name': 'df', 'editable': 'false'},
     )
     task2 = dict(name='hello', pip={'name': 'df', 'editable': 'false'})
     task3 = dict(name='hello', pip='name=df editable=false')
     task4 = dict(name='hello', action='pip name=df editable=false')
     assert utils.normalize_task(task1, 'tasks.yml') == utils.normalize_task(
-        task2, 'tasks.yml'
+        task2,
+        'tasks.yml',
     )
     assert utils.normalize_task(task2, 'tasks.yml') == utils.normalize_task(
-        task3, 'tasks.yml'
+        task3,
+        'tasks.yml',
     )
     assert utils.normalize_task(task3, 'tasks.yml') == utils.normalize_task(
-        task4, 'tasks.yml'
+        task4,
+        'tasks.yml',
     )
 
 
@@ -215,7 +220,7 @@ def test_template_lookup(role: str, expect_warning: bool) -> None:
             role,
             'tasks',
             'main.yml',
-        )
+        ),
     )
     result = run_ansible_lint('-v', task_path)
     assert ('Unable to find' in result.stderr) == expect_warning
@@ -258,7 +263,9 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
     ),
 )
 def test_expand_paths_vars(
-    test_path: Union[str, Path], expected: str, monkeypatch: MonkeyPatch
+    test_path: Union[str, Path],
+    expected: str,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Ensure that tilde and env vars are expanded in paths lists."""
     monkeypatch.setenv('TEST_PATH', '/test/path')
@@ -297,7 +304,9 @@ def test_discover_lintables_git_verbose(
     ids=('in Git', 'outside Git'),
 )
 def test_discover_lintables_silent(
-    is_in_git: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture[str]
+    is_in_git: bool,
+    monkeypatch: MonkeyPatch,
+    capsys: CaptureFixture[str],
 ) -> None:
     """Verify that no stderr output is displayed while discovering yaml files.
 
@@ -312,7 +321,7 @@ def test_discover_lintables_silent(
         monkeypatch.setenv('GIT_DIR', '')
 
     yaml_count = len(list(lint_path.glob('**/*.yml'))) + len(
-        list(lint_path.glob('**/*.yaml'))
+        list(lint_path.glob('**/*.yaml')),
     )
 
     monkeypatch.chdir(str(lint_path))
@@ -484,7 +493,9 @@ _CUSTOM_RULEDIRS = [
     ),
 )
 def test_get_rules_dirs(
-    user_ruledirs: List[str], use_default: bool, expected: List[str]
+    user_ruledirs: List[str],
+    use_default: bool,
+    expected: List[str],
 ) -> None:
     """Test it returns expected dir lists."""
     assert get_rules_dirs(user_ruledirs, use_default) == expected

@@ -33,7 +33,9 @@ class App:
             # If formatter CodeclimateJSONFormatter is chosen,
             # then print only the matches in JSON
             console.print(
-                self.formatter.format_result(matches), markup=False, highlight=False
+                self.formatter.format_result(matches),
+                markup=False,
+                highlight=False,
             )
             return None
 
@@ -51,7 +53,8 @@ class App:
                     console.print(self.formatter.format(match), highlight=False)
         if fatal_matches:
             _logger.warning(
-                'Listing %s violation(s) that are fatal', len(fatal_matches)
+                'Listing %s violation(s) that are fatal',
+                len(fatal_matches),
             )
             for match in fatal_matches:
                 if not match.ignored:

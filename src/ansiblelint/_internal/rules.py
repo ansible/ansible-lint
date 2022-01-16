@@ -46,7 +46,9 @@ class BaseRule:
         return []
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         """Confirm if current rule is matching a specific task."""
         return False
@@ -60,7 +62,9 @@ class BaseRule:
         return []
 
     def matchplay(
-        self, file: 'Lintable', data: 'odict[str, Any]'
+        self,
+        file: 'Lintable',
+        data: 'odict[str, Any]',
     ) -> List['MatchError']:
         """Return matches found for a specific playbook."""
         return []

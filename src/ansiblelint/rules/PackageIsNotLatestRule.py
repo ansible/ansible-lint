@@ -68,7 +68,9 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         return (
             task['action']['__ansible_module__'] in self._package_managers

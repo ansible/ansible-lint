@@ -32,7 +32,7 @@ class TestCodeclimateJSONFormatter:
                 details='hello',
                 filename='filename.yml',
                 rule=self.rule,
-            )
+            ),
         )
         self.matches.append(
             MatchError(
@@ -41,10 +41,11 @@ class TestCodeclimateJSONFormatter:
                 details='hello',
                 filename='filename.yml',
                 rule=self.rule,
-            )
+            ),
         )
         self.formatter = CodeclimateJSONFormatter(
-            pathlib.Path.cwd(), display_relative_path=True
+            pathlib.Path.cwd(),
+            display_relative_path=True,
         )
 
     def test_format_list(self) -> None:

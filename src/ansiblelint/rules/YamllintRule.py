@@ -21,7 +21,7 @@ except ImportError:
     # missing library is ignored unless yaml is exclitely added to enable_list
     if 'yaml' in options.enable_list:
         raise RuntimeError(
-            'Failed to load yamllint library and ansible-linted was configured to require it.'
+            'Failed to load yamllint library and ansible-linted was configured to require it.',
         )
 
 
@@ -92,7 +92,9 @@ class YamllintRule(AnsibleLintRule):
 
         if YamllintRule.config:
             for p in run_yamllint(
-                file.content, YamllintRule.config, filepath=file.path
+                file.content,
+                YamllintRule.config,
+                filepath=file.path,
             ):
                 self.severity = 'VERY_LOW'
                 if p.level == 'error':
@@ -106,7 +108,7 @@ class YamllintRule(AnsibleLintRule):
                         details='',
                         filename=str(file.path),
                         tag=p.rule,
-                    )
+                    ),
                 )
 
         if matches:

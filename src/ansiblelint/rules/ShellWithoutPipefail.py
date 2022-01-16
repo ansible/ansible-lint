@@ -29,7 +29,9 @@ class ShellWithoutPipefail(AnsibleLintRule):
     _pipe_re = re.compile(r'(?<!\|)\|(?!\|)')
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         if task['__ansible_action_type__'] != 'task':
             return False
@@ -41,11 +43,11 @@ class ShellWithoutPipefail(AnsibleLintRule):
             return False
 
         unjinjad_cmd = self.unjinja(
-            ' '.join(task['action'].get('__ansible_arguments__', []))
+            ' '.join(task['action'].get('__ansible_arguments__', [])),
         )
 
         return bool(
             self._pipe_re.search(unjinjad_cmd)
             and not self._pipefail_re.search(unjinjad_cmd)
-            and not convert_to_boolean(task['action'].get('ignore_errors', False))
+            and not convert_to_boolean(task['action'].get('ignore_errors', False)),
         )

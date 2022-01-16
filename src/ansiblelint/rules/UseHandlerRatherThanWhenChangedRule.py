@@ -61,7 +61,9 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     version_added = 'historic'
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         if task['__ansible_action_type__'] != 'task':
             return False
@@ -124,7 +126,9 @@ if 'pytest' in sys.modules:
 """
 
     @pytest.mark.parametrize(
-        'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']
+        'rule_runner',
+        (UseHandlerRatherThanWhenChangedRule,),
+        indirect=['rule_runner'],
     )
     def test_succeed_changed_when(rule_runner: Any) -> None:
         """Using changed_when is acceptable."""
@@ -132,7 +136,9 @@ if 'pytest' in sys.modules:
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']
+        'rule_runner',
+        (UseHandlerRatherThanWhenChangedRule,),
+        indirect=['rule_runner'],
     )
     def test_succeed_when_and(rule_runner: Any) -> None:
         """See https://github.com/ansible-community/ansible-lint/issues/1526."""
@@ -140,7 +146,9 @@ if 'pytest' in sys.modules:
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']
+        'rule_runner',
+        (UseHandlerRatherThanWhenChangedRule,),
+        indirect=['rule_runner'],
     )
     def test_fail_result_is_changed(rule_runner: Any) -> None:
         """This task uses 'is changed'."""
@@ -148,7 +156,9 @@ if 'pytest' in sys.modules:
         assert len(results) == 1
 
     @pytest.mark.parametrize(
-        'rule_runner', (UseHandlerRatherThanWhenChangedRule,), indirect=['rule_runner']
+        'rule_runner',
+        (UseHandlerRatherThanWhenChangedRule,),
+        indirect=['rule_runner'],
     )
     def test_failed_something_changed(rule_runner: Any) -> None:
         """This task uses '.changed'."""

@@ -17,7 +17,9 @@ from ansiblelint.formatters import BaseFormatter
 )
 @pytest.mark.parametrize('path', ('/whatever/string', Path('/whatever/string')))
 def test_base_formatter_when_base_dir(
-    base_dir: Any, relative_path: bool, path: str
+    base_dir: Any,
+    relative_path: bool,
+    path: str,
 ) -> None:
     """Check that base formatter accepts relative pathlib and str."""
     # Given
@@ -41,7 +43,8 @@ def test_base_formatter_when_base_dir(
 )
 @pytest.mark.parametrize('path', ('/whatever/string', Path('/whatever/string')))
 def test_base_formatter_when_base_dir_is_given_and_relative_is_true(
-    path: Union[str, Path], base_dir: Union[str, Path]
+    path: Union[str, Path],
+    base_dir: Union[str, Path],
 ) -> None:
     """Check that the base formatter equally accepts pathlib and str."""
     # Given

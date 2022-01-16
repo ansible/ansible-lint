@@ -82,11 +82,13 @@ class OctalPermissionsRule(AnsibleLintRule):
             or user_write_without_read
             or other_more_generous_than_group
             or other_more_generous_than_user
-            or group_more_generous_than_user
+            or group_more_generous_than_user,
         )
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         if task['action']['__ansible_module__'] in self._modules:
             mode = task['action'].get('mode', None)

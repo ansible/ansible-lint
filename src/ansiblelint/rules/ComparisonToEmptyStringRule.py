@@ -29,7 +29,9 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
     empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         for k, v, _ in nested_items(task):
             if k == 'when':
@@ -41,7 +43,7 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
                 else:
                     for item in v:
                         if isinstance(item, str) and self.empty_string_compare.search(
-                            item
+                            item,
                         ):
                             return True
 
@@ -75,7 +77,9 @@ if 'pytest' in sys.modules:
 """
 
     @pytest.mark.parametrize(
-        'rule_runner', (ComparisonToEmptyStringRule,), indirect=['rule_runner']
+        'rule_runner',
+        (ComparisonToEmptyStringRule,),
+        indirect=['rule_runner'],
     )
     def test_rule_empty_string_compare_fail(rule_runner: RunFromText) -> None:
         """Test rule matches."""
@@ -85,7 +89,9 @@ if 'pytest' in sys.modules:
             assert result.message == ComparisonToEmptyStringRule.shortdesc
 
     @pytest.mark.parametrize(
-        'rule_runner', (ComparisonToEmptyStringRule,), indirect=['rule_runner']
+        'rule_runner',
+        (ComparisonToEmptyStringRule,),
+        indirect=['rule_runner'],
     )
     def test_rule_empty_string_compare_pass(rule_runner: RunFromText) -> None:
         """Test rule matches."""

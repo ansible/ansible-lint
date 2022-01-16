@@ -17,28 +17,28 @@ LAYOUT_IMPORTS: Dict[str, str] = {
           tasks:
             - name: from main import task 1
               import_tasks: tasks/task_1.yml
-        """
+        """,
     ),
     'tasks/task_1.yml': textwrap.dedent(
         """\
         ---
         - name: from task 1 import task 2
           import_tasks: tasks/task_2.yml
-        """
+        """,
     ),
     'tasks/task_2.yml': textwrap.dedent(
         """\
         ---
         - name: from task 2 import subtask 1
           import_tasks: tasks/subtasks/subtask_1.yml
-        """
+        """,
     ),
     'tasks/subtasks/subtask_1.yml': textwrap.dedent(
         """\
         ---
         - name: from subtask 1 import subtask 2
           import_tasks: tasks/subtasks/subtask_2.yml
-        """
+        """,
     ),
     'tasks/subtasks/subtask_2.yml': textwrap.dedent(
         """\
@@ -47,7 +47,7 @@ LAYOUT_IMPORTS: Dict[str, str] = {
           debug:
             msg: |
               Something...
-        """
+        """,
     ),
 }
 
@@ -60,28 +60,28 @@ LAYOUT_INCLUDES: Dict[str, str] = {
           tasks:
             - name: from main import task 1
               include_tasks: tasks/task_1.yml
-        """
+        """,
     ),
     'tasks/task_1.yml': textwrap.dedent(
         """\
         ---
         - name: from task 1 import task 2
           include_tasks: tasks/task_2.yml
-        """
+        """,
     ),
     'tasks/task_2.yml': textwrap.dedent(
         """\
         ---
         - name: from task 2 import subtask 1
           include_tasks: tasks/subtasks/subtask_1.yml
-        """
+        """,
     ),
     'tasks/subtasks/subtask_1.yml': textwrap.dedent(
         """\
         ---
         - name: from subtask 1 import subtask 2
           include_tasks: tasks/subtasks/subtask_2.yml
-        """
+        """,
     ),
     'tasks/subtasks/subtask_2.yml': textwrap.dedent(
         """\
@@ -90,7 +90,7 @@ LAYOUT_INCLUDES: Dict[str, str] = {
           debug:
             msg: |
               Something...
-        """
+        """,
     ),
 }
 
@@ -103,7 +103,7 @@ LAYOUT_INCLUDES: Dict[str, str] = {
     ),
 )
 @pytest.mark.xfail(
-    reason='https://github.com/ansible-community/ansible-lint/issues/1446'
+    reason='https://github.com/ansible-community/ansible-lint/issues/1446',
 )
 def test_file_path_evaluation(
     tmp_path: Path,

@@ -27,7 +27,9 @@ class NoFormattingInWhenRule(AnsibleLintRule):
         return when.find('{{') == -1 and when.find('}}') == -1
 
     def matchplay(
-        self, file: 'Lintable', data: 'odict[str, Any]'
+        self,
+        file: 'Lintable',
+        data: 'odict[str, Any]',
     ) -> List['MatchError']:
         errors: List['MatchError'] = []
         if isinstance(data, dict):
@@ -40,7 +42,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
                             details=str({'when': role}),
                             filename=file,
                             linenumber=role[LINE_NUMBER_KEY],
-                        )
+                        ),
                     )
         if isinstance(data, list):
             for play_item in data:
@@ -50,6 +52,8 @@ class NoFormattingInWhenRule(AnsibleLintRule):
         return errors
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         return 'when' in task and not self._is_valid(task['when'])

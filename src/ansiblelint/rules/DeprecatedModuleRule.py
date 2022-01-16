@@ -66,7 +66,9 @@ class DeprecatedModuleRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         module = task['action']['__ansible_module__']
         if module in self._modules:

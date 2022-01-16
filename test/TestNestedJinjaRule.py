@@ -214,7 +214,8 @@ def _playbook_file(tmp_path: Path, request: SubRequest) -> None:
         pytest.param([FAIL_TASK_2LN_M], id='file includes two-level multiline nesting'),
         pytest.param([FAIL_TASK_W_5LN], id='file includes five-level wild nesting'),
         pytest.param(
-            [FAIL_TASK_W_5LN_M], id='file includes five-level wild multiline nesting'
+            [FAIL_TASK_W_5LN_M],
+            id='file includes five-level wild multiline nesting',
         ),
     ),
     indirect=['_playbook_file'],
@@ -231,7 +232,8 @@ def test_including_wrong_nested_jinja(runner: Runner) -> None:
     (
         pytest.param([SUCCESS_TASK_P], id='file includes non-nested example'),
         pytest.param(
-            [SUCCESS_TASK_P_M], id='file includes multiline non-nested example'
+            [SUCCESS_TASK_P_M],
+            id='file includes multiline non-nested example',
         ),
         pytest.param([SUCCESS_TASK_2P], id='file includes nesting far from each other'),
         pytest.param(
@@ -239,7 +241,8 @@ def test_including_wrong_nested_jinja(runner: Runner) -> None:
             id='file includes multiline nesting far from each other',
         ),
         pytest.param(
-            [SUCCESS_TASK_C_2P], id='file includes nesting close to each other'
+            [SUCCESS_TASK_C_2P],
+            id='file includes nesting close to each other',
         ),
         pytest.param(
             [SUCCESS_TASK_C_2P_M],

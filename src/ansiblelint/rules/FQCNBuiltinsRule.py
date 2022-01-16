@@ -88,7 +88,9 @@ class FQCNBuiltinsRule(AnsibleLintRule):
     tags = ['opt-in', 'formatting', 'experimental']
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
+        self,
+        task: Dict[str, Any],
+        file: Optional[Lintable] = None,
     ) -> Union[bool, str]:
         return task['action']['__ansible_module_original__'] in builtins
 
@@ -113,7 +115,9 @@ if 'pytest' in sys.modules:
     """
 
     @pytest.mark.parametrize(
-        'rule_runner', (FQCNBuiltinsRule,), indirect=['rule_runner']
+        'rule_runner',
+        (FQCNBuiltinsRule,),
+        indirect=['rule_runner'],
     )
     def test_fqcn_builtin_fail(rule_runner: RunFromText) -> None:
         """Test rule matches."""
@@ -123,7 +127,9 @@ if 'pytest' in sys.modules:
             assert result.message == FQCNBuiltinsRule.shortdesc
 
     @pytest.mark.parametrize(
-        'rule_runner', (FQCNBuiltinsRule,), indirect=['rule_runner']
+        'rule_runner',
+        (FQCNBuiltinsRule,),
+        indirect=['rule_runner'],
     )
     def test_fqcn_builtin_pass(rule_runner: RunFromText) -> None:
         """Test rule does not match."""

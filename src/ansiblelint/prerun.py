@@ -65,7 +65,7 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
             from ansible.release import __version__ as ansible_module_version
 
             if version.parse(ansible_module_version) < version.parse(
-                ANSIBLE_MIN_VERSION
+                ANSIBLE_MIN_VERSION,
             ):
                 failed = True
         except (ImportError, ModuleNotFoundError) as e:
@@ -365,7 +365,9 @@ def _write_module_stub(
 ) -> None:
     """Write module stub to disk."""
     body = ANSIBLE_MOCKED_MODULE.format(
-        name=name, collection=collection, namespace=namespace
+        name=name,
+        collection=collection,
+        namespace=namespace,
     )
     with open(filename, 'w') as f:
         f.write(body)
@@ -410,7 +412,7 @@ def _perform_mockings() -> None:
     if not namespace or not collection:
         return
     p = pathlib.Path(
-        f'{options.cache_dir}/collections/ansible_collections/{ namespace }'
+        f'{options.cache_dir}/collections/ansible_collections/{ namespace }',
     )
     p.mkdir(parents=True, exist_ok=True)
     link_path = p / collection
@@ -432,7 +434,9 @@ def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str],
         env.pop(colpathvar)
 
     config = subprocess.check_output(  # noqa: S603, S607
-        ['ansible-config', 'dump'], universal_newlines=True, env=env
+        ['ansible-config', 'dump'],
+        universal_newlines=True,
+        env=env,
     )
 
     if kind == str:
@@ -453,7 +457,9 @@ def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str],
 
 
 def require_collection(  # noqa: C901
-    name: str, version: Optional[str] = None, install: bool = True
+    name: str,
+    version: Optional[str] = None,
+    install: bool = True,
 ) -> None:
     """Check if a minimal collection version is present or exits.
 
@@ -488,7 +494,7 @@ def require_collection(  # noqa: C901
             with open(mpath, 'r') as f:
                 manifest = json.loads(f.read())
                 found_version = packaging.version.parse(
-                    manifest['collection_info']['version']
+                    manifest['collection_info']['version'],
                 )
                 if version and found_version < packaging.version.parse(version):
                     if install:

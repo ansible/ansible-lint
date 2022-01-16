@@ -88,7 +88,9 @@ def playbook_path(request: SubRequest, tmp_path: Path) -> str:
     indirect=('playbook_path',),
 )
 def test_import_role2(
-    default_rules_collection: RulesCollection, playbook_path: str, messages: List[str]
+    default_rules_collection: RulesCollection,
+    playbook_path: str,
+    messages: List[str],
 ) -> None:
     """Test that include_role digs deeper than import_role."""
     runner = Runner(playbook_path, rules=default_rules_collection)

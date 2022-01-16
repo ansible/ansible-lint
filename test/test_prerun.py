@@ -18,8 +18,11 @@ def test_prerun_reqs_v1() -> None:
     """Checks that the linter can auto-install requirements v1 when found."""
     cwd = os.path.realpath(
         os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), '..', 'examples', 'reqs_v1'
-        )
+            os.path.dirname(os.path.realpath(__file__)),
+            '..',
+            'examples',
+            'reqs_v1',
+        ),
     )
     result = run_ansible_lint('-v', '.', cwd=cwd)
     assert 'Running ansible-galaxy role install' in result.stderr, result.stderr
@@ -34,8 +37,11 @@ def test_prerun_reqs_v2() -> None:
     """Checks that the linter can auto-install requirements v2 when found."""
     cwd = os.path.realpath(
         os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), '..', 'examples', 'reqs_v2'
-        )
+            os.path.dirname(os.path.realpath(__file__)),
+            '..',
+            'examples',
+            'reqs_v2',
+        ),
     )
     result = run_ansible_lint('-v', '.', cwd=cwd)
     assert 'Running ansible-galaxy role install' in result.stderr, result.stderr
@@ -79,7 +85,9 @@ def test__update_env_no_default_no_value(monkeypatch: MonkeyPatch) -> None:
     ),
 )
 def test__update_env_no_old_value_no_default(
-    monkeypatch: MonkeyPatch, value: List[str], result: str
+    monkeypatch: MonkeyPatch,
+    value: List[str],
+    result: str,
 ) -> None:
     """Values are concatenated using : as the separator."""
     monkeypatch.delenv('DUMMY_VAR', raising=False)
@@ -97,7 +105,10 @@ def test__update_env_no_old_value_no_default(
     ),
 )
 def test__update_env_no_old_value(
-    monkeypatch: MonkeyPatch, default: str, value: List[str], result: str
+    monkeypatch: MonkeyPatch,
+    default: str,
+    value: List[str],
+    result: str,
 ) -> None:
     """Values are appended to default value."""
     monkeypatch.delenv('DUMMY_VAR', raising=False)
@@ -115,7 +126,10 @@ def test__update_env_no_old_value(
     ),
 )
 def test__update_env_no_default(
-    monkeypatch: MonkeyPatch, old_value: str, value: List[str], result: str
+    monkeypatch: MonkeyPatch,
+    old_value: str,
+    value: List[str],
+    result: str,
 ) -> None:
     """Values are appended to preexisting value."""
     monkeypatch.setenv('DUMMY_VAR', old_value)
@@ -159,7 +173,7 @@ def test_require_collection_wrong_version() -> None:
             'containers.podman',
             '-p',
             '~/.ansible/collections',
-        ]
+        ],
     )
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         prerun.require_collection('containers.podman', '9999.9.9')

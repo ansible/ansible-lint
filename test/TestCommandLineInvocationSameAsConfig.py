@@ -30,7 +30,9 @@ def base_arguments() -> List[str]:
     ),
 )
 def test_ensure_config_are_equal(
-    base_arguments: List[str], args: List[str], config: str
+    base_arguments: List[str],
+    args: List[str],
+    config: str,
 ) -> None:
     """Check equality of the CLI options to config files."""
     command = base_arguments + args
@@ -55,7 +57,7 @@ def test_config_can_be_overridden(base_arguments: List[str]) -> None:
     no_override = cli.get_config(base_arguments + ['-t', 'bad_tag'])
 
     overridden = cli.get_config(
-        base_arguments + ['-t', 'bad_tag', '-c', 'test/fixtures/tags.yml']
+        base_arguments + ['-t', 'bad_tag', '-c', 'test/fixtures/tags.yml'],
     )
 
     assert no_override.tags + ['skip_ansible_lint'] == overridden.tags
@@ -64,7 +66,7 @@ def test_config_can_be_overridden(base_arguments: List[str]) -> None:
 def test_different_config_file(base_arguments: List[str]) -> None:
     """Ensures an alternate config_file can be used."""
     diff_config = cli.get_config(
-        base_arguments + ['-c', 'test/fixtures/ansible-config.yml']
+        base_arguments + ['-c', 'test/fixtures/ansible-config.yml'],
     )
     no_config = cli.get_config(base_arguments + ['-v'])
 
@@ -74,11 +76,11 @@ def test_different_config_file(base_arguments: List[str]) -> None:
 def test_expand_path_user_and_vars_config_file(base_arguments: List[str]) -> None:
     """Ensure user and vars are expanded when specified as exclude_paths."""
     config1 = cli.get_config(
-        base_arguments + ['-c', 'test/fixtures/exclude-paths-with-expands.yml']
+        base_arguments + ['-c', 'test/fixtures/exclude-paths-with-expands.yml'],
     )
     config2 = cli.get_config(
         base_arguments
-        + ['--exclude', '~/.ansible/roles', '--exclude', '$HOME/.ansible/roles']
+        + ['--exclude', '~/.ansible/roles', '--exclude', '$HOME/.ansible/roles'],
     )
 
     assert str(config1.exclude_paths[0]) == os.path.expanduser('~/.ansible/roles')
@@ -99,7 +101,8 @@ def test_path_from_config_do_not_depend_on_cwd(
 
 
 def test_path_from_cli_depend_on_cwd(
-    base_arguments: List[str], monkeypatch: MonkeyPatch
+    base_arguments: List[str],
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Check that CLI-provided paths are relative to CWD."""
     # Issue 572
@@ -134,7 +137,7 @@ def test_config_failure(base_arguments: List[str], config_file: str) -> None:
 def test_extra_vars_loaded(base_arguments: List[str]) -> None:
     """Ensure ``extra_vars`` option is loaded from file config."""
     config = cli.get_config(
-        base_arguments + ['-c', 'test/fixtures/config-with-extra-vars.yml']
+        base_arguments + ['-c', 'test/fixtures/config-with-extra-vars.yml'],
     )
 
     assert config.extra_vars == {'foo': 'bar', 'knights_favorite_word': 'NI'}

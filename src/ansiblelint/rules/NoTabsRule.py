@@ -27,7 +27,9 @@ class NoTabsRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         for k, v, parent in nested_items(task):
             if isinstance(k, str) and '\t' in k:

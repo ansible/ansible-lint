@@ -40,6 +40,8 @@ class TaskHasNameRule(AnsibleLintRule):
     version_added = 'historic'
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self,
+        task: Dict[str, Any],
+        file: 'Optional[Lintable]' = None,
     ) -> Union[bool, str]:
         return not task.get('name')

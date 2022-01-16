@@ -19,7 +19,7 @@ META_INFO = tuple(
         'license',
         'min_ansible_version',
         'platforms',
-    ]
+    ],
 )
 
 

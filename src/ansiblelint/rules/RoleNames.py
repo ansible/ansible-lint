@@ -66,11 +66,13 @@ class RoleNames(AnsibleLintRule):
             return result
         if file.kind == 'role':
             role_name = self._infer_role_name(
-                meta=file.path / 'meta' / 'main.yml', default=file.path.name
+                meta=file.path / 'meta' / 'main.yml',
+                default=file.path.name,
             )
         else:
             role_name = self._infer_role_name(
-                meta=file.path, default=file.path.resolve().parents[1].name
+                meta=file.path,
+                default=file.path.resolve().parents[1].name,
             )
 
         role_name = _remove_prefix(role_name, 'ansible-role-')
@@ -81,7 +83,7 @@ class RoleNames(AnsibleLintRule):
                     self.create_matcherror(
                         filename=str(file.path),
                         message=self.__class__.shortdesc.format(role_name),
-                    )
+                    ),
                 )
         return result
 
