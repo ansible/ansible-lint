@@ -145,8 +145,8 @@ def runner_result(
         pytest.param(
             'examples/roles/role_for_facts_namespacing/tasks/fail.yml',
             [],
-            6,
-            6,
+            7,
+            7,
             True,
             id="facts_namespacing_tasks",
         ),
