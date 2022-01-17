@@ -6,6 +6,10 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules.TaskNoLocalAction import TaskNoLocalAction
 from ansiblelint.transforms import Transform
+from ansiblelint.utils import (
+    get_normalized_tasks_including_skipped,
+    parse_yaml_linenumbers,
+)
 
 
 class ReplaceLocalActionTransform(Transform):
@@ -31,7 +35,8 @@ class ReplaceLocalActionTransform(Transform):
 
         # TaskNoLocalAction matches lines, not tasks.
         # So we need to resolve the ansible bits instead of grabbing match.task
-        tasks = self._get_ansible_tasks(lintable)
+        yaml = parse_yaml_linenumbers(lintable)
+        tasks = get_normalized_tasks_including_skipped(yaml, lintable)
 
         normalized_task: dict = self._seek(match.yaml_path, tasks)
         target_task: CommentedMap = self._seek(match.yaml_path, data)

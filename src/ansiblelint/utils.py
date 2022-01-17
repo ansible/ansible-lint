@@ -724,6 +724,27 @@ def get_normalized_tasks(
     return res
 
 
+def get_normalized_tasks_including_skipped(
+    yaml: "AnsibleBaseYAMLObject", file: Lintable
+) -> List[Dict[str, Any]]:
+    """Extract normalized tasks from a file without skipping any tasks.
+    This is primarily for transforms that need a list of tasks
+    in the same order as in the tasks/playbook file for editing.
+    """
+    raw_tasks = get_action_tasks(yaml, file)
+    tasks = []
+    for raw_task in raw_tasks:
+        try:
+            tasks.append(normalize_task(raw_task, str(file.path)))
+        except MatchError as e:
+            # This gets raised from AnsibleParserError.
+            # Leave it as-is to keep the task indexes the same.
+            raw_task["__match_error__"] = e
+            tasks.append(raw_task)
+
+    return tasks
+
+
 @lru_cache(maxsize=128)
 def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.

@@ -77,25 +77,6 @@ class Transform:
         """Enable us to sort transforms by their id."""
         return self.id < other.id
 
-    @staticmethod
-    def _get_ansible_tasks(lintable: Lintable):
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(lintable)
-        # we can't use ansiblelint.utils.get_normalized_tasks
-        # because it does not normalize tasks tagged with skip_ansible_lint
-        raw_tasks = ansiblelint.utils.get_action_tasks(yaml, lintable)
-        tasks = []
-        for raw_task in raw_tasks:
-            try:
-                tasks.append(
-                    ansiblelint.utils.normalize_task(raw_task, str(lintable.path))
-                )
-            except MatchError as e:
-                # This gets raised from AnsibleParserError.
-                # Leave it as-is to keep the task indexes the same.
-                raw_task["__match_error__"] = e
-                tasks.append(raw_task)
-        return tasks
-
 
 # TODO: is_valid_transform and load_plugins are essentially the same as is_valid_rule and load_plugins
 #       refactor so both rules and transforms can use the same functions
