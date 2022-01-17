@@ -25,7 +25,6 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
-# noinspection PyProtectedMember
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
     BaseRule,
