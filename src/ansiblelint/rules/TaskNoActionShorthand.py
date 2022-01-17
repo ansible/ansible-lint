@@ -10,7 +10,6 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
-
 FREE_FORM_MODULES = {
     "command",
     "shell",

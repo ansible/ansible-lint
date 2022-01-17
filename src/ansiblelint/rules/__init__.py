@@ -14,9 +14,9 @@ from typing import (
     Dict,
     Iterator,
     List,
-    Optional,
     MutableMapping,
     MutableSequence,
+    Optional,
     Set,
     Union,
 )

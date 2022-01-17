@@ -1,14 +1,14 @@
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
 
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
-
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 

@@ -2,7 +2,7 @@
 import logging
 import re
 from textwrap import dedent
-from typing import Dict, List, Optional, Set, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Union
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -14,9 +14,9 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from .errors import MatchError
 from .file_utils import Lintable
+from .rules import TransformMixin
 from .runner import LintResult
 from .skip_utils import load_data  # TODO: move load_data out of skip_utils
-from .rules import TransformMixin
 
 _logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
-from typing import MutableSequence, MutableMapping, Union
+from typing import MutableMapping, MutableSequence, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 

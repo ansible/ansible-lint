@@ -19,7 +19,7 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
-from ansiblelint.utils import ansible_templar, LINE_NUMBER_KEY
+from ansiblelint.utils import LINE_NUMBER_KEY, ansible_templar
 
 # This is probably a partial list of facts.
 # There is no nice way to extract a list of possible facts from ansible.

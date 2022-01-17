@@ -7,7 +7,7 @@ import pytest
 from ansiblelint.rules import RulesCollection
 
 # noinspection PyProtectedMember
-from ansiblelint.runner import _get_matches, LintResult
+from ansiblelint.runner import LintResult, _get_matches
 from ansiblelint.transformer import Transformer
 
 
