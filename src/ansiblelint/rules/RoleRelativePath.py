@@ -1,17 +1,19 @@
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
 
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
-from ansiblelint.rules import AnsibleLintRule
+from pathlib import Path
+
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
-    from typing import Optional
-
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
-class RoleRelativePath(AnsibleLintRule):
+class RoleRelativePath(AnsibleLintRule, TransformMixin):
     id = 'no-relative-paths'
     shortdesc = "Doesn't need a relative path in role"
     description = (
@@ -43,3 +45,25 @@ class RoleRelativePath(AnsibleLintRule):
             return True
 
         return False
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq],
+    ) -> None:
+        """Transform data to fix the MatchError."""
+        target_task = self._seek(match.yaml_path, data)
+        module = match.task["action"]["__ansible_module__"]
+        src_path = Path(target_task[module]["src"])
+
+        default_relative_path = f"../{self._module_to_path_folder[module]}"
+        try:
+            src = src_path.relative_to(default_relative_path)
+        except ValueError:
+            # probably a false positive alternate directory.
+            # bail. unable to fix.
+            return
+
+        target_task[module]["src"] = str(src)
+        self._fixed(match)
