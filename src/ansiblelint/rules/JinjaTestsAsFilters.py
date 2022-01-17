@@ -1,23 +1,77 @@
 """Rule that flags Jinja2 tests used as filters."""
 
+import os
 import re
 import sys
 from functools import lru_cache
-from typing import List, MutableMapping, Union
+from typing import List, MutableMapping, Optional, Union
 
 import ansible.plugins.test.core
 import ansible.plugins.test.files
 import ansible.plugins.test.mathstuff
+from ansible.template import Templar
+from jinja2 import nodes
+from jinja2.environment import Environment
+from jinja2.visitor import NodeTransformer
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.transform_utils import dump
+from ansiblelint.utils import ansible_templar, LINE_NUMBER_KEY
 
 
-class JinjaTestsAsFilters(AnsibleLintRule):
+@lru_cache
+def ansible_tests():
+    # inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
+    return (
+            list(ansible.plugins.test.core.TestModule().tests().keys())
+            + list(ansible.plugins.test.files.TestModule().tests().keys())
+            + list(ansible.plugins.test.mathstuff.TestModule().tests().keys())
+    )
+
+
+class FilterNodeTransformer(NodeTransformer):
+
+    # from https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
+    ansible_test_map = {
+        'version_compare': 'version',
+        'is_dir': 'directory',
+        'is_file': 'file',
+        'is_link': 'link',
+        'is_abs': 'abs',
+        'is_same_file': 'same_file',
+        'is_mount': 'mount',
+        'issubset': 'subset',
+        'issuperset': 'superset',
+        'isnan': 'nan',
+        'succeeded': 'successful',
+        'success': 'successful',
+        'change': 'changed',
+        'skip': 'skipped',
+    }
+
+    def visit_Filter(self, node: nodes.Filter) -> Optional[nodes.Node]:
+        if node.name not in ansible_tests():
+            return self.generic_visit(node)
+
+        test_name = self.ansible_test_map.get(node.name, node.name)
+        # fields = ("node", "name", "args", "kwargs", "dyn_args", "dyn_kwargs")
+        test_node = nodes.Test(
+            node.node,
+            test_name,
+            node.args,
+            node.kwargs,
+            node.dyn_args,
+            node.dyn_kwargs,
+        )
+        return self.generic_visit(test_node)
+
+
+class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
 
     id = "jinja-tests-as-filters"
     shortdesc = "Using tests as filters is deprecated."
@@ -31,19 +85,9 @@ class JinjaTestsAsFilters(AnsibleLintRule):
     tags = ["deprecations"]
     version_added = "5.3"
 
-    @staticmethod
-    @lru_cache
-    def ansible_tests():
-        # inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
-        return (
-            list(ansible.plugins.test.core.TestModule().tests().keys())
-            + list(ansible.plugins.test.files.TestModule().tests().keys())
-            + list(ansible.plugins.test.mathstuff.TestModule().tests().keys())
-        )
-
     @lru_cache
     def tests_as_filter_re(self):
-        return re.compile(r"\s*\|\s*" + f"({'|'.join(self.ansible_tests())})" + r"\b")
+        return re.compile(r"\s*\|\s*" + f"({'|'.join(ansible_tests())})" + r"\b")
 
     def _uses_test_as_filter(self, value: str) -> bool:
         matches = self.tests_as_filter_re().search(value)
@@ -115,6 +159,56 @@ class JinjaTestsAsFilters(AnsibleLintRule):
     def match(self, line: str) -> Union[bool, str]:
         """Match template lines."""
         return self._uses_test_as_filter(line)
+
+    def transform(
+            self,
+            match: MatchError,
+            lintable: Lintable,
+            data: Union[CommentedMap, CommentedSeq, str],
+    ) -> None:
+        """Transform data to fix the MatchError."""
+        if lintable.path in self._files_fixed:
+            # text/jinja2 template file was already reformatted. Nothing left to do.
+            self._fixed(match)
+            return
+
+        basedir: str = os.path.abspath(os.path.dirname(str(lintable.path)))
+        templar: Templar = ansible_templar(basedir, templatevars={})
+        jinja_env: Environment = templar.environment
+
+        target_key: Optional[Union[int, str]]
+        target_parent: Optional[Union[CommentedMap, CommentedSeq]]
+        target_template: str
+
+        if str(lintable.base_kind) == 'text/yaml':
+            # the full yaml_path is to the string template.
+            # we need the parent so we can modify it.
+            target_key = match.yaml_path[-1]
+            target_parent = self._seek(match.yaml_path[:-1], data)
+            target_template = target_parent[target_key]
+            if "when" in match.yaml_path:
+                target_template = "{{" + target_template + "}}"
+        elif str(lintable.base_kind) == 'text/jinja2':
+            target_parent = target_key = None
+            target_template = data  # the whole file
+        else:  # unknown file type
+            return
+
+        ast = jinja_env.parse(target_template)
+        ast = FilterNodeTransformer().visit(ast)
+        new_template = dump(node=ast, environment=jinja_env)
+
+        if target_parent is not None:
+            if "when" in match.yaml_path:
+                # remove "{{ " and " }}" (dump always adds space w/ braces)
+                new_template = new_template[3:-3]
+            target_parent[target_key] = new_template
+        else:
+            with open(lintable.path.resolve(), mode='w', encoding='utf-8') as f:
+                f.write(new_template)
+            self._files_fixed.append(lintable.path)
+
+        self._fixed(match)
 
 
 # testing code to be loaded only with pytest or when executed the rule file
