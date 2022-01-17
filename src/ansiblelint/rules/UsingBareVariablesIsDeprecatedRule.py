@@ -22,7 +22,11 @@ import os
 import re
 from typing import TYPE_CHECKING, Any, Dict, Union
 
-from ansiblelint.rules import AnsibleLintRule
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -30,7 +34,7 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
-class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
+class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule, TransformMixin):
     id = 'deprecated-bare-vars'
     shortdesc = 'Using bare variables is deprecated'
     description = (
@@ -45,10 +49,14 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     _jinja = re.compile(r"{[{%].*[%}]}", re.DOTALL)
     _glob = re.compile('[][*?]')
 
+    @staticmethod
+    def _get_loop_type(task: Dict[str, Any]) -> Optional[str]:
+        return next((key for key in task if key.startswith("with_")), None)
+
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
-        loop_type = next((key for key in task if key.startswith("with_")), None)
+        loop_type = self._get_loop_type(task)
         if loop_type:
             if loop_type in [
                 "with_nested",
@@ -91,3 +99,52 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 )
                 return message.format(task[loop_type], loop_type)
         return False
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq],
+    ) -> None:
+        """Transform data to fix the MatchError."""
+        target_task = self._seek(match.yaml_path, data)
+        loop_type = self._get_loop_type(target_task)
+        if not loop_type:
+            # We should not get here because the transform only gets tasks that matched.
+            # A task without a loop_type would not have matched.
+            return
+        loop = target_task[loop_type]
+
+        fixed = False
+        if isinstance(loop, (list, tuple)):
+            for loop_index, loop_item in enumerate(loop):
+                if loop_type == "with_subelements" and loop_index > 0:
+                    break
+                if self._needs_wrap(loop_item, loop_type):
+                    target_task[loop_type][loop_index] = self._wrap(loop_item)
+                    fixed = True
+        elif self._needs_wrap(loop, loop_type):
+            target_task[loop_type] = self._wrap(loop)
+            fixed = True
+        # call self._fixed(match) when data has been transformed to fix the error.
+        if fixed:
+            self._fixed(match)
+
+    @staticmethod
+    def _wrap(expression: str) -> str:
+        return "{{ " + expression + " }}"
+
+    def _needs_wrap(self, loop_item: Any, loop_type: str) -> bool:
+        if not isinstance(loop_item, str):
+            return False
+        if loop_type in ["with_sequence", "with_ini", "with_inventory_hostnames"]:
+            return False
+        if self._jinja.match(loop_item):
+            return False
+        if loop_type == "with_fileglob":
+            return not bool(
+                self._jinja.search(loop_item) or self._glob.search(loop_item)
+            )
+        if loop_type == 'with_filetree':
+            return not bool(self._jinja.search(loop_item) or loop_item.endswith(os.sep))
+        return True
