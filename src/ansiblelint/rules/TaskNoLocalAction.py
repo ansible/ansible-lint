@@ -38,7 +38,6 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
         data: Union[CommentedMap, CommentedSeq],
     ) -> None:
         """Transform data to replace the local_action."""
-
         # TaskNoLocalAction matches lines, not tasks.
         # So we need to resolve the ansible bits instead of grabbing match.task
         yaml = parse_yaml_linenumbers(lintable)

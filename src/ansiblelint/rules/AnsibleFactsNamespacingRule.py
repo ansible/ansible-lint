@@ -247,6 +247,13 @@ def _re_possible_net_interface() -> re.Pattern[str]:
 
 
 def is_fact_name(name: str) -> Optional[bool]:
+    """Evaluate a var name to see if it is an ansible_fact.
+
+    The return value indicates confidence level.
+    True = Confidently an ansible fact.
+    False = Confidently NOT an ansible fact.
+    None = Ambiguous. No confidence. It might be a fact.
+    """
     if name in PREFIXLESS_MAGIC_VARS:
         # confident: node_name IS NOT a fact
         return False

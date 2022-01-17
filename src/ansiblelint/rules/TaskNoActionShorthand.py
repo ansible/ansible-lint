@@ -85,7 +85,6 @@ class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
         data: Union[CommentedMap, CommentedSeq],
     ) -> None:
         """Transform data to replace the action shorthand."""
-
         target_task: CommentedMap = self._seek(match.yaml_path, data)
 
         # see ansiblelint.utils.normalize_task()

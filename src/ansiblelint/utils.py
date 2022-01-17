@@ -728,6 +728,7 @@ def get_normalized_tasks_including_skipped(
     yaml: "AnsibleBaseYAMLObject", file: Lintable
 ) -> List[Dict[str, Any]]:
     """Extract normalized tasks from a file without skipping any tasks.
+
     This is primarily for transforms that need a list of tasks
     in the same order as in the tasks/playbook file for editing.
     """

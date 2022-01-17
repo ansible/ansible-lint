@@ -13,9 +13,7 @@ import yaml
 from ansiblelint.config import DEFAULT_KINDS
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
-    CUSTOM_TRANSFORMSDIR_ENVVAR,
     DEFAULT_RULESDIR,
-    DEFAULT_TRANSFORMSDIR,
     INVALID_CONFIG_RC,
 )
 from ansiblelint.file_utils import (

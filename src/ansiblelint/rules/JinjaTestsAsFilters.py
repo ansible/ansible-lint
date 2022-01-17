@@ -26,6 +26,7 @@ from ansiblelint.utils import LINE_NUMBER_KEY, ansible_templar
 
 @lru_cache
 def ansible_tests():
+    """Get a list of valid jinja tests provided by ansible."""
     # inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
     return (
         list(ansible.plugins.test.core.TestModule().tests().keys())

@@ -53,6 +53,7 @@ class BaseRule:
         file: "Optional[Lintable]" = None,
     ) -> Union[bool, str]:
         """Confirm if current rule is matching a specific raw task.
+
         `raw_task` is a task that has not been normalized.
         `task` is the normalized task (as parsed by ansible).
         This will run instead of matchtask if needs_raw_task is True.

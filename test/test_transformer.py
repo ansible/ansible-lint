@@ -1,3 +1,5 @@
+"""Tests for Transformer."""
+
 from argparse import Namespace
 from typing import List, Tuple
 
@@ -15,6 +17,7 @@ from ansiblelint.transformer import Transformer
 def copy_examples_dir(
     tmpdir: py.path.local, config_options: Namespace
 ) -> Tuple[py.path.local, py.path.local]:
+    """Fixture that copies the examples/ dir into a tmpdir."""
     examples_dir = py.path.local("examples")
     examples_dir.copy(tmpdir / "examples")
     oldcwd = tmpdir.chdir()
@@ -30,6 +33,7 @@ def runner_result(
     playbook: str,
     exclude: List[str],
 ) -> LintResult:
+    """Fixture that runs the Runner to populate a LintResult for a given file."""
     config_options.lintables = [playbook]
     config_options.exclude_paths = exclude
     result = _get_matches(rules=default_rules_collection, options=config_options)

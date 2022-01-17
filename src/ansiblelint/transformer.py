@@ -284,7 +284,7 @@ class Transformer:
 
     def _final_yaml_transform(self, text: str) -> str:
         """
-        This ensures that top-level sequences are not over-indented.
+        Ensure that top-level sequences are not over-indented.
 
         In order to make that work, we cannot delegate adding the yaml explict_start
         to ruamel.yaml or dedent() won't have anything to work with.
