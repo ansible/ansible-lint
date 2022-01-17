@@ -36,7 +36,7 @@ FREE_FORM_MODULES = {
 # set_fact and add_host use _raw_params for a dict of vars. They are not free-form.
 
 
-class TaskNoActionShorthand(AnsibleLintRule):
+class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
 
     id = "no-action-shorthand"
     shortdesc = "Use YAML args instead of action shorthand."
@@ -78,39 +78,6 @@ class TaskNoActionShorthand(AnsibleLintRule):
         #     return False
 
         return False
-
-
-# testing code to be loaded only with pytest or when executed the rule file
-if "pytest" in sys.modules:
-
-    import pytest
-
-    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
-
-    @pytest.mark.parametrize(
-        ("test_file", "failures"),
-        (
-            pytest.param(
-                'examples/roles/role_for_no_action_shorthand/tasks/fail.yml',
-                3,
-                id='fail',
-            ),
-            pytest.param(
-                'examples/roles/role_for_no_action_shorthand/tasks/pass.yml',
-                0,
-                id='pass',
-            ),
-        ),
-    )
-    def test_no_action_shorthand_rule(
-        default_rules_collection: RulesCollection, test_file: str, failures: int
-    ) -> None:
-        """Test rule matches."""
-        results = Runner(test_file, rules=default_rules_collection).run()
-        assert len(results) == failures
-        for result in results:
-            assert result.message == TaskNoActionShorthand.shortdesc
 
     def transform(
         self,
@@ -184,3 +151,36 @@ if "pytest" in sys.modules:
 
         # call self._fixed(match) when data has been transformed to fix the error.
         self._fixed(match)
+
+
+# testing code to be loaded only with pytest or when executed the rule file
+if "pytest" in sys.modules:
+
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("test_file", "failures"),
+        (
+            pytest.param(
+                'examples/roles/role_for_no_action_shorthand/tasks/fail.yml',
+                3,
+                id='fail',
+            ),
+            pytest.param(
+                'examples/roles/role_for_no_action_shorthand/tasks/pass.yml',
+                0,
+                id='pass',
+            ),
+        ),
+    )
+    def test_no_action_shorthand_rule(
+        default_rules_collection: RulesCollection, test_file: str, failures: int
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(test_file, rules=default_rules_collection).run()
+        assert len(results) == failures
+        for result in results:
+            assert result.message == TaskNoActionShorthand.shortdesc

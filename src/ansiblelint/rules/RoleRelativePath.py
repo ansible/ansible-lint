@@ -48,9 +48,9 @@ class RoleRelativePath(AnsibleLintRule, TransformMixin):
 
     def transform(
         self,
-        match: MatchError,
-        lintable: Lintable,
-        data: Union[CommentedMap, CommentedSeq],
+        match: "MatchError",
+        lintable: "Lintable",
+        data: "Union[CommentedMap, CommentedSeq]",
     ) -> None:
         """Transform data to fix the MatchError."""
         target_task = self._seek(match.yaml_path, data)

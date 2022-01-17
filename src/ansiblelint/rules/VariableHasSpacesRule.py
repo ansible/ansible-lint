@@ -69,6 +69,7 @@ class VariableHasSpacesRule(AnsibleLintRule, TransformMixin):
         if fixed:
             self._fixed(match)
 
+
 if 'pytest' in sys.modules:
 
     import pytest

@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
-class TaskHasNameRule(AnsibleLintRule):
+class TaskHasNameRule(AnsibleLintRule, TransformMixin):
     id = 'unnamed-task'
     shortdesc = 'All tasks should be named'
     description = (
@@ -54,11 +54,11 @@ class TaskHasNameRule(AnsibleLintRule):
     ) -> Union[bool, str]:
         return not task.get('name')
 
-    def __call__(
-            self,
-            match: MatchError,
-            lintable: Lintable,
-            data: Union[CommentedMap, CommentedSeq],
+    def transform(
+        self,
+        match: "MatchError",
+        lintable: "Lintable",
+        data: Union[CommentedMap, CommentedSeq],
     ) -> None:
         """Transform data to simplify manually fixing the MatchError."""
         # This transform does not fully fix errors.

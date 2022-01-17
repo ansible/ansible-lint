@@ -19,7 +19,7 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
-from ansiblelint.utils import LINE_NUMBER_KEY
+from ansiblelint.utils import ansible_templar, LINE_NUMBER_KEY
 
 # This is probably a partial list of facts.
 # There is no nice way to extract a list of possible facts from ansible.
@@ -321,7 +321,6 @@ class GetVarNodeTransformer(NodeTransformer):
     # ], kwargs=[], dyn_args=None, dyn_kwargs=None)
 
 
-
 class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
 
     id = "facts-namespacing"
@@ -463,10 +462,10 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
         return False
 
     def transform(
-            self,
-            match: MatchError,
-            lintable: Lintable,
-            data: Union[CommentedMap, CommentedSeq, str],
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq, str],
     ) -> None:
         """Transform data to fix the MatchError."""
         if lintable.path in self._files_fixed:

@@ -20,18 +20,13 @@
 
 import os
 import re
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-
-if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.file_utils import Lintable
 
 
 class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule, TransformMixin):
@@ -54,7 +49,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule, TransformMixin):
         return next((key for key in task if key.startswith("with_")), None)
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         loop_type = self._get_loop_type(task)
         if loop_type:

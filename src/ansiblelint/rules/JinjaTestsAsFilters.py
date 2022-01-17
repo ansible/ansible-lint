@@ -28,9 +28,9 @@ from ansiblelint.utils import ansible_templar, LINE_NUMBER_KEY
 def ansible_tests():
     # inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
     return (
-            list(ansible.plugins.test.core.TestModule().tests().keys())
-            + list(ansible.plugins.test.files.TestModule().tests().keys())
-            + list(ansible.plugins.test.mathstuff.TestModule().tests().keys())
+        list(ansible.plugins.test.core.TestModule().tests().keys())
+        + list(ansible.plugins.test.files.TestModule().tests().keys())
+        + list(ansible.plugins.test.mathstuff.TestModule().tests().keys())
     )
 
 
@@ -84,6 +84,10 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
     severity = "VERY_HIGH"
     tags = ["deprecations"]
     version_added = "5.3"
+
+    # for raw jinja templates (not yaml) we only need to reformat for one match.
+    # keep a list of files so we can skip them.
+    _files_fixed = []
 
     @lru_cache
     def tests_as_filter_re(self):
@@ -161,10 +165,10 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
         return self._uses_test_as_filter(line)
 
     def transform(
-            self,
-            match: MatchError,
-            lintable: Lintable,
-            data: Union[CommentedMap, CommentedSeq, str],
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq, str],
     ) -> None:
         """Transform data to fix the MatchError."""
         if lintable.path in self._files_fixed:

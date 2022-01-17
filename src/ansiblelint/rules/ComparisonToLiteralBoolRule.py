@@ -1,8 +1,9 @@
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018-2021, Ansible Project
 
+import os
 import re
-from typing import TYPE_CHECKING, Any, Dict, MutableSequence, Optional, Union
+from typing import Any, Dict, MutableSequence, Optional, Union
 
 import py
 from ansible.template import Templar
@@ -12,13 +13,11 @@ from jinja2.lexer import TOKEN_EQ, TOKEN_NE
 from jinja2.visitor import NodeTransformer
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
 from ansiblelint.utils import ansible_templar, nested_items
-
-if TYPE_CHECKING:
-    from ansiblelint.errors import MatchError
-    from ansiblelint.file_utils import Lintable
 
 
 class CompareNodeTransformer(NodeTransformer):
