@@ -905,7 +905,7 @@ def nested_items(
 
 def nested_items_path(
     data: Union[Dict[Any, Any], List[Any]],
-    parent_path: Optional[List[Union[str, int]]] = None
+    parent_path: Optional[List[Union[str, int]]] = None,
 ) -> Generator[Tuple[Any, Any, List[Union[str, int]]], None, None]:
     """Iterate a nested data structure."""
     if parent_path is None:
