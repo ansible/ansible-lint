@@ -1,17 +1,17 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.utils import LINE_NUMBER_KEY, convert_to_boolean
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
     from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
-class NoFormattingInWhenRule(AnsibleLintRule):
+class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
     id = 'no-jinja-when'
     shortdesc = 'No Jinja2 in when'
     description = (
@@ -54,3 +54,47 @@ class NoFormattingInWhenRule(AnsibleLintRule):
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
         return 'when' in task and not self._is_valid(task['when'])
+
+    def transform(
+        self,
+        match: "MatchError",
+        lintable: "Lintable",
+        data: "Union[CommentedMap, CommentedSeq]",
+    ) -> None:
+        """Transform data to fix the MatchError."""
+        fixed = False
+
+        # target is the role or a task with the wrapped when expression
+        target: Optional[dict] = None
+
+        if match.match_type == "play":
+            # a role
+            target_play = self._seek(match.yaml_path, data)
+            for role in target_play.get("roles", []):
+                # noinspection PyProtectedMember
+                if "when" in role and not self._is_valid(role["when"]):
+                    target = role
+                    break
+        else:
+            # a task
+            target = self._seek(match.yaml_path, data)
+
+        if target:
+            when_original = target["when"]
+            when = self._unwrap(when_original)
+            target["when"] = when
+            fixed = True
+
+        # call self._fixed(match) when data has been transformed to fix the error.
+        if fixed:
+            self._fixed(match)
+
+    @staticmethod
+    def _unwrap(when: str) -> Union[str, bool]:
+        start = when.find("{{") + 2
+        end = when.rfind("}}")
+        expression = when[start:end].strip()
+        try:
+            return convert_to_boolean(expression)
+        except TypeError:
+            return expression
