@@ -19,7 +19,6 @@ from ansiblelint.constants import DEFAULT_RULESDIR, DEFAULT_TRANSFORMSDIR
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
-from ansiblelint.transforms import TransformsCollection
 from ansiblelint.testing import RunFromText
 
 
@@ -45,13 +44,6 @@ def default_rules_collection() -> RulesCollection:
     # For testing we want to manually enable opt-in rules
     options.enable_list = ['no-same-owner']
     return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=options)
-
-
-@pytest.fixture
-def default_transforms_collection() -> TransformsCollection:
-    """Return default transform collection."""
-    assert os.path.isdir(DEFAULT_TRANSFORMSDIR)
-    return TransformsCollection(transformsdirs=[DEFAULT_TRANSFORMSDIR], options=options)
 
 
 @pytest.fixture

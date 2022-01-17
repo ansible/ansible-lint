@@ -16,7 +16,7 @@ from .errors import MatchError
 from .file_utils import Lintable
 from .runner import LintResult
 from .skip_utils import load_data  # TODO: move load_data out of skip_utils
-from .transforms import Transform, TransformsCollection
+from .rules import TransformMixin
 
 _logger = logging.getLogger(__name__)
 
@@ -39,11 +39,7 @@ NESTED_TASK_KEYS = [
 class Transformer:
     """Transformer class performs the fmt transformations."""
 
-    def __init__(
-        self,
-        result: LintResult,
-        transforms: TransformsCollection,
-    ):
+    def __init__(self, result: LintResult):
         """Initialize a Transformer instance."""
         # TODO: options for explict_start, indent_sequences
         self.explicit_start = True
@@ -51,7 +47,6 @@ class Transformer:
 
         self.matches: List[MatchError] = result.matches
         self.files: Set[Lintable] = result.files
-        self.transforms = transforms
 
         file: Lintable
         lintables: Dict[str, Lintable] = {file.filename: file for file in result.files}
@@ -112,8 +107,7 @@ class Transformer:
                 data: Union[CommentedMap, CommentedSeq] = load_data(data)
 
             for match in sorted(matches):
-                transforms: List[Transform] = self.transforms.get_transforms_for(match)
-                if not transforms:
+                if not isinstance(match.rule, TransformMixin):
                     continue
                 if file.base_kind == "text/yaml" and not match.yaml_path:
                     if match.match_type == "play":
@@ -124,8 +118,7 @@ class Transformer:
                         match.yaml_path = self._get_task_path(
                             file, match.linenumber, data
                         )
-                for transform in transforms:
-                    transform(match, file, data)
+                match.rule.transform(match, file, data)
 
             if file.base_kind == "text/yaml":
                 # YAML transforms modify data in-place. Now write it to file.

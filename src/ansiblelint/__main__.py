@@ -196,12 +196,9 @@ def _do_transform(result: "LintResult", options: Namespace) -> None:
     # On purpose lazy-imports to avoid loading transforms unless requested
     # pylint: disable=import-outside-toplevel
     from ansiblelint.transformer import Transformer
-    from ansiblelint.transforms import TransformsCollection
-
-    transforms = TransformsCollection(options.transformsdirs)
 
     # future: maybe pass options to Transformer
-    transformer = Transformer(result, transforms)
+    transformer = Transformer(result)
 
     # this will mark any matches as fixed if the transforms repaired the issue
     transformer.run(fmt_all_files=options.fmt_all_files)

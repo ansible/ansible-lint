@@ -9,7 +9,6 @@ from ansiblelint.rules import RulesCollection
 # noinspection PyProtectedMember
 from ansiblelint.runner import _get_matches, LintResult
 from ansiblelint.transformer import Transformer
-from ansiblelint.transforms import TransformsCollection
 
 
 @pytest.fixture
@@ -165,7 +164,6 @@ def test_transformer(
     copy_examples_dir: Tuple[py.path.local, py.path.local],
     playbook: str,
     config_options: Namespace,
-    default_transforms_collection: TransformsCollection,
     runner_result: LintResult,
     transformed: bool,
     matches_count: int,
@@ -178,9 +176,7 @@ def test_transformer(
     """
     config_options.fmt_all_files = True  # TODO: make configurable
 
-    transformer = Transformer(
-        result=runner_result, transforms=default_transforms_collection
-    )
+    transformer = Transformer(result=runner_result)
     transformer.run(fmt_all_files=config_options.fmt_all_files)
 
     matches = runner_result.matches

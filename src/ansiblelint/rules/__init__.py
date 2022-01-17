@@ -9,7 +9,19 @@ from argparse import Namespace
 from collections import defaultdict
 from functools import lru_cache
 from importlib.abc import Loader
-from typing import Any, Dict, Iterator, List, Optional, Set, Union
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    MutableMapping,
+    MutableSequence,
+    Set,
+    Union,
+)
+
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
@@ -188,6 +200,31 @@ class AnsibleLintRule(BaseRule):
                 matches.append(match)
 
         return matches
+
+
+class TransformMixin:
+    @staticmethod
+    def _fixed(match: MatchError) -> None:
+        """Mark a match as fixed (transform was successful, so issue should be resolved)."""
+        match.fixed = True
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq, str],
+    ) -> None:
+        """Transform data to fix the MatchError."""
+        # call self._fixed(match) when data has been transformed to fix the error.
+
+    @staticmethod
+    def _seek(
+        yaml_path: List[Union[int, str]], data: Union[MutableMapping, MutableSequence]
+    ) -> Any:
+        target = data
+        for segment in yaml_path:
+            target = target[segment]
+        return target
 
 
 def is_valid_rule(rule: AnsibleLintRule) -> bool:
