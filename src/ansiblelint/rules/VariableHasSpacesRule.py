@@ -1,16 +1,23 @@
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 
+import os
 import re
 import sys
 from typing import Any, Dict, List, Optional, Union
 
+from ansible.template import Templar
+from jinja2.environment import Environment
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import nested_items
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.transform_utils import dump
+from ansiblelint.utils import ansible_templar, nested_items, nested_items_path
 
 
-class VariableHasSpacesRule(AnsibleLintRule):
+class VariableHasSpacesRule(AnsibleLintRule, TransformMixin):
     id = 'var-spacing'
     base_msg = 'Variables should have spaces before and after: '
     shortdesc = base_msg + ' {{ var_name }}'
@@ -32,6 +39,35 @@ class VariableHasSpacesRule(AnsibleLintRule):
                     return self.base_msg + v
         return False
 
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq],
+    ) -> None:
+        """Transform data to fix the MatchError."""
+        basedir: str = os.path.abspath(os.path.dirname(str(lintable.path)))
+        templar: Templar = ansible_templar(basedir, templatevars={})
+        jinja_env: Environment = templar.environment
+
+        target_task: CommentedMap = self._seek(match.yaml_path, data)
+
+        fixed = False
+        for key, value, parent_path in nested_items_path(target_task):
+            if not (isinstance(value, str) and templar.is_template(value)):
+                continue
+            # value is a jinja expression
+            ast = jinja_env.parse(value)
+            new_value = dump(node=ast, environment=jinja_env)
+            if parent_path:
+                target = self._seek(parent_path, target_task)
+                target[key] = new_value
+            else:
+                target_task[key] = new_value
+            fixed = True
+
+        if fixed:
+            self._fixed(match)
 
 if 'pytest' in sys.modules:
 
