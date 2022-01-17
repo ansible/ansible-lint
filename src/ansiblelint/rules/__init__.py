@@ -21,7 +21,7 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.config import get_rule_config, options
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, expand_paths_vars
 
 _logger = logging.getLogger(__name__)
 
@@ -208,7 +208,7 @@ class RulesCollection:
         self.options = options
         if rulesdirs is None:
             rulesdirs = []
-        self.rulesdirs = ansiblelint.file_utils.expand_paths_vars(rulesdirs)
+        self.rulesdirs = expand_paths_vars(rulesdirs)
         self.rules: List[BaseRule] = []
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
