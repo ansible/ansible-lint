@@ -20,11 +20,14 @@
 
 from typing import TYPE_CHECKING, Any, Dict, Union
 
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
     from typing import Optional
 
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
@@ -35,11 +38,30 @@ class TaskHasNameRule(AnsibleLintRule):
         'All tasks should have a distinct name for readability '
         'and for ``--start-at-task`` to work'
     )
+    transform_description = (
+        "This adds an empty name to every unnamed task to "
+        "simplify adding names to tasks."
+    )
     severity = 'MEDIUM'
     tags = ['idiom']
     version_added = 'historic'
+
+    # comment to add on the stubbed name: lines
+    comment = "TODO: Name this task"
 
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
         return not task.get('name')
+
+    def __call__(
+            self,
+            match: MatchError,
+            lintable: Lintable,
+            data: Union[CommentedMap, CommentedSeq],
+    ) -> None:
+        """Transform data to simplify manually fixing the MatchError."""
+        # This transform does not fully fix errors.
+        # Do not call self._fixed(match).
+        target_task: CommentedMap = self._seek(match.yaml_path, data)
+        target_task.insert(0, "name", None, self.comment)
