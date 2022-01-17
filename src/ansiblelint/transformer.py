@@ -6,6 +6,7 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import TransformMixin
 from ansiblelint.runner import LintResult
 from ansiblelint.yaml_utils import FormattedYAML
 
@@ -50,7 +51,7 @@ class Transformer:
 
     def run(self) -> None:
         """For each file, read it, execute transforms on it, then write it."""
-        for file, _ in self.matches_per_file.items():
+        for file, matches in self.matches_per_file.items():
             # str() convinces mypy that "text/yaml" is a valid Literal.
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
             file_is_yaml = str(file.base_kind) == "text/yaml"
@@ -74,5 +75,11 @@ class Transformer:
                     # It is not safe to write this file or data-loss is likely.
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
+
+                for match in sorted(matches):
+                    if not isinstance(match.rule, TransformMixin):
+                        continue
+                    match.rule.transform(match, file, data)
+
                 file.content = yaml.dumps(ruamel_data)
                 file.write()

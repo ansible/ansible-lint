@@ -12,6 +12,8 @@ from functools import lru_cache
 from importlib.abc import Loader
 from typing import Any, Dict, Iterator, List, Optional, Set, Union
 
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
 import ansiblelint.skip_utils
 import ansiblelint.utils
 import ansiblelint.yaml_utils
@@ -198,6 +200,16 @@ class AnsibleLintRule(BaseRule):
             matches.extend(self.matchplay(file, play))
 
         return matches
+
+
+class TransformMixin:
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq, str],
+    ) -> None:
+        """Transform data to fix the MatchError."""
 
 
 def is_valid_rule(rule: Any) -> bool:
