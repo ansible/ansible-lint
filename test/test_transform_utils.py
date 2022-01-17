@@ -1,7 +1,10 @@
+"""Tests for utils that dump Jinja expressions."""
+
 import pytest
 from jinja2.environment import Environment
 
-from ansiblelint.transform_utils import TemplateDumper, dump
+# from ansiblelint.transform_utils import TemplateDumper, dump
+from ansiblelint.transform_utils import dump
 
 
 @pytest.mark.parametrize(
@@ -92,6 +95,7 @@ from ansiblelint.transform_utils import TemplateDumper, dump
     ),
 )
 def test_dump(in_template, expected_template):
+    """Test the jinja template dumping function."""
     environment = Environment()
     in_ast = environment.parse(in_template)
     out_template = dump(
