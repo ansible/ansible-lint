@@ -172,44 +172,51 @@ class Transformer:
         if lintable.kind in ("tasks", "handlers"):
             return self._get_task_path_in_tasks_block(linenumber, ruamel_data)
         elif lintable.kind == "playbook":
-            ruamel_data: CommentedSeq
-            play_count = len(ruamel_data)
-            for i_play, play in enumerate(ruamel_data):
-                i_next_play = i_play + 1
-                if play_count > i_next_play:
-                    next_play_line = ruamel_data[i_next_play].lc.line
-                else:
-                    next_play_line = None
-
-                play_keys = list(play.keys())
-                play_keys_by_index = dict(enumerate(play_keys))
-                for tasks_keyword in PLAYBOOK_TASK_KEYWORDS:
-                    tasks_block = play.get(tasks_keyword, [])
-                    if not tasks_block:
-                        continue
-
-                    play_index = play_keys.index(tasks_keyword)
-                    next_keyword = play_keys_by_index.get(play_index + 1, None)
-                    if next_keyword is not None:
-                        next_block_line = play.lc.data[next_keyword][0]
-                    else:
-                        next_block_line = None
-                    # last_line_in_block is 1-based; next_*_line is 0-based
-                    if next_block_line is not None:
-                        last_line_in_block = next_block_line
-                    elif next_play_line is not None:
-                        last_line_in_block = next_play_line
-                    else:
-                        last_line_in_block = None
-
-                    tasks_yaml_path = self._get_task_path_in_tasks_block(
-                        linenumber, tasks_block, last_line_in_block
-                    )
-                    if tasks_yaml_path:
-                        return [i_play, tasks_keyword] + tasks_yaml_path
+            return self._get_task_path_in_playbook(linenumber, ruamel_data)
         # elif lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
 
         return []
+
+    def _get_task_path_in_playbook(
+        self,
+        linenumber: int,  # 1-based
+        ruamel_data: Union[CommentedMap, CommentedSeq],
+    ) -> List[Union[str, int]]:
+        ruamel_data: CommentedSeq
+        play_count = len(ruamel_data)
+        for i_play, play in enumerate(ruamel_data):
+            i_next_play = i_play + 1
+            if play_count > i_next_play:
+                next_play_line = ruamel_data[i_next_play].lc.line
+            else:
+                next_play_line = None
+
+            play_keys = list(play.keys())
+            play_keys_by_index = dict(enumerate(play_keys))
+            for tasks_keyword in PLAYBOOK_TASK_KEYWORDS:
+                tasks_block = play.get(tasks_keyword, [])
+                if not tasks_block:
+                    continue
+
+                play_index = play_keys.index(tasks_keyword)
+                next_keyword = play_keys_by_index.get(play_index + 1, None)
+                if next_keyword is not None:
+                    next_block_line = play.lc.data[next_keyword][0]
+                else:
+                    next_block_line = None
+                # last_line_in_block is 1-based; next_*_line is 0-based
+                if next_block_line is not None:
+                    last_line_in_block = next_block_line
+                elif next_play_line is not None:
+                    last_line_in_block = next_play_line
+                else:
+                    last_line_in_block = None
+
+                tasks_yaml_path = self._get_task_path_in_tasks_block(
+                    linenumber, tasks_block, last_line_in_block
+                )
+                if tasks_yaml_path:
+                    return [i_play, tasks_keyword] + tasks_yaml_path
 
     def _get_task_path_in_tasks_block(
         self,
