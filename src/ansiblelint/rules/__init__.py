@@ -17,6 +17,7 @@ from typing import (
     MutableMapping,
     MutableSequence,
     Optional,
+    Sequence,
     Set,
     Union,
     cast,
@@ -206,7 +207,7 @@ class TransformMixin:
 
     @staticmethod
     def _seek(
-        yaml_path: List[Union[int, str]],
+        yaml_path: Sequence[Union[int, str]],
         data: Union[MutableMapping[str, Any], MutableSequence[Any]],
     ) -> Any:
         target = data

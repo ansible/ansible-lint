@@ -2,7 +2,7 @@
 import logging
 import re
 from textwrap import dedent
-from typing import TYPE_CHECKING, Dict, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Union, cast
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -63,7 +63,7 @@ class Transformer:
                 self.matches_per_file[lintable] = []
             self.matches_per_file[lintable].append(match)
 
-    def run(self, fmt_all_files=True) -> None:
+    def run(self, fmt_all_files: bool = True) -> None:
         """Execute the fmt transforms."""
         # ruamel.yaml rt=round trip (preserves comments while allowing for modification)
         yaml = YAML(typ="rt")
@@ -101,15 +101,18 @@ class Transformer:
             if not fmt_all_files and not matches:
                 continue
 
-            data: str = file.content
-            if file.base_kind == "text/yaml":
-                # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
-                data: Union[CommentedMap, CommentedSeq] = load_data(data)
+            # str() convinces mypy that "text/yaml" is a valid Literal.
+            # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
+            file_is_yaml = str(file.base_kind) == "text/yaml"
+
+            # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
+            data = load_data(file.content) if file_is_yaml else file.content
 
             for match in sorted(matches):
                 if not isinstance(match.rule, TransformMixin):
                     continue
-                if file.base_kind == "text/yaml" and not match.yaml_path:
+                if file_is_yaml:
+                    data = cast(Union[CommentedMap, CommentedSeq], data)
                     if match.match_type == "play":
                         match.yaml_path = self._get_play_path(
                             file, match.linenumber, data
@@ -120,47 +123,49 @@ class Transformer:
                         )
                 match.rule.transform(match, file, data)
 
-            if file.base_kind == "text/yaml":
+            if file_is_yaml:
                 # YAML transforms modify data in-place. Now write it to file.
                 yaml.dump(data, file.path, transform=self._final_yaml_transform)
             # transforms for other filetypes must handle writing it to file.
 
+    @staticmethod
     def _get_play_path(
-        self,
         lintable: Lintable,
         linenumber: int,  # 1-based
         ruamel_data: Union[CommentedMap, CommentedSeq],
-    ) -> List[Union[str, int]]:
-        if lintable.kind == "playbook":
-            ruamel_data: CommentedSeq
-            lc: LineCol  # lc uses 0-based counts
-            # linenumber and last_line are 1-based. Convert to 0-based.
-            linenumber_0 = linenumber - 1
+    ) -> Sequence[Union[str, int]]:
+        if lintable.kind != "playbook":
+            return []
+        ruamel_data = cast(CommentedSeq, ruamel_data)
+        lc: LineCol  # lc uses 0-based counts
+        # linenumber and last_line are 1-based. Convert to 0-based.
+        linenumber_0 = linenumber - 1
 
-            prev_play_line = ruamel_data.lc.line
-            play_count = len(ruamel_data)
-            for i_play, play in enumerate(ruamel_data):
-                i_next_play = i_play + 1
-                if play_count > i_next_play:
-                    next_play_line = ruamel_data[i_next_play].lc.line
-                else:
-                    next_play_line = None
+        prev_play_line = ruamel_data.lc.line
+        play_count = len(ruamel_data)
+        for i_play, play in enumerate(ruamel_data):
+            i_next_play = i_play + 1
+            if play_count > i_next_play:
+                next_play_line = ruamel_data[i_next_play].lc.line
+            else:
+                next_play_line = None
 
-                lc = play.lc
-                if lc.line == linenumber_0:
-                    return [i_play]
-                elif i_play > 0 and prev_play_line < linenumber_0 < lc.line:
-                    return [i_play - 1]
-                # The previous play check (above) can't catch the last play,
-                # so, handle the last play separately.
-                elif (
-                    i_play + 1 == play_count
-                    and linenumber_0 > lc.line
-                    and (next_play_line is None or linenumber_0 < next_play_line)
-                ):
-                    # part of this (last) play
-                    return [i_play]
-                prev_play_line = play.lc.line
+            lc = play.lc
+            assert isinstance(lc.line, int)
+            if lc.line == linenumber_0:
+                return [i_play]
+            elif i_play > 0 and prev_play_line < linenumber_0 < lc.line:
+                return [i_play - 1]
+            # The previous play check (above) can't catch the last play,
+            # so, handle the last play separately.
+            elif (
+                i_play + 1 == play_count
+                and linenumber_0 > lc.line
+                and (next_play_line is None or linenumber_0 < next_play_line)
+            ):
+                # part of this (last) play
+                return [i_play]
+            prev_play_line = play.lc.line
         return []
 
     def _get_task_path(
@@ -168,10 +173,12 @@ class Transformer:
         lintable: Lintable,
         linenumber: int,  # 1-based
         ruamel_data: Union[CommentedMap, CommentedSeq],
-    ) -> List[Union[str, int]]:
+    ) -> Sequence[Union[str, int]]:
         if lintable.kind in ("tasks", "handlers"):
+            assert isinstance(ruamel_data, CommentedSeq)
             return self._get_task_path_in_tasks_block(linenumber, ruamel_data)
         elif lintable.kind == "playbook":
+            assert isinstance(ruamel_data, CommentedSeq)
             return self._get_task_path_in_playbook(linenumber, ruamel_data)
         # elif lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
 
@@ -180,9 +187,8 @@ class Transformer:
     def _get_task_path_in_playbook(
         self,
         linenumber: int,  # 1-based
-        ruamel_data: Union[CommentedMap, CommentedSeq],
-    ) -> List[Union[str, int]]:
-        ruamel_data: CommentedSeq
+        ruamel_data: CommentedSeq,
+    ) -> Sequence[Union[str, int]]:
         play_count = len(ruamel_data)
         for i_play, play in enumerate(ruamel_data):
             i_next_play = i_play + 1
@@ -212,18 +218,25 @@ class Transformer:
                 else:
                     last_line_in_block = None
 
-                tasks_yaml_path = self._get_task_path_in_tasks_block(
+                task_path = self._get_task_path_in_tasks_block(
                     linenumber, tasks_block, last_line_in_block
                 )
-                if tasks_yaml_path:
-                    return [i_play, tasks_keyword] + tasks_yaml_path
+                if task_path:
+                    # mypy gets confused without this typehint
+                    tasks_keyword_path: List[Union[int, str]] = [
+                        i_play,
+                        tasks_keyword,
+                    ]
+                    return tasks_keyword_path + list(task_path)
+        # probably no tasks keywords in any of the plays
+        return []
 
     def _get_task_path_in_tasks_block(
         self,
         linenumber: int,  # 1-based
         tasks_block: CommentedSeq,
         last_line: Optional[int] = None,  # 1-based
-    ) -> List[Union[str, int]]:
+    ) -> Sequence[Union[str, int]]:
         task: CommentedMap
         lc: LineCol  # lc uses 0-based counts
         # linenumber and last_line are 1-based. Convert to 0-based.
@@ -245,9 +258,12 @@ class Transformer:
                     linenumber, task, nested_task_keys, next_task_line_0
                 )
                 if subtask_path:
-                    return [i_task] + subtask_path
+                    # mypy gets confused without this typehint
+                    task_path: List[Union[str, int]] = [i_task]
+                    return task_path + list(subtask_path)
 
             lc = task.lc
+            assert isinstance(lc.line, int)
             if lc.line == linenumber_0:
                 return [i_task]
             elif i_task > 0 and prev_task_line < linenumber_0 < lc.line:
@@ -271,7 +287,7 @@ class Transformer:
         task: CommentedMap,
         nested_task_keys: Set[str],
         next_task_line_0: Optional[int] = None,  # 0-based
-    ) -> List[Union[str, int]]:
+    ) -> Sequence[Union[str, int]]:
         subtask: CommentedMap
         # loop through the keys in line order
         task_keys = list(task.keys())
@@ -299,7 +315,8 @@ class Transformer:
                 last_block_line,  # 1-based
             )
             if subtask_path:
-                return [task_key] + subtask_path
+                return [task_key] + list(subtask_path)
+        return []
 
     def _final_yaml_transform(self, text: str) -> str:
         """
