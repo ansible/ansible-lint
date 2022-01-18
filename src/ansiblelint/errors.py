@@ -1,6 +1,6 @@
 """Exceptions and error representations."""
 import functools
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.file_utils import Lintable, normpath
@@ -76,7 +76,7 @@ class MatchError(ValueError):
         # optional indicator on how this error was found (play, task, etc)
         self.match_type: Optional[str] = None
         # for task matches, save the normalized task object (useful for transforms)
-        self.task: Optional[dict] = None
+        self.task: Optional[Dict[str, Any]] = None
         # path to the problem area, like: [0,"pre_tasks",3] for [0].pre_tasks[3]
         self.yaml_path: List[Union[int, str]] = []
 

@@ -31,8 +31,9 @@ from typing import (
     Any,
     Callable,
     Dict,
-    Generator,
+    Iterator,
     List,
+    MutableMapping,
     Optional,
     Sequence,
     Tuple,
@@ -788,7 +789,16 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
     return data
 
 
-def iter_tasks_in_file(lintable: Lintable, rule_id: str):
+def iter_tasks_in_file(
+    lintable: Lintable, rule_id: str
+) -> Iterator[
+    Tuple[
+        MutableMapping[str, Any],
+        Optional[MutableMapping[str, Any]],
+        bool,
+        Optional[MatchError],
+    ]
+]:
     """Iterate over tasks in file."""
     data = parse_yaml_linenumbers(lintable)
     if not data:
@@ -948,7 +958,7 @@ def convert_to_boolean(value: Any) -> bool:
 
 def nested_items(
     data: Union[Dict[Any, Any], List[Any]], parent: str = ""
-) -> Generator[Tuple[Any, Any, str], None, None]:
+) -> Iterator[Tuple[Any, Any, str]]:
     """Iterate a nested data structure."""
     if isinstance(data, dict):
         for k, v in data.items():
@@ -965,7 +975,7 @@ def nested_items(
 def nested_items_path(
     data: Union[Dict[Any, Any], List[Any]],
     parent_path: Optional[List[Union[str, int]]] = None,
-) -> Generator[Tuple[Any, Any, List[Union[str, int]]], None, None]:
+) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
     """Iterate a nested data structure."""
     if parent_path is None:
         parent_path = []
