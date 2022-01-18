@@ -27,17 +27,7 @@ from argparse import Namespace
 from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generator,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 import yaml
 from ansible import constants
@@ -889,7 +879,7 @@ def convert_to_boolean(value: Any) -> bool:
 
 def nested_items(
     data: Union[Dict[Any, Any], List[Any]], parent: str = ""
-) -> Generator[Tuple[Any, Any, str], None, None]:
+) -> Iterator[Tuple[Any, Any, str]]:
     """Iterate a nested data structure."""
     if isinstance(data, dict):
         for k, v in data.items():
@@ -906,7 +896,7 @@ def nested_items(
 def nested_items_path(
     data: Union[Dict[Any, Any], List[Any]],
     parent_path: Optional[List[Union[str, int]]] = None,
-) -> Generator[Tuple[Any, Any, List[Union[str, int]]], None, None]:
+) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
     """Iterate a nested data structure."""
     if parent_path is None:
         parent_path = []
