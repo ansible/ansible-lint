@@ -46,7 +46,11 @@ class Transformer:
         """For each file, read it, execute transforms on it, then write it."""
         yaml = FormattedYAML()
         for file, matches in self.matches_per_file.items():
-            if file.base_kind == "text/yaml":
+            # str() convinces mypy that "text/yaml" is a valid Literal.
+            # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
+            file_is_yaml = str(file.base_kind) == "text/yaml"
+
+            if file_is_yaml:
                 ruamel_data: Union[CommentedMap, CommentedSeq] = yaml.loads(file.content)
                 file.content = yaml.dumps(ruamel_data)
                 file.write()
