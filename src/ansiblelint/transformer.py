@@ -22,10 +22,7 @@ _comment_line_re = re.compile(r"^ *#")
 class Transformer:
     """Transformer class performs the fmt transformations."""
 
-    def __init__(
-        self,
-        result: LintResult,
-    ):
+    def __init__(self, result: LintResult):
         """Initialize a Transformer instance."""
         # TODO: options for explict_start, indent_sequences
         self.explicit_start = True
@@ -82,10 +79,14 @@ class Transformer:
         #       - item1
 
         for file, matches in self.matches_per_file.items():
-            if file.base_kind == "text/yaml":
+            # str() convinces mypy that "text/yaml" is a valid Literal.
+            # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
+            file_is_yaml = str(file.base_kind) == "text/yaml"
+
+            if file_is_yaml:
                 # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
-                ruamel_data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
-                yaml.dump(ruamel_data, file.path, transform=self._final_yaml_transform)
+                data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
+                yaml.dump(data, file.path, transform=self._final_yaml_transform)
 
     def _final_yaml_transform(self, text: str) -> str:
         """
