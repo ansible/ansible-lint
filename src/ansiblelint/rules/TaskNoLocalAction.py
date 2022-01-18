@@ -1,6 +1,6 @@
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
-from typing import MutableMapping, MutableSequence, Union
+from typing import List, MutableMapping, MutableSequence, Tuple, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -31,35 +31,15 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
             return True
         return False
 
-    def transform(
-        self,
-        match: MatchError,
-        lintable: Lintable,
-        data: Union[CommentedMap, CommentedSeq],
-    ) -> None:
-        """Transform data to replace the local_action."""
-        # TaskNoLocalAction matches lines, not tasks.
-        # So we need to resolve the ansible bits instead of grabbing match.task
-        yaml = parse_yaml_linenumbers(lintable)
-        tasks = get_normalized_tasks_including_skipped(yaml, lintable)
-
-        normalized_task: dict = self._seek(match.yaml_path, tasks)
-        target_task: CommentedMap = self._seek(match.yaml_path, data)
-
+    def _clean_task_and_params(self, task: dict) -> Tuple[dict, Union[dict, str]]:
         # see ansiblelint.utils.normalize_task()
-        # semantics of which one is fqcn may change in future versions
-        action: dict = normalized_task["action"].copy()
-        # module_normalized = action.pop("__ansible_module__")
-        module = action.pop("__ansible_module_original__")
+        action: dict = task["action"].copy()
         # '__ansible_arguments__' includes _raw_params or argv
         arguments = action.pop("__ansible_arguments__")
 
         internal_keys = [k for k in action if k.startswith("__") and k.endswith("__")]
         for internal_key in internal_keys:
             del action[internal_key]
-
-        # get order of the keys in the index
-        position = list(target_task.keys()).index("local_action")
 
         params = None
         if arguments and isinstance(arguments, MutableMapping):
@@ -75,6 +55,16 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
         elif action:
             params = action
 
+        return action, params
+
+    def _extract_comments(
+        self, params: Union[MutableMapping, str], target_task: CommentedMap
+    ) -> Tuple[Union[CommentedMap, str], List[str]]:
+        """Extract comments from the target_task.
+
+        Comments will be attached to params where possible or returned in
+        a list of comments to be used as eol comments.
+        """
         local_action = target_task["local_action"]
         local_action_ca = getattr(local_action, "ca", None)
         local_action_module_comment = None
@@ -96,9 +86,6 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
                     commented_params.ca.items[key] = local_action_ca.items[key]
             params = commented_params
 
-        target_task.insert(position, module, params)
-
-        # move any comments to the new location
         comments = []
         for possible_comment in [
             target_task.ca.items.pop("local_action", None),
@@ -111,9 +98,41 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
                 if not comment:
                     continue
                 comments.append(comment.value)
-        if comments:
+        return params, comments
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq],
+    ) -> None:
+        """Transform data to replace the local_action."""
+        # TaskNoLocalAction matches lines, not tasks.
+        # So we need to resolve the ansible bits instead of grabbing match.task
+        yaml = parse_yaml_linenumbers(lintable)
+        tasks = get_normalized_tasks_including_skipped(yaml, lintable)
+
+        normalized_task: dict = self._seek(match.yaml_path, tasks)
+        target_task: CommentedMap = self._seek(match.yaml_path, data)
+
+        # semantics of which one is fqcn may change in future versions
+        # module_normalized = normalized_task["action"]["__ansible_module__"]
+        module = normalized_task["action"]["__ansible_module_original__"]
+
+        # get order of the keys in the index
+        position = list(target_task.keys()).index("local_action")
+
+        action, params = self._clean_task_and_params(normalized_task)
+
+        # This will replace params with a CommentedMap if needed.
+        params, eol_comments = self._extract_comments(params, target_task)
+
+        target_task.insert(position, module, params)
+
+        # move any comments to the new location
+        if eol_comments:
             # at least two spaces or the file indentation gets messed up
-            target_task.yaml_add_eol_comment("  ".join(comments), module)
+            target_task.yaml_add_eol_comment("  ".join(eol_comments), module)
 
         delegate_to = normalized_task.get("delegate_to", "localhost")
         target_task.insert(position, "delegate_to", delegate_to)
