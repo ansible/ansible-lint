@@ -1,7 +1,7 @@
 """Tests for Transformer."""
 
 from argparse import Namespace
-from typing import List, Tuple
+from typing import Iterator, List, Tuple
 
 import py
 import pytest
@@ -16,7 +16,7 @@ from ansiblelint.transformer import Transformer
 @pytest.fixture
 def copy_examples_dir(
     tmpdir: py.path.local, config_options: Namespace
-) -> Tuple[py.path.local, py.path.local]:
+) -> Iterator[Tuple[py.path.local, py.path.local]]:
     """Fixture that copies the examples/ dir into a tmpdir."""
     examples_dir = py.path.local("examples")
     examples_dir.copy(tmpdir / "examples")
