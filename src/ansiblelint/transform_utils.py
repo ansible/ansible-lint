@@ -1,7 +1,7 @@
 """Jinja template/expression utils for transforms."""
 
 from io import StringIO
-from typing import Optional, TextIO, Union
+from typing import List, Optional, TextIO, Union, cast
 
 from jinja2 import nodes
 from jinja2.compiler import operators
@@ -25,7 +25,8 @@ def dump(
     dumper.visit(node)
 
     if stream is None:
-        return dumper.stream.getvalue()
+        stream = cast(StringIO, dumper.stream)
+        return stream.getvalue()
 
     return None
 
@@ -67,8 +68,8 @@ class TemplateDumper(NodeVisitor):
             else:
                 self.write(", ")
             self.visit(arg)
-        kwarg: nodes.Keyword  # typehint is incorrect on nodes._FilterTestCommon
-        for kwarg in node.kwargs:
+        # cast because typehint is incorrect on nodes._FilterTestCommon
+        for kwarg in cast(List[nodes.Keyword], node.kwargs):
             if first:
                 first = False
             else:
@@ -416,7 +417,7 @@ class TemplateDumper(NodeVisitor):
             self.visit(item.value)
         self.write("}")
 
-    def _visit_possible_binop(self, node: nodes.Expr):
+    def _visit_possible_binop(self, node: nodes.Expr) -> None:
         """Wrap binops in parentheses if needed.
 
         This is not in _binop so that the outermost
@@ -520,7 +521,7 @@ class TemplateDumper(NodeVisitor):
             self.signature(node)
             self.write(")")
 
-    def visit_Test(self, node: nodes.Test, negate=False) -> None:
+    def visit_Test(self, node: nodes.Test, negate: bool = False) -> None:
         """Write a Jinja Test to the stream."""
         self.visit(node.node)
         if negate:
@@ -622,7 +623,8 @@ class TemplateDumper(NodeVisitor):
                 break
         if autoescape is None:
             # unknown Modifier block
-            return self.generic_visit(node)
+            self.generic_visit(node)
+            return
         self.write(f"{self.environment.block_start_string} autoescape ")
         self.visit(autoescape)
         self.write(f" {self.environment.block_end_string}")
