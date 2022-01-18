@@ -409,7 +409,7 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
             if key == "skipped_rules":
                 skip_path = parent_path + [key]
                 continue
-            elif skip_path and parent_path == skip_path:
+            if skip_path and parent_path == skip_path:
                 continue
 
             # we can only get the linenumber from the most recent dictionary.

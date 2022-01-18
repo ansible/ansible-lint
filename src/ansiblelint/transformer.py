@@ -154,11 +154,11 @@ class Transformer:
             assert isinstance(lc.line, int)
             if lc.line == linenumber_0:
                 return [i_play]
-            elif i_play > 0 and prev_play_line < linenumber_0 < lc.line:
+            if i_play > 0 and prev_play_line < linenumber_0 < lc.line:
                 return [i_play - 1]
             # The previous play check (above) can't catch the last play,
             # so, handle the last play separately.
-            elif (
+            if (
                 i_play + 1 == play_count
                 and linenumber_0 > lc.line
                 and (next_play_line is None or linenumber_0 < next_play_line)
@@ -177,10 +177,10 @@ class Transformer:
         if lintable.kind in ("tasks", "handlers"):
             assert isinstance(ruamel_data, CommentedSeq)
             return self._get_task_path_in_tasks_block(linenumber, ruamel_data)
-        elif lintable.kind == "playbook":
+        if lintable.kind == "playbook":
             assert isinstance(ruamel_data, CommentedSeq)
             return self._get_task_path_in_playbook(linenumber, ruamel_data)
-        # elif lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
+        # if lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
 
         return []
 
@@ -266,11 +266,11 @@ class Transformer:
             assert isinstance(lc.line, int)
             if lc.line == linenumber_0:
                 return [i_task]
-            elif i_task > 0 and prev_task_line < linenumber_0 < lc.line:
+            if i_task > 0 and prev_task_line < linenumber_0 < lc.line:
                 return [i_task - 1]
             # The previous task check can't catch the last task,
             # so, handle the last task separately (also after subtask checks).
-            elif (
+            if (
                 i_task + 1 == tasks_count
                 and linenumber_0 > lc.line
                 and (next_task_line_0 is None or linenumber_0 < next_task_line_0)

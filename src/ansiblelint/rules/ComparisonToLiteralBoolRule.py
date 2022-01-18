@@ -47,8 +47,7 @@ class CompareNodeTransformer(NodeTransformer):
 
         if negate:
             return self.generic_visit(nodes.Not(left, lineno=node.lineno))
-        else:
-            return self.generic_visit(left)
+        return self.generic_visit(left)
 
 
 class ComparisonToLiteralBoolRule(AnsibleLintRule, TransformMixin):
