@@ -225,7 +225,6 @@ class Transformer:
         last_line: Optional[int] = None,  # 1-based
     ) -> List[Union[str, int]]:
         task: CommentedMap
-        subtask: CommentedMap
         lc: LineCol  # lc uses 0-based counts
         # linenumber and last_line are 1-based. Convert to 0-based.
         linenumber_0 = linenumber - 1
@@ -242,34 +241,11 @@ class Transformer:
 
             nested_task_keys = set(task.keys()).intersection(set(NESTED_TASK_KEYS))
             if nested_task_keys:
-                # loop through the keys in line order
-                task_keys = list(task.keys())
-                task_keys_by_index = dict(enumerate(task_keys))
-                for task_key in task_keys:
-                    nested_task_block = task[task_key]
-                    if task_key not in nested_task_keys or not nested_task_block:
-                        continue
-                    task_index = task_keys.index(task_key)
-                    next_task_key = task_keys_by_index.get(task_index + 1, None)
-                    if next_task_key is not None:
-                        next_task_key_line_0 = task.lc.data[next_task_key][0]
-                    else:
-                        next_task_key_line_0 = None
-                    # 0-based next_line - 1 to get line before next_line.
-                    # Then + 1 to make it a 1-based number.
-                    # So, next_task*_0 - 1 + 1 = last_block_line
-                    last_block_line = (
-                        next_task_key_line_0
-                        if next_task_key_line_0 is not None
-                        else next_task_line_0
-                    )
-                    subtask_path = self._get_task_path_in_tasks_block(
-                        linenumber,
-                        nested_task_block,
-                        last_block_line,  # 1-based
-                    )
-                    if subtask_path:
-                        return [i_task, task_key] + subtask_path
+                subtask_path = self._get_task_path_in_nested_tasks_block(
+                    linenumber, task, nested_task_keys, next_task_line_0
+                )
+                if subtask_path:
+                    return [i_task] + subtask_path
 
             lc = task.lc
             if lc.line == linenumber_0:
@@ -288,6 +264,42 @@ class Transformer:
                 return [i_task]
             prev_task_line = task.lc.line
         return []
+
+    def _get_task_path_in_nested_tasks_block(
+        self,
+        linenumber: int,  # 1-based
+        task: CommentedMap,
+        nested_task_keys: Set[str],
+        next_task_line_0: Optional[int] = None,  # 0-based
+    ) -> List[Union[str, int]]:
+        subtask: CommentedMap
+        # loop through the keys in line order
+        task_keys = list(task.keys())
+        task_keys_by_index = dict(enumerate(task_keys))
+        for task_index, task_key in enumerate(task_keys):
+            nested_task_block = task[task_key]
+            if task_key not in nested_task_keys or not nested_task_block:
+                continue
+            next_task_key = task_keys_by_index.get(task_index + 1, None)
+            if next_task_key is not None:
+                next_task_key_line_0 = task.lc.data[next_task_key][0]
+            else:
+                next_task_key_line_0 = None
+            # 0-based next_line - 1 to get line before next_line.
+            # Then + 1 to make it a 1-based number.
+            # So, next_task*_0 - 1 + 1 = last_block_line
+            last_block_line = (
+                next_task_key_line_0
+                if next_task_key_line_0 is not None
+                else next_task_line_0
+            )
+            subtask_path = self._get_task_path_in_tasks_block(
+                linenumber,
+                nested_task_block,
+                last_block_line,  # 1-based
+            )
+            if subtask_path:
+                return [task_key] + subtask_path
 
     def _final_yaml_transform(self, text: str) -> str:
         """
