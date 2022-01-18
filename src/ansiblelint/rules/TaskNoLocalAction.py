@@ -104,7 +104,7 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
         self,
         match: MatchError,
         lintable: Lintable,
-        data: Union[CommentedMap, CommentedSeq],
+        data: Union[CommentedMap, CommentedSeq, str],
     ) -> None:
         """Transform data to replace the local_action."""
         # TaskNoLocalAction matches lines, not tasks.

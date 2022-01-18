@@ -59,7 +59,7 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
         self,
         match: "MatchError",
         lintable: "Lintable",
-        data: "Union[CommentedMap, CommentedSeq]",
+        data: "Union[CommentedMap, CommentedSeq, str]",
     ) -> None:
         """Transform data to fix the MatchError."""
         fixed = False

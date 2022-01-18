@@ -208,8 +208,11 @@ class TransformMixin:
     @staticmethod
     def _seek(
         yaml_path: Sequence[Union[int, str]],
-        data: Union[MutableMapping[str, Any], MutableSequence[Any]],
+        data: Union[MutableMapping[str, Any], MutableSequence[Any], str],
     ) -> Any:
+        if isinstance(data, str):
+            # can't descend into a string
+            return data
         target = data
         for segment in yaml_path:
             # This cast() bits tell mypy what types we expect

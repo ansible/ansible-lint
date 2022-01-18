@@ -43,7 +43,7 @@ class VariableHasSpacesRule(AnsibleLintRule, TransformMixin):
         self,
         match: MatchError,
         lintable: Lintable,
-        data: Union[CommentedMap, CommentedSeq],
+        data: Union[CommentedMap, CommentedSeq, str],
     ) -> None:
         """Transform data to fix the MatchError."""
         basedir: str = os.path.abspath(os.path.dirname(str(lintable.path)))

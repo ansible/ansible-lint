@@ -58,7 +58,7 @@ class TaskHasNameRule(AnsibleLintRule, TransformMixin):
         self,
         match: "MatchError",
         lintable: "Lintable",
-        data: Union[CommentedMap, CommentedSeq],
+        data: Union[CommentedMap, CommentedSeq, str],
     ) -> None:
         """Transform data to simplify manually fixing the MatchError."""
         # This transform does not fully fix errors.
