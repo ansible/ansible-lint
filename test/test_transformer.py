@@ -40,6 +40,7 @@ def runner_result(
     return result
 
 
+# pylint: disable=too-many-arguments,too-many-locals
 @pytest.mark.parametrize(
     ('playbook', 'exclude', 'matches_count', 'fixed_count', 'transformed'),
     (

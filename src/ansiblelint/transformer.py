@@ -198,18 +198,16 @@ class Transformer:
                 next_play_line = None
 
             play_keys = list(play.keys())
-            play_keys_by_index = dict(enumerate(play_keys))
             for tasks_keyword in PLAYBOOK_TASK_KEYWORDS:
-                tasks_block = play.get(tasks_keyword, [])
-                if not tasks_block:
+                if not play.get(tasks_keyword):
                     continue
 
-                play_index = play_keys.index(tasks_keyword)
-                next_keyword = play_keys_by_index.get(play_index + 1, None)
-                if next_keyword is not None:
-                    next_block_line = play.lc.data[next_keyword][0]
-                else:
+                try:
+                    next_keyword = play_keys[play_keys.index(tasks_keyword) + 1]
+                except IndexError:
                     next_block_line = None
+                else:
+                    next_block_line = play.lc.data[next_keyword][0]
                 # last_line_in_block is 1-based; next_*_line is 0-based
                 if next_block_line is not None:
                     last_line_in_block = next_block_line
@@ -219,7 +217,7 @@ class Transformer:
                     last_line_in_block = None
 
                 task_path = self._get_task_path_in_tasks_block(
-                    linenumber, tasks_block, last_line_in_block
+                    linenumber, play[tasks_keyword], last_line_in_block
                 )
                 if task_path:
                     # mypy gets confused without this typehint
@@ -238,7 +236,7 @@ class Transformer:
         last_line: Optional[int] = None,  # 1-based
     ) -> Sequence[Union[str, int]]:
         task: CommentedMap
-        lc: "LineCol"  # lc uses 0-based counts
+        # lc (LineCol) uses 0-based counts
         # linenumber and last_line are 1-based. Convert to 0-based.
         linenumber_0 = linenumber - 1
         last_line_0 = None if last_line is None else last_line - 1
@@ -262,17 +260,16 @@ class Transformer:
                     task_path: List[Union[str, int]] = [i_task]
                     return task_path + list(subtask_path)
 
-            lc = task.lc
-            assert isinstance(lc.line, int)
-            if lc.line == linenumber_0:
+            assert isinstance(task.lc.line, int)
+            if task.lc.line == linenumber_0:
                 return [i_task]
-            if i_task > 0 and prev_task_line < linenumber_0 < lc.line:
+            if i_task > 0 and prev_task_line < linenumber_0 < task.lc.line:
                 return [i_task - 1]
             # The previous task check can't catch the last task,
             # so, handle the last task separately (also after subtask checks).
             if (
                 i_task + 1 == tasks_count
-                and linenumber_0 > lc.line
+                and linenumber_0 > task.lc.line
                 and (next_task_line_0 is None or linenumber_0 < next_task_line_0)
                 and (last_line_0 is None or linenumber_0 <= last_line_0)
             ):
