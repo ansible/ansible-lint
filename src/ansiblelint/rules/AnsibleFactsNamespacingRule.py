@@ -427,8 +427,9 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
             if not do_wrap_template and not templar.is_template(value):
                 continue
             # We have a Jinja2 template string
-            template = "{{" + value + "}}" if do_wrap_template else value
-            legacy_facts = self._uses_ansible_facts_as_vars(template)
+            legacy_facts = self._uses_ansible_facts_as_vars(
+                "{{" + value + "}}" if do_wrap_template else value
+            )
             if legacy_facts:
                 msg = self._error_message(legacy_facts)
                 err = self.create_matcherror(

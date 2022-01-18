@@ -136,9 +136,8 @@ class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
             commented_params[key] = value
 
         module_comment = ""
-        module_comment_parts = target_task.ca.items.pop(module, [])
         comment: Optional[CommentToken]
-        for comment in module_comment_parts:
+        for comment in target_task.ca.items.pop(module, []):
             if not comment:
                 continue
             module_comment += comment.value
