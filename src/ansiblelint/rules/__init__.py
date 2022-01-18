@@ -119,34 +119,20 @@ class AnsibleLintRule(BaseRule):
         ):
             return matches
 
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
-        if not yaml:
-            return matches
-
-        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, file)
-
-        raw_tasks = ansiblelint.utils.get_action_tasks(yaml, file)
-        for raw_task in raw_tasks:
-            # An empty `tags` block causes `None` to be returned if
-            # the `or []` is not present - `task.get('tags', [])`
-            # does not suffice.
-            if 'skip_ansible_lint' in (raw_task.get('tags') or []) or (
-                self.id in raw_task.get('skipped_rules', ())
-            ):
-                continue
-
-            try:
-                task = ansiblelint.utils.normalize_task(raw_task, str(file.path))
-            except MatchError as e:
+        tasks_iterator = ansiblelint.utils.iter_tasks_in_file(file, self.id)
+        for raw_task, task, skipped, error in tasks_iterator:
+            if error is not None:
                 # normalize_task converts AnsibleParserError to MatchError
-                return [e]
+                return [error]
 
-            if 'action' not in task:
+            if skipped or 'action' not in task:
                 continue
+
             if self.needs_raw_task:
                 result = self.matchrawtask(raw_task, task, file=file)
             else:
                 result = self.matchtask(task, file=file)
+
             if not result:
                 continue
 
