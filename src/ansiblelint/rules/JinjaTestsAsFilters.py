@@ -3,9 +3,8 @@
 import os
 import re
 import sys
-from functools import lru_cache
 from pathlib import Path
-from typing import List, MutableMapping, Optional, Union, cast
+from typing import List, MutableMapping, Optional, Pattern, Union, cast
 
 import ansible.plugins.test.core
 import ansible.plugins.test.files
@@ -24,16 +23,33 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
 from ansiblelint.utils import LINE_NUMBER_KEY, ansible_templar
 
+# module-level cache. lru_cache caused mypy headaches.
+_ansible_tests: List[str] = []
+_tests_as_filters_rule_: Optional[Pattern[str]] = None
 
-@lru_cache
+
 def ansible_tests() -> List[str]:
     """Get a list of valid jinja tests provided by ansible."""
+    global _ansible_tests
+    if _ansible_tests:
+        return _ansible_tests
     # inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
-    return (
+    _ansible_tests = (
         list(ansible.plugins.test.core.TestModule().tests().keys())
         + list(ansible.plugins.test.files.TestModule().tests().keys())
         + list(ansible.plugins.test.mathstuff.TestModule().tests().keys())
     )
+    return _ansible_tests
+
+
+def _tests_as_filter_re() -> Pattern[str]:
+    global _tests_as_filters_rule_
+    if _tests_as_filters_rule_:
+        return _tests_as_filters_rule_
+    _tests_as_filters_rule_ = re.compile(
+        r"\s*\|\s*" + f"({'|'.join(ansible_tests())})" + r"\b"
+    )
+    return _tests_as_filters_rule_
 
 
 class FilterNodeTransformer(NodeTransformer):
@@ -91,12 +107,8 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
     # keep a list of files so we can skip them.
     _files_fixed: List[Path] = []
 
-    @lru_cache
-    def tests_as_filter_re(self) -> re.Pattern[str]:
-        return re.compile(r"\s*\|\s*" + f"({'|'.join(ansible_tests())})" + r"\b")
-
     def _uses_test_as_filter(self, value: str) -> bool:
-        matches = self.tests_as_filter_re().search(value)
+        matches = _tests_as_filter_re().search(value)
         return bool(matches)
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
@@ -190,14 +202,16 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
             # the full yaml_path is to the string template.
             # we need the parent so we can modify it.
             target_key = match.yaml_path[-1]
-            target_parent = self._seek(match.yaml_path[:-1], data)
-            assert not isinstance(target_parent, str)
+            target_parent = cast(
+                Union[CommentedMap, CommentedSeq],
+                self._seek(match.yaml_path[:-1], data),
+            )
             target_template = target_parent[target_key]
             if "when" in match.yaml_path:
                 target_template = "{{" + target_template + "}}"
         elif str(lintable.base_kind) == 'text/jinja2':
             target_parent = target_key = None
-            target_template = data  # the whole file
+            target_template = cast(str, data)  # the whole file
         else:  # unknown file type
             return
 

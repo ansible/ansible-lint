@@ -3,9 +3,8 @@
 import os
 import re
 import sys
-from functools import lru_cache
 from pathlib import Path
-from typing import List, MutableMapping, Optional, Union, cast
+from typing import List, MutableMapping, Optional, Pattern, Union, cast
 
 from ansible.constants import MAGIC_VARIABLE_MAPPING
 from ansible.template import Templar
@@ -235,15 +234,37 @@ PREFIXLESS_MAGIC_VARS.update(
 )
 MAGIC_VAR_SUFFIXES = ["_host", "_port", "_user", "_interpreter"]
 
+# module-level cache. lru_cache caused mypy headaches.
+_re_possible_net_interface_: Optional[Pattern[str]] = None
+_re_possible_facts_: Optional[Pattern[str]] = None
 
-@lru_cache
-def _re_possible_net_interface() -> re.Pattern[str]:
+
+def _re_possible_net_interface() -> Pattern[str]:
+    global _re_possible_net_interface_
+    if _re_possible_net_interface_:
+        return _re_possible_net_interface_
     # Based on (MIT licensed):
     # https://github.com/bosun-monitor/bosun/blob/db70a05b517710cbf39e000c497155cb6b178e34/cmd/scollector/collectors/ifstat_linux.go#L54-L58
-    return re.compile(
+    _re_possible_net_interface_ = re.compile(
         r"eth\d+|em\d+_\d+|em\d+|"
         r"bond\d+|team\d+|p\d+p\d+|"  # simplified the p\d+p\d+ cases. Just use as a prefix.
         r"en[a-zA-Z0-9]+|wl[a-zA-Z0-9]+|ww[a-zA-Z0-9]+"  # Systemd predictable interface names
+    )
+    return _re_possible_net_interface_
+
+
+def _re_possible_facts() -> Pattern[str]:
+    # MAGIC_VARIABLE_MAPPING includes the ssh variants for:
+    # ansible_*_host, ansible_*_port, ansible_*_user
+    # And I include the python variant of: ansible_*_interpreter
+    # These are handled with .endswith()/.startswith() for now,
+    # but they could probably be added to this regex.
+    return re.compile(
+        r"\bansible_"  # match word that starts with "ansible_"
+        + r"(?!"  # Non-capturing group
+        + r"\b|".join(PREFIXLESS_MAGIC_VARS)  # do not match non-fact vars
+        + r"\b)"  # only full word matches, not prefixes
+        + r"([a-zA-Z0-9_]+)\b"  # any valid var chars till the end of the word
     )
 
 
@@ -359,28 +380,13 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
             msg += f"  ansible_{fact} --> ansible_facts.{fact}\n"
         return msg
 
-    @lru_cache
-    def _re_possible_facts(self) -> re.Pattern[str]:
-        # MAGIC_VARIABLE_MAPPING includes the ssh variants for:
-        # ansible_*_host, ansible_*_port, ansible_*_user
-        # And I include the python variant of: ansible_*_interpreter
-        # These are handled with .endswith()/.startswith() for now,
-        # but they could probably be added to this regex.
-        return re.compile(
-            r"\bansible_"  # match word that starts with "ansible_"
-            + r"(?!"  # Non-capturing group
-            + r"\b|".join(PREFIXLESS_MAGIC_VARS)  # do not match non-fact vars
-            + r"\b)"  # only full word matches, not prefixes
-            + r"([a-zA-Z0-9_]+)\b"  # any valid var chars till the end of the word
-        )
-
     def _uses_ansible_facts_as_vars(self, value: str) -> List[str]:
         if "ansible_" not in value:
             return []
         found_facts = set()
 
         # known magic vars were excluded via the regex.
-        possible_facts: List[str] = self._re_possible_facts().findall(value)
+        possible_facts: List[str] = _re_possible_facts().findall(value)
 
         for possible_fact in possible_facts:
             is_a_fact = is_fact_name(possible_fact)
@@ -493,8 +499,10 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
             # the full yaml_path is to the string template.
             # we need the parent so we can modify it.
             target_key = match.yaml_path[-1]
-            target_parent = self._seek(match.yaml_path[:-1], data)
-            assert not isinstance(target_parent, str)
+            target_parent = cast(
+                Union[CommentedMap, CommentedSeq],
+                self._seek(match.yaml_path[:-1], data),
+            )
             target_template = target_parent[target_key]
             do_wrap_template = "when" in match.yaml_path or match.yaml_path[-2:] == [
                 "debug",
@@ -504,7 +512,7 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
                 target_template = "{{" + target_template + "}}"
         elif str(lintable.base_kind) == 'text/jinja2':
             target_parent = target_key = None
-            target_template = data  # the whole file
+            target_template = cast(str, data)  # the whole file
             do_wrap_template = False
         else:  # unknown file type
             return
