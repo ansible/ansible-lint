@@ -36,10 +36,10 @@ class CompareNodeTransformer(NodeTransformer):
             return self.generic_visit(node)
 
         exp = (op, right.value)
-        if exp == (TOKEN_EQ, True) or exp == (TOKEN_NE, False):
+        if exp in ((TOKEN_EQ, True), (TOKEN_NE, False)):
             # var
             negate = False
-        elif exp == (TOKEN_NE, True) or exp == (TOKEN_EQ, False):
+        elif exp in ((TOKEN_NE, True), (TOKEN_EQ, False)):
             # not var
             negate = True
         else:
