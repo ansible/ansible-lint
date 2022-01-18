@@ -3,9 +3,9 @@
 
 import os
 import re
-from typing import Any, Dict, MutableSequence, Optional, Union
+from pathlib import Path
+from typing import Any, Dict, MutableSequence, Optional, Union, cast
 
-import py
 from ansible.template import Templar
 from jinja2 import nodes
 from jinja2.environment import Environment
@@ -119,19 +119,19 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule, TransformMixin):
         self._fixed(match)
 
     @staticmethod
-    def _jinja_env(path: py.path.local) -> Environment:
+    def _jinja_env(path: Path) -> Environment:
         basedir: str = os.path.abspath(os.path.dirname(str(path)))
         templar: Templar = ansible_templar(basedir, templatevars={})
         jinja_env: Environment = templar.environment
         return jinja_env
 
-    def _parse_when_expr(self, path: py.path.local, when: str) -> nodes.Template:
+    def _parse_when_expr(self, path: Path, when: str) -> nodes.Template:
         expression = "{{" + when + "}}"
         ast = self._jinja_env(path).parse(expression)
         return ast
 
-    def _dump_when(self, path: py.path.local, ast: nodes.Template):
+    def _dump_when(self, path: Path, ast: nodes.Template) -> str:
         jinja_env = self._jinja_env(path)
-        expression = dump(node=ast, environment=jinja_env)
+        expression = cast(str, dump(node=ast, environment=jinja_env))
         # remove "{{ " and " }}" (dump always adds space w/ braces)
         return expression[3:-3]
