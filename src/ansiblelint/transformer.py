@@ -111,7 +111,7 @@ class Transformer:
             for match in sorted(matches):
                 if not isinstance(match.rule, TransformMixin):
                     continue
-                if file_is_yaml:
+                if file_is_yaml and not match.yaml_path:
                     data = cast(Union[CommentedMap, CommentedSeq], data)
                     if match.match_type == "play":
                         match.yaml_path = self._get_play_path(
