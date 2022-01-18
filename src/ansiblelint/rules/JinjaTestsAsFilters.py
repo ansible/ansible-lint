@@ -23,33 +23,15 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
 from ansiblelint.utils import LINE_NUMBER_KEY, ansible_templar
 
-# module-level cache. lru_cache caused mypy headaches.
-_ansible_tests: List[str] = []
-_tests_as_filters_rule_: Optional[Pattern[str]] = None
-
-
-def ansible_tests() -> List[str]:
-    """Get a list of valid jinja tests provided by ansible."""
-    global _ansible_tests
-    if _ansible_tests:
-        return _ansible_tests
-    # inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
-    _ansible_tests = (
-        list(ansible.plugins.test.core.TestModule().tests().keys())
-        + list(ansible.plugins.test.files.TestModule().tests().keys())
-        + list(ansible.plugins.test.mathstuff.TestModule().tests().keys())
-    )
-    return _ansible_tests
-
-
-def _tests_as_filter_re() -> Pattern[str]:
-    global _tests_as_filters_rule_
-    if _tests_as_filters_rule_:
-        return _tests_as_filters_rule_
-    _tests_as_filters_rule_ = re.compile(
-        r"\s*\|\s*" + f"({'|'.join(ansible_tests())})" + r"\b"
-    )
-    return _tests_as_filters_rule_
+# inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
+_ansible_tests: List[str] = (
+    list(ansible.plugins.test.core.TestModule().tests().keys())
+    + list(ansible.plugins.test.files.TestModule().tests().keys())
+    + list(ansible.plugins.test.mathstuff.TestModule().tests().keys())
+)
+_tests_as_filters_re: Pattern[str] = re.compile(
+    r"\s*\|\s*" + f"({'|'.join(_ansible_tests)})" + r"\b"
+)
 
 
 class FilterNodeTransformer(NodeTransformer):
@@ -73,7 +55,7 @@ class FilterNodeTransformer(NodeTransformer):
     }
 
     def visit_Filter(self, node: nodes.Filter) -> Optional[nodes.Node]:
-        if node.name not in ansible_tests():
+        if node.name not in _ansible_tests:
             return self.generic_visit(node)
 
         test_name = self.ansible_test_map.get(node.name, node.name)
@@ -108,7 +90,7 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
     _files_fixed: List[Path] = []
 
     def _uses_test_as_filter(self, value: str) -> bool:
-        matches = _tests_as_filter_re().search(value)
+        matches = _tests_as_filters_re.search(value)
         return bool(matches)
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
