@@ -6,6 +6,7 @@ from ansiblelint.utils import LINE_NUMBER_KEY, convert_to_boolean
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    # pylint: disable=ungrouped-imports
     from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable

@@ -2,13 +2,16 @@
 # Copyright (c) 2018, Ansible Project
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
+    from typing import Optional
+
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    # pylint: disable=ungrouped-imports
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 

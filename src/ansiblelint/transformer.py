@@ -4,10 +4,6 @@ import re
 from textwrap import dedent
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Union, cast
 
-if TYPE_CHECKING:
-    # noinspection PyProtectedMember
-    from ruamel.yaml.comments import LineCol
-
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML  # type: ignore
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -17,6 +13,10 @@ from .file_utils import Lintable
 from .rules import TransformMixin
 from .runner import LintResult
 from .skip_utils import load_data  # TODO: move load_data out of skip_utils
+
+if TYPE_CHECKING:
+    # noinspection PyProtectedMember
+    from ruamel.yaml.comments import LineCol
 
 _logger = logging.getLogger(__name__)
 
@@ -137,7 +137,7 @@ class Transformer:
         if lintable.kind != "playbook":
             return []
         ruamel_data = cast(CommentedSeq, ruamel_data)
-        lc: LineCol  # lc uses 0-based counts
+        lc: "LineCol"  # lc uses 0-based counts
         # linenumber and last_line are 1-based. Convert to 0-based.
         linenumber_0 = linenumber - 1
 
@@ -238,7 +238,7 @@ class Transformer:
         last_line: Optional[int] = None,  # 1-based
     ) -> Sequence[Union[str, int]]:
         task: CommentedMap
-        lc: LineCol  # lc uses 0-based counts
+        lc: "LineCol"  # lc uses 0-based counts
         # linenumber and last_line are 1-based. Convert to 0-based.
         linenumber_0 = linenumber - 1
         last_line_0 = None if last_line is None else last_line - 1
