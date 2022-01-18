@@ -78,18 +78,10 @@ class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
 
         return False
 
-    def transform(
-        self,
-        match: MatchError,
-        lintable: Lintable,
-        data: Union[CommentedMap, CommentedSeq],
-    ) -> None:
-        """Transform data to replace the action shorthand."""
-        target_task: CommentedMap = self._seek(match.yaml_path, data)
-
+    def _clean_task(self, task: dict) -> Optional[dict]:
         # see ansiblelint.utils.normalize_task()
         # semantics of which one is fqcn may change in future versions
-        action: dict = match.task["action"].copy()
+        action: dict = task["action"].copy()
         # module_normalized = action.pop("__ansible_module__")
         module = action.pop("__ansible_module_original__")
         if module in FREE_FORM_MODULES:
@@ -111,6 +103,20 @@ class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
         internal_keys = [k for k in action if k.startswith("__") and k.endswith("__")]
         for internal_key in internal_keys:
             del action[internal_key]
+
+        return action
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: Union[CommentedMap, CommentedSeq],
+    ) -> None:
+        """Transform data to replace the action shorthand."""
+        target_task: CommentedMap = self._seek(match.yaml_path, data)
+
+        action = self._clean_task(match.task)
+        module = match.task["action"]["__ansible_module_original__"]
 
         # We can't just use the ansible-normalized values or
         # ruamel.yaml gets confused with AnsibleYAMLObjects
