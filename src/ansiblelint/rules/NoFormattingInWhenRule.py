@@ -65,7 +65,7 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
         fixed = False
 
         # target is the role or a task with the wrapped when expression
-        target: Optional[dict] = None
+        target: Optional[Dict[str, Any]] = None
 
         if match.match_type == "play":
             # a role

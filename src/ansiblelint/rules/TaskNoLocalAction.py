@@ -1,6 +1,6 @@
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
-from typing import List, MutableMapping, MutableSequence, Tuple, Union
+from typing import Any, Dict, List, MutableMapping, MutableSequence, Tuple, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -31,9 +31,12 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
             return True
         return False
 
-    def _clean_task_and_params(self, task: dict) -> Tuple[dict, Union[dict, str]]:
+    @staticmethod
+    def _clean_task_and_params(
+        task: Dict[str, Any]
+    ) -> Tuple[Dict[str, Any], Union[MutableMapping[str, Any], str, None]]:
         # see ansiblelint.utils.normalize_task()
-        action: dict = task["action"].copy()
+        action: Dict[str, Any] = task["action"].copy()
         # '__ansible_arguments__' includes _raw_params or argv
         arguments = action.pop("__ansible_arguments__")
 
@@ -41,7 +44,7 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
         for internal_key in internal_keys:
             del action[internal_key]
 
-        params = None
+        params: Union[MutableMapping[str, Any], str, None] = None
         if arguments and isinstance(arguments, MutableMapping):
             # this can happen with set_fact and add_host modules
             action.update(arguments)
@@ -57,9 +60,10 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
 
         return action, params
 
+    @staticmethod
     def _extract_comments(
-        self, params: Union[MutableMapping, str], target_task: CommentedMap
-    ) -> Tuple[Union[CommentedMap, str], List[str]]:
+        params: Union[MutableMapping[str, Any], str, None], target_task: CommentedMap
+    ) -> Tuple[Union[CommentedMap, str, None], List[str]]:
         """Extract comments from the target_task.
 
         Comments will be attached to params where possible or returned in
@@ -112,7 +116,7 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
         yaml = parse_yaml_linenumbers(lintable)
         tasks = get_normalized_tasks_including_skipped(yaml, lintable)
 
-        normalized_task: dict = self._seek(match.yaml_path, tasks)
+        normalized_task: Dict[str, Any] = self._seek(match.yaml_path, tasks)
         target_task: CommentedMap = self._seek(match.yaml_path, data)
 
         # semantics of which one is fqcn may change in future versions

@@ -53,6 +53,9 @@ class RoleRelativePath(AnsibleLintRule, TransformMixin):
         data: "Union[CommentedMap, CommentedSeq, str]",
     ) -> None:
         """Transform data to fix the MatchError."""
+        if not match.task:
+            # a safety check based on mypy error
+            return
         target_task = self._seek(match.yaml_path, data)
         module = match.task["action"]["__ansible_module__"]
         src_path = Path(target_task[module]["src"])
