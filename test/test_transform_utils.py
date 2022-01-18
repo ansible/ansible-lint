@@ -94,7 +94,7 @@ from ansiblelint.transform_utils import dump
         ),
     ),
 )
-def test_dump(in_template, expected_template):
+def test_dump(in_template: str, expected_template: str) -> None:
     """Test the jinja template dumping function."""
     environment = Environment()
     in_ast = environment.parse(in_template)
@@ -103,6 +103,7 @@ def test_dump(in_template, expected_template):
         environment=environment,
         stream=None,
     )
+    assert out_template is not None
     out_ast = environment.parse(out_template)
     assert in_ast == out_ast
     # expected_template may have spacing changes vs out_template

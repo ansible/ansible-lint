@@ -19,6 +19,7 @@ from typing import (
     Optional,
     Set,
     Union,
+    cast,
 )
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -205,11 +206,18 @@ class TransformMixin:
 
     @staticmethod
     def _seek(
-        yaml_path: List[Union[int, str]], data: Union[MutableMapping, MutableSequence]
+        yaml_path: List[Union[int, str]],
+        data: Union[MutableMapping[str, Any], MutableSequence[Any]],
     ) -> Any:
         target = data
         for segment in yaml_path:
-            target = target[segment]
+            # This cast() bits tell mypy what types we expect
+            # essentially this does:
+            #   target = target[segment]
+            if isinstance(segment, str):
+                target = cast(MutableMapping[str, Any], target)[segment]
+            elif isinstance(segment, int):
+                target = cast(MutableSequence[Any], target)[segment]
         return target
 
 

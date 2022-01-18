@@ -27,18 +27,7 @@ from argparse import Namespace
 from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterator,
-    List,
-    MutableMapping,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 import yaml
 from ansible import constants
@@ -791,14 +780,7 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
 
 def iter_tasks_in_file(
     lintable: Lintable, rule_id: str
-) -> Iterator[
-    Tuple[
-        MutableMapping[str, Any],
-        Optional[MutableMapping[str, Any]],
-        bool,
-        Optional[MatchError],
-    ]
-]:
+) -> Iterator[Tuple[Dict[str, Any], Dict[str, Any], bool, Optional[MatchError]]]:
     """Iterate over tasks in file."""
     data = parse_yaml_linenumbers(lintable)
     if not data:
@@ -822,7 +804,7 @@ def iter_tasks_in_file(
             normalized_task = normalize_task(raw_task, str(lintable.path))
         except MatchError as e:
             # normalize_task converts AnsibleParserError to MatchError
-            yield raw_task, None, False, e
+            yield raw_task, raw_task, False, e
             return
         # raw_task, normalized_task, do_skip
         yield raw_task, normalized_task, False, None
