@@ -458,8 +458,7 @@ class TemplateDumper(NodeVisitor):
         """Write a negated expression to the stream."""
         if isinstance(node.node, nodes.Test):
             return self.visit_Test(node.node, negate=True)
-        else:
-            return self._unop(node)
+        return self._unop(node)
 
     def visit_Concat(self, node: nodes.Concat) -> None:
         """Write a string concatenation expression to the stream.
