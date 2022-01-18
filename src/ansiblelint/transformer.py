@@ -267,6 +267,7 @@ class Transformer:
                 return [i_task - 1]
             # The previous task check can't catch the last task,
             # so, handle the last task separately (also after subtask checks).
+            # pylint: disable=too-many-boolean-expressions
             if (
                 i_task + 1 == tasks_count
                 and linenumber_0 > task.lc.line

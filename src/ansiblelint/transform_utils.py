@@ -31,6 +31,7 @@ def dump(
     return None
 
 
+# pylint: disable=too-many-public-methods
 class TemplateDumper(NodeVisitor):
     """Dump a jinja2 AST back into a jinja2 template.
 
