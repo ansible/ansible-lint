@@ -78,14 +78,14 @@ class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
 
         return False
 
-    def _clean_task(self, task: dict) -> Optional[dict]:
+    def _clean_task(self, task: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         # see ansiblelint.utils.normalize_task()
         # semantics of which one is fqcn may change in future versions
-        action: dict = task["action"].copy()
+        action: Dict[str, Any] = task["action"].copy()
         # module_normalized = action.pop("__ansible_module__")
         module = action.pop("__ansible_module_original__")
         if module in FREE_FORM_MODULES:
-            return
+            return None
 
         # '__ansible_arguments__' includes _raw_params or argv
         arguments = action.pop("__ansible_arguments__")
@@ -98,7 +98,7 @@ class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
             #   _raw_params is for command, shell, script, include*, import*,
             #   and argv is only used by command.
             # Since we don't know how to handle these arguments. bail.
-            return
+            return None
 
         internal_keys = [k for k in action if k.startswith("__") and k.endswith("__")]
         for internal_key in internal_keys:
@@ -113,9 +113,13 @@ class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
         data: Union[CommentedMap, CommentedSeq, str],
     ) -> None:
         """Transform data to replace the action shorthand."""
+        if match.task is None:
+            return
         target_task: CommentedMap = self._seek(match.yaml_path, data)
 
         action = self._clean_task(match.task)
+        if action is None:
+            return
         module = match.task["action"]["__ansible_module_original__"]
 
         # We can't just use the ansible-normalized values or

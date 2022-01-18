@@ -4,7 +4,8 @@ import os
 import re
 import sys
 from functools import lru_cache
-from typing import List, MutableMapping, Optional, Union
+from pathlib import Path
+from typing import List, MutableMapping, Optional, Union, cast
 
 from ansible.constants import MAGIC_VARIABLE_MAPPING
 from ansible.template import Templar
@@ -347,7 +348,7 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
 
     # for raw jinja templates (not yaml) we only need to reformat for one match.
     # keep a list of files so we can skip them.
-    _files_fixed = []
+    _files_fixed: List[Path] = []
 
     def _error_message(self, legacy_facts: List[str]) -> str:
         # legacy_facts is a list of in-use fact names without the "ansible_" prefix.
@@ -458,7 +459,7 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
         if not templar.is_template(file.content):
             return matches
 
-        matches: List[MatchError] = super().matchlines(file)
+        matches = super().matchlines(file)
         return matches
 
     def match(self, line: str) -> Union[bool, str]:
@@ -493,6 +494,7 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
             # we need the parent so we can modify it.
             target_key = match.yaml_path[-1]
             target_parent = self._seek(match.yaml_path[:-1], data)
+            assert not isinstance(target_parent, str)
             target_template = target_parent[target_key]
             do_wrap_template = "when" in match.yaml_path or match.yaml_path[-2:] == [
                 "debug",
@@ -509,7 +511,7 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
 
         ast = jinja_env.parse(target_template)
         ast = GetVarNodeTransformer().visit(ast)
-        new_template = dump(node=ast, environment=jinja_env)
+        new_template = cast(str, dump(node=ast, environment=jinja_env))
 
         if target_parent is not None:
             if do_wrap_template:

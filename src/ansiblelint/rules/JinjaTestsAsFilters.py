@@ -4,7 +4,8 @@ import os
 import re
 import sys
 from functools import lru_cache
-from typing import List, MutableMapping, Optional, Union
+from pathlib import Path
+from typing import List, MutableMapping, Optional, Union, cast
 
 import ansible.plugins.test.core
 import ansible.plugins.test.files
@@ -25,7 +26,7 @@ from ansiblelint.utils import LINE_NUMBER_KEY, ansible_templar
 
 
 @lru_cache
-def ansible_tests():
+def ansible_tests() -> List[str]:
     """Get a list of valid jinja tests provided by ansible."""
     # inspired by https://github.com/ansible/ansible/blob/devel/hacking/fix_test_syntax.py
     return (
@@ -88,10 +89,10 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
 
     # for raw jinja templates (not yaml) we only need to reformat for one match.
     # keep a list of files so we can skip them.
-    _files_fixed = []
+    _files_fixed: List[Path] = []
 
     @lru_cache
-    def tests_as_filter_re(self):
+    def tests_as_filter_re(self) -> re.Pattern[str]:
         return re.compile(r"\s*\|\s*" + f"({'|'.join(ansible_tests())})" + r"\b")
 
     def _uses_test_as_filter(self, value: str) -> bool:
@@ -158,7 +159,7 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
         if not templar.is_template(file.content):
             return matches
 
-        matches: List[MatchError] = super().matchlines(file)
+        matches = super().matchlines(file)
         return matches
 
     def match(self, line: str) -> Union[bool, str]:
@@ -190,6 +191,7 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
             # we need the parent so we can modify it.
             target_key = match.yaml_path[-1]
             target_parent = self._seek(match.yaml_path[:-1], data)
+            assert not isinstance(target_parent, str)
             target_template = target_parent[target_key]
             if "when" in match.yaml_path:
                 target_template = "{{" + target_template + "}}"
@@ -201,7 +203,7 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
 
         ast = jinja_env.parse(target_template)
         ast = FilterNodeTransformer().visit(ast)
-        new_template = dump(node=ast, environment=jinja_env)
+        new_template = cast(str, dump(node=ast, environment=jinja_env))
 
         if target_parent is not None:
             if "when" in match.yaml_path:
