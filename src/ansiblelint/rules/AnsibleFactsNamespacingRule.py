@@ -352,7 +352,7 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
         "https://docs.ansible.com/ansible/latest/porting_guides/porting_guide_2.5.html#ansible-fact-namespacing"
     )
     severity = "MEDIUM"
-    tags = ["deprecations", "experimental"]
+    tags = ["deprecations", "opt-in", "experimental"]
     version_added = "5.3"
 
     # for raw jinja templates (not yaml) we only need to reformat for one match.
