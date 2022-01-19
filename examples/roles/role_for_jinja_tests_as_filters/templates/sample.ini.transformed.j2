@@ -1,4 +1,5 @@
 [config]
 path_type = {{ mypath is abs | ternary('absolute', 'relative') }}
-{% if ansible_facts.distribution_version is version('12.04', '>=') %}use the new thing = of course
+{% if ansible_facts.distribution_version is version('12.04', '>=') %}
+use the new thing = of course
 {% endif %}

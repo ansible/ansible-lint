@@ -1,5 +1,6 @@
 [config]
-{% if ansible_facts.distribution_version is version('12.04', '>=') %}use the new thing = of course
+{% if ansible_facts.distribution_version is version('12.04', '>=') %}
+use the new thing = of course
 {% endif %}
 [dmi]
 board_asset_tag = {{ ansible_facts.board_asset_tag }}
