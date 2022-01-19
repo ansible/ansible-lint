@@ -356,6 +356,6 @@ nitpick_ignore = [
     ('py:obj', 'ansiblelint.formatters.T'),
 ]
 nitpick_ignore_regex = [
-    ('py:class', 'jinja2\.nodes\..*'),
-    ('py:class', 'jinja2\.visitor\..*'),
+    ('py:class', r'jinja2\.nodes\..*'),
+    ('py:class', r'jinja2\.visitor\..*'),
 ]
