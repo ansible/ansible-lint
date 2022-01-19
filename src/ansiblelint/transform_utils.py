@@ -78,7 +78,7 @@ class TemplateDumper(NodeVisitor):
             self.write(f"{self.environment.block_start_string} ")
         if name:
             self.write(name)
-        if start or end:
+        if name or end:
             self.write(" ")
         if end:
             self.write(self.environment.block_end_string)
