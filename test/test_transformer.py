@@ -1,11 +1,13 @@
 """Tests for Transformer."""
 
+import os
 from argparse import Namespace
 from typing import Any, Dict, Iterator, List, Tuple
 
 import py
 import pytest
 
+from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.rules import RulesCollection
 
 # noinspection PyProtectedMember
@@ -27,23 +29,41 @@ def copy_examples_dir(
 
 
 @pytest.fixture
-def runner_result(
-    config_options: Namespace,
-    default_rules_collection: RulesCollection,
-    playbook: str,
-    exclude: List[str],
-    opts: Dict[str, Any],  # key is an option name in ansiblelint.config.options
-) -> LintResult:
-    """Fixture that runs the Runner to populate a LintResult for a given file."""
+def config_options(config_options: Namespace, opts: Dict[str, Any]) -> Namespace:
+    # mirror default_rules_collection fixture setting
+    config_options.enable_list = ['no-same-owner', 'facts-namespacing']
+
+    # our defaults
     config_options.fmt_all_files = True
+
+    # per-test option overrides
+    # opt is an option name in ansiblelint.config.options
     for opt, value in opts.items():
-        if isinstance(list, value):
+        if isinstance(value, list):
             getattr(config_options, opt).extend(value)
         else:
             setattr(config_options, opt, value)
+    yield config_options
+
+
+@pytest.fixture
+def rules_collection(config_options: Namespace) -> RulesCollection:
+    """Return default rule collection."""
+    assert os.path.isdir(DEFAULT_RULESDIR)
+    return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=config_options)
+
+
+@pytest.fixture
+def runner_result(
+    config_options: Namespace,
+    rules_collection: RulesCollection,
+    playbook: str,
+    exclude: List[str],
+) -> LintResult:
+    """Fixture that runs the Runner to populate a LintResult for a given file."""
     config_options.lintables = [playbook]
     config_options.exclude_paths = exclude
-    result = _get_matches(rules=default_rules_collection, options=config_options)
+    result = _get_matches(rules=rules_collection, options=config_options)
     return result
 
 
