@@ -17,7 +17,6 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.testing import RunFromText
 from ansiblelint.utils import convert_to_boolean
 
 if TYPE_CHECKING:
@@ -72,6 +71,8 @@ class NoLogPasswordsRule(AnsibleLintRule):
 
 if "pytest" in sys.modules:
     import pytest
+
+    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
     NO_LOG_UNUSED = '''
 - hosts: all

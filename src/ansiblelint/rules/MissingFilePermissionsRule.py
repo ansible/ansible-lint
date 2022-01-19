@@ -22,7 +22,6 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, Set, Union
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.testing import RunFromText
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -125,6 +124,8 @@ class MissingFilePermissionsRule(AnsibleLintRule):
 
 if "pytest" in sys.modules:  # noqa: C901
     import pytest
+
+    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
     SUCCESS_PERMISSIONS_PRESENT = '''
 - hosts: all

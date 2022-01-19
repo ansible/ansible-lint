@@ -6,7 +6,6 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.testing import RunFromText
 from ansiblelint.utils import nested_items
 
 if TYPE_CHECKING:
@@ -52,6 +51,8 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
 if "pytest" in sys.modules:
 
     import pytest
+
+    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
     SUCCESS_PLAY = '''
 - hosts: all
