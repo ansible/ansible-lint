@@ -348,6 +348,13 @@ nitpick_ignore = [
     ('py:class', 'LintResult'),
     ('py:class', 'ruamel.yaml.comments.CommentedMap'),
     ('py:class', 'ruamel.yaml.comments.CommentedSeq'),
+    ('py:class', 'CommentedMap'),
+    ('py:class', 'CommentedSeq'),
+    ('py:class', 'jinja2.visitor.NodeTransformer'),
+    ('py:class', 'jinja2.environment.Environment'),
     ('py:obj', 'Any'),
     ('py:obj', 'ansiblelint.formatters.T'),
+]
+nitpick_ignore_regex = [
+    ('py:class', 'jinja2\.nodes\..*'),
 ]
