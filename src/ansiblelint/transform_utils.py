@@ -52,6 +52,8 @@ class TemplateDumper(NodeVisitor):
         self._stream_position = 0
         self._line_position = 0
         self._line_number = 1
+        self._block_stmt_start_position = -1
+        self._block_stmt_start_line = -1
 
     # -- Various compilation helpers
 
@@ -72,9 +74,9 @@ class TemplateDumper(NodeVisitor):
         self, *, start: bool = False, name: str = "", end: bool = False
     ) -> None:
         """Write a block start and/or block end string to the stream."""
-        pos = self._line_position
-        line = self._line_number
         if start:
+            self._block_stmt_start_position = self._line_position
+            self._block_stmt_start_line = self._line_number
             self.write(f"{self.environment.block_start_string} ")
         if name:
             self.write(name)
@@ -82,10 +84,15 @@ class TemplateDumper(NodeVisitor):
             self.write(" ")
         if end:
             self.write(self.environment.block_end_string)
-            if pos == 0 or line != self._line_number:
+            if (
                 # if the block starts in the middle of a line, keep it inline.
+                self._block_stmt_start_position == 0
                 # if the block statement uses multiple lines, don't inline the body.
+                or self._block_stmt_start_line != self._line_number
+            ):
                 self.write("\n")
+                self._block_stmt_start_position = -1
+                self._block_stmt_start_line = -1
 
     def signature(
         self,
