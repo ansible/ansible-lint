@@ -1,7 +1,7 @@
 """Tests for Transformer."""
 
 from argparse import Namespace
-from typing import Iterator, List, Tuple
+from typing import Any, Dict, Iterator, List, Tuple
 
 import py
 import pytest
@@ -42,28 +42,38 @@ def runner_result(
 
 # pylint: disable=too-many-arguments,too-many-locals
 @pytest.mark.parametrize(
-    ('playbook', 'exclude', 'matches_count', 'fixed_count', 'transformed'),
+    ('playbook', 'exclude', 'matches_count', 'fixed_count', 'transformed', 'opts'),
     (
         # reuse TestRunner::test_runner test cases to ensure transformer does not mangle matches
         pytest.param(
-            'examples/playbooks/nomatchestest.yml', [], 0, 0, False, id="nomatchestest"
+            'examples/playbooks/nomatchestest.yml',
+            [],
+            0,
+            0,
+            False,
+            {},
+            id="nomatchestest",
         ),
-        pytest.param('examples/playbooks/unicode.yml', [], 1, 0, False, id="unicode"),
+        pytest.param(
+            'examples/playbooks/unicode.yml', [], 1, 0, False, {}, id="unicode"
+        ),
         pytest.param(
             'examples/playbooks/lots_of_warnings.yml',
             ['examples/playbooks/lots_of_warnings.yml'],
             0,
             0,
             False,
+            {},
             id="lots_of_warnings",
         ),
-        pytest.param('examples/playbooks/become.yml', [], 0, 0, True, id="become"),
+        pytest.param('examples/playbooks/become.yml', [], 0, 0, True, {}, id="become"),
         pytest.param(
             'examples/playbooks/contains_secrets.yml',
             [],
             0,
             0,
             True,
+            {},
             id="contains_secrets",
         ),
         # Transformer specific test cases
@@ -73,6 +83,7 @@ def runner_result(
             11,
             11,
             True,
+            {},
             id="bare_vars_failure",
         ),
         pytest.param(
@@ -81,6 +92,7 @@ def runner_result(
             6,
             6,
             True,
+            {},
             id="literal_bool_comparison",
         ),
         pytest.param(
@@ -89,6 +101,7 @@ def runner_result(
             2,
             2,
             True,
+            {},
             id="local_action_replacement",
         ),
         pytest.param(
@@ -97,6 +110,7 @@ def runner_result(
             2,
             2,
             True,
+            {},
             id="unwrap_jinja_when",
         ),
         pytest.param(
@@ -105,6 +119,7 @@ def runner_result(
             4,
             4,
             True,
+            {},
             id="fix_relative_role_paths",
         ),
         pytest.param(
@@ -113,6 +128,7 @@ def runner_result(
             4 + 2,  # 4 unnamed-task, 2 no-changed-when
             0,  # should not fix any unnamed-task
             True,
+            {},
             id="stub_task_names",
         ),
         pytest.param(
@@ -121,6 +137,7 @@ def runner_result(
             5,
             5,
             True,
+            {},
             id="jinja_var_spacing",
         ),
         pytest.param(
@@ -129,6 +146,7 @@ def runner_result(
             3,
             3,
             True,
+            {},
             id="no_action_shorthand",
         ),
         pytest.param(
@@ -137,6 +155,7 @@ def runner_result(
             19,
             19,
             True,
+            {},
             id="jinja_tests_are_not_filters_in_tasks",
         ),
         pytest.param(
@@ -145,6 +164,7 @@ def runner_result(
             2,
             2,
             True,
+            {},
             id="jinja_tests_are_not_filters_in_template",
         ),
         pytest.param(
@@ -153,6 +173,7 @@ def runner_result(
             7,
             7,
             True,
+            {},
             id="facts_namespacing_tasks",
         ),
         pytest.param(
@@ -161,6 +182,7 @@ def runner_result(
             6,
             6,
             True,
+            {},
             id="facts_namespacing_template",
         ),
     ),
@@ -173,13 +195,16 @@ def test_transformer(
     transformed: bool,
     matches_count: int,
     fixed_count: int,
+    opts: Dict[str, Any],  # key is an option name in ansiblelint.config.options
 ) -> None:
     """
     Test that transformer can go through any corner cases.
 
     Based on TestRunner::test_runner
     """
-    config_options.fmt_all_files = True  # TODO: make configurable
+    config_options.fmt_all_files = True
+    for opt, value in opts.items():
+        setattr(config_options, opt, value)
 
     transformer = Transformer(result=runner_result)
     transformer.run(fmt_all_files=config_options.fmt_all_files)
