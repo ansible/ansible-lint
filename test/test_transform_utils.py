@@ -14,10 +14,17 @@ from ansiblelint.transform_utils import dump
         pytest.param("{{item}}", "{{ item }}", id="VarStmtWithoutSpacing"),
         pytest.param(
             "{% set ns = [1, 1, 2] %}",
-            "{% set ns = [1, 1, 2] %}",
+            "{% set ns = [1, 1, 2] %}\n",
             id="SimpleSetBlockStmt",
         ),
-        # TODO: how to handle whitespace and chomping?
+        # This automatically adds newlines after most block tags (like 'set')
+        # any other whitespace, including chomped whitespace, is discarded
+        # by Jinja2's lexer + parser. Preserving that would require significant
+        # changes to Jinja2. So, the best we can do is find decent heuristics
+        # for when to add new lines.
+        # TODO: We might need to make 'multiline' a setting that gets passed
+        #       into TemplatDumper.__init__ to disable these newlines when a
+        #       single expression is expected.
         pytest.param(
             "{{ good_format }}\n{{- good_format }}\n{{- good_format -}}",
             # expect the same as input, but actually get:
