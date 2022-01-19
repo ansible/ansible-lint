@@ -146,7 +146,13 @@ def test_rich_rule_listing() -> None:
 def test_rules_id_format() -> None:
     """Assure all our rules have consistent format."""
     rule_id_re = re.compile("^[a-z-]{4,30}$")
-    options.enable_list = ['no-same-owner', 'no-log-password', 'no-same-owner']
+    options.enable_list = [
+        'facts-namespacing',
+        'fqcn-builtins',
+        'no-same-owner',
+        'no-log-password',
+        'no-with-loops',
+    ]
     rules = RulesCollection(
         [os.path.abspath('./src/ansiblelint/rules')], options=options
     )
@@ -154,4 +160,4 @@ def test_rules_id_format() -> None:
         assert rule_id_re.match(
             rule.id
         ), f"Rule id {rule.id} did not match our required format."
-    assert len(rules) == 42
+    assert len(rules) == 45
