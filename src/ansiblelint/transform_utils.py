@@ -154,7 +154,7 @@ class TemplateDumper(NodeVisitor):
     def visit_Output(self, node: nodes.Template) -> None:
         """Write an Output node to the stream.
 
-        Output is a {{ }} statement (aka `print` or output statement).
+        Output is a {{ }} statement (aka ``print`` or output statement).
         """
         for child_node in node.iter_child_nodes():
             # child_node might be TemplateData which is outside {{ }}
@@ -309,7 +309,7 @@ class TemplateDumper(NodeVisitor):
     def visit_ExprStmt(self, node: nodes.ExprStmt) -> None:
         """Write a do block to the stream.
 
-        ExprStmtExtension: `do` tag like print statement but doesn't print the return value.
+        ExprStmtExtension: ``do`` tag like print statement but doesn't print the return value.
         ExprStmt: A statement that evaluates an expression and discards the result.
         """
         self.write_block_stmt(start=True, name="do")
@@ -481,7 +481,7 @@ class TemplateDumper(NodeVisitor):
     def visit_Concat(self, node: nodes.Concat) -> None:
         """Write a string concatenation expression to the stream.
 
-        The Concat operator `~` concatenates expressions
+        The Concat operator ``~`` concatenates expressions
         after converting them to strings.
         """
         for idx, expr in enumerate(node.nodes):
@@ -583,7 +583,7 @@ class TemplateDumper(NodeVisitor):
 
     # def visit_MarkSafeIfAutoescape(self, node: nodes.MarkSafeIfAutoescape) -> None:
     #     """Used by InternationalizationExtension"""
-    #     # i18n adds blocks: `trans/pluralize/endtrans`, but they are not in ast
+    #     # i18n adds blocks: ``trans/pluralize/endtrans``, but they are not in ast
 
     # def visit_EnvironmentAttribute(self, node: nodes.EnvironmentAttribute) -> None:
     #     """ast node added by extensions, not present in orig template"""
