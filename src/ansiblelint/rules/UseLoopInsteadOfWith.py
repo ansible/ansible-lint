@@ -8,7 +8,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule):
     id = "no-with-loops"
     shortdesc = "Use loop instead of with_* style loops."
     description = shortdesc + (
-        " The `with_*` style loops make it difficult to use automated "
+        " The ``with_*`` style loops make it difficult to use automated "
         "tooling, like schemas, to validate playbooks."
     )
     severity = "LOW"
