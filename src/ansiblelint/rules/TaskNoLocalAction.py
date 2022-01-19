@@ -19,7 +19,7 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
     description = 'Do not use ``local_action``, use ``delegate_to: localhost``'
     transform_description = (
         "Using ``local_action`` is deprecated. This updates your "
-        "playbooks by replacing ``local_action`` tasks with:"
+        "playbooks by replacing ``local_action`` tasks with: "
         "``delegate_to: localhost``"
     )
     severity = 'MEDIUM'

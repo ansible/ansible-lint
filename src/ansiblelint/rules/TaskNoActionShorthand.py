@@ -39,18 +39,23 @@ class TaskNoActionShorthand(AnsibleLintRule, TransformMixin):
 
     id = "no-action-shorthand"
     shortdesc = "Use YAML args instead of action shorthand."
-    description = (
-        "Use YAML args instead of action shorthand.\n"
-        "Instead of ``module: arg1=value arg2=42``, use:\n"
-        "  module:\n"
-        "    arg1: value\n"
-        "    arg2: 42\n"
-        "Early versions of Ansible used a shorthand to define args, but "
-        "(1) action shorthand relies on Ansible's magic type casting "
-        "which is the source of many obscure, difficult-to-debug issues; and "
-        "(2) schema based linting cannot detect issues when args are hidden "
-        "in the action shorthand. "
-    )
+    description = """
+Use YAML args instead of action shorthand.
+
+Instead of ``module: arg1=value arg2=42``, use:
+
+..code:: yaml
+
+  module:
+    arg1: value
+    arg2: 42
+
+Early versions of Ansible used a shorthand to define args, but
+(1) action shorthand relies on Ansible's magic type casting
+which is the source of many obscure, difficult-to-debug issues; and
+(2) schema based linting cannot detect issues when args are hidden
+in the action shorthand.
+"""
     # Action shorthand was removed from ansible's documentation after v2.9
     # https://docs.ansible.com/ansible/2.9/user_guide/playbooks_intro.html#action-shorthand
     severity = 'MEDIUM'

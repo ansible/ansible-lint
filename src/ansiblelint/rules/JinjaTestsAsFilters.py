@@ -75,12 +75,14 @@ class JinjaTestsAsFilters(AnsibleLintRule, TransformMixin):
 
     id = "jinja-tests-as-filters"
     shortdesc = "Using tests as filters is deprecated."
-    description = (
-        "Using tests as filters is deprecated.\n"
-        "Instead of using ``result|failed`` instead use ``result is failed``. "
-        "Deprecated in Ansible 2.5; Removed in Ansible 2.9.\n"
-        "see: https://github.com/ansible/proposals/issues/83"
-    )
+    description = """
+Using tests as filters is deprecated.
+
+Instead of using ``result|failed`` use ``result is failed``.
+
+Deprecated in Ansible 2.5; Removed in Ansible 2.9.
+see: https://github.com/ansible/proposals/issues/83
+"""
     severity = "VERY_HIGH"
     tags = ["deprecations"]
     version_added = "5.3"
