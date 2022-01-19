@@ -84,7 +84,7 @@ Deprecated in Ansible 2.5; Removed in Ansible 2.9.
 see: https://github.com/ansible/proposals/issues/83
 """
     severity = "VERY_HIGH"
-    tags = ["deprecations"]
+    tags = ["deprecations", "experimental"]
     version_added = "5.3"
 
     # for raw jinja templates (not yaml) we only need to reformat for one match.

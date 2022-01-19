@@ -12,7 +12,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule):
         "tooling, like schemas, to validate playbooks."
     )
     severity = "LOW"
-    tags = ["deprecations", "opt-in"]
+    tags = ["deprecations", "opt-in", "experimental"]
     version_added = "5.3"
 
     def matchtask(

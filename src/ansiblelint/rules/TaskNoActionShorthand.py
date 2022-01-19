@@ -58,8 +58,8 @@ in the action shorthand.
 """
     # Action shorthand was removed from ansible's documentation after v2.9
     # https://docs.ansible.com/ansible/2.9/user_guide/playbooks_intro.html#action-shorthand
-    severity = 'MEDIUM'
-    tags = ['idiom']
+    severity = "MEDIUM"
+    tags = ["idiom", "experimental"]
     version_added = "5.3"
 
     needs_raw_task = True
