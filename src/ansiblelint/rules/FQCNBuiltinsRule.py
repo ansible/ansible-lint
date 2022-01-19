@@ -4,7 +4,6 @@ from typing import Any, Dict, Optional, Union
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.testing import RunFromText
 
 builtins = [
     "add_host",
@@ -97,6 +96,8 @@ class FQCNBuiltinsRule(AnsibleLintRule):
 if "pytest" in sys.modules:
 
     import pytest
+
+    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
     SUCCESS_PLAY = '''
 - hosts: localhost
