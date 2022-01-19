@@ -4,7 +4,6 @@ import pytest
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.testing import RunFromText
 
-
 PLAYBOOK_WITH_NOQA = '''\
 - hosts: all
   vars:
