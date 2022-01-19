@@ -49,12 +49,36 @@ class TemplateDumper(NodeVisitor):
             stream = StringIO()
         self.environment = environment
         self.stream = stream
+        self._stream_position = 0
+        self._line_position = 0
+        self._line_number = 1
 
     # -- Various compilation helpers
 
     def write(self, x: str) -> None:
         """Write a string into the output stream."""
         self.stream.write(x)
+        len_x = len(x)
+        newline_pos = x.rfind("\n")
+        if newline_pos == -1:
+            self._line_position += len_x
+        else:
+            # - 1 to exclude the \n
+            self._line_position = len_x - newline_pos - 1
+        self._stream_position += len_x
+        self._line_number += x.count("\n")
+
+    def write_stmt(self, x: str, start=False, end=False) -> None:
+        """Write a block start and/or block end string to the stream."""
+        pos = self._line_position
+        line = self._line_number
+        if start:
+            pass
+        self.write(x)
+        if end and (pos == 0 or line != self._line_number):
+            # if the block starts in the middle of a line, keep it inline.
+            # if the block statement uses multiple lines, don't inline the body.
+            self.write("\n")
 
     def signature(
         self,
@@ -110,9 +134,15 @@ class TemplateDumper(NodeVisitor):
 
     # -- Statement Visitors
 
-    # def visit_Template(self, node: nodes.Template) -> None:
-    #     """Template is the root node. Nothing special needed, so use generic_visitor."""
-    #     pass
+    def visit_Template(self, node: nodes.Template) -> None:
+        """Template is the root node.
+
+        Ensure that multiline templates end with a newline.
+        Single line templates are probably simple expressions.
+        """
+        self.generic_visit(node)
+        if self._line_number > 1 and self._line_position != 0:
+            self.write("\n")
 
     def visit_Output(self, node: nodes.Template) -> None:
         """Write an Output node to the stream.
@@ -136,17 +166,19 @@ class TemplateDumper(NodeVisitor):
         {% block name scoped required %}block{% endblock %}
         {% block name required %}block{% endblock %}
         """
-        self.write(f"{self.environment.block_start_string} block ")
+        self.write_stmt(f"{self.environment.block_start_string} block ", start=True)
         self.write(node.name)
         if node.scoped:
             self.write(" scoped")
         if node.required:
             self.write(" required")
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endblock {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endblock {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     def visit_Extends(self, node: nodes.Extends) -> None:
@@ -154,9 +186,9 @@ class TemplateDumper(NodeVisitor):
 
         {% extends name %}
         """
-        self.write(f"{self.environment.block_start_string} extends ")
+        self.write_stmt(f"{self.environment.block_start_string} extends ", start=True)
         self.visit(node.template)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
 
     def visit_Include(self, node: nodes.Include) -> None:
         """Write an 'Include' block to the stream.
@@ -166,14 +198,14 @@ class TemplateDumper(NodeVisitor):
         {% include name ignore missing without context %}
         {% include name without context %}
         """
-        self.write(f"{self.environment.block_start_string} include ")
+        self.write_stmt(f"{self.environment.block_start_string} include ", start=True)
         self.visit(node.template)
         if node.ignore_missing:
             self.write(" ignore missing")
         # include defaults to "with context" so leave it off
         if not node.with_context:
             self.write(" without context")
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
 
     def visit_Import(self, node: nodes.Import) -> None:
         """Write an Import block to the stream.
@@ -181,13 +213,13 @@ class TemplateDumper(NodeVisitor):
         {% import expr as name %}
         {% import expr as name without context %}
         """
-        self.write(f"{self.environment.block_start_string} import ")
+        self.write_stmt(f"{self.environment.block_start_string} import ", start=True)
         self.visit(node.template)
         self.write(f" as {node.target}")
         # import defaults to "without context" so leave it off
         if node.with_context:
             self.write(" with context")
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
 
     def visit_FromImport(self, node: nodes.FromImport) -> None:
         """Write a FromImport block to the stream.
@@ -195,7 +227,7 @@ class TemplateDumper(NodeVisitor):
         {% import expr as name %}
         {% import expr as name without context %}
         """
-        self.write(f"{self.environment.block_start_string} from ")
+        self.write_stmt(f"{self.environment.block_start_string} from ", start=True)
         self.visit(node.template)
         self.write(" import ")
         for idx, name in enumerate(node.names):
@@ -208,7 +240,7 @@ class TemplateDumper(NodeVisitor):
         # import defaults to "without context" so leave it off
         if node.with_context:
             self.write(" with context")
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
 
     def visit_For(self, node: nodes.For) -> None:
         """Write a For block to the stream.
@@ -217,7 +249,7 @@ class TemplateDumper(NodeVisitor):
         {% for target in iter recursive %}block{% endfor %}
         {% for target in iter %}block{% else %}block{% endfor %}
         """
-        self.write(f"{self.environment.block_start_string} for ")
+        self.write_stmt(f"{self.environment.block_start_string} for ", start=True)
         self.visit(node.target)
         self.write(" in ")
         self.visit(node.iter)
@@ -226,45 +258,53 @@ class TemplateDumper(NodeVisitor):
             self.visit(node.test)
         if node.recursive:
             self.write(" recursive")
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
         if node.else_:
-            self.write(
-                f"{self.environment.block_start_string} else {self.environment.block_end_string}"
+            self.write_stmt(
+                f"{self.environment.block_start_string} else {self.environment.block_end_string}",
+                start=True,
+                end=True,
             )
             for child_node in node.else_:
                 self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endfor {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endfor {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     def visit_If(self, node: nodes.If) -> None:
         """Write an If block to the stream."""
-        self.write(f"{self.environment.block_start_string} if ")
+        self.write_stmt(f"{self.environment.block_start_string} if ", start=True)
         self.visit(node.test)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
         for elif_node in node.elif_:
-            self.write(f"{self.environment.block_start_string} elif ")
+            self.write_stmt(f"{self.environment.block_start_string} elif ", start=True)
             self.visit(elif_node.test)
-            self.write(f" {self.environment.block_end_string}")
+            self.write_stmt(f" {self.environment.block_end_string}", end=True)
             for child_node in elif_node.body:
                 self.visit(child_node)
         if node.else_:
-            self.write(
-                f"{self.environment.block_start_string} else {self.environment.block_end_string}"
+            self.write_stmt(
+                f"{self.environment.block_start_string} else {self.environment.block_end_string}",
+                start=True,
+                end=True,
             )
             for child_node in node.else_:
                 self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endif {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endif {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     def visit_With(self, node: nodes.With) -> None:
         """Write a With statement (manual scopes) to the stream."""
-        self.write(f"{self.environment.block_start_string} with ")
+        self.write_stmt(f"{self.environment.block_start_string} with ", start=True)
         first = True
         for target, expr in zip(node.targets, node.values):
             if first:
@@ -274,11 +314,13 @@ class TemplateDumper(NodeVisitor):
             self.visit(target)
             self.write(" = ")
             self.visit(expr)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endwith {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endwith {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     def visit_ExprStmt(self, node: nodes.ExprStmt) -> None:
@@ -287,20 +329,20 @@ class TemplateDumper(NodeVisitor):
         ExprStmtExtension: `do` tag like print statement but doesn't print the return value.
         ExprStmt: A statement that evaluates an expression and discards the result.
         """
-        self.write(f"{self.environment.block_start_string} do ")
+        self.write_stmt(f"{self.environment.block_start_string} do ", start=True)
         self.visit(node.node)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
 
     def visit_Assign(self, node: nodes.Assign) -> None:
         """Write an Assign statement to the stream.
 
         {% set var = value %}
         """
-        self.write(f"{self.environment.block_start_string} set ")
+        self.write_stmt(f"{self.environment.block_start_string} set ", start=True)
         self.visit(node.target)
         self.write(" = ")
         self.visit(node.node)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
 
     # noinspection DuplicatedCode
     def visit_AssignBlock(self, node: nodes.AssignBlock) -> None:
@@ -308,13 +350,15 @@ class TemplateDumper(NodeVisitor):
 
         {% set var %}value{% endset %}
         """
-        self.write(f"{self.environment.block_start_string} set ")
+        self.write_stmt(f"{self.environment.block_start_string} set ", start=True)
         self.visit(node.target)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endset {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endset {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     # noinspection DuplicatedCode
@@ -323,13 +367,15 @@ class TemplateDumper(NodeVisitor):
 
         {% filter <filter> %}block{% endfilter %}
         """
-        self.write(f"{self.environment.block_start_string} filter ")
+        self.write_stmt(f"{self.environment.block_start_string} filter ", start=True)
         self.visit(node.filter)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endfilter {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endfilter {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     def visit_Macro(self, node: nodes.Macro) -> None:
@@ -337,14 +383,16 @@ class TemplateDumper(NodeVisitor):
 
         {% macro name(args/defaults) %}block{% endmacro %}
         """
-        self.write(f"{self.environment.block_start_string} macro ")
+        self.write_stmt(f"{self.environment.block_start_string} macro ", start=True)
         self.write(node.name)
         self.macro_signature(node)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endmacro {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endmacro {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     def visit_CallBlock(self, node: nodes.CallBlock) -> None:
@@ -353,16 +401,18 @@ class TemplateDumper(NodeVisitor):
         {% call macro() %}block{% endcall %}
         {% call(args/defaults) macro() %}block{% endcall %}
         """
-        self.write(f"{self.environment.block_start_string} call")
+        self.write_stmt(f"{self.environment.block_start_string} call", start=True)
         if node.args:
             self.macro_signature(node)
         self.write(" ")
         self.visit(node.call)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endcall {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endcall {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     # -- Expression Visitors
@@ -590,15 +640,19 @@ class TemplateDumper(NodeVisitor):
     # noinspection PyUnusedLocal
     def visit_Continue(self, node: nodes.Continue) -> None:
         """Write a 'Continue' block for the LoopControlExtension to the stream."""
-        self.write(
-            f"{self.environment.block_start_string} continue {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} continue {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     # noinspection PyUnusedLocal
     def visit_Break(self, node: nodes.Break) -> None:
         """Write a 'Break' block for the LoopControlExtension to the stream."""
-        self.write(
-            f"{self.environment.block_start_string} break {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} break {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
 
     # def visit_Scope(self, node: nodes.Scope) -> None:
@@ -625,11 +679,15 @@ class TemplateDumper(NodeVisitor):
             # unknown Modifier block
             self.generic_visit(node)
             return
-        self.write(f"{self.environment.block_start_string} autoescape ")
+        self.write_stmt(
+            f"{self.environment.block_start_string} autoescape ", start=True
+        )
         self.visit(autoescape)
-        self.write(f" {self.environment.block_end_string}")
+        self.write_stmt(f" {self.environment.block_end_string}", end=True)
         for child_node in node.body:
             self.visit(child_node)
-        self.write(
-            f"{self.environment.block_start_string} endautoescape {self.environment.block_end_string}"
+        self.write_stmt(
+            f"{self.environment.block_start_string} endautoescape {self.environment.block_end_string}",
+            start=True,
+            end=True,
         )
