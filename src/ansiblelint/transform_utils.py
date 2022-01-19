@@ -152,9 +152,9 @@ class TemplateDumper(NodeVisitor):
             self.write("\n")
 
     def visit_Output(self, node: nodes.Template) -> None:
-        """Write an Output node to the stream.
+        """Write an ``Output`` node to the stream.
 
-        Output is a {{ }} statement (aka ``print`` or output statement).
+        Output is a ``{{ }}`` statement (aka ``print`` or output statement).
         """
         for child_node in node.iter_child_nodes():
             # child_node might be TemplateData which is outside {{ }}
@@ -166,12 +166,14 @@ class TemplateDumper(NodeVisitor):
                 self.write(f" {self.environment.variable_end_string}")
 
     def visit_Block(self, node: nodes.Block) -> None:
-        """Write a Block to the stream.
+        """Write a ``Block`` to the stream.
 
-        {% block name %}block{% endblock %}
-        {% block name scoped %}block{% endblock %}
-        {% block name scoped required %}block{% endblock %}
-        {% block name required %}block{% endblock %}
+        Examples::
+
+            {% block name %}block{% endblock %}
+            {% block name scoped %}block{% endblock %}
+            {% block name scoped required %}block{% endblock %}
+            {% block name required %}block{% endblock %}
         """
         self.write_block_stmt(start=True, name="block")
         self.write(node.name)
@@ -185,21 +187,25 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(start=True, name="endblock", end=True)
 
     def visit_Extends(self, node: nodes.Extends) -> None:
-        """Write an Extends block to the stream.
+        """Write an ``Extends`` block to the stream.
 
-        {% extends name %}
+        Example::
+
+            {% extends name %}
         """
         self.write_block_stmt(start=True, name="extends")
         self.visit(node.template)
         self.write_block_stmt(end=True)
 
     def visit_Include(self, node: nodes.Include) -> None:
-        """Write an 'Include' block to the stream.
+        """Write an ``Include`` block to the stream.
 
-        {% include name %}
-        {% include name ignore missing %}
-        {% include name ignore missing without context %}
-        {% include name without context %}
+        Examples::
+
+            {% include name %}
+            {% include name ignore missing %}
+            {% include name ignore missing without context %}
+            {% include name without context %}
         """
         self.write_block_stmt(start=True, name="include")
         self.visit(node.template)
@@ -211,10 +217,12 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(end=True)
 
     def visit_Import(self, node: nodes.Import) -> None:
-        """Write an Import block to the stream.
+        """Write an ``Import`` block to the stream.
 
-        {% import expr as name %}
-        {% import expr as name without context %}
+        Examples::
+
+            {% import expr as name %}
+            {% import expr as name without context %}
         """
         self.write_block_stmt(start=True, name="import")
         self.visit(node.template)
@@ -225,10 +233,12 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(end=True)
 
     def visit_FromImport(self, node: nodes.FromImport) -> None:
-        """Write a FromImport block to the stream.
+        """Write a ``FromImport`` block to the stream.
 
-        {% import expr as name %}
-        {% import expr as name without context %}
+        Examples::
+
+            {% import expr as name %}
+            {% import expr as name without context %}
         """
         self.write_block_stmt(start=True, name="from")
         self.visit(node.template)
@@ -246,11 +256,13 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(end=True)
 
     def visit_For(self, node: nodes.For) -> None:
-        """Write a For block to the stream.
+        """Write a ``For`` block to the stream.
 
-        {% for target in iter %}block{% endfor %}
-        {% for target in iter recursive %}block{% endfor %}
-        {% for target in iter %}block{% else %}block{% endfor %}
+        Examples::
+
+            {% for target in iter %}block{% endfor %}
+            {% for target in iter recursive %}block{% endfor %}
+            {% for target in iter %}block{% else %}block{% endfor %}
         """
         self.write_block_stmt(start=True, name="for")
         self.visit(node.target)
@@ -271,7 +283,7 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(start=True, name="endfor", end=True)
 
     def visit_If(self, node: nodes.If) -> None:
-        """Write an If block to the stream."""
+        """Write an ``If`` block to the stream."""
         self.write_block_stmt(start=True, name="if")
         self.visit(node.test)
         self.write_block_stmt(end=True)
@@ -290,7 +302,7 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(start=True, name="endif", end=True)
 
     def visit_With(self, node: nodes.With) -> None:
-        """Write a With statement (manual scopes) to the stream."""
+        """Write a ``With`` statement (manual scopes) to the stream."""
         self.write_block_stmt(start=True, name="with")
         first = True
         for target, expr in zip(node.targets, node.values):
@@ -307,19 +319,23 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(start=True, name="endwith", end=True)
 
     def visit_ExprStmt(self, node: nodes.ExprStmt) -> None:
-        """Write a do block to the stream.
+        """Write a ``do`` block to the stream.
 
-        ExprStmtExtension: ``do`` tag like print statement but doesn't print the return value.
-        ExprStmt: A statement that evaluates an expression and discards the result.
+        ExprStmtExtension
+            A ``do`` tag is like a ``print`` statement but doesn't print the return value.
+        ExprStmt
+            A statement that evaluates an expression and discards the result.
         """
         self.write_block_stmt(start=True, name="do")
         self.visit(node.node)
         self.write_block_stmt(end=True)
 
     def visit_Assign(self, node: nodes.Assign) -> None:
-        """Write an Assign statement to the stream.
+        """Write an ``Assign`` statement to the stream.
 
-        {% set var = value %}
+        Example::
+
+            {% set var = value %}
         """
         self.write_block_stmt(start=True, name="set")
         self.visit(node.target)
@@ -329,9 +345,11 @@ class TemplateDumper(NodeVisitor):
 
     # noinspection DuplicatedCode
     def visit_AssignBlock(self, node: nodes.AssignBlock) -> None:
-        """Write an Assign block to the stream.
+        """Write an ``Assign`` block to the stream.
 
-        {% set var %}value{% endset %}
+        Example::
+
+            {% set var %}value{% endset %}
         """
         self.write_block_stmt(start=True, name="set")
         self.visit(node.target)
@@ -342,9 +360,11 @@ class TemplateDumper(NodeVisitor):
 
     # noinspection DuplicatedCode
     def visit_FilterBlock(self, node: nodes.FilterBlock) -> None:
-        """Write a Filter block to the stream.
+        """Write a ``Filter`` block to the stream.
 
-        {% filter <filter> %}block{% endfilter %}
+        Example::
+
+            {% filter <filter> %}block{% endfilter %}
         """
         self.write_block_stmt(start=True, name="filter")
         self.visit(node.filter)
@@ -354,9 +374,11 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(start=True, name="endfilter", end=True)
 
     def visit_Macro(self, node: nodes.Macro) -> None:
-        """Write a Macro definition block to the stream.
+        """Write a ``Macro`` definition block to the stream.
 
-        {% macro name(args/defaults) %}block{% endmacro %}
+        Example::
+
+            {% macro name(args/defaults) %}block{% endmacro %}
         """
         self.write_block_stmt(start=True, name="macro")
         self.write(node.name)
@@ -367,10 +389,12 @@ class TemplateDumper(NodeVisitor):
         self.write_block_stmt(start=True, name="endmacro", end=True)
 
     def visit_CallBlock(self, node: nodes.CallBlock) -> None:
-        """Write a macro Call block to the stream.
+        """Write a macro ``Call`` block to the stream.
 
-        {% call macro() %}block{% endcall %}
-        {% call(args/defaults) macro() %}block{% endcall %}
+        Examples::
+
+            {% call macro() %}block{% endcall %}
+            {% call(args/defaults) macro() %}block{% endcall %}
         """
         self.write_block_stmt(start=True, name="call")
         if node.args:
@@ -385,7 +409,7 @@ class TemplateDumper(NodeVisitor):
     # -- Expression Visitors
 
     def visit_Name(self, node: nodes.Name) -> None:
-        """Write a Name expression to the stream."""
+        """Write a ``Name`` expression to the stream."""
         # ctx is one of: load, store, param
         # load named var, store named var, or store named function parameter
         self.write(node.name)
@@ -395,7 +419,7 @@ class TemplateDumper(NodeVisitor):
         self.write(f"{node.name}.{node.attr}")
 
     def visit_Const(self, node: nodes.Const) -> None:
-        """Write a constant value (int, str, etc) to the stream."""
+        """Write a constant value (``int``, ``str``, etc) to the stream."""
         # We are using repr() here to handle quoting strings.
         self.write(repr(node.value))
 
@@ -404,7 +428,7 @@ class TemplateDumper(NodeVisitor):
         self.write(node.data)
 
     def visit_Tuple(self, node: nodes.Tuple) -> None:
-        """Write a Tuple to the stream."""
+        """Write a ``Tuple`` to the stream."""
         # TODO: handle ctx = load or store
         self.write("(")
         idx = -1
@@ -415,7 +439,7 @@ class TemplateDumper(NodeVisitor):
         self.write(",)" if idx == 0 else ")")
 
     def visit_List(self, node: nodes.List) -> None:
-        """Write a List to the stream."""
+        """Write a ``List`` to the stream."""
         self.write("[")
         for idx, item in enumerate(node.items):
             if idx:
@@ -424,7 +448,7 @@ class TemplateDumper(NodeVisitor):
         self.write("]")
 
     def visit_Dict(self, node: nodes.Dict) -> None:
-        """Write a Dict to the stream."""
+        """Write a ``Dict`` to the stream."""
         self.write("{")
         item: nodes.Pair
         for idx, item in enumerate(node.items):
@@ -449,7 +473,7 @@ class TemplateDumper(NodeVisitor):
             self.visit(node)
 
     def _binop(self, node: nodes.BinExpr) -> None:
-        """Write a BinExpr (left and right op) to the stream."""
+        """Write a ``BinExpr`` (left and right op) to the stream."""
         self._visit_possible_binop(node.left)
         self.write(f" {node.operator} ")
         self._visit_possible_binop(node.right)
@@ -465,7 +489,7 @@ class TemplateDumper(NodeVisitor):
     visit_Or = _binop
 
     def _unop(self, node: nodes.UnaryExpr) -> None:
-        """Write an UnaryExpr (one node with one op) to the stream."""
+        """Write an ``UnaryExpr`` (one node with one op) to the stream."""
         self.write(f"{node.operator} ")
         self._visit_possible_binop(node.node)
 
@@ -490,7 +514,7 @@ class TemplateDumper(NodeVisitor):
             self.visit(expr)
 
     def visit_Compare(self, node: nodes.Compare) -> None:
-        """Write a Compare operator to the stream."""
+        """Write a ``Compare`` operator to the stream."""
         self._visit_possible_binop(node.expr)
         for op in node.ops:
             # node.ops: List[Operand]
@@ -498,18 +522,18 @@ class TemplateDumper(NodeVisitor):
             self.visit(op)
 
     def visit_Operand(self, node: nodes.Operand) -> None:
-        """Write an Operand to the stream."""
+        """Write an ``Operand`` to the stream."""
         self.write(f" {operators[node.op]} ")
         self._visit_possible_binop(node.expr)
 
     def visit_Getattr(self, node: nodes.Getattr) -> None:
-        """Write a Getattr expression to the stream."""
+        """Write a ``Getattr`` expression to the stream."""
         # node.ctx is only ever "load". Not sure this would change if it wasn't.
         self.visit(node.node)
         self.write(f".{node.attr}")
 
     def visit_Getitem(self, node: nodes.Getitem) -> None:
-        """Write a Getitem expression to the stream."""
+        """Write a ``Getitem`` expression to the stream."""
         # node.ctx is only ever "load". Not sure this would change if it wasn't.
         self.visit(node.node)
         self.write("[")
@@ -517,7 +541,7 @@ class TemplateDumper(NodeVisitor):
         self.write("]")
 
     def visit_Slice(self, node: nodes.Slice) -> None:
-        """Write a Slice expression to the stream."""
+        """Write a ``Slice`` expression to the stream."""
         if node.start is not None:
             self.visit(node.start)
         self.write(":")
@@ -528,7 +552,7 @@ class TemplateDumper(NodeVisitor):
             self.visit(node.step)
 
     def visit_Filter(self, node: nodes.Filter) -> None:
-        """Write a Jinja Filter to the stream."""
+        """Write a Jinja ``Filter`` to the stream."""
         if node.node is not None:
             self.visit(node.node)
             self.write(" | ")
@@ -539,7 +563,7 @@ class TemplateDumper(NodeVisitor):
             self.write(")")
 
     def visit_Test(self, node: nodes.Test, negate: bool = False) -> None:
-        """Write a Jinja Test to the stream."""
+        """Write a Jinja ``Test`` to the stream."""
         self.visit(node.node)
         if negate:
             self.write(" is not ")
@@ -554,8 +578,9 @@ class TemplateDumper(NodeVisitor):
     def visit_CondExpr(self, node: nodes.CondExpr) -> None:
         """Write a conditional expression to the stream.
 
-        A conditional expression (inline if expression).
-        {{ foo if bar else baz }}
+        A conditional expression (inline ``if`` expression)::
+
+            {{ foo if bar else baz }}
         """
         self.visit(node.expr1)
         self.write(" if ")
@@ -565,14 +590,14 @@ class TemplateDumper(NodeVisitor):
             self.visit(node.expr2)
 
     def visit_Call(self, node: nodes.Call) -> None:
-        """Write a function Call expression to the stream."""
+        """Write a function ``Call`` expression to the stream."""
         self.visit(node.node)
         self.write("(")
         self.signature(node)
         self.write(")")
 
     def visit_Keyword(self, node: nodes.Keyword) -> None:
-        """Write a dict Keyword expression to the stream."""
+        """Write a dict ``Keyword`` expression to the stream."""
         self.write(node.key + "=")
         self.visit(node.value)
 
@@ -606,12 +631,12 @@ class TemplateDumper(NodeVisitor):
 
     # noinspection PyUnusedLocal
     def visit_Continue(self, node: nodes.Continue) -> None:
-        """Write a 'Continue' block for the LoopControlExtension to the stream."""
+        """Write a ``Continue`` block for the LoopControlExtension to the stream."""
         self.write_block_stmt(start=True, name="continue", end=True)
 
     # noinspection PyUnusedLocal
     def visit_Break(self, node: nodes.Break) -> None:
-        """Write a 'Break' block for the LoopControlExtension to the stream."""
+        """Write a ``Break`` block for the LoopControlExtension to the stream."""
         self.write_block_stmt(start=True, name="break", end=True)
 
     # def visit_Scope(self, node: nodes.Scope) -> None:
@@ -628,7 +653,7 @@ class TemplateDumper(NodeVisitor):
     def visit_ScopedEvalContextModifier(
         self, node: nodes.ScopedEvalContextModifier
     ) -> None:
-        """Write an autoescape/endautoescape block to the stream."""
+        """Write an ``autoescape``/``endautoescape`` block to the stream."""
         autoescape = None
         for keyword_node in node.options:
             if keyword_node.key == "autoescape":
