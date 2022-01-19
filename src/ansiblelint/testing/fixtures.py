@@ -42,7 +42,7 @@ def default_rules_collection() -> RulesCollection:
     """Return default rule collection."""
     assert os.path.isdir(DEFAULT_RULESDIR)
     # For testing we want to manually enable opt-in rules
-    options.enable_list = ['no-same-owner', 'facts-namespacing']
+    options.enable_list = ['no-same-owner', 'facts-namespacing', 'no-with-loops']
     return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=options)
 
 
