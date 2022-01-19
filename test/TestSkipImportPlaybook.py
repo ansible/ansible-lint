@@ -9,7 +9,8 @@ IMPORTED_PLAYBOOK = '''\
 - hosts: all
   tasks:
     - name: success
-      fail: msg="fail"
+      fail:
+        msg: "fail"
       when: false
 '''
 
