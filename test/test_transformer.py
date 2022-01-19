@@ -32,8 +32,15 @@ def runner_result(
     default_rules_collection: RulesCollection,
     playbook: str,
     exclude: List[str],
+    opts: Dict[str, Any],  # key is an option name in ansiblelint.config.options
 ) -> LintResult:
     """Fixture that runs the Runner to populate a LintResult for a given file."""
+    config_options.fmt_all_files = True
+    for opt, value in opts.items():
+        if isinstance(list, value):
+            getattr(config_options, opt).extend(value)
+        else:
+            setattr(config_options, opt, value)
     config_options.lintables = [playbook]
     config_options.exclude_paths = exclude
     result = _get_matches(rules=default_rules_collection, options=config_options)
@@ -195,17 +202,12 @@ def test_transformer(
     transformed: bool,
     matches_count: int,
     fixed_count: int,
-    opts: Dict[str, Any],  # key is an option name in ansiblelint.config.options
 ) -> None:
     """
     Test that transformer can go through any corner cases.
 
     Based on TestRunner::test_runner
     """
-    config_options.fmt_all_files = True
-    for opt, value in opts.items():
-        setattr(config_options, opt, value)
-
     transformer = Transformer(result=runner_result)
     transformer.run(fmt_all_files=config_options.fmt_all_files)
 
