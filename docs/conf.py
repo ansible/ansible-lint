@@ -314,6 +314,12 @@ nitpick_ignore = [
     ("py:class", "CommentedMap"),
     ("py:class", "CommentedSeq"),
     ("py:class", "yamllint.config.YamlLintConfig"),
+    ("py:class", "jinja2.environment.Environment"),
+    ("py:class", "TextIO"),
     ("py:obj", "Any"),
     ("py:obj", "ansiblelint.formatters.T"),
+]
+nitpick_ignore_regex = [
+    ("py:class", r"jinja2\.nodes\..*"),
+    ("py:class", r"jinja2\.visitor\..*"),
 ]
