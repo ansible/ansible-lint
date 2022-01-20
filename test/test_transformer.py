@@ -212,6 +212,15 @@ def runner_result(
             {},
             id="facts_namespacing_template",
         ),
+        pytest.param(
+            'examples/playbooks/with-loops.yml',
+            [],
+            10,
+            10,
+            True,
+            {"enable_list": ["no-with-loops"]},
+            id="no_with_loops",
+        ),
     ),
 )
 def test_transformer(

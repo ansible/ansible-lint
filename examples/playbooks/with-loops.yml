@@ -1,0 +1,64 @@
+---
+- hosts: all
+
+  tasks:
+    - name: with_list
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_list:
+        - one
+        - two
+
+    - name: with_items
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_items: "{{ items }}"
+
+    - name: with_indexed_items
+      ansible.builtin.debug:
+        msg: "{{ item.0 }} - {{ item.1 }}"
+      with_indexed_items: "{{ items }}"
+
+    - name: with_together simple
+      ansible.builtin.debug:
+        msg: "{{ item.0 }} - {{ item.1 }}"
+      with_together:
+        - "{{ list_one }}"
+        - "{{ list_two }}"
+
+    - name: with_together complex
+      ansible.builtin.debug:
+        msg: "{{ item.0 }} - {{ item.1 }} - {{ item.2 }}"
+      with_together:
+        - ['a', 'b', 'c']
+        - ['d', 'e', 'f']
+        - ['g', 'h', 'i']
+
+    - name: with_dict
+      ansible.builtin.debug:
+        msg: "{{ item.key }} - {{ item.value }}"
+      with_dict: "{{ dictionary }}"
+
+    - name: with_sequence
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_sequence: start=0 end=4 stride=2 format=testuser%02x
+
+    - name: with_subelements
+      ansible.builtin.debug:
+        msg: "{{ item.0.name }} - {{ item.1 }}"
+      with_subelements:
+        - "{{ users }}"
+        - mysql.hosts
+
+    - name: with_nested
+      ansible.builtin.debug:
+        msg: "{{ item.0 }} - {{ item.1 }}"
+      with_nested:
+        - "{{ list_one }}"
+        - "{{ list_two }}"
+
+    - name: with_random_choice
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_random_choice: "{{ my_list }}"
