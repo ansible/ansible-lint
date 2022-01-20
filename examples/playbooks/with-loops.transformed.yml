@@ -16,7 +16,7 @@
 
     - name: with_indexed_items
       ansible.builtin.debug:
-        msg: '{{ item.0 }} - {{ item.1 }}'
+        msg: '{{ index }} - {{ item }}'
       loop: '{{ items | flatten(levels=1) }}'
       loop_control:
         index_var: index
