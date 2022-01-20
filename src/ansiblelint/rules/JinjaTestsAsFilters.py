@@ -129,10 +129,13 @@ see: https://github.com/ansible/proposals/issues/83
             ):
                 continue
             yaml_path = parent_path + [key]
-            if "when" not in yaml_path and not templar.is_template(value):
+            do_wrap_template = "when" in yaml_path or (
+                isinstance(key, str) and key.endswith("_when")
+            )
+            if not do_wrap_template and not templar.is_template(value):
                 continue
             # We have a Jinja2 template string
-            template = value if "when" not in parent_path else "{{" + value + "}}"
+            template = "{{" + value + "}}" if do_wrap_template else value
             if self._uses_test_as_filter(template):
                 err = self.create_matcherror(
                     linenumber=linenumber,
@@ -181,6 +184,7 @@ see: https://github.com/ansible/proposals/issues/83
         target_key: Optional[Union[int, str]]
         target_parent: Optional[Union[CommentedMap, CommentedSeq]]
         target_template: str
+        do_wrap_template = False
 
         if str(lintable.base_kind) == 'text/yaml':
             # the full yaml_path is to the string template.
@@ -191,7 +195,11 @@ see: https://github.com/ansible/proposals/issues/83
                 self._seek(match.yaml_path[:-1], data),
             )
             target_template = target_parent[target_key]
-            if "when" in match.yaml_path:
+            do_wrap_template = "when" in match.yaml_path or (
+                isinstance(match.yaml_path[-1], str)
+                and match.yaml_path[-1].endswith("_when")
+            )
+            if do_wrap_template:
                 target_template = "{{" + target_template + "}}"
         elif str(lintable.base_kind) == 'text/jinja2':
             target_parent = target_key = None
@@ -204,7 +212,7 @@ see: https://github.com/ansible/proposals/issues/83
         new_template = cast(str, dump(node=ast, environment=jinja_env))
 
         if target_parent is not None:
-            if "when" in match.yaml_path:
+            if do_wrap_template:
                 # remove "{{ " and " }}" (dump always adds space w/ braces)
                 new_template = new_template[3:-3]
             target_parent[target_key] = new_template

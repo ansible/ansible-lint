@@ -423,7 +423,11 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
             ):
                 continue
             yaml_path = parent_path + [key]
-            do_wrap_template = "when" in yaml_path or yaml_path[-2:] == ["debug", "var"]
+            do_wrap_template = (
+                "when" in yaml_path
+                or yaml_path[-2:] == ["debug", "var"]
+                or (isinstance(key, str) and key.endswith("_when"))
+            )
             if not do_wrap_template and not templar.is_template(value):
                 continue
             # We have a Jinja2 template string
@@ -493,10 +497,14 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
                 self._seek(match.yaml_path[:-1], data),
             )
             target_template = target_parent[target_key]
-            do_wrap_template = "when" in match.yaml_path or match.yaml_path[-2:] == [
-                "debug",
-                "var",
-            ]
+            do_wrap_template = (
+                "when" in match.yaml_path
+                or match.yaml_path[-2:] == ["debug", "var"]
+                or (
+                    isinstance(match.yaml_path[-1], str)
+                    and match.yaml_path[-1].endswith("_when")
+                )
+            )
             if do_wrap_template:
                 target_template = "{{" + target_template + "}}"
         elif str(lintable.base_kind) == 'text/jinja2':

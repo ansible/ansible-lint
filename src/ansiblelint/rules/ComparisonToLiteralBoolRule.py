@@ -72,6 +72,7 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule, TransformMixin):
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         for k, v, _ in nested_items(task):
+            # TODO: also handle k.endswith("_when") (changed_when, failed_when, ...)
             if k == 'when':
                 if isinstance(v, str):
                     if self.literal_bool_compare.search(v):

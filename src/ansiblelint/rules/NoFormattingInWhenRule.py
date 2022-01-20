@@ -54,6 +54,7 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
+        # TODO: also handle k.endswith("_when") (changed_when, failed_when, ...)
         return 'when' in task and not self._is_valid(task['when'])
 
     def transform(
