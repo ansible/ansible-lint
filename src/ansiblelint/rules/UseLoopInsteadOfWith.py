@@ -1,7 +1,16 @@
 import functools
 import os
 import sys
-from typing import Any, Dict, MutableMapping, Optional, Tuple, Union, cast
+from typing import (
+    Any,
+    Dict,
+    MutableMapping,
+    MutableSequence,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
 
 from ansible.template import Templar
 from jinja2 import nodes
@@ -15,7 +24,7 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
-from ansiblelint.utils import ansible_templar
+from ansiblelint.utils import ansible_templar, nested_items_path
 
 
 def filter_with_flatten(
@@ -35,7 +44,6 @@ def filter_with_flatten(
     return dump(node=loop_ast, environment=jinja_env)
 
 
-# noinspection PyMethodMayBeStatic
 class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
     id = "no-with-loops"
     shortdesc = "Use loop instead of with_* style loops."
@@ -72,29 +80,45 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
 
         basedir: str = os.path.abspath(os.path.dirname(str(lintable.path)))
         templar: Templar = ansible_templar(basedir, templatevars={})
-        jinja_env: Environment = templar.environment
 
         with2loop = getattr(self, f"_replace_{loop_type}", None)
         if callable(with2loop):
-            fixed = with2loop(loop_type, match.task, target_task, jinja_env)
+            fixed = with2loop(loop_type, match.task, target_task, templar)
 
         if fixed:
             self._fixed(match)
 
-    @staticmethod
-    def _extract_comment(key: str, target_task: CommentedMap) -> Tuple[str, bool]:
-        key_comment = ""
-        comment: Optional[CommentToken]
-        for comment in target_task.ca.items.pop(key, []):
-            if not comment:
-                continue
-            key_comment += comment.value
-        key_comment_stripped = key_comment.strip()
+    # ### transform utility methods ###
+
+    def _extract_comment(
+        self, key: Union[str, int], target_task: CommentedMap
+    ) -> Tuple[str, bool]:
+        def get_comment(
+            key_or_index: Union[str, int], target: Union[CommentedMap, CommentedSeq]
+        ):
+            item_comment = ""
+            comment: Optional[CommentToken]
+            for comment in target.ca.items.pop(key_or_index, []):
+                if not comment:
+                    continue
+                item_comment += comment.value
+            return item_comment
+
+        key_comment = get_comment(key, target_task)
 
         last_key = list(target_task.keys())[-1]
+
+        if key in target_task and isinstance(
+            target_task[key], (MutableMapping, MutableSequence)
+        ):
+            for k, v, p in nested_items_path(target_task[key]):
+                parent = self._seek(p, target_task[key])
+                if hasattr(parent, "ca"):
+                    key_comment += get_comment(k, parent)
+
         last_key_needs_newline = last_key == key and key_comment.endswith("\n\n")
 
-        return key_comment_stripped, last_key_needs_newline
+        return key_comment.strip(), last_key_needs_newline
 
     def _set_loop_value(
         self, loop_type: str, loop_value: Any, target_task: CommentedMap
@@ -128,7 +152,8 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         if isinstance(target, CommentedMap):
             last_key = list(target.keys())[-1]
         else:
-            last_key = -1
+            # the key here must be an actual index
+            last_key = len(target) - 1
 
         if target[last_key] and isinstance(
             target[last_key], (CommentedMap, CommentedSeq)
@@ -138,14 +163,20 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
 
         if last_key in target.ca.items:
             last_key_comment_item = target.ca.items[last_key]
-            ct: CommentToken = last_key_comment_item[3]
+            if isinstance(target, CommentedMap):
+                ct: CommentToken = last_key_comment_item[2]
+            else:
+                ct = last_key_comment_item[0]
             if not ct.value.endswith("\n\n"):
                 ct.value = ct.value.strip() + "\n\n"
             return
         # re-add a newline after the task block
         # https://stackoverflow.com/a/42199053
         ct = CommentToken("\n\n", CommentMark(0), None)
-        last_key_comment_item = [None, None, ct, None]
+        if isinstance(target, CommentedMap):
+            last_key_comment_item = [None, None, ct, None]
+        else:
+            last_key_comment_item = [ct, None]
         target.ca.items[last_key] = last_key_comment_item
 
     @staticmethod
@@ -154,13 +185,15 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             var_name += "_"
         return var_name
 
+    # ### transform methods for each with_* variant ###
+
     # noinspection PyUnusedLocal
     def _replace_with_list(
         self,
         loop_type: str,
         task: Dict[str, Any],
         target_task: CommentedMap,
-        jinja_env: Environment,
+        templar: Templar,
     ) -> bool:
         with_list = target_task[loop_type]
         needs_newline = self._set_loop_value(loop_type, with_list, target_task)
@@ -173,7 +206,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         loop_type: str,
         task: Dict[str, Any],
         target_task: CommentedMap,
-        jinja_env: Environment,
+        templar: Templar,
         flatten_levels: Optional[int] = 1,
     ) -> bool:
         with_items = target_task[loop_type]
@@ -187,7 +220,9 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         else:
             loop_value = with_items
 
-        loop_value = filter_with_flatten(jinja_env, loop_value, levels=flatten_levels)
+        loop_value = filter_with_flatten(
+            templar.environment, loop_value, levels=flatten_levels
+        )
         if loop_value is None:
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
@@ -203,12 +238,13 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         _replace_with_items, flatten_levels=None
     )
 
+    # noinspection PyUnusedLocal
     def _replace_with_indexed_items(
         self,
         loop_type: str,
         task: Dict[str, Any],
         target_task: CommentedMap,
-        jinja_env: Environment,
+        templar: Templar,
     ) -> bool:
         with_indexed_items = target_task[loop_type]
         vars_ = target_task.get("vars", None)
@@ -224,7 +260,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
 
         index_var_name = self._unique_vars_name(vars_, "index")
 
-        loop_value = filter_with_flatten(jinja_env, loop_value, levels=1)
+        loop_value = filter_with_flatten(templar.environment, loop_value, levels=1)
         if loop_value is None:
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
@@ -240,6 +276,80 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         elif not isinstance(target_task["loop_control"], MutableMapping):
             target_task["loop_control"] = CommentedMap()
         target_task["loop_control"]["index_var"] = index_var_name
+        self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
+        return True
+
+    # noinspection PyUnusedLocal
+    def _replace_with_together(
+        self,
+        loop_type: str,
+        task: Dict[str, Any],
+        target_task: CommentedMap,
+        templar: Templar,
+    ) -> bool:
+        with_together = target_task[loop_type]
+        if not isinstance(with_together, MutableSequence):
+            # this is probably an indirect set of lists stored in a variable somewhere.
+            # we would need to parse the Jinja, and, if simple, check for that var
+            # in vars. Then, if that is a list, continue.
+            return False
+
+        lists_count = len(with_together)
+        if lists_count < 2:
+            # not sure what to do with this
+            return False
+
+        jinja_env: Environment = templar.environment
+
+        vars_ = None
+        if all(
+            isinstance(item, str) and templar.is_template(item)
+            for item in with_together
+        ):
+            # all Jinja expressions, collapse them into one.
+            with_together_asts = [
+                jinja_env.parse(template) for template in with_together
+            ]
+            # we'll reuse the first template
+            loop_ast = with_together_asts[0]
+            loop_output_node = None
+            with_together_nodes = []
+            for ast in with_together_asts:
+                output_node = cast(nodes.Output, ast.body[0])
+                if loop_output_node is None:
+                    loop_output_node = output_node
+                if len(output_node.nodes) != 1:
+                    # unexpected template.
+                    # There shouldn't be TemplateData nodes or more than one expression.
+                    return False
+                node: nodes.Node = output_node.nodes[0]
+                with_together_nodes.append(node)
+            loop_output_node.nodes[0] = nodes.Filter(
+                nodes.Filter(
+                    with_together_nodes[0],
+                    "zip_longest",
+                    with_together_nodes[1:],
+                    [],
+                    None,
+                    None,
+                ),
+                "list",
+                [],
+                [],
+                None,
+                None,
+            )
+        else:
+            vars_ = target_task.get("vars", CommentedMap())
+            var_name = self._unique_vars_name(vars_, "data")
+            vars_[var_name] = with_together
+            loop_ast = jinja_env.parse(
+                "{{ " + var_name + "[0] | zip_longest(*" + var_name + "[1:]) | list }}"
+            )
+
+        loop_value = dump(node=loop_ast, environment=jinja_env)
+        vars_had_newline = self._set_vars(vars_, target_task)
+        loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
         return True
 
