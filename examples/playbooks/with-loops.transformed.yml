@@ -12,24 +12,24 @@
     - name: with_items
       ansible.builtin.debug:
         msg: '{{ item }}'
-      loop: '{{ items|flatten(levels=1) }}'
+      loop: '{{ items | flatten(levels=1) }}'
 
     - name: with_indexed_items
       ansible.builtin.debug:
         msg: '{{ item.0 }} - {{ item.1 }}'
-      loop: '{{ items|flatten(levels=1) }}'
+      loop: '{{ items | flatten(levels=1) }}'
       loop_control:
         index_var: index
 
     - name: with_together simple
       ansible.builtin.debug:
         msg: '{{ item.0 }} - {{ item.1 }}'
-      loop: '{{ list_one|zip(list_two)|list }}'
+      loop: '{{ list_one | zip(list_two) | list }}'
 
     - name: with_together complex
       ansible.builtin.debug:
         msg: '{{ item.0 }} - {{ item.1 }} - {{ item.2 }}'
-      loop: '{{ data[0]|zip(*data[1:])|list }}'
+      loop: '{{ data[0] | zip(*data[1:]) | list }}'
       vars:
         data:
           - [a, b, c]
@@ -39,23 +39,23 @@
     - name: with_dict
       ansible.builtin.debug:
         msg: '{{ item.key }} - {{ item.value }}'
-      loop: '{{ dictionary|dict2items }}'
+      loop: '{{ dictionary | dict2items }}'
 
     - name: with_sequence
       ansible.builtin.debug:
         msg: '{{ item }}'
-      loop: '{{ range(0, 4 + 1, 2)|list }}'
+      loop: '{{ range(0, 4 + 1, 2) | list }}'
 
     - name: with_subelements
       ansible.builtin.debug:
         msg: '{{ item.0.name }} - {{ item.1 }}'
-      loop: "{{ users|subelements('mysql.hosts') }}"
+      loop: "{{ users | subelements('mysql.hosts') }}"
 
     - name: with_nested
       ansible.builtin.debug:
         msg: '{{ item.0 }} - {{ item.1 }}'
-      loop: '{{ list_one|product(list_two)|list }}'
+      loop: '{{ list_one | product(list_two) | list }}'
 
     - name: with_random_choice
       ansible.builtin.debug:
-        msg: '{{ my_list|random }}'
+        msg: '{{ my_list | random }}'
