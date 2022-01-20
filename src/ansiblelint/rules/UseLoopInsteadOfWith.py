@@ -1,19 +1,21 @@
 import functools
 import os
 import sys
-from typing import Any, Dict, List, MutableMapping, Optional, Union, cast
+from typing import Any, Dict, MutableMapping, Optional, Tuple, Union, cast
 
 from ansible.template import Templar
 from jinja2 import nodes
 from jinja2.environment import Environment
 from jinja2.visitor import NodeTransformer
 from ruamel.yaml import CommentedMap, CommentedSeq
+from ruamel.yaml.error import CommentMark
+from ruamel.yaml.tokens import CommentToken
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
-from ansiblelint.utils import LINE_NUMBER_KEY, ansible_templar
+from ansiblelint.utils import ansible_templar
 
 
 def filter_with_flatten(
@@ -80,22 +82,71 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             self._fixed(match)
 
     @staticmethod
-    def _set_loop_value(loop_type: str, loop_value: Any, target_task: CommentedMap):
+    def _extract_comment(key: str, target_task: CommentedMap) -> Tuple[str, bool]:
+        key_comment = ""
+        comment: Optional[CommentToken]
+        for comment in target_task.ca.items.pop(key, []):
+            if not comment:
+                continue
+            key_comment += comment.value
+        key_comment_stripped = key_comment.strip()
+
+        last_key = list(target_task.keys())[-1]
+        last_key_needs_newline = last_key == key and key_comment.endswith("\n\n")
+
+        return key_comment_stripped, last_key_needs_newline
+
+    def _set_loop_value(
+        self, loop_type: str, loop_value: Any, target_task: CommentedMap
+    ) -> bool:
         position = list(target_task.keys()).index(loop_type)
         target_task.insert(position, "loop", loop_value)
-        comment = target_task.ca.items.pop(loop_type, None)
-        if comment is not None:
-            target_task.ca.items["loop"] = comment
+        comment, last_key_needs_newline = self._extract_comment(loop_type, target_task)
+        if comment:
+            target_task.yaml_add_eol_comment(comment, "loop")
         del target_task[loop_type]
+        # Delay adding the last_key_comment_item as other keys might get added.
+        return last_key_needs_newline
 
-    @staticmethod
-    def _set_vars(vars_: Optional[CommentedMap], target_task: CommentedMap):
+    def _set_vars(
+        self, vars_: Optional[CommentedMap], target_task: CommentedMap
+    ) -> bool:
         if vars_ is None:
-            return
-        comment = target_task.ca.items.pop("vars", None)
+            return False
+        comment, last_key_needs_newline = self._extract_comment("vars", target_task)
         target_task["vars"] = vars_
-        if comment is not None:
-            target_task.ca.items["vars"] = comment
+        if comment:
+            target_task.yaml_add_eol_comment(comment, "vars")
+        # Delay adding the last_key_comment_item as other keys might get added.
+        return last_key_needs_newline
+
+    def _handle_last_key_newline(
+        self, last_key_needs_newline: bool, target: Union[CommentedMap, CommentedSeq]
+    ) -> None:
+        if not last_key_needs_newline:
+            return
+        if isinstance(target, CommentedMap):
+            last_key = list(target.keys())[-1]
+        else:
+            last_key = -1
+
+        if target[last_key] and isinstance(
+            target[last_key], (CommentedMap, CommentedSeq)
+        ):
+            self._handle_last_key_newline(last_key_needs_newline, target[last_key])
+            return
+
+        if last_key in target.ca.items:
+            last_key_comment_item = target.ca.items[last_key]
+            ct: CommentToken = last_key_comment_item[3]
+            if not ct.value.endswith("\n\n"):
+                ct.value = ct.value.strip() + "\n\n"
+            return
+        # re-add a newline after the task block
+        # https://stackoverflow.com/a/42199053
+        ct = CommentToken("\n\n", CommentMark(0), None)
+        last_key_comment_item = [None, None, ct, None]
+        target.ca.items[last_key] = last_key_comment_item
 
     @staticmethod
     def _unique_vars_name(vars_: Optional[CommentedMap], var_name: str):
@@ -112,7 +163,8 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         jinja_env: Environment,
     ) -> bool:
         with_list = target_task[loop_type]
-        self._set_loop_value(loop_type, with_list, target_task)
+        needs_newline = self._set_loop_value(loop_type, with_list, target_task)
+        self._handle_last_key_newline(needs_newline, target_task)
         return True
 
     # noinspection PyUnusedLocal
@@ -141,8 +193,9 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
 
-        self._set_vars(vars_, target_task)
-        self._set_loop_value(loop_type, loop_value, target_task)
+        loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
+        vars_had_newline = self._set_vars(vars_, target_task)
+        self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
         return True
 
     # flattend lookup is in the community.general collection (see note above)
@@ -179,14 +232,15 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
 
         position = list(target_task.keys()).index(loop_type)
 
-        self._set_vars(vars_, target_task)
-        self._set_loop_value(loop_type, loop_value, target_task)
+        loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
+        vars_had_newline = self._set_vars(vars_, target_task)
 
         if "loop_control" not in target_task:
             target_task.insert(position + 1, "loop_control", CommentedMap())
         elif not isinstance(target_task["loop_control"], MutableMapping):
             target_task["loop_control"] = CommentedMap()
         target_task["loop_control"]["index_var"] = index_var_name
+        self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
         return True
 
 
