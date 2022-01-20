@@ -97,7 +97,7 @@ def _append_skipped_rules(
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
 
-    if lintable.kind == 'meta':
+    if lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
         pyyaml_data[0]['skipped_rules'] = _get_rule_skips_from_yaml(ruamel_data)
         return pyyaml_data
 
@@ -114,8 +114,6 @@ def _append_skipped_rules(
             # assume it is a playbook, check needs to be added higher in the
             # call stack, and can remove this except
             return pyyaml_data
-    elif lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
-        return pyyaml_data
     else:
         # For unsupported file types, we return empty skip lists
         return None
