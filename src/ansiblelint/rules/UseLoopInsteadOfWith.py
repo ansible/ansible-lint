@@ -28,6 +28,25 @@ from ansiblelint.transform_utils import dump
 from ansiblelint.utils import ansible_templar, nested_items_path
 
 
+def _get_node(template: str, jinja_env: Environment):
+    """Get the node from the template, discarding Template and Output nodes."""
+    ast = jinja_env.parse(template)
+    output_node = cast(nodes.Output, ast.body[0])
+    if len(output_node.nodes) != 1:
+        # unexpected template.
+        # There shouldn't be TemplateData nodes or more than one expression.
+        return None
+    return output_node.nodes[0]
+
+
+def _get_empty_ast(jinja_env: Environment) -> Tuple[nodes.Template, nodes.Output]:
+    """Get an empty template ast."""
+    ast = jinja_env.parse("{{ discard_me }}")
+    output_node = cast(nodes.Output, ast.body[0])
+    output_node.nodes.clear()
+    return ast, output_node
+
+
 def filter_with_flatten(
     jinja_env: Environment, loop_value: str, levels: int = None
 ) -> Optional[str]:
@@ -124,7 +143,6 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         if callable(with2loop):
             fixed = with2loop(loop_type, match.task, target_task, templar)
 
-        fixed = True  # TODO: drop after testing is complete
         if fixed:
             self._fixed(match)
 
@@ -409,38 +427,32 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             isinstance(item, str) and templar.is_template(item)
             for item in with_together
         ):
-            # all Jinja expressions, collapse them into one.
-            with_together_asts = [
-                jinja_env.parse(template) for template in with_together
+            # collapse all Jinja expressions into one ast
+            loop_ast, loop_output_node = _get_empty_ast(jinja_env)
+            with_together_nodes = [
+                _get_node(template, jinja_env) for template in with_together
             ]
-            # we'll reuse the first template
-            loop_ast = with_together_asts[0]
-            loop_output_node = None
-            with_together_nodes = []
-            for ast in with_together_asts:
-                output_node = cast(nodes.Output, ast.body[0])
-                if loop_output_node is None:
-                    loop_output_node = output_node
-                if len(output_node.nodes) != 1:
-                    # unexpected template.
-                    # There shouldn't be TemplateData nodes or more than one expression.
-                    return False
-                node: nodes.Node = output_node.nodes[0]
-                with_together_nodes.append(node)
-            loop_output_node.nodes[0] = nodes.Filter(
+            if any(node is None for node in with_together_nodes):
+                # unexpected template.
+                # There shouldn't be TemplateData nodes or more than one expression.
+                return False
+
+            loop_output_node.nodes.append(
                 nodes.Filter(
-                    with_together_nodes[0],
-                    "zip_longest",
-                    with_together_nodes[1:],
+                    nodes.Filter(
+                        with_together_nodes[0],
+                        "zip_longest",
+                        with_together_nodes[1:],
+                        [],
+                        None,
+                        None,
+                    ),
+                    "list",
+                    [],
                     [],
                     None,
                     None,
-                ),
-                "list",
-                [],
-                [],
-                None,
-                None,
+                )
             )
         else:
             vars_ = target_task.get("vars", CommentedMap())
@@ -504,7 +516,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         from ansible.plugins.lookup.sequence import SHORTCUT
 
         match = SHORTCUT.match(with_sequence)
-        params = orig_params = {}
+        params = {}
         if match:
             # shorthand mode. Assume
             (
@@ -526,7 +538,6 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         else:
             params = parse_kv(with_sequence)
             if "count" in params:
-                orig_params = params.copy()
                 count = params.pop("count")
                 if count != 0:
                     params["end"] = (
@@ -584,6 +595,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         self._handle_last_key_newline(loop_had_newline, target_task)
         return True
 
+    # noinspection PyUnusedLocal
     def _replace_with_subelements(
         self,
         loop_type: str,
@@ -622,43 +634,105 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             vars_[var_name] = subelements_items
             loop_value = "{{" + var_name + "}}"
 
-        def get_node(template):
-            if not templar.is_template(template):
-                template = "{{" + repr(template) + "}}"
-            template_ast = jinja_env.parse(template)
-            template_output_node = cast(nodes.Output, template_ast.body[0])
-            if len(template_output_node.nodes) != 1:
-                # unexpected template.
-                # There shouldn't be TemplateData nodes or more than one expression.
-                return None
-            return template_output_node.nodes[0]
-
-        args = [get_node(subelements_path)]
+        args = [
+            _get_node(
+                subelements_path
+                if templar.is_template(subelements_path)
+                else "{{" + repr(subelements_path) + "}}",
+                jinja_env,
+            )
+        ]
         if args[0] is None:
             return False
 
         if subelements_skip_missing is None:
             kwargs = []
         else:
-            kwarg = get_node(subelements_skip_missing)
+            kwarg = _get_node(
+                subelements_skip_missing
+                if templar.is_template(subelements_skip_missing)
+                else "{{" + repr(subelements_skip_missing) + "}}",
+                jinja_env,
+            )
             if kwarg is None:
                 return False
             kwargs = [nodes.Keyword("skip_missing", kwarg)]
 
-        ast = jinja_env.parse(loop_value)
-        output_node = cast(nodes.Output, ast.body[0])
+        loop_ast = jinja_env.parse(loop_value)
+        output_node = cast(nodes.Output, loop_ast.body[0])
         if len(output_node.nodes) != 1:
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
         node: nodes.Node = output_node.nodes[0]
 
-        output_node.nodes[0] = nodes.Filter(node, "subelements", args, kwargs, None, None)
-        loop_value = cast(str, dump(node=ast, environment=jinja_env))
+        output_node.nodes[0] = nodes.Filter(
+            node, "subelements", args, kwargs, None, None
+        )
+        loop_value = cast(str, dump(node=loop_ast, environment=jinja_env))
 
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
+
+    def _replace_with_nested(
+        self,
+        loop_type: str,
+        task: Dict[str, Any],
+        target_task: CommentedMap,
+        templar: Templar,
+    ) -> bool:
+        with_nested = target_task[loop_type]
+        if not isinstance(with_nested, CommentedSeq):
+            # probably a template referring to a var from who knows where.
+            return False
+        jinja_env: Environment = templar.environment
+        vars_ = None
+        nested_list_templates = []
+        for index, nested_list in enumerate(with_nested):
+            if isinstance(nested_list, str):
+                if not templar.is_template(nested_list):
+                    # strings should be templates. Bail out.
+                    return False
+                nested_list_templates.append(nested_list)
+                continue
+            # not a template. We need to put it in vars.
+            if vars_ is None:
+                vars_ = target_task.get("vars", CommentedMap())
+            var_name = self._unique_vars_name(vars_, f"list{index}")
+            vars_[var_name] = nested_list
+            nested_list_templates.append("{{" + var_name + "}}")
+        loop_ast, loop_output_node = _get_empty_ast(jinja_env)
+        nested_list_nodes = [
+            _get_node(template, jinja_env) for template in nested_list_templates
+        ]
+        if any(node is None for node in nested_list_nodes):
+            # unexpected template.
+            # There shouldn't be TemplateData nodes or more than one expression.
+            return False
+        loop_output_node.nodes.append(
+            nodes.Filter(
+                nodes.Filter(
+                    nested_list_nodes[0],
+                    "product",
+                    nested_list_nodes[1:],
+                    [],
+                    None,
+                    None,
+                ),
+                "list",
+                [],
+                [],
+                None,
+                None,
+            )
+        )
+        loop_value = cast(str, dump(node=loop_ast, environment=jinja_env))
+        loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
+        vars_had_newline = self._set_vars(vars_, target_task)
+        self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
+
+    _replace_with_cartesian = _replace_with_nested
 
 
 if 'pytest' in sys.modules:
