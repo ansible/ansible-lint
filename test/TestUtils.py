@@ -526,7 +526,8 @@ def test_nested_items() -> None:
         ("list-item", "apple", "fruits"),
         ("list-item", "orange", "fruits"),
     ]
-    assert list(utils.nested_items(data)) == items
+    with pytest.deprecated_call():
+        assert list(utils.nested_items(data)) == items
 
 
 def test_nested_items_path() -> None:
