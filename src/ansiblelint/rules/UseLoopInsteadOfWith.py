@@ -44,6 +44,18 @@ def filter_with_flatten(
     return dump(node=loop_ast, environment=jinja_env)
 
 
+def filter_with_dict2items(jinja_env: Environment, loop_value: str) -> Optional[str]:
+    loop_ast = jinja_env.parse(loop_value)
+    output_node = cast(nodes.Output, loop_ast.body[0])
+    if len(output_node.nodes) != 1:
+        # unexpected template.
+        # There shouldn't be TemplateData nodes or more than one expression.
+        return None
+    node: nodes.Node = output_node.nodes[0]
+    output_node.nodes[0] = nodes.Filter(node, "dict2items", [], [], None, None)
+    return dump(node=loop_ast, environment=jinja_env)
+
+
 class SimpleNodeReplacer(NodeTransformer):
     """This Jinja Node Replacer can only handle simple (hashable) nodes.
 
@@ -110,7 +122,6 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         if callable(with2loop):
             fixed = with2loop(loop_type, match.task, target_task, templar)
 
-        fixed = True  # TODO: drop after testing is complete
         if fixed:
             self._fixed(match)
 
@@ -427,6 +438,35 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         loop_value = dump(node=loop_ast, environment=jinja_env)
         vars_had_newline = self._set_vars(vars_, target_task)
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
+        self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
+        return True
+
+    def _replace_with_dict(
+        self,
+        loop_type: str,
+        task: Dict[str, Any],
+        target_task: CommentedMap,
+        templar: Templar,
+    ) -> bool:
+        with_dict = target_task[loop_type]
+        vars_ = None
+        if isinstance(with_dict, CommentedMap):
+            vars_ = target_task.get("vars", CommentedMap())
+            var_name = self._unique_vars_name(vars_, "items")
+            vars_[var_name] = with_dict
+
+            loop_value = "{{" + var_name + "}}"
+        else:
+            loop_value = with_dict
+
+        loop_value = filter_with_dict2items(templar.environment, loop_value)
+        if loop_value is None:
+            # unexpected template.
+            # There shouldn't be TemplateData nodes or more than one expression.
+            return False
+
+        loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
+        vars_had_newline = self._set_vars(vars_, target_task)
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
         return True
 
