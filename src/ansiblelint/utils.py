@@ -877,6 +877,7 @@ def convert_to_boolean(value: Any) -> bool:
     return bool(boolean(value))
 
 
+# TODO: mark this function deprecated. Use nested_items_path instead.
 def nested_items(
     data: Union[Dict[Any, Any], List[Any]], parent: str = ""
 ) -> Iterator[Tuple[Any, Any, str]]:
