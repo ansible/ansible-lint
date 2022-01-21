@@ -543,6 +543,10 @@ class TemplateDumper(NodeVisitor):
         """Write a ``Getitem`` expression to the stream."""
         # node.ctx is only ever "load". Not sure this would change if it wasn't.
         self.visit(node.node)
+        # using . and [] are mostly interchangeable. Prefer . for the simple case
+        if isinstance(node.arg, nodes.Const) and isinstance(node.arg.value, int):
+            self.write(f".{node.arg.value}")
+            return
         self.write("[")
         self.visit(node.arg)
         self.write("]")

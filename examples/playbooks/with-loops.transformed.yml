@@ -29,7 +29,7 @@
     - name: with_together complex
       ansible.builtin.debug:
         msg: '{{ item.0 }} - {{ item.1 }} - {{ item.2 }}'
-      loop: '{{ data[0] | zip_longest(*data[1:]) | list }}'
+      loop: '{{ data.0 | zip_longest(*data[1:]) | list }}'
       vars:
         data:
           - [a, b, c]

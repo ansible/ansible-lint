@@ -425,7 +425,8 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
             yaml_path = parent_path + [key]
             do_wrap_template = (
                 "when" in yaml_path
-                or yaml_path[-2:] == ["debug", "var"]
+                or yaml_path[-2:]
+                in (["debug", "var"], ["ansible.builtin.debug", "var"])
                 or (isinstance(key, str) and key.endswith("_when"))
             )
             if not do_wrap_template and not templar.is_template(value):
@@ -499,7 +500,8 @@ class AnsibleFactsNamespacingRule(AnsibleLintRule, TransformMixin):
             target_template = target_parent[target_key]
             do_wrap_template = (
                 "when" in match.yaml_path
-                or match.yaml_path[-2:] == ["debug", "var"]
+                or match.yaml_path[-2:]
+                in (["debug", "var"], ["ansible.builtin.debug", "var"])
                 or (
                     isinstance(match.yaml_path[-1], str)
                     and match.yaml_path[-1].endswith("_when")

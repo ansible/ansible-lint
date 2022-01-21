@@ -44,6 +44,31 @@ def filter_with_flatten(
     return dump(node=loop_ast, environment=jinja_env)
 
 
+class SimpleNodeReplacer(NodeTransformer):
+    """This Jinja Node Replacer can only handle simple (hashable) nodes.
+
+    Nodes that have list or dict attributes will not work.
+    """
+    def __init__(self, translate: Dict[str, str]):
+        jinja_env = ansible_templar(".", templatevars={}).environment
+        key_asts = [jinja_env.parse("{{" + key + "}}") for key in translate.keys()]
+        value_asts = [
+            jinja_env.parse("{{" + value + "}}") for value in translate.values()
+        ]
+        self.translate = {
+            key_ast.body[0].nodes[0]: value_ast.body[0].nodes[0]
+            for key_ast, value_ast in zip(key_asts, value_asts)
+        }
+
+    def visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
+        try:
+            if node in self.translate:
+                return self.translate[node]
+        except TypeError:
+            pass
+        return super().visit(node, *args, **kwargs)
+
+
 class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
     id = "no-with-loops"
     shortdesc = "Use loop instead of with_* style loops."
@@ -85,6 +110,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         if callable(with2loop):
             fixed = with2loop(loop_type, match.task, target_task, templar)
 
+        fixed = True  # TODO: drop after testing is complete
         if fixed:
             self._fixed(match)
 
@@ -238,7 +264,6 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         _replace_with_items, flatten_levels=None
     )
 
-    # noinspection PyUnusedLocal
     def _replace_with_indexed_items(
         self,
         loop_type: str,
@@ -258,13 +283,63 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         else:
             loop_value = with_indexed_items
 
-        index_var_name = self._unique_vars_name(vars_, "index")
+        index_var_name = target_task.get("loop_control", {}).get(
+            "index_var", self._unique_vars_name(vars_, "index")
+        )
+        loop_var_name = target_task.get("loop_control", {}).get(
+            "loop_var", self._unique_vars_name(vars_, "item")
+        )
 
         loop_value = filter_with_flatten(templar.environment, loop_value, levels=1)
         if loop_value is None:
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
+
+        module = task["action"]["__ansible_module_original__"]
+
+        jinja_env: Environment = templar.environment
+        var_replacer = SimpleNodeReplacer(
+            translate={
+                f"{loop_var_name}.0": index_var_name,
+                f"{loop_var_name}.1": loop_var_name,
+            }
+        )
+        # look for places to replace index_var and item_var
+        for key, value, parent_path in nested_items_path(target_task):
+            top_key = parent_path[0] if parent_path else None
+            if (
+                # The loop definition gets templated before the loop (of course),
+                # so do not look for loop_var or index_var usage there.
+                {key, top_key} & {loop_type, "loop"}
+                # Under loop_control, these are also templated before the loop:
+                or (
+                    top_key == "loop_control"
+                    and key in ("loop_var", "index_var", "loop_pause", "extended")
+                )
+                # we are only looking for template strings
+                or not isinstance(value, str)
+            ):
+                continue
+            do_wrap_template = (
+                not parent_path and (key == "when" or key.endswith("_when"))
+            ) or (
+                parent_path
+                and parent_path[-1] == module
+                and module in ("debug", "ansible.builtin.debug")
+                and key == "var"
+            )
+            if not do_wrap_template and not templar.is_template(value):
+                continue
+            template = "{{" + value + "}}" if do_wrap_template else value
+            ast = jinja_env.parse(template)
+            ast = var_replacer.visit(ast)
+            new_template = cast(str, dump(node=ast, environment=jinja_env))
+            if do_wrap_template:
+                # remove "{{ " and " }}" (dump always adds space w/ braces)
+                new_template = new_template[3:-3]
+
+            self._seek(parent_path, target_task)[key] = new_template
 
         position = list(target_task.keys()).index(loop_type)
 
@@ -276,6 +351,8 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         elif not isinstance(target_task["loop_control"], MutableMapping):
             target_task["loop_control"] = CommentedMap()
         target_task["loop_control"]["index_var"] = index_var_name
+        if loop_var_name != "item":
+            target_task["loop_control"]["loop_var"] = loop_var_name
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
         return True
 
