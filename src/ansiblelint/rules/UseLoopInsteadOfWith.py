@@ -83,10 +83,19 @@ class SimpleNodeReplacer(NodeTransformer):
     """
 
     def __init__(self, translate: Dict[str, str]):
-        jinja_env = ansible_templar(".", templatevars={}).environment
-        key_asts = [jinja_env.parse("{{" + key + "}}") for key in translate.keys()]
+        templar = ansible_templar(".", templatevars={})
+        jinja_env = templar.environment
+        key_asts = [
+            jinja_env.parse(
+                key if templar.is_possibly_template(key) else "{{" + key + "}}"
+            )
+            for key in translate.keys()
+        ]
         value_asts = [
-            jinja_env.parse("{{" + value + "}}") for value in translate.values()
+            jinja_env.parse(
+                value if templar.is_possibly_template(value) else "{{" + value + "}}"
+            )
+            for value in translate.values()
         ]
         self.translate = {
             key_ast.body[0].nodes[0]: value_ast.body[0].nodes[0]
@@ -120,8 +129,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         has_with_style_loop = bool(with_keys)
         return has_with_style_loop
 
-    # NB: several lookups are in the community.general collection:
-    #     flattened, cartesian
+    # NB: Some lookups are in the community.general collection: flattened, cartesian
     #     So, transform() needs to handle this (common-ish) with_ loop,
     #     but, we can't run it through tests because we don't want to
     #     depend on collections.
@@ -674,7 +682,9 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
+        return True
 
+    # noinspection PyUnusedLocal
     def _replace_with_nested(
         self,
         loop_type: str,
@@ -731,8 +741,60 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
+        return True
 
+    # cartesian lookup is in the community.general collection (see note above)
     _replace_with_cartesian = _replace_with_nested
+
+    def _replace_with_random_choice(
+        self,
+        loop_type: str,
+        task: Dict[str, Any],
+        target_task: CommentedMap,
+        templar: Templar,
+    ) -> bool:
+        with_random_choice = target_task[loop_type]
+        vars_ = target_task.get("vars", CommentedMap())
+        if isinstance(with_random_choice, list):
+            var_name = self._unique_vars_name(vars_, "choices")
+            vars_[var_name] = with_random_choice
+            loop_value = "{{" + var_name + "}}"
+        else:
+            loop_value = with_random_choice
+        loop_var_name = target_task.get("loop_control", {}).get(
+            "loop_var", self._unique_vars_name(vars_, "item")
+        )
+        jinja_env = templar.environment
+        ast, output_node = _get_empty_ast(jinja_env)
+        node = _get_node(loop_value, jinja_env)
+        output_node.nodes.append(nodes.Filter(node, "random", [], [], None, None))
+        template = cast(str, dump(node=ast, environment=jinja_env))
+        self._translate_vars_in_task(
+            translate={
+                loop_var_name: template,
+            },
+            loop_type=loop_type,
+            module=task["action"]["__ansible_module_original__"],
+            target_task=target_task,
+            templar=templar,
+        )
+        if not vars_:
+            vars_ = None
+
+        vars_had_newline = self._set_vars(vars_, target_task)
+        # This is not really a loop, but we'll use _set_loop_value to see if we need a newline.
+        loop_had_newline = self._set_loop_value(loop_type, None, target_task)
+        loop_control_had_newline = False
+        if "loop_control" in target_task:
+            loop_control_had_newline = self._set_loop_value(
+                "loop_control", None, target_task
+            )
+        target_task.pop("loop", None)
+        self._handle_last_key_newline(
+            vars_had_newline or loop_had_newline or loop_control_had_newline,
+            target_task,
+        )
+        return True
 
 
 if 'pytest' in sys.modules:
