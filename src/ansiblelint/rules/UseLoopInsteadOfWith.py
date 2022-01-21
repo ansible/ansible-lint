@@ -12,6 +12,7 @@ from typing import (
     cast,
 )
 
+from ansible.parsing.splitter import parse_kv
 from ansible.template import Templar
 from jinja2 import nodes
 from jinja2.environment import Environment
@@ -61,6 +62,7 @@ class SimpleNodeReplacer(NodeTransformer):
 
     Nodes that have list or dict attributes will not work.
     """
+
     def __init__(self, translate: Dict[str, str]):
         jinja_env = ansible_templar(".", templatevars={}).environment
         key_asts = [jinja_env.parse("{{" + key + "}}") for key in translate.keys()]
@@ -222,6 +224,52 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             var_name += "_"
         return var_name
 
+    def _translate_vars_in_task(
+        self,
+        translate: Dict[str, str],
+        loop_type: str,
+        module: str,
+        target_task: CommentedMap,
+        templar: Templar,
+    ):
+        jinja_env: Environment = templar.environment
+        var_replacer = SimpleNodeReplacer(translate=translate)
+        # look for places to replace index_var and item_var
+        for key, value, parent_path in nested_items_path(target_task):
+            top_key = parent_path[0] if parent_path else None
+            if (
+                # The loop definition gets templated before the loop (of course),
+                # so do not look for loop_var or index_var usage there.
+                {key, top_key} & {loop_type, "loop"}
+                # Under loop_control, these are also templated before the loop:
+                or (
+                    top_key == "loop_control"
+                    and key in ("loop_var", "index_var", "loop_pause", "extended")
+                )
+                # we are only looking for template strings
+                or not isinstance(value, str)
+            ):
+                continue
+            do_wrap_template = (
+                not parent_path and (key == "when" or key.endswith("_when"))
+            ) or (
+                parent_path
+                and parent_path[-1] == module
+                and module in ("debug", "ansible.builtin.debug")
+                and key == "var"
+            )
+            if not do_wrap_template and not templar.is_template(value):
+                continue
+            template = "{{" + value + "}}" if do_wrap_template else value
+            ast = jinja_env.parse(template)
+            ast = var_replacer.visit(ast)
+            new_template = cast(str, dump(node=ast, environment=jinja_env))
+            if do_wrap_template:
+                # remove "{{ " and " }}" (dump always adds space w/ braces)
+                new_template = new_template[3:-3]
+
+            self._seek(parent_path, target_task)[key] = new_template
+
     # ### transform methods for each with_* variant ###
 
     # noinspection PyUnusedLocal
@@ -307,50 +355,16 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
 
-        module = task["action"]["__ansible_module_original__"]
-
-        jinja_env: Environment = templar.environment
-        var_replacer = SimpleNodeReplacer(
+        self._translate_vars_in_task(
             translate={
                 f"{loop_var_name}.0": index_var_name,
                 f"{loop_var_name}.1": loop_var_name,
-            }
+            },
+            loop_type=loop_type,
+            module=task["action"]["__ansible_module_original__"],
+            target_task=target_task,
+            templar=templar,
         )
-        # look for places to replace index_var and item_var
-        for key, value, parent_path in nested_items_path(target_task):
-            top_key = parent_path[0] if parent_path else None
-            if (
-                # The loop definition gets templated before the loop (of course),
-                # so do not look for loop_var or index_var usage there.
-                {key, top_key} & {loop_type, "loop"}
-                # Under loop_control, these are also templated before the loop:
-                or (
-                    top_key == "loop_control"
-                    and key in ("loop_var", "index_var", "loop_pause", "extended")
-                )
-                # we are only looking for template strings
-                or not isinstance(value, str)
-            ):
-                continue
-            do_wrap_template = (
-                not parent_path and (key == "when" or key.endswith("_when"))
-            ) or (
-                parent_path
-                and parent_path[-1] == module
-                and module in ("debug", "ansible.builtin.debug")
-                and key == "var"
-            )
-            if not do_wrap_template and not templar.is_template(value):
-                continue
-            template = "{{" + value + "}}" if do_wrap_template else value
-            ast = jinja_env.parse(template)
-            ast = var_replacer.visit(ast)
-            new_template = cast(str, dump(node=ast, environment=jinja_env))
-            if do_wrap_template:
-                # remove "{{ " and " }}" (dump always adds space w/ braces)
-                new_template = new_template[3:-3]
-
-            self._seek(parent_path, target_task)[key] = new_template
 
         position = list(target_task.keys()).index(loop_type)
 
@@ -441,6 +455,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
         return True
 
+    # noinspection PyUnusedLocal
     def _replace_with_dict(
         self,
         loop_type: str,
@@ -468,6 +483,104 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
+        return True
+
+    def _replace_with_sequence(
+        self,
+        loop_type: str,
+        task: Dict[str, Any],
+        target_task: CommentedMap,
+        templar: Templar,
+    ) -> bool:
+        with_sequence: str = target_task[loop_type]
+        if not isinstance(with_sequence, str):
+            # what? This should be a string... giving up!
+            return False
+        # sadly we need to parse the with_sequence string
+        # and there's a shortcut format for this!
+        # we can't just import the lookup itself, because it expects
+        # vars to already be templated. So we parse it ourselves
+        from ansible.plugins.lookup.sequence import SHORTCUT
+
+        match = SHORTCUT.match(with_sequence)
+        params = orig_params = {}
+        if match:
+            # shorthand mode. Assume
+            (
+                _,
+                params["start"],
+                params["end"],
+                _,
+                params["stride"],
+                _,
+                params["format"],
+            ) = match.groups()
+            for key in ["start", "end", "stride"]:
+                try:
+                    value = int(params[key], 0)
+                except ValueError:
+                    # might be a template string. leave as is.
+                    continue
+                params[key] = value
+        else:
+            params = parse_kv(with_sequence)
+            if "count" in params:
+                orig_params = params.copy()
+                count = params.pop("count")
+                if count != 0:
+                    params["end"] = (
+                        params.get("start", 1) + count * params.get("stride", 1) - 1
+                    )
+                else:
+                    params["start"] = 0
+                    params["end"] = 0
+                    params["stride"] = 0
+            if "stride" in params and "start" not in params:
+                params["start"] = 0
+        try:
+            stride = int(params.get("stride", 1), 0)
+            if stride >= 0:
+                adjust = "+ 1"
+            else:
+                adjust = "- 1"
+        except ValueError:
+            # probably a template
+            adjust = "+ 1"
+
+        loop_value = "{{ range("
+        if "start" in params:
+            loop_value += f"{params['start']}, "
+        loop_value += f"{params['end']} {adjust}"
+        if "stride" in params:
+            loop_value += f", {params['stride']}"
+        loop_value += ") | list }}"
+
+        if "format" in params:
+            vars_ = target_task.get("vars", CommentedMap())
+            loop_var_name = target_task.get("loop_control", {}).get(
+                "loop_var", self._unique_vars_name(vars_, "item")
+            )
+            # search for the item var and replace it with
+            self._translate_vars_in_task(
+                translate={
+                    loop_var_name: f"'{params['format']}' | format({loop_var_name})"
+                },
+                loop_type=loop_type,
+                module=task["action"]["__ansible_module_original__"],
+                target_task=target_task,
+                templar=templar,
+            )
+            if loop_var_name != "item":
+                if "loop_control" not in target_task:
+                    position = list(target_task.keys()).index(loop_type)
+                    target_task.insert(position + 1, "loop_control", CommentedMap())
+                elif not isinstance(target_task["loop_control"], MutableMapping):
+                    target_task["loop_control"] = CommentedMap()
+                target_task["loop_control"]["loop_var"] = loop_var_name
+
+        loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
+        # do not set vars_ here. We queried but did not modify it.
+        self._handle_last_key_newline(loop_had_newline, target_task)
         return True
 
 

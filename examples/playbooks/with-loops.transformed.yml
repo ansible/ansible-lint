@@ -43,7 +43,7 @@
 
     - name: with_sequence
       ansible.builtin.debug:
-        msg: '{{ item }}'
+        msg: "{{ 'testuser%02x' | format(item) }}"
       loop: '{{ range(0, 4 + 1, 2) | list }}'
 
     - name: with_subelements
