@@ -529,6 +529,32 @@ def test_nested_items() -> None:
     assert list(utils.nested_items(data)) == items
 
 
+def test_nested_items_path() -> None:
+    """Verify correct function of nested_items_path()."""
+    data = {
+        "foo": "text",
+        "bar": {"some": "text2"},
+        "fruits": ["apple", "orange"],
+        "answer": [{"forty-two": ["life", "universe", "everything"]}],
+    }
+
+    items = [
+        ("foo", "text", []),
+        ("bar", {"some": "text2"}, []),
+        ("some", "text2", ["bar"]),
+        ("fruits", ["apple", "orange"], []),
+        (0, "apple", ["fruits"]),
+        (1, "orange", ["fruits"]),
+        ("answer", [{"forty-two": ["life", "universe", "everything"]}], []),
+        (0, {"forty-two": ["life", "universe", "everything"]}, ["answer"]),
+        ("forty-two", ["life", "universe", "everything"], ["answer", 0]),
+        (0, "life", ["answer", 0, "forty-two"]),
+        (1, "universe", ["answer", 0, "forty-two"]),
+        (2, "everything", ["answer", 0, "forty-two"]),
+    ]
+    assert list(utils.nested_items_path(data)) == items
+
+
 def test_guess_project_dir(tmp_path: Path) -> None:
     """Verify guess_project_dir()."""
     with cwd(str(tmp_path)):
