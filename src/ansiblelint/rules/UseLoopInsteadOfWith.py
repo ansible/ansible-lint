@@ -124,6 +124,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         if callable(with2loop):
             fixed = with2loop(loop_type, match.task, target_task, templar)
 
+        fixed = True  # TODO: drop after testing is complete
         if fixed:
             self._fixed(match)
 
@@ -582,6 +583,82 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         # do not set vars_ here. We queried but did not modify it.
         self._handle_last_key_newline(loop_had_newline, target_task)
         return True
+
+    def _replace_with_subelements(
+        self,
+        loop_type: str,
+        task: Dict[str, Any],
+        target_task: CommentedMap,
+        templar: Templar,
+    ) -> bool:
+        with_subelements: CommentedSeq = target_task[loop_type]
+        if (
+            # This might be a string template referring to a
+            # variable that is who-knows-where.
+            not isinstance(with_subelements, CommentedSeq)
+            # Or it is a list with the wrong number of elements.
+            or not 2 <= len(with_subelements) <= 3
+            # Or the subelements_path is an unknown type
+            or not isinstance(with_subelements[1], str)
+        ):
+            return False
+        subelements_items = with_subelements[0]
+        subelements_path = with_subelements[1]
+        try:
+            subelements_skip_missing = with_subelements[2]
+            subelements_skip_missing = subelements_skip_missing["skip_missing"]
+        except (IndexError, KeyError):
+            subelements_skip_missing = None
+
+        vars_ = None
+        jinja_env: Environment = templar.environment
+        if isinstance(subelements_items, str):
+            # got a template
+            loop_value = subelements_items
+        else:
+            # got a raw list. Move it to 'vars:'
+            vars_ = target_task.get("vars", CommentedMap())
+            var_name = self._unique_vars_name(vars_, "items")
+            vars_[var_name] = subelements_items
+            loop_value = "{{" + var_name + "}}"
+
+        def get_node(template):
+            if not templar.is_template(template):
+                template = "{{" + repr(template) + "}}"
+            template_ast = jinja_env.parse(template)
+            template_output_node = cast(nodes.Output, template_ast.body[0])
+            if len(template_output_node.nodes) != 1:
+                # unexpected template.
+                # There shouldn't be TemplateData nodes or more than one expression.
+                return None
+            return template_output_node.nodes[0]
+
+        args = [get_node(subelements_path)]
+        if args[0] is None:
+            return False
+
+        if subelements_skip_missing is None:
+            kwargs = []
+        else:
+            kwarg = get_node(subelements_skip_missing)
+            if kwarg is None:
+                return False
+            kwargs = [nodes.Keyword("skip_missing", kwarg)]
+
+        ast = jinja_env.parse(loop_value)
+        output_node = cast(nodes.Output, ast.body[0])
+        if len(output_node.nodes) != 1:
+            # unexpected template.
+            # There shouldn't be TemplateData nodes or more than one expression.
+            return False
+        node: nodes.Node = output_node.nodes[0]
+
+        output_node.nodes[0] = nodes.Filter(node, "subelements", args, kwargs, None, None)
+        loop_value = cast(str, dump(node=ast, environment=jinja_env))
+
+        loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
+        vars_had_newline = self._set_vars(vars_, target_task)
+        self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
 
 
 if 'pytest' in sys.modules:
