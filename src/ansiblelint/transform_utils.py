@@ -537,6 +537,10 @@ class TemplateDumper(NodeVisitor):
         """Write a ``Getattr`` expression to the stream."""
         # node.ctx is only ever "load". Not sure this would change if it wasn't.
         self.visit(node.node)
+        if node.attr in []:  # TODO: which protected names?
+            # if this is a protected name (like "items") use [] syntax
+            self.write(f"[{repr(node.attr)}]")
+            return
         self.write(f".{node.attr}")
 
     def visit_Getitem(self, node: nodes.Getitem) -> None:
