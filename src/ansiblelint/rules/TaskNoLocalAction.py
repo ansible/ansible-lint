@@ -7,10 +7,7 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.utils import (
-    get_normalized_tasks_including_skipped,
-    parse_yaml_linenumbers,
-)
+from ansiblelint.utils import iter_tasks_in_file, parse_yaml_linenumbers
 
 
 class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
@@ -113,8 +110,7 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
         """Transform data to replace the local_action."""
         # TaskNoLocalAction matches lines, not tasks.
         # So we need to resolve the ansible bits instead of grabbing match.task
-        yaml = parse_yaml_linenumbers(lintable)
-        tasks = get_normalized_tasks_including_skipped(yaml, lintable)
+        tasks = [task for _, task, _, _ in iter_tasks_in_file(lintable, match.rule.id)]
 
         normalized_task: Dict[str, Any] = self._seek(match.yaml_path, tasks)
         target_task: CommentedMap = self._seek(match.yaml_path, data)
