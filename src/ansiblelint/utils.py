@@ -23,6 +23,7 @@ import contextlib
 import inspect
 import logging
 import os
+import warnings
 from argparse import Namespace
 from collections.abc import ItemsView
 from functools import lru_cache
@@ -877,11 +878,16 @@ def convert_to_boolean(value: Any) -> bool:
     return bool(boolean(value))
 
 
-# TODO: mark this function deprecated. Use nested_items_path instead.
 def nested_items(
     data: Union[Dict[Any, Any], List[Any]], parent: str = ""
 ) -> Iterator[Tuple[Any, Any, str]]:
     """Iterate a nested data structure."""
+    warnings.warn(
+        "Call to deprecated function ansiblelint.utils.nested_items. "
+        "Use ansiblelint.utils.nested_items_path instead.",
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
     if isinstance(data, dict):
         for k, v in data.items():
             yield k, v, parent
