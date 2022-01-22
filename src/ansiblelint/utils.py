@@ -985,4 +985,4 @@ def nested_items_path(
     for key, value in convert_to_tuples(data):
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
-            yield from nested_items_path(value, parent_path + [key])
+            yield from nested_items_path(data=value, parent_path=parent_path + [key])
