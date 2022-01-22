@@ -802,24 +802,26 @@ def iter_tasks_in_file(
     raw_tasks = get_action_tasks(data, lintable)
 
     for raw_task in raw_tasks:
+        err: Optional[MatchError] = None
+
         # An empty `tags` block causes `None` to be returned if
         # the `or []` is not present - `task.get('tags', [])`
         # does not suffice.
-        if 'skip_ansible_lint' in (raw_task.get('tags') or []) or (
-            rule_id in raw_task.get('skipped_rules', ())
-        ):
-            # raw_task, normalized_task, do_skip, err
-            yield raw_task, raw_task, True, None
+        skipped_in_task_tag = 'skip_ansible_lint' in (raw_task.get('tags') or [])
+        skipped_in_yaml_comment = rule_id in raw_task.get('skipped_rules', ())
+        skipped = skipped_in_task_tag or skipped_in_yaml_comment
+        if skipped:
+            yield raw_task, raw_task, skipped, err
             continue
 
         try:
             normalized_task = normalize_task(raw_task, str(lintable.path))
-        except MatchError as e:
+        except MatchError as err:
             # normalize_task converts AnsibleParserError to MatchError
-            yield raw_task, raw_task, False, e
+            yield raw_task, raw_task, skipped, err
             return
-        # raw_task, normalized_task, do_skip, err
-        yield raw_task, normalized_task, False, None
+
+        yield raw_task, normalized_task, skipped, err
 
 
 def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
