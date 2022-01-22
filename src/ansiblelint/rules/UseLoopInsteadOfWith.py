@@ -86,27 +86,44 @@ class SimpleNodeReplacer(NodeTransformer):
         templar = ansible_templar(".", templatevars={})
         jinja_env = templar.environment
         key_asts = [
-            jinja_env.parse(
-                key if templar.is_possibly_template(key) else "{{" + key + "}}"
+            _get_node(
+                key if templar.is_possibly_template(key) else "{{" + key + "}}",
+                jinja_env,
             )
             for key in translate.keys()
         ]
         value_asts = [
-            jinja_env.parse(
-                value if templar.is_possibly_template(value) else "{{" + value + "}}"
+            _get_node(
+                value if templar.is_possibly_template(value) else "{{" + value + "}}",
+                jinja_env,
             )
             for value in translate.values()
         ]
         self.translate = {
-            key_ast.body[0].nodes[0]: value_ast.body[0].nodes[0]
+            self._hash(key_ast): value_ast
             for key_ast, value_ast in zip(key_asts, value_asts)
         }
 
+    def _hash(self, node: nodes.Node):
+        # we cannot rely on Jinja's hashing behavior (node.__hash__).
+        # It worked from 3.0.0-3.0.2, but Jinja 3.0.3 reverted to using
+        # the object id for the hash. So, we recreate the 3.0.0 hashing
+        # behavior here. This only works for simple nodes. If any of
+        # the node's fields are lists, then hashing won't work.
+        return hash(
+            tuple(
+                (field, self._hash(value) if isinstance(value, nodes.Node) else value)
+                for field, value in node.iter_fields()
+            )
+        )
+
     def visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
         try:
-            if node in self.translate:
-                return self.translate[node]
+            node_hash = self._hash(node)
+            if node_hash in self.translate:
+                return self.translate[node_hash]
         except TypeError:
+            # got a complex node where hashing does not work. Ignore.
             pass
         return super().visit(node, *args, **kwargs)
 
