@@ -33,7 +33,6 @@ from typing import (
     Callable,
     Dict,
     Generator,
-    Iterator,
     List,
     Optional,
     Sequence,
@@ -67,7 +66,6 @@ except ImportError:
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-import ansiblelint.skip_utils
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
     LoadingFailureRule,
@@ -766,62 +764,6 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         logging.exception(e)
         raise SystemExit("Failed to parse YAML in %s: %s" % (lintable.path, str(e)))
     return data
-
-
-def iter_tasks_in_file(
-    lintable: Lintable, rule_id: str
-) -> Iterator[Tuple[Dict[str, Any], Dict[str, Any], bool, Optional[MatchError]]]:
-    """Iterate over tasks in file.
-
-    This yields a 4-tuple of raw_task, normalized_task, skipped, and error.
-
-    raw_task:
-        When looping through the tasks in the file, each "raw_task" is minimally
-        processed to include these special keys: __line__, __file__, skipped_rules.
-    normalized_task:
-        When each raw_task is "normalized", action shorthand (strings) get parsed
-        by ansible into python objects and the action key gets normalized. If the task
-        should be skipped (skipped is True) or normalizing it fails (error is not None)
-        then this is just the raw_task instead of a normalized copy.
-    skipped:
-        Whether or not the task should be skipped according to tags or skipped_rules.
-    error:
-        This is normally None. It will be a MatchError when the raw_task cannot be
-        normalized due to an AnsibleParserError.
-
-    :param lintable: The playbook or tasks/handlers yaml file to get tasks from
-    :param rule_id: The current rule id to allow calculating skipped.
-
-    :return: raw_task, normalized_task, skipped, error
-    """
-    data = parse_yaml_linenumbers(lintable)
-    if not data:
-        return
-    data = ansiblelint.skip_utils.append_skipped_rules(data, lintable)
-
-    raw_tasks = get_action_tasks(data, lintable)
-
-    for raw_task in raw_tasks:
-        err: Optional[MatchError] = None
-
-        # An empty `tags` block causes `None` to be returned if
-        # the `or []` is not present - `task.get('tags', [])`
-        # does not suffice.
-        skipped_in_task_tag = 'skip_ansible_lint' in (raw_task.get('tags') or [])
-        skipped_in_yaml_comment = rule_id in raw_task.get('skipped_rules', ())
-        skipped = skipped_in_task_tag or skipped_in_yaml_comment
-        if skipped:
-            yield raw_task, raw_task, skipped, err
-            continue
-
-        try:
-            normalized_task = normalize_task(raw_task, str(lintable.path))
-        except MatchError as err:
-            # normalize_task converts AnsibleParserError to MatchError
-            yield raw_task, raw_task, skipped, err
-            return
-
-        yield raw_task, normalized_task, skipped, err
 
 
 def get_first_cmd_arg(task: Dict[str, Any]) -> Any:

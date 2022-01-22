@@ -13,6 +13,7 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Union
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
+import ansiblelint.yaml_utils
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
     BaseRule,
@@ -107,7 +108,7 @@ class AnsibleLintRule(BaseRule):
         ):
             return matches
 
-        tasks_iterator = ansiblelint.utils.iter_tasks_in_file(file, self.id)
+        tasks_iterator = ansiblelint.yaml_utils.iter_tasks_in_file(file, self.id)
         for raw_task, task, skipped, error in tasks_iterator:
             if error is not None:
                 # normalize_task converts AnsibleParserError to MatchError
