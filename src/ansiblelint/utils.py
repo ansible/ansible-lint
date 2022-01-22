@@ -925,8 +925,8 @@ def nested_items_path(
     2. the current item's value, and
     3. the path to the current item from the outermost data structure.
 
-    For dicts, the yielded (1) key and (2) value are what mydict.items() yields.
-    For lists, the yielded (1) index and (2) value are what enumerate(mylist) yields.
+    For dicts, the yielded (1) key and (2) value are what ``dict.items()`` yields.
+    For lists, the yielded (1) index and (2) value are what ``enumerate()`` yields.
     The final component, the parent path, is a list of dict keys and list indexes.
     The parent path can be helpful in providing error messages that indicate
     precisely which part of a yaml file (or other data structure) needs to be fixed.
