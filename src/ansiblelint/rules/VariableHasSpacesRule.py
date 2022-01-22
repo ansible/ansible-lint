@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import nested_items_path
+from ansiblelint.yaml_utils import nested_items_path
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
