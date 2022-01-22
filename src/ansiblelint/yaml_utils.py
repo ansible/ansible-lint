@@ -1,4 +1,5 @@
 """Utility helpers to simplify working with yaml-based data."""
+import functools
 from typing import Any, Callable, Dict, Iterator, List, Tuple, Union, cast
 
 
@@ -73,17 +74,20 @@ def _nested_items_path(
     not be using the parent_path param which is used in recursive _nested_items_path
     calls to build up the path to the parent object of the current key/index, value.
     """
+    # we have to cast each convert_to_tuples assignment or mypy complains
+    # that both assignments (for dict and list) do not have the same type
     convert_to_tuples_type = Callable[
         [Union[Dict[Any, Any], List[Any]]],
         Iterator[Tuple[Union[str, int], Any]],
     ]
     if isinstance(data_collection, dict):
-        # dict subclasses can override items() so don't use dict.items directly
         convert_to_tuples = cast(
-            convert_to_tuples_type, data_collection.__class__.items
+            convert_to_tuples_type, functools.partial(data_collection.items)
         )
     elif isinstance(data_collection, list):
-        convert_to_tuples = cast(convert_to_tuples_type, enumerate)
+        convert_to_tuples = cast(
+            convert_to_tuples_type, functools.partial(enumerate, data_collection)
+        )
     else:
         raise TypeError(
             f"Expected a dict or a list but got {data_collection!r} "
