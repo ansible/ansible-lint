@@ -28,7 +28,18 @@ from argparse import Namespace
 from collections.abc import ItemsView
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import yaml
 from ansible import constants
@@ -880,7 +891,7 @@ def convert_to_boolean(value: Any) -> bool:
 
 def nested_items(
     data: Union[Dict[Any, Any], List[Any]], parent: str = ""
-) -> Iterator[Tuple[Any, Any, str]]:
+) -> Generator[Tuple[Any, Any, str], None, None]:
     """Iterate a nested data structure."""
     warnings.warn(
         "Call to deprecated function ansiblelint.utils.nested_items. "
