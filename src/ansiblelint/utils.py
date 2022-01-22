@@ -39,6 +39,7 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    cast,
 )
 
 import yaml
@@ -974,10 +975,15 @@ def nested_items_path(
     """
     if parent_path is None:
         parent_path = []
+    convert_to_tuples_type = Callable[
+        [Union[Dict[Any, Any], List[Any]]],
+        Iterator[Tuple[Union[str, int], Any]],
+    ]
     if isinstance(data, dict):
-        convert_to_tuples = data.__class__.items  # dict subclasses can override items
+        # dict subclasses can override items() so don't use dict.items directly
+        convert_to_tuples = cast(convert_to_tuples_type, data.__class__.items)
     elif isinstance(data, list):
-        convert_to_tuples = enumerate
+        convert_to_tuples = cast(convert_to_tuples_type, enumerate)
     else:
         raise TypeError(
             f"nested_items_path expects a dict or a list but got {type(data)}"
