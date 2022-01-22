@@ -1,4 +1,6 @@
 """Tests for yaml-related utility functions."""
+from typing import Any
+
 import pytest
 
 import ansiblelint.yaml_utils
@@ -30,10 +32,18 @@ def test_nested_items_path() -> None:
     assert list(ansiblelint.yaml_utils.nested_items_path(data)) == items
 
 
-def test_nested_items_path_raises_typeerror() -> None:
+@pytest.mark.parametrize(
+    'invalid_data_input',
+    (
+        "string",
+        42,
+        1.234,
+        None,
+        ("tuple",),
+        {"set"},
+    ),
+)
+def test_nested_items_path_raises_typeerror(invalid_data_input: Any) -> None:
     """Verify non-dict/non-list types make nested_items_path() raises TypeError."""
-    unexpected_data_types = ["string", 42, 1.234, None, ("tuple",), {"set"}]
-
-    for data in unexpected_data_types:
-        with pytest.raises(TypeError):
-            list(ansiblelint.yaml_utils.nested_items_path(data))  # type: ignore
+    with pytest.raises(TypeError):
+        list(ansiblelint.yaml_utils.nested_items_path(invalid_data_input))
