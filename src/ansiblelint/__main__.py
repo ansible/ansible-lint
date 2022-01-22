@@ -76,8 +76,7 @@ def initialize_logger(level: int = 0) -> None:
     # Unknown logging level is treated as DEBUG
     logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
     logger.setLevel(logging_level)
-    # Also pass all warnings.warn() messages through the logger
-    logging.captureWarnings(True)
+    logging.captureWarnings(True)  # pass all warnings.warn() messages through logging
     # Use module-level _logger instance to validate it
     _logger.debug("Logging initialized to level %s", logging_level)
 
