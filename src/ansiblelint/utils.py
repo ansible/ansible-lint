@@ -986,7 +986,7 @@ def nested_items_path(
         convert_to_tuples = cast(convert_to_tuples_type, enumerate)
     else:
         raise TypeError(
-            f"nested_items_path expects a dict or a list but got {type(data)}"
+            f"Expected a dict or a list but got {data!r} of type '{type(data)}'",
         )
     for key, value in convert_to_tuples(data):
         yield key, value, parent_path
