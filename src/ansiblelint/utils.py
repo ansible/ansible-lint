@@ -33,6 +33,7 @@ from typing import (
     Callable,
     Dict,
     Generator,
+    Iterator,
     List,
     Optional,
     Sequence,
@@ -767,8 +768,32 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
     return data
 
 
-def iter_tasks_in_file(lintable: Lintable, rule_id: str):
-    """Iterate over tasks in file."""
+def iter_tasks_in_file(
+    lintable: Lintable, rule_id: str
+) -> Iterator[Tuple[Dict[str, Any], Dict[str, Any], bool, Optional[MatchError]]]:
+    """Iterate over tasks in file.
+
+    This yields a 4-tuple of raw_task, normalized_task, skipped, and error.
+
+    raw_task:
+        When looping through the tasks in the file, each "raw_task" is minimally
+        processed to include these special keys: __line__, __file__, skipped_rules.
+    normalized_task:
+        When each raw_task is "normalized", action shorthand (strings) get parsed
+        by ansible into python objects and the action key gets normalized. If the task
+        should be skipped (skipped is True) or normalizing it fails (error is not None)
+        then this is just the raw_task instead of a normalized copy.
+    skipped:
+        Whether or not the task should be skipped according to tags or skipped_rules.
+    error:
+        This is normally None. It will be a MatchError when the raw_task cannot be
+        normalized due to an AnsibleParserError.
+
+    :param lintable: The playbook or tasks/handlers yaml file to get tasks from
+    :param rule_id: The current rule id to allow calculating skipped.
+
+    :return: raw_task, normalized_task, skipped, error
+    """
     data = parse_yaml_linenumbers(lintable)
     if not data:
         return
@@ -791,7 +816,7 @@ def iter_tasks_in_file(lintable: Lintable, rule_id: str):
             normalized_task = normalize_task(raw_task, str(lintable.path))
         except MatchError as e:
             # normalize_task converts AnsibleParserError to MatchError
-            yield raw_task, None, False, e
+            yield raw_task, raw_task, False, e
             return
         # raw_task, normalized_task, do_skip, err
         yield raw_task, normalized_task, False, None
