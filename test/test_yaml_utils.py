@@ -45,5 +45,5 @@ def test_nested_items_path() -> None:
 )
 def test_nested_items_path_raises_typeerror(invalid_data_input: Any) -> None:
     """Verify non-dict/non-list types make nested_items_path() raises TypeError."""
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"Expected a dict or a list.*"):
         list(ansiblelint.yaml_utils.nested_items_path(invalid_data_input))
