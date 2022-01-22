@@ -1,10 +1,9 @@
 """Utility helpers to simplify working with yaml-based data."""
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, cast
+from typing import Any, Callable, Dict, Iterator, List, Tuple, Union, cast
 
 
 def nested_items_path(
     data_collection: Union[Dict[Any, Any], List[Any]],
-    parent_path: Optional[List[Union[str, int]]] = None,
 ) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
     """Iterate a nested data structure, yielding key/index, value, and parent_path.
 
@@ -58,13 +57,22 @@ def nested_items_path(
             target = target[segment]
 
     :param data_collection: The nested data (dicts or lists).
-    :param parent_path: Do not use this param. It is used internally to recursively
-                        build the yielded parent path (list of keys, indexes).
 
     :returns: each iteration yields the key (of the parent dict) or the index (lists)
     """
-    if parent_path is None:
-        parent_path = []
+    yield from _nested_items_path(data_collection=data_collection, parent_path=[])
+
+
+def _nested_items_path(
+    data_collection: Union[Dict[Any, Any], List[Any]],
+    parent_path: List[Union[str, int]],
+) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
+    """Iterate through data_collection (internal implementation of nested_items_path).
+
+    This is a separate function because callers of nested_items_path should
+    not be using the parent_path param which is used in recursive _nested_items_path
+    calls to build up the path to the parent object of the current key/index, value.
+    """
     convert_to_tuples_type = Callable[
         [Union[Dict[Any, Any], List[Any]]],
         Iterator[Tuple[Union[str, int], Any]],
@@ -84,6 +92,6 @@ def nested_items_path(
     for key, value in convert_to_tuples(data_collection):
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
-            yield from nested_items_path(
+            yield from _nested_items_path(
                 data_collection=value, parent_path=parent_path + [key]
             )
