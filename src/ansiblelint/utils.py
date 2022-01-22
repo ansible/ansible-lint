@@ -955,7 +955,7 @@ def nested_items_path(
     you do not need to descend into any nested dicts or lists to find the indicated
     key and value.
 
-    If a rule were designed to prohimit "foobar" debug messages, it could use the
+    If a rule were designed to prohibit "foobar" debug messages, it could use the
     parent path to provide a path to the problematic ``msg``. It might use a jq-style
     path in its error message: "the error is at ``.[0].tasks[0].debug.msg``".
     Or if a utility could automatically fix issues, it could use the path to descend
