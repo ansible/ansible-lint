@@ -76,16 +76,13 @@ def _nested_items_path(
     """
     # we have to cast each convert_to_tuples assignment or mypy complains
     # that both assignments (for dict and list) do not have the same type
-    convert_to_tuples_type = Callable[
-        [Union[Dict[Any, Any], List[Any]]],
-        Iterator[Tuple[Union[str, int], Any]],
-    ]
+    convert_to_tuples_type = Callable[[], Iterator[Tuple[Union[str, int], Any]]]
     if isinstance(data_collection, dict):
-        convert_to_tuples = cast(
+        convert_data_collection_to_tuples = cast(
             convert_to_tuples_type, functools.partial(data_collection.items)
         )
     elif isinstance(data_collection, list):
-        convert_to_tuples = cast(
+        convert_data_collection_to_tuples = cast(
             convert_to_tuples_type, functools.partial(enumerate, data_collection)
         )
     else:
@@ -93,7 +90,7 @@ def _nested_items_path(
             f"Expected a dict or a list but got {data_collection!r} "
             f"of type '{type(data_collection)}'"
         )
-    for key, value in convert_to_tuples(data_collection):
+    for key, value in convert_data_collection_to_tuples():
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
             yield from _nested_items_path(
