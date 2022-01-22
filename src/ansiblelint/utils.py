@@ -928,7 +928,7 @@ def nested_items_path(
     For lists, the yielded (1) index and (2) value are what enumerate(mylist) yields.
     The final component, the parent path, is a list of dict keys and list indexes.
     The parent path can be helpful in providing error messages that indicate
-    precisely which part of a yaml file (or other data strucutre) needs to be fixed.
+    precisely which part of a yaml file (or other data structure) needs to be fixed.
 
     For example, given this playbook:
 
