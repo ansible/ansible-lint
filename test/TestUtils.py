@@ -559,11 +559,12 @@ def test_nested_items_path() -> None:
 
 
 def test_nested_items_path_raises_typeerror() -> None:
+    """Verify non-dict/non-list types make nested_items_path() raises TypeError."""
     unexpected_data_types = ["string", 42, 1.234, None, ("tuple",), {"set"}]
 
     for data in unexpected_data_types:
         with pytest.raises(TypeError):
-            list(utils.nested_items_path(data))
+            list(utils.nested_items_path(data))  # type: ignore
 
 
 def test_guess_project_dir(tmp_path: Path) -> None:
