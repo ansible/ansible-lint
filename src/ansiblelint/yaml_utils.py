@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, 
 
 
 def nested_items_path(
-    data: Union[Dict[Any, Any], List[Any]],
+    collection: Union[Dict[Any, Any], List[Any]],
     parent_path: Optional[List[Union[str, int]]] = None,
 ) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
     """Iterate a nested data structure, yielding key/index, value, and parent_path.
@@ -57,7 +57,7 @@ def nested_items_path(
         for segment in parent_path:
             target = target[segment]
 
-    :param data: The nested data (dicts or lists).
+    :param collection: The nested data (dicts or lists).
     :param parent_path: Do not use this param. It is used internally to recursively
                         build the yielded parent path (list of keys, indexes).
 
@@ -69,16 +69,19 @@ def nested_items_path(
         [Union[Dict[Any, Any], List[Any]]],
         Iterator[Tuple[Union[str, int], Any]],
     ]
-    if isinstance(data, dict):
+    if isinstance(collection, dict):
         # dict subclasses can override items() so don't use dict.items directly
-        convert_to_tuples = cast(convert_to_tuples_type, data.__class__.items)
-    elif isinstance(data, list):
+        convert_to_tuples = cast(convert_to_tuples_type, collection.__class__.items)
+    elif isinstance(collection, list):
         convert_to_tuples = cast(convert_to_tuples_type, enumerate)
     else:
         raise TypeError(
-            f"Expected a dict or a list but got {data!r} of type '{type(data)}'"
+            f"Expected a dict or a list but got {collection!r} "
+            f"of type '{type(collection)}'"
         )
-    for key, value in convert_to_tuples(data):
+    for key, value in convert_to_tuples(collection):
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
-            yield from nested_items_path(data=value, parent_path=parent_path + [key])
+            yield from nested_items_path(
+                collection=value, parent_path=parent_path + [key]
+            )
