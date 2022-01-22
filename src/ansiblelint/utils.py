@@ -975,10 +975,14 @@ def nested_items_path(
     if parent_path is None:
         parent_path = []
     if isinstance(data, dict):
-        for key, value in data.items():
-            yield key, value, parent_path
+        convert_to_tuples = data.__class__.items  # dict subclasses can override items
+    elif isinstance(data, list):
+        convert_to_tuples = enumerate
+    else:
+        raise TypeError(
+            f"nested_items_path expects a dict or a list but got {type(data)}"
+        )
+    for key, value in convert_to_tuples(data):
+        yield key, value, parent_path
+        if isinstance(value, (dict, list)):
             yield from nested_items_path(value, parent_path + [key])
-    if isinstance(data, list):
-        for index, item in enumerate(data):
-            yield index, item, parent_path
-            yield from nested_items_path(item, parent_path + [index])
