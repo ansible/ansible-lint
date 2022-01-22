@@ -32,9 +32,9 @@ class NoTabsRule(AnsibleLintRule):
         for k, v, parent_path in nested_items_path(task):
             if isinstance(k, str) and '\t' in k:
                 return True
+            parent_key = "" if not parent_path else parent_path[-1]
             if (
-                parent_path
-                and (parent_path[-1], k) not in self.allow_list
+                (parent_key, k) not in self.allow_list
                 and isinstance(v, str)
                 and '\t' in v
             ):
