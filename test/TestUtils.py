@@ -526,7 +526,9 @@ def test_nested_items() -> None:
         ("list-item", "apple", "fruits"),
         ("list-item", "orange", "fruits"),
     ]
-    with pytest.deprecated_call():
+    with pytest.deprecated_call(
+        match=r"Call to deprecated function ansiblelint\.utils\.nested_items.*"
+    ):
         assert list(utils.nested_items(data)) == items
 
 
