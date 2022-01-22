@@ -915,7 +915,63 @@ def nested_items_path(
     data: Union[Dict[Any, Any], List[Any]],
     parent_path: Optional[List[Union[str, int]]] = None,
 ) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
-    """Iterate a nested data structure."""
+    """Iterate a nested data structure, yielding key/index, value, and parent_path.
+
+    This is a recursive function that calls itself for each nested layer of data.
+    Each iteration yields:
+
+    1. the current item's dictionary key or list index,
+    2. the current item's value, and
+    3. the path to the current item from the outermost data structure.
+
+    For dicts, the yielded (1) key and (2) value are what mydict.items() yields.
+    For lists, the yielded (1) index and (2) value are what enumerate(mylist) yields.
+    The final component, the parent path, is a list of dict keys and list indexes.
+    The parent path can be helpful in providing error messages that indicate
+    precisely which part of a yaml file (or other data strucutre) needs to be fixed.
+
+    For example, given this playbook:
+
+    .. code-block:: yaml
+
+        - name: a play
+          tasks:
+          - name: a task
+            debug:
+              msg: foobar
+
+    Here's the first and last yielded items:
+
+    .. code-block:: python
+
+        >>> playbook=[{"name": "a play", "tasks": [{"name": "a task", "debug": {"msg": "foobar"}}]}]
+        >>> next( nested_items_path( playbook ) )
+        (0, {'name': 'a play', 'tasks': [{'name': 'a task', 'debug': {'msg': 'foobar'}}]}, [])
+        >>> list( nested_items_path( playbook ) )[-1]
+        ('msg', 'foobar', [0, 'tasks', 0, 'debug'])
+
+    Note that, for outermost data structure, the parent path is ``[]`` because
+    you do not need to descend into any nested dicts or lists to find the indicated
+    key and value.
+
+    If a rule were designed to prohimit "foobar" debug messages, it could use the
+    parent path to provide a path to the problematic ``msg``. It might use a jq-style
+    path in its error message: "the error is at ``.[0].tasks[0].debug.msg``".
+    Or if a utility could automatically fix issues, it could use the path to descend
+    to the parent object using something like this:
+
+    .. code-block:: python
+
+        target = data
+        for segment in parent_path:
+            target = target[segment]
+
+    :param data: The nested data (dicts or lists).
+    :param parent_path: Do not use this param. It is used internally to recursively
+                        build the yielded parent path (list of keys, indexes).
+
+    :returns: each iteration yields the key (of the parent dict) or the index (lists)
+    """
     if parent_path is None:
         parent_path = []
     if isinstance(data, dict):
