@@ -558,6 +558,14 @@ def test_nested_items_path() -> None:
     assert list(utils.nested_items_path(data)) == items
 
 
+def test_nested_items_path_raises_typeerror() -> None:
+    unexpected_data_types = ["string", 42, 1.234, None, ("tuple",), {"set"}]
+
+    for data in unexpected_data_types:
+        with pytest.raises(TypeError):
+            list(utils.nested_items_path(data))
+
+
 def test_guess_project_dir(tmp_path: Path) -> None:
     """Verify guess_project_dir()."""
     with cwd(str(tmp_path)):
