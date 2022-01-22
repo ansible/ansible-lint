@@ -910,10 +910,8 @@ def nested_items_path(
     if isinstance(data, dict):
         for key, value in data.items():
             yield key, value, parent_path
-            for k, v, p in nested_items_path(value, parent_path + [key]):
-                yield k, v, p
+            yield from nested_items_path(value, parent_path + [key])
     if isinstance(data, list):
         for index, item in enumerate(data):
             yield index, item, parent_path
-            for k, v, p in nested_items_path(item, parent_path + [index]):
-                yield k, v, p
+            yield from nested_items_path(item, parent_path + [index])
