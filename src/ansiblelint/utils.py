@@ -23,6 +23,7 @@ import contextlib
 import inspect
 import logging
 import os
+import warnings
 from argparse import Namespace
 from collections.abc import ItemsView
 from functools import lru_cache
@@ -102,10 +103,8 @@ def path_dwim(basedir: str, given: str) -> str:
     return str(dl.path_dwim(given))
 
 
-def ansible_template(
-    basedir: str, varname: Any, templatevars: Any, **kwargs: Any
-) -> Any:
-    """Render a templated string."""
+def ansible_templar(basedir: str, templatevars: Any) -> Templar:
+    """Create an Ansible Templar using templatevars."""
     # `basedir` is the directory containing the lintable file.
     # Therefore, for tasks in a role, `basedir` has the form
     # `roles/some_role/tasks`. On the other hand, the search path
@@ -117,6 +116,14 @@ def ansible_template(
     dl = DataLoader()
     dl.set_basedir(basedir)
     templar = Templar(dl, variables=templatevars)
+    return templar
+
+
+def ansible_template(
+    basedir: str, varname: Any, templatevars: Any, **kwargs: Any
+) -> Any:
+    """Render a templated string."""
+    templar = ansible_templar(basedir=basedir, templatevars=templatevars)
     return templar.template(varname, **kwargs)
 
 
@@ -891,6 +898,12 @@ def nested_items(
     data: Union[Dict[Any, Any], List[Any]], parent: str = ""
 ) -> Generator[Tuple[Any, Any, str], None, None]:
     """Iterate a nested data structure."""
+    warnings.warn(
+        "Call to deprecated function ansiblelint.utils.nested_items. "
+        "Use ansiblelint.yaml_utils.nested_items_path instead.",
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
     if isinstance(data, dict):
         for k, v in data.items():
             yield k, v, parent
