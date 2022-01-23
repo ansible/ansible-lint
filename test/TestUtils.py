@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-"""Tests for generic utilitary functions."""
+"""Tests for generic utility functions."""
 
 import logging
 import os
@@ -526,7 +526,10 @@ def test_nested_items() -> None:
         ("list-item", "apple", "fruits"),
         ("list-item", "orange", "fruits"),
     ]
-    assert list(utils.nested_items(data)) == items
+    with pytest.deprecated_call(
+        match=r"Call to deprecated function ansiblelint\.utils\.nested_items.*"
+    ):
+        assert list(utils.nested_items(data)) == items
 
 
 def test_guess_project_dir(tmp_path: Path) -> None:

@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import nested_items
+from ansiblelint.yaml_utils import nested_items_path
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
@@ -25,7 +25,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
-        for k, v, _ in nested_items(task):
+        for k, v, _ in nested_items_path(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
                 if bool(self.bracket_regex.search(cleaned)):
