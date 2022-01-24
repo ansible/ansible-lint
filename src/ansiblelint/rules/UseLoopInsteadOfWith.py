@@ -17,7 +17,7 @@ from ansible.template import Templar
 from jinja2 import nodes
 from jinja2.environment import Environment
 from jinja2.visitor import NodeTransformer
-from ruamel.yaml import CommentedMap, CommentedSeq
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ruamel.yaml.error import CommentMark
 from ruamel.yaml.tokens import CommentToken
 
@@ -72,7 +72,7 @@ def _get_sequence_params(with_sequence: str) -> Dict[str, Any]:
     return params
 
 
-def _get_node(template: str, jinja_env: Environment):
+def _get_node(template: str, jinja_env: Environment) -> Optional[nodes.Node]:
     """Get the node from the template, discarding Template and Output nodes."""
     ast = jinja_env.parse(template)
     output_node = cast(nodes.Output, ast.body[0])
@@ -92,7 +92,7 @@ def _get_empty_ast(jinja_env: Environment) -> Tuple[nodes.Template, nodes.Output
 
 
 def filter_with_flatten(
-    jinja_env: Environment, loop_value: str, levels: int = None
+    jinja_env: Environment, loop_value: str, levels: Optional[int] = None
 ) -> Optional[str]:
     """Edit the given template to apply the 'flatten' filter to it."""
     loop_ast = jinja_env.parse(loop_value)
@@ -146,12 +146,18 @@ class SimpleNodeReplacer(NodeTransformer):
             )
             for value in translate.values()
         ]
+        if any(ast is None for ast in key_asts):
+            raise TypeError(
+                "Expected template keys to be simple templates but got "
+                f"{next(key for ast, key in zip(key_asts, translate.keys()))}."
+            )
         self.translate = {
             self._hash(key_ast): value_ast
             for key_ast, value_ast in zip(key_asts, value_asts)
+            if key_ast is not None  # convince mypy that these can't be None here.
         }
 
-    def _hash(self, node: nodes.Node):
+    def _hash(self, node: nodes.Node) -> int:
         # we cannot rely on Jinja's hashing behavior (node.__hash__).
         # It worked from 3.0.0-3.0.2, but Jinja 3.0.3 reverted to using
         # the object id for the hash. So, we recreate the 3.0.0 hashing
@@ -206,7 +212,9 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
     ) -> None:
         fixed = False
         target_task = self._seek(match.yaml_path, data)
-        loop_type = next(key for key in match.task if key.startswith("with_"))
+        loop_type = next(
+            key for key in cast(Dict[str, Any], match.task) if key.startswith("with_")
+        )
 
         basedir: str = os.path.abspath(os.path.dirname(str(lintable.path)))
         templar: Templar = ansible_templar(basedir, templatevars={})
@@ -225,7 +233,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
     ) -> Tuple[str, bool]:
         def get_comment(
             key_or_index: Union[str, int], target: Union[CommentedMap, CommentedSeq]
-        ):
+        ) -> str:
             item_comment = ""
             comment: Optional[CommentToken]
             for comment in target.ca.items.pop(key_or_index, []):
@@ -310,7 +318,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         target.ca.items[last_key] = last_key_comment_item
 
     @staticmethod
-    def _unique_vars_name(vars_: Optional[CommentedMap], var_name: str):
+    def _unique_vars_name(vars_: Optional[CommentedMap], var_name: str) -> str:
         while vars_ and var_name in vars_:
             var_name += "_"
         return var_name
@@ -322,7 +330,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         module: str,
         target_task: CommentedMap,
         templar: Templar,
-    ):
+    ) -> None:
         jinja_env: Environment = templar.environment
         var_replacer = SimpleNodeReplacer(translate=translate)
         # look for places to replace index_var and item_var
@@ -396,13 +404,15 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         else:
             loop_value = with_items
 
-        loop_value = filter_with_flatten(
+        filtered_loop_value = filter_with_flatten(
             templar.environment, loop_value, levels=flatten_levels
         )
-        if loop_value is None:
+        if filtered_loop_value is None:
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
+        else:
+            loop_value = filtered_loop_value
 
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
@@ -440,11 +450,15 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             "loop_var", self._unique_vars_name(vars_, "item")
         )
 
-        loop_value = filter_with_flatten(templar.environment, loop_value, levels=1)
-        if loop_value is None:
+        filtered_loop_value = filter_with_flatten(
+            templar.environment, loop_value, levels=1
+        )
+        if filtered_loop_value is None:
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
+        else:
+            loop_value = filtered_loop_value
 
         self._translate_vars_in_task(
             translate={
@@ -559,11 +573,13 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         else:
             loop_value = with_dict
 
-        loop_value = filter_with_dict2items(templar.environment, loop_value)
-        if loop_value is None:
+        filtered_loop_value = filter_with_dict2items(templar.environment, loop_value)
+        if filtered_loop_value is None:
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
+        else:
+            loop_value = filtered_loop_value
 
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
