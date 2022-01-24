@@ -28,6 +28,50 @@ from ansiblelint.transform_utils import dump
 from ansiblelint.utils import ansible_templar, nested_items_path
 
 
+def _get_sequence_params(with_sequence: str) -> Dict[str, Any]:
+    # sadly we need to parse the with_sequence string
+    # and there's a shortcut format for this!
+    # we can't just import the lookup itself, because it expects
+    # vars to already be templated. So we parse it ourselves
+    from ansible.plugins.lookup.sequence import SHORTCUT
+
+    match = SHORTCUT.match(with_sequence)
+    params = {}
+    if match:
+        # shorthand mode. Assume
+        (
+            _,
+            params["start"],
+            params["end"],
+            _,
+            params["stride"],
+            _,
+            params["format"],
+        ) = match.groups()
+        for key in ["start", "end", "stride"]:
+            try:
+                value = int(params[key], 0)
+            except ValueError:
+                # might be a template string. leave as is.
+                continue
+            params[key] = value
+    else:
+        params = parse_kv(with_sequence)
+        if "count" in params:
+            count = params.pop("count")
+            if count != 0:
+                params["end"] = (
+                    params.get("start", 1) + count * params.get("stride", 1) - 1
+                )
+            else:
+                params["start"] = 0
+                params["end"] = 0
+                params["stride"] = 0
+        if "stride" in params and "start" not in params:
+            params["start"] = 0
+    return params
+
+
 def _get_node(template: str, jinja_env: Environment):
     """Get the node from the template, discarding Template and Output nodes."""
     ast = jinja_env.parse(template)
@@ -365,7 +409,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
         return True
 
-    # flattend lookup is in the community.general collection (see note above)
+    # flattened lookup is in the community.general collection (see note above)
     _replace_with_flattened = functools.partialmethod(
         _replace_with_items, flatten_levels=None
     )
@@ -537,52 +581,10 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         if not isinstance(with_sequence, str):
             # what? This should be a string... giving up!
             return False
-        # sadly we need to parse the with_sequence string
-        # and there's a shortcut format for this!
-        # we can't just import the lookup itself, because it expects
-        # vars to already be templated. So we parse it ourselves
-        from ansible.plugins.lookup.sequence import SHORTCUT
 
-        match = SHORTCUT.match(with_sequence)
-        params = {}
-        if match:
-            # shorthand mode. Assume
-            (
-                _,
-                params["start"],
-                params["end"],
-                _,
-                params["stride"],
-                _,
-                params["format"],
-            ) = match.groups()
-            for key in ["start", "end", "stride"]:
-                try:
-                    value = int(params[key], 0)
-                except ValueError:
-                    # might be a template string. leave as is.
-                    continue
-                params[key] = value
-        else:
-            params = parse_kv(with_sequence)
-            if "count" in params:
-                count = params.pop("count")
-                if count != 0:
-                    params["end"] = (
-                        params.get("start", 1) + count * params.get("stride", 1) - 1
-                    )
-                else:
-                    params["start"] = 0
-                    params["end"] = 0
-                    params["stride"] = 0
-            if "stride" in params and "start" not in params:
-                params["start"] = 0
+        params = _get_sequence_params(with_sequence)
         try:
-            stride = int(params.get("stride", 1), 0)
-            if stride >= 0:
-                adjust = "+ 1"
-            else:
-                adjust = "- 1"
+            adjust = "+ 1" if 0 <= int(params.get("stride", 1), 0) else "- 1"
         except ValueError:
             # probably a template
             adjust = "+ 1"
