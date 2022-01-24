@@ -353,7 +353,6 @@ nitpick_ignore = [
     ('py:class', 'CommentedMap'),
     ('py:class', 'CommentedSeq'),
     ('py:class', 'jinja2.environment.Environment'),
-    ('py:class', 'ansible.template.Templar'),
     ('py:class', 'TextIO'),
     ('py:obj', 'Any'),
     ('py:obj', 'ansiblelint.formatters.T'),
