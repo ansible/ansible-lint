@@ -50,6 +50,7 @@ def _get_empty_ast(jinja_env: Environment) -> Tuple[nodes.Template, nodes.Output
 def filter_with_flatten(
     jinja_env: Environment, loop_value: str, levels: int = None
 ) -> Optional[str]:
+    """Edit the given template to apply the 'flatten' filter to it."""
     loop_ast = jinja_env.parse(loop_value)
     output_node = cast(nodes.Output, loop_ast.body[0])
     if len(output_node.nodes) != 1:
@@ -65,6 +66,7 @@ def filter_with_flatten(
 
 
 def filter_with_dict2items(jinja_env: Environment, loop_value: str) -> Optional[str]:
+    """Edit the given template to apply the 'dict2items' filter to it."""
     loop_ast = jinja_env.parse(loop_value)
     output_node = cast(nodes.Output, loop_ast.body[0])
     if len(output_node.nodes) != 1:
@@ -83,6 +85,7 @@ class SimpleNodeReplacer(NodeTransformer):
     """
 
     def __init__(self, translate: Dict[str, str]):
+        """Initialize the SingleNodeReplacer with the map of which nodes to replace."""
         templar = ansible_templar(".", templatevars={})
         jinja_env = templar.environment
         key_asts = [
