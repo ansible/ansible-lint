@@ -13,6 +13,7 @@ from typing import (
 )
 
 from ansible.parsing.splitter import parse_kv
+from ansible.plugins.lookup.sequence import SHORTCUT  # only for _get_sequence_params
 from ansible.template import Templar
 from jinja2 import nodes
 from jinja2.environment import Environment
@@ -33,7 +34,6 @@ def _get_sequence_params(with_sequence: str) -> Dict[str, Any]:
     # and there's a shortcut format for this!
     # we can't just import the lookup itself, because it expects
     # vars to already be templated. So we parse it ourselves
-    from ansible.plugins.lookup.sequence import SHORTCUT
 
     match = SHORTCUT.match(with_sequence)
     params = {}
@@ -323,7 +323,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             var_name += "_"
         return var_name
 
-    def _translate_vars_in_task(
+    def _translate_vars_in_task(  # pylint: disable=too-many-arguments
         self,
         translate: Dict[str, str],
         loop_type: str,
@@ -331,7 +331,6 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         target_task: CommentedMap,
         templar: Templar,
     ) -> None:
-        jinja_env: Environment = templar.environment
         var_replacer = SimpleNodeReplacer(translate=translate)
         # look for places to replace index_var and item_var
         for key, value, parent_path in nested_items_path(target_task):
@@ -360,9 +359,9 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             if not do_wrap_template and not templar.is_template(value):
                 continue
             template = "{{" + value + "}}" if do_wrap_template else value
-            ast = jinja_env.parse(template)
+            ast = templar.environment.parse(template)
             ast = var_replacer.visit(ast)
-            new_template = cast(str, dump(node=ast, environment=jinja_env))
+            new_template = cast(str, dump(node=ast, environment=templar.environment))
             if do_wrap_template:
                 # remove "{{ " and " }}" (dump always adds space w/ braces)
                 new_template = new_template[3:-3]
@@ -385,7 +384,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         return True
 
     # noinspection PyUnusedLocal
-    def _replace_with_items(
+    def _replace_with_items(  # pylint: disable=too-many-arguments
         self,
         loop_type: str,
         task: Dict[str, Any],
@@ -411,8 +410,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
-        else:
-            loop_value = filtered_loop_value
+        loop_value = filtered_loop_value
 
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
@@ -457,8 +455,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
-        else:
-            loop_value = filtered_loop_value
+        loop_value = filtered_loop_value
 
         self._translate_vars_in_task(
             translate={
@@ -506,17 +503,15 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             # not sure what to do with this
             return False
 
-        jinja_env: Environment = templar.environment
-
         vars_ = None
         if all(
             isinstance(item, str) and templar.is_template(item)
             for item in with_together
         ):
             # collapse all Jinja expressions into one ast
-            loop_ast, loop_output_node = _get_empty_ast(jinja_env)
+            loop_ast, loop_output_node = _get_empty_ast(templar.environment)
             with_together_nodes = [
-                _get_node(template, jinja_env) for template in with_together
+                _get_node(template, templar.environment) for template in with_together
             ]
             if any(node is None for node in with_together_nodes):
                 # unexpected template.
@@ -544,11 +539,11 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             vars_ = target_task.get("vars", CommentedMap())
             var_name = self._unique_vars_name(vars_, "data")
             vars_[var_name] = with_together
-            loop_ast = jinja_env.parse(
+            loop_ast = templar.environment.parse(
                 "{{ " + var_name + "[0] | zip_longest(*" + var_name + "[1:]) | list }}"
             )
 
-        loop_value = dump(node=loop_ast, environment=jinja_env)
+        loop_value = dump(node=loop_ast, environment=templar.environment)
         vars_had_newline = self._set_vars(vars_, target_task)
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
@@ -578,8 +573,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
-        else:
-            loop_value = filtered_loop_value
+        loop_value = filtered_loop_value
 
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
@@ -600,7 +594,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
 
         params = _get_sequence_params(with_sequence)
         try:
-            adjust = "+ 1" if 0 <= int(params.get("stride", 1), 0) else "- 1"
+            adjust = "+ 1" if int(params.get("stride", 1), 0) >= 0 else "- 1"
         except ValueError:
             # probably a template
             adjust = "+ 1"
@@ -642,6 +636,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         return True
 
     # noinspection PyUnusedLocal
+    # pylint: disable=too-many-locals  # 18/15 - can't simplify much more
     def _replace_with_subelements(
         self,
         loop_type: str,
@@ -663,13 +658,11 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         subelements_items = with_subelements[0]
         subelements_path = with_subelements[1]
         try:
-            subelements_skip_missing = with_subelements[2]
-            subelements_skip_missing = subelements_skip_missing["skip_missing"]
+            subelements_skip_missing = with_subelements[2]["skip_missing"]
         except (IndexError, KeyError):
             subelements_skip_missing = None
 
         vars_ = None
-        jinja_env: Environment = templar.environment
         if isinstance(subelements_items, str):
             # got a template
             loop_value = subelements_items
@@ -685,7 +678,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
                 subelements_path
                 if templar.is_template(subelements_path)
                 else "{{" + repr(subelements_path) + "}}",
-                jinja_env,
+                templar.environment,
             )
         ]
         if args[0] is None:
@@ -694,28 +687,31 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         if subelements_skip_missing is None:
             kwargs = []
         else:
-            kwarg = _get_node(
-                subelements_skip_missing
-                if templar.is_template(subelements_skip_missing)
-                else "{{" + repr(subelements_skip_missing) + "}}",
-                jinja_env,
-            )
-            if kwarg is None:
+            kwargs = [
+                nodes.Keyword(
+                    "skip_missing",
+                    _get_node(
+                        subelements_skip_missing
+                        if templar.is_template(subelements_skip_missing)
+                        else "{{" + repr(subelements_skip_missing) + "}}",
+                        templar.environment,
+                    ),
+                )
+            ]
+            if kwargs[0].value is None:
                 return False
-            kwargs = [nodes.Keyword("skip_missing", kwarg)]
 
-        loop_ast = jinja_env.parse(loop_value)
+        loop_ast = templar.environment.parse(loop_value)
         output_node = cast(nodes.Output, loop_ast.body[0])
         if len(output_node.nodes) != 1:
             # unexpected template.
             # There shouldn't be TemplateData nodes or more than one expression.
             return False
-        node: nodes.Node = output_node.nodes[0]
 
         output_node.nodes[0] = nodes.Filter(
-            node, "subelements", args, kwargs, None, None
+            output_node.nodes[0], "subelements", args, kwargs, None, None
         )
-        loop_value = cast(str, dump(node=loop_ast, environment=jinja_env))
+        loop_value = cast(str, dump(node=loop_ast, environment=templar.environment))
 
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
@@ -734,7 +730,6 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
         if not isinstance(with_nested, CommentedSeq):
             # probably a template referring to a var from who knows where.
             return False
-        jinja_env: Environment = templar.environment
         vars_ = None
         nested_list_templates = []
         for index, nested_list in enumerate(with_nested):
@@ -750,9 +745,10 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
             var_name = self._unique_vars_name(vars_, f"list{index}")
             vars_[var_name] = nested_list
             nested_list_templates.append("{{" + var_name + "}}")
-        loop_ast, loop_output_node = _get_empty_ast(jinja_env)
+        loop_ast, loop_output_node = _get_empty_ast(templar.environment)
         nested_list_nodes = [
-            _get_node(template, jinja_env) for template in nested_list_templates
+            _get_node(template, templar.environment)
+            for template in nested_list_templates
         ]
         if any(node is None for node in nested_list_nodes):
             # unexpected template.
@@ -775,7 +771,7 @@ class UseLoopInsteadOfWith(AnsibleLintRule, TransformMixin):
                 None,
             )
         )
-        loop_value = cast(str, dump(node=loop_ast, environment=jinja_env))
+        loop_value = cast(str, dump(node=loop_ast, environment=templar.environment))
         loop_had_newline = self._set_loop_value(loop_type, loop_value, target_task)
         vars_had_newline = self._set_vars(vars_, target_task)
         self._handle_last_key_newline(loop_had_newline or vars_had_newline, target_task)
