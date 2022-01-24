@@ -3,7 +3,6 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.testing import RunFromText
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -43,6 +42,8 @@ class IgnoreErrorsRule(AnsibleLintRule):
 
 if "pytest" in sys.modules:
     import pytest
+
+    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
     IGNORE_ERRORS_TRUE = '''
 - hosts: all
