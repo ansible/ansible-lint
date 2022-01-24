@@ -17,6 +17,7 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
+import ansiblelint.yaml_utils
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
@@ -111,7 +112,7 @@ see: https://github.com/ansible/proposals/issues/83
 
         linenumber = 1
         # skip_path = []
-        for key, value, parent_path in ansiblelint.utils.nested_items_path(yaml):
+        for key, value, parent_path in ansiblelint.yaml_utils.nested_items_path(yaml):
             # if key == "skipped_rules":
             #     skip_path = parent_path + [key]
             #     continue

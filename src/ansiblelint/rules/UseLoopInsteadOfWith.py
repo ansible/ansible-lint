@@ -26,7 +26,8 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
-from ansiblelint.utils import ansible_templar, nested_items_path
+from ansiblelint.utils import ansible_templar
+from ansiblelint.yaml_utils import nested_items_path
 
 
 def _get_sequence_params(with_sequence: str) -> Dict[str, Any]:
