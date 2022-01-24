@@ -330,6 +330,8 @@ linkcheck_workers = 25
 nitpicky = True
 nitpick_ignore = [
     ('py:class', 'ansible.parsing.yaml.objects.AnsibleBaseYAMLObject'),
+    ('py:class', 'ansible.template.Templar'),
+    ('py:class', 'Templar'),
     ('py:class', 'Lintable'),
     ('py:class', 'yaml'),
     ('py:class', 'role'),

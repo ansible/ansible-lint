@@ -14,7 +14,8 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
-from ansiblelint.utils import ansible_templar, nested_items, nested_items_path
+from ansiblelint.utils import ansible_templar
+from ansiblelint.yaml_utils import nested_items_path
 
 
 class VariableHasSpacesRule(AnsibleLintRule, TransformMixin):
@@ -32,7 +33,7 @@ class VariableHasSpacesRule(AnsibleLintRule, TransformMixin):
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
-        for k, v, _ in nested_items(task):
+        for k, v, _ in nested_items_path(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
                 if bool(self.bracket_regex.search(cleaned)):

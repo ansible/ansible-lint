@@ -17,7 +17,8 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.transform_utils import dump
-from ansiblelint.utils import ansible_templar, nested_items
+from ansiblelint.utils import ansible_templar
+from ansiblelint.yaml_utils import nested_items_path
 
 
 class CompareNodeTransformer(NodeTransformer):
@@ -71,7 +72,7 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule, TransformMixin):
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
-        for k, v, _ in nested_items(task):
+        for k, v, _ in nested_items_path(task):
             # TODO: also handle k.endswith("_when") (changed_when, failed_when, ...)
             if k == 'when':
                 if isinstance(v, str):
