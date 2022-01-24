@@ -30,6 +30,7 @@ def copy_examples_dir(
 
 @pytest.fixture
 def config_options(config_options: Namespace, opts: Dict[str, Any]) -> Namespace:
+    """Return a test-specific set of options."""
     # mirror default_rules_collection fixture setting
     config_options.enable_list = ['no-same-owner', 'facts-namespacing']
 
@@ -43,7 +44,7 @@ def config_options(config_options: Namespace, opts: Dict[str, Any]) -> Namespace
             getattr(config_options, opt).extend(value)
         else:
             setattr(config_options, opt, value)
-    yield config_options
+    return config_options
 
 
 @pytest.fixture
