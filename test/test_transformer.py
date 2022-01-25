@@ -9,7 +9,7 @@ import pytest
 from ansiblelint.rules import RulesCollection
 
 # noinspection PyProtectedMember
-from ansiblelint.runner import _get_matches, LintResult
+from ansiblelint.runner import LintResult, _get_matches
 from ansiblelint.transformer import Transformer
 
 
@@ -77,7 +77,6 @@ def test_transformer(
 
     Based on TestRunner::test_runner
     """
-
     transformer = Transformer(result=runner_result)
     transformer.run()
 
