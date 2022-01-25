@@ -707,24 +707,6 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
     ]
 
 
-def get_normalized_tasks(
-    yaml: "AnsibleBaseYAMLObject", file: Lintable
-) -> List[Dict[str, Any]]:
-    """Extract normalized tasks from a file."""
-    tasks = get_action_tasks(yaml, file)
-    res = []
-    for task in tasks:
-        # An empty `tags` block causes `None` to be returned if
-        # the `or []` is not present - `task.get('tags', [])`
-        # does not suffice.
-        if 'skip_ansible_lint' in (task.get('tags') or []):
-            # No need to normalize_task is we are skipping it.
-            continue
-        res.append(normalize_task(task, str(file.path)))
-
-    return res
-
-
 @lru_cache(maxsize=128)
 def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.

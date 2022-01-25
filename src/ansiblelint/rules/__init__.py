@@ -13,6 +13,7 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Union
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
+import ansiblelint.yaml_utils
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
     BaseRule,
@@ -21,7 +22,7 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.config import get_rule_config, options
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, expand_paths_vars
 
 _logger = logging.getLogger(__name__)
 
@@ -107,24 +108,17 @@ class AnsibleLintRule(BaseRule):
         ):
             return matches
 
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
-        if not yaml:
-            return matches
+        tasks_iterator = ansiblelint.yaml_utils.iter_tasks_in_file(file, self.id)
+        for raw_task, task, skipped, error in tasks_iterator:
+            if error is not None:
+                # normalize_task converts AnsibleParserError to MatchError
+                return [error]
 
-        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, file)
-
-        try:
-            tasks = ansiblelint.utils.get_normalized_tasks(yaml, file)
-        except MatchError as e:
-            return [e]
-
-        for task in tasks:
-            if self.id in task.get('skipped_rules', ()):
+            if skipped or 'action' not in task:
                 continue
 
-            if 'action' not in task:
-                continue
             result = self.matchtask(task, file=file)
+
             if not result:
                 continue
 
@@ -208,7 +202,7 @@ class RulesCollection:
         self.options = options
         if rulesdirs is None:
             rulesdirs = []
-        self.rulesdirs = ansiblelint.file_utils.expand_paths_vars(rulesdirs)
+        self.rulesdirs = expand_paths_vars(rulesdirs)
         self.rules: List[BaseRule] = []
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
