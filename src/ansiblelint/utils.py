@@ -33,7 +33,6 @@ from typing import (
     Callable,
     Dict,
     Generator,
-    Iterator,
     List,
     Optional,
     Sequence,
@@ -67,7 +66,6 @@ except ImportError:
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-import ansiblelint.skip_utils
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
     LoadingFailureRule,
@@ -748,38 +746,6 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         logging.exception(e)
         raise SystemExit("Failed to parse YAML in %s: %s" % (lintable.path, str(e)))
     return data
-
-
-def iter_tasks_in_file(
-    lintable: Lintable, rule_id: str
-) -> Iterator[Tuple[Dict[str, Any], Dict[str, Any], bool, Optional[MatchError]]]:
-    """Iterate over tasks in file."""
-    data = parse_yaml_linenumbers(lintable)
-    if not data:
-        return
-    data = ansiblelint.skip_utils.append_skipped_rules(data, lintable)
-
-    raw_tasks = get_action_tasks(data, lintable)
-
-    for raw_task in raw_tasks:
-        # An empty `tags` block causes `None` to be returned if
-        # the `or []` is not present - `task.get('tags', [])`
-        # does not suffice.
-        if 'skip_ansible_lint' in (raw_task.get('tags') or []) or (
-            rule_id in raw_task.get('skipped_rules', ())
-        ):
-            # raw_task, normalized_task, do_skip
-            yield raw_task, raw_task, True, None
-            continue
-
-        try:
-            normalized_task = normalize_task(raw_task, str(lintable.path))
-        except MatchError as e:
-            # normalize_task converts AnsibleParserError to MatchError
-            yield raw_task, raw_task, False, e
-            return
-        # raw_task, normalized_task, do_skip
-        yield raw_task, normalized_task, False, None
 
 
 def get_first_cmd_arg(task: Dict[str, Any]) -> Any:

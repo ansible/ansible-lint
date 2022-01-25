@@ -7,7 +7,7 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.utils import iter_tasks_in_file
+from ansiblelint.yaml_utils import iter_tasks_in_file
 
 
 class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
