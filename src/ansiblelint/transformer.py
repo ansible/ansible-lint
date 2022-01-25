@@ -5,7 +5,8 @@ from textwrap import dedent
 from typing import Dict, List, Set, Union
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
-from ruamel.yaml import YAML  # type: ignore
+# To make the type checkers happy, we import from ruamel.yaml.main instead.
+from ruamel.yaml.main import YAML
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from .errors import MatchError
