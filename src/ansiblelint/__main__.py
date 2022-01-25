@@ -187,9 +187,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     result = _get_matches(rules, options)
 
-    # TODO: options.listtransforms
-
-    if options.do_transforms:
+    if options.fmt_yaml_files:
         _do_transform(result, options)
 
     mark_as_success = False
