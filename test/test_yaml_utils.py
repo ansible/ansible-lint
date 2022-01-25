@@ -4,6 +4,23 @@ from typing import Any
 import pytest
 
 import ansiblelint.yaml_utils
+from ansiblelint.file_utils import Lintable
+
+
+@pytest.fixture
+def empty_lintable() -> Lintable:
+    """Return a Lintable with no contents."""
+    lintable = Lintable("__empty_file__")
+    lintable._content = ""
+    return lintable
+
+
+def test_iter_tasks_in_file_with_empty_file(empty_lintable: Lintable) -> None:
+    """Make sure that iter_tasks_in_file returns early when files are empty."""
+    res = list(
+        ansiblelint.yaml_utils.iter_tasks_in_file(empty_lintable, "some-rule-id")
+    )
+    assert res == []
 
 
 def test_nested_items_path() -> None:
