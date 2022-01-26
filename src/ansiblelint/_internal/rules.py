@@ -22,6 +22,7 @@ class BaseRule:
     severity: str = ""
     link: str = ""
     has_dynamic_tags: bool = False
+    needs_raw_task: bool = False
 
     def getmatches(self, file: "Lintable") -> List["MatchError"]:
         """Return all matches while ignoring exceptions."""
@@ -48,7 +49,12 @@ class BaseRule:
     def matchtask(
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
-        """Confirm if current rule is matching a specific task."""
+        """Confirm if current rule is matching a specific task.
+
+        If ``needs_raw_task`` (a class level attribute) is ``True``, then
+        the original task (before normalization) will be made available under
+        ``task["__raw_task__"]``.
+        """
         return False
 
     def matchtasks(self, file: "Lintable") -> List["MatchError"]:
