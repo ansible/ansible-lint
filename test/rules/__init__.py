@@ -1,3 +1,3 @@
 """Test rules resources."""
 
-__all__ = ['EMatcherRule']
+__all__ = ['EMatcherRule', 'RawTaskRule']
