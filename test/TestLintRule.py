@@ -20,7 +20,7 @@
 
 from ansiblelint.file_utils import Lintable
 
-from .rules import EMatcherRule, UnsetVariableMatcherRule
+from .rules import EMatcherRule
 
 
 def test_rule_matching() -> None:
@@ -29,11 +29,3 @@ def test_rule_matching() -> None:
     lintable = Lintable('examples/playbooks/ematcher-rule.yml', kind="playbook")
     matches = ematcher.matchlines(lintable)
     assert len(matches) == 3
-
-
-def test_rule_postmatching() -> None:
-    """Test rule.matchlines() in 'post templating' (whatever that means)."""
-    rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
-    lintable = Lintable('examples/playbooks/bracketsmatchtest.yml', kind="playbook")
-    matches = rule.matchlines(lintable)
-    assert len(matches) == 2
