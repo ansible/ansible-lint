@@ -261,13 +261,20 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     if out is None:
         exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
         _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
-        out = set(
-            WcMatch(
+        # remove './' prefix from output of WcMatch
+        out = {
+            strip_dotslash_prefix(fname)
+            for fname in WcMatch(
                 '.', exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
             ).match()
-        )
+        }
 
     return OrderedDict.fromkeys(sorted(out))
+
+
+def strip_dotslash_prefix(fname: str) -> str:
+    """Remove ./ leading from filenames."""
+    return fname[2:] if fname.startswith('./') else fname
 
 
 def guess_project_dir(config_file: Optional[str]) -> str:
