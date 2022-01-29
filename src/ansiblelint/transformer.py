@@ -14,6 +14,8 @@ from .file_utils import Lintable
 from .runner import LintResult
 from .skip_utils import load_data  # TODO: move load_data out of skip_utils
 
+__all__ = ["Transformer"]
+
 _logger = logging.getLogger(__name__)
 
 _comment_line_re = re.compile(r"^ *#")
