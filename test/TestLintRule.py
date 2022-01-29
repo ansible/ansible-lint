@@ -18,23 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
-import unittest
+import pytest
 
 from ansiblelint.file_utils import Lintable
 
-from .rules import EMatcherRule, UnsetVariableMatcherRule
+from .rules import EMatcherRule, RawTaskRule
 
 
-class TestRule(unittest.TestCase):
-    def test_rule_matching(self) -> None:
-        ematcher = EMatcherRule.EMatcherRule()
-        lintable = Lintable('examples/playbooks/ematcher-rule.yml', kind="playbook")
-        matches = ematcher.matchlines(lintable)
-        assert len(matches) == 3
+@pytest.fixture
+def lintable() -> Lintable:
+    """Return a playbook Lintable for use in this file's tests."""
+    return Lintable('examples/playbooks/ematcher-rule.yml', kind="playbook")
 
-    def test_rule_postmatching(self) -> None:
-        rule = UnsetVariableMatcherRule.UnsetVariableMatcherRule()
-        lintable = Lintable('examples/playbooks/bracketsmatchtest.yml', kind="playbook")
-        matches = rule.matchlines(lintable)
-        assert len(matches) == 2
+
+def test_rule_matching(lintable: Lintable) -> None:
+    """Test rule.matchlines() on a plyabook."""
+    ematcher = EMatcherRule.EMatcherRule()
+    matches = ematcher.matchlines(lintable)
+    assert len(matches) == 3
+
+
+def test_raw_rule_matching(lintable: Lintable) -> None:
+    """Test rule.matchlines() on a plyabook."""
+    ematcher = RawTaskRule.RawTaskRule()
+    matches = ematcher.matchtasks(lintable)
+    assert len(matches) == 1
