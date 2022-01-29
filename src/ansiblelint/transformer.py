@@ -1,7 +1,7 @@
 """Transformer implementation."""
 import logging
 import re
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Set, Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ruamel.yaml.emitter import Emitter
@@ -19,7 +19,10 @@ __all__ = ["Transformer"]
 
 _logger = logging.getLogger(__name__)
 
-_comment_line_re = re.compile(r"^ *#")
+# ruamel.yaml only preserves empty (no whitespace) blank lines
+# (ie "/n/n" becomes "/n/n" but "/n  /n" becomes "/n").
+# So, we need to identify whitespace-only lines to drop spaces before reading.
+_whitespace_only_lines_re = re.compile(r"^ +$", re.MULTILINE)
 
 
 class FormattedEmitter(Emitter):
@@ -153,6 +156,9 @@ class Transformer:
                 file_is_yaml = False
 
             if file_is_yaml:
+                # ruamel.yaml only preserves empty (no whitespace) blank lines.
+                # So, drop spaces in whitespace-only lines. ("\n  \n" -> "\n\n")
+                data = _whitespace_only_lines_re.sub("", cast(str, data))
                 # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
                 data = load_data(data)
                 yaml.dump(data, file.path)
