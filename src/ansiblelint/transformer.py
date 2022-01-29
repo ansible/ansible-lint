@@ -50,7 +50,14 @@ class Transformer:
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
             file_is_yaml = str(file.base_kind) == "text/yaml"
 
+            try:
+                data: str = file.content
+            except (UnicodeDecodeError, IsADirectoryError):
+                # we hit a binary file (eg a jar or tar.gz) or a directory
+                data = ""
+                file_is_yaml = False
+
             if file_is_yaml:
-                ruamel_data: Union[CommentedMap, CommentedSeq] = yaml.loads(file.content)
+                ruamel_data: Union[CommentedMap, CommentedSeq] = yaml.loads(data)
                 file.content = yaml.dumps(ruamel_data)
                 file.write()
