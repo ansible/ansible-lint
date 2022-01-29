@@ -145,7 +145,14 @@ class Transformer:
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
             file_is_yaml = str(file.base_kind) == "text/yaml"
 
+            try:
+                data: Union[CommentedMap, CommentedSeq, str] = file.content
+            except (UnicodeDecodeError, IsADirectoryError):
+                # we hit a binary file (eg a jar or tar.gz) or a directory
+                data = ""
+                file_is_yaml = False
+
             if file_is_yaml:
                 # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
-                data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
+                data = load_data(data)
                 yaml.dump(data, file.path)
