@@ -1,7 +1,6 @@
 """Transformer implementation."""
 import logging
 import re
-from textwrap import dedent
 from typing import Dict, List, Set, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -56,9 +55,7 @@ class Transformer:
         # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
 
         # configure yaml dump formatting
-        yaml.explicit_start = (  # we handle adding --- in self._final_yaml_transform()
-            False  # type: ignore[assignment]
-        )
+        yaml.explicit_start = True  # type: ignore[assignment]
         yaml.explicit_end = False  # type: ignore[assignment]
 
         # TODO: make the width configurable
@@ -97,29 +94,4 @@ class Transformer:
             if file_is_yaml:
                 # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
                 data: Union[CommentedMap, CommentedSeq] = load_data(file.content)
-                yaml.dump(data, file.path, transform=self._final_yaml_transform)
-
-    def _final_yaml_transform(self, text: str) -> str:
-        """
-        Ensure that top-level sequences are not over-indented.
-
-        In order to make that work, we cannot delegate adding the yaml explict_start
-        to ruamel.yaml or dedent() won't have anything to work with.
-        Instead, we add the explicit_start here.
-        """
-        text_lines = text.splitlines(keepends=True)
-        # dedent() does not handle cases where there is a comment at column 0
-        text_without_comments = "".join(
-            ["\n" if _comment_line_re.match(line) else line for line in text_lines]
-        )
-        dedented_lines = dedent(text_without_comments).splitlines(keepends=True)
-
-        # preserve the indents for comment lines (do not dedent them)
-        for i, line in enumerate(text_lines):
-            if _comment_line_re.match(line):
-                dedented_lines[i] = line
-
-        text = "".join(dedented_lines)
-        if self.explicit_start:
-            text = "---\n" + text
-        return text
+                yaml.dump(data, file.path)
