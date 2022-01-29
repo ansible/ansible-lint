@@ -4,6 +4,7 @@ import re
 from typing import Dict, List, Set, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
+from ruamel.yaml.emitter import Emitter
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
@@ -19,6 +20,44 @@ __all__ = ["Transformer"]
 _logger = logging.getLogger(__name__)
 
 _comment_line_re = re.compile(r"^ *#")
+
+
+class FormattedEmitter(Emitter):
+    """Emitter that applies custom formatting rules when dumping YAML.
+
+    Root-level sequences are never indented.
+    All subsequent levels are indented as configured (normal ruamel.yaml behavior).
+
+    Earlier implementations used dedent on ruamel.yaml's dumped output,
+    but string magic like that had a ton of problematic edge cases.
+    """
+
+    _sequence_indent = 2
+    _sequence_dash_offset = 0  # Should be _sequence_indent - 2
+
+    # NB: mypy does not support overriding attributes with properties yet:
+    #     https://github.com/python/mypy/issues/4125
+    #     To silence we have to ignore[override] both the @property and the method.
+
+    @property  # type: ignore[override]
+    def best_sequence_indent(self) -> int:  # type: ignore[override]
+        """Return the configured sequence_indent or 2 for root level."""
+        return 2 if self.column < 2 else self._sequence_indent
+
+    @best_sequence_indent.setter
+    def best_sequence_indent(self, value: int) -> None:
+        """Configure how many columns to indent each sequence item (including the '-')."""
+        self._sequence_indent = value
+
+    @property  # type: ignore[override]
+    def sequence_dash_offset(self) -> int:  # type: ignore[override]
+        """Return the configured sequence_dash_offset or 2 for root level."""
+        return 0 if self.column < 2 else self._sequence_dash_offset
+
+    @sequence_dash_offset.setter
+    def sequence_dash_offset(self, value: int) -> None:
+        """Configure how many spaces to put before each sequence item's '-'."""
+        self._sequence_dash_offset = value
 
 
 # Transformer is for transforms like runner is for rules
@@ -76,6 +115,11 @@ class Transformer:
         yaml.sequence_indent = 4 if self.indent_sequences else 2  # type: ignore[assignment]
         yaml.sequence_dash_offset = yaml.sequence_indent - 2  # type: ignore[operator]
 
+        if self.indent_sequences:  # in the future: or other formatting options
+            # For root-level sequences, FormattedEmitter overrides sequence_indent
+            # and sequence_dash_offset to prevent root-level indents.
+            yaml.Emitter = FormattedEmitter
+
         # explicit_start=True + map_indent=2 + sequence_indent=2 + sequence_dash_offset=0
         # ---
         # - name: playbook
@@ -83,10 +127,18 @@ class Transformer:
         #   - item1
         #
         # explicit_start=True + map_indent=2 + sequence_indent=4 + sequence_dash_offset=2
+        # With the normal Emitter
         # ---
         #   - name: playbook
         #     loop:
         #       - item1
+        #
+        # explicit_start=True + map_indent=2 + sequence_indent=4 + sequence_dash_offset=2
+        # With the FormattedEmitter
+        # ---
+        # - name: playbook
+        #   loop:
+        #     - item1
 
         for file, matches in self.matches_per_file.items():
             # str() convinces mypy that "text/yaml" is a valid Literal.
