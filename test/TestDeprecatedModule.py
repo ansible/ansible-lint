@@ -5,11 +5,11 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.DeprecatedModuleRule import DeprecatedModuleRule
 from ansiblelint.testing import RunFromText
 
-MODULE_DEPRECATED = '''
+MODULE_DEPRECATED = """
 - name: task example
   docker:
     debug: test
-'''
+"""
 
 
 class TestDeprecatedModuleRule(unittest.TestCase):

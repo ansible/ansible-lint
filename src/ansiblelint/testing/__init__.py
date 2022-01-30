@@ -49,10 +49,10 @@ class RunFromText:
 
     def run_role_tasks_main(self, tasks_main_text: str) -> List[MatchError]:
         """Lints received text as tasks."""
-        role_path = tempfile.mkdtemp(prefix='role_')
-        tasks_path = os.path.join(role_path, 'tasks')
+        role_path = tempfile.mkdtemp(prefix="role_")
+        tasks_path = os.path.join(role_path, "tasks")
         os.makedirs(tasks_path)
-        with open(os.path.join(tasks_path, 'main.yml'), 'w') as fp:
+        with open(os.path.join(tasks_path, "main.yml"), "w") as fp:
             fp.write(tasks_main_text)
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
@@ -60,10 +60,10 @@ class RunFromText:
 
     def run_role_meta_main(self, meta_main_text: str) -> List[MatchError]:
         """Lints received text as meta."""
-        role_path = tempfile.mkdtemp(prefix='role_')
-        meta_path = os.path.join(role_path, 'meta')
+        role_path = tempfile.mkdtemp(prefix="role_")
+        meta_path = os.path.join(role_path, "meta")
         os.makedirs(meta_path)
-        with open(os.path.join(meta_path, 'main.yml'), 'w') as fp:
+        with open(os.path.join(meta_path, "main.yml"), "w") as fp:
             fp.write(meta_main_text)
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
@@ -87,15 +87,15 @@ def run_ansible_lint(
     # pollute the env, causing weird behaviors, so we pass only a safe list of
     # vars.
     safe_list = [
-        'HOME',
-        'LANG',
-        'LC_ALL',
-        'LC_CTYPE',
-        'NO_COLOR',
-        'PATH',
-        'PYTHONIOENCODING',
-        'PYTHONPATH',
-        'TERM',
+        "HOME",
+        "LANG",
+        "LC_ALL",
+        "LC_CTYPE",
+        "NO_COLOR",
+        "PATH",
+        "PYTHONIOENCODING",
+        "PYTHONPATH",
+        "TERM",
     ]
 
     if env is None:

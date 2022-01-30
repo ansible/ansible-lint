@@ -29,27 +29,27 @@ if TYPE_CHECKING:
 
 
 class OctalPermissionsRule(AnsibleLintRule):
-    id = 'risky-octal'
-    shortdesc = 'Octal file permissions must contain leading zero or be a string'
+    id = "risky-octal"
+    shortdesc = "Octal file permissions must contain leading zero or be a string"
     description = (
-        'Numeric file permissions without leading zero can behave '
-        'in unexpected ways. See '
-        'https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html'
+        "Numeric file permissions without leading zero can behave "
+        "in unexpected ways. See "
+        "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html"
     )
-    severity = 'VERY_HIGH'
-    tags = ['formatting']
-    version_added = 'historic'
+    severity = "VERY_HIGH"
+    tags = ["formatting"]
+    version_added = "historic"
 
     _modules = [
-        'assemble',
-        'copy',
-        'file',
-        'ini_file',
-        'lineinfile',
-        'replace',
-        'synchronize',
-        'template',
-        'unarchive',
+        "assemble",
+        "copy",
+        "file",
+        "ini_file",
+        "lineinfile",
+        "replace",
+        "synchronize",
+        "template",
+        "unarchive",
     ]
 
     def is_invalid_permission(self, mode: int) -> bool:
@@ -86,10 +86,10 @@ class OctalPermissionsRule(AnsibleLintRule):
         )
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in self._modules:
-            mode = task['action'].get('mode', None)
+            mode = task["action"].get("mode", None)
 
             if isinstance(mode, str):
                 return False

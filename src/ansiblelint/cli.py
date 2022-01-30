@@ -25,8 +25,8 @@ from ansiblelint.file_utils import (
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [
-    'exclude_paths',
-    'rulesdir',
+    "exclude_paths",
+    "rulesdir",
 ]
 
 
@@ -74,7 +74,7 @@ def load_config(config_file: str) -> Dict[Any, Any]:
         _logger.error(e)
         sys.exit(INVALID_CONFIG_RC)
 
-    config['config_file'] = config_path
+    config["config_file"] = config_path
     # TODO(ssbarnea): implement schema validation for config file
     if isinstance(config, list):
         _logger.error(
@@ -89,7 +89,7 @@ def load_config(config_file: str) -> Dict[Any, Any]:
     return config
 
 
-def get_config_path(config_file: str = '.ansible-lint') -> Optional[str]:
+def get_config_path(config_file: str = ".ansible-lint") -> Optional[str]:
     """Return local config file."""
     project_filenames = [config_file]
     parent = tail = os.getcwd()
@@ -98,7 +98,7 @@ def get_config_path(config_file: str = '.ansible-lint') -> Optional[str]:
             filename = os.path.abspath(os.path.join(parent, project_filename))
             if os.path.exists(filename):
                 return filename
-            if os.path.exists(os.path.abspath(os.path.join(parent, '.git'))):
+            if os.path.exists(os.path.abspath(os.path.join(parent, ".git"))):
                 # Avoid looking outside .git folders as we do not want endup
                 # picking config files from upper level projects if current
                 # project has no config.
@@ -130,160 +130,160 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '-L',
-        dest='listrules',
+        "-L",
+        dest="listrules",
         default=False,
-        action='store_true',
+        action="store_true",
         help="list all the rules",
     )
     parser.add_argument(
-        '-f',
-        dest='format',
-        default='rich',
-        choices=['rich', 'plain', 'rst', 'codeclimate', 'quiet', 'pep8'],
+        "-f",
+        dest="format",
+        default="rich",
+        choices=["rich", "plain", "rst", "codeclimate", "quiet", "pep8"],
         help="Format used rules output, (default: %(default)s)",
     )
     parser.add_argument(
-        '-q',
-        dest='quiet',
+        "-q",
+        dest="quiet",
         default=0,
-        action='count',
+        action="count",
         help="quieter, reduce verbosity, can be specified twice.",
     )
     parser.add_argument(
-        '-p',
-        dest='parseable',
+        "-p",
+        dest="parseable",
         default=False,
-        action='store_true',
+        action="store_true",
         help="parseable output, same as '-f pep8'",
     )
     parser.add_argument(
-        '--parseable-severity',
-        dest='parseable_severity',
+        "--parseable-severity",
+        dest="parseable_severity",
         default=False,
-        action='store_true',
+        action="store_true",
         help="parseable output including severity of rule",
     )
     parser.add_argument(
-        '--progressive',
-        dest='progressive',
+        "--progressive",
+        dest="progressive",
         default=False,
-        action='store_true',
+        action="store_true",
         help="Return success if it detects a reduction in number"
         " of violations compared with previous git commit. This "
         "feature works only in git repositories.",
     )
     parser.add_argument(
-        '--project-dir',
-        dest='project_dir',
+        "--project-dir",
+        dest="project_dir",
         default=".",
         help="Location of project/repository, autodetected based on location "
         " of configuration file.",
     )
     parser.add_argument(
-        '-r',
+        "-r",
         action=AbspathArgAction,
-        dest='rulesdir',
+        dest="rulesdir",
         default=[],
         type=Path,
         help="Specify custom rule directories. Add -R "
         f"to keep using embedded rules from {DEFAULT_RULESDIR}",
     )
     parser.add_argument(
-        '-R',
-        action='store_true',
+        "-R",
+        action="store_true",
         default=False,
-        dest='use_default_rules',
+        dest="use_default_rules",
         help="Keep default rules when using -r",
     )
     parser.add_argument(
-        '--show-relpath',
-        dest='display_relative_path',
-        action='store_false',
+        "--show-relpath",
+        dest="display_relative_path",
+        action="store_false",
         default=True,
         help="Display path relative to CWD",
     )
     parser.add_argument(
-        '-t',
-        dest='tags',
-        action='append',
+        "-t",
+        dest="tags",
+        action="append",
         default=[],
         help="only check rules whose id/tags match these values",
     )
     parser.add_argument(
-        '-T', dest='listtags', action='store_true', help="list all the tags"
+        "-T", dest="listtags", action="store_true", help="list all the tags"
     )
     parser.add_argument(
-        '-v',
-        dest='verbosity',
-        action='count',
+        "-v",
+        dest="verbosity",
+        action="count",
         help="Increase verbosity level (-vv for more)",
         default=0,
     )
     parser.add_argument(
-        '-x',
-        dest='skip_list',
+        "-x",
+        dest="skip_list",
         default=[],
-        action='append',
+        action="append",
         help="only check rules whose id/tags do not " "match these values",
     )
     parser.add_argument(
-        '-w',
-        dest='warn_list',
+        "-w",
+        dest="warn_list",
         default=[],
-        action='append',
+        action="append",
         help="only warn about these rules, unless overridden in "
         "config file defaults to 'experimental'",
     )
     parser.add_argument(
-        '--enable-list',
-        dest='enable_list',
+        "--enable-list",
+        dest="enable_list",
         default=[],
-        action='append',
+        action="append",
         help="activate optional rules by their tag name",
     )
     # Do not use store_true/store_false because they create opposite defaults.
     parser.add_argument(
-        '--nocolor',
-        dest='colored',
-        action='store_const',
+        "--nocolor",
+        dest="colored",
+        action="store_const",
         const=False,
         help="disable colored output, same as NO_COLOR=1",
     )
     parser.add_argument(
-        '--force-color',
-        dest='colored',
-        action='store_const',
+        "--force-color",
+        dest="colored",
+        action="store_const",
         const=True,
         help="Force colored output, same as FORCE_COLOR=1",
     )
     parser.add_argument(
-        '--exclude',
-        dest='exclude_paths',
+        "--exclude",
+        dest="exclude_paths",
         action=AbspathArgAction,
         type=Path,
         default=[],
-        help='path to directories or files to skip. ' 'This option is repeatable.',
+        help="path to directories or files to skip. " "This option is repeatable.",
     )
     parser.add_argument(
-        '-c',
-        dest='config_file',
-        help='Specify configuration file to use.  ' 'Defaults to ".ansible-lint"',
+        "-c",
+        dest="config_file",
+        help="Specify configuration file to use.  " 'Defaults to ".ansible-lint"',
     )
     parser.add_argument(
-        '--offline',
-        dest='offline',
-        action='store_const',
+        "--offline",
+        dest="offline",
+        action="store_const",
         const=True,
-        help='Disable installation of requirements.yml',
+        help="Disable installation of requirements.yml",
     )
     parser.add_argument(
-        '--version',
-        action='store_true',
+        "--version",
+        action="store_true",
     )
     parser.add_argument(
-        dest='lintables',
-        nargs='*',
+        dest="lintables",
+        nargs="*",
         help="One or more files or paths. When missing it will "
         " enable auto-detection mode.",
     )
@@ -294,24 +294,24 @@ def get_cli_parser() -> argparse.ArgumentParser:
 def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespace:
     """Combine the file config with the CLI args."""
     bools = (
-        'display_relative_path',
-        'parseable',
-        'parseable_severity',
-        'quiet',
-        'use_default_rules',
-        'progressive',
-        'offline',
+        "display_relative_path",
+        "parseable",
+        "parseable_severity",
+        "quiet",
+        "use_default_rules",
+        "progressive",
+        "offline",
     )
     # maps lists to their default config values
     lists_map = {
-        'exclude_paths': [".cache", ".git", ".hg", ".svn", ".tox"],
-        'rulesdir': [],
-        'skip_list': [],
-        'tags': [],
-        'warn_list': ['experimental', 'role-name'],
-        'mock_modules': [],
-        'mock_roles': [],
-        'enable_list': [],
+        "exclude_paths": [".cache", ".git", ".hg", ".svn", ".tox"],
+        "rulesdir": [],
+        "skip_list": [],
+        "tags": [],
+        "warn_list": ["experimental", "role-name"],
+        "mock_modules": [],
+        "mock_roles": [],
+        "enable_list": [],
     }
 
     scalar_map = {
@@ -345,17 +345,17 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
             value = default
         setattr(cli_config, entry, value)
 
-    if 'verbosity' in file_config:
-        cli_config.verbosity = cli_config.verbosity + file_config.pop('verbosity')
+    if "verbosity" in file_config:
+        cli_config.verbosity = cli_config.verbosity + file_config.pop("verbosity")
 
     # merge options that can be set only via a file config
     for entry, value in file_config.items():
         setattr(cli_config, entry, value)
 
     # append default kinds to the custom list
-    kinds = file_config.get('kinds', [])
+    kinds = file_config.get("kinds", [])
     kinds.extend(DEFAULT_KINDS)
-    setattr(cli_config, 'kinds', kinds)
+    setattr(cli_config, "kinds", kinds)
 
     return cli_config
 

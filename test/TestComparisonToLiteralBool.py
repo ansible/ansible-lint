@@ -5,7 +5,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.ComparisonToLiteralBoolRule import ComparisonToLiteralBoolRule
 from ansiblelint.testing import RunFromText
 
-PASS_WHEN = '''
+PASS_WHEN = """
 - name: example task
   debug:
     msg: test
@@ -17,30 +17,30 @@ PASS_WHEN = '''
   when:
     - 1 + 1 == 2
     - true
-'''
+"""
 
-PASS_WHEN_NOT_FALSE = '''
+PASS_WHEN_NOT_FALSE = """
 - name: example task
   debug:
     msg: test
   when: not my_var
-'''
+"""
 
-PASS_WHEN_NOT_NULL = '''
+PASS_WHEN_NOT_NULL = """
 - name: example task
   debug:
     msg: test
   when: my_var not None
-'''
+"""
 
-FAIL_LITERAL_TRUE = '''
+FAIL_LITERAL_TRUE = """
 - name: example task
   debug:
     msg: test
   when: my_var == True
-'''
+"""
 
-FAIL_LITERAL_FALSE = '''
+FAIL_LITERAL_FALSE = """
 - name: example task
   debug:
     msg: test
@@ -51,7 +51,7 @@ FAIL_LITERAL_FALSE = '''
     msg: test
   when:
     - my_var == false
-'''
+"""
 
 
 class TestComparisonToLiteralBoolRule(unittest.TestCase):

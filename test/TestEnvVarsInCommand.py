@@ -5,7 +5,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.EnvVarsInCommandRule import EnvVarsInCommandRule
 from ansiblelint.testing import RunFromText
 
-SUCCESS_PLAY_TASKS = '''
+SUCCESS_PLAY_TASKS = """
 - hosts: localhost
 
   tasks:
@@ -60,9 +60,9 @@ SUCCESS_PLAY_TASKS = '''
     command: echo
     args:
       strip_empty_ends: false
-'''
+"""
 
-FAIL_PLAY_TASKS = '''
+FAIL_PLAY_TASKS = """
 - hosts: localhost
 
   tasks:
@@ -71,7 +71,7 @@ FAIL_PLAY_TASKS = '''
 
   - name: typo some stuff
     command: cerates=/tmp/blah warn=no touch /tmp/blah
-'''
+"""
 
 
 class TestEnvVarsInCommand(unittest.TestCase):

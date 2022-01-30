@@ -5,7 +5,7 @@ from subprocess import run
 import pytest
 
 
-@pytest.mark.parametrize('module', ("ansiblelint", "ansiblelint.__main__"))
+@pytest.mark.parametrize("module", ("ansiblelint", "ansiblelint.__main__"))
 def test_import(module: str) -> None:
     """Safeguard that Ansible does not become an implicit import."""
     # We cannot test it directly because our test fixtures already do

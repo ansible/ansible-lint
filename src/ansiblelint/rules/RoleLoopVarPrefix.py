@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class RoleLoopVarPrefix(AnsibleLintRule):
     """Role loop_var should use configured prefix."""
 
-    id = 'no-loop-var-prefix'
+    id = "no-loop-var-prefix"
     shortdesc = __doc__
     link = (
         "https://docs.ansible.com/ansible/latest/user_guide/"
@@ -27,9 +27,9 @@ class RoleLoopVarPrefix(AnsibleLintRule):
 Looping inside roles has the risk of clashing with loops from user-playbooks.\
 """
 
-    tags = ['idiom']
+    tags = ["idiom"]
     prefix = ""
-    severity = 'MEDIUM'
+    severity = "MEDIUM"
 
     def matchplay(self, file: Lintable, data: "odict[str, Any]") -> List[MatchError]:
         """Return matches found for a specific playbook."""
@@ -40,7 +40,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         self.prefix = options.loop_var_prefix.format(role=toidentifier(file.role))
         self.shortdesc = f"{self.__class__.shortdesc}: {self.prefix}"
 
-        if file.kind not in ('tasks', 'handlers'):
+        if file.kind not in ("tasks", "handlers"):
             return results
 
         results.extend(self.handle_play(file, data))
@@ -51,8 +51,8 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     ) -> List[MatchError]:
         """Return matches for a playlist."""
         results = []
-        if 'block' in task:
-            results.extend(self.handle_tasks(lintable, task['block']))
+        if "block" in task:
+            results.extend(self.handle_tasks(lintable, task["block"]))
         else:
             results.extend(self.handle_task(lintable, task))
         return results
@@ -71,14 +71,14 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     ) -> List[MatchError]:
         """Return matches for a specific task."""
         results = []
-        has_loop = 'loop' in task
+        has_loop = "loop" in task
         for key in task.keys():
-            if key.startswith('with_'):
+            if key.startswith("with_"):
                 has_loop = True
 
         if has_loop:
-            loop_control = task.get('loop_control', {})
-            loop_var = loop_control.get('loop_var', "")
+            loop_control = task.get("loop_control", {})
+            loop_var = loop_control.get("loop_var", "")
 
             if not loop_var or not loop_var.startswith(self.prefix):
                 results.append(

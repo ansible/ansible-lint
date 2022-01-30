@@ -10,5 +10,5 @@ def main() -> None:
     module.exit_json(msg="Hello 2!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

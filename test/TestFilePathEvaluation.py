@@ -9,7 +9,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 LAYOUT_IMPORTS: Dict[str, str] = {
-    'main.yml': textwrap.dedent(
+    "main.yml": textwrap.dedent(
         """\
         ---
         - hosts: target
@@ -19,28 +19,28 @@ LAYOUT_IMPORTS: Dict[str, str] = {
               import_tasks: tasks/task_1.yml
         """
     ),
-    'tasks/task_1.yml': textwrap.dedent(
+    "tasks/task_1.yml": textwrap.dedent(
         """\
         ---
         - name: from task 1 import task 2
           import_tasks: tasks/task_2.yml
         """
     ),
-    'tasks/task_2.yml': textwrap.dedent(
+    "tasks/task_2.yml": textwrap.dedent(
         """\
         ---
         - name: from task 2 import subtask 1
           import_tasks: tasks/subtasks/subtask_1.yml
         """
     ),
-    'tasks/subtasks/subtask_1.yml': textwrap.dedent(
+    "tasks/subtasks/subtask_1.yml": textwrap.dedent(
         """\
         ---
         - name: from subtask 1 import subtask 2
           import_tasks: tasks/subtasks/subtask_2.yml
         """
     ),
-    'tasks/subtasks/subtask_2.yml': textwrap.dedent(
+    "tasks/subtasks/subtask_2.yml": textwrap.dedent(
         """\
         ---
         - name: from subtask 2 do something
@@ -52,7 +52,7 @@ LAYOUT_IMPORTS: Dict[str, str] = {
 }
 
 LAYOUT_INCLUDES: Dict[str, str] = {
-    'main.yml': textwrap.dedent(
+    "main.yml": textwrap.dedent(
         """\
         ---
         - hosts: target
@@ -62,28 +62,28 @@ LAYOUT_INCLUDES: Dict[str, str] = {
               include_tasks: tasks/task_1.yml
         """
     ),
-    'tasks/task_1.yml': textwrap.dedent(
+    "tasks/task_1.yml": textwrap.dedent(
         """\
         ---
         - name: from task 1 import task 2
           include_tasks: tasks/task_2.yml
         """
     ),
-    'tasks/task_2.yml': textwrap.dedent(
+    "tasks/task_2.yml": textwrap.dedent(
         """\
         ---
         - name: from task 2 import subtask 1
           include_tasks: tasks/subtasks/subtask_1.yml
         """
     ),
-    'tasks/subtasks/subtask_1.yml': textwrap.dedent(
+    "tasks/subtasks/subtask_1.yml": textwrap.dedent(
         """\
         ---
         - name: from subtask 1 import subtask 2
           include_tasks: tasks/subtasks/subtask_2.yml
         """
     ),
-    'tasks/subtasks/subtask_2.yml': textwrap.dedent(
+    "tasks/subtasks/subtask_2.yml": textwrap.dedent(
         """\
         ---
         - name: from subtask 2 do something
@@ -96,14 +96,14 @@ LAYOUT_INCLUDES: Dict[str, str] = {
 
 
 @pytest.mark.parametrize(
-    'ansible_project_layout',
+    "ansible_project_layout",
     (
-        pytest.param(LAYOUT_IMPORTS, id='using only import_tasks'),
-        pytest.param(LAYOUT_INCLUDES, id='using only include_tasks'),
+        pytest.param(LAYOUT_IMPORTS, id="using only import_tasks"),
+        pytest.param(LAYOUT_INCLUDES, id="using only include_tasks"),
     ),
 )
 @pytest.mark.xfail(
-    reason='https://github.com/ansible-community/ansible-lint/issues/1446'
+    reason="https://github.com/ansible-community/ansible-lint/issues/1446"
 )
 def test_file_path_evaluation(
     tmp_path: Path,

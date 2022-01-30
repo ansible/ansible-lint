@@ -5,85 +5,85 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.runner import Runner
 
 PLAY_IN_THE_PLACE = Lintable(
-    'playbook.yml',
-    '''\
+    "playbook.yml",
+    """\
 - hosts: all
   roles:
     - include_in_the_place
-''',
+""",
 )
 
 PLAY_RELATIVE = Lintable(
-    'playbook.yml',
-    '''\
+    "playbook.yml",
+    """\
 - hosts: all
   roles:
     - include_relative
-''',
+""",
 )
 
 PLAY_MISS_INCLUDE = Lintable(
-    'playbook.yml',
-    '''\
+    "playbook.yml",
+    """\
 - hosts: all
   roles:
     - include_miss
-''',
+""",
 )
 
 PLAY_ROLE_INCLUDED_IN_THE_PLACE = Lintable(
-    'roles/include_in_the_place/tasks/main.yml',
-    '''\
+    "roles/include_in_the_place/tasks/main.yml",
+    """\
 ---
 - include_tasks: included_file.yml
-''',
+""",
 )
 
 PLAY_ROLE_INCLUDED_RELATIVE = Lintable(
-    'roles/include_relative/tasks/main.yml',
-    '''\
+    "roles/include_relative/tasks/main.yml",
+    """\
 ---
 - include_tasks: tasks/included_file.yml
-''',
+""",
 )
 
 PLAY_ROLE_INCLUDED_MISS = Lintable(
-    'roles/include_miss/tasks/main.yml',
-    '''\
+    "roles/include_miss/tasks/main.yml",
+    """\
 ---
 - include_tasks: tasks/noexist_file.yml
-''',
+""",
     kind="tasks",
 )
 
 PLAY_INCLUDED_IN_THE_PLACE = Lintable(
-    'roles/include_in_the_place/tasks/included_file.yml',
-    '''\
+    "roles/include_in_the_place/tasks/included_file.yml",
+    """\
 - debug:
     msg: 'was found & included'
-''',
+""",
     kind="tasks",
 )
 
 PLAY_INCLUDED_RELATIVE = Lintable(
-    'roles/include_relative/tasks/included_file.yml',
-    '''\
+    "roles/include_relative/tasks/included_file.yml",
+    """\
 - debug:
     msg: 'was found & included'
-''',
+""",
 )
 
 
 @pytest.mark.parametrize(
-    '_play_files',
+    "_play_files",
     (
         pytest.param(
-            [PLAY_MISS_INCLUDE, PLAY_ROLE_INCLUDED_MISS], id='no exist file include'
+            [PLAY_MISS_INCLUDE, PLAY_ROLE_INCLUDED_MISS], id="no exist file include"
         ),
     ),
-    indirect=['_play_files'],
+    indirect=["_play_files"],
 )
-@pytest.mark.usefixtures('_play_files')
+@pytest.mark.usefixtures("_play_files")
 def test_cases_warning_message(runner: Runner, caplog: LogCaptureFixture) -> None:
     """Test that including a non-existing file produces an error."""
     result = runner.run()
@@ -93,7 +93,7 @@ def test_cases_warning_message(runner: Runner, caplog: LogCaptureFixture) -> Non
 
 
 @pytest.mark.parametrize(
-    '_play_files',
+    "_play_files",
     (
         pytest.param(
             [
@@ -101,16 +101,16 @@ def test_cases_warning_message(runner: Runner, caplog: LogCaptureFixture) -> Non
                 PLAY_ROLE_INCLUDED_IN_THE_PLACE,
                 PLAY_INCLUDED_IN_THE_PLACE,
             ],
-            id='in the place include',
+            id="in the place include",
         ),
         pytest.param(
             [PLAY_RELATIVE, PLAY_ROLE_INCLUDED_RELATIVE, PLAY_INCLUDED_RELATIVE],
-            id='relative include',
+            id="relative include",
         ),
     ),
-    indirect=['_play_files'],
+    indirect=["_play_files"],
 )
-@pytest.mark.usefixtures('_play_files')
+@pytest.mark.usefixtures("_play_files")
 def test_cases_that_do_not_report(runner: Runner, caplog: LogCaptureFixture) -> None:
     """Test that relative inclusions are properly followed."""
     runner.run()

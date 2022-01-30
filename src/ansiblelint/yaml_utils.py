@@ -47,8 +47,8 @@ def iter_tasks_in_file(
         # An empty `tags` block causes `None` to be returned if
         # the `or []` is not present - `task.get('tags', [])`
         # does not suffice.
-        skipped_in_task_tag = 'skip_ansible_lint' in (raw_task.get('tags') or [])
-        skipped_in_yaml_comment = rule_id in raw_task.get('skipped_rules', ())
+        skipped_in_task_tag = "skip_ansible_lint" in (raw_task.get("tags") or [])
+        skipped_in_yaml_comment = rule_id in raw_task.get("skipped_rules", ())
         skipped = skipped_in_task_tag or skipped_in_yaml_comment
         if skipped:
             yield raw_task, raw_task, skipped, err

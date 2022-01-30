@@ -11,8 +11,8 @@ from ansiblelint.utils import LINE_NUMBER_KEY
 
 class NoSameOwnerRule(AnsibleLintRule):
 
-    id = 'no-same-owner'
-    shortdesc = 'Owner should not be kept between different hosts'
+    id = "no-same-owner"
+    shortdesc = "Owner should not be kept between different hosts"
     description = """
 Optional rule that highlights dangers of assuming that user/group on the remote
 machines may not exist on ansible controller or vice versa. Owner and group
@@ -23,13 +23,13 @@ See:
 https://zuul-ci.org/docs/zuul-jobs/policy.html\
 #preservation-of-owner-between-executor-and-remote
 """
-    severity = 'LOW'
-    tags = ['opt-in']
+    severity = "LOW"
+    tags = ["opt-in"]
 
     def matchplay(self, file: Lintable, data: Any) -> List[MatchError]:
         """Return matches found for a specific playbook."""
         results: List[MatchError] = []
-        if file.kind not in ('tasks', 'handlers', 'playbook'):
+        if file.kind not in ("tasks", "handlers", "playbook"):
             return results
 
         results.extend(self.handle_play(file, data))
@@ -38,8 +38,8 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
     def handle_play(self, lintable: Lintable, task: Any) -> List[MatchError]:
         """Process a play."""
         results = []
-        if 'block' in task:
-            results.extend(self.handle_playlist(lintable, task['block']))
+        if "block" in task:
+            results.extend(self.handle_playlist(lintable, task["block"]))
         else:
             results.extend(self.handle_task(lintable, task))
         return results
@@ -54,7 +54,7 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
     def handle_task(self, lintable: Lintable, task: Any) -> List[MatchError]:
         """Process a task."""
         results = []
-        if 'synchronize' in task:
+        if "synchronize" in task:
             if self.handle_synchronize(task):
                 print(task)
                 results.append(
@@ -62,7 +62,7 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
                         filename=lintable, linenumber=task[LINE_NUMBER_KEY]
                     )
                 )
-        elif 'unarchive' in task:
+        elif "unarchive" in task:
             if self.handle_unarchive(task):
                 results.append(
                     self.create_matcherror(
@@ -75,32 +75,32 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
     @staticmethod
     def handle_synchronize(task: Any) -> bool:
         """Process a synchronize task."""
-        if task.get('delegate_to') is not None:
+        if task.get("delegate_to") is not None:
             return False
 
-        synchronize = task['synchronize']
-        archive = synchronize.get('archive', True)
+        synchronize = task["synchronize"]
+        archive = synchronize.get("archive", True)
 
-        if synchronize.get('owner', archive) or synchronize.get('group', archive):
+        if synchronize.get("owner", archive) or synchronize.get("group", archive):
             return True
         return False
 
     @staticmethod
     def handle_unarchive(task: Any) -> bool:
         """Process unarchive task."""
-        unarchive = task['unarchive']
-        delegate_to = task.get('delegate_to')
+        unarchive = task["unarchive"]
+        delegate_to = task.get("delegate_to")
 
         if (
-            delegate_to == 'localhost'
-            or delegate_to != 'localhost'
-            and 'remote_src' not in unarchive
+            delegate_to == "localhost"
+            or delegate_to != "localhost"
+            and "remote_src" not in unarchive
         ):
-            if unarchive['src'].endswith('zip'):
-                if '-X' in unarchive.get('extra_opts', []):
+            if unarchive["src"].endswith("zip"):
+                if "-X" in unarchive.get("extra_opts", []):
                     return True
-            if re.search(r'.*\.tar(\.(gz|bz2|xz))?$', unarchive['src']):
-                if '--no-same-owner' not in unarchive.get('extra_opts', []):
+            if re.search(r".*\.tar(\.(gz|bz2|xz))?$", unarchive["src"]):
+                if "--no-same-owner" not in unarchive.get("extra_opts", []):
                     return True
         return False
 
@@ -117,10 +117,10 @@ if "pytest" in sys.modules:
         ("test_file", "failures"),
         (
             pytest.param(
-                'examples/roles/role_for_no_same_owner/tasks/fail.yml', 10, id='fail'
+                "examples/roles/role_for_no_same_owner/tasks/fail.yml", 10, id="fail"
             ),
             pytest.param(
-                'examples/roles/role_for_no_same_owner/tasks/pass.yml', 0, id='pass'
+                "examples/roles/role_for_no_same_owner/tasks/pass.yml", 0, id="pass"
             ),
         ),
     )

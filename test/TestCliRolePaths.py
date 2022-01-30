@@ -18,77 +18,77 @@ class TestCliRolePaths(unittest.TestCase):
 
     def test_run_single_role_path_no_trailing_slash_module(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/test-role'
+        role_path = "roles/test-role"
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
     def test_run_single_role_path_no_trailing_slash_script(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/test-role'
+        role_path = "roles/test-role"
 
         result = run_ansible_lint(role_path, cwd=cwd, executable="ansible-lint")
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
     def test_run_single_role_path_with_trailing_slash(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/test-role/'
+        role_path = "roles/test-role/"
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
     def test_run_multiple_role_path_no_trailing_slash(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/test-role'
+        role_path = "roles/test-role"
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
     def test_run_multiple_role_path_with_trailing_slash(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/test-role/'
+        role_path = "roles/test-role/"
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
     def test_run_inside_role_dir(self) -> None:
-        cwd = os.path.join(self.local_test_dir, 'roles/test-role/')
-        role_path = '.'
+        cwd = os.path.join(self.local_test_dir, "roles/test-role/")
+        role_path = "."
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
     def test_run_role_three_dir_deep(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'testproject/roles/test-role'
+        role_path = "testproject/roles/test-role"
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
     def test_run_playbook(self) -> None:
         """Call ansible-lint the way molecule does."""
-        cwd = os.path.abspath(os.path.join(self.local_test_dir, 'roles/test-role'))
-        lintable = 'molecule/default/include-import-role.yml'
+        cwd = os.path.abspath(os.path.join(self.local_test_dir, "roles/test-role"))
+        lintable = "molecule/default/include-import-role.yml"
         role_path = str(Path(cwd).parent.resolve())
 
         env = os.environ.copy()
-        env['ANSIBLE_ROLES_PATH'] = role_path
+        env["ANSIBLE_ROLES_PATH"] = role_path
 
         result = run_ansible_lint(lintable, cwd=cwd, env=env)
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
     def test_run_role_name_invalid(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/invalid-name'
+        role_path = "roles/invalid-name"
 
         result = run_ansible_lint(role_path, cwd=cwd)
-        assert 'role-name: Role name invalid-name does not match' in strip_ansi_escape(
+        assert "role-name: Role name invalid-name does not match" in strip_ansi_escape(
             result.stdout
         )
 
     def test_run_role_name_with_prefix(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/ansible-role-foo'
+        role_path = "roles/ansible-role-foo"
 
         result = run_ansible_lint("-v", role_path, cwd=cwd)
         assert len(result.stdout) == 0
@@ -100,7 +100,7 @@ class TestCliRolePaths(unittest.TestCase):
 
     def test_run_role_name_from_meta(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/valid-due-to-meta'
+        role_path = "roles/valid-due-to-meta"
 
         result = run_ansible_lint("-v", role_path, cwd=cwd)
         assert len(result.stdout) == 0
@@ -112,11 +112,11 @@ class TestCliRolePaths(unittest.TestCase):
 
     def test_run_invalid_role_name_from_meta(self) -> None:
         cwd = self.local_test_dir
-        role_path = 'roles/invalid_due_to_meta'
+        role_path = "roles/invalid_due_to_meta"
 
         result = run_ansible_lint(role_path, cwd=cwd)
         assert (
-            'role-name: Role name invalid-due-to-meta does not match'
+            "role-name: Role name invalid-due-to-meta does not match"
             in strip_ansi_escape(result.stdout)
         )
 
@@ -127,34 +127,34 @@ class TestCliRolePaths(unittest.TestCase):
         specified as parameter exists in the current directory and the ANSIBLE_ROLES_PATH.
         """
         cwd = self.local_test_dir
-        role_path = 'roles/test-role'
+        role_path = "roles/test-role"
 
         env = os.environ.copy()
-        env['ANSIBLE_ROLES_PATH'] = os.path.realpath(
+        env["ANSIBLE_ROLES_PATH"] = os.path.realpath(
             os.path.join(cwd, "../examples/roles")
         )
 
         result = run_ansible_lint(role_path, cwd=cwd, env=env)
-        assert 'Use shell only when shell functionality is required' in result.stdout
+        assert "Use shell only when shell functionality is required" in result.stdout
 
 
 @pytest.mark.parametrize(
-    ('result', 'env'),
+    ("result", "env"),
     ((True, {"GITHUB_ACTIONS": "true", "GITHUB_WORKFLOW": "foo"}), (False, None)),
     ids=("on", "off"),
 )
 def test_run_playbook_github(result: bool, env: Dict[str, str]) -> None:
     """Call ansible-lint simulating GitHub Actions environment."""
     cwd = str(Path(__file__).parent.parent.resolve())
-    role_path = 'examples/playbooks/example.yml'
+    role_path = "examples/playbooks/example.yml"
 
     if env is None:
         env = {}
-    env['PATH'] = os.environ['PATH']
+    env["PATH"] = os.environ["PATH"]
     result_gh = run_ansible_lint(role_path, cwd=cwd, env=env)
 
     expected = (
-        '::warning file=examples/playbooks/example.yml,line=44,severity=VERY_LOW::package-latest '
-        'Package installs should not use latest'
+        "::warning file=examples/playbooks/example.yml,line=44,severity=VERY_LOW::package-latest "
+        "Package installs should not use latest"
     )
     assert (expected in result_gh.stdout) is result

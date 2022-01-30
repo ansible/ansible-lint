@@ -25,4 +25,4 @@ from ansiblelint.rules import AnsibleLintRule
 class ExampleComRule(AnsibleLintRule):
     """A dummy custom rule class."""
 
-    id = '100002'
+    id = "100002"

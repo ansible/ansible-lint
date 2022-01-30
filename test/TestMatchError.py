@@ -15,7 +15,7 @@ class DummyTestObject:
 
     def __repr__(self) -> str:
         """Return a dummy object representation for parmetrize."""
-        return '{self.__class__.__name__}()'.format(self=self)
+        return "{self.__class__.__name__}()".format(self=self)
 
     def __eq__(self, other: object) -> bool:
         """Report the equality check failure with any object."""
@@ -31,23 +31,23 @@ class DummySentinelTestObject:
 
     def __eq__(self, other: object) -> bool:
         """Return sentinel as result of equality check w/ anything."""
-        return 'EQ_SENTINEL'  # type: ignore
+        return "EQ_SENTINEL"  # type: ignore
 
     def __ne__(self, other: object) -> bool:
         """Return sentinel as result of inequality check w/ anything."""
-        return 'NE_SENTINEL'  # type: ignore
+        return "NE_SENTINEL"  # type: ignore
 
     def __lt__(self, other: object) -> bool:
         """Return sentinel as result of less than check w/ anything."""
-        return 'LT_SENTINEL'  # type: ignore
+        return "LT_SENTINEL"  # type: ignore
 
     def __gt__(self, other: object) -> bool:
         """Return sentinel as result of greater than chk w/ anything."""
-        return 'GT_SENTINEL'  # type: ignore
+        return "GT_SENTINEL"  # type: ignore
 
 
 @pytest.mark.parametrize(
-    ('left_match_error', 'right_match_error'),
+    ("left_match_error", "right_match_error"),
     (
         (MatchError("foo"), MatchError("foo")),
         (MatchError("a", details="foo"), MatchError("a", details="foo")),
@@ -70,7 +70,7 @@ def test_matcherror_invalid() -> None:
 
 
 @pytest.mark.parametrize(
-    ('left_match_error', 'right_match_error'),
+    ("left_match_error", "right_match_error"),
     (
         # sorting by message
         (MatchError("z"), MatchError("a")),
@@ -109,7 +109,7 @@ class TestMatchErrorCompare:
 
 
 @pytest.mark.parametrize(
-    'other',
+    "other",
     (
         None,
         "foo",
@@ -119,10 +119,10 @@ class TestMatchErrorCompare:
     ids=repr,
 )
 @pytest.mark.parametrize(
-    ('operation', 'operator_char'),
+    ("operation", "operator_char"),
     (
-        pytest.param(operator.le, '<=', id='<='),
-        pytest.param(operator.gt, '>', id='>'),
+        pytest.param(operator.le, "<=", id="<="),
+        pytest.param(operator.gt, ">", id=">"),
     ),
 )
 def test_matcherror_compare_no_other_fallback(
@@ -130,8 +130,8 @@ def test_matcherror_compare_no_other_fallback(
 ) -> None:
     """Check that MatchError comparison with other types causes TypeError."""
     expected_error = (
-        r'^('
-        r'unsupported operand type\(s\) for {operator!s}:|'
+        r"^("
+        r"unsupported operand type\(s\) for {operator!s}:|"
         r"'{operator!s}' not supported between instances of"
         r") 'MatchError' and '{other_type!s}'$".format(
             other_type=type(other).__name__, operator=operator_char
@@ -142,23 +142,23 @@ def test_matcherror_compare_no_other_fallback(
 
 
 @pytest.mark.parametrize(
-    'other',
+    "other",
     (
         None,
-        'foo',
+        "foo",
         42,
-        Exception('foo'),
+        Exception("foo"),
         DummyTestObject(),
     ),
     ids=repr,
 )
 @pytest.mark.parametrize(
-    ('operation', 'expected_value'),
+    ("operation", "expected_value"),
     (
         (operator.eq, False),
         (operator.ne, True),
     ),
-    ids=('==', '!='),
+    ids=("==", "!="),
 )
 def test_matcherror_compare_with_other_fallback(
     other: object,
@@ -170,18 +170,18 @@ def test_matcherror_compare_with_other_fallback(
 
 
 @pytest.mark.parametrize(
-    ('operation', 'expected_value'),
+    ("operation", "expected_value"),
     (
-        (operator.eq, 'EQ_SENTINEL'),
-        (operator.ne, 'NE_SENTINEL'),
+        (operator.eq, "EQ_SENTINEL"),
+        (operator.ne, "NE_SENTINEL"),
         # NOTE: these are swapped because when we do `x < y`, and `x.__lt__(y)`
         # NOTE: returns `NotImplemented`, Python will reverse the check into
         # NOTE: `y > x`, and so `y.__gt__(x) is called.
         # Ref: https://docs.python.org/3/reference/datamodel.html#object.__lt__
-        (operator.lt, 'GT_SENTINEL'),
-        (operator.gt, 'LT_SENTINEL'),
+        (operator.lt, "GT_SENTINEL"),
+        (operator.gt, "LT_SENTINEL"),
     ),
-    ids=('==', '!=', '<', '>'),
+    ids=("==", "!=", "<", ">"),
 )
 def test_matcherror_compare_with_dummy_sentinel(
     operation: Callable[..., bool], expected_value: str

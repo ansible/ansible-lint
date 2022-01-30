@@ -80,9 +80,9 @@ from ansiblelint.text import removeprefix
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
-DEFAULT_VAULT_PASSWORD = 'x'
+DEFAULT_VAULT_PASSWORD = "x"
 
-PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
+PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 
 
 _logger = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ _logger = logging.getLogger(__name__)
 def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
     """Extract a decrypted YAML object from file."""
     dl = DataLoader()
-    if hasattr(dl, 'set_vault_password'):
+    if hasattr(dl, "set_vault_password"):
         dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
     return dl.load_from_file(filepath)
 
@@ -110,7 +110,7 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
     # `roles/some_role/tasks`. On the other hand, the search path
     # is `roles/some_role/{files,templates}`. As a result, the
     # `tasks` part in the basedir should be stripped stripped.
-    if os.path.basename(basedir) == 'tasks':
+    if os.path.basename(basedir) == "tasks":
         basedir = os.path.dirname(basedir)
 
     dl = DataLoader()
@@ -127,70 +127,70 @@ def ansible_template(
     return templar.template(varname, **kwargs)
 
 
-LINE_NUMBER_KEY = '__line__'
-FILENAME_KEY = '__file__'
+LINE_NUMBER_KEY = "__line__"
+FILENAME_KEY = "__file__"
 
 VALID_KEYS = [
-    'name',
-    'action',
-    'when',
-    'async',
-    'poll',
-    'notify',
-    'first_available_file',
-    'include',
-    'include_tasks',
-    'import_tasks',
-    'import_playbook',
-    'tags',
-    'register',
-    'ignore_errors',
-    'delegate_to',
-    'local_action',
-    'transport',
-    'remote_user',
-    'sudo',
-    'sudo_user',
-    'sudo_pass',
-    'when',
-    'connection',
-    'environment',
-    'args',
-    'any_errors_fatal',
-    'changed_when',
-    'failed_when',
-    'check_mode',
-    'delay',
-    'retries',
-    'until',
-    'su',
-    'su_user',
-    'su_pass',
-    'no_log',
-    'run_once',
-    'become',
-    'become_user',
-    'become_method',
+    "name",
+    "action",
+    "when",
+    "async",
+    "poll",
+    "notify",
+    "first_available_file",
+    "include",
+    "include_tasks",
+    "import_tasks",
+    "import_playbook",
+    "tags",
+    "register",
+    "ignore_errors",
+    "delegate_to",
+    "local_action",
+    "transport",
+    "remote_user",
+    "sudo",
+    "sudo_user",
+    "sudo_pass",
+    "when",
+    "connection",
+    "environment",
+    "args",
+    "any_errors_fatal",
+    "changed_when",
+    "failed_when",
+    "check_mode",
+    "delay",
+    "retries",
+    "until",
+    "su",
+    "su_user",
+    "su_pass",
+    "no_log",
+    "run_once",
+    "become",
+    "become_user",
+    "become_method",
     FILENAME_KEY,
 ]
 
 BLOCK_NAME_TO_ACTION_TYPE_MAP = {
-    'tasks': 'task',
-    'handlers': 'handler',
-    'pre_tasks': 'task',
-    'post_tasks': 'task',
-    'block': 'meta',
-    'rescue': 'meta',
-    'always': 'meta',
+    "tasks": "task",
+    "handlers": "handler",
+    "pre_tasks": "task",
+    "post_tasks": "task",
+    "block": "meta",
+    "rescue": "meta",
+    "always": "meta",
 }
 
 
 def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
     """Parse a string task invocation."""
     tokens = line.lstrip().split(" ")
-    if tokens[0] == '-':
+    if tokens[0] == "-":
         tokens = tokens[1:]
-    if tokens[0] == 'action:' or tokens[0] == 'local_action:':
+    if tokens[0] == "action:" or tokens[0] == "local_action:":
         tokens = tokens[1:]
     command = tokens[0].replace(":", "")
 
@@ -240,10 +240,10 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
     if not lintable.path.exists():
         return []
     playbook_dir = str(lintable.path.parent)
-    _set_collections_basedir(playbook_dir or os.path.abspath('.'))
-    add_all_plugin_dirs(playbook_dir or '.')
-    if lintable.kind == 'role':
-        playbook_ds = AnsibleMapping({'roles': [{'role': str(lintable.path)}]})
+    _set_collections_basedir(playbook_dir or os.path.abspath("."))
+    add_all_plugin_dirs(playbook_dir or ".")
+    if lintable.kind == "role":
+        playbook_ds = AnsibleMapping({"roles": [{"role": str(lintable.path)}]})
     elif lintable.kind not in ("playbook", "tasks"):
         return []
     else:
@@ -269,10 +269,10 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
             # - include: simpletask.yml tags=nginx
             valid_tokens = list()
             for token in split_args(path_str):
-                if '=' in token:
+                if "=" in token:
                     break
                 valid_tokens.append(token)
-            path = ' '.join(valid_tokens)
+            path = " ".join(valid_tokens)
             if path != path_str:
                 child.path = Path(path)
                 child.name = child.path.name
@@ -309,17 +309,17 @@ def play_children(
 ) -> List[Lintable]:
     """Flatten the traversed play tasks."""
     delegate_map: Dict[str, Callable[[str, Any, Any, FileType], List[Lintable]]] = {
-        'tasks': _taskshandlers_children,
-        'pre_tasks': _taskshandlers_children,
-        'post_tasks': _taskshandlers_children,
-        'block': _taskshandlers_children,
-        'include': _include_children,
-        'import_playbook': _include_children,
-        'roles': _roles_children,
-        'dependencies': _roles_children,
-        'handlers': _taskshandlers_children,
-        'include_tasks': _include_children,
-        'import_tasks': _include_children,
+        "tasks": _taskshandlers_children,
+        "pre_tasks": _taskshandlers_children,
+        "post_tasks": _taskshandlers_children,
+        "block": _taskshandlers_children,
+        "include": _include_children,
+        "import_playbook": _include_children,
+        "roles": _roles_children,
+        "dependencies": _roles_children,
+        "handlers": _taskshandlers_children,
+        "include_tasks": _include_children,
+        "import_tasks": _include_children,
     }
     (k, v) = item
     add_all_plugin_dirs(os.path.abspath(basedir))
@@ -340,8 +340,8 @@ def _include_children(
     basedir: str, k: str, v: Any, parent_type: FileType
 ) -> List[Lintable]:
     # handle special case include_tasks: name=filename.yml
-    if k == 'include_tasks' and isinstance(v, dict) and 'file' in v:
-        v = v['file']
+    if k == "include_tasks" and isinstance(v, dict) and "file" in v:
+        v = v["file"]
 
     # handle include: filename.yml tags=blah
     (command, args, kwargs) = tokenize("{0}: {1}".format(k, v))
@@ -378,32 +378,32 @@ def _taskshandlers_children(
             continue
 
         if (
-            'include_role' in th or 'import_role' in th
+            "include_role" in th or "import_role" in th
         ):  # lgtm [py/unreachable-statement]
             th = normalize_task_v2(th)
-            _validate_task_handler_action_for_role(th['action'])
+            _validate_task_handler_action_for_role(th["action"])
             results.extend(
                 _roles_children(
                     basedir,
                     k,
-                    [th['action'].get("name")],
+                    [th["action"].get("name")],
                     parent_type,
-                    main=th['action'].get('tasks_from', 'main'),
+                    main=th["action"].get("tasks_from", "main"),
                 )
             )
             continue
 
-        if 'block' not in th:
+        if "block" not in th:
             continue
 
-        results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
-        if 'rescue' in th:
+        results.extend(_taskshandlers_children(basedir, k, th["block"], parent_type))
+        if "rescue" in th:
             results.extend(
-                _taskshandlers_children(basedir, k, th['rescue'], parent_type)
+                _taskshandlers_children(basedir, k, th["rescue"], parent_type)
             )
-        if 'always' in th:
+        if "always" in th:
             results.extend(
-                _taskshandlers_children(basedir, k, th['always'], parent_type)
+                _taskshandlers_children(basedir, k, th["always"], parent_type)
             )
 
     return results
@@ -416,9 +416,9 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     parent_type: FileType,
 ) -> Lintable:
     """Try to get children of taskhandler for include/import tasks/playbooks."""
-    child_type = k if parent_type == 'playbook' else parent_type
+    child_type = k if parent_type == "playbook" else parent_type
 
-    task_include_keys = 'include', 'include_tasks', 'import_playbook', 'import_tasks'
+    task_include_keys = "include", "include_tasks", "import_playbook", "import_tasks"
     for task_handler_key in task_include_keys:
 
         with contextlib.suppress(KeyError):
@@ -439,31 +439,31 @@ def _get_task_handler_children_for_tasks_or_playbooks(
 
 def _validate_task_handler_action_for_role(th_action: Dict[str, Any]) -> None:
     """Verify that the task handler action is valid for role include."""
-    module = th_action['__ansible_module__']
+    module = th_action["__ansible_module__"]
 
-    if 'name' not in th_action:
+    if "name" not in th_action:
         raise MatchError(message=f"Failed to find required 'name' key in {module!s}")
 
-    if not isinstance(th_action['name'], str):
+    if not isinstance(th_action["name"], str):
         raise MatchError(
             message=f"Value assigned to 'name' key on '{module!s}' is not a string.",
         )
 
 
 def _roles_children(
-    basedir: str, k: str, v: Sequence[Any], parent_type: FileType, main: str = 'main'
+    basedir: str, k: str, v: Sequence[Any], parent_type: FileType, main: str = "main"
 ) -> List[Lintable]:
     results: List[Lintable] = []
     for role in v:
         if isinstance(role, dict):
-            if 'role' in role or 'name' in role:
-                if 'tags' not in role or 'skip_ansible_lint' not in role['tags']:
+            if "role" in role or "name" in role:
+                if "tags" not in role or "skip_ansible_lint" not in role["tags"]:
                     results.extend(
                         _look_for_role_files(
-                            basedir, role.get('role', role.get('name')), main=main
+                            basedir, role.get("role", role.get("name")), main=main
                         )
                     )
-            elif k != 'dependencies':
+            elif k != "dependencies":
                 raise SystemExit(
                     'role dict {0} does not contain a "role" '
                     'or "name" key'.format(role)
@@ -478,13 +478,13 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
 
     possible_paths = [
         # if included from a playbook
-        path_dwim(basedir, os.path.join('roles', role)),
+        path_dwim(basedir, os.path.join("roles", role)),
         path_dwim(basedir, role),
         # if included from roles/[role]/meta/main.yml
-        path_dwim(basedir, os.path.join('..', '..', '..', 'roles', role)),
-        path_dwim(basedir, os.path.join('..', '..', role)),
+        path_dwim(basedir, os.path.join("..", "..", "..", "roles", role)),
+        path_dwim(basedir, os.path.join("..", "..", role)),
         # if checking a role in the current directory
-        path_dwim(basedir, os.path.join('..', role)),
+        path_dwim(basedir, os.path.join("..", role)),
     ]
 
     if constants.DEFAULT_ROLES_PATH:
@@ -495,7 +495,7 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
             loc = os.path.expanduser(loc)
             possible_paths.append(path_dwim(loc, role))
 
-    possible_paths.append(path_dwim(basedir, ''))
+    possible_paths.append(path_dwim(basedir, ""))
 
     for path_option in possible_paths:
         if os.path.isdir(path_option):
@@ -509,7 +509,7 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
 
 
 def _look_for_role_files(
-    basedir: str, role: str, main: Optional[str] = 'main'
+    basedir: str, role: str, main: Optional[str] = "main"
 ) -> List[Lintable]:
     role_path = _rolepath(basedir, role)
     if not role_path:
@@ -517,12 +517,12 @@ def _look_for_role_files(
 
     results = []
 
-    for kind in ['tasks', 'meta', 'handlers', 'vars', 'defaults']:
+    for kind in ["tasks", "meta", "handlers", "vars", "defaults"]:
         current_path = os.path.join(role_path, kind)
         for folder, subdirs, files in os.walk(current_path):
             for file in files:
                 file_ignorecase = file.lower()
-                if file_ignorecase.endswith(('.yml', '.yaml')):
+                if file_ignorecase.endswith((".yml", ".yaml")):
                     thpath = os.path.join(folder, file)
                     results.append(Lintable(thpath))
 
@@ -543,7 +543,7 @@ def _sanitize_task(task: Dict[str, Any]) -> Dict[str, Any]:
     result = task.copy()
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
-    for k in ['skipped_rules', FILENAME_KEY, LINE_NUMBER_KEY]:
+    for k in ["skipped_rules", FILENAME_KEY, LINE_NUMBER_KEY]:
         if k in result:
             del result[k]
     return result
@@ -556,7 +556,7 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     sanitized_task = _sanitize_task(task)
     mod_arg_parser = ModuleArgsParser(sanitized_task)
     try:
-        action, arguments, result['delegate_to'] = mod_arg_parser.parse(
+        action, arguments, result["delegate_to"] = mod_arg_parser.parse(
             skip_action_validation=options.skip_action_validation
         )
     except AnsibleParserError as e:
@@ -568,12 +568,12 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         )
 
     # denormalize shell -> command conversion
-    if '_uses_shell' in arguments:
-        action = 'shell'
-        del arguments['_uses_shell']
+    if "_uses_shell" in arguments:
+        action = "shell"
+        del arguments["_uses_shell"]
 
     for (k, v) in list(task.items()):
-        if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
+        if k in ("action", "local_action", "args", "delegate_to") or k == action:
             # we don't want to re-assign these values, which were
             # determined by the ModuleArgsParser() above
             continue
@@ -587,32 +587,32 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     # the opposite. Mainly we currently consider normalized the module listing
     # used by `ansible-doc -t module -l 2>/dev/null`
     action = removeprefix(action, "ansible.builtin.")
-    result['action'] = dict(
+    result["action"] = dict(
         __ansible_module__=action, __ansible_module_original__=action_unnormalized
     )
 
-    if '_raw_params' in arguments:
-        result['action']['__ansible_arguments__'] = arguments['_raw_params'].split(' ')
-        del arguments['_raw_params']
+    if "_raw_params" in arguments:
+        result["action"]["__ansible_arguments__"] = arguments["_raw_params"].split(" ")
+        del arguments["_raw_params"]
     else:
-        result['action']['__ansible_arguments__'] = list()
+        result["action"]["__ansible_arguments__"] = list()
 
-    if 'argv' in arguments and not result['action']['__ansible_arguments__']:
-        result['action']['__ansible_arguments__'] = arguments['argv']
-        del arguments['argv']
+    if "argv" in arguments and not result["action"]["__ansible_arguments__"]:
+        result["action"]["__ansible_arguments__"] = arguments["argv"]
+        del arguments["argv"]
 
-    result['action'].update(arguments)
+    result["action"].update(arguments)
     return result
 
 
 def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
     """Unify task-like object structures."""
-    ansible_action_type = task.get('__ansible_action_type__', 'task')
-    if '__ansible_action_type__' in task:
-        del task['__ansible_action_type__']
+    ansible_action_type = task.get("__ansible_action_type__", "task")
+    if "__ansible_action_type__" in task:
+        del task["__ansible_action_type__"]
     task = normalize_task_v2(task)
     task[FILENAME_KEY] = filename
-    task['__ansible_action_type__'] = ansible_action_type
+    task["__ansible_action_type__"] = ansible_action_type
     return task
 
 
@@ -640,7 +640,7 @@ def task_to_str(task: Dict[str, Any]) -> str:
     )
     for item in action.get("__ansible_arguments__", []):
         args += f" {item}"
-    return u"{0} {1}".format(action["__ansible_module__"], args)
+    return "{0} {1}".format(action["__ansible_module__"], args)
 
 
 def extract_from_list(
@@ -673,7 +673,7 @@ def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[An
         # ignore empty task
         if not action:
             continue
-        action['__ansible_action_type__'] = BLOCK_NAME_TO_ACTION_TYPE_MAP[action_type]
+        action["__ansible_action_type__"] = BLOCK_NAME_TO_ACTION_TYPE_MAP[action_type]
         results.append(action)
     return results
 
@@ -681,19 +681,19 @@ def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[An
 def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
     """Get a flattened list of action tasks from the file."""
     tasks = list()
-    if file.kind in ['tasks', 'handlers']:
+    if file.kind in ["tasks", "handlers"]:
         tasks = add_action_type(yaml, file.kind)
     else:
         tasks.extend(
-            extract_from_list(yaml, ['tasks', 'handlers', 'pre_tasks', 'post_tasks'])
+            extract_from_list(yaml, ["tasks", "handlers", "pre_tasks", "post_tasks"])
         )
 
     # Add sub-elements of block/rescue/always to tasks list
     tasks.extend(
-        extract_from_list(tasks, ['block', 'rescue', 'always'], recursive=True)
+        extract_from_list(tasks, ["block", "rescue", "always"], recursive=True)
     )
     # Remove block/rescue/always elements from tasks list
-    block_rescue_always = ('block', 'rescue', 'always')
+    block_rescue_always = ("block", "rescue", "always")
     tasks[:] = [
         task for task in tasks if all(k not in task for k in block_rescue_always)
     ]
@@ -702,7 +702,7 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
         task
         for task in tasks
         if set(
-            ['include', 'include_tasks', 'import_playbook', 'import_tasks']
+            ["include", "include_tasks", "import_playbook", "import_tasks"]
         ).isdisjoint(task.keys())
     ]
 
@@ -720,14 +720,14 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         node = Composer.compose_node(loader, parent, index)
         if not isinstance(node, yaml.nodes.Node):
             raise RuntimeError("Unexpected yaml data.")
-        setattr(node, '__line__', line + 1)
+        setattr(node, "__line__", line + 1)
         return node
 
     def construct_mapping(
         node: AnsibleBaseYAMLObject, deep: bool = False
     ) -> AnsibleMapping:
         mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
-        if hasattr(node, '__line__'):
+        if hasattr(node, "__line__"):
             mapping[LINE_NUMBER_KEY] = node.__line__
         else:
             mapping[LINE_NUMBER_KEY] = mapping._line_number
@@ -736,8 +736,8 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
 
     try:
         kwargs = {}
-        if 'vault_password' in inspect.getfullargspec(AnsibleLoader.__init__).args:
-            kwargs['vault_password'] = DEFAULT_VAULT_PASSWORD
+        if "vault_password" in inspect.getfullargspec(AnsibleLoader.__init__).args:
+            kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
         loader = AnsibleLoader(lintable.content, **kwargs)
         loader.compose_node = compose_node
         loader.construct_mapping = construct_mapping
@@ -751,10 +751,10 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
 def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
     """Extract the first arg from a cmd task."""
     try:
-        if 'cmd' in task['action']:
-            first_cmd_arg = task['action']['cmd'].split()[0]
+        if "cmd" in task["action"]:
+            first_cmd_arg = task["action"]["cmd"].split()[0]
         else:
-            first_cmd_arg = task['action']['__ansible_arguments__'][0]
+            first_cmd_arg = task["action"]["__ansible_arguments__"][0]
     except IndexError:
         return None
     return first_cmd_arg
@@ -763,10 +763,10 @@ def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
 def get_second_cmd_arg(task: Dict[str, Any]) -> Any:
     """Extract the second arg from a cmd task."""
     try:
-        if 'cmd' in task['action']:
-            second_cmd_arg = task['action']['cmd'].split()[1]
+        if "cmd" in task["action"]:
+            second_cmd_arg = task["action"]["cmd"].split()[1]
         else:
-            second_cmd_arg = task['action']['__ansible_arguments__'][1]
+            second_cmd_arg = task["action"]["__ansible_arguments__"][1]
     except IndexError:
         return None
     return second_cmd_arg
@@ -804,7 +804,7 @@ def is_playbook(filename: str) -> bool:
     else:
         if (
             isinstance(f, AnsibleSequence)
-            and hasattr(next(iter(f), {}), 'keys')
+            and hasattr(next(iter(f), {}), "keys")
             and playbooks_keys.intersection(next(iter(f), {}).keys())
         ):
             return True
@@ -841,10 +841,10 @@ def get_lintables(
                 for file_path in options.exclude_paths:
                     if str(p.resolve()).startswith(str(file_path)):
                         raise FileNotFoundError(
-                            f'File {file_path} matched exclusion entry: {p}'
+                            f"File {file_path} matched exclusion entry: {p}"
                         )
             except FileNotFoundError as e:
-                _logger.debug('Ignored %s due to: %s', p, e)
+                _logger.debug("Ignored %s due to: %s", p, e)
                 continue
 
             lintables.append(Lintable(p))
@@ -860,7 +860,7 @@ def _extend_with_roles(lintables: List[Lintable]) -> None:
     """Detect roles among lintables and adds them to the list."""
     for lintable in lintables:
         parts = lintable.path.parent.parts
-        if 'roles' in parts:
+        if "roles" in parts:
             role = lintable.path
             while role.parent.name != "roles" and role.name:
                 role = role.parent

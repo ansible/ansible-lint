@@ -50,7 +50,7 @@ def test_nested_items_path() -> None:
 
 
 @pytest.mark.parametrize(
-    'invalid_data_input',
+    "invalid_data_input",
     (
         "string",
         42,

@@ -74,20 +74,20 @@ class TestCodeclimateJSONFormatter:
         assert isinstance(self.formatter, CodeclimateJSONFormatter)
         result = json.loads(self.formatter.format_result(self.matches))
         single_match = result[0]
-        assert 'type' in single_match
-        assert single_match['type'] == 'issue'
-        assert 'check_name' in single_match
-        assert 'categories' in single_match
-        assert isinstance(single_match['categories'], list)
-        assert 'severity' in single_match
-        assert single_match['severity'] == 'blocker'
-        assert 'description' in single_match
-        assert 'fingerprint' in single_match
-        assert 'location' in single_match
-        assert 'path' in single_match['location']
-        assert single_match['location']['path'] == self.matches[0].filename
-        assert 'lines' in single_match['location']
-        assert single_match['location']['lines']['begin'] == self.matches[0].linenumber
+        assert "type" in single_match
+        assert single_match["type"] == "issue"
+        assert "check_name" in single_match
+        assert "categories" in single_match
+        assert isinstance(single_match["categories"], list)
+        assert "severity" in single_match
+        assert single_match["severity"] == "blocker"
+        assert "description" in single_match
+        assert "fingerprint" in single_match
+        assert "location" in single_match
+        assert "path" in single_match["location"]
+        assert single_match["location"]["path"] == self.matches[0].filename
+        assert "lines" in single_match["location"]
+        assert single_match["location"]["lines"]["begin"] == self.matches[0].linenumber
 
 
 def test_code_climate_parsable_ignored() -> None:

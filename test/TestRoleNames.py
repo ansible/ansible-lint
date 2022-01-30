@@ -10,15 +10,15 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.RoleNames import RoleNames
 from ansiblelint.runner import Runner
 
-ROLE_NAME_VALID = 'test_role'
+ROLE_NAME_VALID = "test_role"
 
 TASK_MINIMAL = """
 - name: Some task
   ping:
 """
 
-ROLE_MINIMAL = {'tasks': {'main.yml': TASK_MINIMAL}}
-ROLE_META_EMPTY = {'meta': {'main.yml': ''}}
+ROLE_MINIMAL = {"tasks": {"main.yml": TASK_MINIMAL}}
+ROLE_META_EMPTY = {"meta": {"main.yml": ""}}
 
 ROLE_WITH_EMPTY_META = {**ROLE_MINIMAL, **ROLE_META_EMPTY}
 
@@ -57,21 +57,21 @@ def playbook_path(request: SubRequest, tmp_path: Path) -> str:
     role_path = tmp_path / role_name
     role_path.mkdir()
     dict_to_files(role_path, role_layout)
-    play_path = tmp_path / 'playbook.yml'
+    play_path = tmp_path / "playbook.yml"
     play_path.write_text(playbook_text)
     return str(play_path)
 
 
 @pytest.mark.parametrize(
-    ('playbook_path', 'messages'),
+    ("playbook_path", "messages"),
     (
         pytest.param(
             (PLAY_INCLUDE_ROLE, ROLE_NAME_VALID, ROLE_WITH_EMPTY_META),
             [],
-            id='ROLE_EMPTY_META',
+            id="ROLE_EMPTY_META",
         ),
     ),
-    indirect=('playbook_path',),
+    indirect=("playbook_path",),
 )
 def test_role_name(
     test_rules_collection: RulesCollection, playbook_path: str, messages: List[str]

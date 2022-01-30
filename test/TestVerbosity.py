@@ -12,67 +12,67 @@ from ansiblelint.testing import run_ansible_lint
 #    component 1 is the substring in question
 #    component 2 is whether or not to invert ("NOT") the match
 @pytest.mark.parametrize(
-    ('verbosity', 'substrs'),
+    ("verbosity", "substrs"),
     (
         (
-            '',
+            "",
             [
-                ('WARNING  Loading custom .yamllint config file,', False),
-                ('WARNING  Listing 1 violation(s) that are fatal', False),
-                ('DEBUG ', True),
-                ('INFO ', True),
+                ("WARNING  Loading custom .yamllint config file,", False),
+                ("WARNING  Listing 1 violation(s) that are fatal", False),
+                ("DEBUG ", True),
+                ("INFO ", True),
             ],
         ),
         (
-            '-q',
+            "-q",
             [
-                ('WARNING ', True),
-                ('DEBUG ', True),
-                ('INFO ', True),
+                ("WARNING ", True),
+                ("DEBUG ", True),
+                ("INFO ", True),
             ],
         ),
         (
-            '-qq',
+            "-qq",
             [
-                ('WARNING ', True),
-                ('DEBUG ', True),
-                ('INFO ', True),
+                ("WARNING ", True),
+                ("DEBUG ", True),
+                ("INFO ", True),
             ],
         ),
         (
-            '-v',
+            "-v",
             [
-                ('WARNING  Loading custom .yamllint config file,', False),
-                ('WARNING  Listing 1 violation(s) that are fatal', False),
-                ('INFO     Added ANSIBLE_LIBRARY=', False),
-                ('DEBUG ', True),
+                ("WARNING  Loading custom .yamllint config file,", False),
+                ("WARNING  Listing 1 violation(s) that are fatal", False),
+                ("INFO     Added ANSIBLE_LIBRARY=", False),
+                ("DEBUG ", True),
             ],
         ),
         (
-            '-vv',
+            "-vv",
             [
-                ('WARNING  Loading custom .yamllint config file,', False),
-                ('WARNING  Listing 1 violation(s) that are fatal', False),
-                ('INFO     Added ANSIBLE_LIBRARY=', False),
-                ('DEBUG    Effective yamllint rules used', False),
+                ("WARNING  Loading custom .yamllint config file,", False),
+                ("WARNING  Listing 1 violation(s) that are fatal", False),
+                ("INFO     Added ANSIBLE_LIBRARY=", False),
+                ("DEBUG    Effective yamllint rules used", False),
             ],
         ),
         (
-            '-vvvvvvvvvvvvvvvvvvvvvvvvv',
+            "-vvvvvvvvvvvvvvvvvvvvvvvvv",
             [
-                ('WARNING  Loading custom .yamllint config file,', False),
-                ('WARNING  Listing 1 violation(s) that are fatal', False),
-                ('INFO     Added ANSIBLE_LIBRARY=', False),
-                ('DEBUG    Effective yamllint rules used', False),
+                ("WARNING  Loading custom .yamllint config file,", False),
+                ("WARNING  Listing 1 violation(s) that are fatal", False),
+                ("INFO     Added ANSIBLE_LIBRARY=", False),
+                ("DEBUG    Effective yamllint rules used", False),
             ],
         ),
     ),
     ids=(
-        'default verbosity',
-        'quiet',
-        'really quiet',
-        'loquacious',
-        'really loquacious',
+        "default verbosity",
+        "quiet",
+        "really quiet",
+        "loquacious",
+        "really loquacious",
         'really loquacious but with more "v"s -- same as -vv',
     ),
 )
@@ -84,7 +84,7 @@ def test_default_verbosity(verbosity: str, substrs: List[Tuple[str, bool]]) -> N
         os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
     )
 
-    fakerole = os.path.join('test', 'fixtures', 'verbosity-tests')
+    fakerole = os.path.join("test", "fixtures", "verbosity-tests")
 
     if verbosity:
         result = run_ansible_lint(verbosity, fakerole, cwd=cwd)

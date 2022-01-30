@@ -49,16 +49,16 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     @staticmethod
     def _get_ansible_syntax_check_matches(lintable: Lintable) -> List[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
-        if lintable.kind != 'playbook':
+        if lintable.kind != "playbook":
             return []
 
         with timed_info("Executing syntax check on %s", lintable.path):
             extra_vars_cmd = []
             if options.extra_vars:
-                extra_vars_cmd = ['--extra-vars', json.dumps(options.extra_vars)]
+                extra_vars_cmd = ["--extra-vars", json.dumps(options.extra_vars)]
             cmd = [
-                'ansible-playbook',
-                '--syntax-check',
+                "ansible-playbook",
+                "--syntax-check",
                 *extra_vars_cmd,
                 str(lintable.path),
             ]
@@ -90,11 +90,11 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
 
             m = _ansible_syntax_check_re.search(stderr)
             if m:
-                message = m.groupdict()['title']
+                message = m.groupdict()["title"]
                 # Ansible returns absolute paths
-                filename = m.groupdict()['filename']
-                linenumber = int(m.groupdict()['line'])
-                column = int(m.groupdict()['column'])
+                filename = m.groupdict()["filename"]
+                linenumber = int(m.groupdict()["line"])
+                column = int(m.groupdict()["column"])
             elif _empty_playbook_re.search(stderr):
                 message = "Empty playbook, nothing to do"
                 filename = str(lintable.path)
@@ -130,7 +130,7 @@ if "pytest" in sys.modules:
     def test_get_ansible_syntax_check_matches() -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(
-            'examples/playbooks/conflicting_action.yml', kind='playbook'
+            "examples/playbooks/conflicting_action.yml", kind="playbook"
         )
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 3
@@ -143,7 +143,7 @@ if "pytest" in sys.modules:
 
     def test_empty_playbook() -> None:
         """Validate detection of empty-playbook."""
-        lintable = Lintable('examples/playbooks/empty_playbook.yml', kind='playbook')
+        lintable = Lintable("examples/playbooks/empty_playbook.yml", kind="playbook")
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 1
         # We internally convert absolute paths returned by ansible into paths
@@ -156,10 +156,10 @@ if "pytest" in sys.modules:
     def test_extra_vars_passed_to_command(config_options: Any) -> None:
         """Validate `extra-vars` are passed to syntax check command."""
         config_options.extra_vars = {
-            'foo': 'bar',
-            'complex_variable': ':{;\t$()',
+            "foo": "bar",
+            "complex_variable": ":{;\t$()",
         }
-        lintable = Lintable('examples/playbooks/extra_vars.yml', kind='playbook')
+        lintable = Lintable("examples/playbooks/extra_vars.yml", kind="playbook")
 
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
 

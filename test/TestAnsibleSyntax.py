@@ -5,10 +5,10 @@ when encountering what counts as valid Ansible syntax.
 """
 from ansiblelint.testing import RunFromText
 
-PB_WITH_NULL_TASKS = '''\
+PB_WITH_NULL_TASKS = """\
 - hosts: all
   tasks:
-'''
+"""
 
 
 def test_null_tasks(default_text_runner: RunFromText) -> None:

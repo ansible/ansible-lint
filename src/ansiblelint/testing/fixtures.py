@@ -25,7 +25,7 @@ from ansiblelint.testing import RunFromText
 @pytest.fixture
 def play_file_path(tmp_path: Path) -> str:
     """Fixture to return a playbook path."""
-    p = tmp_path / 'playbook.yml'
+    p = tmp_path / "playbook.yml"
     return str(p)
 
 
@@ -42,7 +42,7 @@ def default_rules_collection() -> RulesCollection:
     """Return default rule collection."""
     assert os.path.isdir(DEFAULT_RULESDIR)
     # For testing we want to manually enable opt-in rules
-    options.enable_list = ['no-same-owner']
+    options.enable_list = ["no-same-owner"]
     return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=options)
 
 

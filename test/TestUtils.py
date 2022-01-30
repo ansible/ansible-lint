@@ -52,25 +52,25 @@ from .conftest import cwd
 
 
 @pytest.mark.parametrize(
-    ('string', 'expected_cmd', 'expected_args', 'expected_kwargs'),
+    ("string", "expected_cmd", "expected_args", "expected_kwargs"),
     (
-        pytest.param('', '', [], {}, id='blank'),
-        pytest.param('vars:', 'vars', [], {}, id='single_word'),
-        pytest.param('hello: a=1', 'hello', [], {'a': '1'}, id='string_module_and_arg'),
-        pytest.param('action: hello a=1', 'hello', [], {'a': '1'}, id='strips_action'),
+        pytest.param("", "", [], {}, id="blank"),
+        pytest.param("vars:", "vars", [], {}, id="single_word"),
+        pytest.param("hello: a=1", "hello", [], {"a": "1"}, id="string_module_and_arg"),
+        pytest.param("action: hello a=1", "hello", [], {"a": "1"}, id="strips_action"),
         pytest.param(
-            'action: whatever bobbins x=y z=x c=3',
-            'whatever',
-            ['bobbins', 'x=y', 'z=x', 'c=3'],
+            "action: whatever bobbins x=y z=x c=3",
+            "whatever",
+            ["bobbins", "x=y", "z=x", "c=3"],
             {},
-            id='more_than_one_arg',
+            id="more_than_one_arg",
         ),
         pytest.param(
-            'action: command chdir=wxy creates=zyx tar xzf zyx.tgz',
-            'command',
-            ['tar', 'xzf', 'zyx.tgz'],
-            {'chdir': 'wxy', 'creates': 'zyx'},
-            id='command_with_args',
+            "action: command chdir=wxy creates=zyx tar xzf zyx.tgz",
+            "command",
+            ["tar", "xzf", "zyx.tgz"],
+            {"chdir": "wxy", "creates": "zyx"},
+            id="command_with_args",
         ),
     ),
 )
@@ -88,24 +88,24 @@ def test_tokenize(
 
 
 @pytest.mark.parametrize(
-    ('reference_form', 'alternate_forms'),
+    ("reference_form", "alternate_forms"),
     (
         pytest.param(
-            dict(name='hello', action='command chdir=abc echo hello world'),
+            dict(name="hello", action="command chdir=abc echo hello world"),
             (dict(name="hello", command="chdir=abc echo hello world"),),
-            id='simple_command',
+            id="simple_command",
         ),
         pytest.param(
-            {'git': {'version': 'abc'}, 'args': {'repo': 'blah', 'dest': 'xyz'}},
+            {"git": {"version": "abc"}, "args": {"repo": "blah", "dest": "xyz"}},
             (
-                {'git': {'version': 'abc', 'repo': 'blah', 'dest': 'xyz'}},
-                {"git": 'version=abc repo=blah dest=xyz'},
+                {"git": {"version": "abc", "repo": "blah", "dest": "xyz"}},
+                {"git": "version=abc repo=blah dest=xyz"},
                 {
                     "git": None,
-                    "args": {'repo': 'blah', 'dest': 'xyz', 'version': 'abc'},
+                    "args": {"repo": "blah", "dest": "xyz", "version": "abc"},
                 },
             ),
-            id='args',
+            id="args",
         ),
     ),
 )
@@ -113,87 +113,87 @@ def test_normalize(
     reference_form: Dict[str, Any], alternate_forms: Tuple[Dict[str, Any]]
 ) -> None:
     """Test that tasks specified differently are normalized same way."""
-    normal_form = utils.normalize_task(reference_form, 'tasks.yml')
+    normal_form = utils.normalize_task(reference_form, "tasks.yml")
 
     for form in alternate_forms:
-        assert normal_form == utils.normalize_task(form, 'tasks.yml')
+        assert normal_form == utils.normalize_task(form, "tasks.yml")
 
 
 def test_normalize_complex_command() -> None:
     """Test that tasks specified differently are normalized same way."""
     task1 = dict(
-        name="hello", action={'module': 'pip', 'name': 'df', 'editable': 'false'}
+        name="hello", action={"module": "pip", "name": "df", "editable": "false"}
     )
-    task2 = dict(name="hello", pip={'name': 'df', 'editable': 'false'})
+    task2 = dict(name="hello", pip={"name": "df", "editable": "false"})
     task3 = dict(name="hello", pip="name=df editable=false")
     task4 = dict(name="hello", action="pip name=df editable=false")
-    assert utils.normalize_task(task1, 'tasks.yml') == utils.normalize_task(
-        task2, 'tasks.yml'
+    assert utils.normalize_task(task1, "tasks.yml") == utils.normalize_task(
+        task2, "tasks.yml"
     )
-    assert utils.normalize_task(task2, 'tasks.yml') == utils.normalize_task(
-        task3, 'tasks.yml'
+    assert utils.normalize_task(task2, "tasks.yml") == utils.normalize_task(
+        task3, "tasks.yml"
     )
-    assert utils.normalize_task(task3, 'tasks.yml') == utils.normalize_task(
-        task4, 'tasks.yml'
+    assert utils.normalize_task(task3, "tasks.yml") == utils.normalize_task(
+        task4, "tasks.yml"
     )
 
 
 def test_extract_from_list() -> None:
     """Check that tasks get extracted from blocks if present."""
     block = {
-        'block': [{'tasks': {'name': 'hello', 'command': 'whoami'}}],
-        'test_none': None,
-        'test_string': 'foo',
+        "block": [{"tasks": {"name": "hello", "command": "whoami"}}],
+        "test_none": None,
+        "test_string": "foo",
     }
     blocks = [block]
 
-    test_list = utils.extract_from_list(blocks, ['block'])
-    test_none = utils.extract_from_list(blocks, ['test_none'])
+    test_list = utils.extract_from_list(blocks, ["block"])
+    test_none = utils.extract_from_list(blocks, ["test_none"])
 
-    assert list(block['block']) == test_list  # type: ignore
+    assert list(block["block"]) == test_list  # type: ignore
     assert list() == test_none
     with pytest.raises(RuntimeError):
-        utils.extract_from_list(blocks, ['test_string'])
+        utils.extract_from_list(blocks, ["test_string"])
 
 
 def test_extract_from_list_recursive() -> None:
     """Check that tasks get extracted from blocks if present."""
     block = {
-        'block': [{'block': [{'name': 'hello', 'command': 'whoami'}]}],
+        "block": [{"block": [{"name": "hello", "command": "whoami"}]}],
     }
     blocks = [block]
 
-    test_list = utils.extract_from_list(blocks, ['block'])
-    assert list(block['block']) == test_list
+    test_list = utils.extract_from_list(blocks, ["block"])
+    assert list(block["block"]) == test_list
 
-    test_list_recursive = utils.extract_from_list(blocks, ['block'], recursive=True)
-    assert block['block'] + block['block'][0]['block'] == test_list_recursive  # type: ignore
+    test_list_recursive = utils.extract_from_list(blocks, ["block"], recursive=True)
+    assert block["block"] + block["block"][0]["block"] == test_list_recursive  # type: ignore
 
 
 @pytest.mark.parametrize(
-    ('template', 'output'),
+    ("template", "output"),
     (
-        pytest.param('{{ playbook_dir }}', '/a/b/c', id='simple'),
+        pytest.param("{{ playbook_dir }}", "/a/b/c", id="simple"),
         pytest.param(
             "{{ 'hello' | doesnotexist }}",
             "{{ 'hello' | doesnotexist }}",
-            id='unknown_filter',
+            id="unknown_filter",
         ),
         pytest.param(
-            '{{ hello | to_json }}',
-            '{{ hello | to_json }}',
-            id='to_json_filter_on_undefined_variable',
+            "{{ hello | to_json }}",
+            "{{ hello | to_json }}",
+            id="to_json_filter_on_undefined_variable",
         ),
         pytest.param(
-            '{{ hello | to_nice_yaml }}',
-            '{{ hello | to_nice_yaml }}',
-            id='to_nice_yaml_filter_on_undefined_variable',
+            "{{ hello | to_nice_yaml }}",
+            "{{ hello | to_nice_yaml }}",
+            id="to_nice_yaml_filter_on_undefined_variable",
         ),
     ),
 )
 def test_template(template: str, output: str) -> None:
     """Verify that resolvable template vars and filters get rendered."""
-    result = utils.template('/base/dir', template, dict(playbook_dir='/a/b/c'))
+    result = utils.template("/base/dir", template, dict(playbook_dir="/a/b/c"))
     assert result == output
 
 
@@ -224,15 +224,15 @@ def test_template_lookup(role: str, expect_warning: bool) -> None:
 def test_task_to_str_unicode() -> None:
     """Ensure that extracting messages from tasks preserves Unicode."""
     task = dict(fail=dict(msg=u"unicode é ô à"))
-    result = utils.task_to_str(utils.normalize_task(task, 'filename.yml'))
+    result = utils.task_to_str(utils.normalize_task(task, "filename.yml"))
     assert result == u"fail msg=unicode é ô à"
 
 
 @pytest.mark.parametrize(
-    'path',
+    "path",
     (
-        pytest.param(Path('a/b/../'), id='pathlib.Path'),
-        pytest.param('a/b/../', id='str'),
+        pytest.param(Path("a/b/../"), id="pathlib.Path"),
+        pytest.param("a/b/../", id="str"),
     ),
 )
 def test_normpath_with_path_object(path: str) -> None:
@@ -242,38 +242,38 @@ def test_normpath_with_path_object(path: str) -> None:
 
 def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
     """Ensure that tilde and env vars are expanded in paths."""
-    test_path = '/test/path'
-    monkeypatch.setenv('TEST_PATH', test_path)
-    assert expand_path_vars('~') == os.path.expanduser('~')
-    assert expand_path_vars('$TEST_PATH') == test_path
+    test_path = "/test/path"
+    monkeypatch.setenv("TEST_PATH", test_path)
+    assert expand_path_vars("~") == os.path.expanduser("~")
+    assert expand_path_vars("$TEST_PATH") == test_path
 
 
 @pytest.mark.parametrize(
-    ('test_path', 'expected'),
+    ("test_path", "expected"),
     (
-        pytest.param(Path('$TEST_PATH'), "/test/path", id='pathlib.Path'),
-        pytest.param('$TEST_PATH', "/test/path", id='str'),
-        pytest.param('  $TEST_PATH  ', "/test/path", id='stripped-str'),
-        pytest.param('~', os.path.expanduser('~'), id='home'),
+        pytest.param(Path("$TEST_PATH"), "/test/path", id="pathlib.Path"),
+        pytest.param("$TEST_PATH", "/test/path", id="str"),
+        pytest.param("  $TEST_PATH  ", "/test/path", id="stripped-str"),
+        pytest.param("~", os.path.expanduser("~"), id="home"),
     ),
 )
 def test_expand_paths_vars(
     test_path: Union[str, Path], expected: str, monkeypatch: MonkeyPatch
 ) -> None:
     """Ensure that tilde and env vars are expanded in paths lists."""
-    monkeypatch.setenv('TEST_PATH', '/test/path')
+    monkeypatch.setenv("TEST_PATH", "/test/path")
     assert expand_paths_vars([test_path]) == [expected]  # type: ignore
 
 
 @pytest.mark.parametrize(
-    ('reset_env_var', 'message_prefix'),
+    ("reset_env_var", "message_prefix"),
     (
         # simulate absence of git command
-        ('PATH', "Failed to locate command: "),
+        ("PATH", "Failed to locate command: "),
         # simulate a missing git repo
-        ('GIT_DIR', "Looking up for files"),
+        ("GIT_DIR", "Looking up for files"),
     ),
-    ids=('no-git-cli', 'outside-git-repo'),
+    ids=("no-git-cli", "outside-git-repo"),
 )
 def test_discover_lintables_git_verbose(
     reset_env_var: str,
@@ -282,9 +282,9 @@ def test_discover_lintables_git_verbose(
     caplog: LogCaptureFixture,
 ) -> None:
     """Ensure that autodiscovery lookup failures are logged."""
-    options = cli.get_config(['-v'])
+    options = cli.get_config(["-v"])
     initialize_logger(options.verbosity)
-    monkeypatch.setenv(reset_env_var, '')
+    monkeypatch.setenv(reset_env_var, "")
     file_utils.discover_lintables(options)
 
     assert any(m[2].startswith("Looking up for files") for m in caplog.record_tuples)
@@ -292,9 +292,9 @@ def test_discover_lintables_git_verbose(
 
 
 @pytest.mark.parametrize(
-    'is_in_git',
+    "is_in_git",
     (True, False),
-    ids=('in Git', 'outside Git'),
+    ids=("in Git", "outside Git"),
 )
 def test_discover_lintables_silent(
     is_in_git: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture[str]
@@ -307,18 +307,18 @@ def test_discover_lintables_silent(
     """
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
-    lint_path = test_dir / '..' / 'examples' / 'roles' / 'test-role'
+    lint_path = test_dir / ".." / "examples" / "roles" / "test-role"
     if not is_in_git:
-        monkeypatch.setenv('GIT_DIR', '')
+        monkeypatch.setenv("GIT_DIR", "")
 
-    yaml_count = len(list(lint_path.glob('**/*.yml'))) + len(
-        list(lint_path.glob('**/*.yaml'))
+    yaml_count = len(list(lint_path.glob("**/*.yml"))) + len(
+        list(lint_path.glob("**/*.yaml"))
     )
 
     monkeypatch.chdir(str(lint_path))
     files = file_utils.discover_lintables(options)
     stderr = capsys.readouterr().err
-    assert not stderr, 'No stderr output is expected when the verbosity is off'
+    assert not stderr, "No stderr output is expected when the verbosity is off"
     assert (
         len(files) == yaml_count
     ), "Expected to find {yaml_count} yaml files in {lint_path}".format_map(
@@ -330,23 +330,23 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
     """Verify that filenames containing German umlauts are not garbled by the discover_lintables."""
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
-    lint_path = test_dir / '..' / 'examples' / 'playbooks'
+    lint_path = test_dir / ".." / "examples" / "playbooks"
 
     monkeypatch.chdir(str(lint_path))
     files = file_utils.discover_lintables(options)
     assert '"with-umlaut-\\303\\244.yml"' not in files
-    assert 'with-umlaut-ä.yml' in files
+    assert "with-umlaut-ä.yml" in files
 
 
 def test_logger_debug(caplog: LogCaptureFixture) -> None:
     """Test that the double verbosity arg causes logger to be DEBUG."""
-    options = cli.get_config(['-vv'])
+    options = cli.get_config(["-vv"])
     initialize_logger(options.verbosity)
 
     expected_info = (
         "ansiblelint.__main__",
         logging.DEBUG,
-        'Logging initialized to level 10',
+        "Logging initialized to level 10",
     )
 
     assert expected_info in caplog.record_tuples
@@ -396,7 +396,7 @@ def test_is_playbook() -> None:
 
 
 @pytest.mark.parametrize(
-    ('path', 'kind'),
+    ("path", "kind"),
     (
         ("foo/playbook.yml", "playbook"),
         ("playbooks/foo.yml", "playbook"),
@@ -446,7 +446,7 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
     lintable_expected = Lintable(path, kind=kind)
     assert lintable_detected == lintable_expected
 
-    monkeypatch.setattr(file_utils, 'discover_lintables', mockreturn)
+    monkeypatch.setattr(file_utils, "discover_lintables", mockreturn)
     result = file_utils.discover_lintables(options)
     # get_lintable could return additional files and we only care to see
     # that the given file is among the returned list.
@@ -456,14 +456,14 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
 
 def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
     """Verify that exclude option can be used to narrow down detection."""
-    options = cli.get_config(['--exclude', 'foo'])
+    options = cli.get_config(["--exclude", "foo"])
 
     def mockreturn(options: Namespace) -> List[str]:
-        return ['foo/playbook.yml', 'bar/playbook.yml']
+        return ["foo/playbook.yml", "bar/playbook.yml"]
 
-    monkeypatch.setattr(utils, 'discover_lintables', mockreturn)
+    monkeypatch.setattr(utils, "discover_lintables", mockreturn)
     result = utils.get_lintables(options)
-    assert result == [Lintable('bar/playbook.yml', kind='playbook')]
+    assert result == [Lintable("bar/playbook.yml", kind="playbook")]
 
 
 _DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]

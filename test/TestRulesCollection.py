@@ -33,19 +33,19 @@ from ansiblelint.testing import run_ansible_lint
 @pytest.fixture
 def test_rules_collection() -> RulesCollection:
     """Create a shared rules collection test instance."""
-    return RulesCollection([os.path.abspath('./test/rules')])
+    return RulesCollection([os.path.abspath("./test/rules")])
 
 
 @pytest.fixture
 def ematchtestfile() -> Lintable:
     """Produce a test lintable with an id violation."""
-    return Lintable('examples/playbooks/ematcher-rule.yml', kind='playbook')
+    return Lintable("examples/playbooks/ematcher-rule.yml", kind="playbook")
 
 
 @pytest.fixture
 def bracketsmatchtestfile() -> Lintable:
     """Produce a test lintable with matching brackets."""
-    return Lintable('examples/playbooks/bracketsmatchtest.yml', kind='playbook')
+    return Lintable("examples/playbooks/bracketsmatchtest.yml", kind="playbook")
 
 
 def test_load_collection_from_directory(test_rules_collection: RulesCollection) -> None:
@@ -69,13 +69,13 @@ def test_tags(
     bracketsmatchtestfile: Lintable,
 ) -> None:
     """Test that tags are treated as skip markers."""
-    matches = test_rules_collection.run(ematchtestfile, tags={'test1'})
+    matches = test_rules_collection.run(ematchtestfile, tags={"test1"})
     assert len(matches) == 3
-    matches = test_rules_collection.run(ematchtestfile, tags={'test2'})
+    matches = test_rules_collection.run(ematchtestfile, tags={"test2"})
     assert len(matches) == 0
-    matches = test_rules_collection.run(bracketsmatchtestfile, tags={'test1'})
+    matches = test_rules_collection.run(bracketsmatchtestfile, tags={"test1"})
     assert len(matches) == 0
-    matches = test_rules_collection.run(bracketsmatchtestfile, tags={'test2'})
+    matches = test_rules_collection.run(bracketsmatchtestfile, tags={"test2"})
     assert len(matches) == 2
 
 
@@ -85,13 +85,13 @@ def test_skip_tags(
     bracketsmatchtestfile: Lintable,
 ) -> None:
     """Test that tags can be skipped."""
-    matches = test_rules_collection.run(ematchtestfile, skip_list=['test1', 'test3'])
+    matches = test_rules_collection.run(ematchtestfile, skip_list=["test1", "test3"])
     assert len(matches) == 0
-    matches = test_rules_collection.run(ematchtestfile, skip_list=['test2', 'test3'])
+    matches = test_rules_collection.run(ematchtestfile, skip_list=["test2", "test3"])
     assert len(matches) == 3
-    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test1'])
+    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=["test1"])
     assert len(matches) == 2
-    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test2'])
+    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=["test2"])
     assert len(matches) == 0
 
 
@@ -102,16 +102,16 @@ def test_skip_id(
 ) -> None:
     """Check that skipping valid IDs excludes their violations."""
     matches = test_rules_collection.run(
-        ematchtestfile, skip_list=['TEST0001', 'TEST0003']
+        ematchtestfile, skip_list=["TEST0001", "TEST0003"]
     )
     assert len(matches) == 0
     matches = test_rules_collection.run(
-        ematchtestfile, skip_list=['TEST0002', 'TEST0003']
+        ematchtestfile, skip_list=["TEST0002", "TEST0003"]
     )
     assert len(matches) == 3
-    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0001'])
+    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=["TEST0001"])
     assert len(matches) == 2
-    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0002'])
+    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=["TEST0002"])
     assert len(matches) == 0
 
 
@@ -119,13 +119,13 @@ def test_skip_non_existent_id(
     test_rules_collection: RulesCollection, ematchtestfile: Lintable
 ) -> None:
     """Check that skipping invalid IDs changes nothing."""
-    matches = test_rules_collection.run(ematchtestfile, skip_list=['DOESNOTEXIST'])
+    matches = test_rules_collection.run(ematchtestfile, skip_list=["DOESNOTEXIST"])
     assert len(matches) == 4
 
 
 def test_no_duplicate_rule_ids(test_rules_collection: RulesCollection) -> None:
     """Check that rules of the collection don't have duplicate IDs."""
-    real_rules = RulesCollection([os.path.abspath('./src/ansiblelint/rules')])
+    real_rules = RulesCollection([os.path.abspath("./src/ansiblelint/rules")])
     rule_ids = [rule.id for rule in real_rules]
     assert not any(y > 1 for y in collections.Counter(rule_ids).values())
 
@@ -136,7 +136,7 @@ def test_rich_rule_listing() -> None:
     This check also offers the contract of having rule id, short and long
     descriptions in the console output.
     """
-    rules_path = os.path.abspath('./test/rules')
+    rules_path = os.path.abspath("./test/rules")
     result = run_ansible_lint("-r", rules_path, "-f", "rich", "-L")
     assert result.returncode == 0
 
@@ -150,9 +150,9 @@ def test_rich_rule_listing() -> None:
 def test_rules_id_format() -> None:
     """Assure all our rules have consistent format."""
     rule_id_re = re.compile("^[a-z-]{4,30}$")
-    options.enable_list = ['no-same-owner', 'no-log-password', 'no-same-owner']
+    options.enable_list = ["no-same-owner", "no-log-password", "no-same-owner"]
     rules = RulesCollection(
-        [os.path.abspath('./src/ansiblelint/rules')], options=options
+        [os.path.abspath("./src/ansiblelint/rules")], options=options
     )
     for rule in rules:
         assert rule_id_re.match(

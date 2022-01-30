@@ -28,19 +28,19 @@ FAIL_PLAY = """
 # properties/parameters are prefixed and postfixed with `__`
 def is_property(k: str) -> bool:
     """Check if key is a property."""
-    return k.startswith('__') and k.endswith('__')
+    return k.startswith("__") and k.endswith("__")
 
 
 class VariableNamingRule(AnsibleLintRule):
-    id = 'var-naming'
-    base_msg = 'All variables should be named using only lowercase and underscores'
+    id = "var-naming"
+    base_msg = "All variables should be named using only lowercase and underscores"
     shortdesc = base_msg
-    description = 'All variables should be named using only lowercase and underscores'
+    description = "All variables should be named using only lowercase and underscores"
     severity = (
-        'MEDIUM'  # ansible-lint displays severity when with --parseable-severity option
+        "MEDIUM"  # ansible-lint displays severity when with --parseable-severity option
     )
-    tags = ['idiom', 'experimental']
-    version_added = 'v5.0.10'
+    tags = ["idiom", "experimental"]
+    version_added = "v5.0.10"
 
     @lru_cache()
     def re_pattern(self) -> Pattern[str]:
@@ -53,7 +53,7 @@ class VariableNamingRule(AnsibleLintRule):
             return False
 
         try:
-            ident.encode('ascii')
+            ident.encode("ascii")
         except UnicodeEncodeError:
             return False
 
@@ -72,7 +72,7 @@ class VariableNamingRule(AnsibleLintRule):
         results = []
 
         # If the Play uses the 'vars' section to set variables
-        our_vars = data.get('vars', {})
+        our_vars = data.get("vars", {})
         for key in our_vars.keys():
             if self.is_invalid_variable_name(key):
                 results.append(
@@ -92,21 +92,21 @@ class VariableNamingRule(AnsibleLintRule):
     ) -> Union[bool, str]:
         """Return matches for task based variables."""
         # If the task uses the 'vars' section to set variables
-        our_vars = task.get('vars', {})
+        our_vars = task.get("vars", {})
         for key in our_vars.keys():
             if self.is_invalid_variable_name(key):
                 return "Task defines variables within 'vars' section that violates variable naming standards"
 
         # If the task uses the 'set_fact' module
-        ansible_module = task['action']['__ansible_module__']
-        ansible_action = task['action']
-        if ansible_module == 'set_fact':
+        ansible_module = task["action"]["__ansible_module__"]
+        ansible_action = task["action"]
+        if ansible_module == "set_fact":
             for key in ansible_action.keys():
                 if self.is_invalid_variable_name(key):
                     return "Task uses 'set_fact' to define variables that violates variable naming standards"
 
         # If the task registers a variable
-        registered_var = task.get('register', None)
+        registered_var = task.get("register", None)
         if registered_var and self.is_invalid_variable_name(registered_var):
             return "Task registers a variable that violates variable naming standards"
 
@@ -143,7 +143,7 @@ if "pytest" in sys.modules:
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
     @pytest.mark.parametrize(
-        'rule_runner', (VariableNamingRule,), indirect=['rule_runner']
+        "rule_runner", (VariableNamingRule,), indirect=["rule_runner"]
     )
     def test_invalid_var_name_playbook(rule_runner: RunFromText) -> None:
         """Test rule matches."""
