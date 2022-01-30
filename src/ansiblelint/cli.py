@@ -197,10 +197,10 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Keep default rules when using -r",
     )
     parser.add_argument(
-        '--fmt',
-        dest='do_transforms',
+        '--fmt-yaml',
+        dest='fmt_yaml_files',
         action='store_true',
-        help="Reformat/Transform files to fix issues where possible",
+        help="Reformat yaml files to standardize spacing, quotes, etc.",
     )
     parser.add_argument(
         '--only-fmt-errors',

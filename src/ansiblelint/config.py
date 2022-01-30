@@ -69,6 +69,7 @@ options = Namespace(
     lintables=[],
     listrules=False,
     listtags=False,
+    fmt_yaml_files=False,
     do_transforms=False,
     fmt_all_files=True,  # on do_transforms, fmt all yaml files, even w/o LintErrors
     parseable=False,

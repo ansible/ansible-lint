@@ -194,19 +194,6 @@ warn_list:  # or 'skip_list' to silence them completely
     return 2
 
 
-def _do_transform(result: "LintResult", options: Namespace) -> None:
-    """Create and run fmt Transformer."""
-    # On purpose lazy-imports to avoid loading transforms unless requested
-    # pylint: disable=import-outside-toplevel
-    from ansiblelint.transformer import Transformer
-
-    # future: maybe pass options to Transformer
-    transformer = Transformer(result)
-
-    # this will mark any matches as fixed if the transforms repaired the issue
-    transformer.run(fmt_all_files=options.fmt_all_files)
-
-
 def _do_list(rules: "RulesCollection") -> int:
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
@@ -229,6 +216,19 @@ def _do_list(rules: "RulesCollection") -> int:
 
     # we should not get here!
     return 1
+
+
+def _do_transform(result: "LintResult", options: Namespace) -> None:
+    """Create and run fmt Transformer."""
+    # On purpose lazy-imports to avoid loading transforms unless requested
+    # pylint: disable=import-outside-toplevel
+    from ansiblelint.transformer import Transformer
+
+    # future: maybe pass options to Transformer
+    transformer = Transformer(result)
+
+    # this will mark any matches as fixed if the transforms repaired the issue
+    transformer.run(fmt_all_files=options.fmt_all_files)
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -267,7 +267,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # TODO: options.listtransforms
 
-    if options.do_transforms:
+    if options.fmt_yaml_files:
         _do_transform(result, options)
 
     mark_as_success = False

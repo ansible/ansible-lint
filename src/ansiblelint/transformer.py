@@ -1,12 +1,14 @@
 """Transformer implementation."""
 import logging
 import re
-from textwrap import dedent
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Union, cast
 
-# Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
-from ruamel.yaml import YAML  # type: ignore
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
+from ruamel.yaml.emitter import Emitter
+
+# Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
+# To make the type checkers happy, we import from ruamel.yaml.main instead.
+from ruamel.yaml.main import YAML
 
 from .errors import MatchError
 from .file_utils import Lintable
@@ -14,13 +16,18 @@ from .rules import TransformMixin
 from .runner import LintResult
 from .skip_utils import load_data  # TODO: move load_data out of skip_utils
 
+__all__ = ["Transformer"]
+
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
     from ruamel.yaml.comments import LineCol
 
 _logger = logging.getLogger(__name__)
 
-_comment_line_re = re.compile(r"^ *#")
+# ruamel.yaml only preserves empty (no whitespace) blank lines
+# (ie "/n/n" becomes "/n/n" but "/n  /n" becomes "/n").
+# So, we need to identify whitespace-only lines to drop spaces before reading.
+_whitespace_only_lines_re = re.compile(r"^ +$", re.MULTILINE)
 
 PLAYBOOK_TASK_KEYWORDS = [
     'tasks',
@@ -33,6 +40,44 @@ NESTED_TASK_KEYS = [
     'always',
     'rescue',
 ]
+
+
+class FormattedEmitter(Emitter):
+    """Emitter that applies custom formatting rules when dumping YAML.
+
+    Root-level sequences are never indented.
+    All subsequent levels are indented as configured (normal ruamel.yaml behavior).
+
+    Earlier implementations used dedent on ruamel.yaml's dumped output,
+    but string magic like that had a ton of problematic edge cases.
+    """
+
+    _sequence_indent = 2
+    _sequence_dash_offset = 0  # Should be _sequence_indent - 2
+
+    # NB: mypy does not support overriding attributes with properties yet:
+    #     https://github.com/python/mypy/issues/4125
+    #     To silence we have to ignore[override] both the @property and the method.
+
+    @property  # type: ignore[override]
+    def best_sequence_indent(self) -> int:  # type: ignore[override]
+        """Return the configured sequence_indent or 2 for root level."""
+        return 2 if self.column < 2 else self._sequence_indent
+
+    @best_sequence_indent.setter
+    def best_sequence_indent(self, value: int) -> None:
+        """Configure how many columns to indent each sequence item (including the '-')."""
+        self._sequence_indent = value
+
+    @property  # type: ignore[override]
+    def sequence_dash_offset(self) -> int:  # type: ignore[override]
+        """Return the configured sequence_dash_offset or 2 for root level."""
+        return 0 if self.column < 2 else self._sequence_dash_offset
+
+    @sequence_dash_offset.setter
+    def sequence_dash_offset(self, value: int) -> None:
+        """Configure how many spaces to put before each sequence item's '-'."""
+        self._sequence_dash_offset = value
 
 
 # Transformer is for transforms like runner is for rules
@@ -68,20 +113,32 @@ class Transformer:
         # ruamel.yaml rt=round trip (preserves comments while allowing for modification)
         yaml = YAML(typ="rt")
 
+        # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
+
         # configure yaml dump formatting
-        yaml.explicit_start = (
-            False  # explicit_start is handled in self._final_yaml_transform()
-        )
-        yaml.explicit_end = False
+        yaml.explicit_start = True  # type: ignore[assignment]
+        yaml.explicit_end = False  # type: ignore[assignment]
+
         # TODO: make the width configurable
-        yaml.width = 120  # defaults to 80 which wraps longer lines in tests
+        # yaml.width defaults to 80 which wraps longer lines in tests
+        yaml.width = 120  # type: ignore[assignment]
+
         yaml.default_flow_style = False
-        yaml.compact_seq_seq = True  # dash after dash
-        yaml.compact_seq_map = True  # key after dash
+        yaml.compact_seq_seq = (  # dash after dash
+            True  # type: ignore[assignment]
+        )
+        yaml.compact_seq_map = (  # key after dash
+            True  # type: ignore[assignment]
+        )
         # yaml.indent() obscures the purpose of these vars:
-        yaml.map_indent = 2
-        yaml.sequence_indent = 4 if self.indent_sequences else 2
-        yaml.sequence_dash_offset = yaml.sequence_indent - 2
+        yaml.map_indent = 2  # type: ignore[assignment]
+        yaml.sequence_indent = 4 if self.indent_sequences else 2  # type: ignore[assignment]
+        yaml.sequence_dash_offset = yaml.sequence_indent - 2  # type: ignore[operator]
+
+        if self.indent_sequences:  # in the future: or other formatting options
+            # For root-level sequences, FormattedEmitter overrides sequence_indent
+            # and sequence_dash_offset to prevent root-level indents.
+            yaml.Emitter = FormattedEmitter
 
         # explicit_start=True + map_indent=2 + sequence_indent=2 + sequence_dash_offset=0
         # ---
@@ -90,10 +147,18 @@ class Transformer:
         #   - item1
         #
         # explicit_start=True + map_indent=2 + sequence_indent=4 + sequence_dash_offset=2
+        # With the normal Emitter
         # ---
         #   - name: playbook
         #     loop:
         #       - item1
+        #
+        # explicit_start=True + map_indent=2 + sequence_indent=4 + sequence_dash_offset=2
+        # With the FormattedEmitter
+        # ---
+        # - name: playbook
+        #   loop:
+        #     - item1
 
         for file, matches in self.matches_per_file.items():
             # matches can be empty if no LintErrors were found.
@@ -105,8 +170,19 @@ class Transformer:
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
             file_is_yaml = str(file.base_kind) == "text/yaml"
 
-            # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
-            data = load_data(file.content) if file_is_yaml else file.content
+            try:
+                data: Union[CommentedMap, CommentedSeq, str] = file.content
+            except (UnicodeDecodeError, IsADirectoryError):
+                # we hit a binary file (eg a jar or tar.gz) or a directory
+                data = ""
+                file_is_yaml = False
+
+            if file_is_yaml:
+                # ruamel.yaml only preserves empty (no whitespace) blank lines.
+                # So, drop spaces in whitespace-only lines. ("\n  \n" -> "\n\n")
+                data = _whitespace_only_lines_re.sub("", cast(str, data))
+                # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
+                data = load_data(data)
 
             for match in sorted(matches):
                 if not isinstance(match.rule, TransformMixin):
@@ -125,7 +201,7 @@ class Transformer:
 
             if file_is_yaml:
                 # YAML transforms modify data in-place. Now write it to file.
-                yaml.dump(data, file.path, transform=self._final_yaml_transform)
+                yaml.dump(data, file.path)
             # transforms for other filetypes must handle writing it to file.
 
     @staticmethod
@@ -315,28 +391,3 @@ class Transformer:
             if subtask_path:
                 return [task_key] + list(subtask_path)
         return []
-
-    def _final_yaml_transform(self, text: str) -> str:
-        """
-        Ensure that top-level sequences are not over-indented.
-
-        In order to make that work, we cannot delegate adding the yaml explict_start
-        to ruamel.yaml or dedent() won't have anything to work with.
-        Instead, we add the explicit_start here.
-        """
-        text_lines = text.splitlines(keepends=True)
-        # dedent() does not handle cases where there is a comment at column 0
-        text_without_comments = "".join(
-            ["\n" if _comment_line_re.match(line) else line for line in text_lines]
-        )
-        dedented_lines = dedent(text_without_comments).splitlines(keepends=True)
-
-        # preserve the indents for comment lines (do not dedent them)
-        for i, line in enumerate(text_lines):
-            if _comment_line_re.match(line):
-                dedented_lines[i] = line
-
-        text = "".join(dedented_lines)
-        if self.explicit_start:
-            text = "---\n" + text
-        return text
