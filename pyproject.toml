@@ -18,7 +18,7 @@ exclude_lines = [
 ]
 
 [tool.black]
-skip-string-normalization = true
+skip-string-normalization = false
 
 [tool.isort]
 profile = "black"
