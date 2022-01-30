@@ -6,3 +6,7 @@
     - name: foo
       debug:
         msg: A 3rd BANNED line
+
+    - name: bar
+      command: echo something
+      changed_when: false

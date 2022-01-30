@@ -132,9 +132,9 @@ class AnsibleLintRule(BaseRule):
                 continue
 
             if self.needs_raw_task:
-                result = self.matchrawtask(raw_task, task, file=file)
-            else:
-                result = self.matchtask(task, file=file)
+                task["__raw_task__"] = raw_task
+
+            result = self.matchtask(task, file=file)
 
             if not result:
                 continue

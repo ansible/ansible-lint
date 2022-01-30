@@ -51,7 +51,7 @@ def bracketsmatchtestfile() -> Lintable:
 def test_load_collection_from_directory(test_rules_collection: RulesCollection) -> None:
     """Test that custom rules extend the default ones."""
     # two detected rules plus the internal ones
-    assert len(test_rules_collection) == 5
+    assert len(test_rules_collection) == 6
 
 
 def test_run_collection(
@@ -59,7 +59,7 @@ def test_run_collection(
 ) -> None:
     """Test that default rules match pre-meditated violations."""
     matches = test_rules_collection.run(ematchtestfile)
-    assert len(matches) == 3  # 3 occurrences of BANNED using TEST0001
+    assert len(matches) == 4  # 3 occurrences of BANNED using TEST0001 + 1 for TEST0003
     assert matches[0].linenumber == 2
 
 
@@ -85,9 +85,9 @@ def test_skip_tags(
     bracketsmatchtestfile: Lintable,
 ) -> None:
     """Test that tags can be skipped."""
-    matches = test_rules_collection.run(ematchtestfile, skip_list=['test1'])
+    matches = test_rules_collection.run(ematchtestfile, skip_list=['test1', 'test3'])
     assert len(matches) == 0
-    matches = test_rules_collection.run(ematchtestfile, skip_list=['test2'])
+    matches = test_rules_collection.run(ematchtestfile, skip_list=['test2', 'test3'])
     assert len(matches) == 3
     matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test1'])
     assert len(matches) == 2
@@ -101,9 +101,13 @@ def test_skip_id(
     bracketsmatchtestfile: Lintable,
 ) -> None:
     """Check that skipping valid IDs excludes their violations."""
-    matches = test_rules_collection.run(ematchtestfile, skip_list=['TEST0001'])
+    matches = test_rules_collection.run(
+        ematchtestfile, skip_list=['TEST0001', 'TEST0003']
+    )
     assert len(matches) == 0
-    matches = test_rules_collection.run(ematchtestfile, skip_list=['TEST0002'])
+    matches = test_rules_collection.run(
+        ematchtestfile, skip_list=['TEST0002', 'TEST0003']
+    )
     assert len(matches) == 3
     matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0001'])
     assert len(matches) == 2
@@ -116,7 +120,7 @@ def test_skip_non_existent_id(
 ) -> None:
     """Check that skipping invalid IDs changes nothing."""
     matches = test_rules_collection.run(ematchtestfile, skip_list=['DOESNOTEXIST'])
-    assert len(matches) == 3
+    assert len(matches) == 4
 
 
 def test_no_duplicate_rule_ids(test_rules_collection: RulesCollection) -> None:
