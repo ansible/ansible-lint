@@ -35,7 +35,8 @@ def config_options(config_options: Namespace, opts: Dict[str, Any]) -> Namespace
     config_options.enable_list = ['no-same-owner', 'facts-namespacing']
 
     # our defaults
-    config_options.fmt_all_files = True
+    config_options.fmt_yaml_files = True
+    config_options.do_transforms = True
 
     # per-test option overrides
     # opt is an option name in ansiblelint.config.options
@@ -239,7 +240,10 @@ def test_transformer(
     Based on TestRunner::test_runner
     """
     transformer = Transformer(result=runner_result)
-    transformer.run(fmt_all_files=config_options.fmt_all_files)
+    transformer.run(
+        fmt_yaml_files=config_options.fmt_yaml_files,
+        do_transforms=config_options.do_transforms,
+    )
 
     matches = runner_result.matches
     assert len(matches) == matches_count

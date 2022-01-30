@@ -228,7 +228,9 @@ def _do_transform(result: "LintResult", options: Namespace) -> None:
     transformer = Transformer(result)
 
     # this will mark any matches as fixed if the transforms repaired the issue
-    transformer.run(fmt_all_files=options.fmt_all_files)
+    transformer.run(
+        fmt_yaml_files=options.fmt_yaml_files, do_transforms=options.do_transforms
+    )
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -267,7 +269,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # TODO: options.listtransforms
 
-    if options.fmt_yaml_files:
+    if options.fmt_yaml_files or options.do_transforms:
         _do_transform(result, options)
 
     mark_as_success = False

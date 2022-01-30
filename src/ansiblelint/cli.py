@@ -200,14 +200,17 @@ def get_cli_parser() -> argparse.ArgumentParser:
         '--fmt-yaml',
         dest='fmt_yaml_files',
         action='store_true',
-        help="Reformat yaml files to standardize spacing, quotes, etc.",
+        help="Reformat all YAML files to standardize spacing, quotes, etc.",
     )
     parser.add_argument(
-        '--only-fmt-errors',
-        dest='fmt_all_files',
+        '--transform',
+        dest='do_transforms',
         default=True,
         action='store_false',
-        help="Only reformat YAML files with lint errors. Otherwise reformat all YAML files.",
+        help=(
+            "Transform files to fix (or simplify fixing) LintErrors. "
+            "This implies --fmt-yaml, but only for YAML files with LintErrors."
+        ),
     )
     parser.add_argument(
         '--show-relpath',

@@ -108,8 +108,11 @@ class Transformer:
                 self.matches_per_file[lintable] = []
             self.matches_per_file[lintable].append(match)
 
-    def run(self, fmt_all_files: bool = True) -> None:
+    def run(self, fmt_yaml_files: bool = True, do_transforms: bool = True) -> None:
         """Execute the fmt transforms."""
+        assert (
+            fmt_yaml_files or do_transforms
+        ), "At least one of fmt_yaml_files or do_transforms should be True."
         # ruamel.yaml rt=round trip (preserves comments while allowing for modification)
         yaml = YAML(typ="rt")
 
@@ -163,12 +166,8 @@ class Transformer:
         for file, matches in self.matches_per_file.items():
             # matches can be empty if no LintErrors were found.
             # However, we can still fmt the yaml file
-            if not fmt_all_files and not matches:
+            if not ((do_transforms and matches) or fmt_yaml_files):
                 continue
-
-            # str() convinces mypy that "text/yaml" is a valid Literal.
-            # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
-            file_is_yaml = str(file.base_kind) == "text/yaml"
 
             try:
                 data: Union[CommentedMap, CommentedSeq, str] = file.content
@@ -176,6 +175,10 @@ class Transformer:
                 # we hit a binary file (eg a jar or tar.gz) or a directory
                 data = ""
                 file_is_yaml = False
+            else:
+                # str() convinces mypy that "text/yaml" is a valid Literal.
+                # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
+                file_is_yaml = str(file.base_kind) == "text/yaml"
 
             if file_is_yaml:
                 # ruamel.yaml only preserves empty (no whitespace) blank lines.
@@ -184,25 +187,35 @@ class Transformer:
                 # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
                 data = load_data(data)
 
-            for match in sorted(matches):
-                if not isinstance(match.rule, TransformMixin):
-                    continue
-                if file_is_yaml and not match.yaml_path:
-                    data = cast(Union[CommentedMap, CommentedSeq], data)
-                    if match.match_type == "play":
-                        match.yaml_path = self._get_play_path(
-                            file, match.linenumber, data
-                        )
-                    elif match.task or file.kind in ("tasks", "handlers", "playbook"):
-                        match.yaml_path = self._get_task_path(
-                            file, match.linenumber, data
-                        )
-                match.rule.transform(match, file, data)
+            if do_transforms:
+                self._do_transforms(file, data, file_is_yaml, matches)
 
             if file_is_yaml:
                 # YAML transforms modify data in-place. Now write it to file.
                 yaml.dump(data, file.path)
             # transforms for other filetypes must handle writing it to file.
+
+    def _do_transforms(
+        self,
+        file: Lintable,
+        data: Union[CommentedMap, CommentedSeq, str],
+        file_is_yaml: bool,
+        matches: List[MatchError],
+    ) -> None:
+        for match in sorted(matches):
+            if not isinstance(match.rule, TransformMixin):
+                continue
+            if file_is_yaml and not match.yaml_path:
+                data = cast(Union[CommentedMap, CommentedSeq], data)
+                if match.match_type == "play":
+                    match.yaml_path = self._get_play_path(file, match.linenumber, data)
+                elif match.task or file.kind in (
+                    "tasks",
+                    "handlers",
+                    "playbook",
+                ):
+                    match.yaml_path = self._get_task_path(file, match.linenumber, data)
+            match.rule.transform(match, file, data)
 
     @staticmethod
     def _get_play_path(
