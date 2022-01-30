@@ -64,17 +64,14 @@ in the action shorthand.
 
     needs_raw_task = True
 
-    def matchrawtask(
-        self,
-        raw_task: Dict[str, Any],
-        task: Dict[str, Any],
-        file: Optional[Lintable] = None,
+    def matchtask(
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in FREE_FORM_MODULES:
             return False
 
         module = task["action"]["__ansible_module_original__"]
-        raw_action_block = raw_task[module]
+        raw_action_block = task["__raw_task__"][module]
         if isinstance(raw_action_block, str):
             return True
         # raw_action_block should be a dict, which is what we want.
