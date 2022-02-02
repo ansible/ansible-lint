@@ -50,6 +50,8 @@ from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
+    # RulesCollection must be imported lazily or ansible gets imported too early.
+    from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
 
 
@@ -69,7 +71,7 @@ def initialize_logger(level: int = 0) -> None:
     }
 
     handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(levelname)-8s %(message)s')
+    formatter = logging.Formatter("%(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
     logger = logging.getLogger()
     logger.addHandler(handler)
@@ -89,7 +91,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     if new_options.version:
         ansible_version, err = check_ansible_presence()
         print(
-            'ansible-lint {ver!s} using ansible {ansible_ver!s}'.format(
+            "ansible-lint {ver!s} using ansible {ansible_ver!s}".format(
                 ver=__version__, ansible_ver=ansible_version
             )
         )
@@ -143,7 +145,7 @@ def report_outcome(  # noqa: C901
 
     # remove unskippable rules from the list
     for rule_id in list(matched_rules.keys()):
-        if 'unskippable' in matched_rules[rule_id].tags:
+        if "unskippable" in matched_rules[rule_id].tags:
             matched_rules.pop(rule_id)
 
     entries = []
@@ -192,6 +194,30 @@ warn_list:  # or 'skip_list' to silence them completely
     return 2
 
 
+def _do_list(rules: "RulesCollection") -> int:
+    # On purpose lazy-imports to avoid pre-loading Ansible
+    # pylint: disable=import-outside-toplevel
+    from ansiblelint.generate_docs import rules_as_rich, rules_as_rst, rules_as_str
+
+    if options.listrules:
+
+        _rule_format_map: Dict[str, Callable[..., Any]] = {
+            "plain": rules_as_str,
+            "rich": rules_as_rich,
+            "rst": rules_as_rst,
+        }
+
+        console.print(_rule_format_map[options.format](rules), highlight=False)
+        return 0
+
+    if options.listtags:
+        console.print(render_yaml(rules.listtags()))
+        return 0
+
+    # we should not get here!
+    return 1
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     """Linter CLI entry point."""
     if argv is None:
@@ -212,28 +238,15 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
-    from ansiblelint.generate_docs import rules_as_rich, rules_as_rst, rules_as_str
     from ansiblelint.rules import RulesCollection
 
     rules = RulesCollection(options.rulesdirs)
 
-    if options.listrules:
-
-        _rule_format_map: Dict[str, Callable[..., Any]] = {
-            'plain': rules_as_str,
-            'rich': rules_as_rich,
-            'rst': rules_as_rst,
-        }
-
-        console.print(_rule_format_map[options.format](rules), highlight=False)
-        return 0
-
-    if options.listtags:
-        console.print(render_yaml(rules.listtags()))
-        return 0
+    if options.listrules or options.listtags:
+        return _do_list(rules)
 
     if isinstance(options.tags, str):
-        options.tags = options.tags.split(',')
+        options.tags = options.tags.split(",")
 
     from ansiblelint.runner import _get_matches
 

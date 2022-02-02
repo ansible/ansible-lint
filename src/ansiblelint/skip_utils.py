@@ -69,7 +69,7 @@ def append_skipped_rules(
         yaml_skip = _append_skipped_rules(pyyaml_data, lintable)
     except RuntimeError:
         # Notify user of skip error, do not stop, do not change exit code
-        _logger.error('Error trying to append skipped rules', exc_info=True)
+        _logger.error("Error trying to append skipped rules", exc_info=True)
         return pyyaml_data
 
     if not yaml_skip:
@@ -97,15 +97,15 @@ def _append_skipped_rules(
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
 
-    if lintable.kind in ['yaml', 'requirements', 'vars', 'meta', 'reno']:
-        pyyaml_data[0]['skipped_rules'] = _get_rule_skips_from_yaml(ruamel_data)
+    if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno"]:
+        pyyaml_data[0]["skipped_rules"] = _get_rule_skips_from_yaml(ruamel_data)
         return pyyaml_data
 
     # create list of blocks of tasks or nested tasks
-    if lintable.kind in ('tasks', 'handlers'):
+    if lintable.kind in ("tasks", "handlers"):
         ruamel_task_blocks = ruamel_data
         pyyaml_task_blocks = pyyaml_data
-    elif lintable.kind == 'playbook':
+    elif lintable.kind == "playbook":
         try:
             pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
             ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)
@@ -129,9 +129,9 @@ def _append_skipped_rules(
         if not pyyaml_task and not ruamel_task:
             continue
 
-        if pyyaml_task.get('name') != ruamel_task.get('name'):
-            raise RuntimeError('Error in matching skip comment to a task')
-        pyyaml_task['skipped_rules'] = _get_rule_skips_from_yaml(ruamel_task)
+        if pyyaml_task.get("name") != ruamel_task.get("name"):
+            raise RuntimeError("Error in matching skip comment to a task")
+        pyyaml_task["skipped_rules"] = _get_rule_skips_from_yaml(ruamel_task)
 
     return pyyaml_data
 
@@ -143,10 +143,10 @@ def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> List[Any]:
     :returns: list of task dictionaries.
     """
     PLAYBOOK_TASK_KEYWORDS = [
-        'tasks',
-        'pre_tasks',
-        'post_tasks',
-        'handlers',
+        "tasks",
+        "pre_tasks",
+        "post_tasks",
+        "handlers",
     ]
 
     task_blocks = []
@@ -158,9 +158,9 @@ def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> List[Any]:
 def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, None]:
     """Get list of tasks from list made of tasks and nested tasks."""
     NESTED_TASK_KEYS = [
-        'block',
-        'always',
-        'rescue',
+        "block",
+        "always",
+        "rescue",
     ]
 
     def get_nested_tasks(task: Any) -> Generator[Any, None, None]:
@@ -196,7 +196,7 @@ def _get_rule_skips_from_yaml(yaml_input: Sequence[Any]) -> Sequence[Any]:
 
     rule_id_list = []
     for comment_obj_str in yaml_comment_obj_strs:
-        for line in comment_obj_str.split(r'\n'):
+        for line in comment_obj_str.split(r"\n"):
             rule_id_list.extend(get_rule_skips_from_line(line))
 
     return [normalize_tag(tag) for tag in rule_id_list]

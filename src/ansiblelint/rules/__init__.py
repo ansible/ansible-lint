@@ -13,6 +13,7 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Union
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
+import ansiblelint.yaml_utils
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
     BaseRule,
@@ -21,7 +22,7 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.config import get_rule_config, options
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, expand_paths_vars
 
 _logger = logging.getLogger(__name__)
 
@@ -74,7 +75,7 @@ class AnsibleLintRule(BaseRule):
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(file.content.split("\n")):
-            if line.lstrip().startswith('#'):
+            if line.lstrip().startswith("#"):
                 continue
 
             rule_id_list = ansiblelint.skip_utils.get_rule_skips_from_line(line)
@@ -102,29 +103,25 @@ class AnsibleLintRule(BaseRule):
         matches: List[MatchError] = []
         if (
             not self.matchtask
-            or file.kind not in ['handlers', 'tasks', 'playbook']
-            or str(file.base_kind) != 'text/yaml'
+            or file.kind not in ["handlers", "tasks", "playbook"]
+            or str(file.base_kind) != "text/yaml"
         ):
             return matches
 
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
-        if not yaml:
-            return matches
+        tasks_iterator = ansiblelint.yaml_utils.iter_tasks_in_file(file, self.id)
+        for raw_task, task, skipped, error in tasks_iterator:
+            if error is not None:
+                # normalize_task converts AnsibleParserError to MatchError
+                return [error]
 
-        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, file)
-
-        try:
-            tasks = ansiblelint.utils.get_normalized_tasks(yaml, file)
-        except MatchError as e:
-            return [e]
-
-        for task in tasks:
-            if self.id in task.get('skipped_rules', ()):
+            if skipped or "action" not in task:
                 continue
 
-            if 'action' not in task:
-                continue
+            if self.needs_raw_task:
+                task["__raw_task__"] = raw_task
+
             result = self.matchtask(task, file=file)
+
             if not result:
                 continue
 
@@ -143,7 +140,7 @@ class AnsibleLintRule(BaseRule):
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
         matches: List[MatchError] = []
-        if not self.matchplay or str(file.base_kind) != 'text/yaml':
+        if not self.matchplay or str(file.base_kind) != "text/yaml":
             return matches
 
         yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
@@ -151,7 +148,7 @@ class AnsibleLintRule(BaseRule):
         # file contains a single string. YAML spec allows this but we consider
         # this an fatal error.
         if isinstance(yaml, str):
-            if yaml.startswith('$ANSIBLE_VAULT'):
+            if yaml.startswith("$ANSIBLE_VAULT"):
                 return []
             return [MatchError(filename=str(file.path), rule=LoadingFailureRule())]
         if not yaml:
@@ -168,7 +165,7 @@ class AnsibleLintRule(BaseRule):
             if play is None:
                 continue
 
-            if self.id in play.get('skipped_rules', ()):
+            if self.id in play.get("skipped_rules", ()):
                 continue
 
             matches.extend(self.matchplay(file, play))
@@ -183,9 +180,9 @@ def is_valid_rule(rule: AnsibleLintRule) -> bool:
 
 def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
     """Yield a rule class."""
-    for pluginfile in glob.glob(os.path.join(directory, '[A-Za-z]*.py')):
+    for pluginfile in glob.glob(os.path.join(directory, "[A-Za-z]*.py")):
 
-        pluginname = os.path.basename(pluginfile.replace('.py', ''))
+        pluginname = os.path.basename(pluginfile.replace(".py", ""))
         spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
         # https://github.com/python/typeshed/issues/2793
         if spec and isinstance(spec.loader, Loader):
@@ -208,7 +205,7 @@ class RulesCollection:
         self.options = options
         if rulesdirs is None:
             rulesdirs = []
-        self.rulesdirs = ansiblelint.file_utils.expand_paths_vars(rulesdirs)
+        self.rulesdirs = expand_paths_vars(rulesdirs)
         self.rules: List[BaseRule] = []
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
@@ -223,7 +220,7 @@ class RulesCollection:
 
     def register(self, obj: AnsibleLintRule) -> None:
         # We skip opt-in rules which were not manually enabled
-        if 'opt-in' not in obj.tags or obj.id in self.options.enable_list:
+        if "opt-in" not in obj.tags or obj.id in self.options.enable_list:
             self.rules.append(obj)
 
     def __iter__(self) -> Iterator[BaseRule]:

@@ -15,34 +15,34 @@ if TYPE_CHECKING:
 
 
 class MetaTagValidRule(AnsibleLintRule):
-    id = 'meta-no-tags'
-    shortdesc = 'Tags must contain lowercase letters and digits only'
+    id = "meta-no-tags"
+    shortdesc = "Tags must contain lowercase letters and digits only"
     description = (
-        'Tags must contain lowercase letters and digits only, '
-        'and ``galaxy_tags`` is expected to be a list'
+        "Tags must contain lowercase letters and digits only, "
+        "and ``galaxy_tags`` is expected to be a list"
     )
-    severity = 'HIGH'
-    tags = ['metadata']
-    version_added = 'v4.0.0'
+    severity = "HIGH"
+    tags = ["metadata"]
+    version_added = "v4.0.0"
 
-    TAG_REGEXP = re.compile('^[a-z0-9]+$')
+    TAG_REGEXP = re.compile("^[a-z0-9]+$")
 
     def matchplay(
         self, file: "Lintable", data: "odict[str, Any]"
     ) -> List["MatchError"]:
-        if file.kind != 'meta':
+        if file.kind != "meta":
             return []
 
-        galaxy_info = data.get('galaxy_info', None)
+        galaxy_info = data.get("galaxy_info", None)
         if not galaxy_info:
             return []
 
         tags = []
         results = []
 
-        if 'galaxy_tags' in galaxy_info:
-            if isinstance(galaxy_info['galaxy_tags'], list):
-                tags += galaxy_info['galaxy_tags']
+        if "galaxy_tags" in galaxy_info:
+            if isinstance(galaxy_info["galaxy_tags"], list):
+                tags += galaxy_info["galaxy_tags"]
             else:
                 results.append(
                     self.create_matcherror(
@@ -50,14 +50,14 @@ class MetaTagValidRule(AnsibleLintRule):
                     )
                 )
 
-        if 'categories' in galaxy_info:
+        if "categories" in galaxy_info:
             results.append(
                 self.create_matcherror(
                     "Use 'galaxy_tags' rather than 'categories'", filename=file
                 )
             )
-            if isinstance(galaxy_info['categories'], list):
-                tags += galaxy_info['categories']
+            if isinstance(galaxy_info["categories"], list):
+                tags += galaxy_info["categories"]
             else:
                 results.append(
                     self.create_matcherror(
@@ -84,11 +84,11 @@ class MetaTagValidRule(AnsibleLintRule):
         return results
 
 
-META_TAG_VALID = '''
+META_TAG_VALID = """
 galaxy_info:
     galaxy_tags: ['database', 'my s q l', 'MYTAG']
     categories: 'my_category_not_in_a_list'
-'''
+"""
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
@@ -96,7 +96,7 @@ if "pytest" in sys.modules:
     import pytest
 
     @pytest.mark.parametrize(
-        'rule_runner', (MetaTagValidRule,), indirect=['rule_runner']
+        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
     )
     def test_valid_tag_rule(rule_runner: "Any") -> None:
         """Test rule matches."""

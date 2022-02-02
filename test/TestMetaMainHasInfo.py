@@ -5,12 +5,12 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.MetaMainHasInfoRule import MetaMainHasInfoRule
 from ansiblelint.testing import RunFromText
 
-NO_GALAXY_INFO = '''
+NO_GALAXY_INFO = """
 author: the author
 description: this meta/main.yml has no galaxy_info
-'''
+"""
 
-MISSING_INFO = '''
+MISSING_INFO = """
 galaxy_info:
   # author: the author
   description: Testing if meta contains values
@@ -27,9 +27,9 @@ galaxy_info:
   - missing_name: No name
     versions:
     - 25
-'''
+"""
 
-BAD_TYPES = '''
+BAD_TYPES = """
 galaxy_info:
   author: 007
   description: ['Testing meta']
@@ -40,9 +40,9 @@ galaxy_info:
   min_ansible_version: 2.5
 
   platforms: Fedora
-'''
+"""
 
-PLATFORMS_LIST_OF_STR = '''
+PLATFORMS_LIST_OF_STR = """
 galaxy_info:
   author: '007'
   description: 'Testing meta'
@@ -53,7 +53,7 @@ galaxy_info:
   min_ansible_version: 2.5
 
   platforms: ['Fedora', 'EL']
-'''
+"""
 
 
 class TestMetaMainHasInfo(unittest.TestCase):

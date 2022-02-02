@@ -31,22 +31,22 @@ if TYPE_CHECKING:
 
 
 class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
-    id = 'deprecated-bare-vars'
-    shortdesc = 'Using bare variables is deprecated'
+    id = "deprecated-bare-vars"
+    shortdesc = "Using bare variables is deprecated"
     description = (
-        'Using bare variables is deprecated. Update your '
-        'playbooks so that the environment value uses the full variable '
-        'syntax ``{{ your_variable }}``'
+        "Using bare variables is deprecated. Update your "
+        "playbooks so that the environment value uses the full variable "
+        "syntax ``{{ your_variable }}``"
     )
-    severity = 'VERY_HIGH'
-    tags = ['deprecations']
-    version_added = 'historic'
+    severity = "VERY_HIGH"
+    tags = ["deprecations"]
+    version_added = "historic"
 
     _jinja = re.compile(r"{[{%].*[%}]}", re.DOTALL)
-    _glob = re.compile('[][*?]')
+    _glob = re.compile("[][*?]")
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         loop_type = next((key for key in task if key.startswith("with_")), None)
         if loop_type:
@@ -77,11 +77,11 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
         self, varstring: str, task: Dict[str, Any], loop_type: str
     ) -> Union[bool, str]:
         if isinstance(varstring, str) and not self._jinja.match(varstring):
-            valid = loop_type == 'with_fileglob' and bool(
+            valid = loop_type == "with_fileglob" and bool(
                 self._jinja.search(varstring) or self._glob.search(varstring)
             )
 
-            valid |= loop_type == 'with_filetree' and bool(
+            valid |= loop_type == "with_filetree" and bool(
                 self._jinja.search(varstring) or varstring.endswith(os.sep)
             )
             if not valid:

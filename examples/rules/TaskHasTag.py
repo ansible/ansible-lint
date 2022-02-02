@@ -12,13 +12,13 @@ if TYPE_CHECKING:
 class TaskHasTag(AnsibleLintRule):
     """Tasks must have tag."""
 
-    id = 'EXAMPLE001'
-    shortdesc = 'Tasks must have tag'
-    description = 'Tasks must have tag'
-    tags = ['productivity', 'tags']
+    id = "EXAMPLE001"
+    shortdesc = "Tasks must have tag"
+    description = "Tasks must have tag"
+    tags = ["productivity", "tags"]
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         """Task matching method."""
         if isinstance(task, str):
@@ -26,17 +26,17 @@ class TaskHasTag(AnsibleLintRule):
 
         # If the task include another task or make the playbook fail
         # Don't force to have a tag
-        if not set(task.keys()).isdisjoint(['include', 'fail']):
+        if not set(task.keys()).isdisjoint(["include", "fail"]):
             return False
 
-        if not set(task.keys()).isdisjoint(['include_tasks', 'fail']):
+        if not set(task.keys()).isdisjoint(["include_tasks", "fail"]):
             return False
 
-        if not set(task.keys()).isdisjoint(['import_tasks', 'fail']):
+        if not set(task.keys()).isdisjoint(["import_tasks", "fail"]):
             return False
 
         # Task should have tags
-        if 'tags' not in task:
+        if "tags" not in task:
             return True
 
         return False

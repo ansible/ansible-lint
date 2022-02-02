@@ -2,7 +2,7 @@ import pytest
 
 from ansiblelint.testing import RunFromText
 
-PLAYBOOK_PRE_TASKS = '''\
+PLAYBOOK_PRE_TASKS = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -14,9 +14,9 @@ PLAYBOOK_PRE_TASKS = '''\
       action: git a=b c=d
     - name: bad git 4
       action: git a=b c=d
-'''
+"""
 
-PLAYBOOK_POST_TASKS = '''\
+PLAYBOOK_POST_TASKS = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -28,9 +28,9 @@ PLAYBOOK_POST_TASKS = '''\
       action: git a=b c=d
     - name: bad git 4
       action: git a=b c=d
-'''
+"""
 
-PLAYBOOK_HANDLERS = '''\
+PLAYBOOK_HANDLERS = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -42,9 +42,9 @@ PLAYBOOK_HANDLERS = '''\
       action: git a=b c=d
     - name: bad git 4
       action: git a=b c=d
-'''
+"""
 
-PLAYBOOK_TWO_PLAYS = '''\
+PLAYBOOK_TWO_PLAYS = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -58,9 +58,9 @@ PLAYBOOK_TWO_PLAYS = '''\
       action: git a=b c=d
     - name: bad git 4
       action: git a=b c=d
-'''
+"""
 
-PLAYBOOK_WITH_BLOCK = '''\
+PLAYBOOK_WITH_BLOCK = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -83,17 +83,17 @@ PLAYBOOK_WITH_BLOCK = '''\
           action: git a=b c=d
         - name: bad git 8
           action: git a=b c=d
-'''
+"""
 
 
 @pytest.mark.parametrize(
-    ('playbook', 'length'),
+    ("playbook", "length"),
     (
-        pytest.param(PLAYBOOK_PRE_TASKS, 2, id='PRE_TASKS'),
-        pytest.param(PLAYBOOK_POST_TASKS, 2, id='POST_TASKS'),
-        pytest.param(PLAYBOOK_HANDLERS, 2, id='HANDLERS'),
-        pytest.param(PLAYBOOK_TWO_PLAYS, 2, id='TWO_PLAYS'),
-        pytest.param(PLAYBOOK_WITH_BLOCK, 4, id='WITH_BLOCK'),
+        pytest.param(PLAYBOOK_PRE_TASKS, 2, id="PRE_TASKS"),
+        pytest.param(PLAYBOOK_POST_TASKS, 2, id="POST_TASKS"),
+        pytest.param(PLAYBOOK_HANDLERS, 2, id="HANDLERS"),
+        pytest.param(PLAYBOOK_TWO_PLAYS, 2, id="TWO_PLAYS"),
+        pytest.param(PLAYBOOK_WITH_BLOCK, 4, id="WITH_BLOCK"),
     ),
 )
 def test_pre_tasks(

@@ -165,4 +165,4 @@ def ansible_version(version: str = "") -> Version:
 
 
 if ansible_collections_path() in os.environ:
-    collection_list = os.environ[ansible_collections_path()].split(':')
+    collection_list = os.environ[ansible_collections_path()].split(":")

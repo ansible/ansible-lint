@@ -11,11 +11,11 @@ from ansiblelint import cli
 @pytest.fixture
 def base_arguments() -> List[str]:
     """Define reusable base arguments for tests in current module."""
-    return ['../test/skiptasks.yml']
+    return ["../test/skiptasks.yml"]
 
 
 @pytest.mark.parametrize(
-    ('args', 'config'),
+    ("args", "config"),
     (
         (["-p"], "test/fixtures/parseable.yml"),
         (["-q"], "test/fixtures/quiet.yml"),
@@ -42,10 +42,10 @@ def test_ensure_config_are_equal(
     for key, val in file_config.items():
 
         # config_file does not make sense in file_config
-        if key == 'config_file':
+        if key == "config_file":
             continue
 
-        if key in {'exclude_paths', 'rulesdir'}:
+        if key in {"exclude_paths", "rulesdir"}:
             val = [Path(p) for p in val]
         assert val == getattr(options, key)
 
@@ -92,10 +92,10 @@ def test_path_from_config_do_not_depend_on_cwd(
 ) -> None:  # Issue 572
     """Check that config-provided paths are decoupled from CWD."""
     config1 = cli.load_config("test/fixtures/config-with-relative-path.yml")
-    monkeypatch.chdir('test')
+    monkeypatch.chdir("test")
     config2 = cli.load_config("fixtures/config-with-relative-path.yml")
 
-    assert config1['exclude_paths'].sort() == config2['exclude_paths'].sort()
+    assert config1["exclude_paths"].sort() == config2["exclude_paths"].sort()
 
 
 def test_path_from_cli_depend_on_cwd(
@@ -109,13 +109,13 @@ def test_path_from_cli_depend_on_cwd(
     ]
 
     options1 = cli.get_cli_parser().parse_args(arguments)
-    assert 'test/test' not in str(options1.exclude_paths[0])
+    assert "test/test" not in str(options1.exclude_paths[0])
 
-    test_dir = 'test'
+    test_dir = "test"
     monkeypatch.chdir(test_dir)
     options2 = cli.get_cli_parser().parse_args(arguments)
 
-    assert 'test/test' in str(options2.exclude_paths[0])
+    assert "test/test" in str(options2.exclude_paths[0])
 
 
 @pytest.mark.parametrize(
@@ -137,4 +137,4 @@ def test_extra_vars_loaded(base_arguments: List[str]) -> None:
         base_arguments + ["-c", "test/fixtures/config-with-extra-vars.yml"]
     )
 
-    assert config.extra_vars == {'foo': 'bar', 'knights_favorite_word': 'NI'}
+    assert config.extra_vars == {"foo": "bar", "knights_favorite_word": "NI"}

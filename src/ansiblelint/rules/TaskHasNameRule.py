@@ -29,17 +29,17 @@ if TYPE_CHECKING:
 
 
 class TaskHasNameRule(AnsibleLintRule):
-    id = 'unnamed-task'
-    shortdesc = 'All tasks should be named'
+    id = "unnamed-task"
+    shortdesc = "All tasks should be named"
     description = (
-        'All tasks should have a distinct name for readability '
-        'and for ``--start-at-task`` to work'
+        "All tasks should have a distinct name for readability "
+        "and for ``--start-at-task`` to work"
     )
-    severity = 'MEDIUM'
-    tags = ['idiom']
-    version_added = 'historic'
+    severity = "MEDIUM"
+    tags = ["idiom"]
+    version_added = "historic"
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
-        return not task.get('name')
+        return not task.get("name")

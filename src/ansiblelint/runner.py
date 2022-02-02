@@ -116,7 +116,7 @@ class Runner:
 
         # playbooks: List[Lintable] = []
         for lintable in self.lintables:
-            if lintable.kind != 'playbook':
+            if lintable.kind != "playbook":
                 continue
             files.append(lintable)
 

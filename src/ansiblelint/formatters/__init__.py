@@ -12,7 +12,7 @@ from ansiblelint.config import options
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
-T = TypeVar('T', bound='BaseFormatter')  # type: ignore
+T = TypeVar("T", bound="BaseFormatter")  # type: ignore
 
 
 class BaseFormatter(Generic[T]):
@@ -58,7 +58,7 @@ class BaseFormatter(Generic[T]):
 
 class Formatter(BaseFormatter):  # type: ignore
     def format(self, match: "MatchError") -> str:
-        _id = getattr(match.rule, 'id', '000')
+        _id = getattr(match.rule, "id", "000")
         result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
         if match.tag:
             result += f" [dim][error_code]({match.tag})[/][/]"
@@ -131,12 +131,12 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
 
     @staticmethod
     def _severity_to_level(severity: str) -> str:
-        if severity in ['VERY_LOW', 'LOW']:
-            return 'warning'
-        if severity in ['INFO']:
-            return 'debug'
+        if severity in ["VERY_LOW", "LOW"]:
+            return "warning"
+        if severity in ["INFO"]:
+            return "debug"
         # ['MEDIUM', 'HIGH', 'VERY_HIGH'] or anything else
-        return 'error'
+        return "error"
 
 
 class ParseableSeverityFormatter(BaseFormatter[Any]):
@@ -144,7 +144,7 @@ class ParseableSeverityFormatter(BaseFormatter[Any]):
 
         filename = self._format_path(match.filename or "")
         position = match.position
-        rule_id = u"{0}".format(match.rule.id)
+        rule_id = "{0}".format(match.rule.id)
         severity = match.rule.severity
         message = self.escape(str(match.message))
 
@@ -172,26 +172,26 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
         result = []
         for match in matches:
             issue: Dict[str, Any] = {}
-            issue['type'] = 'issue'
-            issue['check_name'] = f"[{match.rule.id}] {match.message}"
-            issue['categories'] = match.rule.tags
-            issue['severity'] = self._severity_to_level(match.rule.severity)
-            issue['description'] = self.escape(str(match.rule.description))
-            issue['fingerprint'] = hashlib.sha256(
-                repr(match).encode('utf-8')
+            issue["type"] = "issue"
+            issue["check_name"] = f"[{match.rule.id}] {match.message}"
+            issue["categories"] = match.rule.tags
+            issue["severity"] = self._severity_to_level(match.rule.severity)
+            issue["description"] = self.escape(str(match.rule.description))
+            issue["fingerprint"] = hashlib.sha256(
+                repr(match).encode("utf-8")
             ).hexdigest()
-            issue['location'] = {}
-            issue['location']['path'] = self._format_path(match.filename or "")
-            issue['location']['lines'] = {}
+            issue["location"] = {}
+            issue["location"]["path"] = self._format_path(match.filename or "")
+            issue["location"]["lines"] = {}
             if match.column:
-                issue['location']['lines']['begin'] = {}
-                issue['location']['lines']['begin']['line'] = match.linenumber
-                issue['location']['lines']['begin']['column'] = match.column
+                issue["location"]["lines"]["begin"] = {}
+                issue["location"]["lines"]["begin"]["line"] = match.linenumber
+                issue["location"]["lines"]["begin"]["column"] = match.column
             else:
-                issue['location']['lines']['begin'] = match.linenumber
+                issue["location"]["lines"]["begin"] = match.linenumber
             if match.details:
-                issue['content'] = {}
-                issue['content']['body'] = match.details
+                issue["content"] = {}
+                issue["content"]["body"] = match.details
             # Append issue to result list
             result.append(issue)
 
@@ -199,13 +199,13 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
 
     @staticmethod
     def _severity_to_level(severity: str) -> str:
-        if severity in ['LOW']:
-            return 'minor'
-        if severity in ['MEDIUM']:
-            return 'major'
-        if severity in ['HIGH']:
-            return 'critical'
-        if severity in ['VERY_HIGH']:
-            return 'blocker'
+        if severity in ["LOW"]:
+            return "minor"
+        if severity in ["MEDIUM"]:
+            return "major"
+        if severity in ["HIGH"]:
+            return "critical"
+        if severity in ["VERY_HIGH"]:
+            return "blocker"
         # VERY_LOW, INFO or anything else
-        return 'info'
+        return "info"

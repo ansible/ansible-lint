@@ -7,6 +7,6 @@ except ImportError:
 
 
 try:
-    __version__ = pkg_resources.get_distribution('ansible-lint').version
+    __version__ = pkg_resources.get_distribution("ansible-lint").version
 except Exception:
-    __version__ = 'unknown'
+    __version__ = "unknown"

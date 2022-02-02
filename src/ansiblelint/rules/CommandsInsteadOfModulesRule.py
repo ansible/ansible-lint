@@ -32,51 +32,51 @@ if TYPE_CHECKING:
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
-    id = 'command-instead-of-module'
-    shortdesc = 'Using command rather than module'
+    id = "command-instead-of-module"
+    shortdesc = "Using command rather than module"
     description = (
-        'Executing a command when there is an Ansible module is generally a bad idea'
+        "Executing a command when there is an Ansible module is generally a bad idea"
     )
-    severity = 'HIGH'
-    tags = ['command-shell', 'idiom']
-    version_added = 'historic'
+    severity = "HIGH"
+    tags = ["command-shell", "idiom"]
+    version_added = "historic"
 
-    _commands = ['command', 'shell']
+    _commands = ["command", "shell"]
     _modules = {
-        'apt-get': 'apt-get',
-        'chkconfig': 'service',
-        'curl': 'get_url or uri',
-        'git': 'git',
-        'hg': 'hg',
-        'letsencrypt': 'acme_certificate',
-        'mktemp': 'tempfile',
-        'mount': 'mount',
-        'patch': 'patch',
-        'rpm': 'yum or rpm_key',
-        'rsync': 'synchronize',
-        'sed': 'template, replace or lineinfile',
-        'service': 'service',
-        'supervisorctl': 'supervisorctl',
-        'svn': 'subversion',
-        'systemctl': 'systemd',
-        'tar': 'unarchive',
-        'unzip': 'unarchive',
-        'wget': 'get_url or uri',
-        'yum': 'yum',
+        "apt-get": "apt-get",
+        "chkconfig": "service",
+        "curl": "get_url or uri",
+        "git": "git",
+        "hg": "hg",
+        "letsencrypt": "acme_certificate",
+        "mktemp": "tempfile",
+        "mount": "mount",
+        "patch": "patch",
+        "rpm": "yum or rpm_key",
+        "rsync": "synchronize",
+        "sed": "template, replace or lineinfile",
+        "service": "service",
+        "supervisorctl": "supervisorctl",
+        "svn": "subversion",
+        "systemctl": "systemd",
+        "tar": "unarchive",
+        "unzip": "unarchive",
+        "wget": "get_url or uri",
+        "yum": "yum",
     }
 
     _executable_options = {
-        'git': ['branch', 'log'],
-        'systemctl': ['set-default', 'show-environment', 'status'],
-        'yum': ['clean'],
-        'rpm': ['--nodeps'],
+        "git": ["branch", "log"],
+        "systemctl": ["set-default", "show-environment", "status"],
+        "yum": ["clean"],
+        "rpm": ["--nodeps"],
     }
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
 
-        if task['action']['__ansible_module__'] not in self._commands:
+        if task["action"]["__ansible_module__"] not in self._commands:
             return False
 
         first_cmd_arg = get_first_cmd_arg(task)
@@ -95,9 +95,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             return False
 
         if executable in self._modules and convert_to_boolean(
-            task['action'].get('warn', True)
+            task["action"].get("warn", True)
         ):
-            message = '{0} used in place of {1} module'
+            message = "{0} used in place of {1} module"
             return message.format(executable, self._modules[executable])
         return False
 
@@ -107,71 +107,71 @@ if "pytest" in sys.modules:  # noqa: C901
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
-    APT_GET = '''
+    APT_GET = """
 - hosts: all
   tasks:
     - name: run apt-get update
       command: apt-get update
-'''
+"""
 
-    GIT_BRANCH = '''
+    GIT_BRANCH = """
 - hosts: all
   tasks:
     - name: print current git branch
       command: git branch
-'''
+"""
 
-    GIT_LOG = '''
+    GIT_LOG = """
 - hosts: all
   tasks:
     - name: print git log
       command: git log
-'''
+"""
 
-    RESTART_SSHD = '''
+    RESTART_SSHD = """
 - hosts: all
   tasks:
     - name: restart sshd
       command: systemctl restart sshd
-'''
+"""
 
-    SYSTEMCTL_STATUS = '''
+    SYSTEMCTL_STATUS = """
 - hosts: all
   tasks:
     - name: show systemctl service status
       command: systemctl status systemd-timesyncd
-'''
+"""
 
-    SYSTEMD_ENVIRONMENT = '''
+    SYSTEMD_ENVIRONMENT = """
 - hosts: all
   tasks:
     - name: show systemd environment
       command: systemctl show-environment
-'''
+"""
 
-    SYSTEMD_RUNLEVEL = '''
+    SYSTEMD_RUNLEVEL = """
 - hosts: all
   tasks:
     - name: set systemd runlevel
       command: systemctl set-default multi-user.target
-'''
+"""
 
-    YUM_UPDATE = '''
+    YUM_UPDATE = """
 - hosts: all
   tasks:
     - name: run yum update
       command: yum update
-'''
+"""
 
-    YUM_CLEAN = '''
+    YUM_CLEAN = """
 - hosts: all
   tasks:
     - name: clear yum cache
       command: yum clean all
-'''
+"""
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_apt_get(rule_runner: RunFromText) -> None:
         """The apt module supports update."""
@@ -179,7 +179,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 1
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_restart_sshd(rule_runner: RunFromText) -> None:
         """Restarting services is supported by the systemd module."""
@@ -187,7 +187,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 1
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_git_log(rule_runner: RunFromText) -> None:
         """The git log command is not supported by the git module."""
@@ -195,7 +195,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_git_branch(rule_runner: RunFromText) -> None:
         """The git branch command is not supported by the git module."""
@@ -203,7 +203,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_systemd_status(rule_runner: RunFromText) -> None:
         """Set-default is not supported by the systemd module."""
@@ -211,7 +211,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_systemd_environment(rule_runner: RunFromText) -> None:
         """Showing the environment is not supported by the systemd module."""
@@ -219,7 +219,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_systemd_runlevel(rule_runner: RunFromText) -> None:
         """Set-default is not supported by the systemd module."""
@@ -227,7 +227,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_yum_update(rule_runner: RunFromText) -> None:
         """Using yum update should fail."""
@@ -235,7 +235,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 1
 
     @pytest.mark.parametrize(
-        'rule_runner', (CommandsInsteadOfModulesRule,), indirect=['rule_runner']
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_yum_clean(rule_runner: RunFromText) -> None:
         """The yum module does not support clearing yum cache."""

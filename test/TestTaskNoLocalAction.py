@@ -5,11 +5,11 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.TaskNoLocalAction import TaskNoLocalAction
 from ansiblelint.testing import RunFromText
 
-TASK_LOCAL_ACTION = '''
+TASK_LOCAL_ACTION = """
 - name: task example
   local_action:
     module: boto3_facts
-'''
+"""
 
 
 class TestTaskNoLocalAction(unittest.TestCase):

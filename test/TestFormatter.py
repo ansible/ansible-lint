@@ -44,7 +44,7 @@ class TestFormatter(unittest.TestCase):
 
     def test_unicode_format_string(self) -> None:
         match = MatchError(
-            message=u'\U0001f427',
+            message=u"\U0001f427",
             linenumber=1,
             details="hello",
             filename="filename.yml",
@@ -56,7 +56,7 @@ class TestFormatter(unittest.TestCase):
         match = MatchError(
             message="xyz",
             linenumber=1,
-            details={'hello': 'world'},  # type: ignore
+            details={"hello": "world"},  # type: ignore
             filename="filename.yml",
             rule=self.rule,
         )
