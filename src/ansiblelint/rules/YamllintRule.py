@@ -28,6 +28,9 @@ except ImportError:
 YAMLLINT_CONFIG = """
 extends: default
 rules:
+  comments:
+    # https://github.com/prettier/prettier/issues/6780
+    min-spaces-from-content: 1
   # https://github.com/adrienverge/yamllint/issues/384
   comments-indentation: false
   document-start: disable
