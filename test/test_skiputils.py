@@ -4,7 +4,7 @@ import pytest
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.testing import RunFromText
 
-PLAYBOOK_WITH_NOQA = '''\
+PLAYBOOK_WITH_NOQA = """\
 - hosts: all
   vars:
     SOMEVARNOQA: "Foo"  # noqa var-naming
@@ -14,7 +14,7 @@ PLAYBOOK_WITH_NOQA = '''\
       set_fact:
         SOMEOTHERVARNOQA: "Baz"  # noqa var-naming
         SOMEOTHERVAR: "Bat"
-'''
+"""
 
 
 @pytest.mark.parametrize(

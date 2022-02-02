@@ -81,8 +81,8 @@ class FQCNBuiltinsRule(AnsibleLintRule):
     id = "fqcn-builtins"
     shortdesc = "Use FQCN for builtin actions"
     description = (
-        'Check whether the long version starting with ``ansible.builtin`` '
-        'is used in the playbook'
+        "Check whether the long version starting with ``ansible.builtin`` "
+        "is used in the playbook"
     )
     tags = ["opt-in", "formatting", "experimental"]
 
@@ -99,22 +99,22 @@ if "pytest" in sys.modules:
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
-    SUCCESS_PLAY = '''
+    SUCCESS_PLAY = """
 - hosts: localhost
   tasks:
   - name: shell (fqcn)
     ansible.builtin.shell: echo This rule should not get matched by the fqcn-builtins rule
-    '''
+    """
 
-    FAIL_PLAY = '''
+    FAIL_PLAY = """
 - hosts: localhost
   tasks:
   - name: shell (fqcn)
     shell: echo This rule should get matched by the fqcn-builtins rule
-    '''
+    """
 
     @pytest.mark.parametrize(
-        'rule_runner', (FQCNBuiltinsRule,), indirect=['rule_runner']
+        "rule_runner", (FQCNBuiltinsRule,), indirect=["rule_runner"]
     )
     def test_fqcn_builtin_fail(rule_runner: RunFromText) -> None:
         """Test rule matches."""
@@ -124,7 +124,7 @@ if "pytest" in sys.modules:
             assert result.message == FQCNBuiltinsRule.shortdesc
 
     @pytest.mark.parametrize(
-        'rule_runner', (FQCNBuiltinsRule,), indirect=['rule_runner']
+        "rule_runner", (FQCNBuiltinsRule,), indirect=["rule_runner"]
     )
     def test_fqcn_builtin_pass(rule_runner: RunFromText) -> None:
         """Test rule does not match."""

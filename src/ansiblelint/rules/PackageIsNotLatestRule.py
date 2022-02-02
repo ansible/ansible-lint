@@ -29,50 +29,50 @@ if TYPE_CHECKING:
 
 
 class PackageIsNotLatestRule(AnsibleLintRule):
-    id = 'package-latest'
-    shortdesc = 'Package installs should not use latest'
+    id = "package-latest"
+    shortdesc = "Package installs should not use latest"
     description = (
-        'Package installs should use ``state=present`` with or without a version'
+        "Package installs should use ``state=present`` with or without a version"
     )
-    severity = 'VERY_LOW'
-    tags = ['idempotency']
-    version_added = 'historic'
+    severity = "VERY_LOW"
+    tags = ["idempotency"]
+    version_added = "historic"
 
     _package_managers = [
-        'apk',
-        'apt',
-        'bower',
-        'bundler',
-        'dnf',
-        'easy_install',
-        'gem',
-        'homebrew',
-        'jenkins_plugin',
-        'npm',
-        'openbsd_package',
-        'openbsd_pkg',
-        'package',
-        'pacman',
-        'pear',
-        'pip',
-        'pkg5',
-        'pkgutil',
-        'portage',
-        'slackpkg',
-        'sorcery',
-        'swdepot',
-        'win_chocolatey',
-        'yarn',
-        'yum',
-        'zypper',
+        "apk",
+        "apt",
+        "bower",
+        "bundler",
+        "dnf",
+        "easy_install",
+        "gem",
+        "homebrew",
+        "jenkins_plugin",
+        "npm",
+        "openbsd_package",
+        "openbsd_pkg",
+        "package",
+        "pacman",
+        "pear",
+        "pip",
+        "pkg5",
+        "pkgutil",
+        "portage",
+        "slackpkg",
+        "sorcery",
+        "swdepot",
+        "win_chocolatey",
+        "yarn",
+        "yum",
+        "zypper",
     ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         return (
-            task['action']['__ansible_module__'] in self._package_managers
-            and not task['action'].get('version')
-            and not task['action'].get('update_only')
-            and task['action'].get('state') == 'latest'
+            task["action"]["__ansible_module__"] in self._package_managers
+            and not task["action"].get("version")
+            and not task["action"].get("update_only")
+            and task["action"].get("state") == "latest"
         )

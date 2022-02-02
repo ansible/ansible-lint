@@ -30,43 +30,43 @@ if TYPE_CHECKING:
 
 
 class EnvVarsInCommandRule(AnsibleLintRule):
-    id = 'inline-env-var'
+    id = "inline-env-var"
     shortdesc = "Command module does not accept setting environment variables inline"
     description = (
-        'Use ``environment:`` to set environment variables '
-        'or use ``shell`` module which accepts both'
+        "Use ``environment:`` to set environment variables "
+        "or use ``shell`` module which accepts both"
     )
-    severity = 'VERY_HIGH'
-    tags = ['command-shell', 'idiom']
-    version_added = 'historic'
+    severity = "VERY_HIGH"
+    tags = ["command-shell", "idiom"]
+    version_added = "historic"
 
     expected_args = [
-        'chdir',
-        'creates',
-        'executable',
-        'removes',
-        'stdin',
-        'warn',
-        'stdin_add_newline',
-        'strip_empty_ends',
-        'cmd',
-        '__ansible_module__',
-        '__ansible_module_original__',
-        '__ansible_arguments__',
+        "chdir",
+        "creates",
+        "executable",
+        "removes",
+        "stdin",
+        "warn",
+        "stdin_add_newline",
+        "strip_empty_ends",
+        "cmd",
+        "__ansible_module__",
+        "__ansible_module_original__",
+        "__ansible_arguments__",
         LINE_NUMBER_KEY,
         FILENAME_KEY,
     ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
-        if task["action"]["__ansible_module__"] in ['command']:
+        if task["action"]["__ansible_module__"] in ["command"]:
             first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:
                 return False
 
             return any(
-                [arg not in self.expected_args for arg in task['action']]
+                [arg not in self.expected_args for arg in task["action"]]
                 + ["=" in first_cmd_arg]
             )
         return False

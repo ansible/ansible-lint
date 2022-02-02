@@ -5,13 +5,13 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.MetaChangeFromDefaultRule import MetaChangeFromDefaultRule
 from ansiblelint.testing import RunFromText
 
-DEFAULT_GALAXY_INFO = '''
+DEFAULT_GALAXY_INFO = """
 galaxy_info:
   author: your name
   description: your description
   company: your company (optional)
   license: license (GPLv2, CC-BY, etc)
-'''
+"""
 
 
 class TestMetaChangeFromDefault(unittest.TestCase):

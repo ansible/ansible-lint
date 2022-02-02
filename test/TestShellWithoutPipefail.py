@@ -5,7 +5,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.ShellWithoutPipefail import ShellWithoutPipefail
 from ansiblelint.testing import RunFromText
 
-FAIL_TASKS = '''
+FAIL_TASKS = """
 ---
 - hosts: localhost
   become: no
@@ -18,9 +18,9 @@ FAIL_TASKS = '''
 
     - shell: |
         df | grep '/dev'
-'''
+"""
 
-SUCCESS_TASKS = '''
+SUCCESS_TASKS = """
 ---
 - hosts: localhost
   become: no
@@ -75,7 +75,7 @@ SUCCESS_TASKS = '''
     - name: should not fail due to ignore_errors being true
       shell: false | cat
       ignore_errors: true
-'''
+"""
 
 
 class TestShellWithoutPipeFail(unittest.TestCase):

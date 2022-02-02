@@ -33,13 +33,13 @@ if TYPE_CHECKING:
 def _get_subtasks(data: "odict[str, Any]") -> List[Any]:
     result: List[Any] = []
     block_names = [
-        'tasks',
-        'pre_tasks',
-        'post_tasks',
-        'handlers',
-        'block',
-        'always',
-        'rescue',
+        "tasks",
+        "pre_tasks",
+        "post_tasks",
+        "handlers",
+        "block",
+        "always",
+        "rescue",
     ]
     for name in block_names:
         if data and name in data:
@@ -56,10 +56,10 @@ def _nested_search(term: str, data: "odict[str, Any]") -> Any:
 
 
 def _become_user_without_become(becomeuserabove: bool, data: "odict[str, Any]") -> Any:
-    if 'become' in data:
+    if "become" in data:
         # If become is in lineage of tree then correct
         return False
-    if 'become_user' in data and _nested_search('become', data):
+    if "become_user" in data and _nested_search("become", data):
         # If 'become_user' on tree and become somewhere below
         # we must check for a case of a second 'become_user' without a
         # 'become' in its lineage
@@ -67,14 +67,14 @@ def _become_user_without_become(becomeuserabove: bool, data: "odict[str, Any]") 
         return reduce(
             (lambda x, y: x or _become_user_without_become(False, y)), subtasks, False
         )
-    if _nested_search('become_user', data):
+    if _nested_search("become_user", data):
         # Keep searching down if 'become_user' exists in the tree below current task
         subtasks = _get_subtasks(data)
         return len(subtasks) == 0 or reduce(
             (
                 lambda x, y: x
                 or _become_user_without_become(
-                    becomeuserabove or 'become_user' in data, y
+                    becomeuserabove or "become_user" in data, y
                 )
             ),
             subtasks,
@@ -86,17 +86,17 @@ def _become_user_without_become(becomeuserabove: bool, data: "odict[str, Any]") 
 
 
 class BecomeUserWithoutBecomeRule(AnsibleLintRule):
-    id = 'partial-become'
-    shortdesc = 'become_user requires become to work as expected'
-    description = '``become_user`` without ``become`` will not actually change user'
-    severity = 'VERY_HIGH'
-    tags = ['unpredictability']
-    version_added = 'historic'
+    id = "partial-become"
+    shortdesc = "become_user requires become to work as expected"
+    description = "``become_user`` without ``become`` will not actually change user"
+    severity = "VERY_HIGH"
+    tags = ["unpredictability"]
+    version_added = "historic"
 
     def matchplay(
         self, file: "Lintable", data: "odict[str, Any]"
     ) -> List["MatchError"]:
-        if file.kind == 'playbook':
+        if file.kind == "playbook":
             result = _become_user_without_become(False, data)
             if result:
                 return [

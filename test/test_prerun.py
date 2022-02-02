@@ -162,7 +162,7 @@ def test_require_collection_wrong_version() -> None:
         ]
     )
     with pytest.raises(SystemExit) as pytest_wrapped_e:
-        prerun.require_collection("containers.podman", '9999.9.9')
+        prerun.require_collection("containers.podman", "9999.9.9")
     assert pytest_wrapped_e.type == SystemExit
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 

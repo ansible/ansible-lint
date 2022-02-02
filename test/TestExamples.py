@@ -12,15 +12,15 @@ from ansiblelint.testing import run_ansible_lint
 
 @pytest.fixture
 def _change_into_examples_dir(request: FixtureRequest) -> Generator[None, None, None]:
-    os.chdir('examples')
+    os.chdir("examples")
     yield
-    os.chdir('..')
+    os.chdir("..")
 
 
-@pytest.mark.usefixtures('_change_into_examples_dir')
+@pytest.mark.usefixtures("_change_into_examples_dir")
 def test_example(default_rules_collection: RulesCollection) -> None:
     """example.yml is expected to have 16 match errors inside."""
-    result = Runner('playbooks/example.yml', rules=default_rules_collection).run()
+    result = Runner("playbooks/example.yml", rules=default_rules_collection).run()
     assert len(result) == 16
 
 
@@ -28,9 +28,9 @@ def test_example(default_rules_collection: RulesCollection) -> None:
     ("filename", "line", "column"),
     (
         pytest.param(
-            'examples/playbooks/syntax-error-string.yml', 1, 1, id='syntax-error-string'
+            "examples/playbooks/syntax-error-string.yml", 1, 1, id="syntax-error-string"
         ),
-        pytest.param('examples/playbooks/syntax-error.yml', 2, 3, id='syntax-error'),
+        pytest.param("examples/playbooks/syntax-error.yml", 2, 3, id="syntax-error"),
     ),
 )
 def test_example_syntax_error(
@@ -49,7 +49,7 @@ def test_example_syntax_error(
 def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
     result = Runner(
-        'examples/playbooks/custom_module.yml', rules=default_rules_collection
+        "examples/playbooks/custom_module.yml", rules=default_rules_collection
     ).run()
     assert len(result) == 0
 
@@ -57,14 +57,14 @@ def test_example_custom_module(default_rules_collection: RulesCollection) -> Non
 def test_full_vault(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
     result = Runner(
-        'examples/playbooks/vars/not_decryptable.yml', rules=default_rules_collection
+        "examples/playbooks/vars/not_decryptable.yml", rules=default_rules_collection
     ).run()
     assert len(result) == 0
 
 
 def test_custom_kinds() -> None:
     """Check if user defined kinds are used."""
-    result = run_ansible_lint('-vv', '--offline', 'examples/other/')
+    result = run_ansible_lint("-vv", "--offline", "examples/other/")
     assert result.returncode == 0
     # .yaml-too is not a recognized extension and unless is manually defined
     # in our .ansible-lint config, the test would not identify it as yaml file.

@@ -15,23 +15,23 @@ if TYPE_CHECKING:
 
 
 class ComparisonToEmptyStringRule(AnsibleLintRule):
-    id = 'empty-string-compare'
+    id = "empty-string-compare"
     shortdesc = "Don't compare to empty string"
     description = (
         'Use ``when: var|length > 0`` rather than ``when: var != ""`` (or '
         'conversely ``when: var|length == 0`` rather than ``when: var == ""``)'
     )
-    severity = 'HIGH'
-    tags = ['idiom']
-    version_added = 'v4.0.0'
+    severity = "HIGH"
+    tags = ["idiom"]
+    version_added = "v4.0.0"
 
     empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         for k, v, _ in nested_items_path(task):
-            if k == 'when':
+            if k == "when":
                 if isinstance(v, str):
                     if self.empty_string_compare.search(v):
                         return True
@@ -54,7 +54,7 @@ if "pytest" in sys.modules:
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
-    SUCCESS_PLAY = '''
+    SUCCESS_PLAY = """
 - hosts: all
   tasks:
     - name: shut down
@@ -62,9 +62,9 @@ if "pytest" in sys.modules:
         /sbin/shutdown -t now
         echo $var == ""
       when: ansible_os_family
-'''
+"""
 
-    FAIL_PLAY = '''
+    FAIL_PLAY = """
 - hosts: all
   tasks:
   - name: shut down
@@ -73,10 +73,10 @@ if "pytest" in sys.modules:
   - name: shut down
     command: /sbin/shutdown -t now
     when: ansible_os_family !=""
-'''
+"""
 
     @pytest.mark.parametrize(
-        'rule_runner', (ComparisonToEmptyStringRule,), indirect=['rule_runner']
+        "rule_runner", (ComparisonToEmptyStringRule,), indirect=["rule_runner"]
     )
     def test_rule_empty_string_compare_fail(rule_runner: RunFromText) -> None:
         """Test rule matches."""
@@ -86,7 +86,7 @@ if "pytest" in sys.modules:
             assert result.message == ComparisonToEmptyStringRule.shortdesc
 
     @pytest.mark.parametrize(
-        'rule_runner', (ComparisonToEmptyStringRule,), indirect=['rule_runner']
+        "rule_runner", (ComparisonToEmptyStringRule,), indirect=["rule_runner"]
     )
     def test_rule_empty_string_compare_pass(rule_runner: RunFromText) -> None:
         """Test rule matches."""

@@ -13,12 +13,12 @@ class TestTaskHasNameRule(unittest.TestCase):
         self.collection.register(TaskHasNameRule())
 
     def test_file_positive(self) -> None:
-        success = 'examples/playbooks/task-has-name-success.yml'
+        success = "examples/playbooks/task-has-name-success.yml"
         good_runner = Runner(success, rules=self.collection)
         assert [] == good_runner.run()
 
     def test_file_negative(self) -> None:
-        failure = 'examples/playbooks/task-has-name-failure.yml'
+        failure = "examples/playbooks/task-has-name-failure.yml"
         bad_runner = Runner(failure, rules=self.collection)
         errs = bad_runner.run()
         assert len(errs) == 4

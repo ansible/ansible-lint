@@ -91,36 +91,36 @@ class BaseRule:
 class RuntimeErrorRule(BaseRule):
     """Used to identify errors."""
 
-    id = 'internal-error'
-    shortdesc = 'Unexpected internal error'
+    id = "internal-error"
+    shortdesc = "Unexpected internal error"
     description = (
-        'This error can be caused by internal bugs but also by '
-        'custom rules. Instead of just stopping linter we generate the errors and '
-        'continue processing. This allows users to add this rule to their warn list until '
-        'the root cause is fixed.'
+        "This error can be caused by internal bugs but also by "
+        "custom rules. Instead of just stopping linter we generate the errors and "
+        "continue processing. This allows users to add this rule to their warn list until "
+        "the root cause is fixed."
     )
-    severity = 'VERY_HIGH'
-    tags = ['core']
-    version_added = 'v5.0.0'
+    severity = "VERY_HIGH"
+    tags = ["core"]
+    version_added = "v5.0.0"
 
 
 class AnsibleParserErrorRule(BaseRule):
     """Used to mark errors received from Ansible."""
 
-    id = 'parser-error'
-    shortdesc = 'AnsibleParserError'
-    description = 'Ansible parser fails; this usually indicates an invalid file.'
-    severity = 'VERY_HIGH'
-    tags = ['core']
-    version_added = 'v5.0.0'
+    id = "parser-error"
+    shortdesc = "AnsibleParserError"
+    description = "Ansible parser fails; this usually indicates an invalid file."
+    severity = "VERY_HIGH"
+    tags = ["core"]
+    version_added = "v5.0.0"
 
 
 class LoadingFailureRule(BaseRule):
     """File loading failure."""
 
-    id = 'load-failure'
-    shortdesc = 'Failed to load or parse file'
-    description = 'Linter failed to process a YAML file, possible not an Ansible file.'
-    severity = 'VERY_HIGH'
-    tags = ['core']
-    version_added = 'v4.3.0'
+    id = "load-failure"
+    shortdesc = "Failed to load or parse file"
+    description = "Linter failed to process a YAML file, possible not an Ansible file."
+    severity = "VERY_HIGH"
+    tags = ["core"]
+    version_added = "v4.3.0"

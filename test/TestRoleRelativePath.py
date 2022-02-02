@@ -5,7 +5,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.RoleRelativePath import RoleRelativePath
 from ansiblelint.testing import RunFromText
 
-FAIL_TASKS = '''
+FAIL_TASKS = """
 - name: template example
   template:
     src: ../templates/foo.j2
@@ -23,9 +23,9 @@ FAIL_TASKS = '''
 #   win_copy:
 #     src: ../files/foo.conf
 #     dest: renamed-foo.conf
-'''
+"""
 
-SUCCESS_TASKS = '''
+SUCCESS_TASKS = """
 - name: content example with no src
   copy:
     content: '# This file was moved to /etc/other.conf'
@@ -34,7 +34,7 @@ SUCCESS_TASKS = '''
 #   win_copy:
 #     content: '# This file was moved to /etc/other.conf'
 #     dest: /etc/mine.conf
-'''
+"""
 
 
 class TestRoleRelativePath(unittest.TestCase):

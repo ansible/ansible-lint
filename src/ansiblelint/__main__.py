@@ -71,7 +71,7 @@ def initialize_logger(level: int = 0) -> None:
     }
 
     handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(levelname)-8s %(message)s')
+    formatter = logging.Formatter("%(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
     logger = logging.getLogger()
     logger.addHandler(handler)
@@ -91,7 +91,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     if new_options.version:
         ansible_version, err = check_ansible_presence()
         print(
-            'ansible-lint {ver!s} using ansible {ansible_ver!s}'.format(
+            "ansible-lint {ver!s} using ansible {ansible_ver!s}".format(
                 ver=__version__, ansible_ver=ansible_version
             )
         )
@@ -145,7 +145,7 @@ def report_outcome(  # noqa: C901
 
     # remove unskippable rules from the list
     for rule_id in list(matched_rules.keys()):
-        if 'unskippable' in matched_rules[rule_id].tags:
+        if "unskippable" in matched_rules[rule_id].tags:
             matched_rules.pop(rule_id)
 
     entries = []
@@ -202,9 +202,9 @@ def _do_list(rules: "RulesCollection") -> int:
     if options.listrules:
 
         _rule_format_map: Dict[str, Callable[..., Any]] = {
-            'plain': rules_as_str,
-            'rich': rules_as_rich,
-            'rst': rules_as_rst,
+            "plain": rules_as_str,
+            "rich": rules_as_rich,
+            "rst": rules_as_rst,
         }
 
         console.print(_rule_format_map[options.format](rules), highlight=False)
@@ -246,7 +246,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         return _do_list(rules)
 
     if isinstance(options.tags, str):
-        options.tags = options.tags.split(',')
+        options.tags = options.tags.split(",")
 
     from ansiblelint.runner import _get_matches
 

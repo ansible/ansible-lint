@@ -12,5 +12,5 @@ class TestModule:
     def tests(self):
         """Return tests."""
         return {
-            'b_test_success': compatibility_in_test,
+            "b_test_success": compatibility_in_test,
         }

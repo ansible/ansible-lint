@@ -218,9 +218,9 @@ def prepare_environment(required_collections: Optional[Dict[str, str]] = None) -
 
 def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
     """Compute role namespace from meta/main.yml, including trailing dot."""
-    role_namespace = galaxy_infos.get('namespace', "")
+    role_namespace = galaxy_infos.get("namespace", "")
     if len(role_namespace) == 0:
-        role_namespace = galaxy_infos.get('author', "")
+        role_namespace = galaxy_infos.get("author", "")
     # if there's a space in the name space, it's likely author name
     # and not the galaxy login, so act as if there was no namespace
     if re.match(r"^\w+ \w+", role_namespace):
@@ -234,7 +234,7 @@ def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
 
 def _get_galaxy_role_name(galaxy_infos: Dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
-    return galaxy_infos.get('role_name', "")
+    return galaxy_infos.get("role_name", "")
 
 
 def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
@@ -243,7 +243,7 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
     role_name = _get_galaxy_role_name(galaxy_infos)
     if len(role_name) == 0:
         role_name = pathlib.Path(".").absolute().name
-        role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name)
+        role_name = re.sub(r"(ansible-|ansible-role-)", "", role_name)
 
     return f"{role_namespace}{role_name}"
 
@@ -253,12 +253,12 @@ def _install_galaxy_role() -> None:
     if not os.path.exists("meta/main.yml"):
         return
     yaml = yaml_from_file("meta/main.yml")
-    if 'galaxy_info' not in yaml:
+    if "galaxy_info" not in yaml:
         return
 
-    fqrn = _get_role_fqrn(yaml['galaxy_info'])
+    fqrn = _get_role_fqrn(yaml["galaxy_info"])
 
-    if 'role-name' not in options.skip_list:
+    if "role-name" not in options.skip_list:
         if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
             msg = (
                 """\
@@ -276,16 +276,16 @@ As an alternative, you can add 'role-name' to either skip_list or warn_list.
 """
                 % fqrn
             )
-            if 'role-name' in options.warn_list:
+            if "role-name" in options.warn_list:
                 _logger.warning(msg)
             else:
                 _logger.error(msg)
                 sys.exit(INVALID_PREREQUISITES_RC)
     else:
         # when 'role-name' is in skip_list, we stick to plain role names
-        if 'role_name' in yaml['galaxy_info']:
-            role_namespace = _get_galaxy_role_ns(yaml['galaxy_info'])
-            role_name = _get_galaxy_role_name(yaml['galaxy_info'])
+        if "role_name" in yaml["galaxy_info"]:
+            role_namespace = _get_galaxy_role_ns(yaml["galaxy_info"])
+            role_name = _get_galaxy_role_name(yaml["galaxy_info"])
             fqrn = f"{role_namespace}{role_name}"
         else:
             fqrn = pathlib.Path(".").absolute().name
@@ -320,9 +320,9 @@ def _prepare_ansible_paths() -> None:
         if path not in path_list and os.path.exists(path):
             path_list.append(path)
 
-    _update_env('ANSIBLE_LIBRARY', library_paths)
+    _update_env("ANSIBLE_LIBRARY", library_paths)
     _update_env(ansible_collections_path(), collection_list)
-    _update_env('ANSIBLE_ROLES_PATH', roles_path, default=ANSIBLE_DEFAULT_ROLES_PATH)
+    _update_env("ANSIBLE_ROLES_PATH", roles_path, default=ANSIBLE_DEFAULT_ROLES_PATH)
 
     # If we are asking to run without warnings, then also silence certain
     # Ansible warnings which could slip through, namely the devel branch
@@ -377,7 +377,7 @@ def _update_env(varname: str, value: List[str], default: str = "") -> None:
         orig_value = os.environ.get(varname, default=default)
         if orig_value:
             # Prepend original or default variable content to custom content.
-            value = [*orig_value.split(':'), *value]
+            value = [*orig_value.split(":"), *value]
         value_str = ":".join(value)
         if value_str != os.environ.get(varname, ""):
             os.environ[varname] = value_str
@@ -405,8 +405,8 @@ def _perform_mockings() -> None:
     if not yaml:
         # ignore empty galaxy.yml file
         return
-    namespace = yaml.get('namespace', None)
-    collection = yaml.get('name', None)
+    namespace = yaml.get("namespace", None)
+    collection = yaml.get("name", None)
     if not namespace or not collection:
         return
     p = pathlib.Path(
@@ -460,11 +460,11 @@ def require_collection(  # noqa: C901
     collection before failing.
     """
     try:
-        ns, coll = name.split('.', 1)
+        ns, coll = name.split(".", 1)
     except ValueError:
         sys.exit("Invalid collection name supplied: %s" % name)
 
-    paths = ansible_config_get('COLLECTIONS_PATHS', list)
+    paths = ansible_config_get("COLLECTIONS_PATHS", list)
     if not paths or not isinstance(paths, list):
         sys.exit(f"Unable to determine ansible collection paths. ({paths})")
 
@@ -474,9 +474,9 @@ def require_collection(  # noqa: C901
         paths.insert(0, f"{options.cache_dir}/collections")
 
     for path in paths:
-        collpath = os.path.join(path, 'ansible_collections', ns, coll)
+        collpath = os.path.join(path, "ansible_collections", ns, coll)
         if os.path.exists(collpath):
-            mpath = os.path.join(collpath, 'MANIFEST.json')
+            mpath = os.path.join(collpath, "MANIFEST.json")
             if not os.path.exists(mpath):
                 _logger.fatal(
                     "Found collection at '%s' but missing MANIFEST.json, cannot get info.",
@@ -484,10 +484,10 @@ def require_collection(  # noqa: C901
                 )
                 sys.exit(INVALID_PREREQUISITES_RC)
 
-            with open(mpath, 'r') as f:
+            with open(mpath, "r") as f:
                 manifest = json.loads(f.read())
                 found_version = packaging.version.parse(
-                    manifest['collection_info']['version']
+                    manifest["collection_info"]["version"]
                 )
                 if version and found_version < packaging.version.parse(version):
                     if install:

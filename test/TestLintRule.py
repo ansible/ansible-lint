@@ -28,7 +28,7 @@ from .rules import EMatcherRule, RawTaskRule
 @pytest.fixture
 def lintable() -> Lintable:
     """Return a playbook Lintable for use in this file's tests."""
-    return Lintable('examples/playbooks/ematcher-rule.yml', kind="playbook")
+    return Lintable("examples/playbooks/ematcher-rule.yml", kind="playbook")
 
 
 def test_rule_matching(lintable: Lintable) -> None:

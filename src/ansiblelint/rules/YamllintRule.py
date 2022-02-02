@@ -19,9 +19,9 @@ try:
     from yamllint.linter import run as run_yamllint
 except ImportError:
     # missing library is ignored unless yaml is exclitely added to enable_list
-    if 'yaml' in options.enable_list:
+    if "yaml" in options.enable_list:
         raise RuntimeError(
-            'Failed to load yamllint library and ansible-linted was configured to require it.'
+            "Failed to load yamllint library and ansible-linted was configured to require it."
         )
 
 
@@ -53,19 +53,19 @@ inside the configuration file.
 
 
 class YamllintRule(AnsibleLintRule):
-    id = 'yaml'
-    shortdesc = 'Violations reported by yamllint'
+    id = "yaml"
+    shortdesc = "Violations reported by yamllint"
     description = DESCRIPTION
-    severity = 'VERY_LOW'
-    tags = ['formatting', 'yaml']
-    version_added = 'v5.0.0'
+    severity = "VERY_LOW"
+    tags = ["formatting", "yaml"]
+    version_added = "v5.0.0"
     config = None
     has_dynamic_tags = True
     if "yamllint.config" in sys.modules:
         config = YamlLintConfig(content=YAMLLINT_CONFIG)
         # if we detect local yamllint config we use it but raise a warning
         # as this is likely to get out of sync with our internal config.
-        for file in ['.yamllint', '.yamllint.yaml', '.yamllint.yml']:
+        for file in [".yamllint", ".yamllint.yaml", ".yamllint.yml"]:
             if os.path.isfile(file):
                 _logger.warning(
                     "Loading custom %s config file, this extends our "
@@ -87,18 +87,18 @@ class YamllintRule(AnsibleLintRule):
         """Return matches found for a specific YAML text."""
         matches: List["MatchError"] = []
         filtered_matches: List["MatchError"] = []
-        if str(file.base_kind) != 'text/yaml':
+        if str(file.base_kind) != "text/yaml":
             return matches
 
         if YamllintRule.config:
             for p in run_yamllint(
                 file.content, YamllintRule.config, filepath=file.path
             ):
-                self.severity = 'VERY_LOW'
+                self.severity = "VERY_LOW"
                 if p.level == "error":
-                    self.severity = 'MEDIUM'
+                    self.severity = "MEDIUM"
                 if p.desc.endswith("(syntax)"):
-                    self.severity = 'VERY_HIGH'
+                    self.severity = "VERY_HIGH"
                 matches.append(
                     self.create_matcherror(
                         message=p.desc,

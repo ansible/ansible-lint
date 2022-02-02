@@ -5,15 +5,15 @@ import pytest
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
-IMPORTED_PLAYBOOK = '''\
+IMPORTED_PLAYBOOK = """\
 - hosts: all
   tasks:
     - name: success
       fail: msg="fail"
       when: false
-'''
+"""
 
-MAIN_PLAYBOOK = '''\
+MAIN_PLAYBOOK = """\
 - hosts: all
 
   tasks:
@@ -21,15 +21,15 @@ MAIN_PLAYBOOK = '''\
       shell: echo lol
 
 - import_playbook: imported_playbook.yml
-'''
+"""
 
 
 @pytest.fixture
 def playbook(tmp_path: Path) -> str:
     """Create a reusable per-test playbook."""
-    playbook_path = tmp_path / 'playbook.yml'
+    playbook_path = tmp_path / "playbook.yml"
     playbook_path.write_text(MAIN_PLAYBOOK)
-    (tmp_path / 'imported_playbook.yml').write_text(IMPORTED_PLAYBOOK)
+    (tmp_path / "imported_playbook.yml").write_text(IMPORTED_PLAYBOOK)
     return str(playbook_path)
 
 

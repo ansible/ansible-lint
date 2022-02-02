@@ -115,7 +115,7 @@ def kind_from_path(path: Path, base: bool = False) -> FileType:
     if path.is_dir():
         return "role"
 
-    if str(path) == '/dev/stdin':
+    if str(path) == "/dev/stdin":
         return "playbook"
 
     # Unknown file types report a empty string (evaluated as False)
@@ -152,14 +152,14 @@ class Lintable:
         # if the lintable is part of a role, we save role folder name
         self.role = ""
         parts = self.path.parent.parts
-        if 'roles' in parts:
+        if "roles" in parts:
             role = self.path
             while role.parent.name != "roles" and role.name:
                 role = role.parent
             if role.exists:
                 self.role = role.name
 
-        if str(self.path) in ['/dev/stdin', '-']:
+        if str(self.path) in ["/dev/stdin", "-"]:
             # pylint: disable=consider-using-with
             self.file = NamedTemporaryFile(mode="w+", suffix="playbook.yml")
             self.filename = self.file.name
@@ -167,9 +167,9 @@ class Lintable:
             self.file.write(self._content)
             self.file.flush()
             self.path = Path(self.file.name)
-            self.name = 'stdin'
-            self.kind = 'playbook'
-            self.dir = '/'
+            self.name = "stdin"
+            self.kind = "playbook"
+            self.dir = "/"
         else:
             self.kind = kind or kind_from_path(self.path)
         # We store absolute directory in dir
@@ -184,9 +184,9 @@ class Lintable:
 
     def __getitem__(self, key: Any) -> Any:
         """Provide compatibility subscriptable support."""
-        if key == 'path':
+        if key == "path":
             return str(self.path)
-        if key == 'type':
+        if key == "type":
             return str(self.kind)
         raise NotImplementedError()
 
@@ -201,7 +201,7 @@ class Lintable:
     def content(self) -> str:
         """Retried file content, from internal cache or disk."""
         if self._content is None:
-            with open(self.path.resolve(), mode='r', encoding='utf-8') as f:
+            with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
                 self._content = f.read()
         return self._content
 
@@ -224,14 +224,14 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
     """Find all files that we know how to lint."""
     # git is preferred as it also considers .gitignore
     git_command_present = [
-        'git',
-        'ls-files',
-        '--cached',
-        '--others',
-        '--exclude-standard',
-        '-z',
+        "git",
+        "ls-files",
+        "--cached",
+        "--others",
+        "--exclude-standard",
+        "-z",
     ]
-    git_command_absent = ['git', 'ls-files', '--deleted', '-z']
+    git_command_absent = ["git", "ls-files", "--deleted", "-z"]
     out = None
 
     try:
@@ -239,20 +239,20 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
             git_command_present, stderr=subprocess.STDOUT, universal_newlines=True
         ).split("\x00")[:-1]
         _logger.info(
-            "Discovered files to lint using: %s", ' '.join(git_command_present)
+            "Discovered files to lint using: %s", " ".join(git_command_present)
         )
 
         out_absent = subprocess.check_output(
             git_command_absent, stderr=subprocess.STDOUT, universal_newlines=True
         ).split("\x00")[:-1]
-        _logger.info("Excluded removed files using: %s", ' '.join(git_command_absent))
+        _logger.info("Excluded removed files using: %s", " ".join(git_command_absent))
 
         out = set(out_present) - set(out_absent)
     except subprocess.CalledProcessError as exc:
-        if not (exc.returncode == 128 and 'fatal: not a git repository' in exc.output):
+        if not (exc.returncode == 128 and "fatal: not a git repository" in exc.output):
             _logger.warning(
                 "Failed to discover lintable files using git: %s",
-                exc.output.rstrip('\n'),
+                exc.output.rstrip("\n"),
             )
     except FileNotFoundError as exc:
         if options.verbosity:
@@ -265,7 +265,7 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
         out = {
             strip_dotslash_prefix(fname)
             for fname in WcMatch(
-                '.', exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
+                ".", exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
             ).match()
         }
 
@@ -274,7 +274,7 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
 
 def strip_dotslash_prefix(fname: str) -> str:
     """Remove ./ leading from filenames."""
-    return fname[2:] if fname.startswith('./') else fname
+    return fname[2:] if fname.startswith("./") else fname
 
 
 def guess_project_dir(config_file: Optional[str]) -> str:
@@ -298,11 +298,11 @@ def guess_project_dir(config_file: Optional[str]) -> str:
             path = result.stdout.splitlines()[0]
         except subprocess.CalledProcessError as exc:
             if not (
-                exc.returncode == 128 and 'fatal: not a git repository' in exc.stderr
+                exc.returncode == 128 and "fatal: not a git repository" in exc.stderr
             ):
                 _logger.warning(
                     "Failed to guess project directory using git: %s",
-                    exc.stderr.rstrip('\n'),
+                    exc.stderr.rstrip("\n"),
                 )
         except FileNotFoundError as exc:
             _logger.warning("Failed to locate command: %s", exc)

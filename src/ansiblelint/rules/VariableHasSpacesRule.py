@@ -11,13 +11,13 @@ from ansiblelint.yaml_utils import nested_items_path
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
-    id = 'var-spacing'
-    base_msg = 'Variables should have spaces before and after: '
-    shortdesc = base_msg + ' {{ var_name }}'
-    description = 'Variables should have spaces before and after: ``{{ var_name }}``'
-    severity = 'LOW'
-    tags = ['formatting']
-    version_added = 'v4.0.0'
+    id = "var-spacing"
+    base_msg = "Variables should have spaces before and after: "
+    shortdesc = base_msg + " {{ var_name }}"
+    description = "Variables should have spaces before and after: ``{{ var_name }}``"
+    severity = "LOW"
+    tags = ["formatting"]
+    version_added = "v4.0.0"
 
     bracket_regex = re.compile(r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
     exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}", re.MULTILINE | re.DOTALL)
@@ -33,7 +33,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
         return False
 
 
-if 'pytest' in sys.modules:
+if "pytest" in sys.modules:
 
     import pytest
 

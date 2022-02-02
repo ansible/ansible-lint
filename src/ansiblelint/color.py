@@ -19,7 +19,7 @@ _theme = Theme(
 )
 console_options: Dict[str, Any] = {"emoji": False, "theme": _theme, "soft_wrap": True}
 console_options_stderr = console_options.copy()
-console_options_stderr['stderr'] = True
+console_options_stderr["stderr"] = True
 
 console = rich.get_console()
 console_stderr = Console(**console_options_stderr)
@@ -34,11 +34,11 @@ def reconfigure(new_options: Dict[str, Any]) -> None:
     rich.reconfigure(**new_options)
     # see https://github.com/willmcgugan/rich/discussions/484#discussioncomment-200182
     console_options_stderr = console_options.copy()
-    console_options_stderr['stderr'] = True
+    console_options_stderr["stderr"] = True
     tmp_console = Console(**console_options_stderr)
     console_stderr.__dict__ = tmp_console.__dict__
 
 
 def render_yaml(text: str) -> Syntax:
     """Colorize YAMl for nice display."""
-    return Syntax(text, 'yaml', theme="ansi_dark")
+    return Syntax(text, "yaml", theme="ansi_dark")

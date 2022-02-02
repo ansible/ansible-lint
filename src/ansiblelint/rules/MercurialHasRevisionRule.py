@@ -29,20 +29,20 @@ if TYPE_CHECKING:
 
 
 class MercurialHasRevisionRule(AnsibleLintRule):
-    id = 'hg-latest'
-    shortdesc = 'Mercurial checkouts must contain explicit revision'
+    id = "hg-latest"
+    shortdesc = "Mercurial checkouts must contain explicit revision"
     description = (
-        'All version control checkouts must point to '
-        'an explicit commit or tag, not just ``latest``'
+        "All version control checkouts must point to "
+        "an explicit commit or tag, not just ``latest``"
     )
-    severity = 'MEDIUM'
-    tags = ['idempotency']
-    version_added = 'historic'
+    severity = "MEDIUM"
+    tags = ["idempotency"]
+    version_added = "historic"
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         return bool(
-            task['action']['__ansible_module__'] == 'hg'
-            and task['action'].get('revision', 'default') == 'default'
+            task["action"]["__ansible_module__"] == "hg"
+            and task["action"].get("revision", "default") == "default"
         )

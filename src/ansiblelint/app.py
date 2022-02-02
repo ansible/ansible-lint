@@ -58,7 +58,7 @@ class App:
                     console.print(self.formatter.format(match), highlight=False)
 
         # If run under GitHub Actions we also want to emit output recognized by it.
-        if os.getenv('GITHUB_ACTIONS') == 'true' and os.getenv('GITHUB_WORKFLOW'):
+        if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("GITHUB_WORKFLOW"):
             formatter = formatters.AnnotationsFormatter(self.options.cwd, True)
             for match in matches:
                 console.print(formatter.format(match), markup=False, highlight=False)
@@ -69,13 +69,13 @@ def choose_formatter_factory(
 ) -> Type[formatters.BaseFormatter[Any]]:
     """Select an output formatter based on the incoming command line arguments."""
     r: Type[formatters.BaseFormatter[Any]] = formatters.Formatter
-    if options_list.format == 'quiet':
+    if options_list.format == "quiet":
         r = formatters.QuietFormatter
     elif options_list.parseable_severity:
         r = formatters.ParseableSeverityFormatter
-    elif options_list.format == 'codeclimate':
+    elif options_list.format == "codeclimate":
         r = formatters.CodeclimateJSONFormatter
-    elif options_list.parseable or options_list.format == 'pep8':
+    elif options_list.parseable or options_list.format == "pep8":
         r = formatters.ParseableFormatter
     return r
 
@@ -85,6 +85,6 @@ def _sanitize_list_options(tag_list: List[str]) -> List[str]:
     # expand comma separated entries
     tags = set()
     for t in tag_list:
-        tags.update(str(t).split(','))
+        tags.update(str(t).split(","))
     # remove duplicates, and return as sorted list
     return sorted(set(tags))

@@ -28,24 +28,24 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 LOTS_OF_WARNINGS_PLAYBOOK = abspath(
-    'examples/playbooks/lots_of_warnings.yml', os.getcwd()
+    "examples/playbooks/lots_of_warnings.yml", os.getcwd()
 )
 
 
 @pytest.mark.parametrize(
-    ('playbook', 'exclude', 'length'),
+    ("playbook", "exclude", "length"),
     (
-        pytest.param('examples/playbooks/nomatchestest.yml', [], 0, id="nomatchestest"),
-        pytest.param('examples/playbooks/unicode.yml', [], 1, id="unicode"),
+        pytest.param("examples/playbooks/nomatchestest.yml", [], 0, id="nomatchestest"),
+        pytest.param("examples/playbooks/unicode.yml", [], 1, id="unicode"),
         pytest.param(
             LOTS_OF_WARNINGS_PLAYBOOK,
             [LOTS_OF_WARNINGS_PLAYBOOK],
             0,
             id="lots_of_warnings",
         ),
-        pytest.param('examples/playbooks/become.yml', [], 0, id="become"),
+        pytest.param("examples/playbooks/become.yml", [], 0, id="become"),
         pytest.param(
-            'examples/playbooks/contains_secrets.yml', [], 0, id="contains_secrets"
+            "examples/playbooks/contains_secrets.yml", [], 0, id="contains_secrets"
         ),
     ),
 )
@@ -66,22 +66,22 @@ def test_runner(
 def test_runner_exclude_paths(default_rules_collection: RulesCollection) -> None:
     """Test that exclude paths do work."""
     runner = Runner(
-        'examples/playbooks/example.yml',
+        "examples/playbooks/example.yml",
         rules=default_rules_collection,
-        exclude_paths=['examples/'],
+        exclude_paths=["examples/"],
     )
 
     matches = runner.run()
     assert len(matches) == 0
 
 
-@pytest.mark.parametrize(('exclude_path'), ('**/playbooks/*.yml',))
+@pytest.mark.parametrize(("exclude_path"), ("**/playbooks/*.yml",))
 def test_runner_exclude_globs(
     default_rules_collection: RulesCollection, exclude_path: str
 ) -> None:
     """Test that globs work."""
     runner = Runner(
-        'examples/playbooks',
+        "examples/playbooks",
         rules=default_rules_collection,
         exclude_paths=[exclude_path],
     )
@@ -92,12 +92,12 @@ def test_runner_exclude_globs(
 
 
 @pytest.mark.parametrize(
-    ('formatter_cls'),
+    ("formatter_cls"),
     (
-        pytest.param(formatters.Formatter, id='Formatter-plain'),
-        pytest.param(formatters.ParseableFormatter, id='ParseableFormatter-colored'),
-        pytest.param(formatters.QuietFormatter, id='QuietFormatter-colored'),
-        pytest.param(formatters.Formatter, id='Formatter-colored'),
+        pytest.param(formatters.Formatter, id="Formatter-plain"),
+        pytest.param(formatters.ParseableFormatter, id="ParseableFormatter-colored"),
+        pytest.param(formatters.QuietFormatter, id="QuietFormatter-colored"),
+        pytest.param(formatters.Formatter, id="Formatter-colored"),
     ),
 )
 def test_runner_unicode_format(
@@ -107,7 +107,7 @@ def test_runner_unicode_format(
     """Check that all formatters are unicode-friendly."""
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(
-        Lintable('examples/playbooks/unicode.yml', "playbook"),
+        Lintable("examples/playbooks/unicode.yml", "playbook"),
         rules=default_rules_collection,
     )
 
@@ -116,7 +116,7 @@ def test_runner_unicode_format(
     formatter.format(matches[0])
 
 
-@pytest.mark.parametrize('directory_name', ('test/', os.path.abspath('test')))
+@pytest.mark.parametrize("directory_name", ("test/", os.path.abspath("test")))
 def test_runner_with_directory(
     default_rules_collection: RulesCollection, directory_name: str
 ) -> None:
@@ -131,7 +131,7 @@ def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> N
     """Ensure that lintables aren't double-checked."""
     checked_files: Set[Lintable] = set()
 
-    filename = os.path.abspath('examples/playbooks/common-include-1.yml')
+    filename = os.path.abspath("examples/playbooks/common-include-1.yml")
     runner = Runner(
         filename,
         rules=default_rules_collection,
@@ -142,7 +142,7 @@ def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> N
     assert len(runner.checked_files) == 2
     assert len(run1) == 1
 
-    filename = os.path.abspath('examples/playbooks/common-include-2.yml')
+    filename = os.path.abspath("examples/playbooks/common-include-2.yml")
     runner = Runner(
         filename,
         rules=default_rules_collection,

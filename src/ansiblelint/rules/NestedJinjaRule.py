@@ -33,29 +33,29 @@ if TYPE_CHECKING:
 
 
 class NestedJinjaRule(AnsibleLintRule):
-    id = 'no-jinja-nesting'
-    shortdesc = 'Nested jinja pattern'
+    id = "no-jinja-nesting"
+    shortdesc = "Nested jinja pattern"
     description = (
         "There should not be any nested jinja pattern. "
         "Example (bad): ``{{ list_one + {{ list_two | max }} }}``, "
         "Example (good): ``{{ list_one + max(list_two) }}``, "
         "Example (allowed): ``--format='{{'{{'}}.Size{{'}}'}}'``"
     )
-    severity = 'VERY_HIGH'
-    tags = ['formatting']
-    version_added = 'v4.3.0'
+    severity = "VERY_HIGH"
+    tags = ["formatting"]
+    version_added = "v4.3.0"
 
     pattern = re.compile(r"{{(?:[^{}]*)?[^'\"]{{")
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         command = "".join(
             str(value)
             # task properties are stored in the 'action' key
-            for key, value in task['action'].items()
+            for key, value in task["action"].items()
             # exclude useless values of '__file__', '__ansible_module__', '__*__', etc.
-            if not key.startswith('__') and not key.endswith('__')
+            if not key.startswith("__") and not key.endswith("__")
         )
 
         return bool(self.pattern.search(command))

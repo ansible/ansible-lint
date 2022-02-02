@@ -14,23 +14,23 @@ if TYPE_CHECKING:
 
 
 class ComparisonToLiteralBoolRule(AnsibleLintRule):
-    id = 'literal-compare'
+    id = "literal-compare"
     shortdesc = "Don't compare to literal True/False"
     description = (
-        'Use ``when: var`` rather than ``when: var == True`` '
-        '(or conversely ``when: not var``)'
+        "Use ``when: var`` rather than ``when: var == True`` "
+        "(or conversely ``when: not var``)"
     )
-    severity = 'HIGH'
-    tags = ['idiom']
-    version_added = 'v4.0.0'
+    severity = "HIGH"
+    tags = ["idiom"]
+    version_added = "v4.0.0"
 
     literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         for k, v, _ in nested_items_path(task):
-            if k == 'when':
+            if k == "when":
                 if isinstance(v, str):
                     if self.literal_bool_compare.search(v):
                         return True

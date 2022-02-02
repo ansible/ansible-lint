@@ -40,11 +40,11 @@ class MatchError(ValueError):
 
         if rule.__class__ is RuntimeErrorRule and not message:
             raise TypeError(
-                f'{self.__class__.__name__}() missing a '
+                f"{self.__class__.__name__}() missing a "
                 "required argument: one of 'message' or 'rule'",
             )
 
-        self.message = message or getattr(rule, 'shortdesc', "")
+        self.message = message or getattr(rule, "shortdesc", "")
 
         # Safety measture to ensure we do not endup with incorrect indexes
         if linenumber == 0:
@@ -73,7 +73,7 @@ class MatchError(ValueError):
 
     def __repr__(self) -> str:
         """Return a MatchError instance representation."""
-        formatstr = u"[{0}] ({1}) matched {2}:{3} {4}"
+        formatstr = "[{0}] ({1}) matched {2}:{3} {4}"
         # note that `rule.id` can be int, str or even missing, as users
         # can defined their own custom rules.
         _id = getattr(self.rule, "id", "000")
@@ -95,7 +95,7 @@ class MatchError(ValueError):
         return (
             self.filename,
             self.linenumber,
-            str(getattr(self.rule, 'id', 0)),
+            str(getattr(self.rule, "id", 0)),
             self.message,
             self.details,
             # -1 is used here to force errors with no column to sort before
