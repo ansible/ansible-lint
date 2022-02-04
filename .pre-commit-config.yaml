@@ -14,6 +14,10 @@ ci:
   - pip-compile-docs-upgrade
   - pip-compile-upgrade
 repos:
+- repo: https://github.com/sirosen/check-jsonschema
+  rev: 0.10.2
+  hooks:
+  - id: check-github-workflows
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v4.0.1
   hooks:
