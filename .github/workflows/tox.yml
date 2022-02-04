@@ -92,8 +92,7 @@ jobs:
         path: .tox/**/log/
 
   unit:
-    name: >-
-      ${{ matrix.tox_env }}@${{ matrix.os }}
+    name: ${{ matrix.name || matrix.tox_env }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
