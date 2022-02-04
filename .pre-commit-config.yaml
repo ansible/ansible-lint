@@ -13,6 +13,8 @@ ci:
   - pip-compile-docs
   - pip-compile-docs-upgrade
   - pip-compile-upgrade
+default_language_version:
+  python: python3.9
 repos:
 - repo: https://github.com/sirosen/check-jsonschema
   rev: 0.10.2
@@ -124,26 +126,28 @@ repos:
   hooks:
   - id: pip-compile
     name: pip-compile
-    entry: pip-compile -q --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
+    entry: python3.9 -m piptools compile -q --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
+    stages: [manual]
   - id: pip-compile-docs
     name: pip-compile-docs
-    entry: pip-compile -q --no-annotate --output-file=docs/requirements.txt --extra yamllint --strip-extras docs/requirements.in setup.cfg
+    entry: python3.9 -m piptools compile -q --no-annotate --output-file=docs/requirements.txt --extra yamllint --strip-extras docs/requirements.in setup.cfg
     language: system
     files: ^(docs\/requirements\.(txt|in)|)$
     pass_filenames: false
+    stages: [manual]
   - id: pip-compile-upgrade
     name: pip-compile-upgrade
-    entry: pip-compile -q --upgrade --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
+    entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
     stages: [manual]
   - id: pip-compile-docs-upgrade
     name: pip-compile-docs-upgrade
-    entry: pip-compile -q --upgrade --no-annotate  --extra yamllint --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
+    entry: python3.9 -m piptools compile -q --upgrade --no-annotate  --extra yamllint --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
     language: system
     files: ^(docs\/requirements\.(txt|in)|)$
     pass_filenames: false

@@ -9,7 +9,7 @@ bracex==2.2.1
 colorama==0.4.4
 commonmark==0.9.1
 coverage==6.2
-enrich==1.2.6
+enrich==1.2.7
 execnet==1.9.0
 flaky==3.7.0
 iniconfig==1.1.1
@@ -19,18 +19,18 @@ pluggy==1.0.0
 psutil==5.9.0
 py==1.11.0
 pygments==2.11.2
-pyparsing==3.0.6
+pyparsing==3.0.7
 pytest==6.2.5
 pytest-cov==3.0.0
 pytest-forked==1.4.0
 pytest-xdist==2.5.0
 pyyaml==6.0
-rich==11.0.0
+rich==11.1.0
 ruamel-yaml==0.17.20 ; python_version >= "3.7"
 ruamel-yaml-clib==0.2.6
 tenacity==8.0.1
 toml==0.10.2
-tomli==1.2.1
+tomli==1.2.3
 wcmatch==8.3
 yamllint==1.26.3
 
