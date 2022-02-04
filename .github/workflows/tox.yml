@@ -112,8 +112,6 @@ jobs:
       matrix:
         python-version:
         # keep list sorted as it determines UI order too
-        - 3.6
-        - 3.7
         - 3.8
         - 3.9
         - "3.10"
@@ -123,18 +121,12 @@ jobs:
         # - windows-latest
         # - windows-2016
         include:
-        - tox_env: py36
-          os: ubuntu-20.04
-          python-version: 3.6
         # Disabled due to gettings stuck and timeouts not working
         # https://github.com/Vampire/setup-wsl/discussions/25
         # - name: py39 (wsl)
         #   tox_env: py39
         #   os: windows-latest
         #   shell: "wsl-bash {0}"
-        - tox_env: py37
-          os: ubuntu-20.04
-          python-version: 3.7
         - tox_env: py38
           os: ubuntu-20.04
           python-version: 3.8
@@ -148,10 +140,10 @@ jobs:
           python-version: "3.10"
           devel: true
           skip_ansible29: true
-        - name: py36 (macos)
-          tox_env: py36
+        - name: py38 (macos)
+          tox_env: py38
           os: macOS-latest
-          python-version: 3.6
+          python-version: 3.8
         - name: py310 (macos)
           tox_env: py310
           os: macOS-latest
