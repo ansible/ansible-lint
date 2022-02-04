@@ -41,8 +41,8 @@ pyyaml==5.4.1
 requests==2.26.0
 resolvelib==0.5.4
 rich==10.7.0
-ruamel.yaml==0.17.11 ; python_version >= "3.7"
-ruamel.yaml.clib==0.2.6
+ruamel-yaml==0.17.20 ; python_version >= "3.7"
+ruamel-yaml-clib==0.2.6
 snowballstemmer==2.1.0
 sphinx==4.1.2
 sphinx-ansible-theme==0.8.0
