@@ -1,9 +1,9 @@
-ansible-core  # needed by rules_table_generator
-myst-parser
-pipdeptree
-pytest
-Sphinx
-sphinx_ansible_theme
-sphinxcontrib-apidoc >= 0.3.0
+ansible-core>=2.12.2  # needed by rules_table_generator
+myst-parser>=0.16.1
+pipdeptree>=2.2.1
+pytest>=6.2.5,<7.0.0  # 7.0.0 dropped support for py36
+Sphinx>=4.4.0
+sphinx_ansible_theme>=0.9.1
+sphinxcontrib-apidoc>=0.3.0
 sphinxcontrib-programoutput2>=2.0a1
-yamllint
+yamllint>=1.26.3
