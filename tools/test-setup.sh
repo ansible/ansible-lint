@@ -1,17 +1,32 @@
 #!/bin/bash
-set -euxo pipefail
-# Used by Zuul CI to perform extra bootstrapping
+# This tool is used to setup the environment for running the tests. Its name
+# name and location is based on Zuul CI, which can automatically run it.
+set -euo pipefail
 
-# sudo used only because currently zuul default tox_executable=tox instead of
-# "python3 -m tox"
-# https://zuul-ci.org/docs/zuul-jobs/python-roles.html#rolevar-ensure-tox.tox_executable
+# User specific environment
+# shellcheck disable=SC2076
+if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]
+then
+    PATH="$HOME/.local/bin:$PATH"
+fi
 
-# Install pip if not already install on the system
-python3 -m pip --version || {
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-    sudo python3 get-pip.py
-}
+if [ -f "/usr/bin/apt-get" ]; then
+    if [ ! -f "/var/cache/apt/pkgcache.bin" ]; then
+        sudo apt-get update  # mandatory or other apt-get commands fail
+    fi
+    # avoid outdated ansible and pipx
+    sudo apt-get remove -y ansible pipx || true
+    sudo apt-get install -y --no-install-recommends -o=Dpkg::Use-Pty=0 \
+        git python3-venv python3-pip
+fi
 
-# Workaround until ensure-tox will allow upgrades
-# https://review.opendev.org/#/c/690057/
-sudo python3 -m pip install -U tox
+which pipx || python3 -m pip install --user pipx
+which -a pipx
+which pre-commit || pipx install pre-commit
+which tox || pipx install tox
+
+# Log some useful info in case of unexpected failures:
+uname
+python3 --version
+tox --version
+pre-commit --version
