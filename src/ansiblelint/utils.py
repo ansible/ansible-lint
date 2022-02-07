@@ -314,12 +314,16 @@ def play_children(
         "post_tasks": _taskshandlers_children,
         "block": _taskshandlers_children,
         "include": _include_children,
+        "ansible.builtin.include": _include_children,
         "import_playbook": _include_children,
+        "ansible.builtin.import_playbook": _include_children,
         "roles": _roles_children,
         "dependencies": _roles_children,
         "handlers": _taskshandlers_children,
         "include_tasks": _include_children,
+        "ansible.builtin.include_tasks": _include_children,
         "import_tasks": _include_children,
+        "ansible.builtin.import_tasks": _include_children,
     }
     (k, v) = item
     add_all_plugin_dirs(os.path.abspath(basedir))
