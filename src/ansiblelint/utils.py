@@ -423,9 +423,16 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     child_type = k if parent_type == "playbook" else parent_type
 
     # Include the FQCN task names as this happens before normalize
-    task_include_keys = ("include", "include_tasks", "import_playbook", "import_tasks",
-        "ansible.builtin.include", "ansible.builtin.include_tasks",
-        "ansible.builtin.import_playbook", "ansible.builtin.import_tasks")
+    task_include_keys = (
+        "include",
+        "include_tasks",
+        "import_playbook",
+        "import_tasks",
+        "ansible.builtin.include",
+        "ansible.builtin.include_tasks",
+        "ansible.builtin.import_playbook",
+        "ansible.builtin.import_tasks",
+    )
     for task_handler_key in task_include_keys:
 
         with contextlib.suppress(KeyError):
@@ -710,9 +717,16 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
         task
         for task in tasks
         if set(
-            ["include", "include_tasks", "import_playbook", "import_tasks",
-            "ansible.builtin.include", "ansible.builtin.include_tasks",
-            "ansible.builtin.import_playbook", "ansible.builtin.import_tasks"]
+            [
+                "include",
+                "include_tasks",
+                "import_playbook",
+                "import_tasks",
+                "ansible.builtin.include",
+                "ansible.builtin.include_tasks",
+                "ansible.builtin.import_playbook",
+                "ansible.builtin.import_tasks",
+            ]
         ).isdisjoint(task.keys())
     ]
 
