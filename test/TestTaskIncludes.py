@@ -15,8 +15,8 @@ from ansiblelint.runner import Runner
             2,
             id="blockincludes2",
         ),
-        pytest.param("examples/playbooks/taskincludes.yml", 2, 1, id="taskincludes"),
-        pytest.param("examples/playbooks/taskimports.yml", 4, 2, id="taskimports"),
+        pytest.param("examples/playbooks/taskincludes.yml", 3, 1, id="taskincludes"),
+        pytest.param("examples/playbooks/taskimports.yml", 5, 2, id="taskimports"),
         pytest.param(
             "examples/playbooks/include-in-block.yml",
             3,

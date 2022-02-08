@@ -1,0 +1,4 @@
+---
+- name: Simple task to include which generates no errors
+  assert:
+    that: true
