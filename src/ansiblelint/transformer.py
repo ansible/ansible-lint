@@ -124,12 +124,14 @@ class Transformer:
         This example does not indent any sequences:
 
         .. code:: python
+
             yaml.explicit_start=True
             yaml.map_indent=2
             yaml.sequence_indent=2
             yaml.sequence_dash_offset=0
 
         .. code:: yaml
+
             ---
             - name: playbook
               loop:
@@ -138,6 +140,7 @@ class Transformer:
         This example indents all sequences including the root-level:
 
         .. code:: python
+
             yaml.explicit_start=True
             yaml.map_indent=2
             yaml.sequence_indent=4
@@ -145,6 +148,7 @@ class Transformer:
             # yaml.Emitter defaults to ruamel.yaml.emitter.Emitter
 
         .. code:: yaml
+
             ---
               - name: playbook
                 loop:
@@ -153,6 +157,7 @@ class Transformer:
         This example indents all sequences except at the root-level:
 
         .. code:: python
+
             yaml.explicit_start=True
             yaml.map_indent=2
             yaml.sequence_indent=4
@@ -160,6 +165,7 @@ class Transformer:
             yaml.Emitter = FormattedEmitter  # custom Emitter prevents root-level indents
 
         .. code:: yaml
+
             ---
             - name: playbook
               loop:
