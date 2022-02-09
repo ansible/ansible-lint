@@ -20,6 +20,10 @@ class Transformer:
     The Transformer is similar to the ``ansiblelint.runner.Runner`` which manages
     running each of the rules. We only expect there to be one ``Transformer`` instance
     which should be instantiated from the main entrypoint function.
+
+    In the future, the transformer will be responsible for running transforms for each
+    of the rule matches. For now, it just reads/writes YAML files which is a
+    pre-requisite for the planned rule-specific transforms.
     """
 
     def __init__(self, result: LintResult):
