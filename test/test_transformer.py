@@ -1,16 +1,19 @@
 """Tests for Transformer."""
 
 from argparse import Namespace
-from typing import Iterator, List, Tuple
+from io import StringIO
+from typing import Iterator, List, Optional, Tuple
 
 import py
 import pytest
+from ruamel.yaml.emitter import Emitter
+from ruamel.yaml.main import YAML
 
 from ansiblelint.rules import RulesCollection
 
 # noinspection PyProtectedMember
 from ansiblelint.runner import LintResult, _get_matches
-from ansiblelint.transformer import Transformer
+from ansiblelint.transformer import FormattedEmitter, Transformer
 
 
 @pytest.fixture
@@ -38,6 +41,70 @@ def runner_result(
     config_options.exclude_paths = exclude
     result = _get_matches(rules=default_rules_collection, options=config_options)
     return result
+
+
+_input_playbook = [{"name": "playbook", "tasks": [{"name": "task"}]}]
+_without_indents = """\
+---
+- name: playbook
+  tasks:
+  - name: task
+"""
+_with_indents = """\
+---
+  - name: playbook
+    tasks:
+      - name: task
+"""
+_with_indents_except_root_level = """\
+---
+- name: playbook
+  tasks:
+    - name: task
+"""
+
+
+@pytest.mark.parametrize(
+    (
+        "map_indent",
+        "sequence_indent",
+        "sequence_dash_offset",
+        "alternate_emitter",
+        "expected_output",
+    ),
+    (
+        pytest.param(2, 2, 0, None, _without_indents, id="without_indents"),
+        pytest.param(2, 4, 2, None, _with_indents, id="with_indents"),
+        pytest.param(
+            2,
+            4,
+            2,
+            FormattedEmitter,
+            _with_indents_except_root_level,
+            id="with_indents_except_root_level",
+        ),
+    ),
+)
+def test_ruamel_yaml_sequence_formatting(
+    map_indent: int,
+    sequence_indent: int,
+    sequence_dash_offset: int,
+    alternate_emitter: Optional[Emitter],
+    expected_output: str,
+) -> None:
+    """Test ``ruamel.yaml.YAML.dump()`` sequence formatting."""
+    yaml = YAML(typ="rt")
+    # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
+    yaml.explicit_start = True  # type: ignore[assignment]
+    yaml.map_indent = map_indent  # type: ignore[assignment]
+    yaml.sequence_indent = sequence_indent  # type: ignore[assignment]
+    yaml.sequence_dash_offset = sequence_dash_offset
+    if alternate_emitter is not None:
+        yaml.Emitter = alternate_emitter
+    # ruamel.yaml only writes to a stream (there is no `dumps` function)
+    with StringIO() as output:
+        yaml.dump(_input_playbook, output)
+        assert output.getvalue() == expected_output
 
 
 @pytest.mark.parametrize(

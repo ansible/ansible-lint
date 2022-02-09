@@ -134,8 +134,8 @@ class Transformer:
 
             ---
             - name: playbook
-              loop:
-              - item1
+              tasks:
+              - name: task
 
         This example indents all sequences including the root-level:
 
@@ -151,8 +151,8 @@ class Transformer:
 
             ---
               - name: playbook
-                loop:
-                  - item1
+                tasks:
+                  - name: task
 
         This example indents all sequences except at the root-level:
 
@@ -168,8 +168,8 @@ class Transformer:
 
             ---
             - name: playbook
-              loop:
-                - item1
+              tasks:
+                - name: task
         """
         if self._yaml is not None:
             return self._yaml
