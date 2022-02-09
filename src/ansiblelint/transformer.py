@@ -65,13 +65,25 @@ class FormattedEmitter(Emitter):
 
 # Transformer is for transforms like runner is for rules
 class Transformer:
-    """Transformer class performs the fmt transformations."""
+    """Transformer class performs the fmt transformations.
+
+    The Transformer is similar to the ``ansiblelint.runner.Runner`` which manages
+    running each of the rules. We only expect there to be one ``Transformer`` instance
+    which should be instantiated from the main entrypoint function.
+
+    In the future, the transformer will be responsible for running tranforms for each
+    of the rule matches. For now, it just reads/writes YAML files which is a
+    pre-requisite for the planned rule-specific transforms.
+    """
 
     def __init__(self, result: LintResult):
         """Initialize a Transformer instance."""
-        # TODO: options for explict_start, indent_sequences
-        self.explicit_start = True
-        self.indent_sequences = True
+        # TODO: Make config options for: explict_start, indent_sequences, yaml_width, etc
+        self.yaml_explicit_start = True
+        self.yaml_explicit_end = False
+        self.yaml_indent_sequences = True
+        # yaml.width defaults to 80 which wraps longer lines in tests
+        self.yaml_width = 120
 
         self.matches: List[MatchError] = result.matches
         self.files: Set[Lintable] = result.files
@@ -91,20 +103,72 @@ class Transformer:
                 self.matches_per_file[lintable] = []
             self.matches_per_file[lintable].append(match)
 
-    def run(self) -> None:
-        """Execute the fmt transforms."""
+        self._yaml: Optional[YAML] = None
+
+    @property
+    def yaml(self) -> YAML:
+        """Return a configured ``ruamel.yaml.YAML`` instance.
+
+        ``ruamel.yaml.YAML`` uses attributes to configure how it dumps yaml files.
+        Some of these settings can be confusing, so here are examples of how different
+        settings will affect the dumped yaml.
+
+        This example does not indent any sequences:
+
+        .. code:: python
+            yaml.explicit_start=True
+            yaml.map_indent=2
+            yaml.sequence_indent=2
+            yaml.sequence_dash_offset=0
+
+        .. code:: yaml
+            ---
+            - name: playbook
+              loop:
+              - item1
+
+        This example indents all sequences including the root-level:
+
+        .. code:: python
+            yaml.explicit_start=True
+            yaml.map_indent=2
+            yaml.sequence_indent=4
+            yaml.sequence_dash_offset=2
+            # yaml.Emitter defaults to ruamel.yaml.emitter.Emitter
+
+        .. code:: yaml
+            ---
+              - name: playbook
+                loop:
+                  - item1
+
+        This example indents all sequences except at the root-level:
+
+        .. code:: python
+            yaml.explicit_start=True
+            yaml.map_indent=2
+            yaml.sequence_indent=4
+            yaml.sequence_dash_offset=2
+            yaml.Emitter = FormattedEmitter  # custom Emitter prevents root-level indents
+
+        .. code:: yaml
+            ---
+            - name: playbook
+              loop:
+                - item1
+        """
+        if self._yaml is not None:
+            return self._yaml
+
         # ruamel.yaml rt=round trip (preserves comments while allowing for modification)
         yaml = YAML(typ="rt")
 
         # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
 
         # configure yaml dump formatting
-        yaml.explicit_start = True  # type: ignore[assignment]
-        yaml.explicit_end = False  # type: ignore[assignment]
-
-        # TODO: make the width configurable
-        # yaml.width defaults to 80 which wraps longer lines in tests
-        yaml.width = 120  # type: ignore[assignment]
+        yaml.explicit_start = self.yaml_explicit_start  # type: ignore[assignment]
+        yaml.explicit_end = self.yaml_explicit_end  # type: ignore[assignment]
+        yaml.width = self.yaml_width  # type: ignore[assignment]
 
         yaml.default_flow_style = False
         yaml.compact_seq_seq = (  # dash after dash
@@ -113,36 +177,23 @@ class Transformer:
         yaml.compact_seq_map = (  # key after dash
             True  # type: ignore[assignment]
         )
-        # yaml.indent() obscures the purpose of these vars:
+        # Do not use yaml.indent() as it obscures the purpose of these vars:
         yaml.map_indent = 2  # type: ignore[assignment]
-        yaml.sequence_indent = 4 if self.indent_sequences else 2  # type: ignore[assignment]
+        yaml.sequence_indent = 4 if self.yaml_indent_sequences else 2  # type: ignore[assignment]
         yaml.sequence_dash_offset = yaml.sequence_indent - 2  # type: ignore[operator]
 
-        if self.indent_sequences:  # in the future: or other formatting options
+        if self.yaml_indent_sequences:  # in the future: or other formatting options
             # For root-level sequences, FormattedEmitter overrides sequence_indent
             # and sequence_dash_offset to prevent root-level indents.
             yaml.Emitter = FormattedEmitter
 
-        # explicit_start=True + map_indent=2 + sequence_indent=2 + sequence_dash_offset=0
-        # ---
-        # - name: playbook
-        #   loop:
-        #   - item1
-        #
-        # explicit_start=True + map_indent=2 + sequence_indent=4 + sequence_dash_offset=2
-        # With the normal Emitter
-        # ---
-        #   - name: playbook
-        #     loop:
-        #       - item1
-        #
-        # explicit_start=True + map_indent=2 + sequence_indent=4 + sequence_dash_offset=2
-        # With the FormattedEmitter
-        # ---
-        # - name: playbook
-        #   loop:
-        #     - item1
+        self._yaml = yaml
+        return yaml
 
+    def run(self) -> None:
+        """
+        For each file, read it, execute fmt transforms on it, then write it.
+        """
         for file, matches in self.matches_per_file.items():
             # str() convinces mypy that "text/yaml" is a valid Literal.
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
@@ -161,4 +212,4 @@ class Transformer:
                 data = _whitespace_only_lines_re.sub("", cast(str, data))
                 # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
                 data = load_data(data)
-                yaml.dump(data, file.path)
+                self.yaml.dump(data, file.path)
