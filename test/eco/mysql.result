@@ -1,0 +1,6 @@
+ignore-errors: Use failed_when and specify error conditions instead of using ignore_errors
+../../ansible-lint/314d98/roles/geerlingguy.mysql/tasks/replication.yml:37 Task/Handler: Configure replication on the slave.
+
+ignore-errors: Use failed_when and specify error conditions instead of using ignore_errors
+tasks/replication.yml:37 Task/Handler: Configure replication on the slave.
+

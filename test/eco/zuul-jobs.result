@@ -1,0 +1,9 @@
+roles/emit-job-header/tasks/main.yaml:26: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors
+roles/ensure-pip/tasks/Debian.yaml:17: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors
+test-playbooks/registry/roles/ensure-registry-cert/tasks/main.yaml:1: risky-file-permissions File permissions unset or incorrect
+test-playbooks/registry/roles/ensure-registry-cert/tasks/main.yaml:6: risky-file-permissions File permissions unset or incorrect
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:1: no-loop-var-prefix Role loop_var should use configured prefix.: zj_
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:1: risky-file-permissions File permissions unset or incorrect
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:17: risky-file-permissions File permissions unset or incorrect
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:25: risky-file-permissions File permissions unset or incorrect
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:30: risky-file-permissions File permissions unset or incorrect

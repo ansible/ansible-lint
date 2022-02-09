@@ -24,6 +24,10 @@ repos:
   rev: v4.0.1
   hooks:
   - id: end-of-file-fixer
+    exclude: >
+      (?x)^(
+        test/eco/.*.result
+      )$
   - id: trailing-whitespace
     exclude: >
       (?x)^(
