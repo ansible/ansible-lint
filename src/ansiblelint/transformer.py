@@ -39,8 +39,8 @@ class FormattedEmitter(Emitter):
     _sequence_dash_offset = 0  # Should be _sequence_indent - 2
 
     @property
-    def _root_level(self) -> bool:
-        """Return true if this is the root level of the yaml document.
+    def _is_root_level(self) -> bool:
+        """Return True if this is the root level of the yaml document.
 
         Here, root level means the outermost sequence or map of the document.
         """
@@ -53,7 +53,7 @@ class FormattedEmitter(Emitter):
     @property  # type: ignore[override]
     def best_sequence_indent(self) -> int:  # type: ignore[override]
         """Return the configured sequence_indent or 2 for root level."""
-        return 2 if self._root_level else self._sequence_indent
+        return 2 if self._is_root_level else self._sequence_indent
 
     @best_sequence_indent.setter
     def best_sequence_indent(self, value: int) -> None:
@@ -63,7 +63,7 @@ class FormattedEmitter(Emitter):
     @property  # type: ignore[override]
     def sequence_dash_offset(self) -> int:  # type: ignore[override]
         """Return the configured sequence_dash_offset or 2 for root level."""
-        return 0 if self._root_level else self._sequence_dash_offset
+        return 0 if self._is_root_level else self._sequence_dash_offset
 
     @sequence_dash_offset.setter
     def sequence_dash_offset(self, value: int) -> None:
