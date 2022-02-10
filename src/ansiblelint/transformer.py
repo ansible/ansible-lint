@@ -227,7 +227,7 @@ class Transformer:
 
     def run(self) -> None:
         """For each file, read it, execute fmt transforms on it, then write it."""
-        for file, matches in self.matches_per_file.items():
+        for file, _ in self.matches_per_file.items():
             # str() convinces mypy that "text/yaml" is a valid Literal.
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
             file_is_yaml = str(file.base_kind) == "text/yaml"
