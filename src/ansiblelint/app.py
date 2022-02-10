@@ -9,9 +9,10 @@ from ansiblelint.errors import MatchError
 
 if TYPE_CHECKING:
     from argparse import Namespace
-    from typing import Dict  # pylint: disable=ungrouped-imports
+    from typing import Dict, Set  # pylint: disable=ungrouped-imports
 
     from ansiblelint._internal.rules import BaseRule
+    from ansiblelint.file_utils import Lintable
     from ansiblelint.runner import LintResult
 
 
@@ -79,6 +80,13 @@ class App:
         return failures, warnings
 
     @staticmethod
+    def count_lintables(files: "Set[Lintable]") -> Tuple[int, int]:
+        """Count total and modified files."""
+        files_count = len(files)
+        changed_files_count = len([file for file in files if file.updated])
+        return files_count, changed_files_count
+
+    @staticmethod
     def _get_matched_skippable_rules(
         matches: List[MatchError],
     ) -> "Dict[str, BaseRule]":
@@ -101,6 +109,7 @@ class App:
         msg = ""
 
         failures, warnings = self.count_results(result.matches)
+        files_count, changed_files_count = self.count_lintables(result.files)
 
         matched_rules = self._get_matched_skippable_rules(result.matches)
 
@@ -140,9 +149,11 @@ warn_list:  # or 'skip_list' to silence them completely
 
         if result.matches and not self.options.quiet:
             console_stderr.print(render_yaml(msg))
+            if changed_files_count:
+                console_stderr.print(f"Modified {changed_files_count} files.")
             console_stderr.print(
                 f"Finished with {failures} failure(s), {warnings} warning(s) "
-                f"on {len(result.files)} files."
+                f"on {files_count} files."
             )
 
         if mark_as_success or not failures:
