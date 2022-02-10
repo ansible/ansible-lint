@@ -27,7 +27,6 @@ import os
 import pathlib
 import subprocess
 import sys
-from argparse import Namespace
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 
@@ -35,13 +34,7 @@ from enrich.console import should_do_markup
 
 from ansiblelint import cli
 from ansiblelint.app import App
-from ansiblelint.color import (
-    console,
-    console_options,
-    console_stderr,
-    reconfigure,
-    render_yaml,
-)
+from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
 from ansiblelint.constants import ANSIBLE_MISSING_RC, EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
@@ -52,7 +45,6 @@ from ansiblelint.version import __version__
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
-    from ansiblelint.runner import LintResult
 
 
 _logger = logging.getLogger(__name__)
@@ -121,77 +113,6 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
         os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache")),
         cache_key,
     )
-
-
-def report_outcome(  # noqa: C901
-    result: "LintResult", options: Namespace, mark_as_success: bool = False
-) -> int:
-    """Display information about how to skip found rules.
-
-    Returns exit code, 2 if errors were found, 0 when only warnings were found.
-    """
-    failures = 0
-    warnings = 0
-    msg = ""
-    matches_unignored = [match for match in result.matches if not match.ignored]
-
-    # counting
-    matched_rules = {match.rule.id: match.rule for match in matches_unignored}
-    for match in result.matches:
-        if {match.rule.id, *match.rule.tags}.isdisjoint(options.warn_list):
-            failures += 1
-        else:
-            warnings += 1
-
-    # remove unskippable rules from the list
-    for rule_id in list(matched_rules.keys()):
-        if "unskippable" in matched_rules[rule_id].tags:
-            matched_rules.pop(rule_id)
-
-    entries = []
-    for key in sorted(matched_rules.keys()):
-        if {key, *matched_rules[key].tags}.isdisjoint(options.warn_list):
-            entries.append(f"  - {key}  # {matched_rules[key].shortdesc}\n")
-    for match in result.matches:
-        if "experimental" in match.rule.tags:
-            entries.append("  - experimental  # all rules tagged as experimental\n")
-            break
-    if entries and not options.quiet:
-        console_stderr.print(
-            "You can skip specific rules or tags by adding them to your "
-            "configuration file:"
-        )
-        msg += """\
-# .ansible-lint
-warn_list:  # or 'skip_list' to silence them completely
-"""
-        msg += "".join(sorted(entries))
-
-    # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
-    # to migrate old tags to new tags. There are a lot of things out there that still
-    # use ansible-lint 4 (for example, Ansible Galaxy and Automation Hub imports). If we
-    # replace the old tags, those tools will report warnings. If we do not replace them,
-    # ansible-lint 5 will report warnings.
-    #
-    # We can do the deprecation once the ecosystem caught up at least a bit.
-    # for k, v in used_old_tags.items():
-    #     _logger.warning(
-    #         "Replaced deprecated tag '%s' with '%s' but it will become an "
-    #         "error in the future.",
-    #         k,
-    #         v,
-    #     )
-
-    if result.matches and not options.quiet:
-        console_stderr.print(render_yaml(msg))
-        console_stderr.print(
-            f"Finished with {failures} failure(s), {warnings} warning(s) "
-            f"on {len(result.files)} files."
-        )
-
-    if mark_as_success or not failures:
-        return 0
-    return 2
 
 
 def _do_list(rules: "RulesCollection") -> int:
@@ -287,7 +208,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     app.render_matches(result.matches)
 
-    return report_outcome(result, mark_as_success=mark_as_success, options=options)
+    return app.report_outcome(result, mark_as_success=mark_as_success)
 
 
 @contextmanager
