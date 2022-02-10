@@ -1,7 +1,7 @@
 """Application."""
 import logging
 import os
-from typing import TYPE_CHECKING, Any, List, Type
+from typing import TYPE_CHECKING, Any, List, Tuple, Type
 
 from ansiblelint import formatters
 from ansiblelint.color import console, console_stderr, render_yaml
@@ -65,25 +65,30 @@ class App:
             for match in matches:
                 console.print(formatter.format(match), markup=False, highlight=False)
 
-    def report_outcome(  # noqa: C901
+    def count_results(self, matches: List[MatchError]) -> Tuple[int, int]:
+        """Count failures and warnings in matches."""
+        failures = 0
+        warnings = 0
+        for match in matches:
+            if {match.rule.id, *match.rule.tags}.isdisjoint(self.options.warn_list):
+                failures += 1
+            else:
+                warnings += 1
+        return failures, warnings
+
+    def report_outcome(
         self, result: "LintResult", mark_as_success: bool = False
     ) -> int:
         """Display information about how to skip found rules.
 
         Returns exit code, 2 if errors were found, 0 when only warnings were found.
         """
-        failures = 0
-        warnings = 0
         msg = ""
         matches_unignored = [match for match in result.matches if not match.ignored]
 
         # counting
         matched_rules = {match.rule.id: match.rule for match in matches_unignored}
-        for match in result.matches:
-            if {match.rule.id, *match.rule.tags}.isdisjoint(self.options.warn_list):
-                failures += 1
-            else:
-                warnings += 1
+        failures, warnings = self.count_results(result.matches)
 
         # remove unskippable rules from the list
         for rule_id in list(matched_rules.keys()):
