@@ -240,11 +240,13 @@ class Lintable:
             yield self.path.open(mode, buffering, encoding, errors, newline)
             return
         pre_write_hash = self.content_hash()
-        yield self.path.open(mode, buffering, encoding, errors, newline)
-        post_write_hash = self.content_hash()
-        if pre_write_hash != post_write_hash:
-            self.contents_changed = True  # signal that the file has been updated
-            self._content = None  # reset contents cache so next access gets the update
+        try:
+            yield self.path.open(mode, buffering, encoding, errors, newline)
+        finally:
+            post_write_hash = self.content_hash()
+            if pre_write_hash != post_write_hash:
+                self.contents_changed = True  # signal that the file has been updated
+                self._content = None  # reset internal content cache
 
     def __hash__(self) -> int:
         """Return a hash value of the lintables."""
