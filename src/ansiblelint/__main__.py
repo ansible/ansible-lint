@@ -25,6 +25,7 @@ import hashlib
 import logging
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 from contextlib import contextmanager
@@ -138,6 +139,9 @@ def _do_list(rules: "RulesCollection") -> int:
 
 def main(argv: Optional[List[str]] = None) -> int:
     """Linter CLI entry point."""
+    # alter PATH if needed (venv support)
+    path_inject()
+
     if argv is None:
         argv = sys.argv
     initialize_options(argv[1:])
@@ -248,6 +252,27 @@ def _run_cli_entrypoint() -> None:
         sys.exit(EXIT_CONTROL_C_RC)
     except RuntimeError as e:
         raise SystemExit(str(e))
+
+
+def path_inject() -> None:
+    """Add python interpreter path to top of PATH to fix outside venv calling."""
+    # This make it possible to call ansible-lint that was installed inside a
+    # virtualenv without having to pre-activate it. Otherwise subprocess will
+    # either fail to find ansible executables or call the wrong ones.
+    #
+    # This must be run before we do run any subprocesses, and loading config
+    # does this as part of the ansible detection.
+    paths = [x for x in os.environ.get("PATH", "").split(os.pathsep) if x]
+    ansible_path = shutil.which("ansible")
+    if ansible_path:
+        ansible_path = os.path.dirname(ansible_path)
+    py_path = os.path.dirname(sys.executable)
+    # Determine if we need to manipulate PATH
+    if ansible_path not in paths or py_path != ansible_path:  # pragma: no cover
+        # tested by test_call_from_outside_venv but coverage cannot detect it
+        paths.insert(0, py_path)
+        os.environ["PATH"] = os.pathsep.join(paths)
+        print(f"WARNING: PATH altered to include {py_path}", file=sys.stderr)
 
 
 if __name__ == "__main__":
