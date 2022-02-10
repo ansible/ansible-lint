@@ -46,6 +46,7 @@ from ansiblelint.version import __version__
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import LintResult
 
 
 _logger = logging.getLogger(__name__)
@@ -137,7 +138,7 @@ def _do_list(rules: "RulesCollection") -> int:
     return 1
 
 
-def _do_transform(result: "LintResult", options: Namespace) -> None:
+def _do_transform(result: "LintResult") -> None:
     """Create and run fmt Transformer."""
     # On purpose lazy-imports to avoid loading transforms unless requested
     # pylint: disable=import-outside-toplevel
@@ -188,7 +189,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     result = _get_matches(rules, options)
 
     if options.fmt_yaml_files:
-        _do_transform(result, options)
+        _do_transform(result)
 
     mark_as_success = False
     if result.matches and options.progressive:
