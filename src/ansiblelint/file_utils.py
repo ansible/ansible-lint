@@ -1,5 +1,6 @@
 """Utility functions related to file operations."""
 import copy
+import hashlib
 import logging
 import os
 import pathlib
@@ -10,7 +11,7 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union
+from typing import IO, TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union
 
 # import wcmatch
 import wcmatch.pathlib
@@ -182,6 +183,8 @@ class Lintable:
         # determine base file kind (yaml, xml, ini, ...)
         self.base_kind = kind_from_path(self.path, base=True)
 
+        self.contents_changed = False
+
     def __getitem__(self, key: Any) -> Any:
         """Provide compatibility subscriptable support."""
         if key == "path":
@@ -199,11 +202,49 @@ class Lintable:
 
     @property
     def content(self) -> str:
-        """Retried file content, from internal cache or disk."""
+        """Retrieve file content, from internal cache or disk."""
         if self._content is None:
-            with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
+            with self.open() as f:
                 self._content = f.read()
         return self._content
+
+    def content_hash(self, block_size: int = 2 ** 16) -> bytes:
+        """Calculate the hash of on-disk contents."""
+        _hash = hashlib.sha256()
+        try:
+            with self.path.open("rb") as f:
+                while True:
+                    chunk = f.read(block_size)
+                    if not chunk:
+                        break
+                    _hash.update(chunk)
+        except FileNotFoundError:
+            pass
+        return _hash.digest()
+
+    @contextmanager
+    def open(  # pylint: disable=too-many-arguments # mirrors pathlib.Path.open()
+        self,
+        mode: str = "r",
+        buffering: int = -1,
+        encoding: str = "utf-8",
+        errors: Optional[str] = None,
+        newline: Optional[str] = None,
+    ) -> Iterator[IO[Any]]:
+        """Open a stream to the file and detect when file contents change.
+
+        This must be used as a context manager (``with lintable.open() as f:``).
+        """
+        if "r" in mode:
+            # Just reading. No need to detect changes.
+            yield self.path.open(mode, buffering, encoding, errors, newline)
+            return
+        pre_write_hash = self.content_hash()
+        yield self.path.open(mode, buffering, encoding, errors, newline)
+        post_write_hash = self.content_hash()
+        if pre_write_hash != post_write_hash:
+            self.contents_changed = True  # signal that the file has been updated
+            self._content = None  # reset contents cache so next access gets the update
 
     def __hash__(self) -> int:
         """Return a hash value of the lintables."""
