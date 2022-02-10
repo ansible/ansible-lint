@@ -1,7 +1,9 @@
 """Tests related to prerun part of the linter."""
 import os
+import re
 import subprocess
-from typing import List
+import sys
+from typing import Callable, List
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -11,35 +13,113 @@ from ansiblelint import prerun
 from ansiblelint.constants import INVALID_PREREQUISITES_RC
 from ansiblelint.testing import run_ansible_lint
 
+EXECDIR = os.path.dirname(sys.executable)
+
+Deactivator = Callable[[bool], str]
+DeactivateVenv = Callable[[], Deactivator]
+
+
+@pytest.fixture
+def deactivate_venv(monkeypatch: MonkeyPatch) -> Deactivator:
+    """Deliver a function to deactivate the current venv, if any, if requested, by removing it's bin dir from $PATH."""
+
+    def deactiveator(deactivate: bool) -> str:
+        if deactivate:
+            search_path = os.get_exec_path()
+            try:
+                pos = search_path.index(EXECDIR)
+            except ValueError:
+                return ""
+            del search_path[pos]
+            monkeypatch.setenv("PATH", ";".join(search_path))
+            return EXECDIR
+        return ""
+
+    return deactiveator
+
 
 # https://github.com/box/flaky/issues/170
 @flaky(max_runs=3)  # type: ignore
-def test_prerun_reqs_v1() -> None:
+@pytest.mark.parametrize(
+    ("deactivate"),
+    (
+        (False),
+        (True),
+    ),
+    ids=("venv activated", "venv deactivated"),
+)
+def test_prerun_reqs_v1(deactivate: bool, deactivate_venv: Deactivator) -> None:
     """Checks that the linter can auto-install requirements v1 when found."""
     cwd = os.path.realpath(
         os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "..", "examples", "reqs_v1"
         )
     )
+    execdir = deactivate_venv(deactivate)
     result = run_ansible_lint("-v", ".", cwd=cwd)
-    assert "Running ansible-galaxy role install" in result.stderr, result.stderr
+
+    ansible_galaxy = os.path.join(execdir, "ansible-galaxy")
+    assert f"Running {ansible_galaxy} role install" in result.stderr, result.stderr
     assert (
-        "Running ansible-galaxy collection install" not in result.stderr
+        f"Running {ansible_galaxy} collection install" not in result.stderr
     ), result.stderr
     assert result.returncode == 0, result
 
 
 @flaky(max_runs=3)  # type: ignore
-def test_prerun_reqs_v2() -> None:
+@pytest.mark.parametrize(
+    ("executable"),  # Run with `python -m` or the venv command: issue #1507
+    (
+        (None),
+        (os.path.join(os.path.dirname(sys.executable), "ansible-lint")),
+    ),
+    ids=(
+        "run as ansiblelint python module",
+        "run via path to the virtualenv's ansible-lint command",
+    ),
+)
+@pytest.mark.parametrize(
+    ("deactivate"),
+    (
+        (False),
+        (True),
+    ),
+    ids=("venv activated", "venv deactivated"),
+)
+def test_prerun_reqs_v2(
+    executable: str, deactivate: bool, deactivate_venv: Deactivator
+) -> None:
     """Checks that the linter can auto-install requirements v2 when found."""
     cwd = os.path.realpath(
         os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "..", "examples", "reqs_v2"
         )
     )
-    result = run_ansible_lint("-v", ".", cwd=cwd)
-    assert "Running ansible-galaxy role install" in result.stderr, result.stderr
-    assert "Running ansible-galaxy collection install" in result.stderr, result.stderr
+    execdir = deactivate_venv(deactivate)
+    result = run_ansible_lint("-v", ".", cwd=cwd, executable=executable)
+
+    # These first 2 assertations are written to pass both with the test
+    # as-it-is before the fix of issue #1507 and after the fix.
+    # (See: https://github.com/ansible-community/ansible-lint/issues/1507)
+    # But these assertations are written as much like the "before" version
+    # of this test as possible, to demonstrate that the assertion
+    # itself is not substantively changed by the fix.
+    # When these asserations fail, without the #1507 patch,
+    # it demonstrates that ansible-lint does not run in a virtual environment
+    # unless that environment is activated.
+    assert re.search(
+        "Running [^ ]*ansible-galaxy role install", result.stderr
+    ), result.stderr
+    assert re.search(
+        "Running [^ ]*ansible-galaxy collection install", result.stderr
+    ), result.stderr
+
+    # Commands are given with or without paths, as expected.
+    ansible_galaxy = os.path.join(execdir, "ansible-galaxy")
+    assert f"Running {ansible_galaxy} role install" in result.stderr, result.stderr
+    assert (
+        f"Running {ansible_galaxy} collection install" in result.stderr
+    ), result.stderr
     assert result.returncode == 0, result
 
 
