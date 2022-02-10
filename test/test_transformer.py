@@ -31,37 +31,27 @@ def runner_result(
     config_options: Namespace,
     default_rules_collection: RulesCollection,
     playbook: str,
-    exclude: List[str],
 ) -> LintResult:
     """Fixture that runs the Runner to populate a LintResult for a given file."""
     config_options.lintables = [playbook]
-    config_options.exclude_paths = exclude
     result = _get_matches(rules=default_rules_collection, options=config_options)
     return result
 
 
 @pytest.mark.parametrize(
-    ('playbook', 'exclude', 'matches_count', 'transformed'),
+    ("playbook", "matches_count", "transformed"),
     (
         # reuse TestRunner::test_runner test cases to ensure transformer does not mangle matches
         pytest.param(
-            'examples/playbooks/nomatchestest.yml', [], 0, False, id="nomatchestest"
+            "examples/playbooks/nomatchestest.yml", 0, False, id="nomatchestest"
         ),
-        pytest.param('examples/playbooks/unicode.yml', [], 1, True, id="unicode"),
+        pytest.param("examples/playbooks/unicode.yml", 1, True, id="unicode"),
         pytest.param(
-            'examples/playbooks/lots_of_warnings.yml',
-            ['examples/playbooks/lots_of_warnings.yml'],
-            0,
-            False,
-            id="lots_of_warnings",
+            "examples/playbooks/lots_of_warnings.yml", 992, False, id="lots_of_warnings"
         ),
-        pytest.param('examples/playbooks/become.yml', [], 0, True, id="become"),
+        pytest.param("examples/playbooks/become.yml", 0, True, id="become"),
         pytest.param(
-            'examples/playbooks/contains_secrets.yml',
-            [],
-            0,
-            True,
-            id="contains_secrets",
+            "examples/playbooks/contains_secrets.yml", 0, True, id="contains_secrets"
         ),
     ),
 )
