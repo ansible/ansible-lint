@@ -208,7 +208,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     app.render_matches(result.matches)
 
-    return app.report_outcome(result, mark_as_success=mark_as_success, options=options)
+    return app.report_outcome(result, mark_as_success=mark_as_success)
 
 
 @contextmanager

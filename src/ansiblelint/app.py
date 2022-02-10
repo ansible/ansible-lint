@@ -65,9 +65,8 @@ class App:
             for match in matches:
                 console.print(formatter.format(match), markup=False, highlight=False)
 
-    @staticmethod
     def report_outcome(  # noqa: C901
-        result: "LintResult", options: "Namespace", mark_as_success: bool = False
+        self, result: "LintResult", mark_as_success: bool = False
     ) -> int:
         """Display information about how to skip found rules.
 
@@ -81,7 +80,7 @@ class App:
         # counting
         matched_rules = {match.rule.id: match.rule for match in matches_unignored}
         for match in result.matches:
-            if {match.rule.id, *match.rule.tags}.isdisjoint(options.warn_list):
+            if {match.rule.id, *match.rule.tags}.isdisjoint(self.options.warn_list):
                 failures += 1
             else:
                 warnings += 1
@@ -93,13 +92,13 @@ class App:
 
         entries = []
         for key in sorted(matched_rules.keys()):
-            if {key, *matched_rules[key].tags}.isdisjoint(options.warn_list):
+            if {key, *matched_rules[key].tags}.isdisjoint(self.options.warn_list):
                 entries.append(f"  - {key}  # {matched_rules[key].shortdesc}\n")
         for match in result.matches:
             if "experimental" in match.rule.tags:
                 entries.append("  - experimental  # all rules tagged as experimental\n")
                 break
-        if entries and not options.quiet:
+        if entries and not self.options.quiet:
             console_stderr.print(
                 "You can skip specific rules or tags by adding them to your "
                 "configuration file:"
@@ -125,7 +124,7 @@ warn_list:  # or 'skip_list' to silence them completely
         #         v,
         #     )
 
-        if result.matches and not options.quiet:
+        if result.matches and not self.options.quiet:
             console_stderr.print(render_yaml(msg))
             console_stderr.print(
                 f"Finished with {failures} failure(s), {warnings} warning(s) "
