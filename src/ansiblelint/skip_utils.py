@@ -182,7 +182,7 @@ def _get_rule_skips_from_yaml(yaml_input: Sequence[Any]) -> Sequence[Any]:
     def traverse_yaml(obj: Any) -> None:
         yaml_comment_obj_strs.append(str(obj.ca.items))
         if isinstance(obj, dict):
-            for key, val in obj.items():
+            for _, val in obj.items():
                 if isinstance(val, (dict, list)):
                     traverse_yaml(val)
         elif isinstance(obj, list):
