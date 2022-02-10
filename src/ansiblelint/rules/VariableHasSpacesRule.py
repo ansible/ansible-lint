@@ -26,7 +26,6 @@ class VariableHasSpacesRule(AnsibleLintRule):
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         for _, v, _ in nested_items_path(task):
-            v = result[1]
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
                 if bool(self.bracket_regex.search(cleaned)):
