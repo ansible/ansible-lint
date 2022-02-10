@@ -39,6 +39,9 @@ max-line-length = 100
 extend-ignore =
   E203,
   E501,
+  F401,  # duplicate of pylint W0611 (unused-import)
+  F821,  # duplicate of pylint E0602 (undefined-variable)
+  F841,  # duplicate of pylint W0612 (unused-variable)
   H,
 
 # Allow certain violations in certain files:
