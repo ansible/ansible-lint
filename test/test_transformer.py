@@ -92,6 +92,8 @@ def test_ruamel_yaml_sequence_formatting(
 ) -> None:
     """Test ``ruamel.yaml.YAML.dump()`` sequence formatting."""
     yaml = YAML(typ="rt")
+    # Ansible (via PyYAML) only supports YAML 1.1, so make sure to use that code path.
+    yaml.version = (1, 1)  # type: ignore[assignment]
     # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
     yaml.explicit_start = True  # type: ignore[assignment]
     yaml.map_indent = map_indent  # type: ignore[assignment]
@@ -101,7 +103,8 @@ def test_ruamel_yaml_sequence_formatting(
         yaml.Emitter = alternate_emitter
     # ruamel.yaml only writes to a stream (there is no `dumps` function)
     with StringIO() as output:
-        yaml.dump(_input_playbook, output)
+        # _final_yaml_transform strips the "%YAML 1.1" prefix
+        yaml.dump(_input_playbook, output, transform=Transformer._final_yaml_transform)
         assert output.getvalue() == expected_output
 
 

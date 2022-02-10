@@ -179,6 +179,14 @@ class Transformer:
 
         # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
 
+        # Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
+        # So, we have to make sure we dump yaml files using YAML 1.1.
+        # We can relax the version requirement once ansible uses a version of PyYAML
+        # that includes this PR: https://github.com/yaml/pyyaml/pull/555
+        yaml.version = (1, 1)  # type: ignore[assignment]
+        # Sadly, this means all YAML files will be prefixed with "%YAML 1.1\n" on dump
+        # We'll have to drop that using a transform so people don't yell too much.
+
         # configure yaml dump formatting
         yaml.explicit_start = self.yaml_explicit_start  # type: ignore[assignment]
         yaml.explicit_end = self.yaml_explicit_end  # type: ignore[assignment]
@@ -204,6 +212,19 @@ class Transformer:
         self._yaml = yaml
         return yaml
 
+    @staticmethod
+    def _final_yaml_transform(text: str) -> str:
+        """Transform YAML string before writing to file.
+
+        Ansible uses PyYAML which only supports YAML 1.1, so we dump YAML 1.1.
+        But we don't want "%YAML 1.1" at the start, so drop that.
+        """
+        prefix = "%YAML 1.1\n"
+        prefix_len = len(prefix)
+        if text.startswith(prefix):
+            return text[prefix_len:]
+        return text
+
     def run(self) -> None:
         """For each file, read it, execute fmt transforms on it, then write it."""
         for file, matches in self.matches_per_file.items():
@@ -224,4 +245,4 @@ class Transformer:
                 data = _whitespace_only_lines_re.sub("", cast(str, data))
                 # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
                 data = load_data(data)
-                self.yaml.dump(data, file.path)
+                self.yaml.dump(data, file.path, transform=self._final_yaml_transform)
