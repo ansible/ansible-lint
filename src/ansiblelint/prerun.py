@@ -28,6 +28,7 @@ from ansiblelint.constants import (
     INVALID_PREREQUISITES_RC,
 )
 from ansiblelint.loaders import yaml_from_file
+from ansiblelint.venv_utils import add_venv_path, run_ansible_version
 
 _logger = logging.getLogger(__name__)
 
@@ -45,12 +46,7 @@ def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
         err = ""
         failed = False
         ver = ""
-        result = subprocess.run(
-            args=["ansible", "--version"],
-            stdout=subprocess.PIPE,
-            universal_newlines=True,
-            check=False,
-        )
+        result = run_ansible_version()
         if result.returncode != 0:
             return (
                 ver,
@@ -103,7 +99,7 @@ def install_collection(collection: str, destination: Optional[str] = None) -> No
     Can accept version constraints like 'foo.bar:>=1.2.3'
     """
     cmd = [
-        "ansible-galaxy",
+        add_venv_path("ansible-galaxy"),
         "collection",
         "install",
         "--force",  # required for ansible 2.9
@@ -138,7 +134,7 @@ def install_requirements(requirement: str) -> None:
         return
 
     cmd = [
-        "ansible-galaxy",
+        add_venv_path("ansible-galaxy"),
         "role",
         "install",
         "--force",  # required for ansible 2.9
@@ -164,7 +160,7 @@ def install_requirements(requirement: str) -> None:
     if "collections" in yaml_from_file(requirement):
 
         cmd = [
-            "ansible-galaxy",
+            add_venv_path("ansible-galaxy"),
             "collection",
             "install",
             "--force",  # required for ansible 2.9
@@ -432,7 +428,7 @@ def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str],
         env.pop(colpathvar)
 
     config = subprocess.check_output(
-        ["ansible-config", "dump"], universal_newlines=True, env=env
+        [add_venv_path("ansible-config"), "dump"], universal_newlines=True, env=env
     )
 
     if kind == str:

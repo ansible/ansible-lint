@@ -12,6 +12,7 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.logger import timed_info
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import strip_ansi_escape
+from ansiblelint.venv_utils import add_venv_path
 
 DESCRIPTION = """\
 Running ``ansible-playbook --syntax-check ...`` failed.
@@ -57,7 +58,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             if options.extra_vars:
                 extra_vars_cmd = ["--extra-vars", json.dumps(options.extra_vars)]
             cmd = [
-                "ansible-playbook",
+                add_venv_path("ansible-playbook"),
                 "--syntax-check",
                 *extra_vars_cmd,
                 str(lintable.path),

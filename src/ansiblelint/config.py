@@ -1,7 +1,6 @@
 """Store configuration options as a singleton."""
 import os
 import re
-import subprocess
 import sys
 from argparse import Namespace
 from functools import lru_cache
@@ -10,6 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from packaging.version import Version
 
 from ansiblelint.constants import ANSIBLE_MISSING_RC
+from ansiblelint.venv_utils import run_ansible_version
 
 DEFAULT_KINDS = [
     # Do not sort this list, order matters.
@@ -143,13 +143,7 @@ def ansible_version(version: str = "") -> Version:
     to Version object in order to make it usable in comparisons.
     """
     if not version:
-        proc = subprocess.run(
-            ["ansible", "--version"],
-            universal_newlines=True,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        proc = run_ansible_version()
         if proc.returncode == 0:
             version, error = parse_ansible_version(proc.stdout)
             if error is not None:
