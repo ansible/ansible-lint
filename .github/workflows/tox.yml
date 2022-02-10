@@ -1,4 +1,4 @@
-name: gh
+name: tox
 
 on:
   create:  # is used for publishing to PyPI and TestPyPI
@@ -142,10 +142,12 @@ jobs:
           python-version: "3.10"
           devel: true
           skip_ansible29: true
-        - tox_env: py36
+        - name: py36 (macos)
+          tox_env: py36
           os: macOS-latest
           python-version: 3.6
-        - tox_env: py310
+        - name: py310 (macos)
+          tox_env: py310
           os: macOS-latest
           python-version: "3.10"
           skip_ansible29: true
