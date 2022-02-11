@@ -235,7 +235,7 @@ class Lintable:
 
         This must be used as a context manager (``with lintable.open() as f:``).
         """
-        if "r" in mode:
+        if mode in ["r", "rt", "rb"]:
             # Just reading. No need to detect changes.
             yield self.path.open(mode, buffering, encoding, errors, newline)
             return
