@@ -237,11 +237,13 @@ class Lintable:
         """
         if mode in ["r", "rt", "rb"]:
             # Just reading. No need to detect changes.
-            yield self.path.open(mode, buffering, encoding, errors, newline)
+            with self.path.open(mode, buffering, encoding, errors, newline) as f:
+                yield f
             return
         pre_write_hash = self.content_hash()
         try:
-            yield self.path.open(mode, buffering, encoding, errors, newline)
+            with self.path.open(mode, buffering, encoding, errors, newline) as f:
+                yield f
         finally:
             post_write_hash = self.content_hash()
             if pre_write_hash != post_write_hash:
