@@ -36,7 +36,7 @@ from ansiblelint import cli
 from ansiblelint.app import App
 from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
-from ansiblelint.constants import ANSIBLE_MISSING_RC, EXIT_CONTROL_C_RC
+from ansiblelint.constants import EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.prerun import check_ansible_presence, prepare_environment
 from ansiblelint.skip_utils import normalize_tag
@@ -81,15 +81,12 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     new_options.cwd = pathlib.Path.cwd()
 
     if new_options.version:
-        ansible_version, err = check_ansible_presence()
+        ansible_version, _ = check_ansible_presence(exit_on_error=True)
         print(
             "ansible-lint {ver!s} using ansible {ansible_ver!s}".format(
                 ver=__version__, ansible_ver=ansible_version
             )
         )
-        if err:
-            _logger.error(err)
-            sys.exit(ANSIBLE_MISSING_RC)
         sys.exit(0)
 
     if new_options.colored is None:
