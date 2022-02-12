@@ -43,15 +43,14 @@ using ``--user`` or fixing potential conflicts if not using virtualenvs.
 
 .. code-block:: bash
 
-    # Assuming you already installed Ansible and you also want the optional
-    # yamllint support:
-    pip3 install "ansible-lint[yamllint]"
+    # Assuming you already installed Ansible
+    pip3 install "ansible-lint"
 
     # If you want to install and use the latest Ansible (w/o community collections)
-    pip3 install "ansible-lint[core,yamllint]"
+    pip3 install "ansible-lint[core]"
 
     # If you want to install and use the latest Ansible with community collections
-    pip3 install "ansible-lint[community,yamllint]"
+    pip3 install "ansible-lint[community]"
 
     # If you want to install an older version of Ansible 2.9
     pip3 install ansible-lint "ansible>=2.9,<2.10"

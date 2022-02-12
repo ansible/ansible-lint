@@ -125,33 +125,34 @@ repos:
     - tenacity
     - typing_extensions
     - wcmatch
+    - yamllint
 - # keep at bottom as these are slower
   repo: local
   hooks:
   - id: pip-compile
     name: pip-compile
-    entry: python3.9 -m piptools compile -q --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
+    entry: python3.9 -m piptools compile -q --no-annotate --output-file=constraints.txt setup.cfg --extra test --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
     stages: [manual]
   - id: pip-compile-docs
     name: pip-compile-docs
-    entry: python3.9 -m piptools compile -q --no-annotate --output-file=docs/requirements.txt --extra yamllint --strip-extras docs/requirements.in setup.cfg
+    entry: python3.9 -m piptools compile -q --no-annotate --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
     language: system
     files: ^(docs\/requirements\.(txt|in)|)$
     pass_filenames: false
     stages: [manual]
   - id: pip-compile-upgrade
     name: pip-compile-upgrade
-    entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=constraints.txt setup.cfg --extra test --extra yamllint --strip-extras
+    entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=constraints.txt setup.cfg --extra test --strip-extras
     language: system
     files: ^(setup\.cfg|=constraints\.txt)$
     pass_filenames: false
     stages: [manual]
   - id: pip-compile-docs-upgrade
     name: pip-compile-docs-upgrade
-    entry: python3.9 -m piptools compile -q --upgrade --no-annotate  --extra yamllint --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
+    entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
     language: system
     files: ^(docs\/requirements\.(txt|in)|)$
     pass_filenames: false
