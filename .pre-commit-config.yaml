@@ -16,6 +16,13 @@ ci:
 default_language_version:
   python: python3.9
 repos:
+- repo: https://github.com/streetsidesoftware/cspell-cli
+  rev: v5.8.1
+  hooks:
+  - id: cspell
+    # entry: codespell --relative
+    args: ["--relative", "--no-progress", "--no-summary"]
+    name: Spell check with cspell
 - repo: https://github.com/sirosen/check-jsonschema
   rev: 0.10.2
   hooks:
