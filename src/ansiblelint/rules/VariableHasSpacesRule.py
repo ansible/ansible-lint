@@ -25,7 +25,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
-        for k, v, _ in nested_items_path(task):
+        for _, v, _ in nested_items_path(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
                 if bool(self.bracket_regex.search(cleaned)):

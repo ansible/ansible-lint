@@ -1,14 +1,16 @@
 """Application."""
 import logging
 import os
-from typing import TYPE_CHECKING, Any, List, Type
+from typing import TYPE_CHECKING, Any, List, Tuple, Type
 
 from ansiblelint import formatters
-from ansiblelint.color import console
+from ansiblelint.color import console, console_stderr, render_yaml
 from ansiblelint.errors import MatchError
 
 if TYPE_CHECKING:
     from argparse import Namespace
+
+    from ansiblelint.runner import LintResult
 
 
 _logger = logging.getLogger(__package__)
@@ -62,6 +64,81 @@ class App:
             formatter = formatters.AnnotationsFormatter(self.options.cwd, True)
             for match in matches:
                 console.print(formatter.format(match), markup=False, highlight=False)
+
+    def count_results(self, matches: List[MatchError]) -> Tuple[int, int]:
+        """Count failures and warnings in matches."""
+        failures = 0
+        warnings = 0
+        for match in matches:
+            if {match.rule.id, *match.rule.tags}.isdisjoint(self.options.warn_list):
+                failures += 1
+            else:
+                warnings += 1
+        return failures, warnings
+
+    def report_outcome(
+        self, result: "LintResult", mark_as_success: bool = False
+    ) -> int:
+        """Display information about how to skip found rules.
+
+        Returns exit code, 2 if errors were found, 0 when only warnings were found.
+        """
+        msg = ""
+        matches_unignored = [match for match in result.matches if not match.ignored]
+
+        # counting
+        matched_rules = {match.rule.id: match.rule for match in matches_unignored}
+        failures, warnings = self.count_results(result.matches)
+
+        # remove unskippable rules from the list
+        for rule_id in list(matched_rules.keys()):
+            if "unskippable" in matched_rules[rule_id].tags:
+                matched_rules.pop(rule_id)
+
+        entries = []
+        for key in sorted(matched_rules.keys()):
+            if {key, *matched_rules[key].tags}.isdisjoint(self.options.warn_list):
+                entries.append(f"  - {key}  # {matched_rules[key].shortdesc}\n")
+        for match in result.matches:
+            if "experimental" in match.rule.tags:
+                entries.append("  - experimental  # all rules tagged as experimental\n")
+                break
+        if entries and not self.options.quiet:
+            console_stderr.print(
+                "You can skip specific rules or tags by adding them to your "
+                "configuration file:"
+            )
+            msg += """\
+# .ansible-lint
+warn_list:  # or 'skip_list' to silence them completely
+"""
+            msg += "".join(sorted(entries))
+
+        # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
+        # to migrate old tags to new tags. There are a lot of things out there that still
+        # use ansible-lint 4 (for example, Ansible Galaxy and Automation Hub imports). If we
+        # replace the old tags, those tools will report warnings. If we do not replace them,
+        # ansible-lint 5 will report warnings.
+        #
+        # We can do the deprecation once the ecosystem caught up at least a bit.
+        # for k, v in used_old_tags.items():
+        #     _logger.warning(
+        #         "Replaced deprecated tag '%s' with '%s' but it will become an "
+        #         "error in the future.",
+        #         k,
+        #         v,
+        #     )
+
+        if result.matches and not self.options.quiet:
+            console_stderr.print(render_yaml(msg))
+            console_stderr.print(
+                f"Finished with {failures} failure(s), {warnings} warning(s) "
+                f"on {len(result.files)} files."
+            )
+
+        if mark_as_success or not failures:
+            return 0
+        return 2
 
 
 def choose_formatter_factory(

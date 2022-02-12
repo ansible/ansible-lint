@@ -344,6 +344,7 @@ def _include_children(
         v = v["file"]
 
     # handle include: filename.yml tags=blah
+    # pylint: disable=unused-variable
     (command, args, kwargs) = tokenize("{0}: {1}".format(k, v))
 
     result = path_dwim(basedir, args[0])
@@ -519,7 +520,7 @@ def _look_for_role_files(
 
     for kind in ["tasks", "meta", "handlers", "vars", "defaults"]:
         current_path = os.path.join(role_path, kind)
-        for folder, subdirs, files in os.walk(current_path):
+        for folder, _, files in os.walk(current_path):
             for file in files:
                 file_ignorecase = file.lower()
                 if file_ignorecase.endswith((".yml", ".yaml")):

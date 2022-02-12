@@ -13,12 +13,7 @@ import packaging
 import tenacity
 from packaging import version
 
-from ansiblelint.config import (
-    ansible_collections_path,
-    collection_list,
-    options,
-    parse_ansible_version,
-)
+from ansiblelint.config import ansible_collections_path, options, parse_ansible_version
 from ansiblelint.constants import (
     ANSIBLE_DEFAULT_ROLES_PATH,
     ANSIBLE_MIN_VERSION,
@@ -309,6 +304,10 @@ def _prepare_ansible_paths() -> None:
     """Configure Ansible environment variables."""
     library_paths: List[str] = []
     roles_path: List[str] = []
+    collection_list: List[str] = []
+
+    if ansible_collections_path() in os.environ:
+        collection_list = os.environ[ansible_collections_path()].split(":")
 
     for path_list, path in (
         (library_paths, "plugins/modules"),
@@ -374,7 +373,7 @@ def _write_module_stub(
 def _update_env(varname: str, value: List[str], default: str = "") -> None:
     """Update colon based environment variable if needed. by appending."""
     if value:
-        orig_value = os.environ.get(varname, default=default)
+        orig_value = os.environ.get(varname, default)
         if orig_value:
             # Prepend original or default variable content to custom content.
             value = [*orig_value.split(":"), *value]
