@@ -12,13 +12,13 @@ Each rule definition should have the following:
 
 * ID: A unique identifier
 * Short description: Brief description of the rule
-* Description: Behaviour the rule is looking for
+* Description: What the rule is looking for
 * Tags: One or more tags that may be used to include or exclude the rule
 * At least one of the following methods:
 
   * ``match`` that takes a line and returns None or False, if the line doesn't
     match the test, and True or a custom message, when it does. (This allows
-    one rule to test multiple behaviours - see e.g. the
+    one rule to test multiple behaviors - see e.g. the
     *CommandsInsteadOfModulesRule*.)
   * ``matchtask`` that operates on a single task or handler, such that tasks
     get standardized to always contain a *module* key and *module_arguments*

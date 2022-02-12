@@ -2,7 +2,7 @@
 - hosts: webservers
 
   vars:
-    oldskool: "1.2.3"
+    old_school: "1.2.3"
     bracket: "and close bracket"
 
   tasks:

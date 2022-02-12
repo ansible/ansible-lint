@@ -30,7 +30,7 @@ _logger = logging.getLogger(__name__)
 def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
     """Assures we stop execution if Ansible is missing or outdated.
 
-    Returne found version and an optional exception if something wrong
+    Returns found version and an optional exception if something wrong
     was detected.
     """
 
@@ -475,15 +475,15 @@ def require_collection(  # noqa: C901
     for path in paths:
         collpath = os.path.join(path, "ansible_collections", ns, coll)
         if os.path.exists(collpath):
-            mpath = os.path.join(collpath, "MANIFEST.json")
-            if not os.path.exists(mpath):
+            manifest_path = os.path.join(collpath, "MANIFEST.json")
+            if not os.path.exists(manifest_path):
                 _logger.fatal(
                     "Found collection at '%s' but missing MANIFEST.json, cannot get info.",
                     collpath,
                 )
                 sys.exit(INVALID_PREREQUISITES_RC)
 
-            with open(mpath, "r") as f:
+            with open(manifest_path, "r") as f:
                 manifest = json.loads(f.read())
                 found_version = packaging.version.parse(
                     manifest["collection_info"]["version"]
