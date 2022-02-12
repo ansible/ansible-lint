@@ -17,6 +17,10 @@ on:
   # https://crontab.guru/#2_18_*_*_5
   # - cron: 2 18 * * 5
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   linters:
     name: >-
