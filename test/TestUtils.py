@@ -214,9 +214,9 @@ def test_template_lookup(role: str, expect_warning: bool) -> None:
 
 def test_task_to_str_unicode() -> None:
     """Ensure that extracting messages from tasks preserves Unicode."""
-    task = dict(fail=dict(msg=u"unicode é ô à"))
+    task = dict(fail=dict(msg="unicode é ô à"))
     result = utils.task_to_str(utils.normalize_task(task, "filename.yml"))
-    assert result == u"fail msg=unicode é ô à"
+    assert result == "fail msg=unicode é ô à"
 
 
 def test_logger_debug(caplog: LogCaptureFixture) -> None:
