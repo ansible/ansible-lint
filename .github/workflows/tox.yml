@@ -139,7 +139,6 @@ jobs:
           os: ubuntu-20.04
           python-version: "3.10"
           devel: true
-          skip_ansible29: true
         - name: py38 (macos)
           tox_env: py38
           os: macOS-latest
@@ -148,7 +147,6 @@ jobs:
           tox_env: py310
           os: macOS-latest
           python-version: "3.10"
-          skip_ansible29: true
 
     env:
       TOX_PARALLEL_NO_SPINNER: 1
@@ -206,19 +204,13 @@ jobs:
         --skip-missing-interpreters false
         -vv
       env:
-        TOXENV: ${{ matrix.tox_env }}-core,${{ matrix.tox_env }}-ansible29
+        TOXENV: ${{ matrix.tox_env }}-core
     # sequential run improves browsing experience (almost no speed impact)
     - name: "Test with tox: ${{ matrix.tox_env }}-core"
       run: |
         python3 -m tox
       env:
         TOXENV: ${{ matrix.tox_env }}-core
-    - name: "Test with tox: ${{ matrix.tox_env }}-ansible29"
-      if: ${{ !matrix.skip_ansible29 }}
-      run: |
-        python3 -m tox
-      env:
-        TOXENV: ${{ matrix.tox_env }}-ansible29
     - name: "Test with tox: ${{ matrix.tox_env }}-devel"
       if: ${{ matrix.devel }}
       run: |
