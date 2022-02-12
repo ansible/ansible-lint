@@ -44,7 +44,7 @@ class MatchError(ValueError):
                 "required argument: one of 'message' or 'rule'",
             )
 
-        self.message = message or getattr(rule, "shortdesc", "")
+        self.message = str(message or getattr(rule, "shortdesc", ""))
 
         # Safety measture to ensure we do not endup with incorrect indexes
         if linenumber == 0:
