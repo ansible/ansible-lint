@@ -9,7 +9,9 @@ from ansiblelint.errors import MatchError
 
 if TYPE_CHECKING:
     from argparse import Namespace
+    from typing import Dict  # pylint: disable=ungrouped-imports
 
+    from ansiblelint._internal.rules import BaseRule
     from ansiblelint.runner import LintResult
 
 
@@ -76,6 +78,19 @@ class App:
                 warnings += 1
         return failures, warnings
 
+    @staticmethod
+    def _get_matched_skippable_rules(
+        matches: List[MatchError],
+    ) -> "Dict[str, BaseRule]":
+        """Extract the list of matched rules, if skippable, from the list of matches."""
+        matches_unignored = [match for match in matches if not match.ignored]
+        matched_rules = {match.rule.id: match.rule for match in matches_unignored}
+        # remove unskippable rules from the list
+        for rule_id in list(matched_rules.keys()):
+            if "unskippable" in matched_rules[rule_id].tags:
+                matched_rules.pop(rule_id)
+        return matched_rules
+
     def report_outcome(
         self, result: "LintResult", mark_as_success: bool = False
     ) -> int:
@@ -84,16 +99,10 @@ class App:
         Returns exit code, 2 if errors were found, 0 when only warnings were found.
         """
         msg = ""
-        matches_unignored = [match for match in result.matches if not match.ignored]
 
-        # counting
-        matched_rules = {match.rule.id: match.rule for match in matches_unignored}
         failures, warnings = self.count_results(result.matches)
 
-        # remove unskippable rules from the list
-        for rule_id in list(matched_rules.keys()):
-            if "unskippable" in matched_rules[rule_id].tags:
-                matched_rules.pop(rule_id)
+        matched_rules = self._get_matched_skippable_rules(result.matches)
 
         entries = []
         for key in sorted(matched_rules.keys()):
