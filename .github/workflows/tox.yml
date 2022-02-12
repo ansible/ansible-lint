@@ -122,10 +122,12 @@ jobs:
         - tox_env: py36
           os: ubuntu-20.04
           python-version: 3.6
-        - name: py39 (wsl)
-          tox_env: py39
-          os: windows-latest
-          shell: "wsl-bash {0}"
+        # Disabled due to gettings stuck and timeouts not working
+        # https://github.com/Vampire/setup-wsl/discussions/25
+        # - name: py39 (wsl)
+        #   tox_env: py39
+        #   os: windows-latest
+        #   shell: "wsl-bash {0}"
         - tox_env: py37
           os: ubuntu-20.04
           python-version: 3.7
