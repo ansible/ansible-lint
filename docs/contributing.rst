@@ -38,7 +38,7 @@ to create a new rule by following the steps below:
 * If the rule is task specific, it may be best to include a test to verify its
   use inside blocks as well.
 * Optionally run only the rule specific tests with a command like:
-  :command:`tox -e py38-ansible29 -- -k NewRule`
+  :command:`tox -e py38-core -- -k NewRule`
 * Run :command:`tox` in order to run all ansible-lint tests. Adding a new rule
   can break some other tests. Update them if needed.
 * Run :command:`ansible-lint -L` and check that the rule description renders
