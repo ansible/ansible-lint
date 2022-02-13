@@ -223,30 +223,40 @@ BASIC_PLAYBOOK = """
 """
 
 
+@pytest.fixture
+def tmp_updated_lintable(tmp_path: Path, path: str, content: str, updated_content: str) -> Lintable:
+    lintable = Lintable(tmp_path / path, content)
+    with lintable.path.open("w", encoding="utf-8") as f:
+        f.write(content)
+    lintable.writable.truncate(0)
+    lintable.writable.write(updated_content)
+    return lintable
+
+
 @pytest.mark.parametrize(
     ("path", "content", "updated_content", "updated"),
     (
-        pytest.param("a.yaml", BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"),
+        pytest.param("no_change.yaml", BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"),
         pytest.param(
-            "b.yaml",
+            "quotes.yaml",
             BASIC_PLAYBOOK,
             BASIC_PLAYBOOK.replace('"', "'"),
             True,
             id="updated_quotes",
         ),
         pytest.param(
-            "c.yaml", BASIC_PLAYBOOK, "# short file\n", True, id="shorten_file"
+            "shorten.yaml", BASIC_PLAYBOOK, "# short file\n", True, id="shorten_file"
         ),
     ),
 )
 def test_lintable_updated(
-    tmp_path: Path,
+    path: str,
     content: str,
     updated_content: str,
     updated: bool,
 ) -> None:
     """Validate ``Lintable.updated`` when using to ``Lintable.writable``."""
-    lintable = Lintable(tmp_path / "new.yaml", content)
+    lintable = Lintable(path, content)
 
     assert lintable.content == content
 
@@ -287,12 +297,9 @@ def test_lintable_with_new_file(tmp_path: Path) -> None:
         pytest.param(b"# bytes content\n", id="write_bytes_fails"),
     ),
 )
-def test_lintable_writable_with_bad_types(
-    tmp_path: Path,
-    updated_content: Any,
-) -> None:
+def test_lintable_writable_with_bad_types(updated_content: Any) -> None:
     """Validate ``Lintable.updated`` when using to ``Lintable.writable``."""
-    lintable = Lintable(tmp_path / "bad_type.yaml", BASIC_PLAYBOOK)
+    lintable = Lintable("bad_type.yaml", BASIC_PLAYBOOK)
     assert lintable.content == BASIC_PLAYBOOK
 
     stream = lintable.writable
@@ -301,3 +308,56 @@ def test_lintable_writable_with_bad_types(
         stream.write(updated_content)  # type: ignore # we're testing bad types
 
     assert not lintable.updated
+
+
+@pytest.mark.parametrize(
+    ("path", "force", "content", "updated_content", "updated"),
+    (
+        pytest.param("no_change.yaml", False, BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"),
+        pytest.param("forced.yaml", True, BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="forced_rewrite"),
+        pytest.param(
+            "quotes.yaml",
+            False,
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK.replace('"', "'"),
+            True,
+            id="updated_quotes",
+        ),
+        pytest.param(
+            "shorten.yaml", False, BASIC_PLAYBOOK, "# short file\n", True, id="shorten_file"
+        ),
+        pytest.param(
+            "forced.yaml",
+            True,
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK.replace('"', "'"),
+            True,
+            id="forced_and_updated",
+        ),
+    ),
+)
+def test_lintable_write(
+    tmp_updated_lintable: Lintable,
+    force: bool,
+    content: str,
+    updated_content: str,
+    updated: bool,
+) -> None:
+    """Validate ``Lintable.write`` writes when it should."""
+    pre_stat = tmp_updated_lintable.path.stat()
+    tmp_updated_lintable.write(force=force)
+    post_stat = tmp_updated_lintable.path.stat()
+
+    if force or updated:
+        assert pre_stat.st_mtime_ns < post_stat.st_mtime_ns
+    else:
+        assert pre_stat.st_mtime_ns == post_stat.st_mtime_ns
+
+    with tmp_updated_lintable.path.open("r", encoding="utf-8") as f:
+        post_content = f.read()
+
+    if updated:
+        assert content != post_content
+    else:
+        assert content == post_content
+    assert post_content == updated_content
