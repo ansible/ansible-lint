@@ -23,15 +23,6 @@ related to containers and use the discussions_ forum instead.
 .. _toolset: https://github.com/ansible-community/toolset
 .. _discussions: https://github.com/ansible-community/ansible-lint/discussions
 
-.. note::
-
-    The default installation of the ansible-lint package no longer installs any
-    specific version of Ansible. You need to either install the desired version
-    of Ansible yourself or mention one of the helper extras:
-
-    * ``core`` - will install the latest version of ansible-core 2.11+
-    * ``community`` - will install the latest version of ansible community edition
-
 Using pip or pipx
 -----------------
 
@@ -43,17 +34,8 @@ using ``--user`` or fixing potential conflicts if not using virtualenvs.
 
 .. code-block:: bash
 
-    # Assuming you already installed Ansible
+    # This will also install ansible-core if needed
     pip3 install "ansible-lint"
-
-    # If you want to install and use the latest Ansible (w/o community collections)
-    pip3 install "ansible-lint[core]"
-
-    # If you want to install and use the latest Ansible with community collections
-    pip3 install "ansible-lint[community]"
-
-    # If you want to install an older version of Ansible 2.9
-    pip3 install ansible-lint "ansible>=2.9,<2.10"
 
 .. _installing_from_source:
 .. _pip3: https://pypi.org/project/pip/

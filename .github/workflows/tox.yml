@@ -204,13 +204,13 @@ jobs:
         --skip-missing-interpreters false
         -vv
       env:
-        TOXENV: ${{ matrix.tox_env }}-core
+        TOXENV: ${{ matrix.tox_env }}
     # sequential run improves browsing experience (almost no speed impact)
-    - name: "Test with tox: ${{ matrix.tox_env }}-core"
+    - name: "Test with tox: ${{ matrix.tox_env }}"
       run: |
         python3 -m tox
       env:
-        TOXENV: ${{ matrix.tox_env }}-core
+        TOXENV: ${{ matrix.tox_env }}
     - name: "Test with tox: ${{ matrix.tox_env }}-devel"
       if: ${{ matrix.devel }}
       run: |
