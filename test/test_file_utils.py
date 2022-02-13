@@ -2,7 +2,7 @@
 import os
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import pytest
 from _pytest.capture import CaptureFixture
@@ -212,3 +212,72 @@ def test_guess_project_dir(tmp_path: Path) -> None:
     with cwd(str(tmp_path)):
         result = guess_project_dir(None)
         assert result == str(tmp_path)
+
+
+@pytest.fixture
+def temp_lintable(path: str, content: Optional[str], tmp_path: Path) -> Lintable:
+    """Return a Lintable in a temporary directory that is safe to write to."""
+    lintable = Lintable(tmp_path / path, content)
+    return lintable
+
+
+BASIC_PLAYBOOK = """
+- name: "playbook"
+  tasks:
+    - name: hello
+      debug:
+        msg: 'world'
+"""
+
+
+@pytest.mark.parametrize(
+    ("path", "content", "updated_content", "updated"),
+    (
+        pytest.param("a.yaml", BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"),
+        pytest.param(
+            "b.yaml",
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK.replace('"', "'"),
+            True,
+            id="updated_quotes",
+        ),
+        pytest.param(
+            "c.yaml", BASIC_PLAYBOOK, "# short file\n", True, id="shorten_file"
+        ),
+        pytest.param("d.yaml", None, BASIC_PLAYBOOK, True, id="new_file"),
+        pytest.param("e.yaml", BASIC_PLAYBOOK, None, False, id="write_none_fails"),
+        pytest.param(
+            "e.yaml",
+            BASIC_PLAYBOOK,
+            b"# bytes content\n",
+            False,
+            id="write_bytes_fails",
+        ),
+    ),
+)
+def test_lintable_updated(
+    temp_lintable: Lintable,
+    content: Optional[str],
+    updated_content: Optional[str],
+    updated: bool,
+) -> None:
+    """Validate ``Lintable.updated`` when using to ``Lintable.writable``."""
+    if content is None:
+        # Accessing content of a new file
+        with pytest.raises(FileNotFoundError):
+            _ = temp_lintable.content
+    else:
+        assert temp_lintable.content == content
+
+    stream = temp_lintable.writable
+
+    if not isinstance(updated_content, str):
+        with pytest.raises(TypeError):
+            stream.write(updated_content)  # type: ignore # we're testing bad types
+    else:
+        # The stream is pre-populated with self.content
+        stream.truncate(0)
+        stream.write(updated_content)
+        assert temp_lintable.content == updated_content
+
+    assert temp_lintable.updated is updated

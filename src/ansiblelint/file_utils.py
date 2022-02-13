@@ -227,6 +227,8 @@ class Lintable:
     def writable(self) -> TextIO:
         """Yield a writable stream that can be used to update ``lintable.content``.
 
+        The stream is pre-populated with ``lintable.content``.
+
         Do not close this or use it in a ``with`` context or the updated content
         will probably be lost.
         """
