@@ -264,9 +264,8 @@ class Lintable:
         This only writes to disk if the value of ``Lintable.writable`` is not the same
         as ``Lintable.content``.
 
-        Use ``force=True`` when you want:
-          - to write a new file, or
-          - to rewrite the file even if content has not changed.
+        Use ``force=True`` when you want to force a content rewrite even if the file
+        has not changed.
         """
         if not force and not self.updated:
             # No changes to write.

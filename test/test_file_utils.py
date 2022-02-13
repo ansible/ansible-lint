@@ -361,9 +361,16 @@ def test_lintable_write(
     updated: bool,
 ) -> None:
     """Validate ``Lintable.write`` writes when it should."""
+    pre_updated = tmp_updated_lintable.updated
     pre_stat = tmp_updated_lintable.path.stat()
+
     tmp_updated_lintable.write(force=force)
+
     post_stat = tmp_updated_lintable.path.stat()
+    post_updated = tmp_updated_lintable.updated
+
+    # write() should not hide that an update happened
+    assert pre_updated == post_updated == updated
 
     if force or updated:
         assert pre_stat.st_mtime_ns < post_stat.st_mtime_ns
