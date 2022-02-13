@@ -1,5 +1,6 @@
 """Tests for file utility functions."""
 import os
+import time
 from argparse import Namespace
 from pathlib import Path
 from typing import Any, Dict, Union
@@ -231,6 +232,9 @@ def tmp_updated_lintable(
     lintable = Lintable(tmp_path / path, content)
     with lintable.path.open("w", encoding="utf-8") as f:
         f.write(content)
+    # move mtime to a time in the past to avoid race conditions in the test
+    mtime = time.time() - 60 * 60  # 1hr ago
+    os.utime(str(lintable.path), (mtime, mtime))
     lintable.writable.truncate(0)
     lintable.writable.write(updated_content)
     return lintable
@@ -373,9 +377,9 @@ def test_lintable_write(
     assert pre_updated == post_updated == updated
 
     if force or updated:
-        assert pre_stat.st_mtime_ns < post_stat.st_mtime_ns
+        assert pre_stat.st_mtime < post_stat.st_mtime
     else:
-        assert pre_stat.st_mtime_ns == post_stat.st_mtime_ns
+        assert pre_stat.st_mtime == post_stat.st_mtime
 
     with tmp_updated_lintable.path.open("r", encoding="utf-8") as f:
         post_content = f.read()
