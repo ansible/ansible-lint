@@ -26,7 +26,7 @@ pytest-forked==1.4.0
 pytest-xdist==2.5.0
 pyyaml==6.0
 rich==11.1.0
-ruamel-yaml==0.17.20 ; python_version >= "3.7"
+ruamel-yaml==0.17.21
 ruamel-yaml-clib==0.2.6
 tenacity==8.0.1
 toml==0.10.2

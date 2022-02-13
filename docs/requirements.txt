@@ -43,7 +43,7 @@ pyyaml==6.0
 requests==2.27.1
 resolvelib==0.5.4
 rich==11.1.0
-ruamel-yaml==0.17.20 ; python_version >= "3.7"
+ruamel-yaml==0.17.21
 ruamel-yaml-clib==0.2.6
 snowballstemmer==2.2.0
 sphinx==4.4.0
