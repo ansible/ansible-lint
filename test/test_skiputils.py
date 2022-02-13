@@ -7,13 +7,13 @@ from ansiblelint.testing import RunFromText
 PLAYBOOK_WITH_NOQA = """\
 - hosts: all
   vars:
-    SOMEVARNOQA: "Foo"  # noqa var-naming
-    SOMEVAR: "Bar"
+    SOME_VAR_NOQA: "Foo"  # noqa var-naming
+    SOME_VAR: "Bar"
   tasks:
-    - name: "Set the SOMEOTHERVAR"
+    - name: "Set the SOME_OTHER_VAR"
       set_fact:
-        SOMEOTHERVARNOQA: "Baz"  # noqa var-naming
-        SOMEOTHERVAR: "Bat"
+        SOME_OTHER_VAR_NOQA: "Baz"  # noqa var-naming
+        SOME_OTHER_VAR: "Bat"
 """
 
 

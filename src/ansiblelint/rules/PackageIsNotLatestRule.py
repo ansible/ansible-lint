@@ -39,6 +39,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     version_added = "historic"
 
     _package_managers = [
+        # spell-checker: disable
         "apk",
         "apt",
         "bower",
@@ -65,6 +66,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
         "yarn",
         "yum",
         "zypper",
+        # spell-checker: enable
     ]
 
     def matchtask(

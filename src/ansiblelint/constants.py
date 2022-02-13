@@ -65,7 +65,7 @@ FileType = Literal[
     "playbook",
     "meta",  # role meta
     "tasks",  # includes pre_tasks, post_tasks
-    "handlers",  # very similar to tasks but with some specificts
+    "handlers",  # very similar to tasks but with some specifics
     # https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file
     "requirements",
     "role",  # that is a folder!

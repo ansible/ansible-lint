@@ -3,4 +3,4 @@
 - include_tasks:
     file: included_tasks.yml
     apply:
-      tags: sometag
+      tags: some_tag

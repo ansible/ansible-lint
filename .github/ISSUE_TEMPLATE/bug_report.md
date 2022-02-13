@@ -43,12 +43,12 @@ ansible-lint --version
 
 <!--- HINT: You can paste gist.github.com links for larger files -->
 
-##### Desired Behaviour
+##### Desired Behavior
 <!--- Describe what you expected to happen when running the steps above -->
 
 Possible security bugs should be reported via email to `security@ansible.com`
 
-##### Actual Behaviour
+##### Actual Behavior
 <!--- Describe what actually happened. If possible run with extra verbosity (-vvvv) -->
 
 Please give some details of what is actually happening.

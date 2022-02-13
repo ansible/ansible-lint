@@ -1,4 +1,4 @@
-- name: syncronize-delegate
+- name: synchronize-delegate
   synchronize:
     src: dummy
     dest: dummy

@@ -108,7 +108,7 @@ jobs:
       # which are expected to be used by users in production. Avoid adding a
       # combination unless there are good reasons to test it, like having
       # proof that we failed to catch a bug by not running it. Using
-      # distribution should be prefferred instead of custom builds.
+      # distribution should be preferred instead of custom builds.
       matrix:
         python-version:
         # keep list sorted as it determines UI order too
@@ -121,7 +121,7 @@ jobs:
         # - windows-latest
         # - windows-2016
         include:
-        # Disabled due to gettings stuck and timeouts not working
+        # Disabled due to getting stuck and timeouts not working
         # https://github.com/Vampire/setup-wsl/discussions/25
         # - name: py39 (wsl)
         #   tox_env: py39
@@ -235,6 +235,7 @@ jobs:
       # https://github.com/actions/upload-artifact/issues/123
       continue-on-error: true
     - name: Report junit failures
+      # cspell:disable-next-line
       uses: shyim/junit-report-annotations-action@3d2e5374f2b13e70f6f3209a21adfdbc42c466ae
       with:
         path: .tox/junit.*.xml

@@ -8,7 +8,7 @@ After `creating your fork on GitHub`_, you can do:
 
 .. code-block:: shell-session
 
-   $ git clone git@github.com:yourname/ansible-lint
+   $ git clone git@github.com:your-name/ansible-lint
    $ cd ansible-lint
    $ git checkout -b your-branch-name
    # DO SOME CODING HERE
