@@ -396,9 +396,9 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
         CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, "custom")
     )
     custom_ruledirs = sorted(
-        str(rdir.resolve())
-        for rdir in Path(default_custom_rulesdir).iterdir()
-        if rdir.is_dir() and (rdir / "__init__.py").exists()
+        str(x.resolve())
+        for x in Path(default_custom_rulesdir).iterdir()
+        if x.is_dir() and (x / "__init__.py").exists()
     )
 
     if use_default:

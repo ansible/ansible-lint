@@ -13,7 +13,7 @@ galaxy_info:
   - https://youtu.be/this_is_not_a_dictionary
   - my_bad_key: https://youtu.be/aWmRepTSFKs
     title: This has a bad key
-  - url: www.myvid.com/vid
+  - url: www.acme.com/vid
     title: Bad format of url
 """
 
@@ -29,4 +29,4 @@ class TestMetaVideoLinks(unittest.TestCase):
         results = self.runner.run_role_meta_main(META_VIDEO_LINKS)
         assert "Expected item in 'video_links' to be a dictionary" in str(results)
         assert "'video_links' to contain only keys 'url' and 'title'" in str(results)
-        assert "URL format 'www.myvid.com/vid' is not recognized" in str(results)
+        assert "URL format 'www.acme.com/vid' is not recognized" in str(results)

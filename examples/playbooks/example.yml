@@ -7,7 +7,7 @@
 
   tasks:
     - name: unset variable
-      action: command echo {{thisvariable}} is not set in this playbook
+      action: command echo {{this_variable}} is not set in this playbook
 
     - name: trailing whitespace
       action: command echo do nothing   

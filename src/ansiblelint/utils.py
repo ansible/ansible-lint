@@ -196,13 +196,13 @@ def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
 
     args = list()
     kwargs = dict()
-    nonkvfound = False
+    non_kv_found = False
     for arg in tokens[1:]:
-        if "=" in arg and not nonkvfound:
+        if "=" in arg and not non_kv_found:
             kv = arg.split("=", 1)
             kwargs[kv[0]] = kv[1]
         else:
-            nonkvfound = True
+            non_kv_found = True
             args.append(arg)
     return (command, args, kwargs)
 
@@ -524,8 +524,7 @@ def _look_for_role_files(
             for file in files:
                 file_ignorecase = file.lower()
                 if file_ignorecase.endswith((".yml", ".yaml")):
-                    thpath = os.path.join(folder, file)
-                    results.append(Lintable(thpath))
+                    results.append(Lintable(os.path.join(folder, file)))
 
     return results
 
