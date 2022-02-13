@@ -43,12 +43,12 @@ def _galaxy_info_errors_itr(
     str_info_list: "Tuple[str, ...]" = META_STR_INFO,
 ) -> Generator[str, None, None]:
     for info in info_list:
-        ginfo = galaxy_info.get(info, False)
-        if ginfo:
-            if info in str_info_list and not isinstance(ginfo, str):
+        g_info = galaxy_info.get(info, False)
+        if g_info:
+            if info in str_info_list and not isinstance(g_info, str):
                 yield "{info} should be a string".format(info=info)
             elif info == "platforms":
-                for err in _platform_info_errors_itr(ginfo):
+                for err in _platform_info_errors_itr(g_info):
                     yield err
         else:
             yield "Role info should contain {info}".format(info=info)

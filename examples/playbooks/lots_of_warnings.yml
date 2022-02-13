@@ -1,7 +1,7 @@
 ---
 # This playbook causes ansible-lint to output tons of warnings
 # Enough to exceed typical stdout buffering size and thus to show the need for
-# catching IOError (EPIEP) errors.
+# catching IOError (EPIPE) errors.
 
 - hosts: webservers
 

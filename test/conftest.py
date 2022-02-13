@@ -6,9 +6,9 @@ from typing import Iterator
 @contextmanager
 def cwd(path: str) -> Iterator[None]:
     """Context manager for chdir."""
-    oldpwd = os.getcwd()
+    old_pwd = os.getcwd()
     os.chdir(path)
     try:
         yield
     finally:
-        os.chdir(oldpwd)
+        os.chdir(old_pwd)

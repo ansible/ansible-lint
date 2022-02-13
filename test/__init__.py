@@ -1,1 +1,1 @@
-"""Use ansiblelint.testing instead for test reusables."""
+"""Use ansiblelint.testing instead for reusable tests."""

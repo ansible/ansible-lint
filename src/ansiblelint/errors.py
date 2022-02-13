@@ -46,7 +46,7 @@ class MatchError(ValueError):
 
         self.message = str(message or getattr(rule, "shortdesc", ""))
 
-        # Safety measture to ensure we do not endup with incorrect indexes
+        # Safety measure to ensure we do not endup with incorrect indexes
         if linenumber == 0:
             raise RuntimeError(
                 "MatchError called incorrectly as line numbers start with 1"
@@ -84,7 +84,7 @@ class MatchError(ValueError):
 
     @property
     def position(self) -> str:
-        """Return error positioniong, with column number if available."""
+        """Return error positioning, with column number if available."""
         if self.column:
             return f"{self.linenumber}:{self.column}"
         return str(self.linenumber)

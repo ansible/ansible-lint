@@ -14,7 +14,7 @@ class DummyTestObject:
     """A dummy object for equality tests."""
 
     def __repr__(self) -> str:
-        """Return a dummy object representation for parmetrize."""
+        """Return a dummy object representation for parametrize."""
         return "{self.__class__.__name__}()".format(self=self)
 
     def __eq__(self, other: object) -> bool:

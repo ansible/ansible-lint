@@ -79,7 +79,7 @@ if "pytest" in sys.modules:
   tasks:
     - name: Succeed when no_log is not used but no loop present
       user:
-        name: bidule
+        name: john_doe
         password: "wow"
         state: absent
 """
@@ -89,7 +89,7 @@ if "pytest" in sys.modules:
   tasks:
     - name: Fail when no_log is set to False
       user:
-        name: bidule
+        name: john_doe
         user_password: "{{ item }}"
         state: absent
       with_items:
@@ -103,7 +103,7 @@ if "pytest" in sys.modules:
   tasks:
     - name: Fail when no_log is set to no
       user:
-        name: bidule
+        name: john_doe
         password: "{{ item }}"
         state: absent
       no_log: no
@@ -146,7 +146,7 @@ if "pytest" in sys.modules:
   tasks:
     - name: Succeed when no_log is set to True
       user:
-        name: bidule
+        name: john_doe
         user_password: "{{ item }}"
         state: absent
       no_log: True
