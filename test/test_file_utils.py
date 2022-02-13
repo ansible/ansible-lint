@@ -2,7 +2,7 @@
 import os
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Union
 
 import pytest
 from _pytest.capture import CaptureFixture
@@ -224,7 +224,10 @@ BASIC_PLAYBOOK = """
 
 
 @pytest.fixture
-def tmp_updated_lintable(tmp_path: Path, path: str, content: str, updated_content: str) -> Lintable:
+def tmp_updated_lintable(
+    tmp_path: Path, path: str, content: str, updated_content: str
+) -> Lintable:
+    """Create a temp file Lintable with an update in writable that is not on disk."""
     lintable = Lintable(tmp_path / path, content)
     with lintable.path.open("w", encoding="utf-8") as f:
         f.write(content)
@@ -236,7 +239,9 @@ def tmp_updated_lintable(tmp_path: Path, path: str, content: str, updated_conten
 @pytest.mark.parametrize(
     ("path", "content", "updated_content", "updated"),
     (
-        pytest.param("no_change.yaml", BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"),
+        pytest.param(
+            "no_change.yaml", BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"
+        ),
         pytest.param(
             "quotes.yaml",
             BASIC_PLAYBOOK,
@@ -250,10 +255,7 @@ def tmp_updated_lintable(tmp_path: Path, path: str, content: str, updated_conten
     ),
 )
 def test_lintable_updated(
-    path: str,
-    content: str,
-    updated_content: str,
-    updated: bool,
+    path: str, content: str, updated_content: str, updated: bool
 ) -> None:
     """Validate ``Lintable.updated`` when using to ``Lintable.writable``."""
     lintable = Lintable(path, content)
@@ -268,6 +270,22 @@ def test_lintable_updated(
     assert lintable.content == updated_content
 
     assert lintable.updated is updated
+
+
+@pytest.mark.parametrize(
+    "updated_content", ((None,), (b"bytes",)), ids=("none", "bytes")
+)
+def test_lintable_writable_with_bad_types(updated_content: Any) -> None:
+    """Validate ``Lintable.updated`` when using to ``Lintable.writable``."""
+    lintable = Lintable("bad_type.yaml", BASIC_PLAYBOOK)
+    assert lintable.content == BASIC_PLAYBOOK
+
+    stream = lintable.writable
+
+    with pytest.raises(TypeError):
+        stream.write(updated_content)
+
+    assert not lintable.updated
 
 
 def test_lintable_with_new_file(tmp_path: Path) -> None:
@@ -291,30 +309,24 @@ def test_lintable_with_new_file(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    ("updated_content",),
-    (
-        pytest.param(None, id="write_none_fails"),
-        pytest.param(b"# bytes content\n", id="write_bytes_fails"),
-    ),
-)
-def test_lintable_writable_with_bad_types(updated_content: Any) -> None:
-    """Validate ``Lintable.updated`` when using to ``Lintable.writable``."""
-    lintable = Lintable("bad_type.yaml", BASIC_PLAYBOOK)
-    assert lintable.content == BASIC_PLAYBOOK
-
-    stream = lintable.writable
-
-    with pytest.raises(TypeError):
-        stream.write(updated_content)  # type: ignore # we're testing bad types
-
-    assert not lintable.updated
-
-
-@pytest.mark.parametrize(
     ("path", "force", "content", "updated_content", "updated"),
     (
-        pytest.param("no_change.yaml", False, BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"),
-        pytest.param("forced.yaml", True, BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="forced_rewrite"),
+        pytest.param(
+            "no_change.yaml",
+            False,
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK,
+            False,
+            id="no_change",
+        ),
+        pytest.param(
+            "forced.yaml",
+            True,
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK,
+            False,
+            id="forced_rewrite",
+        ),
         pytest.param(
             "quotes.yaml",
             False,
@@ -324,7 +336,12 @@ def test_lintable_writable_with_bad_types(updated_content: Any) -> None:
             id="updated_quotes",
         ),
         pytest.param(
-            "shorten.yaml", False, BASIC_PLAYBOOK, "# short file\n", True, id="shorten_file"
+            "shorten.yaml",
+            False,
+            BASIC_PLAYBOOK,
+            "# short file\n",
+            True,
+            id="shorten_file",
         ),
         pytest.param(
             "forced.yaml",
