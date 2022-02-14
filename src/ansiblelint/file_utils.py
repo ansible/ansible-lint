@@ -230,13 +230,22 @@ class Lintable:
         self._content = None
 
     def write(self, force: bool = False) -> None:
-        """Write the value of ``Lintable.writable`` to disk.
+        """Write the value of ``Lintable.content`` to disk.
 
-        This only writes to disk if the value of ``Lintable.writable`` is not the same
-        as ``Lintable.content``.
+        This only writes to disk if the content has been updated (``Lintable.updated``).
+        For example, you can update the content, and then write it to disk like this:
 
-        Use ``force=True`` when you want to force a content rewrite even if the file
-        has not changed.
+        .. code:: python
+
+            lintable.content = new_content
+            lintable.write()
+
+        Use ``force=True`` when you want to force a content rewrite even if the
+        content has not changed. For example:
+
+        .. code:: python
+
+            lintable.write(force=True)
         """
         if not force and not self.updated:
             # No changes to write.
