@@ -166,7 +166,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
 
         if not isinstance(matches, list):
             raise RuntimeError(
-                "The CodeclimatJSONFormatter was expecting a list of MatchError."
+                f"The {self.__class__} was expecting a list of MatchError."
             )
 
         result = []
