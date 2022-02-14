@@ -278,7 +278,6 @@ class RulesCollection:
 
     def listtags(self) -> str:
         tag_desc = {
-            "behaviour": "Indicates a bad practice or behavior",
             "command-shell": "Specific to use of command and shell modules",
             "core": "Related to internal implementation of the linter",
             "deprecations": "Indicate use of features that are removed from Ansible",
@@ -287,7 +286,11 @@ class RulesCollection:
             "idempotency": "Possible indication that consequent runs would produce different results",
             "idiom": "Anti-pattern detected, likely to cause undesired behavior",
             "metadata": "Invalid metadata, likely related to galaxy, collections or roles",
-            "yaml": "External linter which will also produce its own rule codes.",
+            "opt-in": "Rules that are not used unless manually added to `enable_list`",
+            "security": "Rules related o potentially security issues, like exposing credentials",
+            "unpredictability": "Warn about code that might not work in a predictable way",
+            "unskippable": "Indicate a fatal error that cannot be ignored or disabled",
+            "yaml": "External linter which will also produce its own rule codes",
         }
 
         tags = defaultdict(list)
