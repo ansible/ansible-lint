@@ -1,6 +1,7 @@
 """Transformer implementation."""
 import logging
 import re
+from io import StringIO
 from typing import Dict, List, Optional, Set, Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -245,4 +246,8 @@ class Transformer:
                 data = _whitespace_only_lines_re.sub("", cast(str, data))
                 # load_data has an lru_cache, so using it should be cached vs using YAML().load() to reload
                 data = load_data(data)
-                self.yaml.dump(data, file.path, transform=self._final_yaml_transform)
+                with StringIO() as stream:
+                    # ruamel.yaml does not have `dumps`. We have to give it a path or a stream.
+                    self.yaml.dump(data, stream, transform=self._final_yaml_transform)
+                    file.content = stream.getvalue()
+                file.write()
