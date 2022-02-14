@@ -210,6 +210,7 @@ class Lintable:
 
     @content.setter
     def content(self, value: str) -> None:
+        """Update ``content`` and calculate ``updated``."""
         if not isinstance(value, str):
             raise TypeError(f"Expected str but got {type(value)}")
         if self._original_content is None:
@@ -222,6 +223,11 @@ class Lintable:
         if self._content != value:
             self.updated = True
         self._content = value
+
+    @content.deleter
+    def content(self) -> None:
+        """Reset the internal content cache."""
+        self._content = None
 
     def write(self, force: bool = False) -> None:
         """Write the value of ``Lintable.writable`` to disk.

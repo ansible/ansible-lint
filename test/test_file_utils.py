@@ -381,3 +381,26 @@ def test_lintable_write(
     else:
         assert content == post_content
     assert post_content == updated_content
+
+
+@pytest.mark.parametrize(
+    ("path", "content", "updated_content"),
+    (
+        pytest.param(
+            "quotes.yaml",
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK.replace('"', "'"),
+            id="updated_quotes",
+        ),
+    ),
+)
+def test_lintable_content_deleter(
+    tmp_updated_lintable: Lintable,
+    content: str,
+    updated_content: str,
+) -> None:
+    """Ensure that resetting content cache triggers re-reading file."""
+    assert content != updated_content
+    assert tmp_updated_lintable.content == updated_content
+    del tmp_updated_lintable.content
+    assert tmp_updated_lintable.content == content
