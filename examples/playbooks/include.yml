@@ -7,7 +7,7 @@
 
   roles:
     - hello
-    - { role: morecomplex, t: z }
+    - { role: more_complex, t: z }
 
   tasks:
     - include: tasks/x.yml
