@@ -8,20 +8,9 @@ import sys
 from argparse import Namespace
 from collections import OrderedDict
 from contextlib import contextmanager
-from io import StringIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Set,
-    TextIO,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union
 
 # import wcmatch
 import wcmatch.pathlib
@@ -158,9 +147,8 @@ class Lintable:
         else:
             self.name = str(name)
             self.path = name
-        self._content = self._original_content = content  # original content
-        self._writable: Optional[TextIO] = None  # updated content stream
-        self._content_updated = None
+        self._content = self._original_content = content
+        self.updated = False
 
         # if the lintable is part of a role, we save role folder name
         self.role = ""
@@ -213,12 +201,6 @@ class Lintable:
     @property
     def content(self) -> str:
         """Retrieve file content, from internal cache or disk."""
-        # If content has been updated in memory, return that instead.
-        new_content = self._writable_value
-        if new_content is not None:
-            return new_content
-        # Check _writable before _content to avoid raising FileNotFoundError
-        # if this Lintable represents a new file.
         if self._content is None:
             with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
                 self._content = f.read()
@@ -236,47 +218,10 @@ class Lintable:
             elif not self.path.exists():
                 # new file
                 self._original_content = ""
-                self._content_updated = True
+                self.updated = True
         if self._content != value:
-            self._content_updated = True
+            self.updated = True
         self._content = value
-
-    @property
-    def writable(self) -> TextIO:
-        """Yield a writable stream that can be used to update ``lintable.content``.
-
-        The stream is pre-populated with ``lintable.content``.
-
-        Do not close this or use it in a ``with`` context or the updated content
-        will probably be lost.
-        """
-        # closing a StringIO effectively resets and empties it.
-        if self._writable is None or self._writable.closed:
-            # Switch to a temporary file if this costs too much memory.
-            try:
-                self._writable = StringIO(self.content)
-            except FileNotFoundError:
-                # This Lintable represents a new file.
-                self._writable = StringIO()
-        return self._writable
-
-    @property
-    def _writable_value(self) -> Optional[str]:
-        """Get the writable stream's value."""
-        if self._writable is None or self._writable.closed:
-            return None
-        # TextIO does not have a ``getvalue`` method, even though StringIO does.
-        # Use seek+read to keep it compatible with, for example, temporary files.
-        self._writable.seek(0)
-        return self._writable.read()
-
-    @property
-    def updated(self) -> bool:
-        """Indicate if content has been updated in the writable stream."""
-        if self._content_updated is not None:
-            return self._content_updated
-        new_content = self._writable_value
-        return new_content is not None and new_content != self._content
 
     def write(self, force: bool = False) -> None:
         """Write the value of ``Lintable.writable`` to disk.
