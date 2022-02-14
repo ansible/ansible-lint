@@ -158,8 +158,9 @@ class Lintable:
         else:
             self.name = str(name)
             self.path = name
-        self._content = content  # original content
+        self._content = self._original_content = content  # original content
         self._writable: Optional[TextIO] = None  # updated content stream
+        self._content_updated = None
 
         # if the lintable is part of a role, we save role folder name
         self.role = ""
@@ -221,7 +222,24 @@ class Lintable:
         if self._content is None:
             with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
                 self._content = f.read()
+            if self._original_content is None:
+                self._original_content = self._content
         return self._content
+
+    @content.setter
+    def content(self, value: str) -> None:
+        if not isinstance(value, str):
+            raise TypeError(f"Expected str but got {type(value)}")
+        if self._original_content is None:
+            if self._content is not None:
+                self._original_content = self._content
+            elif not self.path.exists():
+                # new file
+                self._original_content = ""
+                self._content_updated = True
+        if self._content != value:
+            self._content_updated = True
+        self._content = value
 
     @property
     def writable(self) -> TextIO:
@@ -255,6 +273,8 @@ class Lintable:
     @property
     def updated(self) -> bool:
         """Indicate if content has been updated in the writable stream."""
+        if self._content_updated is not None:
+            return self._content_updated
         new_content = self._writable_value
         return new_content is not None and new_content != self._content
 
@@ -271,10 +291,7 @@ class Lintable:
             # No changes to write.
             return
         with open(self.path.resolve(), mode="w", encoding="utf-8") as file:
-            file.write(self._writable_value or "")
-        # Do not update self._content here.
-        # Instead, self.content gets updated content from self.writable.
-        # This way, a diff can be generated from self._content to self._writable_value.
+            file.write(self._content or "")
 
     def __hash__(self) -> int:
         """Return a hash value of the lintables."""

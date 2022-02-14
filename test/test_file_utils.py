@@ -235,8 +235,7 @@ def tmp_updated_lintable(
     # move mtime to a time in the past to avoid race conditions in the test
     mtime = time.time() - 60 * 60  # 1hr ago
     os.utime(str(lintable.path), (mtime, mtime))
-    lintable.writable.truncate(0)
-    lintable.writable.write(updated_content)
+    lintable.content = updated_content
     return lintable
 
 
@@ -266,11 +265,8 @@ def test_lintable_updated(
 
     assert lintable.content == content
 
-    stream = lintable.writable
+    lintable.content = updated_content
 
-    # The stream is pre-populated with self.content
-    stream.truncate(0)
-    stream.write(updated_content)
     assert lintable.content == updated_content
 
     assert lintable.updated is updated
@@ -284,10 +280,8 @@ def test_lintable_writable_with_bad_types(updated_content: Any) -> None:
     lintable = Lintable("bad_type.yaml", BASIC_PLAYBOOK)
     assert lintable.content == BASIC_PLAYBOOK
 
-    stream = lintable.writable
-
     with pytest.raises(TypeError):
-        stream.write(updated_content)
+        lintable.content = updated_content
 
     assert not lintable.updated
 
@@ -299,9 +293,7 @@ def test_lintable_with_new_file(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
         _ = lintable.content
 
-    stream = lintable.writable
-
-    stream.write(BASIC_PLAYBOOK)
+    lintable.content = BASIC_PLAYBOOK
     assert lintable.content == BASIC_PLAYBOOK
 
     assert lintable.updated
