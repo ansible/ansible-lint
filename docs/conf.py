@@ -120,7 +120,6 @@ intersphinx_mapping = {
     "packaging": ("https://packaging.rtfd.io/en/latest", None),
     "pytest": ("https://docs.pytest.org/en/latest", None),
     "python": ("https://docs.python.org/3", None),
-    "python2": ("https://docs.python.org/2", None),
     "rich": ("https://rich.rtfd.io/en/latest", None),
 }
 
@@ -169,23 +168,6 @@ default_role = "any"
 pygments_style = "sphinx"
 
 highlight_language = "YAML+Jinja"
-
-# Substitutions, variables, entities, & shortcuts for text which do not need to link to anything.
-# For titles which should be a link, use the intersphinx anchors set at the index, chapter, and
-# section levels, such as  qi_start_:
-rst_epilog = """
-.. |acapi| replace:: *Ansible Core API Guide*
-.. |acrn| replace:: *Ansible Core Release Notes*
-.. |ac| replace:: Ansible Core
-.. |acversion| replace:: Ansible Core Version 2.1
-.. |acversionshort| replace:: Ansible Core 2.1
-.. |versionshortest| replace:: 2.2
-.. |versiondev| replace:: 2.3
-.. |pubdate| replace:: July 19, 2016
-.. |rhel| replace:: Red Hat Enterprise Linux
-
-"""
-
 
 # Options for HTML output
 # -----------------------
@@ -277,43 +259,6 @@ html_use_opensearch = "https://ansible-lint.readthedocs.io/en/latest/"
 
 # If nonempty, this is the file name suffix for HTML files (e.g. ".xhtml").
 # html_file_suffix = ''
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = "Poseidodoc"
-
-
-# Options for LaTeX output
-# ------------------------
-
-# The paper size ('letter' or 'a4').
-# latex_paper_size = 'letter'
-
-# The font size ('10pt', '11pt' or '12pt').
-# latex_font_size = '10pt'
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title, author, document class
-# [howto/manual]).
-latex_documents = [
-    ("index", "ansible.tex", "Ansible 2.2 Documentation", AUTHOR, "manual"),
-]
-
-# The name of an image file (relative to this directory) to place at the top of
-# the title page.
-# latex_logo = None
-
-# For "manual" documents, if this is true, then toplevel headings are parts,
-# not chapters.
-# latex_use_parts = False
-
-# Additional stuff for the LaTeX preamble.
-# latex_preamble = ''
-
-# Documents to append as an appendix to all manuals.
-# latex_appendices = []
-
-# If false, no module index is generated.
-# latex_use_modindex = True
 
 autoclass_content = "both"
 
