@@ -139,21 +139,6 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
         return "error"
 
 
-class ParseableSeverityFormatter(BaseFormatter[Any]):
-    def format(self, match: "MatchError") -> str:
-
-        filename = self._format_path(match.filename or "")
-        position = match.position
-        rule_id = "{0}".format(match.rule.id)
-        severity = match.rule.severity
-        message = self.escape(str(match.message))
-
-        return (
-            f"[filename]{filename}[/]:{position}: [[error_code]{rule_id}[/]] "
-            f"[[error_code]{severity}[/]] [dim]{message}[/]"
-        )
-
-
 class CodeclimateJSONFormatter(BaseFormatter[Any]):
     """Formatter for emitting violations in Codeclimate JSON report format.
 
