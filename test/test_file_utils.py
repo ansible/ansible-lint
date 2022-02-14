@@ -228,7 +228,7 @@ BASIC_PLAYBOOK = """
 def tmp_updated_lintable(
     tmp_path: Path, path: str, content: str, updated_content: str
 ) -> Lintable:
-    """Create a temp file Lintable with an update in writable that is not on disk."""
+    """Create a temp file Lintable with a content update that is not on disk."""
     lintable = Lintable(tmp_path / path, content)
     with lintable.path.open("w", encoding="utf-8") as f:
         f.write(content)
@@ -260,7 +260,7 @@ def tmp_updated_lintable(
 def test_lintable_updated(
     path: str, content: str, updated_content: str, updated: bool
 ) -> None:
-    """Validate ``Lintable.updated`` when using to ``Lintable.writable``."""
+    """Validate ``Lintable.updated`` when setting ``Lintable.content``."""
     lintable = Lintable(path, content)
 
     assert lintable.content == content
@@ -275,8 +275,8 @@ def test_lintable_updated(
 @pytest.mark.parametrize(
     "updated_content", ((None,), (b"bytes",)), ids=("none", "bytes")
 )
-def test_lintable_writable_with_bad_types(updated_content: Any) -> None:
-    """Validate ``Lintable.updated`` when using to ``Lintable.writable``."""
+def test_lintable_content_setter_with_bad_types(updated_content: Any) -> None:
+    """Validate ``Lintable.updated`` when setting ``Lintable.content``."""
     lintable = Lintable("bad_type.yaml", BASIC_PLAYBOOK)
     assert lintable.content == BASIC_PLAYBOOK
 
