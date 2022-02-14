@@ -87,7 +87,7 @@ class Transformer:
 
     def __init__(self, result: LintResult):
         """Initialize a Transformer instance."""
-        # TODO: Make config options for: explict_start, indent_sequences, yaml_width, etc
+        # TODO: Make config options for: explicit_start, indent_sequences, yaml_width, etc
         self.yaml_explicit_start = True
         self.yaml_explicit_end = False
         self.yaml_indent_sequences = True
