@@ -248,6 +248,6 @@ class Transformer:
                 data = load_data(data)
                 with StringIO() as stream:
                     # ruamel.yaml does not have `dumps`. We have to give it a path or a stream.
-                    self.yaml.dump(data, stream, transform=self._final_yaml_transform)
-                    file.content = stream.getvalue()
+                    self.yaml.dump(data, stream)
+                    file.content = self._final_yaml_transform(stream.getvalue())
                 file.write()
