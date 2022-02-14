@@ -20,10 +20,10 @@ def copy_examples_dir(
     """Fixture that copies the examples/ dir into a tmpdir."""
     examples_dir = py.path.local("examples")
     examples_dir.copy(tmpdir / "examples")
-    oldcwd = tmpdir.chdir()
+    old_cwd = tmpdir.chdir()
     config_options.cwd = tmpdir
-    yield oldcwd, tmpdir
-    oldcwd.chdir()
+    yield old_cwd, tmpdir
+    old_cwd.chdir()
 
 
 @pytest.fixture
