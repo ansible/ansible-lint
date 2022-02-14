@@ -219,9 +219,7 @@ class Lintable:
             elif not self.path.exists():
                 # new file
                 self._original_content = ""
-                self.updated = True
-        if self._content != value:
-            self.updated = True
+        self.updated = self._original_content != value
         self._content = value
 
     @content.deleter
