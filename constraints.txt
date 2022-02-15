@@ -35,7 +35,6 @@ resolvelib==0.5.4
 rich==11.2.0
 ruamel-yaml==0.17.21
 ruamel-yaml-clib==0.2.6
-tenacity==8.0.1
 tomli==1.2.3
 wcmatch==8.3
 yamllint==1.26.3
