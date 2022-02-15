@@ -216,7 +216,10 @@ class Lintable:
         if self._original_content is None:
             if self._content is not None:
                 self._original_content = self._content
-            elif not self.path.exists():
+            elif self.path.exists():
+                # use self.content to populate self._original_content
+                _ = self.content
+            else:
                 # new file
                 self._original_content = ""
         self.updated = self._original_content != value
