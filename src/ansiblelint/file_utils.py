@@ -10,7 +10,7 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union, cast
 
 # import wcmatch
 import wcmatch.pathlib
@@ -198,27 +198,33 @@ class Lintable:
         except NotImplementedError:
             return default
 
+    def _populate_content_cache_from_disk(self) -> None:
+        with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
+            self._content = f.read()
+        if self._original_content is None:
+            self._original_content = self._content
+
     @property
     def content(self) -> str:
         """Retrieve file content, from internal cache or disk."""
         if self._content is None:
-            with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
-                self._content = f.read()
-            if self._original_content is None:
-                self._original_content = self._content
-        return self._content
+            self._populate_content_cache_from_disk()
+        return cast(str, self._content)
 
     @content.setter
     def content(self, value: str) -> None:
-        """Update ``content`` and calculate ``updated``."""
+        """Update ``content`` and calculate ``updated``.
+
+        To calculate ``updated`` this will read the file from disk if the cache
+        has not already been populated.
+        """
         if not isinstance(value, str):
             raise TypeError(f"Expected str but got {type(value)}")
         if self._original_content is None:
             if self._content is not None:
                 self._original_content = self._content
             elif self.path.exists():
-                # use self.content to populate self._original_content
-                _ = self.content
+                self._populate_content_cache_from_disk()
             else:
                 # new file
                 self._original_content = ""
