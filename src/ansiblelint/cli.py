@@ -158,13 +158,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="parseable output, same as '-f pep8'",
     )
     parser.add_argument(
-        "--parseable-severity",
-        dest="parseable_severity",
-        default=False,
-        action="store_true",
-        help="parseable output including severity of rule",
-    )
-    parser.add_argument(
         "--progressive",
         dest="progressive",
         default=False,
@@ -296,7 +289,6 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     bools = (
         "display_relative_path",
         "parseable",
-        "parseable_severity",
         "quiet",
         "use_default_rules",
         "progressive",

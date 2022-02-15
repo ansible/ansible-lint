@@ -36,9 +36,7 @@ class VariableNamingRule(AnsibleLintRule):
     base_msg = "All variables should be named using only lowercase and underscores"
     shortdesc = base_msg
     description = "All variables should be named using only lowercase and underscores"
-    severity = (
-        "MEDIUM"  # ansible-lint displays severity when with --parseable-severity option
-    )
+    severity = "MEDIUM"
     tags = ["idiom", "experimental"]
     version_added = "v5.0.10"
 
