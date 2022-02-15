@@ -141,27 +141,12 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
         ("playbooks/roles/foo.yml", "yaml"),
         # the only yml file that is not a playbook inside molecule/ folders
         (".config/molecule/config.yml", "yaml"),  # molecule shared config
-        (
-            "roles/foo/molecule/scenario1/base.yml",
-            "yaml",
-        ),  # molecule scenario base config
-        (
-            "roles/foo/molecule/scenario1/molecule.yml",
-            "yaml",
-        ),  # molecule scenario config
+        ("roles/foo/molecule/scenario1/base.yml", "yaml"),  # molecule scenario base config
+        ("roles/foo/molecule/scenario1/molecule.yml", "yaml"),  # molecule scenario config
         ("roles/foo/molecule/scenario2/foobar.yml", "playbook"),  # custom playbook name
-        (
-            "roles/foo/molecule/scenario3/converge.yml",
-            "playbook",
-        ),  # common playbook name
-        (
-            "roles/foo/molecule/scenario3/requirements.yml",
-            "requirements",
-        ),  # requirements
-        (
-            "roles/foo/molecule/scenario3/collections.yml",
-            "requirements",
-        ),  # requirements
+        ("roles/foo/molecule/scenario3/converge.yml", "playbook"),  # common playbook name
+        ("roles/foo/molecule/scenario3/requirements.yml", "requirements"),  # requirements
+        ("roles/foo/molecule/scenario3/collections.yml", "requirements"),  # requirements
         # tasks files:
         ("tasks/directory with spaces/main.yml", "tasks"),  # tasks
         ("tasks/requirements.yml", "tasks"),  # tasks
