@@ -1,3 +1,4 @@
+# spell-checker:ignore testmon tmontmp
 [flake8]
 
 # Don't even try to analyze these:

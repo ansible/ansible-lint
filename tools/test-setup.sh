@@ -16,6 +16,7 @@ if [ -f "/usr/bin/apt-get" ]; then
     fi
     # avoid outdated ansible and pipx
     sudo apt-get remove -y ansible pipx || true
+    # cspell:disable-next-line
     sudo apt-get install -y --no-install-recommends -o=Dpkg::Use-Pty=0 \
         git python3-venv python3-pip
 fi

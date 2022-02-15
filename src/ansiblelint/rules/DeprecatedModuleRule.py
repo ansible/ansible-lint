@@ -24,6 +24,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
     version_added = "v4.0.0"
 
     _modules = [
+        # spell-checker:disable
         "accelerate",
         "aos_asn_pool",
         "aos_blueprint",
@@ -63,6 +64,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
         "vsphere_guest",
         "win_msi",
         "include",
+        # spell-checker:enable
     ]
 
     def matchtask(
