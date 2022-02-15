@@ -1,2 +1,2 @@
 ---
-- include_tasks: tasks/simpletask.yml
+- include_tasks: tasks/simple_task.yml

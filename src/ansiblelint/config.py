@@ -70,7 +70,6 @@ options = Namespace(
     listrules=False,
     listtags=False,
     parseable=False,
-    parseable_severity=False,
     quiet=False,
     rulesdirs=[],
     skip_list=[],
