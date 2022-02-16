@@ -46,7 +46,7 @@ class MatchError(ValueError):
 
         self.message = str(message or getattr(rule, "shortdesc", ""))
 
-        # Safety measure to ensure we do not endup with incorrect indexes
+        # Safety measure to ensure we do not end-up with incorrect indexes
         if linenumber == 0:
             raise RuntimeError(
                 "MatchError called incorrectly as line numbers start with 1"

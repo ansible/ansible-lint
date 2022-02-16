@@ -54,7 +54,7 @@ def normpath(path: Union[str, BasePathLike]) -> str:
     # conversion to string in order to allow receiving non string objects
     relpath = os.path.relpath(str(path))
     abspath = os.path.abspath(str(path))
-    # we avoid returning relative paths that endup at root level
+    # we avoid returning relative paths that end-up at root level
     if abspath in relpath:
         return abspath
     return relpath

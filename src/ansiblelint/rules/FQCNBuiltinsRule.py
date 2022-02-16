@@ -6,6 +6,7 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 
 builtins = [
+    # spell-checker:disable
     "add_host",
     "apt",
     "apt_key",
@@ -74,6 +75,7 @@ builtins = [
     "wait_for_connection",
     "yum",
     "yum_repository",
+    # spell-checker:enable
 ]
 
 

@@ -115,12 +115,12 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
         # rather than pipes
         if task["action"]["__ansible_module__"] in ["shell", "ansible.builtin.shell"]:
             if "cmd" in task["action"]:
-                unjinjad_cmd = self.unjinja(task["action"].get("cmd", []))
+                jinja_stripped_cmd = self.unjinja(task["action"].get("cmd", []))
             else:
-                unjinjad_cmd = self.unjinja(
+                jinja_stripped_cmd = self.unjinja(
                     " ".join(task["action"].get("__ansible_arguments__", []))
                 )
-            return not any(ch in unjinjad_cmd for ch in "&|<>;$\n*[]{}?`")
+            return not any(ch in jinja_stripped_cmd for ch in "&|<>;$\n*[]{}?`")
         return False
 
 

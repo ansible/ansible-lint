@@ -10,7 +10,6 @@ from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import packaging
-import tenacity
 from packaging import version
 
 from ansiblelint.config import ansible_collections_path, options, parse_ansible_version
@@ -121,12 +120,6 @@ def install_collection(collection: str, destination: Optional[str] = None) -> No
         sys.exit(INVALID_PREREQUISITES_RC)
 
 
-@tenacity.retry(  # Retry up to 3 times as galaxy server can return errors
-    reraise=True,
-    wait=tenacity.wait_fixed(30),  # type: ignore
-    stop=tenacity.stop_after_attempt(3),  # type: ignore
-    before_sleep=tenacity.after_log(_logger, logging.WARNING),  # type: ignore
-)
 def install_requirements(requirement: str) -> None:
     """Install dependencies from a requirements.yml."""
     if not os.path.exists(requirement):
