@@ -1,6 +1,10 @@
-ignore-errors: Use failed_when and specify error conditions instead of using ignore_errors
-../../ansible-lint/314d98/roles/geerlingguy.mysql/tasks/replication.yml:37 Task/Handler: Configure replication on the slave.
+WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
+WARNING  Listing 2 violation(s) that are fatal
+../../ansible-lint/314d98/roles/geerlingguy.mysql/tasks/replication.yml:37: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors
+tasks/replication.yml:37: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors
+You can skip specific rules or tags by adding them to your configuration file:
+# .ansible-lint
+warn_list:  # or 'skip_list' to silence them completely
+  - experimental  # all rules tagged as experimental
 
-ignore-errors: Use failed_when and specify error conditions instead of using ignore_errors
-tasks/replication.yml:37 Task/Handler: Configure replication on the slave.
-
+Finished with 0 failure(s), 2 warning(s) on 46 files.
