@@ -3,4 +3,4 @@
 
   tasks:
   - name: a bad play
-    action: command service blah restart
+    action: ansible.builtin.command service blah restart

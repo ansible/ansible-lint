@@ -1,24 +1,24 @@
 - hosts: localhost
   tasks:
   - name: command with creates check
-    command: echo blah
+    ansible.builtin.command: echo blah
     args:
       creates: Z
 
   - name: command with removes check
-    command: echo blah
+    ansible.builtin.command: echo blah
     args:
       removes: Z
 
   - name: command with changed_when
-    command: echo blah
+    ansible.builtin.command: echo blah
     changed_when: False
 
   - name: command with inline creates
-    command: creates=Z echo blah
+    ansible.builtin.command: creates=Z echo blah
 
   - name: command with inline removes
-    command: removes=Z echo blah
+    ansible.builtin.command: removes=Z echo blah
 
   - name: command with cmd
     command:
