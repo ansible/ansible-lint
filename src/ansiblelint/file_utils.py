@@ -257,8 +257,7 @@ class Lintable:
         if not force and not self.updated:
             # No changes to write.
             return
-        with self.path.resolve().open(mode="w", encoding="utf-8") as file:
-            file.write(self._content or "")
+        self.path.resolve().write_text(self._content or "")
 
     def __hash__(self) -> int:
         """Return a hash value of the lintables."""
