@@ -10,7 +10,7 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union, cast
 
 # import wcmatch
 import wcmatch.pathlib
@@ -147,7 +147,8 @@ class Lintable:
         else:
             self.name = str(name)
             self.path = name
-        self._content = content
+        self._content = self._original_content = content
+        self.updated = False
 
         # if the lintable is part of a role, we save role folder name
         self.role = ""
@@ -197,13 +198,67 @@ class Lintable:
         except NotImplementedError:
             return default
 
+    def _populate_content_cache_from_disk(self) -> None:
+        with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
+            self._content = f.read()
+        if self._original_content is None:
+            self._original_content = self._content
+
     @property
     def content(self) -> str:
-        """Retried file content, from internal cache or disk."""
+        """Retrieve file content, from internal cache or disk."""
         if self._content is None:
-            with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
-                self._content = f.read()
-        return self._content
+            self._populate_content_cache_from_disk()
+        return cast(str, self._content)
+
+    @content.setter
+    def content(self, value: str) -> None:
+        """Update ``content`` and calculate ``updated``.
+
+        To calculate ``updated`` this will read the file from disk if the cache
+        has not already been populated.
+        """
+        if not isinstance(value, str):
+            raise TypeError(f"Expected str but got {type(value)}")
+        if self._original_content is None:
+            if self._content is not None:
+                self._original_content = self._content
+            elif self.path.exists():
+                self._populate_content_cache_from_disk()
+            else:
+                # new file
+                self._original_content = ""
+        self.updated = self._original_content != value
+        self._content = value
+
+    @content.deleter
+    def content(self) -> None:
+        """Reset the internal content cache."""
+        self._content = None
+
+    def write(self, force: bool = False) -> None:
+        """Write the value of ``Lintable.content`` to disk.
+
+        This only writes to disk if the content has been updated (``Lintable.updated``).
+        For example, you can update the content, and then write it to disk like this:
+
+        .. code:: python
+
+            lintable.content = new_content
+            lintable.write()
+
+        Use ``force=True`` when you want to force a content rewrite even if the
+        content has not changed. For example:
+
+        .. code:: python
+
+            lintable.write(force=True)
+        """
+        if not force and not self.updated:
+            # No changes to write.
+            return
+        with open(self.path.resolve(), mode="w", encoding="utf-8") as file:
+            file.write(self._content or "")
 
     def __hash__(self) -> int:
         """Return a hash value of the lintables."""

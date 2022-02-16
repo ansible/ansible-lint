@@ -1,5 +1,6 @@
 """Tests for file utility functions."""
 import os
+import time
 from argparse import Namespace
 from pathlib import Path
 from typing import Any, Dict, Union
@@ -212,3 +213,194 @@ def test_guess_project_dir(tmp_path: Path) -> None:
     with cwd(str(tmp_path)):
         result = guess_project_dir(None)
         assert result == str(tmp_path)
+
+
+BASIC_PLAYBOOK = """
+- name: "playbook"
+  tasks:
+    - name: hello
+      debug:
+        msg: 'world'
+"""
+
+
+@pytest.fixture
+def tmp_updated_lintable(
+    tmp_path: Path, path: str, content: str, updated_content: str
+) -> Lintable:
+    """Create a temp file Lintable with a content update that is not on disk."""
+    lintable = Lintable(tmp_path / path, content)
+    with lintable.path.open("w", encoding="utf-8") as f:
+        f.write(content)
+    # move mtime to a time in the past to avoid race conditions in the test
+    mtime = time.time() - 60 * 60  # 1hr ago
+    os.utime(str(lintable.path), (mtime, mtime))
+    lintable.content = updated_content
+    return lintable
+
+
+@pytest.mark.parametrize(
+    ("path", "content", "updated_content", "updated"),
+    (
+        pytest.param(
+            "no_change.yaml", BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"
+        ),
+        pytest.param(
+            "quotes.yaml",
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK.replace('"', "'"),
+            True,
+            id="updated_quotes",
+        ),
+        pytest.param(
+            "shorten.yaml", BASIC_PLAYBOOK, "# short file\n", True, id="shorten_file"
+        ),
+    ),
+)
+def test_lintable_updated(
+    path: str, content: str, updated_content: str, updated: bool
+) -> None:
+    """Validate ``Lintable.updated`` when setting ``Lintable.content``."""
+    lintable = Lintable(path, content)
+
+    assert lintable.content == content
+
+    lintable.content = updated_content
+
+    assert lintable.content == updated_content
+
+    assert lintable.updated is updated
+
+
+@pytest.mark.parametrize(
+    "updated_content", ((None,), (b"bytes",)), ids=("none", "bytes")
+)
+def test_lintable_content_setter_with_bad_types(updated_content: Any) -> None:
+    """Validate ``Lintable.updated`` when setting ``Lintable.content``."""
+    lintable = Lintable("bad_type.yaml", BASIC_PLAYBOOK)
+    assert lintable.content == BASIC_PLAYBOOK
+
+    with pytest.raises(TypeError):
+        lintable.content = updated_content
+
+    assert not lintable.updated
+
+
+def test_lintable_with_new_file(tmp_path: Path) -> None:
+    """Validate ``Lintable.updated`` for a new file."""
+    lintable = Lintable(tmp_path / "new.yaml")
+
+    with pytest.raises(FileNotFoundError):
+        _ = lintable.content
+
+    lintable.content = BASIC_PLAYBOOK
+    assert lintable.content == BASIC_PLAYBOOK
+
+    assert lintable.updated
+
+    assert not lintable.path.exists()
+    lintable.write()
+    assert lintable.path.exists()
+    assert lintable.path.read_text(encoding="utf-8") == BASIC_PLAYBOOK
+
+
+@pytest.mark.parametrize(
+    ("path", "force", "content", "updated_content", "updated"),
+    (
+        pytest.param(
+            "no_change.yaml",
+            False,
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK,
+            False,
+            id="no_change",
+        ),
+        pytest.param(
+            "forced.yaml",
+            True,
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK,
+            False,
+            id="forced_rewrite",
+        ),
+        pytest.param(
+            "quotes.yaml",
+            False,
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK.replace('"', "'"),
+            True,
+            id="updated_quotes",
+        ),
+        pytest.param(
+            "shorten.yaml",
+            False,
+            BASIC_PLAYBOOK,
+            "# short file\n",
+            True,
+            id="shorten_file",
+        ),
+        pytest.param(
+            "forced.yaml",
+            True,
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK.replace('"', "'"),
+            True,
+            id="forced_and_updated",
+        ),
+    ),
+)
+def test_lintable_write(
+    tmp_updated_lintable: Lintable,
+    force: bool,
+    content: str,
+    updated_content: str,
+    updated: bool,
+) -> None:
+    """Validate ``Lintable.write`` writes when it should."""
+    pre_updated = tmp_updated_lintable.updated
+    pre_stat = tmp_updated_lintable.path.stat()
+
+    tmp_updated_lintable.write(force=force)
+
+    post_stat = tmp_updated_lintable.path.stat()
+    post_updated = tmp_updated_lintable.updated
+
+    # write() should not hide that an update happened
+    assert pre_updated == post_updated == updated
+
+    if force or updated:
+        assert pre_stat.st_mtime < post_stat.st_mtime
+    else:
+        assert pre_stat.st_mtime == post_stat.st_mtime
+
+    with tmp_updated_lintable.path.open("r", encoding="utf-8") as f:
+        post_content = f.read()
+
+    if updated:
+        assert content != post_content
+    else:
+        assert content == post_content
+    assert post_content == updated_content
+
+
+@pytest.mark.parametrize(
+    ("path", "content", "updated_content"),
+    (
+        pytest.param(
+            "quotes.yaml",
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK.replace('"', "'"),
+            id="updated_quotes",
+        ),
+    ),
+)
+def test_lintable_content_deleter(
+    tmp_updated_lintable: Lintable,
+    content: str,
+    updated_content: str,
+) -> None:
+    """Ensure that resetting content cache triggers re-reading file."""
+    assert content != updated_content
+    assert tmp_updated_lintable.content == updated_content
+    del tmp_updated_lintable.content
+    assert tmp_updated_lintable.content == content
