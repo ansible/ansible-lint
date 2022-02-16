@@ -67,6 +67,6 @@ def test_custom_kinds() -> None:
     result = run_ansible_lint("-vv", "--offline", "examples/other/")
     assert result.returncode == 0
     # .yaml-too is not a recognized extension and unless is manually defined
-    # in our .ansible-lint config, the test would not identify it as yaml file.
+    # in our ansible-lint config, the test would not identify it as yaml file.
     assert "Examining examples/other/some.yaml-too of type yaml" in result.stderr
     assert "Examining examples/other/some.j2.yaml of type jinja2" in result.stderr
