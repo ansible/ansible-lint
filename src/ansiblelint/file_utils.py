@@ -199,8 +199,7 @@ class Lintable:
             return default
 
     def _populate_content_cache_from_disk(self) -> None:
-        with self.path.resolve().open(mode="r", encoding="utf-8") as f:
-            self._content = f.read()
+        self._content = self.path.resolve().read_text(encoding="utf-8")
         if self._original_content is None:
             self._original_content = self._content
 
