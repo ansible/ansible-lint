@@ -71,7 +71,6 @@ options = Namespace(
     listtags=False,
     fmt_yaml_files=False,
     parseable=False,
-    parseable_severity=False,
     quiet=False,
     rulesdirs=[],
     skip_list=[],

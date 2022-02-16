@@ -44,9 +44,9 @@ to define when the task has changed.
 .. code:: yaml
 
     - name: handle shell output with return code
-      ansible.builtin.shell: cat {{ myfile|quote }}
-      register: myoutput
-      changed_when: myoutput.rc != 0
+      ansible.builtin.shell: cat {{ my_file|quote }}
+      register: my_output
+      changed_when: my_output.rc != 0
 
 The following example will trigger the rule since the task does not
 handle the output of the ``command``.
@@ -54,7 +54,7 @@ handle the output of the ``command``.
 .. code:: yaml
 
     - name: does not handle any output or return codes
-      ansible.builtin.command: cat {{ myfile|quote }}
+      ansible.builtin.command: cat {{ my_file|quote }}
     """
     severity = "HIGH"
     tags = ["command-shell", "idempotency"]
@@ -84,26 +84,26 @@ if "pytest" in sys.modules:
 - hosts: all
   tasks:
     - name: handle command output with return code
-      ansible.builtin.command: cat {{ myfile|quote }}
-      register: myoutput
-      changed_when: myoutput.rc != 0
+      ansible.builtin.command: cat {{ my_file|quote }}
+      register: my_output
+      changed_when: my_output.rc != 0
 """
 
     NO_CHANGE_SHELL_RC = """
 - hosts: all
   tasks:
     - name: handle shell output with return code
-      ansible.builtin.shell: cat {{ myfile|quote }}
-      register: myoutput
-      changed_when: myoutput.rc != 0
+      ansible.builtin.shell: cat {{ my_file|quote }}
+      register: my_output
+      changed_when: my_output.rc != 0
 """
 
     NO_CHANGE_SHELL_FALSE = """
 - hosts: all
   tasks:
     - name: handle shell output with false changed_when
-      ansible.builtin.shell: cat {{ myfile|quote }}
-      register: myoutput
+      ansible.builtin.shell: cat {{ my_file|quote }}
+      register: my_output
       changed_when: false
 """
 
@@ -120,8 +120,8 @@ if "pytest" in sys.modules:
 - hosts: all
   tasks:
     - name: register command output, but cat still does not change anything
-      ansible.builtin.command: cat {{ myfile|quote }}
-      register: myoutput
+      ansible.builtin.command: cat {{ my_file|quote }}
+      register: my_output
 """
 
     # also test to ensure it catches tasks in nested blocks.
@@ -131,14 +131,14 @@ if "pytest" in sys.modules:
     - block:
         - block:
             - name: basic command task, should fail
-              ansible.builtin.command: cat myfile
+              ansible.builtin.command: cat my_file
 """
 
     NO_CHANGE_SHELL_FAIL = """
 - hosts: all
   tasks:
     - name: basic shell task, should fail
-      shell: cat myfile
+      shell: cat my_file
 """
 
     @pytest.mark.parametrize(

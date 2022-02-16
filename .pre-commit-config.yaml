@@ -16,6 +16,13 @@ ci:
 default_language_version:
   python: python3.9
 repos:
+- repo: https://github.com/streetsidesoftware/cspell-cli
+  rev: v5.8.1
+  hooks:
+  - id: cspell
+    # entry: codespell --relative
+    args: ["--relative", "--no-progress", "--no-summary"]
+    name: Spell check with cspell
 - repo: https://github.com/sirosen/check-jsonschema
   rev: 0.10.2
   hooks:
@@ -96,7 +103,6 @@ repos:
     - pytest
     - rich>=11.0.0
     - ruamel.yaml
-    - tenacity
     - types-PyYAML
     - types-dataclasses
     - types-docutils
@@ -122,7 +128,6 @@ repos:
     - rich>=11.0.0
     - ruamel.yaml
     - sphinx
-    - tenacity
     - typing_extensions
     - wcmatch
     - yamllint
