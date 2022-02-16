@@ -199,7 +199,7 @@ class Lintable:
             return default
 
     def _populate_content_cache_from_disk(self) -> None:
-        with open(self.path.resolve(), mode="r", encoding="utf-8") as f:
+        with self.path.resolve().open(mode="r", encoding="utf-8") as f:
             self._content = f.read()
         if self._original_content is None:
             self._original_content = self._content
@@ -257,7 +257,7 @@ class Lintable:
         if not force and not self.updated:
             # No changes to write.
             return
-        with open(self.path.resolve(), mode="w", encoding="utf-8") as file:
+        with self.path.resolve().open(mode="w", encoding="utf-8") as file:
             file.write(self._content or "")
 
     def __hash__(self) -> int:
