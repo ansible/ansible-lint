@@ -117,7 +117,7 @@ def test_ruamel_yaml_sequence_formatting(
         ),
         pytest.param("examples/playbooks/unicode.yml", 1, False, id="unicode"),
         pytest.param(
-            "examples/playbooks/lots_of_warnings.yml", 992, True, id="lots_of_warnings"
+            "examples/playbooks/lots_of_warnings.yml", 992, False, id="lots_of_warnings"
         ),
         pytest.param("examples/playbooks/become.yml", 0, True, id="become"),
         pytest.param(
