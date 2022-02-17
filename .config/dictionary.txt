@@ -112,6 +112,7 @@ prerun
 psutil
 pyargs
 pycache
+pycharm
 pyenv
 pygments
 pylint
@@ -187,6 +188,7 @@ xdist
 xfail
 xunit
 zuul
+
 # Contributors
 Sorin
 Sbarnea
