@@ -5,26 +5,39 @@
 #    pip-compile --extra=test --no-annotate --output-file=constraints.txt --strip-extras setup.cfg
 #
 ansible-core==2.12.2
+astroid==2.9.3
 attrs==21.4.0
+black==22.1.0
 bracex==2.2.1
 cffi==1.15.0
+click==8.0.3
 colorama==0.4.4
 commonmark==0.9.1
 coverage==6.2
 cryptography==36.0.1
 enrich==1.2.7
 execnet==1.9.0
+flake8==4.0.1
 flaky==3.7.0
 iniconfig==1.1.1
+isort==5.10.1
 jinja2==3.0.3
+lazy-object-proxy==1.7.1
 markupsafe==2.0.1
+mccabe==0.6.1
+mypy==0.931
+mypy-extensions==0.4.3
 packaging==21.3
 pathspec==0.9.0
+platformdirs==2.5.0
 pluggy==1.0.0
 psutil==5.9.0
 py==1.11.0
+pycodestyle==2.8.0
 pycparser==2.21
+pyflakes==2.4.0
 pygments==2.11.2
+pylint==2.12.2
 pyparsing==3.0.7
 pytest==7.0.1
 pytest-cov==3.0.0
@@ -35,8 +48,11 @@ resolvelib==0.5.4
 rich==11.2.0
 ruamel-yaml==0.17.21
 ruamel-yaml-clib==0.2.6
+toml==0.10.2
 tomli==1.2.3
+typing-extensions==4.1.1
 wcmatch==8.3
+wrapt==1.13.3
 yamllint==1.26.3
 
 # The following packages are considered to be unsafe in a requirements file:
