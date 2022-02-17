@@ -44,6 +44,7 @@ from typing import (
 import yaml
 from ansible import constants
 from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.splitter import split_args
@@ -52,18 +53,7 @@ from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible.template import Templar
-
-try:
-    from ansible.module_utils.parsing.convert_bool import boolean
-except ImportError:
-    try:
-        from ansible.utils.boolean import boolean
-    except ImportError:
-        try:
-            from ansible.utils import boolean
-        except ImportError:
-            boolean = constants.mk_boolean
-
+from ansible.utils.collection_loader import AnsibleCollectionConfig
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
@@ -178,18 +168,7 @@ def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignor
 
 def _set_collections_basedir(basedir: str) -> None:
     # Sets the playbook directory as playbook_paths for the collection loader
-    try:
-        # Ansible 2.10+
-        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
-        from ansible.utils.collection_loader import AnsibleCollectionConfig
-
-        AnsibleCollectionConfig.playbook_paths = basedir
-    except ImportError:
-        # Ansible 2.8 or 2.9
-        # noqa: # pylint:disable=cyclic-import,import-outside-toplevel
-        from ansible.utils.collection_loader import set_collection_playbook_paths
-
-        set_collection_playbook_paths(basedir)
+    AnsibleCollectionConfig.playbook_paths = basedir
 
 
 def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
