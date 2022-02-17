@@ -131,50 +131,6 @@ def ansible_template(
 LINE_NUMBER_KEY = "__line__"
 FILENAME_KEY = "__file__"
 
-VALID_KEYS = [
-    "name",
-    "action",
-    "when",
-    "async",
-    "poll",
-    "notify",
-    "first_available_file",
-    "include",
-    "include_tasks",
-    "import_tasks",
-    "import_playbook",
-    "tags",
-    "register",
-    "ignore_errors",
-    "delegate_to",
-    "local_action",
-    "transport",
-    "remote_user",
-    "sudo",
-    "sudo_user",
-    "sudo_pass",
-    "when",
-    "connection",
-    "environment",
-    "args",
-    "any_errors_fatal",
-    "changed_when",
-    "failed_when",
-    "check_mode",
-    "delay",
-    "retries",
-    "until",
-    "su",
-    "su_user",
-    "su_pass",
-    "no_log",
-    "run_once",
-    "become",
-    "become_user",
-    "become_method",
-    FILENAME_KEY,
-]
-
 BLOCK_NAME_TO_ACTION_TYPE_MAP = {
     "tasks": "task",
     "handlers": "handler",
@@ -315,12 +271,16 @@ def play_children(
         "post_tasks": _taskshandlers_children,
         "block": _taskshandlers_children,
         "include": _include_children,
+        "ansible.builtin.include": _include_children,
         "import_playbook": _include_children,
+        "ansible.builtin.import_playbook": _include_children,
         "roles": _roles_children,
         "dependencies": _roles_children,
         "handlers": _taskshandlers_children,
         "include_tasks": _include_children,
+        "ansible.builtin.include_tasks": _include_children,
         "import_tasks": _include_children,
+        "ansible.builtin.import_tasks": _include_children,
     }
     (k, v) = item
     add_all_plugin_dirs(os.path.abspath(basedir))
@@ -420,7 +380,17 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     """Try to get children of taskhandler for include/import tasks/playbooks."""
     child_type = k if parent_type == "playbook" else parent_type
 
-    task_include_keys = "include", "include_tasks", "import_playbook", "import_tasks"
+    # Include the FQCN task names as this happens before normalize
+    task_include_keys = (
+        "include",
+        "include_tasks",
+        "import_playbook",
+        "import_tasks",
+        "ansible.builtin.include",
+        "ansible.builtin.include_tasks",
+        "ansible.builtin.import_playbook",
+        "ansible.builtin.import_tasks",
+    )
     for task_handler_key in task_include_keys:
 
         with contextlib.suppress(KeyError):
@@ -699,11 +669,21 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
         task for task in tasks if all(k not in task for k in block_rescue_always)
     ]
 
+    # Include the FQCN task names as this happens before normalize
     return [
         task
         for task in tasks
         if set(
-            ["include", "include_tasks", "import_playbook", "import_tasks"]
+            [
+                "include",
+                "include_tasks",
+                "import_playbook",
+                "import_tasks",
+                "ansible.builtin.include",
+                "ansible.builtin.include_tasks",
+                "ansible.builtin.import_playbook",
+                "ansible.builtin.import_tasks",
+            ]
         ).isdisjoint(task.keys())
     ]
 

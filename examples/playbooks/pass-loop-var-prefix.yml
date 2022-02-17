@@ -2,7 +2,7 @@
   tasks:
     # validate that we did not trigger loop-var-prefix on playbooks
     - name: that should pass
-      debug:
+      ansible.builtin.debug:
         var: item
       loop:
         - foo
@@ -10,7 +10,7 @@
     - name: a block
       block:
         - name: that should also pass
-          debug:
+          ansible.builtin.debug:
             var: item
           loop:
             - apples

@@ -3,7 +3,7 @@
 
   tasks:
     - name: hello world
-      action: debug msg="Hello!"
+      ansible.builtin.action: debug msg="Hello!"
 
     - name: this should be fine too
-      action: file state=touch mode=0644 dest=./wherever
+      ansible.builtin.action: file state=touch mode=0644 dest=./wherever

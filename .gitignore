@@ -17,6 +17,7 @@ parts/
 pip-wheel-metadata
 sdist/
 var/
+venv/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -48,3 +49,4 @@ pip-wheel-metadata
 # other
 .DS_Store
 .vscode
+.idea

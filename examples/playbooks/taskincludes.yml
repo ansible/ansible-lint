@@ -6,3 +6,5 @@
     # - include_tasks: "{{ varnotset }}.yml"
     - include_tasks: "{{ varset }}.yml"
     - include_tasks: "tasks/directory with spaces/main.yml"
+    # Include tasks by FQCN as well to ensure they load
+    - ansible.builtin.include_tasks: "tasks/passing_task.yml"
