@@ -1,4 +1,5 @@
 # Issue Type
+
 - Bug report
 - Feature request
 
@@ -23,10 +24,10 @@ Possible security bugs should be reported via email to `security@ansible.com`
 
 Please give some details of what is actually happening.
 Include a [minimum complete verifiable example] with:
+
 - playbook
 - output of running ansible-lint
 - if you're getting a stack trace, output of
   `ansible-playbook --syntax-check playbook`
-
 
 [minimum complete verifiable example]: http://stackoverflow.com/help/mcve
