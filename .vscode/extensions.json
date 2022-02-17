@@ -1,7 +1,9 @@
+// spell-checker:ignore esbenp
 {
     "recommendations": [
+        "esbenp.prettier-vscode",
         "ms-python.python",
-        "redhat.vscode-yaml",
         "redhat.ansible",
+        "redhat.vscode-yaml",
     ]
 }

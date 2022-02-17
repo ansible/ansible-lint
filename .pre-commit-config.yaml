@@ -21,7 +21,6 @@ repos:
     rev: "v2.5.1"
     hooks:
       - id: prettier
-        types: [file, yaml]
         # Temporary excludes so we can gradually normalize the formatting
         exclude: >
           (?x)^(
