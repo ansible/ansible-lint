@@ -8,4 +8,4 @@
     - import_tasks: "{{ varset }}"
     - import_tasks: "tasks/directory with spaces/main.yml"
     # Import tasks by FQCN as well to ensure they load
-    - ansible.builtin.import_tasks: "tasks/passingtask.yml"
+    - ansible.builtin.import_tasks: "tasks/passing_task.yml"
