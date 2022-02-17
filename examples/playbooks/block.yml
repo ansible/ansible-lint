@@ -2,7 +2,7 @@
 - hosts: all
 
   pre_tasks:
-    - {import_tasks: 'does-not-exist.yml'}
+    - { import_tasks: "does-not-exist.yml" }
 
   tasks:
     - block:

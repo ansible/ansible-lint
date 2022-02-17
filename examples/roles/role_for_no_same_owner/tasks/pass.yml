@@ -16,14 +16,14 @@
     src: "{{ file }}.tar.gz"
     dest: dummy
     extra_opts:
-      - '--no-same-owner'
+      - "--no-same-owner"
 
 - name: unarchive-remote-src
   unarchive:
     src: "{{ file }}.tar.gz"
     dest: dummy
     extra_opts:
-      - '--no-same-owner'
+      - "--no-same-owner"
 
 - name: unarchive-unknown-file-ending
   unarchive:

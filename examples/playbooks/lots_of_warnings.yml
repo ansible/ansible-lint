@@ -6,995 +6,995 @@
 - hosts: webservers
 
   tasks:
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
-  - name: executing git through command
-    action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah
+    - name: executing git through command
+      action: ansible.builtin.command git clone blah

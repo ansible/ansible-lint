@@ -1,5 +1,4 @@
 ---
-
 - hosts: all
   tasks:
     - ansible.builtin.command: echo "no name"

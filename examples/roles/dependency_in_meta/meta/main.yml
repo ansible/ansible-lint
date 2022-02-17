@@ -24,7 +24,7 @@ dependencies:
   # from GitLab or other git-based scm
   - src: git@gitlab.company.com:my-group/my-repo.git
     scm: git
-    version: "0.1"  # quoted, so YAML doesn't parse this as a floating-point value
+    version: "0.1" # quoted, so YAML doesn't parse this as a floating-point value
 
   # from a webserver, where the role is packaged in a tar.gz
   - src: https://some.webserver.example.com/files/master.tar.gz
@@ -32,7 +32,7 @@ dependencies:
 
 galaxy_info:
   author: foo
-  description: 'Testing meta'
+  description: "Testing meta"
   company: Not applicable
   license: MIT
   min_ansible_version: 2.5
