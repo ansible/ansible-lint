@@ -16,21 +16,21 @@ LAYOUT_IMPORTS: Dict[str, str] = {
           gather_facts: false
           tasks:
             - name: from main import task 1
-              import_tasks: tasks/task_1.yml
+              ansible.builtin.import_tasks: tasks/task_1.yml
         """
     ),
     "tasks/task_1.yml": textwrap.dedent(
         """\
         ---
         - name: from task 1 import task 2
-          import_tasks: tasks/task_2.yml
+          ansible.builtin.import_tasks: tasks/task_2.yml
         """
     ),
     "tasks/task_2.yml": textwrap.dedent(
         """\
         ---
         - name: from task 2 import subtask 1
-          import_tasks: tasks/subtasks/subtask_1.yml
+          ansible.builtin.import_tasks: tasks/subtasks/subtask_1.yml
         """
     ),
     "tasks/subtasks/subtask_1.yml": textwrap.dedent(
@@ -44,7 +44,7 @@ LAYOUT_IMPORTS: Dict[str, str] = {
         """\
         ---
         - name: from subtask 2 do something
-          debug:
+          ansible.builtin.debug:
             msg: |
               Something...
         """

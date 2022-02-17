@@ -3,17 +3,17 @@
 
 
   pre_tasks:
-    - include: tasks/x.yml
+    - ansible.builtin.include_tasks: tasks/x.yml
 
   roles:
     - hello
     - { role: more_complex, t: z }
 
   tasks:
-    - include: tasks/x.yml
-    - include: tasks/x.yml y=z
+    - ansible.builtin.include_tasks: tasks/x.yml
+    - ansible.builtin.include_tasks: tasks/x.yml y=z
 
   handlers:
-    - include: handlers/y.yml
+    - ansible.builtin.include_tasks: handlers/y.yml
 
-- include: play.yml
+- ansible.builtin.include_tasks: play.yml

@@ -9,18 +9,18 @@
         - name: successful debug message
           debug: msg='i execute normally'
         - name: failure command
-          command: /bin/false
+          ansible.builtin.command: /bin/false
           changed_when: false
         - name: never reached debug message
           debug: msg='i never execute, cause ERROR!'
       rescue:
         - name: exception debug message
-          debug: msg='I caught an error'
+          ansible.builtin.debug: msg='I caught an error'
         - name: another failure command
-          command: /bin/false
+          ansible.builtin.command: /bin/false
           changed_when: false
         - name: another missed debug message
           debug: msg='I also never execute :-('
       always:
         - name: always reached debug message
-          debug: msg="this always executes"
+          ansible.builtin.debug: msg="this always executes"

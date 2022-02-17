@@ -1,20 +1,20 @@
 - hosts: localhost
   tasks:
   - name: install ansible
-    yum: name=ansible state=latest
+    ansible.builtin.yum: name=ansible state=latest
 
   - name: install ansible-lint
-    pip: name=ansible-lint
+    ansible.builtin.pip: name=ansible-lint
     args:
       state: latest
 
   - name: install some-package
-    package:
+    ansible.builtin.package:
       name: some-package
       state: latest
 
   - name: install ansible with update_only to false
-    yum:
+    ansible.builtin.yum:
       name: sudo
       state: latest
       update_only: false

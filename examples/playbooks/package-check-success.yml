@@ -1,21 +1,21 @@
 - hosts: localhost
   tasks:
   - name: install ansible
-    yum: name=ansible-2.1.0.0 state=present
+    ansible.builtin.yum: name=ansible-2.1.0.0 state=present
 
   - name: install ansible-lint
-    pip: name=ansible-lint
+    ansible.builtin.pip: name=ansible-lint
     args:
       state: present
       version: 3.1.2
 
   - name: install some-package
-    package:
+    ansible.builtin.package:
       name: some-package
       state: present
 
   - name: update ansible
-    yum:
+    ansible.builtin.yum:
       name: sudo
       state: latest
       update_only: true

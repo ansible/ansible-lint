@@ -3,4 +3,4 @@
   tasks:
     # cspell:disable-next-line
     - name: тест
-      command: uname
+      ansible.builtin.command: uname

@@ -7,43 +7,43 @@
 
   tasks:
     - name: unset variable
-      action: command echo {{this_variable}} is not set in this playbook
+      action: ansible.builtin.command echo {{this_variable}} is not set in this playbook
 
     - name: trailing whitespace
-      action: command echo do nothing   
+      action: ansible.builtin.command echo do nothing   
 
     - name: git check
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
 
     - name: git check 2
-      action: git version=HEAD c=d
+      action: ansible.builtin.git version=HEAD c=d
 
     - name: git check 3
-      git: version=a1b2c3d4 repo=xyz bobbins=d
+      ansible.builtin.git: version=a1b2c3d4 repo=xyz bobbins=d
 
     - name: executing git through command
-      action: command git clone blah
+      action: ansible.builtin.command git clone blah
 
     - name: executing git through command
-      action: command chdir=bobbins creates=whatever /usr/bin/git clone blah
+      action: ansible.builtin.command chdir=bobbins creates=whatever /usr/bin/git clone blah
 
     - name: using git module
-      action: git repo=blah
+      action: ansible.builtin.git repo=blah
 
     - name: passing git as an argument to another task
-      action: debug msg="{{item}}"
+      action: ansible.builtin.debug msg="{{item}}"
       with_items:
       - git  # yamllint wrong indentation
       - bobbins
 
     - name: yum latest
-      yum: state=latest name=httpd
+      ansible.builtin.yum: state=latest name=httpd
 
-    - debug: msg="debug task without a name"
+    - ansible.builtin.debug: msg="debug task without a name"
 
     - name: apt latest
-      apt: state=latest name=apache2
+      ansible.builtin.apt: state=latest name=apache2
 
-    - meta: flush_handlers
+    - ansible.builtin.meta: flush_handlers
     # empty task is currently accepted by ansible as valid code:
     -
