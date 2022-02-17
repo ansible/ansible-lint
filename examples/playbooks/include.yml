@@ -1,7 +1,6 @@
 ---
 - hosts: bobbins
 
-
   pre_tasks:
     - ansible.builtin.include_tasks: tasks/x.yml
 

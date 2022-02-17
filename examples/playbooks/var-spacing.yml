@@ -29,7 +29,7 @@
     - name: bad variable format
       debug:
         msg: "{{bad_format }}"
-    - name: not a jinja variable  # noqa var-spacing
+    - name: not a jinja variable # noqa var-spacing
       debug:
         # spell-checker: disable-next-line
         msg: "data = ${lookup{$local_part}lsearch{/etc/aliases}}"

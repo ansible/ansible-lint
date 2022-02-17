@@ -3,32 +3,32 @@
   become: true
 
   tasks:
-  - ansible.builtin.debug:
-      msg: hello
+    - ansible.builtin.debug:
+        msg: hello
 
 - hosts: localhost
 
   tasks:
-  - name: foo
-    ansible.builtin.command: whoami
-    become_user: postgres
-    become: true
-    changed_when: false
+    - name: foo
+      ansible.builtin.command: whoami
+      become_user: postgres
+      become: true
+      changed_when: false
 
 - hosts: localhost
   become: true
 
   tasks:
-  - name: Accepts a become from higher scope
-    ansible.builtin.command: whoami
-    become_user: postgres
-    changed_when: false
+    - name: Accepts a become from higher scope
+      ansible.builtin.command: whoami
+      become_user: postgres
+      changed_when: false
 
 - hosts: localhost
   become_user: postgres
 
   tasks:
-  - name: Accepts a become from a lower scope
-    ansible.builtin.command: whoami
-    become: true
-    changed_when: false
+    - name: Accepts a become from a lower scope
+      ansible.builtin.command: whoami
+      become: true
+      changed_when: false

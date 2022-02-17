@@ -49,11 +49,11 @@
     src: "{{ file }}.zip"
     dest: dummy
     extra_opts:
-      - '-X'
+      - "-X"
 
 - name: unarchive-zip-same-owner
   unarchive:
     src: "{{ file }}.zip"
     dest: dummy
     extra_opts:
-      - '-X'
+      - "-X"

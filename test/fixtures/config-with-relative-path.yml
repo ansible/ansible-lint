@@ -1,5 +1,4 @@
 ---
 exclude_paths:
-- ../../examples/roles/test-role/
-
+  - ../../examples/roles/test-role/
 # vim: et:sw=2:syntax=yaml:ts=2:
