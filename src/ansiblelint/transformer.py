@@ -2,7 +2,7 @@
 import logging
 import re
 from io import StringIO
-from typing import Dict, List, Optional, Set, Union, cast
+from typing import Any, Dict, List, Optional, Set, Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ruamel.yaml.emitter import Emitter
@@ -29,7 +29,12 @@ _whitespace_only_lines_re = re.compile(r"^ +$", re.MULTILINE)
 class FormattedEmitter(Emitter):
     """Emitter that applies custom formatting rules when dumping YAML.
 
-    Root-level sequences are never indented.
+    Differences from ruamel.yaml defaults:
+
+      - indentation of root-level sequences
+      - prefer double-quoted scalars over single-quoted scalars
+
+    This ensures that root-level sequences are never indented.
     All subsequent levels are indented as configured (normal ruamel.yaml behavior).
 
     Earlier implementations used dedent on ruamel.yaml's dumped output,
@@ -70,6 +75,18 @@ class FormattedEmitter(Emitter):
     def sequence_dash_offset(self, value: int) -> None:
         """Configure how many spaces to put before each sequence item's '-'."""
         self._sequence_dash_offset = value
+
+    def choose_scalar_style(self) -> Any:
+        """Select which string type to use preferring ``"`` over ``'``."""
+        style = super().choose_scalar_style()
+        if style != "'":
+            # block scalar, double quoted, etc.
+            return style
+        if '"' in self.event.value:
+            return "'"
+        # TODO: we might need to have a singleQuote option like prettier
+        #       which would return ' here instead of ".
+        return '"'
 
 
 class Transformer:
