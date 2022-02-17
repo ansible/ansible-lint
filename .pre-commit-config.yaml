@@ -25,8 +25,7 @@ repos:
         # Temporary excludes so we can gradually normalize the formatting
         exclude: >
           (?x)^(
-            examples/.*|
-            test/.*
+            examples/.*
           )$
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v5.8.1
