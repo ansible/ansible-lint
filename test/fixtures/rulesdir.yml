@@ -1,5 +1,4 @@
 ---
 rulesdir:
-- ./rules
-
+  - ./rules
 # vim: et:sw=2:syntax=yaml:ts=2:
