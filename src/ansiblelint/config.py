@@ -111,11 +111,7 @@ def ansible_collections_path() -> str:
     for env_var in ["ANSIBLE_COLLECTIONS_PATHS", "ANSIBLE_COLLECTIONS_PATH"]:
         if env_var in os.environ:
             return env_var
-
-    # https://github.com/ansible/ansible/pull/70007
-    if ansible_version() >= ansible_version("2.10.0.dev0"):
-        return "ANSIBLE_COLLECTIONS_PATH"
-    return "ANSIBLE_COLLECTIONS_PATHS"
+    return "ANSIBLE_COLLECTIONS_PATH"
 
 
 def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
