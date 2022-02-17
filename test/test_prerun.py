@@ -150,7 +150,7 @@ def test__update_env(
 
 
 def test_require_collection_wrong_version() -> None:
-    """Tests behaviour of require_collection."""
+    """Tests behavior of require_collection."""
     subprocess.check_output(
         [
             "ansible-galaxy",
@@ -175,7 +175,7 @@ def test_require_collection_wrong_version() -> None:
     ),
 )
 def test_require_collection_missing(name: str, version: str) -> None:
-    """Tests behaviour of require_collection, missing case."""
+    """Tests behavior of require_collection, missing case."""
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         prerun.require_collection(name, version)
     assert pytest_wrapped_e.type == SystemExit

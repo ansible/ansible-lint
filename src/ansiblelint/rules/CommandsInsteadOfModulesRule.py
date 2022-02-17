@@ -66,7 +66,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     }
 
     _executable_options = {
-        "git": ["branch", "log"],
+        "git": ["branch", "log", "lfs"],
         "systemctl": ["set-default", "show-environment", "status"],
         "yum": ["clean"],
         "rpm": ["--nodeps"],
@@ -114,18 +114,15 @@ if "pytest" in sys.modules:  # noqa: C901
       command: apt-get update
 """
 
-    GIT_BRANCH = """
+    GIT_COMMANDS_OK = """
 - hosts: all
   tasks:
     - name: print current git branch
       command: git branch
-"""
-
-    GIT_LOG = """
-- hosts: all
-  tasks:
     - name: print git log
       command: git log
+    - name: install git lfs support
+      command: git lfs install
 """
 
     RESTART_SSHD = """
@@ -189,17 +186,9 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.mark.parametrize(
         "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
-    def test_git_log(rule_runner: RunFromText) -> None:
-        """The git log command is not supported by the git module."""
-        results = rule_runner.run_playbook(GIT_LOG)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_git_branch(rule_runner: RunFromText) -> None:
-        """The git branch command is not supported by the git module."""
-        results = rule_runner.run_playbook(GIT_BRANCH)
+    def test_git_commands_ok(rule_runner: RunFromText) -> None:
+        """Check the git commands not supported by the git module do not trigger rule."""
+        results = rule_runner.run_playbook(GIT_COMMANDS_OK)
         assert len(results) == 0
 
     @pytest.mark.parametrize(

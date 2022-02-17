@@ -25,7 +25,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
-        for k, v, _ in nested_items_path(task):
+        for _, v, _ in nested_items_path(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
                 if bool(self.bracket_regex.search(cleaned)):
@@ -43,7 +43,7 @@ if "pytest" in sys.modules:
     @pytest.fixture
     def error_expected_lines() -> List[int]:
         """Return list of expected error lines."""
-        return [23, 26, 29, 54, 65]
+        return [23, 26, 29, 55, 66]
 
     @pytest.fixture
     def test_playbook() -> str:

@@ -3,14 +3,14 @@
   become: true
 
   tasks:
-  - debug:
+  - ansible.builtin.debug:
       msg: hello
 
 - hosts: localhost
 
   tasks:
   - name: foo
-    command: whoami
+    ansible.builtin.command: whoami
     become_user: postgres
     become: true
     changed_when: false
@@ -20,7 +20,7 @@
 
   tasks:
   - name: Accepts a become from higher scope
-    command: whoami
+    ansible.builtin.command: whoami
     become_user: postgres
     changed_when: false
 
@@ -29,6 +29,6 @@
 
   tasks:
   - name: Accepts a become from a lower scope
-    command: whoami
+    ansible.builtin.command: whoami
     become: true
     changed_when: false

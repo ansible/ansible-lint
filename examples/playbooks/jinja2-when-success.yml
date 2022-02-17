@@ -1,8 +1,8 @@
 - hosts: all
   tasks:
     - name: test when
-      debug: msg=text
+      ansible.builtin.debug: msg=text
       when: true
     - name: test when 2
-      debug: msg=text2
+      ansible.builtin.debug: msg=text2
       when: 1 = 1

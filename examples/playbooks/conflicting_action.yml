@@ -1,9 +1,9 @@
 - hosts: localhost
   tasks:
     - name: foo
-      debug:
+      ansible.builtin.debug:
         msg: bar
-      command: echo
+      ansible.builtin.command: echo
 # On this file ansible-playbook --syntax-check reports:
 # ERROR! conflicting action statements: debug, command
 #

@@ -32,14 +32,14 @@ def lintable() -> Lintable:
 
 
 def test_rule_matching(lintable: Lintable) -> None:
-    """Test rule.matchlines() on a plyabook."""
+    """Test rule.matchlines() on a playbook."""
     ematcher = EMatcherRule.EMatcherRule()
     matches = ematcher.matchlines(lintable)
     assert len(matches) == 3
 
 
 def test_raw_rule_matching(lintable: Lintable) -> None:
-    """Test rule.matchlines() on a plyabook."""
+    """Test rule.matchlines() on a playbook."""
     ematcher = RawTaskRule.RawTaskRule()
     matches = ematcher.matchtasks(lintable)
     assert len(matches) == 1

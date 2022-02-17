@@ -23,7 +23,7 @@ SUCCESS_TASKS = """
     var: result
   when: False
 
-- name: Dont execute this step
+- name: "Don't execute this step"
   debug:
     msg: "debug message"
   when:

@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+# spell-checker:ignore dwim
 """Generic utility helpers."""
 
 import contextlib
@@ -130,50 +131,6 @@ def ansible_template(
 LINE_NUMBER_KEY = "__line__"
 FILENAME_KEY = "__file__"
 
-VALID_KEYS = [
-    "name",
-    "action",
-    "when",
-    "async",
-    "poll",
-    "notify",
-    "first_available_file",
-    "include",
-    "include_tasks",
-    "import_tasks",
-    "import_playbook",
-    "tags",
-    "register",
-    "ignore_errors",
-    "delegate_to",
-    "local_action",
-    "transport",
-    "remote_user",
-    "sudo",
-    "sudo_user",
-    "sudo_pass",
-    "when",
-    "connection",
-    "environment",
-    "args",
-    "any_errors_fatal",
-    "changed_when",
-    "failed_when",
-    "check_mode",
-    "delay",
-    "retries",
-    "until",
-    "su",
-    "su_user",
-    "su_pass",
-    "no_log",
-    "run_once",
-    "become",
-    "become_user",
-    "become_method",
-    FILENAME_KEY,
-]
-
 BLOCK_NAME_TO_ACTION_TYPE_MAP = {
     "tasks": "task",
     "handlers": "handler",
@@ -196,13 +153,13 @@ def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
 
     args = list()
     kwargs = dict()
-    nonkvfound = False
+    non_kv_found = False
     for arg in tokens[1:]:
-        if "=" in arg and not nonkvfound:
+        if "=" in arg and not non_kv_found:
             kv = arg.split("=", 1)
             kwargs[kv[0]] = kv[1]
         else:
-            nonkvfound = True
+            non_kv_found = True
             args.append(arg)
     return (command, args, kwargs)
 
@@ -348,6 +305,7 @@ def _include_children(
         v = v["file"]
 
     # handle include: filename.yml tags=blah
+    # pylint: disable=unused-variable
     (command, args, kwargs) = tokenize("{0}: {1}".format(k, v))
 
     result = path_dwim(basedir, args[0])
@@ -533,12 +491,11 @@ def _look_for_role_files(
 
     for kind in ["tasks", "meta", "handlers", "vars", "defaults"]:
         current_path = os.path.join(role_path, kind)
-        for folder, subdirs, files in os.walk(current_path):
+        for folder, _, files in os.walk(current_path):
             for file in files:
                 file_ignorecase = file.lower()
                 if file_ignorecase.endswith((".yml", ".yaml")):
-                    thpath = os.path.join(folder, file)
-                    results.append(Lintable(thpath))
+                    results.append(Lintable(os.path.join(folder, file)))
 
     return results
 

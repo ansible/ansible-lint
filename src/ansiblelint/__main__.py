@@ -25,9 +25,9 @@ import hashlib
 import logging
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
-from argparse import Namespace
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 
@@ -35,15 +35,9 @@ from enrich.console import should_do_markup
 
 from ansiblelint import cli
 from ansiblelint.app import App
-from ansiblelint.color import (
-    console,
-    console_options,
-    console_stderr,
-    reconfigure,
-    render_yaml,
-)
+from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
-from ansiblelint.constants import ANSIBLE_MISSING_RC, EXIT_CONTROL_C_RC
+from ansiblelint.constants import EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.prerun import check_ansible_presence, prepare_environment
 from ansiblelint.skip_utils import normalize_tag
@@ -52,7 +46,6 @@ from ansiblelint.version import __version__
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
-    from ansiblelint.runner import LintResult
 
 
 _logger = logging.getLogger(__name__)
@@ -89,15 +82,12 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     new_options.cwd = pathlib.Path.cwd()
 
     if new_options.version:
-        ansible_version, err = check_ansible_presence()
+        ansible_version, _ = check_ansible_presence(exit_on_error=True)
         print(
             "ansible-lint {ver!s} using ansible {ansible_ver!s}".format(
                 ver=__version__, ansible_ver=ansible_version
             )
         )
-        if err:
-            _logger.error(err)
-            sys.exit(ANSIBLE_MISSING_RC)
         sys.exit(0)
 
     if new_options.colored is None:
@@ -121,77 +111,6 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
         os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache")),
         cache_key,
     )
-
-
-def report_outcome(  # noqa: C901
-    result: "LintResult", options: Namespace, mark_as_success: bool = False
-) -> int:
-    """Display information about how to skip found rules.
-
-    Returns exit code, 2 if errors were found, 0 when only warnings were found.
-    """
-    failures = 0
-    warnings = 0
-    msg = ""
-    matches_unignored = [match for match in result.matches if not match.ignored]
-
-    # counting
-    matched_rules = {match.rule.id: match.rule for match in matches_unignored}
-    for match in result.matches:
-        if {match.rule.id, *match.rule.tags}.isdisjoint(options.warn_list):
-            failures += 1
-        else:
-            warnings += 1
-
-    # remove unskippable rules from the list
-    for rule_id in list(matched_rules.keys()):
-        if "unskippable" in matched_rules[rule_id].tags:
-            matched_rules.pop(rule_id)
-
-    entries = []
-    for key in sorted(matched_rules.keys()):
-        if {key, *matched_rules[key].tags}.isdisjoint(options.warn_list):
-            entries.append(f"  - {key}  # {matched_rules[key].shortdesc}\n")
-    for match in result.matches:
-        if "experimental" in match.rule.tags:
-            entries.append("  - experimental  # all rules tagged as experimental\n")
-            break
-    if entries and not options.quiet:
-        console_stderr.print(
-            "You can skip specific rules or tags by adding them to your "
-            "configuration file:"
-        )
-        msg += """\
-# .ansible-lint
-warn_list:  # or 'skip_list' to silence them completely
-"""
-        msg += "".join(sorted(entries))
-
-    # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
-    # to migrate old tags to new tags. There are a lot of things out there that still
-    # use ansible-lint 4 (for example, Ansible Galaxy and Automation Hub imports). If we
-    # replace the old tags, those tools will report warnings. If we do not replace them,
-    # ansible-lint 5 will report warnings.
-    #
-    # We can do the deprecation once the ecosystem caught up at least a bit.
-    # for k, v in used_old_tags.items():
-    #     _logger.warning(
-    #         "Replaced deprecated tag '%s' with '%s' but it will become an "
-    #         "error in the future.",
-    #         k,
-    #         v,
-    #     )
-
-    if result.matches and not options.quiet:
-        console_stderr.print(render_yaml(msg))
-        console_stderr.print(
-            f"Finished with {failures} failure(s), {warnings} warning(s) "
-            f"on {len(result.files)} files."
-        )
-
-    if mark_as_success or not failures:
-        return 0
-    return 2
 
 
 def _do_list(rules: "RulesCollection") -> int:
@@ -220,6 +139,9 @@ def _do_list(rules: "RulesCollection") -> int:
 
 def main(argv: Optional[List[str]] = None) -> int:
     """Linter CLI entry point."""
+    # alter PATH if needed (venv support)
+    path_inject()
+
     if argv is None:
         argv = sys.argv
     initialize_options(argv[1:])
@@ -287,7 +209,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     app.render_matches(result.matches)
 
-    return report_outcome(result, mark_as_success=mark_as_success, options=options)
+    return app.report_outcome(result, mark_as_success=mark_as_success)
 
 
 @contextmanager
@@ -330,6 +252,27 @@ def _run_cli_entrypoint() -> None:
         sys.exit(EXIT_CONTROL_C_RC)
     except RuntimeError as e:
         raise SystemExit(str(e))
+
+
+def path_inject() -> None:
+    """Add python interpreter path to top of PATH to fix outside venv calling."""
+    # This make it possible to call ansible-lint that was installed inside a
+    # virtualenv without having to pre-activate it. Otherwise subprocess will
+    # either fail to find ansible executables or call the wrong ones.
+    #
+    # This must be run before we do run any subprocesses, and loading config
+    # does this as part of the ansible detection.
+    paths = [x for x in os.environ.get("PATH", "").split(os.pathsep) if x]
+    ansible_path = shutil.which("ansible")
+    if ansible_path:
+        ansible_path = os.path.dirname(ansible_path)
+    py_path = os.path.dirname(sys.executable)
+    # Determine if we need to manipulate PATH
+    if ansible_path not in paths or py_path != ansible_path:  # pragma: no cover
+        # tested by test_call_from_outside_venv but coverage cannot detect it
+        paths.insert(0, py_path)
+        os.environ["PATH"] = os.pathsep.join(paths)
+        print(f"WARNING: PATH altered to include {py_path}", file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-name: gh
+name: tox
 
 on:
   create:  # is used for publishing to PyPI and TestPyPI
@@ -17,6 +17,10 @@ on:
   # https://crontab.guru/#2_18_*_*_5
   # - cron: 2 18 * * 5
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   linters:
     name: >-
@@ -32,7 +36,6 @@ jobs:
         env:
         - TOXENV: lint
         - TOXENV: docs
-        - TOXENV: linkcheck-docs
         - TOXENV: eco
         - TOXENV: packaging
     env:
@@ -104,12 +107,10 @@ jobs:
       # which are expected to be used by users in production. Avoid adding a
       # combination unless there are good reasons to test it, like having
       # proof that we failed to catch a bug by not running it. Using
-      # distribution should be prefferred instead of custom builds.
+      # distribution should be preferred instead of custom builds.
       matrix:
         python-version:
         # keep list sorted as it determines UI order too
-        - 3.6
-        - 3.7
         - 3.8
         - 3.9
         - "3.10"
@@ -119,16 +120,12 @@ jobs:
         # - windows-latest
         # - windows-2016
         include:
-        - tox_env: py36
-          os: ubuntu-20.04
-          python-version: 3.6
-        - name: py39 (wsl)
-          tox_env: py39
-          os: windows-latest
-          shell: "wsl-bash {0}"
-        - tox_env: py37
-          os: ubuntu-20.04
-          python-version: 3.7
+        # Disabled due to getting stuck and timeouts not working
+        # https://github.com/Vampire/setup-wsl/discussions/25
+        # - name: py39 (wsl)
+        #   tox_env: py39
+        #   os: windows-latest
+        #   shell: "wsl-bash {0}"
         - tox_env: py38
           os: ubuntu-20.04
           python-version: 3.8
@@ -141,14 +138,14 @@ jobs:
           os: ubuntu-20.04
           python-version: "3.10"
           devel: true
-          skip_ansible29: true
-        - tox_env: py36
+        - name: py38 (macos)
+          tox_env: py38
           os: macOS-latest
-          python-version: 3.6
-        - tox_env: py310
+          python-version: 3.8
+        - name: py310 (macos)
+          tox_env: py310
           os: macOS-latest
           python-version: "3.10"
-          skip_ansible29: true
 
     env:
       TOX_PARALLEL_NO_SPINNER: 1
@@ -206,19 +203,13 @@ jobs:
         --skip-missing-interpreters false
         -vv
       env:
-        TOXENV: ${{ matrix.tox_env }}-core,${{ matrix.tox_env }}-ansible29
+        TOXENV: ${{ matrix.tox_env }}
     # sequential run improves browsing experience (almost no speed impact)
-    - name: "Test with tox: ${{ matrix.tox_env }}-core"
+    - name: "Test with tox: ${{ matrix.tox_env }}"
       run: |
         python3 -m tox
       env:
-        TOXENV: ${{ matrix.tox_env }}-core
-    - name: "Test with tox: ${{ matrix.tox_env }}-ansible29"
-      if: ${{ !matrix.skip_ansible29 }}
-      run: |
-        python3 -m tox
-      env:
-        TOXENV: ${{ matrix.tox_env }}-ansible29
+        TOXENV: ${{ matrix.tox_env }}
     - name: "Test with tox: ${{ matrix.tox_env }}-devel"
       if: ${{ matrix.devel }}
       run: |
@@ -243,6 +234,7 @@ jobs:
       # https://github.com/actions/upload-artifact/issues/123
       continue-on-error: true
     - name: Report junit failures
+      # cspell:disable-next-line
       uses: shyim/junit-report-annotations-action@3d2e5374f2b13e70f6f3209a21adfdbc42c466ae
       with:
         path: .tox/junit.*.xml

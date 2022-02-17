@@ -10,15 +10,9 @@ from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import packaging
-import tenacity
 from packaging import version
 
-from ansiblelint.config import (
-    ansible_collections_path,
-    collection_list,
-    options,
-    parse_ansible_version,
-)
+from ansiblelint.config import ansible_collections_path, options, parse_ansible_version
 from ansiblelint.constants import (
     ANSIBLE_DEFAULT_ROLES_PATH,
     ANSIBLE_MIN_VERSION,
@@ -35,7 +29,7 @@ _logger = logging.getLogger(__name__)
 def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
     """Assures we stop execution if Ansible is missing or outdated.
 
-    Returne found version and an optional exception if something wrong
+    Returns found version and an optional exception if something wrong
     was detected.
     """
 
@@ -126,12 +120,6 @@ def install_collection(collection: str, destination: Optional[str] = None) -> No
         sys.exit(INVALID_PREREQUISITES_RC)
 
 
-@tenacity.retry(  # Retry up to 3 times as galaxy server can return errors
-    reraise=True,
-    wait=tenacity.wait_fixed(30),  # type: ignore
-    stop=tenacity.stop_after_attempt(3),  # type: ignore
-    before_sleep=tenacity.after_log(_logger, logging.WARNING),  # type: ignore
-)
 def install_requirements(requirement: str) -> None:
     """Install dependencies from a requirements.yml."""
     if not os.path.exists(requirement):
@@ -309,6 +297,10 @@ def _prepare_ansible_paths() -> None:
     """Configure Ansible environment variables."""
     library_paths: List[str] = []
     roles_path: List[str] = []
+    collection_list: List[str] = []
+
+    if ansible_collections_path() in os.environ:
+        collection_list = os.environ[ansible_collections_path()].split(":")
 
     for path_list, path in (
         (library_paths, "plugins/modules"),
@@ -374,7 +366,7 @@ def _write_module_stub(
 def _update_env(varname: str, value: List[str], default: str = "") -> None:
     """Update colon based environment variable if needed. by appending."""
     if value:
-        orig_value = os.environ.get(varname, default=default)
+        orig_value = os.environ.get(varname, default)
         if orig_value:
             # Prepend original or default variable content to custom content.
             value = [*orig_value.split(":"), *value]
@@ -476,15 +468,15 @@ def require_collection(  # noqa: C901
     for path in paths:
         collpath = os.path.join(path, "ansible_collections", ns, coll)
         if os.path.exists(collpath):
-            mpath = os.path.join(collpath, "MANIFEST.json")
-            if not os.path.exists(mpath):
+            manifest_path = os.path.join(collpath, "MANIFEST.json")
+            if not os.path.exists(manifest_path):
                 _logger.fatal(
                     "Found collection at '%s' but missing MANIFEST.json, cannot get info.",
                     collpath,
                 )
                 sys.exit(INVALID_PREREQUISITES_RC)
 
-            with open(mpath, "r") as f:
+            with open(manifest_path, "r") as f:
                 manifest = json.loads(f.read())
                 found_version = packaging.version.parse(
                     manifest["collection_info"]["version"]

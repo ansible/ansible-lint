@@ -17,4 +17,4 @@
         # if you want to use only the base ansible version for linting,
         # replace 'community' extra with 'core' or just mention the exact
         # version of Ansible you want to install as a dependency.
-        - .[community,yamllint]
+        - .[community]

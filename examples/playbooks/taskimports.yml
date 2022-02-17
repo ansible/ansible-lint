@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
   vars:
-    varset: tasks/simpletask.yml
+    varset: tasks/simple_task.yml
   tasks:
     - import_tasks: tasks/nestedincludes.yml
     # - import_tasks: "{{ varnotset }}.yml"

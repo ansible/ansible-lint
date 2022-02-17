@@ -70,7 +70,6 @@ options = Namespace(
     listrules=False,
     listtags=False,
     parseable=False,
-    parseable_severity=False,
     quiet=False,
     rulesdirs=[],
     skip_list=[],
@@ -162,7 +161,3 @@ def ansible_version(version: str = "") -> Version:
             )
             sys.exit(ANSIBLE_MISSING_RC)
     return Version(version)
-
-
-if ansible_collections_path() in os.environ:
-    collection_list = os.environ[ansible_collections_path()].split(":")

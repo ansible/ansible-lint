@@ -177,12 +177,12 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
 
 def _get_rule_skips_from_yaml(yaml_input: Sequence[Any]) -> Sequence[Any]:
     """Traverse yaml for comments with rule skips and return list of rules."""
-    yaml_comment_obj_strs = []
+    yaml_comment_obj_strings = []
 
     def traverse_yaml(obj: Any) -> None:
-        yaml_comment_obj_strs.append(str(obj.ca.items))
+        yaml_comment_obj_strings.append(str(obj.ca.items))
         if isinstance(obj, dict):
-            for key, val in obj.items():
+            for _, val in obj.items():
                 if isinstance(val, (dict, list)):
                     traverse_yaml(val)
         elif isinstance(obj, list):
@@ -195,7 +195,7 @@ def _get_rule_skips_from_yaml(yaml_input: Sequence[Any]) -> Sequence[Any]:
     traverse_yaml(yaml_input)
 
     rule_id_list = []
-    for comment_obj_str in yaml_comment_obj_strs:
+    for comment_obj_str in yaml_comment_obj_strings:
         for line in comment_obj_str.split(r"\n"):
             rule_id_list.extend(get_rule_skips_from_line(line))
 

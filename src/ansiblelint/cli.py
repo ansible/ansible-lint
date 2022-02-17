@@ -99,7 +99,7 @@ def get_config_path(config_file: str = ".ansible-lint") -> Optional[str]:
             if os.path.exists(filename):
                 return filename
             if os.path.exists(os.path.abspath(os.path.join(parent, ".git"))):
-                # Avoid looking outside .git folders as we do not want endup
+                # Avoid looking outside .git folders as we do not want end-up
                 # picking config files from upper level projects if current
                 # project has no config.
                 return None
@@ -156,13 +156,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         default=False,
         action="store_true",
         help="parseable output, same as '-f pep8'",
-    )
-    parser.add_argument(
-        "--parseable-severity",
-        dest="parseable_severity",
-        default=False,
-        action="store_true",
-        help="parseable output including severity of rule",
     )
     parser.add_argument(
         "--progressive",
@@ -296,7 +289,6 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     bools = (
         "display_relative_path",
         "parseable",
-        "parseable_severity",
         "quiet",
         "use_default_rules",
         "progressive",
@@ -396,9 +388,9 @@ def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
         CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, "custom")
     )
     custom_ruledirs = sorted(
-        str(rdir.resolve())
-        for rdir in Path(default_custom_rulesdir).iterdir()
-        if rdir.is_dir() and (rdir / "__init__.py").exists()
+        str(x.resolve())
+        for x in Path(default_custom_rulesdir).iterdir()
+        if x.is_dir() and (x / "__init__.py").exists()
     )
 
     if use_default:

@@ -135,7 +135,10 @@ if "pytest" in sys.modules:
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 3
         assert result[0].column == 7
-        assert result[0].message == "conflicting action statements: debug, command"
+        assert (
+            result[0].message
+            == "conflicting action statements: ansible.builtin.debug, ansible.builtin.command"
+        )
         # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
         assert result[0].filename.endswith("/conflicting_action.yml")

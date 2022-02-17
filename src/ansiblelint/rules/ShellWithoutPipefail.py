@@ -40,12 +40,12 @@ class ShellWithoutPipefail(AnsibleLintRule):
         if task.get("ignore_errors"):
             return False
 
-        unjinjad_cmd = self.unjinja(
+        jinja_stripped_cmd = self.unjinja(
             " ".join(task["action"].get("__ansible_arguments__", []))
         )
 
         return bool(
-            self._pipe_re.search(unjinjad_cmd)
-            and not self._pipefail_re.search(unjinjad_cmd)
+            self._pipe_re.search(jinja_stripped_cmd)
+            and not self._pipefail_re.search(jinja_stripped_cmd)
             and not convert_to_boolean(task["action"].get("ignore_errors", False))
         )

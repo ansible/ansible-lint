@@ -1,6 +1,6 @@
 - name: block
   block:
-    - name: synchonize-in-block
+    - name: synchronize-in-block
       synchronize:
         src: dummy
         dest: dummy
@@ -13,7 +13,7 @@
 - name: nested-block
   block:
     - block:
-        - name: synchonize-in-deep-block
+        - name: synchronize-in-deep-block
           synchronize:
             src: dummy
             dest: dummy

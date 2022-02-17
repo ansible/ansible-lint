@@ -68,7 +68,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                 )
                 continue
 
-            for name, expr in self.VIDEO_REGEXP.items():
+            for _, expr in self.VIDEO_REGEXP.items():
                 if expr.match(video["url"]):
                     break
             else:
