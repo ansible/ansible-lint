@@ -46,6 +46,7 @@ from ansiblelint.version import __version__
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import LintResult
 
 
 _logger = logging.getLogger(__name__)
@@ -137,6 +138,19 @@ def _do_list(rules: "RulesCollection") -> int:
     return 1
 
 
+def _do_transform(result: "LintResult") -> None:
+    """Create and run Transformer."""
+    # On purpose lazy-imports to avoid loading transforms unless requested
+    # pylint: disable=import-outside-toplevel
+    from ansiblelint.transformer import Transformer
+
+    # future: maybe pass options to Transformer
+    transformer = Transformer(result)
+
+    # this will mark any matches as fixed if the transforms repaired the issue
+    transformer.run()
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
@@ -173,6 +187,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     from ansiblelint.runner import _get_matches
 
     result = _get_matches(rules, options)
+
+    if options.write:
+        _do_transform(result)
 
     mark_as_success = False
     if result.matches and options.progressive:

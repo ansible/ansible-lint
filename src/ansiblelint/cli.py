@@ -190,6 +190,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Keep default rules when using -r",
     )
     parser.add_argument(
+        "--write",
+        dest="write",
+        action="store_true",
+        help="Reformat YAML files to standardize spacing, quotes, etc. "
+        "Future versions will expand this option so it fixes more issues.",
+    )
+    parser.add_argument(
         "--show-relpath",
         dest="display_relative_path",
         action="store_false",
