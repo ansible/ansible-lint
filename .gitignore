@@ -48,3 +48,4 @@ pip-wheel-metadata
 # other
 .DS_Store
 .vscode
+.idea
