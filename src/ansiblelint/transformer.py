@@ -72,9 +72,8 @@ class FormattedEmitter(Emitter):
         self._sequence_dash_offset = value
 
 
-# Transformer is for transforms like runner is for rules
 class Transformer:
-    """Transformer class performs the fmt transformations.
+    """Transformer class marshals YAML and other transformations.
 
     The Transformer is similar to the ``ansiblelint.runner.Runner`` which manages
     running each of the rules. We only expect there to be one ``Transformer`` instance
@@ -227,7 +226,7 @@ class Transformer:
         return text
 
     def run(self) -> None:
-        """For each file, read it, execute fmt transforms on it, then write it."""
+        """For each file, read it, execute transforms on it, then write it."""
         for file, _ in self.matches_per_file.items():
             # str() convinces mypy that "text/yaml" is a valid Literal.
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...

@@ -139,7 +139,7 @@ def _do_list(rules: "RulesCollection") -> int:
 
 
 def _do_transform(result: "LintResult") -> None:
-    """Create and run fmt Transformer."""
+    """Create and run Transformer."""
     # On purpose lazy-imports to avoid loading transforms unless requested
     # pylint: disable=import-outside-toplevel
     from ansiblelint.transformer import Transformer
@@ -188,7 +188,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     result = _get_matches(rules, options)
 
-    if options.fmt_yaml_files:
+    if options.write:
         _do_transform(result)
 
     mark_as_success = False
