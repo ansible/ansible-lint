@@ -1,61 +1,59 @@
 - hosts: localhost
   tasks:
-  - name: command with creates check
-    ansible.builtin.command: echo blah
-    args:
-      creates: Z
+    - name: command with creates check
+      ansible.builtin.command: echo blah
+      args:
+        creates: Z
 
-  - name: command with removes check
-    ansible.builtin.command: echo blah
-    args:
-      removes: Z
+    - name: command with removes check
+      ansible.builtin.command: echo blah
+      args:
+        removes: Z
 
-  - name: command with changed_when
-    ansible.builtin.command: echo blah
-    changed_when: False
+    - name: command with changed_when
+      ansible.builtin.command: echo blah
+      changed_when: False
 
-  - name: command with inline creates
-    ansible.builtin.command: creates=Z echo blah
+    - name: command with inline creates
+      ansible.builtin.command: creates=Z echo blah
 
-  - name: command with inline removes
-    ansible.builtin.command: removes=Z echo blah
+    - name: command with inline removes
+      ansible.builtin.command: removes=Z echo blah
 
-  - name: command with cmd
-    command:
-      cmd:
-        echo blah
-    args:
-      creates: Z
+    - name: command with cmd
+      command:
+        cmd: echo blah
+      args:
+        creates: Z
 
-  - name: shell with creates check
-    shell: echo blah
-    args:
-      creates: Z
+    - name: shell with creates check
+      shell: echo blah
+      args:
+        creates: Z
 
-  - name: shell with removes check
-    shell: echo blah
-    args:
-      removes: Z
+    - name: shell with removes check
+      shell: echo blah
+      args:
+        removes: Z
 
-  - name: shell with changed_when
-    shell: echo blah
-    changed_when: False
+    - name: shell with changed_when
+      shell: echo blah
+      changed_when: False
 
-  - name: shell with inline creates
-    shell: creates=Z echo blah
+    - name: shell with inline creates
+      shell: creates=Z echo blah
 
-  - name: shell with inline removes
-    shell: removes=Z echo blah
+    - name: shell with inline removes
+      shell: removes=Z echo blah
 
-  - name: shell with cmd
-    shell:
-      cmd:
-        echo blah
-    args:
-      creates: Z
+    - name: shell with cmd
+      shell:
+        cmd: echo blah
+      args:
+        creates: Z
 
 - hosts: localhost
   handlers:
-  - name: restart something
-    command: do something
-  - include: handlers/included-handlers.yml
+    - name: restart something
+      command: do something
+    - include: handlers/included-handlers.yml

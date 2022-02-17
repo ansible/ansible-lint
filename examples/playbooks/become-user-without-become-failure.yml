@@ -3,25 +3,25 @@
   become_user: root
 
   tasks:
-  - ansible.builtin.debug:
-      msg: hello
+    - ansible.builtin.debug:
+        msg: hello
 
 - hosts: localhost
 
   tasks:
-  - name: become_user without become task
-    ansible.builtin.command: whoami
-    become_user: postgres
-    changed_when: false
-
-- hosts: localhost
-
-  tasks:
-  - name: a block with become and become_user on different tasks
-    block:
-    - name: become
-      become: true
+    - name: become_user without become task
       ansible.builtin.command: whoami
-    - name: become_user
       become_user: postgres
-      ansible.builtin.command: whoami
+      changed_when: false
+
+- hosts: localhost
+
+  tasks:
+    - name: a block with become and become_user on different tasks
+      block:
+        - name: become
+          become: true
+          ansible.builtin.command: whoami
+        - name: become_user
+          become_user: postgres
+          ansible.builtin.command: whoami

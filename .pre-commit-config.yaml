@@ -25,7 +25,12 @@ repos:
         # Temporary excludes so we can gradually normalize the formatting
         exclude: >
           (?x)^(
-            examples/.*
+            examples/other/some.j2.yaml|
+            examples/playbooks/example.yml|
+            examples/playbooks/multiline-brackets.*|
+            examples/playbooks/templates/not-valid.yaml|
+            examples/playbooks/with-umlaut-.*|
+            examples/playbooks/with-skip-tag-id.yml
           )$
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v5.8.1

@@ -2,7 +2,6 @@
 - hosts: all
 
   tasks:
-
     - name: test git-latest
       action: ansible.builtin.git
 

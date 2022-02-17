@@ -40,8 +40,8 @@
       debug:
         msg: "{{ item.key }} - {{ item.value }}"
       with_items:
-        - {key: foo, value: 1}
-        - {key: bar, value: 2}
+        - { key: foo, value: 1 }
+        - { key: bar, value: 2 }
 
     - name: with_items loop using variable
       debug:
@@ -53,15 +53,15 @@
       debug:
         msg: "{{ item[0] }} - {{ item[1] }}"
       with_nested:
-        - ['foo', 'bar']
-        - ['1', '2', '3']
+        - ["foo", "bar"]
+        - ["1", "2", "3"]
 
     - name: with_nested loop using variable list and static
       debug:
         msg: "{{ item[0] }} - {{ item[1] }}"
       with_nested:
         - "{{ my_list }}"
-        - ['1', '2', '3']
+        - ["1", "2", "3"]
 
     ### Testing with_dict
     - name: with_dict loop using variable
@@ -93,19 +93,19 @@
       debug:
         msg: "{{ item }}"
       with_fileglob:
-        - '*.txt'
+        - "*.txt"
 
     ### Testing non-list form of with_fileglob
     - name: with_fileglob loop using single value *.txt
       debug:
         msg: "{{ item }}"
-      with_fileglob: '*.txt'
+      with_fileglob: "*.txt"
 
     ### Testing non-list form of with_fileglob with trailing templated pattern
     - name: with_fileglob loop using templated pattern
       debug:
         msg: "{{ item }}"
-      with_fileglob: 'foo{{ glob }}'
+      with_fileglob: "foo{{ glob }}"
 
     ### Testing with_together
     - name: with_together loop using variable lists
