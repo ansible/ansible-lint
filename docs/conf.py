@@ -293,6 +293,7 @@ nitpick_ignore = [
     ("py:class", "Pattern"),
     ("py:class", "odict"),
     ("py:class", "LintResult"),
+    ("py:class", "ruamel.yaml.main.YAML"),
     ("py:obj", "Any"),
     ("py:obj", "ansiblelint.formatters.T"),
 ]
