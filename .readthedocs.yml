@@ -3,7 +3,6 @@
 # for details
 
 ---
-
 # Required
 version: 2
 
@@ -23,7 +22,7 @@ sphinx:
 formats: []
 
 submodules:
-  include: all  # []
+  include: all # []
   exclude: []
   recursive: true
 
@@ -35,7 +34,7 @@ build:
 python:
   version: 3.8
   install:
-  - method: pip
-    path: .
-  - requirements: docs/requirements.txt
+    - method: pip
+      path: .
+    - requirements: docs/requirements.txt
   system_packages: false
