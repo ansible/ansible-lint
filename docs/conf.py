@@ -294,6 +294,8 @@ nitpick_ignore = [
     ("py:class", "odict"),
     ("py:class", "LintResult"),
     ("py:class", "ruamel.yaml.main.YAML"),
+    ("py:class", "ruamel.yaml.emitter.Emitter"),
+    ("py:class", "StreamType"),  # used in Emitter's type annotation
     ("py:obj", "Any"),
     ("py:obj", "ansiblelint.formatters.T"),
 ]
