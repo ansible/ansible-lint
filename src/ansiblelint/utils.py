@@ -280,7 +280,11 @@ def _include_children(
     basedir: str, k: str, v: Any, parent_type: FileType
 ) -> List[Lintable]:
     # handle special case include_tasks: name=filename.yml
-    if k == "include_tasks" and isinstance(v, dict) and "file" in v:
+    if (
+        k in ["include_tasks", "ansible.builtin.include_tasks"]
+        and isinstance(v, dict)
+        and "file" in v
+    ):
         v = v["file"]
 
     # handle include: filename.yml tags=blah
