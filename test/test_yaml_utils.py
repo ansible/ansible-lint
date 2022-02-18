@@ -8,7 +8,6 @@ from ruamel.yaml.main import YAML
 
 import ansiblelint.yaml_utils
 from ansiblelint.file_utils import Lintable
-from ansiblelint.yaml_utils import FormattedEmitter, final_yaml_dump_transform
 
 
 @pytest.fixture
@@ -148,7 +147,7 @@ _double_quote_with_indents_except_root_level = """\
             2,
             2,
             0,
-            FormattedEmitter,
+            ansiblelint.yaml_utils.FormattedEmitter,
             _double_quote_without_indents,
             id="double_quote_without_indents",
         ),
@@ -156,7 +155,7 @@ _double_quote_with_indents_except_root_level = """\
             2,
             4,
             2,
-            FormattedEmitter,
+            ansiblelint.yaml_utils.FormattedEmitter,
             _double_quote_with_indents_except_root_level,
             id="double_quote_with_indents_except_root_level",
         ),
@@ -183,6 +182,8 @@ def test_custom_ruamel_yaml_emitter(
     # ruamel.yaml only writes to a stream (there is no `dumps` function)
     with StringIO() as output_stream:
         yaml.dump(_input_playbook, output_stream)
-        # _final_yaml_transform strips the "%YAML 1.1" prefix
-        output = final_yaml_dump_transform(output_stream.getvalue())
+        # final_yaml_dump_transform strips the "%YAML 1.1" prefix
+        output = ansiblelint.yaml_utils.final_yaml_dump_transform(
+            output_stream.getvalue()
+        )
         assert output == expected_output
