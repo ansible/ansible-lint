@@ -2,6 +2,7 @@
 import functools
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, cast
 
+import ruamel.yaml.events
 from ruamel.yaml.emitter import Emitter
 
 import ansiblelint.skip_utils
@@ -193,14 +194,24 @@ class FormattedEmitter(Emitter):
 
     _sequence_indent = 2
     _sequence_dash_offset = 0  # Should be _sequence_indent - 2
+    _root_is_sequence = False
 
     @property
-    def _is_root_level(self) -> bool:
-        """Return True if this is the root level of the yaml document.
+    def _is_root_level_sequence(self) -> bool:
+        """Return True if this is a sequence at the root level of the yaml document."""
+        return self.column < 2 and self._root_is_sequence
 
-        Here, root level means the outermost sequence or map of the document.
-        """
-        return self.column < 2
+    def expect_node(
+        self,
+        root: bool = False,
+        sequence: bool = False,
+        mapping: bool = False,
+        simple_key: bool = False,
+    ) -> None:
+        """Expect node (extend to record if the root doc is a sequence)."""
+        if root and isinstance(self.event, ruamel.yaml.events.SequenceStartEvent):
+            self._root_is_sequence = True
+        return super().expect_node(root, sequence, mapping, simple_key)
 
     # NB: mypy does not support overriding attributes with properties yet:
     #     https://github.com/python/mypy/issues/4125
@@ -209,7 +220,7 @@ class FormattedEmitter(Emitter):
     @property  # type: ignore[override]
     def best_sequence_indent(self) -> int:  # type: ignore[override]
         """Return the configured sequence_indent or 2 for root level."""
-        return 2 if self._is_root_level else self._sequence_indent
+        return 2 if self._is_root_level_sequence else self._sequence_indent
 
     @best_sequence_indent.setter
     def best_sequence_indent(self, value: int) -> None:
@@ -219,7 +230,7 @@ class FormattedEmitter(Emitter):
     @property  # type: ignore[override]
     def sequence_dash_offset(self) -> int:  # type: ignore[override]
         """Return the configured sequence_dash_offset or 2 for root level."""
-        return 0 if self._is_root_level else self._sequence_dash_offset
+        return 0 if self._is_root_level_sequence else self._sequence_dash_offset
 
     @sequence_dash_offset.setter
     def sequence_dash_offset(self, value: int) -> None:
