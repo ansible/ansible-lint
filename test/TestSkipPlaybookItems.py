@@ -6,83 +6,83 @@ PLAYBOOK_PRE_TASKS = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 2
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
   pre_tasks:
     - name: bad git 3  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 4
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
 """
 
 PLAYBOOK_POST_TASKS = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 2
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
   post_tasks:
     - name: bad git 3  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 4
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
 """
 
 PLAYBOOK_HANDLERS = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 2
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
   handlers:
     - name: bad git 3  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 4
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
 """
 
 PLAYBOOK_TWO_PLAYS = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 2
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
 
 - hosts: all
   tasks:
     - name: bad git 3  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 4
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
 """
 
 PLAYBOOK_WITH_BLOCK = """\
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 2
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: Block with rescue and always section
       block:
         - name: bad git 3  # noqa git-latest
-          action: git a=b c=d
+          action: ansible.builtin.git a=b c=d
         - name: bad git 4
-          action: git a=b c=d
+          action: ansible.builtin.git a=b c=d
       rescue:
         - name: bad git 5  # noqa git-latest
-          action: git a=b c=d
+          action: ansible.builtin.git a=b c=d
         - name: bad git 6
-          action: git a=b c=d
+          action: ansible.builtin.git a=b c=d
       always:
         - name: bad git 7  # noqa git-latest
-          action: git a=b c=d
+          action: ansible.builtin.git a=b c=d
         - name: bad git 8
-          action: git a=b c=d
+          action: ansible.builtin.git a=b c=d
 """
 
 

@@ -32,11 +32,11 @@ FAIL_PLAY = """---
 - hosts: localhost
   tasks:
   - name: shell no pipe
-    shell: echo hello
+    ansible.builtin.shell: echo hello
     changed_when: false
 
   - name: shell with jinja filter
-    shell: echo {{ "hello"|upper }}
+    ansible.builtin.shell: echo {{ "hello"|upper }}
     changed_when: false
 
   - name: shell with jinja filter (fqcn)
@@ -48,47 +48,47 @@ SUCCESS_PLAY = """---
 - hosts: localhost
   tasks:
   - name: shell with pipe
-    shell: echo hello | true  # noqa: risky-shell-pipe
+    ansible.builtin.shell: echo hello | true  # noqa: risky-shell-pipe
     changed_when: false
 
   - name: shell with redirect
-    shell: echo hello >  /tmp/hello
+    ansible.builtin.shell: echo hello >  /tmp/hello
     changed_when: false
 
   - name: chain two shell commands
-    shell: echo hello && echo goodbye
+    ansible.builtin.shell: echo hello && echo goodbye
     changed_when: false
 
   - name: run commands in succession
-    shell: echo hello ; echo goodbye
+    ansible.builtin.shell: echo hello ; echo goodbye
     changed_when: false
 
   - name: use variables
-    shell: echo $HOME $USER
+    ansible.builtin.shell: echo $HOME $USER
     changed_when: false
 
   - name: use * for globbing
-    shell: ls foo*
+    ansible.builtin.shell: ls foo*
     changed_when: false
 
   - name: use ? for globbing
-    shell: ls foo?
+    ansible.builtin.shell: ls foo?
     changed_when: false
 
   - name: use [] for globbing
-    shell: ls foo[1,2,3]
+    ansible.builtin.shell: ls foo[1,2,3]
     changed_when: false
 
   - name: use shell generator
-    shell: ls foo{.txt,.xml}
+    ansible.builtin.shell: ls foo{.txt,.xml}
     changed_when: false
 
   - name: use backticks
-    shell: ls `ls foo*`
+    ansible.builtin.shell: ls `ls foo*`
     changed_when: false
 
   - name: use shell with cmd
-    shell:
+    ansible.builtin.shell:
       cmd: |
         set -x
         ls foo?

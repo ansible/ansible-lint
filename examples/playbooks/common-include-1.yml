@@ -3,4 +3,4 @@
   gather_facts: false
   tasks:
     - name: some include
-      include: tasks/included-with-lint.yml
+      ansible.builtin.include: tasks/included-with-lint.yml

@@ -8,6 +8,6 @@
         - block:
             # - include_tasks: "{{ varnotset }}.yml"
             - block:
-                - include: "{{ varset }}.yml"
+                - ansible.builtin.include: "{{ varset }}.yml"
                 - block:
-                    - include_tasks: "tasks/directory with spaces/main.yml"
+                    - ansible.builtin.include_tasks: "tasks/directory with spaces/main.yml"
