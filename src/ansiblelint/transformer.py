@@ -1,8 +1,6 @@
 """Transformer implementation."""
 import logging
-from typing import Any, List, Optional, Set
-
-from ruamel.yaml.emitter import Emitter
+from typing import List, Optional, Set
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
@@ -11,86 +9,11 @@ from ruamel.yaml.main import YAML
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.runner import LintResult
+from ansiblelint.yaml_utils import FormattedEmitter
 
 __all__ = ["Transformer"]
 
 _logger = logging.getLogger(__name__)
-
-
-def _final_yaml_transform(text: str) -> str:
-    """Transform YAML string before writing to file.
-
-    Ansible uses PyYAML which only supports YAML 1.1, so we dump YAML 1.1.
-    But we don't want "%YAML 1.1" at the start, so drop that.
-    """
-    prefix = "%YAML 1.1\n"
-    prefix_len = len(prefix)
-    if text.startswith(prefix):
-        return text[prefix_len:]
-    return text
-
-
-class FormattedEmitter(Emitter):
-    """Emitter that applies custom formatting rules when dumping YAML.
-
-    Differences from ruamel.yaml defaults:
-
-      - indentation of root-level sequences
-      - prefer double-quoted scalars over single-quoted scalars
-
-    This ensures that root-level sequences are never indented.
-    All subsequent levels are indented as configured (normal ruamel.yaml behavior).
-
-    Earlier implementations used dedent on ruamel.yaml's dumped output,
-    but string magic like that had a ton of problematic edge cases.
-    """
-
-    preferred_quote = '"'  # either " or '
-
-    _sequence_indent = 2
-    _sequence_dash_offset = 0  # Should be _sequence_indent - 2
-
-    @property
-    def _is_root_level(self) -> bool:
-        """Return True if this is the root level of the yaml document.
-
-        Here, root level means the outermost sequence or map of the document.
-        """
-        return self.column < 2
-
-    # NB: mypy does not support overriding attributes with properties yet:
-    #     https://github.com/python/mypy/issues/4125
-    #     To silence we have to ignore[override] both the @property and the method.
-
-    @property  # type: ignore[override]
-    def best_sequence_indent(self) -> int:  # type: ignore[override]
-        """Return the configured sequence_indent or 2 for root level."""
-        return 2 if self._is_root_level else self._sequence_indent
-
-    @best_sequence_indent.setter
-    def best_sequence_indent(self, value: int) -> None:
-        """Configure how many columns to indent each sequence item (including the '-')."""
-        self._sequence_indent = value
-
-    @property  # type: ignore[override]
-    def sequence_dash_offset(self) -> int:  # type: ignore[override]
-        """Return the configured sequence_dash_offset or 2 for root level."""
-        return 0 if self._is_root_level else self._sequence_dash_offset
-
-    @sequence_dash_offset.setter
-    def sequence_dash_offset(self, value: int) -> None:
-        """Configure how many spaces to put before each sequence item's '-'."""
-        self._sequence_dash_offset = value
-
-    def choose_scalar_style(self) -> Any:
-        """Select how to quote scalars if needed."""
-        style = super().choose_scalar_style()
-        if style != "'":
-            # block scalar, double quoted, etc.
-            return style
-        if '"' in self.event.value:
-            return "'"
-        return self.preferred_quote
 
 
 class Transformer:
