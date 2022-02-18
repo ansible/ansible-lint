@@ -29,7 +29,8 @@ repos:
             examples/playbooks/multiline-brackets.*|
             examples/playbooks/templates/not-valid.yaml|
             examples/playbooks/with-umlaut-.*|
-            examples/playbooks/with-skip-tag-id.yml
+            examples/playbooks/with-skip-tag-id.yml|
+            test/fixtures/formatting-before/.*
           )$
         additional_dependencies:
           - prettier
@@ -51,13 +52,15 @@ repos:
       - id: end-of-file-fixer
         exclude: >
           (?x)^(
-            test/eco/.*.result
+            test/eco/.*.result|
+            test/fixtures/formatting-before/.*
           )$
       - id: trailing-whitespace
         exclude: >
           (?x)^(
             examples/playbooks/(with-skip-tag-id|unicode).yml|
-            examples/playbooks/example.yml
+            examples/playbooks/example.yml|
+            test/fixtures/formatting-before/.*
           )$
       - id: mixed-line-ending
       - id: fix-byte-order-marker
@@ -80,7 +83,8 @@ repos:
         exclude: >
           (?x)^(
             examples/playbooks/templates/.*|
-            examples/other/some.j2.yaml
+            examples/other/some.j2.yaml|
+            test/fixtures/formatting-before/.*
           )$
         files: \.(yaml|yml)$
         types: [file, yaml]
