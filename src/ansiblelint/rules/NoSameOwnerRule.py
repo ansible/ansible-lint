@@ -54,16 +54,18 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
     def handle_task(self, lintable: Lintable, task: Any) -> List[MatchError]:
         """Process a task."""
         results = []
-        if "synchronize" in task:
-            if self.handle_synchronize(task):
+        action = [e for e in ("synchronize", "ansible.posix.synchronize") if e in task]
+        if action:
+            if self.handle_synchronize(task, action[0]):
                 print(task)
                 results.append(
                     self.create_matcherror(
                         filename=lintable, linenumber=task[LINE_NUMBER_KEY]
                     )
                 )
-        elif "unarchive" in task:
-            if self.handle_unarchive(task):
+        action = [e for e in ("unarchive", "ansible.builtin.unarchive") if e in task]
+        if action:
+            if self.handle_unarchive(task, action[0]):
                 results.append(
                     self.create_matcherror(
                         filename=lintable, linenumber=task[LINE_NUMBER_KEY]
@@ -73,12 +75,12 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
         return results
 
     @staticmethod
-    def handle_synchronize(task: Any) -> bool:
+    def handle_synchronize(task: Any, action: str) -> bool:
         """Process a synchronize task."""
         if task.get("delegate_to") is not None:
             return False
 
-        synchronize = task["synchronize"]
+        synchronize = task[action]
         archive = synchronize.get("archive", True)
 
         if synchronize.get("owner", archive) or synchronize.get("group", archive):
@@ -86,9 +88,9 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
         return False
 
     @staticmethod
-    def handle_unarchive(task: Any) -> bool:
+    def handle_unarchive(task: Any, action: str) -> bool:
         """Process unarchive task."""
-        unarchive = task["unarchive"]
+        unarchive = task[action]
         delegate_to = task.get("delegate_to")
 
         if (
