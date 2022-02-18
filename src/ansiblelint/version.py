@@ -1,12 +1,13 @@
 """Ansible-lint version information."""
-
 try:
-    import pkg_resources
+    from ._version import version as __version__  # type: ignore
 except ImportError:
-    pass
 
+    try:
+        import pkg_resources
 
-try:
-    __version__ = pkg_resources.get_distribution("ansible-lint").version
-except Exception:
-    __version__ = "unknown"
+        __version__ = pkg_resources.get_distribution("ansible-lint").version
+    except Exception:
+        __version__ = "unknown"
+
+__all__ = ("__version__",)

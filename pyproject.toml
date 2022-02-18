@@ -19,3 +19,4 @@ profile = "black"
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
+write_to = "src/ansiblelint/_version.py"
