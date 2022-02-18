@@ -1,31 +1,31 @@
 - name: synchronize-delegate
-  synchronize:
+  ansible.builtin.synchronize:
     src: dummy
     dest: dummy
   delegate_to: localhost
 
 - name: synchronize-no-same-owner
-  synchronize:
+  ansible.builtin.synchronize:
     src: dummy
     dest: dummy
     owner: false
     group: false
 
 - name: unarchive-no-same-owner
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ file }}.tar.gz"
     dest: dummy
     extra_opts:
       - "--no-same-owner"
 
 - name: unarchive-remote-src
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ file }}.tar.gz"
     dest: dummy
     extra_opts:
       - "--no-same-owner"
 
 - name: unarchive-unknown-file-ending
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ file }}"
     dest: "dummy"

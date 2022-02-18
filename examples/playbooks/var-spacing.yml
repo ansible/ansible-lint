@@ -2,39 +2,39 @@
 - hosts: all
   tasks:
     - name: good variable format
-      debug:
+      ansible.builtin.debug:
         msg: "{{ good_format }}"
     - name: good variable format
-      debug:
+      ansible.builtin.debug:
         msg: "Value: {{ good_format }}"
     - name: jinja escaping allowed
-      debug:
+      ansible.builtin.debug:
         msg: "{{ '{{' }}"
     - name: jinja escaping allowed
       # noqa: 306
-      shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
+      ansible.builtin.shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
       changed_when: false
     - name: jinja whitespace control allowed
-      debug:
+      ansible.builtin.debug:
         msg: |
           {{ good_format }}/
           {{- good_format }}
           {{- good_format -}}
     - name: bad variable format
-      debug:
+      ansible.builtin.debug:
         msg: "{{bad_format}}"
     - name: bad variable format
-      debug:
+      ansible.builtin.debug:
         msg: "Value: {{ bad_format}}"
     - name: bad variable format
-      debug:
+      ansible.builtin.debug:
         msg: "{{bad_format }}"
     - name: not a jinja variable # noqa var-spacing
-      debug:
+      ansible.builtin.debug:
         # spell-checker: disable-next-line
         msg: "data = ${lookup{$local_part}lsearch{/etc/aliases}}"
     - name: JSON inside jinja is valid
-      debug:
+      ansible.builtin.debug:
         msg: "{{ {'test': {'subtest': variable}} }}"
     - name: Avoid false positive on multiline
       vars:
@@ -45,26 +45,26 @@
           case2: >-
             http://example.com/{{
             case2 }}
-      debug:
+      ansible.builtin.debug:
         var: cases
 
     - name: Valid single line nested JSON false positive
-      debug:
+      ansible.builtin.debug:
         msg: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1) }}"
 
     - name: Invalid single line nested JSON
-      debug:
+      ansible.builtin.debug:
         msg: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1)}}"
 
     - name: Valid multiline nested JSON false positive
-      debug:
+      ansible.builtin.debug:
         msg: >-
           {{ {'dummy_2': {'nested_dummy_1': value_1,
                           'nested_dummy_2': value_2}} |
           combine(dummy_1) }}
 
     - name: Invalid multiline nested JSON
-      debug:
+      ansible.builtin.debug:
         msg: >-
           {{ {'dummy_2': {'nested_dummy_1': value_1,
                           'nested_dummy_2': value_2}} |

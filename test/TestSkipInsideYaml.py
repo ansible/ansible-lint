@@ -4,68 +4,68 @@ from ansiblelint.testing import RunFromText
 
 ROLE_TASKS = """\
 ---
-- debug:
+- ansible.builtin.debug:
     msg: this should fail linting due lack of name
-- debug:  # noqa unnamed-task
+- ansible.builtin.debug:  # noqa unnamed-task
     msg: this should pass due to noqa comment
 """
 
 ROLE_TASKS_WITH_BLOCK = """\
 ---
 - name: bad git 1  # noqa git-latest
-  action: git a=b c=d
+  action: ansible.builtin.git a=b c=d
 - name: bad git 2
-  action: git a=b c=d
+  action: ansible.builtin.git a=b c=d
 - name: Block with rescue and always section
   block:
     - name: bad git 3  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 4
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
   rescue:
     - name: bad git 5  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 6
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
   always:
     - name: bad git 7  # noqa git-latest
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
     - name: bad git 8
-      action: git a=b c=d
+      action: ansible.builtin.git a=b c=d
 """
 
 PLAYBOOK = """\
 - hosts: all
   tasks:
     - name: test hg-latest
-      action: hg
+      action: ansible.builtin.hg
     - name: test hg-latest (skipped)  # noqa hg-latest
-      action: hg
+      action: ansible.builtin.hg
 
     - name: test git-latest and partial-become
       become_user: alice
-      action: git
+      action: ansible.builtin.git
     - name: test git-latest and partial-become (skipped)  # noqa git-latest partial-become
       become_user: alice
-      action: git
+      action: ansible.builtin.git
 
     - name: test YAML and var-spacing
-      get_url:
+      ansible.builtin.get_url:
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf
         dest: "{{dest_proj_path}}/foo.conf"
     - name: test YAML and var-spacing (skipped)
-      get_url:
+      ansible.builtin.get_url:
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa yaml
         dest: "{{dest_proj_path}}/foo.conf"  # noqa var-spacing
 
     - name: test deprecated-command-syntax
-      command: creates=B chmod 644 A
+      ansible.builtin.command: creates=B chmod 644 A
     - name: test deprecated-command-syntax
-      command: warn=yes creates=B chmod 644 A
+      ansible.builtin.command: warn=yes creates=B chmod 644 A
     - name: test deprecated-command-syntax (skipped via no warn)
-      command: warn=no creates=B chmod 644 A
+      ansible.builtin.command: warn=no creates=B chmod 644 A
     - name: test deprecated-command-syntax (skipped via skip_ansible_lint)
-      command: creates=B chmod 644 A
+      ansible.builtin.command: creates=B chmod 644 A
       tags:
         - skip_ansible_lint
 """
@@ -85,7 +85,7 @@ ROLE_TASKS_WITH_BLOCK_BECOME = """\
       block:
         - name: bar
           become_user: john_doe
-          command: "/etc/test.sh"
+          ansible.builtin.command: "/etc/test.sh"
           changed_when: false
 """
 

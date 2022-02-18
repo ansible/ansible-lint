@@ -11,7 +11,7 @@ PLAYBOOK_WITH_NOQA = """\
     SOME_VAR: "Bar"
   tasks:
     - name: "Set the SOME_OTHER_VAR"
-      set_fact:
+      ansible.builtin.set_fact:
         SOME_OTHER_VAR_NOQA: "Baz"  # noqa var-naming
         SOME_OTHER_VAR: "Bat"
 """

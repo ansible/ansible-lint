@@ -3,7 +3,7 @@
   connection: local
   gather_facts: false
   tasks:
-    - command: echo "no name" # should generate unnamed-task
+    - ansible.builtin.command: echo "no name" # should generate unnamed-task
     - name: Another task
-      debug:
+      ansible.builtin.debug:
         msg: debug message
