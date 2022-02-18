@@ -109,6 +109,7 @@ pkgcache  # linux
 pluggy
 podman
 prerun
+prettierignore
 psutil
 pyargs
 pycache
@@ -168,6 +169,7 @@ toolset
 ungrouped
 unignored
 unimported
+unindented
 unjinja
 unnormalized
 unskippable
