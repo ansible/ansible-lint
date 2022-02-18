@@ -31,6 +31,9 @@ repos:
             examples/playbooks/with-umlaut-.*|
             examples/playbooks/with-skip-tag-id.yml
           )$
+        additional_dependencies:
+          - prettier
+          - prettier-plugin-toml
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v5.8.1
     hooks:
