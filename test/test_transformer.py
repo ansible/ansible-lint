@@ -8,7 +8,6 @@ from ruamel.yaml import CommentedMap
 
 from ansiblelint.runner import LintResult
 from ansiblelint.transformer import Transformer
-from ansiblelint.yaml_utils import final_yaml_dump_transform
 from ansiblelint.skip_utils import load_data
 
 
@@ -65,13 +64,13 @@ def test_transformer_yaml_reformat(
 
     with StringIO() as stream:
         empty_transformer.yaml.dump(before_data, stream)
-        before_output = final_yaml_dump_transform(stream.getvalue())
+        before_output = stream.getvalue()
     # before_path.with_suffix(".transformed.yml").write_text(before_output, encoding="utf-8")
     before_transformed = before_path.with_suffix(".transformed.yml").read_text(encoding="utf-8")
 
     with StringIO() as stream:
         empty_transformer.yaml.dump(after_data, stream)
-        after_output = final_yaml_dump_transform(stream.getvalue())
+        after_output = stream.getvalue()
     # after_path.with_suffix(".transformed.yml").write_text(after_output, encoding="utf-8")
     after_transformed = after_path.with_suffix(".transformed.yml").read_text(encoding="utf-8")
 

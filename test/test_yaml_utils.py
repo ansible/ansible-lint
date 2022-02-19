@@ -182,8 +182,5 @@ def test_custom_ruamel_yaml_emitter(
     # ruamel.yaml only writes to a stream (there is no `dumps` function)
     with StringIO() as output_stream:
         yaml.dump(_input_playbook, output_stream)
-        # final_yaml_dump_transform strips the "%YAML 1.1" prefix
-        output = ansiblelint.yaml_utils.final_yaml_dump_transform(
-            output_stream.getvalue()
-        )
-        assert output == expected_output
+        output = output_stream.getvalue()
+    assert output == expected_output

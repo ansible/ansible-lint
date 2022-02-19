@@ -162,19 +162,6 @@ def _nested_items_path(
             )
 
 
-def final_yaml_dump_transform(text: str) -> str:
-    """Transform YAML string before writing to file.
-
-    Ansible uses PyYAML which only supports YAML 1.1, so we dump YAML 1.1.
-    But we don't want "%YAML 1.1" at the start, so drop that.
-    """
-    prefix = "%YAML 1.1\n"
-    prefix_len = len(prefix)
-    if text.startswith(prefix):
-        return text[prefix_len:]
-    return text
-
-
 class FormattedEmitter(Emitter):
     """Emitter that applies custom formatting rules when dumping YAML.
 
@@ -246,3 +233,9 @@ class FormattedEmitter(Emitter):
         if '"' in self.event.value:
             return "'"
         return self.preferred_quote
+
+    def write_version_directive(self, version_text: Any) -> None:
+        """Skip writing '%YAML 1.1'."""
+        if version_text == "1.1":
+            return
+        return super().write_version_directive(version_text)
