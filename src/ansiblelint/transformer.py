@@ -105,14 +105,6 @@ class Transformer:
 
         # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
 
-        # Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
-        # So, we have to make sure we dump yaml files using YAML 1.1.
-        # We can relax the version requirement once ansible uses a version of PyYAML
-        # that includes this PR: https://github.com/yaml/pyyaml/pull/555
-        yaml.version = (1, 1)  # type: ignore[assignment]
-        # Sadly, this means all YAML files will be prefixed with "%YAML 1.1\n" on dump
-        # We'll have to drop that using a transform so people don't yell too much.
-
         # configure yaml dump formatting
         yaml.explicit_start = self.yaml_explicit_start  # type: ignore[assignment]
         yaml.explicit_end = self.yaml_explicit_end  # type: ignore[assignment]
@@ -138,6 +130,22 @@ class Transformer:
             # For root-level sequences, FormattedEmitter overrides sequence_indent
             # and sequence_dash_offset to prevent root-level indents.
             yaml.Emitter = FormattedEmitter
+
+        # Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
+        # So, we have to make sure we dump yaml files using YAML 1.1.
+        # We can relax the version requirement once ansible uses a version of PyYAML
+        # that includes this PR: https://github.com/yaml/pyyaml/pull/555
+        yaml.version = (1, 1)  # type: ignore[assignment]
+        # Sadly, this means all YAML files will be prefixed with "%YAML 1.1\n" on dump
+        # We'll have to drop that using a transform so people don't yell too much.
+
+        # There's a bug where ruamel.yaml.parser.process_directives overrides
+        # self.loader.version (loader is a YAML instance) with None even though
+        # there was no %YAML directive.
+        # By accessing the yaml.resolver now, we ensure version 1.1 is used for parsing.
+        assert yaml.version == yaml.resolver.processing_version
+        # alternatively we could globally change the default version:
+        # ruamel.yaml.compat._DEFAULT_YAML_VERSION = (1, 1)
 
         self._yaml = yaml
         return yaml
