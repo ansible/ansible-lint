@@ -386,12 +386,24 @@ class FormattedEmitter(Emitter):
         See: https://stackoverflow.com/a/42712747/1134951
         """
         value: str = comment.value
-        if pre and not value.strip():
+        if (
+            pre
+            and not value.strip()
+            and not isinstance(
+                self.event,
+                (
+                    ruamel.yaml.events.CollectionEndEvent,
+                    ruamel.yaml.events.DocumentEndEvent,
+                    ruamel.yaml.events.StreamEndEvent,
+                ),
+            )
+        ):
             # drop pure whitespace pre comments
+            # does not apply to End events since they consume one of the newlines.
             value = ""
         elif pre:
             # preserve content in pre comment with at least one newline,
-            # but no blank lines.
+            # but no extra blank lines.
             value = self._re_repeat_blank_lines.sub("\n", value)
         else:
             # single blank lines in post comments
