@@ -1,6 +1,18 @@
 """Utility helpers to simplify working with yaml-based data."""
 import functools
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, cast
+import re
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+    Pattern,
+)
 
 import ruamel.yaml.events
 from ruamel.yaml.emitter import Emitter
@@ -8,6 +20,7 @@ from ruamel.yaml.emitter import Emitter
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
 from ruamel.yaml.main import YAML
+from ruamel.yaml.tokens import CommentToken
 
 import ansiblelint.skip_utils
 from ansiblelint.errors import MatchError
@@ -360,6 +373,31 @@ class FormattedEmitter(Emitter):
         if '"' in self.event.value:
             return "'"
         return self.preferred_quote
+
+    # "/n/n" results in one blank line (end the previous line, then newline).
+    # So, more "/n/n/n" or more is too many new lines. Clean it up.
+    _re_repeat_blank_lines: Pattern = re.compile(r"\n{3,}")
+
+    # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
+    def write_comment(self, comment: CommentToken, pre: bool = False) -> None:
+        """Clean up extra new lines in comments.
+
+        ruamel.yaml treats new or empty lines as comments.
+        See: https://stackoverflow.com/a/42712747/1134951
+        """
+        value: str = comment.value
+        if pre and not value.strip():
+            # drop pure whitespace pre comments
+            value = ""
+        elif pre:
+            # preserve content in pre comment with at least one newline,
+            # but no blank lines.
+            value = self._re_repeat_blank_lines.sub("\n", value)
+        else:
+            # single blank lines in post comments
+            value = self._re_repeat_blank_lines.sub("\n\n", value)
+        comment.value = value
+        return super().write_comment(comment, pre)
 
     def write_version_directive(self, version_text: Any) -> None:
         """Skip writing '%YAML 1.1'."""
