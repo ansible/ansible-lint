@@ -380,7 +380,7 @@ class FormattedEmitter(Emitter):
 
     # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
     def write_comment(self, comment: CommentToken, pre: bool = False) -> None:
-        """Clean up extra new lines in comments.
+        """Clean up extra new lines and spaces in comments.
 
         ruamel.yaml treats new or empty lines as comments.
         See: https://stackoverflow.com/a/42712747/1134951
@@ -397,6 +397,10 @@ class FormattedEmitter(Emitter):
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
         comment.value = value
+
+        # make sure that the comment only has one space before it.
+        if comment.column > self.column + 1:
+            comment.column = self.column + 1
         return super().write_comment(comment, pre)
 
     def write_version_directive(self, version_text: Any) -> None:
