@@ -5,6 +5,10 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, 
 import ruamel.yaml.events
 from ruamel.yaml.emitter import Emitter
 
+# Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
+# To make the type checkers happy, we import from ruamel.yaml.main instead.
+from ruamel.yaml.main import YAML
+
 import ansiblelint.skip_utils
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
@@ -160,6 +164,121 @@ def _nested_items_path(
             yield from _nested_items_path(
                 data_collection=value, parent_path=parent_path + [key]
             )
+
+
+def yaml_round_tripper(
+    explicit_start: bool = True,  # ---
+    explicit_end: bool = False,  # ...
+    indent_sequences: bool = True,
+    preferred_quote: str = '"',  # either ' or "
+    width: int = 120,
+) -> YAML:
+    """Return a configured ``ruamel.yaml.YAML`` instance.
+
+    ``ruamel.yaml.YAML`` uses attributes to configure how it dumps yaml files.
+    Some of these settings can be confusing, so here are examples of how different
+    settings will affect the dumped yaml.
+
+    This example does not indent any sequences:
+
+    .. code:: python
+
+        yaml.explicit_start=True
+        yaml.map_indent=2
+        yaml.sequence_indent=2
+        yaml.sequence_dash_offset=0
+
+    .. code:: yaml
+
+        ---
+        - name: playbook
+          tasks:
+          - name: task
+
+    This example indents all sequences including the root-level:
+
+    .. code:: python
+
+        yaml.explicit_start=True
+        yaml.map_indent=2
+        yaml.sequence_indent=4
+        yaml.sequence_dash_offset=2
+        # yaml.Emitter defaults to ruamel.yaml.emitter.Emitter
+
+    .. code:: yaml
+
+        ---
+          - name: playbook
+            tasks:
+              - name: task
+
+    This example indents all sequences except at the root-level:
+
+    .. code:: python
+
+        yaml.explicit_start=True
+        yaml.map_indent=2
+        yaml.sequence_indent=4
+        yaml.sequence_dash_offset=2
+        yaml.Emitter = FormattedEmitter  # custom Emitter prevents root-level indents
+
+    .. code:: yaml
+
+        ---
+        - name: playbook
+          tasks:
+            - name: task
+    """
+    # ruamel.yaml rt=round trip (preserves comments while allowing for modification)
+    yaml = YAML(typ="rt")
+
+    # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
+
+    # configure yaml dump formatting
+    yaml.explicit_start = explicit_start  # type: ignore[assignment]
+    yaml.explicit_end = explicit_end  # type: ignore[assignment]
+    yaml.width = width  # type: ignore[assignment]
+
+    yaml.default_flow_style = False
+    yaml.compact_seq_seq = (  # dash after dash
+        True  # type: ignore[assignment]
+    )
+    yaml.compact_seq_map = (  # key after dash
+        True  # type: ignore[assignment]
+    )
+    # Do not use yaml.indent() as it obscures the purpose of these vars:
+    yaml.map_indent = 2  # type: ignore[assignment]
+    yaml.sequence_indent = 4 if indent_sequences else 2  # type: ignore[assignment]
+    yaml.sequence_dash_offset = yaml.sequence_indent - 2  # type: ignore[operator]
+
+    # ignore invalid preferred_quote setting
+    if preferred_quote in ['"', "'"]:
+        FormattedEmitter.preferred_quote = preferred_quote
+    # yaml.default_style ∈ None, '', '"', "'", '|', '>'
+    #   None is the default
+
+    if indent_sequences or preferred_quote == '"':
+        # For root-level sequences, FormattedEmitter overrides sequence_indent
+        # and sequence_dash_offset to prevent root-level indents.
+        yaml.Emitter = FormattedEmitter
+
+    # Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
+    # So, we have to make sure we dump yaml files using YAML 1.1.
+    # We can relax the version requirement once ansible uses a version of PyYAML
+    # that includes this PR: https://github.com/yaml/pyyaml/pull/555
+    yaml.version = (1, 1)  # type: ignore[assignment]
+    # Sadly, this means all YAML files will be prefixed with "%YAML 1.1\n" on dump
+    # We'll have to drop that using a transform so people don't yell too much.
+
+    # There's a bug where ruamel.yaml.parser.process_directives overrides
+    # self.loader.version (loader is the YAML instance) with None even though
+    # there was no %YAML directive.
+    # By accessing the yaml.resolver now, we ensure version 1.1 is used for parsing.
+    assert yaml.version == yaml.resolver.processing_version
+    # alternatively we could globally change the default version:
+    # ruamel.yaml.compat._DEFAULT_YAML_VERSION = (1, 1)
+
+    return yaml
 
 
 class FormattedEmitter(Emitter):
