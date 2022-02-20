@@ -374,6 +374,26 @@ class FormattedEmitter(Emitter):
             return "'"
         return self.preferred_quote
 
+    def write_indicator(
+        self,
+        indicator: str,  # ruamel.yaml typehint is wrong. This is a string.
+        need_whitespace: bool,
+        whitespace: bool = False,
+        indention: bool = False,
+    ) -> None:
+        """Make sure that flow maps get whitespace by the curly braces."""
+        # If this is the end of the flow mapping that isn't on a new line:
+        if indicator == "}" and self.column > self.indent:
+            indicator = " }"
+        super(FormattedEmitter, self).write_indicator(
+            indicator, need_whitespace, whitespace=whitespace, indention=indention
+        )
+        # if it is the start of a flow mapping, and it's not time
+        # to wrap the lines, insert a space.
+        if indicator == "{" and self.column < self.best_width:
+            self.column += 1
+            self.stream.write(" ")
+
     # "/n/n" results in one blank line (end the previous line, then newline).
     # So, more "/n/n/n" or more is too many new lines. Clean it up.
     _re_repeat_blank_lines: Pattern = re.compile(r"\n{3,}")
