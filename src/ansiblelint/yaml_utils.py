@@ -299,6 +299,13 @@ def yaml_round_tripper(
     # alternatively we could globally change the default version:
     # ruamel.yaml.compat._DEFAULT_YAML_VERSION = (1, 1)
 
+    # If needed, we can use this to change null representation to be explicit
+    # (see https://stackoverflow.com/a/44314840/1134951)
+    # yaml.representer.add_representer(
+    #     type(None),
+    #     lambda self, data: self.represent_scalar("tag:yaml.org,2002:null", "null"),
+    # )
+
     return yaml
 
 
