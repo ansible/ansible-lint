@@ -395,7 +395,7 @@ class FormattedEmitter(Emitter):
             self.stream.write(" ")
 
     # "/n/n" results in one blank line (end the previous line, then newline).
-    # So, more "/n/n/n" or more is too many new lines. Clean it up.
+    # So, "/n/n/n" or more is too many new lines. Clean it up.
     _re_repeat_blank_lines: Pattern = re.compile(r"\n{3,}")
 
     # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
