@@ -257,6 +257,14 @@ def yaml_round_tripper(
     # yaml.default_style ∈ None, '', '"', "'", '|', '>'
     #   None is the default
 
+    # TODO: preserve_quotes loads all strings as a str subclass that carries
+    #       a quote attribute. Will the str subclasses cause problems in transforms?
+    #       Are there any other gotchas to this?
+    # This will only preserve quotes for strings read from the file.
+    # anything modified by the transform will use no quotes, preferred_quote,
+    # or the quote that results in the least amount of escaping.
+    # yaml.preserve_quotes = True
+
     if indent_sequences or preferred_quote == '"':
         # For root-level sequences, FormattedEmitter overrides sequence_indent
         # and sequence_dash_offset to prevent root-level indents.
