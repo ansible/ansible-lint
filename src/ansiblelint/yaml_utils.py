@@ -179,6 +179,54 @@ def _nested_items_path(
             )
 
 
+# ruamel.yaml only preserves empty (no whitespace) blank lines
+# (ie "/n/n" becomes "/n/n" but "/n  /n" becomes "/n").
+# So, we need to identify whitespace-only lines to drop spaces before reading.
+_whitespace_only_lines_re = re.compile(r"^ +$", re.MULTILINE)
+
+
+def pre_process_yaml(text: str) -> Tuple[str, Optional[str]]:
+    """Handle known issues with ruamel.yaml loading.
+
+    Preserve blank lines despite extra whitespace.
+    Preserve any header comments before "---".
+
+    For more on header comments, see: https://stackoverflow.com/a/70287507/1134951
+    """
+    text = _whitespace_only_lines_re.sub("", text)
+
+    # I investigated extending ruamel.yaml to capture header comments.
+    #   header comment goes from:
+    #     DocumentStartToken.comment -> DocumentStartEvent.comment
+    #   Then, in the composer:
+    #     once in composer.current_event
+    #       composer.compose_document()
+    #         discards DocumentStartEvent
+    #           move DocumentStartEvent to composer.last_event
+    #           node = composer.compose_node(None, None)
+    #             all document nodes get composed (events get used)
+    #         discard DocumentEndEvent
+    #           move DocumentEndEvent to composer.last_event
+    #         return node
+    # So, there's no convenient way to extend the composer
+    # to somehow capture the comments and pass them on.
+
+    header_comments = []
+    if '\n---\n' not in text and '\n--- ' not in text:
+        # nothing is before the document start mark,
+        # so there are no comments to preserve.
+        return text, None
+    for line in text.splitlines(True):
+        # We only need to capture the header comments. No need to remove them.
+        # lines might also include directives.
+        if line.lstrip().startswith('#'):
+            header_comments.append(line)
+        elif line.startswith('---'):
+            break
+
+    return text, "".join(header_comments) or None
+
+
 def yaml_round_tripper(
     explicit_start: bool = True,  # ---
     explicit_end: bool = False,  # ...
