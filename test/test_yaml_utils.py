@@ -4,13 +4,11 @@ from pathlib import Path
 from typing import Any, Optional, Tuple
 
 import pytest
-from ruamel.yaml.comments import CommentedMap
 from ruamel.yaml.emitter import Emitter
 from ruamel.yaml.main import YAML
 
 import ansiblelint.yaml_utils
 from ansiblelint.file_utils import Lintable
-
 
 fixtures_dir = Path(__file__).parent / "fixtures"
 formatting_before_fixtures_dir = fixtures_dir / "formatting-before"
@@ -222,6 +220,7 @@ def test_formatted_yaml_loader_dumper(
     yaml_formatting_fixtures: Tuple[str, str, str],
     fixture_filename: str,
 ) -> None:
+    """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
     before_content, prettier_content, after_content = yaml_formatting_fixtures
     assert before_content != prettier_content
     assert before_content != after_content

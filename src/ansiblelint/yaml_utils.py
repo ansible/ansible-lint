@@ -263,9 +263,7 @@ class FormattedEmitter(Emitter):
         # If this is the end of the flow mapping that isn't on a new line:
         if indicator == "}" and (self.column or 0) > (self.indent or 0):
             indicator = " }"
-        super(FormattedEmitter, self).write_indicator(
-            indicator, need_whitespace, whitespace, indention
-        )
+        super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
         if indicator == "{" and self.column < self.best_width:
