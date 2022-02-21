@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Tuple
 
 import pytest
-from ruamel.yaml import CommentedMap
+from ruamel.yaml.comments import CommentedMap
 
 from ansiblelint.runner import LintResult
 from ansiblelint.skip_utils import load_data
@@ -48,11 +48,11 @@ def yaml_formatting_fixture_after(
 
 
 @pytest.mark.parametrize(
-    ("fixture_filename",),
-    [
+    "fixture_filename",
+    (
         ("fmt-1.yml",),
         ("fmt-2.yml",),
-    ],
+    ),
 )
 def test_transformer_yaml_reformat(
     empty_transformer: Transformer,

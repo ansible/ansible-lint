@@ -261,7 +261,7 @@ class FormattedEmitter(Emitter):
     ) -> None:
         """Make sure that flow maps get whitespace by the curly braces."""
         # If this is the end of the flow mapping that isn't on a new line:
-        if indicator == "}" and self.column > self.indent:
+        if indicator == "}" and (self.column or 0) > (self.indent or 0):
             indicator = " }"
         super(FormattedEmitter, self).write_indicator(
             indicator, need_whitespace, whitespace, indention
@@ -274,7 +274,7 @@ class FormattedEmitter(Emitter):
 
     # "/n/n" results in one blank line (end the previous line, then newline).
     # So, "/n/n/n" or more is too many new lines. Clean it up.
-    _re_repeat_blank_lines: Pattern = re.compile(r"\n{3,}")
+    _re_repeat_blank_lines: Pattern[str] = re.compile(r"\n{3,}")
 
     # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
     def write_comment(self, comment: CommentToken, pre: bool = False) -> None:
@@ -389,25 +389,29 @@ class FormattedYAML(YAML):
                 - name: task
         """
         # Default to reading/dumping YAML 1.1 (ruamel.yaml defaults to 1.2)
-        self._yaml_version = self._yaml_version_default = (1, 1)
+        self._yaml_version_default: Tuple[int, int] = (1, 1)
+        self._yaml_version: Union[str, Tuple[int, int]] = self._yaml_version_default
 
         super().__init__(typ=typ, pure=pure, output=output, plug_ins=plug_ins)
+
+        # NB: We ignore some mypy issues because ruamel.yaml typehints are not great.
+
         # TODO: make some of these dump settings configurable in ansible-lint's options:
         #       explicit_start, explicit_end, width, indent_sequences, preferred_quote
-        self.explicit_start: bool = True
-        self.explicit_end: bool = False
-        self.width: int = 120
+        self.explicit_start: bool = True  # type: ignore[assignment]
+        self.explicit_end: bool = False  # type: ignore[assignment]
+        self.width: int = 120  # type: ignore[assignment]
         indent_sequences: bool = True
         preferred_quote: str = '"'  # either ' or "
 
         self.default_flow_style = False
-        self.compact_seq_seq = True  # dash after dash
-        self.compact_seq_map = True  # key after dash
+        self.compact_seq_seq = True  # type: ignore[assignment] # dash after dash
+        self.compact_seq_map = True  # type: ignore[assignment] # key after dash
 
         # Do not use yaml.indent() as it obscures the purpose of these vars:
         self.map_indent = 2  # type: ignore[assignment]
-        self.sequence_indent = 4 if indent_sequences else 2
-        self.sequence_dash_offset = self.sequence_indent - 2
+        self.sequence_indent = 4 if indent_sequences else 2  # type: ignore[assignment]
+        self.sequence_dash_offset = self.sequence_indent - 2  # type: ignore[operator]
 
         # If someone doesn't want our FormattedEmitter, they can change it.
         self.Emitter = FormattedEmitter
@@ -433,8 +437,8 @@ class FormattedYAML(YAML):
         #     lambda self, data: self.represent_scalar("tag:yaml.org,2002:null", "null"),
         # )
 
-    @property
-    def version(self) -> Union[str, Tuple[int, int]]:
+    @property  # type: ignore[override]
+    def version(self) -> Union[str, Tuple[int, int]]:  # type: ignore[override]
         """Return the YAML version used to parse or dump.
 
         Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
@@ -445,7 +449,7 @@ class FormattedYAML(YAML):
         return self._yaml_version
 
     @version.setter
-    def version(self, value: Optional[Union[str, Tuple[int, int]]]):
+    def version(self, value: Optional[Union[str, Tuple[int, int]]]) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.
@@ -454,13 +458,13 @@ class FormattedYAML(YAML):
         """
         self._yaml_version = value if value is not None else self._yaml_version_default
 
-    def load(self, stream: str) -> Any:
+    def loads(self, stream: str) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
         # TODO: maybe add support for passing a Lintable for the stream.
         if not isinstance(stream, str):
             raise NotImplementedError(f"expected a str but got {type(stream)}")
         text, preamble_comment = self._pre_process_yaml(stream)
-        data = super().load(stream=text)
+        data = self.load(stream=text)
         if preamble_comment is not None:
             setattr(data, "preamble_comment", preamble_comment)
         return data
