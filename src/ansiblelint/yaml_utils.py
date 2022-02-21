@@ -16,11 +16,15 @@ from typing import (
 )
 
 import ruamel.yaml.events
+from ruamel.yaml.constructor import RoundTripConstructor
+from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.emitter import Emitter
+from ruamel.yaml.representer import RoundTripRepresenter
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
 from ruamel.yaml.main import YAML
+from ruamel.yaml.scalarint import ScalarInt
 from ruamel.yaml.tokens import CommentToken
 
 import ansiblelint.skip_utils
@@ -178,6 +182,66 @@ def _nested_items_path(
             yield from _nested_items_path(
                 data_collection=value, parent_path=parent_path + [key]
             )
+
+
+class OctalIntYAML11(ScalarInt):
+    """OctalInt representation for YAML 1.1."""
+
+    def __new__(
+        cls, value: int, width: Any = None, underscore: Any = None, anchor: Any = None
+    ) -> "OctalIntYAML11":
+        """Create a new int with ScalarInt-defined attributes."""
+        return ScalarInt.__new__(
+            cls, value, width=width, underscore=underscore, anchor=anchor
+        )
+
+    @staticmethod
+    def represent_octal(representer: RoundTripRepresenter, data: "OctalIntYAML11"):
+        """Return a YAML 1.1 octal representation.
+
+        Based on ruamel.yaml.representer.RoundTripRepresenter.represent_octal_int()
+        (which only handles YAML 1.2 octals).
+        """
+        s = format(data, "o")
+        anchor = data.yaml_anchor(any=True)
+        # noinspection PyProtectedMember
+        return representer.insert_underscore("0", s, data._underscore, anchor=anchor)
+
+
+class CustomConstructor(RoundTripConstructor):
+    def construct_yaml_int(self, node: ScalarNode) -> Any:
+        """Construct int while preserving Octal formatting in YAML 1.1.
+
+        ruamel.yaml only preserves the octal format for YAML 1.2.
+        For 1.1, it converts the octal to an int. So, we preserve the format.
+
+        Code partially copied from ruamel.yaml (MIT licensed).
+        """
+        ret = super().construct_yaml_int(node)
+        if self.resolver.processing_version == (1, 1) and isinstance(ret, int):
+            # see if we've got an octal we need to preserve.
+            value_su = self.construct_scalar(node)
+            try:
+                sx = value_su.rstrip("_")
+                underscore = [len(sx) - sx.rindex("_") - 1, False, False]  # type: Any
+            except ValueError:
+                underscore = None
+            except IndexError:
+                underscore = None
+            value_s = value_su.replace("_", "")
+            if value_s[0] in "+-":
+                value_s = value_s[1:]
+            if value_s[0] == "0":
+                # got an octal in YAML 1.1
+                ret = OctalIntYAML11(
+                    ret, width=None, underscore=underscore, anchor=node.anchor
+                )
+        return ret
+
+
+CustomConstructor.add_constructor(
+    "tag:yaml.org,2002:int", CustomConstructor.construct_yaml_int
+)
 
 
 class FormattedEmitter(Emitter):
@@ -419,6 +483,10 @@ class FormattedYAML(YAML):
             FormattedEmitter.preferred_quote = preferred_quote
         # NB: default_style affects preferred_quote as well.
         # self.default_style ∈ None (default), '', '"', "'", '|', '>'
+
+        # We need a custom constructor to preserve Octal formatting in YAML 1.1
+        self.Constructor = CustomConstructor
+        self.Representer.add_representer(OctalIntYAML11, OctalIntYAML11.represent_octal)
 
         # TODO: preserve_quotes loads all strings as a str subclass that carries
         #       a quote attribute. Will the str subclasses cause problems in transforms?
