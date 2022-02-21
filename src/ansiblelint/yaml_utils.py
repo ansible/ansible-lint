@@ -17,13 +17,13 @@ from typing import (
 
 import ruamel.yaml.events
 from ruamel.yaml.constructor import RoundTripConstructor
-from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.emitter import Emitter
-from ruamel.yaml.representer import RoundTripRepresenter
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
 from ruamel.yaml.main import YAML
+from ruamel.yaml.nodes import ScalarNode
+from ruamel.yaml.representer import RoundTripRepresenter
 from ruamel.yaml.scalarint import ScalarInt
 from ruamel.yaml.tokens import CommentToken
 
@@ -187,20 +187,22 @@ def _nested_items_path(
 class OctalIntYAML11(ScalarInt):
     """OctalInt representation for YAML 1.1."""
 
-    def __new__(
-        cls, value: int, width: Any = None, underscore: Any = None, anchor: Any = None
-    ) -> "OctalIntYAML11":
+    # tell mypy that ScalarInt has these attributes
+    _width: Any
+    _underscore: Any
+
+    def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new int with ScalarInt-defined attributes."""
-        return ScalarInt.__new__(
-            cls, value, width=width, underscore=underscore, anchor=anchor
-        )
+        return ScalarInt.__new__(cls, *args, **kwargs)
 
     @staticmethod
-    def represent_octal(representer: RoundTripRepresenter, data: "OctalIntYAML11"):
+    def represent_octal(
+        representer: RoundTripRepresenter, data: "OctalIntYAML11"
+    ) -> Any:
         """Return a YAML 1.1 octal representation.
 
         Based on ruamel.yaml.representer.RoundTripRepresenter.represent_octal_int()
-        (which only handles YAML 1.2 octals).
+        (which only handles the YAML 1.2 octal representation).
         """
         s = format(data, "o")
         anchor = data.yaml_anchor(any=True)
@@ -209,6 +211,8 @@ class OctalIntYAML11(ScalarInt):
 
 
 class CustomConstructor(RoundTripConstructor):
+    """Custom YAML constructor that preserves Octal formatting in YAML 1.1."""
+
     def construct_yaml_int(self, node: ScalarNode) -> Any:
         """Construct int while preserving Octal formatting in YAML 1.1.
 
