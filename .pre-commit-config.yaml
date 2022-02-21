@@ -51,11 +51,13 @@ repos:
     hooks:
       - id: end-of-file-fixer
         # ignore formatting-prettier to have an accurate prettier comparison
+        # also temporarily ignore formatting-ruamel-yaml until #1927 is merged
         exclude: >
           (?x)^(
             test/eco/.*.result|
             test/fixtures/formatting-before/.*|
-            test/fixtures/formatting-prettier/.*
+            test/fixtures/formatting-prettier/.*|
+            test/fixtures/formatting-ruamel-yaml/.*
           )$
       - id: trailing-whitespace
         exclude: >
