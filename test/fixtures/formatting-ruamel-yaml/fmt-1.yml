@@ -1,0 +1,52 @@
+---
+
+
+
+# ^ too many newlines before
+foo: bar        # This is a comment has extra spaces preceding it
+
+fruits: # unindented sequence:
+- apple
+- orange
+vegetables: # indented sequence:
+  - onion
+  - carrot
+
+quoting:
+  - 'that should have double quotes'
+  - 'that should remain in single quotes'
+  - 'a string with " inside'
+  # next line has some undesired trailing spaces:
+  - "a string with ' inside"    
+  - can't be sure!
+  # next line should be converted to use double quotes:
+  - ['foo', 'bar']
+
+inline-dictionary:
+ - {foo: bar} # should add some spacing between curly braces and content
+
+# YAML 1.1 Boolean-hell: https://yaml.org/type/bool.html
+booleans-true:
+  preferred: true # YAML 1.2 compatible!
+  answer-1.1: YES
+  canonical-1.1: y
+  canonical-upper-1.1: Y
+  logical-1.1: True
+  option-1.1: on
+booleans-false:
+  preferred: false # YAML 1.2 compatible!
+  answer-1.1: NO
+  canonical-1.1: n
+  canonical-upper-1.1: N
+  logical-1.1: False
+  option-1.1: off
+
+
+# ^ double newline should be removed
+overly-indented-vault-value: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      123466303630313
+
+# this file also has 3 newlines at end-of-file instead of one
+
+
