@@ -8,10 +8,10 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Pattern,
     Tuple,
     Union,
     cast,
-    Pattern,
 )
 
 import ruamel.yaml.events
@@ -212,16 +212,16 @@ def pre_process_yaml(text: str) -> Tuple[str, Optional[str]]:
     # to somehow capture the comments and pass them on.
 
     header_comments = []
-    if '\n---\n' not in text and '\n--- ' not in text:
+    if "\n---\n" not in text and "\n--- " not in text:
         # nothing is before the document start mark,
         # so there are no comments to preserve.
         return text, None
     for line in text.splitlines(True):
         # We only need to capture the header comments. No need to remove them.
         # lines might also include directives.
-        if line.lstrip().startswith('#'):
+        if line.lstrip().startswith("#"):
             header_comments.append(line)
-        elif line.startswith('---'):
+        elif line.startswith("---"):
             break
 
     return text, "".join(header_comments) or None
@@ -434,14 +434,14 @@ class FormattedEmitter(Emitter):
         indicator: str,  # ruamel.yaml typehint is wrong. This is a string.
         need_whitespace: bool,
         whitespace: bool = False,
-        indention: bool = False,
+        indention: bool = False,  # (sic) ruamel.yaml has this typo in their API
     ) -> None:
         """Make sure that flow maps get whitespace by the curly braces."""
         # If this is the end of the flow mapping that isn't on a new line:
         if indicator == "}" and self.column > self.indent:
             indicator = " }"
         super(FormattedEmitter, self).write_indicator(
-            indicator, need_whitespace, whitespace=whitespace, indention=indention
+            indicator, need_whitespace, whitespace, indention
         )
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
