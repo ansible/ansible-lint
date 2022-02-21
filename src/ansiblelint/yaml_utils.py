@@ -1,6 +1,7 @@
 """Utility helpers to simplify working with yaml-based data."""
 import functools
 import re
+from io import StringIO
 from typing import (
     Any,
     Callable,
@@ -177,54 +178,6 @@ def _nested_items_path(
             yield from _nested_items_path(
                 data_collection=value, parent_path=parent_path + [key]
             )
-
-
-# ruamel.yaml only preserves empty (no whitespace) blank lines
-# (ie "/n/n" becomes "/n/n" but "/n  /n" becomes "/n").
-# So, we need to identify whitespace-only lines to drop spaces before reading.
-_whitespace_only_lines_re = re.compile(r"^ +$", re.MULTILINE)
-
-
-def pre_process_yaml(text: str) -> Tuple[str, Optional[str]]:
-    """Handle known issues with ruamel.yaml loading.
-
-    Preserve blank lines despite extra whitespace.
-    Preserve any header comments before "---".
-
-    For more on header comments, see: https://stackoverflow.com/a/70287507/1134951
-    """
-    text = _whitespace_only_lines_re.sub("", text)
-
-    # I investigated extending ruamel.yaml to capture header comments.
-    #   header comment goes from:
-    #     DocumentStartToken.comment -> DocumentStartEvent.comment
-    #   Then, in the composer:
-    #     once in composer.current_event
-    #       composer.compose_document()
-    #         discards DocumentStartEvent
-    #           move DocumentStartEvent to composer.last_event
-    #           node = composer.compose_node(None, None)
-    #             all document nodes get composed (events get used)
-    #         discard DocumentEndEvent
-    #           move DocumentEndEvent to composer.last_event
-    #         return node
-    # So, there's no convenient way to extend the composer
-    # to somehow capture the comments and pass them on.
-
-    header_comments = []
-    if "\n---\n" not in text and "\n--- " not in text:
-        # nothing is before the document start mark,
-        # so there are no comments to preserve.
-        return text, None
-    for line in text.splitlines(True):
-        # We only need to capture the header comments. No need to remove them.
-        # lines might also include directives.
-        if line.lstrip().startswith("#"):
-            header_comments.append(line)
-        elif line.startswith("---"):
-            break
-
-    return text, "".join(header_comments) or None
 
 
 class FormattedEmitter(Emitter):
@@ -439,7 +392,7 @@ class FormattedYAML(YAML):
         self._yaml_version = self._yaml_version_default = (1, 1)
 
         super().__init__(typ=typ, pure=pure, output=output, plug_ins=plug_ins)
-        # TODO: make some of these configurable:
+        # TODO: make some of these dump settings configurable in ansible-lint's options:
         #       explicit_start, explicit_end, width, indent_sequences, preferred_quote
         self.explicit_start: bool = True
         self.explicit_end: bool = False
@@ -500,3 +453,79 @@ class FormattedYAML(YAML):
         But, None effectively resets the parsing version to YAML 1.2 (ruamel's default).
         """
         self._yaml_version = value if value is not None else self._yaml_version_default
+
+    def load(self, stream: str) -> Any:
+        """Load YAML content from a string while avoiding known ruamel.yaml issues."""
+        # TODO: maybe add support for passing a Lintable for the stream.
+        if not isinstance(stream, str):
+            raise NotImplementedError(f"expected a str but got {type(stream)}")
+        text, preamble_comment = self._pre_process_yaml(stream)
+        data = super().load(stream=text)
+        if preamble_comment is not None:
+            setattr(data, "preamble_comment", preamble_comment)
+        return data
+
+    def dumps(self, data: Any) -> str:
+        """Dump YAML document to string (including its preamble_comment)."""
+        preamble_comment: Optional[str] = getattr(data, "preamble_comment", None)
+        with StringIO() as stream:
+            if preamble_comment:
+                stream.write(preamble_comment)
+            self.dump(data, stream)
+            text = stream.getvalue()
+        return self._post_process_yaml(text)
+
+    # ruamel.yaml only preserves empty (no whitespace) blank lines
+    # (ie "/n/n" becomes "/n/n" but "/n  /n" becomes "/n").
+    # So, we need to identify whitespace-only lines to drop spaces before reading.
+    _whitespace_only_lines_re = re.compile(r"^ +$", re.MULTILINE)
+
+    def _pre_process_yaml(self, text: str) -> Tuple[str, Optional[str]]:
+        """Handle known issues with ruamel.yaml loading.
+
+        Preserve blank lines despite extra whitespace.
+        Preserve any preamble (aka header) comments before "---".
+
+        For more on preamble comments, see: https://stackoverflow.com/a/70287507/1134951
+        """
+        text = self._whitespace_only_lines_re.sub("", text)
+
+        # I investigated extending ruamel.yaml to capture preamble comments.
+        #   preamble comment goes from:
+        #     DocumentStartToken.comment -> DocumentStartEvent.comment
+        #   Then, in the composer:
+        #     once in composer.current_event
+        #       composer.compose_document()
+        #         discards DocumentStartEvent
+        #           move DocumentStartEvent to composer.last_event
+        #           node = composer.compose_node(None, None)
+        #             all document nodes get composed (events get used)
+        #         discard DocumentEndEvent
+        #           move DocumentEndEvent to composer.last_event
+        #         return node
+        # So, there's no convenient way to extend the composer
+        # to somehow capture the comments and pass them on.
+
+        preamble_comments = []
+        if "\n---\n" not in text and "\n--- " not in text:
+            # nothing is before the document start mark,
+            # so there are no comments to preserve.
+            return text, None
+        for line in text.splitlines(True):
+            # We only need to capture the preamble comments. No need to remove them.
+            # lines might also include directives.
+            if line.lstrip().startswith("#"):
+                preamble_comments.append(line)
+            elif line.startswith("---"):
+                break
+
+        return text, "".join(preamble_comments) or None
+
+    @staticmethod
+    def _post_process_yaml(text: str) -> str:
+        """Handle known issues with ruamel.yaml dumping.
+
+        Make sure there's only one newline at the end of the file.
+        """
+        text = text.rstrip("\n") + "\n"
+        return text
