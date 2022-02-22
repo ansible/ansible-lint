@@ -57,3 +57,6 @@ test/fixtures/formatting-before/
 .DS_Store
 .vscode
 .idea
+src/ansiblelint/_version.py
+*.tar.gz
+.pytest_cache
