@@ -1,11 +1,20 @@
-"""Script to re-generate formatting fixtures."""
+"""Test that re-generates formatting fixtures."""
 import shutil
 import subprocess
 from pathlib import Path
 
+import pytest
 
-def main() -> None:
-    """Re-generate formatting fixtures with prettier and internal formatter."""
+
+@pytest.mark.formatting_fixtures()
+def test_regenerate_formatting_fixtures() -> None:
+    """Re-generate formatting fixtures with prettier and internal formatter.
+
+    Pass ``--regenerate-formatting-fixtures`` to run this and skip all other tests.
+    This is a "test" because once fixtures are regenerated,
+    we run prettier again to make sure it does not change files formatted
+    with our internal formatting code.
+    """
     print("Looking for prettier on PATH...")
     subprocess.check_call(["which", "prettier"])
 
@@ -28,7 +37,3 @@ def main() -> None:
 
     # prepare ruamel.yaml fixtures (diff in next PR will show how it compares).
     subprocess.check_call(["prettier", "-w", str(fixtures_dir_ruamel_yaml)])
-
-
-if __name__ == "__main__":
-    main()
