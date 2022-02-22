@@ -31,6 +31,7 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-pytest-xdist
 BuildRequires:  python%{python3_pkgversion}-libselinux
 BuildRequires:  git
+BuildRequires:  rpmlint
 %endif
 # Named based on fedora 35:
 Requires:       ansible-core >= 2.12.0
