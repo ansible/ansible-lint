@@ -176,8 +176,6 @@ def test_custom_ruamel_yaml_emitter(
 ) -> None:
     """Test ``ruamel.yaml.YAML.dump()`` sequence formatting and quotes."""
     yaml = YAML(typ="rt")
-    # Ansible (via PyYAML) only supports YAML 1.1, so make sure to use that code path.
-    yaml.version = (1, 1)  # type: ignore[assignment]
     # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
     yaml.explicit_start = True  # type: ignore[assignment]
     yaml.map_indent = map_indent  # type: ignore[assignment]
