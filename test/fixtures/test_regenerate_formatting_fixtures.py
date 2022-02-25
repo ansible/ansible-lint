@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from ansiblelint.yaml_utils import FormattedYAML
+
 
 @pytest.mark.formatting_fixtures()
 def test_regenerate_formatting_fixtures() -> None:
@@ -17,6 +19,8 @@ def test_regenerate_formatting_fixtures() -> None:
     """
     print("Looking for prettier on PATH...")
     subprocess.check_call(["which", "prettier"])
+
+    yaml = FormattedYAML()
 
     fixtures_dir = Path("test/fixtures/")
     fixtures_dir_before = fixtures_dir / "formatting-before"
@@ -35,5 +39,12 @@ def test_regenerate_formatting_fixtures() -> None:
     subprocess.check_call(["prettier", "-w", str(fixtures_dir_prettier)])
     # NB: pre-commit end-of-file-fixer can also modify files.
 
-    # prepare ruamel.yaml fixtures (diff in next PR will show how it compares).
-    subprocess.check_call(["prettier", "-w", str(fixtures_dir_after)])
+    print("\nWriting fixtures with ansiblelint.yaml_utils.FormattedYAML()...")
+    for fixture in fixtures_dir_after.glob("fmt-[0-9].yml"):
+        data = yaml.loads(fixture.read_text())
+        output = yaml.dumps(data)
+        print(fixture)
+        fixture.write_text(output)
+
+    print(f"\nMake sure prettier won't make changes in {fixtures_dir_after}...")
+    subprocess.check_call(["prettier", "-c", str(fixtures_dir_after)])
