@@ -50,10 +50,14 @@ repos:
     rev: v4.1.0
     hooks:
       - id: end-of-file-fixer
+        # ignore formatting-prettier to have an accurate prettier comparison
+        # also temporarily ignore formatting-after until #1927 is merged
         exclude: >
           (?x)^(
             test/eco/.*.result|
-            test/fixtures/formatting-before/.*
+            test/fixtures/formatting-before/.*|
+            test/fixtures/formatting-prettier/.*|
+            test/fixtures/formatting-after/.*
           )$
       - id: trailing-whitespace
         exclude: >
