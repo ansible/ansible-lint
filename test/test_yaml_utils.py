@@ -241,8 +241,8 @@ def test_formatted_yaml_loader_dumper(
     assert dump_from_prettier == after_content
     assert dump_from_after == after_content
 
-    # We can't do this because ruamel.yaml is stricter in some cases:
-    # assert prettier_content == ruamel_yaml_content
+    # We can't do this because FormattedYAML is stricter in some cases:
+    # assert prettier_content == after_content
     #
-    # Instead, generate-formatting-fixtures.py will fail if prettier would
-    # change any files in test/fixtures/formatting-ruamel-yaml
+    # Instead, `pytest --regenerate-formatting-fixtures` will fail if prettier would
+    # change any files in test/fixtures/formatting-after
