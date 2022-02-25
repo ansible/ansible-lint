@@ -3,7 +3,7 @@
 # and not relative to the CWD of execution. CLI arguments passed to the --exclude
 # option will be parsed relative to the CWD of execution.
 exclude_paths:
-  - .cache/  # implicit unless exclude_paths is defined in config
+  - .cache/ # implicit unless exclude_paths is defined in config
   - .github/
 # parseable: true
 # quiet: true
@@ -17,8 +17,8 @@ mock_modules:
   - fake_namespace.fake_collection.fake_module.fake_submodule
 mock_roles:
   - mocked_role
-  - author.role_name  # old standalone galaxy role
-  - fake_namespace.fake_collection.fake_role  # role within a collection
+  - author.role_name # old standalone galaxy role
+  - fake_namespace.fake_collection.fake_role # role within a collection
 
 # Enable checking of loop variable prefixes in roles
 loop_var_prefix: "{role}_"
@@ -41,9 +41,8 @@ skip_list:
 # Any rule that has the 'opt-in' tag will not be loaded unless its 'id' is
 # mentioned in the enable_list:
 enable_list:
-  - fqcn-builtins  # opt-in
-  - no-log-password  # opt-in
-  - no-same-owner  # opt-in
+  - no-log-password # opt-in
+  - no-same-owner # opt-in
   # add yaml here if you want to avoid ignoring yaml checks when yamllint
   # library is missing. Normally its absence just skips using that rule.
   - yaml
@@ -55,7 +54,7 @@ enable_list:
 warn_list:
   - skip_this_tag
   - git-latest
-  - experimental  # experimental is included in the implicit list
+  - experimental # experimental is included in the implicit list
   # - role-name
 
 # Offline mode disables installation of requirements.yml

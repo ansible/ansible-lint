@@ -1,6 +1,10 @@
-load-failure: [Errno 2] No such file or directory: '/Users/ssbarnea/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (filenotfounderror)
-.ansible-lint:1
+WARNING  Listing 2 violation(s) that are fatal
+.ansible-lint:1: load-failure [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (filenotfounderror)
+playbooks/molecule/sudo/molecule.yml:17: yaml line too long (576 > 160 characters) (line-length)
+You can skip specific rules or tags by adding them to your configuration file:
+# .ansible-lint
+warn_list:  # or 'skip_list' to silence them completely
+  - load-failure  # Failed to load or parse file
+  - yaml  # Violations reported by yamllint
 
-yaml: line too long (576 > 160 characters) (line-length)
-playbooks/molecule/sudo/molecule.yml:17
-
+Finished with 2 failure(s), 0 warning(s) on 291 files.

@@ -81,12 +81,13 @@ builtins = [
 
 class FQCNBuiltinsRule(AnsibleLintRule):
     id = "fqcn-builtins"
+    severity = "MEDIUM"
     shortdesc = "Use FQCN for builtin actions"
     description = (
         "Check whether the long version starting with ``ansible.builtin`` "
         "is used in the playbook"
     )
-    tags = ["opt-in", "formatting", "experimental"]
+    tags = ["formatting"]
 
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None

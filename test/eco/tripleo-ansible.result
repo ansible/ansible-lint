@@ -1,0 +1,7 @@
+INFO     Running ansible-galaxy role install --roles-path ~/.cache/ansible-lint/3378c2/roles -vr requirements.yml
+INFO     Running ansible-galaxy collection install -p ~/.cache/ansible-lint/3378c2/collections -vr requirements.yml
+INFO     Added ANSIBLE_LIBRARY=plugins/modules:~/.cache/ansible-lint/314d98/modules:plugins/modules:~/.cache/ansible-lint/314d98/modules:~/.cache/ansible-lint/3378c2/modules
+INFO     Added ANSIBLE_COLLECTIONS_PATH=~/.cache/ansible-lint/314d98/collections:~/.cache/ansible-lint/314d98/collections:~/.cache/ansible-lint/314d98/collections:~/.cache/ansible-lint/314d98/collections:~/.cache/ansible-lint/3378c2/collections
+INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.cache/ansible-lint/314d98/roles:~/.cache/ansible-lint/314d98/roles:roles:~/.cache/ansible-lint/3378c2/roles
+INFO     Discovered files to lint using: git ls-files --cached --others --exclude-standard -z
+INFO     Excluded removed files using: git ls-files --deleted -z

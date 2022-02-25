@@ -45,9 +45,11 @@ def test_eco(repo: str) -> None:
         subprocess.run("git pull", cwd=f"{cache_dir}/{repo}", shell=True, check=True)
     else:
         subprocess.run(f"git clone {url} {cache_dir}/{repo}", shell=True, check=True)
-    # run ansible lint
+    # run ansible lint and paths from user home in order to produce
+    # consistent results regardless on its location.
     subprocess.run(
-        f"ansible-lint 2>&1 > {my_dir}/{repo}.result",
+        # we exclude `fqcn-builtins` until repository owners fix it.
+        f'ansible-lint -f pep8 -x fqcn-builtins 2>&1 | sed "s:${{HOME}}:~:g" > {my_dir}/{repo}.result',
         shell=True,
         check=False,
         cwd=f"{cache_dir}/{repo}",
