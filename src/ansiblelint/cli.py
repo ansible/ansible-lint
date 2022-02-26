@@ -140,8 +140,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-f",
         dest="format",
         default="rich",
-        choices=["rich", "plain", "rst", "codeclimate", "quiet", "pep8"],
-        help="Format used rules output, (default: %(default)s)",
+        choices=["rich", "plain", "rst", "json", "codeclimate", "quiet", "pep8"],
+        help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
     parser.add_argument(
         "-q",

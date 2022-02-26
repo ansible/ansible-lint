@@ -157,7 +157,7 @@ def choose_formatter_factory(
     r: Type[formatters.BaseFormatter[Any]] = formatters.Formatter
     if options_list.format == "quiet":
         r = formatters.QuietFormatter
-    elif options_list.format == "codeclimate":
+    elif options_list.format in ("json", "codeclimate"):
         r = formatters.CodeclimateJSONFormatter
     elif options_list.parseable or options_list.format == "pep8":
         r = formatters.ParseableFormatter
