@@ -374,8 +374,8 @@ class FormattedEmitter(Emitter):
             value = self._re_repeat_blank_lines.sub("\n\n", value)
         comment.value = value
 
-        # make sure that the comment only has one space before it.
-        if comment.column > self.column + 1:
+        # make sure that the eol comment only has one space before it.
+        if comment.column > self.column + 1 and not self.whitespace:
             comment.column = self.column + 1
         return super().write_comment(comment, pre)
 
