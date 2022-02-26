@@ -1,7 +1,7 @@
 """Tests for Transformer."""
 
 from argparse import Namespace
-from typing import Iterator, List, Tuple
+from typing import Iterator, Tuple
 
 import py
 import pytest
