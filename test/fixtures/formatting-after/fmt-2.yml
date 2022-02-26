@@ -11,9 +11,8 @@
     - pig
     - giraffe
 
-- nothing: null # null
+- nothing: # null
 
 - octal:
     - 0o123 # YAML 1.2 octal
     - 0123 # YAML 1.1 octal
-
