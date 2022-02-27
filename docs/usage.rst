@@ -104,9 +104,10 @@ are also handled:
    :returncode: 2
    :nostderr:
 
-A codeclimate report in JSON format can be generated with ansible-lint.
+A ``JSON`` report, based on codeclimate specification, can be generated with
+ansible-lint.
 
-.. command-output:: ansible-lint -f codeclimate examples/playbooks/norole.yml
+.. command-output:: ansible-lint -f json examples/playbooks/norole.yml
    :cwd: ..
    :returncode: 2
    :nostderr:
