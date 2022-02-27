@@ -120,12 +120,13 @@ jobs:
         # - windows-latest
         # - windows-2016
         include:
-          # Disabled due to getting stuck and timeouts not working
-          # https://github.com/Vampire/setup-wsl/discussions/25
-          # - name: py39 (wsl)
-          #   tox_env: py39
-          #   os: windows-latest
-          #   shell: "wsl-bash {0}"
+          # windows-2022 WSL does timeout running tests, likely caused but some
+          # extreme (>10x) performance degradation compared with windows-2019
+          # https://github.com/actions/virtual-environments/issues/4856
+          - name: py39 (wsl)
+            tox_env: py39
+            os: windows-2019
+            shell: "wsl-bash {0}"
           - tox_env: py38
             os: ubuntu-20.04
             python-version: 3.8
