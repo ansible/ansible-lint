@@ -1,0 +1,6 @@
+---
+- hosts: all
+  tasks:
+    # cspell:disable-next-line
+    - name: тест
+      ansible.builtin.command: uname
