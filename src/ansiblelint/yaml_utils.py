@@ -337,6 +337,7 @@ class FormattedEmitter(Emitter):
             and not self._in_empty_flow_map
         ):
             indicator = " }"
+            self._in_empty_flow_map = False
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
