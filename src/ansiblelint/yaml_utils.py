@@ -391,8 +391,6 @@ class FormattedEmitter(Emitter):
         if comment.column > self.column + 1 and not pre:
             comment.column = self.column + 1
 
-        # re-indent full-line comments to match prettier's format
-
         if self._re_full_line_comment.search(value) or (
             pre and self.indent is not None
         ):
