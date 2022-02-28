@@ -147,7 +147,7 @@ warn_list:  # or 'skip_list' to silence them completely
         #         v,
         #     )
 
-        if result.matches and not self.options.quiet:
+        if (result.matches or changed_files_count) and not self.options.quiet:
             console_stderr.print(render_yaml(msg))
             if changed_files_count:
                 console_stderr.print(f"Modified {changed_files_count} files.")
