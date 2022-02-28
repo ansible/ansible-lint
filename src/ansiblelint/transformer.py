@@ -63,5 +63,10 @@ class Transformer:
 
             if file_is_yaml:
                 ruamel_data: Union[CommentedMap, CommentedSeq] = yaml.loads(data)
+                if not isinstance(ruamel_data, (CommentedMap, CommentedSeq)):
+                    # This is an empty vars file or similar which loads as None.
+                    # It is not safe to write this file or data-loss is likely.
+                    # Only maps and sequences can preserve comments. Skip it.
+                    continue
                 file.content = yaml.dumps(ruamel_data)
                 file.write()

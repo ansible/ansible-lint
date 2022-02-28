@@ -53,6 +53,9 @@ def runner_result(
         pytest.param(
             "examples/playbooks/contains_secrets.yml", 0, True, id="contains_secrets"
         ),
+        pytest.param(
+            "examples/playbooks/vars/empty_vars.yml", 0, False, id="empty_vars"
+        ),
     ),
 )
 def test_transformer(
