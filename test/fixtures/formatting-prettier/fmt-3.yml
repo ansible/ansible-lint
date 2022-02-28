@@ -11,6 +11,8 @@ dummy_map: # eol comment
 
 # comment before top-level
 second_key:
-  - []
+  - {} # should drop the extra space in flow map
+  # comment before non top-level
+  - {}
   # comment before non top-level
   - []
