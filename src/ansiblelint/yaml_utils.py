@@ -342,6 +342,9 @@ class FormattedEmitter(Emitter):
     # So, "/n/n/n" or more is too many new lines. Clean it up.
     _re_repeat_blank_lines: Pattern[str] = re.compile(r"\n{3,}")
 
+    # We might need to fix the indent for comments
+    _re_full_line_comment: Pattern[str] = re.compile(r"\n( *)#")
+
     # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
     def write_comment(self, comment: CommentToken, pre: bool = False) -> None:
         """Clean up extra new lines and spaces in comments.
@@ -372,11 +375,44 @@ class FormattedEmitter(Emitter):
         else:
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
-        comment.value = value
 
         # make sure that the eol comment only has one space before it.
-        if comment.column > self.column + 1 and not self.whitespace:
+        if comment.column > self.column + 1 and not pre:
             comment.column = self.column + 1
+
+        # re-indent full-line comments to match prettier's format
+
+        full_line_comments = self._re_full_line_comment.search(value)
+        if full_line_comments or (pre and self.indent is not None):
+            # we need to re-indent full line comments to match prettier's format
+            indent = self.indent
+            first_line_is_blank = value.startswith("\n")
+            if not first_line_is_blank:
+                indent += (
+                    self.best_sequence_indent
+                    if self.indents.last_seq()
+                    else self.best_map_indent
+                )
+            value_lines = value.splitlines(keepends=True)
+            for index, line in enumerate(value_lines):
+                if (not pre and index == 0) or "#" not in line:
+                    # already covered first line with eol comment handling above
+                    # or no comment on this line
+                    continue
+                comment_start = line.index("#") if index != 0 else comment.column
+                if comment_start == 0 and isinstance(self.event, ruamel.yaml.events.CollectionEndEvent):
+                    # prettier does not indent comments just before top-level keys
+                    continue
+                if (first_line_is_blank and comment_start > indent) or (
+                    not first_line_is_blank and comment_start != indent
+                ):
+                    if index == 0:
+                        comment.column = indent
+                    else:
+                        value_lines[index] = " " * indent + line.lstrip(" ")
+            value = "".join(value_lines)
+
+        comment.value = value
         return super().write_comment(comment, pre)
 
     def write_version_directive(self, version_text: Any) -> None:
