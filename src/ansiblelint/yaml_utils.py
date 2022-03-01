@@ -501,6 +501,8 @@ class FormattedYAML(YAML):
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
+        Some config defaults get extracted from the yamllint config.
+
         ``ruamel.yaml.YAML`` uses attributes to configure how it dumps yaml files.
         Some of these settings can be confusing, so here are examples of how different
         settings will affect the dumped yaml.
@@ -563,13 +565,14 @@ class FormattedYAML(YAML):
 
         # NB: We ignore some mypy issues because ruamel.yaml typehints are not great.
 
-        # TODO: make some of these dump settings configurable in ansible-lint's options:
-        #       explicit_start, explicit_end, width, indent_sequences, preferred_quote
-        self.explicit_start: bool = True  # type: ignore[assignment]
-        self.explicit_end: bool = False  # type: ignore[assignment]
-        self.width: int = 120  # type: ignore[assignment]
-        indent_sequences: bool = True
-        preferred_quote: str = '"'  # either ' or "
+        config = self._defaults_from_yamllint_config()
+
+        # these settings are derived from yamllint config
+        self.explicit_start: bool = config["explicit_start"]  # type: ignore[assignment]
+        self.explicit_end: bool = config["explicit_end"]  # type: ignore[assignment]
+        self.width: int = config["width"]  # type: ignore[assignment]
+        indent_sequences: bool = cast(bool, config["indent_sequences"])
+        preferred_quote: str = cast(str, config["preferred_quote"])  # either ' or "
 
         self.default_flow_style = False
         self.compact_seq_seq = True  # type: ignore[assignment] # dash after dash
@@ -607,6 +610,42 @@ class FormattedYAML(YAML):
         #     type(None),
         #     lambda self, data: self.represent_scalar("tag:yaml.org,2002:null", "null"),
         # )
+
+    @staticmethod
+    def _defaults_from_yamllint_config() -> Dict[str, Union[bool, int, str]]:
+        """Extract FormattedYAML-relevant settings from yamllint config if possible."""
+        config = {
+            "explicit_start": True,
+            "explicit_end": False,
+            "width": 160,
+            "indent_sequences": True,
+            "preferred_quote": '"',
+        }
+        for rule, rule_config in load_yamllint_config().rules.items():
+            if not rule_config:
+                # rule disabled
+                continue
+
+            if rule == "document-start":
+                config["explicit_start"] = rule_config["present"]
+            elif rule == "document-end":
+                config["explicit_end"] = rule_config["present"]
+            elif rule == "line-length":
+                config["width"] = rule_config["max"]
+            elif rule == "indentation":
+                indent_sequences = rule_config["indent-sequences"]
+                # one of: bool, "whatever", "consistent"
+                # so, we use True for "whatever" and "consistent"
+                config["indent_sequences"] = bool(indent_sequences)
+            elif rule == "quoted-strings":
+                quote_type = rule_config["quote-type"]
+                # one of: single, double, any
+                if quote_type == "single":
+                    config["preferred_quote"] = "'"
+                elif quote_type == "double":
+                    config["preferred_quote"] = '"'
+
+        return cast(Dict[str, Union[bool, int, str]], config)
 
     @property  # type: ignore[override]
     def version(self) -> Union[str, Tuple[int, int]]:  # type: ignore[override]
