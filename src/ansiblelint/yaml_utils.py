@@ -269,6 +269,8 @@ class FormattedEmitter(Emitter):
     _sequence_dash_offset = 0  # Should be _sequence_indent - 2
     _root_is_sequence = False
 
+    _in_empty_flow_map = False
+
     @property
     def _is_root_level_sequence(self) -> bool:
         """Return True if this is a sequence at the root level of the yaml document."""
@@ -329,18 +331,29 @@ class FormattedEmitter(Emitter):
     ) -> None:
         """Make sure that flow maps get whitespace by the curly braces."""
         # If this is the end of the flow mapping that isn't on a new line:
-        if indicator == "}" and (self.column or 0) > (self.indent or 0):
+        if (
+            indicator == "}"
+            and (self.column or 0) > (self.indent or 0)
+            and not self._in_empty_flow_map
+        ):
             indicator = " }"
+            self._in_empty_flow_map = False
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
         if indicator == "{" and self.column < self.best_width:
-            self.column += 1
-            self.stream.write(" ")
+            if self.check_empty_mapping():
+                self._in_empty_flow_map = True
+            else:
+                self.column += 1
+                self.stream.write(" ")
 
     # "/n/n" results in one blank line (end the previous line, then newline).
     # So, "/n/n/n" or more is too many new lines. Clean it up.
     _re_repeat_blank_lines: Pattern[str] = re.compile(r"\n{3,}")
+
+    # We might need to fix the indent for comments
+    _re_full_line_comment: Pattern[str] = re.compile(r"\n( *)#")
 
     # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
     def write_comment(self, comment: CommentToken, pre: bool = False) -> None:
@@ -374,10 +387,57 @@ class FormattedEmitter(Emitter):
             value = self._re_repeat_blank_lines.sub("\n\n", value)
         comment.value = value
 
-        # make sure that the comment only has one space before it.
-        if comment.column > self.column + 1:
+        # make sure that the eol comment only has one space before it.
+        if comment.column > self.column + 1 and not pre:
             comment.column = self.column + 1
+
+        if self._re_full_line_comment.search(value) or (
+            pre and self.indent is not None
+        ):
+            # we need to re-indent full line comments to match prettier's format
+            self._mutate_full_line_comments(comment, pre)
+
         return super().write_comment(comment, pre)
+
+    def _mutate_full_line_comments(self, comment: CommentToken, pre: bool) -> None:
+        value = comment.value
+        indent = self.indent or 0
+        first_line_is_blank = value.startswith("\n")
+        if not first_line_is_blank:
+            indent += (
+                self.best_sequence_indent
+                if self.indents.last_seq()
+                else self.best_map_indent
+            )
+        value_lines = value.splitlines(keepends=True)
+        for index, line in enumerate(value_lines):
+            if (not pre and index == 0) or "#" not in line:
+                # already covered first line with eol comment handling above
+                # or no comment on this line
+                continue
+            comment_start = line.index("#") if index != 0 else comment.column
+
+            if (
+                index != 0  # full-line comment
+                and value_lines[index - 1] == "\n"  # after a blank line
+                and comment_start == 0  # at start of line
+                and isinstance(self.event, ruamel.yaml.events.CollectionEndEvent)
+            ):
+                # prettier does not indent comments just before top-level keys
+                # but the emitter cannot check the next key (it does not have a
+                # peek or lookahead). So we try to guess using blank lines.
+                # FIXME: Find a better way that avoids more edge cases.
+                continue
+
+            if (first_line_is_blank and comment_start > indent) or (
+                not first_line_is_blank and comment_start != indent
+            ):
+                if index == 0:
+                    comment.column = indent
+                else:
+                    value_lines[index] = " " * indent + line.lstrip(" ")
+        value = "".join(value_lines)
+        comment.value = value
 
     def write_version_directive(self, version_text: Any) -> None:
         """Skip writing '%YAML 1.1'."""

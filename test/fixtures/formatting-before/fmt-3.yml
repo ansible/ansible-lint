@@ -1,0 +1,18 @@
+---
+dummy_map:       # eol comment
+# full line comment not indented
+  something:
+    # full line comment indented
+  # next full line comment indented
+    - or
+            # 1 full line comments over indented
+            # 2 full line comments over indented
+    - other
+
+# comment before top-level
+second_key:
+  - { } # should drop the extra space in flow map
+# comment before non top-level
+  - {}
+# comment before non top-level
+  - []
