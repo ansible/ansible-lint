@@ -301,6 +301,7 @@ nitpick_ignore = [
     ("py:class", "ruamel.yaml.representer.RoundTripRepresenter"),
     ("py:class", "ruamel.yaml.scalarint.ScalarInt"),
     ("py:class", "ruamel.yaml.tokens.CommentToken"),
+    ("py:class", "yamllint.config.YamlLintConfig"),
     ("py:obj", "Any"),
     ("py:obj", "ansiblelint.formatters.T"),
 ]
