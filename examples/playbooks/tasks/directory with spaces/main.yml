@@ -1,3 +1,4 @@
+---
 # this should generate: unnamed-task: All tasks should be named
 - ansible.builtin.assert:
     fail_msg: tasks in directory with spaces included

@@ -1,3 +1,4 @@
+---
 - hosts: localhost
   tasks:
     - name: command with creates check

@@ -1,3 +1,4 @@
+---
 - hosts: all
   tasks:
     - name: test when with jinja2
