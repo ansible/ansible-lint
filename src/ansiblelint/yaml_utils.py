@@ -1,5 +1,7 @@
 """Utility helpers to simplify working with yaml-based data."""
 import functools
+import logging
+import os
 import re
 from io import StringIO
 from typing import (
@@ -26,11 +28,50 @@ from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.representer import RoundTripRepresenter
 from ruamel.yaml.scalarint import ScalarInt
 from ruamel.yaml.tokens import CommentToken
+from yamllint.config import YamlLintConfig
 
 import ansiblelint.skip_utils
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.utils import get_action_tasks, normalize_task, parse_yaml_linenumbers
+
+_logger = logging.getLogger(__name__)
+
+YAMLLINT_CONFIG = """
+extends: default
+rules:
+  comments:
+    # https://github.com/prettier/prettier/issues/6780
+    min-spaces-from-content: 1
+  # https://github.com/adrienverge/yamllint/issues/384
+  comments-indentation: false
+  document-start: disable
+  # 160 chars was the default used by old E204 rule, but
+  # you can easily change it or disable in your .yamllint file.
+  line-length:
+    max: 160
+"""
+
+
+@functools.lru_cache(maxsize=1)
+def load_yamllint_config() -> YamlLintConfig:
+    """Load our default yamllint config and any customized override file."""
+    config = YamlLintConfig(content=YAMLLINT_CONFIG)
+    # if we detect local yamllint config we use it but raise a warning
+    # as this is likely to get out of sync with our internal config.
+    for file in [".yamllint", ".yamllint.yaml", ".yamllint.yml"]:
+        if os.path.isfile(file):
+            _logger.warning(
+                "Loading custom %s config file, this extends our "
+                "internal yamllint config.",
+                file,
+            )
+            config_override = YamlLintConfig(file=file)
+            config_override.extend(config)
+            config = config_override
+            break
+    _logger.debug("Effective yamllint rules used: %s", config.rules)
+    return config
 
 
 def iter_tasks_in_file(
