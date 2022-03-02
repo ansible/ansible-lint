@@ -1,34 +1,17 @@
 import logging
-import os
-import sys
 from typing import TYPE_CHECKING, List
 
-from yamllint.config import YamlLintConfig
 from yamllint.linter import run as run_yamllint
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
+from ansiblelint.yaml_utils import load_yamllint_config
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
 _logger = logging.getLogger(__name__)
-
-YAMLLINT_CONFIG = """
-extends: default
-rules:
-  comments:
-    # https://github.com/prettier/prettier/issues/6780
-    min-spaces-from-content: 1
-  # https://github.com/adrienverge/yamllint/issues/384
-  comments-indentation: false
-  document-start: disable
-  # 160 chars was the default used by old E204 rule, but
-  # you can easily change it or disable in your .yamllint file.
-  line-length:
-    max: 160
-"""
 
 DESCRIPTION = """\
 Rule violations reported by YamlLint when this is installed.
@@ -48,24 +31,8 @@ class YamllintRule(AnsibleLintRule):
     severity = "VERY_LOW"
     tags = ["formatting", "yaml"]
     version_added = "v5.0.0"
-    config = None
+    config = load_yamllint_config()
     has_dynamic_tags = True
-    if "yamllint.config" in sys.modules:
-        config = YamlLintConfig(content=YAMLLINT_CONFIG)
-        # if we detect local yamllint config we use it but raise a warning
-        # as this is likely to get out of sync with our internal config.
-        for file in [".yamllint", ".yamllint.yaml", ".yamllint.yml"]:
-            if os.path.isfile(file):
-                _logger.warning(
-                    "Loading custom %s config file, this extends our "
-                    "internal yamllint config.",
-                    file,
-                )
-                config_override = YamlLintConfig(file=file)
-                config_override.extend(config)
-                config = config_override
-                break
-        _logger.debug("Effective yamllint rules used: %s", config.rules)
 
     def __init__(self) -> None:
         """Construct a rule instance."""
@@ -79,24 +46,21 @@ class YamllintRule(AnsibleLintRule):
         if str(file.base_kind) != "text/yaml":
             return matches
 
-        if YamllintRule.config:
-            for p in run_yamllint(
-                file.content, YamllintRule.config, filepath=file.path
-            ):
-                self.severity = "VERY_LOW"
-                if p.level == "error":
-                    self.severity = "MEDIUM"
-                if p.desc.endswith("(syntax)"):
-                    self.severity = "VERY_HIGH"
-                matches.append(
-                    self.create_matcherror(
-                        message=p.desc,
-                        linenumber=p.line,
-                        details="",
-                        filename=str(file.path),
-                        tag=p.rule,
-                    )
+        for p in run_yamllint(file.content, YamllintRule.config, filepath=file.path):
+            self.severity = "VERY_LOW"
+            if p.level == "error":
+                self.severity = "MEDIUM"
+            if p.desc.endswith("(syntax)"):
+                self.severity = "VERY_HIGH"
+            matches.append(
+                self.create_matcherror(
+                    message=p.desc,
+                    linenumber=p.line,
+                    details="",
+                    filename=str(file.path),
+                    tag=p.rule,
                 )
+            )
 
         if matches:
             lines = file.content.splitlines()

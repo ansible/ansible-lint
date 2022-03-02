@@ -305,6 +305,7 @@ nitpick_ignore = [
     ("py:class", "ruamel.yaml.comments.CommentedSeq"),
     ("py:class", "CommentedMap"),
     ("py:class", "CommentedSeq"),
+    ("py:class", "yamllint.config.YamlLintConfig"),
     ("py:obj", "Any"),
     ("py:obj", "ansiblelint.formatters.T"),
 ]
