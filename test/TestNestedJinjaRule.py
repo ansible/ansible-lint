@@ -31,6 +31,7 @@ from ansiblelint.runner import Runner
 FAIL_TASK_1LN = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: one-level nesting
@@ -42,6 +43,7 @@ FAIL_TASK_1LN = Lintable(
 FAIL_TASK_1LN_M = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: one-level multiline nesting
@@ -56,6 +58,7 @@ FAIL_TASK_1LN_M = Lintable(
 FAIL_TASK_2LN = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: two-level nesting
@@ -67,6 +70,7 @@ FAIL_TASK_2LN = Lintable(
 FAIL_TASK_2LN_M = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: two-level multiline nesting
@@ -82,6 +86,7 @@ FAIL_TASK_2LN_M = Lintable(
 FAIL_TASK_W_5LN = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: five-level wild nesting
@@ -93,6 +98,7 @@ FAIL_TASK_W_5LN = Lintable(
 FAIL_TASK_W_5LN_M = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: five-level wild multiline nesting
@@ -113,6 +119,7 @@ FAIL_TASK_W_5LN_M = Lintable(
 SUCCESS_TASK_P = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: non-nested example
@@ -124,6 +131,7 @@ SUCCESS_TASK_P = Lintable(
 SUCCESS_TASK_P_M = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: multiline non-nested example
@@ -137,6 +145,7 @@ SUCCESS_TASK_P_M = Lintable(
 SUCCESS_TASK_2P = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: nesting far from each other
@@ -148,6 +157,7 @@ SUCCESS_TASK_2P = Lintable(
 SUCCESS_TASK_2P_M = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: multiline nesting far from each other
@@ -162,6 +172,7 @@ SUCCESS_TASK_2P_M = Lintable(
 SUCCESS_TASK_C_2P = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: nesting close to each other
@@ -173,6 +184,7 @@ SUCCESS_TASK_C_2P = Lintable(
 SUCCESS_TASK_C_2P_M = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: multiline nesting close to each other
@@ -187,6 +199,7 @@ SUCCESS_TASK_C_2P_M = Lintable(
 SUCCESS_TASK_PRINT = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   tasks:
     - name: print curly braces

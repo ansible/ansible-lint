@@ -60,7 +60,7 @@ def test_run_collection(
     """Test that default rules match pre-meditated violations."""
     matches = test_rules_collection.run(ematchtestfile)
     assert len(matches) == 4  # 3 occurrences of BANNED using TEST0001 + 1 for TEST0003
-    assert matches[0].linenumber == 2
+    assert matches[0].linenumber == 3
 
 
 def test_tags(

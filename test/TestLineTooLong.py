@@ -6,6 +6,7 @@ from ansiblelint.rules.YamllintRule import YamllintRule
 from ansiblelint.testing import RunFromText
 
 LONG_LINE = """\
+---
 - name: task example
   debug:
     msg: 'This is a very long text that is used in order to verify the rule that checks for very long lines. We do hope it was long enough to go over the line limit.'
