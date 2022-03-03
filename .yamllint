@@ -1,9 +1,13 @@
+---
 rules:
-  document-start: disable
+  document-start:
+    present: true
   indentation:
     level: error
     indent-sequences: consistent
 ignore: |
   .tox
   examples/playbooks/example.yml
+  examples/playbooks/syntax-error-string.yml
+  examples/playbooks/vars/not_decryptable.yml
 # ignore added because this file includes on-purpose errors

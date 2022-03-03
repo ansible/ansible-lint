@@ -6,6 +6,7 @@ when encountering what counts as valid Ansible syntax.
 from ansiblelint.testing import RunFromText
 
 PB_WITH_NULL_TASKS = """\
+---
 - hosts: all
   tasks:
 """

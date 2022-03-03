@@ -1,3 +1,4 @@
+---
 - hosts: localhost
   name: become_user without become play
   become_user: root

@@ -7,6 +7,7 @@ from ansiblelint.runner import Runner
 PLAY_IN_THE_PLACE = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   roles:
     - include_in_the_place
@@ -16,6 +17,7 @@ PLAY_IN_THE_PLACE = Lintable(
 PLAY_RELATIVE = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   roles:
     - include_relative
@@ -25,6 +27,7 @@ PLAY_RELATIVE = Lintable(
 PLAY_MISS_INCLUDE = Lintable(
     "playbook.yml",
     """\
+---
 - hosts: all
   roles:
     - include_miss

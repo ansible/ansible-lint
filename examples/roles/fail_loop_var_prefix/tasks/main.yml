@@ -1,3 +1,4 @@
+---
 # 3 expected no-loop-var-prefix failures at 2, 8, 18
 - name: that should trigger no-loop-var-prefix
   debug:

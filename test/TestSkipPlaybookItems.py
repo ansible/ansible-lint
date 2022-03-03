@@ -3,6 +3,7 @@ import pytest
 from ansiblelint.testing import RunFromText
 
 PLAYBOOK_PRE_TASKS = """\
+---
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -17,6 +18,7 @@ PLAYBOOK_PRE_TASKS = """\
 """
 
 PLAYBOOK_POST_TASKS = """\
+---
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -31,6 +33,7 @@ PLAYBOOK_POST_TASKS = """\
 """
 
 PLAYBOOK_HANDLERS = """\
+---
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -45,6 +48,7 @@ PLAYBOOK_HANDLERS = """\
 """
 
 PLAYBOOK_TWO_PLAYS = """\
+---
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest
@@ -61,6 +65,7 @@ PLAYBOOK_TWO_PLAYS = """\
 """
 
 PLAYBOOK_WITH_BLOCK = """\
+---
 - hosts: all
   tasks:
     - name: bad git 1  # noqa git-latest

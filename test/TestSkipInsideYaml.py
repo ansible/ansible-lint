@@ -35,6 +35,7 @@ ROLE_TASKS_WITH_BLOCK = """\
 """
 
 PLAYBOOK = """\
+---
 - hosts: all
   tasks:
     - name: test hg-latest
@@ -71,6 +72,7 @@ PLAYBOOK = """\
 """
 
 ROLE_META = """\
+---
 galaxy_info:  # noqa meta-no-info
   author: your name  # noqa meta-incorrect
   description: missing min_ansible_version and platforms. author default not changed
@@ -78,6 +80,7 @@ galaxy_info:  # noqa meta-no-info
 """
 
 ROLE_TASKS_WITH_BLOCK_BECOME = """\
+---
 - hosts: localhost
   tasks:
     - name: foo

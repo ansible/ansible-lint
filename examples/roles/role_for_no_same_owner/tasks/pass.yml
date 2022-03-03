@@ -1,3 +1,4 @@
+---
 - name: synchronize-delegate
   ansible.builtin.synchronize:
     src: dummy

@@ -1,3 +1,4 @@
+---
 - hosts: localhost
   gather_facts: false
   tags:

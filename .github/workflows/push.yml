@@ -1,3 +1,4 @@
+---
 # See https://github.com/ansible-community/devtools/blob/main/.github/workflows/push.yml
 name: push
 on:
