@@ -44,6 +44,8 @@ _MODULES: Set[str] = {
     "ansible.builtin.copy",
     "file",
     "ansible.builtin.file",
+    "get_url",
+    "ansible.builtin.get_url",
     "replace",  # implicit preserve behavior but mode: preserve is invalid
     "ansible.builtin.replace",
     "template",  # supports preserve
