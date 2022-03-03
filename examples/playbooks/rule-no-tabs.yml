@@ -4,8 +4,8 @@
     - name: should not trigger no-tabs rules
       ansible.builtin.lineinfile:
         path: some.txt
-        regexp: '^\t$'
-        line: 'string with \t inside'
+        regexp: ^\t$
+        line: string with \t inside
     - name: foo
       ansible.builtin.debug:
         msg: "Presence of \t should trigger no-tabs here."

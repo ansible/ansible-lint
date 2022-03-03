@@ -10,4 +10,4 @@
             - block:
                 - ansible.builtin.include: "{{ varset }}.yml"
                 - block:
-                    - ansible.builtin.include_tasks: "tasks/directory with spaces/main.yml"
+                    - ansible.builtin.include_tasks: tasks/directory with spaces/main.yml

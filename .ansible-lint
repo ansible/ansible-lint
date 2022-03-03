@@ -1,3 +1,4 @@
+---
 # .ansible-lint
 # exclude_paths included in this file are parsed relative to this file's location
 # and not relative to the CWD of execution. CLI arguments passed to the --exclude
@@ -5,6 +6,8 @@
 exclude_paths:
   - .cache/ # implicit unless exclude_paths is defined in config
   - .github/
+  - test/fixtures/formatting-before/
+  - test/fixtures/formatting-prettier/
 # parseable: true
 # quiet: true
 # verbosity: 1

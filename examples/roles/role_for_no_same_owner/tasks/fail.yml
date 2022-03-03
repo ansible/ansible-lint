@@ -22,39 +22,39 @@
 - name: unarchive-bz2
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.bz2"
-    dest: "dummy"
+    dest: dummy
 
 - name: unarchive delegated
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.bz2"
-    dest: "dummy"
+    dest: dummy
   delegate_to: localhost
 
 - name: unarchive-gz
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.gz"
-    dest: "dummy"
+    dest: dummy
 
 - name: unarchive-tar
   ansible.builtin.unarchive:
     src: "{{ file }}.tar"
-    dest: "dummy"
+    dest: dummy
 
 - name: unarchive-xz
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.xz"
-    dest: "dummy"
+    dest: dummy
 
 - name: unarchive-zip
   ansible.builtin.unarchive:
     src: "{{ file }}.zip"
     dest: dummy
     extra_opts:
-      - "-X"
+      - -X
 
 - name: unarchive-zip-same-owner
   ansible.builtin.unarchive:
     src: "{{ file }}.zip"
     dest: dummy
     extra_opts:
-      - "-X"
+      - -X

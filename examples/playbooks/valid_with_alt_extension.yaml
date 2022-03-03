@@ -3,4 +3,4 @@
 - hosts: localhost
   tasks:
     - ansible.builtin.debug: # <-- should notify about missing 'name'
-        msg: "hello!"
+        msg: hello!
