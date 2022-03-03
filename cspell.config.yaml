@@ -1,3 +1,4 @@
+---
 dictionaryDefinitions:
   - name: words
     path: .config/dictionary.txt

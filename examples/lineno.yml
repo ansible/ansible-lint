@@ -1,2 +1,3 @@
+---
 - tasks:
     - git: repo=hello

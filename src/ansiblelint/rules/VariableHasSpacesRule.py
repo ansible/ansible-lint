@@ -43,7 +43,7 @@ if "pytest" in sys.modules:
     @pytest.fixture
     def error_expected_lines() -> List[int]:
         """Return list of expected error lines."""
-        return [23, 26, 29, 55, 66]
+        return [24, 27, 30, 56, 67]
 
     @pytest.fixture
     def test_playbook() -> str:
