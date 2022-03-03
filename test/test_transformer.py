@@ -51,7 +51,7 @@ def runner_result(
         ),
         pytest.param("examples/playbooks/become.yml", 0, True, id="become"),
         pytest.param(
-            "examples/playbooks/contains_secrets.yml", 0, True, id="contains_secrets"
+            "examples/playbooks/contains_secrets.yml", 0, False, id="contains_secrets"
         ),
         pytest.param(
             "examples/playbooks/vars/empty_vars.yml", 0, False, id="empty_vars"
