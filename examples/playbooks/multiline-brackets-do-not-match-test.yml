@@ -12,7 +12,7 @@
 
 - name: "Set Origin specific facts on localhost (for later use)"
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Setting oo_minion_ips fact on localhost
       ansible.builtin.set_fact:
