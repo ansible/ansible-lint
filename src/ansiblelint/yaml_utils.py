@@ -432,55 +432,7 @@ class FormattedEmitter(Emitter):
         if comment.column > self.column + 1 and not pre:
             comment.column = self.column + 1
 
-        # TODO: This is not reliable. It messes up more than it fixes.
-        #       The only file it seems to work well with is the fmt-3.yml fixture.
-        # if self._re_full_line_comment.search(value) or (
-        #     pre and self.indent is not None
-        # ):
-        #     # we need to re-indent full line comments to match prettier's format
-        #     self._mutate_full_line_comments(comment, pre)
-
         return super().write_comment(comment, pre)
-
-    def _mutate_full_line_comments(self, comment: CommentToken, pre: bool) -> None:
-        value = comment.value
-        indent = self.indent or 0
-        first_line_is_blank = value.startswith("\n")
-        if not first_line_is_blank:
-            indent += (
-                self.best_sequence_indent
-                if self.indents.last_seq()
-                else self.best_map_indent
-            )
-        value_lines = value.splitlines(keepends=True)
-        for index, line in enumerate(value_lines):
-            if (not pre and index == 0) or "#" not in line:
-                # already covered first line with eol comment handling above
-                # or no comment on this line
-                continue
-            comment_start = line.index("#") if index != 0 else comment.column
-
-            if (
-                index != 0  # full-line comment
-                and value_lines[index - 1] == "\n"  # after a blank line
-                and comment_start == 0  # at start of line
-                and isinstance(self.event, ruamel.yaml.events.CollectionEndEvent)
-            ):
-                # prettier does not indent comments just before top-level keys
-                # but the emitter cannot check the next key (it does not have a
-                # peek or lookahead). So we try to guess using blank lines.
-                # FIXME: Find a better way that avoids more edge cases.
-                continue
-
-            if (first_line_is_blank and comment_start > indent) or (
-                not first_line_is_blank and comment_start != indent
-            ):
-                if index == 0:
-                    comment.column = indent
-                else:
-                    value_lines[index] = " " * indent + line.lstrip(" ")
-        value = "".join(value_lines)
-        comment.value = value
 
     def write_version_directive(self, version_text: Any) -> None:
         """Skip writing '%YAML 1.1'."""
@@ -742,6 +694,24 @@ class FormattedYAML(YAML):
         """Handle known issues with ruamel.yaml dumping.
 
         Make sure there's only one newline at the end of the file.
+        Fix the indent of full-line comments to match the indent of the next line.
+        See: https://stackoverflow.com/a/71355688/1134951
         """
         text = text.rstrip("\n") + "\n"
+
+        lines = text.splitlines(keepends=True)
+        full_line_comments = []
+        for i, line in enumerate(lines):
+            stripped = line.lstrip()
+            if stripped.startswith("#"):
+                # got a full line comment
+                full_line_comments.append((i, stripped))
+            elif full_line_comments:
+                # end of full line comments so adjust to match indent of this line
+                non_space_length = len(stripped)
+                spaces = line[:-non_space_length]
+                for index, comment in full_line_comments:
+                    lines[index] = spaces + comment
+                full_line_comments.clear()
+        text = "".join(lines)
         return text
