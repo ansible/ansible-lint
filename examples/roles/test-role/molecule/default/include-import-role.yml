@@ -1,6 +1,6 @@
 ---
 - name: test
-  gather_facts: no
+  gather_facts: false
   hosts: all
   roles:
     - role: test-role

@@ -1,7 +1,7 @@
 ---
 - hosts: all
   vars:
-    var_is_set: no
+    var_is_set: false
 
   tasks:
     - import_role:
@@ -9,7 +9,7 @@
 
 - hosts: all
   vars:
-    var_is_set: no
+    var_is_set: false
 
   tasks:
     - include_role:

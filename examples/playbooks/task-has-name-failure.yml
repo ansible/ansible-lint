@@ -5,5 +5,5 @@
     - name:
       ansible.builtin.command: echo "empty name"
     - ansible.builtin.debug:
-        msg: "Debug without a name"
+        msg: Debug without a name
     - ansible.builtin.meta: flush_handlers

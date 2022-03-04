@@ -53,7 +53,7 @@
       debug:
         msg: "{{ item[0] }} - {{ item[1] }}"
       with_nested:
-        - ["foo", "bar"]
+        - [foo, bar]
         - ["1", "2", "3"]
 
     - name: with_nested loop using variable list and static
@@ -105,7 +105,7 @@
     - name: with_fileglob loop using templated pattern
       debug:
         msg: "{{ item }}"
-      with_fileglob: "foo{{ glob }}"
+      with_fileglob: foo{{ glob }}
 
     ### Testing with_together
     - name: with_together loop using variable lists

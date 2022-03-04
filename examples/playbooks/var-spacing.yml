@@ -33,7 +33,7 @@
     - name: not a jinja variable # noqa var-spacing
       ansible.builtin.debug:
         # spell-checker: disable-next-line
-        msg: "data = ${lookup{$local_part}lsearch{/etc/aliases}}"
+        msg: data = ${lookup{$local_part}lsearch{/etc/aliases}}
     - name: JSON inside jinja is valid
       ansible.builtin.debug:
         msg: "{{ {'test': {'subtest': variable}} }}"
