@@ -13,7 +13,7 @@
 
     - name: command with changed_when
       ansible.builtin.command: echo blah
-      changed_when: False
+      changed_when: false
 
     - name: command with inline creates
       ansible.builtin.command: creates=Z echo blah
@@ -39,7 +39,7 @@
 
     - name: shell with changed_when
       shell: echo blah
-      changed_when: False
+      changed_when: false
 
     - name: shell with inline creates
       shell: creates=Z echo blah

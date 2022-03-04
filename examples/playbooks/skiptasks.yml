@@ -10,7 +10,7 @@
 
     - name: test command-instead-of-module
       ansible.builtin.command: git log
-      changed_when: False
+      changed_when: false
 
     - name: test deprecated-command-syntax
       ansible.builtin.command: creates=B chmod 644 A
@@ -38,24 +38,24 @@
     - name: test git-latest (don't warn)
       ansible.builtin.command: git log
       args:
-        warn: False
-      changed_when: False
+        warn: false
+      changed_when: false
 
     - name: test hg-latest (don't warn)
       ansible.builtin.command: chmod 644 A
       args:
-        warn: False
+        warn: false
         creates: B
 
     - name: test hg-latest (warn)
       ansible.builtin.command: chmod 644 A
       args:
-        warn: yes
+        warn: true
         creates: B
 
     - name: test git-latest (don't warn single line)
       ansible.builtin.command: warn=False chdir=/tmp/blah git log
-      changed_when: False
+      changed_when: false
 
     - name: test hg-latest (don't warn single line)
       ansible.builtin.command: warn=no creates=B chmod 644 A
