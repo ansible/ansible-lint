@@ -694,8 +694,11 @@ class FormattedYAML(YAML):
         """Handle known issues with ruamel.yaml dumping.
 
         Make sure there's only one newline at the end of the file.
+
         Fix the indent of full-line comments to match the indent of the next line.
         See: https://stackoverflow.com/a/71355688/1134951
+
+        Make sure null list items don't end in a space.
         """
         text = text.rstrip("\n") + "\n"
 
@@ -714,7 +717,7 @@ class FormattedYAML(YAML):
 
                 # allow some full line comments to match the previous indent
                 if i > 0 and not full_line_comments and space_length:
-                    prev = lines[i-1]
+                    prev = lines[i - 1]
                     prev_space_length = len(prev) - len(prev.lstrip())
                     if prev_space_length == space_length:
                         # if the indent matches the previous line's indent, skip it.
@@ -727,5 +730,11 @@ class FormattedYAML(YAML):
                 for index, comment in full_line_comments:
                     lines[index] = spaces + comment
                 full_line_comments.clear()
+
+            cleaned = line.strip()
+            if not cleaned.startswith("#") and cleaned.endswith("-"):
+                # got an empty list item. drop any trailing spaces.
+                lines[i] = line.rstrip() + "\n"
+
         text = "".join(lines)
         return text
