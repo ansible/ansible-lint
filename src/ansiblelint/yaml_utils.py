@@ -703,7 +703,7 @@ class FormattedYAML(YAML):
         text = text.rstrip("\n") + "\n"
 
         lines = text.splitlines(keepends=True)
-        full_line_comments = []
+        full_line_comments: List[Tuple[int, str]] = []
         for i, line in enumerate(lines):
             stripped = line.lstrip()
             if not stripped:
@@ -719,7 +719,10 @@ class FormattedYAML(YAML):
                 if i > 0 and not full_line_comments and space_length:
                     prev = lines[i - 1]
                     prev_space_length = len(prev) - len(prev.lstrip())
-                    if prev_space_length == space_length:
+                    is_first_line_of_string = bool(
+                        set(prev.rstrip()[-2:]).intersection({"|", ">"})
+                    )
+                    if prev_space_length == space_length or is_first_line_of_string:
                         # if the indent matches the previous line's indent, skip it.
                         continue
 
