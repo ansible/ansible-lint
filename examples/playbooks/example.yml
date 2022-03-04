@@ -2,8 +2,8 @@
 - hosts: webservers
 
   vars:
-    old_school: "1.2.3"
-    bracket: "and close bracket"
+    old_school: 1.2.3
+    bracket: and close bracket
 
   tasks:
     - name: unset variable

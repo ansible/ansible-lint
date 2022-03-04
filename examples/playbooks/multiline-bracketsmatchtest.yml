@@ -10,7 +10,7 @@
     }
     - ../../../roles/pods
 
-- name: "Set Origin specific facts on localhost (for later use)"
+- name: Set Origin specific facts on localhost (for later use)
   hosts: localhost
   gather_facts: false
   tasks:
