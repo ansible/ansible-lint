@@ -703,13 +703,27 @@ class FormattedYAML(YAML):
         full_line_comments = []
         for i, line in enumerate(lines):
             stripped = line.lstrip()
+            if not stripped:
+                # blank line. Move on.
+                continue
+
+            space_length = len(line) - len(stripped)
+
             if stripped.startswith("#"):
                 # got a full line comment
+
+                # allow some full line comments to match the previous indent
+                if i > 0 and not full_line_comments and space_length:
+                    prev = lines[i-1]
+                    prev_space_length = len(prev) - len(prev.lstrip())
+                    if prev_space_length == space_length:
+                        # if the indent matches the previous line's indent, skip it.
+                        continue
+
                 full_line_comments.append((i, stripped))
             elif full_line_comments:
                 # end of full line comments so adjust to match indent of this line
-                non_space_length = len(stripped)
-                spaces = line[:-non_space_length]
+                spaces = " " * space_length
                 for index, comment in full_line_comments:
                     lines[index] = spaces + comment
                 full_line_comments.clear()
