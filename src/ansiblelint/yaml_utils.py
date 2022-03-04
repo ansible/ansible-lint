@@ -432,11 +432,13 @@ class FormattedEmitter(Emitter):
         if comment.column > self.column + 1 and not pre:
             comment.column = self.column + 1
 
-        if self._re_full_line_comment.search(value) or (
-            pre and self.indent is not None
-        ):
-            # we need to re-indent full line comments to match prettier's format
-            self._mutate_full_line_comments(comment, pre)
+        # TODO: This is not reliable. It messes up more than it fixes.
+        #       The only file it seems to work well with is the fmt-3.yml fixture.
+        # if self._re_full_line_comment.search(value) or (
+        #     pre and self.indent is not None
+        # ):
+        #     # we need to re-indent full line comments to match prettier's format
+        #     self._mutate_full_line_comments(comment, pre)
 
         return super().write_comment(comment, pre)
 
