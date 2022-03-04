@@ -138,6 +138,16 @@ if "pytest" in sys.modules:  # noqa: C901
         mode: 0600
 """
 
+    SUCCESS_PERMISSIONS_PRESENT_GET_URL = """
+- hosts: all
+  tasks:
+    - name: permissions not missing and numeric
+      get_url:
+        url: http://foo
+        dest: foo
+        mode: 0600
+"""
+
     SUCCESS_ABSENT_STATE = """
 - hosts: all
   tasks:
@@ -237,6 +247,15 @@ if "pytest" in sys.modules:  # noqa: C901
         line: some content here
 """
 
+    FAIL_MISSING_PERMISSIONS_GET_URL = """
+- hosts: all
+  tasks:
+    - name: permissions missing
+      get_url:
+        url: http://foo
+        dest: foo
+"""
+
     FAIL_LINEINFILE_CREATE = """
 - hosts: all
   tasks:
@@ -293,6 +312,14 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_success_permissions_present(rule_runner: RunFromText) -> None:
         """Permissions present and numeric."""
         results = rule_runner.run_playbook(SUCCESS_PERMISSIONS_PRESENT)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        "rule_runner", (MissingFilePermissionsRule,), indirect=["rule_runner"]
+    )
+    def test_success_permissions_present_get_url(rule_runner: RunFromText) -> None:
+        """Permissions present and numeric for get_url."""
+        results = rule_runner.run_playbook(SUCCESS_PERMISSIONS_PRESENT_GET_URL)
         assert len(results) == 0
 
     @pytest.mark.parametrize(
@@ -365,6 +392,14 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_fail_missing_permissions_directory(rule_runner: RunFromText) -> None:
         """Missing permissions when possibly creating a directory."""
         results = rule_runner.run_playbook(FAIL_MISSING_PERMISSIONS_DIRECTORY)
+        assert len(results) == 2
+
+    @pytest.mark.parametrize(
+        "rule_runner", (MissingFilePermissionsRule,), indirect=["rule_runner"]
+    )
+    def test_fail_missing_permissions_get_url(rule_runner: RunFromText) -> None:
+        """Missing permissions with get_url module."""
+        results = rule_runner.run_playbook(FAIL_MISSING_PERMISSIONS_GET_URL)
         assert len(results) == 2
 
     @pytest.mark.parametrize(
