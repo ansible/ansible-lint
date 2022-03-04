@@ -49,7 +49,7 @@ def runner_result(
         pytest.param(
             "examples/playbooks/lots_of_warnings.yml", 992, False, id="lots_of_warnings"
         ),
-        pytest.param("examples/playbooks/become.yml", 0, True, id="become"),
+        pytest.param("examples/playbooks/become.yml", 0, False, id="become"),
         pytest.param(
             "examples/playbooks/contains_secrets.yml", 0, False, id="contains_secrets"
         ),
