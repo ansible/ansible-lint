@@ -730,7 +730,7 @@ class FormattedYAML(YAML):
         for line in text.splitlines(True):
             # We only need to capture the preamble comments. No need to remove them.
             # lines might also include directives.
-            if line.lstrip().startswith("#"):
+            if line.lstrip().startswith("#") or line == "\n":
                 preamble_comments.append(line)
             elif line.startswith("---"):
                 break
