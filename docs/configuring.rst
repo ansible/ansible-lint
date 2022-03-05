@@ -10,10 +10,11 @@ Configuring
 Configuration File
 ------------------
 
-Ansible-lint supports local configuration via a ``.ansible-lint`` configuration
-file. Ansible-lint checks the working directory for the presence of this file
-and applies any configuration found there. The configuration file location can
-also be overridden via the ``-c path/to/file`` CLI flag.
+Ansible-lint supports local configuration via a ``.ansible-lint`` or
+``.config/ansible-lint.yml`` configuration files. Ansible-lint checks the
+working directory for the presence of this file and applies any configuration
+found there. The configuration file location can also be overridden via the
+``-c path/to/file`` CLI flag.
 
 When configuration file is not found in current directory, the tool will try
 to look for one in parent directories but it will not go outside current git

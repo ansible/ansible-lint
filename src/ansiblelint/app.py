@@ -127,7 +127,7 @@ class App:
                 "configuration file:"
             )
             msg += """\
-# .ansible-lint
+# .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
 """
             msg += "".join(sorted(entries))

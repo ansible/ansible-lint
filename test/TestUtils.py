@@ -262,7 +262,7 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
         "examples/playbooks/empty_playbook.yml:1: "
         "syntax-check Empty playbook, nothing to do" in out
     )
-    # assures that our .ansible-lint exclude was effective in excluding github files
+    # assures that our ansible-lint config exclude was effective in excluding github files
     assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks
     assert "Identified: test/test/always-run-success.yml" not in err
