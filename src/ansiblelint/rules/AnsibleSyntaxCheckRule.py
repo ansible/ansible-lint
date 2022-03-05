@@ -133,7 +133,7 @@ if "pytest" in sys.modules:
             "examples/playbooks/conflicting_action.yml", kind="playbook"
         )
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
-        assert result[0].linenumber == 3
+        assert result[0].linenumber == 4
         assert result[0].column == 7
         assert (
             result[0].message

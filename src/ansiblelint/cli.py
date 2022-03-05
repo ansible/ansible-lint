@@ -89,9 +89,12 @@ def load_config(config_file: str) -> Dict[Any, Any]:
     return config
 
 
-def get_config_path(config_file: str = ".ansible-lint") -> Optional[str]:
+def get_config_path(config_file: Optional[str] = None) -> Optional[str]:
     """Return local config file."""
-    project_filenames = [config_file]
+    if config_file:
+        project_filenames = [config_file]
+    else:
+        project_filenames = [".ansible-lint", ".config/ansible-lint.yml"]
     parent = tail = os.getcwd()
     while tail:
         for project_filename in project_filenames:
@@ -268,7 +271,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-c",
         dest="config_file",
-        help="Specify configuration file to use.  " 'Defaults to ".ansible-lint"',
+        help="Specify configuration file to use. By default it will look for '.ansible-lint' or '.config/ansible-lint.yml'",
     )
     parser.add_argument(
         "--offline",

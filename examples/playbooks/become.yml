@@ -1,10 +1,11 @@
+---
 - hosts: all
 
   tasks:
     - name: clone content repository
       ansible.builtin.git:
         repo: "{{ archive_services_repo_url }}"
-        dest: "/home/www"
+        dest: /home/www
         accept_hostkey: true
         version: master
         update: false

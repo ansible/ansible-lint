@@ -10,4 +10,4 @@
       rescue:
         - ansible.builtin.include_tasks: "{{ varset }}.yml"
       always:
-        - ansible.builtin.include_tasks: "tasks/directory with spaces/main.yml"
+        - ansible.builtin.include_tasks: tasks/directory with spaces/main.yml

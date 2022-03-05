@@ -1,3 +1,4 @@
+---
 - name: test bad command
   action: command mkdir blah
 

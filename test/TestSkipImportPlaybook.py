@@ -6,6 +6,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 IMPORTED_PLAYBOOK = """\
+---
 - hosts: all
   tasks:
     - name: success
@@ -14,6 +15,7 @@ IMPORTED_PLAYBOOK = """\
 """
 
 MAIN_PLAYBOOK = """\
+---
 - hosts: all
 
   tasks:

@@ -1,3 +1,4 @@
+---
 - debug: msg="var was set"
 
 - git: repo=hello.git

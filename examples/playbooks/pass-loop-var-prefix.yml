@@ -1,3 +1,4 @@
+---
 - hosts: localhost
   tasks:
     # validate that we did not trigger loop-var-prefix on playbooks

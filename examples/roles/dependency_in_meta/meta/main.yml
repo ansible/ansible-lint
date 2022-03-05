@@ -32,7 +32,7 @@ dependencies:
 
 galaxy_info:
   author: foo
-  description: "Testing meta"
+  description: Testing meta
   company: Not applicable
   license: MIT
   min_ansible_version: 2.5

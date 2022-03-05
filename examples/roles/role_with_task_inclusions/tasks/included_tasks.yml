@@ -1,2 +1,3 @@
+---
 # this task is missing a name (unnamed-task)
 - ansible.builtin.ping:

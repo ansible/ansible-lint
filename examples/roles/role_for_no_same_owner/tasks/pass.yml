@@ -1,3 +1,4 @@
+---
 - name: synchronize-delegate
   ansible.builtin.synchronize:
     src: dummy
@@ -16,16 +17,16 @@
     src: "{{ file }}.tar.gz"
     dest: dummy
     extra_opts:
-      - "--no-same-owner"
+      - --no-same-owner
 
 - name: unarchive-remote-src
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.gz"
     dest: dummy
     extra_opts:
-      - "--no-same-owner"
+      - --no-same-owner
 
 - name: unarchive-unknown-file-ending
   ansible.builtin.unarchive:
     src: "{{ file }}"
-    dest: "dummy"
+    dest: dummy

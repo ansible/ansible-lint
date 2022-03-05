@@ -432,53 +432,7 @@ class FormattedEmitter(Emitter):
         if comment.column > self.column + 1 and not pre:
             comment.column = self.column + 1
 
-        if self._re_full_line_comment.search(value) or (
-            pre and self.indent is not None
-        ):
-            # we need to re-indent full line comments to match prettier's format
-            self._mutate_full_line_comments(comment, pre)
-
         return super().write_comment(comment, pre)
-
-    def _mutate_full_line_comments(self, comment: CommentToken, pre: bool) -> None:
-        value = comment.value
-        indent = self.indent or 0
-        first_line_is_blank = value.startswith("\n")
-        if not first_line_is_blank:
-            indent += (
-                self.best_sequence_indent
-                if self.indents.last_seq()
-                else self.best_map_indent
-            )
-        value_lines = value.splitlines(keepends=True)
-        for index, line in enumerate(value_lines):
-            if (not pre and index == 0) or "#" not in line:
-                # already covered first line with eol comment handling above
-                # or no comment on this line
-                continue
-            comment_start = line.index("#") if index != 0 else comment.column
-
-            if (
-                index != 0  # full-line comment
-                and value_lines[index - 1] == "\n"  # after a blank line
-                and comment_start == 0  # at start of line
-                and isinstance(self.event, ruamel.yaml.events.CollectionEndEvent)
-            ):
-                # prettier does not indent comments just before top-level keys
-                # but the emitter cannot check the next key (it does not have a
-                # peek or lookahead). So we try to guess using blank lines.
-                # FIXME: Find a better way that avoids more edge cases.
-                continue
-
-            if (first_line_is_blank and comment_start > indent) or (
-                not first_line_is_blank and comment_start != indent
-            ):
-                if index == 0:
-                    comment.column = indent
-                else:
-                    value_lines[index] = " " * indent + line.lstrip(" ")
-        value = "".join(value_lines)
-        comment.value = value
 
     def write_version_directive(self, version_text: Any) -> None:
         """Skip writing '%YAML 1.1'."""
@@ -728,7 +682,7 @@ class FormattedYAML(YAML):
         for line in text.splitlines(True):
             # We only need to capture the preamble comments. No need to remove them.
             # lines might also include directives.
-            if line.lstrip().startswith("#"):
+            if line.lstrip().startswith("#") or line == "\n":
                 preamble_comments.append(line)
             elif line.startswith("---"):
                 break
@@ -740,6 +694,50 @@ class FormattedYAML(YAML):
         """Handle known issues with ruamel.yaml dumping.
 
         Make sure there's only one newline at the end of the file.
+
+        Fix the indent of full-line comments to match the indent of the next line.
+        See: https://stackoverflow.com/a/71355688/1134951
+
+        Make sure null list items don't end in a space.
         """
         text = text.rstrip("\n") + "\n"
+
+        lines = text.splitlines(keepends=True)
+        full_line_comments: List[Tuple[int, str]] = []
+        for i, line in enumerate(lines):
+            stripped = line.lstrip()
+            if not stripped:
+                # blank line. Move on.
+                continue
+
+            space_length = len(line) - len(stripped)
+
+            if stripped.startswith("#"):
+                # got a full line comment
+
+                # allow some full line comments to match the previous indent
+                if i > 0 and not full_line_comments and space_length:
+                    prev = lines[i - 1]
+                    prev_space_length = len(prev) - len(prev.lstrip())
+                    is_first_line_of_string = bool(
+                        set(prev.rstrip()[-2:]).intersection({"|", ">"})
+                    )
+                    if prev_space_length == space_length or is_first_line_of_string:
+                        # if the indent matches the previous line's indent, skip it.
+                        continue
+
+                full_line_comments.append((i, stripped))
+            elif full_line_comments:
+                # end of full line comments so adjust to match indent of this line
+                spaces = " " * space_length
+                for index, comment in full_line_comments:
+                    lines[index] = spaces + comment
+                full_line_comments.clear()
+
+            cleaned = line.strip()
+            if not cleaned.startswith("#") and cleaned.endswith("-"):
+                # got an empty list item. drop any trailing spaces.
+                lines[i] = line.rstrip() + "\n"
+
+        text = "".join(lines)
         return text

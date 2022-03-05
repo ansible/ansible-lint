@@ -22,7 +22,7 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
         'conversely ``when: var|length == 0`` rather than ``when: var == ""``)'
     )
     severity = "HIGH"
-    tags = ["idiom"]
+    tags = ["idiom", "opt-in"]
     version_added = "v4.0.0"
 
     empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
