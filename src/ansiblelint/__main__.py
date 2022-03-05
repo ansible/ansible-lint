@@ -44,6 +44,8 @@ from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
+    from argparse import Namespace
+
     # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
@@ -138,8 +140,14 @@ def _do_list(rules: "RulesCollection") -> int:
     return 1
 
 
-def _do_transform(result: "LintResult") -> None:
+# noinspection PyShadowingNames
+def _do_transform(result: "LintResult", options: "Namespace") -> None:
     """Create and run Transformer."""
+    if "yaml" in options.skip_list:
+        # The transformer rewrites yaml files, but the user requested to skip
+        # the yaml rule or anything tagged with "yaml", so there is nothing to do.
+        return
+
     # On purpose lazy-imports to avoid loading transforms unless requested
     # pylint: disable=import-outside-toplevel
     from ansiblelint.transformer import Transformer
@@ -189,7 +197,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     result = _get_matches(rules, options)
 
     if options.write:
-        _do_transform(result)
+        _do_transform(result, options)
 
     mark_as_success = False
     if result.matches and options.progressive:
