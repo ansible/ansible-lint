@@ -50,6 +50,9 @@ rules:
   # you can easily change it or disable in your .yamllint file.
   line-length:
     max: 160
+  # By default only "false" or "true" is considered truthy.
+  truthy:
+    allowed-values: ["true", "True", "false", "False", "yes", "no"]
 """
 
 
