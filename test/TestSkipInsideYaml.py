@@ -52,10 +52,12 @@ PLAYBOOK = """\
 
     - name: test YAML and var-spacing
       ansible.builtin.get_url:
+        # noqa: risky-file-permissions
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf
         dest: "{{dest_proj_path}}/foo.conf"
     - name: test YAML and var-spacing (skipped)
       ansible.builtin.get_url:
+        # noqa: risky-file-permissions
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa yaml
         dest: "{{dest_proj_path}}/foo.conf"  # noqa var-spacing
 
