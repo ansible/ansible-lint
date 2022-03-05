@@ -5,9 +5,12 @@ dummy_map: # eol comment
     # full line comment indented
     # next full line comment indented
     - or
-      # 1 full line comments over indented
-      # 2 full line comments over indented
+    # 1 full line comments over indented
+    # 2 full line comments over indented
     - other
+    - |
+      # this is part of a string not a yaml comment
+      # also not a comment
 
 # comment before top-level
 second_key:
