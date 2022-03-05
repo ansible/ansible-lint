@@ -297,6 +297,7 @@ nitpick_ignore = [
     ("py:class", "ruamel.yaml.constructor.RoundTripConstructor"),
     ("py:class", "ruamel.yaml.emitter.Emitter"),
     ("py:class", "StreamType"),  # used in Emitter's type annotation
+    ("py:class", "ruamel.yaml.emitter.ScalarAnalysis"),
     ("py:class", "ruamel.yaml.nodes.ScalarNode"),
     ("py:class", "ruamel.yaml.representer.RoundTripRepresenter"),
     ("py:class", "ruamel.yaml.scalarint.ScalarInt"),
