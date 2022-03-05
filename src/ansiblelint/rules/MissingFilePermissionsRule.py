@@ -248,9 +248,11 @@ if "pytest" in sys.modules:  # noqa: C901
 """
 
     FAIL_MISSING_PERMISSIONS_GET_URL = """
+---
 - hosts: all
   tasks:
     - name: permissions missing
+      # noqa: fqcn-builtins
       get_url:
         url: http://foo
         dest: foo
@@ -400,7 +402,7 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_fail_missing_permissions_get_url(rule_runner: RunFromText) -> None:
         """Missing permissions with get_url module."""
         results = rule_runner.run_playbook(FAIL_MISSING_PERMISSIONS_GET_URL)
-        assert len(results) == 2
+        assert len(results) == 1
 
     @pytest.mark.parametrize(
         "rule_runner", (MissingFilePermissionsRule,), indirect=["rule_runner"]
