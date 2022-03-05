@@ -19,7 +19,7 @@ from typing import (
 
 import ruamel.yaml.events
 from ruamel.yaml.constructor import RoundTripConstructor
-from ruamel.yaml.emitter import Emitter
+from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
@@ -393,8 +393,44 @@ class FormattedEmitter(Emitter):
     # So, "/n/n/n" or more is too many new lines. Clean it up.
     _re_repeat_blank_lines: Pattern[str] = re.compile(r"\n{3,}")
 
-    # We might need to fix the indent for comments
-    _re_full_line_comment: Pattern[str] = re.compile(r"\n( *)#")
+    @staticmethod
+    def add_octothorpe_protection(string: str) -> str:
+        """Modify strings to protect "#" from full-line-comment post-processing."""
+        try:
+            if "#" in string:
+                # ＃ is \uFF03 (fullwidth number sign)
+                # ﹟ is \uFE5F (small number sign)
+                string = string.replace("#", "\uFF03#\uFE5F")
+                # this is safe even if this sequence is present
+                # because it gets reversed in post-processing
+        except (ValueError, TypeError):
+            # probably not really a string. Whatever.
+            pass
+        return string
+
+    @staticmethod
+    def drop_octothorpe_protection(string: str) -> str:
+        """Remove string protection of "#" after full-line-comment post-processing."""
+        try:
+            if "\uFF03#\uFE5F" in string:
+                # ＃ is \uFF03 (fullwidth number sign)
+                # ﹟ is \uFE5F (small number sign)
+                string = string.replace("\uFF03#\uFE5F", "#")
+        except (ValueError, TypeError):
+            # probably not really a string. Whatever.
+            pass
+        return string
+
+    def analyze_scalar(self, scalar: str) -> ScalarAnalysis:
+        """Determine quoting and other requirements for string.
+
+        And protect "#" from full-line-comment post-processing.
+        """
+        analysis: ScalarAnalysis = super().analyze_scalar(scalar)
+        if analysis.empty:
+            return analysis
+        analysis.scalar = self.add_octothorpe_protection(analysis.scalar)
+        return analysis
 
     # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
     def write_comment(self, comment: CommentToken, pre: bool = False) -> None:
@@ -697,6 +733,8 @@ class FormattedYAML(YAML):
 
         Fix the indent of full-line comments to match the indent of the next line.
         See: https://stackoverflow.com/a/71355688/1134951
+        Also, removes "#" protection from strings that prevents them from being
+        identified as full line comments in post-processing.
 
         Make sure null list items don't end in a space.
         """
@@ -719,10 +757,7 @@ class FormattedYAML(YAML):
                 if i > 0 and not full_line_comments and space_length:
                     prev = lines[i - 1]
                     prev_space_length = len(prev) - len(prev.lstrip())
-                    is_first_line_of_string = bool(
-                        set(prev.rstrip()[-2:]).intersection({"|", ">"})
-                    )
-                    if prev_space_length == space_length or is_first_line_of_string:
+                    if prev_space_length == space_length:
                         # if the indent matches the previous line's indent, skip it.
                         continue
 
@@ -739,5 +774,7 @@ class FormattedYAML(YAML):
                 # got an empty list item. drop any trailing spaces.
                 lines[i] = line.rstrip() + "\n"
 
-        text = "".join(lines)
+        text = "".join(
+            FormattedEmitter.drop_octothorpe_protection(line) for line in lines
+        )
         return text
