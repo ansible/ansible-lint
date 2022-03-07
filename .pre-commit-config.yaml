@@ -36,14 +36,14 @@ repos:
           - prettier
           - prettier-plugin-toml
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v5.8.1
+    rev: v5.8.4
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/sirosen/check-jsonschema
-    rev: 0.10.2
+    rev: 0.14.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
