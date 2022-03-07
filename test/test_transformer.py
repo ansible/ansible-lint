@@ -56,6 +56,7 @@ def runner_result(
         pytest.param(
             "examples/playbooks/vars/empty_vars.yml", 0, False, id="empty_vars"
         ),
+        pytest.param("examples/playbooks/vars/strings.yml", 0, True, id="strings"),
     ),
 )
 def test_transformer(

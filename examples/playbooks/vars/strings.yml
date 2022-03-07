@@ -1,0 +1,45 @@
+---
+# Make sure that the Transformer does not mangle strings
+# TODO: there is a bug in ruamel.yaml that discards some EOL comments
+
+single: "single" # this is a comment
+single_with_double: '"single" quoted' # this is a comment
+
+single_multiline_with_octothorpe: # this EOL comment gets lost
+  "single over 160 char line to force wrapping. over 160 char line to force wrapping. over 160 char line to force wrapping.
+  over 160
+
+  # this is not a comment"
+
+double: "double" # this is a comment
+double_with_single: "'double' quoted" # this is a comment
+
+double_multiline_with_octothorpe: # this EOL comment gets lost
+  "double over 160 char line to force wrapping. over 160 char line to force wrapping. over 160 char line to force wrapping.
+  over 160
+
+  # this is not a comment"
+
+# this is a comment
+folded_block_scalar_with_octothorpe: > # > EOL comment gets lost
+  # this is not a comment
+
+# this is a comment
+folded_chomp_strip_block_scalar_with_octothorpe: >- # > EOL comment gets lost
+  # this is not a comment
+
+# this is a comment
+folded_chomp_keep_block_scalar_with_octothorpe: >+ # > EOL comment gets lost
+  # this is not a comment
+
+# this is a comment
+literal_block_scalar_with_octothorpe: | # this is a | EOL comment
+  # this is not a comment
+
+# this is a comment
+literal_chomp_strip_block_scalar_with_octothorpe: |- # this is a | EOL comment
+  # this is not a comment
+
+# this is a comment
+literal_chomp_keep_block_scalar_with_octothorpe: |+ # this is a | EOL comment
+  # this is not a comment
