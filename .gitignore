@@ -52,6 +52,8 @@ src/ansiblelint/_version.py
 # Unformatted fixtures, need to be added with force as we need to exclude
 # them from being reformatted (.prettierignore is a symlink to .gitignore)
 test/fixtures/formatting-before/
+# prettier should not edit this (yet)
+examples/playbooks/vars/strings.transformed.yml
 
 # other
 .DS_Store
