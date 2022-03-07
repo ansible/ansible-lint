@@ -48,7 +48,6 @@ class Transformer:
 
     def run(self) -> None:
         """For each file, read it, execute transforms on it, then write it."""
-        yaml = FormattedYAML()
         for file, _ in self.matches_per_file.items():
             # str() convinces mypy that "text/yaml" is a valid Literal.
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
@@ -62,6 +61,11 @@ class Transformer:
                 file_is_yaml = False
 
             if file_is_yaml:
+                # We need a fresh YAML() instance for each load because ruamel.yaml
+                # stores intermediate state during load which could affect loading
+                # any other files. (Based on suggestion from ruamel.yaml author)
+                yaml = FormattedYAML()
+
                 ruamel_data: Union[CommentedMap, CommentedSeq] = yaml.loads(data)
                 if not isinstance(ruamel_data, (CommentedMap, CommentedSeq)):
                     # This is an empty vars file or similar which loads as None.
