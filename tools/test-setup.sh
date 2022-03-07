@@ -25,9 +25,11 @@ which pipx || python3 -m pip install --user pipx
 which -a pipx
 which pre-commit || pipx install pre-commit
 which tox || pipx install tox
+which prettier || npm install -g prettier
 
 # Log some useful info in case of unexpected failures:
 uname
 python3 --version
 tox --version
 pre-commit --version
+prettier --version

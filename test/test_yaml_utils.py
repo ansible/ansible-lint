@@ -242,5 +242,5 @@ def test_formatted_yaml_loader_dumper(
     # We can't do this because FormattedYAML is stricter in some cases:
     # assert prettier_content == after_content
     #
-    # Instead, `pytest --regenerate-formatting-fixtures` will fail if prettier would
+    # `pytest tools/regenerate-fixtures.py` will fail if prettier would
     # change any files in test/fixtures/formatting-after
