@@ -2,8 +2,8 @@
 import shutil
 import subprocess
 from pathlib import Path
-from ansiblelint.yaml_utils import FormattedYAML
 
+from ansiblelint.yaml_utils import FormattedYAML
 
 """Re-generate formatting fixtures with prettier and internal formatter.
 
