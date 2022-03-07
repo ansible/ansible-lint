@@ -31,6 +31,7 @@ import sys
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 
+from ansible_compat.config import ansible_version
 from enrich.console import should_do_markup
 
 from ansiblelint import cli
@@ -85,10 +86,9 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     new_options.cwd = pathlib.Path.cwd()
 
     if new_options.version:
-        ansible_version, _ = check_ansible_presence(exit_on_error=True)
         print(
             "ansible-lint {ver!s} using ansible {ansible_ver!s}".format(
-                ver=__version__, ansible_ver=ansible_version
+                ver=__version__, ansible_ver=ansible_version()
             )
         )
         sys.exit(0)

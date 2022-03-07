@@ -4,6 +4,7 @@
 #
 #    pip-compile --extra=test --no-annotate --output-file=constraints.txt --strip-extras setup.cfg
 #
+ansible-compat==2.0.0
 ansible-core==2.12.2
 astroid==2.9.3
 attrs==21.4.0
@@ -48,6 +49,7 @@ resolvelib==0.5.4
 rich==11.2.0
 ruamel-yaml==0.17.21
 ruamel-yaml-clib==0.2.6
+subprocess-tee==0.3.5
 toml==0.10.2
 tomli==1.2.3
 typing-extensions==4.1.1

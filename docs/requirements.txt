@@ -5,6 +5,7 @@
 #    pip-compile --no-annotate --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
 #
 alabaster==0.7.12
+ansible-compat==2.0.0
 ansible-core==2.12.2
 ansible-pygments==0.1.1
 attrs==21.4.0
@@ -57,6 +58,7 @@ sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-programoutput2==2.0a1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
+subprocess-tee==0.3.5
 toml==0.10.2
 typing-extensions==4.1.0
 urllib3==1.26.8
