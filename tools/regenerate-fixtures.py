@@ -7,10 +7,8 @@ from ansiblelint.yaml_utils import FormattedYAML
 
 """Re-generate formatting fixtures with prettier and internal formatter.
 
-Pass ``--regenerate-formatting-fixtures`` to run this and skip all other tests.
-This is a "test" because once fixtures are regenerated,
-we run prettier again to make sure it does not change files formatted
-with our internal formatting code.
+Once fixtures are regenerated, we run ``prettier`` again to make sure that
+``prettier`` does not change files formatted with our internal formatting code.
 """
 print("Looking for prettier on PATH...")
 subprocess.check_call(["which", "prettier"])
