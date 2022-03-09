@@ -373,7 +373,6 @@ class FormattedEmitter(Emitter):
             and not self._in_empty_flow_map
         ):
             indicator = " }"
-            self._in_empty_flow_map = False
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
@@ -383,6 +382,7 @@ class FormattedEmitter(Emitter):
             else:
                 self.column += 1
                 self.stream.write(" ")
+                self._in_empty_flow_map = False
 
     # "/n/n" results in one blank line (end the previous line, then newline).
     # So, "/n/n/n" or more is too many new lines. Clean it up.
