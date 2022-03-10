@@ -6,6 +6,7 @@ import sys
 from typing import Any, List
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
+from ansiblelint.app import get_app
 from ansiblelint.config import options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
@@ -70,6 +71,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 shell=False,  # needed when command is a list
                 universal_newlines=True,
                 check=False,
+                env=get_app().runtime.environ,
             )
             result = []
         if run.returncode != 0:

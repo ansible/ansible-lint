@@ -92,10 +92,6 @@ class TestCliRolePaths(unittest.TestCase):
 
         result = run_ansible_lint("-v", role_path, cwd=cwd)
         assert len(result.stdout) == 0
-        assert (
-            "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles"
-            in result.stderr
-        )
         assert result.returncode == 0
 
     def test_run_role_name_from_meta(self) -> None:
@@ -104,10 +100,6 @@ class TestCliRolePaths(unittest.TestCase):
 
         result = run_ansible_lint("-v", role_path, cwd=cwd)
         assert len(result.stdout) == 0
-        assert (
-            "Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:roles"
-            in result.stderr
-        )
         assert result.returncode == 0
 
     def test_run_invalid_role_name_from_meta(self) -> None:

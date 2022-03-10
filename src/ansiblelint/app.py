@@ -1,11 +1,16 @@
 """Application."""
 import logging
 import os
+from functools import lru_cache
 from typing import TYPE_CHECKING, Any, List, Tuple, Type
+
+from ansible_compat.runtime import Runtime
 
 from ansiblelint import formatters
 from ansiblelint.color import console, console_stderr, render_yaml
+from ansiblelint.config import options
 from ansiblelint.errors import MatchError
+from ansiblelint.prerun import _perform_mockings
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -31,6 +36,8 @@ class App:
 
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
+
+        self.runtime = Runtime(isolated=True)
 
     def render_matches(self, matches: List[MatchError]) -> None:
         """Display given matches."""
@@ -189,3 +196,15 @@ def _sanitize_list_options(tag_list: List[str]) -> List[str]:
         tags.update(str(t).split(","))
     # remove duplicates, and return as sorted list
     return sorted(set(tags))
+
+
+@lru_cache(maxsize=1)
+def get_app() -> App:
+    """Return the application instance."""
+    app = App(options=options)
+    # Make linter use the cache dir from compat
+    options.cache_dir = app.runtime.cache_dir
+
+    app.runtime.prepare_environment()
+    _perform_mockings()
+    return app

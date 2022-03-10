@@ -60,6 +60,7 @@ options = Namespace(
     cwd=".",
     display_relative_path=True,
     exclude_paths=[],
+    format="rich",
     lintables=[],
     listrules=False,
     listtags=False,

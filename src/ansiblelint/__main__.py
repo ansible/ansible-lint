@@ -35,12 +35,11 @@ from ansible_compat.config import ansible_version
 from enrich.console import should_do_markup
 
 from ansiblelint import cli
-from ansiblelint.app import App
+from ansiblelint.app import get_app
 from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
 from ansiblelint.constants import EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
-from ansiblelint.prerun import check_ansible_presence, prepare_environment
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
@@ -175,14 +174,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
 
-    app = App(options=options)
-
-    prepare_environment()
-    check_ansible_presence(exit_on_error=True)
-
-    # On purpose lazy-imports to avoid pre-loading Ansible
+    app = get_app()
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import _get_matches
 
     rules = RulesCollection(options.rulesdirs)
 
@@ -191,8 +186,6 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")
-
-    from ansiblelint.runner import _get_matches
 
     result = _get_matches(rules, options)
 
