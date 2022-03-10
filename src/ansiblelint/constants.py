@@ -119,3 +119,15 @@ RENAMED_TAGS = {
     "704": "meta-video-links",
     "911": "syntax-check",
 }
+
+PLAYBOOK_TASK_KEYWORDS = [
+    "tasks",
+    "handlers",
+    "pre_tasks",
+    "post_tasks",
+]
+NESTED_TASK_KEYS = [
+    "block",
+    "always",
+    "rescue",
+]

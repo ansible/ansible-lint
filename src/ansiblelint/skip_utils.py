@@ -28,7 +28,7 @@ from typing import TYPE_CHECKING, Any, Generator, List, Optional, Sequence
 from ruamel.yaml import YAML  # type: ignore
 
 from ansiblelint.config import used_old_tags
-from ansiblelint.constants import RENAMED_TAGS
+from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, RENAMED_TAGS
 from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
@@ -142,13 +142,6 @@ def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> List[Any]:
     :param playbook: playbook yaml from yaml parser.
     :returns: list of task dictionaries.
     """
-    PLAYBOOK_TASK_KEYWORDS = [
-        "tasks",
-        "pre_tasks",
-        "post_tasks",
-        "handlers",
-    ]
-
     task_blocks = []
     for play, key in product(playbook, PLAYBOOK_TASK_KEYWORDS):
         task_blocks.extend(play.get(key, []))
@@ -157,11 +150,6 @@ def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> List[Any]:
 
 def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, None]:
     """Get list of tasks from list made of tasks and nested tasks."""
-    NESTED_TASK_KEYS = [
-        "block",
-        "always",
-        "rescue",
-    ]
 
     def get_nested_tasks(task: Any) -> Generator[Any, None, None]:
         for k in NESTED_TASK_KEYS:
