@@ -20,7 +20,7 @@ jobs:
         # - fedora-34  # has no https://src.fedoraproject.org/rpms/python-build
         - fedora-35
         - fedora-36
-        # - centos-stream-9  # has not https://src.fedoraproject.org/rpms/python-build
+        # - centos-stream-9  # has no https://src.fedoraproject.org/rpms/python-build
     trigger: pull_request
   # - job: tests
   #   trigger: pull_request
