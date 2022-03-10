@@ -2,6 +2,7 @@
 import copy
 import glob
 import importlib.util
+import inspect
 import logging
 import os
 import re
@@ -25,6 +26,16 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
 
 _logger = logging.getLogger(__name__)
+
+match_types = {
+    "matchlines": "line",
+    "match": "line",  # called by matchlines
+    "matchtasks": "task",
+    "matchtask": "task",  # called by matchtasks
+    "matchyaml": "yaml",
+    "matchplay": "play",  # called by matchyaml
+    "matchdir": "dir",
+}
 
 
 class AnsibleLintRule(BaseRule):
@@ -66,6 +77,17 @@ class AnsibleLintRule(BaseRule):
         )
         if tag:
             match.tag = tag
+        # search through callers to find one of the match* methods
+        frame = inspect.currentframe()
+        match_type: Optional[str] = None
+        while not match_type and frame is not None:
+            func_name = frame.f_code.co_name
+            match_type = match_types.get(func_name, None)
+            if match_type:
+                # add the match_type to the match
+                match.match_type = match_type
+                break
+            frame = frame.f_back  # get the parent frame for the next iteration
         return match
 
     def matchlines(self, file: "Lintable") -> List[MatchError]:
