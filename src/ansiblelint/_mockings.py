@@ -1,4 +1,4 @@
-"""Utilities for configuring ansible runtime environment."""
+"""Utilities for mocking ansible modules and roles."""
 import logging
 import os
 import pathlib
