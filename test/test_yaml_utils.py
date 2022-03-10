@@ -640,6 +640,45 @@ def test_get_path_to_play(
             [3, "tasks", 0],
             id="4_play_playbook-play_4_last_line_task_1",
         ),
+        pytest.param(
+            # must have at least one key after one of the tasks blocks
+            "examples/playbooks/include.yml",
+            6,
+            [0, "pre_tasks", 0],
+            id="playbook-multi_tasks_blocks-pre_tasks_last_task_before_roles",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            7,
+            [],
+            id="playbook-multi_tasks_blocks-roles_after_pre_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            10,
+            [],
+            id="playbook-multi_tasks_blocks-roles_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            12,
+            [0, "tasks", 0],
+            id="playbook-multi_tasks_blocks-tasks_first_task",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            14,
+            [0, "tasks", 1],
+            id="playbook-multi_tasks_blocks-tasks_last_task_before_handlers",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            16,
+            [0, "handlers", 0],
+            id="playbook-multi_tasks_blocks-handlers_task",
+        ),
+        # playbook with multiple tasks in a play
+        # playbook with subtasks blocks
         # pytest.param("examples/", 1, [], id="tasks"),
         # pytest.param("examples/", 1, [], id="handlers"),
     ),
