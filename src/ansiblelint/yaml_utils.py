@@ -317,17 +317,12 @@ class FormattedEmitter(Emitter):
         """Return True if this is a sequence at the root level of the yaml document."""
         return self.column < 2 and self._root_is_sequence
 
-    def expect_node(
-        self,
-        root: bool = False,
-        sequence: bool = False,
-        mapping: bool = False,
-        simple_key: bool = False,
-    ) -> None:
-        """Expect node (extend to record if the root doc is a sequence)."""
-        if root and isinstance(self.event, ruamel.yaml.events.SequenceStartEvent):
-            self._root_is_sequence = True
-        return super().expect_node(root, sequence, mapping, simple_key)
+    def expect_document_root(self) -> None:
+        """Expect doc root (extend to record if the root doc is a sequence)."""
+        self._root_is_sequence = isinstance(
+            self.event, ruamel.yaml.events.SequenceStartEvent
+        )
+        return super().expect_document_root()
 
     # NB: mypy does not support overriding attributes with properties yet:
     #     https://github.com/python/mypy/issues/4125
@@ -345,7 +340,7 @@ class FormattedEmitter(Emitter):
 
     @property  # type: ignore[override]
     def sequence_dash_offset(self) -> int:  # type: ignore[override]
-        """Return the configured sequence_dash_offset or 2 for root level."""
+        """Return the configured sequence_dash_offset or 0 for root level."""
         return 0 if self._is_root_level_sequence else self._sequence_dash_offset
 
     @sequence_dash_offset.setter
@@ -378,7 +373,6 @@ class FormattedEmitter(Emitter):
             and not self._in_empty_flow_map
         ):
             indicator = " }"
-            self._in_empty_flow_map = False
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
@@ -388,6 +382,7 @@ class FormattedEmitter(Emitter):
             else:
                 self.column += 1
                 self.stream.write(" ")
+                self._in_empty_flow_map = False
 
     # "/n/n" results in one blank line (end the previous line, then newline).
     # So, "/n/n/n" or more is too many new lines. Clean it up.
