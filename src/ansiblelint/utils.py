@@ -63,7 +63,7 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
 )
 from ansiblelint.config import options
-from ansiblelint.constants import FileType
+from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.text import removeprefix
@@ -638,19 +638,12 @@ def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
     if file.kind in ["tasks", "handlers"]:
         tasks = add_action_type(yaml, file.kind)
     else:
-        tasks.extend(
-            extract_from_list(yaml, ["tasks", "handlers", "pre_tasks", "post_tasks"])
-        )
+        tasks.extend(extract_from_list(yaml, PLAYBOOK_TASK_KEYWORDS))
 
     # Add sub-elements of block/rescue/always to tasks list
-    tasks.extend(
-        extract_from_list(tasks, ["block", "rescue", "always"], recursive=True)
-    )
+    tasks.extend(extract_from_list(tasks, NESTED_TASK_KEYS, recursive=True))
     # Remove block/rescue/always elements from tasks list
-    block_rescue_always = ("block", "rescue", "always")
-    tasks[:] = [
-        task for task in tasks if all(k not in task for k in block_rescue_always)
-    ]
+    tasks[:] = [task for task in tasks if all(k not in task for k in NESTED_TASK_KEYS)]
 
     # Include the FQCN task names as this happens before normalize
     return [
