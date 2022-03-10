@@ -4,24 +4,23 @@ specfile_path: dist/ansible-lint.spec
 actions:
   create-archive:
     # packit.dev service does have these module pre-installed:
-    - python3 -m pip install --user build setuptools-scm
     - python3 -m build --sdist --outdir dist
     - sh -c "ls dist/ansible-lint-*.tar.gz"
   get-current-version:
     - ./tools/get-version.sh
   post-upstream-clone:
     - ./tools/update-version.sh
+srpm_build_deps:
+  - python3-build
+  - python3-setuptools_scm
 jobs:
   - job: copr_build
     metadata:
       targets:
-        # Unable to build `centos-stream` due to missing python3-setuptools_scm_git_archive
-        # which is part of EPEL.
-        # - centos-stream-x86_64
-        # - epel-8-x86_64
-        # Unable to build fedora-stable as it includes both 34 and 35 and on first one we do not have python3-setuptools_scm
-        # - fedora-stable
+        # - fedora-34  # has no https://src.fedoraproject.org/rpms/python-build
         - fedora-35
+        - fedora-36
+        # - centos-stream-9  # has no https://src.fedoraproject.org/rpms/python-build
     trigger: pull_request
   # - job: tests
   #   trigger: pull_request
