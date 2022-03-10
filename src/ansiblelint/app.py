@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING, Any, List, Tuple, Type
 from ansible_compat.runtime import Runtime
 
 from ansiblelint import formatters
+from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
 from ansiblelint.config import options
 from ansiblelint.errors import MatchError
-from ansiblelint.prerun import _perform_mockings
 
 if TYPE_CHECKING:
     from argparse import Namespace
