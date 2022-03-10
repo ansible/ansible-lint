@@ -241,6 +241,7 @@ def get_path_to_play(
     """Get the path to the play in the given file at the given line number."""
     if lintable.kind != "playbook" or not isinstance(ruamel_data, CommentedSeq):
         return []
+    # TODO: raise if line_number < 1 or just return [] ?
     lc: "LineCol"  # lc uses 0-based counts
     # line_number is 1-based. Convert to 0-based.
     line_index = line_number - 1
@@ -279,6 +280,7 @@ def get_path_to_task(
     ruamel_data: Union[CommentedMap, CommentedSeq],
 ) -> List[Union[str, int]]:
     """Get the path to the task in the given file at the given line number."""
+    # TODO: raise if line_number < 1 or just return [] ?
     if lintable.kind in ("tasks", "handlers"):
         assert isinstance(ruamel_data, CommentedSeq)
         return _get_path_to_task_in_tasks_block(line_number, ruamel_data)
