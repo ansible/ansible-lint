@@ -146,6 +146,7 @@ signoff
 skippable
 skiptasks
 skiputils
+srpm
 stylesheet
 subdir
 subelements
