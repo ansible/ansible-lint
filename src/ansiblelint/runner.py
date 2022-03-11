@@ -101,8 +101,8 @@ class Runner:
 
     def run(self) -> List[MatchError]:
         """Execute the linting process."""
-        files: List[Lintable] = list()
-        matches: List[MatchError] = list()
+        files: List[Lintable] = []
+        matches: List[MatchError] = []
 
         # remove exclusions
         for lintable in self.lintables.copy():
@@ -187,7 +187,7 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
 
     lintables = ansiblelint.utils.get_lintables(options=options, args=options.lintables)
 
-    matches = list()
+    matches = []
     checked_files: Set[Lintable] = set()
     runner = Runner(
         *lintables,

@@ -29,7 +29,7 @@ def test_iter_tasks_in_file_with_empty_file(empty_lintable: Lintable) -> None:
     res = list(
         ansiblelint.yaml_utils.iter_tasks_in_file(empty_lintable, "some-rule-id")
     )
-    assert res == []
+    assert not res
 
 
 def test_nested_items_path() -> None:

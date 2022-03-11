@@ -141,8 +141,8 @@ def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
         tokens = tokens[1:]
     command = tokens[0].replace(":", "")
 
-    args = list()
-    kwargs = dict()
+    args = []
+    kwargs = {}
     non_kv_found = False
     for arg in tokens[1:]:
         if "=" in arg and not non_kv_found:
@@ -203,7 +203,7 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
 
             # Repair incorrect paths obtained when old syntax was used, like:
             # - include: simpletask.yml tags=nginx
-            valid_tokens = list()
+            valid_tokens = []
             for token in split_args(path_str):
                 if "=" in token:
                     break
@@ -507,7 +507,7 @@ def _sanitize_task(task: Dict[str, Any]) -> Dict[str, Any]:
 
 def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
-    result = dict()
+    result = {}
 
     sanitized_task = _sanitize_task(task)
     mod_arg_parser = ModuleArgsParser(sanitized_task)
@@ -551,7 +551,7 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         result["action"]["__ansible_arguments__"] = arguments["_raw_params"].split(" ")
         del arguments["_raw_params"]
     else:
-        result["action"]["__ansible_arguments__"] = list()
+        result["action"]["__ansible_arguments__"] = []
 
     if "argv" in arguments and not result["action"]["__ansible_arguments__"]:
         result["action"]["__ansible_arguments__"] = arguments["argv"]
@@ -603,7 +603,7 @@ def extract_from_list(
     blocks: AnsibleBaseYAMLObject, candidates: List[str], recursive: bool = False
 ) -> List[Any]:
     """Get action tasks from block structures."""
-    results = list()
+    results = []
     for block in blocks:
         for candidate in candidates:
             if isinstance(block, dict) and candidate in block:
@@ -624,7 +624,7 @@ def extract_from_list(
 
 def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[Any]:
     """Add action markers to task objects."""
-    results = list()
+    results = []
     for action in actions:
         # ignore empty task
         if not action:
@@ -636,7 +636,7 @@ def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[An
 
 def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
     """Get a flattened list of action tasks from the file."""
-    tasks = list()
+    tasks = []
     if file.kind in ["tasks", "handlers"]:
         tasks = add_action_type(yaml, file.kind)
     else:

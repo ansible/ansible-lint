@@ -82,7 +82,7 @@ options = Namespace(
     extra_vars=None,
     enable_list=[],
     skip_action_validation=True,
-    rules=dict(),  # Placeholder to set and keep configurations for each rule.
+    rules={},  # Placeholder to set and keep configurations for each rule.
 )
 
 # Used to store detected tag deprecations
@@ -94,7 +94,7 @@ collection_list: List[str] = []
 
 def get_rule_config(rule_id: str) -> Dict[str, Any]:
     """Get configurations for the rule ``rule_id``."""
-    rule_config = options.rules.get(rule_id, dict())
+    rule_config = options.rules.get(rule_id, {})
     if not isinstance(rule_config, dict):
         raise RuntimeError("Invalid rule config for %s: %s" % (rule_id, rule_config))
     return rule_config
