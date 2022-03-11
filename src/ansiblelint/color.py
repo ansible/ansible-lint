@@ -27,8 +27,8 @@ console_stderr = Console(**console_options_stderr)
 
 def reconfigure(new_options: Dict[str, Any]) -> None:
     """Reconfigure console options."""
-    global console_options  # pylint: disable=global-statement
-    global console_stderr  # pylint: disable=global-statement
+    global console_options  # pylint: disable=global-statement,invalid-name
+    global console_stderr  # pylint: disable=global-statement,invalid-name
 
     console_options = new_options
     rich.reconfigure(**new_options)

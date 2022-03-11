@@ -68,7 +68,7 @@ FileType = Literal[
 
 # odict is the base class used to represent data model of Ansible
 # playbooks and tasks.
-odict = dict
+odict = dict  # pylint: disable=invalid-name
 if sys.version_info[:2] < (3, 7):
     try:
         # pylint: disable=unused-import

@@ -13,6 +13,7 @@
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
 """Documentation Configuration."""
+# pylint: disable=invalid-name
 
 import os
 import sys
