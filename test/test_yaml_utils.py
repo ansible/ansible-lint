@@ -90,7 +90,7 @@ _input_playbook = [
         ],
     }
 ]
-_single_quote_without_indents = """\
+_SINGLE_QUOTE_WITHOUT_INDENTS = """\
 ---
 - name: It's a playbook
   tasks:
@@ -98,7 +98,7 @@ _single_quote_without_indents = """\
     debug:
       msg: '{{ msg }}'
 """
-_single_quote_with_indents = """\
+_SINGLE_QUOTE_WITH_INDENTS = """\
 ---
   - name: It's a playbook
     tasks:
@@ -106,7 +106,7 @@ _single_quote_with_indents = """\
         debug:
           msg: '{{ msg }}'
 """
-_double_quote_without_indents = """\
+_DOUBLE_QUOTE_WITHOUT_INDENTS = """\
 ---
 - name: It's a playbook
   tasks:
@@ -114,7 +114,7 @@ _double_quote_without_indents = """\
     debug:
       msg: "{{ msg }}"
 """
-_double_quote_with_indents_except_root_level = """\
+_DOUBLE_QUOTE_WITH_INDENTS_EXCEPT_ROOT_LEVEL = """\
 ---
 - name: It's a playbook
   tasks:
@@ -138,7 +138,7 @@ _double_quote_with_indents_except_root_level = """\
             2,
             0,
             None,
-            _single_quote_without_indents,
+            _SINGLE_QUOTE_WITHOUT_INDENTS,
             id="single_quote_without_indents",
         ),
         pytest.param(
@@ -146,7 +146,7 @@ _double_quote_with_indents_except_root_level = """\
             4,
             2,
             None,
-            _single_quote_with_indents,
+            _SINGLE_QUOTE_WITH_INDENTS,
             id="single_quote_with_indents",
         ),
         pytest.param(
@@ -154,7 +154,7 @@ _double_quote_with_indents_except_root_level = """\
             2,
             0,
             ansiblelint.yaml_utils.FormattedEmitter,
-            _double_quote_without_indents,
+            _DOUBLE_QUOTE_WITHOUT_INDENTS,
             id="double_quote_without_indents",
         ),
         pytest.param(
@@ -162,7 +162,7 @@ _double_quote_with_indents_except_root_level = """\
             4,
             2,
             ansiblelint.yaml_utils.FormattedEmitter,
-            _double_quote_with_indents_except_root_level,
+            _DOUBLE_QUOTE_WITH_INDENTS_EXCEPT_ROOT_LEVEL,
             id="double_quote_with_indents_except_root_level",
         ),
     ),

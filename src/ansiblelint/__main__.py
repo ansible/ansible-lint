@@ -58,7 +58,7 @@ def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
     # We are about to act on the root logger, which defaults to logging.WARNING.
     # That is where our 0 (default) value comes from.
-    VERBOSITY_MAP = {
+    verbosity_map = {
         -2: logging.CRITICAL,
         -1: logging.ERROR,
         0: logging.WARNING,
@@ -72,7 +72,7 @@ def initialize_logger(level: int = 0) -> None:
     logger = logging.getLogger()
     logger.addHandler(handler)
     # Unknown logging level is treated as DEBUG
-    logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
+    logging_level = verbosity_map.get(level, logging.DEBUG)
     logger.setLevel(logging_level)
     logging.captureWarnings(True)  # pass all warnings.warn() messages through logging
     # Use module-level _logger instance to validate it

@@ -78,11 +78,11 @@ def _perform_mockings() -> None:
     collection = yaml.get("name", None)
     if not namespace or not collection:
         return
-    p = pathlib.Path(
+    collections_path = pathlib.Path(
         f"{options.cache_dir}/collections/ansible_collections/{ namespace }"
     )
-    p.mkdir(parents=True, exist_ok=True)
-    link_path = p / collection
+    collections_path.mkdir(parents=True, exist_ok=True)
+    link_path = collections_path / collection
     target = pathlib.Path(options.project_dir).absolute()
     if not link_path.exists() or os.readlink(link_path) != target:
         if link_path.exists():
