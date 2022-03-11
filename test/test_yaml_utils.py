@@ -709,6 +709,24 @@ def test_get_path_to_play(
             "examples/playbooks/tasks/x.yml", 6, [1], id="tasks-null_task_next"
         ),
         pytest.param(
+            "examples/playbooks/tasks/empty_blocks.yml",
+            7,
+            [0],  # this IS part of the first task and "rescue" does not have subtasks.
+            id="tasks-null_rescue",
+        ),
+        pytest.param(
+            "examples/playbooks/tasks/empty_blocks.yml",
+            8,
+            [0],  # this IS part of the first task and "always" does not have subtasks.
+            id="tasks-empty_always",
+        ),
+        pytest.param(
+            "examples/playbooks/tasks/empty_blocks.yml",
+            16,
+            [1, "always", 0],
+            id="tasks-task_beyond_empty_blocks",
+        ),
+        pytest.param(
             "examples/roles/more_complex/tasks/main.yml",
             0,  # TODO: raise error?
             [],
