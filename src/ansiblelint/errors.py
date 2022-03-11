@@ -1,6 +1,6 @@
 """Exceptions and error representations."""
 import functools
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.file_utils import Lintable, normpath
@@ -76,6 +76,8 @@ class MatchError(ValueError):
         self.match_type: Optional[str] = None
         # for task matches, save the normalized task object (useful for transforms)
         self.task: Optional[Dict[str, Any]] = None
+        # path to the problem area, like: [0,"pre_tasks",3] for [0].pre_tasks[3]
+        self.yaml_path: List[Union[int, str]] = []
 
     def __repr__(self) -> str:
         """Return a MatchError instance representation."""
