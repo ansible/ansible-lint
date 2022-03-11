@@ -339,7 +339,7 @@ def _get_path_to_task_in_playbook(
                     tasks_keyword,
                 ]
                 return tasks_keyword_path + list(task_path)
-    # probably no tasks keywords in any of the plays
+    # line_number is before first play or no tasks keywords in any of the plays
     return []
 
 
@@ -399,6 +399,7 @@ def _get_path_to_task_in_tasks_block(
             # part of this (last) task
             return [task_index]
         prev_task_line_index = task.lc.line
+    # line is not part of this tasks block
     return []
 
 
@@ -437,6 +438,7 @@ def _get_path_to_task_in_nested_tasks_block(
         )
         if subtask_path:
             return [task_key] + list(subtask_path)
+    # line is not part of this nested tasks block
     return []
 
 
