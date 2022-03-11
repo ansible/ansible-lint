@@ -22,7 +22,7 @@ import pytest
 
 from ansiblelint.file_utils import Lintable
 
-from .rules import EMatcherRule, RawTaskRule
+from .rules.fixtures import EMatcherRule, RawTaskRule
 
 
 @pytest.fixture
