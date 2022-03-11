@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.YamllintRule import YamllintRule
+from ansiblelint.rules.yaml import YamllintRule
 from ansiblelint.runner import Runner
 
 

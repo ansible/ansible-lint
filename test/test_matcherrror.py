@@ -6,8 +6,8 @@ from typing import Any, Callable
 import pytest
 
 from ansiblelint.errors import MatchError
-from ansiblelint.rules.BecomeUserWithoutBecomeRule import BecomeUserWithoutBecomeRule
-from ansiblelint.rules.CommandHasChangesCheckRule import CommandHasChangesCheckRule
+from ansiblelint.rules.no_changed_when import CommandHasChangesCheckRule
+from ansiblelint.rules.partial_become import BecomeUserWithoutBecomeRule
 
 
 class DummyTestObject:

@@ -13,7 +13,7 @@ import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
-from ansiblelint.rules.AnsibleSyntaxCheckRule import AnsibleSyntaxCheckRule
+from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
     from argparse import Namespace

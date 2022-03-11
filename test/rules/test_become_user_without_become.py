@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.BecomeUserWithoutBecomeRule import BecomeUserWithoutBecomeRule
+from ansiblelint.rules.partial_become import BecomeUserWithoutBecomeRule
 from ansiblelint.runner import Runner
 
 

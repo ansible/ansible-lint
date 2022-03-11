@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.PackageIsNotLatestRule import PackageIsNotLatestRule
+from ansiblelint.rules.package_latest import PackageIsNotLatestRule
 from ansiblelint.runner import Runner
 
 

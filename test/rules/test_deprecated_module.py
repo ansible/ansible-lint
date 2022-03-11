@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.DeprecatedModuleRule import DeprecatedModuleRule
+from ansiblelint.rules.deprecated_module import DeprecatedModuleRule
 from ansiblelint.testing import RunFromText
 
 MODULE_DEPRECATED = """

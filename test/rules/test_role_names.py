@@ -7,7 +7,7 @@ import pytest
 from _pytest.fixtures import SubRequest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.RoleNames import RoleNames
+from ansiblelint.rules.role_name import RoleNames
 from ansiblelint.runner import Runner
 
 ROLE_NAME_VALID = "test_role"
