@@ -245,10 +245,10 @@ class OctalIntYAML11(ScalarInt):
         Based on ruamel.yaml.representer.RoundTripRepresenter.represent_octal_int()
         (which only handles the YAML 1.2 octal representation).
         """
-        s = format(data, "o")
+        v = format(data, "o")
         anchor = data.yaml_anchor(any=True)
         # noinspection PyProtectedMember
-        return representer.insert_underscore("0", s, data._underscore, anchor=anchor)
+        return representer.insert_underscore("0", v, data._underscore, anchor=anchor)
 
 
 class CustomConstructor(RoundTripConstructor):
@@ -267,8 +267,8 @@ class CustomConstructor(RoundTripConstructor):
             # see if we've got an octal we need to preserve.
             value_su = self.construct_scalar(node)
             try:
-                sx = value_su.rstrip("_")
-                underscore = [len(sx) - sx.rindex("_") - 1, False, False]  # type: Any
+                v = value_su.rstrip("_")
+                underscore = [len(v) - v.rindex("_") - 1, False, False]  # type: Any
             except ValueError:
                 underscore = None
             except IndexError:

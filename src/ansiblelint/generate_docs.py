@@ -38,19 +38,19 @@ def rules_as_str(rules: RulesCollection) -> str:
 
 def rules_as_rst(rules: RulesCollection) -> str:
     """Return RST documentation for a list of rules."""
-    r = DOC_HEADER
+    result = DOC_HEADER
 
-    for d in rules:
+    for rule in rules:
 
-        title = f"{d.id}"
+        title = f"{rule.id}"
 
-        description = d.description
-        if d.link:
-            description += " `(more) <%s>`__" % d.link
+        description = rule.description
+        if rule.link:
+            description += " `(more) <%s>`__" % rule.link
 
-        r += f"\n\n.. _{d.id}:\n\n{title}\n{'*' * len(title)}\n\n{d.shortdesc}\n\n{description}"
+        result += f"\n\n.. _{rule.id}:\n\n{title}\n{'*' * len(title)}\n\n{rule.shortdesc}\n\n{description}"
 
-    return r
+    return result
 
 
 @group()

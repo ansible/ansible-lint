@@ -81,17 +81,17 @@ _logger = logging.getLogger(__name__)
 
 def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
     """Extract a decrypted YAML object from file."""
-    dl = DataLoader()
-    if hasattr(dl, "set_vault_password"):
-        dl.set_vault_password(DEFAULT_VAULT_PASSWORD)
-    return dl.load_from_file(filepath)
+    dataloader = DataLoader()
+    if hasattr(dataloader, "set_vault_password"):
+        dataloader.set_vault_password(DEFAULT_VAULT_PASSWORD)
+    return dataloader.load_from_file(filepath)
 
 
 def path_dwim(basedir: str, given: str) -> str:
     """Convert a given path do-what-I-mean style."""
-    dl = DataLoader()
-    dl.set_basedir(basedir)
-    return str(dl.path_dwim(given))
+    dataloader = DataLoader()
+    dataloader.set_basedir(basedir)
+    return str(dataloader.path_dwim(given))
 
 
 def ansible_templar(basedir: str, templatevars: Any) -> Templar:
@@ -104,9 +104,9 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
     if os.path.basename(basedir) == "tasks":
         basedir = os.path.dirname(basedir)
 
-    dl = DataLoader()
-    dl.set_basedir(basedir)
-    templar = Templar(dl, variables=templatevars)
+    dataloader = DataLoader()
+    dataloader.set_basedir(basedir)
+    templar = Templar(dataloader, variables=templatevars)
     return templar
 
 
@@ -146,8 +146,8 @@ def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
     non_kv_found = False
     for arg in tokens[1:]:
         if "=" in arg and not non_kv_found:
-            kv = arg.split("=", 1)
-            kwargs[kv[0]] = kv[1]
+            key_value = arg.split("=", 1)
+            kwargs[key_value[0]] = key_value[1]
         else:
             non_kv_found = True
             args.append(arg)
@@ -185,8 +185,8 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
     else:
         try:
             playbook_ds = parse_yaml_from_file(str(lintable.path))
-        except AnsibleError as e:
-            raise SystemExit(str(e))
+        except AnsibleError as exc:
+            raise SystemExit(str(exc))
     results = []
     basedir = os.path.dirname(str(lintable.path))
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
@@ -306,15 +306,15 @@ def _taskshandlers_children(
             message="A malformed block was encountered while loading a block.",
             rule=RuntimeErrorRule(),
         )
-    for th in v:
+    for task_handler in v:
 
         # ignore empty tasks, `-`
-        if not th:
+        if not task_handler:
             continue
 
         with contextlib.suppress(LookupError):
             children = _get_task_handler_children_for_tasks_or_playbooks(
-                th,
+                task_handler,
                 basedir,
                 k,
                 parent_type,
@@ -323,32 +323,34 @@ def _taskshandlers_children(
             continue
 
         if (
-            "include_role" in th or "import_role" in th
+            "include_role" in task_handler or "import_role" in task_handler
         ):  # lgtm [py/unreachable-statement]
-            th = normalize_task_v2(th)
-            _validate_task_handler_action_for_role(th["action"])
+            task_handler = normalize_task_v2(task_handler)
+            _validate_task_handler_action_for_role(task_handler["action"])
             results.extend(
                 _roles_children(
                     basedir,
                     k,
-                    [th["action"].get("name")],
+                    [task_handler["action"].get("name")],
                     parent_type,
-                    main=th["action"].get("tasks_from", "main"),
+                    main=task_handler["action"].get("tasks_from", "main"),
                 )
             )
             continue
 
-        if "block" not in th:
+        if "block" not in task_handler:
             continue
 
-        results.extend(_taskshandlers_children(basedir, k, th["block"], parent_type))
-        if "rescue" in th:
+        results.extend(
+            _taskshandlers_children(basedir, k, task_handler["block"], parent_type)
+        )
+        if "rescue" in task_handler:
             results.extend(
-                _taskshandlers_children(basedir, k, th["rescue"], parent_type)
+                _taskshandlers_children(basedir, k, task_handler["rescue"], parent_type)
             )
-        if "always" in th:
+        if "always" in task_handler:
             results.extend(
-                _taskshandlers_children(basedir, k, th["always"], parent_type)
+                _taskshandlers_children(basedir, k, task_handler["always"], parent_type)
             )
 
     return results
@@ -513,10 +515,10 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         action, arguments, result["delegate_to"] = mod_arg_parser.parse(
             skip_action_validation=options.skip_action_validation
         )
-    except AnsibleParserError as e:
+    except AnsibleParserError as exc:
         raise MatchError(
             rule=AnsibleParserErrorRule(),
-            message=e.message,
+            message=exc.message,
             filename=task.get(FILENAME_KEY, "Unknown"),
             linenumber=task.get(LINE_NUMBER_KEY, 0),
         )
@@ -699,9 +701,9 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         loader.compose_node = compose_node
         loader.construct_mapping = construct_mapping
         data = loader.get_single_data()
-    except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
-        logging.exception(e)
-        raise SystemExit("Failed to parse YAML in %s: %s" % (lintable.path, str(e)))
+    except (yaml.parser.ParserError, yaml.scanner.ScannerError) as exc:
+        logging.exception(exc)
+        raise SystemExit("Failed to parse YAML in %s: %s" % (lintable.path, str(exc)))
     return data
 
 
@@ -754,9 +756,9 @@ def is_playbook(filename: str) -> bool:
 
     try:
         f = parse_yaml_from_file(filename)
-    except Exception as e:
+    except Exception as exc:
         _logger.warning(
-            "Failed to load %s with %s, assuming is not a playbook.", filename, e
+            "Failed to load %s with %s, assuming is not a playbook.", filename, exc
         )
     else:
         if (
@@ -792,19 +794,19 @@ def get_lintables(
 
         for filename in discover_lintables(options):
 
-            p = Path(filename)
+            path = Path(filename)
             # skip exclusions
             try:
                 for file_path in options.exclude_paths:
-                    if str(p.resolve()).startswith(str(file_path)):
+                    if str(path.resolve()).startswith(str(file_path)):
                         raise FileNotFoundError(
-                            f"File {file_path} matched exclusion entry: {p}"
+                            f"File {file_path} matched exclusion entry: {path}"
                         )
-            except FileNotFoundError as e:
-                _logger.debug("Ignored %s due to: %s", p, e)
+            except FileNotFoundError as exc:
+                _logger.debug("Ignored %s due to: %s", path, exc)
                 continue
 
-            lintables.append(Lintable(p))
+            lintables.append(Lintable(path))
 
         # stage 2: guess roles from current lintables, as there is no unique
         # file that must be present in any kind of role.
@@ -846,10 +848,10 @@ def nested_items(
     if isinstance(data, dict):
         for k, v in data.items():
             yield k, v, parent
-            for k, v, p in nested_items(v, k):
-                yield k, v, p
+            for k, v, returned_parent in nested_items(v, k):
+                yield k, v, returned_parent
     if isinstance(data, list):
         for item in data:
             yield "list-item", item, parent
-            for k, v, p in nested_items(item):
-                yield k, v, p
+            for k, v, returned_parent in nested_items(item):
+                yield k, v, returned_parent

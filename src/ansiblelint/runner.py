@@ -171,11 +171,11 @@ class Runner:
                             continue
                         self.lintables.add(child)
                         files.append(child)
-                except MatchError as e:
-                    if not e.filename:
-                        e.filename = str(lintable.path)
-                    e.rule = LoadingFailureRule()
-                    yield e
+                except MatchError as exc:
+                    if not exc.filename:
+                        exc.filename = str(lintable.path)
+                    exc.rule = LoadingFailureRule()
+                    yield exc
                 except AttributeError:
                     yield MatchError(
                         filename=str(lintable.path), rule=LoadingFailureRule()

@@ -70,8 +70,8 @@ def load_config(config_file: str) -> Dict[Any, Any]:
             if not isinstance(config, dict):
                 _logger.error("Invalid configuration file %s", config_path)
                 sys.exit(INVALID_CONFIG_RC)
-    except yaml.YAMLError as e:
-        _logger.error(e)
+    except yaml.YAMLError as exc:
+        _logger.error(exc)
         sys.exit(INVALID_CONFIG_RC)
 
     config["config_file"] = config_path
@@ -330,12 +330,12 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         return cli_config
 
     for entry in bools:
-        x = getattr(cli_config, entry) or file_config.pop(entry, False)
-        setattr(cli_config, entry, x)
+        v = getattr(cli_config, entry) or file_config.pop(entry, False)
+        setattr(cli_config, entry, v)
 
     for entry, default in scalar_map.items():
-        x = getattr(cli_config, entry, None) or file_config.pop(entry, default)
-        setattr(cli_config, entry, x)
+        v = getattr(cli_config, entry, None) or file_config.pop(entry, default)
+        setattr(cli_config, entry, v)
 
     # if either commandline parameter or config file option is set merge
     # with the other, if neither is set use the default

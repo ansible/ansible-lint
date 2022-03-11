@@ -41,10 +41,10 @@ class RunFromText:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yml", prefix="playbook"
-        ) as fp:
-            fp.write(playbook_text)
-            fp.flush()
-            results = self._call_runner(fp.name)
+        ) as fh:
+            fh.write(playbook_text)
+            fh.flush()
+            results = self._call_runner(fh.name)
         return results
 
     def run_role_tasks_main(self, tasks_main_text: str) -> List[MatchError]:
@@ -52,8 +52,8 @@ class RunFromText:
         role_path = tempfile.mkdtemp(prefix="role_")
         tasks_path = os.path.join(role_path, "tasks")
         os.makedirs(tasks_path)
-        with open(os.path.join(tasks_path, "main.yml"), "w") as fp:
-            fp.write(tasks_main_text)
+        with open(os.path.join(tasks_path, "main.yml"), "w") as fh:
+            fh.write(tasks_main_text)
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results
@@ -63,8 +63,8 @@ class RunFromText:
         role_path = tempfile.mkdtemp(prefix="role_")
         meta_path = os.path.join(role_path, "meta")
         os.makedirs(meta_path)
-        with open(os.path.join(meta_path, "main.yml"), "w") as fp:
-            fp.write(meta_main_text)
+        with open(os.path.join(meta_path, "main.yml"), "w") as fh:
+            fh.write(meta_main_text)
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results

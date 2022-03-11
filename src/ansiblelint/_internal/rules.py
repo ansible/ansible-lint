@@ -31,12 +31,12 @@ class BaseRule:
             for method in [self.matchlines, self.matchtasks, self.matchyaml]:
                 try:
                     matches.extend(method(file))
-                except Exception as e:
+                except Exception as exc:
                     _logger.debug(
                         "Ignored exception from %s.%s: %s",
                         self.__class__.__name__,
                         method,
-                        e,
+                        exc,
                     )
         else:
             matches.extend(self.matchdir(file))

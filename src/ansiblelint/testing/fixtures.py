@@ -25,8 +25,8 @@ from ansiblelint.testing import RunFromText
 @pytest.fixture
 def play_file_path(tmp_path: Path) -> str:
     """Fixture to return a playbook path."""
-    p = tmp_path / "playbook.yml"
-    return str(p)
+    path = tmp_path / "playbook.yml"
+    return str(path)
 
 
 @pytest.fixture
@@ -77,6 +77,6 @@ def _play_files(tmp_path: Path, request: SubRequest) -> None:
         return
     for play_file in request.param:
         print(play_file.name)
-        p = tmp_path / play_file.name
-        os.makedirs(os.path.dirname(p), exist_ok=True)
-        p.write_text(play_file.content)
+        path = tmp_path / play_file.name
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        path.write_text(play_file.content)

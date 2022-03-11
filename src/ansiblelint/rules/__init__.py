@@ -110,13 +110,13 @@ class AnsibleLintRule(BaseRule):
             message = None
             if isinstance(result, str):
                 message = result
-            m = self.create_matcherror(
+            matcherror = self.create_matcherror(
                 message=message,
                 linenumber=prev_line_no + 1,
                 details=line,
                 filename=file,
             )
-            matches.append(m)
+            matches.append(matcherror)
         return matches
 
     # TODO(ssbarnea): Reduce mccabe complexity
@@ -151,14 +151,14 @@ class AnsibleLintRule(BaseRule):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            m = self.create_matcherror(
+            match = self.create_matcherror(
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
                 details=task_msg,
                 filename=file,
             )
-            m.task = task
-            matches.append(m)
+            match.task = task
+            matches.append(match)
         return matches
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
@@ -266,13 +266,13 @@ class RulesCollection:
             try:
                 if file.content is not None:  # loads the file content
                     pass
-            except IOError as e:
+            except IOError as exc:
                 return [
                     MatchError(
-                        message=str(e),
+                        message=str(exc),
                         filename=file,
                         rule=LoadingFailureRule(),
-                        tag=e.__class__.__name__.lower(),
+                        tag=exc.__class__.__name__.lower(),
                     )
                 ]
 

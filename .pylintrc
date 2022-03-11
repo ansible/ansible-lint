@@ -2,6 +2,10 @@
 preferred-modules =
     unittest:pytest,
 
+[MASTER]
+# pylint defaults + f,fh,v
+good-names =i,j,k,ex,Run,_,f,fh,v
+
 [MESSAGES CONTROL]
 
 disable =

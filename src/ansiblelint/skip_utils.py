@@ -174,9 +174,9 @@ def _get_rule_skips_from_yaml(yaml_input: Sequence[Any]) -> Sequence[Any]:
                 if isinstance(val, (dict, list)):
                     traverse_yaml(val)
         elif isinstance(obj, list):
-            for e in obj:
-                if isinstance(e, (dict, list)):
-                    traverse_yaml(e)
+            for element in obj:
+                if isinstance(element, (dict, list)):
+                    traverse_yaml(element)
         else:
             return
 

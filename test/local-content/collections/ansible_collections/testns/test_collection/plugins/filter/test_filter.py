@@ -1,4 +1,5 @@
 """A filter plugin."""
+# pylint: disable=invalid-name
 
 
 def a_test_filter(a, b):

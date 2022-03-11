@@ -192,8 +192,8 @@ def _sanitize_list_options(tag_list: List[str]) -> List[str]:
     """Normalize list options."""
     # expand comma separated entries
     tags = set()
-    for t in tag_list:
-        tags.update(str(t).split(","))
+    for tag in tag_list:
+        tags.update(str(tag).split(","))
     # remove duplicates, and return as sorted list
     return sorted(set(tags))
 
