@@ -33,7 +33,7 @@ from ansiblelint.testing import run_ansible_lint
 @pytest.fixture
 def test_rules_collection() -> RulesCollection:
     """Create a shared rules collection test instance."""
-    return RulesCollection([os.path.abspath("./test/rules")])
+    return RulesCollection([os.path.abspath("./test/rules/fixtures")])
 
 
 @pytest.fixture
@@ -136,7 +136,7 @@ def test_rich_rule_listing() -> None:
     This check also offers the contract of having rule id, short and long
     descriptions in the console output.
     """
-    rules_path = os.path.abspath("./test/rules")
+    rules_path = os.path.abspath("./test/rules/fixtures")
     result = run_ansible_lint("-r", rules_path, "-f", "rich", "-L")
     assert result.returncode == 0
 

@@ -59,48 +59,7 @@ per-file-ignores =
 
   # FIXME: drop these once they're fixed
   # Ref: https://github.com/ansible-community/ansible-lint/issues/725
-  test/__init__.py: D102
-  test/conftest.py: D100
-  test/rules/EMatcherRule.py: D100 D101 D102
-  test/rules/UnsetVariableMatcherRule.py: D100 D101 D102
-  test/TestAnsibleLintRule.py: D100
-  test/TestBaseFormatter.py: D100
-  test/TestBecomeUserWithoutBecome.py: D100 D101 D102
-  test/TestCliRolePaths.py: D100 D101 D102
-  test/TestCommandLineInvocationSameAsConfig.py: D100
-  test/TestCommandHasChangesCheck.py: D100 D101 D102
-  test/TestComparisonToLiteralBool.py: D100 D101 D102
-  test/TestDependenciesInMeta.py: D100
-  test/TestDeprecatedModule.py: D100 D101 D102
-  test/TestEnvVarsInCommand.py: D100 D101 D102
-  test/TestFormatter.py: D100 D101 D102
-  test/TestImportIncludeRole.py: D100
-  test/TestImportWithMalformed.py: D100
-  test/TestIncludeMissFileWithRole.py: D100
-  test/TestLineTooLong.py: D100 D101 D102
-  test/TestLintRule.py: D100 D101 D102
-  test/TestNestedJinjaRule.py: D100
-  test/TestMatchError.py: D101
-  test/TestMetaChangeFromDefault.py: D100 D101 D102
-  test/TestMetaMainHasInfo.py: D100 D101 D102
-  test/TestMetaVideoLinks.py: D100 D101 D102
-  test/TestNoFormattingInWhenRule.py: D100 D101 D102
-  test/TestOctalPermissions.py: D100 D101 D102
-  test/TestPackageIsNotLatest.py: D100 D101 D102
-  test/TestRoleRelativePath.py: D100 D101 D102
-  test/TestRuleProperties.py: D100
-  test/TestRulesCollection.py: D100
-  test/TestRunner.py: D100
-  test/TestShellWithoutPipefail.py: D100 D101 D102
-  test/TestSkipImportPlaybook.py: D100
-  test/TestSkipInsideYaml.py: D100
-  test/TestSkipPlaybookItems.py: D100
-  test/TestTaskHasName.py: D100 D101 D102
-  test/TestTaskIncludes.py: D100
-  test/TestTaskNoLocalAction.py: D100 D101 D102
-  test/TestUseHandlerRatherThanWhenChanged.py: D100 D101 D102
-  test/TestUsingBareVariablesIsDeprecated.py: D100 D101 D102
-  test/TestWithSkipTagId.py: D100 D101 D102
+  test/*: D100 D101 D102
 
 # flake8-pytest-style
 # PT001:
