@@ -77,10 +77,7 @@ class Transformer:
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
 
-            for match in sorted(matches):
-                if not isinstance(match.rule, TransformMixin):
-                    continue
-                match.rule.transform(match, file, ruamel_data or data)
+            self._do_transforms(file, ruamel_data or data, matches)
 
             if file_is_yaml:
                 # noinspection PyUnboundLocalVariable
@@ -88,3 +85,15 @@ class Transformer:
 
             if file.updated:
                 file.write()
+
+    @staticmethod
+    def _do_transforms(
+        file: Lintable,
+        data: Union[CommentedMap, CommentedSeq, str],
+        matches: List[MatchError],
+    ) -> None:
+        """Do Rule-Transforms handling any last-minute MatchError inspections."""
+        for match in sorted(matches):
+            if not isinstance(match.rule, TransformMixin):
+                continue
+            match.rule.transform(match, file, data)
