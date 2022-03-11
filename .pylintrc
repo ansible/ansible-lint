@@ -14,6 +14,7 @@ disable =
     # TODO(ssbarnea): remove temporary skips adding during initial adoption:
     bad-continuation,
     broad-except,
+    consider-using-f-string,
     dangerous-default-value,
     duplicate-code,
     fixme,
@@ -33,3 +34,4 @@ disable =
     too-many-instance-attributes,
     too-many-return-statements,
     unused-argument,
+    unspecified-encoding,

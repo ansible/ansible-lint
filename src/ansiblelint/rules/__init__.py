@@ -262,7 +262,7 @@ class RulesCollection:
     def run(
         self, file: Lintable, tags: Set[str] = set(), skip_list: List[str] = []
     ) -> List[MatchError]:
-        matches: List[MatchError] = list()
+        matches: List[MatchError] = []
 
         if not file.path.is_dir():
             try:
