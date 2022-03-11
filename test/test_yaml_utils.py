@@ -303,12 +303,6 @@ def ruamel_data(lintable: Lintable) -> Union[CommentedMap, CommentedSeq]:
         # playbook lintables
         pytest.param(
             "examples/playbooks/become.yml",
-            0,  # TODO: raise error?
-            [],
-            id="1_play_playbook-bad_line_number",
-        ),
-        pytest.param(
-            "examples/playbooks/become.yml",
             1,
             [],
             id="1_play_playbook-line_before_play",
@@ -330,12 +324,6 @@ def ruamel_data(lintable: Lintable) -> Union[CommentedMap, CommentedSeq]:
             100,
             [0],
             id="1_play_playbook-line_after_eof",
-        ),
-        pytest.param(
-            "examples/playbooks/become-user-without-become-success.yml",
-            0,  # TODO: raise error?
-            [],
-            id="4_play_playbook-bad_line_number",
         ),
         pytest.param(
             "examples/playbooks/become-user-without-become-success.yml",
@@ -423,12 +411,6 @@ def ruamel_data(lintable: Lintable) -> Union[CommentedMap, CommentedSeq]:
         ),
         pytest.param(
             "examples/playbooks/playbook-parent.yml",
-            0,  # TODO: raise error?
-            [],
-            id="import_playbook-bad_line_number",
-        ),
-        pytest.param(
-            "examples/playbooks/playbook-parent.yml",
             1,
             [],
             id="import_playbook-line_before_play",
@@ -496,12 +478,6 @@ def test_get_path_to_play(
             ".pre-commit-config.yaml", 2, [], id="ignore_unrecognized_yaml_file"
         ),
         # tasks-containing lintables
-        pytest.param(
-            "examples/playbooks/become.yml",
-            0,  # TODO: raise error?
-            [],
-            id="1_task_playbook-bad_line_number",
-        ),
         pytest.param(
             "examples/playbooks/become.yml",
             4,
@@ -728,12 +704,6 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/roles/more_complex/tasks/main.yml",
-            0,  # TODO: raise error?
-            [],
-            id="tasks-bad_line_number",
-        ),
-        pytest.param(
-            "examples/roles/more_complex/tasks/main.yml",
             1,
             [],
             id="tasks-line_before_tasks",
@@ -830,3 +800,44 @@ def test_get_path_to_task(
         lintable, line_number, ruamel_data
     )
     assert path_to_task == expected_path
+
+
+@pytest.mark.parametrize(
+    ("file_path", "line_number"),
+    (
+        pytest.param("examples/playbooks/become.yml", 0, id="1_play_playbook"),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            0,
+            id="4_play_playbook",
+        ),
+        pytest.param("examples/playbooks/playbook-parent.yml", 0, id="import_playbook"),
+        pytest.param("examples/playbooks/become.yml", 0, id="1_task_playbook"),
+    ),
+)
+def test_get_path_to_play_raises_value_error_for_bad_line_number(
+    lintable: Lintable,
+    line_number: int,
+    ruamel_data: Union[CommentedMap, CommentedSeq],
+) -> None:
+    """Ensure ``get_path_to_play`` raises ValueError for line_number < 1."""
+    with pytest.raises(
+        ValueError, match=f"expected line_number >= 1, got {line_number}"
+    ):
+        ansiblelint.yaml_utils.get_path_to_play(lintable, line_number, ruamel_data)
+
+
+@pytest.mark.parametrize(
+    ("file_path", "line_number"),
+    (pytest.param("examples/roles/more_complex/tasks/main.yml", 0, id="tasks"),),
+)
+def test_get_path_to_task_raises_value_error_for_bad_line_number(
+    lintable: Lintable,
+    line_number: int,
+    ruamel_data: Union[CommentedMap, CommentedSeq],
+) -> None:
+    """Ensure ``get_task_to_play`` raises ValueError for line_number < 1."""
+    with pytest.raises(
+        ValueError, match=f"expected line_number >= 1, got {line_number}"
+    ):
+        ansiblelint.yaml_utils.get_path_to_task(lintable, line_number, ruamel_data)
