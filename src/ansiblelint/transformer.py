@@ -1,6 +1,6 @@
 """Transformer implementation."""
 import logging
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Optional, Set, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -63,23 +63,28 @@ class Transformer:
                 data = ""
                 file_is_yaml = False
 
+            ruamel_data: Optional[Union[CommentedMap, CommentedSeq]] = None
             if file_is_yaml:
                 # We need a fresh YAML() instance for each load because ruamel.yaml
                 # stores intermediate state during load which could affect loading
                 # any other files. (Based on suggestion from ruamel.yaml author)
                 yaml = FormattedYAML()
 
-                ruamel_data: Union[CommentedMap, CommentedSeq] = yaml.loads(data)
+                ruamel_data = yaml.loads(data)
                 if not isinstance(ruamel_data, (CommentedMap, CommentedSeq)):
                     # This is an empty vars file or similar which loads as None.
                     # It is not safe to write this file or data-loss is likely.
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
 
-                for match in sorted(matches):
-                    if not isinstance(match.rule, TransformMixin):
-                        continue
-                    match.rule.transform(match, file, data)
+            for match in sorted(matches):
+                if not isinstance(match.rule, TransformMixin):
+                    continue
+                match.rule.transform(match, file, ruamel_data or data)
 
+            if file_is_yaml:
+                # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
+
+            if file.updated:
                 file.write()
