@@ -90,13 +90,13 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             else:
                 details = stdout
 
-            m = _ansible_syntax_check_re.search(stderr)
-            if m:
-                message = m.groupdict()["title"]
+            match = _ansible_syntax_check_re.search(stderr)
+            if match:
+                message = match.groupdict()["title"]
                 # Ansible returns absolute paths
-                filename = m.groupdict()["filename"]
-                linenumber = int(m.groupdict()["line"])
-                column = int(m.groupdict()["column"])
+                filename = match.groupdict()["filename"]
+                linenumber = int(match.groupdict()["line"])
+                column = int(match.groupdict()["column"])
             elif _empty_playbook_re.search(stderr):
                 message = "Empty playbook, nothing to do"
                 filename = str(lintable.path)

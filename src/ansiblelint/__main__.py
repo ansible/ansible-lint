@@ -244,8 +244,8 @@ def _previous_revision() -> Iterator[None]:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
     ).stdout
-    p = pathlib.Path(worktree_dir)
-    p.mkdir(parents=True, exist_ok=True)
+    path = pathlib.Path(worktree_dir)
+    path.mkdir(parents=True, exist_ok=True)
     os.system(f"git worktree add -f {worktree_dir} 2>/dev/null")
     try:
         with cwd(worktree_dir):
@@ -268,8 +268,8 @@ def _run_cli_entrypoint() -> None:
             raise
     except KeyboardInterrupt:
         sys.exit(EXIT_CONTROL_C_RC)
-    except RuntimeError as e:
-        raise SystemExit(str(e))
+    except RuntimeError as exc:
+        raise SystemExit(str(exc))
 
 
 def path_inject() -> None:

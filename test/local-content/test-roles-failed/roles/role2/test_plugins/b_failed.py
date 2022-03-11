@@ -1,9 +1,9 @@
 """A test plugin."""
 
 
-def compatibility_in_test(a, b):
-    """Return True when a is contained in b."""
-    return a in b
+def compatibility_in_test(element, container):
+    """Return True when element is contained in container."""
+    return element in container
 
 
 class TestModule:

@@ -46,19 +46,21 @@ class YamllintRule(AnsibleLintRule):
         if str(file.base_kind) != "text/yaml":
             return matches
 
-        for p in run_yamllint(file.content, YamllintRule.config, filepath=file.path):
+        for problem in run_yamllint(
+            file.content, YamllintRule.config, filepath=file.path
+        ):
             self.severity = "VERY_LOW"
-            if p.level == "error":
+            if problem.level == "error":
                 self.severity = "MEDIUM"
-            if p.desc.endswith("(syntax)"):
+            if problem.desc.endswith("(syntax)"):
                 self.severity = "VERY_HIGH"
             matches.append(
                 self.create_matcherror(
-                    message=p.desc,
-                    linenumber=p.line,
+                    message=problem.desc,
+                    linenumber=problem.line,
                     details="",
                     filename=str(file.path),
-                    tag=p.rule,
+                    tag=problem.rule,
                 )
             )
 

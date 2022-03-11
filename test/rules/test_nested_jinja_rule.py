@@ -214,8 +214,8 @@ def _playbook_file(tmp_path: Path, request: SubRequest) -> None:
     if request.param is None:
         return
     for play_file in request.param:
-        p = tmp_path / play_file.name
-        p.write_text(play_file.content)
+        path = tmp_path / play_file.name
+        path.write_text(play_file.content)
 
 
 @pytest.mark.parametrize(
