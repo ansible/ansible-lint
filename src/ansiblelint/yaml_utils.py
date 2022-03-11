@@ -347,7 +347,7 @@ def _get_path_to_task_in_tasks_block(
     last_line_number: Optional[int] = None,  # 1-based
 ) -> List[Union[str, int]]:
     """Get the path to the task in the given tasks block at the given line number."""
-    task: CommentedMap
+    task: Optional[CommentedMap]
     # line_number and last_line_number are 1-based. Convert to 0-based.
     line_index = line_number - 1
     last_line_index = None if last_line_number is None else last_line_number - 1
@@ -358,9 +358,17 @@ def _get_path_to_task_in_tasks_block(
     for task_index, task in enumerate(tasks_block):
         next_task_index = task_index + 1
         if last_task_index > next_task_index:
-            next_task_line_index = tasks_block[next_task_index].lc.line
+            if tasks_block[next_task_index] is not None:
+                next_task_line_index = tasks_block[next_task_index].lc.line
+            else:
+                next_task_line_index = tasks_block.lc.item(next_task_index)[0]
         else:
             next_task_line_index = None
+
+        if task is None:
+            # create a dummy task to represent the null task
+            task = CommentedMap()
+            task.lc.line, task.lc.col = tasks_block.lc.item(task_index)
 
         nested_task_keys = set(task.keys()).intersection(set(NESTED_TASK_KEYS))
         if nested_task_keys:

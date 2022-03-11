@@ -703,7 +703,11 @@ def test_get_path_to_play(
             [0, "tasks", 0, "always", 0],
             id="playbook-subtasks-always_task_3",
         ),
-        # pytest.param("examples/", 1, [], id="tasks"),
+        # tasks files
+        pytest.param("examples/playbooks/tasks/x.yml", 2, [0], id="tasks-null_task"),
+        pytest.param(
+            "examples/playbooks/tasks/x.yml", 6, [1], id="tasks-null_task_next"
+        ),
         # pytest.param("examples/", 1, [], id="handlers"),
     ),
 )
