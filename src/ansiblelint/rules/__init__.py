@@ -196,9 +196,9 @@ class AnsibleLintRule(BaseRule):
         return matches
 
 
-def is_valid_rule(rule: AnsibleLintRule) -> bool:
+def is_valid_rule(rule: Any) -> bool:
     """Check if given rule is valid or not."""
-    return isinstance(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc)
+    return issubclass(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc)
 
 
 def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
@@ -212,12 +212,14 @@ def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             try:
-                rule = getattr(module, pluginname)()
-                if is_valid_rule(rule):
-                    yield rule
+                for _, obj in inspect.getmembers(module):
+                    if inspect.isclass(obj) and is_valid_rule(obj):
+                        yield obj()
 
-            except (TypeError, ValueError, AttributeError):
-                _logger.warning("Skipped invalid rule from %s", pluginname)
+            except (TypeError, ValueError, AttributeError) as exc:
+                _logger.warning(
+                    "Skipped invalid rule from %s due to %s", pluginname, exc
+                )
 
 
 class RulesCollection:

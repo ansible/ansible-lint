@@ -68,6 +68,7 @@ hwcksum
 idempotency
 importlib
 iniconfig
+isclass
 isdir
 isdisjoint
 iskeyword
