@@ -25,7 +25,6 @@ disable =
     no-self-use,
     not-callable,
     protected-access,
-    raise-missing-from,
     too-few-public-methods,
     too-many-branches,
     too-many-instance-attributes,
