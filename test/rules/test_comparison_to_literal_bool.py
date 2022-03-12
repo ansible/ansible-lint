@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.ComparisonToLiteralBoolRule import ComparisonToLiteralBoolRule
+from ansiblelint.rules.literal_compare import ComparisonToLiteralBoolRule
 from ansiblelint.testing import RunFromText
 
 PASS_WHEN = """

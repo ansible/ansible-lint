@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.RoleRelativePath import RoleRelativePath
+from ansiblelint.rules.no_relative_paths import RoleRelativePath
 from ansiblelint.testing import RunFromText
 
 FAIL_TASKS = """

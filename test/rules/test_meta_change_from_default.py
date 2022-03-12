@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.MetaChangeFromDefaultRule import MetaChangeFromDefaultRule
+from ansiblelint.rules.meta_incorrect import MetaChangeFromDefaultRule
 from ansiblelint.testing import RunFromText
 
 DEFAULT_GALAXY_INFO = """

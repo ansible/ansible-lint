@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.EnvVarsInCommandRule import EnvVarsInCommandRule
+from ansiblelint.rules.inline_env_var import EnvVarsInCommandRule
 from ansiblelint.testing import RunFromText
 
 SUCCESS_PLAY_TASKS = """

@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.TaskNoLocalAction import TaskNoLocalAction
+from ansiblelint.rules.deprecated_local_action import TaskNoLocalAction
 from ansiblelint.testing import RunFromText
 
 TASK_LOCAL_ACTION = """

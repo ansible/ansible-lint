@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.MetaVideoLinksRule import MetaVideoLinksRule
+from ansiblelint.rules.meta_video_links import MetaVideoLinksRule
 from ansiblelint.testing import RunFromText
 
 META_VIDEO_LINKS = """

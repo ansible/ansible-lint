@@ -2,7 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.CommandHasChangesCheckRule import CommandHasChangesCheckRule
+from ansiblelint.rules.no_changed_when import CommandHasChangesCheckRule
 from ansiblelint.runner import Runner
 
 

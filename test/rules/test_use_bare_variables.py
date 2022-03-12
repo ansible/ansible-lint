@@ -2,9 +2,7 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.UsingBareVariablesIsDeprecatedRule import (
-    UsingBareVariablesIsDeprecatedRule,
-)
+from ansiblelint.rules.deprecated_bare_vars import UsingBareVariablesIsDeprecatedRule
 from ansiblelint.runner import Runner
 
 
