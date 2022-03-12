@@ -89,20 +89,23 @@ def test_matcherror_invalid() -> None:
     ),
 )
 class TestMatchErrorCompare:
+    @staticmethod
     def test_match_error_less_than(
-        self, left_match_error: MatchError, right_match_error: MatchError
+        left_match_error: MatchError, right_match_error: MatchError
     ) -> None:
         """Check 'less than' protocol implementation in MatchError."""
         assert right_match_error < left_match_error
 
+    @staticmethod
     def test_match_error_greater_than(
-        self, left_match_error: MatchError, right_match_error: MatchError
+        left_match_error: MatchError, right_match_error: MatchError
     ) -> None:
         """Check 'greater than' protocol implementation in MatchError."""
         assert left_match_error > right_match_error
 
+    @staticmethod
     def test_match_error_not_equal(
-        self, left_match_error: MatchError, right_match_error: MatchError
+        left_match_error: MatchError, right_match_error: MatchError
     ) -> None:
         """Check 'not equals' protocol implementation in MatchError."""
         assert left_match_error != right_match_error

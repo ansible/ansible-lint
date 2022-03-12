@@ -52,7 +52,8 @@ class OctalPermissionsRule(AnsibleLintRule):
         "unarchive",
     ]
 
-    def is_invalid_permission(self, mode: int) -> bool:
+    @staticmethod
+    def is_invalid_permission(mode: int) -> bool:
         # sensible file permission modes don't
         # have write bit set when read bit is
         # not set and don't have execute bit set

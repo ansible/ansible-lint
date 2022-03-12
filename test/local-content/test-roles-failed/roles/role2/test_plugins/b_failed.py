@@ -9,7 +9,8 @@ def compatibility_in_test(element, container):
 class TestModule:
     """Test plugin."""
 
-    def tests(self):
+    @staticmethod
+    def tests():
         """Return tests."""
         return {
             "b_test_failed": compatibility_in_test,
