@@ -1,5 +1,4 @@
-# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
-import unittest
+import pytest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.risky_octal import OctalPermissionsRule
@@ -75,81 +74,90 @@ FAIL_TASKS = """
 """
 
 
-class TestOctalPermissionsRuleWithFile(unittest.TestCase):
+VALID_MODES = [
+    0o777,
+    0o775,
+    0o770,
+    0o755,
+    0o750,
+    0o711,
+    0o710,
+    0o700,
+    0o666,
+    0o664,
+    0o660,
+    0o644,
+    0o640,
+    0o600,
+    0o555,
+    0o551,
+    0o550,
+    0o511,
+    0o510,
+    0o500,
+    0o444,
+    0o440,
+    0o400,
+]
 
+INVALID_MODES = [
+    777,
+    775,
+    770,
+    755,
+    750,
+    711,
+    710,
+    700,
+    666,
+    664,
+    660,
+    644,
+    640,
+    622,
+    620,
+    600,
+    555,
+    551,
+    550,  # 511 == 0o777, 510 == 0o776, 500 == 0o764
+    444,
+    440,
+    400,
+]
+
+
+@pytest.fixture(name="runner")
+def fixture_runner() -> RunFromText:
+    """Fixture for testing the OctalPermissionsRule."""
     collection = RulesCollection()
-    VALID_MODES = [
-        0o777,
-        0o775,
-        0o770,
-        0o755,
-        0o750,
-        0o711,
-        0o710,
-        0o700,
-        0o666,
-        0o664,
-        0o660,
-        0o644,
-        0o640,
-        0o600,
-        0o555,
-        0o551,
-        0o550,
-        0o511,
-        0o510,
-        0o500,
-        0o444,
-        0o440,
-        0o400,
-    ]
+    rule = OctalPermissionsRule()
+    collection.register(rule)
+    return RunFromText(collection)
 
-    INVALID_MODES = [
-        777,
-        775,
-        770,
-        755,
-        750,
-        711,
-        710,
-        700,
-        666,
-        664,
-        660,
-        644,
-        640,
-        622,
-        620,
-        600,
-        555,
-        551,
-        550,  # 511 == 0o777, 510 == 0o776, 500 == 0o764
-        444,
-        440,
-        400,
-    ]
 
-    def setUp(self) -> None:
-        self.rule = OctalPermissionsRule()
-        self.collection.register(self.rule)
-        self.runner = RunFromText(self.collection)
+def test_octal_success(runner: RunFromText) -> None:
+    """Test that octal permissions are valid."""
+    results = runner.run_playbook(SUCCESS_TASKS)
+    assert len(results) == 0
 
-    def test_success(self) -> None:
-        results = self.runner.run_playbook(SUCCESS_TASKS)
-        assert len(results) == 0
 
-    def test_fail(self) -> None:
-        results = self.runner.run_playbook(FAIL_TASKS)
-        assert len(results) == 4
+def test_octal_fail(runner: RunFromText) -> None:
+    """Test that octal permissions are invalid."""
+    results = runner.run_playbook(FAIL_TASKS)
+    assert len(results) == 4
 
-    def test_valid_modes(self) -> None:
-        for mode in self.VALID_MODES:
-            assert not self.rule.is_invalid_permission(mode), (
-                "0o%o should be a valid mode" % mode
-            )
 
-    def test_invalid_modes(self) -> None:
-        for mode in self.INVALID_MODES:
-            assert self.rule.is_invalid_permission(mode), (
-                "%d should be an invalid mode" % mode
-            )
+def test_octal_valid_modes(runner: RunFromText) -> None:
+    """Test that octal modes are valid."""
+    rule = OctalPermissionsRule()
+    for mode in VALID_MODES:
+        assert not rule.is_invalid_permission(mode), (
+            "0o%o should be a valid mode" % mode
+        )
+
+
+def test_octal_invalid_modes() -> None:
+    """Test that octal modes are invalid."""
+    rule = OctalPermissionsRule()
+    for mode in INVALID_MODES:
+        assert rule.is_invalid_permission(mode), "%d should be an invalid mode" % mode

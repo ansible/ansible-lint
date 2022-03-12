@@ -1,6 +1,3 @@
-# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
-import unittest
-
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.risky_shell_pipe import ShellWithoutPipefail
 from ansiblelint.testing import RunFromText
@@ -78,17 +75,19 @@ SUCCESS_TASKS = """
 """
 
 
-class TestShellWithoutPipeFail(unittest.TestCase):
+def test_fail() -> None:
+    """Negative test for risky-shell-pipe."""
     collection = RulesCollection()
     collection.register(ShellWithoutPipefail())
+    runner = RunFromText(collection)
+    results = runner.run_playbook(FAIL_TASKS)
+    assert len(results) == 3
 
-    def setUp(self) -> None:
-        self.runner = RunFromText(self.collection)
 
-    def test_fail(self) -> None:
-        results = self.runner.run_playbook(FAIL_TASKS)
-        assert len(results) == 3
-
-    def test_success(self) -> None:
-        results = self.runner.run_playbook(SUCCESS_TASKS)
-        assert len(results) == 0
+def test_success() -> None:
+    """Positive test for risky-shell-pipe."""
+    collection = RulesCollection()
+    collection.register(ShellWithoutPipefail())
+    runner = RunFromText(collection)
+    results = runner.run_playbook(SUCCESS_TASKS)
+    assert len(results) == 0
