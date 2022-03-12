@@ -1,8 +1,7 @@
 import keyword
 import re
 import sys
-from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Pattern, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
@@ -44,10 +43,7 @@ class VariableNamingRule(AnsibleLintRule):
     severity = "MEDIUM"
     tags = ["idiom", "experimental"]
     version_added = "v5.0.10"
-
-    @lru_cache()
-    def re_pattern(self) -> Pattern[str]:
-        return re.compile(options.var_naming_pattern or "^[a-z_][a-z0-9_]*$")
+    re_pattern = re.compile(options.var_naming_pattern or "^[a-z_][a-z0-9_]*$")
 
     def is_invalid_variable_name(self, ident: str) -> bool:
         """Check if variable name is using right pattern."""
@@ -70,7 +66,7 @@ class VariableNamingRule(AnsibleLintRule):
         # previous tests should not be triggered as they would have raised a
         # syntax-error when we loaded the files but we keep them here as a
         # safety measure.
-        return not bool(self.re_pattern().match(ident))
+        return not bool(self.re_pattern.match(ident))
 
     def matchplay(
         self, file: "Lintable", data: "odict[str, Any]"

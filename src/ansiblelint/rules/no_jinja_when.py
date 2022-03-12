@@ -21,7 +21,8 @@ class NoFormattingInWhenRule(AnsibleLintRule):
     tags = ["deprecations"]
     version_added = "historic"
 
-    def _is_valid(self, when: str) -> bool:
+    @staticmethod
+    def _is_valid(when: str) -> bool:
         if not isinstance(when, str):
             return True
         return when.find("{{") == -1 and when.find("}}") == -1

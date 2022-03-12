@@ -48,10 +48,12 @@ class BaseFormatter(Generic[T]):
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self._base_dir)
 
+    # pylint: disable=no-self-use
     def format(self, match: "MatchError") -> str:
         return str(match)
 
-    def escape(self, text: str) -> str:
+    @staticmethod
+    def escape(text: str) -> str:
         """Escapes a string to avoid processing it as markup."""
         return rich.markup.escape(text)
 

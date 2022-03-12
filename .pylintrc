@@ -21,7 +21,6 @@ disable =
     missing-function-docstring,
     missing-module-docstring,
     no-member,
-    no-self-use,
     not-callable,
     protected-access,
     too-few-public-methods,

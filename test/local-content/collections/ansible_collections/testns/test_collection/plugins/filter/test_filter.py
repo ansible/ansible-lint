@@ -10,6 +10,7 @@ def a_test_filter(a, b):
 class FilterModule:
     """Filter plugin."""
 
-    def filters(self):
+    @staticmethod
+    def filters():
         """Return filters."""
         return {"test_filter": a_test_filter}

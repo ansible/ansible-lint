@@ -85,7 +85,8 @@ class RoleNames(AnsibleLintRule):
                 )
         return result
 
-    def _infer_role_name(self, meta: Path, default: str) -> str:
+    @staticmethod
+    def _infer_role_name(meta: Path, default: str) -> str:
         if meta.is_file():
             meta_data = parse_yaml_from_file(str(meta))
             if meta_data:
