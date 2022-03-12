@@ -49,7 +49,7 @@ def _write_module_stub(
     body = ANSIBLE_MOCKED_MODULE.format(
         name=name, collection=collection, namespace=namespace
     )
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(body)
 
 

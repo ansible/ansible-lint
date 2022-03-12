@@ -65,7 +65,7 @@ def load_config(config_file: str) -> Dict[Any, Any]:
         return {}
 
     try:
-        with open(config_path, "r") as stream:
+        with open(config_path, "r", encoding="utf-8") as stream:
             config = yaml.safe_load(stream)
             if not isinstance(config, dict):
                 _logger.error("Invalid configuration file %s", config_path)
