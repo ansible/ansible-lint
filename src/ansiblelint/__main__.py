@@ -269,7 +269,7 @@ def _run_cli_entrypoint() -> None:
     except KeyboardInterrupt:
         sys.exit(EXIT_CONTROL_C_RC)
     except RuntimeError as exc:
-        raise SystemExit(str(exc))
+        raise SystemExit from exc
 
 
 def path_inject() -> None:
