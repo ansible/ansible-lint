@@ -65,7 +65,7 @@ def rule_runner(request: SubRequest, config_options: Namespace) -> RunFromText:
 @pytest.fixture
 def config_options() -> Iterator[Namespace]:
     """Return configuration options that will be restored after testrun."""
-    global options  # pylint: disable=global-statement
+    global options  # pylint: disable=global-statement,invalid-name
     original_options = copy.deepcopy(options)
     yield options
     options = original_options

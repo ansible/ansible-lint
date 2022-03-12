@@ -19,7 +19,6 @@ disable =
     duplicate-code,
     fixme,
     inconsistent-return-statements,
-    invalid-name,
     missing-class-docstring,
     missing-function-docstring,
     missing-module-docstring,
