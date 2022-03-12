@@ -16,7 +16,6 @@ disable =
     dangerous-default-value,
     duplicate-code,
     fixme,
-    inconsistent-return-statements,
     missing-class-docstring,
     missing-function-docstring,
     missing-module-docstring,

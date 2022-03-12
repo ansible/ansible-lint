@@ -469,7 +469,7 @@ class FormattedEmitter(Emitter):
         """Skip writing '%YAML 1.1'."""
         if version_text == "1.1":
             return
-        return super().write_version_directive(version_text)
+        super().write_version_directive(version_text)
 
 
 class FormattedYAML(YAML):
