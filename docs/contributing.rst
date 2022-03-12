@@ -46,5 +46,5 @@ to create a new rule by following the steps below:
 * Build the docs using :command:`tox -e docs` and check that the new rule is
   displayed correctly in them.
 
-.. _MetaTagValidRule: https://github.com/ansible-community/ansible-lint/blob/main/src/ansiblelint/rules/MetaTagValidRule.py
+.. _MetaTagValidRule: https://github.com/ansible-community/ansible-lint/blob/main/src/ansiblelint/rules/meta_no_tags.py
 .. _rules: https://ansible-lint.readthedocs.io/en/latest/default_rules.html

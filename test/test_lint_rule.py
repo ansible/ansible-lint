@@ -22,7 +22,7 @@ import pytest
 
 from ansiblelint.file_utils import Lintable
 
-from .rules.fixtures import EMatcherRule, RawTaskRule
+from .rules.fixtures import ematcher, raw_task
 
 
 @pytest.fixture
@@ -33,13 +33,13 @@ def lintable() -> Lintable:
 
 def test_rule_matching(lintable: Lintable) -> None:
     """Test rule.matchlines() on a playbook."""
-    ematcher = EMatcherRule.EMatcherRule()
-    matches = ematcher.matchlines(lintable)
+    rule = ematcher.EMatcherRule()
+    matches = rule.matchlines(lintable)
     assert len(matches) == 3
 
 
 def test_raw_rule_matching(lintable: Lintable) -> None:
     """Test rule.matchlines() on a playbook."""
-    ematcher = RawTaskRule.RawTaskRule()
+    ematcher = raw_task.RawTaskRule()
     matches = ematcher.matchtasks(lintable)
     assert len(matches) == 1
