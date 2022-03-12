@@ -14,12 +14,11 @@ if TYPE_CHECKING:
 
 
 class ComparisonToLiteralBoolRule(AnsibleLintRule):
+    """Use ``when: var`` rather than ``when: var == True`` (or conversely ``when: not var``)."""
+
     id = "literal-compare"
     shortdesc = "Don't compare to literal True/False"
-    description = (
-        "Use ``when: var`` rather than ``when: var == True`` "
-        "(or conversely ``when: not var``)"
-    )
+    description = __doc__
     severity = "HIGH"
     tags = ["idiom"]
     version_added = "v4.0.0"

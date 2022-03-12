@@ -13,21 +13,20 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
-DESCRIPTION = """\
-Rule violations reported by YamlLint when this is installed.
-
-You can fully disable all of them by adding 'yaml' to the 'skip_list'.
-
-Specific tag identifiers that are printed at the end of rule name,
-like 'trailing-spaces' or 'indentation' can also be be skipped, allowing
-you to have a more fine control.
-"""
-
 
 class YamllintRule(AnsibleLintRule):
+    """Rule violations reported by YamlLint when this is installed.
+
+    You can fully disable all of them by adding 'yaml' to the 'skip_list'.
+
+    Specific tag identifiers that are printed at the end of rule name,
+    like 'trailing-spaces' or 'indentation' can also be be skipped, allowing
+    you to have a more fine control.
+    """
+
     id = "yaml"
     shortdesc = "Violations reported by yamllint"
-    description = DESCRIPTION
+    description = __doc__
     severity = "VERY_LOW"
     tags = ["formatting", "yaml"]
     version_added = "v5.0.0"

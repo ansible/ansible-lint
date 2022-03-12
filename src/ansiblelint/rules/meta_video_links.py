@@ -15,13 +15,11 @@ if TYPE_CHECKING:
 
 
 class MetaVideoLinksRule(AnsibleLintRule):
+    """Items in ``video_links`` in meta/main.yml should be dictionaries, and contain only keys ``url`` and ``title``, and have a shared link from a supported provider."""
+
     id = "meta-video-links"
     shortdesc = "meta/main.yml video_links should be formatted correctly"
-    description = (
-        "Items in ``video_links`` in meta/main.yml should be "
-        "dictionaries, and contain only keys ``url`` and ``title``, "
-        "and have a shared link from a supported provider"
-    )
+    description = __doc__
     severity = "LOW"
     tags = ["metadata"]
     version_added = "v4.0.0"

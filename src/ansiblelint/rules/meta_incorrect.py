@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 
 
 class MetaChangeFromDefaultRule(AnsibleLintRule):
+    """meta/main.yml default values should be changed."""
+
     id = "meta-incorrect"
     shortdesc = "meta/main.yml default values should be changed"
     field_defaults = [
@@ -23,7 +25,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         ("license", "license (GPLv2, CC-BY, etc)"),
         ("license", "license (GPL-2.0-or-later, MIT, etc)"),
     ]
-    description = "meta/main.yml default values should be changed for: ``{}``".format(
+    description = __doc__ + "Still using defaults: ``{}``".format(
         ", ".join(f[0] for f in field_defaults)
     )
     severity = "HIGH"

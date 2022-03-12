@@ -13,9 +13,11 @@ if TYPE_CHECKING:
 
 
 class NoTabsRule(AnsibleLintRule):
+    """Tabs can cause unexpected display issues, use spaces."""
+
     id = "no-tabs"
     shortdesc = "Most files should not contain tabs"
-    description = "Tabs can cause unexpected display issues, use spaces"
+    description = __doc__
     severity = "LOW"
     tags = ["formatting"]
     version_added = "v4.0.0"

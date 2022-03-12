@@ -10,9 +10,11 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class PlaybookExtension(AnsibleLintRule):
+    """Playbooks should have the ".yml" or ".yaml" extension."""
+
     id = "playbook-extension"
     shortdesc = 'Use ".yml" or ".yaml" playbook extension'
-    description = 'Playbooks should have the ".yml" or ".yaml" extension'
+    description = __doc__
     severity = "MEDIUM"
     tags = ["formatting"]
     done: List[str] = []

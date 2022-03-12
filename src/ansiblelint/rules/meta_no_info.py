@@ -55,11 +55,13 @@ def _galaxy_info_errors_itr(
 
 
 class MetaMainHasInfoRule(AnsibleLintRule):
+    """meta/main.yml should contain: author, description, license, min_ansible_version, platforms."""
+
     id = "meta-no-info"
     shortdesc = "meta/main.yml should contain relevant info"
     str_info = META_STR_INFO
     info = META_INFO
-    description = "meta/main.yml should contain: ``{}``".format(", ".join(info))
+    description = __doc__
     severity = "HIGH"
     tags = ["metadata"]
     version_added = "v4.0.0"

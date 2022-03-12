@@ -39,14 +39,12 @@ def _remove_prefix(text: str, prefix: str) -> str:
 
 
 class RoleNames(AnsibleLintRule):
+    """Role names are now limited to contain only lowercase alphanumeric characters, plus '_' and start with an alpha character."""
+
     id = "role-name"
     shortdesc = "Role name {0} does not match ``%s`` pattern" % ROLE_NAME_REGEX
-    description = (
-        "Role names are now limited to contain only lowercase alphanumeric "
-        "characters, plus '_' and start with an alpha character. See "
-        "`developing collections <https://docs.ansible.com/ansible/devel/dev_guide/"
-        "developing_collections_structure.html#roles-directory>`_"
-    )
+    description = __doc__
+    link = "https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory"
     severity = "HIGH"
     done: List[str] = []  # already noticed roles list
     tags = ["deprecations", "metadata"]

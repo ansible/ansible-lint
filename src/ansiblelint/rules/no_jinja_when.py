@@ -12,11 +12,11 @@ if TYPE_CHECKING:
 
 
 class NoFormattingInWhenRule(AnsibleLintRule):
+    """``when`` is a raw Jinja2 expression, remove redundant {{ }} from variable(s)."""
+
     id = "no-jinja-when"
     shortdesc = "No Jinja2 in when"
-    description = (
-        "``when`` is a raw Jinja2 expression, remove redundant {{ }} from variable(s)."
-    )
+    description = __doc__
     severity = "HIGH"
     tags = ["deprecations"]
     version_added = "historic"

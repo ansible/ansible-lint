@@ -31,12 +31,11 @@ if TYPE_CHECKING:
 
 
 class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
+    """Executing a command when there are arguments to modules is generally a bad idea."""
+
     id = "deprecated-command-syntax"
     shortdesc = "Using command rather than an argument to e.g. file"
-    description = (
-        "Executing a command when there are arguments to modules "
-        "is generally a bad idea"
-    )
+    description = __doc__
     severity = "VERY_HIGH"
     tags = ["command-shell", "deprecations"]
     version_added = "historic"

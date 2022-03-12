@@ -29,13 +29,12 @@ if TYPE_CHECKING:
 
 
 class OctalPermissionsRule(AnsibleLintRule):
+    """Numeric file permissions without leading zero can behave in unexpected ways."""
+
     id = "risky-octal"
     shortdesc = "Octal file permissions must contain leading zero or be a string"
-    description = (
-        "Numeric file permissions without leading zero can behave "
-        "in unexpected ways. See "
-        "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html"
-    )
+    description = __doc__
+    link = "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html"
     severity = "VERY_HIGH"
     tags = ["formatting"]
     version_added = "historic"

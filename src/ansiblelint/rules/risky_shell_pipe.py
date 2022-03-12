@@ -11,16 +11,15 @@ if TYPE_CHECKING:
 
 
 class ShellWithoutPipefail(AnsibleLintRule):
+    """Without the pipefail option set, a shell command that implements a pipeline can fail and still return 0.
+
+    If any part of the pipeline other than the terminal command fails, the whole pipeline will still return 0, which may
+    be considered a success by Ansible. Pipefail is available in the bash shell.
+    """
+
     id = "risky-shell-pipe"
     shortdesc = "Shells that use pipes should set the pipefail option"
-    description = (
-        "Without the pipefail option set, a shell command that "
-        "implements a pipeline can fail and still return 0. If "
-        "any part of the pipeline other than the terminal command "
-        "fails, the whole pipeline will still return 0, which may "
-        "be considered a success by Ansible. "
-        "Pipefail is available in the bash shell."
-    )
+    description = __doc__
     severity = "MEDIUM"
     tags = ["command-shell"]
     version_added = "v4.1.0"

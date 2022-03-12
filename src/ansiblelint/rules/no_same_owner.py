@@ -10,19 +10,17 @@ from ansiblelint.utils import LINE_NUMBER_KEY
 
 
 class NoSameOwnerRule(AnsibleLintRule):
+    """Optional rule that highlights dangers of assuming that user/group on the remote machines may not exist on ansible controller or vice versa.
+
+    Owner and group should not be preserved when transferring files between them.
+
+    This rule is not enabled by default and was inspired by Zuul execution policy.
+    """
 
     id = "no-same-owner"
     shortdesc = "Owner should not be kept between different hosts"
-    description = """
-Optional rule that highlights dangers of assuming that user/group on the remote
-machines may not exist on ansible controller or vice versa. Owner and group
-should not be preserved when transferring files between them.
-
-This rule is not enabled by default and was inspired by Zuul execution policy.
-See:
-https://zuul-ci.org/docs/zuul-jobs/policy.html\
-#preservation-of-owner-between-executor-and-remote
-"""
+    description = __doc__
+    link = "https://zuul-ci.org/docs/zuul-jobs/policy.html#preservation-of-owner-between-executor-and-remote"
     severity = "LOW"
     tags = ["opt-in"]
 

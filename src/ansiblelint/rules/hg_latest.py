@@ -29,12 +29,11 @@ if TYPE_CHECKING:
 
 
 class MercurialHasRevisionRule(AnsibleLintRule):
+    """All version control checkouts must point to an explicit commit or tag, not just ``latest``."""
+
     id = "hg-latest"
     shortdesc = "Mercurial checkouts must contain explicit revision"
-    description = (
-        "All version control checkouts must point to "
-        "an explicit commit or tag, not just ``latest``"
-    )
+    description = __doc__
     severity = "MEDIUM"
     tags = ["idempotency"]
     version_added = "historic"

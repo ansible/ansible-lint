@@ -11,14 +11,12 @@ if TYPE_CHECKING:
 
 
 class DeprecatedModuleRule(AnsibleLintRule):
+    """These are deprecated modules, some modules are kept temporarily for backwards compatibility but usage is discouraged."""
+
     id = "deprecated-module"
     shortdesc = "Deprecated module"
-    description = (
-        "These are deprecated modules, some modules are kept "
-        "temporarily for backwards compatibility but usage is discouraged. "
-        "For more details see: "
-        "https://docs.ansible.com/ansible/latest/collections/index_module.html"
-    )
+    description = __doc__
+    link = "https://docs.ansible.com/ansible/latest/collections/index_module.html"
     severity = "HIGH"
     tags = ["deprecations"]
     version_added = "v4.0.0"

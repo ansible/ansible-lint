@@ -97,13 +97,11 @@ SUCCESS_PLAY = """---
 
 
 class UseCommandInsteadOfShellRule(AnsibleLintRule):
+    """Shell should only be used when piping, redirecting or chaining commands (and Ansible would be preferred for some of those!)."""
+
     id = "command-instead-of-shell"
     shortdesc = "Use shell only when shell functionality is required"
-    description = (
-        "Shell should only be used when piping, redirecting "
-        "or chaining commands (and Ansible would be preferred "
-        "for some of those!)"
-    )
+    description = __doc__
     severity = "HIGH"
     tags = ["command-shell", "idiom"]
     version_added = "historic"

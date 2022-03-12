@@ -1,3 +1,4 @@
+"""Tests related to skipping rules."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.yaml import YamllintRule
 from ansiblelint.runner import Runner

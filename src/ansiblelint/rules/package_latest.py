@@ -29,11 +29,11 @@ if TYPE_CHECKING:
 
 
 class PackageIsNotLatestRule(AnsibleLintRule):
+    """Package installs should use ``state=present`` with or without a version."""
+
     id = "package-latest"
     shortdesc = "Package installs should not use latest"
-    description = (
-        "Package installs should use ``state=present`` with or without a version"
-    )
+    description = __doc__
     severity = "VERY_LOW"
     tags = ["idempotency"]
     version_added = "historic"

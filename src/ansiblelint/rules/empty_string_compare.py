@@ -15,12 +15,11 @@ if TYPE_CHECKING:
 
 
 class ComparisonToEmptyStringRule(AnsibleLintRule):
+    """Use ``when: var|length > 0`` rather than ``when: var != ""`` (or conversely ``when: var|length == 0`` rather than ``when: var == ""``)."""
+
     id = "empty-string-compare"
     shortdesc = "Don't compare to empty string"
-    description = (
-        'Use ``when: var|length > 0`` rather than ``when: var != ""`` (or '
-        'conversely ``when: var|length == 0`` rather than ``when: var == ""``)'
-    )
+    description = __doc__
     severity = "HIGH"
     tags = ["idiom", "opt-in"]
     version_added = "v4.0.0"

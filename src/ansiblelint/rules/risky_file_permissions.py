@@ -66,16 +66,16 @@ _MODULES_WITH_CREATE: Dict[str, bool] = {
 
 
 class MissingFilePermissionsRule(AnsibleLintRule):
+    """Missing or unsupported mode parameter can cause unexpected file permissions based on version of Ansible being used."""
+
     id = "risky-file-permissions"
     shortdesc = "File permissions unset or incorrect"
-    description = (
-        "Missing or unsupported mode parameter can cause unexpected file "
-        "permissions based "
-        "on version of Ansible being used. Be explicit, like ``mode: 0644`` to "
+    description = __doc__ + (
+        " Be explicit, like ``mode: 0644`` to "
         "avoid hitting this rule. Special ``preserve`` value is accepted "
-        f"only by {', '.join(_modules_with_preserve)} modules. "
-        "See https://github.com/ansible/ansible/issues/71200"
+        f"only by {', '.join(_modules_with_preserve)} modules."
     )
+    link = "https://github.com/ansible/ansible/issues/71200"
     severity = "VERY_HIGH"
     tags = ["unpredictability", "experimental"]
     version_added = "v4.3.0"

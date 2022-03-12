@@ -29,12 +29,11 @@ if TYPE_CHECKING:
 
 
 class GitHasVersionRule(AnsibleLintRule):
+    """All version control checkouts must point to an explicit commit or tag, not just ``latest``."""
+
     id = "git-latest"
     shortdesc = "Git checkouts must contain explicit version"
-    description = (
-        "All version control checkouts must point to "
-        "an explicit commit or tag, not just ``latest``"
-    )
+    description = __doc__
     severity = "MEDIUM"
     tags = ["idempotency"]
     version_added = "historic"

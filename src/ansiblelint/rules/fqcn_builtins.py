@@ -80,13 +80,12 @@ builtins = [
 
 
 class FQCNBuiltinsRule(AnsibleLintRule):
+    """Check whether the long version starting with ``ansible.builtin`` is used in the playbook."""
+
     id = "fqcn-builtins"
     severity = "MEDIUM"
     shortdesc = "Use FQCN for builtin actions"
-    description = (
-        "Check whether the long version starting with ``ansible.builtin`` "
-        "is used in the playbook"
-    )
+    description = __doc__
     tags = ["formatting"]
 
     def matchtask(

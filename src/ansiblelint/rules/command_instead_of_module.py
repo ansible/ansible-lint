@@ -32,11 +32,11 @@ if TYPE_CHECKING:
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
+    """Executing a command when there is an Ansible module is generally a bad idea."""
+
     id = "command-instead-of-module"
     shortdesc = "Using command rather than module"
-    description = (
-        "Executing a command when there is an Ansible module is generally a bad idea"
-    )
+    description = __doc__
     severity = "HIGH"
     tags = ["command-shell", "idiom"]
     version_added = "historic"

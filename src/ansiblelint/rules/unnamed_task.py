@@ -29,12 +29,11 @@ if TYPE_CHECKING:
 
 
 class TaskHasNameRule(AnsibleLintRule):
+    """All tasks should have a distinct name for readability and for ``--start-at-task`` to work."""
+
     id = "unnamed-task"
     shortdesc = "All tasks should be named"
-    description = (
-        "All tasks should have a distinct name for readability "
-        "and for ``--start-at-task`` to work"
-    )
+    description = __doc__
     severity = "MEDIUM"
     tags = ["idiom"]
     version_added = "historic"

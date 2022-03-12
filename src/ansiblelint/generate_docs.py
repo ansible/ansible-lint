@@ -63,7 +63,10 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
         table.add_column(Markdown(rule.shortdesc))
         description = rule.description
         if rule.link:
-            description += " [(more)](%s)" % rule.link
+            description += f" [(more)]({rule.link})"
+        import inspect
+
+        description = inspect.cleandoc(description)
         table.add_row("description", Markdown(description))
         if rule.version_added:
             table.add_row("version_added", rule.version_added)

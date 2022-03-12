@@ -12,11 +12,11 @@ if TYPE_CHECKING:
 
 
 class RoleRelativePath(AnsibleLintRule):
+    """``copy`` and ``template`` do not need to use relative path for ``src``."""
+
     id = "no-relative-paths"
     shortdesc = "Doesn't need a relative path in role"
-    description = (
-        "``copy`` and ``template`` do not need to use relative path for ``src``"
-    )
+    description = __doc__
     severity = "HIGH"
     tags = ["idiom"]
     version_added = "v4.0.0"

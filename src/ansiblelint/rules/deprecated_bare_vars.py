@@ -31,13 +31,14 @@ if TYPE_CHECKING:
 
 
 class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
+    """Using bare variables is deprecated.
+
+    Update your playbooks so that the environment value uses the full variable syntax ``{{ your_variable }}``.
+    """
+
     id = "deprecated-bare-vars"
     shortdesc = "Using bare variables is deprecated"
-    description = (
-        "Using bare variables is deprecated. Update your "
-        "playbooks so that the environment value uses the full variable "
-        "syntax ``{{ your_variable }}``"
-    )
+    description = __doc__
     severity = "VERY_HIGH"
     tags = ["deprecations"]
     version_added = "historic"

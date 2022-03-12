@@ -4,9 +4,11 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class TaskNoLocalAction(AnsibleLintRule):
+    """Do not use ``local_action``, use ``delegate_to: localhost``."""
+
     id = "deprecated-local-action"
     shortdesc = "Do not use 'local_action', use 'delegate_to: localhost'"
-    description = "Do not use ``local_action``, use ``delegate_to: localhost``"
+    description = __doc__
     severity = "MEDIUM"
     tags = ["deprecations"]
     version_added = "v4.0.0"

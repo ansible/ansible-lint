@@ -30,32 +30,30 @@ if TYPE_CHECKING:
 
 
 class CommandHasChangesCheckRule(AnsibleLintRule):
+    """Tasks should tell Ansible when to return ``changed``, unless the task only reads information. To do this, set ``changed_when``, use the ``creates`` or ``removes`` argument, or use ``when`` to run the task only if another check has a particular result.
+
+            For example, this task registers the ``shell`` output and uses the return code
+            to define when the task has changed.
+
+            .. code:: yaml
+
+                - name: handle shell output with return code
+                  ansible.builtin.shell: cat {{ my_file|quote }}
+                  register: my_output
+                  changed_when: my_output.rc != 0
+
+            The following example will trigger the rule since the task does not
+            handle the output of the ``command``.
+
+    .. code:: yaml
+
+        - name: does not handle any output or return codes
+            ansible.builtin.command: cat {{ my_file|quote }}
+    """
+
     id = "no-changed-when"
     shortdesc = "Commands should not change things if nothing needs doing"
-    description = """
-Tasks should tell Ansible when to return ``changed``, unless the task only reads
-information. To do this, set ``changed_when``, use the ``creates`` or
-``removes`` argument, or use ``when`` to run the task only if another check has
-a particular result.
-
-For example, this task registers the ``shell`` output and uses the return code
-to define when the task has changed.
-
-.. code:: yaml
-
-    - name: handle shell output with return code
-      ansible.builtin.shell: cat {{ my_file|quote }}
-      register: my_output
-      changed_when: my_output.rc != 0
-
-The following example will trigger the rule since the task does not
-handle the output of the ``command``.
-
-.. code:: yaml
-
-    - name: does not handle any output or return codes
-      ansible.builtin.command: cat {{ my_file|quote }}
-    """
+    description = __doc__
     severity = "HIGH"
     tags = ["command-shell", "idempotency"]
     version_added = "historic"

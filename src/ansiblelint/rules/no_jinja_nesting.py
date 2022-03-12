@@ -33,14 +33,18 @@ if TYPE_CHECKING:
 
 
 class NestedJinjaRule(AnsibleLintRule):
+    """There should not be any nested jinja pattern.
+
+    Example (bad): ``{{ list_one + {{ list_two | max }} }}``.
+
+    Example (good): ``{{ list_one + max(list_two) }}``.
+
+    Example (allowed): ``--format='{{'{{'}}.Size{{'}}'}}'``.
+    """
+
     id = "no-jinja-nesting"
     shortdesc = "Nested jinja pattern"
-    description = (
-        "There should not be any nested jinja pattern. "
-        "Example (bad): ``{{ list_one + {{ list_two | max }} }}``, "
-        "Example (good): ``{{ list_one + max(list_two) }}``, "
-        "Example (allowed): ``--format='{{'{{'}}.Size{{'}}'}}'``"
-    )
+    description = __doc__
     severity = "VERY_HIGH"
     tags = ["formatting"]
     version_added = "v4.3.0"
