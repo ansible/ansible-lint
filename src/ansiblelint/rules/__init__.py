@@ -21,7 +21,8 @@ from ansiblelint._internal.rules import (
     LoadingFailureRule,
     RuntimeErrorRule,
 )
-from ansiblelint.config import get_rule_config, options
+from ansiblelint.config import get_rule_config
+from ansiblelint.config import options as default_options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
 
@@ -224,7 +225,9 @@ def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
 
 class RulesCollection:
     def __init__(
-        self, rulesdirs: Optional[List[str]] = None, options: Namespace = options
+        self,
+        rulesdirs: Optional[List[str]] = None,
+        options: Namespace = default_options,
     ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options

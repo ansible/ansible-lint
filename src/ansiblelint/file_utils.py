@@ -53,10 +53,10 @@ def normpath(path: Union[str, BasePathLike]) -> str:
     """
     # conversion to string in order to allow receiving non string objects
     relpath = os.path.relpath(str(path))
-    abspath = os.path.abspath(str(path))
+    path_absolute = os.path.abspath(str(path))
     # we avoid returning relative paths that end-up at root level
-    if abspath in relpath:
-        return abspath
+    if path_absolute in relpath:
+        return path_absolute
     return relpath
 
 
@@ -273,6 +273,7 @@ class Lintable:
         return f"{self.name} ({self.kind})"
 
 
+# pylint: disable=redefined-outer-name
 def discover_lintables(options: Namespace) -> Dict[str, Any]:
     """Find all files that we know how to lint."""
     # git is preferred as it also considers .gitignore

@@ -140,9 +140,9 @@ def _do_list(rules: "RulesCollection") -> int:
 
 
 # noinspection PyShadowingNames
-def _do_transform(result: "LintResult", options: "Namespace") -> None:
+def _do_transform(result: "LintResult", opts: "Namespace") -> None:
     """Create and run Transformer."""
-    if "yaml" in options.skip_list:
+    if "yaml" in opts.skip_list:
         # The transformer rewrites yaml files, but the user requested to skip
         # the yaml rule or anything tagged with "yaml", so there is nothing to do.
         return

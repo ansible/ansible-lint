@@ -16,8 +16,8 @@ formatting_prettier_fixtures_dir = fixtures_dir / "formatting-prettier"
 formatting_after_fixtures_dir = fixtures_dir / "formatting-after"
 
 
-@pytest.fixture
-def empty_lintable() -> Lintable:
+@pytest.fixture(name="empty_lintable")
+def fixture_empty_lintable() -> Lintable:
     """Return a Lintable with no contents."""
     lintable = Lintable("__empty_file__")
     lintable._content = ""
@@ -190,8 +190,8 @@ def test_custom_ruamel_yaml_emitter(
     assert output == expected_output
 
 
-@pytest.fixture
-def yaml_formatting_fixtures(fixture_filename: str) -> Tuple[str, str, str]:
+@pytest.fixture(name="yaml_formatting_fixtures")
+def fixture_yaml_formatting_fixtures(fixture_filename: str) -> Tuple[str, str, str]:
     """Get the contents for the formatting fixture files.
 
     To regenerate these fixtures, please run ``tools/generate-formatting-fixtures.py``.

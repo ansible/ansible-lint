@@ -634,13 +634,13 @@ def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[An
     return results
 
 
-def get_action_tasks(yaml: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
+def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
     """Get a flattened list of action tasks from the file."""
     tasks = []
     if file.kind in ["tasks", "handlers"]:
-        tasks = add_action_type(yaml, file.kind)
+        tasks = add_action_type(data, file.kind)
     else:
-        tasks.extend(extract_from_list(yaml, PLAYBOOK_TASK_KEYWORDS))
+        tasks.extend(extract_from_list(data, PLAYBOOK_TASK_KEYWORDS))
 
     # Add sub-elements of block/rescue/always to tasks list
     tasks.extend(extract_from_list(tasks, NESTED_TASK_KEYS, recursive=True))
@@ -772,7 +772,7 @@ def is_playbook(filename: str) -> bool:
 
 # pylint: disable=too-many-statements
 def get_lintables(
-    options: Namespace = Namespace(), args: Optional[List[str]] = None
+    opts: Namespace = Namespace(), args: Optional[List[str]] = None
 ) -> List[Lintable]:
     """Detect files and directories that are lintable."""
     lintables: List[Lintable] = []
@@ -792,12 +792,12 @@ def get_lintables(
             lintables.append(lintable)
     else:
 
-        for filename in discover_lintables(options):
+        for filename in discover_lintables(opts):
 
             path = Path(filename)
             # skip exclusions
             try:
-                for file_path in options.exclude_paths:
+                for file_path in opts.exclude_paths:
                     if str(path.resolve()).startswith(str(file_path)):
                         raise FileNotFoundError(
                             f"File {file_path} matched exclusion entry: {path}"
@@ -848,6 +848,7 @@ def nested_items(
     if isinstance(data, dict):
         for k, v in data.items():
             yield k, v, parent
+            # pylint: disable=redefined-outer-name
             for k, v, returned_parent in nested_items(v, k):
                 yield k, v, returned_parent
     if isinstance(data, list):

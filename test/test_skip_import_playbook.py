@@ -26,8 +26,8 @@ MAIN_PLAYBOOK = """\
 """
 
 
-@pytest.fixture
-def playbook(tmp_path: Path) -> str:
+@pytest.fixture(name="playbook")
+def fixture_playbook(tmp_path: Path) -> str:
     """Create a reusable per-test playbook."""
     playbook_path = tmp_path / "playbook.yml"
     playbook_path.write_text(MAIN_PLAYBOOK)

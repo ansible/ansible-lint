@@ -29,8 +29,8 @@ PLAY_INCLUDE_ROLE = f"""
 """
 
 
-@pytest.fixture
-def test_rules_collection() -> RulesCollection:
+@pytest.fixture(name="test_rules_collection")
+def fixture_test_rules_collection() -> RulesCollection:
     """Instantiate a roles collection for tests."""
     collection = RulesCollection()
     collection.register(RoleNames())
@@ -48,8 +48,8 @@ def dict_to_files(parent_dir: Path, file_dict: Dict[str, Any]) -> None:
             (parent_dir / file).write_text(content)
 
 
-@pytest.fixture
-def playbook_path(request: SubRequest, tmp_path: Path) -> str:
+@pytest.fixture(name="playbook_path")
+def fixture_playbook_path(request: SubRequest, tmp_path: Path) -> str:
     """Create a playbook with a role in a temporary directory."""
     playbook_text = request.param[0]
     role_name = request.param[1]

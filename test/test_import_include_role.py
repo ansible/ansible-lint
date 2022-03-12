@@ -48,8 +48,8 @@ PLAY_INCLUDE_ROLE_INLINE = """
 """
 
 
-@pytest.fixture
-def playbook_path(request: SubRequest, tmp_path: Path) -> str:
+@pytest.fixture(name="playbook_path")
+def fixture_playbook_path(request: SubRequest, tmp_path: Path) -> str:
     """Create a reusable per-test role skeleton."""
     playbook_text = request.param
     role_tasks_dir = tmp_path / "test-role" / "tasks"

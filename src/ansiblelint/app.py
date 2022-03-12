@@ -9,7 +9,7 @@ from ansible_compat.runtime import Runtime
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
-from ansiblelint.config import options
+from ansiblelint.config import options as default_options
 from ansiblelint.errors import MatchError
 
 if TYPE_CHECKING:
@@ -201,9 +201,9 @@ def _sanitize_list_options(tag_list: List[str]) -> List[str]:
 @lru_cache(maxsize=1)
 def get_app() -> App:
     """Return the application instance."""
-    app = App(options=options)
+    app = App(options=default_options)
     # Make linter use the cache dir from compat
-    options.cache_dir = app.runtime.cache_dir
+    default_options.cache_dir = app.runtime.cache_dir
 
     app.runtime.prepare_environment()
     _perform_mockings()
