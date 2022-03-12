@@ -1,6 +1,3 @@
-# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
-import unittest
-
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.yaml import YamllintRule
 from ansiblelint.testing import RunFromText
@@ -13,13 +10,10 @@ LONG_LINE = """\
 """  # noqa 501
 
 
-class TestLineTooLongRule(unittest.TestCase):
+def test_long_line() -> None:
+    """Negative test for long-line."""
     collection = RulesCollection()
     collection.register(YamllintRule())
-
-    def setUp(self) -> None:
-        self.runner = RunFromText(self.collection)
-
-    def test_long_line(self) -> None:
-        results = self.runner.run_role_tasks_main(LONG_LINE)
-        assert len(results) == 1
+    runner = RunFromText(collection)
+    results = runner.run_role_tasks_main(LONG_LINE)
+    assert len(results) == 1

@@ -27,7 +27,7 @@ from ansiblelint.runner import Runner  # noqa: E402
 
 
 class RunFromText:
-    """Use Runner on temp files created from unittest text snippets."""
+    """Use Runner on temp files created from testing text snippets."""
 
     def __init__(self, collection: RulesCollection) -> None:
         """Initialize a RunFromText instance with rules collection."""
