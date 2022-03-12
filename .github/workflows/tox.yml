@@ -153,7 +153,10 @@ jobs:
       TOX_PARALLEL_NO_SPINNER: 1
       FORCE_COLOR: 1
       # vars safe to be passed to wsl:
-      WSLENV: FORCE_COLOR:TOXENV:TOX_PARALLEL_NO_SPINNER
+      WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:TOX_PARALLEL_NO_SPINNER
+      # Number of expected test passes, safety measure for accidental skip of
+      # tests. Update value if you add/remove tests.
+      PYTEST_REQPASS: 399
 
     steps:
       - name: Activate WSL1
