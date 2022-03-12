@@ -756,7 +756,7 @@ def is_playbook(filename: str) -> bool:
 
     try:
         f = parse_yaml_from_file(filename)
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-except
         _logger.warning(
             "Failed to load %s with %s, assuming is not a playbook.", filename, exc
         )
