@@ -3,7 +3,7 @@
    :alt: PyPI version
 
 .. image:: https://img.shields.io/badge/Ansible--lint-rules%20table-blue.svg
-   :target: https://ansible-lint.readthedocs.io/en/latest/default_rules.html
+   :target: https://ansible-lint.readthedocs.io/en/latest/default_rules
    :alt: Ansible-lint rules explanation
 
 .. image:: https://img.shields.io/badge/Code%20of%20Conduct-black.svg
@@ -57,7 +57,7 @@ Authors
 ansible-lint was created by `Will Thames`_ and is now maintained as part of the
 `Ansible`_ by `Red Hat`_ project.
 
-.. _Contribution guidelines: https://ansible-lint.readthedocs.io/en/latest/contributing.html
+.. _Contribution guidelines: https://ansible-lint.readthedocs.io/en/latest/contributing
 .. _Will Thames: https://github.com/willthames
 .. _Ansible: https://ansible.com
 .. _Red Hat: https://redhat.com
