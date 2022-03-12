@@ -1,6 +1,3 @@
-# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
-import unittest
-
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.no_relative_paths import RoleRelativePath
 from ansiblelint.testing import RunFromText
@@ -37,17 +34,19 @@ SUCCESS_TASKS = """
 """
 
 
-class TestRoleRelativePath(unittest.TestCase):
+def test_no_relative_paths_fail() -> None:
+    """Negative test for no-relative-paths."""
     collection = RulesCollection()
     collection.register(RoleRelativePath())
+    runner = RunFromText(collection)
+    results = runner.run_role_tasks_main(FAIL_TASKS)
+    assert len(results) == 2
 
-    def setUp(self) -> None:
-        self.runner = RunFromText(self.collection)
 
-    def test_fail(self) -> None:
-        results = self.runner.run_role_tasks_main(FAIL_TASKS)
-        assert len(results) == 2
-
-    def test_success(self) -> None:
-        results = self.runner.run_role_tasks_main(SUCCESS_TASKS)
-        assert len(results) == 0
+def test_no_relative_paths_success() -> None:
+    """Positive test for no-relative-paths."""
+    collection = RulesCollection()
+    collection.register(RoleRelativePath())
+    runner = RunFromText(collection)
+    results = runner.run_role_tasks_main(SUCCESS_TASKS)
+    assert len(results) == 0
