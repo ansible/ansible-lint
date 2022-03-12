@@ -17,47 +17,48 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
 import pathlib
-import unittest
 
 from ansiblelint.errors import MatchError
 from ansiblelint.formatters import Formatter
 from ansiblelint.rules import AnsibleLintRule
 
+rule = AnsibleLintRule()
+rule.id = "TCF0001"
+formatter = Formatter(pathlib.Path.cwd(), display_relative_path=True)
 
-class TestFormatter(unittest.TestCase):
-    def setUp(self) -> None:
-        self.rule = AnsibleLintRule()
-        self.rule.id = "TCF0001"
-        self.formatter = Formatter(pathlib.Path.cwd(), display_relative_path=True)
 
-    def test_format_coloured_string(self) -> None:
-        match = MatchError(
-            message="message",
-            linenumber=1,
-            details="hello",
-            filename="filename.yml",
-            rule=self.rule,
-        )
-        self.formatter.format(match)
+def test_format_coloured_string() -> None:
+    """Test formetting colored."""
+    match = MatchError(
+        message="message",
+        linenumber=1,
+        details="hello",
+        filename="filename.yml",
+        rule=rule,
+    )
+    formatter.format(match)
 
-    def test_unicode_format_string(self) -> None:
-        match = MatchError(
-            message="\U0001f427",
-            linenumber=1,
-            details="hello",
-            filename="filename.yml",
-            rule=self.rule,
-        )
-        self.formatter.format(match)
 
-    def test_dict_format_line(self) -> None:
-        match = MatchError(
-            message="xyz",
-            linenumber=1,
-            details={"hello": "world"},  # type: ignore
-            filename="filename.yml",
-            rule=self.rule,
-        )
-        self.formatter.format(match)
+def test_unicode_format_string() -> None:
+    """Test formatting unicode."""
+    match = MatchError(
+        message="\U0001f427",
+        linenumber=1,
+        details="hello",
+        filename="filename.yml",
+        rule=rule,
+    )
+    formatter.format(match)
+
+
+def test_dict_format_line() -> None:
+    """Test formatting dictionary details."""
+    match = MatchError(
+        message="xyz",
+        linenumber=1,
+        details={"hello": "world"},  # type: ignore
+        filename="filename.yml",
+        rule=rule,
+    )
+    formatter.format(match)

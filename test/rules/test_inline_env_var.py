@@ -1,6 +1,3 @@
-# pylint: disable=preferred-module  # FIXME: remove once migrated per GH-725
-import unittest
-
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.inline_env_var import EnvVarsInCommandRule
 from ansiblelint.testing import RunFromText
@@ -74,17 +71,19 @@ FAIL_PLAY_TASKS = """
 """
 
 
-class TestEnvVarsInCommand(unittest.TestCase):
+def test_success() -> None:
+    """Positive test for inline-env-var."""
     collection = RulesCollection()
     collection.register(EnvVarsInCommandRule())
+    runner = RunFromText(collection)
+    results = runner.run_playbook(SUCCESS_PLAY_TASKS)
+    assert len(results) == 0
 
-    def setUp(self) -> None:
-        self.runner = RunFromText(self.collection)
 
-    def test_success(self) -> None:
-        results = self.runner.run_playbook(SUCCESS_PLAY_TASKS)
-        assert len(results) == 0
-
-    def test_fail(self) -> None:
-        results = self.runner.run_playbook(FAIL_PLAY_TASKS)
-        assert len(results) == 2
+def test_fail() -> None:
+    """Negative test for inline-env-var."""
+    collection = RulesCollection()
+    collection.register(EnvVarsInCommandRule())
+    runner = RunFromText(collection)
+    results = runner.run_playbook(FAIL_PLAY_TASKS)
+    assert len(results) == 2
