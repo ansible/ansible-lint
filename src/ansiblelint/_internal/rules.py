@@ -31,7 +31,7 @@ class BaseRule:
             for method in [self.matchlines, self.matchtasks, self.matchyaml]:
                 try:
                     matches.extend(method(file))
-                except Exception as exc:
+                except Exception as exc:  # pylint: disable=broad-except
                     _logger.debug(
                         "Ignored exception from %s.%s: %s",
                         self.__class__.__name__,

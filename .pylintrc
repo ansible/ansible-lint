@@ -13,7 +13,6 @@ disable =
     line-too-long,
     # TODO(ssbarnea): remove temporary skips adding during initial adoption:
     bad-continuation,
-    broad-except,
     consider-using-f-string,
     dangerous-default-value,
     duplicate-code,
