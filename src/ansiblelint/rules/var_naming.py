@@ -22,6 +22,11 @@ FAIL_PLAY = """
       CamelCase: ...
       ALL_CAPS: ...
     ALL_CAPS_ARE_BAD_TOO: ...  # invalid
+
+  tasks:
+    - name: foo
+      ansible.builtin.set_fact:
+        "{{ 'test_' }}var": "value"  # valid
 """
 
 
@@ -56,6 +61,10 @@ class VariableNamingRule(AnsibleLintRule):
             return False
 
         if keyword.iskeyword(ident):
+            return False
+
+        # We want to allow use of jinja2 templating for variable names
+        if "{{" in ident:
             return False
 
         # previous tests should not be triggered as they would have raised a
