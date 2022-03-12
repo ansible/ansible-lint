@@ -47,7 +47,7 @@ class App:
             console.print(
                 self.formatter.format_result(matches), markup=False, highlight=False
             )
-            return None
+            return
 
         ignored_matches = [match for match in matches if match.ignored]
         fatal_matches = [match for match in matches if not match.ignored]
