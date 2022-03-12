@@ -52,7 +52,7 @@ class RunFromText:
         role_path = tempfile.mkdtemp(prefix="role_")
         tasks_path = os.path.join(role_path, "tasks")
         os.makedirs(tasks_path)
-        with open(os.path.join(tasks_path, "main.yml"), "w") as fh:
+        with open(os.path.join(tasks_path, "main.yml"), "w", encoding="utf-8") as fh:
             fh.write(tasks_main_text)
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
@@ -63,7 +63,7 @@ class RunFromText:
         role_path = tempfile.mkdtemp(prefix="role_")
         meta_path = os.path.join(role_path, "meta")
         os.makedirs(meta_path)
-        with open(os.path.join(meta_path, "main.yml"), "w") as fh:
+        with open(os.path.join(meta_path, "main.yml"), "w", encoding="utf-8") as fh:
             fh.write(meta_main_text)
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)

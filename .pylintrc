@@ -27,4 +27,3 @@ disable =
     too-many-instance-attributes,
     too-many-return-statements,
     unused-argument,
-    unspecified-encoding,
