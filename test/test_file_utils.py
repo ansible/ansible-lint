@@ -224,8 +224,8 @@ BASIC_PLAYBOOK = """
 """
 
 
-@pytest.fixture
-def tmp_updated_lintable(
+@pytest.fixture(name="tmp_updated_lintable")
+def fixture_tmp_updated_lintable(
     tmp_path: Path, path: str, content: str, updated_content: str
 ) -> Lintable:
     """Create a temp file Lintable with a content update that is not on disk."""

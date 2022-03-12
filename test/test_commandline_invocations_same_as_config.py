@@ -8,8 +8,8 @@ from _pytest.monkeypatch import MonkeyPatch
 from ansiblelint import cli
 
 
-@pytest.fixture
-def base_arguments() -> List[str]:
+@pytest.fixture(name="base_arguments")
+def fixture_base_arguments() -> List[str]:
     """Define reusable base arguments for tests in current module."""
     return ["../test/skiptasks.yml"]
 

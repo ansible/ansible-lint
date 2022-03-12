@@ -13,8 +13,8 @@ from ansiblelint.runner import LintResult, _get_matches
 from ansiblelint.transformer import Transformer
 
 
-@pytest.fixture
-def copy_examples_dir(
+@pytest.fixture(name="copy_examples_dir")
+def fixture_copy_examples_dir(
     tmpdir: py.path.local, config_options: Namespace
 ) -> Iterator[Tuple[py.path.local, py.path.local]]:
     """Fixture that copies the examples/ dir into a tmpdir."""
@@ -26,8 +26,8 @@ def copy_examples_dir(
     old_cwd.chdir()
 
 
-@pytest.fixture
-def runner_result(
+@pytest.fixture(name="runner_result")
+def fixture_runner_result(
     config_options: Namespace,
     default_rules_collection: RulesCollection,
     playbook: str,

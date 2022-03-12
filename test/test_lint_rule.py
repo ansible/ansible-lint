@@ -25,8 +25,8 @@ from ansiblelint.file_utils import Lintable
 from .rules.fixtures import ematcher, raw_task
 
 
-@pytest.fixture
-def lintable() -> Lintable:
+@pytest.fixture(name="lintable")
+def fixture_lintable() -> Lintable:
     """Return a playbook Lintable for use in this file's tests."""
     return Lintable("examples/playbooks/ematcher-rule.yml", kind="playbook")
 
@@ -40,6 +40,6 @@ def test_rule_matching(lintable: Lintable) -> None:
 
 def test_raw_rule_matching(lintable: Lintable) -> None:
     """Test rule.matchlines() on a playbook."""
-    ematcher = raw_task.RawTaskRule()
-    matches = ematcher.matchtasks(lintable)
+    rule = raw_task.RawTaskRule()
+    matches = rule.matchtasks(lintable)
     assert len(matches) == 1

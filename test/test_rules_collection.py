@@ -30,20 +30,20 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import run_ansible_lint
 
 
-@pytest.fixture
-def test_rules_collection() -> RulesCollection:
+@pytest.fixture(name="test_rules_collection")
+def fixture_test_rules_collection() -> RulesCollection:
     """Create a shared rules collection test instance."""
     return RulesCollection([os.path.abspath("./test/rules/fixtures")])
 
 
-@pytest.fixture
-def ematchtestfile() -> Lintable:
+@pytest.fixture(name="ematchtestfile")
+def fixture_ematchtestfile() -> Lintable:
     """Produce a test lintable with an id violation."""
     return Lintable("examples/playbooks/ematcher-rule.yml", kind="playbook")
 
 
-@pytest.fixture
-def bracketsmatchtestfile() -> Lintable:
+@pytest.fixture(name="bracketsmatchtestfile")
+def fixture_bracketsmatchtestfile() -> Lintable:
     """Produce a test lintable with matching brackets."""
     return Lintable("examples/playbooks/bracketsmatchtest.yml", kind="playbook")
 

@@ -26,7 +26,6 @@ disable =
     not-callable,
     protected-access,
     raise-missing-from,
-    redefined-outer-name,
     too-few-public-methods,
     too-many-branches,
     too-many-instance-attributes,

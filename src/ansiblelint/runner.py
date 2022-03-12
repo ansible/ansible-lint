@@ -185,7 +185,7 @@ class Runner:
 
 def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
 
-    lintables = ansiblelint.utils.get_lintables(options=options, args=options.lintables)
+    lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
     matches = []
     checked_files: Set[Lintable] = set()

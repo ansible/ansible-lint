@@ -40,18 +40,18 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
-    @pytest.fixture
-    def error_expected_lines() -> List[int]:
+    @pytest.fixture(name="error_expected_lines")
+    def fixture_error_expected_lines() -> List[int]:
         """Return list of expected error lines."""
         return [24, 27, 30, 56, 67]
 
-    @pytest.fixture
-    def test_playbook() -> str:
+    @pytest.fixture(name="test_playbook")
+    def fixture_test_playbook() -> str:
         """Return test cases playbook path."""
         return "examples/playbooks/var-spacing.yml"
 
-    @pytest.fixture
-    def lint_error_lines(test_playbook: str) -> List[int]:
+    @pytest.fixture(name="lint_error_lines")
+    def fixture_lint_error_lines(test_playbook: str) -> List[int]:
         """Get VarHasSpacesRules linting results on test_playbook."""
         collection = RulesCollection()
         collection.register(VariableHasSpacesRule())
