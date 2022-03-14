@@ -22,7 +22,6 @@ disable =
     no-member,
     not-callable,
     protected-access,
-    too-few-public-methods,
     too-many-branches,
     too-many-instance-attributes,
     too-many-return-statements,
