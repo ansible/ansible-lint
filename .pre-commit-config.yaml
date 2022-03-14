@@ -128,7 +128,7 @@ repos:
           - rich>=11.0.0
           - ruamel.yaml
           - sphinx>=4.4.0
-          - types-PyYAML
+          - types-pyyaml>=6.0.4
           - types-dataclasses
           - types-docutils
           - types-pkg_resources
