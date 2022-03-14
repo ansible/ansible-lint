@@ -7,6 +7,7 @@ def a_test_filter(a, b):
     return "{0}:{1}".format(a, b)
 
 
+# pylint: disable=too-few-public-methods
 class FilterModule:
     """Filter plugin."""
 

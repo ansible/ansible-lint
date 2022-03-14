@@ -7,6 +7,7 @@ def compatibility_in_test(a, b):
     return a in b
 
 
+# pylint: disable=too-few-public-methods
 class TestModule:
     """Test plugin."""
 
