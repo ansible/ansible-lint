@@ -11,9 +11,9 @@ from ansiblelint.yaml_utils import nested_items_path
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
+    """Variables should have spaces before and after: {{ var_name }}."""
+
     id = "var-spacing"
-    base_msg = "Variables should have spaces before and after: "
-    shortdesc = base_msg + " {{ var_name }}"
     description = "Variables should have spaces before and after: ``{{ var_name }}``"
     severity = "LOW"
     tags = ["formatting"]
@@ -29,7 +29,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
                 if bool(self.bracket_regex.search(cleaned)):
-                    return self.base_msg + v
+                    return self.shortdesc.format(var_name=v)
         return False
 
 

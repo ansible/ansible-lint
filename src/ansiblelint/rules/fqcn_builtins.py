@@ -80,9 +80,10 @@ builtins = [
 
 
 class FQCNBuiltinsRule(AnsibleLintRule):
+    """Use FQCN for builtin actions."""
+
     id = "fqcn-builtins"
     severity = "MEDIUM"
-    shortdesc = "Use FQCN for builtin actions"
     description = (
         "Check whether the long version starting with ``ansible.builtin`` "
         "is used in the playbook"
@@ -124,7 +125,7 @@ if "pytest" in sys.modules:
         results = rule_runner.run_playbook(FAIL_PLAY)
         assert len(results) == 1
         for result in results:
-            assert result.message == FQCNBuiltinsRule.shortdesc
+            assert result.message == FQCNBuiltinsRule().shortdesc
 
     @pytest.mark.parametrize(
         "rule_runner", (FQCNBuiltinsRule,), indirect=["rule_runner"]

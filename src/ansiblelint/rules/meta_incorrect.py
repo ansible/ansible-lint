@@ -14,8 +14,9 @@ if TYPE_CHECKING:
 
 
 class MetaChangeFromDefaultRule(AnsibleLintRule):
+    """meta/main.yml default values should be changed."""
+
     id = "meta-incorrect"
-    shortdesc = "meta/main.yml default values should be changed"
     field_defaults = [
         ("author", "your name"),
         ("description", "your description"),

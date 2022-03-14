@@ -36,10 +36,9 @@ def is_property(k: str) -> bool:
 
 
 class VariableNamingRule(AnsibleLintRule):
+    """All variables should be named using only lowercase and underscores."""
+
     id = "var-naming"
-    base_msg = "All variables should be named using only lowercase and underscores"
-    shortdesc = base_msg
-    description = "All variables should be named using only lowercase and underscores"
     severity = "MEDIUM"
     tags = ["idiom", "experimental"]
     version_added = "v5.0.10"

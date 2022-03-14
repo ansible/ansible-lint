@@ -11,12 +11,9 @@ if TYPE_CHECKING:
 
 
 class IgnoreErrorsRule(AnsibleLintRule):
-    """Describe and test the IgnoreErrorsRule."""
+    """Use failed_when and specify error conditions instead of using ignore_errors."""
 
     id = "ignore-errors"
-    shortdesc = (
-        "Use failed_when and specify error conditions instead of using ignore_errors"
-    )
     description = (
         "Instead of ignoring all errors, ignore the errors only when using ``{{ ansible_check_mode }}``, "
         "register the errors using ``register``, "

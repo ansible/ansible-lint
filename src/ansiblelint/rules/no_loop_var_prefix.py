@@ -18,7 +18,6 @@ class RoleLoopVarPrefix(AnsibleLintRule):
     """Role loop_var should use configured prefix."""
 
     id = "no-loop-var-prefix"
-    shortdesc = __doc__
     link = (
         "https://docs.ansible.com/ansible/latest/user_guide/"
         "playbooks_loops.html#defining-inner-and-outer-variable-names-with-loop-var"
@@ -38,7 +37,6 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         if not options.loop_var_prefix:
             return results
         self.prefix = options.loop_var_prefix.format(role=toidentifier(file.role))
-        self.shortdesc = f"{self.__class__.shortdesc}: {self.prefix}"
 
         if file.kind not in ("tasks", "handlers"):
             return results

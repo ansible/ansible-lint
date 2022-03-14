@@ -38,10 +38,9 @@ _empty_playbook_re = re.compile(
 
 
 class AnsibleSyntaxCheckRule(AnsibleLintRule):
-    """Ansible syntax check report failure."""
+    """Ansible syntax check failed."""
 
     id = "syntax-check"
-    shortdesc = "Ansible syntax check failed"
     description = DESCRIPTION
     severity = "VERY_HIGH"
     tags = ["core", "unskippable"]

@@ -10,9 +10,9 @@ from ansiblelint.utils import LINE_NUMBER_KEY
 
 
 class NoSameOwnerRule(AnsibleLintRule):
+    """Owner should not be kept between different hosts."""
 
     id = "no-same-owner"
-    shortdesc = "Owner should not be kept between different hosts"
     description = """
 Optional rule that highlights dangers of assuming that user/group on the remote
 machines may not exist on ansible controller or vice versa. Owner and group
@@ -133,4 +133,4 @@ if "pytest" in sys.modules:
         results = Runner(test_file, rules=default_rules_collection).run()
         assert len(results) == failures
         for result in results:
-            assert result.message == NoSameOwnerRule.shortdesc
+            assert result.message == NoSameOwnerRule().shortdesc

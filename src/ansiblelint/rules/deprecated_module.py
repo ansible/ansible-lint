@@ -11,8 +11,9 @@ if TYPE_CHECKING:
 
 
 class DeprecatedModuleRule(AnsibleLintRule):
+    """Deprecated module."""
+
     id = "deprecated-module"
-    shortdesc = "Deprecated module"
     description = (
         "These are deprecated modules, some modules are kept "
         "temporarily for backwards compatibility but usage is discouraged. "

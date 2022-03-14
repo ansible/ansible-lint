@@ -32,9 +32,9 @@ An example rule using ``match`` is:
     from ansiblelint.rules import AnsibleLintRule
 
     class DeprecatedVariableRule(AnsibleLintRule):
+        """Deprecated variable declarations."""
 
         id = 'EXAMPLE002'
-        shortdesc = 'Deprecated variable declarations'
         description = 'Check for lines that have old style ${var} ' + \
                       'declarations'
         tags = { 'deprecations' }
@@ -57,8 +57,9 @@ An example rule using ``matchtask`` is:
         from ansiblelint.file_utils import Lintable
 
     class TaskHasTag(AnsibleLintRule):
+        """Tasks must have tag."""
+
         id = 'EXAMPLE001'
-        shortdesc = 'Tasks must have tag'
         description = 'Tasks must have tag'
         tags = ['productivity']
 

@@ -66,8 +66,9 @@ _MODULES_WITH_CREATE: Dict[str, bool] = {
 
 
 class MissingFilePermissionsRule(AnsibleLintRule):
+    """File permissions unset or incorrect."""
+
     id = "risky-file-permissions"
-    shortdesc = "File permissions unset or incorrect"
     description = (
         "Missing or unsupported mode parameter can cause unexpected file "
         "permissions based "

@@ -30,8 +30,9 @@ if TYPE_CHECKING:
 
 
 class EnvVarsInCommandRule(AnsibleLintRule):
+    """Command module does not accept setting environment variables inline."""
+
     id = "inline-env-var"
-    shortdesc = "Command module does not accept setting environment variables inline"
     description = (
         "Use ``environment:`` to set environment variables "
         "or use ``shell`` module which accepts both"
