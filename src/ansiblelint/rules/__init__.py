@@ -44,6 +44,7 @@ class AnsibleLintRule(BaseRule):
 
     @property
     def rule_config(self) -> Dict[str, Any]:
+        """Retrieve rule specific configuration."""
         return get_rule_config(self.id)
 
     @lru_cache()
@@ -57,6 +58,7 @@ class AnsibleLintRule(BaseRule):
 
     @staticmethod
     def unjinja(text: str) -> str:
+        """Remove jinja2 bits from a string."""
         text = re.sub(r"{{.+?}}", "JINJA_EXPRESSION", text)
         text = re.sub(r"{%.+?%}", "JINJA_STATEMENT", text)
         text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
@@ -71,6 +73,7 @@ class AnsibleLintRule(BaseRule):
         filename: Optional[Union[str, Lintable]] = None,
         tag: str = "",
     ) -> MatchError:
+        """Instantiate a new MatchError."""
         match = MatchError(
             message=message,
             linenumber=linenumber,
@@ -251,6 +254,7 @@ class RulesCollection:
         self.rules = sorted(self.rules)
 
     def register(self, obj: AnsibleLintRule) -> None:
+        """Register a rule."""
         # We skip opt-in rules which were not manually enabled
         if "opt-in" not in obj.tags or obj.id in self.options.enable_list:
             self.rules.append(obj)
@@ -264,11 +268,13 @@ class RulesCollection:
         return len(self.rules)
 
     def extend(self, more: List[AnsibleLintRule]) -> None:
+        """Combine rules."""
         self.rules.extend(more)
 
     def run(
         self, file: Lintable, tags: Set[str] = set(), skip_list: List[str] = []
     ) -> List[MatchError]:
+        """Run all the rules against the given lintable."""
         matches: List[MatchError] = []
 
         if not file.path.is_dir():
@@ -309,6 +315,7 @@ class RulesCollection:
         )
 
     def listtags(self) -> str:
+        """Return a string with all the tags in the RulesCollection."""
         tag_desc = {
             "command-shell": "Specific to use of command and shell modules",
             "core": "Related to internal implementation of the linter",

@@ -56,14 +56,15 @@ class OctalPermissionsRule(AnsibleLintRule):
 
     @staticmethod
     def is_invalid_permission(mode: int) -> bool:
-        # sensible file permission modes don't
-        # have write bit set when read bit is
-        # not set and don't have execute bit set
-        # when user execute bit is not set.
-        # also, user permissions are more generous than
-        # group permissions and user and group permissions
-        # are more generous than world permissions
+        """Check if permissions are valid.
 
+        Sensible file permission modes don't have write bit set when read bit
+        is not set and don't have execute bit set when user execute bit is
+        not set.
+
+        Also, user permissions are more generous than group permissions and
+        user and group permissions are more generous than world permissions.
+        """
         other_write_without_read = (
             mode % 8 and mode % 8 < 4 and not (mode % 8 == 1 and (mode >> 6) % 2 == 1)
         )
