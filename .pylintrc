@@ -22,7 +22,4 @@ disable =
     no-member,
     not-callable,
     protected-access,
-    too-many-branches,
-    too-many-instance-attributes,
-    too-many-return-statements,
     unused-argument,

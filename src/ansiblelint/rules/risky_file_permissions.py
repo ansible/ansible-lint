@@ -84,6 +84,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
     _modules = _MODULES
     _modules_with_create = _MODULES_WITH_CREATE
 
+    # pylint: disable=too-many-return-statements
     def matchtask(
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
