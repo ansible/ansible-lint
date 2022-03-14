@@ -1,3 +1,5 @@
+"""Implementation of meta-no-tags rule."""
+
 # Copyright (c) 2018, Ansible Project
 
 import re

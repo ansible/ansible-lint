@@ -1,3 +1,4 @@
+"""Tests for no-jinja-when rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.no_jinja_when import NoFormattingInWhenRule
 from ansiblelint.runner import Runner

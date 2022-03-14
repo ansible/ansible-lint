@@ -1,3 +1,4 @@
+"""Test related to import of invalid files."""
 import pytest
 
 from ansiblelint.file_utils import Lintable

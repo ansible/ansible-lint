@@ -1,3 +1,4 @@
+"""Implementation of the literal-compare rule."""
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018-2021, Ansible Project
 

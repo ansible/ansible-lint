@@ -6,6 +6,9 @@ preferred-modules =
 # pylint defaults + f,fh,v,id
 good-names =i,j,k,ex,Run,_,f,fh,v,id,T
 
+# Ignore as being generated:
+ignore-paths=^src/ansiblelint/_version.*$
+
 [MESSAGES CONTROL]
 
 disable =
@@ -17,7 +20,6 @@ disable =
     duplicate-code,
     fixme,
     missing-function-docstring,
-    missing-module-docstring,
     no-member,
     not-callable,
     protected-access,

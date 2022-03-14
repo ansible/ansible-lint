@@ -1,3 +1,4 @@
+"""Tests for meta-no-info rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.meta_no_info import MetaMainHasInfoRule
 from ansiblelint.testing import RunFromText

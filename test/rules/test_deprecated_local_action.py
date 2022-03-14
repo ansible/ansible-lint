@@ -1,3 +1,4 @@
+"""Tests for deprecated-local-action rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.deprecated_local_action import TaskNoLocalAction
 from ansiblelint.testing import RunFromText

@@ -1,3 +1,4 @@
+"""Implementations of the package-latest rule."""
 # Copyright (c) 2016 Will Thames <will@thames.id.au>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy

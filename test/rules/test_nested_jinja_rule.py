@@ -1,3 +1,4 @@
+"""Tests for nested-jinja rule."""
 # -*- coding: utf-8 -*-
 # Author: Adrián Tóth <adtoth@redhat.com>
 #

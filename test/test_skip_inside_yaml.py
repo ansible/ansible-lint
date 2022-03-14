@@ -1,3 +1,4 @@
+"""Tests related to use of inline noqa."""
 import pytest
 
 from ansiblelint.testing import RunFromText

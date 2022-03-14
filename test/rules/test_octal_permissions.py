@@ -1,3 +1,4 @@
+"""Tests for risky-octal rule."""
 import pytest
 
 from ansiblelint.rules import RulesCollection

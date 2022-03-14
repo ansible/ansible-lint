@@ -1,3 +1,4 @@
+"""Tests related to role imports."""
 from pathlib import Path
 from typing import List
 

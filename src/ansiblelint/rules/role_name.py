@@ -1,3 +1,4 @@
+"""Implementation of role-name rule."""
 # Copyright (c) 2020 Gael Chamoulaud <gchamoul@redhat.com>
 # Copyright (c) 2020 Sorin Sbarnea <ssbarnea@redhat.com>
 #

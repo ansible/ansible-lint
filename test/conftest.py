@@ -1,3 +1,4 @@
+"""PyTest fixtures for testing the project."""
 import os
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Iterator

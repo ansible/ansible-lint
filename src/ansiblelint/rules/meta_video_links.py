@@ -1,3 +1,4 @@
+"""Implementation of meta-video-links rule."""
 # Copyright (c) 2018, Ansible Project
 
 import re

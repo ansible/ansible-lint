@@ -1,3 +1,4 @@
+"""Implementation of var-naming rule."""
 import keyword
 import re
 import sys

@@ -1,3 +1,4 @@
+"""Tests for inline-env-var rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.inline_env_var import EnvVarsInCommandRule
 from ansiblelint.testing import RunFromText

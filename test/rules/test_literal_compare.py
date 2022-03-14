@@ -1,3 +1,4 @@
+"""Tests for literal-compare rule."""
 import pytest
 
 from ansiblelint.rules import RulesCollection

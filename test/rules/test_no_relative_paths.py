@@ -1,3 +1,4 @@
+"""Tests for no-relative-paths rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.no_relative_paths import RoleRelativePath
 from ansiblelint.testing import RunFromText

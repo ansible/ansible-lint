@@ -1,3 +1,4 @@
+"""Tests for deprecated-module rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.deprecated_module import DeprecatedModuleRule
 from ansiblelint.testing import RunFromText

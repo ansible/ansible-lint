@@ -1,3 +1,4 @@
+"""Tests for unnamed-task rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.unnamed_task import TaskHasNameRule
 from ansiblelint.runner import Runner

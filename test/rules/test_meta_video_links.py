@@ -1,3 +1,4 @@
+"""Tests for meta-video-links rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.meta_video_links import MetaVideoLinksRule
 from ansiblelint.testing import RunFromText
