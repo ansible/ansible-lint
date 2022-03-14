@@ -34,9 +34,9 @@ class OctalPermissionsRule(AnsibleLintRule):
     id = "risky-octal"
     description = (
         "Numeric file permissions without leading zero can behave "
-        "in unexpected ways. See "
-        "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html"
+        "in unexpected ways."
     )
+    link = "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html"
     severity = "VERY_HIGH"
     tags = ["formatting"]
     version_added = "historic"

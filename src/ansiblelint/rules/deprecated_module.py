@@ -16,10 +16,9 @@ class DeprecatedModuleRule(AnsibleLintRule):
     id = "deprecated-module"
     description = (
         "These are deprecated modules, some modules are kept "
-        "temporarily for backwards compatibility but usage is discouraged. "
-        "For more details see: "
-        "https://docs.ansible.com/ansible/latest/collections/index_module.html"
+        "temporarily for backwards compatibility but usage is discouraged."
     )
+    link = "https://docs.ansible.com/ansible/latest/collections/index_module.html"
     severity = "HIGH"
     tags = ["deprecations"]
     version_added = "v4.0.0"

@@ -60,7 +60,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
     id = "meta-no-info"
     str_info = META_STR_INFO
     info = META_INFO
-    description = "meta/main.yml should contain: ``{}``".format(", ".join(info))
+    description = "meta/main.yml should contain: {}".format(", ".join(info))
     severity = "HIGH"
     tags = ["metadata"]
     version_added = "v4.0.0"
