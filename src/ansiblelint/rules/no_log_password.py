@@ -26,10 +26,9 @@ if TYPE_CHECKING:
 
 
 class NoLogPasswordsRule(AnsibleLintRule):
-    """Describe and test the NoLogPasswordsRule."""
+    """Password should not be logged."."""
 
     id = "no-log-password"
-    shortdesc = "password should not be logged."
     description = (
         "When passing password argument you should have no_log configured "
         "to a non False value to avoid accidental leaking of secrets."

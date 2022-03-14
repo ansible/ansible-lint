@@ -13,8 +13,9 @@ if TYPE_CHECKING:
 
 
 class NoTabsRule(AnsibleLintRule):
+    """Most files should not contain tabs."""
+
     id = "no-tabs"
-    shortdesc = "Most files should not contain tabs"
     description = "Tabs can cause unexpected display issues, use spaces"
     severity = "LOW"
     tags = ["formatting"]
@@ -65,5 +66,5 @@ if "pytest" in sys.modules:
         """Test rule matches."""
         results = rule_runner.run_playbook(RULE_EXAMPLE)
         assert results[0].linenumber == 9
-        assert results[0].message == NoTabsRule.shortdesc
+        assert results[0].message == NoTabsRule().shortdesc
         assert len(results) == 1

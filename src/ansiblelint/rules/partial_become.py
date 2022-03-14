@@ -86,8 +86,9 @@ def _become_user_without_become(becomeuserabove: bool, data: "odict[str, Any]") 
 
 
 class BecomeUserWithoutBecomeRule(AnsibleLintRule):
+    """become_user requires become to work as expected."""
+
     id = "partial-become"
-    shortdesc = "become_user requires become to work as expected"
     description = "``become_user`` without ``become`` will not actually change user"
     severity = "VERY_HIGH"
     tags = ["unpredictability"]

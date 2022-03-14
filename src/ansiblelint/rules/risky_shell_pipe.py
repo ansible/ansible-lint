@@ -11,8 +11,9 @@ if TYPE_CHECKING:
 
 
 class ShellWithoutPipefail(AnsibleLintRule):
+    """Shells that use pipes should set the pipefail option."""
+
     id = "risky-shell-pipe"
-    shortdesc = "Shells that use pipes should set the pipefail option"
     description = (
         "Without the pipefail option set, a shell command that "
         "implements a pipeline can fail and still return 0. If "

@@ -15,8 +15,9 @@ if TYPE_CHECKING:
 
 
 class ComparisonToEmptyStringRule(AnsibleLintRule):
+    """Don't compare to empty string."""
+
     id = "empty-string-compare"
-    shortdesc = "Don't compare to empty string"
     description = (
         'Use ``when: var|length > 0`` rather than ``when: var != ""`` (or '
         'conversely ``when: var|length == 0`` rather than ``when: var == ""``)'
@@ -83,7 +84,7 @@ if "pytest" in sys.modules:
         results = rule_runner.run_playbook(FAIL_PLAY)
         assert len(results) == 2
         for result in results:
-            assert result.message == ComparisonToEmptyStringRule.shortdesc
+            assert result.message == ComparisonToEmptyStringRule().shortdesc
 
     @pytest.mark.parametrize(
         "rule_runner", (ComparisonToEmptyStringRule,), indirect=["rule_runner"]

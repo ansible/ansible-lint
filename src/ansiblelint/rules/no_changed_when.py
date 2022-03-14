@@ -30,8 +30,9 @@ if TYPE_CHECKING:
 
 
 class CommandHasChangesCheckRule(AnsibleLintRule):
+    """Commands should not change things if nothing needs doing."""
+
     id = "no-changed-when"
-    shortdesc = "Commands should not change things if nothing needs doing"
     description = """
 Tasks should tell Ansible when to return ``changed``, unless the task only reads
 information. To do this, set ``changed_when``, use the ``creates`` or

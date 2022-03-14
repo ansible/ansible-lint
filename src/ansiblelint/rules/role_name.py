@@ -39,8 +39,10 @@ def _remove_prefix(text: str, prefix: str) -> str:
 
 
 class RoleNames(AnsibleLintRule):
+    # Unable to use f-strings due to flake8 bug with AST parsing
+    """Role name {0} does not match ``^[a-z][a-z0-9_]+$`` pattern."""
+
     id = "role-name"
-    shortdesc = "Role name {0} does not match ``%s`` pattern" % ROLE_NAME_REGEX
     description = (
         "Role names are now limited to contain only lowercase alphanumeric "
         "characters, plus '_' and start with an alpha character. See "
@@ -80,7 +82,7 @@ class RoleNames(AnsibleLintRule):
                 result.append(
                     self.create_matcherror(
                         filename=str(file.path),
-                        message=self.__class__.shortdesc.format(role_name),
+                        message=self.shortdesc.format(role_name),
                     )
                 )
         return result

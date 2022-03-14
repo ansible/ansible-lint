@@ -29,8 +29,9 @@ if TYPE_CHECKING:
 
 
 class GitHasVersionRule(AnsibleLintRule):
+    """Git checkouts must contain explicit version."""
+
     id = "git-latest"
-    shortdesc = "Git checkouts must contain explicit version"
     description = (
         "All version control checkouts must point to "
         "an explicit commit or tag, not just ``latest``"

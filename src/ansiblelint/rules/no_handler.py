@@ -48,8 +48,9 @@ def _changed_in_when(item: str) -> bool:
 
 
 class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
+    """Tasks that run when changed should likely be handlers."""
+
     id = "no-handler"
-    shortdesc = "Tasks that run when changed should likely be handlers"
     description = (
         "If a task has a ``when: result.changed`` setting, it is effectively "
         "acting as a handler. You could use notify and move that task to "

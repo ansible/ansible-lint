@@ -13,7 +13,6 @@ class TaskHasTag(AnsibleLintRule):
     """Tasks must have tag."""
 
     id = "EXAMPLE001"
-    shortdesc = "Tasks must have tag"
     description = "Tasks must have tag"
     tags = ["productivity", "tags"]
 

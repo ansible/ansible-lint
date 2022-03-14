@@ -25,8 +25,9 @@ you to have a more fine control.
 
 
 class YamllintRule(AnsibleLintRule):
+    """Violations reported by yamllint."""
+
     id = "yaml"
-    shortdesc = "Violations reported by yamllint"
     description = DESCRIPTION
     severity = "VERY_LOW"
     tags = ["formatting", "yaml"]

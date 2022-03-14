@@ -33,8 +33,9 @@ if TYPE_CHECKING:
 
 
 class NestedJinjaRule(AnsibleLintRule):
+    """Nested jinja pattern."""
+
     id = "no-jinja-nesting"
-    shortdesc = "Nested jinja pattern"
     description = (
         "There should not be any nested jinja pattern. "
         "Example (bad): ``{{ list_one + {{ list_two | max }} }}``, "
