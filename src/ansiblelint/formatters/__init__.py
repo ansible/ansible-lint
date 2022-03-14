@@ -59,6 +59,8 @@ class BaseFormatter(Generic[T]):
 
 
 class Formatter(BaseFormatter):  # type: ignore
+    """Default output formatter of ansible-lint."""
+
     def format(self, match: "MatchError") -> str:
         _id = getattr(match.rule, "id", "000")
         result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
@@ -75,6 +77,8 @@ class Formatter(BaseFormatter):  # type: ignore
 
 
 class QuietFormatter(BaseFormatter[Any]):
+    """Brief output formatter for ansible-lint."""
+
     def format(self, match: "MatchError") -> str:
         return (
             f"[error_code]{match.rule.id}[/] "

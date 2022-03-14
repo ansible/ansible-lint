@@ -40,6 +40,8 @@ match_types = {
 
 
 class AnsibleLintRule(BaseRule):
+    """AnsibleLintRule should be used as base for writing new rules."""
+
     @property
     def rule_config(self) -> Dict[str, Any]:
         return get_rule_config(self.id)
@@ -224,6 +226,8 @@ def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
 
 
 class RulesCollection:
+    """Container for a collection of rules."""
+
     def __init__(
         self,
         rulesdirs: Optional[List[str]] = None,

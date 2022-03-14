@@ -89,6 +89,8 @@ def test_matcherror_invalid() -> None:
     ),
 )
 class TestMatchErrorCompare:
+    """Test the comparison of MatchError instances."""
+
     @staticmethod
     def test_match_error_less_than(
         left_match_error: MatchError, right_match_error: MatchError
