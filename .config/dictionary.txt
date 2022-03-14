@@ -46,6 +46,7 @@ delenv
 denormalize
 deps
 devel
+dirhtml
 dists
 distutils
 docstrings
