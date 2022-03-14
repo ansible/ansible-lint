@@ -111,6 +111,8 @@ def get_config_path(config_file: Optional[str] = None) -> Optional[str]:
 
 
 class AbspathArgAction(argparse.Action):
+    """Argparse action to convert relative paths to absolute paths."""
+
     def __call__(
         self,
         parser: argparse.ArgumentParser,
