@@ -472,6 +472,7 @@ class FormattedEmitter(Emitter):
         super().write_version_directive(version_text)
 
 
+# pylint: disable=too-many-instance-attributes
 class FormattedYAML(YAML):
     """A YAML loader/dumper that handles ansible content better by default."""
 

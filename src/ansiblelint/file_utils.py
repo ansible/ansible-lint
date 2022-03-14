@@ -122,6 +122,7 @@ def kind_from_path(path: Path, base: bool = False) -> FileType:
     return ""
 
 
+# pylint: disable=too-many-instance-attributes
 class Lintable:
     """Defines a file/folder that can be linted.
 

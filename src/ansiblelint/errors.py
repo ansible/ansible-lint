@@ -6,6 +6,7 @@ from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.file_utils import Lintable, normpath
 
 
+# pylint: disable=too-many-instance-attributes
 @functools.total_ordering
 class MatchError(ValueError):
     """Rule violation detected during linting.
