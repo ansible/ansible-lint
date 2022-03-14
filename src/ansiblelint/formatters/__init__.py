@@ -50,6 +50,7 @@ class BaseFormatter(Generic[T]):
 
     # pylint: disable=no-self-use
     def format(self, match: "MatchError") -> str:
+        """Format a match error."""
         return str(match)
 
     @staticmethod
@@ -154,7 +155,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
     """
 
     def format_result(self, matches: List["MatchError"]) -> str:
-
+        """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             raise RuntimeError(
                 f"The {self.__class__} was expecting a list of MatchError."

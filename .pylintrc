@@ -19,7 +19,6 @@ disable =
     dangerous-default-value,
     duplicate-code,
     fixme,
-    missing-function-docstring,
     no-member,
     not-callable,
     protected-access,
