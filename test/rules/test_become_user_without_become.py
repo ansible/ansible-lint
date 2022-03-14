@@ -1,3 +1,4 @@
+"""Tests for partial-become rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.partial_become import BecomeUserWithoutBecomeRule
 from ansiblelint.runner import Runner

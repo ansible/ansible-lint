@@ -1,3 +1,4 @@
+"""Test cli arguments and config."""
 import os
 from pathlib import Path
 from typing import List

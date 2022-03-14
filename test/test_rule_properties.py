@@ -1,3 +1,4 @@
+"""Tests related to rule properties."""
 from ansiblelint.rules import RulesCollection
 
 

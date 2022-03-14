@@ -1,3 +1,4 @@
+"""Tests for line-too-long rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.yaml import YamllintRule
 from ansiblelint.testing import RunFromText

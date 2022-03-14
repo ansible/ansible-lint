@@ -1,3 +1,4 @@
+"""Implementation of yaml linting rule (yamllint integration)."""
 import logging
 from typing import TYPE_CHECKING, List
 

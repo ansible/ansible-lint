@@ -1,3 +1,4 @@
+"""Tests about dependencies in meta."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 

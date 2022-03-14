@@ -1,3 +1,4 @@
+"""Tests for meta-incorrect rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.meta_incorrect import MetaChangeFromDefaultRule
 from ansiblelint.testing import RunFromText

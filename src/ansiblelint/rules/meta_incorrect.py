@@ -1,3 +1,4 @@
+"""Implementation of meta-incorrect rule."""
 # Copyright (c) 2018, Ansible Project
 
 from typing import TYPE_CHECKING, List

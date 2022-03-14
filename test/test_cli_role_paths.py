@@ -1,3 +1,4 @@
+"""Tests related to role paths."""
 import os
 from pathlib import Path
 from typing import Dict

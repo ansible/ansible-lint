@@ -1,3 +1,4 @@
+"""Internally used rule classes."""
 import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 

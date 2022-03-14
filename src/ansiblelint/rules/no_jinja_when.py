@@ -1,3 +1,4 @@
+"""Implementation of no-jinja-when rule."""
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 from ansiblelint.rules import AnsibleLintRule

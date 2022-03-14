@@ -1,3 +1,4 @@
+"""Tests for risky-shell-pile rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.risky_shell_pipe import ShellWithoutPipefail
 from ansiblelint.testing import RunFromText

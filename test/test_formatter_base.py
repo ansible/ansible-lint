@@ -1,4 +1,5 @@
 # -*- coding: utf-8; -*-
+"""Tests related to base formatter."""
 from pathlib import Path
 from typing import Any, Union
 

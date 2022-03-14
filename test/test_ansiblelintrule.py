@@ -1,3 +1,4 @@
+"""Generic tests for AnsibleLintRule class."""
 from typing import Any, Dict
 
 import pytest

@@ -1,3 +1,4 @@
+"""Tests for no-handler rule."""
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.no_handler import UseHandlerRatherThanWhenChangedRule
 from ansiblelint.testing import RunFromText
