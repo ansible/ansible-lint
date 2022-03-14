@@ -42,7 +42,6 @@ from typing import (
 )
 
 import yaml
-from ansible import constants
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
@@ -62,6 +61,7 @@ from ansiblelint._internal.rules import (
     LoadingFailureRule,
     RuntimeErrorRule,
 )
+from ansiblelint.app import get_app
 from ansiblelint.config import options
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, FileType
 from ansiblelint.errors import MatchError
@@ -444,13 +444,9 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
         path_dwim(basedir, os.path.join("..", role)),
     ]
 
-    if constants.DEFAULT_ROLES_PATH:
-        search_locations = constants.DEFAULT_ROLES_PATH
-        if isinstance(search_locations, str):
-            search_locations = search_locations.split(os.pathsep)
-        for loc in search_locations:
-            loc = os.path.expanduser(loc)
-            possible_paths.append(path_dwim(loc, role))
+    for loc in get_app().runtime.config.default_roles_path:
+        loc = os.path.expanduser(loc)
+        possible_paths.append(path_dwim(loc, role))
 
     possible_paths.append(path_dwim(basedir, ""))
 
