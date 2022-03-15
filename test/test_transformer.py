@@ -1,9 +1,11 @@
 """Tests for Transformer."""
 
+import os
+import pathlib
+import shutil
 from argparse import Namespace
 from typing import Iterator, Tuple
 
-import py
 import pytest
 
 from ansiblelint.rules import RulesCollection
@@ -15,15 +17,19 @@ from ansiblelint.transformer import Transformer
 
 @pytest.fixture(name="copy_examples_dir")
 def fixture_copy_examples_dir(
-    tmpdir: py.path.local, config_options: Namespace
-) -> Iterator[Tuple[py.path.local, py.path.local]]:
+    tmp_path: pathlib.Path, config_options: Namespace
+) -> Iterator[Tuple[pathlib.Path, pathlib.Path]]:
     """Fixture that copies the examples/ dir into a tmpdir."""
-    examples_dir = py.path.local("examples")
-    examples_dir.copy(tmpdir / "examples")
-    old_cwd = tmpdir.chdir()
-    config_options.cwd = tmpdir
-    yield old_cwd, tmpdir
-    old_cwd.chdir()
+    examples_dir = pathlib.Path("examples")
+
+    shutil.copytree(examples_dir, tmp_path / "examples")
+    old_cwd = os.getcwd()
+    try:
+        os.chdir(tmp_path)
+        config_options.cwd = tmp_path
+        yield pathlib.Path(old_cwd), tmp_path
+    finally:
+        os.chdir(old_cwd)
 
 
 @pytest.fixture(name="runner_result")
@@ -60,7 +66,7 @@ def fixture_runner_result(
     ),
 )
 def test_transformer(
-    copy_examples_dir: Tuple[py.path.local, py.path.local],
+    copy_examples_dir: Tuple[pathlib.Path, pathlib.Path],
     playbook: str,
     runner_result: LintResult,
     transformed: bool,
@@ -82,9 +88,9 @@ def test_transformer(
     expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
     transformed_playbook = tmp_dir / playbook
 
-    orig_playbook_content = orig_playbook.read()
-    expected_playbook_content = expected_playbook.read()
-    transformed_playbook_content = transformed_playbook.read()
+    orig_playbook_content = orig_playbook.read_text()
+    expected_playbook_content = expected_playbook.read_text()
+    transformed_playbook_content = transformed_playbook.read_text()
 
     if transformed:
         assert orig_playbook_content != transformed_playbook_content

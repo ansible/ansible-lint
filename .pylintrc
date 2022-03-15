@@ -1,5 +1,6 @@
 [IMPORTS]
 preferred-modules =
+    py:pathlib,
     unittest:pytest,
 
 [MASTER]
@@ -19,7 +20,10 @@ disable =
     dangerous-default-value,
     duplicate-code,
     fixme,
-    no-member,
     not-callable,
     protected-access,
     unused-argument,
+
+[TYPECHECK]
+# pylint is unable to detect Namespace attributes and will throw a E1101
+generated-members=options.*
