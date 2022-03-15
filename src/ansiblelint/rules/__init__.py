@@ -270,10 +270,17 @@ class RulesCollection:
         self.rules.extend(more)
 
     def run(
-        self, file: Lintable, tags: Set[str] = set(), skip_list: List[str] = []
+        self,
+        file: Lintable,
+        tags: Optional[Set[str]] = None,
+        skip_list: Optional[List[str]] = None,
     ) -> List[MatchError]:
         """Run all the rules against the given lintable."""
         matches: List[MatchError] = []
+        if tags is None:
+            tags = set()
+        if skip_list is None:
+            skip_list = []
 
         if not file.path.is_dir():
             try:
