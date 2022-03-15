@@ -12,7 +12,9 @@ else:
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
 
-INVALID_CONFIG_RC = 2
+SUCCESS_RC = 0
+VIOLATIONS_FOUND_RC = 2
+INVALID_CONFIG_RC = 3
 EXIT_CONTROL_C_RC = 130
 
 # Minimal version of Ansible we support for runtime

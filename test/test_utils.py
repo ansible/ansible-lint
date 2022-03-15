@@ -38,6 +38,7 @@ from _pytest.monkeypatch import MonkeyPatch
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
+from ansiblelint.constants import VIOLATIONS_FOUND_RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.testing import run_ansible_lint
 
@@ -246,8 +247,7 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     result = subprocess.run(cmd, check=False).returncode
 
     # We de expect to fail on our own repo due to test examples we have
-    # TODO(ssbarnea) replace it with exact return code once we document them
-    assert result != 0
+    assert result == VIOLATIONS_FOUND_RC
 
     out, err = capfd.readouterr()
 
