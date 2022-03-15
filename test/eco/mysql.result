@@ -1,10 +1,17 @@
-WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
-WARNING  Listing 2 violation(s) that are fatal
-../../ansible-lint/314d98/roles/geerlingguy.mysql/tasks/replication.yml:37: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors
-tasks/replication.yml:37: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors
-You can skip specific rules or tags by adding them to your configuration file:
-# .ansible-lint
-warn_list:  # or 'skip_list' to silence them completely
-  - experimental  # all rules tagged as experimental
+CMD: ansible-lint -f pep8 -x fqcn-builtins
 
-Finished with 0 failure(s), 2 warning(s) on 46 files.
+RC: 2
+
+STDERR:
+WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
+WARNING  Listing 1 violation(s) that are fatal
+You can skip specific rules or tags by adding them to your configuration file:
+# .config/ansible-lint.yml
+warn_list:  # or 'skip_list' to silence them completely
+  - internal-error  # Unexpected internal error.
+
+Finished with 1 failure(s), 0 warning(s) on 28 files.
+
+
+STDOUT:
+molecule/default/converge.yml:7:7: internal-error the role 'geerlingguy.mysql' was not found in ~/.cache/ansible-lint-eco/mysql/molecule/default/roles:~/.cache/ansible-compat/430005/roles:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.cache/ansible-lint-eco/mysql/molecule/default

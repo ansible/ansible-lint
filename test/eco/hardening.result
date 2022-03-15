@@ -1,8 +1,16 @@
+CMD: ansible-lint -f pep8 -x fqcn-builtins
+
+RC: 0
+
+STDERR:
 WARNING  Loading custom .yamllint.yml config file, this extends our internal yamllint config.
 WARNING  Listing 4 violation(s) that are fatal
+
+Finished with 0 failure(s), 4 warning(s) on 121 files.
+
+
+STDOUT:
 defaults/main/sshd.yml:20: yaml line too long (143 > 120 characters) (line-length)
 tasks/auditd.yml:21: yaml line too long (122 > 120 characters) (line-length)
 tasks/packagemgmt.yml:164: yaml line too long (129 > 120 characters) (line-length)
 tasks/packagemgmt.yml:192: yaml line too long (162 > 120 characters) (line-length)
-
-Finished with 0 failure(s), 4 warning(s) on 121 files.
