@@ -689,7 +689,9 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         if hasattr(node, "__line__"):
             mapping[LINE_NUMBER_KEY] = node.__line__
         else:
-            mapping[LINE_NUMBER_KEY] = mapping._line_number
+            mapping[
+                LINE_NUMBER_KEY
+            ] = mapping._line_number  # pylint: disable=protected-access
         mapping[FILENAME_KEY] = lintable.path
         return mapping
 

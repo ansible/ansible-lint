@@ -19,7 +19,6 @@ disable =
     consider-using-f-string,
     dangerous-default-value,
     duplicate-code,
-    protected-access,
 
 [TYPECHECK]
 # pylint is unable to detect Namespace attributes and will throw a E1101

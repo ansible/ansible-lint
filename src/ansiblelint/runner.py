@@ -112,6 +112,7 @@ class Runner:
 
         # -- phase 1 : syntax check in parallel --
         def worker(lintable: Lintable) -> List[MatchError]:
+            # pylint: disable=protected-access
             return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
 
         # playbooks: List[Lintable] = []

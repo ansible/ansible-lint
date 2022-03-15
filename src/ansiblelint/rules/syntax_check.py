@@ -133,6 +133,7 @@ if "pytest" in sys.modules:
         lintable = Lintable(
             "examples/playbooks/conflicting_action.yml", kind="playbook"
         )
+        # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 4
         assert result[0].column == 7
@@ -148,6 +149,7 @@ if "pytest" in sys.modules:
     def test_empty_playbook() -> None:
         """Validate detection of empty-playbook."""
         lintable = Lintable("examples/playbooks/empty_playbook.yml", kind="playbook")
+        # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
         assert result[0].linenumber == 1
         # We internally convert absolute paths returned by ansible into paths
@@ -165,6 +167,7 @@ if "pytest" in sys.modules:
         }
         lintable = Lintable("examples/playbooks/extra_vars.yml", kind="playbook")
 
+        # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
 
         assert not result

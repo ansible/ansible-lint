@@ -248,6 +248,7 @@ class OctalIntYAML11(ScalarInt):
         v = format(data, "o")
         anchor = data.yaml_anchor(any=True)
         # noinspection PyProtectedMember
+        # pylint: disable=protected-access
         return representer.insert_underscore("0", v, data._underscore, anchor=anchor)
 
 
