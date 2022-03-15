@@ -280,6 +280,7 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
     """Verify that exclude option can be used to narrow down detection."""
     options = cli.get_config(["--exclude", "foo"])
 
+    # pylint: disable=unused-argument
     def mockreturn(options: Namespace) -> List[str]:
         return ["foo/playbook.yml", "bar/playbook.yml"]
 

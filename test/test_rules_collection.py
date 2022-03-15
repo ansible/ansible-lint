@@ -124,7 +124,7 @@ def test_skip_non_existent_id(
     assert len(matches) == 4
 
 
-def test_no_duplicate_rule_ids(test_rules_collection: RulesCollection) -> None:
+def test_no_duplicate_rule_ids() -> None:
     """Check that rules of the collection don't have duplicate IDs."""
     real_rules = RulesCollection([os.path.abspath("./src/ansiblelint/rules")])
     rule_ids = [rule.id for rule in real_rules]

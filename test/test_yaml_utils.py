@@ -219,6 +219,7 @@ def test_formatted_yaml_loader_dumper(
     fixture_filename: str,
 ) -> None:
     """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
+    # pylint: disable=unused-argument
     before_content, prettier_content, after_content = yaml_formatting_fixtures
     assert before_content != prettier_content
     assert before_content != after_content

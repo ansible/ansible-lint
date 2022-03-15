@@ -148,7 +148,7 @@ def test_octal_fail(runner: RunFromText) -> None:
     assert len(results) == 4
 
 
-def test_octal_valid_modes(runner: RunFromText) -> None:
+def test_octal_valid_modes() -> None:
     """Test that octal modes are valid."""
     rule = OctalPermissionsRule()
     for mode in VALID_MODES:
