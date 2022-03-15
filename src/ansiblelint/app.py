@@ -10,6 +10,7 @@ from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
 from ansiblelint.config import options as default_options
+from ansiblelint.constants import SUCCESS_RC, VIOLATIONS_FOUND_RC
 from ansiblelint.errors import MatchError
 
 if TYPE_CHECKING:
@@ -170,8 +171,8 @@ warn_list:  # or 'skip_list' to silence them completely
             )
 
         if mark_as_success or not failures:
-            return 0
-        return 2
+            return SUCCESS_RC
+        return VIOLATIONS_FOUND_RC
 
 
 def choose_formatter_factory(
