@@ -40,14 +40,19 @@ class Runner:
         *lintables: Union[Lintable, str],
         rules: "RulesCollection",
         tags: FrozenSet[Any] = frozenset(),
-        skip_list: List[str] = [],
-        exclude_paths: List[str] = [],
+        skip_list: Optional[List[str]] = None,
+        exclude_paths: Optional[List[str]] = None,
         verbosity: int = 0,
         checked_files: Optional[Set[Lintable]] = None
     ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.lintables: Set[Lintable] = set()
+
+        if skip_list is None:
+            skip_list = []
+        if exclude_paths is None:
+            exclude_paths = []
 
         # Assure consistent type
         for item in lintables:
