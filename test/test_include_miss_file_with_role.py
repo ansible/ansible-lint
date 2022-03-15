@@ -88,7 +88,7 @@ PLAY_INCLUDED_RELATIVE = Lintable(
     indirect=["_play_files"],
 )
 @pytest.mark.usefixtures("_play_files")
-def test_cases_warning_message(runner: Runner, caplog: LogCaptureFixture) -> None:
+def test_cases_warning_message(runner: Runner) -> None:
     """Test that including a non-existing file produces an error."""
     result = runner.run()
 

@@ -244,6 +244,7 @@ def play_children(
     basedir: str, item: Tuple[str, Any], parent_type: FileType, playbook_dir: str
 ) -> List[Lintable]:
     """Flatten the traversed play tasks."""
+    # pylint: disable=unused-argument
     delegate_map: Dict[str, Callable[[str, Any, Any, FileType], List[Lintable]]] = {
         "tasks": _taskshandlers_children,
         "pre_tasks": _taskshandlers_children,
@@ -410,6 +411,7 @@ def _validate_task_handler_action_for_role(th_action: Dict[str, Any]) -> None:
 def _roles_children(
     basedir: str, k: str, v: Sequence[Any], parent_type: FileType, main: str = "main"
 ) -> List[Lintable]:
+    # pylint: disable=unused-argument # parent_type)
     results: List[Lintable] = []
     for role in v:
         if isinstance(role, dict):
@@ -464,6 +466,7 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
 def _look_for_role_files(
     basedir: str, role: str, main: Optional[str] = "main"
 ) -> List[Lintable]:
+    # pylint: disable=unused-argument # main
     role_path = _rolepath(basedir, role)
     if not role_path:
         return []

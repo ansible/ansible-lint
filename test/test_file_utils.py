@@ -192,6 +192,7 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
     """Verify auto-detection logic based on DEFAULT_KINDS."""
     options = cli.get_config([])
 
+    # pylint: disable=unused-argument
     def mockreturn(options: Namespace) -> Dict[str, Any]:
         return {path: kind}
 

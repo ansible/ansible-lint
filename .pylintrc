@@ -20,9 +20,7 @@ disable =
     dangerous-default-value,
     duplicate-code,
     fixme,
-    not-callable,
     protected-access,
-    unused-argument,
 
 [TYPECHECK]
 # pylint is unable to detect Namespace attributes and will throw a E1101

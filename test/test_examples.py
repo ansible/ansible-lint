@@ -12,6 +12,7 @@ from ansiblelint.testing import run_ansible_lint
 
 @pytest.fixture
 def _change_into_examples_dir(request: FixtureRequest) -> Generator[None, None, None]:
+    # pylint: disable=unused-argument
     os.chdir("examples")
     yield
     os.chdir("..")
