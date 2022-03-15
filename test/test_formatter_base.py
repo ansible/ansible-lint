@@ -25,10 +25,11 @@ def test_base_formatter_when_base_dir(
     base_formatter = BaseFormatter(base_dir, relative_path)  # type: ignore
 
     # When
-    output_path = base_formatter._format_path(path)
+    output_path = base_formatter._format_path(path)  # pylint: disable=protected-access
 
     # Then
     assert isinstance(output_path, str)
+    # pylint: disable=protected-access
     assert base_formatter._base_dir is None or isinstance(base_formatter._base_dir, str)
     assert output_path == str(path)
 
@@ -49,10 +50,12 @@ def test_base_formatter_when_base_dir_is_given_and_relative_is_true(
     base_formatter = BaseFormatter(base_dir, True)  # type: ignore
 
     # When
+    # pylint: disable=protected-access
     output_path = base_formatter._format_path(path)
 
     # Then
     assert isinstance(output_path, str)
+    # pylint: disable=protected-access
     assert isinstance(base_formatter._base_dir, str)
     assert output_path == Path(path).name
 
