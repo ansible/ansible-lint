@@ -290,7 +290,7 @@ def _include_children(
 
     # handle include: filename.yml tags=blah
     # pylint: disable=unused-variable
-    (command, args, kwargs) = tokenize("{0}: {1}".format(k, v))
+    (command, args, kwargs) = tokenize(f"{k}: {v}")
 
     result = path_dwim(basedir, args[0])
     if not os.path.exists(result):
@@ -424,8 +424,7 @@ def _roles_children(
                     )
             elif k != "dependencies":
                 raise SystemExit(
-                    'role dict {0} does not contain a "role" '
-                    'or "name" key'.format(role)
+                    f'role dict {role} does not contain a "role" or "name" key'
                 )
         else:
             results.extend(_look_for_role_files(basedir, role, main=main))
@@ -536,7 +535,7 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         result[k] = v
 
     if not isinstance(action, str):
-        raise RuntimeError("Task actions can only be strings, got %s" % action)
+        raise RuntimeError(f"Task actions can only be strings, got {action}")
     action_unnormalized = action
     # convert builtin fqn calls to short forms because most rules know only
     # about short calls but in the future we may switch the normalization to do
@@ -582,7 +581,7 @@ def task_to_str(task: Dict[str, Any]) -> str:
         return str(action)
     args = " ".join(
         [
-            "{0}={1}".format(k, v)
+            f"{k}={v}"
             for (k, v) in action.items()
             if k
             not in [
@@ -596,7 +595,7 @@ def task_to_str(task: Dict[str, Any]) -> str:
     )
     for item in action.get("__ansible_arguments__", []):
         args += f" {item}"
-    return "{0} {1}".format(action["__ansible_module__"], args)
+    return f"{action['__ansible_module__']} {args}"
 
 
 def extract_from_list(
@@ -616,8 +615,7 @@ def extract_from_list(
                     results.extend(subresults)
                 elif block[candidate] is not None:
                     raise RuntimeError(
-                        "Key '%s' defined, but bad value: '%s'"
-                        % (candidate, str(block[candidate]))
+                        f"Key '{candidate}' defined, but bad value: '{str(block[candidate])}'"
                     )
     return results
 
@@ -706,7 +704,7 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as exc:
         logging.exception(exc)
         # pylint: disable=raise-missing-from
-        raise SystemExit("Failed to parse YAML in %s: %s" % (lintable.path, str(exc)))
+        raise SystemExit(f"Failed to parse YAML in {lintable.path}: {str(exc)}")
     return data
 
 

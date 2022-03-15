@@ -152,13 +152,13 @@ def test_octal_valid_modes() -> None:
     """Test that octal modes are valid."""
     rule = OctalPermissionsRule()
     for mode in VALID_MODES:
-        assert not rule.is_invalid_permission(mode), (
-            "0o%o should be a valid mode" % mode
-        )
+        assert not rule.is_invalid_permission(
+            mode
+        ), f"0o{mode:o} should be a valid mode"
 
 
 def test_octal_invalid_modes() -> None:
     """Test that octal modes are invalid."""
     rule = OctalPermissionsRule()
     for mode in INVALID_MODES:
-        assert rule.is_invalid_permission(mode), "%d should be an invalid mode" % mode
+        assert rule.is_invalid_permission(mode), f"{mode:d} should be an invalid mode"
