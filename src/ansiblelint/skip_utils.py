@@ -110,9 +110,6 @@ def _append_skipped_rules(
             pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
             ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)
         except (AttributeError, TypeError):
-            # TODO(awcrosby): running ansible-lint on any .yml file will
-            # assume it is a playbook, check needs to be added higher in the
-            # call stack, and can remove this except
             return pyyaml_data
     else:
         # For unsupported file types, we return empty skip lists

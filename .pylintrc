@@ -19,7 +19,6 @@ disable =
     consider-using-f-string,
     dangerous-default-value,
     duplicate-code,
-    fixme,
     protected-access,
 
 [TYPECHECK]

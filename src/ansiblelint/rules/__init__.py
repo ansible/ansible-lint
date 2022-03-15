@@ -125,8 +125,6 @@ class AnsibleLintRule(BaseRule):
             matches.append(matcherror)
         return matches
 
-    # TODO(ssbarnea): Reduce mccabe complexity
-    # https://github.com/ansible-community/ansible-lint/issues/744
     def matchtasks(self, file: Lintable) -> List[MatchError]:
         matches: List[MatchError] = []
         if (

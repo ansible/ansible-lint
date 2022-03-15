@@ -582,9 +582,10 @@ class FormattedYAML(YAML):
         self.Constructor = CustomConstructor
         self.Representer.add_representer(OctalIntYAML11, OctalIntYAML11.represent_octal)
 
-        # TODO: preserve_quotes loads all strings as a str subclass that carries
-        #       a quote attribute. Will the str subclasses cause problems in transforms?
-        #       Are there any other gotchas to this?
+        # We should preserve_quotes loads all strings as a str subclass that carries
+        # a quote attribute. Will the str subclasses cause problems in transforms?
+        # Are there any other gotchas to this?
+        #
         # This will only preserve quotes for strings read from the file.
         # anything modified by the transform will use no quotes, preferred_quote,
         # or the quote that results in the least amount of escaping.
@@ -656,7 +657,6 @@ class FormattedYAML(YAML):
 
     def loads(self, stream: str) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
-        # TODO: maybe add support for passing a Lintable for the stream.
         if not isinstance(stream, str):
             raise NotImplementedError(f"expected a str but got {type(stream)}")
         text, preamble_comment = self._pre_process_yaml(stream)

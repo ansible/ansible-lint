@@ -75,7 +75,7 @@ def load_config(config_file: str) -> Dict[Any, Any]:
         sys.exit(INVALID_CONFIG_RC)
 
     config["config_file"] = config_path
-    # TODO(ssbarnea): implement schema validation for config file
+    # See https://github.com/ansible-community/ansible-lint/issues/1803
     if isinstance(config, list):
         _logger.error(
             "Invalid configuration '%s', expected YAML mapping in the config file.",
