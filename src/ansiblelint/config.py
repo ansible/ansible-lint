@@ -96,7 +96,7 @@ def get_rule_config(rule_id: str) -> Dict[str, Any]:
     """Get configurations for the rule ``rule_id``."""
     rule_config = options.rules.get(rule_id, {})
     if not isinstance(rule_config, dict):
-        raise RuntimeError("Invalid rule config for %s: %s" % (rule_id, rule_config))
+        raise RuntimeError(f"Invalid rule config for {rule_id}: {rule_config}")
     return rule_config
 
 
@@ -122,4 +122,4 @@ def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
     match = re.search(r"^ansible ([^\s]+)", stdout, re.MULTILINE)
     if match:
         return match.group(1), None
-    return "", "FATAL: Unable parse ansible cli version: %s" % stdout
+    return "", f"FATAL: Unable parse ansible cli version: {stdout}"

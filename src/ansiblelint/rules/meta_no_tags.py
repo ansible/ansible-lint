@@ -73,14 +73,14 @@ class MetaTagValidRule(AnsibleLintRule):
             if not isinstance(tag, str):
                 results.append(
                     self.create_matcherror(
-                        "Tags must be strings: '{}'".format(tag), filename=file
+                        f"Tags must be strings: '{tag}'", filename=file
                     )
                 )
                 continue
             if not re.match(self.TAG_REGEXP, tag):
                 results.append(
                     self.create_matcherror(
-                        message="{}, invalid: '{}'".format(msg, tag), filename=file
+                        message=f"{msg}, invalid: '{tag}'", filename=file
                     )
                 )
 

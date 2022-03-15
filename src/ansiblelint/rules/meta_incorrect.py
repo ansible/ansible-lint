@@ -25,9 +25,8 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         ("license", "license (GPLv2, CC-BY, etc)"),
         ("license", "license (GPL-2.0-or-later, MIT, etc)"),
     ]
-    description = "meta/main.yml default values should be changed for: {}".format(
-        ", ".join(sorted(set((f[0] for f in field_defaults))))
-    )
+    values = ", ".join(sorted(set((f[0] for f in field_defaults))))
+    description = f"meta/main.yml default values should be changed for: {values}"
     severity = "HIGH"
     tags = ["metadata"]
     version_added = "v4.0.0"
@@ -50,7 +49,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
                     self.create_matcherror(
                         filename=file,
                         linenumber=data[LINE_NUMBER_KEY],
-                        message="Should change default metadata: %s" % field,
+                        message=f"Should change default metadata: {field}",
                     )
                 )
 

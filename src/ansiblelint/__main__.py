@@ -85,11 +85,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     new_options.cwd = pathlib.Path.cwd()
 
     if new_options.version:
-        print(
-            "ansible-lint {ver!s} using ansible {ansible_ver!s}".format(
-                ver=__version__, ansible_ver=ansible_version()
-            )
-        )
+        print(f"ansible-lint {__version__} using ansible {ansible_version()}")
         sys.exit(0)
 
     if new_options.colored is None:
@@ -109,10 +105,8 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     cache_key = hashlib.sha256(
         os.path.abspath(options.project_dir).encode()
     ).hexdigest()[:6]
-    options.cache_dir = "%s/ansible-lint/%s" % (
-        os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache")),
-        cache_key,
-    )
+    cache_dir = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+    options.cache_dir = f"{cache_dir}/ansible-lint/{cache_key}"
 
 
 def _do_list(rules: "RulesCollection") -> int:

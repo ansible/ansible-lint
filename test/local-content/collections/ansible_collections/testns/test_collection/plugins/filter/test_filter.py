@@ -4,7 +4,7 @@
 
 def a_test_filter(a, b):
     """Return a string containing both a and b."""
-    return "{0}:{1}".format(a, b)
+    return f"{a}:{b}"
 
 
 # pylint: disable=too-few-public-methods

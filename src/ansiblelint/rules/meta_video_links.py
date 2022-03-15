@@ -75,9 +75,9 @@ class MetaVideoLinksRule(AnsibleLintRule):
                     break
             else:
                 msg = (
-                    "URL format '{0}' is not recognized. "
+                    f"URL format '{video['url']}' is not recognized. "
                     "Expected it be a shared link from Vimeo, YouTube, "
-                    "or Google Drive.".format(video["url"])
+                    "or Google Drive."
                 )
                 results.append(self.create_matcherror(msg, filename=file))
 
