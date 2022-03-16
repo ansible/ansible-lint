@@ -4,7 +4,7 @@
 #
 #    pip-compile --extra=test --no-annotate --output-file=requirements.txt --strip-extras setup.cfg
 #
-ansible-compat==2.0.0
+ansible-compat==2.0.1
 ansible-core==2.12.2
 astroid==2.9.3
 attrs==21.4.0

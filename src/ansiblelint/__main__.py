@@ -21,7 +21,6 @@
 """Command line implementation."""
 
 import errno
-import hashlib
 import logging
 import os
 import pathlib
@@ -32,6 +31,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 
 from ansible_compat.config import ansible_version
+from ansible_compat.prerun import get_cache_dir
 from enrich.console import should_do_markup
 
 from ansiblelint import cli
@@ -101,12 +101,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     options.warn_list = [normalize_tag(tag) for tag in options.warn_list]
 
     options.configured = True
-    # 6 chars of entropy should be enough
-    cache_key = hashlib.sha256(
-        os.path.abspath(options.project_dir).encode()
-    ).hexdigest()[:6]
-    cache_dir = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
-    options.cache_dir = f"{cache_dir}/ansible-lint/{cache_key}"
+    options.cache_dir = get_cache_dir(options.project_dir)
 
 
 def _do_list(rules: "RulesCollection") -> int:
