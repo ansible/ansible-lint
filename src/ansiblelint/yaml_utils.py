@@ -1,4 +1,5 @@
 """Utility helpers to simplify working with yaml-based data."""
+# pylint: disable=too-many-lines
 import functools
 import logging
 import os
@@ -20,7 +21,7 @@ from typing import (
 )
 
 import ruamel.yaml.events
-from ruamel.yaml.comments import CommentedMap, CommentedSeq
+from ruamel.yaml.comments import CommentedMap, CommentedSeq, Format
 from ruamel.yaml.constructor import RoundTripConstructor
 from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 
@@ -886,12 +887,57 @@ class FormattedYAML(YAML):
     def dumps(self, data: Any) -> str:
         """Dump YAML document to string (including its preamble_comment)."""
         preamble_comment: Optional[str] = getattr(data, "preamble_comment", None)
+        self._prevent_wrapping_flow_style(data)
         with StringIO() as stream:
             if preamble_comment:
                 stream.write(preamble_comment)
             self.dump(data, stream)
             text = stream.getvalue()
         return self._post_process_yaml(text)
+
+    def _prevent_wrapping_flow_style(self, data: Any) -> None:
+        if not isinstance(data, (CommentedMap, CommentedSeq)):
+            return
+        for key, value, parent_path in nested_items_path(data):
+            if not isinstance(value, (CommentedMap, CommentedSeq)):
+                continue
+            fa: Format = value.fa  # pylint: disable=invalid-name
+            if fa.flow_style():
+                predicted_indent = self._predict_indent_length(parent_path, key)
+                predicted_width = len(str(value))
+                if predicted_indent + predicted_width > self.width:
+                    # this flow-style map will probably get line-wrapped,
+                    # so, switch it to block style to avoid the line wrap.
+                    fa.set_block_style()
+
+    def _predict_indent_length(
+        self, parent_path: List[Union[str, int]], key: Any
+    ) -> int:
+        indent = 0
+
+        # each parent_key type tells us what the indent is for the next level.
+        for parent_key in parent_path:
+            if isinstance(parent_key, int) and indent == 0:
+                # root level is a sequence
+                indent += self.sequence_dash_offset
+            elif isinstance(parent_key, int):
+                # next level is a sequence
+                indent += cast(int, self.sequence_indent)
+            elif isinstance(parent_key, str):
+                # next level is a map
+                indent += cast(int, self.map_indent)
+
+        if isinstance(key, int) and indent == 0:
+            # flow map is an item in a root-level sequence
+            indent += self.sequence_dash_offset
+        elif isinstance(key, int) and indent > 0:
+            # flow map is in a sequence
+            indent += cast(int, self.sequence_indent)
+        elif isinstance(key, str):
+            # flow map is in a map
+            indent += len(key + ": ")
+
+        return indent
 
     # ruamel.yaml only preserves empty (no whitespace) blank lines
     # (ie "/n/n" becomes "/n/n" but "/n  /n" becomes "/n").
