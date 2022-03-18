@@ -1,0 +1,6 @@
+---
+# even if is hosted under playbooks and is named playbook.yml, this file
+# is not a real playbook because it is hosted in a "templates" directory
+# and that means we will avoid processing it as a playbook. Templates use
+# either jinja2 or another templating engine, so we cannot load them.
+foo: bar
