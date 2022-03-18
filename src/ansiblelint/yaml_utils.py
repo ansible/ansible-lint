@@ -243,7 +243,7 @@ def get_path_to_play(
         raise ValueError(f"expected line_number >= 1, got {line_number}")
     if lintable.kind != "playbook" or not isinstance(ruamel_data, CommentedSeq):
         return []
-    lc: "LineCol"  # lc uses 0-based counts
+    lc: "LineCol"  # lc uses 0-based counts # pylint: disable=invalid-name
     # line_number is 1-based. Convert to 0-based.
     line_index = line_number - 1
 
@@ -256,7 +256,7 @@ def get_path_to_play(
         else:
             next_play_line_index = None
 
-        lc = play.lc
+        lc = play.lc  # pylint: disable=invalid-name
         assert isinstance(lc.line, int)
         if lc.line == line_index:
             return [play_index]

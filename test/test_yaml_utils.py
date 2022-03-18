@@ -249,14 +249,14 @@ def test_formatted_yaml_loader_dumper(
     # change any files in test/fixtures/formatting-after
 
 
-@pytest.fixture
-def lintable(file_path: str) -> Lintable:
+@pytest.fixture(name="lintable")
+def fixture_lintable(file_path: str) -> Lintable:
     """Return a playbook Lintable for use in ``get_path_to_*`` tests."""
     return Lintable(file_path)
 
 
-@pytest.fixture
-def ruamel_data(lintable: Lintable) -> Union[CommentedMap, CommentedSeq]:
+@pytest.fixture(name="ruamel_data")
+def fixture_ruamel_data(lintable: Lintable) -> Union[CommentedMap, CommentedSeq]:
     """Return the loaded YAML data for the Lintable."""
     yaml = ansiblelint.yaml_utils.FormattedYAML()
     data: Union[CommentedMap, CommentedSeq] = yaml.loads(lintable.content)
