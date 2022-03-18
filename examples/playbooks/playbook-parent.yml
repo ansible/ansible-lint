@@ -4,3 +4,6 @@
 
 - name: Importing playbook from collection
   import_playbook: community.molecule.validate
+
+- name: Importing playbook using jinja2
+  import_playbook: "{{ 'community.molecule.validate' }}"

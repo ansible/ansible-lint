@@ -27,7 +27,7 @@ import os
 import re
 import warnings
 from argparse import Namespace
-from collections.abc import ItemsView
+from collections.abc import ItemsView, Mapping
 from functools import lru_cache
 from pathlib import Path
 from typing import (
@@ -290,6 +290,10 @@ def _include_children(
     ):
         v = v["file"]
 
+    # we cannot really parse any jinja2 in includes, so we ignore them
+    if "{{" in v:
+        return []
+
     if "import_playbook" in k and COLLECTION_PLAY_RE.match(v):
         # Any import_playbooks from collections should be ignored as ansible
         # own syntax check will handle them.
@@ -392,10 +396,12 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             if not task_handler:
                 continue
 
-            # import pdb; pdb.set_trace()
-            return Lintable(
-                path_dwim(basedir, task_handler[task_handler_key]), kind=child_type
-            )
+            file_name = task_handler[task_handler_key]
+            if isinstance(file_name, Mapping) and file_name.get("file", None):
+                file_name = file_name["file"]
+
+            f = path_dwim(basedir, file_name)
+            return Lintable(f, kind=child_type)
 
     raise LookupError(
         f'The node contains none of: {", ".join(task_include_keys)}',
