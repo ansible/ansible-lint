@@ -161,6 +161,7 @@ synchronize
 sysvinit
 taskimports
 taskincludes
+templating
 testmon
 testns
 testpath
