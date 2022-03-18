@@ -1,0 +1,5 @@
+---
+collections:
+  # that collection is used during ansible-lint testing for validating our
+  # ability to import_playbook from a collection.
+  - name: community.molecule
