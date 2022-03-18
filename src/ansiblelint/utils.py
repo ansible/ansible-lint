@@ -24,6 +24,7 @@ import contextlib
 import inspect
 import logging
 import os
+import re
 import warnings
 from argparse import Namespace
 from collections.abc import ItemsView
@@ -72,6 +73,7 @@ from ansiblelint.text import removeprefix
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
 DEFAULT_VAULT_PASSWORD = "x"
+COLLECTION_PLAY_RE = re.compile(r"^[\w\d_]+\.[\w\d_]+\.[\w\d_]+$")
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 
@@ -287,6 +289,11 @@ def _include_children(
         and "file" in v
     ):
         v = v["file"]
+
+    if "import_playbook" in k and COLLECTION_PLAY_RE.match(v):
+        # Any import_playbooks from collections should be ignored as ansible
+        # own syntax check will handle them.
+        return []
 
     # handle include: filename.yml tags=blah
     # pylint: disable=unused-variable
