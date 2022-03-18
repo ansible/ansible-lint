@@ -27,8 +27,8 @@ PLAYBOOK_WITH_NOQA = """\
 )
 def test_get_rule_skips_from_line(line: str, expected: str) -> None:
     """Validate get_rule_skips_from_line."""
-    x = get_rule_skips_from_line(line)
-    assert x == [expected]
+    v = get_rule_skips_from_line(line)
+    assert v == [expected]
 
 
 def test_playbook_noqa(default_text_runner: RunFromText) -> None:

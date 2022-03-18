@@ -7,7 +7,7 @@ except ImportError:
         import pkg_resources
 
         __version__ = pkg_resources.get_distribution("ansible-lint").version
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         __version__ = "unknown"
 
 __all__ = ("__version__",)

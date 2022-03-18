@@ -1,1 +1,9 @@
+CMD: ansible-lint -f pep8 -x fqcn-builtins
+
+RC: 0
+
+STDERR:
 WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
+
+
+STDOUT:

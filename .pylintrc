@@ -1,6 +1,14 @@
 [IMPORTS]
 preferred-modules =
+    py:pathlib,
     unittest:pytest,
+
+[MASTER]
+# pylint defaults + f,fh,v,id
+good-names =i,j,k,ex,Run,_,f,fh,v,id,T
+
+# Ignore as being generated:
+ignore-paths=^src/ansiblelint/_version.*$
 
 [MESSAGES CONTROL]
 
@@ -8,24 +16,8 @@ disable =
     # On purpose disabled as we rely on black
     line-too-long,
     # TODO(ssbarnea): remove temporary skips adding during initial adoption:
-    bad-continuation,
-    broad-except,
-    dangerous-default-value,
     duplicate-code,
-    fixme,
-    inconsistent-return-statements,
-    invalid-name,
-    missing-class-docstring,
-    missing-function-docstring,
-    missing-module-docstring,
-    no-member,
-    no-self-use,
-    not-callable,
-    protected-access,
-    raise-missing-from,
-    redefined-outer-name,
-    too-few-public-methods,
-    too-many-branches,
-    too-many-instance-attributes,
-    too-many-return-statements,
-    unused-argument,
+
+[TYPECHECK]
+# pylint is unable to detect Namespace attributes and will throw a E1101
+generated-members=options.*

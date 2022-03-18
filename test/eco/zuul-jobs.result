@@ -1,25 +1,40 @@
-INFO     Added ANSIBLE_LIBRARY=plugins/modules:~/.cache/ansible-lint/314d98/modules:plugins/modules:~/.cache/ansible-lint/314d98/modules:~/.cache/ansible-lint/6f378d/modules
-INFO     Added ANSIBLE_COLLECTIONS_PATH=~/.cache/ansible-lint/314d98/collections:~/.cache/ansible-lint/314d98/collections:~/.cache/ansible-lint/314d98/collections:~/.cache/ansible-lint/314d98/collections
-INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.cache/ansible-lint/314d98/roles:~/.cache/ansible-lint/314d98/roles:roles
+CMD: ansible-lint -f pep8 -x fqcn-builtins
+
+RC: 2
+
+STDERR:
+INFO     Set ANSIBLE_LIBRARY=~/.cache/ansible-compat/7f15ad/modules:~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules
+INFO     Set ANSIBLE_COLLECTIONS_PATH=~/.cache/ansible-compat/7f15ad/collections:~/.ansible/collections:/usr/share/ansible/collections
+INFO     Set ANSIBLE_ROLES_PATH=~/.cache/ansible-compat/7f15ad/roles:roles:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
 WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
 INFO     Discovered files to lint using: git ls-files --cached --others --exclude-standard -z
 INFO     Excluded removed files using: git ls-files --deleted -z
 INFO     Discovered files to lint using: git ls-files --cached --others --exclude-standard -z
 INFO     Excluded removed files using: git ls-files --deleted -z
-WARNING  Listing 9 violation(s) that are fatal
-roles/emit-job-header/tasks/main.yaml:26: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors
-roles/ensure-pip/tasks/Debian.yaml:17: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors
-test-playbooks/registry/roles/ensure-registry-cert/tasks/main.yaml:1: risky-file-permissions File permissions unset or incorrect
-test-playbooks/registry/roles/ensure-registry-cert/tasks/main.yaml:6: risky-file-permissions File permissions unset or incorrect
-test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:1: no-loop-var-prefix Role loop_var should use configured prefix.: zj_
-test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:1: risky-file-permissions File permissions unset or incorrect
-test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:17: risky-file-permissions File permissions unset or incorrect
-test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:25: risky-file-permissions File permissions unset or incorrect
-test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:30: risky-file-permissions File permissions unset or incorrect
+WARNING  Listing 16 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
-# .ansible-lint
+# .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
   - experimental  # all rules tagged as experimental
-  - no-loop-var-prefix  # Role loop_var should use configured prefix.: zj_
+  - no-loop-var-prefix  # Role loop_var should use configured prefix.
 
-Finished with 1 failure(s), 8 warning(s) on 1242 files.
+Finished with 1 failure(s), 15 warning(s) on 1242 files.
+
+
+STDOUT:
+roles/emit-job-header/tasks/main.yaml:26: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors.
+roles/ensure-chart-testing/tasks/main.yaml:27: risky-file-permissions File permissions unset or incorrect.
+roles/ensure-dhall/tasks/main.yaml:15: risky-file-permissions File permissions unset or incorrect.
+roles/ensure-go/tasks/install-go.yaml:12: risky-file-permissions File permissions unset or incorrect.
+roles/ensure-packer/tasks/install-packer.yaml:21: risky-file-permissions File permissions unset or incorrect.
+roles/ensure-pip/tasks/Debian.yaml:17: ignore-errors Use failed_when and specify error conditions instead of using ignore_errors.
+roles/ensure-pip/tasks/source.yaml:7: risky-file-permissions File permissions unset or incorrect.
+roles/ensure-terraform/tasks/install-terraform.yaml:32: risky-file-permissions File permissions unset or incorrect.
+roles/phoronix-combine-results/tasks/fetch-result.yaml:8: risky-file-permissions File permissions unset or incorrect.
+test-playbooks/registry/roles/ensure-registry-cert/tasks/main.yaml:1: risky-file-permissions File permissions unset or incorrect.
+test-playbooks/registry/roles/ensure-registry-cert/tasks/main.yaml:6: risky-file-permissions File permissions unset or incorrect.
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:1: no-loop-var-prefix Role loop_var should use configured prefix.
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:1: risky-file-permissions File permissions unset or incorrect.
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:17: risky-file-permissions File permissions unset or incorrect.
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:25: risky-file-permissions File permissions unset or incorrect.
+test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:30: risky-file-permissions File permissions unset or incorrect.

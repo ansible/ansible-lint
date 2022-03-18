@@ -17,11 +17,11 @@ formatting_prettier_fixtures_dir = fixtures_dir / "formatting-prettier"
 formatting_after_fixtures_dir = fixtures_dir / "formatting-after"
 
 
-@pytest.fixture
-def empty_lintable() -> Lintable:
+@pytest.fixture(name="empty_lintable")
+def fixture_empty_lintable() -> Lintable:
     """Return a Lintable with no contents."""
     lintable = Lintable("__empty_file__")
-    lintable._content = ""
+    lintable._content = ""  # pylint: disable=protected-access
     return lintable
 
 
@@ -30,7 +30,7 @@ def test_iter_tasks_in_file_with_empty_file(empty_lintable: Lintable) -> None:
     res = list(
         ansiblelint.yaml_utils.iter_tasks_in_file(empty_lintable, "some-rule-id")
     )
-    assert res == []
+    assert not res
 
 
 def test_nested_items_path() -> None:
@@ -91,7 +91,7 @@ _input_playbook = [
         ],
     }
 ]
-_single_quote_without_indents = """\
+_SINGLE_QUOTE_WITHOUT_INDENTS = """\
 ---
 - name: It's a playbook
   tasks:
@@ -99,7 +99,7 @@ _single_quote_without_indents = """\
     debug:
       msg: '{{ msg }}'
 """
-_single_quote_with_indents = """\
+_SINGLE_QUOTE_WITH_INDENTS = """\
 ---
   - name: It's a playbook
     tasks:
@@ -107,7 +107,7 @@ _single_quote_with_indents = """\
         debug:
           msg: '{{ msg }}'
 """
-_double_quote_without_indents = """\
+_DOUBLE_QUOTE_WITHOUT_INDENTS = """\
 ---
 - name: It's a playbook
   tasks:
@@ -115,7 +115,7 @@ _double_quote_without_indents = """\
     debug:
       msg: "{{ msg }}"
 """
-_double_quote_with_indents_except_root_level = """\
+_DOUBLE_QUOTE_WITH_INDENTS_EXCEPT_ROOT_LEVEL = """\
 ---
 - name: It's a playbook
   tasks:
@@ -139,7 +139,7 @@ _double_quote_with_indents_except_root_level = """\
             2,
             0,
             None,
-            _single_quote_without_indents,
+            _SINGLE_QUOTE_WITHOUT_INDENTS,
             id="single_quote_without_indents",
         ),
         pytest.param(
@@ -147,7 +147,7 @@ _double_quote_with_indents_except_root_level = """\
             4,
             2,
             None,
-            _single_quote_with_indents,
+            _SINGLE_QUOTE_WITH_INDENTS,
             id="single_quote_with_indents",
         ),
         pytest.param(
@@ -155,7 +155,7 @@ _double_quote_with_indents_except_root_level = """\
             2,
             0,
             ansiblelint.yaml_utils.FormattedEmitter,
-            _double_quote_without_indents,
+            _DOUBLE_QUOTE_WITHOUT_INDENTS,
             id="double_quote_without_indents",
         ),
         pytest.param(
@@ -163,7 +163,7 @@ _double_quote_with_indents_except_root_level = """\
             4,
             2,
             ansiblelint.yaml_utils.FormattedEmitter,
-            _double_quote_with_indents_except_root_level,
+            _DOUBLE_QUOTE_WITH_INDENTS_EXCEPT_ROOT_LEVEL,
             id="double_quote_with_indents_except_root_level",
         ),
     ),
@@ -191,8 +191,8 @@ def test_custom_ruamel_yaml_emitter(
     assert output == expected_output
 
 
-@pytest.fixture
-def yaml_formatting_fixtures(fixture_filename: str) -> Tuple[str, str, str]:
+@pytest.fixture(name="yaml_formatting_fixtures")
+def fixture_yaml_formatting_fixtures(fixture_filename: str) -> Tuple[str, str, str]:
     """Get the contents for the formatting fixture files.
 
     To regenerate these fixtures, please run ``tools/generate-formatting-fixtures.py``.
@@ -221,6 +221,7 @@ def test_formatted_yaml_loader_dumper(
     fixture_filename: str,
 ) -> None:
     """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
+    # pylint: disable=unused-argument
     before_content, prettier_content, after_content = yaml_formatting_fixtures
     assert before_content != prettier_content
     assert before_content != after_content

@@ -21,7 +21,8 @@ from ansiblelint._internal.rules import (
     LoadingFailureRule,
     RuntimeErrorRule,
 )
-from ansiblelint.config import get_rule_config, options
+from ansiblelint.config import get_rule_config
+from ansiblelint.config import options as default_options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
 
@@ -39,8 +40,11 @@ match_types = {
 
 
 class AnsibleLintRule(BaseRule):
+    """AnsibleLintRule should be used as base for writing new rules."""
+
     @property
     def rule_config(self) -> Dict[str, Any]:
+        """Retrieve rule specific configuration."""
         return get_rule_config(self.id)
 
     @lru_cache()
@@ -54,6 +58,7 @@ class AnsibleLintRule(BaseRule):
 
     @staticmethod
     def unjinja(text: str) -> str:
+        """Remove jinja2 bits from a string."""
         text = re.sub(r"{{.+?}}", "JINJA_EXPRESSION", text)
         text = re.sub(r"{%.+?%}", "JINJA_STATEMENT", text)
         text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
@@ -68,6 +73,7 @@ class AnsibleLintRule(BaseRule):
         filename: Optional[Union[str, Lintable]] = None,
         tag: str = "",
     ) -> MatchError:
+        """Instantiate a new MatchError."""
         match = MatchError(
             message=message,
             linenumber=linenumber,
@@ -110,17 +116,15 @@ class AnsibleLintRule(BaseRule):
             message = None
             if isinstance(result, str):
                 message = result
-            m = self.create_matcherror(
+            matcherror = self.create_matcherror(
                 message=message,
                 linenumber=prev_line_no + 1,
                 details=line,
                 filename=file,
             )
-            matches.append(m)
+            matches.append(matcherror)
         return matches
 
-    # TODO(ssbarnea): Reduce mccabe complexity
-    # https://github.com/ansible-community/ansible-lint/issues/744
     def matchtasks(self, file: Lintable) -> List[MatchError]:
         matches: List[MatchError] = []
         if (
@@ -151,14 +155,14 @@ class AnsibleLintRule(BaseRule):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            m = self.create_matcherror(
+            match = self.create_matcherror(
                 message=message,
                 linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
                 details=task_msg,
                 filename=file,
             )
-            m.task = task
-            matches.append(m)
+            match.task = task
+            matches.append(match)
         return matches
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
@@ -196,9 +200,9 @@ class AnsibleLintRule(BaseRule):
         return matches
 
 
-def is_valid_rule(rule: AnsibleLintRule) -> bool:
+def is_valid_rule(rule: Any) -> bool:
     """Check if given rule is valid or not."""
-    return isinstance(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc)
+    return issubclass(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc)
 
 
 def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
@@ -212,17 +216,23 @@ def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             try:
-                rule = getattr(module, pluginname)()
-                if is_valid_rule(rule):
-                    yield rule
+                for _, obj in inspect.getmembers(module):
+                    if inspect.isclass(obj) and is_valid_rule(obj):
+                        yield obj()
 
-            except (TypeError, ValueError, AttributeError):
-                _logger.warning("Skipped invalid rule from %s", pluginname)
+            except (TypeError, ValueError, AttributeError) as exc:
+                _logger.warning(
+                    "Skipped invalid rule from %s due to %s", pluginname, exc
+                )
 
 
 class RulesCollection:
+    """Container for a collection of rules."""
+
     def __init__(
-        self, rulesdirs: Optional[List[str]] = None, options: Namespace = options
+        self,
+        rulesdirs: Optional[List[str]] = None,
+        options: Namespace = default_options,
     ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options
@@ -242,6 +252,7 @@ class RulesCollection:
         self.rules = sorted(self.rules)
 
     def register(self, obj: AnsibleLintRule) -> None:
+        """Register a rule."""
         # We skip opt-in rules which were not manually enabled
         if "opt-in" not in obj.tags or obj.id in self.options.enable_list:
             self.rules.append(obj)
@@ -255,24 +266,33 @@ class RulesCollection:
         return len(self.rules)
 
     def extend(self, more: List[AnsibleLintRule]) -> None:
+        """Combine rules."""
         self.rules.extend(more)
 
     def run(
-        self, file: Lintable, tags: Set[str] = set(), skip_list: List[str] = []
+        self,
+        file: Lintable,
+        tags: Optional[Set[str]] = None,
+        skip_list: Optional[List[str]] = None,
     ) -> List[MatchError]:
-        matches: List[MatchError] = list()
+        """Run all the rules against the given lintable."""
+        matches: List[MatchError] = []
+        if tags is None:
+            tags = set()
+        if skip_list is None:
+            skip_list = []
 
         if not file.path.is_dir():
             try:
                 if file.content is not None:  # loads the file content
                     pass
-            except IOError as e:
+            except IOError as exc:
                 return [
                     MatchError(
-                        message=str(e),
+                        message=str(exc),
                         filename=file,
                         rule=LoadingFailureRule(),
-                        tag=e.__class__.__name__.lower(),
+                        tag=exc.__class__.__name__.lower(),
                     )
                 ]
 
@@ -300,6 +320,7 @@ class RulesCollection:
         )
 
     def listtags(self) -> str:
+        """Return a string with all the tags in the RulesCollection."""
         tag_desc = {
             "command-shell": "Specific to use of command and shell modules",
             "core": "Related to internal implementation of the linter",

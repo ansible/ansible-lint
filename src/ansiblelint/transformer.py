@@ -14,6 +14,7 @@ __all__ = ["Transformer"]
 _logger = logging.getLogger(__name__)
 
 
+# pylint: disable=too-few-public-methods
 class Transformer:
     """Transformer class marshals transformations.
 
@@ -32,6 +33,7 @@ class Transformer:
         self.files: Set[Lintable] = result.files
 
         file: Lintable
+        # pylint: disable=undefined-variable
         lintables: Dict[str, Lintable] = {file.filename: file for file in result.files}
         self.matches_per_file: Dict[Lintable, List[MatchError]] = {
             file: [] for file in result.files

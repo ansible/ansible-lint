@@ -13,7 +13,7 @@ import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
-from ansiblelint.rules.AnsibleSyntaxCheckRule import AnsibleSyntaxCheckRule
+from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -40,14 +40,19 @@ class Runner:
         *lintables: Union[Lintable, str],
         rules: "RulesCollection",
         tags: FrozenSet[Any] = frozenset(),
-        skip_list: List[str] = [],
-        exclude_paths: List[str] = [],
+        skip_list: Optional[List[str]] = None,
+        exclude_paths: Optional[List[str]] = None,
         verbosity: int = 0,
         checked_files: Optional[Set[Lintable]] = None
     ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.lintables: Set[Lintable] = set()
+
+        if skip_list is None:
+            skip_list = []
+        if exclude_paths is None:
+            exclude_paths = []
 
         # Assure consistent type
         for item in lintables:
@@ -101,8 +106,8 @@ class Runner:
 
     def run(self) -> List[MatchError]:
         """Execute the linting process."""
-        files: List[Lintable] = list()
-        matches: List[MatchError] = list()
+        files: List[Lintable] = []
+        matches: List[MatchError] = []
 
         # remove exclusions
         for lintable in self.lintables.copy():
@@ -112,6 +117,7 @@ class Runner:
 
         # -- phase 1 : syntax check in parallel --
         def worker(lintable: Lintable) -> List[MatchError]:
+            # pylint: disable=protected-access
             return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
 
         # playbooks: List[Lintable] = []
@@ -171,11 +177,11 @@ class Runner:
                             continue
                         self.lintables.add(child)
                         files.append(child)
-                except MatchError as e:
-                    if not e.filename:
-                        e.filename = str(lintable.path)
-                    e.rule = LoadingFailureRule()
-                    yield e
+                except MatchError as exc:
+                    if not exc.filename:
+                        exc.filename = str(lintable.path)
+                    exc.rule = LoadingFailureRule()
+                    yield exc
                 except AttributeError:
                     yield MatchError(
                         filename=str(lintable.path), rule=LoadingFailureRule()
@@ -185,9 +191,9 @@ class Runner:
 
 def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
 
-    lintables = ansiblelint.utils.get_lintables(options=options, args=options.lintables)
+    lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
-    matches = list()
+    matches = []
     checked_files: Set[Lintable] = set()
     runner = Runner(
         *lintables,

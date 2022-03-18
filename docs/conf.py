@@ -13,11 +13,12 @@
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
 """Documentation Configuration."""
+# pylint: disable=invalid-name
 
 import os
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import pkg_resources
 
@@ -95,7 +96,7 @@ apidoc_module_dir = "../src/ansiblelint"
 apidoc_module_first = False
 apidoc_output_dir = "pkg"
 apidoc_separate_modules = True
-apidoc_toc_file = None
+apidoc_toc_file: Optional[str] = None
 
 # General substitutions.
 project = "Ansible Lint Documentation"

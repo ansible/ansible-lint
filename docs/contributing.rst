@@ -24,8 +24,8 @@ to create a new rule by following the steps below:
 
 * Use a short but clear class name, which must match the filename
 * Pick an unused ``id``, the first number is used to determine rule section.
-  Look at rules_ page and pick one that matches the best your new rule.
-  see which one fits best.
+  Look at :ref:`rules <default_rules>` page and pick one that matches the best
+  your new rule and ee which one fits best.
 * Include ``experimental`` tag. Any new rule must stay as
   experimental for at least two weeks until this tag is removed in next major
   release.
@@ -46,5 +46,4 @@ to create a new rule by following the steps below:
 * Build the docs using :command:`tox -e docs` and check that the new rule is
   displayed correctly in them.
 
-.. _MetaTagValidRule: https://github.com/ansible-community/ansible-lint/blob/main/src/ansiblelint/rules/MetaTagValidRule.py
-.. _rules: https://ansible-lint.readthedocs.io/en/latest/default_rules.html
+.. _MetaTagValidRule: https://github.com/ansible-community/ansible-lint/blob/main/src/ansiblelint/rules/meta_no_tags.py

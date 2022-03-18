@@ -48,15 +48,20 @@ class BaseFormatter(Generic[T]):
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self._base_dir)
 
+    # pylint: disable=no-self-use
     def format(self, match: "MatchError") -> str:
+        """Format a match error."""
         return str(match)
 
-    def escape(self, text: str) -> str:
+    @staticmethod
+    def escape(text: str) -> str:
         """Escapes a string to avoid processing it as markup."""
         return rich.markup.escape(text)
 
 
 class Formatter(BaseFormatter):  # type: ignore
+    """Default output formatter of ansible-lint."""
+
     def format(self, match: "MatchError") -> str:
         _id = getattr(match.rule, "id", "000")
         result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
@@ -73,6 +78,8 @@ class Formatter(BaseFormatter):  # type: ignore
 
 
 class QuietFormatter(BaseFormatter[Any]):
+    """Brief output formatter for ansible-lint."""
+
     def format(self, match: "MatchError") -> str:
         return (
             f"[error_code]{match.rule.id}[/] "
@@ -148,7 +155,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
     """
 
     def format_result(self, matches: List["MatchError"]) -> str:
-
+        """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             raise RuntimeError(
                 f"The {self.__class__} was expecting a list of MatchError."

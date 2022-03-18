@@ -9,7 +9,8 @@ from ansible_compat.runtime import Runtime
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
-from ansiblelint.config import options
+from ansiblelint.config import options as default_options
+from ansiblelint.constants import SUCCESS_RC, VIOLATIONS_FOUND_RC
 from ansiblelint.errors import MatchError
 
 if TYPE_CHECKING:
@@ -47,7 +48,7 @@ class App:
             console.print(
                 self.formatter.format_result(matches), markup=False, highlight=False
             )
-            return None
+            return
 
         ignored_matches = [match for match in matches if match.ignored]
         fatal_matches = [match for match in matches if not match.ignored]
@@ -170,8 +171,8 @@ warn_list:  # or 'skip_list' to silence them completely
             )
 
         if mark_as_success or not failures:
-            return 0
-        return 2
+            return SUCCESS_RC
+        return VIOLATIONS_FOUND_RC
 
 
 def choose_formatter_factory(
@@ -192,8 +193,8 @@ def _sanitize_list_options(tag_list: List[str]) -> List[str]:
     """Normalize list options."""
     # expand comma separated entries
     tags = set()
-    for t in tag_list:
-        tags.update(str(t).split(","))
+    for tag in tag_list:
+        tags.update(str(tag).split(","))
     # remove duplicates, and return as sorted list
     return sorted(set(tags))
 
@@ -201,9 +202,9 @@ def _sanitize_list_options(tag_list: List[str]) -> List[str]:
 @lru_cache(maxsize=1)
 def get_app() -> App:
     """Return the application instance."""
-    app = App(options=options)
+    app = App(options=default_options)
     # Make linter use the cache dir from compat
-    options.cache_dir = app.runtime.cache_dir
+    default_options.cache_dir = app.runtime.cache_dir
 
     app.runtime.prepare_environment()
     _perform_mockings()

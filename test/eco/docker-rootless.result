@@ -1,1 +1,18 @@
+CMD: ansible-lint -f pep8 -x fqcn-builtins
+
+RC: 0
+
+STDERR:
 WARNING  Loading custom .yamllint.yml config file, this extends our internal yamllint config.
+WARNING  Listing 2 violation(s) that are fatal
+You can skip specific rules or tags by adding them to your configuration file:
+# .config/ansible-lint.yml
+warn_list:  # or 'skip_list' to silence them completely
+  - experimental  # all rules tagged as experimental
+
+Finished with 0 failure(s), 2 warning(s) on 29 files.
+
+
+STDOUT:
+tasks/docker_install_rootless.yml:22: risky-file-permissions File permissions unset or incorrect.
+tasks/docker_install_rootless.yml:32: risky-file-permissions File permissions unset or incorrect.

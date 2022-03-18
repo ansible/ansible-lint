@@ -462,10 +462,11 @@ class OctalIntYAML11(ScalarInt):
         Based on ruamel.yaml.representer.RoundTripRepresenter.represent_octal_int()
         (which only handles the YAML 1.2 octal representation).
         """
-        s = format(data, "o")
+        v = format(data, "o")
         anchor = data.yaml_anchor(any=True)
         # noinspection PyProtectedMember
-        return representer.insert_underscore("0", s, data._underscore, anchor=anchor)
+        # pylint: disable=protected-access
+        return representer.insert_underscore("0", v, data._underscore, anchor=anchor)
 
 
 class CustomConstructor(RoundTripConstructor):
@@ -484,8 +485,8 @@ class CustomConstructor(RoundTripConstructor):
             # see if we've got an octal we need to preserve.
             value_su = self.construct_scalar(node)
             try:
-                sx = value_su.rstrip("_")
-                underscore = [len(sx) - sx.rindex("_") - 1, False, False]  # type: Any
+                v = value_su.rstrip("_")
+                underscore = [len(v) - v.rindex("_") - 1, False, False]  # type: Any
             except ValueError:
                 underscore = None
             except IndexError:
@@ -686,9 +687,10 @@ class FormattedEmitter(Emitter):
         """Skip writing '%YAML 1.1'."""
         if version_text == "1.1":
             return
-        return super().write_version_directive(version_text)
+        super().write_version_directive(version_text)
 
 
+# pylint: disable=too-many-instance-attributes
 class FormattedYAML(YAML):
     """A YAML loader/dumper that handles ansible content better by default."""
 
@@ -798,9 +800,10 @@ class FormattedYAML(YAML):
         self.Constructor = CustomConstructor
         self.Representer.add_representer(OctalIntYAML11, OctalIntYAML11.represent_octal)
 
-        # TODO: preserve_quotes loads all strings as a str subclass that carries
-        #       a quote attribute. Will the str subclasses cause problems in transforms?
-        #       Are there any other gotchas to this?
+        # We should preserve_quotes loads all strings as a str subclass that carries
+        # a quote attribute. Will the str subclasses cause problems in transforms?
+        # Are there any other gotchas to this?
+        #
         # This will only preserve quotes for strings read from the file.
         # anything modified by the transform will use no quotes, preferred_quote,
         # or the quote that results in the least amount of escaping.
@@ -872,7 +875,6 @@ class FormattedYAML(YAML):
 
     def loads(self, stream: str) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
-        # TODO: maybe add support for passing a Lintable for the stream.
         if not isinstance(stream, str):
             raise NotImplementedError(f"expected a str but got {type(stream)}")
         text, preamble_comment = self._pre_process_yaml(stream)

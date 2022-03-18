@@ -22,11 +22,11 @@ from ansiblelint.runner import Runner
 from ansiblelint.testing import RunFromText
 
 
-@pytest.fixture
-def play_file_path(tmp_path: Path) -> str:
+@pytest.fixture(name="play_file_path")
+def fixture_play_file_path(tmp_path: Path) -> str:
     """Fixture to return a playbook path."""
-    p = tmp_path / "playbook.yml"
-    return str(p)
+    path = tmp_path / "playbook.yml"
+    return str(path)
 
 
 @pytest.fixture
@@ -37,8 +37,8 @@ def runner(
     return Runner(play_file_path, rules=default_rules_collection)
 
 
-@pytest.fixture
-def default_rules_collection() -> RulesCollection:
+@pytest.fixture(name="default_rules_collection")
+def fixture_default_rules_collection() -> RulesCollection:
     """Return default rule collection."""
     assert os.path.isdir(DEFAULT_RULESDIR)
     # For testing we want to manually enable opt-in rules
@@ -62,10 +62,10 @@ def rule_runner(request: SubRequest, config_options: Namespace) -> RunFromText:
     return RunFromText(collection)
 
 
-@pytest.fixture
-def config_options() -> Iterator[Namespace]:
+@pytest.fixture(name="config_options")
+def fixture_config_options() -> Iterator[Namespace]:
     """Return configuration options that will be restored after testrun."""
-    global options  # pylint: disable=global-statement
+    global options  # pylint: disable=global-statement,invalid-name
     original_options = copy.deepcopy(options)
     yield options
     options = original_options
@@ -77,6 +77,6 @@ def _play_files(tmp_path: Path, request: SubRequest) -> None:
         return
     for play_file in request.param:
         print(play_file.name)
-        p = tmp_path / play_file.name
-        os.makedirs(os.path.dirname(p), exist_ok=True)
-        p.write_text(play_file.content)
+        path = tmp_path / play_file.name
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        path.write_text(play_file.content)

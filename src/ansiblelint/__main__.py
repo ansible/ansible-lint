@@ -21,7 +21,6 @@
 """Command line implementation."""
 
 import errno
-import hashlib
 import logging
 import os
 import pathlib
@@ -32,6 +31,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 
 from ansible_compat.config import ansible_version
+from ansible_compat.prerun import get_cache_dir
 from enrich.console import should_do_markup
 
 from ansiblelint import cli
@@ -58,7 +58,7 @@ def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
     # We are about to act on the root logger, which defaults to logging.WARNING.
     # That is where our 0 (default) value comes from.
-    VERBOSITY_MAP = {
+    verbosity_map = {
         -2: logging.CRITICAL,
         -1: logging.ERROR,
         0: logging.WARNING,
@@ -72,7 +72,7 @@ def initialize_logger(level: int = 0) -> None:
     logger = logging.getLogger()
     logger.addHandler(handler)
     # Unknown logging level is treated as DEBUG
-    logging_level = VERBOSITY_MAP.get(level, logging.DEBUG)
+    logging_level = verbosity_map.get(level, logging.DEBUG)
     logger.setLevel(logging_level)
     logging.captureWarnings(True)  # pass all warnings.warn() messages through logging
     # Use module-level _logger instance to validate it
@@ -85,11 +85,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     new_options.cwd = pathlib.Path.cwd()
 
     if new_options.version:
-        print(
-            "ansible-lint {ver!s} using ansible {ansible_ver!s}".format(
-                ver=__version__, ansible_ver=ansible_version()
-            )
-        )
+        print(f"ansible-lint {__version__} using ansible {ansible_version()}")
         sys.exit(0)
 
     if new_options.colored is None:
@@ -105,14 +101,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     options.warn_list = [normalize_tag(tag) for tag in options.warn_list]
 
     options.configured = True
-    # 6 chars of entropy should be enough
-    cache_key = hashlib.sha256(
-        os.path.abspath(options.project_dir).encode()
-    ).hexdigest()[:6]
-    options.cache_dir = "%s/ansible-lint/%s" % (
-        os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache")),
-        cache_key,
-    )
+    options.cache_dir = get_cache_dir(options.project_dir)
 
 
 def _do_list(rules: "RulesCollection") -> int:
@@ -140,9 +129,9 @@ def _do_list(rules: "RulesCollection") -> int:
 
 
 # noinspection PyShadowingNames
-def _do_transform(result: "LintResult", options: "Namespace") -> None:
+def _do_transform(result: "LintResult", opts: "Namespace") -> None:
     """Create and run Transformer."""
-    if "yaml" in options.skip_list:
+    if "yaml" in opts.skip_list:
         # The transformer rewrites yaml files, but the user requested to skip
         # the yaml rule or anything tagged with "yaml", so there is nothing to do.
         return
@@ -244,8 +233,8 @@ def _previous_revision() -> Iterator[None]:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
     ).stdout
-    p = pathlib.Path(worktree_dir)
-    p.mkdir(parents=True, exist_ok=True)
+    path = pathlib.Path(worktree_dir)
+    path.mkdir(parents=True, exist_ok=True)
     os.system(f"git worktree add -f {worktree_dir} 2>/dev/null")
     try:
         with cwd(worktree_dir):
@@ -268,8 +257,8 @@ def _run_cli_entrypoint() -> None:
             raise
     except KeyboardInterrupt:
         sys.exit(EXIT_CONTROL_C_RC)
-    except RuntimeError as e:
-        raise SystemExit(str(e))
+    except RuntimeError as exc:
+        raise SystemExit from exc
 
 
 def path_inject() -> None:

@@ -27,15 +27,15 @@ console_stderr = Console(**console_options_stderr)
 
 def reconfigure(new_options: Dict[str, Any]) -> None:
     """Reconfigure console options."""
-    global console_options  # pylint: disable=global-statement
-    global console_stderr  # pylint: disable=global-statement
+    global console_options  # pylint: disable=global-statement,invalid-name
+    global console_stderr  # pylint: disable=global-statement,invalid-name,global-variable-not-assigned
 
     console_options = new_options
     rich.reconfigure(**new_options)
     # see https://github.com/willmcgugan/rich/discussions/484#discussioncomment-200182
-    console_options_stderr = console_options.copy()
-    console_options_stderr["stderr"] = True
-    tmp_console = Console(**console_options_stderr)
+    new_console_options_stderr = console_options.copy()
+    new_console_options_stderr["stderr"] = True
+    tmp_console = Console(**new_console_options_stderr)
     console_stderr.__dict__ = tmp_console.__dict__
 
 

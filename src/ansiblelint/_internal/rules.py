@@ -1,3 +1,4 @@
+"""Internally used rule classes."""
 import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
@@ -11,18 +12,25 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
+# Derived rules are likely to want to access class members, so:
+# pylint: disable=no-self-use
+# pylint: disable=unused-argument
 class BaseRule:
     """Root class used by Rules."""
 
     id: str = ""
     tags: List[str] = []
-    shortdesc: str = ""
     description: str = ""
     version_added: str = ""
     severity: str = ""
     link: str = ""
     has_dynamic_tags: bool = False
     needs_raw_task: bool = False
+
+    @property
+    def shortdesc(self) -> str:
+        """Return the short description of the rule, basically the docstring."""
+        return self.__doc__ or ""
 
     def getmatches(self, file: "Lintable") -> List["MatchError"]:
         """Return all matches while ignoring exceptions."""
@@ -31,12 +39,12 @@ class BaseRule:
             for method in [self.matchlines, self.matchtasks, self.matchyaml]:
                 try:
                     matches.extend(method(file))
-                except Exception as e:
+                except Exception as exc:  # pylint: disable=broad-except
                     _logger.debug(
                         "Ignored exception from %s.%s: %s",
                         self.__class__.__name__,
                         method,
-                        e,
+                        exc,
                     )
         else:
             matches.extend(self.matchdir(file))
@@ -88,11 +96,14 @@ class BaseRule:
         return self.id < other.id
 
 
+# pylint: enable=no-self-use
+# pylint: enable=unused-argument
+
+
 class RuntimeErrorRule(BaseRule):
-    """Used to identify errors."""
+    """Unexpected internal error."""
 
     id = "internal-error"
-    shortdesc = "Unexpected internal error"
     description = (
         "This error can be caused by internal bugs but also by "
         "custom rules. Instead of just stopping linter we generate the errors and "
@@ -105,10 +116,9 @@ class RuntimeErrorRule(BaseRule):
 
 
 class AnsibleParserErrorRule(BaseRule):
-    """Used to mark errors received from Ansible."""
+    """AnsibleParserError."""
 
     id = "parser-error"
-    shortdesc = "AnsibleParserError"
     description = "Ansible parser fails; this usually indicates an invalid file."
     severity = "VERY_HIGH"
     tags = ["core"]
@@ -116,10 +126,9 @@ class AnsibleParserErrorRule(BaseRule):
 
 
 class LoadingFailureRule(BaseRule):
-    """File loading failure."""
+    """Failed to load or parse file."""
 
     id = "load-failure"
-    shortdesc = "Failed to load or parse file"
     description = "Linter failed to process a YAML file, possible not an Ansible file."
     severity = "VERY_HIGH"
     tags = ["core"]
