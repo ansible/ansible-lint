@@ -1,9 +1,10 @@
 """Tests for yaml-related utility functions."""
 from io import StringIO
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Union
 
 import pytest
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ruamel.yaml.emitter import Emitter
 from ruamel.yaml.main import YAML
 
@@ -212,6 +213,7 @@ def fixture_yaml_formatting_fixtures(fixture_filename: str) -> Tuple[str, str, s
     (
         "fmt-1.yml",
         "fmt-2.yml",
+        "fmt-3.yml",
     ),
 )
 def test_formatted_yaml_loader_dumper(
@@ -245,3 +247,634 @@ def test_formatted_yaml_loader_dumper(
     #
     # Instead, `pytest --regenerate-formatting-fixtures` will fail if prettier would
     # change any files in test/fixtures/formatting-after
+
+
+@pytest.fixture(name="lintable")
+def fixture_lintable(file_path: str) -> Lintable:
+    """Return a playbook Lintable for use in ``get_path_to_*`` tests."""
+    return Lintable(file_path)
+
+
+@pytest.fixture(name="ruamel_data")
+def fixture_ruamel_data(lintable: Lintable) -> Union[CommentedMap, CommentedSeq]:
+    """Return the loaded YAML data for the Lintable."""
+    yaml = ansiblelint.yaml_utils.FormattedYAML()
+    data: Union[CommentedMap, CommentedSeq] = yaml.loads(lintable.content)
+    return data
+
+
+@pytest.mark.parametrize(
+    ("file_path", "line_number", "expected_path"),
+    (
+        # ignored lintables
+        pytest.param(
+            "examples/playbooks/tasks/passing_task.yml", 2, [], id="ignore_tasks_file"
+        ),
+        pytest.param(
+            "examples/roles/more_complex/handlers/main.yml",
+            2,
+            [],
+            id="ignore_handlers_file",
+        ),
+        pytest.param("examples/playbooks/vars/other.yml", 2, [], id="ignore_vars_file"),
+        pytest.param(
+            "examples/host_vars/localhost.yml", 2, [], id="ignore_host_vars_file"
+        ),
+        pytest.param("examples/group_vars/all.yml", 2, [], id="ignore_group_vars_file"),
+        pytest.param(
+            "examples/inventory/inventory.yml", 2, [], id="ignore_inventory_file"
+        ),
+        pytest.param(
+            "examples/roles/dependency_in_meta/meta/main.yml",
+            2,
+            [],
+            id="ignore_meta_file",
+        ),
+        pytest.param(
+            "examples/reqs_v1/requirements.yml", 2, [], id="ignore_requirements_v1_file"
+        ),
+        pytest.param(
+            "examples/reqs_v2/requirements.yml", 2, [], id="ignore_requirements_v2_file"
+        ),
+        # we don't have any release notes examples. Oh well.
+        # pytest.param("examples/", 2, [], id="ignore_release_notes_file"),
+        pytest.param(
+            ".pre-commit-config.yaml", 2, [], id="ignore_unrecognized_yaml_file"
+        ),
+        # playbook lintables
+        pytest.param(
+            "examples/playbooks/become.yml",
+            1,
+            [],
+            id="1_play_playbook-line_before_play",
+        ),
+        pytest.param(
+            "examples/playbooks/become.yml",
+            2,
+            [0],
+            id="1_play_playbook-first_line_in_play",
+        ),
+        pytest.param(
+            "examples/playbooks/become.yml",
+            10,
+            [0],
+            id="1_play_playbook-middle_line_in_play",
+        ),
+        pytest.param(
+            "examples/playbooks/become.yml",
+            100,
+            [0],
+            id="1_play_playbook-line_after_eof",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            1,
+            [],
+            id="4_play_playbook-line_before_play_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            2,
+            [0],
+            id="4_play_playbook-first_line_in_play_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            5,
+            [0],
+            id="4_play_playbook-middle_line_in_play_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            9,
+            [0],
+            id="4_play_playbook-last_line_in_play_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            10,
+            [1],
+            id="4_play_playbook-first_line_in_play_2",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            14,
+            [1],
+            id="4_play_playbook-middle_line_in_play_2",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            18,
+            [1],
+            id="4_play_playbook-last_line_in_play_2",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            19,
+            [2],
+            id="4_play_playbook-first_line_in_play_3",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            23,
+            [2],
+            id="4_play_playbook-middle_line_in_play_3",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            27,
+            [2],
+            id="4_play_playbook-last_line_in_play_3",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            28,
+            [3],
+            id="4_play_playbook-first_line_in_play_4",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            31,
+            [3],
+            id="4_play_playbook-middle_line_in_play_4",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            35,
+            [3],
+            id="4_play_playbook-last_line_in_play_4",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            100,
+            [3],
+            id="4_play_playbook-line_after_eof",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            1,
+            [],
+            id="import_playbook-line_before_play_1",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            2,
+            [0],
+            id="import_playbook-first_line_in_play_1",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            3,
+            [0],
+            id="import_playbook-middle_line_in_play_1",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            4,
+            [0],
+            id="import_playbook-last_line_in_play_1",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            5,
+            [1],
+            id="import_playbook-first_line_in_play_2",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            6,
+            [1],
+            id="import_playbook-middle_line_in_play_2",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            7,
+            [1],
+            id="import_playbook-last_line_in_play_2",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            8,
+            [2],
+            id="import_playbook-first_line_in_play_3",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            9,
+            [2],
+            id="import_playbook-last_line_in_play_3",
+        ),
+        pytest.param(
+            "examples/playbooks/playbook-parent.yml",
+            15,
+            [2],
+            id="import_playbook-line_after_eof",
+        ),
+    ),
+)
+def test_get_path_to_play(
+    lintable: Lintable,
+    line_number: int,
+    ruamel_data: Union[CommentedMap, CommentedSeq],
+    expected_path: List[Union[int, str]],
+) -> None:
+    """Ensure ``get_path_to_play`` returns the expected path given a file + line."""
+    path_to_play = ansiblelint.yaml_utils.get_path_to_play(
+        lintable, line_number, ruamel_data
+    )
+    assert path_to_play == expected_path
+
+
+@pytest.mark.parametrize(
+    ("file_path", "line_number", "expected_path"),
+    (
+        # ignored lintables
+        pytest.param("examples/playbooks/vars/other.yml", 2, [], id="ignore_vars_file"),
+        pytest.param(
+            "examples/host_vars/localhost.yml", 2, [], id="ignore_host_vars_file"
+        ),
+        pytest.param("examples/group_vars/all.yml", 2, [], id="ignore_group_vars_file"),
+        pytest.param(
+            "examples/inventory/inventory.yml", 2, [], id="ignore_inventory_file"
+        ),
+        pytest.param(
+            "examples/roles/dependency_in_meta/meta/main.yml",
+            2,
+            [],
+            id="ignore_meta_file",
+        ),
+        pytest.param(
+            "examples/reqs_v1/requirements.yml", 2, [], id="ignore_requirements_v1_file"
+        ),
+        pytest.param(
+            "examples/reqs_v2/requirements.yml", 2, [], id="ignore_requirements_v2_file"
+        ),
+        # we don't have any release notes examples. Oh well.
+        # pytest.param("examples/", 2, [], id="ignore_release_notes_file"),
+        pytest.param(
+            ".pre-commit-config.yaml", 2, [], id="ignore_unrecognized_yaml_file"
+        ),
+        # tasks-containing lintables
+        pytest.param(
+            "examples/playbooks/become.yml",
+            4,
+            [],
+            id="1_task_playbook-line_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/become.yml",
+            5,
+            [0, "tasks", 0],
+            id="1_task_playbook-first_line_in_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become.yml",
+            10,
+            [0, "tasks", 0],
+            id="1_task_playbook-middle_line_in_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become.yml",
+            15,
+            [0, "tasks", 0],
+            id="1_task_playbook-last_line_in_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become.yml",
+            100,
+            [0, "tasks", 0],
+            id="1_task_playbook-line_after_eof_without_anything_after_task",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            1,
+            [],
+            id="4_play_playbook-play_1_line_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            7,
+            [0, "tasks", 0],
+            id="4_play_playbook-play_1_first_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            9,
+            [0, "tasks", 0],
+            id="4_play_playbook-play_1_last_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            10,
+            [],
+            id="4_play_playbook-play_2_line_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            12,
+            [],
+            id="4_play_playbook-play_2_line_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            13,
+            [1, "tasks", 0],
+            id="4_play_playbook-play_2_first_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            18,
+            [1, "tasks", 0],
+            id="4_play_playbook-play_2_middle_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            18,
+            [1, "tasks", 0],
+            id="4_play_playbook-play_2_last_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            19,
+            [],
+            id="4_play_playbook-play_3_line_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            22,
+            [],
+            id="4_play_playbook-play_3_line_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            23,
+            [2, "tasks", 0],
+            id="4_play_playbook-play_3_first_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            25,
+            [2, "tasks", 0],
+            id="4_play_playbook-play_3_middle_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            27,
+            [2, "tasks", 0],
+            id="4_play_playbook-play_3_last_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            28,
+            [],
+            id="4_play_playbook-play_4_line_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            31,
+            [],
+            id="4_play_playbook-play_4_line_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            32,
+            [3, "tasks", 0],
+            id="4_play_playbook-play_4_first_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            33,
+            [3, "tasks", 0],
+            id="4_play_playbook-play_4_middle_line_task_1",
+        ),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            35,
+            [3, "tasks", 0],
+            id="4_play_playbook-play_4_last_line_task_1",
+        ),
+        # playbook with multiple tasks + tasks blocks in a play
+        pytest.param(
+            # must have at least one key after one of the tasks blocks
+            "examples/playbooks/include.yml",
+            6,
+            [0, "pre_tasks", 0],
+            id="playbook-multi_tasks_blocks-pre_tasks_last_task_before_roles",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            7,
+            [],
+            id="playbook-multi_tasks_blocks-roles_after_pre_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            10,
+            [],
+            id="playbook-multi_tasks_blocks-roles_before_tasks",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            12,
+            [0, "tasks", 0],
+            id="playbook-multi_tasks_blocks-tasks_first_task",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            14,
+            [0, "tasks", 1],
+            id="playbook-multi_tasks_blocks-tasks_last_task_before_handlers",
+        ),
+        pytest.param(
+            "examples/playbooks/include.yml",
+            16,
+            [0, "handlers", 0],
+            id="playbook-multi_tasks_blocks-handlers_task",
+        ),
+        # playbook with subtasks blocks
+        pytest.param(
+            "examples/playbooks/blockincludes.yml",
+            13,
+            [0, "tasks", 0, "block", 1, "block", 0, "block", 1, "block", 0],
+            id="playbook-deeply_nested_task",
+        ),
+        pytest.param(
+            "examples/playbooks/block.yml",
+            12,
+            [0, "tasks", 0, "block", 1],
+            id="playbook-subtasks-block_task_2",
+        ),
+        pytest.param(
+            "examples/playbooks/block.yml",
+            22,
+            [0, "tasks", 0, "rescue", 2],
+            id="playbook-subtasks-rescue_task_3",
+        ),
+        pytest.param(
+            "examples/playbooks/block.yml",
+            25,
+            [0, "tasks", 0, "always", 0],
+            id="playbook-subtasks-always_task_3",
+        ),
+        # tasks files
+        pytest.param("examples/playbooks/tasks/x.yml", 2, [0], id="tasks-null_task"),
+        pytest.param(
+            "examples/playbooks/tasks/x.yml", 6, [1], id="tasks-null_task_next"
+        ),
+        pytest.param(
+            "examples/playbooks/tasks/empty_blocks.yml",
+            7,
+            [0],  # this IS part of the first task and "rescue" does not have subtasks.
+            id="tasks-null_rescue",
+        ),
+        pytest.param(
+            "examples/playbooks/tasks/empty_blocks.yml",
+            8,
+            [0],  # this IS part of the first task and "always" does not have subtasks.
+            id="tasks-empty_always",
+        ),
+        pytest.param(
+            "examples/playbooks/tasks/empty_blocks.yml",
+            16,
+            [1, "always", 0],
+            id="tasks-task_beyond_empty_blocks",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            1,
+            [],
+            id="tasks-line_before_tasks",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            2,
+            [0],
+            id="tasks-first_line_in_task_1",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            3,
+            [0],
+            id="tasks-middle_line_in_task_1",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            4,
+            [0],
+            id="tasks-last_line_in_task_1",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            5,
+            [1],
+            id="tasks-first_line_in_task_2",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            6,
+            [1],
+            id="tasks-middle_line_in_task_2",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            7,
+            [1],
+            id="tasks-last_line_in_task_2",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            8,
+            [2],
+            id="tasks-first_line_in_task_3",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            9,
+            [2],
+            id="tasks-last_line_in_task_3",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/tasks/main.yml",
+            100,
+            [2],
+            id="tasks-line_after_eof",
+        ),
+        # handlers
+        pytest.param(
+            "examples/roles/more_complex/handlers/main.yml",
+            1,
+            [],
+            id="handlers-line_before_tasks",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/handlers/main.yml",
+            2,
+            [0],
+            id="handlers-first_line_in_task_1",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/handlers/main.yml",
+            3,
+            [0],
+            id="handlers-last_line_in_task_1",
+        ),
+        pytest.param(
+            "examples/roles/more_complex/handlers/main.yml",
+            100,
+            [0],
+            id="handlers-line_after_eof",
+        ),
+    ),
+)
+def test_get_path_to_task(
+    lintable: Lintable,
+    line_number: int,
+    ruamel_data: Union[CommentedMap, CommentedSeq],
+    expected_path: List[Union[int, str]],
+) -> None:
+    """Ensure ``get_task_to_play`` returns the expected path given a file + line."""
+    path_to_task = ansiblelint.yaml_utils.get_path_to_task(
+        lintable, line_number, ruamel_data
+    )
+    assert path_to_task == expected_path
+
+
+@pytest.mark.parametrize(
+    ("file_path", "line_number"),
+    (
+        pytest.param("examples/playbooks/become.yml", 0, id="1_play_playbook"),
+        pytest.param(
+            "examples/playbooks/become-user-without-become-success.yml",
+            0,
+            id="4_play_playbook",
+        ),
+        pytest.param("examples/playbooks/playbook-parent.yml", 0, id="import_playbook"),
+        pytest.param("examples/playbooks/become.yml", 0, id="1_task_playbook"),
+    ),
+)
+def test_get_path_to_play_raises_value_error_for_bad_line_number(
+    lintable: Lintable,
+    line_number: int,
+    ruamel_data: Union[CommentedMap, CommentedSeq],
+) -> None:
+    """Ensure ``get_path_to_play`` raises ValueError for line_number < 1."""
+    with pytest.raises(
+        ValueError, match=f"expected line_number >= 1, got {line_number}"
+    ):
+        ansiblelint.yaml_utils.get_path_to_play(lintable, line_number, ruamel_data)
+
+
+@pytest.mark.parametrize(
+    ("file_path", "line_number"),
+    (pytest.param("examples/roles/more_complex/tasks/main.yml", 0, id="tasks"),),
+)
+def test_get_path_to_task_raises_value_error_for_bad_line_number(
+    lintable: Lintable,
+    line_number: int,
+    ruamel_data: Union[CommentedMap, CommentedSeq],
+) -> None:
+    """Ensure ``get_task_to_play`` raises ValueError for line_number < 1."""
+    with pytest.raises(
+        ValueError, match=f"expected line_number >= 1, got {line_number}"
+    ):
+        ansiblelint.yaml_utils.get_path_to_task(lintable, line_number, ruamel_data)

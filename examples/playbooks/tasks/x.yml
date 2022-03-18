@@ -4,3 +4,4 @@
   action: funny value=clown
   args:
     key: value
+-  # a second null task, validates yaml_utils.get_path_to_task
