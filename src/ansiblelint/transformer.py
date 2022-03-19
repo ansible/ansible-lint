@@ -1,11 +1,12 @@
 """Transformer implementation."""
 import logging
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Optional, Set, Union
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import TransformMixin
 from ansiblelint.runner import LintResult
 from ansiblelint.yaml_utils import FormattedYAML
 
@@ -50,7 +51,7 @@ class Transformer:
 
     def run(self) -> None:
         """For each file, read it, execute transforms on it, then write it."""
-        for file, _ in self.matches_per_file.items():
+        for file, matches in self.matches_per_file.items():
             # str() convinces mypy that "text/yaml" is a valid Literal.
             # Otherwise, it thinks base_kind is one of playbook, meta, tasks, ...
             file_is_yaml = str(file.base_kind) == "text/yaml"
@@ -62,17 +63,37 @@ class Transformer:
                 data = ""
                 file_is_yaml = False
 
+            ruamel_data: Optional[Union[CommentedMap, CommentedSeq]] = None
             if file_is_yaml:
                 # We need a fresh YAML() instance for each load because ruamel.yaml
                 # stores intermediate state during load which could affect loading
                 # any other files. (Based on suggestion from ruamel.yaml author)
                 yaml = FormattedYAML()
 
-                ruamel_data: Union[CommentedMap, CommentedSeq] = yaml.loads(data)
+                ruamel_data = yaml.loads(data)
                 if not isinstance(ruamel_data, (CommentedMap, CommentedSeq)):
                     # This is an empty vars file or similar which loads as None.
                     # It is not safe to write this file or data-loss is likely.
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
+
+            self._do_transforms(file, ruamel_data or data, matches)
+
+            if file_is_yaml:
+                # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
+
+            if file.updated:
                 file.write()
+
+    @staticmethod
+    def _do_transforms(
+        file: Lintable,
+        data: Union[CommentedMap, CommentedSeq, str],
+        matches: List[MatchError],
+    ) -> None:
+        """Do Rule-Transforms handling any last-minute MatchError inspections."""
+        for match in sorted(matches):
+            if not isinstance(match.rule, TransformMixin):
+                continue
+            match.rule.transform(match, file, data)
