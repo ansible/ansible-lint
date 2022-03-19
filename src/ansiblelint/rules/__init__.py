@@ -222,6 +222,11 @@ class TransformMixin:
     a MatchError can do transforms to fix that match.
     """
 
+    @staticmethod
+    def _fixed(match: MatchError) -> None:
+        """Mark a match as fixed (transform was successful, so issue should be resolved)."""
+        match.fixed = True
+
     def transform(
         self,
         match: MatchError,
@@ -256,6 +261,7 @@ class TransformMixin:
             new_data = self.do_something_to_fix_the_match(data)
             lintable.content = new_data
         """
+        # call self._fixed(match) when data has been transformed to fix the error.
 
     @staticmethod
     def seek(
