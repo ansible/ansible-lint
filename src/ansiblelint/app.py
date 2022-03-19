@@ -76,16 +76,22 @@ class App:
             for match in matches:
                 console.print(formatter.format(match), markup=False, highlight=False)
 
-    def count_results(self, matches: List[MatchError]) -> Tuple[int, int]:
+    def count_results(self, matches: List[MatchError]) -> Tuple[int, int, int, int]:
         """Count failures and warnings in matches."""
         failures = 0
         warnings = 0
+        fixed_failures = 0
+        fixed_warnings = 0
         for match in matches:
             if {match.rule.id, *match.rule.tags}.isdisjoint(self.options.warn_list):
                 failures += 1
+                if match.fixed:
+                    fixed_failures += 1
             else:
                 warnings += 1
-        return failures, warnings
+                if match.fixed:
+                    fixed_warnings += 1
+        return failures, warnings, fixed_failures, fixed_warnings
 
     @staticmethod
     def count_lintables(files: "Set[Lintable]") -> Tuple[int, int]:
@@ -116,7 +122,12 @@ class App:
         """
         msg = ""
 
-        failures, warnings = self.count_results(result.matches)
+        (
+            failures,
+            warnings,
+            fixed_failures,
+            fixed_warnings,
+        ) = self.count_results(result.matches)
         files_count, changed_files_count = self.count_lintables(result.files)
 
         matched_rules = self._get_matched_skippable_rules(result.matches)
@@ -165,10 +176,17 @@ warn_list:  # or 'skip_list' to silence them completely
             console_stderr.print(render_yaml(msg))
             if changed_files_count:
                 console_stderr.print(f"Modified {changed_files_count} files.")
-            console_stderr.print(
-                f"Finished with {failures} failure(s), {warnings} warning(s) "
-                f"on {files_count} files."
-            )
+            if fixed_failures or fixed_warnings:
+                console_stderr.print(
+                    f"Fixed {fixed_failures}/{failures} failure(s), "
+                    f"{fixed_warnings}/{warnings} warning(s) "
+                    f"on {files_count} files."
+                )
+            else:
+                console_stderr.print(
+                    f"Finished with {failures} failure(s), {warnings} warning(s) "
+                    f"on {files_count} files."
+                )
 
         if mark_as_success or not failures:
             return SUCCESS_RC
