@@ -248,7 +248,7 @@ class TransformMixin:
             target_task = self.seek(match.yaml_path, data)
             target_task["when"] = False
 
-        For any files that aren't YAML, data is the loaded file's content as a string.
+        For any files that aren't YAML, ``data`` is the loaded file's content as a string.
         To edit non-YAML files, save the updated contents in ``lintable.content``:
 
         .. code:: python
