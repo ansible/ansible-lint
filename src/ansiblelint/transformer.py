@@ -1,6 +1,6 @@
 """Transformer implementation."""
 import logging
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -8,7 +8,7 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import TransformMixin
 from ansiblelint.runner import LintResult
-from ansiblelint.yaml_utils import FormattedYAML
+from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
 
 __all__ = ["Transformer"]
 
@@ -77,7 +77,7 @@ class Transformer:
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
 
-            self._do_transforms(file, ruamel_data or data, matches)
+            self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if file_is_yaml:
                 # noinspection PyUnboundLocalVariable
@@ -90,10 +90,21 @@ class Transformer:
     def _do_transforms(
         file: Lintable,
         data: Union[CommentedMap, CommentedSeq, str],
+        file_is_yaml: bool,
         matches: List[MatchError],
     ) -> None:
         """Do Rule-Transforms handling any last-minute MatchError inspections."""
         for match in sorted(matches):
             if not isinstance(match.rule, TransformMixin):
                 continue
+            if file_is_yaml and not match.yaml_path:
+                data = cast(Union[CommentedMap, CommentedSeq], data)
+                if match.match_type == "play":
+                    match.yaml_path = get_path_to_play(file, match.linenumber, data)
+                elif match.task or file.kind in (
+                    "tasks",
+                    "handlers",
+                    "playbook",
+                ):
+                    match.yaml_path = get_path_to_task(file, match.linenumber, data)
             match.rule.transform(match, file, data)

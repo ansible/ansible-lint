@@ -10,7 +10,18 @@ from argparse import Namespace
 from collections import defaultdict
 from functools import lru_cache
 from importlib.abc import Loader
-from typing import Any, Dict, Iterator, List, Optional, Set, Union
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    MutableMapping,
+    MutableSequence,
+    Optional,
+    Set,
+    Union,
+    cast,
+)
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -202,7 +213,7 @@ class AnsibleLintRule(BaseRule):
         return matches
 
 
-class TransformMixin:  # pylint: disable=too-few-public-methods
+class TransformMixin:
     """A mixin for AnsibleLintRule to enable transforming files.
 
     If ansible-lint is started with the ``--write`` option, then the ``Transformer``
@@ -230,14 +241,51 @@ class TransformMixin:  # pylint: disable=too-few-public-methods
 
             data[0]["tasks"][0]["when"] = False
 
-        For any files that aren't YAML, data is the loaded file's content as a string.
-        To edit non-YAML files, save the updated contents update ``lintable.content``:
+        This is easier with the ``seek()`` utility method:
+
+        .. code :: python
+
+            target_task = self.seek(match.yaml_path, data)
+            target_task["when"] = False
+
+        For any files that aren't YAML, ``data`` is the loaded file's content as a string.
+        To edit non-YAML files, save the updated contents in ``lintable.content``:
 
         .. code:: python
 
             new_data = self.do_something_to_fix_the_match(data)
             lintable.content = new_data
         """
+
+    @staticmethod
+    def seek(
+        yaml_path: List[Union[int, str]],
+        data: Union[MutableMapping[str, Any], MutableSequence[Any], str],
+    ) -> Any:
+        """Get the element identified by ``yaml_path`` in ``data``.
+
+        Rules that work with YAML need to seek, or descend, into nested YAML data
+        structures to perform the relevant transforms. For example:
+
+        .. code:: python
+
+            def transform(self, match, lintable, data):
+                target_task = self.seek(match.yaml_path, data)
+                # transform target_task
+        """
+        if isinstance(data, str):
+            # can't descend into a string
+            return data
+        target = data
+        for segment in yaml_path:
+            # The cast() calls tell mypy what types we expect.
+            # Essentially this does:
+            #   target = target[segment]
+            if isinstance(segment, str):
+                target = cast(MutableMapping[str, Any], target)[segment]
+            elif isinstance(segment, int):
+                target = cast(MutableSequence[Any], target)[segment]
+        return target
 
 
 def is_valid_rule(rule: Any) -> bool:
