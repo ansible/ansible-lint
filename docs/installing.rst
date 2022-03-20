@@ -11,17 +11,8 @@ Installing
 Installing on Windows is not supported because we use symlinks inside Python
 packages.
 
-While our project does not directly ship a container, the
-tool is part of the toolset_ container.  Please avoid raising any bugs
-related to containers and use the discussions_ forum instead.
-
-.. code-block:: bash
-
-    # replace docker with podman
-    docker run -h toolset -it quay.io/ansible/toolset ansible-lint --version
-
-.. _toolset: https://github.com/ansible-community/toolset
-.. _discussions: https://github.com/ansible-community/ansible-lint/discussions
+Our project does not ship a container. Please avoid raising any bugs
+related to containers and use the `discussions <https://github.com/ansible-community/ansible-lint/discussions>`_ forum instead.
 
 Using pip or pipx
 -----------------
