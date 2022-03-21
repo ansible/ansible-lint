@@ -25,15 +25,17 @@ from .conftest import cwd
 
 
 @pytest.mark.parametrize(
-    "path",
+    ("path", "expected"),
     (
-        pytest.param(Path("a/b/../"), id="pathlib.Path"),
-        pytest.param("a/b/../", id="str"),
+        pytest.param(Path("a/b/../"), "a", id="pathlib.Path"),
+        pytest.param("a/b/../", "a", id="str"),
+        pytest.param("", ".", id="empty"),
+        pytest.param(".", ".", id="empty"),
     ),
 )
-def test_normpath_with_path_object(path: str) -> None:
+def test_normpath(path: str, expected: str) -> None:
     """Ensure that relative parent dirs are normalized in paths."""
-    assert normpath(path) == "a"
+    assert normpath(path) == expected
 
 
 def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
