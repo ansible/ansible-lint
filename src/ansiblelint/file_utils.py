@@ -51,6 +51,9 @@ def normpath(path: Union[str, BasePathLike]) -> str:
     Currently it generates a relative path but in the future we may want to
     make this user configurable.
     """
+    # prevent possible ValueError with relpath(), when input is an empty string
+    if not path:
+        path = "."
     # conversion to string in order to allow receiving non string objects
     relpath = os.path.relpath(str(path))
     path_absolute = os.path.abspath(str(path))
