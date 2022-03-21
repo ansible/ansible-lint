@@ -14,6 +14,9 @@ packages.
 Our project does not ship a container. Please avoid raising any bugs
 related to containers and use the `discussions <https://github.com/ansible-community/ansible-lint/discussions>`_ forum instead.
 
+We recommend you to try `creator-ee <https://github.com/ansible/creator-ee/>`_,
+which is a container that also carries ansible-lint.
+
 Using pip or pipx
 -----------------
 
