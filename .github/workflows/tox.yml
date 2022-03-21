@@ -48,6 +48,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0 # needed by setuptools-scm
+
+      - name: Test ansible-lint action on its own repo
+        uses: ansible/ansible-lint-action@main
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
