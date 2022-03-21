@@ -4,31 +4,6 @@ RC: 0
 
 STDERR:
 WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
-WARNING  Listing 18 violation(s) that are fatal
-You can skip specific rules or tags by adding them to your configuration file:
-# .config/ansible-lint.yml
-warn_list:  # or 'skip_list' to silence them completely
-  - experimental  # all rules tagged as experimental
-
-Finished with 0 failure(s), 18 warning(s) on 4869 files.
 
 
 STDOUT:
-ansible/roles/golang/tasks/golang_build_install.yml:82: risky-file-permissions File permissions unset or incorrect.
-ansible/roles/hashicorp/tasks/main.yml:106: risky-file-permissions File permissions unset or incorrect.
-ansible/roles/hashicorp/tasks/main.yml:121: risky-file-permissions File permissions unset or incorrect.
-ansible/roles/ipxe/tasks/debian_netboot.yml:26: risky-file-permissions File permissions unset or incorrect.
-ansible/roles/ipxe/tasks/debian_netboot.yml:76: risky-file-permissions File permissions unset or incorrect.
-ansible/roles/owncloud/tasks/tarball.yml:75: risky-file-permissions File permissions unset or incorrect.
-ansible/roles/owncloud/tasks/tarball.yml:102: risky-file-permissions File permissions unset or incorrect.
-ansible/roles/rstudio_server/tasks/main.yml:70: risky-file-permissions File permissions unset or incorrect.
-ansible/roles/wpcli/tasks/main.yml:23: risky-file-permissions File permissions unset or incorrect.
-roles/golang/tasks/golang_build_install.yml:82: risky-file-permissions File permissions unset or incorrect.
-roles/hashicorp/tasks/main.yml:106: risky-file-permissions File permissions unset or incorrect.
-roles/hashicorp/tasks/main.yml:121: risky-file-permissions File permissions unset or incorrect.
-roles/ipxe/tasks/debian_netboot.yml:26: risky-file-permissions File permissions unset or incorrect.
-roles/ipxe/tasks/debian_netboot.yml:76: risky-file-permissions File permissions unset or incorrect.
-roles/owncloud/tasks/tarball.yml:75: risky-file-permissions File permissions unset or incorrect.
-roles/owncloud/tasks/tarball.yml:102: risky-file-permissions File permissions unset or incorrect.
-roles/rstudio_server/tasks/main.yml:70: risky-file-permissions File permissions unset or incorrect.
-roles/wpcli/tasks/main.yml:23: risky-file-permissions File permissions unset or incorrect.
