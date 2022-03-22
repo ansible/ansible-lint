@@ -9,6 +9,7 @@ DEFAULT_KINDS = [
     # Do not sort this list, order matters.
     {"jinja2": "**/*.j2"},  # jinja2 templates are not always parsable as something else
     {"jinja2": "**/*.j2.*"},
+    {"yaml": ".github/**/*.{yaml,yml}"},  # github workflows
     {"text": "**/templates/**/*.*"},  # templates are likely not validable
     {"inventory": "**/inventory/**.yml"},
     {"requirements": "**/meta/requirements.yml"},  # v1 only
@@ -54,6 +55,25 @@ BASE_KINDS = [
     {"text/yaml": "**/.*.{yaml,yml}"},
 ]
 
+
+# Maps kinds to JSON schemas
+# See https://www.schemastore.org/json/
+JSON_SCHEMAS = {
+    # playbook and task schemas not used yet due jsonschema bug:
+    # https://github.com/python-jsonschema/jsonschema/issues/931
+    # "playbook": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible.json#/definitions/playbook",
+    # "tasks": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible.json#/definitions/tasks",
+    "vars": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-vars.json",
+    "requirements": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-requirements.json",
+    "meta": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
+    "galaxy": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json",
+    # unsupported yet:
+    "execution-environment": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json",
+    "meta-runtime": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
+    "inventory": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json",
+    "ansible-lint-config": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-lint.json",
+    "ansible-navigator-config": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json",
+}
 
 options = Namespace(
     cache_dir=None,

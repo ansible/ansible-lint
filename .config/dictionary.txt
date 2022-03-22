@@ -76,6 +76,7 @@ isdir
 isdisjoint
 iskeyword
 isort
+jsonschema
 junitxml
 kubernetes
 libera

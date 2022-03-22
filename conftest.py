@@ -2,6 +2,9 @@
 import importlib
 import os
 import sys
+from typing import Any
+
+from ansiblelint.schemas import refresh_schemas
 
 # checking if user is running pytest without installing test dependencies:
 missing = []
@@ -18,3 +21,10 @@ if missing:
 
 os.environ["NO_COLOR"] = "1"
 pytest_plugins = ["ansiblelint.testing.fixtures"]
+
+
+def pytest_configure(config: Any) -> None:
+    """Configure pytest."""
+    # run only on master node (xdist):
+    if not hasattr(config, "slaveinput"):
+        refresh_schemas()

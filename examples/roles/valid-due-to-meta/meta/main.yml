@@ -5,5 +5,5 @@ galaxy_info:
   description: foo
   license: MIT
   platforms:
-    - name: foo
-  min_ansible_version: 2.7
+    - name: Fedora
+  min_ansible_version: "2.7"

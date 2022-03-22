@@ -28,7 +28,8 @@ repos:
             examples/playbooks/templates/not-valid.yaml|
             examples/playbooks/with-umlaut-.*|
             examples/playbooks/with-skip-tag-id.yml|
-            test/fixtures/formatting-before/.*
+            test/fixtures/formatting-before/.*|
+            src/ansiblelint/schemas/.*
           )$
         additional_dependencies:
           - prettier
@@ -60,6 +61,7 @@ repos:
           (?x)^(
             examples/playbooks/(with-skip-tag-id|unicode).yml|
             examples/playbooks/example.yml|
+            test/eco/.*.result|
             test/fixtures/formatting-before/.*
           )$
       - id: mixed-line-ending
@@ -72,6 +74,10 @@ repos:
     rev: v2.1.0
     hooks:
       - id: codespell
+        exclude: >
+          (?x)^(
+            src/ansiblelint/schemas/.*\.json
+          )$
   - repo: https://github.com/PyCQA/doc8
     rev: 0.11.1
     hooks:
@@ -126,10 +132,11 @@ repos:
           - rich>=11.0.0
           - ruamel.yaml
           - sphinx>=4.4.0
-          - types-pyyaml>=6.0.4
           - types-dataclasses
           - types-docutils
+          - types-jsonschema>=4.4.2
           - types-pkg_resources
+          - types-pyyaml>=6.0.4
           - wcmatch
           - yamllint
         exclude: >
@@ -147,6 +154,7 @@ repos:
           - docutils
           - enrich
           - flaky
+          - jsonschema>=4.5.1
           - pytest
           - pyyaml
           - rich>=11.0.0

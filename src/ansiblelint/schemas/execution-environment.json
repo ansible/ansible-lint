@@ -1,0 +1,70 @@
+{
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
+  "description": "See https://docs.ansible.com/automation-controller/latest/html/userguide/ee_reference.html",
+  "examples": ["execution-environment.yml"],
+  "properties": {
+    "additional_build_steps": {
+      "properties": {
+        "append": {
+          "examples": ["RUN cat /etc/os-release"],
+          "type": ["string", "array"]
+        },
+        "prepend": {
+          "examples": ["RUN cat /etc/os-release"],
+          "type": ["string", "array"]
+        }
+      },
+      "title": "Commands to append or prepend to container build process.",
+      "type": "object"
+    },
+    "ansible_config": {
+      "examples": ["ansible.cfg"],
+      "title": "Ansible configuration file",
+      "type": "string"
+    },
+    "build_arg_defaults": {
+      "additionalProperties": true,
+      "properties": {
+        "EE_BASE_IMAGE": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "dependencies": {
+      "description": "Allows adding system, python or galaxy dependencies.",
+      "properties": {
+        "galaxy": {
+          "examples": ["requirements.yml"],
+          "markdownDescription": "Example `requirements.yml`",
+          "title": "Optional galaxy file",
+          "type": "string"
+        },
+        "python": {
+          "examples": ["requirements.txt"],
+          "markdownDescription": "Example `requirements.txt`",
+          "title": "Optional python package dependencies",
+          "type": "string"
+        },
+        "system": {
+          "examples": ["bindep.txt"],
+          "markdownDescription": "Example `bindep.txt`",
+          "title": "Optional system dependencies using bindep format",
+          "type": "string"
+        }
+      },
+      "title": "Dependencies",
+      "type": "object"
+    },
+    "version": {
+      "enum": [1],
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": ["version", "dependencies"],
+  "title": "Ansible Execution Environment Schema",
+  "type": "object"
+}

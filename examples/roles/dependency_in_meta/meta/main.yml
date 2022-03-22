@@ -1,6 +1,7 @@
 ---
 # meta file, determined by ending in meta/main.yml
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-dependencies
+allow_duplicates: true
 dependencies:
   # from Bitbucket
   - src: git+http://bitbucket.org/willthames/git-ansible-galaxy
@@ -35,6 +36,6 @@ galaxy_info:
   description: Testing meta
   company: Not applicable
   license: MIT
-  min_ansible_version: 2.5
+  min_ansible_version: "2.5"
   platforms:
     - name: Fedora

@@ -294,6 +294,8 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
         sys.executable,
         "-m",
         "ansiblelint",
+        "-x",
+        "schema",  # exclude schema as our test file would fail it
         "-v",
         "-p",
         "--nocolor",
