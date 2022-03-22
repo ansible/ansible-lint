@@ -88,6 +88,26 @@ class VariableNamingRule(AnsibleLintRule):
                     )
                 )
 
+        # If the block in the play use the 'vars' section to set variables
+        block_vars_list = []
+        tasks = data.get("tasks", {})
+
+        for task in tasks:
+            if task.get("block", {}):
+                block_vars_list.append(task.get("vars", {}))
+        for block_vars in block_vars_list:
+            for key in block_vars.keys():
+                if self.is_invalid_variable_name(key):
+                    results.append(
+                        self.create_matcherror(
+                            filename=file,
+                            linenumber=block_vars[LINE_NUMBER_KEY],
+                            message="Block defines variable '"
+                            + key
+                            + "' within 'vars' section that violates variable naming standards",
+                        )
+                    )           
+
         return results
 
     def matchtask(
