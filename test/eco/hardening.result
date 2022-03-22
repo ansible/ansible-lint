@@ -6,7 +6,7 @@ STDERR:
 WARNING  Loading custom .yamllint.yml config file, this extends our internal yamllint config.
 WARNING  Listing 4 violation(s) that are fatal
 
-Finished with 0 failure(s), 4 warning(s) on 121 files.
+Finished with 0 failure(s), 4 warning(s) on 118 files.
 
 
 STDOUT:
