@@ -17,6 +17,9 @@ _logger = logging.getLogger(__name__)
 DESCRIPTION = """\
 Rule violations reported by YamlLint when this is installed.
 
+Yamllint configuration will be loaded following yamllint's configuration file
+resolution order.
+
 You can fully disable all of them by adding 'yaml' to the 'skip_list'.
 
 Specific tag identifiers that are printed at the end of rule name,

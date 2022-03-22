@@ -68,7 +68,14 @@ def load_yamllint_config() -> YamlLintConfig:
     config = YamlLintConfig(content=YAMLLINT_CONFIG)
     # if we detect local yamllint config we use it but raise a warning
     # as this is likely to get out of sync with our internal config.
-    for file in [".yamllint", ".yamllint.yaml", ".yamllint.yml"]:
+    for file in [
+        ".yamllint",
+        ".yamllint.yaml",
+        ".yamllint.yml",
+        os.getenv("YAMLLINT_CONFIG_FILE", ""),
+        os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+        + "/yamllint/config",
+    ]:
         if os.path.isfile(file):
             _logger.warning(
                 "Loading custom %s config file, this extends our "
