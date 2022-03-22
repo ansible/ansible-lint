@@ -72,8 +72,9 @@ def load_yamllint_config() -> YamlLintConfig:
         ".yamllint",
         ".yamllint.yaml",
         ".yamllint.yml",
-        os.getenv('YAMLLINT_CONFIG_FILE', ''),
-        os.getenv("XDG_CONFIG_HOME", os.path.expanduser('~/.config')) + "/yamllint/config"
+        os.getenv("YAMLLINT_CONFIG_FILE", ""),
+        os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+        + "/yamllint/config",
     ]:
         if os.path.isfile(file):
             _logger.warning(
