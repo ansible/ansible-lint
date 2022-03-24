@@ -174,23 +174,42 @@ warn_list:  # or 'skip_list' to silence them completely
 
         if (result.matches or changed_files_count) and not self.options.quiet:
             console_stderr.print(render_yaml(msg))
-            if changed_files_count:
-                console_stderr.print(f"Modified {changed_files_count} files.")
-            if fixed_failures or fixed_warnings:
-                console_stderr.print(
-                    f"Fixed {fixed_failures}/{failures} failure(s), "
-                    f"{fixed_warnings}/{warnings} warning(s) "
-                    f"on {files_count} files."
-                )
-            else:
-                console_stderr.print(
-                    f"Finished with {failures} failure(s), {warnings} warning(s) "
-                    f"on {files_count} files."
-                )
+            self.report_summary(
+                fixed_failures,
+                failures,
+                fixed_warnings,
+                warnings,
+                changed_files_count,
+                files_count,
+            )
 
         if mark_as_success or not failures:
             return SUCCESS_RC
         return VIOLATIONS_FOUND_RC
+
+    @staticmethod
+    def report_summary(  # pylint: disable=too-many-arguments
+        fixed_failures: int,
+        failures: int,
+        fixed_warnings: int,
+        warnings: int,
+        changed_files_count: int,
+        files_count: int,
+    ) -> None:
+        """Report match and file counts."""
+        if changed_files_count:
+            console_stderr.print(f"Modified {changed_files_count} files.")
+        if fixed_failures or fixed_warnings:
+            console_stderr.print(
+                f"Fixed {fixed_failures}/{failures} failure(s), "
+                f"{fixed_warnings}/{warnings} warning(s) "
+                f"on {files_count} files."
+            )
+        else:
+            console_stderr.print(
+                f"Finished with {failures} failure(s), {warnings} warning(s) "
+                f"on {files_count} files."
+            )
 
 
 def choose_formatter_factory(
