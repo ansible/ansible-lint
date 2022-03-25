@@ -57,7 +57,9 @@ class App:
         self.runtime = Runtime(isolated=True)
 
     def render_matches(self, matches: List[MatchError]) -> None:
-        """Display given matches."""
+        """Display given matches (if they are not fixed)."""
+        matches = [match for match in matches if not match.fixed]
+
         if isinstance(self.formatter, formatters.CodeclimateJSONFormatter):
             # If formatter CodeclimateJSONFormatter is chosen,
             # then print only the matches in JSON
