@@ -1,6 +1,5 @@
 """All internal ansible-lint rules."""
 import copy
-from doctest import DocTestFailure
 import glob
 import importlib.util
 import inspect
