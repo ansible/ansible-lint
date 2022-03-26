@@ -276,7 +276,7 @@ linkcheck_workers = 25
 # Matrix room links look like they have anchors
 linkcheck_anchors_ignore = [
     "^!",
-    "^[a-z]+:ansible\.com$",
+    "^/#[a-z]+:ansible\.com$",
 ]
 
 nitpicky = True
