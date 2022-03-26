@@ -1,5 +1,6 @@
 """All internal ansible-lint rules."""
 import copy
+from doctest import DocTestFailure
 import glob
 import importlib.util
 import inspect
@@ -176,6 +177,32 @@ class AnsibleLintRule(BaseRule):
             )
             match.task = task
             matches.append(match)
+
+        # If playbook contains blocks in pre_tasks/tasks/post_tasks
+        if self.needs_block and file.kind == "playbook":
+            data = ansiblelint.utils.parse_yaml_linenumbers(file)
+            block_list = ansiblelint.skip_utils._get_task_blocks_from_playbook(data)
+            for block in block_list:
+                if block.get('block', {}):
+                    block_result = self.matchtask(block)
+
+                if not block_result:
+                    continue
+                
+                message = None
+                if isinstance(block_result, str):
+                    message = block_result
+
+                block_msg = "Block: " + ansiblelint.utils.task_to_str(block)
+                match = self.create_matcherror(
+                    message=message,
+                    linenumber=block[ansiblelint.utils.LINE_NUMBER_KEY],
+                    details=block_msg,
+                    filename=file,
+                )
+                match.task = block
+                matches.append(match)
+
         return matches
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
