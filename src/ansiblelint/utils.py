@@ -334,9 +334,14 @@ def _taskshandlers_children(
             results.append(children)
             continue
 
-        if (
-            "include_role" in task_handler or "import_role" in task_handler
-        ):  # lgtm [py/unreachable-statement]
+        including_commands = (
+            "import_role",
+            "ansible.builtin.import_role",
+            "include_role",
+            "ansible.builtin.include_role",
+        )
+        if any(x in task_handler for x in including_commands):
+            # lgtm [py/unreachable-statement]
             task_handler = normalize_task_v2(task_handler)
             _validate_task_handler_action_for_role(task_handler["action"])
             results.extend(
