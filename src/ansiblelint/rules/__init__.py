@@ -182,7 +182,7 @@ class AnsibleLintRule(BaseRule):
             data = ansiblelint.utils.parse_yaml_linenumbers(file)
             block_list = ansiblelint.skip_utils._get_task_blocks_from_playbook(data)
             for block in block_list:
-                if block.get('block', {}):
+                if block.get("block", {}):
                     block_result = self.matchtask(block)
 
                 if not block_result:
