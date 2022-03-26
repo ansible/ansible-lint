@@ -187,7 +187,7 @@ class AnsibleLintRule(BaseRule):
 
                 if not block_result:
                     continue
-                
+
                 message = None
                 if isinstance(block_result, str):
                     message = block_result
