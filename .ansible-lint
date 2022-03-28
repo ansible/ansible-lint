@@ -61,6 +61,13 @@ warn_list:
   - experimental # experimental is included in the implicit list
   # - role-name
 
+# Some rules can transform files to fix (or make it easier to fix) identified
+# errors. By default, 'ansible-lint --write' will only reformat YAML files.
+# To enable these transforms, either add "all" to write_list or add rule ids
+# or tags for the rules that should be allowed to transform files.
+# write_list:
+#   - all
+
 # Offline mode disables installation of requirements.yml
 offline: false
 
