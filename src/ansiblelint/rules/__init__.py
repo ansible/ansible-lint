@@ -234,6 +234,9 @@ class TransformMixin:
         When ``transform()`` is called on a rule, the rule should either fix the
         issue, if possible, or make modifications that make it easier to fix manually.
 
+        The transform must set ``match.fixed = True`` when data has been transformed to
+        fix the error.
+
         For YAML files, ``data`` is an editable YAML dict/array that preserves
         any comments that were in the original file.
 

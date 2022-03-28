@@ -78,6 +78,8 @@ class MatchError(ValueError):
         self.task: Optional[Dict[str, Any]] = None
         # path to the problem area, like: [0,"pre_tasks",3] for [0].pre_tasks[3]
         self.yaml_path: List[Union[int, str]] = []
+        # True when a transform has resolved this MatchError
+        self.fixed = False
 
     def __repr__(self) -> str:
         """Return a MatchError instance representation."""
