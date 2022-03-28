@@ -234,8 +234,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         const="none",  # --write (no option) implicitly stores this
         nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
         action=WriteArgAction,
-        help="Reformat YAML files to standardize spacing, quotes, etc. "
-        "Future versions will expand this option so it fixes more issues.",
+        help="Allow ansible-lint to modify files. "
+        "'--write' will reformat YAML files to standardize spacing, quotes, etc. "
+        "'--write=all' will also run all available rule transforms on files "
+        "(A rule transform can fix or simplify fixing issues identified by that rule). "
+        "'--write=rule-tag,rule-id' will limit running transforms to rules that match "
+        "the given comma-separated list of rule ids or rule tags. "
+        "'--write=none' behaves the same as '--write' to reformat without running "
+        "transforms.",
     )
     parser.add_argument(
         "--show-relpath",
