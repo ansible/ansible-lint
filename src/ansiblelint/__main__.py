@@ -141,7 +141,7 @@ def _do_transform(result: "LintResult", opts: "Namespace") -> None:
     from ansiblelint.transformer import Transformer
 
     # future: maybe pass options to Transformer
-    transformer = Transformer(result)
+    transformer = Transformer(result, options.write_list)
 
     # this will mark any matches as fixed if the transforms repaired the issue
     transformer.run()

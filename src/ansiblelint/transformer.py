@@ -6,7 +6,7 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import TransformMixin
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.runner import LintResult
 from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
 
@@ -28,8 +28,10 @@ class Transformer:
     pre-requisite for the planned rule-specific transforms.
     """
 
-    def __init__(self, result: LintResult):
+    def __init__(self, result: LintResult, write_list: List[str]):
         """Initialize a Transformer instance."""
+        self.write_list = write_list
+
         self.matches: List[MatchError] = result.matches
         self.files: Set[Lintable] = result.files
 
@@ -77,7 +79,8 @@ class Transformer:
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
 
-            self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
+            if self.write_list != ["none"]:
+                self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if file_is_yaml:
                 # noinspection PyUnboundLocalVariable
@@ -86,8 +89,8 @@ class Transformer:
             if file.updated:
                 file.write()
 
-    @staticmethod
     def _do_transforms(
+        self,
         file: Lintable,
         data: Union[CommentedMap, CommentedSeq, str],
         file_is_yaml: bool,
@@ -97,6 +100,13 @@ class Transformer:
         for match in sorted(matches):
             if not isinstance(match.rule, TransformMixin):
                 continue
+            if "all" not in self.write_list:
+                rule = cast(AnsibleLintRule, match.rule)
+                rule_definition = set(rule.tags)
+                rule_definition.add(rule.id)
+                if rule_definition.isdisjoint(set(self.write_list)):
+                    # rule transform not requested. Skip it.
+                    continue
             if file_is_yaml and not match.yaml_path:
                 data = cast(Union[CommentedMap, CommentedSeq], data)
                 if match.match_type == "play":
