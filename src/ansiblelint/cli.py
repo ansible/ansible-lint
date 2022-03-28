@@ -197,7 +197,11 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--write",
         dest="write",
-        action="store_true",
+        # this is a tri-state argument: not provided, --write, --write=a,b,c
+        type=lambda arg: arg.split(",") if arg else ["none"],
+        const=["none"],  # --write (no option) implicitly stores this
+        nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
+        action="store",
         help="Reformat YAML files to standardize spacing, quotes, etc. "
         "Future versions will expand this option so it fixes more issues.",
     )
