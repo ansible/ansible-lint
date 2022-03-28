@@ -75,7 +75,9 @@ def test_ensure_config_are_equal(
         ),
     ),
 )
-def test_ensure_write_cli_does_not_consume_lintables(args: List[str], config: str) -> None:
+def test_ensure_write_cli_does_not_consume_lintables(
+    args: List[str], config: str
+) -> None:
     """Check equality of the CLI --write options to config files.
 
     Unlike ``test_ensure_config_are_equal``, this test does not use base_arguments.
