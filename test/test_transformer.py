@@ -77,7 +77,7 @@ def test_transformer(
 
     Based on TestRunner::test_runner
     """
-    transformer = Transformer(result=runner_result)
+    transformer = Transformer(result=runner_result, write_list=["all"])
     transformer.run()
 
     matches = runner_result.matches
