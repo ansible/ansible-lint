@@ -28,6 +28,17 @@ def fixture_base_arguments() -> List[str]:
         (["--exclude", "test/"], "test/fixtures/exclude-paths.yml"),
         (["--show-relpath"], "test/fixtures/show-abspath.yml"),
         ([], "test/fixtures/show-relpath.yml"),
+        (["--write"], "test/fixtures/config-with-write.yml"),
+        (["--write=none"], "test/fixtures/config-with-write.yml"),
+        (["--write", "none"], "test/fixtures/config-with-write.yml"),
+        (["--write=all"], "test/fixtures/config-with-write-all.yml"),
+        (["--write", "all"], "test/fixtures/config-with-write-all.yml"),
+        (["--write=rule-tag,rule-id"], "test/fixtures/config-with-write-subset.yml"),
+        (["--write", "rule-tag,rule-id"], "test/fixtures/config-with-write-subset.yml"),
+        (
+            ["--write", "rule-tag", "--write", "rule-id"],
+            "test/fixtures/config-with-write-subset.yml",
+        ),
     ),
 )
 def test_ensure_config_are_equal(
@@ -38,6 +49,40 @@ def test_ensure_config_are_equal(
     cli_parser = cli.get_cli_parser()
 
     options = cli_parser.parse_args(command)
+    file_config = cli.load_config(config)
+
+    for key, val in file_config.items():
+
+        # config_file does not make sense in file_config
+        if key == "config_file":
+            continue
+
+        if key in {"exclude_paths", "rulesdir"}:
+            val = [Path(p) for p in val]
+        assert val == getattr(options, key)
+
+
+@pytest.mark.parametrize(
+    ("args", "config"),
+    (
+        (
+            ["--write", "examples/playbooks/example.yml"],
+            "test/fixtures/config-with-write.yml",
+        ),
+        (
+            ["--write", "examples/playbooks/example.yml", "non-existent.yml"],
+            "test/fixtures/config-with-write.yml",
+        ),
+    ),
+)
+def test_ensure_write_cli_does_not_consume_lintables(args: List[str], config: str) -> None:
+    """Check equality of the CLI --write options to config files.
+
+    Unlike ``test_ensure_config_are_equal``, this test does not use base_arguments.
+    """
+    cli_parser = cli.get_cli_parser()
+
+    options = cli_parser.parse_args(args)
     file_config = cli.load_config(config)
 
     for key, val in file_config.items():
