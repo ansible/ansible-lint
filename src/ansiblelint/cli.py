@@ -130,6 +130,44 @@ class AbspathArgAction(argparse.Action):
             setattr(namespace, self.dest, previous_values + normalized_values)
 
 
+class WriteArgAction(argparse.Action):
+    """Argparse action to handle the --write flag with optional args."""
+
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: Namespace,
+        values: Union[str, Sequence[Any], None],
+        option_string: Optional[str] = None,
+    ) -> None:
+        lintables = getattr(namespace, "lintables", None)
+        if not lintables:
+            # args are processed in order.
+            # If --write is after lintables, then that is not ambiguous.
+            # But if --write comes first, then it might actually be a lintable.
+            try:
+                maybe_lintable = Path(values)
+            except TypeError:
+                pass
+            else:
+                if maybe_lintable.exists():
+                    setattr(namespace, "lintables", [values])
+                    values = []
+        if isinstance(values, str):
+            values = values.split(",")
+        default = [self.const] if isinstance(self.const, str) else self.const
+        previous_values = getattr(namespace, self.dest, default) or default
+        if not values:
+            values = previous_values
+        elif previous_values != default:
+            new_values = previous_values
+            new_values.extend(
+                value for value in values if value not in previous_values
+            )
+            values = new_values
+        setattr(namespace, self.dest, values)
+
+
 def get_cli_parser() -> argparse.ArgumentParser:
     """Initialize an argument parser."""
     parser = argparse.ArgumentParser()
@@ -197,11 +235,11 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--write",
         dest="write",
-        # this is a tri-state argument: not provided, --write, --write=a,b,c
-        type=lambda arg: arg.split(",") if arg else ["none"],
-        const=["none"],  # --write (no option) implicitly stores this
+        # this is a tri-state argument that takes an optional comma separated list:
+        #   not provided, --write, --write=a,b,c
+        const="none",  # --write (no option) implicitly stores this
         nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
-        action="store",
+        action=WriteArgAction,
         help="Reformat YAML files to standardize spacing, quotes, etc. "
         "Future versions will expand this option so it fixes more issues.",
     )
@@ -293,6 +331,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         dest="lintables",
         nargs="*",
+        action="extend",
         help="One or more files or paths. When missing it will "
         " enable auto-detection mode.",
     )
