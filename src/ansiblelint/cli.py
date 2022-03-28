@@ -141,18 +141,14 @@ class WriteArgAction(argparse.Action):
         option_string: Optional[str] = None,
     ) -> None:
         lintables = getattr(namespace, "lintables", None)
-        if not lintables:
+        if not lintables and isinstance(values, str):
             # args are processed in order.
             # If --write is after lintables, then that is not ambiguous.
             # But if --write comes first, then it might actually be a lintable.
-            try:
-                maybe_lintable = Path(values)
-            except TypeError:
-                pass
-            else:
-                if maybe_lintable.exists():
-                    setattr(namespace, "lintables", [values])
-                    values = []
+            maybe_lintable = Path(values)
+            if maybe_lintable.exists():
+                setattr(namespace, "lintables", [values])
+                values = []
         if isinstance(values, str):
             values = values.split(",")
         default = [self.const] if isinstance(self.const, str) else self.const
@@ -161,9 +157,7 @@ class WriteArgAction(argparse.Action):
             values = previous_values
         elif previous_values != default:
             new_values = previous_values
-            new_values.extend(
-                value for value in values if value not in previous_values
-            )
+            new_values.extend(value for value in values if value not in previous_values)
             values = new_values
         setattr(namespace, self.dest, values)
 
