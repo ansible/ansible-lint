@@ -178,7 +178,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     result = _get_matches(rules, options)
 
-    if options.write:
+    if options.write_list:
         _do_transform(result, options)
 
     mark_as_success = False

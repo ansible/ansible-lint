@@ -234,7 +234,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--write",
-        dest="write",
+        dest="write_list",
         # this is a tri-state argument that takes an optional comma separated list:
         #   not provided, --write, --write=a,b,c
         const="none",  # --write (no option) implicitly stores this
@@ -359,6 +359,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         "mock_modules": [],
         "mock_roles": [],
         "enable_list": [],
+        "write_list": [],
     }
 
     scalar_map = {

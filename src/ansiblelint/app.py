@@ -181,7 +181,7 @@ warn_list:  # or 'skip_list' to silence them completely
         #         v,
         #     )
 
-        if self.options.write and "yaml" in self.options.skip_list:
+        if self.options.write_list and "yaml" in self.options.skip_list:
             _logger.warning(
                 "You specified '--write', but no files can be modified "
                 "because 'yaml' is in 'skip_list'."
