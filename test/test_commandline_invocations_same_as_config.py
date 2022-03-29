@@ -87,15 +87,12 @@ def test_ensure_write_cli_does_not_consume_lintables(
     options = cli_parser.parse_args(args)
     file_config = cli.load_config(config)
 
-    for key, val in file_config.items():
-
-        # config_file does not make sense in file_config
-        if key == "config_file":
-            continue
-
-        if key in {"exclude_paths", "rulesdir"}:
-            val = [Path(p) for p in val]
-        assert val == getattr(options, key)
+    file_value = file_config.get("write_list")
+    orig_cli_value = getattr(options, "write_list")
+    cli_value = cli.WriteArgAction.merge_write_list_config(
+        from_file=[], from_cli=orig_cli_value
+    )
+    assert file_value == cli_value
 
 
 def test_config_can_be_overridden(base_arguments: List[str]) -> None:
