@@ -38,6 +38,9 @@ from ansiblelint.config import get_rule_config
 from ansiblelint.config import options as default_options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
+from ansiblelint.skip_utils import (
+    _get_task_blocks_from_playbook,  # pylint: disable=protected-access
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -180,27 +183,11 @@ class AnsibleLintRule(BaseRule):
         # If playbook contains blocks in pre_tasks/tasks/post_tasks
         if self.needs_block and file.kind == "playbook":
             data = ansiblelint.utils.parse_yaml_linenumbers(file)
-            block_list = ansiblelint.skip_utils._get_task_blocks_from_playbook(data)
+            block_list = _get_task_blocks_from_playbook(data)
             for block in block_list:
-                if block.get("block", {}):
-                    block_result = self.matchtask(block)
-
-                if not block_result:
-                    continue
-
-                message = None
-                if isinstance(block_result, str):
-                    message = block_result
-
-                block_msg = "Block: " + ansiblelint.utils.task_to_str(block)
-                match = self.create_matcherror(
-                    message=message,
-                    linenumber=block[ansiblelint.utils.LINE_NUMBER_KEY],
-                    details=block_msg,
-                    filename=file,
+                ansiblelint.utils.add_block_matcherror_to_maches(
+                    file, block, self.matchtask, self.create_matcherror, matches
                 )
-                match.task = block
-                matches.append(match)
 
         return matches
 
