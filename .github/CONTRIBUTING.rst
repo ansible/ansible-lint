@@ -53,7 +53,8 @@ Talk to us
 ----------
 
 Use Github `discussions`_ forum or for a live chat experience try
-``#ansible-lint`` IRC channel on libera.chat.
+``#ansible-devtools`` IRC channel on libera.chat or Matrix room
+`#devtools:ansible.com <https://matrix.to/#/#devtools:ansible.com>`_.
 
 For the full list of Ansible IRC and Mailing list, please see the
 `Ansible Communication`_ page.

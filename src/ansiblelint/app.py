@@ -1,6 +1,7 @@
 """Application."""
 import logging
 import os
+from dataclasses import dataclass
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, List, Tuple, Type
 
@@ -25,6 +26,21 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__package__)
 
 
+@dataclass
+class SummarizedResults:
+    """The statistics about an ansible-lint run."""
+
+    failures: int = 0
+    warnings: int = 0
+    fixed_failures: int = 0
+    fixed_warnings: int = 0
+
+    @property
+    def fixed(self) -> int:
+        """Get total fixed count."""
+        return self.fixed_failures + self.fixed_warnings
+
+
 class App:
     """App class represents an execution of the linter."""
 
@@ -41,7 +57,9 @@ class App:
         self.runtime = Runtime(isolated=True)
 
     def render_matches(self, matches: List[MatchError]) -> None:
-        """Display given matches."""
+        """Display given matches (if they are not fixed)."""
+        matches = [match for match in matches if not match.fixed]
+
         if isinstance(self.formatter, formatters.CodeclimateJSONFormatter):
             # If formatter CodeclimateJSONFormatter is chosen,
             # then print only the matches in JSON
@@ -76,16 +94,24 @@ class App:
             for match in matches:
                 console.print(formatter.format(match), markup=False, highlight=False)
 
-    def count_results(self, matches: List[MatchError]) -> Tuple[int, int]:
+    def count_results(self, matches: List[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
         failures = 0
         warnings = 0
+        fixed_failures = 0
+        fixed_warnings = 0
         for match in matches:
             if {match.rule.id, *match.rule.tags}.isdisjoint(self.options.warn_list):
-                failures += 1
+                if match.fixed:
+                    fixed_failures += 1
+                else:
+                    failures += 1
             else:
-                warnings += 1
-        return failures, warnings
+                if match.fixed:
+                    fixed_warnings += 1
+                else:
+                    warnings += 1
+        return SummarizedResults(failures, warnings, fixed_failures, fixed_warnings)
 
     @staticmethod
     def count_lintables(files: "Set[Lintable]") -> Tuple[int, int]:
@@ -116,7 +142,7 @@ class App:
         """
         msg = ""
 
-        failures, warnings = self.count_results(result.matches)
+        summary = self.count_results(result.matches)
         files_count, changed_files_count = self.count_lintables(result.files)
 
         matched_rules = self._get_matched_skippable_rules(result.matches)
@@ -163,16 +189,27 @@ warn_list:  # or 'skip_list' to silence them completely
 
         if (result.matches or changed_files_count) and not self.options.quiet:
             console_stderr.print(render_yaml(msg))
-            if changed_files_count:
-                console_stderr.print(f"Modified {changed_files_count} files.")
-            console_stderr.print(
-                f"Finished with {failures} failure(s), {warnings} warning(s) "
-                f"on {files_count} files."
-            )
+            self.report_summary(summary, changed_files_count, files_count)
 
-        if mark_as_success or not failures:
+        if mark_as_success or not summary.failures:
             return SUCCESS_RC
         return VIOLATIONS_FOUND_RC
+
+    @staticmethod
+    def report_summary(
+        summary: SummarizedResults, changed_files_count: int, files_count: int
+    ) -> None:
+        """Report match and file counts."""
+        if changed_files_count:
+            console_stderr.print(f"Modified {changed_files_count} files.")
+
+        msg = "Finished with "
+        msg += f"{summary.failures} failure(s), {summary.warnings} warning(s)"
+        if summary.fixed:
+            msg += f", and fixed {summary.fixed} issue(s)"
+        msg += f" on {files_count} files."
+
+        console_stderr.print(msg)
 
 
 def choose_formatter_factory(
