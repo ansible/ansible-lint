@@ -65,7 +65,7 @@ def fixture_runner_result(
         pytest.param("examples/playbooks/vars/strings.yml", 0, True, id="strings"),
     ),
 )
-def test_transformer(
+def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
     config_options: Namespace,
     copy_examples_dir: Tuple[pathlib.Path, pathlib.Path],
     playbook: str,

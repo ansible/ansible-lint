@@ -233,7 +233,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
         action=WriteArgAction,
         help="Allow ansible-lint to reformat YAML files and run rule transforms "
-        "(Reformatting YAML files standardizes spacing, qutoes, etc. "
+        "(Reformatting YAML files standardizes spacing, quotes, etc. "
         "A rule transform can fix or simplify fixing issues identified by that rule). "
         "You can limit the effective rule transforms (the 'write_list') by passing a "
         "keywords 'all' or 'none' or a comma separated list of rule ids or rule tags. "
@@ -243,7 +243,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "followed whatever '--write' args are provided on the commandline. "
         "'--write=none' resets the list of transforms to allow reformatting YAML "
         "without running any of the transforms (ie '--write=none,rule-id' will "
-        "ignore write_list in the config file and only run the rule-id transform)."
+        "ignore write_list in the config file and only run the rule-id transform).",
     )
     parser.add_argument(
         "--show-relpath",
@@ -397,10 +397,8 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
 
     # For "write_list", config file params must come before commandline params.
     entry = "write_list"
-    if getattr(cli_config, entry, None) or entry in file_config.keys():
-        value = file_config.pop(entry, [])
-        value.extend(getattr(cli_config, entry, []))
-        setattr(cli_config, entry, value)
+    value = file_config.pop(entry, []) + getattr(cli_config, entry, [])
+    setattr(cli_config, entry, value)
 
     if "verbosity" in file_config:
         cli_config.verbosity = cli_config.verbosity + file_config.pop("verbosity")
