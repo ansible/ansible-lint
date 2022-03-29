@@ -877,7 +877,7 @@ def nested_items(
                 yield k, v, returned_parent
 
 
-def add_block_matcherror_to_maches(
+def add_block_matcherror_to_matches(
     file: Lintable,
     block: Dict[str, Any],
     matchtask: Callable[[Dict[str, Any], Optional[Lintable]], Union[bool, str]],

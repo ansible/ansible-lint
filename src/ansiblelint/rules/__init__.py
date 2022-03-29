@@ -185,7 +185,7 @@ class AnsibleLintRule(BaseRule):
             data = ansiblelint.utils.parse_yaml_linenumbers(file)
             block_list = _get_task_blocks_from_playbook(data)
             for block in block_list:
-                ansiblelint.utils.add_block_matcherror_to_maches(
+                ansiblelint.utils.add_block_matcherror_to_matches(
                     file, block, self.matchtask, self.create_matcherror, matches
                 )
 
