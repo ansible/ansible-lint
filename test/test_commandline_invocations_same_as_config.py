@@ -28,11 +28,11 @@ def fixture_base_arguments() -> List[str]:
         (["--exclude", "test/"], "test/fixtures/exclude-paths.yml"),
         (["--show-relpath"], "test/fixtures/show-abspath.yml"),
         ([], "test/fixtures/show-relpath.yml"),
-        (["--write"], "test/fixtures/config-with-write.yml"),
-        (["--write=none"], "test/fixtures/config-with-write.yml"),
-        (["--write", "none"], "test/fixtures/config-with-write.yml"),
+        (["--write"], "test/fixtures/config-with-write-all.yml"),
         (["--write=all"], "test/fixtures/config-with-write-all.yml"),
         (["--write", "all"], "test/fixtures/config-with-write-all.yml"),
+        (["--write=none"], "test/fixtures/config-with-write-none.yml"),
+        (["--write", "none"], "test/fixtures/config-with-write-none.yml"),
         (["--write=rule-tag,rule-id"], "test/fixtures/config-with-write-subset.yml"),
         (["--write", "rule-tag,rule-id"], "test/fixtures/config-with-write-subset.yml"),
         (
@@ -67,11 +67,11 @@ def test_ensure_config_are_equal(
     (
         (
             ["--write", "examples/playbooks/example.yml"],
-            "test/fixtures/config-with-write.yml",
+            "test/fixtures/config-with-write-all.yml",
         ),
         (
             ["--write", "examples/playbooks/example.yml", "non-existent.yml"],
-            "test/fixtures/config-with-write.yml",
+            "test/fixtures/config-with-write-all.yml",
         ),
     ),
 )
