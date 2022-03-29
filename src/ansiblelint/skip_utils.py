@@ -25,7 +25,7 @@ from itertools import product
 from typing import TYPE_CHECKING, Any, Generator, List, Optional, Sequence
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
-from ruamel.yaml import YAML  # type: ignore
+from ruamel.yaml import YAML
 
 from ansiblelint.config import used_old_tags
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, RENAMED_TAGS
