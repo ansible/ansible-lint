@@ -397,7 +397,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
 
     # For "write_list", config file params must come before commandline params.
     entry = "write_list"
-    value = file_config.pop(entry, []) + getattr(cli_config, entry, [])
+    value = file_config.pop(entry, []) + (getattr(cli_config, entry, []) or [])
     setattr(cli_config, entry, value)
 
     if "verbosity" in file_config:
