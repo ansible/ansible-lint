@@ -60,7 +60,7 @@ class AnsibleLintRule(BaseRule):
         """Retrieve rule specific configuration."""
         return get_rule_config(self.id)
 
-    @lru_cache()
+    @lru_cache(maxsize=256)
     def get_config(self, key: str) -> Any:
         """Return a configured value for given key string."""
         return self.rule_config.get(key, None)
