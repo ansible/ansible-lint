@@ -31,16 +31,7 @@ class Transformer:
 
     def __init__(self, result: LintResult, options: Namespace):
         """Initialize a Transformer instance."""
-        write_list: List[str] = options.write_list
-        # "none" resets the enabled transforms
-        # So, write_list will be ["none"] or everything after "none"
-        none_indexes = [i for i, value in enumerate(write_list) if value == "none"]
-        if none_indexes:
-            index = none_indexes[-1]
-            if len(write_list) > index + 1:
-                index += 1
-            write_list = write_list[index:]
-        self.write_list = write_list
+        self.write_set = self.effective_write_set(options.write_list)
 
         self.matches: List[MatchError] = result.matches
         self.files: Set[Lintable] = result.files
@@ -60,6 +51,26 @@ class Transformer:
                 lintable = Lintable(match.filename)
                 self.matches_per_file[lintable] = []
             self.matches_per_file[lintable].append(match)
+
+    @staticmethod
+    def effective_write_set(write_list: List[str]) -> Set[str]:
+        """Simplify write_list based on ``"none"`` and ``"all"`` keywords.
+
+        ``"none"`` resets the enabled rule transforms.
+        This returns ``{"none"}`` or a set of everything after the last ``"none"``.
+
+        If ``"all"`` is in the ``write_list`` (after ``"none"`` if present),
+        then this will return ``{"all"}``.
+        """
+        none_indexes = [i for i, value in enumerate(write_list) if value == "none"]
+        if none_indexes:
+            index = none_indexes[-1]
+            if len(write_list) > index + 1:
+                index += 1
+            write_list = write_list[index:]
+        if "all" in write_list:
+            return {"all"}
+        return set(write_list)
 
     def run(self) -> None:
         """For each file, read it, execute transforms on it, then write it."""
@@ -89,7 +100,7 @@ class Transformer:
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
 
-            if self.write_list != ["none"]:
+            if self.write_set != {"none"}:
                 self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if file_is_yaml:
@@ -110,11 +121,11 @@ class Transformer:
         for match in sorted(matches):
             if not isinstance(match.rule, TransformMixin):
                 continue
-            if "all" not in self.write_list:
+            if self.write_set != {"all"}:
                 rule = cast(AnsibleLintRule, match.rule)
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
-                if rule_definition.isdisjoint(set(self.write_list)):
+                if rule_definition.isdisjoint(self.write_set):
                     # rule transform not requested. Skip it.
                     continue
             if file_is_yaml and not match.yaml_path:
