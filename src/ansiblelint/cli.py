@@ -6,7 +6,7 @@ import os
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import yaml
 
@@ -133,6 +133,40 @@ class AbspathArgAction(argparse.Action):
 class WriteArgAction(argparse.Action):
     """Argparse action to handle the --write flag with optional args."""
 
+    _default = "__default__"
+
+    # noinspection PyShadowingBuiltins
+    def __init__(  # pylint: disable=too-many-arguments,redefined-builtin
+        self,
+        option_strings: List[str],
+        dest: str,
+        nargs: Optional[Union[int, str]] = None,
+        const: Any = None,
+        default: Any = None,
+        type: Optional[Callable[[str], Any]] = None,
+        choices: Optional[List[Any]] = None,
+        required: bool = False,
+        help: Optional[str] = None,
+        metavar: Optional[str] = None,
+    ) -> None:
+        """Create the argparse action with WriteArg-specific defaults."""
+        if nargs is not None:
+            raise ValueError("nargs for WriteArgAction must not be set.")
+        if const is not None:
+            raise ValueError("const for WriteArgAction must not be set.")
+        super().__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
+            const=self._default,  # --write (no option) implicitly stores this
+            default=default,
+            type=type,
+            choices=choices,
+            required=required,
+            help=help,
+            metavar=metavar,
+        )
+
     def __call__(
         self,
         parser: argparse.ArgumentParser,
@@ -158,6 +192,21 @@ class WriteArgAction(argparse.Action):
         elif previous_values != default:
             values = previous_values + values
         setattr(namespace, self.dest, values)
+
+    @classmethod
+    def merge_write_list_config(
+        cls, from_file: List[str], from_cli: List[str]
+    ) -> List[str]:
+        """Combine the write_list from file config with --write CLI arg.
+
+        Handles the implicit "all" when "__default__" is present and file config is empty.
+        """
+        if not from_file or "none" in from_cli:
+            # --write is the same as --write=all
+            return ["all" if value == cls._default else value for value in from_cli]
+        # --write means use the config from the config file
+        from_cli = [value for value in from_cli if value != cls._default]
+        return from_file + from_cli
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
@@ -229,8 +278,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="write_list",
         # this is a tri-state argument that takes an optional comma separated list:
         #   not provided, --write, --write=a,b,c
-        const="all",  # --write (no option) implicitly stores this
-        nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
         action=WriteArgAction,
         help="Allow ansible-lint to reformat YAML files and run rule transforms "
         "(Reformatting YAML files standardizes spacing, quotes, etc. "
@@ -395,10 +442,16 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
             value = default
         setattr(cli_config, entry, value)
 
-    # For "write_list", config file params must come before commandline params.
+    # "write_list" config has special merge rules
     entry = "write_list"
-    value = file_config.pop(entry, []) + (getattr(cli_config, entry, []) or [])
-    setattr(cli_config, entry, value)
+    setattr(
+        cli_config,
+        entry,
+        WriteArgAction.merge_write_list_config(
+            from_file=file_config.pop(entry, []),
+            from_cli=getattr(cli_config, entry, []) or [],
+        ),
+    )
 
     if "verbosity" in file_config:
         cli_config.verbosity = cli_config.verbosity + file_config.pop("verbosity")
