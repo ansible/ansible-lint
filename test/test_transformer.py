@@ -66,6 +66,7 @@ def fixture_runner_result(
     ),
 )
 def test_transformer(
+    config_options: Namespace,
     copy_examples_dir: Tuple[pathlib.Path, pathlib.Path],
     playbook: str,
     runner_result: LintResult,
@@ -77,7 +78,8 @@ def test_transformer(
 
     Based on TestRunner::test_runner
     """
-    transformer = Transformer(result=runner_result, write_list=["all"])
+    setattr(config_options, "write_list", ["all"])
+    transformer = Transformer(result=runner_result, options=config_options)
     transformer.run()
 
     matches = runner_result.matches

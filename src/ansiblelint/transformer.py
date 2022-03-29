@@ -1,5 +1,6 @@
 """Transformer implementation."""
 import logging
+from argparse import Namespace
 from typing import Dict, List, Optional, Set, Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -28,8 +29,9 @@ class Transformer:
     pre-requisite for the planned rule-specific transforms.
     """
 
-    def __init__(self, result: LintResult, write_list: List[str]):
+    def __init__(self, result: LintResult, options: Namespace):
         """Initialize a Transformer instance."""
+        write_list: List[str] = options.write_list
         # "none" resets the enabled transforms
         # So, write_list will be ["none"] or everything after "none"
         none_indexes = [i for i, value in enumerate(write_list) if value == "none"]

@@ -140,8 +140,7 @@ def _do_transform(result: "LintResult", opts: "Namespace") -> None:
     # pylint: disable=import-outside-toplevel
     from ansiblelint.transformer import Transformer
 
-    # future: maybe pass options to Transformer
-    transformer = Transformer(result, options.write_list)
+    transformer = Transformer(result, options)
 
     # this will mark any matches as fixed if the transforms repaired the issue
     transformer.run()
