@@ -879,7 +879,7 @@ def nested_items(
 
 def add_block_matcherror_to_maches(
     file: Lintable,
-    block: AnsibleMapping,
+    block: Dict[str, Any],
     matchtask: Callable[[Dict[str, Any], Optional[Lintable]], Union[bool, str]],
     create_matcherror: Callable[
         [Optional[str], int, str, Union[str, Lintable, None], str], MatchError
