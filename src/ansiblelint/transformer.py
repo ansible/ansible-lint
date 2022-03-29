@@ -30,6 +30,14 @@ class Transformer:
 
     def __init__(self, result: LintResult, write_list: List[str]):
         """Initialize a Transformer instance."""
+        # "none" resets the enabled transforms
+        # So, write_list will be ["none"] or everything after "none"
+        none_indexes = [i for i, value in enumerate(write_list) if value == "none"]
+        if none_indexes:
+            index = none_indexes[-1]
+            if len(write_list) > index + 1:
+                index += 1
+            write_list = write_list[index:]
         self.write_list = write_list
 
         self.matches: List[MatchError] = result.matches

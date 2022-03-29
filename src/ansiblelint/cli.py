@@ -156,9 +156,7 @@ class WriteArgAction(argparse.Action):
         if not values:
             values = previous_values
         elif previous_values != default:
-            new_values = previous_values
-            new_values.extend(value for value in values if value not in previous_values)
-            values = new_values
+            values = previous_values + values
         setattr(namespace, self.dest, values)
 
 
@@ -231,17 +229,21 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="write_list",
         # this is a tri-state argument that takes an optional comma separated list:
         #   not provided, --write, --write=a,b,c
-        const="none",  # --write (no option) implicitly stores this
+        const="all",  # --write (no option) implicitly stores this
         nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
         action=WriteArgAction,
-        help="Allow ansible-lint to modify files. "
-        "'--write' will reformat YAML files to standardize spacing, quotes, etc. "
-        "'--write=all' will also run all available rule transforms on files "
-        "(A rule transform can fix or simplify fixing issues identified by that rule). "
-        "'--write=rule-tag,rule-id' will limit running transforms to rules that match "
-        "the given comma-separated list of rule ids or rule tags. "
-        "'--write=none' behaves the same as '--write' to reformat without running "
-        "transforms.",
+        help="Allow ansible-lint to reformat YAML files and run rule transforms "
+        "(Reformatting YAML files standardizes spacing, qutoes, etc. "
+        "A rule transform can fix or simplify fixing issues identified by that rule). "
+        "You can limit the effective rule transforms (the 'write_list') by passing a "
+        "keywords 'all' or 'none' or a comma separated list of rule ids or rule tags. "
+        "YAML reformatting happens whenever '--write' or '--write=' is used. "
+        "'--write' and '--write=all' are equivalent: they allow all transforms to run. "
+        "The effective list of transforms comes from 'write_list' in the config file, "
+        "followed whatever '--write' args are provided on the commandline. "
+        "'--write=none' resets the list of transforms to allow reformatting YAML "
+        "without running any of the transforms (ie '--write=none,rule-id' will "
+        "ignore write_list in the config file and only run the rule-id transform)."
     )
     parser.add_argument(
         "--show-relpath",
@@ -359,7 +361,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         "mock_modules": [],
         "mock_roles": [],
         "enable_list": [],
-        "write_list": [],
+        # do not include "write_list" here. See special logic below.
     }
 
     scalar_map = {
@@ -391,6 +393,13 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
             value.extend(file_config.pop(entry, []))
         else:
             value = default
+        setattr(cli_config, entry, value)
+
+    # For "write_list", config file params must come before commandline params.
+    entry = "write_list"
+    if getattr(cli_config, entry, None) or entry in file_config.keys():
+        value = file_config.pop(entry, [])
+        value.extend(getattr(cli_config, entry, []))
         setattr(cli_config, entry, value)
 
     if "verbosity" in file_config:
