@@ -6,7 +6,7 @@ import os
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import yaml
 
@@ -130,6 +130,85 @@ class AbspathArgAction(argparse.Action):
             setattr(namespace, self.dest, previous_values + normalized_values)
 
 
+class WriteArgAction(argparse.Action):
+    """Argparse action to handle the --write flag with optional args."""
+
+    _default = "__default__"
+
+    # noinspection PyShadowingBuiltins
+    def __init__(  # pylint: disable=too-many-arguments,redefined-builtin
+        self,
+        option_strings: List[str],
+        dest: str,
+        nargs: Optional[Union[int, str]] = None,
+        const: Any = None,
+        default: Any = None,
+        type: Optional[Callable[[str], Any]] = None,
+        choices: Optional[List[Any]] = None,
+        required: bool = False,
+        help: Optional[str] = None,
+        metavar: Optional[str] = None,
+    ) -> None:
+        """Create the argparse action with WriteArg-specific defaults."""
+        if nargs is not None:
+            raise ValueError("nargs for WriteArgAction must not be set.")
+        if const is not None:
+            raise ValueError("const for WriteArgAction must not be set.")
+        super().__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
+            const=self._default,  # --write (no option) implicitly stores this
+            default=default,
+            type=type,
+            choices=choices,
+            required=required,
+            help=help,
+            metavar=metavar,
+        )
+
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: Namespace,
+        values: Union[str, Sequence[Any], None],
+        option_string: Optional[str] = None,
+    ) -> None:
+        lintables = getattr(namespace, "lintables", None)
+        if not lintables and isinstance(values, str):
+            # args are processed in order.
+            # If --write is after lintables, then that is not ambiguous.
+            # But if --write comes first, then it might actually be a lintable.
+            maybe_lintable = Path(values)
+            if maybe_lintable.exists():
+                setattr(namespace, "lintables", [values])
+                values = []
+        if isinstance(values, str):
+            values = values.split(",")
+        default = [self.const] if isinstance(self.const, str) else self.const
+        previous_values = getattr(namespace, self.dest, default) or default
+        if not values:
+            values = previous_values
+        elif previous_values != default:
+            values = previous_values + values
+        setattr(namespace, self.dest, values)
+
+    @classmethod
+    def merge_write_list_config(
+        cls, from_file: List[str], from_cli: List[str]
+    ) -> List[str]:
+        """Combine the write_list from file config with --write CLI arg.
+
+        Handles the implicit "all" when "__default__" is present and file config is empty.
+        """
+        if not from_file or "none" in from_cli:
+            # --write is the same as --write=all
+            return ["all" if value == cls._default else value for value in from_cli]
+        # --write means use the config from the config file
+        from_cli = [value for value in from_cli if value != cls._default]
+        return from_file + from_cli
+
+
 def get_cli_parser() -> argparse.ArgumentParser:
     """Initialize an argument parser."""
     parser = argparse.ArgumentParser()
@@ -196,10 +275,22 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--write",
-        dest="write",
-        action="store_true",
-        help="Reformat YAML files to standardize spacing, quotes, etc. "
-        "Future versions will expand this option so it fixes more issues.",
+        dest="write_list",
+        # this is a tri-state argument that takes an optional comma separated list:
+        #   not provided, --write, --write=a,b,c
+        action=WriteArgAction,
+        help="Allow ansible-lint to reformat YAML files and run rule transforms "
+        "(Reformatting YAML files standardizes spacing, quotes, etc. "
+        "A rule transform can fix or simplify fixing issues identified by that rule). "
+        "You can limit the effective rule transforms (the 'write_list') by passing a "
+        "keywords 'all' or 'none' or a comma separated list of rule ids or rule tags. "
+        "YAML reformatting happens whenever '--write' or '--write=' is used. "
+        "'--write' and '--write=all' are equivalent: they allow all transforms to run. "
+        "The effective list of transforms comes from 'write_list' in the config file, "
+        "followed whatever '--write' args are provided on the commandline. "
+        "'--write=none' resets the list of transforms to allow reformatting YAML "
+        "without running any of the transforms (ie '--write=none,rule-id' will "
+        "ignore write_list in the config file and only run the rule-id transform).",
     )
     parser.add_argument(
         "--show-relpath",
@@ -289,6 +380,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         dest="lintables",
         nargs="*",
+        action="extend",
         help="One or more files or paths. When missing it will "
         " enable auto-detection mode.",
     )
@@ -316,6 +408,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         "mock_modules": [],
         "mock_roles": [],
         "enable_list": [],
+        # do not include "write_list" here. See special logic below.
     }
 
     scalar_map = {
@@ -348,6 +441,17 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         else:
             value = default
         setattr(cli_config, entry, value)
+
+    # "write_list" config has special merge rules
+    entry = "write_list"
+    setattr(
+        cli_config,
+        entry,
+        WriteArgAction.merge_write_list_config(
+            from_file=file_config.pop(entry, []),
+            from_cli=getattr(cli_config, entry, []) or [],
+        ),
+    )
 
     if "verbosity" in file_config:
         cli_config.verbosity = cli_config.verbosity + file_config.pop("verbosity")

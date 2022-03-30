@@ -1,12 +1,13 @@
 """Transformer implementation."""
 import logging
+from argparse import Namespace
 from typing import Dict, List, Optional, Set, Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import TransformMixin
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.runner import LintResult
 from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
 
@@ -28,8 +29,10 @@ class Transformer:
     pre-requisite for the planned rule-specific transforms.
     """
 
-    def __init__(self, result: LintResult):
+    def __init__(self, result: LintResult, options: Namespace):
         """Initialize a Transformer instance."""
+        self.write_set = self.effective_write_set(options.write_list)
+
         self.matches: List[MatchError] = result.matches
         self.files: Set[Lintable] = result.files
 
@@ -48,6 +51,26 @@ class Transformer:
                 lintable = Lintable(match.filename)
                 self.matches_per_file[lintable] = []
             self.matches_per_file[lintable].append(match)
+
+    @staticmethod
+    def effective_write_set(write_list: List[str]) -> Set[str]:
+        """Simplify write_list based on ``"none"`` and ``"all"`` keywords.
+
+        ``"none"`` resets the enabled rule transforms.
+        This returns ``{"none"}`` or a set of everything after the last ``"none"``.
+
+        If ``"all"`` is in the ``write_list`` (after ``"none"`` if present),
+        then this will return ``{"all"}``.
+        """
+        none_indexes = [i for i, value in enumerate(write_list) if value == "none"]
+        if none_indexes:
+            index = none_indexes[-1]
+            if len(write_list) > index + 1:
+                index += 1
+            write_list = write_list[index:]
+        if "all" in write_list:
+            return {"all"}
+        return set(write_list)
 
     def run(self) -> None:
         """For each file, read it, execute transforms on it, then write it."""
@@ -77,7 +100,8 @@ class Transformer:
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
 
-            self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
+            if self.write_set != {"none"}:
+                self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if file_is_yaml:
                 # noinspection PyUnboundLocalVariable
@@ -86,8 +110,8 @@ class Transformer:
             if file.updated:
                 file.write()
 
-    @staticmethod
     def _do_transforms(
+        self,
         file: Lintable,
         data: Union[CommentedMap, CommentedSeq, str],
         file_is_yaml: bool,
@@ -97,6 +121,13 @@ class Transformer:
         for match in sorted(matches):
             if not isinstance(match.rule, TransformMixin):
                 continue
+            if self.write_set != {"all"}:
+                rule = cast(AnsibleLintRule, match.rule)
+                rule_definition = set(rule.tags)
+                rule_definition.add(rule.id)
+                if rule_definition.isdisjoint(self.write_set):
+                    # rule transform not requested. Skip it.
+                    continue
             if file_is_yaml and not match.yaml_path:
                 data = cast(Union[CommentedMap, CommentedSeq], data)
                 if match.match_type == "play":
