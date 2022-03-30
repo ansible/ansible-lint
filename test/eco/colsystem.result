@@ -3,16 +3,18 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Listing 2 violation(s) that are fatal
+WARNING  Listing 4 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
   - load-failure  # Failed to load or parse file.
   - yaml  # Violations reported by yamllint.
 
-Finished with 2 failure(s), 0 warning(s) on 256 files.
+Finished with 4 failure(s), 0 warning(s) on 330 files.
 
 
 STDOUT:
 .ansible-lint:1: load-failure [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (filenotfounderror)
 playbooks/molecule/sudo/molecule.yml:17: yaml line too long (576 > 160 characters) (line-length)
+roles/firewalld/defaults/main.yml:11: yaml missing starting space in comment (comments)
+roles/firewalld/defaults/main.yml:28: yaml missing starting space in comment (comments)
