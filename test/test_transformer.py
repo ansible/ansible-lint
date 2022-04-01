@@ -4,7 +4,7 @@ import os
 import pathlib
 import shutil
 from argparse import Namespace
-from typing import Iterator, Tuple
+from typing import Iterator, List, Set, Tuple
 
 import pytest
 
@@ -65,7 +65,8 @@ def fixture_runner_result(
         pytest.param("examples/playbooks/vars/strings.yml", 0, True, id="strings"),
     ),
 )
-def test_transformer(
+def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
+    config_options: Namespace,
     copy_examples_dir: Tuple[pathlib.Path, pathlib.Path],
     playbook: str,
     runner_result: LintResult,
@@ -77,7 +78,8 @@ def test_transformer(
 
     Based on TestRunner::test_runner
     """
-    transformer = Transformer(result=runner_result)
+    setattr(config_options, "write_list", ["all"])
+    transformer = Transformer(result=runner_result, options=config_options)
     transformer.run()
 
     matches = runner_result.matches
@@ -98,3 +100,56 @@ def test_transformer(
         assert orig_playbook_content == transformed_playbook_content
 
     assert transformed_playbook_content == expected_playbook_content
+
+
+@pytest.mark.parametrize(
+    ("write_list", "expected"),
+    (
+        # 1 item
+        (["all"], {"all"}),
+        (["none"], {"none"}),
+        (["rule-id"], {"rule-id"}),
+        # 2 items
+        (["all", "all"], {"all"}),
+        (["all", "none"], {"none"}),
+        (["all", "rule-id"], {"all"}),
+        (["none", "all"], {"all"}),
+        (["none", "none"], {"none"}),
+        (["none", "rule-id"], {"rule-id"}),
+        (["rule-id", "all"], {"all"}),
+        (["rule-id", "none"], {"none"}),
+        (["rule-id", "rule-id"], {"rule-id"}),
+        # 3 items
+        (["all", "all", "all"], {"all"}),
+        (["all", "all", "none"], {"none"}),
+        (["all", "all", "rule-id"], {"all"}),
+        (["all", "none", "all"], {"all"}),
+        (["all", "none", "none"], {"none"}),
+        (["all", "none", "rule-id"], {"rule-id"}),
+        (["all", "rule-id", "all"], {"all"}),
+        (["all", "rule-id", "none"], {"none"}),
+        (["all", "rule-id", "rule-id"], {"all"}),
+        (["none", "all", "all"], {"all"}),
+        (["none", "all", "none"], {"none"}),
+        (["none", "all", "rule-id"], {"all"}),
+        (["none", "none", "all"], {"all"}),
+        (["none", "none", "none"], {"none"}),
+        (["none", "none", "rule-id"], {"rule-id"}),
+        (["none", "rule-id", "all"], {"all"}),
+        (["none", "rule-id", "none"], {"none"}),
+        (["none", "rule-id", "rule-id"], {"rule-id"}),
+        (["rule-id", "all", "all"], {"all"}),
+        (["rule-id", "all", "none"], {"none"}),
+        (["rule-id", "all", "rule-id"], {"all"}),
+        (["rule-id", "none", "all"], {"all"}),
+        (["rule-id", "none", "none"], {"none"}),
+        (["rule-id", "none", "rule-id"], {"rule-id"}),
+        (["rule-id", "rule-id", "all"], {"all"}),
+        (["rule-id", "rule-id", "none"], {"none"}),
+        (["rule-id", "rule-id", "rule-id"], {"rule-id"}),
+    ),
+)
+def test_effective_write_set(write_list: List[str], expected: Set[str]) -> None:
+    """Make sure effective_write_set handles all/none keywords correctly."""
+    actual = Transformer.effective_write_set(write_list)
+    assert actual == expected
