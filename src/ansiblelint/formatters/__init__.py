@@ -284,7 +284,7 @@ class SarifFormatter(BaseFormatter[Any]):
             "help": {
                 "text": str(match.rule.description),
             },
-            "properties": {"tags": match.rule.tags}
+            "properties": {"tags": match.rule.tags},
         }
         if match.rule.link:
             rule["helpUri"] = match.rule.link
@@ -305,9 +305,9 @@ class SarifFormatter(BaseFormatter[Any]):
                         },
                         "region": {
                             "startLine": match.linenumber,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             ],
         }
         if match.column:

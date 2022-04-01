@@ -99,7 +99,9 @@ class TestSarifFormatter:
                 == self.matches[i].filename
             )
             assert (
-                result["locations"][0]["physicalLocation"]["artifactLocation"]["uriBaseId"]
+                result["locations"][0]["physicalLocation"]["artifactLocation"][
+                    "uriBaseId"
+                ]
                 == SarifFormatter.BASE_URI_ID
             )
             assert (

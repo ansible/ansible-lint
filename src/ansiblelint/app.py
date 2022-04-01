@@ -62,7 +62,7 @@ class App:
 
         if isinstance(
             self.formatter,
-            (formatters.CodeclimateJSONFormatter, formatters.SarifFormatter)
+            (formatters.CodeclimateJSONFormatter, formatters.SarifFormatter),
         ):
             # If formatter CodeclimateJSONFormatter or SarifFormatter is chosen,
             # then print only the matches in JSON
