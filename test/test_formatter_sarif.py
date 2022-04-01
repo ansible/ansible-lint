@@ -47,9 +47,7 @@ class TestSarifFormatter:
                 rule=self.rule,
             )
         )
-        self.formatter = SarifFormatter(
-            pathlib.Path.cwd(), display_relative_path=True
-        )
+        self.formatter = SarifFormatter(pathlib.Path.cwd(), display_relative_path=True)
 
     def test_format_list(self) -> None:
         """Test if the return value is a string."""
@@ -96,13 +94,28 @@ class TestSarifFormatter:
         for i, result in enumerate(results):
             assert result["ruleId"] == self.matches[i].rule.id
             assert result["message"]["text"] == self.matches[i].details
-            assert result["locations"][0]["physicalLocation"]["artifactLocation"]["uri"] == self.matches[i].filename
-            assert result["locations"][0]["physicalLocation"]["artifactLocation"]["uriBaseId"] == SarifFormatter.BASE_URI_ID
-            assert result["locations"][0]["physicalLocation"]["region"]["startLine"] == self.matches[i].linenumber
+            assert (
+                result["locations"][0]["physicalLocation"]["artifactLocation"]["uri"]
+                == self.matches[i].filename
+            )
+            assert (
+                result["locations"][0]["physicalLocation"]["artifactLocation"]["uriBaseId"]
+                == SarifFormatter.BASE_URI_ID
+            )
+            assert (
+                result["locations"][0]["physicalLocation"]["region"]["startLine"]
+                == self.matches[i].linenumber
+            )
             if self.matches[i].column:
-                assert result["locations"][0]["physicalLocation"]["region"]["startColumn"] == self.matches[i].column
+                assert (
+                    result["locations"][0]["physicalLocation"]["region"]["startColumn"]
+                    == self.matches[i].column
+                )
             else:
-                assert "startColumn" not in result["locations"][0]["physicalLocation"]["region"]
+                assert (
+                    "startColumn"
+                    not in result["locations"][0]["physicalLocation"]["region"]
+                )
         assert sarif["runs"][0]["originalUriBaseIds"][SarifFormatter.BASE_URI_ID]["uri"]
 
 

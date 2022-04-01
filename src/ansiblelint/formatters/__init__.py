@@ -213,7 +213,9 @@ class SarifFormatter(BaseFormatter[Any]):
 
     TOOL_NAME = "Ansible-lint"
     TOOL_URL = "https://github.com/ansible/ansible-lint"
-    SARIF_SCHEMA = "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
+    SARIF_SCHEMA = (
+        "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
+    )
     SARIF_SCHEMA_VERSION = "2.1.0"
     BASE_URI_ID = "SRCROOT"
 
@@ -237,16 +239,16 @@ class SarifFormatter(BaseFormatter[Any]):
             }
         }
 
-        runs = [{
-            "tool": tool,
-            "columnKind": "utf16CodeUnits",
-            "results": results,
-            "originalUriBaseIds": {
-                self.BASE_URI_ID: {
-                    "uri": root_path
+        runs = [
+            {
+                "tool": tool,
+                "columnKind": "utf16CodeUnits",
+                "results": results,
+                "originalUriBaseIds": {
+                    self.BASE_URI_ID: {"uri": root_path},
                 },
-            },
-        }]
+            }
+        ]
 
         report = {
             "$schema": self.SARIF_SCHEMA,
@@ -254,9 +256,13 @@ class SarifFormatter(BaseFormatter[Any]):
             "runs": runs,
         }
 
-        return json.dumps(report, default=lambda o: o.__dict__, sort_keys=False, indent=2)
+        return json.dumps(
+            report, default=lambda o: o.__dict__, sort_keys=False, indent=2
+        )
 
-    def _extract_results(self, matches: List["MatchError"]) -> Tuple[List[Any], List[Any]]:
+    def _extract_results(
+        self, matches: List["MatchError"]
+    ) -> Tuple[List[Any], List[Any]]:
         rules = {}
         results = []
         for match in matches:
@@ -278,9 +284,7 @@ class SarifFormatter(BaseFormatter[Any]):
             "help": {
                 "text": str(match.rule.description),
             },
-            "properties": {
-                "tags": match.rule.tags
-            }
+            "properties": {"tags": match.rule.tags}
         }
         if match.rule.link:
             rule["helpUri"] = match.rule.link
@@ -292,20 +296,24 @@ class SarifFormatter(BaseFormatter[Any]):
             "message": {
                 "text": match.details,
             },
-            "locations": [{
-                "physicalLocation": {
-                    "artifactLocation": {
-                        "uri": self._format_path(match.filename or ""),
-                        "uriBaseId": self.BASE_URI_ID,
-                    },
-                    "region": {
-                        "startLine": match.linenumber,
+            "locations": [
+                {
+                    "physicalLocation": {
+                        "artifactLocation": {
+                            "uri": self._format_path(match.filename or ""),
+                            "uriBaseId": self.BASE_URI_ID,
+                        },
+                        "region": {
+                            "startLine": match.linenumber,
+                        }
                     }
                 }
-            }],
+            ],
         }
         if match.column:
-            result["locations"][0]["physicalLocation"]["region"]["startColumn"] = match.column
+            result["locations"][0]["physicalLocation"]["region"][
+                "startColumn"
+            ] = match.column
         return result
 
     @staticmethod

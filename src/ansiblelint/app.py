@@ -60,7 +60,10 @@ class App:
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
 
-        if isinstance(self.formatter, (formatters.CodeclimateJSONFormatter, formatters.SarifFormatter)):
+        if isinstance(
+            self.formatter,
+            (formatters.CodeclimateJSONFormatter, formatters.SarifFormatter)
+        ):
             # If formatter CodeclimateJSONFormatter or SarifFormatter is chosen,
             # then print only the matches in JSON
             console.print(
