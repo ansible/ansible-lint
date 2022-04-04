@@ -211,13 +211,14 @@ class SarifFormatter(BaseFormatter[Any]):
     https://docs.oasis-open.org/sarif/sarif/v2.1.0/
     """
 
+    BASE_URI_ID = "SRCROOT"
     TOOL_NAME = "Ansible-lint"
     TOOL_URL = "https://github.com/ansible/ansible-lint"
+    SARIF_SCHEMA_VERSION = "2.1.0"
+    RULE_DOC_URL = "https://ansible-lint.readthedocs.io/en/latest/default_rules/"
     SARIF_SCHEMA = (
         "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
     )
-    SARIF_SCHEMA_VERSION = "2.1.0"
-    BASE_URI_ID = "SRCROOT"
 
     def format_result(self, matches: List["MatchError"]) -> str:
         """Format a list of match errors as a JSON string."""
@@ -284,6 +285,7 @@ class SarifFormatter(BaseFormatter[Any]):
             "help": {
                 "text": str(match.rule.description),
             },
+            "helpUri": self.RULE_DOC_URL + "#" + match.rule.id,
             "properties": {"tags": match.rule.tags},
         }
         if match.rule.link:
