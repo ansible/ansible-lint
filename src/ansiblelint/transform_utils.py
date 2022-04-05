@@ -466,11 +466,11 @@ class TemplateDumper(NodeVisitor):
             self.visit(item.value)
         self.write("}")
 
-    def _visit_possible_binop(self, node: nodes.Expr) -> None:
-        """Wrap binops in parentheses if needed.
+    def _visit_possible_binary_op(self, node: nodes.Expr) -> None:
+        """Wrap binary_ops in parentheses if needed.
 
-        This is not in _binop so that the outermost
-        binop does not get wrapped in parentheses.
+        This is not in _binary_op so that the outermost
+        binary_op does not get wrapped in parentheses.
         """
         if isinstance(node, nodes.BinExpr):
             self.write("(")
@@ -479,35 +479,35 @@ class TemplateDumper(NodeVisitor):
         else:
             self.visit(node)
 
-    def _binop(self, node: nodes.BinExpr) -> None:
+    def _binary_op(self, node: nodes.BinExpr) -> None:
         """Write a ``BinExpr`` (left and right op) to the stream."""
-        self._visit_possible_binop(node.left)
+        self._visit_possible_binary_op(node.left)
         self.write(f" {node.operator} ")
-        self._visit_possible_binop(node.right)
+        self._visit_possible_binary_op(node.right)
 
-    visit_Add = _binop
-    visit_Sub = _binop
-    visit_Mul = _binop
-    visit_Div = _binop
-    visit_FloorDiv = _binop
-    visit_Pow = _binop
-    visit_Mod = _binop
-    visit_And = _binop
-    visit_Or = _binop
+    visit_Add = _binary_op
+    visit_Sub = _binary_op
+    visit_Mul = _binary_op
+    visit_Div = _binary_op
+    visit_FloorDiv = _binary_op
+    visit_Pow = _binary_op
+    visit_Mod = _binary_op
+    visit_And = _binary_op
+    visit_Or = _binary_op
 
-    def _unop(self, node: nodes.UnaryExpr) -> None:
+    def _unary_op(self, node: nodes.UnaryExpr) -> None:
         """Write an ``UnaryExpr`` (one node with one op) to the stream."""
         self.write(f"{node.operator} ")
-        self._visit_possible_binop(node.node)
+        self._visit_possible_binary_op(node.node)
 
-    visit_Pos = _unop
-    visit_Neg = _unop
+    visit_Pos = _unary_op
+    visit_Neg = _unary_op
 
     def visit_Not(self, node: nodes.Not) -> None:
         """Write a negated expression to the stream."""
         if isinstance(node.node, nodes.Test):
             return self.visit_Test(node.node, negate=True)
-        return self._unop(node)
+        return self._unary_op(node)
 
     def visit_Concat(self, node: nodes.Concat) -> None:
         """Write a string concatenation expression to the stream.
@@ -522,16 +522,18 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Compare(self, node: nodes.Compare) -> None:
         """Write a ``Compare`` operator to the stream."""
-        self._visit_possible_binop(node.expr)
+        self._visit_possible_binary_op(node.expr)
+        # spell-checker:disable
         for op in node.ops:
             # node.ops: List[Operand]
             # op.op: eq, ne, gt, gteq, lt, lteq, in, notin
             self.visit(op)
+        # spell-checker:enable
 
     def visit_Operand(self, node: nodes.Operand) -> None:
         """Write an ``Operand`` to the stream."""
         self.write(f" {operators[node.op]} ")
-        self._visit_possible_binop(node.expr)
+        self._visit_possible_binary_op(node.expr)
 
     def visit_Getattr(self, node: nodes.Getattr) -> None:
         """Write a ``Getattr`` expression to the stream."""
