@@ -31,7 +31,8 @@ def dump(
     return None
 
 
-# pylint: disable=too-many-public-methods
+# Ignore these because they're required by Jinja2's NodeVisitor interface
+# pylint: disable=too-many-public-methods,invalid-name
 class TemplateDumper(NodeVisitor):
     """Dump a jinja2 AST back into a jinja2 template.
 
@@ -57,18 +58,18 @@ class TemplateDumper(NodeVisitor):
 
     # -- Various compilation helpers
 
-    def write(self, x: str) -> None:
+    def write(self, string: str) -> None:
         """Write a string into the output stream."""
-        self.stream.write(x)
-        len_x = len(x)
-        newline_pos = x.rfind("\n")
+        self.stream.write(string)
+        len_string = len(string)
+        newline_pos = string.rfind("\n")
         if newline_pos == -1:
-            self._line_position += len_x
+            self._line_position += len_string
         else:
             # - 1 to exclude the \n
-            self._line_position = len_x - newline_pos - 1
-        self._stream_position += len_x
-        self._line_number += x.count("\n")
+            self._line_position = len_string - newline_pos - 1
+        self._stream_position += len_string
+        self._line_number += string.count("\n")
 
     def write_block_stmt(
         self, *, start: bool = False, name: str = "", end: bool = False
@@ -524,10 +525,10 @@ class TemplateDumper(NodeVisitor):
         """Write a ``Compare`` operator to the stream."""
         self._visit_possible_binary_op(node.expr)
         # spell-checker:disable
-        for op in node.ops:
+        for operand in node.ops:
             # node.ops: List[Operand]
             # op.op: eq, ne, gt, gteq, lt, lteq, in, notin
-            self.visit(op)
+            self.visit(operand)
         # spell-checker:enable
 
     def visit_Operand(self, node: nodes.Operand) -> None:
@@ -647,12 +648,14 @@ class TemplateDumper(NodeVisitor):
     #     """could be added by extensions. like debug block but w/ locals"""
 
     # noinspection PyUnusedLocal
-    def visit_Continue(self, node: nodes.Continue) -> None:
+    def visit_Continue(
+        self, node: nodes.Continue  # pylint: disable=unused-argument
+    ) -> None:
         """Write a ``Continue`` block for the LoopControlExtension to the stream."""
         self.write_block_stmt(start=True, name="continue", end=True)
 
     # noinspection PyUnusedLocal
-    def visit_Break(self, node: nodes.Break) -> None:
+    def visit_Break(self, node: nodes.Break) -> None:  # pylint: disable=unused-argument
         """Write a ``Break`` block for the LoopControlExtension to the stream."""
         self.write_block_stmt(start=True, name="break", end=True)
 
