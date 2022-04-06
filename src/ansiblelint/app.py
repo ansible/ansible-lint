@@ -60,8 +60,11 @@ class App:
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
 
-        if isinstance(self.formatter, formatters.CodeclimateJSONFormatter):
-            # If formatter CodeclimateJSONFormatter is chosen,
+        if isinstance(
+            self.formatter,
+            (formatters.CodeclimateJSONFormatter, formatters.SarifFormatter),
+        ):
+            # If formatter CodeclimateJSONFormatter or SarifFormatter is chosen,
             # then print only the matches in JSON
             console.print(
                 self.formatter.format_result(matches), markup=False, highlight=False
@@ -181,7 +184,7 @@ warn_list:  # or 'skip_list' to silence them completely
         #         v,
         #     )
 
-        if self.options.write and "yaml" in self.options.skip_list:
+        if self.options.write_list and "yaml" in self.options.skip_list:
             _logger.warning(
                 "You specified '--write', but no files can be modified "
                 "because 'yaml' is in 'skip_list'."
@@ -221,6 +224,8 @@ def choose_formatter_factory(
         r = formatters.QuietFormatter
     elif options_list.format in ("json", "codeclimate"):
         r = formatters.CodeclimateJSONFormatter
+    elif options_list.format == "sarif":
+        r = formatters.SarifFormatter
     elif options_list.parseable or options_list.format == "pep8":
         r = formatters.ParseableFormatter
     return r

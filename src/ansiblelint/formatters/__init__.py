@@ -3,11 +3,12 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Generic, List, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, Generic, List, Tuple, TypeVar, Union
 
 import rich
 
 from ansiblelint.config import options
+from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
@@ -201,3 +202,127 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             return "blocker"
         # VERY_LOW, INFO or anything else
         return "info"
+
+
+class SarifFormatter(BaseFormatter[Any]):
+    """Formatter for emitting violations in SARIF report format.
+
+    The spec of SARIF can be found here:
+    https://docs.oasis-open.org/sarif/sarif/v2.1.0/
+    """
+
+    BASE_URI_ID = "SRCROOT"
+    TOOL_NAME = "Ansible-lint"
+    TOOL_URL = "https://github.com/ansible/ansible-lint"
+    SARIF_SCHEMA_VERSION = "2.1.0"
+    RULE_DOC_URL = "https://ansible-lint.readthedocs.io/en/latest/default_rules/"
+    SARIF_SCHEMA = (
+        "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
+    )
+
+    def format_result(self, matches: List["MatchError"]) -> str:
+        """Format a list of match errors as a JSON string."""
+        if not isinstance(matches, list):
+            raise RuntimeError(
+                f"The {self.__class__} was expecting a list of MatchError."
+            )
+
+        root_path = Path(str(self._base_dir)).as_uri()
+        root_path = root_path + "/" if not root_path.endswith("/") else root_path
+        rules, results = self._extract_results(matches)
+
+        tool = {
+            "driver": {
+                "name": self.TOOL_NAME,
+                "version": __version__,
+                "informationUri": self.TOOL_URL,
+                "rules": rules,
+            }
+        }
+
+        runs = [
+            {
+                "tool": tool,
+                "columnKind": "utf16CodeUnits",
+                "results": results,
+                "originalUriBaseIds": {
+                    self.BASE_URI_ID: {"uri": root_path},
+                },
+            }
+        ]
+
+        report = {
+            "$schema": self.SARIF_SCHEMA,
+            "version": self.SARIF_SCHEMA_VERSION,
+            "runs": runs,
+        }
+
+        return json.dumps(
+            report, default=lambda o: o.__dict__, sort_keys=False, indent=2
+        )
+
+    def _extract_results(
+        self, matches: List["MatchError"]
+    ) -> Tuple[List[Any], List[Any]]:
+        rules = {}
+        results = []
+        for match in matches:
+            if match.rule.id not in rules:
+                rules[match.rule.id] = self._to_sarif_rule(match)
+            results.append(self._to_sarif_result(match))
+        return list(rules.values()), results
+
+    def _to_sarif_rule(self, match: "MatchError") -> Dict[str, Any]:
+        rule: Dict[str, Any] = {
+            "id": match.rule.id,
+            "name": match.rule.id,
+            "shortDescription": {
+                "text": self.escape(str(match.message)),
+            },
+            "defaultConfiguration": {
+                "level": self._to_sarif_level(match.rule.severity),
+            },
+            "help": {
+                "text": str(match.rule.description),
+            },
+            "helpUri": self.RULE_DOC_URL + "#" + match.rule.id,
+            "properties": {"tags": match.rule.tags},
+        }
+        if match.rule.link:
+            rule["helpUri"] = match.rule.link
+        return rule
+
+    def _to_sarif_result(self, match: "MatchError") -> Dict[str, Any]:
+        result: Dict[str, Any] = {
+            "ruleId": match.rule.id,
+            "message": {
+                "text": match.details,
+            },
+            "locations": [
+                {
+                    "physicalLocation": {
+                        "artifactLocation": {
+                            "uri": self._format_path(match.filename or ""),
+                            "uriBaseId": self.BASE_URI_ID,
+                        },
+                        "region": {
+                            "startLine": match.linenumber,
+                        },
+                    },
+                },
+            ],
+        }
+        if match.column:
+            result["locations"][0]["physicalLocation"]["region"][
+                "startColumn"
+            ] = match.column
+        return result
+
+    @staticmethod
+    def _to_sarif_level(severity: str) -> str:
+        if severity in ["VERY_HIGH", "HIGH", "MEDIUM"]:
+            return "error"
+        if severity in ["LOW"]:
+            return "warning"
+        # VERY_LOW, INFO or anything else
+        return "note"

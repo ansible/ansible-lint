@@ -51,6 +51,59 @@ def test_ensure_config_are_equal(
         assert val == getattr(options, key)
 
 
+@pytest.mark.parametrize(
+    ("with_base", "args", "config"),
+    (
+        (True, ["--write"], "test/fixtures/config-with-write-all.yml"),
+        (True, ["--write=all"], "test/fixtures/config-with-write-all.yml"),
+        (True, ["--write", "all"], "test/fixtures/config-with-write-all.yml"),
+        (True, ["--write=none"], "test/fixtures/config-with-write-none.yml"),
+        (True, ["--write", "none"], "test/fixtures/config-with-write-none.yml"),
+        (
+            True,
+            ["--write=rule-tag,rule-id"],
+            "test/fixtures/config-with-write-subset.yml",
+        ),
+        (
+            True,
+            ["--write", "rule-tag,rule-id"],
+            "test/fixtures/config-with-write-subset.yml",
+        ),
+        (
+            True,
+            ["--write", "rule-tag", "--write", "rule-id"],
+            "test/fixtures/config-with-write-subset.yml",
+        ),
+        (
+            False,
+            ["--write", "examples/playbooks/example.yml"],
+            "test/fixtures/config-with-write-all.yml",
+        ),
+        (
+            False,
+            ["--write", "examples/playbooks/example.yml", "non-existent.yml"],
+            "test/fixtures/config-with-write-all.yml",
+        ),
+    ),
+)
+def test_ensure_write_cli_does_not_consume_lintables(
+    base_arguments: List[str], with_base: bool, args: List[str], config: str
+) -> None:
+    """Check equality of the CLI --write options to config files."""
+    cli_parser = cli.get_cli_parser()
+
+    command = base_arguments + args if with_base else args
+    options = cli_parser.parse_args(command)
+    file_config = cli.load_config(config)
+
+    file_value = file_config.get("write_list")
+    orig_cli_value = getattr(options, "write_list")
+    cli_value = cli.WriteArgAction.merge_write_list_config(
+        from_file=[], from_cli=orig_cli_value
+    )
+    assert file_value == cli_value
+
+
 def test_config_can_be_overridden(base_arguments: List[str]) -> None:
     """Check that config can be overridden from CLI."""
     no_override = cli.get_config(base_arguments + ["-t", "bad_tag"])
