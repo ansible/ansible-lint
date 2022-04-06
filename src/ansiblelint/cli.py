@@ -224,7 +224,16 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-f",
         dest="format",
         default="rich",
-        choices=["rich", "plain", "rst", "json", "codeclimate", "quiet", "pep8"],
+        choices=[
+            "rich",
+            "plain",
+            "rst",
+            "json",
+            "codeclimate",
+            "quiet",
+            "pep8",
+            "sarif",
+        ],
         help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
     parser.add_argument(
