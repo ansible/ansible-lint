@@ -188,7 +188,7 @@ def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
         try:
             playbook_ds = parse_yaml_from_file(str(lintable.path))
         except AnsibleError as exc:
-            raise SystemExit from exc
+            raise SystemExit(exc) from exc
     results = []
     basedir = os.path.dirname(str(lintable.path))
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
