@@ -69,6 +69,17 @@ class RunFromText:
         shutil.rmtree(role_path)
         return results
 
+    def run_role_defaults_main(self, defaults_main_text: str) -> List[MatchError]:
+        """Lints received text as vars file in defaults."""
+        role_path = tempfile.mkdtemp(prefix="role_")
+        defaults_path = os.path.join(role_path, "defaults")
+        os.makedirs(defaults_path)
+        with open(os.path.join(defaults_path, "main.yml"), "w", encoding="utf-8") as fh:
+            fh.write(defaults_main_text)
+        results = self._call_runner(role_path)
+        shutil.rmtree(role_path)
+        return results
+
 
 def run_ansible_lint(
     *argv: str,
