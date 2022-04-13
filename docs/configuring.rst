@@ -11,7 +11,9 @@ Configuration File
 ------------------
 
 Ansible-lint supports local configuration via a ``.ansible-lint`` or
-``.config/ansible-lint.yml`` configuration files. Ansible-lint checks the
+``.config/ansible-lint`` configuration file. It will also look for these files
+with ``.yml`` or ``.yaml`` extensions. The canonical location is
+``.config/ansible-lint.yml``. Ansible-lint checks the
 working directory for the presence of this file and applies any configuration
 found there. The configuration file location can also be overridden via the
 ``-c path/to/file`` CLI flag.
