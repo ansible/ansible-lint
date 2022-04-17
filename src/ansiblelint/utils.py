@@ -898,37 +898,6 @@ def nested_items(
                 yield k, v, returned_parent
 
 
-def add_block_matcherror_to_matches(
-    file: Lintable,
-    block: Dict[str, Any],
-    matchtask: Callable[[Dict[str, Any], Optional[Lintable]], Union[bool, str]],
-    create_matcherror: Callable[
-        [Optional[str], int, str, Union[str, Lintable, None], str], MatchError
-    ],
-    matches: List[MatchError],
-) -> None:
-    """Evaluate blocks in a playbook and add matcherrors of them to matches."""
-    block_result = matchtask(block, file)
-    if not block_result:
-        return
-
-    message = None
-    if isinstance(block_result, str):
-        message = block_result
-
-    block_msg = "Block: " + task_to_str(block)
-    match = create_matcherror(
-        message,
-        block[LINE_NUMBER_KEY],
-        block_msg,
-        file,
-        "",
-    )
-    match.task = block
-    if isinstance(match, MatchError):
-        matches.append(match)
-
-
 def include_nested_task_key(task: Dict[str, Any]) -> bool:
     """Check if task include block/always/rescue."""
     include_key = False

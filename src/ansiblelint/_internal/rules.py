@@ -26,7 +26,6 @@ class BaseRule:
     link: str = ""
     has_dynamic_tags: bool = False
     needs_raw_task: bool = False
-    needs_block: bool = False
 
     @property
     def shortdesc(self) -> str:

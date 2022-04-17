@@ -38,9 +38,6 @@ from ansiblelint.config import get_rule_config
 from ansiblelint.config import options as default_options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
-from ansiblelint.skip_utils import (
-    _get_task_blocks_from_playbook,  # pylint: disable=protected-access
-)
 
 _logger = logging.getLogger(__name__)
 
