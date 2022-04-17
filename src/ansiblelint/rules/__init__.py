@@ -180,15 +180,6 @@ class AnsibleLintRule(BaseRule):
             match.task = task
             matches.append(match)
 
-        # If playbook contains blocks in pre_tasks/tasks/post_tasks
-        if self.needs_block and file.kind == "playbook":
-            data = ansiblelint.utils.parse_yaml_linenumbers(file)
-            block_list = _get_task_blocks_from_playbook(data)
-            for block in block_list:
-                ansiblelint.utils.add_block_matcherror_to_matches(
-                    file, block, self.matchtask, self.create_matcherror, matches
-                )
-
         return matches
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
