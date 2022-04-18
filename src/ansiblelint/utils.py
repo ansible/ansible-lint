@@ -537,7 +537,7 @@ def _extract_ansible_parsed_keys_from_task(task: Dict[str, Any]) -> Dict[str, An
 def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
     if is_nested_task(task):
-        result = _get_dict_with_existing_key(task)
+        result = _extract_ansible_parsed_keys_from_task(task)
         # Add dummy action for block/always/rescue statements
         result["action"] = dict(
             __ansible_module__="block/always/rescue",
