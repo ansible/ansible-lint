@@ -44,7 +44,6 @@ class VariableNamingRule(AnsibleLintRule):
     tags = ["idiom", "experimental"]
     version_added = "v5.0.10"
     re_pattern = re.compile(options.var_naming_pattern or "^[a-z_][a-z0-9_]*$")
-    needs_block = True
 
     def is_invalid_variable_name(self, ident: str) -> bool:
         """Check if variable name is using right pattern."""
