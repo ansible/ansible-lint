@@ -536,7 +536,7 @@ def _get_dict_with_existing_key(task: Dict[str, Any]) -> Dict[str, Any]:
 
 def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
-    if include_nested_task_key(task):
+    if is_nested_task(task):
         result = _get_dict_with_existing_key(task)
         # Add dummy action for block/always/rescue statements
         result["action"] = dict(
