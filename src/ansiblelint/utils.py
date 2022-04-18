@@ -521,25 +521,29 @@ def _sanitize_task(task: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
-def _extract_ansible_parsed_keys_from_task(task: Dict[str, Any]) -> Dict[str, Any]:
+def _extract_ansible_parsed_keys_from_task(
+    result: Dict[str, Any],
+    task: Dict[str, Any],
+    keys: Tuple[str, ...],
+    action: Optional[str] = None,
+) -> Dict[str, Any]:
     """Return a dict with existing key in task."""
-    result = {}
     for (k, v) in list(task.items()):
-        if k in ("action", "local_action", "args", "delegate_to"):
+        if k in keys or k == action:
             # we don't want to re-assign these values, which were
             # determined by the ModuleArgsParser() above
             continue
         result[k] = v
-
     return result
 
 
 def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
-    result = {}
+    result: Dict[str, Any] = {}
+    ansible_parsed_keys = ("action", "local_action", "args", "delegate_to")
 
     if is_nested_task(task):
-        result = _extract_ansible_parsed_keys_from_task(task)
+        _extract_ansible_parsed_keys_from_task(result, task, ansible_parsed_keys)
         # Add dummy action for block/always/rescue statements
         result["action"] = dict(
             __ansible_module__="block/always/rescue",
@@ -569,12 +573,7 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         action = "shell"
         del arguments["_uses_shell"]
 
-    for (k, v) in list(task.items()):
-        if k in ("action", "local_action", "args", "delegate_to") or k == action:
-            # we don't want to re-assign these values, which were
-            # determined by the ModuleArgsParser() above
-            continue
-        result[k] = v
+    _extract_ansible_parsed_keys_from_task(result, task, ansible_parsed_keys, action)
 
     if not isinstance(action, str):
         raise RuntimeError(f"Task actions can only be strings, got {action}")
