@@ -23,7 +23,7 @@
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import include_nested_task_key
+from ansiblelint.utils import is_nested_task
 
 if TYPE_CHECKING:
     from typing import Optional
