@@ -47,4 +47,4 @@ class TaskHasNameRule(AnsibleLintRule):
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         # Ignore nonamed block/always/rescue
-        return not (task.get("name") or include_nested_task_key(task))
+        return not (task.get("name") or is_nested_task(task))
