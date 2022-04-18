@@ -176,7 +176,6 @@ class AnsibleLintRule(BaseRule):
             )
             match.task = task
             matches.append(match)
-
         return matches
 
     def matchyaml(self, file: Lintable) -> List[MatchError]:
