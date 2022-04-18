@@ -521,7 +521,7 @@ def _sanitize_task(task: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
-def _get_dict_with_existing_key(task: Dict[str, Any]) -> Dict[str, Any]:
+def _extract_ansible_parsed_keys_from_task(task: Dict[str, Any]) -> Dict[str, Any]:
     """Return a dict with existing key in task."""
     result = {}
     for (k, v) in list(task.items()):
