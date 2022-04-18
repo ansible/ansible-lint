@@ -900,9 +900,8 @@ def nested_items(
 
 def include_nested_task_key(task: Dict[str, Any]) -> bool:
     """Check if task include block/always/rescue."""
-    include_key = False
     for key in NESTED_TASK_KEYS:
         if task.get(key):
-            include_key = True
+            return True
 
-    return include_key
+    return False
