@@ -898,8 +898,8 @@ def nested_items(
                 yield k, v, returned_parent
 
 
-def include_nested_task_key(task: Dict[str, Any]) -> bool:
-    """Check if task include block/always/rescue."""
+def is_nested_task(task: Dict[str, Any]) -> bool:
+    """Check if task includes block/always/rescue."""
     for key in NESTED_TASK_KEYS:
         if task.get(key):
             return True
