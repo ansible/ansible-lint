@@ -536,6 +536,8 @@ def _extract_ansible_parsed_keys_from_task(task: Dict[str, Any]) -> Dict[str, An
 
 def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
+    result = {}
+
     if is_nested_task(task):
         result = _extract_ansible_parsed_keys_from_task(task)
         # Add dummy action for block/always/rescue statements
@@ -543,61 +545,60 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
             __ansible_module__="block/always/rescue",
             __ansible_module_original__="block/always/rescue",
         )
-    else:
-        result = {}
-        sanitized_task = _sanitize_task(task)
-        mod_arg_parser = ModuleArgsParser(sanitized_task)
 
-        try:
-            action, arguments, result["delegate_to"] = mod_arg_parser.parse(
-                skip_action_validation=options.skip_action_validation
-            )
-        except AnsibleParserError as exc:
-            # pylint: disable=raise-missing-from
-            raise MatchError(
-                rule=AnsibleParserErrorRule(),
-                message=exc.message,
-                filename=task.get(FILENAME_KEY, "Unknown"),
-                linenumber=task.get(LINE_NUMBER_KEY, 0),
-            )
+        return result
 
-        # denormalize shell -> command conversion
-        if "_uses_shell" in arguments:
-            action = "shell"
-            del arguments["_uses_shell"]
+    sanitized_task = _sanitize_task(task)
+    mod_arg_parser = ModuleArgsParser(sanitized_task)
 
-        for (k, v) in list(task.items()):
-            if k in ("action", "local_action", "args", "delegate_to") or k == action:
-                # we don't want to re-assign these values, which were
-                # determined by the ModuleArgsParser() above
-                continue
-            result[k] = v
-
-        if not isinstance(action, str):
-            raise RuntimeError(f"Task actions can only be strings, got {action}")
-        action_unnormalized = action
-        # convert builtin fqn calls to short forms because most rules know only
-        # about short calls but in the future we may switch the normalization to do
-        # the opposite. Mainly we currently consider normalized the module listing
-        # used by `ansible-doc -t module -l 2>/dev/null`
-        action = removeprefix(action, "ansible.builtin.")
-        result["action"] = dict(
-            __ansible_module__=action, __ansible_module_original__=action_unnormalized
+    try:
+        action, arguments, result["delegate_to"] = mod_arg_parser.parse(
+            skip_action_validation=options.skip_action_validation
+        )
+    except AnsibleParserError as exc:
+        # pylint: disable=raise-missing-from
+        raise MatchError(
+            rule=AnsibleParserErrorRule(),
+            message=exc.message,
+            filename=task.get(FILENAME_KEY, "Unknown"),
+            linenumber=task.get(LINE_NUMBER_KEY, 0),
         )
 
-        if "_raw_params" in arguments:
-            result["action"]["__ansible_arguments__"] = arguments["_raw_params"].split(
-                " "
-            )
-            del arguments["_raw_params"]
-        else:
-            result["action"]["__ansible_arguments__"] = []
+    # denormalize shell -> command conversion
+    if "_uses_shell" in arguments:
+        action = "shell"
+        del arguments["_uses_shell"]
 
-        if "argv" in arguments and not result["action"]["__ansible_arguments__"]:
-            result["action"]["__ansible_arguments__"] = arguments["argv"]
-            del arguments["argv"]
+    for (k, v) in list(task.items()):
+        if k in ("action", "local_action", "args", "delegate_to") or k == action:
+            # we don't want to re-assign these values, which were
+            # determined by the ModuleArgsParser() above
+            continue
+        result[k] = v
 
-        result["action"].update(arguments)
+    if not isinstance(action, str):
+        raise RuntimeError(f"Task actions can only be strings, got {action}")
+    action_unnormalized = action
+    # convert builtin fqn calls to short forms because most rules know only
+    # about short calls but in the future we may switch the normalization to do
+    # the opposite. Mainly we currently consider normalized the module listing
+    # used by `ansible-doc -t module -l 2>/dev/null`
+    action = removeprefix(action, "ansible.builtin.")
+    result["action"] = dict(
+        __ansible_module__=action, __ansible_module_original__=action_unnormalized
+    )
+
+    if "_raw_params" in arguments:
+        result["action"]["__ansible_arguments__"] = arguments["_raw_params"].split(" ")
+        del arguments["_raw_params"]
+    else:
+        result["action"]["__ansible_arguments__"] = []
+
+    if "argv" in arguments and not result["action"]["__ansible_arguments__"]:
+        result["action"]["__ansible_arguments__"] = arguments["argv"]
+        del arguments["argv"]
+
+    result["action"].update(arguments)
     return result
 
 
