@@ -34,6 +34,12 @@ Ansible teams.
 
 .. toctree::
    :maxdepth: 3
+   :caption: Philosophy
+
+   philosophy
+
+.. toctree::
+   :maxdepth: 3
    :caption: Installing
 
    installing
