@@ -572,7 +572,9 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         action = "shell"
         del arguments["_uses_shell"]
 
-    _extract_ansible_parsed_keys_from_task(result, task, ansible_parsed_keys + (action,))
+    _extract_ansible_parsed_keys_from_task(
+        result, task, ansible_parsed_keys + (action,)
+    )
 
     if not isinstance(action, str):
         raise RuntimeError(f"Task actions can only be strings, got {action}")
