@@ -528,7 +528,7 @@ def _extract_ansible_parsed_keys_from_task(
 ) -> Dict[str, Any]:
     """Return a dict with existing key in task."""
     for (k, v) in list(task.items()):
-        if k in keys or k == action:
+        if k in keys:
             # we don't want to re-assign these values, which were
             # determined by the ModuleArgsParser() above
             continue
