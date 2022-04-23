@@ -525,7 +525,6 @@ def _extract_ansible_parsed_keys_from_task(
     result: Dict[str, Any],
     task: Dict[str, Any],
     keys: Tuple[str, ...],
-    action: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Return a dict with existing key in task."""
     for (k, v) in list(task.items()):
