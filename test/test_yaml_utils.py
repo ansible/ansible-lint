@@ -7,6 +7,7 @@ import pytest
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ruamel.yaml.emitter import Emitter
 from ruamel.yaml.main import YAML
+from yamllint.linter import run as run_yamllint
 
 import ansiblelint.yaml_utils
 from ansiblelint.file_utils import Lintable
@@ -247,6 +248,11 @@ def test_formatted_yaml_loader_dumper(
     #
     # Instead, `pytest --regenerate-formatting-fixtures` will fail if prettier would
     # change any files in test/fixtures/formatting-after
+
+    # Running our files through yamllint, after we reformatted them,
+    # should not yield any problems.
+    config = ansiblelint.yaml_utils.load_yamllint_config()
+    assert not list(run_yamllint(after_content, config))
 
 
 @pytest.fixture(name="lintable")
