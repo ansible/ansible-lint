@@ -13,6 +13,7 @@ import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
+from ansiblelint.logger import timed_info
 from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
@@ -115,47 +116,56 @@ class Runner:
                 _logger.debug("Excluded %s", lintable)
                 self.lintables.remove(lintable)
 
-        # -- phase 1 : syntax check in parallel --
-        def worker(lintable: Lintable) -> List[MatchError]:
-            # pylint: disable=protected-access
-            return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+        with timed_info("Phase 1"):
+            # -- phase 1 : syntax check in parallel --
+            def worker(lintables: List[Lintable]) -> List[MatchError]:
+                # pylint: disable=protected-access
+                return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(
+                    lintables
+                )
 
-        # playbooks: List[Lintable] = []
-        for lintable in self.lintables:
-            if lintable.kind != "playbook":
-                continue
-            files.append(lintable)
-
-        pool = multiprocessing.pool.ThreadPool(processes=multiprocessing.cpu_count())
-        return_list = pool.map(worker, files, chunksize=1)
-        pool.close()
-        pool.join()
-        for data in return_list:
-            matches.extend(data)
-
-        # -- phase 2 ---
-        if not matches:
-
-            # do our processing only when ansible syntax check passed in order
-            # to avoid causing runtime exceptions. Our processing is not as
-            # resilient to be able process garbage.
-            matches.extend(self._emit_matches(files))
-
-            # remove duplicates from files list
-            files = [value for n, value in enumerate(files) if value not in files[:n]]
-
-            for file in self.lintables:
-                if file in self.checked_files or not file.kind:
+            # playbooks: List[Lintable] = []
+            for lintable in self.lintables:
+                if lintable.kind != "playbook":
                     continue
-                _logger.debug(
-                    "Examining %s of type %s",
-                    ansiblelint.file_utils.normpath(file.path),
-                    file.kind,
-                )
+                files.append(lintable)
 
-                matches.extend(
-                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list)
-                )
+            pool = multiprocessing.pool.ThreadPool(
+                processes=multiprocessing.cpu_count()
+            )
+            return_list = pool.map(worker, chunks(files), chunksize=1)
+            pool.close()
+            pool.join()
+            for data in return_list:
+                matches.extend(data)
+
+        with timed_info("Phase 2"):
+            if not matches:
+
+                # do our processing only when ansible syntax check passed in order
+                # to avoid causing runtime exceptions. Our processing is not as
+                # resilient to be able process garbage.
+                matches.extend(self._emit_matches(files))
+
+                # remove duplicates from files list
+                files = [
+                    value for n, value in enumerate(files) if value not in files[:n]
+                ]
+
+                for file in self.lintables:
+                    if file in self.checked_files or not file.kind:
+                        continue
+                    _logger.debug(
+                        "Examining %s of type %s",
+                        ansiblelint.file_utils.normpath(file.path),
+                        file.kind,
+                    )
+
+                    matches.extend(
+                        self.rules.run(
+                            file, tags=set(self.tags), skip_list=self.skip_list
+                        )
+                    )
 
         # update list of checked files
         self.checked_files.update(self.lintables)
@@ -218,3 +228,10 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
                 break
 
     return LintResult(matches=matches, files=checked_files)
+
+
+def chunks(lst: List[Lintable]) -> Generator[List[Lintable], None, None]:
+    """Yield successive n-sized chunks from lst."""
+    chunk_size = int(len(lst) / multiprocessing.cpu_count()) or 1
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i : i + chunk_size]
