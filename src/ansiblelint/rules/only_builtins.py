@@ -44,12 +44,10 @@ if "pytest" in sys.modules:
     FAIL_PLAY = """
 - hosts: localhost
   tasks:
-  - name: fake_namespace.fake_collection.fake_module
-    community.general.ini_file:
-      path: /etc/conf
-      section: drinks
-      option: fav
-      value: lemonade
+  - name: sysctl
+    ansible.posix.sysctl:
+      name: vm.swappiness
+      value: '5'
     """
 
     @pytest.mark.parametrize(
