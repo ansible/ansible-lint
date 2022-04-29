@@ -59,7 +59,7 @@ class Formatter(BaseFormatter):  # type: ignore
         _id = getattr(match.rule, "id", "000")
         result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
         if match.tag:
-            result += f" [dim][error_code]({match.tag})[/][/]"
+            result += f" [dim][error_code]({self.escape(match.tag)})[/][/]"
         result += (
             "\n"
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
@@ -90,10 +90,10 @@ class ParseableFormatter(BaseFormatter[Any]):
         )
 
         if not options.quiet:
-            result += f" [dim]{match.message}[/]"
+            result += f": [dim]{match.message}[/]"
 
         if match.tag:
-            result += f" [dim][error_code]({match.tag})[/][/]"
+            result += f" [dim][error_code]({self.escape(match.tag)})[/][/]"
         return result
 
 

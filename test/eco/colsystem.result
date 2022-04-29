@@ -13,7 +13,7 @@ warn_list:  # or 'skip_list' to silence them completely
 
 
 STDOUT:
-.ansible-lint:1: load-failure [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (filenotfounderror)
-playbooks/molecule/sudo/molecule.yml:17: yaml line too long (576 > 160 characters) (line-length)
-roles/firewalld/defaults/main.yml:11: yaml missing starting space in comment (comments)
-roles/firewalld/defaults/main.yml:28: yaml missing starting space in comment (comments)
+.ansible-lint:1: load-failure: [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (filenotfounderror)
+playbooks/molecule/sudo/molecule.yml:17: yaml: line too long (576 > 160 characters) (line-length)
+roles/firewalld/defaults/main.yml:11: yaml: missing starting space in comment (comments)
+roles/firewalld/defaults/main.yml:28: yaml: missing starting space in comment (comments)
