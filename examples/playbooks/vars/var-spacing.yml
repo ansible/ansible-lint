@@ -1,0 +1,36 @@
+---
+# Should raise var-spacing at line [12, 13, 14, 27, 33], at following variables.
+# ".bad_var_1", ".bad_var_2", ".bad_var_3", ".invalid_multiline_nested_json", ".invalid_nested_json"
+good_var_1: "{{ good_format }}"
+good_var_2: "Value: {{ good_format }}"
+jinja_escape_1: "{{ '{{' }}"
+jinja_escape_2: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
+jinja_whitespace_control: |
+  {{ good_format }}/
+  {{- good_format }}
+  {{- good_format -}}
+bad_var_1: "{{bad_format}}"
+bad_var_2: "Value: {{ bad_format}}"
+bad_var_3: "{{bad_format }}"
+# spell-checker: disable-next-line
+non_jinja_var: "data = ${lookup{$local_part}lsearch{/etc/aliases}}" # noqa: var-spacing
+json_inside_jinja: "{{ {'test': {'subtest': variable}} }}"
+multiline_vars: # Assert that no false positive on multiline exists
+  cases:
+    case1: >-
+      http://example.com/{{
+        case1 }}
+    case2: >-
+      http://example.com/{{
+      case2 }}
+valid_nested_json: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1) }}"
+invalid_nested_json: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1)}}"
+
+valid_multiline_nested_json: >-
+  {{ {'dummy_2': {'nested_dummy_1': value_1,
+                  'nested_dummy_2': value_2}} |
+  combine(dummy_1) }}
+invalid_multiline_nested_json: >-
+  {{ {'dummy_2': {'nested_dummy_1': value_1,
+                  'nested_dummy_2': value_2}} |
+  combine(dummy_1)}}
