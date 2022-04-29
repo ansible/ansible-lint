@@ -10,7 +10,6 @@ You can skip specific rules or tags by adding them to your configuration file:
 warn_list:  # or 'skip_list' to silence them completely
   - var-spacing  # Variables should have spaces before and after: {{ var_name }}.
 
-Finished with 2 failure(s), 0 warning(s) on 4872 files.
 
 
 STDOUT:

@@ -10,7 +10,6 @@ warn_list:  # or 'skip_list' to silence them completely
   - load-failure  # Failed to load or parse file.
   - yaml  # Violations reported by yamllint.
 
-Finished with 4 failure(s), 0 warning(s) on 330 files.
 
 
 STDOUT:
