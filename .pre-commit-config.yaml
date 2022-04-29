@@ -10,8 +10,6 @@ ci:
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
-    - pip-compile-docs
-    - pip-compile-docs-upgrade
     - pip-compile-upgrade
 default_language_version:
   python: python3.9
@@ -162,29 +160,15 @@ repos:
     hooks:
       - id: pip-compile
         name: pip-compile
-        entry: python3.9 -m piptools compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra test --strip-extras
+        entry: python3.9 -m piptools compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras
         language: system
         files: ^(setup\.cfg|=constraints\.txt)$
-        pass_filenames: false
-        stages: [manual]
-      - id: pip-compile-docs
-        name: pip-compile-docs
-        entry: python3.9 -m piptools compile -q --no-annotate --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
-        language: system
-        files: ^(docs\/requirements\.(txt|in)|)$
         pass_filenames: false
         stages: [manual]
       - id: pip-compile-upgrade
         name: pip-compile-upgrade
-        entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=requirements.txt setup.cfg --extra test --strip-extras
+        entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras
         language: system
         files: ^(setup\.cfg|=constraints\.txt)$
-        pass_filenames: false
-        stages: [manual]
-      - id: pip-compile-docs-upgrade
-        name: pip-compile-docs-upgrade
-        entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=docs/requirements.txt --strip-extras docs/requirements.in setup.cfg
-        language: system
-        files: ^(docs\/requirements\.(txt|in)|)$
         pass_filenames: false
         stages: [manual]
