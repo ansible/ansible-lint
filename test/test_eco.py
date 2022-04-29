@@ -1,6 +1,7 @@
 """Test a set of 3rd party Ansible repositories for possible regressions."""
 import os
 import pathlib
+import re
 import shlex
 import subprocess
 
@@ -59,14 +60,19 @@ def test_eco(repo: str) -> None:
         cwd=f"{cache_dir}/{repo}",
     )
 
-    def rel_home(text: str) -> str:
-        """Replace full path to home directory with ~."""
-        return text.replace(os.path.expanduser("~"), "~")
+    def sanitize_output(text: str) -> str:
+        """Make the output less likely to vary between runs or minor changes."""
+        # replace full path to home directory with ~.
+        result = text.replace(os.path.expanduser("~"), "~")
+        # removes summary line it can change too often on active repositories.
+        result = re.sub(r"^Finished with .+\n", "", result, flags=re.MULTILINE)
+
+        return result
 
     result_txt = f"CMD: {shlex.join(result.args)}\n\nRC: {result.returncode}\n\nSTDERR:\n{result.stderr}\n\nSTDOUT:\n{result.stdout}"
 
     with open(f"{my_dir}/{repo}.result", "w", encoding="utf-8") as f:
-        f.write(rel_home(result_txt))
+        f.write(sanitize_output(result_txt))
     # fail if result is different than our expected one:
     result = subprocess.run(
         f"git diff --exit-code test/eco/{repo}.result",

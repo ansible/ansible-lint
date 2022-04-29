@@ -33,9 +33,13 @@ build:
 # Optionally set the version of Python and requirements required
 # to build docs
 python:
-  version: 3.8
+  version: "3.8"
   install:
+    # On https://readthedocs.org/dashboard/ansible-lint/environmentvariables/ we
+    # do have PIP_CONSTRAINTS=requirements.txt which ensures we install only
+    # pinned requirements that that we know to be working.
     - method: pip
       path: .
-    - requirements: docs/requirements.txt
+      extra_requirements:
+        - docs
   system_packages: false

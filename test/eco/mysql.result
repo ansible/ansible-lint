@@ -10,7 +10,6 @@ You can skip specific rules or tags by adding them to your configuration file:
 warn_list:  # or 'skip_list' to silence them completely
   - internal-error  # Unexpected internal error.
 
-Finished with 1 failure(s), 0 warning(s) on 28 files.
 
 
 STDOUT:
