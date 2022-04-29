@@ -863,6 +863,7 @@ class FormattedYAML(YAML):
                 # rule disabled
                 continue
 
+            # refactor this if ... elif ... elif ... else monstrosity using match/case (PEP 634) once python 3.10 is mandatory
             if rule == "document-start":
                 config["explicit_start"] = rule_config["present"]
             elif rule == "document-end":
