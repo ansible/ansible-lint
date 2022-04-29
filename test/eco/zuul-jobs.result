@@ -18,7 +18,7 @@ warn_list:  # or 'skip_list' to silence them completely
   - experimental  # all rules tagged as experimental
   - no-loop-var-prefix  # Role loop_var should use configured prefix.
 
-Finished with 1 failure(s), 15 warning(s) on 1242 files.
+Finished with 1 failure(s), 15 warning(s) on 1258 files.
 
 
 STDOUT:
