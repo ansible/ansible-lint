@@ -28,10 +28,12 @@ def test_base_formatter_when_base_dir(
     output_path = base_formatter._format_path(path)  # pylint: disable=protected-access
 
     # Then
-    assert isinstance(output_path, str)
+    assert isinstance(output_path, (str, Path))
     # pylint: disable=protected-access
-    assert base_formatter._base_dir is None or isinstance(base_formatter._base_dir, str)
-    assert output_path == str(path)
+    assert base_formatter._base_dir is None or isinstance(
+        base_formatter._base_dir, (str, Path)
+    )
+    assert output_path == path
 
 
 @pytest.mark.parametrize(
@@ -54,9 +56,9 @@ def test_base_formatter_when_base_dir_is_given_and_relative_is_true(
     output_path = base_formatter._format_path(path)
 
     # Then
-    assert isinstance(output_path, str)
+    assert isinstance(output_path, (str, Path))
     # pylint: disable=protected-access
-    assert isinstance(base_formatter._base_dir, str)
+    assert isinstance(base_formatter._base_dir, (str, Path))
     assert output_path == Path(path).name
 
 
