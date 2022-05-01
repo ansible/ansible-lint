@@ -165,6 +165,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
             "roles/foo/molecule/scenario3/collections.yml",
             "requirements",
         ),  # requirements
+        ("roles/foo/meta/argument_specs.yml", "arg_specs"),  # role argument specs
         # tasks files:
         ("tasks/directory with spaces/main.yml", "tasks"),  # tasks
         ("tasks/requirements.yml", "tasks"),  # tasks

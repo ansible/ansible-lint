@@ -22,6 +22,7 @@ DEFAULT_KINDS = [
     {"handlers": "**/handlers/*.{yaml,yml}"},
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
     {"meta": "**/meta/main.{yaml,yml}"},
+    {"arg_specs": "**/roles/**/meta/argument_specs.{yaml,yml}"},  # role argument specs
     {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
     {
         "requirements": "**/molecule/*/{collections,requirements}.{yaml,yml}"
