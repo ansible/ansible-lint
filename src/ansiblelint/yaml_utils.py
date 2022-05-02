@@ -59,6 +59,11 @@ rules:
   # you can easily change it or disable in your .yamllint file.
   line-length:
     max: 160
+  # We are adding an extra space inside braces as that's how prettier does it
+  # and we are trying not to fight other linters.
+  braces:
+    min-spaces-inside: 0  # yamllint defaults to 0
+    max-spaces-inside: 1  # yamllint defaults to 0
 """
 
 
@@ -532,6 +537,9 @@ class FormattedEmitter(Emitter):
 
     preferred_quote = '"'  # either " or '
 
+    min_spaces_inside = 0
+    max_spaces_inside = 1
+
     _sequence_indent = 2
     _sequence_dash_offset = 0  # Should be _sequence_indent - 2
     _root_is_sequence = False
@@ -592,13 +600,20 @@ class FormattedEmitter(Emitter):
         indention: bool = False,  # (sic) ruamel.yaml has this typo in their API
     ) -> None:
         """Make sure that flow maps get whitespace by the curly braces."""
+        # We try to go with one whitespace by the curly braces and adjust accordingly
+        # to what min_spaces_inside and max_spaces_inside are set to.
+        # This assumes min_spaces_inside <= max_spaces_inside
+        spaces_inside = min(
+            max(1, self.min_spaces_inside),
+            self.max_spaces_inside if self.max_spaces_inside != -1 else 1,
+        )
         # If this is the end of the flow mapping that isn't on a new line:
         if (
             indicator == "}"
             and (self.column or 0) > (self.indent or 0)
             and not self._in_empty_flow_map
         ):
-            indicator = " }"
+            indicator = (" " * spaces_inside) + "}"
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
@@ -607,7 +622,7 @@ class FormattedEmitter(Emitter):
                 self._in_empty_flow_map = True
             else:
                 self.column += 1
-                self.stream.write(" ")
+                self.stream.write(" " * spaces_inside)
                 self._in_empty_flow_map = False
 
     # "/n/n" results in one blank line (end the previous line, then newline).
@@ -786,6 +801,9 @@ class FormattedYAML(YAML):
         indent_sequences: bool = cast(bool, config["indent_sequences"])
         preferred_quote: str = cast(str, config["preferred_quote"])  # either ' or "
 
+        min_spaces_inside: int = cast(int, config["min_spaces_inside"])
+        max_spaces_inside: int = cast(int, config["max_spaces_inside"])
+
         self.default_flow_style = False
         self.compact_seq_seq = True  # type: ignore[assignment] # dash after dash
         self.compact_seq_map = True  # type: ignore[assignment] # key after dash
@@ -803,6 +821,10 @@ class FormattedYAML(YAML):
             FormattedEmitter.preferred_quote = preferred_quote
         # NB: default_style affects preferred_quote as well.
         # self.default_style ∈ None (default), '', '"', "'", '|', '>'
+
+        # spaces inside braces for flow mappings
+        FormattedEmitter.min_spaces_inside = min_spaces_inside
+        FormattedEmitter.max_spaces_inside = max_spaces_inside
 
         # We need a custom constructor to preserve Octal formatting in YAML 1.1
         self.Constructor = CustomConstructor
@@ -833,18 +855,28 @@ class FormattedYAML(YAML):
             "width": 160,
             "indent_sequences": True,
             "preferred_quote": '"',
+            "min_spaces_inside": 0,
+            "max_spaces_inside": 1,
         }
         for rule, rule_config in load_yamllint_config().rules.items():
             if not rule_config:
                 # rule disabled
                 continue
 
+            # refactor this if ... elif ... elif ... else monstrosity using match/case (PEP 634) once python 3.10 is mandatory
             if rule == "document-start":
                 config["explicit_start"] = rule_config["present"]
             elif rule == "document-end":
                 config["explicit_end"] = rule_config["present"]
             elif rule == "line-length":
                 config["width"] = rule_config["max"]
+            elif rule == "braces":
+                min_spaces_inside = rule_config["min-spaces-inside"]
+                if min_spaces_inside:
+                    config["min_spaces_inside"] = int(min_spaces_inside)
+                max_spaces_inside = rule_config["max-spaces-inside"]
+                if max_spaces_inside:
+                    config["max_spaces_inside"] = int(max_spaces_inside)
             elif rule == "indentation":
                 indent_sequences = rule_config["indent-sequences"]
                 # one of: bool, "whatever", "consistent"
