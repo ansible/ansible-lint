@@ -73,7 +73,7 @@ jobs:
       - name: Install tox
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade tox
+          python3 -m pip install --upgrade 'tox>=4.0.0b2'
       - name: Log installed dists
         run: >-
           python -m pip freeze --all
@@ -202,7 +202,7 @@ jobs:
       #       ${{ runner.os }}-
       - name: Install tox
         run: |
-          python3 -m pip install --upgrade tox
+          python3 -m pip install --upgrade 'tox>=4.0.0b2'
       - name: Log installed dists
         run: >-
           python3 -m pip freeze --all
