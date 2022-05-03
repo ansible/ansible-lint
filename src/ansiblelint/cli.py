@@ -486,6 +486,13 @@ def get_config(arguments: List[str]) -> Namespace:
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
 
+    if options.listrules and options.format not in ["plain", "rich", "rst"]:
+        parser.error(
+            f"argument -f: invalid choice: '{options.format}'. "
+            f"In combination with argument -L only 'plain', "
+            f"'rich' or 'rst' are supported with -f."
+        )
+
     file_config = load_config(options.config_file)
 
     config = merge_config(file_config, options)
