@@ -50,10 +50,14 @@ class NoPromptingRule(AnsibleLintRule):
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         """Return matches for ansible.builtin.pause tasks."""
+        # We do not want to trigger this rule if pause has either seconds or
+        # minutes defined, as that does not make it blocking.
         return task["action"]["__ansible_module_original__"] in [
             "pause",
             "ansible.builtin.pause",
-        ]
+        ] and not (
+            task["action"].get("minutes", None) or task["action"].get("seconds", None)
+        )
 
 
 if "pytest" in sys.modules:
@@ -69,6 +73,5 @@ if "pytest" in sys.modules:
         rules = RulesCollection(options=options)
         rules.register(NoPromptingRule())
         results = Runner("examples/playbooks/no-prompting.yml", rules=rules).run()
-        assert len(results) == 2
+        assert len(results) == 1
         assert results[0].rule.id == "no-prompting"
-        assert results[1].rule.id == "no-prompting"
