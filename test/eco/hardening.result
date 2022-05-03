@@ -9,7 +9,7 @@ WARNING  Listing 4 violation(s) that are fatal
 
 
 STDOUT:
-defaults/main/sshd.yml:20: yaml line too long (143 > 120 characters) (line-length)
-tasks/auditd.yml:21: yaml line too long (122 > 120 characters) (line-length)
-tasks/packagemgmt.yml:164: yaml line too long (129 > 120 characters) (line-length)
-tasks/packagemgmt.yml:192: yaml line too long (162 > 120 characters) (line-length)
+defaults/main/sshd.yml:20: yaml: line too long (143 > 120 characters) (line-length)
+tasks/auditd.yml:21: yaml: line too long (122 > 120 characters) (line-length)
+tasks/packagemgmt.yml:164: yaml: line too long (129 > 120 characters) (line-length)
+tasks/packagemgmt.yml:192: yaml: line too long (162 > 120 characters) (line-length)

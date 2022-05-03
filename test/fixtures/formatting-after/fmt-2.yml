@@ -16,3 +16,9 @@
 - octal:
     - 0o123 # YAML 1.2 octal
     - 0123 # YAML 1.1 octal
+
+- integer:
+    - 0 # Not an octal. See #2071
+    - 10
+    - 9999
+  zero: 0 # Not an octal. See #2071

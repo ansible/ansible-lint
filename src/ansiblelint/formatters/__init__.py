@@ -33,17 +33,9 @@ class BaseFormatter(Generic[T]):
         if base_dir:  # can be None
             base_dir = base_dir.absolute()
 
-        # Required 'cause os.path.relpath() does not accept Path before 3.6
-        if isinstance(base_dir, Path):
-            base_dir = str(base_dir)  # Drop when Python 3.5 is no longer supported
-
         self._base_dir = base_dir if display_relative_path else None
 
-    def _format_path(self, path: Union[str, Path]) -> str:
-        # Required 'cause os.path.relpath() does not accept Path before 3.6
-        if isinstance(path, Path):
-            path = str(path)  # Drop when Python 3.5 is no longer supported
-
+    def _format_path(self, path: Union[str, Path]) -> Union[str, Path]:
         if not self._base_dir or not path:
             return path
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
@@ -67,7 +59,7 @@ class Formatter(BaseFormatter):  # type: ignore
         _id = getattr(match.rule, "id", "000")
         result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
         if match.tag:
-            result += f" [dim][error_code]({match.tag})[/][/]"
+            result += f" [dim][error_code]({self.escape(match.tag)})[/][/]"
         result += (
             "\n"
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
@@ -98,10 +90,10 @@ class ParseableFormatter(BaseFormatter[Any]):
         )
 
         if not options.quiet:
-            result += f" [dim]{match.message}[/]"
+            result += f": [dim]{match.message}[/]"
 
         if match.tag:
-            result += f" [dim][error_code]({match.tag})[/][/]"
+            result += f" [dim][error_code]({self.escape(match.tag)})[/][/]"
         return result
 
 

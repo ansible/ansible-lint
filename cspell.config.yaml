@@ -19,3 +19,4 @@ ignorePaths:
   - test/**/*.result
   # Other
   - "*.svg"
+allowCompoundWords: true
