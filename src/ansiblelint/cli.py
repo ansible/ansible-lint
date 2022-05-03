@@ -218,7 +218,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="listrules",
         default=False,
         action="store_true",
-        help="list all the rules",
+        help="List all the rules. For listing rules only the following formats "
+        "for argument -f are supported: {plain, rich, rst}",
     )
     parser.add_argument(
         "-f",
@@ -316,7 +317,10 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="only check rules whose id/tags match these values",
     )
     parser.add_argument(
-        "-T", dest="listtags", action="store_true", help="list all the tags"
+        "-T",
+        dest="listtags",
+        action="store_true",
+        help="List all the tags and the rules they cover.",
     )
     parser.add_argument(
         "-v",

@@ -27,7 +27,7 @@ The following shows the available tags in an example set of rules, and the
 rules associated with each tag:
 
 
-.. command-output:: ansible-lint -v -T
+.. command-output:: ansible-lint -T
    :cwd: ..
    :returncode: 0
    :nostderr:
