@@ -13,4 +13,4 @@ warn_list:  # or 'skip_list' to silence them completely
 
 
 STDOUT:
-molecule/default/converge.yml:7:7: internal-error the role 'geerlingguy.mysql' was not found in ~/.cache/ansible-lint-eco/mysql/molecule/default/roles:~/.cache/ansible-compat/430005/roles:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.cache/ansible-lint-eco/mysql/molecule/default
+molecule/default/converge.yml:7:7: internal-error: the role 'geerlingguy.mysql' was not found in ~/.cache/ansible-lint-eco/mysql/molecule/default/roles:~/.cache/ansible-compat/430005/roles:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.cache/ansible-lint-eco/mysql/molecule/default

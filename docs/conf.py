@@ -121,7 +121,7 @@ intersphinx_mapping = {
     "packaging": ("https://packaging.rtfd.io/en/latest", None),
     "pytest": ("https://docs.pytest.org/en/latest", None),
     "python": ("https://docs.python.org/3", None),
-    "rich": ("https://rich.rtfd.io/en/latest", None),
+    "rich": ("https://rich.rtfd.io/en/stable", None),
 }
 
 # The default replacements for |version| and |release|, also used in various
