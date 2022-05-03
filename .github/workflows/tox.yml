@@ -22,6 +22,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
+env:
+  FORCE_COLOR: 1 # tox, pytest, ansible-lint
+  PY_COLORS: 1
+  TOX_PARALLEL_NO_SPINNER: 1
+
 jobs:
   linters:
     name: >-
@@ -39,9 +44,6 @@ jobs:
           - TOXENV: docs
           - TOXENV: eco
           - TOXENV: packaging
-    env:
-      TOX_PARALLEL_NO_SPINNER: 1
-      FORCE_COLOR: 1
 
     steps:
       - name: Check out src from Git
@@ -74,8 +76,7 @@ jobs:
       - name: Log installed dists
         run: >-
           python -m pip freeze --all
-      - name: >-
-          Initialize tox envs
+      - name: Initialize tox envs
         run: >-
           python -m
           tox
@@ -150,8 +151,6 @@ jobs:
             python-version: "3.10"
 
     env:
-      TOX_PARALLEL_NO_SPINNER: 1
-      FORCE_COLOR: 1
       # vars safe to be passed to wsl:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:TOX_PARALLEL_NO_SPINNER
       # Number of expected test passes, safety measure for accidental skip of
@@ -195,8 +194,7 @@ jobs:
       - name: Log installed dists
         run: >-
           python3 -m pip freeze --all
-      - name: >-
-          Initialize tox envs
+      - name: Initialize tox envs
         run: >-
           python3 -m
           tox
