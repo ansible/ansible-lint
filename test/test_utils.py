@@ -179,7 +179,7 @@ def test_normalize_complex_command() -> None:
         ),
     ),
 )
-def test_normalize_task_v2(task: Dict[str, Any], expected_form: bool) -> None:
+def test_normalize_task_v2(task: Dict[str, Any], expected_form: Dict[str, Any]) -> None:
     """Check that it normalizes task and returns the expected form."""
     assert utils.normalize_task_v2(task) == expected_form
 
