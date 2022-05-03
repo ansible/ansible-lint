@@ -216,6 +216,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     listing_group = parser.add_mutually_exclusive_group()
     listing_group.add_argument(
         "-L",
+        "--list-rules",
         dest="listrules",
         default=False,
         action="store_true",
@@ -224,6 +225,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     listing_group.add_argument(
         "-T",
+        "--list-tags",
         dest="listtags",
         action="store_true",
         help="List all the tags and the rules they cover. Increase the verbosity level "
@@ -231,6 +233,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-f",
+        "--format",
         dest="format",
         default="rich",
         choices=[
@@ -254,6 +257,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-p",
+        "--parseable",
         dest="parseable",
         default=False,
         action="store_true",
@@ -277,6 +281,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-r",
+        "--rules-dir",
         action=AbspathArgAction,
         dest="rulesdir",
         default=[],
@@ -319,6 +324,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-t",
+        "--tags",
         dest="tags",
         action="append",
         default=[],
@@ -333,6 +339,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-x",
+        "--skip-list",
         dest="skip_list",
         default=[],
         action="append",
@@ -340,6 +347,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-w",
+        "--warn-list",
         dest="warn_list",
         default=[],
         action="append",
@@ -378,6 +386,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-c",
+        "--config-file",
         dest="config_file",
         help="Specify configuration file to use. By default it will look for '.ansible-lint' or '.config/ansible-lint.yml'",
     )
