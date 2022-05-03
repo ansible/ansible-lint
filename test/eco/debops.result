@@ -13,5 +13,5 @@ warn_list:  # or 'skip_list' to silence them completely
 
 
 STDOUT:
-ansible/roles/rspamd/defaults/main.yml:318: var-spacing Variables should have spaces before and after: { var_name }.
-roles/rspamd/defaults/main.yml:318: var-spacing Variables should have spaces before and after: { var_name }.
+ansible/roles/rspamd/defaults/main.yml:318: var-spacing: Variables should have spaces before and after: { var_name }.
+roles/rspamd/defaults/main.yml:318: var-spacing: Variables should have spaces before and after: { var_name }.

@@ -260,7 +260,7 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     # An expected rule match from our examples
     assert (
         "examples/playbooks/empty_playbook.yml:1: "
-        "syntax-check Empty playbook, nothing to do" in out
+        "syntax-check: Empty playbook, nothing to do" in out
     )
     # assures that our ansible-lint config exclude was effective in excluding github files
     assert "Identified: .github/" not in out
