@@ -495,6 +495,9 @@ class CustomConstructor(RoundTripConstructor):
         """
         ret = super().construct_yaml_int(node)
         if self.resolver.processing_version == (1, 1) and isinstance(ret, int):
+            # Do not rewrite zero as octal.
+            if ret == 0:
+                return ret
             # see if we've got an octal we need to preserve.
             value_su = self.construct_scalar(node)
             try:
