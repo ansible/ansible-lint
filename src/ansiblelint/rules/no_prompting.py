@@ -1,5 +1,5 @@
 """Implementation of no-prompting rule."""
-
+import sys
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 from ansiblelint.rules import AnsibleLintRule
@@ -54,3 +54,21 @@ class NoPromptingRule(AnsibleLintRule):
             "pause",
             "ansible.builtin.pause",
         ]
+
+
+if "pytest" in sys.modules:
+
+    from ansiblelint.config import options
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    def test_no_prompting_fail() -> None:
+        """Negative test for no-prompting."""
+        # For testing we want to manually enable opt-in rules
+        options.enable_list = ["no-prompting"]
+        rules = RulesCollection(options=options)
+        rules.register(NoPromptingRule())
+        results = Runner("examples/playbooks/no-prompting.yml", rules=rules).run()
+        assert len(results) == 2
+        assert results[0].rule.id == "no-prompting"
+        assert results[1].rule.id == "no-prompting"
