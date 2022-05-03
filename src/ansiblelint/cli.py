@@ -213,13 +213,21 @@ def get_cli_parser() -> argparse.ArgumentParser:
     """Initialize an argument parser."""
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
+    listing_group = parser.add_mutually_exclusive_group()
+    listing_group.add_argument(
         "-L",
         dest="listrules",
         default=False,
         action="store_true",
         help="List all the rules. For listing rules only the following formats "
         "for argument -f are supported: {plain, rich, rst}",
+    )
+    listing_group.add_argument(
+        "-T",
+        dest="listtags",
+        action="store_true",
+        help="List all the tags and the rules they cover. Increase the verbosity level "
+        "with `-v` to include 'opt-in' tag and its rules.",
     )
     parser.add_argument(
         "-f",
@@ -315,12 +323,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         help="only check rules whose id/tags match these values",
-    )
-    parser.add_argument(
-        "-T",
-        dest="listtags",
-        action="store_true",
-        help="List all the tags and the rules they cover.",
     )
     parser.add_argument(
         "-v",
