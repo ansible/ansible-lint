@@ -21,6 +21,7 @@ quoting:
 
 inline-dictionary:
   - { foo: bar } # should add some spacing between curly braces and content
+  - { foo2: bar2 } # should reduce spacing between curly braces and content
 
 # YAML 1.1 Boolean-hell: https://yaml.org/type/bool.html
 booleans-true:
