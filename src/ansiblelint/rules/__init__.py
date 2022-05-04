@@ -344,8 +344,16 @@ class RulesCollection:
 
     def register(self, obj: AnsibleLintRule) -> None:
         """Register a rule."""
-        # We skip opt-in rules which were not manually enabled
-        if "opt-in" not in obj.tags or obj.id in self.options.enable_list:
+        # We skip opt-in rules which were not manually enabled.
+        # But we do include opt-in rules when listing all rules or tags
+        if any(
+            [
+                "opt-in" not in obj.tags,
+                obj.id in self.options.enable_list,
+                self.options.listrules,
+                self.options.listtags,
+            ]
+        ):
             self.rules.append(obj)
 
     def __iter__(self) -> Iterator[BaseRule]:
