@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
 
-# Should raise var-naming at line [4, 8].
+# Should raise var-naming at line [4, 8, 18, 20].
 FAIL_PLAY = """---
 - hosts: localhost
   vars:
@@ -35,6 +35,16 @@ FAIL_PLAY = """---
     - name: bar
       ansible.builtin.set_fact:
         CamelCaseButErrorIgnored: true  # noqa: var-naming
+    - name: test in a block
+      block:
+        - name:
+          ansible.builtin.set_fact:
+            CamelCaseIsBad: "{{ BAD }}" # invalid
+          vars:
+            ALL_CAPS_ARE_BAD_TOO: "{{ MoreBad }}" # invalid
+      vars:
+        BAD: false # invalid
+        MoreBad: ... # invalid
 """
 
 
@@ -189,12 +199,12 @@ if "pytest" in sys.modules:
     def test_invalid_var_name_playbook(rule_runner: RunFromText) -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(FAIL_PLAY)
-        assert len(results) == 2
+        assert len(results) == 4
         for result in results:
             assert result.rule.id == VariableNamingRule.id
 
         # list unexpected error lines or non-matching error lines
-        expected_error_lines = [4, 8]
+        expected_error_lines = [4, 8, 18, 20]
         lines = [i.linenumber for i in results]
         error_lines_difference = list(
             set(expected_error_lines).symmetric_difference(set(lines))
