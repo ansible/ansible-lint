@@ -3,11 +3,12 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Listing 4 violation(s) that are fatal
+WARNING  Listing 5 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
   - load-failure  # Failed to load or parse file.
+  - no-handler  # Tasks that run when changed should likely be handlers.
   - yaml  # Violations reported by yamllint.
 
 
@@ -17,3 +18,4 @@ STDOUT:
 playbooks/molecule/sudo/molecule.yml:17: yaml: line too long (576 > 160 characters) (line-length)
 roles/firewalld/defaults/main.yml:11: yaml: missing starting space in comment (comments)
 roles/firewalld/defaults/main.yml:28: yaml: missing starting space in comment (comments)
+roles/packages_workstation/tasks/Linux/06_blu_ray.yml:18: no-handler: Tasks that run when changed should likely be handlers.

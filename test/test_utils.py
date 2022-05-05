@@ -34,6 +34,7 @@ import pytest
 from _pytest.capture import CaptureFixture
 from _pytest.logging import LogCaptureFixture
 from _pytest.monkeypatch import MonkeyPatch
+from ansible.utils.sentinel import Sentinel
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
@@ -128,6 +129,59 @@ def test_normalize_complex_command() -> None:
     assert utils.normalize_task(task3, "tasks.yml") == utils.normalize_task(
         task4, "tasks.yml"
     )
+
+
+@pytest.mark.parametrize(
+    ("task", "expected_form"),
+    (
+        pytest.param(
+            dict(
+                name="ensure apache is at the latest version",
+                yum={"name": "httpd", "state": "latest"},
+            ),
+            dict(
+                delegate_to=Sentinel,
+                name="ensure apache is at the latest version",
+                action={
+                    "__ansible_module__": "yum",
+                    "__ansible_module_original__": "yum",
+                    "__ansible_arguments__": [],
+                    "name": "httpd",
+                    "state": "latest",
+                },
+            ),
+        ),
+        pytest.param(
+            dict(
+                name="Attempt and graceful roll back",
+                block=[
+                    {
+                        "name": "Install httpd and memcached",
+                        "ansible.builtin.yum": ["httpd", "memcached"],
+                        "state": "present",
+                    }
+                ],
+            ),
+            dict(
+                name="Attempt and graceful roll back",
+                block=[
+                    {
+                        "name": "Install httpd and memcached",
+                        "ansible.builtin.yum": ["httpd", "memcached"],
+                        "state": "present",
+                    }
+                ],
+                action={
+                    "__ansible_module__": "block/always/rescue",
+                    "__ansible_module_original__": "block/always/rescue",
+                },
+            ),
+        ),
+    ),
+)
+def test_normalize_task_v2(task: Dict[str, Any], expected_form: Dict[str, Any]) -> None:
+    """Check that it normalizes task and returns the expected form."""
+    assert utils.normalize_task_v2(task) == expected_form
 
 
 def test_extract_from_list() -> None:
@@ -353,3 +407,41 @@ def test_nested_items() -> None:
         match=r"Call to deprecated function ansiblelint\.utils\.nested_items.*"
     ):
         assert list(utils.nested_items(data)) == items
+
+
+@pytest.mark.parametrize(
+    ("task", "expected"),
+    (
+        pytest.param(
+            dict(
+                name="ensure apache is at the latest version",
+                yum={"name": "httpd", "state": "latest"},
+            ),
+            False,
+        ),
+        pytest.param(
+            dict(
+                name="Attempt and graceful roll back",
+                block=[
+                    {"name": "Force a failure", "ansible.builtin.command": "/bin/false"}
+                ],
+                rescue=[
+                    {
+                        "name": "Force a failure in middle of recovery!",
+                        "ansible.builtin.command": "/bin/false",
+                    }
+                ],
+                always=[
+                    {
+                        "name": "Always do this",
+                        "ansible.builtin.debug": {"msg": "This always executes"},
+                    }
+                ],
+            ),
+            True,
+        ),
+    ),
+)
+def test_is_nested_task(task: Dict[str, Any], expected: bool) -> None:
+    """Test is_nested_task() returns expected bool."""
+    assert utils.is_nested_task(task) == expected
