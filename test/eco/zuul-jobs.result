@@ -11,25 +11,67 @@ INFO     Discovered files to lint using: git ls-files --cached --others --exclud
 INFO     Excluded removed files using: git ls-files --deleted -z
 INFO     Discovered files to lint using: git ls-files --cached --others --exclude-standard -z
 INFO     Excluded removed files using: git ls-files --deleted -z
-WARNING  Listing 16 violation(s) that are fatal
+WARNING  Listing 57 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
   - experimental  # all rules tagged as experimental
   - no-loop-var-prefix  # Role loop_var should use configured prefix.
+  - unnamed-task  # All tasks should be named.
 
 
 
 STDOUT:
+roles/ara-report/tasks/main.yaml:1: unnamed-task: All tasks should be named.
+roles/ara-report/tasks/main.yaml:39: unnamed-task: All tasks should be named.
+roles/ara-report/tasks/main.yaml:74: unnamed-task: All tasks should be named.
+roles/copy-build-sshkey/tasks/main.yaml:3: unnamed-task: All tasks should be named.
+roles/emit-job-header/tasks/main.yaml:2: unnamed-task: All tasks should be named.
 roles/emit-job-header/tasks/main.yaml:26: ignore-errors: Use failed_when and specify error conditions instead of using ignore_errors.
+roles/ensure-cabal/tasks/main.yaml:11: unnamed-task: All tasks should be named.
 roles/ensure-chart-testing/tasks/main.yaml:27: risky-file-permissions: File permissions unset or incorrect.
 roles/ensure-dhall/tasks/main.yaml:15: risky-file-permissions: File permissions unset or incorrect.
 roles/ensure-go/tasks/install-go.yaml:12: risky-file-permissions: File permissions unset or incorrect.
+roles/ensure-haskell-stack/tasks/main.yaml:11: unnamed-task: All tasks should be named.
+roles/ensure-nimble/tasks/main.yaml:14: unnamed-task: All tasks should be named.
 roles/ensure-packer/tasks/install-packer.yaml:21: risky-file-permissions: File permissions unset or incorrect.
 roles/ensure-pip/tasks/Debian.yaml:17: ignore-errors: Use failed_when and specify error conditions instead of using ignore_errors.
+roles/ensure-pip/tasks/RedHat.yaml:10: unnamed-task: All tasks should be named.
 roles/ensure-pip/tasks/source.yaml:7: risky-file-permissions: File permissions unset or incorrect.
+roles/ensure-shake/tasks/main.yaml:15: unnamed-task: All tasks should be named.
 roles/ensure-terraform/tasks/install-terraform.yaml:32: risky-file-permissions: File permissions unset or incorrect.
+roles/fetch-coverage-output/tasks/main.yaml:13: unnamed-task: All tasks should be named.
+roles/fetch-javascript-tarball/tasks/main.yaml:12: unnamed-task: All tasks should be named.
+roles/fetch-sphinx-tarball/tasks/html.yaml:12: unnamed-task: All tasks should be named.
+roles/fetch-sphinx-tarball/tasks/html.yaml:39: unnamed-task: All tasks should be named.
+roles/fetch-subunit-output/tasks/main.yaml:9: unnamed-task: All tasks should be named.
+roles/fetch-subunit-output/tasks/main.yaml:50: unnamed-task: All tasks should be named.
+roles/fetch-translation-output/tasks/main.yaml:6: unnamed-task: All tasks should be named.
+roles/golangci-lint/tasks/main.yaml:1: unnamed-task: All tasks should be named.
+roles/hlint/tasks/main.yaml:1: unnamed-task: All tasks should be named.
+roles/multi-node-bridge/tasks/common.yaml:13: unnamed-task: All tasks should be named.
+roles/multi-node-bridge/tasks/common.yaml:102: unnamed-task: All tasks should be named.
+roles/multi-node-bridge/tasks/peer.yaml:66: unnamed-task: All tasks should be named.
+roles/multi-node-bridge/tasks/switch.yaml:10: unnamed-task: All tasks should be named.
+roles/packer/tasks/main.yaml:20: unnamed-task: All tasks should be named.
 roles/phoronix-combine-results/tasks/fetch-result.yaml:8: risky-file-permissions: File permissions unset or incorrect.
+roles/shake-build/tasks/main.yaml:1: unnamed-task: All tasks should be named.
+roles/stage-output/tasks/main.yaml:110: unnamed-task: All tasks should be named.
+roles/test-setup/tasks/main.yaml:1: unnamed-task: All tasks should be named.
+roles/test-upload-logs-swift/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/test-upload-logs-swift/tasks/main.yaml:33: unnamed-task: All tasks should be named.
+roles/tox/tasks/main.yaml:39: unnamed-task: All tasks should be named.
+roles/trigger-readthedocs/tasks/main.yaml:11: unnamed-task: All tasks should be named.
+roles/trigger-readthedocs/tasks/main.yaml:30: unnamed-task: All tasks should be named.
+roles/upload-git-mirror/tasks/main.yaml:1: unnamed-task: All tasks should be named.
+roles/upload-logs-azure/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-gcs/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-ibm/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-s3/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-swift/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-swift/tasks/main.yaml:33: unnamed-task: All tasks should be named.
+roles/upload-logs/tasks/main.yaml:6: unnamed-task: All tasks should be named.
+roles/version-from-git/tasks/main.yaml:64: unnamed-task: All tasks should be named.
 test-playbooks/registry/roles/ensure-registry-cert/tasks/main.yaml:1: risky-file-permissions: File permissions unset or incorrect.
 test-playbooks/registry/roles/ensure-registry-cert/tasks/main.yaml:6: risky-file-permissions: File permissions unset or incorrect.
 test-playbooks/registry/roles/run-test-intermediate-registry/tasks/main.yaml:1: no-loop-var-prefix: Role loop_var should use configured prefix.

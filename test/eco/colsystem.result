@@ -3,12 +3,13 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Listing 5 violation(s) that are fatal
+WARNING  Listing 20 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
   - load-failure  # Failed to load or parse file.
   - no-handler  # Tasks that run when changed should likely be handlers.
+  - unnamed-task  # All tasks should be named.
   - yaml  # Violations reported by yamllint.
 
 
@@ -16,6 +17,21 @@ warn_list:  # or 'skip_list' to silence them completely
 STDOUT:
 .ansible-lint:1: load-failure: [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (filenotfounderror)
 playbooks/molecule/sudo/molecule.yml:17: yaml: line too long (576 > 160 characters) (line-length)
+roles/common/tasks/main.yml:1: unnamed-task: All tasks should be named.
+roles/common/tasks/main.yml:33: unnamed-task: All tasks should be named.
+roles/container/tasks/main.yml:26: unnamed-task: All tasks should be named.
 roles/firewalld/defaults/main.yml:11: yaml: missing starting space in comment (comments)
 roles/firewalld/defaults/main.yml:28: yaml: missing starting space in comment (comments)
+roles/flatpak/tasks/main.yml:1: unnamed-task: All tasks should be named.
+roles/k3s_base/tasks/main.yml:13: unnamed-task: All tasks should be named.
+roles/k3s_master/tasks/main.yml:13: unnamed-task: All tasks should be named.
+roles/k3s_worker/tasks/main.yml:13: unnamed-task: All tasks should be named.
+roles/mariadb/tasks/secure.yml:1: unnamed-task: All tasks should be named.
+roles/mirror/tasks/mirror.yml:1: unnamed-task: All tasks should be named.
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:1: unnamed-task: All tasks should be named.
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:62: unnamed-task: All tasks should be named.
 roles/packages_workstation/tasks/Linux/06_blu_ray.yml:18: no-handler: Tasks that run when changed should likely be handlers.
+roles/packages_workstation/tasks/Linux/06_blu_ray.yml:18: unnamed-task: All tasks should be named.
+roles/packages_workstation/tasks/Linux/main.yml:11: unnamed-task: All tasks should be named.
+roles/sudoers/tasks/main.yml:13: unnamed-task: All tasks should be named.
+roles/update_ca_trust/tasks/main.yml:13: unnamed-task: All tasks should be named.
