@@ -23,7 +23,6 @@
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import is_nested_task
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -46,5 +45,4 @@ class TaskHasNameRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
-        # Ignore nonamed block/always/rescue
-        return not (task.get("name") or is_nested_task(task))
+        return not task.get("name")

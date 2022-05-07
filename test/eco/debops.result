@@ -4,14 +4,23 @@ RC: 2
 
 STDERR:
 WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
-WARNING  Listing 2 violation(s) that are fatal
+WARNING  Listing 10 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
+  - unnamed-task  # All tasks should be named.
   - var-spacing  # Variables should have spaces before and after: {{ var_name }}.
 
 
 
 STDOUT:
+ansible/roles/hashicorp/tasks/main.yml:99: unnamed-task: All tasks should be named.
+ansible/roles/owncloud/tasks/tarball.yml:46: unnamed-task: All tasks should be named.
+ansible/roles/persistent_paths/tasks/main.yml:12: unnamed-task: All tasks should be named.
+ansible/roles/pki/tasks/main.yml:201: unnamed-task: All tasks should be named.
+ansible/roles/pki/tasks/main.yml:403: unnamed-task: All tasks should be named.
 ansible/roles/rspamd/defaults/main.yml:318: var-spacing: Variables should have spaces before and after: { var_name }.
+roles/hashicorp/tasks/main.yml:99: unnamed-task: All tasks should be named.
+roles/owncloud/tasks/tarball.yml:46: unnamed-task: All tasks should be named.
+roles/persistent_paths/tasks/main.yml:12: unnamed-task: All tasks should be named.
 roles/rspamd/defaults/main.yml:318: var-spacing: Variables should have spaces before and after: { var_name }.

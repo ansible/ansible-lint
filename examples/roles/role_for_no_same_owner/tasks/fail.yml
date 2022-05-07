@@ -13,7 +13,8 @@
 
 - name: nested-block
   block:
-    - block:
+    - name: synchronize
+      block:
         - name: synchronize-in-deep-block
           ansible.posix.synchronize:
             src: dummy
