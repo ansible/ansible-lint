@@ -9,6 +9,7 @@ from ansiblelint.testing import RunFromText
 
 class TaskHasNameFirstRule(AnsibleLintRule):
     """All tasks should be have name come first."""
+
     id = "task-name-first"
     shortdesc = __doc__
     severity = "LOW"
@@ -16,9 +17,7 @@ class TaskHasNameFirstRule(AnsibleLintRule):
     version_added = "v6.0.2"
     needs_raw_task = True
 
-    def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> bool:
+    def matchtask(self, task: Dict[str, Any], file: Optional[Lintable] = None) -> bool:
         raw_task = task["__raw_task__"]
         attribute_list = [*raw_task]
 
