@@ -21,7 +21,7 @@ class TaskHasNameFirstRule(AnsibleLintRule):
         raw_task = task["__raw_task__"]
         attribute_list = [*raw_task]
 
-        return attribute_list[0] != "name"
+        return bool(attribute_list[0] != "name")
 
 
 # testing code to be loaded only with pytest or when executed the rule file
