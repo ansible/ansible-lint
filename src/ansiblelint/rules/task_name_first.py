@@ -1,12 +1,14 @@
-"""All tasks should be have name be the first attribute"""
+"""All tasks should be have name come first."""
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.testing import RunFromText
 
 
 class TaskHasNameFirstRule(AnsibleLintRule):
+    """All tasks should be have name come first."""
     id = "task-name-first"
     shortdesc = __doc__
     severity = "LOW"
@@ -16,7 +18,7 @@ class TaskHasNameFirstRule(AnsibleLintRule):
 
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+    ) -> bool:
         raw_task = task["__raw_task__"]
         attribute_list = [*raw_task]
 
@@ -27,8 +29,6 @@ class TaskHasNameFirstRule(AnsibleLintRule):
 if "pytest" in sys.modules:
 
     import pytest
-
-    from ansiblelint.testing import RunFromText
 
     PLAY_FAIL = """---
 - hosts: localhost
