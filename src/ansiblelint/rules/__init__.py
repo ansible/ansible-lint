@@ -10,8 +10,18 @@ from argparse import Namespace
 from collections import defaultdict
 from functools import lru_cache
 from importlib.abc import Loader
-from typing import Any, Dict, Iterator, List, Optional, Set, Union
-from pprint import pp, pprint
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    MutableMapping,
+    MutableSequence,
+    Optional,
+    Set,
+    Union,
+    cast,
+)
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 

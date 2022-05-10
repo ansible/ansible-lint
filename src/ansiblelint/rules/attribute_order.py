@@ -1,20 +1,70 @@
-import logging
+from re import A
 import sys
+
 from collections import OrderedDict as odict
 from pprint import pp, pprint
-from typing import TYPE_CHECKING, Any, Dict, Union, List
+from typing import Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.testing import RunFromText
+from ansiblelint.file_utils import Lintable
 
-if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.file_utils import Lintable
-    from ansiblelint.errors import MatchError
+from typing import Optional
 
 # _logger = logging.getLogger(__name__)
 # logging.basicConfig(filename='example.log', level=logging.DEBUG)
+
+# skipped rules causes error
+# delegate_to is always present
+# tags is never in the right order
+removed_attributes = ['skipped_rules', 'delegate_to', 'tags']
+possible_attrs = [
+    "name",
+    "when",
+    "notify",
+    "any_errors_fatal",
+    "async",
+    "become",
+    "become_exe",
+    "become_flags",
+    "become_method",
+    "become_user",
+    "remote_user",
+    "changed_when",
+    "failed_when",
+    "check_mode",
+    "collections",
+    "connection",
+    "debugger",
+    "delay",
+    "delegate_facts",
+    "delegate_to",
+    "diff",
+    "environment",
+    "ignore_errors",
+    "ignore_unreachable",
+    "local_action",
+    "module_defaults",
+    "no_log",
+    "poll",
+    "port",
+    "timeout",
+    "retries",
+    "until",
+    "register",
+    "run_once",
+    "throttle",
+    "action",
+    "args",
+    "loop_control",
+    "loop",
+    "vars",
+    "tags",
+    # "with_",
+]
+ordered_expected_attrs = odict(
+    (key, idx) for idx, key in enumerate(possible_attrs)
+)
 
 
 class TaskAttributesOrderRule(AnsibleLintRule):
@@ -24,79 +74,35 @@ class TaskAttributesOrderRule(AnsibleLintRule):
     severity = 'LOW'
     tags = ['opt-in', 'formatting', 'experimental']
     version_added = 'v5.2.2'
-
-    # skipped rules causes error
-    # delegate_to is always present
-    # tags is never in the right order
-    removed_attributes = ['skipped_rules', 'delegate_to', 'tags']
-    possible_attrs = [
-        "name",
-        "any_errors_fatal",
-        "async",
-        "become",
-        "become_exe",
-        "become_flags",
-        "become_method",
-        "become_user",
-        "changed_when",
-        "check_mode",
-        "collections",
-        "connection",
-        "debugger",
-        "delay",
-        "delegate_facts",
-        "delegate_to",
-        "diff",
-        "environment",
-        "failed_when",
-        "ignore_errors",
-        "ignore_unreachable",
-        "local_action",
-        "module_defaults",
-        "no_log",
-        "poll",
-        "port",
-        "register",
-        "remote_user",
-        "retries",
-        "run_once",
-        "throttle",
-        "timeout",
-        "until",
-        "vars",
-        "when",
-        "action",
-        "args",
-        "notify",
-        "loop",
-        "loop_control",
-        "tags",
-        # "with_",
-    ]
-    ordered_expected_attrs = odict((key, idx) for idx, key in enumerate(possible_attrs))
+    needs_raw_task = True
 
 
     def matchtask(
         self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
     ) -> Union[bool, str]:
+        raw_task = task["__raw_task__"]
+
+        # remove skipped attributes from the list
         attrs = []
-        for k in task.keys():
-            if not k.startswith('__') and (k not in self.removed_attributes):
+        for k in raw_task.keys():
+            if not k.startswith('__') and (k not in removed_attributes):
                 attrs.append(k)
 
+        # get the expected order in from the lookup table
         actual_attrs = odict()
         for attr in attrs:
-            actual_attrs[attr] = self.ordered_expected_attrs[attr]
+            pos = ordered_expected_attrs.get(attr)
+            if pos == None:
+                pos = ordered_expected_attrs.get('action')
+            actual_attrs[attr] = pos
 
         sorted_actual_attrs = odict(
             sorted(actual_attrs.items(), key=lambda item: item[1])
         )
 
-        pprint(task)
-        # logging.info(task)
-        # logging.info((task.get('name'), actual_attrs))
-        # logging.info(('sorted:', sorted_actual_attrs))
-        # logging.info(sorted_actual_attrs != actual_attrs)
+        pprint(actual_attrs)
+        pprint(sorted_actual_attrs)
+        print(sorted_actual_attrs != actual_attrs)
 
         # if sorted_actual_attrs != actual_attrs:
         #     return "Please verify the order of the attributes in this task."
@@ -104,8 +110,9 @@ class TaskAttributesOrderRule(AnsibleLintRule):
         return sorted_actual_attrs != actual_attrs
 
 
-
+# testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
+
     import pytest
 
     PLAY_FAIL = """---
@@ -143,5 +150,4 @@ if "pytest" in sys.modules:
     def test_task_attribute_order_rule_fail(rule_runner: RunFromText) -> None:
         """The task has when last."""
         results = rule_runner.run_playbook(PLAY_FAIL)
-        # pprint(results)
         assert len(results) == 1
