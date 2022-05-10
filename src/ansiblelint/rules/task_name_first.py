@@ -13,8 +13,8 @@ class TaskHasNameFirstRule(AnsibleLintRule):
     id = "task-name-first"
     shortdesc = __doc__
     severity = "LOW"
-    tags = ["opt-in", "formatting", "experimental"]
-    version_added = "v6.0.2"
+    tags = ["formatting", "experimental"]
+    version_added = "v6.2.0"
     needs_raw_task = True
 
     def matchtask(self, task: Dict[str, Any], file: Optional[Lintable] = None) -> bool:
