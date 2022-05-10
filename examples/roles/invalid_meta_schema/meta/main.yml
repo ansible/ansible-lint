@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: foo
+  description: false # <-- schema fail as string is expected
+  license: XXX
+  platforms:
+    - name: AIX
+  min_ansible_version: "2.7"

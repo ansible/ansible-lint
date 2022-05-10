@@ -11,5 +11,5 @@ dependencies:
   other_namespace.collection2: ">=2.0.0,<3.0.0"
   anderson55.my_collection: "*" # note: "*" selects the highest version available
 license:
-  - GPL
+  - GPL # <-- invalid license values based on galaxy schema
   - Apache

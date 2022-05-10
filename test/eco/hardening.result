@@ -1,15 +1,36 @@
 CMD: ansible-lint -f pep8 -x fqcn-builtins
 
-RC: 0
+RC: 2
 
 STDERR:
 WARNING  Loading custom .yamllint.yml config file, this extends our internal yamllint config.
-WARNING  Listing 4 violation(s) that are fatal
+WARNING  Listing 5 violation(s) that are fatal
+You can skip specific rules or tags by adding them to your configuration file:
+# .config/ansible-lint.yml
+warn_list:  # or 'skip_list' to silence them completely
+  - experimental  # all rules tagged as experimental
+  - schema  # Perform JSON Schema Validation for known lintable kinds.
+
+    Returned errors will not include exact line numbers, but they will mention
+    the schema name being used as a tag, like ``playbook-schema``,
+    ``tasks-schema``.
+
+    This rule is not skippable and stops further processing of the file.
+
+    Schema bugs should be reported towards https://github.com/ansible/schemas
+    project instead of ansible-lint.
+
+    If incorrect schema was picked, you might want to either:
+
+    * move the file to standard location, so its file is detected correctly.
+    * use ``kinds:`` option in linter config to help it pick correct file type.
+    
 
 
 
 STDOUT:
 defaults/main/sshd.yml:20: yaml: line too long (143 > 120 characters) (line-length)
+meta/main.yml:1: schema: 8 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
 tasks/auditd.yml:21: yaml: line too long (122 > 120 characters) (line-length)
 tasks/packagemgmt.yml:164: yaml: line too long (129 > 120 characters) (line-length)
 tasks/packagemgmt.yml:192: yaml: line too long (162 > 120 characters) (line-length)

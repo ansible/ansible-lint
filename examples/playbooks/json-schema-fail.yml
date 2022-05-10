@@ -1,0 +1,4 @@
+---
+- name: This should raise json-schema error, due to hosts missing the last letter
+  host: localhost
+  tasks: []

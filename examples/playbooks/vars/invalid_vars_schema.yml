@@ -1,0 +1,2 @@
+---
+123: true # invalid as schema expects string key

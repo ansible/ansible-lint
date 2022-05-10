@@ -1,0 +1,29 @@
+{
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-vars.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "anyOf": [
+    {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(?!(False|None|True|and|any_errors_fatal|as|assert|async|await|become|become_exe|become_flags|become_method|become_user|break|check_mode|class|collections|connection|continue|debugger|def|del|diff|elif|else|environment|except|fact_path|finally|for|force_handlers|from|gather_facts|gather_subset|gather_timeout|global|handlers|hosts|if|ignore_errors|ignore_unreachable|import|in|is|lambda|max_fail_percentage|module_defaults|name|no_log|nonlocal|not|or|order|pass|port|post_tasks|pre_tasks|raise|remote_user|return|roles|run_once|serial|strategy|tags|tasks|throttle|timeout|try|vars|vars_files|vars_prompt|while|with|yield)$)[a-zA-Z_][\\w]*$": {}
+      },
+      "type": "object"
+    },
+    {
+      "pattern": "^\\$ANSIBLE_VAULT;",
+      "type": "string"
+    },
+    {
+      "type": "null"
+    }
+  ],
+  "examples": [
+    "playbooks/vars/*.yml",
+    "vars/*.yml",
+    "defaults/*.yml",
+    "host_vars/*.yml",
+    "group_vars/*.yml"
+  ],
+  "markdownDescription": "See [Using Variables](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html)",
+  "title": "Ansible Vars Schema"
+}

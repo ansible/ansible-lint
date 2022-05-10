@@ -32,6 +32,7 @@ importlib-metadata==4.11.3
 iniconfig==1.1.1
 isort==5.10.1
 jinja2==3.1.2
+jsonschema==4.5.1
 lazy-object-proxy==1.7.1
 markdown-it-py==2.1.0
 markupsafe==2.1.1
@@ -56,6 +57,7 @@ pyflakes==2.4.0
 pygments==2.12.0
 pylint==2.13.8
 pyparsing==3.0.8
+pyrsistent==0.18.1
 pytest==7.1.2
 pytest-cov==3.0.0
 pytest-forked==1.4.0
