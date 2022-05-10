@@ -67,6 +67,9 @@ def load_config(config_file: str) -> Dict[Any, Any]:
     try:
         with open(config_path, "r", encoding="utf-8") as stream:
             config = yaml.safe_load(stream)
+            # We want to allow passing /dev/null to disable config use
+            if config is None:
+                return {}
             if not isinstance(config, dict):
                 _logger.error("Invalid configuration file %s", config_path)
                 sys.exit(INVALID_CONFIG_RC)
