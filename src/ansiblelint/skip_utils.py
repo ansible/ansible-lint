@@ -22,7 +22,7 @@
 import logging
 from functools import lru_cache
 from itertools import product
-from typing import TYPE_CHECKING, Any, Generator, List, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Sequence
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML
@@ -30,7 +30,6 @@ from ruamel.yaml import YAML
 from ansiblelint.config import used_old_tags
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, RENAMED_TAGS
 from ansiblelint.file_utils import Lintable
-from ansiblelint.utils import is_nested_task
 
 if TYPE_CHECKING:
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
@@ -198,3 +197,12 @@ def normalize_tag(tag: str) -> str:
         used_old_tags[tag] = RENAMED_TAGS[tag]
         return RENAMED_TAGS[tag]
     return tag
+
+
+def is_nested_task(task: Dict[str, Any]) -> bool:
+    """Check if task includes block/always/rescue."""
+    for key in NESTED_TASK_KEYS:
+        if task.get(key):
+            return True
+
+    return False
