@@ -30,6 +30,7 @@ from ruamel.yaml import YAML
 from ansiblelint.config import used_old_tags
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, RENAMED_TAGS
 from ansiblelint.file_utils import Lintable
+from ansiblelint.utils import is_nested_task
 
 if TYPE_CHECKING:
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
@@ -149,9 +150,13 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
     """Get list of tasks from list made of tasks and nested tasks."""
 
     def get_nested_tasks(task: Any) -> Generator[Any, None, None]:
+        if not task:
+            return
         for k in NESTED_TASK_KEYS:
             if task and k in task and task[k]:
                 for subtask in task[k]:
+                    if is_nested_task(subtask):
+                        yield from get_nested_tasks(subtask)
                     yield subtask
 
     for task in task_blocks:
