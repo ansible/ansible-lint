@@ -5,8 +5,12 @@ import urllib.request
 from ansiblelint.config import JSON_SCHEMAS
 
 
-def refresh_schemas() -> None:
-    """Refresh JSON schemas by downloading latest versions."""
+def refresh_schemas() -> int:
+    """Refresh JSON schemas by downloading latest versions.
+
+    Returns number of changed schemas.
+    """
+    changed = 0
     for kind, url in sorted(JSON_SCHEMAS.items()):
         path = f"{os.path.relpath(os.path.dirname(__file__))}/{kind}.json"
         print(f"Refreshing {path} ...")
@@ -17,3 +21,5 @@ def refresh_schemas() -> None:
                     f_out.seek(0)
                     f_out.write(content)
                     f_out.truncate()
+                    changed += 1
+    return changed
