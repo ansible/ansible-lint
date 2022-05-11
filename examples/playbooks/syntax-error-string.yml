@@ -1,3 +1,7 @@
-foo
-# This file is valid YAML but from our point of view is an error, as is
-# neither a Sequence or a Mapping.
+# This file is valid YAML and passed JSON Schema validation but not ansible
+# own syntax check.
+
+- hosts: localhost
+  tasks:
+    - name: invalid syntax
+      x.y.z.w: {}

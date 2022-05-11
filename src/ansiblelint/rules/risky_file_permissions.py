@@ -293,11 +293,11 @@ if "pytest" in sys.modules:  # noqa: C901
 
     FAIL_INI_PERMISSION = """
 - hosts: all
-    tasks:
-     - name: permissions needed if create is used
-       ini_file:
-         path: foo
-         create: true
+  tasks:
+    - name: permissions needed if create is used
+      ini_file:
+        path: foo
+        create: true
 """
 
     FAIL_INI_PRESERVE = """

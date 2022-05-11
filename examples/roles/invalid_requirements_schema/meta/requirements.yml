@@ -1,0 +1,3 @@
+---
+# this should fail validation
+foo: bar

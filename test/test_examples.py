@@ -29,7 +29,7 @@ def test_example(default_rules_collection: RulesCollection) -> None:
     ("filename", "line", "column"),
     (
         pytest.param(
-            "examples/playbooks/syntax-error-string.yml", 1, 1, id="syntax-error-string"
+            "examples/playbooks/syntax-error-string.yml", 6, 7, id="syntax-error"
         ),
         pytest.param("examples/playbooks/syntax-error.yml", 2, 3, id="syntax-error"),
     ),

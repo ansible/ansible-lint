@@ -80,6 +80,8 @@ galaxy_info:  # noqa meta-no-info
   author: your name  # noqa meta-incorrect
   description: missing min_ansible_version and platforms. author default not changed
   license: MIT
+  min_ansible_version: "2.10"
+  platforms: []
 """
 
 ROLE_TASKS_WITH_BLOCK_BECOME = """\

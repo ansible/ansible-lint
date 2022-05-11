@@ -10,3 +10,4 @@
       ansible.builtin.shell: echo blah
       args:
         chdir: X
+      become_method: xx

@@ -11,7 +11,7 @@ INFO     Discovered files to lint using: git ls-files --cached --others --exclud
 INFO     Excluded removed files using: git ls-files --deleted -z
 INFO     Discovered files to lint using: git ls-files --cached --others --exclude-standard -z
 INFO     Excluded removed files using: git ls-files --deleted -z
-WARNING  Listing 57 violation(s) that are fatal
+WARNING  Listing 62 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
@@ -64,10 +64,15 @@ roles/tox/tasks/main.yaml:39: unnamed-task: All tasks should be named.
 roles/trigger-readthedocs/tasks/main.yaml:11: unnamed-task: All tasks should be named.
 roles/trigger-readthedocs/tasks/main.yaml:30: unnamed-task: All tasks should be named.
 roles/upload-git-mirror/tasks/main.yaml:1: unnamed-task: All tasks should be named.
+roles/upload-logs-azure/meta/main.yaml:1: schema: {'dependencies': [{'role': 'upload-logs-base'}]} is not of type 'null' (schema[meta])
 roles/upload-logs-azure/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-gcs/meta/main.yaml:1: schema: {'dependencies': [{'role': 'upload-logs-base'}]} is not of type 'null' (schema[meta])
 roles/upload-logs-gcs/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-ibm/meta/main.yaml:1: schema: {'dependencies': [{'role': 'upload-logs-base'}]} is not of type 'null' (schema[meta])
 roles/upload-logs-ibm/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-s3/meta/main.yaml:1: schema: {'dependencies': [{'role': 'upload-logs-base'}]} is not of type 'null' (schema[meta])
 roles/upload-logs-s3/tasks/main.yaml:7: unnamed-task: All tasks should be named.
+roles/upload-logs-swift/meta/main.yaml:1: schema: {'dependencies': [{'role': 'upload-logs-base'}]} is not of type 'null' (schema[meta])
 roles/upload-logs-swift/tasks/main.yaml:7: unnamed-task: All tasks should be named.
 roles/upload-logs-swift/tasks/main.yaml:33: unnamed-task: All tasks should be named.
 roles/upload-logs/tasks/main.yaml:6: unnamed-task: All tasks should be named.

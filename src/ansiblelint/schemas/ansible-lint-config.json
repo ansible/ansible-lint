@@ -1,0 +1,114 @@
+{
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-lint.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
+  "examples": [".ansible-lint", ".config/ansible-lint.yml"],
+  "properties": {
+    "enable_list": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Enable List",
+      "type": "array"
+    },
+    "exclude_paths": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Exclude Paths",
+      "type": "array"
+    },
+    "extra_vars": {
+      "title": "Extra Vars",
+      "type": "object"
+    },
+    "kinds": {
+      "items": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "title": "Kinds",
+      "type": "array"
+    },
+    "loop_var_prefix": {
+      "title": "Loop Var Prefix",
+      "type": "string"
+    },
+    "mock_modules": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Mock Modules",
+      "type": "array"
+    },
+    "mock_roles": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Mock Roles",
+      "type": "array"
+    },
+    "offline": {
+      "default": false,
+      "title": "Offline",
+      "type": "boolean"
+    },
+    "parseable": {
+      "default": true,
+      "title": "Parseable",
+      "type": "boolean"
+    },
+    "quiet": {
+      "default": true,
+      "title": "Quiet",
+      "type": "boolean"
+    },
+    "rulesdir": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Rulesdir",
+      "type": "array"
+    },
+    "skip_action_validation": {
+      "default": false,
+      "title": "Skip Action Validation",
+      "type": "boolean"
+    },
+    "skip_list": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Skip List",
+      "type": "array"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "type": "array"
+    },
+    "use_default_rules": {
+      "default": true,
+      "title": "Use Default Rules",
+      "type": "boolean"
+    },
+    "verbosity": {
+      "default": 0,
+      "title": "Verbosity",
+      "type": "integer"
+    },
+    "warn_list": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warn List",
+      "type": "array"
+    }
+  },
+  "title": "Ansible-lint Configuration Schema",
+  "type": "object"
+}
