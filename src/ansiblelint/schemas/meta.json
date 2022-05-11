@@ -271,7 +271,7 @@
             "type": "string"
           },
           "title": "Tags",
-          "type": "array"
+          "type": ["array", "string"]
         },
         "vars": {
           "title": "Vars",

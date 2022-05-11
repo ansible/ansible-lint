@@ -1,33 +1,21 @@
 CMD: ansible-lint -f pep8 -x fqcn-builtins
 
-RC: 2
+RC: 0
 
 STDERR:
 WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
-WARNING  Listing 16 violation(s) that are fatal
+WARNING  Listing 6 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
   - experimental  # all rules tagged as experimental
-  - unnamed-task  # All tasks should be named.
-  - var-spacing  # Variables should have spaces before and after: {{ var_name }}.
 
 
 
 STDOUT:
 ansible/roles/boxbackup/meta/main.yml:1: schema: Additional properties are not allowed ('pki_authorities', 'pki_certificates', 'pki_private_groups_present', 'pki_realms', 'pki_routes', 'when' were unexpected) (schema[meta])
-ansible/roles/hashicorp/tasks/main.yml:99: unnamed-task: All tasks should be named.
 ansible/roles/lvm/vars/lvm_config_2.02.168.yml:1: schema: 'global' does not match any of the regexes: '^(?!(False|None|True|and|any_errors_fatal|as|assert|async|await|become|become_exe|become_flags|become_method|become_user|break|check_mode|class|collections|connection|continue|debugger|def|del|diff|elif|else|environment|except|fact_path|finally|for|force_handlers|from|gather_facts|gather_subset|gather_timeout|global|handlers|hosts|if|ignore_errors|ignore_unreachable|import|in|is|lambda|max_fail_percentage|module_defaults|name|no_log|nonlocal|not|or|order|pass|port|post_tasks|pre_tasks|raise|remote_user|return|roles|run_once|serial|strategy|tags|tasks|throttle|timeout|try|vars|vars_files|vars_prompt|while|with|yield)$)[\\w]*$' (schema[vars])
 ansible/roles/lvm/vars/lvm_config_debian_stretch.yml:1: schema: 'global' does not match any of the regexes: '^(?!(False|None|True|and|any_errors_fatal|as|assert|async|await|become|become_exe|become_flags|become_method|become_user|break|check_mode|class|collections|connection|continue|debugger|def|del|diff|elif|else|environment|except|fact_path|finally|for|force_handlers|from|gather_facts|gather_subset|gather_timeout|global|handlers|hosts|if|ignore_errors|ignore_unreachable|import|in|is|lambda|max_fail_percentage|module_defaults|name|no_log|nonlocal|not|or|order|pass|port|post_tasks|pre_tasks|raise|remote_user|return|roles|run_once|serial|strategy|tags|tasks|throttle|timeout|try|vars|vars_files|vars_prompt|while|with|yield)$)[\\w]*$' (schema[vars])
-ansible/roles/owncloud/tasks/tarball.yml:46: unnamed-task: All tasks should be named.
-ansible/roles/persistent_paths/tasks/main.yml:12: unnamed-task: All tasks should be named.
-ansible/roles/pki/tasks/main.yml:201: unnamed-task: All tasks should be named.
-ansible/roles/pki/tasks/main.yml:403: unnamed-task: All tasks should be named.
-ansible/roles/rails_deploy/meta/main.yml:1: schema: 'nodejs' is not of type 'array' (schema[meta])
-ansible/roles/rspamd/defaults/main.yml:318: var-spacing: Variables should have spaces before and after: { var_name }.
-roles/hashicorp/tasks/main.yml:99: unnamed-task: All tasks should be named.
+ansible/roles/rails_deploy/meta/main.yml:1: schema: Additional properties are not allowed ('apt_preferences__dependent_list' was unexpected) (schema[meta])
 roles/lvm/vars/lvm_config_2.02.168.yml:1: schema: 'global' does not match any of the regexes: '^(?!(False|None|True|and|any_errors_fatal|as|assert|async|await|become|become_exe|become_flags|become_method|become_user|break|check_mode|class|collections|connection|continue|debugger|def|del|diff|elif|else|environment|except|fact_path|finally|for|force_handlers|from|gather_facts|gather_subset|gather_timeout|global|handlers|hosts|if|ignore_errors|ignore_unreachable|import|in|is|lambda|max_fail_percentage|module_defaults|name|no_log|nonlocal|not|or|order|pass|port|post_tasks|pre_tasks|raise|remote_user|return|roles|run_once|serial|strategy|tags|tasks|throttle|timeout|try|vars|vars_files|vars_prompt|while|with|yield)$)[\\w]*$' (schema[vars])
 roles/lvm/vars/lvm_config_debian_stretch.yml:1: schema: 'global' does not match any of the regexes: '^(?!(False|None|True|and|any_errors_fatal|as|assert|async|await|become|become_exe|become_flags|become_method|become_user|break|check_mode|class|collections|connection|continue|debugger|def|del|diff|elif|else|environment|except|fact_path|finally|for|force_handlers|from|gather_facts|gather_subset|gather_timeout|global|handlers|hosts|if|ignore_errors|ignore_unreachable|import|in|is|lambda|max_fail_percentage|module_defaults|name|no_log|nonlocal|not|or|order|pass|port|post_tasks|pre_tasks|raise|remote_user|return|roles|run_once|serial|strategy|tags|tasks|throttle|timeout|try|vars|vars_files|vars_prompt|while|with|yield)$)[\\w]*$' (schema[vars])
-roles/owncloud/tasks/tarball.yml:46: unnamed-task: All tasks should be named.
-roles/persistent_paths/tasks/main.yml:12: unnamed-task: All tasks should be named.
-roles/rspamd/defaults/main.yml:318: var-spacing: Variables should have spaces before and after: { var_name }.
