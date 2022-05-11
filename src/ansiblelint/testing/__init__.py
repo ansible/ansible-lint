@@ -19,7 +19,7 @@ else:
 
 # Emulate command line execution initialization as without it Ansible module
 # would be loaded with incomplete module/role/collection list.
-app = get_app()
+app = get_app(offline=True)
 
 # pylint: disable=wrong-import-position
 from ansiblelint.errors import MatchError  # noqa: E402

@@ -11,6 +11,9 @@ INFO     Discovered files to lint using: git ls-files --cached --others --exclud
 INFO     Excluded removed files using: git ls-files --deleted -z
 INFO     Discovered files to lint using: git ls-files --cached --others --exclude-standard -z
 INFO     Excluded removed files using: git ls-files --deleted -z
+INFO     Set ANSIBLE_LIBRARY=~/.cache/ansible-compat/7f15ad/modules:~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules
+INFO     Set ANSIBLE_COLLECTIONS_PATH=~/.cache/ansible-compat/7f15ad/collections:~/.ansible/collections:/usr/share/ansible/collections
+INFO     Set ANSIBLE_ROLES_PATH=~/.cache/ansible-compat/7f15ad/roles:roles:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
 WARNING  Listing 62 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml

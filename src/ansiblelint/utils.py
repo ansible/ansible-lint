@@ -463,7 +463,7 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
         path_dwim(basedir, os.path.join("..", role)),
     ]
 
-    for loc in get_app().runtime.config.default_roles_path:
+    for loc in get_app(offline=True).runtime.config.default_roles_path:
         loc = os.path.expanduser(loc)
         possible_paths.append(path_dwim(loc, role))
 

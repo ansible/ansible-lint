@@ -53,7 +53,7 @@ def _write_module_stub(
         f.write(body)
 
 
-def _perform_mockings() -> None:
+def _perform_mockings() -> None:  # noqa: C901
     """Mock modules and roles."""
     for role_name in options.mock_roles:
         if re.match(r"\w+\.\w+\.\w+$", role_name):
@@ -84,7 +84,10 @@ def _perform_mockings() -> None:
     collections_path.mkdir(parents=True, exist_ok=True)
     link_path = collections_path / collection
     target = pathlib.Path(options.project_dir).absolute()
-    if not link_path.exists() or os.readlink(link_path) != target:
-        if link_path.exists():
+    try:
+        while os.readlink(link_path) != target:
             link_path.unlink()
+    except FileNotFoundError:
+        pass
+    if not link_path.exists():
         link_path.symlink_to(target, target_is_directory=True)

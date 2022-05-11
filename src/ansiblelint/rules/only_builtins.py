@@ -30,9 +30,11 @@ class OnlyBuiltinsRule(AnsibleLintRule):
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
 
+    # pylint: disable=ungrouped-imports
     import pytest
 
-    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
+    from ansiblelint.constants import VIOLATIONS_FOUND_RC
+    from ansiblelint.testing import RunFromText, run_ansible_lint
 
     SUCCESS_PLAY = """
 - hosts: localhost
@@ -41,24 +43,18 @@ if "pytest" in sys.modules:
     ansible.builtin.shell: echo This rule should not get matched by the only-builtins rule
     """
 
-    FAIL_PLAY = """
-- hosts: localhost
-  tasks:
-  - name: sysctl
-    ansible.posix.sysctl:
-      name: vm.swappiness
-      value: '5'
-    """
-
-    @pytest.mark.parametrize(
-        "rule_runner", (OnlyBuiltinsRule,), indirect=["rule_runner"]
-    )
-    def test_only_builtin_fail(rule_runner: RunFromText) -> None:
+    def test_only_builtin_fail() -> None:
         """Test rule matches."""
-        results = rule_runner.run_playbook(FAIL_PLAY)
-        assert len(results) == 1
-        for result in results:
-            assert result.message == OnlyBuiltinsRule().shortdesc
+        result = run_ansible_lint(
+            "--config-file=/dev/null",
+            "--warn-list=",
+            "--enable-list",
+            "only-builtins",
+            "examples/playbooks/rule-only-builtins.yml",
+        )
+        assert result.returncode == VIOLATIONS_FOUND_RC
+        assert "Finished with 1 failure(s)" in result.stderr
+        assert "only-builtins" in result.stdout
 
     @pytest.mark.parametrize(
         "rule_runner", (OnlyBuiltinsRule,), indirect=["rule_runner"]
