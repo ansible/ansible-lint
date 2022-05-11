@@ -47,7 +47,8 @@ def pytest_configure(config: Any) -> None:
 
         if refresh_schemas():
             pytest.exit(
-                "Schemas are outdated, please update them in a separate pull request.", 1
+                "Schemas are outdated, please update them in a separate pull request.",
+                1,
             )
         else:
             pytest.exit("Schemas already updated", 0)
