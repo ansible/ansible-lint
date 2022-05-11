@@ -17,9 +17,11 @@ class KeyOrderRule(AnsibleLintRule):
     version_added = "v6.2.0"
     needs_raw_task = True
 
-    def matchtask(self, task: Dict[str, Any], file: Optional[Lintable] = None) -> Union[bool, str]:
+    def matchtask(
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
+    ) -> Union[bool, str]:
         raw_task = task["__raw_task__"]
-        if 'name' in raw_task:
+        if "name" in raw_task:
             attribute_list = [*raw_task]
             if bool(attribute_list[0] != "name"):
                 return "'name' key is not first"
@@ -71,17 +73,13 @@ if "pytest" in sys.modules:
       name: task with no_log on top
 """
 
-    @pytest.mark.parametrize(
-        "rule_runner", (KeyOrderRule,), indirect=["rule_runner"]
-    )
+    @pytest.mark.parametrize("rule_runner", (KeyOrderRule,), indirect=["rule_runner"])
     def test_task_name_has_name_first_rule_pass(rule_runner: RunFromText) -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(PLAY_SUCCESS)
         assert len(results) == 0
 
-    @pytest.mark.parametrize(
-        "rule_runner", (KeyOrderRule,), indirect=["rule_runner"]
-    )
+    @pytest.mark.parametrize("rule_runner", (KeyOrderRule,), indirect=["rule_runner"])
     def test_task_name_has_name_first_rule_fail(rule_runner: RunFromText) -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(PLAY_FAIL)
