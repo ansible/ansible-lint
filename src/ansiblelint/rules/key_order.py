@@ -1,27 +1,29 @@
 """All tasks should be have name come first."""
 import sys
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.testing import RunFromText
 
 
-class TaskHasNameFirstRule(AnsibleLintRule):
-    """All tasks should be have name come first."""
+class KeyOrderRule(AnsibleLintRule):
+    """Ensure specific order of keys in mappings."""
 
-    id = "task-name-first"
+    id = "key-order"
     shortdesc = __doc__
     severity = "LOW"
     tags = ["formatting", "experimental"]
     version_added = "v6.2.0"
     needs_raw_task = True
 
-    def matchtask(self, task: Dict[str, Any], file: Optional[Lintable] = None) -> bool:
+    def matchtask(self, task: Dict[str, Any], file: Optional[Lintable] = None) -> Union[bool, str]:
         raw_task = task["__raw_task__"]
-        attribute_list = [*raw_task]
-
-        return bool(attribute_list[0] != "name")
+        if 'name' in raw_task:
+            attribute_list = [*raw_task]
+            if bool(attribute_list[0] != "name"):
+                return "'name' key is not first"
+        return False
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -64,13 +66,13 @@ if "pytest" in sys.modules:
         msg: "Debug without a name"
     - name: Flush handlers
       meta: flush_handlers
-    - no_log: true  # noqa task-name-first
+    - no_log: true  # noqa key-order
       shell: echo hello
       name: task with no_log on top
 """
 
     @pytest.mark.parametrize(
-        "rule_runner", (TaskHasNameFirstRule,), indirect=["rule_runner"]
+        "rule_runner", (KeyOrderRule,), indirect=["rule_runner"]
     )
     def test_task_name_has_name_first_rule_pass(rule_runner: RunFromText) -> None:
         """Test rule matches."""
@@ -78,7 +80,7 @@ if "pytest" in sys.modules:
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (TaskHasNameFirstRule,), indirect=["rule_runner"]
+        "rule_runner", (KeyOrderRule,), indirect=["rule_runner"]
     )
     def test_task_name_has_name_first_rule_fail(rule_runner: RunFromText) -> None:
         """Test rule matches."""
