@@ -162,7 +162,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
 
-    app = get_app()
+    app = get_app(offline=options.offline)
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import _get_matches

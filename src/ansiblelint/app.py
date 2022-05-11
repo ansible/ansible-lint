@@ -242,12 +242,12 @@ def _sanitize_list_options(tag_list: List[str]) -> List[str]:
 
 
 @lru_cache(maxsize=1)
-def get_app() -> App:
+def get_app(offline: bool = False) -> App:
     """Return the application instance."""
     app = App(options=default_options)
     # Make linter use the cache dir from compat
     default_options.cache_dir = app.runtime.cache_dir
 
-    app.runtime.prepare_environment()
+    app.runtime.prepare_environment(offline=offline)
     _perform_mockings()
     return app

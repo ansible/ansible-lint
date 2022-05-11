@@ -70,7 +70,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 shell=False,  # needed when command is a list
                 universal_newlines=True,
                 check=False,
-                env=get_app().runtime.environ,
+                env=get_app(offline=True).runtime.environ,
             )
             result = []
         if run.returncode != 0:
