@@ -125,6 +125,12 @@ if "pytest" in sys.modules:
                 "execution-environment",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
             ),
+            ("examples/meta/runtime.yml", "meta-runtime", []),
+            (
+                "examples/broken_collection_meta_runtime/meta/runtime.yml",
+                "meta-runtime",
+                ["Additional properties are not allowed ('foo' was unexpected)"],
+            ),
         ),
         ids=(
             # "playbook-fail",
@@ -134,6 +140,8 @@ if "pytest" in sys.modules:
             "vars",
             "ee",
             "ee-broken",
+            "meta-runtime",
+            "meta-runtime-broken",
         ),
     )
     # # unsupported yet:
