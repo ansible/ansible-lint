@@ -156,6 +156,16 @@ if "pytest" in sys.modules:
                 "ansible-lint-config",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
             ),
+            (
+                "examples/ansible-navigator.yml",
+                "ansible-navigator-config",
+                [],
+            ),
+            (
+                "examples/broken/ansible-navigator.yml",
+                "ansible-navigator-config",
+                ["Additional properties are not allowed ('ansible' was unexpected)"],
+            ),
         ),
         ids=(
             # "playbook-fail",
@@ -172,14 +182,10 @@ if "pytest" in sys.modules:
             "lint-config",
             "lint-config2",
             "lint-config-broken",
+            "navigator",
+            "navigator-broken",
         ),
     )
-    # # unsupported yet:
-    # "execution-environment": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json",
-    # "meta-runtime": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
-    # "inventory": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json",
-    # "ansible-lint-config": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-lint.json",
-    # "ansible-navigator-config": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json",
     def test_schema(file: str, expected_kind: str, expected: List[str]) -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(file)
@@ -189,7 +195,6 @@ if "pytest" in sys.modules:
         rules.register(ValidateSchemaRule())
         results = Runner(lintable, rules=rules).run()
 
-        # ValidateSchemaRule.process_lintable(lintable)
         assert len(results) == len(expected), results
         for idx, result in enumerate(results):
             assert result.filename.endswith(file)

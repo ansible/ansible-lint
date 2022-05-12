@@ -14,6 +14,7 @@ DEFAULT_KINDS = [
     {"execution-environment": "**/execution-environment.yml"},
     {"ansible-lint-config": "**/.ansible-lint"},
     {"ansible-lint-config": "**/.config/ansible-lint.yml"},
+    {"ansible-navigator-config": "**/ansible-navigator.{yaml,yml}"},
     {"inventory": "**/inventory/**.yml"},
     {"requirements": "**/meta/requirements.yml"},  # v1 only
     # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
@@ -71,7 +72,6 @@ JSON_SCHEMAS = {
     "requirements": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-requirements.json",
     "meta": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
     "galaxy": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json",
-    # unsupported yet:
     "execution-environment": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json",
     "meta-runtime": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
     "inventory": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json",
