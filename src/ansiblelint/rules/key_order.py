@@ -5,6 +5,9 @@ from typing import Any, Dict, Optional, Union
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.testing import RunFromText
+from ansiblelint.config import options
+
+from collections import OrderedDict as odict
 
 
 class KeyOrderRule(AnsibleLintRule):
@@ -17,14 +20,36 @@ class KeyOrderRule(AnsibleLintRule):
     version_added = "v6.2.0"
     needs_raw_task = True
 
+    # skipped rules causes error
+    # delegate_to is always present
+    # tags is never in the right order
+    removed_keys = ['skipped_rules']
+    possible_keys = options.key_order
+    ordered_expected_keys = odict(
+        (key, idx) for idx, key in enumerate(possible_keys)
+    )
+
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
-        raw_task = task["__raw_task__"]
-        if "name" in raw_task:
-            attribute_list = [*raw_task]
-            if bool(attribute_list[0] != "name"):
-                return "'name' key is not first"
+        keys = task["__raw_task__"].keys()
+
+        # get the expected order in from the lookup table
+        actual_order = odict()
+        for attr in keys:
+            if not attr.startswith('__') and (attr not in self.removed_keys):
+                pos = self.ordered_expected_keys.get(attr)
+                if pos == None:
+                    pos = self.ordered_expected_keys.get('action')
+                actual_order[attr] = pos
+
+        sorted_actual_order = odict(
+            sorted(actual_order.items(), key=lambda item: item[1])
+        )
+
+
+        if bool(sorted_actual_order != actual_order):
+            return "Keys are not in order"
         return False
 
 
@@ -56,6 +81,9 @@ if "pytest" in sys.modules:
     - register: test
       shell: echo hello
       name: register first
+    - tags: hello
+      name: echo hello with tags
+      shell: echo hello with tags
 """
 
     PLAY_SUCCESS = """---
@@ -83,4 +111,4 @@ if "pytest" in sys.modules:
     def test_task_name_has_name_first_rule_fail(rule_runner: RunFromText) -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(PLAY_FAIL)
-        assert len(results) == 6
+        assert len(results) == 7
