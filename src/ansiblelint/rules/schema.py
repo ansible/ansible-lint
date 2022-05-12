@@ -141,6 +141,21 @@ if "pytest" in sys.modules:
                 "inventory",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
             ),
+            (
+                ".ansible-lint",
+                "ansible-lint-config",
+                [],
+            ),
+            (
+                "examples/.config/ansible-lint.yml",
+                "ansible-lint-config",
+                [],
+            ),
+            (
+                "examples/broken/.ansible-lint",
+                "ansible-lint-config",
+                ["Additional properties are not allowed ('foo' was unexpected)"],
+            ),
         ),
         ids=(
             # "playbook-fail",
@@ -154,6 +169,9 @@ if "pytest" in sys.modules:
             "meta-runtime-broken",
             "inventory",
             "inventory-broken",
+            "lint-config",
+            "lint-config2",
+            "lint-config-broken",
         ),
     )
     # # unsupported yet:
