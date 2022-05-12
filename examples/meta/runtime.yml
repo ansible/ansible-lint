@@ -1,0 +1,3 @@
+---
+# https://docs.ansible.com/ansible/latest/dev_guide/developing_collections_structure.html
+requires_ansible: ">=2.10,<2.20"
