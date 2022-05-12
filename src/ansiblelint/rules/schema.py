@@ -131,6 +131,16 @@ if "pytest" in sys.modules:
                 "meta-runtime",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
             ),
+            (
+                "examples/inventory/production.yml",
+                "inventory",
+                [],
+            ),
+            (
+                "examples/inventory/broken_dev_inventory.yml",
+                "inventory",
+                ["Additional properties are not allowed ('foo' was unexpected)"],
+            ),
         ),
         ids=(
             # "playbook-fail",
@@ -142,6 +152,8 @@ if "pytest" in sys.modules:
             "ee-broken",
             "meta-runtime",
             "meta-runtime-broken",
+            "inventory",
+            "inventory-broken",
         ),
     )
     # # unsupported yet:
