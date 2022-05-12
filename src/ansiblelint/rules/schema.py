@@ -115,6 +115,16 @@ if "pytest" in sys.modules:
                 "vars",
                 ["'123' does not match any of the regexes"],
             ),
+            (
+                "examples/execution-environment.yml",
+                "execution-environment",
+                [],
+            ),
+            (
+                "examples/ee_broken/execution-environment.yml",
+                "execution-environment",
+                ["Additional properties are not allowed ('foo' was unexpected)"],
+            ),
         ),
         ids=(
             # "playbook-fail",
@@ -122,6 +132,8 @@ if "pytest" in sys.modules:
             "requirements",
             "meta",
             "vars",
+            "ee",
+            "ee-broken",
         ),
     )
     # # unsupported yet:

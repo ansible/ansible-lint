@@ -11,6 +11,7 @@ DEFAULT_KINDS = [
     {"jinja2": "**/*.j2.*"},
     {"yaml": ".github/**/*.{yaml,yml}"},  # github workflows
     {"text": "**/templates/**/*.*"},  # templates are likely not validable
+    {"execution-environment": "**/execution-environment.yml"},
     {"inventory": "**/inventory/**.yml"},
     {"requirements": "**/meta/requirements.yml"},  # v1 only
     # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
