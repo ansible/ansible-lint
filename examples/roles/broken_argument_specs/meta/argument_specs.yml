@@ -1,0 +1,5 @@
+---
+argument_specs:
+  main:
+    foo: bar # <-- invalid based on json schema
+    options: {}

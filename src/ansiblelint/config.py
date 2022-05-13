@@ -77,6 +77,7 @@ JSON_SCHEMAS = {
     "inventory": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json",
     "ansible-lint-config": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-lint.json",
     "ansible-navigator-config": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json",
+    "arg_specs": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-argument-specs.json",
 }
 
 options = Namespace(
