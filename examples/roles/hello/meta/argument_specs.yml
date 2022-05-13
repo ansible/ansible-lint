@@ -1,0 +1,27 @@
+---
+# https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation
+argument_specs:
+  main:
+    short_description: The main entry point for the role.
+    description: "a longer description"
+    options:
+      my_app_int:
+        type: "int"
+        required: false
+        default: 42
+        description: "The integer value, defaulting to 42."
+        no_log: false
+
+      my_app_str:
+        type: "str"
+        required: true
+        description: "The string value"
+
+  alternate:
+    short_description: The alternate entry point for the my_app role.
+    options:
+      my_app_int:
+        type: "int"
+        required: false
+        default: 1024
+        description: "The integer value, defaulting to 1024."
