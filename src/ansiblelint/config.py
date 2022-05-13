@@ -11,6 +11,10 @@ DEFAULT_KINDS = [
     {"jinja2": "**/*.j2.*"},
     {"yaml": ".github/**/*.{yaml,yml}"},  # github workflows
     {"text": "**/templates/**/*.*"},  # templates are likely not validable
+    {"execution-environment": "**/execution-environment.yml"},
+    {"ansible-lint-config": "**/.ansible-lint"},
+    {"ansible-lint-config": "**/.config/ansible-lint.yml"},
+    {"ansible-navigator-config": "**/ansible-navigator.{yaml,yml}"},
     {"inventory": "**/inventory/**.yml"},
     {"requirements": "**/meta/requirements.yml"},  # v1 only
     # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
@@ -23,6 +27,7 @@ DEFAULT_KINDS = [
     {"handlers": "**/handlers/*.{yaml,yml}"},
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
     {"meta": "**/meta/main.{yaml,yml}"},
+    {"meta-runtime": "**/meta/runtime.{yaml,yml}"},
     {"arg_specs": "**/roles/**/meta/argument_specs.{yaml,yml}"},  # role argument specs
     {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
     {
@@ -67,7 +72,6 @@ JSON_SCHEMAS = {
     "requirements": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-requirements.json",
     "meta": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
     "galaxy": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json",
-    # unsupported yet:
     "execution-environment": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json",
     "meta-runtime": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
     "inventory": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json",

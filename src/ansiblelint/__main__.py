@@ -162,7 +162,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
 
-    app = get_app()
+    app = get_app(offline=options.offline)
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import _get_matches
@@ -274,11 +274,12 @@ def path_inject() -> None:
         ansible_path = os.path.dirname(ansible_path)
     py_path = os.path.dirname(sys.executable)
     # Determine if we need to manipulate PATH
-    if ansible_path not in paths or py_path != ansible_path:  # pragma: no cover
-        # tested by test_call_from_outside_venv but coverage cannot detect it
-        paths.insert(0, py_path)
-        os.environ["PATH"] = os.pathsep.join(paths)
-        print(f"WARNING: PATH altered to include {py_path}", file=sys.stderr)
+    for path in (ansible_path, py_path):
+        if path and path not in paths:  # pragma: no cover
+            # tested by test_call_from_outside_venv but coverage cannot detect it
+            paths.insert(0, path)
+            os.environ["PATH"] = os.pathsep.join(paths)
+            print(f"WARNING: PATH altered to include {path}", file=sys.stderr)
 
 
 if __name__ == "__main__":

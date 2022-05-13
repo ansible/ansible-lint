@@ -1,0 +1,38 @@
+---
+all:
+  hosts:
+    mail.example.com:
+  children:
+    webservers:
+      hosts:
+        foo.example.com:
+        bar.example.com:
+        # ranges are supported:
+        www[01:50].example.com:
+        www[01:50:2].example.com:
+          # these are variables:
+          var_1: value_1
+          another_var: 200
+    dbservers:
+      hosts:
+        one.example.com:
+        two.example.com:
+        three.example.com:
+    east:
+      hosts:
+        foo.example.com:
+        one.example.com:
+        two.example.com:
+    west:
+      hosts:
+        bar.example.com:
+        three.example.com:
+    prod:
+      children:
+        east:
+    test:
+      children:
+        west:
+  # add variables for all hosts
+  vars:
+    my_var: 123
