@@ -54,6 +54,7 @@ class YamllintRule(AnsibleLintRule):
         for problem in run_yamllint(
             file.content, YamllintRule.config, filepath=file.path
         ):
+            self.description = problem.desc
             self.severity = "VERY_LOW"
             if problem.level == "error":
                 self.severity = "MEDIUM"
