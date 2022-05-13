@@ -64,10 +64,9 @@ BASE_KINDS = [
 # Maps kinds to JSON schemas
 # See https://www.schemastore.org/json/
 JSON_SCHEMAS = {
-    # playbook and task schemas not used yet due jsonschema bug:
-    # https://github.com/python-jsonschema/jsonschema/issues/931
-    # "playbook": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible.json#/definitions/playbook",
-    # "tasks": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible.json#/definitions/tasks",
+    # Do not use anchors in these URLs because python-jsonschema does not support them:
+    "playbook": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json",
+    "tasks": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json",
     "vars": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-vars.json",
     "requirements": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-requirements.json",
     "meta": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",

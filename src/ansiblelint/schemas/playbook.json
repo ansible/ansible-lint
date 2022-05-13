@@ -1,0 +1,1063 @@
+{
+  "$comment": "Generated from ansible.json, do not edit.",
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "ansible.builtin.import_playbook": {
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "not": {
+            "required": [
+              "import_playbook"
+            ]
+          },
+          "required": [
+            "ansible.builtin.import_playbook"
+          ]
+        },
+        {
+          "not": {
+            "required": [
+              "ansible.builtin.import_playbook"
+            ]
+          },
+          "required": [
+            "import_playbook"
+          ]
+        }
+      ],
+      "patternProperties": {
+        "^(ansible\\.builtin\\.)?import_playbook$": {
+          "markdownDescription": "* Includes a file with a list of plays to be executed.\n *  Files with a list of plays can only be included at the top level.\n * You cannot use this action inside a play.\n\nSee [import_playbook](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/import_playbook_module.html)",
+          "title": "Import Playbook",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "become_method": {
+      "markdownDescription": "See [become](https://docs.ansible.com/ansible/latest/user_guide/become.html)",
+      "oneOf": [
+        {
+          "enum": [
+            "sudo",
+            "su",
+            "pbrun",
+            "pfexec",
+            "runas",
+            "dzdo",
+            "ksu",
+            "doas",
+            "machinectl"
+          ],
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/full-jinja"
+        }
+      ],
+      "title": "Become Method"
+    },
+    "block": {
+      "properties": {
+        "always": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/task"
+              },
+              {
+                "$ref": "#/definitions/block"
+              }
+            ]
+          },
+          "title": "Always",
+          "type": "array"
+        },
+        "any_errors_fatal": {
+          "title": "Any Errors Fatal",
+          "type": "boolean"
+        },
+        "become": {
+          "$ref": "#/definitions/templated-boolean",
+          "title": "Become"
+        },
+        "become_exe": {
+          "title": "Become Exe",
+          "type": "string"
+        },
+        "become_flags": {
+          "title": "Become Flags",
+          "type": "string"
+        },
+        "become_method": {
+          "$ref": "#/definitions/become_method"
+        },
+        "become_user": {
+          "title": "Become User",
+          "type": "string"
+        },
+        "block": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/task"
+              },
+              {
+                "$ref": "#/definitions/block"
+              }
+            ]
+          },
+          "markdownDescription": "Blocks create logical groups of tasks. Blocks also offer ways to handle task errors, similar to exception handling in many programming languages. See [blocks](https://docs.ansible.com/ansible/latest/user_guide/playbooks_blocks.html)",
+          "title": "Block",
+          "type": "array"
+        },
+        "check_mode": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "Check Mode"
+        },
+        "collections": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Collections",
+          "type": "array"
+        },
+        "connection": {
+          "title": "Connection",
+          "type": "string"
+        },
+        "debugger": {
+          "title": "Debugger",
+          "type": "string"
+        },
+        "delegate_facts": {
+          "title": "Delegate Facts",
+          "type": "boolean"
+        },
+        "delegate_to": {
+          "title": "Delegate To",
+          "type": "string"
+        },
+        "diff": {
+          "title": "Diff",
+          "type": "boolean"
+        },
+        "environment": {
+          "$ref": "#/definitions/environment"
+        },
+        "ignore_errors": {
+          "$ref": "#/definitions/ignore_errors"
+        },
+        "ignore_unreachable": {
+          "title": "Ignore Unreachable",
+          "type": "boolean"
+        },
+        "module_defaults": {
+          "title": "Module Defaults"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "no_log": {
+          "$ref": "#/definitions/templated-boolean"
+        },
+        "port": {
+          "title": "Port",
+          "type": "integer"
+        },
+        "remote_user": {
+          "title": "Remote User",
+          "type": "string"
+        },
+        "rescue": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/task"
+              },
+              {
+                "$ref": "#/definitions/block"
+              }
+            ]
+          },
+          "title": "Rescue",
+          "type": "array"
+        },
+        "run_once": {
+          "$ref": "#/definitions/templated-boolean",
+          "title": "Run Once"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "throttle": {
+          "$ref": "#/definitions/templated-integer",
+          "title": "Throttle"
+        },
+        "timeout": {
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        },
+        "when": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "When"
+        }
+      },
+      "required": [
+        "block"
+      ],
+      "type": "object"
+    },
+    "complex_conditional": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "environment": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "$ref": "#/definitions/full-jinja"
+        }
+      ],
+      "title": "Environment"
+    },
+    "full-jinja": {
+      "pattern": "^\\{\\{.*\\}\\}$",
+      "type": "string"
+    },
+    "ignore_errors": {
+      "$ref": "#/definitions/templated-boolean",
+      "markdownDescription": "See [ignore_errors](https://docs.ansible.com/ansible/latest/user_guide/playbooks_error_handling.html#ignoring-failed-commands)",
+      "title": "Ignore Errors"
+    },
+    "no_log": {
+      "$ref": "#/definitions/templated-boolean",
+      "markdownDescription": "Use for protecting sensitive data. See [no_log](https://docs.ansible.com/ansible/latest/reference_appendices/logging.html)",
+      "title": "no_log"
+    },
+    "play": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "ansible.builtin.import_playbook"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "import_playbook"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "any_errors_fatal": {
+          "title": "Any Errors Fatal",
+          "type": "boolean"
+        },
+        "become": {
+          "$ref": "#/definitions/templated-boolean",
+          "title": "Become"
+        },
+        "become_exe": {
+          "title": "Become Exe",
+          "type": "string"
+        },
+        "become_flags": {
+          "title": "Become Flags",
+          "type": "string"
+        },
+        "become_method": {
+          "$ref": "#/definitions/become_method"
+        },
+        "become_user": {
+          "title": "Become User",
+          "type": "string"
+        },
+        "check_mode": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "Check Mode"
+        },
+        "collections": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Collections",
+          "type": "array"
+        },
+        "connection": {
+          "title": "Connection",
+          "type": "string"
+        },
+        "debugger": {
+          "title": "Debugger",
+          "type": "string"
+        },
+        "diff": {
+          "title": "Diff",
+          "type": "boolean"
+        },
+        "environment": {
+          "$ref": "#/definitions/environment"
+        },
+        "fact_path": {
+          "title": "Fact Path",
+          "type": "string"
+        },
+        "force_handlers": {
+          "title": "Force Handlers",
+          "type": "boolean"
+        },
+        "gather_facts": {
+          "title": "Gather Facts",
+          "type": "boolean"
+        },
+        "gather_subset": {
+          "title": "Gather Subset",
+          "type": "boolean"
+        },
+        "gather_timeout": {
+          "title": "Gather Timeout",
+          "type": "integer"
+        },
+        "handlers": {
+          "$ref": "#/definitions/tasks"
+        },
+        "hosts": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Hosts"
+        },
+        "ignore_errors": {
+          "$ref": "#/definitions/ignore_errors"
+        },
+        "ignore_unreachable": {
+          "title": "Ignore Unreachable",
+          "type": "boolean"
+        },
+        "max_fail_percentage": {
+          "title": "Max Fail Percentage",
+          "type": "number"
+        },
+        "module_defaults": {
+          "title": "Module Defaults"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "no_log": {
+          "$ref": "#/definitions/templated-boolean"
+        },
+        "order": {
+          "enum": [
+            "default",
+            "sorted",
+            "reverse_sorted",
+            "reverse_inventory",
+            "shuffle"
+          ],
+          "title": "Order",
+          "type": "string"
+        },
+        "port": {
+          "title": "Port",
+          "type": "integer"
+        },
+        "post_tasks": {
+          "$ref": "#/definitions/tasks"
+        },
+        "pre_tasks": {
+          "$ref": "#/definitions/tasks"
+        },
+        "remote_user": {
+          "title": "Remote User",
+          "type": "string"
+        },
+        "roles": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/play-role"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "markdownDescription": "Roles let you automatically load related vars, files, tasks, handlers, and other Ansible artifacts based on a known file structure. After you group your content in roles, you can easily reuse them and share them with other users.\n See [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)",
+          "title": "Roles",
+          "type": "array"
+        },
+        "run_once": {
+          "$ref": "#/definitions/templated-boolean",
+          "title": "Run Once"
+        },
+        "serial": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^\\d+\\.?\\d*%?$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "pattern": "^\\d+\\.?\\d*%?$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "markdownDescription": "Integer, percentage or list of those. See [Setting the batch size with serial](https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html#setting-the-batch-size-with-serial)",
+          "title": "Batch size"
+        },
+        "strategy": {
+          "title": "Strategy",
+          "type": "string"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "tasks": {
+          "$ref": "#/definitions/tasks"
+        },
+        "throttle": {
+          "$ref": "#/definitions/templated-integer",
+          "title": "Throttle"
+        },
+        "timeout": {
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        },
+        "vars_files": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Vars Files",
+          "type": "array"
+        },
+        "vars_prompt": {
+          "items": {
+            "$ref": "#/definitions/vars_prompt"
+          },
+          "markdownDescription": "See [vars_prompt](https://docs.ansible.com/ansible/latest/user_guide/playbooks_prompts.html)",
+          "title": "vars_prompt",
+          "type": "array"
+        },
+        "when": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "When"
+        }
+      },
+      "required": [
+        "hosts"
+      ],
+      "title": "play",
+      "type": "object"
+    },
+    "play-role": {
+      "markdownDescription": "See [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)",
+      "properties": {
+        "any_errors_fatal": {
+          "title": "Any Errors Fatal",
+          "type": "boolean"
+        },
+        "become": {
+          "$ref": "#/definitions/templated-boolean",
+          "title": "Become"
+        },
+        "become_exe": {
+          "title": "Become Exe",
+          "type": "string"
+        },
+        "become_flags": {
+          "title": "Become Flags",
+          "type": "string"
+        },
+        "become_method": {
+          "$ref": "#/definitions/become_method"
+        },
+        "become_user": {
+          "title": "Become User",
+          "type": "string"
+        },
+        "check_mode": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "Check Mode"
+        },
+        "collections": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Collections",
+          "type": "array"
+        },
+        "connection": {
+          "title": "Connection",
+          "type": "string"
+        },
+        "debugger": {
+          "title": "Debugger",
+          "type": "string"
+        },
+        "delegate_to": {
+          "title": "Delegate To",
+          "type": "string"
+        },
+        "diff": {
+          "title": "Diff",
+          "type": "boolean"
+        },
+        "environment": {
+          "$ref": "#/definitions/environment"
+        },
+        "ignore_errors": {
+          "$ref": "#/definitions/ignore_errors"
+        },
+        "ignore_unreachable": {
+          "title": "Ignore Unreachable",
+          "type": "boolean"
+        },
+        "module_defaults": {
+          "title": "Module Defaults"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "no_log": {
+          "$ref": "#/definitions/templated-boolean"
+        },
+        "port": {
+          "title": "Port",
+          "type": "integer"
+        },
+        "remote_user": {
+          "title": "Remote User",
+          "type": "string"
+        },
+        "role": {
+          "title": "Role",
+          "type": "string"
+        },
+        "run_once": {
+          "$ref": "#/definitions/templated-boolean",
+          "title": "Run Once"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "throttle": {
+          "$ref": "#/definitions/templated-integer",
+          "title": "Throttle"
+        },
+        "timeout": {
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        },
+        "when": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "When"
+        }
+      },
+      "required": [
+        "role"
+      ],
+      "title": "play-role",
+      "type": "object"
+    },
+    "playbook": {
+      "examples": [
+        "playbooks/*.yml",
+        "playbooks/*.yaml"
+      ],
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/ansible.builtin.import_playbook"
+          },
+          {
+            "$ref": "#/definitions/play"
+          }
+        ]
+      },
+      "title": "Ansible Playbook",
+      "type": "array"
+    },
+    "task": {
+      "additionalProperties": true,
+      "not": {
+        "required": [
+          "block"
+        ]
+      },
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "any_errors_fatal": {
+          "title": "Any Errors Fatal",
+          "type": "boolean"
+        },
+        "args": {
+          "$ref": "#/definitions/templated-object",
+          "title": "Args"
+        },
+        "async": {
+          "title": "Async",
+          "type": "integer"
+        },
+        "become": {
+          "$ref": "#/definitions/templated-boolean",
+          "title": "Become"
+        },
+        "become_exe": {
+          "title": "Become Exe",
+          "type": "string"
+        },
+        "become_flags": {
+          "title": "Become Flags",
+          "type": "string"
+        },
+        "become_method": {
+          "$ref": "#/definitions/become_method"
+        },
+        "become_user": {
+          "title": "Become User",
+          "type": "string"
+        },
+        "changed_when": {
+          "$ref": "#/definitions/complex_conditional",
+          "markdownDescription": "See [changed_when](https://docs.ansible.com/ansible/latest/user_guide/playbooks_error_handling.html#defining-changed)",
+          "title": "Changed When"
+        },
+        "check_mode": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "Check Mode"
+        },
+        "collections": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Collections",
+          "type": "array"
+        },
+        "connection": {
+          "title": "Connection",
+          "type": "string"
+        },
+        "debugger": {
+          "title": "Debugger",
+          "type": "string"
+        },
+        "delay": {
+          "title": "Delay",
+          "type": "integer"
+        },
+        "delegate_facts": {
+          "title": "Delegate Facts",
+          "type": "boolean"
+        },
+        "delegate_to": {
+          "title": "Delegate To",
+          "type": "string"
+        },
+        "diff": {
+          "title": "Diff",
+          "type": "boolean"
+        },
+        "environment": {
+          "$ref": "#/definitions/environment"
+        },
+        "failed_when": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "Failed When"
+        },
+        "ignore_errors": {
+          "$ref": "#/definitions/ignore_errors"
+        },
+        "ignore_unreachable": {
+          "title": "Ignore Unreachable",
+          "type": "boolean"
+        },
+        "local_action": {
+          "title": "Local Action",
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "loop": {
+          "title": "Loop",
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "loop_control": {
+          "title": "Loop Control"
+        },
+        "module_defaults": {
+          "title": "Module Defaults"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "no_log": {
+          "$ref": "#/definitions/no_log"
+        },
+        "notify": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Notify"
+        },
+        "poll": {
+          "title": "Poll",
+          "type": "integer"
+        },
+        "port": {
+          "title": "Port",
+          "type": "integer"
+        },
+        "register": {
+          "title": "Register",
+          "type": "string"
+        },
+        "remote_user": {
+          "title": "Remote User",
+          "type": "string"
+        },
+        "retries": {
+          "title": "Retries",
+          "type": "integer"
+        },
+        "run_once": {
+          "$ref": "#/definitions/templated-boolean",
+          "title": "Run Once"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "throttle": {
+          "$ref": "#/definitions/templated-integer",
+          "title": "Throttle"
+        },
+        "timeout": {
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "until": {
+          "title": "Until",
+          "type": "string"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        },
+        "when": {
+          "$ref": "#/definitions/complex_conditional",
+          "title": "When"
+        },
+        "with_dict": {
+          "title": "With Dict"
+        },
+        "with_fileglob": {
+          "title": "With Fileglob"
+        },
+        "with_filetree": {
+          "title": "With Filetree"
+        },
+        "with_first_found": {
+          "title": "With First Found"
+        },
+        "with_flattened": {
+          "title": "With Flattened"
+        },
+        "with_indexed_items": {
+          "title": "With Indexed Items"
+        },
+        "with_ini": {
+          "title": "With Ini"
+        },
+        "with_inventory_hostnames": {
+          "title": "With Inventory Hostnames"
+        },
+        "with_items": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/full-jinja"
+            },
+            {
+              "type": "array"
+            }
+          ],
+          "markdownDescription": "See [loops](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#loops)",
+          "title": "With Items"
+        },
+        "with_lines": {
+          "title": "With Lines"
+        },
+        "with_random_choice": {
+          "title": "With Random Choice"
+        },
+        "with_sequence": {
+          "title": "With Sequence"
+        },
+        "with_subelements": {
+          "title": "With Subelements"
+        },
+        "with_together": {
+          "title": "With Together"
+        }
+      },
+      "title": "task",
+      "type": "object"
+    },
+    "tasks": {
+      "$schema": "http://json-schema.org/draft-07/schema",
+      "examples": [
+        "tasks/*.yml",
+        "handlers/*.yml"
+      ],
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/task"
+          },
+          {
+            "$ref": "#/definitions/block"
+          }
+        ]
+      },
+      "title": "Ansible Tasks Schema",
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "templated-boolean": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/full-jinja",
+          "type": "string"
+        }
+      ]
+    },
+    "templated-integer": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "$ref": "#/definitions/full-jinja",
+          "type": "string"
+        }
+      ]
+    },
+    "templated-object": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "$ref": "#/definitions/full-jinja",
+          "type": "string"
+        }
+      ]
+    },
+    "vars_prompt": {
+      "additionalProperties": false,
+      "properties": {
+        "confirm": {
+          "title": "Confirm",
+          "type": "boolean"
+        },
+        "default": {
+          "title": "Default",
+          "type": "string"
+        },
+        "encrypt": {
+          "enum": [
+            "des_crypt",
+            "bsdi_crypt",
+            "bigcrypt",
+            "crypt16",
+            "md5_crypt",
+            "bcrypt",
+            "sha1_crypt",
+            "sun_md5_crypt",
+            "sha256_crypt",
+            "sha512_crypt",
+            "apr_md5_crypt",
+            "phpass",
+            "pbkdf2_digest",
+            "cta_pbkdf2_sha1",
+            "dlitz_pbkdf2_sha1",
+            "scram",
+            "bsd_nthash"
+          ],
+          "title": "Encrypt",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "private": {
+          "default": true,
+          "title": "Private",
+          "type": "boolean"
+        },
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "salt_size": {
+          "default": 8,
+          "title": "Salt Size",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "prompt"
+      ],
+      "type": "object"
+    }
+  },
+  "examples": [
+    "playbooks/*.yml",
+    "playbooks/*.yaml"
+  ],
+  "items": {
+    "oneOf": [
+      {
+        "$ref": "#/definitions/ansible.builtin.import_playbook"
+      },
+      {
+        "$ref": "#/definitions/play"
+      }
+    ]
+  },
+  "title": "Ansible Playbook",
+  "type": "array"
+}
