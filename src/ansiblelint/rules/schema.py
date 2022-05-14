@@ -166,6 +166,16 @@ if "pytest" in sys.modules:
                 "ansible-navigator-config",
                 ["Additional properties are not allowed ('ansible' was unexpected)"],
             ),
+            (
+                "examples/roles/hello/meta/argument_specs.yml",
+                "arg_specs",
+                [],
+            ),
+            (
+                "examples/roles/broken_argument_specs/meta/argument_specs.yml",
+                "arg_specs",
+                ["Additional properties are not allowed ('foo' was unexpected)"],
+            ),
         ),
         ids=(
             # "playbook-fail",
@@ -184,6 +194,8 @@ if "pytest" in sys.modules:
             "lint-config-broken",
             "navigator",
             "navigator-broken",
+            "argspecs",
+            "argspecs-broken",
         ),
     )
     def test_schema(file: str, expected_kind: str, expected: List[str]) -> None:
