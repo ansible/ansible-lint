@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  tasks:
+    - name: this would typically fire git-latest and partial-become
+      become_user: alice # noqa git-latest partial-become
+      git: src=/path/to/git/repo dest=checkout
