@@ -149,13 +149,12 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
     """Get list of tasks from list made of tasks and nested tasks."""
 
     def get_nested_tasks(task: Any) -> Generator[Any, None, None]:
-        if not task:
+        if not task or not is_nested_task(task):
             return
         for k in NESTED_TASK_KEYS:
-            if task and k in task and task[k]:
+            if k in task and task[k]:
                 for subtask in task[k]:
-                    if is_nested_task(subtask):
-                        yield from get_nested_tasks(subtask)
+                    yield from get_nested_tasks(subtask)
                     yield subtask
 
     for task in task_blocks:
