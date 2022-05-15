@@ -114,6 +114,9 @@ if "pytest" in sys.modules:
       loop:
         - 1
         - 2
+    - no_log: true  # noqa key-order
+      shell: echo hello
+      name: task with no_log on top
 """
 
     @pytest.mark.parametrize("rule_runner", (KeyOrderRule,), indirect=["rule_runner"])

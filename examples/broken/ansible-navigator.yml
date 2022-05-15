@@ -1,0 +1,3 @@
+---
+# https://ansible-navigator.readthedocs.io/en/latest/settings/
+ansible: {} # invalid as it is missing 'ansible-navigator' parent key
