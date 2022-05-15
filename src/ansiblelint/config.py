@@ -115,9 +115,9 @@ DEFAULT_KEY_ORDER = [
     "args",
     "loop",
     "loop_control",
+    # "with_",
     "vars",
     "tags",
-    # "with_",
 ]
 
 options = Namespace(

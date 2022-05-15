@@ -49,7 +49,8 @@ class KeyOrderRule(AnsibleLintRule):
 
 
         if bool(sorted_actual_order != actual_order):
-            return "Keys are not in order"
+            text = ','.join(sorted_actual_order.keys())
+            return f"Keys are not in order. Expected order [{text}]"
         return False
 
 
@@ -82,7 +83,10 @@ if "pytest" in sys.modules:
       shell: echo hello
       name: register first
     - tags: hello
+      no_log: true
       name: echo hello with tags
+      become: true
+      delegate_to: localhost
       shell: echo hello with tags
 """
 
@@ -96,9 +100,20 @@ if "pytest" in sys.modules:
         msg: "Debug without a name"
     - name: Flush handlers
       meta: flush_handlers
-    - no_log: true  # noqa key-order
+    - name: task with no_log on top
+      no_log: true  # noqa key-order
       shell: echo hello
-      name: task with no_log on top
+    - name: echo hello with tags
+      become: true
+      delegate_to: localhost
+      no_log: true
+      shell: echo hello with tags
+      tags: hello
+    - name: loopy
+      command: echo {{ item }}
+      loop:
+        - 1
+        - 2
 """
 
     @pytest.mark.parametrize("rule_runner", (KeyOrderRule,), indirect=["rule_runner"])
