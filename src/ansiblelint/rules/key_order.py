@@ -20,9 +20,7 @@ class KeyOrderRule(AnsibleLintRule):
     version_added = "v6.2.0"
     needs_raw_task = True
 
-    # skipped rules causes error
-    # delegate_to is always present
-    # tags is never in the right order
+    # skipped rules is not a key
     removed_keys = ['skipped_rules']
     possible_keys = options.key_order
     ordered_expected_keys = odict(
@@ -50,7 +48,7 @@ class KeyOrderRule(AnsibleLintRule):
 
         if bool(sorted_actual_order != actual_order):
             text = ','.join(sorted_actual_order.keys())
-            return f"Keys are not in order. Expected order [{text}]"
+            return f"Keys are not in order. Expected order '{text}'"
         return False
 
 
