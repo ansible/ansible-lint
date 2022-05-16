@@ -244,6 +244,8 @@ jobs:
 
   check: # This job does nothing and is only used for the branch protection
     if: always()
+    permissions:
+      issues: write # allow codenotify to comment on pull-request
 
     needs:
       - linters

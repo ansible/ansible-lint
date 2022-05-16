@@ -3,7 +3,6 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
 WARNING  Listing 1 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml

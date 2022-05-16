@@ -82,7 +82,7 @@ def load_yamllint_config() -> YamlLintConfig:
         + "/yamllint/config",
     ]:
         if os.path.isfile(file):
-            _logger.warning(
+            _logger.debug(
                 "Loading custom %s config file, this extends our "
                 "internal yamllint config.",
                 file,
