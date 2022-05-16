@@ -1,15 +1,12 @@
 {
-  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json",
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "additionalProperties": false,
-  "definitions": {
+  "$defs": {
     "CollectionVersionConstraintModel": {
       "additionalProperties": false,
       "title": "CollectionVersionConstraintModel",
       "type": "string"
     },
     "SPDXLicense": {
-      "$ref": "#/definitions/SPDXLicenseEnum",
+      "$ref": "#/$defs/SPDXLicenseEnum",
       "title": "SPDXLicense"
     },
     "SPDXLicenseEnum": {
@@ -449,6 +446,9 @@
       "title": "SPDXLicenseEnum"
     }
   },
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
   "examples": ["galaxy.yml"],
   "properties": {
     "authors": {
@@ -467,7 +467,7 @@
     },
     "dependencies": {
       "additionalProperties": {
-        "$ref": "#/definitions/CollectionVersionConstraintModel"
+        "$ref": "#/$defs/CollectionVersionConstraintModel"
       },
       "title": "Dependencies",
       "type": "object"
@@ -490,7 +490,7 @@
     },
     "license": {
       "items": {
-        "$ref": "#/definitions/SPDXLicense"
+        "$ref": "#/$defs/SPDXLicense"
       },
       "title": "License",
       "type": "array"
