@@ -256,3 +256,11 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           jobs: ${{ toJSON(needs) }}
+
+      - name: Check out src from Git
+        uses: actions/checkout@v2
+
+      - name: Notify repository owners about lint change affecting them
+        uses: sourcegraph/codenotify@v0.6.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

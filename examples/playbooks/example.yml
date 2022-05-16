@@ -45,5 +45,5 @@
       ansible.builtin.apt: state=latest name=apache2
 
     - ansible.builtin.meta: flush_handlers
-    # empty task is currently accepted by ansible as valid code:
+    # empty task is currently accepted by ansible as valid code but not our schemas:
     -

@@ -1,0 +1,33 @@
+# Used for notifying repository owners about linter changes that would affect
+# the lint outcomes on their repositories, so they can fix valid violations
+# even before the linter changes are merged and released.
+#
+# Pull request proposers are should review all new violations and
+# decide if they are correct or not. The `.result` files are expected to be
+# updated and included in the PR when the outcome change is normal.
+#
+# Used by https://github.com/marketplace/actions/codenotify
+
+# https://github.com/robertdebock/ansible-role-bootstrap
+bootstrap.result @robertdebock
+
+# https://github.com/devroles/ansible_collection_system
+colsystem.result @greg-hellings
+
+# https://github.com/debops/debops
+debops.result @drybjed
+
+# https://github.com/konstruktoid/ansible-docker-rootless
+docker-rootless.result @konstruktoid
+
+# https://github.com/konstruktoid/ansible-role-hardening
+hardening.result @konstruktoid
+
+# https://github.com/geerlingguy/ansible-role-mysql.git
+mysql.result @geerlingguy
+
+# https://opendev.org/openstack/tripleo-ansible
+tripleo-ansible.result @ssbarnea
+
+# https://opendev.org/zuul/zuul-jobs
+zuul-jobs.result @ssbarnea
