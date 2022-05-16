@@ -266,3 +266,5 @@ jobs:
         uses: sourcegraph/codenotify@v0.6.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # https://github.com/sourcegraph/codenotify/issues/19
+        continue-on-error: true
