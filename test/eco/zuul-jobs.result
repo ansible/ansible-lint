@@ -6,7 +6,6 @@ STDERR:
 INFO     Set ANSIBLE_LIBRARY=~/.cache/ansible-compat/7f15ad/modules:~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules
 INFO     Set ANSIBLE_COLLECTIONS_PATH=~/.cache/ansible-compat/7f15ad/collections:~/.ansible/collections:/usr/share/ansible/collections
 INFO     Set ANSIBLE_ROLES_PATH=~/.cache/ansible-compat/7f15ad/roles:roles:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
-WARNING  Loading custom .yamllint config file, this extends our internal yamllint config.
 INFO     Set ANSIBLE_LIBRARY=~/.cache/ansible-compat/7f15ad/modules:~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules
 INFO     Set ANSIBLE_COLLECTIONS_PATH=~/.cache/ansible-compat/7f15ad/collections:~/.ansible/collections:/usr/share/ansible/collections
 INFO     Set ANSIBLE_ROLES_PATH=~/.cache/ansible-compat/7f15ad/roles:roles:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles

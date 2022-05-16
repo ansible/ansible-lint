@@ -82,7 +82,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/ansible_lint-*.dist-info/
 %{_bindir}/ansible-lint
 %license COPYING
-%doc docs/* README.rst
+%doc docs/* README.md
 
 %changelog
 Available at https://github.com/ansible-community/ansible-lint/releases

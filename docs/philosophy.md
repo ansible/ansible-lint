@@ -16,7 +16,7 @@ Starting in 2022, additional rules will be added that help content creators read
 
 ## Style and formatting
 
-The focus of Ansible content creators should be on automation, outcomes and readability, rather than style or formatting. Thus is why we follow the same concepts as other code formatting tools like [black](https://github.com/psf/black) and [prettier](https://prettier.io).
+The focus of Ansible content creators should be on automation, outcomes and readability, rather than style or formatting. Thus is why we follow the same concepts as other code formatting tools like \[black\](<https://github.com/psf/black>) and \[prettier\](<https://prettier.io>).
 
 Adoption of `ansible-lint` will save time by keeping reviews focused on the quality of the content and less so on the nuances of formatting and style.
 

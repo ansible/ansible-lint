@@ -1,41 +1,5 @@
 {
-  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "anyOf": [
-    {
-      "type": "null"
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "allow_duplicates": {
-          "title": "Allow Duplicates",
-          "type": "boolean"
-        },
-        "collections": {
-          "items": {
-            "markdownDescription": "See [Using collections in roles](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-roles) and [collection naming conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_in_groups.html#naming-conventions)",
-            "pattern": "^[a-z_]+\\.[a-z_]+$",
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "dependencies": {
-          "items": {
-            "$ref": "#/definitions/DependencyModel"
-          },
-          "title": "Dependencies",
-          "type": "array"
-        },
-        "galaxy_info": {
-          "$ref": "#/definitions/GalaxyInfoModel"
-        }
-      },
-      "required": ["galaxy_info"],
-      "type": "object"
-    }
-  ],
-  "definitions": {
+  "$defs": {
     "AIXPlatformModel": {
       "properties": {
         "name": {
@@ -473,124 +437,124 @@
           "items": {
             "anyOf": [
               {
-                "$ref": "#/definitions/AIXPlatformModel"
+                "$ref": "#/$defs/AIXPlatformModel"
               },
               {
-                "$ref": "#/definitions/AlpinePlatformModel"
+                "$ref": "#/$defs/AlpinePlatformModel"
               },
               {
-                "$ref": "#/definitions/AmazonPlatformModel"
+                "$ref": "#/$defs/AmazonPlatformModel"
               },
               {
-                "$ref": "#/definitions/Amazon_Linux_2PlatformModel"
+                "$ref": "#/$defs/Amazon_Linux_2PlatformModel"
               },
               {
-                "$ref": "#/definitions/aosPlatformModel"
+                "$ref": "#/$defs/aosPlatformModel"
               },
               {
-                "$ref": "#/definitions/ArchLinuxPlatformModel"
+                "$ref": "#/$defs/ArchLinuxPlatformModel"
               },
               {
-                "$ref": "#/definitions/ClearLinuxPlatformModel"
+                "$ref": "#/$defs/ClearLinuxPlatformModel"
               },
               {
-                "$ref": "#/definitions/CumulusPlatformModel"
+                "$ref": "#/$defs/CumulusPlatformModel"
               },
               {
-                "$ref": "#/definitions/DebianPlatformModel"
+                "$ref": "#/$defs/DebianPlatformModel"
               },
               {
-                "$ref": "#/definitions/DellOSPlatformModel"
+                "$ref": "#/$defs/DellOSPlatformModel"
               },
               {
-                "$ref": "#/definitions/DevuanPlatformModel"
+                "$ref": "#/$defs/DevuanPlatformModel"
               },
               {
-                "$ref": "#/definitions/DragonFlyBSDPlatformModel"
+                "$ref": "#/$defs/DragonFlyBSDPlatformModel"
               },
               {
-                "$ref": "#/definitions/ELPlatformModel"
+                "$ref": "#/$defs/ELPlatformModel"
               },
               {
-                "$ref": "#/definitions/eosPlatformModel"
+                "$ref": "#/$defs/eosPlatformModel"
               },
               {
-                "$ref": "#/definitions/FedoraPlatformModel"
+                "$ref": "#/$defs/FedoraPlatformModel"
               },
               {
-                "$ref": "#/definitions/FreeBSDPlatformModel"
+                "$ref": "#/$defs/FreeBSDPlatformModel"
               },
               {
-                "$ref": "#/definitions/GenericBSDPlatformModel"
+                "$ref": "#/$defs/GenericBSDPlatformModel"
               },
               {
-                "$ref": "#/definitions/GenericLinuxPlatformModel"
+                "$ref": "#/$defs/GenericLinuxPlatformModel"
               },
               {
-                "$ref": "#/definitions/GenericUNIXPlatformModel"
+                "$ref": "#/$defs/GenericUNIXPlatformModel"
               },
               {
-                "$ref": "#/definitions/GentooPlatformModel"
+                "$ref": "#/$defs/GentooPlatformModel"
               },
               {
-                "$ref": "#/definitions/HardenedBSDPlatformModel"
+                "$ref": "#/$defs/HardenedBSDPlatformModel"
               },
               {
-                "$ref": "#/definitions/IOSPlatformModel"
+                "$ref": "#/$defs/IOSPlatformModel"
               },
               {
-                "$ref": "#/definitions/JunosPlatformModel"
+                "$ref": "#/$defs/JunosPlatformModel"
               },
               {
-                "$ref": "#/definitions/macOSPlatformModel"
+                "$ref": "#/$defs/macOSPlatformModel"
               },
               {
-                "$ref": "#/definitions/MacOSXPlatformModel"
+                "$ref": "#/$defs/MacOSXPlatformModel"
               },
               {
-                "$ref": "#/definitions/NXOSPlatformModel"
+                "$ref": "#/$defs/NXOSPlatformModel"
               },
               {
-                "$ref": "#/definitions/OpenBSDPlatformModel"
+                "$ref": "#/$defs/OpenBSDPlatformModel"
               },
               {
-                "$ref": "#/definitions/opensusePlatformModel"
+                "$ref": "#/$defs/opensusePlatformModel"
               },
               {
-                "$ref": "#/definitions/os10PlatformModel"
+                "$ref": "#/$defs/os10PlatformModel"
               },
               {
-                "$ref": "#/definitions/PAN-OSPlatformModel"
+                "$ref": "#/$defs/PAN-OSPlatformModel"
               },
               {
-                "$ref": "#/definitions/SLESPlatformModel"
+                "$ref": "#/$defs/SLESPlatformModel"
               },
               {
-                "$ref": "#/definitions/SmartOSPlatformModel"
+                "$ref": "#/$defs/SmartOSPlatformModel"
               },
               {
-                "$ref": "#/definitions/SolarisPlatformModel"
+                "$ref": "#/$defs/SolarisPlatformModel"
               },
               {
-                "$ref": "#/definitions/SynologyPlatformModel"
+                "$ref": "#/$defs/SynologyPlatformModel"
               },
               {
-                "$ref": "#/definitions/TMOSPlatformModel"
+                "$ref": "#/$defs/TMOSPlatformModel"
               },
               {
-                "$ref": "#/definitions/UbuntuPlatformModel"
+                "$ref": "#/$defs/UbuntuPlatformModel"
               },
               {
-                "$ref": "#/definitions/vCenterPlatformModel"
+                "$ref": "#/$defs/vCenterPlatformModel"
               },
               {
-                "$ref": "#/definitions/Void_LinuxPlatformModel"
+                "$ref": "#/$defs/Void_LinuxPlatformModel"
               },
               {
-                "$ref": "#/definitions/vSpherePlatformModel"
+                "$ref": "#/$defs/vSpherePlatformModel"
               },
               {
-                "$ref": "#/definitions/WindowsPlatformModel"
+                "$ref": "#/$defs/WindowsPlatformModel"
               }
             ]
           },
@@ -1215,6 +1179,42 @@
       "type": "object"
     }
   },
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "anyOf": [
+    {
+      "type": "null"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "allow_duplicates": {
+          "title": "Allow Duplicates",
+          "type": "boolean"
+        },
+        "collections": {
+          "items": {
+            "markdownDescription": "See [Using collections in roles](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-roles) and [collection naming conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_in_groups.html#naming-conventions)",
+            "pattern": "^[a-z_]+\\.[a-z_]+$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "dependencies": {
+          "items": {
+            "$ref": "#/$defs/DependencyModel"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "galaxy_info": {
+          "$ref": "#/$defs/GalaxyInfoModel"
+        }
+      },
+      "required": ["galaxy_info"],
+      "type": "object"
+    }
+  ],
   "examples": ["meta/main.yml"],
   "title": "Ansible Meta Schema"
 }
