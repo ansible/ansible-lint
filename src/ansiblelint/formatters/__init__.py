@@ -41,7 +41,6 @@ class BaseFormatter(Generic[T]):
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self._base_dir)
 
-    # pylint: disable=no-self-use
     def format(self, match: "MatchError") -> str:
         """Format a match error."""
         return str(match)
