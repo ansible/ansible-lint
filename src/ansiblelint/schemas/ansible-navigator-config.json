@@ -494,7 +494,7 @@
     "required": [
         "ansible-navigator"
     ],
-    "title": "ansible-navigator settings v2.0",
+    "title": "ansible-navigator settings v2.1",
     "type": "object",
-    "version": "2.0"
+    "version": "2.1"
 }
