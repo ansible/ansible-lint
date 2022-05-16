@@ -82,7 +82,10 @@ except pkg_resources.DistributionNotFound:
 templates_path = [".templates"]
 
 # The suffix of source filenames.
-source_suffix = ".rst"
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 # The master toctree document.
 master_doc = "index"
