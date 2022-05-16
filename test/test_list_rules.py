@@ -26,7 +26,7 @@ def test_list_rules_includes_opt_in_rules() -> None:
     (
         (False, 0, "plain"),
         (False, 0, "rich"),
-        (False, 0, "rst"),
+        (False, 0, "md"),
         (True, 2, "json"),
         (True, 2, "codeclimate"),
         (True, 2, "quiet"),
@@ -36,7 +36,7 @@ def test_list_rules_includes_opt_in_rules() -> None:
     ids=(
         "plain",
         "rich",
-        "rst",
+        "md",
         "json",
         "codeclimate",
         "quiet",

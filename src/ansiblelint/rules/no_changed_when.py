@@ -43,20 +43,20 @@ a particular result.
 For example, this task registers the ``shell`` output and uses the return code
 to define when the task has changed.
 
-.. code:: yaml
-
+```yaml
     - name: handle shell output with return code
       ansible.builtin.shell: cat {{ my_file|quote }}
       register: my_output
       changed_when: my_output.rc != 0
+```
 
 The following example will trigger the rule since the task does not
 handle the output of the ``command``.
 
-.. code:: yaml
-
+```yaml
     - name: does not handle any output or return codes
       ansible.builtin.command: cat {{ my_file|quote }}
+```
     """
     severity = "HIGH"
     tags = ["command-shell", "idempotency"]

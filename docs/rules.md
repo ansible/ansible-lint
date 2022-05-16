@@ -22,8 +22,7 @@ for each available rule, use the `-T` option.
 The following shows the available tags in an example set of rules, and the
 rules associated with each tag:
 
-```{eval-rst}
-.. command-output:: ansible-lint -T
+```{command-output} ansible-lint -T
    :cwd: ..
    :returncode: 0
    :nostderr:

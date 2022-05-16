@@ -320,3 +320,5 @@ nitpick_ignore = [
     ("py:obj", "Any"),
     ("py:obj", "ansiblelint.formatters.T"),
 ]
+
+myst_heading_anchors = 3
