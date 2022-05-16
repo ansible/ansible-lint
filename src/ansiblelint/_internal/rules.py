@@ -13,7 +13,6 @@ _logger = logging.getLogger(__name__)
 
 
 # Derived rules are likely to want to access class members, so:
-# pylint: disable=no-self-use
 # pylint: disable=unused-argument
 class BaseRule:
     """Root class used by Rules."""
@@ -96,7 +95,6 @@ class BaseRule:
         return self.id < other.id
 
 
-# pylint: enable=no-self-use
 # pylint: enable=unused-argument
 
 

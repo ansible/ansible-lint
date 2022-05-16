@@ -198,7 +198,7 @@ class Lintable:
     def get(self, key: Any, default: Any = None) -> Any:
         """Provide compatibility subscriptable support."""
         try:
-            return self.__getitem__(key)
+            return self[key]
         except NotImplementedError:
             return default
 

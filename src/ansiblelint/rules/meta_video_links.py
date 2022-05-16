@@ -54,7 +54,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
             if not isinstance(video, dict):
                 results.append(
                     self.create_matcherror(
-                        "Expected item in 'video_links' to be " "a dictionary",
+                        "Expected item in 'video_links' to be a dictionary",
                         filename=file,
                     )
                 )
