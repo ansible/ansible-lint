@@ -1,8 +1,5 @@
 {
-  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "additionalProperties": false,
-  "definitions": {
+  "$defs": {
     "ActionGroup": {
       "items": {
         "oneOf": [
@@ -10,7 +7,7 @@
             "type": "string"
           },
           {
-            "$ref": "#/definitions/Metadata"
+            "$ref": "#/$defs/Metadata"
           }
         ]
       },
@@ -41,12 +38,15 @@
       "type": "object"
     }
   },
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
   "description": "See https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory",
   "examples": ["**/meta/runtime.yml"],
   "properties": {
     "action_groups": {
       "additionalProperties": {
-        "$ref": "#/definitions/ActionGroup"
+        "$ref": "#/$defs/ActionGroup"
       },
       "description": "A mapping of groups and the list of action plugin and module names they contain. They may also have a special ‘metadata’ dictionary in the list, which can be used to include actions from other groups.",
       "title": "Action Groups",
@@ -54,7 +54,7 @@
     },
     "import_redirection": {
       "additionalProperties": {
-        "$ref": "#/definitions/Redirect"
+        "$ref": "#/$defs/Redirect"
       },
       "description": "A mapping of names for Python import statements and their redirected locations.",
       "title": "Import Redirection",
