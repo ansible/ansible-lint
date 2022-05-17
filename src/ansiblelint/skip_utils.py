@@ -97,7 +97,7 @@ def _append_skipped_rules(
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
 
-    if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno"]:
+    if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
         pyyaml_data[0]["skipped_rules"] = _get_rule_skips_from_yaml(ruamel_data)
         return pyyaml_data
 
