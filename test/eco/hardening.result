@@ -10,21 +10,6 @@ warn_list:  # or 'skip_list' to silence them completely
   - experimental  # all rules tagged as experimental
   - schema  # Perform JSON Schema Validation for known lintable kinds.
 
-    Returned errors will not include exact line numbers, but they will mention
-    the schema name being used as a tag, like ``playbook-schema``,
-    ``tasks-schema``.
-
-    This rule is not skippable and stops further processing of the file.
-
-    Schema bugs should be reported towards https://github.com/ansible/schemas
-    project instead of ansible-lint.
-
-    If incorrect schema was picked, you might want to either:
-
-    * move the file to standard location, so its file is detected correctly.
-    * use ``kinds:`` option in linter config to help it pick correct file type.
-    
-
 
 
 STDOUT:

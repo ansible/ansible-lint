@@ -17,8 +17,7 @@ is machine parseable. The default output format is more verbose and likely
 to contain more information, like long description of the rule and its
 associated tags.
 
-```{eval-rst}
-.. command-output:: ansible-lint --help
+```{command-output} ansible-lint --help
    :cwd: ..
    :returncode: 0
 ```
@@ -71,8 +70,7 @@ heuristics to determine file types.
 arguments. The following command lints `examples/playbooks/play.yml` and
 `examples/roles/bobbins` role:
 
-```{eval-rst}
-.. command-output:: ansible-lint -p examples/playbooks/play.yml examples/roles/bobbins
+```{command-output} ansible-lint -p examples/playbooks/play.yml examples/roles/bobbins
    :cwd: ..
    :returncode: 2
    :nostderr:
@@ -84,8 +82,7 @@ Included in `ansible-lint/examples` are some example playbooks with
 undesirable features. Running ansible-lint on them works, as demonstrated in
 the following:
 
-```{eval-rst}
-.. command-output:: ansible-lint -p examples/playbooks/example.yml
+```{command-output} ansible-lint -p examples/playbooks/example.yml
    :cwd: ..
    :returncode: 2
    :nostderr:
@@ -94,8 +91,7 @@ the following:
 If playbooks include other playbooks, or tasks, or handlers or roles, these
 are also handled:
 
-```{eval-rst}
-.. command-output:: ansible-lint --force-color --offline -p examples/playbooks/include.yml
+```{command-output} ansible-lint --force-color --offline -p examples/playbooks/include.yml
    :cwd: ..
    :returncode: 2
    :nostderr:
@@ -104,8 +100,7 @@ are also handled:
 A `JSON` report, based on codeclimate specification, can be generated with
 ansible-lint.
 
-```{eval-rst}
-.. command-output:: ansible-lint -f json examples/playbooks/norole.yml
+```{command-output} ansible-lint -f json examples/playbooks/norole.yml
    :cwd: ..
    :returncode: 2
    :nostderr:
