@@ -20,6 +20,7 @@ class BaseRule:
     id: str = ""
     tags: List[str] = []
     description: str = ""
+    help: str = ""  # markdown help (automatically loaded from `<rule>.md`)
     version_added: str = ""
     severity: str = ""
     link: str = ""

@@ -28,6 +28,7 @@ repos:
             examples/playbooks/templates/not-valid.yaml|
             examples/playbooks/with-umlaut-.*|
             examples/playbooks/with-skip-tag-id.yml|
+            examples/yamllint/.*|
             test/fixtures/formatting-before/.*|
             src/ansiblelint/schemas/.*
           )$
@@ -53,6 +54,7 @@ repos:
         exclude: >
           (?x)^(
             test/eco/.*.result|
+            examples/yamllint/.*|
             test/fixtures/formatting-before/.*|
             test/fixtures/formatting-prettier/.*
           )$
@@ -61,6 +63,7 @@ repos:
           (?x)^(
             examples/playbooks/(with-skip-tag-id|unicode).yml|
             examples/playbooks/example.yml|
+            examples/yamllint/.*|
             test/eco/.*.result|
             test/fixtures/formatting-before/.*
           )$
@@ -89,6 +92,7 @@ repos:
         exclude: >
           (?x)^(
             examples/playbooks/templates/.*|
+            examples/yamllint/.*|
             examples/other/some.j2.yaml|
             test/fixtures/formatting-before/.*
           )$
