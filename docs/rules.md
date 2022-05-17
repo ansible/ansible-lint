@@ -25,7 +25,7 @@ rules associated with each tag:
 ```{command-output} ansible-lint -T
    :cwd: ..
    :returncode: 0
-   :nostderr:
+   :nostderr: true
 ```
 
 To run just the _idempotency_ rules, for example, run the following:
