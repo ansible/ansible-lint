@@ -157,10 +157,10 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
         for match in matches:
             issue: Dict[str, Any] = {}
             issue["type"] = "issue"
-            issue["check_name"] = f"[{match.rule.id}] {match.message}"
+            issue["check_name"] = match.tag or match.rule.id  # rule-id[subrule-id]
             issue["categories"] = match.rule.tags
             issue["severity"] = self._severity_to_level(match.rule.severity)
-            issue["description"] = self.escape(str(match.rule.description))
+            issue["description"] = self.escape(str(match.message))
             issue["fingerprint"] = hashlib.sha256(
                 repr(match).encode("utf-8")
             ).hexdigest()
