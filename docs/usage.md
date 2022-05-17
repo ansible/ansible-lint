@@ -73,7 +73,7 @@ arguments. The following command lints `examples/playbooks/play.yml` and
 ```{command-output} ansible-lint -p examples/playbooks/play.yml examples/roles/bobbins
    :cwd: ..
    :returncode: 2
-   :nostderr:
+   :nostderr: true
 ```
 
 ## Examples
@@ -85,7 +85,7 @@ the following:
 ```{command-output} ansible-lint -p examples/playbooks/example.yml
    :cwd: ..
    :returncode: 2
-   :nostderr:
+   :nostderr: true
 ```
 
 If playbooks include other playbooks, or tasks, or handlers or roles, these
@@ -94,7 +94,7 @@ are also handled:
 ```{command-output} ansible-lint --force-color --offline -p examples/playbooks/include.yml
    :cwd: ..
    :returncode: 2
-   :nostderr:
+   :nostderr: true
 ```
 
 A `JSON` report, based on codeclimate specification, can be generated with
@@ -103,7 +103,7 @@ ansible-lint.
 ```{command-output} ansible-lint -f json examples/playbooks/norole.yml
    :cwd: ..
    :returncode: 2
-   :nostderr:
+   :nostderr: true
 ```
 
 [annotation]: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
