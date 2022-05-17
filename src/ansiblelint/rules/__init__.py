@@ -385,13 +385,13 @@ class RulesCollection:
             try:
                 if file.content is not None:  # loads the file content
                     pass
-            except IOError as exc:
+            except (IOError, UnicodeDecodeError) as exc:
                 return [
                     MatchError(
                         message=str(exc),
                         filename=file,
                         rule=LoadingFailureRule(),
-                        tag=exc.__class__.__name__.lower(),
+                        tag=f"{LoadingFailureRule.id}[{exc.__class__.__name__.lower()}]",
                     )
                 ]
 

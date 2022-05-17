@@ -3,11 +3,12 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Listing 49 violation(s) that are fatal
+WARNING  Listing 50 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
   - experimental  # all rules tagged as experimental
+  - load-failure  # Failed to load or parse file.
   - schema  # Perform JSON Schema Validation for known lintable kinds.
 
 
@@ -62,3 +63,4 @@ tasks/systemdconf.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
 tasks/timesyncd.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
 tasks/umask.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
 tasks/users.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
+templates/usr/share/dict/passwords.list.j2:1: load-failure: 'utf-8' codec can't decode byte 0xc3 in position 104779: invalid continuation byte (load-failure[unicodedecodeerror])

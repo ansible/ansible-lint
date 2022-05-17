@@ -16,7 +16,7 @@ warn_list:  # or 'skip_list' to silence them completely
 
 
 STDOUT:
-.ansible-lint:1: load-failure: [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (filenotfounderror)
+.ansible-lint:1: load-failure: [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (load-failure[filenotfounderror])
 playbooks/molecule/sudo/molecule.yml:17: yaml: line too long (576 > 160 characters) (line-length)
 roles/authorized_key/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
 roles/common/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
