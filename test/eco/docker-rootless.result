@@ -3,20 +3,6 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 0
 
 STDERR:
-WARNING  Listing 8 violation(s) that are fatal
-You can skip specific rules or tags by adding them to your configuration file:
-# .config/ansible-lint.yml
-warn_list:  # or 'skip_list' to silence them completely
-  - experimental  # all rules tagged as experimental
-
 
 
 STDOUT:
-meta/main.yml:1: schema: 8 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-molecule/default/verify.yml:1: schema: 'yes' is not of type 'boolean' (schema[playbook])
-tasks/bashrc.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/docker_install_rootful.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/docker_install_rootless.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/docker_service_rootful.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/manage_user.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/pre.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])

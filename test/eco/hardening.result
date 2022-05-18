@@ -3,64 +3,17 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Listing 50 violation(s) that are fatal
+WARNING  Listing 5 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
-  - experimental  # all rules tagged as experimental
   - load-failure  # Failed to load or parse file.
-  - schema  # Perform JSON Schema Validation for known lintable kinds.
 
 
 
 STDOUT:
 defaults/main/sshd.yml:20: yaml: line too long (143 > 120 characters) (yaml[line-length])
-meta/main.yml:1: schema: 8 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-molecule/default/verify.yml:1: schema: 'yes' is not of type 'boolean' (schema[playbook])
-tasks/adduser.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/aide.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/apparmor.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/apport.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/auditd.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
 tasks/auditd.yml:21: yaml: line too long (122 > 120 characters) (yaml[line-length])
-tasks/compilers.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/cron.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/ctrlaltdel.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/disablefs.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/disablemod.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/disablenet.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/disablewireless.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/extras.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/firewall.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/fstab.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/hosts.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/issue.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/journalconf.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/limits.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/lockroot.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/logindconf.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/logindefs.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/motdnews.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/mount.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/packagemgmt.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
 tasks/packagemgmt.yml:164: yaml: line too long (129 > 120 characters) (yaml[line-length])
 tasks/packagemgmt.yml:192: yaml: line too long (162 > 120 characters) (yaml[line-length])
-tasks/packages.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/password.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/path.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/post.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/postfix.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/pre.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/prelink.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/resolvedconf.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/rkhunter.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/rootaccess.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/sshconfig.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/sudo.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/suid.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/sysctl.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/systemdconf.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/timesyncd.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/umask.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
-tasks/users.yml:1: schema: 'yes' is not of type 'boolean' (schema[tasks])
 templates/usr/share/dict/passwords.list.j2:1: load-failure: 'utf-8' codec can't decode byte 0xc3 in position 104779: invalid continuation byte (load-failure[unicodedecodeerror])
