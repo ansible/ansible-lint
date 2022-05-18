@@ -658,24 +658,6 @@
       "title": "play-role",
       "type": "object"
     },
-    "playbook": {
-      "examples": [
-        "playbooks/*.yml",
-        "playbooks/*.yaml"
-      ],
-      "items": {
-        "oneOf": [
-          {
-            "$ref": "#/$defs/ansible.builtin.import_playbook"
-          },
-          {
-            "$ref": "#/$defs/play"
-          }
-        ]
-      },
-      "title": "Ansible Playbook",
-      "type": "array"
-    },
     "task": {
       "additionalProperties": true,
       "not": {
