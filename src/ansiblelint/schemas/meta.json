@@ -213,6 +213,10 @@
       ],
       "markdownDescription": "See https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-dependencies and https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79",
       "properties": {
+        "become": {
+          "title": "Become",
+          "type": "boolean"
+        },
         "name": {
           "title": "Name",
           "type": "string"
@@ -243,6 +247,10 @@
         },
         "version": {
           "title": "Version",
+          "type": "string"
+        },
+        "when": {
+          "title": "When",
           "type": "string"
         }
       },
@@ -1211,7 +1219,6 @@
           "$ref": "#/$defs/GalaxyInfoModel"
         }
       },
-      "required": ["galaxy_info"],
       "type": "object"
     }
   ],
