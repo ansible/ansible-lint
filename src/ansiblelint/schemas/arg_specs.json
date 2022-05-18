@@ -39,10 +39,30 @@
       "additionalProperties": false,
       "properties": {
         "author": {
-          "type": "string"
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
         },
         "description": {
-          "type": "string"
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
         },
         "options": {
           "additionalProperties": {
@@ -50,7 +70,75 @@
           },
           "type": "object"
         },
+        "seealso": {
+          "items": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "module": {
+                    "type": "string"
+                  }
+                },
+                "required": ["module"],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "plugin": {
+                    "type": "string"
+                  },
+                  "plugin_type": {
+                    "type": "string"
+                  }
+                },
+                "required": ["plugin", "plugin_type"],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "ref": {
+                    "type": "string"
+                  }
+                },
+                "required": ["description", "ref"],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "link": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["description", "link", "name"],
+                "type": "object"
+              }
+            ]
+          },
+          "type": "array"
+        },
         "short_description": {
+          "type": "string"
+        },
+        "version_added": {
           "type": "string"
         }
       },
@@ -81,14 +169,24 @@
       },
       "properties": {
         "choices": {
-          "$ref": "#/$defs/datatype"
+          "type": "array"
         },
         "default": {
           "default": "None"
         },
         "description": {
           "description": "Detailed explanation of what this option does. It should be written in full sentences.",
-          "type": "string"
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
         },
         "elements": {
           "$ref": "#/$defs/datatype"
@@ -105,6 +203,12 @@
           "description": "The name of the option/argument.",
           "type": "string"
         },
+        "options": {
+          "additionalProperties": {
+            "$ref": "#/$defs/option"
+          },
+          "type": "object"
+        },
         "required": {
           "default": false,
           "type": "boolean"
@@ -112,6 +216,9 @@
         "type": {
           "$ref": "#/$defs/datatype",
           "markdownDescription": "See [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec"
+        },
+        "version_added": {
+          "type": "string"
         }
       },
       "removed_at_date": {

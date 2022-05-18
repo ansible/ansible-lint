@@ -296,19 +296,32 @@ def is_valid_rule(rule: Any) -> bool:
     return issubclass(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc)
 
 
+# pylint: disable=too-many-nested-blocks
 def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
     """Yield a rule class."""
     for pluginfile in glob.glob(os.path.join(directory, "[A-Za-z]*.py")):
 
         pluginname = os.path.basename(pluginfile.replace(".py", ""))
         spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
+
         # https://github.com/python/typeshed/issues/2793
         if spec and isinstance(spec.loader, Loader):
+
+            # load rule markdown documentation if found
+            help_md = ""
+            if spec.origin:
+                md_filename = os.path.splitext(spec.origin)[0] + ".md"
+                if os.path.exists(md_filename):
+                    with open(md_filename, encoding="utf-8") as f:
+                        help_md = f.read()
+
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             try:
                 for _, obj in inspect.getmembers(module):
                     if inspect.isclass(obj) and is_valid_rule(obj):
+                        if help_md:
+                            obj.help = help_md
                         yield obj()
 
             except (TypeError, ValueError, AttributeError) as exc:

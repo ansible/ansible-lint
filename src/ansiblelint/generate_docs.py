@@ -42,11 +42,18 @@ def rules_as_md(rules: RulesCollection) -> str:
         # and we do not have to insert `(target_header)=`
         title = f"{rule.id}"
 
-        description = rule.description
-        if rule.link:
-            description += f" [more]({rule.link})"
+        if rule.help:
+            if not rule.help.startswith(f"## {rule.id}"):
+                raise RuntimeError(
+                    f"Rule {rule.__class__} markdown help does not start with `## {rule.id}` header.\n{rule.help}"
+                )
+            result += f"\n\n{rule.help}"
+        else:
+            description = rule.description
+            if rule.link:
+                description += f" [more]({rule.link})"
 
-        result += f"\n\n## {title}\n\n**{rule.shortdesc}**\n\n{description}"
+            result += f"\n\n## {title}\n\n**{rule.shortdesc}**\n\n{description}"
 
     return result
 
@@ -59,7 +66,8 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
         table = Table(show_header=True, header_style="title", box=box.MINIMAL)
         table.add_column(rule.id, style="dim", width=width)
         table.add_column(Markdown(rule.shortdesc))
-        description = rule.description
+
+        description = rule.help or rule.description
         if rule.link:
             description += f" [(more)]({rule.link})"
         table.add_row("description", Markdown(description))

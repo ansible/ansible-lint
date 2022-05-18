@@ -17,7 +17,7 @@ warn_list:  # or 'skip_list' to silence them completely
 
 STDOUT:
 .ansible-lint:1: load-failure: [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (load-failure[filenotfounderror])
-playbooks/molecule/sudo/molecule.yml:17: yaml: line too long (576 > 160 characters) (line-length)
+playbooks/molecule/sudo/molecule.yml:17: yaml: line too long (576 > 160 characters) (yaml[line-length])
 roles/authorized_key/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
 roles/common/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
 roles/common/tasks/main.yml:1: unnamed-task: All tasks should be named.
@@ -28,8 +28,8 @@ roles/copy_or_link/meta/main.yml:1: schema: 2.4 is not of type 'string' (schema[
 roles/dev/meta/main.yml:1: schema: 2.4 is not of type 'string' (schema[meta])
 roles/dotfiles/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
 roles/epel/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-roles/firewalld/defaults/main.yml:11: yaml: missing starting space in comment (comments)
-roles/firewalld/defaults/main.yml:28: yaml: missing starting space in comment (comments)
+roles/firewalld/defaults/main.yml:11: yaml: missing starting space in comment (yaml[comments])
+roles/firewalld/defaults/main.yml:28: yaml: missing starting space in comment (yaml[comments])
 roles/firewalld/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
 roles/flatpak/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
 roles/flatpak/tasks/main.yml:1: unnamed-task: All tasks should be named.
