@@ -1,9 +1,9 @@
 ---
 - name: synchronize-delegate
+  delegate_to: localhost
   ansible.builtin.synchronize:
     src: dummy
     dest: dummy
-  delegate_to: localhost
 
 - name: synchronize-no-same-owner
   ansible.builtin.synchronize:

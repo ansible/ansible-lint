@@ -11,8 +11,8 @@ IMPORTED_PLAYBOOK = """\
 - hosts: all
   tasks:
     - name: success
-      ansible.builtin.fail: msg="fail"
       when: false
+      ansible.builtin.fail: msg="fail"
 """
 
 MAIN_PLAYBOOK = """\

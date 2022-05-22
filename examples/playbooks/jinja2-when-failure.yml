@@ -2,8 +2,8 @@
 - hosts: all
   tasks:
     - name: test when with jinja2
-      ansible.builtin.debug: msg=text
       when: "{{ false }}"
+      ansible.builtin.debug: msg=text
 
 - hosts: all
   roles:

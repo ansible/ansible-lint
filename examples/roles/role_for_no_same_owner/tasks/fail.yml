@@ -26,10 +26,10 @@
     dest: dummy
 
 - name: unarchive delegated
+  delegate_to: localhost
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.bz2"
     dest: dummy
-  delegate_to: localhost
 
 - name: unarchive-gz
   ansible.builtin.unarchive:

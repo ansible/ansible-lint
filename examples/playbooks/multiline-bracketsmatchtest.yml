@@ -15,8 +15,8 @@
   gather_facts: false
   tasks:
     - name: Setting oo_minion_ips fact on localhost
+      when: groups['tag_env-host-type-' + oo_env + '-openshift-minion'] is defined
       ansible.builtin.set_fact:
         oo_minion_ips: "{{ hostvars
             | oo_select_keys(groups['tag_env-host-type-' + oo_env + '-openshift-minion'])
             | oo_collect(attribute='ansible_eth0.ipv4.address') }}"
-      when: groups['tag_env-host-type-' + oo_env + '-openshift-minion'] is defined

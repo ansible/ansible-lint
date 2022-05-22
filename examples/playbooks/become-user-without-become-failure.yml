@@ -11,9 +11,9 @@
 
   tasks:
     - name: become_user without become task
-      ansible.builtin.command: whoami
       become_user: postgres
       changed_when: false
+      ansible.builtin.command: whoami
 
 - hosts: localhost
 

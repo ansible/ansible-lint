@@ -33,67 +33,67 @@ FAIL_PLAY = """---
 - hosts: localhost
   tasks:
   - name: shell no pipe
-    ansible.builtin.shell: echo hello
     changed_when: false
+    ansible.builtin.shell: echo hello
 
   - name: shell with jinja filter
-    ansible.builtin.shell: echo {{ "hello"|upper }}
     changed_when: false
+    ansible.builtin.shell: echo {{ "hello"|upper }}
 
   - name: shell with jinja filter (fqcn)
-    ansible.builtin.shell: echo {{ "hello"|upper }}
     changed_when: false
+    ansible.builtin.shell: echo {{ "hello"|upper }}
 """
 
 SUCCESS_PLAY = """---
 - hosts: localhost
   tasks:
   - name: shell with pipe
-    ansible.builtin.shell: echo hello | true  # noqa: risky-shell-pipe
     changed_when: false
+    ansible.builtin.shell: echo hello | true  # noqa: risky-shell-pipe
 
   - name: shell with redirect
-    ansible.builtin.shell: echo hello >  /tmp/hello
     changed_when: false
+    ansible.builtin.shell: echo hello >  /tmp/hello
 
   - name: chain two shell commands
-    ansible.builtin.shell: echo hello && echo goodbye
     changed_when: false
+    ansible.builtin.shell: echo hello && echo goodbye
 
   - name: run commands in succession
-    ansible.builtin.shell: echo hello ; echo goodbye
     changed_when: false
+    ansible.builtin.shell: echo hello ; echo goodbye
 
   - name: use variables
-    ansible.builtin.shell: echo $HOME $USER
     changed_when: false
+    ansible.builtin.shell: echo $HOME $USER
 
   - name: use * for globbing
-    ansible.builtin.shell: ls foo*
     changed_when: false
+    ansible.builtin.shell: ls foo*
 
   - name: use ? for globbing
-    ansible.builtin.shell: ls foo?
     changed_when: false
+    ansible.builtin.shell: ls foo?
 
   - name: use [] for globbing
-    ansible.builtin.shell: ls foo[1,2,3]
     changed_when: false
+    ansible.builtin.shell: ls foo[1,2,3]
 
   - name: use shell generator
-    ansible.builtin.shell: ls foo{.txt,.xml}
     changed_when: false
+    ansible.builtin.shell: ls foo{.txt,.xml}
 
   - name: use backticks
-    ansible.builtin.shell: ls `ls foo*`
     changed_when: false
+    ansible.builtin.shell: ls `ls foo*`
 
   - name: use shell with cmd
+    changed_when: false
     ansible.builtin.shell:
       cmd: |
         set -x
         ls foo?
-    changed_when: false
 """
 
 

@@ -38,8 +38,8 @@
         removes: Z
 
     - name: shell with changed_when
-      shell: echo blah
       changed_when: false
+      shell: echo blah
 
     - name: shell with inline creates
       shell: creates=Z echo blah

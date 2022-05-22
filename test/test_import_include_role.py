@@ -11,8 +11,8 @@ from ansiblelint.runner import Runner
 ROLE_TASKS_MAIN = """\
 ---
 - name: shell instead of command
-  shell: echo hello world
   changed_when: false
+  shell: echo hello world
 """
 
 ROLE_TASKS_WORLD = """\

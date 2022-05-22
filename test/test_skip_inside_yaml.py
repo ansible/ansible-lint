@@ -93,8 +93,8 @@ ROLE_TASKS_WITH_BLOCK_BECOME = """\
       block:
         - name: bar
           become_user: john_doe
-          ansible.builtin.command: "/etc/test.sh"
           changed_when: false
+          ansible.builtin.command: "/etc/test.sh"
 """
 
 

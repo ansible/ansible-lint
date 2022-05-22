@@ -82,10 +82,6 @@ JSON_SCHEMAS = {
 
 DEFAULT_KEY_ORDER = [
     "name",
-    "when",
-    "notify",
-    "any_errors_fatal",
-    "async",
     "become",
     "become_exe",
     "become_flags",
@@ -95,6 +91,9 @@ DEFAULT_KEY_ORDER = [
     "changed_when",
     "failed_when",
     "check_mode",
+    "any_errors_fatal",
+    "when",
+    "notify",
     "collections",
     "connection",
     "debugger",
@@ -110,6 +109,7 @@ DEFAULT_KEY_ORDER = [
     "no_log",
     "poll",
     "port",
+    "async",
     "timeout",
     "retries",
     "until",

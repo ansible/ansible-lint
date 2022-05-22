@@ -7,7 +7,7 @@
         chdir: X
 
     - name: shell without checks
+      become_method: xx
       ansible.builtin.shell: echo blah
       args:
         chdir: X
-      become_method: xx

@@ -11,25 +11,25 @@
 
   tasks:
     - name: foo
-      ansible.builtin.command: whoami
       become_user: postgres
       become: true
       changed_when: false
+      ansible.builtin.command: whoami
 
 - hosts: localhost
   become: true
 
   tasks:
     - name: Accepts a become from higher scope
-      ansible.builtin.command: whoami
       become_user: postgres
       changed_when: false
+      ansible.builtin.command: whoami
 
 - hosts: localhost
   become_user: postgres
 
   tasks:
     - name: Accepts a become from a lower scope
-      ansible.builtin.command: whoami
       become: true
       changed_when: false
+      ansible.builtin.command: whoami
