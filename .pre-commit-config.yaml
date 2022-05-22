@@ -28,6 +28,7 @@ repos:
             examples/playbooks/templates/not-valid.yaml|
             examples/playbooks/with-umlaut-.*|
             examples/playbooks/with-skip-tag-id.yml|
+            examples/yamllint/.*|
             test/fixtures/formatting-before/.*|
             src/ansiblelint/schemas/.*
           )$
@@ -42,7 +43,7 @@ repos:
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/sirosen/check-jsonschema
-    rev: 0.14.3
+    rev: 0.15.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -53,6 +54,7 @@ repos:
         exclude: >
           (?x)^(
             test/eco/.*.result|
+            examples/yamllint/.*|
             test/fixtures/formatting-before/.*|
             test/fixtures/formatting-prettier/.*
           )$
@@ -61,6 +63,7 @@ repos:
           (?x)^(
             examples/playbooks/(with-skip-tag-id|unicode).yml|
             examples/playbooks/example.yml|
+            examples/yamllint/.*|
             test/eco/.*.result|
             test/fixtures/formatting-before/.*
           )$
@@ -89,6 +92,7 @@ repos:
         exclude: >
           (?x)^(
             examples/playbooks/templates/.*|
+            examples/yamllint/.*|
             examples/other/some.j2.yaml|
             test/fixtures/formatting-before/.*
           )$
@@ -124,7 +128,7 @@ repos:
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=2.0.3
+          - ansible-compat>=2.0.4
           - ansible-core
           - enrich
           - flaky
@@ -145,11 +149,11 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.13.8
+    rev: v2.14.0-b1
     hooks:
       - id: pylint
         additional_dependencies:
-          - ansible-compat>=2.0.3
+          - ansible-compat>=2.0.4
           - ansible-core
           - docutils
           - enrich

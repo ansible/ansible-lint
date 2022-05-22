@@ -155,7 +155,7 @@ jobs:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:TOX_PARALLEL_NO_SPINNER
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 644
+      PYTEST_REQPASS: 650
 
     steps:
       - name: Activate WSL1
@@ -244,6 +244,8 @@ jobs:
 
   check: # This job does nothing and is only used for the branch protection
     if: always()
+    permissions:
+      issues: write # allow codenotify to comment on pull-request
 
     needs:
       - linters
@@ -256,3 +258,13 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           jobs: ${{ toJSON(needs) }}
+
+      - name: Check out src from Git
+        uses: actions/checkout@v2
+
+      - name: Notify repository owners about lint change affecting them
+        uses: sourcegraph/codenotify@v0.6.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # https://github.com/sourcegraph/codenotify/issues/19
+        continue-on-error: true

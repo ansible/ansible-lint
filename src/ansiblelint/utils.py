@@ -67,6 +67,7 @@ from ansiblelint.config import options
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, FileType
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
+from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import removeprefix
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
@@ -897,12 +898,3 @@ def nested_items(
             yield "list-item", item, parent
             for k, v, returned_parent in nested_items(item):
                 yield k, v, returned_parent
-
-
-def is_nested_task(task: Dict[str, Any]) -> bool:
-    """Check if task includes block/always/rescue."""
-    for key in NESTED_TASK_KEYS:
-        if task.get(key):
-            return True
-
-    return False

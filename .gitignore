@@ -62,3 +62,4 @@ examples/playbooks/vars/strings.transformed.yml
 src/ansiblelint/_version.py
 *.tar.gz
 .pytest_cache
+test/eco/CODENOTIFY.html

@@ -18,27 +18,27 @@ from ansiblelint.schemas import __file__ as schemas_module
 
 _logger = logging.getLogger(__name__)
 
+DESCRIPTION_MD = """ Returned errors will not include exact line numbers, but they will mention
+the schema name being used as a tag, like ``playbook-schema``,
+``tasks-schema``.
+
+This rule is not skippable and stops further processing of the file.
+
+Schema bugs should be reported towards [schemas](https://github.com/ansible/schemas) project instead of ansible-lint.
+
+If incorrect schema was picked, you might want to either:
+
+* move the file to standard location, so its file is detected correctly.
+* use ``kinds:`` option in linter config to help it pick correct file type.
+"""
+
 
 class ValidateSchemaRule(AnsibleLintRule):
-    """Perform JSON Schema Validation for known lintable kinds.
+    """Perform JSON Schema Validation for known lintable kinds."""
 
-    Returned errors will not include exact line numbers, but they will mention
-    the schema name being used as a tag, like ``playbook-schema``,
-    ``tasks-schema``.
-
-    This rule is not skippable and stops further processing of the file.
-
-    Schema bugs should be reported towards https://github.com/ansible/schemas
-    project instead of ansible-lint.
-
-    If incorrect schema was picked, you might want to either:
-
-    * move the file to standard location, so its file is detected correctly.
-    * use ``kinds:`` option in linter config to help it pick correct file type.
-    """
+    description = DESCRIPTION_MD
 
     id = "schema"
-    description = __doc__
     severity = "VERY_HIGH"
     tags = ["core", "experimental"]
     version_added = "v6.1.0"

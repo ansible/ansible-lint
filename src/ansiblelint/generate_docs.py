@@ -1,4 +1,4 @@
-"""Utils to generate rule table .rst documentation."""
+"""Utils to generate rules documentation."""
 import logging
 from typing import Iterable
 
@@ -16,13 +16,9 @@ from rich.table import Table
 from ansiblelint.rules import RulesCollection
 
 DOC_HEADER = """
-.. _lint_default_rules:
+# Default Rules
 
-Default Rules
-=============
-
-.. contents::
-   :local:
+(lint_default_rules)=
 
 Below you can see the list of default rules Ansible Lint use to evaluate playbooks and roles:
 
@@ -36,19 +32,28 @@ def rules_as_str(rules: RulesCollection) -> str:
     return str(rules)
 
 
-def rules_as_rst(rules: RulesCollection) -> str:
-    """Return RST documentation for a list of rules."""
+def rules_as_md(rules: RulesCollection) -> str:
+    """Return md documentation for a list of rules."""
     result = DOC_HEADER
 
     for rule in rules:
 
+        # because title == rule.id we get the desired labels for free
+        # and we do not have to insert `(target_header)=`
         title = f"{rule.id}"
 
-        description = rule.description
-        if rule.link:
-            description += f" `(more) <{rule.link}>`__"
+        if rule.help:
+            if not rule.help.startswith(f"## {rule.id}"):
+                raise RuntimeError(
+                    f"Rule {rule.__class__} markdown help does not start with `## {rule.id}` header.\n{rule.help}"
+                )
+            result += f"\n\n{rule.help}"
+        else:
+            description = rule.description
+            if rule.link:
+                description += f" [more]({rule.link})"
 
-        result += f"\n\n.. _{rule.id}:\n\n{title}\n{'*' * len(title)}\n\n{rule.shortdesc}\n\n{description}"
+            result += f"\n\n## {title}\n\n**{rule.shortdesc}**\n\n{description}"
 
     return result
 
@@ -61,7 +66,8 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
         table = Table(show_header=True, header_style="title", box=box.MINIMAL)
         table.add_column(rule.id, style="dim", width=width)
         table.add_column(Markdown(rule.shortdesc))
-        description = rule.description
+
+        description = rule.help or rule.description
         if rule.link:
             description += f" [(more)]({rule.link})"
         table.add_row("description", Markdown(description))

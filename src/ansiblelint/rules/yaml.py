@@ -1,5 +1,6 @@
 """Implementation of yaml linting rule (yamllint integration)."""
 import logging
+import sys
 from typing import TYPE_CHECKING, List
 
 from yamllint.linter import run as run_yamllint
@@ -14,30 +15,17 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
-DESCRIPTION = """\
-Rule violations reported by YamlLint when this is installed.
-
-Yamllint configuration will be loaded following yamllint's configuration file
-resolution order.
-
-You can fully disable all of them by adding 'yaml' to the 'skip_list'.
-
-Specific tag identifiers that are printed at the end of rule name,
-like 'trailing-spaces' or 'indentation' can also be be skipped, allowing
-you to have a more fine control.
-"""
-
 
 class YamllintRule(AnsibleLintRule):
     """Violations reported by yamllint."""
 
     id = "yaml"
-    description = DESCRIPTION
     severity = "VERY_LOW"
     tags = ["formatting", "yaml"]
     version_added = "v5.0.0"
     config = load_yamllint_config()
     has_dynamic_tags = True
+    link = "https://yamllint.readthedocs.io/en/stable/rules.html"
 
     def __init__(self) -> None:
         """Construct a rule instance."""
@@ -65,7 +53,7 @@ class YamllintRule(AnsibleLintRule):
                     linenumber=problem.line,
                     details="",
                     filename=str(file.path),
-                    tag=problem.rule,
+                    tag=f"yaml[{problem.rule}]",
                 )
             )
 
@@ -78,3 +66,63 @@ class YamllintRule(AnsibleLintRule):
                 if match.rule.id not in skip_list and match.tag not in skip_list:
                     filtered_matches.append(match)
         return filtered_matches
+
+
+# testing code to be loaded only with pytest or when executed the rule file
+if "pytest" in sys.modules:
+    import pytest
+
+    # pylint: disable=ungrouped-imports
+    from ansiblelint.config import options
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
+
+    @pytest.mark.parametrize(
+        ("file", "expected_kind", "expected"),
+        (
+            (
+                "examples/yamllint/invalid.yml",
+                "yaml",
+                [
+                    'missing document start "---"',
+                    'duplication of key "foo" in mapping',
+                    "trailing spaces",
+                ],
+            ),
+            (
+                "examples/yamllint/valid.yml",
+                "yaml",
+                [],
+            ),
+        ),
+        ids=(
+            "invalid",
+            "valid",
+        ),
+    )
+    def test_yamllint(file: str, expected_kind: str, expected: List[str]) -> None:
+        """Validate parsing of ansible output."""
+        lintable = Lintable(file)
+        assert lintable.kind == expected_kind
+
+        rules = RulesCollection(options=options)
+        rules.register(YamllintRule())
+        results = Runner(lintable, rules=rules).run()
+
+        assert len(results) == len(expected), results
+        for idx, result in enumerate(results):
+            assert result.filename.endswith(file)
+            assert expected[idx] in result.message
+            assert isinstance(result.tag, str)
+            assert result.tag.startswith("yaml[")
+
+    def test_yamllint_has_help(default_rules_collection: RulesCollection) -> None:
+        """Asserts that we loaded markdown documentation in help property."""
+        for collection in default_rules_collection:
+            if collection.id == "yaml":
+                print(collection.id)
+                assert collection.help is not None
+                assert len(collection.help) > 100
+                break
+        else:
+            pytest.fail("No yaml collection found")

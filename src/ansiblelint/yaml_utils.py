@@ -82,7 +82,7 @@ def load_yamllint_config() -> YamlLintConfig:
         + "/yamllint/config",
     ]:
         if os.path.isfile(file):
-            _logger.warning(
+            _logger.debug(
                 "Loading custom %s config file, this extends our "
                 "internal yamllint config.",
                 file,
@@ -302,7 +302,7 @@ def get_path_to_task(
     if lintable.kind == "playbook":
         assert isinstance(ruamel_data, CommentedSeq)
         return _get_path_to_task_in_playbook(line_number, ruamel_data)
-    # if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno"]:
+    # if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
 
     return []
 

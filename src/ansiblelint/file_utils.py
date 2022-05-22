@@ -198,11 +198,12 @@ class Lintable:
     def get(self, key: Any, default: Any = None) -> Any:
         """Provide compatibility subscriptable support."""
         try:
-            return self.__getitem__(key)
+            return self[key]
         except NotImplementedError:
             return default
 
     def _populate_content_cache_from_disk(self) -> None:
+        # Can raise UnicodeDecodeError
         self._content = self.path.resolve().read_text(encoding="utf-8")
         if self._original_content is None:
             self._original_content = self._content

@@ -26,6 +26,7 @@ DEFAULT_KINDS = [
     {"tasks": "**/tasks/**/*.{yaml,yml}"},
     {"handlers": "**/handlers/*.{yaml,yml}"},
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
+    {"test-meta": "**/tests/integration/targets/*/meta/main.{yaml,yml}"},
     {"meta": "**/meta/main.{yaml,yml}"},
     {"meta-runtime": "**/meta/runtime.{yaml,yml}"},
     {"arg_specs": "**/roles/**/meta/argument_specs.{yaml,yml}"},  # role argument specs

@@ -22,7 +22,7 @@
 import logging
 from functools import lru_cache
 from itertools import product
-from typing import TYPE_CHECKING, Any, Generator, List, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Sequence
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML
@@ -97,7 +97,7 @@ def _append_skipped_rules(
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
 
-    if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno"]:
+    if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
         pyyaml_data[0]["skipped_rules"] = _get_rule_skips_from_yaml(ruamel_data)
         return pyyaml_data
 
@@ -149,9 +149,12 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
     """Get list of tasks from list made of tasks and nested tasks."""
 
     def get_nested_tasks(task: Any) -> Generator[Any, None, None]:
+        if not task or not is_nested_task(task):
+            return
         for k in NESTED_TASK_KEYS:
-            if task and k in task and task[k]:
+            if k in task and task[k]:
                 for subtask in task[k]:
+                    yield from get_nested_tasks(subtask)
                     yield subtask
 
     for task in task_blocks:
@@ -193,3 +196,12 @@ def normalize_tag(tag: str) -> str:
         used_old_tags[tag] = RENAMED_TAGS[tag]
         return RENAMED_TAGS[tag]
     return tag
+
+
+def is_nested_task(task: Dict[str, Any]) -> bool:
+    """Check if task includes block/always/rescue."""
+    for key in NESTED_TASK_KEYS:
+        if task.get(key):
+            return True
+
+    return False

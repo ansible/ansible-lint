@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  tasks:
+    - name: example of multi-level block
+      block:
+        - name: 2nd level
+          block:
+            - ansible.builtin.debug: # noqa unnamed-task
+                msg: "test unnamed task in block"
