@@ -441,6 +441,13 @@
           "title": "Min Ansible Version",
           "type": "string"
         },
+        "namespace": {
+          "markdownDescription": "Used by molecule and ansible-lint to compute FQRN for roles outside collections",
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_]+$",
+          "title": "Namespace Name",
+          "type": "string"
+        },
         "platforms": {
           "items": {
             "anyOf": [
@@ -518,6 +525,9 @@
               },
               {
                 "$ref": "#/$defs/MacOSXPlatformModel"
+              },
+              {
+                "$ref": "#/$defs/MageiaPlatformModel"
               },
               {
                 "$ref": "#/$defs/NXOSPlatformModel"
@@ -746,6 +756,25 @@
         }
       },
       "title": "MacOSXPlatformModel",
+      "type": "object"
+    },
+    "MageiaPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "Mageia",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["7", "8", "all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "MageiaPlatformModel",
       "type": "object"
     },
     "NXOSPlatformModel": {

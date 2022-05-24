@@ -797,12 +797,12 @@
           "title": "Notify"
         },
         "poll": {
-          "title": "Poll",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Poll"
         },
         "port": {
-          "title": "Port",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Port"
         },
         "register": {
           "title": "Register",
@@ -813,8 +813,8 @@
           "type": "string"
         },
         "retries": {
-          "title": "Retries",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Retries"
         },
         "run_once": {
           "$ref": "#/$defs/templated-boolean",
