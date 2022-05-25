@@ -116,6 +116,12 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
         # Use unjinja so that we don't match on jinja filters
         # rather than pipes
         if task["action"]["__ansible_module__"] in ["shell", "ansible.builtin.shell"]:
+            # Since Ansible 2.4, the `command` module does not accept setting
+            # the `executable`. If the user needs to set it, they have to use
+            # the `shell` module.
+            if "executable" in task["action"]:
+                return False
+
             if "cmd" in task["action"]:
                 jinja_stripped_cmd = self.unjinja(task["action"].get("cmd", []))
             else:
