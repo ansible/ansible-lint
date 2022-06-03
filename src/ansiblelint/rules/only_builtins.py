@@ -7,6 +7,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 # fqcn_builtins was added in 5.1.0 as FQCNBuiltinsRule, renamed to fqcn_builtins in 6.0.0
 from ansiblelint.rules.fqcn_builtins import builtins
+from ansiblelint.skip_utils import is_nested_task
 
 
 class OnlyBuiltinsRule(AnsibleLintRule):
@@ -24,7 +25,7 @@ class OnlyBuiltinsRule(AnsibleLintRule):
             "ansible.builtin."
         )
         non_fqcn_builtin = task["action"]["__ansible_module_original__"] in builtins
-        return not fqcn_builtin and not non_fqcn_builtin
+        return not fqcn_builtin and not non_fqcn_builtin and not is_nested_task(task)
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -39,8 +40,10 @@ if "pytest" in sys.modules:
     SUCCESS_PLAY = """
 - hosts: localhost
   tasks:
-  - name: shell (fqcn)
-    ansible.builtin.shell: echo This rule should not get matched by the only-builtins rule
+  - name: a block
+    block:
+    - name: shell (fqcn)
+      ansible.builtin.shell: echo This rule should not get matched by the only-builtins rule
     """
 
     def test_only_builtin_fail() -> None:
