@@ -13,7 +13,7 @@ INFO     Discovered files to lint using: git ls-files --cached --others --exclud
 INFO     Excluded removed files using: git ls-files --deleted -z
 INFO     Discovered files to lint using: git ls-files --cached --others --exclude-standard -z
 INFO     Excluded removed files using: git ls-files --deleted -z
-WARNING  Listing 61 violation(s) that are fatal
+WARNING  Listing 66 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
@@ -35,8 +35,8 @@ roles/ensure-chart-testing/tasks/main.yaml:27: risky-file-permissions: File perm
 roles/ensure-dhall/tasks/main.yaml:15: risky-file-permissions: File permissions unset or incorrect.
 roles/ensure-go/tasks/install-go.yaml:12: risky-file-permissions: File permissions unset or incorrect.
 roles/ensure-haskell-stack/tasks/main.yaml:11: unnamed-task: All tasks should be named.
-roles/ensure-kubernetes/tasks/minikube.yaml:1: schema: True is not of type 'string' (schema[tasks])
-roles/ensure-nimble/tasks/main.yaml:1: schema: 1 is not of type 'string' (schema[tasks])
+roles/ensure-kubernetes/tasks/minikube.yaml:1: schema: {'name': 'Start Minikube', 'become': True, 'command': '/tmp/minikube start --v=7 --vm-driver=none --container-runtime={{ kubernetes_runtime }} {{ extra_args }} {% for _addon in ensure_kubernetes_minikube_addons %} --addons={{ _addon }} {% endfor %}', 'environment': {'MINIKUBE_WANTUPDATENOTIFICATION': False, 'MINIKUBE_WANTREPORTERRORPROMPT': False, 'MINIKUBE_WANTNONEDRIVERWARNING': False, 'MINIKUBE_WANTKUBECTLDOWNLOADMSG': False, 'CHANGE_MINIKUBE_NONE_USER': True, 'MINIKUBE_HOME': '{{ ansible_user_dir }}', 'KUBECONFIG': '{{ ansible_user_dir }}/.kube/config'}} is not valid under any of the given schemas (schema[tasks])
+roles/ensure-nimble/tasks/main.yaml:1: schema: {'when': '_nimble_installed.rc != 0', 'block': [{'name': 'Install compat-openssl11 in CentOS 9', 'package': {'name': 'compat-openssl11'}, 'become': True, 'when': ["ansible_distribution == 'CentOS'", "ansible_distribution_major_version == '9'"]}, {'name': 'Create tempfile for choosenim install script', 'tempfile': None, 'register': 'choosenim_installer'}, {'name': 'Install nim with choosenim', 'get_url': {'url': 'https://nim-lang.org/choosenim/init.sh', 'dest': '{{ choosenim_installer.path }}', 'mode': 493}}, {'name': 'Install nim', 'command': '{{ choosenim_installer.path }} -y', 'environment': {'CHOOSENIM_NO_ANALYTICS': 1, 'CHOOSENIM_CHOOSE_VERSION': '{{ nim_version }}'}}], 'always': [{'name': 'Remove installer tempfile', 'file': {'state': 'absent', 'path': '{{ choosenim_installer.path }}'}}]} is not valid under any of the given schemas (schema[tasks])
 roles/ensure-nimble/tasks/main.yaml:14: unnamed-task: All tasks should be named.
 roles/ensure-packer/tasks/install-packer.yaml:21: risky-file-permissions: File permissions unset or incorrect.
 roles/ensure-pip/tasks/Debian.yaml:17: ignore-errors: Use failed_when and specify error conditions instead of using ignore_errors.
@@ -62,7 +62,12 @@ roles/packer/tasks/main.yaml:20: unnamed-task: All tasks should be named.
 roles/phoronix-combine-results/tasks/fetch-result.yaml:8: risky-file-permissions: File permissions unset or incorrect.
 roles/shake-build/tasks/main.yaml:1: unnamed-task: All tasks should be named.
 roles/stage-output/tasks/main.yaml:110: unnamed-task: All tasks should be named.
-roles/terraform/tasks/main.yaml:1: schema: 1 is not of type 'string' (schema[tasks])
+roles/terraform/tasks/main.yaml:1: schema: {'name': "Create workspace if it doesn't exist", 'when': ['terraform_workspace is defined', 'terraform_workspace not in _terraform_workspace_list.stdout_lines', 'terraform_create_workspace'], 'command': '{{ terraform_executable }} workspace new -no-color {{ terraform_workspace }}', 'args': {'chdir': '{{ zuul_work_dir }}'}, 'environment': {'TF_IN_AUTOMATION': 1}} is not valid under any of the given schemas (schema[tasks])
+roles/terraform/tasks/main.yaml:1: schema: {'name': 'Initialize terraform', 'command': '{{ terraform_executable }} init -no-color -input=false', 'args': {'chdir': '{{ zuul_work_dir }}'}, 'environment': {'TF_IN_AUTOMATION': 1}} is not valid under any of the given schemas (schema[tasks])
+roles/terraform/tasks/main.yaml:1: schema: {'name': 'List workspaces', 'when': 'terraform_workspace is defined', 'shell': "set -o pipefail\n{{ terraform_executable }} workspace list -no-color | sed 's/^..//'\n", 'register': '_terraform_workspace_list', 'args': {'executable': '/bin/bash', 'chdir': '{{ zuul_work_dir }}'}, 'environment': {'TF_IN_AUTOMATION': 1}} is not valid under any of the given schemas (schema[tasks])
+roles/terraform/tasks/main.yaml:1: schema: {'name': 'Remove workspace', 'when': ['terraform_purge_workspace', 'terraform_command == "destroy"', 'terraform_workspace is defined', 'terraform_workspace != "default"'], 'block': [{'name': 'Leave workspace', 'command': '{{ terraform_executable }} workspace select -no-color default', 'args': {'chdir': '{{ zuul_work_dir }}'}, 'environment': {'TF_IN_AUTOMATION': 1}}, {'name': 'Delete workspace', 'command': '{{ terraform_executable }} workspace delete -no-color {{ terraform_workspace }}', 'args': {'chdir': '{{ zuul_work_dir }}'}, 'environment': {'TF_IN_AUTOMATION': 1}}]} is not valid under any of the given schemas (schema[tasks])
+roles/terraform/tasks/main.yaml:1: schema: {'name': 'Run terraform', 'register': 'terraform_state_change', 'command': "{{ terraform_executable }} {{ terraform_command }} -no-color -input=false {{ terraform_extra_args }} {% if terraform_command == 'apply' or terraform_command == 'destroy' %}-auto-approve{% endif %} {{ terraform_plan }}", 'args': {'chdir': '{{ zuul_work_dir }}'}, 'environment': {'TF_IN_AUTOMATION': 1}} is not valid under any of the given schemas (schema[tasks])
+roles/terraform/tasks/main.yaml:1: schema: {'name': 'Select workspace', 'when': ['terraform_workspace is defined'], 'command': '{{ terraform_executable }} workspace select -no-color {{ terraform_workspace }}', 'args': {'chdir': '{{ zuul_work_dir }}'}, 'environment': {'TF_IN_AUTOMATION': 1}} is not valid under any of the given schemas (schema[tasks])
 roles/test-setup/tasks/main.yaml:1: unnamed-task: All tasks should be named.
 roles/test-upload-logs-swift/tasks/main.yaml:7: unnamed-task: All tasks should be named.
 roles/test-upload-logs-swift/tasks/main.yaml:33: unnamed-task: All tasks should be named.

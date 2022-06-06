@@ -3,7 +3,7 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 0
 
 STDERR:
-WARNING  Listing 3 violation(s) that are fatal
+WARNING  Listing 8 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
@@ -12,6 +12,11 @@ warn_list:  # or 'skip_list' to silence them completely
 
 
 STDOUT:
+.github/workflows/galaxy.yml:1: schema: 'authors' is a required property (schema[galaxy])
+.github/workflows/galaxy.yml:1: schema: 'description' is a required property (schema[galaxy])
+.github/workflows/galaxy.yml:1: schema: 'namespace' is a required property (schema[galaxy])
+.github/workflows/galaxy.yml:1: schema: 'readme' is a required property (schema[galaxy])
+.github/workflows/galaxy.yml:1: schema: 'version' is a required property (schema[galaxy])
 .github/workflows/galaxy.yml:1: schema: Additional properties are not allowed ('jobs', 'true' were unexpected) (schema[galaxy])
-meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-requirements.yml:1: schema: None is not of type 'array' (schema[requirements])
+meta/main.yml:1: schema: {'galaxy_info': {'author': 'Robert de Bock', 'namespace': 'robertdebock', 'role_name': 'bootstrap', 'description': 'Prepare your system to be managed by Ansible.', 'license': 'Apache-2.0', 'company': 'none', 'min_ansible_version': '2.10', 'platforms': [{'name': 'Alpine', 'versions': ['all']}, {'name': 'Amazon', 'versions': ['Candidate']}, {'name': 'EL', 'versions': [7, 8]}, {'name': 'Debian', 'versions': ['all']}, {'name': 'Fedora', 'versions': ['all']}, {'name': 'OpenSUSE', 'versions': ['all']}, {'name': 'Ubuntu', 'versions': ['all']}], 'galaxy_tags': ['bootstrap', 'python', 'sudo']}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+requirements.yml:1: schema: {'collections': None} is not valid under any of the given schemas (schema[requirements])

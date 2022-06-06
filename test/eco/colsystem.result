@@ -18,45 +18,45 @@ warn_list:  # or 'skip_list' to silence them completely
 STDOUT:
 .ansible-lint:1: load-failure: [Errno 2] No such file or directory: '~/.cache/ansible-lint-eco/colsystem/tests/ansible-lint.yml' (load-failure[filenotfounderror])
 playbooks/molecule/sudo/molecule.yml:17: yaml: line too long (576 > 160 characters) (yaml[line-length])
-roles/authorized_key/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-roles/common/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
+roles/authorized_key/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Gives myself SSH authorized key access', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'EL', 'versions': [7]}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/common/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': "Fixes a few basic inconsistencies in low-level Fedora machines, such as\nupdating the base vim package (it's had issues in the past), and disabling\nSELinux on workstations", 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'EL', 'versions': ['all']}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/common/tasks/main.yml:1: unnamed-task: All tasks should be named.
 roles/common/tasks/main.yml:33: unnamed-task: All tasks should be named.
-roles/container/meta/main.yml:1: schema: 8 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
+roles/container/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Installs and enables a container runtime. Also configures users with access to the service, the login user by default. It defaults to supporting Docker and Podman and will attempt to make a reasonable guess at which system you want supported', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'EL', 'versions': [8]}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/container/tasks/main.yml:26: unnamed-task: All tasks should be named.
-roles/copy_or_link/meta/main.yml:1: schema: 2.4 is not of type 'string' (schema[meta])
-roles/dev/meta/main.yml:1: schema: 2.4 is not of type 'string' (schema[meta])
-roles/dotfiles/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
-roles/epel/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
+roles/copy_or_link/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'If the connection is a remote connection, this role will copy the files to the target machine. If the connection is local, then the role will symlink the files into place.', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'EL', 'versions': ['all']}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/dev/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Sets up a system as a basic development box', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/dotfiles/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Configures bashrc and other user-directory files the way I like them', 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'EL', 'versions': ['all']}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/epel/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Installs and configures EPEL on compatible distributions', 'company': 'Red Hat, Inc.', 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'EL', 'versions': [7, 8]}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/firewalld/defaults/main.yml:11: yaml: missing starting space in comment (yaml[comments])
 roles/firewalld/defaults/main.yml:28: yaml: missing starting space in comment (yaml[comments])
-roles/firewalld/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-roles/flatpak/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
+roles/firewalld/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Hole punching and local port forwarding for firewalld service', 'license': 'GPLv3', 'min_ansible_version': 2.9, 'platforms': [{'name': 'EL', 'versions': [7, 8]}, {'name': 'Fedora', 'versions': ['all']}], 'galaxy_tags': ['firewall', 'firewalld']}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/flatpak/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Ensures that flatpak is installed on the host', 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'EL', 'versions': [7]}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/flatpak/tasks/main.yml:1: unnamed-task: All tasks should be named.
-roles/k3s_base/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
+roles/k3s_base/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Sets up a node to be ready for k3s', 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/k3s_base/tasks/main.yml:13: unnamed-task: All tasks should be named.
-roles/k3s_master/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
+roles/k3s_master/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Setups up a node to be a k3s master', 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/k3s_master/tasks/main.yml:13: unnamed-task: All tasks should be named.
-roles/k3s_worker/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
+roles/k3s_worker/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Configures a k3s worker node', 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/k3s_worker/tasks/main.yml:13: unnamed-task: All tasks should be named.
-roles/mariadb/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
+roles/mariadb/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'My Description', 'company': 'Red Hat, Inc.', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'EL', 'versions': [7]}], 'galaxy_tags': ['oasis']}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/mariadb/tasks/secure.yml:1: unnamed-task: All tasks should be named.
-roles/mirror/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
+roles/mirror/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Configures an rsync script to mirror down content to the local system', 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'EL', 'versions': ['all']}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/mirror/tasks/mirror.yml:1: unnamed-task: All tasks should be named.
-roles/mounts/meta/main.yml:1: schema: 2.4 is not of type 'string' (schema[meta])
-roles/mta/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-roles/mythtv/meta/main.yml:1: schema: 2.4 is not of type 'string' (schema[meta])
-roles/packages_server/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-roles/packages_workstation/meta/main.yml:1: schema: 2.4 is not of type 'string' (schema[meta])
+roles/mounts/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Ensures that mount points exist on the system and that they are mounted and recorded in /etc/fstab', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'EL', 'versions': ['all']}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/mta/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Installs and configures a mail agent (MTA) on the target host', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'EL', 'versions': [7, 8]}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/mythtv/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Installs mythtv, particularly for Hauppage 950 cards', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/packages_server/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Installs a baseline of packages that are useful to me on server machines', 'license': 'GPLv3', 'min_ansible_version': 2.9, 'platforms': [{'name': 'EL', 'versions': [7, 8]}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/packages_workstation/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Installs the command line utilities, programs, libraries, and services that I find useful on my systems. Also configures a large number of system repos to install some of those utilities that I also find useful.', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/packages_workstation/tasks/Linux/03_libvirt.yml:1: unnamed-task: All tasks should be named.
 roles/packages_workstation/tasks/Linux/03_libvirt.yml:62: unnamed-task: All tasks should be named.
 roles/packages_workstation/tasks/Linux/06_blu_ray.yml:18: no-handler: Tasks that run when changed should likely be handlers.
 roles/packages_workstation/tasks/Linux/06_blu_ray.yml:18: unnamed-task: All tasks should be named.
 roles/packages_workstation/tasks/Linux/main.yml:11: unnamed-task: All tasks should be named.
-roles/python_prep/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-roles/sudoers/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
+roles/python_prep/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': "Sometimes the Python on a target system needs a little bit of extra massaging before it's completely ready for use on the target host. This role gets Python ready by installing some very necessary packages that are needed before you can even install packages!", 'license': 'GPLv3', 'min_ansible_version': 2.0, 'platforms': [{'name': 'EL', 'versions': [7]}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/sudoers/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Make sure that sudo is installed on the system and the\ngiven list of users are provided with appropriate levels\nof access', 'license': 'GPLv3', 'min_ansible_version': 2.9, 'platforms': [{'name': 'EL', 'versions': [7, 8]}, {'name': 'Fedora', 'versions': ['all']}, {'name': 'Ubuntu', 'versions': ['all']}, {'name': 'MacOS', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/sudoers/tasks/main.yml:13: unnamed-task: All tasks should be named.
-roles/system_repositories/meta/main.yml:1: schema: 5 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-roles/update_ca_trust/meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
+roles/system_repositories/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Installs yum/dnf repositories and their keys', 'license': 'GPLv3', 'min_ansible_version': 2.9, 'platforms': [{'name': 'EL', 'versions': [5, 6, 7, 8]}, {'name': 'Fedora', 'versions': ['all']}], 'galaxy_tags': ['repositories', 'yum', 'dnf']}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
+roles/update_ca_trust/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Install certificates using the update-ca-trust command', 'license': 'GPLv3', 'min_ansible_version': 2.4, 'platforms': [{'name': 'EL', 'versions': [7, 8]}, {'name': 'Fedora', 'versions': ['all']}, {'name': 'Ubuntu', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])
 roles/update_ca_trust/tasks/main.yml:13: unnamed-task: All tasks should be named.
-roles/webserver/meta/main.yml:1: schema: 2.8 is not of type 'string' (schema[meta])
+roles/webserver/meta/main.yml:1: schema: {'galaxy_info': {'author': 'devroles', 'description': 'Configures a basic webserver', 'license': 'GPLv3', 'min_ansible_version': 2.8, 'platforms': [{'name': 'EL', 'versions': ['all']}, {'name': 'Fedora', 'versions': ['all']}]}, 'dependencies': []} is not valid under any of the given schemas (schema[meta])

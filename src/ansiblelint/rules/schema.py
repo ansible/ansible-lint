@@ -7,8 +7,7 @@ from functools import lru_cache
 from typing import Any, List
 
 import yaml
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
+from ansible_compat.schema import validate
 
 from ansiblelint.config import JSON_SCHEMAS
 from ansiblelint.errors import MatchError
@@ -61,25 +60,24 @@ class ValidateSchemaRule(AnsibleLintRule):
             # convert yaml to json (keys are converted to strings)
             yaml_data = yaml.safe_load(file.content)
             json_data = json.loads(json.dumps(yaml_data))
-            validate(
-                instance=json_data,
+            for error in validate(
                 schema=ValidateSchemaRule._get_schema(file.kind),
-            )
+                data=json_data,
+            ):
+                result.append(
+                    MatchError(
+                        message=error.message,
+                        filename=file,
+                        rule=ValidateSchemaRule(),
+                        details=ValidateSchemaRule.description,
+                        tag=f"schema[{file.kind}]",
+                    )
+                )
         except yaml.constructor.ConstructorError:
             _logger.debug(
                 "Ignored failure to load %s for schema validation, as !vault may cause it."
             )
             return []
-        except ValidationError as exc:
-            result.append(
-                MatchError(
-                    message=exc.message,
-                    filename=file,
-                    rule=ValidateSchemaRule(),
-                    details=ValidateSchemaRule.description,
-                    tag=f"schema[{file.kind}]",
-                )
-            )
         return result
 
 
