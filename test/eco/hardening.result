@@ -1,19 +1,16 @@
 CMD: ansible-lint -f pep8 -x fqcn-builtins
 
-RC: 2
+RC: 0
 
 STDERR:
-WARNING  Listing 5 violation(s) that are fatal
-You can skip specific rules or tags by adding them to your configuration file:
-# .config/ansible-lint.yml
-warn_list:  # or 'skip_list' to silence them completely
-  - load-failure  # Failed to load or parse file.
+WARNING  Listing 6 violation(s) that are fatal
 
 
 
 STDOUT:
 defaults/main/sshd.yml:20: yaml: line too long (143 > 120 characters) (yaml[line-length])
+molecule/default/verify.yml:123: yaml: line too long (123 > 120 characters) (yaml[line-length])
+molecule/default/verify.yml:124: yaml: line too long (122 > 120 characters) (yaml[line-length])
 tasks/auditd.yml:21: yaml: line too long (122 > 120 characters) (yaml[line-length])
 tasks/packagemgmt.yml:164: yaml: line too long (129 > 120 characters) (yaml[line-length])
 tasks/packagemgmt.yml:192: yaml: line too long (162 > 120 characters) (yaml[line-length])
-templates/usr/share/dict/passwords.list.j2:1: load-failure: 'utf-8' codec can't decode byte 0xc3 in position 104779: invalid continuation byte (load-failure[unicodedecodeerror])

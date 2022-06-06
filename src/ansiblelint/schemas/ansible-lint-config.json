@@ -107,6 +107,13 @@
       },
       "title": "Warn List",
       "type": "array"
+    },
+    "write_list": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Write List",
+      "type": "array"
     }
   },
   "title": "Ansible-lint Configuration Schema",
