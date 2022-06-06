@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Check out src from Git
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0 # needed by setuptools-scm
       - name: Set up Python ${{ matrix.python-version }}
@@ -168,7 +168,7 @@ jobs:
           sudo sysctl -w net.link.generic.system.hwcksum_tx=0
           sudo sysctl -w net.link.generic.system.hwcksum_rx=0
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # needed by setuptools-scm
 
@@ -260,7 +260,7 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
       - name: Check out src from Git
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Notify repository owners about lint change affecting them
         uses: sourcegraph/codenotify@v0.6.0
