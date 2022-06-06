@@ -91,7 +91,7 @@ jobs:
           python -m tox --parallel auto --parallel-live
         env: ${{ matrix.env }}
       - name: Archive logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: logs.zip
           path: .tox/**/log/
@@ -229,7 +229,7 @@ jobs:
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
       - name: Archive logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: logs.zip
           path: .tox/**/log/
