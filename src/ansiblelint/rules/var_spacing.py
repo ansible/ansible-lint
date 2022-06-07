@@ -19,10 +19,9 @@ if TYPE_CHECKING:
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
-    """Variables should have spaces before and after: {{ var_name }}. Filters should have spaces before and after: {{ var_name | filter }}."""
+    """Jinja2 variables and filters should have spaces before and after"""
 
     id = "var-spacing"
-    description = "Variables should have spaces before and after: ``{{ var_name }}``. Filters should have spaces before and after: ``{{ var_name | filter }}.``"
     severity = "LOW"
     tags = ["formatting"]
     version_added = "v4.0.0"
