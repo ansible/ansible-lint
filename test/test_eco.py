@@ -10,29 +10,15 @@ import pytest
 from ansiblelint.testing import run_ansible_lint
 
 eco_repos = {
-    "bootstrap": [
-        "https://github.com/robertdebock/ansible-role-bootstrap",
-        "robertdebock",
-    ],
-    "colsystem": [
-        "https://github.com/devroles/ansible_collection_system",
-        "greg-hellings",
-    ],
-    "debops": ["https://github.com/debops/debops", "drybjed"],
-    "docker-rootless": [
-        "https://github.com/konstruktoid/ansible-docker-rootless",
-        "konstruktoid",
-    ],
-    "tripleo-ansible": ["https://opendev.org/openstack/tripleo-ansible", "ssbarnea"],
-    "hardening": [
-        "https://github.com/konstruktoid/ansible-role-hardening",
-        "konstruktoid",
-    ],
-    "mysql": [
-        "https://github.com/geerlingguy/ansible-role-mysql.git",
-        "geerlingguy",
-    ],
-    "zuul-jobs": ["https://opendev.org/zuul/zuul-jobs", "ssbarnea"],
+    "bootstrap": "https://github.com/robertdebock/ansible-role-bootstrap",
+    "cisco.nxos": "https://github.com/ansible-collections/cisco.nxos",
+    "colsystem": "https://github.com/devroles/ansible_collection_system",
+    "debops": "https://github.com/debops/debops",
+    "docker-rootless": "https://github.com/konstruktoid/ansible-docker-rootless",
+    "hardening": "https://github.com/konstruktoid/ansible-role-hardening",
+    "mysql": "https://github.com/geerlingguy/ansible-role-mysql.git",
+    "tripleo-ansible": "https://opendev.org/openstack/tripleo-ansible",
+    "zuul-jobs": "https://opendev.org/zuul/zuul-jobs",
 }
 
 
@@ -40,7 +26,7 @@ eco_repos = {
 @pytest.mark.parametrize(("repo"), (eco_repos.keys()))
 def test_eco(repo: str) -> None:
     """Test a set of 3rd party Ansible repositories for possible regressions."""
-    url = eco_repos[repo][0]
+    url = eco_repos[repo]
     cache_dir = os.path.expanduser("~/.cache/ansible-lint-eco")
     my_dir = (pathlib.Path(__file__).parent / "eco").resolve()
     os.makedirs(cache_dir, exist_ok=True)

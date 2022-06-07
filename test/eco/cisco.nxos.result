@@ -1,0 +1,19 @@
+CMD: ansible-lint -f pep8 -x fqcn-builtins
+
+RC: 2
+
+STDERR:
+WARNING  Listing 5 violation(s) that are fatal
+You can skip specific rules or tags by adding them to your configuration file:
+# .config/ansible-lint.yml
+warn_list:  # or 'skip_list' to silence them completely
+  - var-spacing  # Jinja2 variables and filters should have spaces before and after.
+
+
+
+STDOUT:
+tests/integration/targets/nxos_l3_interfaces/tasks/main.yaml:2: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tests/integration/targets/nxos_snmp_server/tasks/main.yaml:7: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tests/integration/targets/nxos_snmp_server/tasks/main.yaml:15: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tests/integration/targets/nxos_snmp_server/tasks/main.yaml:23: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tests/integration/targets/nxos_telemetry/tasks/main.yaml:56: var-spacing: Jinja2 variables and filters should have spaces before and after.
