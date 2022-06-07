@@ -19,12 +19,12 @@ if TYPE_CHECKING:
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
-    """Jinja2 variables and filters should have spaces before and after"""
+    """Jinja2 variables and filters should have spaces before and after."""
 
     id = "var-spacing"
     severity = "LOW"
     tags = ["formatting"]
-    version_added = "v4.0.0"
+    version_added = "v6.3.0"
 
     bracket_regex = re.compile(r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
     exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}", re.MULTILINE | re.DOTALL)
