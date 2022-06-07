@@ -99,6 +99,8 @@ jobs:
   unit:
     name: ${{ matrix.name || matrix.tox_env }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      issues: write # allow codenotify to comment on pull-request
     defaults:
       run:
         shell: ${{ matrix.shell || 'bash'}}
@@ -236,6 +238,7 @@ jobs:
           path: .tox/**/log/
         # https://github.com/actions/upload-artifact/issues/123
         continue-on-error: true
+
       - name: Report junit failures
         # cspell:disable-next-line
         uses: shyim/junit-report-annotations-action@3d2e5374f2b13e70f6f3209a21adfdbc42c466ae
@@ -243,11 +246,18 @@ jobs:
           path: .tox/junit.*.xml
         if: always()
 
+      - name: Notify repository owners about lint change affecting them
+        # we also want to run on failed pull requests as proposed change might
+        # fail because it causes changes in eco repositories.
+        if: always()
+        uses: sourcegraph/codenotify@v0.6.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # https://github.com/sourcegraph/codenotify/issues/19
+        continue-on-error: true
+
   check: # This job does nothing and is only used for the branch protection
     if: always()
-    permissions:
-      issues: write # allow codenotify to comment on pull-request
-
     needs:
       - linters
       - unit
@@ -261,11 +271,6 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
       - name: Check out src from Git
+        # needed by codenotify
+        if: always()
         uses: actions/checkout@v3
-
-      - name: Notify repository owners about lint change affecting them
-        uses: sourcegraph/codenotify@v0.6.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # https://github.com/sourcegraph/codenotify/issues/19
-        continue-on-error: true
