@@ -28,6 +28,14 @@ using `--user` or fixing potential conflicts if not using virtualenvs.
 pip3 install "ansible-lint"
 ```
 
+## Using brew
+
+Ansible Lint is available via brew formula [`ansible-lint`](https://formulae.brew.sh/formula/ansible-lint).
+
+```bash
+brew install ansible-lint
+```
+
 (installing-from-source)=
 
 ## From Source
