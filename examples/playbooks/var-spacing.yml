@@ -8,6 +8,12 @@
     - name: good variable format
       ansible.builtin.debug:
         msg: "Value: {{ good_format }}"
+    - name: good variable filter format
+      ansible.builtin.debug:
+        msg: "{{ good_format | filter }}"
+    - name: good variable filter format
+      ansible.builtin.debug:
+        msg: "Value: {{ good_format | filter }}"
     - name: jinja escaping allowed
       ansible.builtin.debug:
         msg: "{{ '{{' }}"
@@ -30,6 +36,15 @@
     - name: bad variable format
       ansible.builtin.debug:
         msg: "{{bad_format }}"
+    - name: bad variable filter format
+      ansible.builtin.debug:
+        msg: "{{ bad_format|filter }}"
+    - name: bad variable filter format
+      ansible.builtin.debug:
+        msg: "Value: {{ bad_format |filter }}"
+    - name: bad variable filter format
+      ansible.builtin.debug:
+        msg: "{{ bad_format| filter }}"
     - name: not a jinja variable # noqa var-spacing
       ansible.builtin.debug:
         # spell-checker: disable-next-line

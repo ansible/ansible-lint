@@ -19,16 +19,18 @@ if TYPE_CHECKING:
 
 
 class VariableHasSpacesRule(AnsibleLintRule):
-    """Variables should have spaces before and after: {{ var_name }}."""
+    """Jinja2 variables and filters should have spaces before and after."""
 
     id = "var-spacing"
-    description = "Variables should have spaces before and after: ``{{ var_name }}``"
     severity = "LOW"
     tags = ["formatting"]
-    version_added = "v4.0.0"
+    version_added = "v6.3.0"
 
     bracket_regex = re.compile(r"{{[^{\n' -]|[^ '\n}-]}}", re.MULTILINE | re.DOTALL)
     exclude_json_re = re.compile(r"[^{]{'\w+': ?[^{]{.*?}}", re.MULTILINE | re.DOTALL)
+    pipe_spacing_regex = re.compile(
+        r"{{.*(?<=[^ \n\t])[|].*|.*[|](?=[^ \n\t]).*}}", re.MULTILINE | re.DOTALL
+    )
 
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
@@ -36,7 +38,9 @@ class VariableHasSpacesRule(AnsibleLintRule):
         for _, v, _ in nested_items_path(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
-                if bool(self.bracket_regex.search(cleaned)):
+                if bool(self.bracket_regex.search(cleaned)) or bool(
+                    self.pipe_spacing_regex.search(cleaned)
+                ):
                     return self.shortdesc.format(var_name=v)
         return False
 
@@ -51,7 +55,9 @@ class VariableHasSpacesRule(AnsibleLintRule):
             for k, v, path in nested_items_path(data):
                 if isinstance(v, AnsibleUnicode):
                     cleaned = self.exclude_json_re.sub("", v)
-                    if bool(self.bracket_regex.search(cleaned)):
+                    if bool(self.bracket_regex.search(cleaned)) or bool(
+                        self.pipe_spacing_regex.search(cleaned)
+                    ):
                         path_elem = [
                             f"[{i}]" if isinstance(i, int) else i for i in path + [k]
                         ]
@@ -85,7 +91,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.fixture(name="error_expected_lines")
     def fixture_error_expected_lines() -> List[int]:
         """Return list of expected error lines."""
-        return [24, 27, 30, 56, 67]
+        return [30, 33, 36, 39, 42, 45, 71, 82]
 
     @pytest.fixture(name="test_playbook")
     def fixture_test_playbook() -> str:
@@ -119,6 +125,9 @@ if "pytest" in sys.modules:  # noqa: C901
             ".bad_var_1",
             ".bad_var_2",
             ".bad_var_3",
+            ".bad_var_4",
+            ".bad_var_5",
+            ".bad_var_6",
             ".invalid_multiline_nested_json",
             ".invalid_nested_json",
         ]
@@ -126,7 +135,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.fixture(name="error_expected_lines_varsfile")
     def fixture_error_expected_lines_varsfile() -> List[int]:
         """Return list of expected error lines."""
-        return [12, 13, 14, 27, 33]
+        return [14, 15, 16, 17, 18, 19, 32, 38]
 
     @pytest.fixture(name="test_varsfile_path")
     def fixture_test_varsfile_path() -> str:
