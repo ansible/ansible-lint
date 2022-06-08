@@ -200,18 +200,22 @@ xfail
 xunit
 zuul
 
-# Contributors
-Sorin
-Sbarnea
-geerlingguy
-ssbarnea
-robertdebock
-drybjed
-Tsukinowa
-Chamoulaud
-awcrosby
-willthames
-konstruktoid
+# names and usernames
 Adrián
+Cacqueray
+Chamoulaud
+Sbarnea
+Sorin
+Tsukinowa
 Tóth
+arxcruz
+awcrosby
+drybjed
+geerlingguy
+konstruktoid
+nilashishc
+nxos
+robertdebock
+ssbarnea
+willthames
 yatesr

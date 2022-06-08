@@ -7,27 +7,27 @@ WARNING  Listing 19 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
-  - var-spacing  # Jinja2 variables and filters should have spaces before and after
+  - var-spacing  # Jinja2 variables and filters should have spaces before and after.
 
 
 
 STDOUT:
 defaults/main/sshd.yml:20: yaml: line too long (143 > 120 characters) (yaml[line-length])
-molecule/default/verify.yml:11: var-spacing: Jinja2 variables and filters should have spaces before and after
+molecule/default/verify.yml:11: var-spacing: Jinja2 variables and filters should have spaces before and after.
 molecule/default/verify.yml:123: yaml: line too long (123 > 120 characters) (yaml[line-length])
 molecule/default/verify.yml:124: yaml: line too long (122 > 120 characters) (yaml[line-length])
-molecule/default/verify.yml:148: var-spacing: Jinja2 variables and filters should have spaces before and after
-molecule/default/verify.yml:194: var-spacing: Jinja2 variables and filters should have spaces before and after
-molecule/default/verify.yml:241: var-spacing: Jinja2 variables and filters should have spaces before and after
-molecule/default/verify.yml:538: var-spacing: Jinja2 variables and filters should have spaces before and after
+molecule/default/verify.yml:148: var-spacing: Jinja2 variables and filters should have spaces before and after.
+molecule/default/verify.yml:194: var-spacing: Jinja2 variables and filters should have spaces before and after.
+molecule/default/verify.yml:241: var-spacing: Jinja2 variables and filters should have spaces before and after.
+molecule/default/verify.yml:538: var-spacing: Jinja2 variables and filters should have spaces before and after.
 tasks/auditd.yml:21: yaml: line too long (122 > 120 characters) (yaml[line-length])
-tasks/disablemod.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after
-tasks/firewall.yml:120: var-spacing: Jinja2 variables and filters should have spaces before and after
-tasks/firewall.yml:135: var-spacing: Jinja2 variables and filters should have spaces before and after
-tasks/mount.yml:2: var-spacing: Jinja2 variables and filters should have spaces before and after
+tasks/disablemod.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tasks/firewall.yml:120: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tasks/firewall.yml:135: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tasks/mount.yml:2: var-spacing: Jinja2 variables and filters should have spaces before and after.
 tasks/packagemgmt.yml:164: yaml: line too long (129 > 120 characters) (yaml[line-length])
 tasks/packagemgmt.yml:192: yaml: line too long (162 > 120 characters) (yaml[line-length])
-tasks/password.yml:260: var-spacing: Jinja2 variables and filters should have spaces before and after
-tasks/sysctl.yml:2: var-spacing: Jinja2 variables and filters should have spaces before and after
-tasks/sysctl.yml:13: var-spacing: Jinja2 variables and filters should have spaces before and after
-tasks/sysctl.yml:23: var-spacing: Jinja2 variables and filters should have spaces before and after
+tasks/password.yml:260: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tasks/sysctl.yml:2: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tasks/sysctl.yml:13: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tasks/sysctl.yml:23: var-spacing: Jinja2 variables and filters should have spaces before and after.

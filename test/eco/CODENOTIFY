@@ -27,7 +27,10 @@ hardening.result @konstruktoid
 mysql.result @geerlingguy
 
 # https://opendev.org/openstack/tripleo-ansible
-tripleo-ansible.result @ssbarnea
+tripleo-ansible.result @marios @arxcruz
 
 # https://opendev.org/zuul/zuul-jobs
-zuul-jobs.result @ssbarnea
+zuul-jobs.result @TristanCacqueray
+
+# https://github.com/ansible-collections/cisco.nxos
+cisco.nxos @nilashishc @KB-perByte

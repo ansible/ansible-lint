@@ -7,11 +7,11 @@ WARNING  Listing 3 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
-  - var-spacing  # Jinja2 variables and filters should have spaces before and after
+  - var-spacing  # Jinja2 variables and filters should have spaces before and after.
 
 
 
 STDOUT:
-molecule/default/verify.yml:115: var-spacing: Jinja2 variables and filters should have spaces before and after
-molecule/default/verify.yml:125: var-spacing: Jinja2 variables and filters should have spaces before and after
-tasks/docker_install_rootful.yml:7: var-spacing: Jinja2 variables and filters should have spaces before and after
+molecule/default/verify.yml:115: var-spacing: Jinja2 variables and filters should have spaces before and after.
+molecule/default/verify.yml:125: var-spacing: Jinja2 variables and filters should have spaces before and after.
+tasks/docker_install_rootful.yml:7: var-spacing: Jinja2 variables and filters should have spaces before and after.
