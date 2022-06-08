@@ -158,7 +158,7 @@ repos:
           - docutils
           - enrich
           - flaky
-          - jsonschema>=4.5.1
+          - jsonschema>=4.6.0
           - pytest
           - pyyaml
           - rich>=11.0.0
