@@ -58,6 +58,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 "with_together",
                 "with_flattened",
                 "with_filetree",
+                "with_community.general.filetree",
             ]:
                 # These loops can either take a list defined directly in the task
                 # or a variable that is a list itself.  When a single variable is used
@@ -89,8 +90,8 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
             )
             if not valid:
                 message = (
-                    "Found a bare variable '{0}' used in a '{1}' loop."
-                    + " You should use the full variable syntax ('{{{{ {0} }}}}')"
+                    "Possible bare variable '{0}' used in a '{1}' loop."
+                    + " You should use the full variable syntax ('{{{{ {0} }}}}') or convert it to a list if that is not really a variable."
                 )
                 return message.format(task[loop_type], loop_type)
         return False
