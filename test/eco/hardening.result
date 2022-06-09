@@ -3,7 +3,7 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Listing 19 violation(s) that are fatal
+WARNING  Listing 18 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
@@ -21,7 +21,6 @@ molecule/default/verify.yml:194: var-spacing: Jinja2 variables and filters shoul
 molecule/default/verify.yml:241: var-spacing: Jinja2 variables and filters should have spaces before and after.
 molecule/default/verify.yml:538: var-spacing: Jinja2 variables and filters should have spaces before and after.
 tasks/auditd.yml:21: yaml: line too long (122 > 120 characters) (yaml[line-length])
-tasks/disablemod.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
 tasks/firewall.yml:120: var-spacing: Jinja2 variables and filters should have spaces before and after.
 tasks/firewall.yml:135: var-spacing: Jinja2 variables and filters should have spaces before and after.
 tasks/mount.yml:2: var-spacing: Jinja2 variables and filters should have spaces before and after.

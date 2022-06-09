@@ -44,7 +44,7 @@ LAYOUT_IMPORTS: Dict[str, str] = {
         """\
         ---
         - name: from subtask 2 do something
-          ansible.builtin.debug:
+          debug:  # <-- expected to raise fqcn-builtins
             msg: |
               Something...
         """
@@ -87,7 +87,7 @@ LAYOUT_INCLUDES: Dict[str, str] = {
         """\
         ---
         - name: from subtask 2 do something
-          debug:
+          debug:  # <-- expected to raise fqcn-builtins
             msg: |
               Something...
         """
@@ -102,9 +102,6 @@ LAYOUT_INCLUDES: Dict[str, str] = {
         pytest.param(LAYOUT_INCLUDES, id="using only include_tasks"),
     ),
 )
-@pytest.mark.xfail(
-    reason="https://github.com/ansible-community/ansible-lint/issues/1446"
-)
 def test_file_path_evaluation(
     tmp_path: Path,
     default_rules_collection: RulesCollection,
@@ -112,8 +109,8 @@ def test_file_path_evaluation(
 ) -> None:
     """Test file path evaluation when using import_tasks / include_tasks in the project.
 
-    Usage of import_tasks / include_tasks may introduce false positive load-failure due
-    to incorrect file path evaluation.
+    The goal of this test is to verify our ability to find errors from within
+    nested includes.
     """
     for file_path, file_content in ansible_project_layout.items():
         full_path = tmp_path / file_path
@@ -122,4 +119,5 @@ def test_file_path_evaluation(
 
     result = Runner(str(tmp_path), rules=default_rules_collection).run()
 
-    assert not result
+    assert len(result) == 1
+    assert result[0].rule.id == "fqcn-builtins"
