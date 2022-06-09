@@ -3,10 +3,11 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Listing 2927 violation(s) that are fatal
+WARNING  Listing 3052 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
+  - experimental  # all rules tagged as experimental
   - var-spacing  # Jinja2 variables and filters should have spaces before and after.
 
 
@@ -33,12 +34,14 @@ ansible/roles/apache/defaults/main.yml:656: var-spacing: Jinja2 variables and fi
 ansible/roles/apache/defaults/main.yml:1000: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apache/defaults/main.yml:1020: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apache/tasks/apache_module_state.yml:8: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/apache/tasks/main.yml:1: schema: {'name': 'Divert sites-available configuration', 'dpkg_divert': {'path': '{{ apache__config_path + "/sites-available/" + item.filename|d( | flatten | first | d("default")) + ".conf" }}', 'divert': '{{ (item.divert | d(apache__config_path + "/sites-available/" + item.divert_filename|d(item.filename|d( | flatten | first | d("default"))) + ".conf") + item.divert_suffix|d(".dpkg-divert")) }}'}, 'when': '(item.type|d(apache__vhost_type) in ["divert"])', 'with_flattened': '{{ apache__combined_vhosts }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/apache/tasks/main.yml:32: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apache/tasks/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apache/tasks/main.yml:62: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apache/tasks/main.yml:77: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apache/tasks/main.yml:99: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apache/tasks/main.yml:136: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/apache/tasks/main_env.yml:1: schema: {'name': 'Ensure base packages are in there desired state', 'ansible.builtin.package': {'name': '{{ item }}', 'state': '{{ "present" if (apache__deploy_state == "present") else "absent" }}'}, 'with_flattened': ['{{ apache__base_packages  }}'], 'register': 'apache__register_base_packages', 'until': 'apache__register_base_packages is succeeded', 'tags': ['role::apache:pkgs']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/apparmor/tasks/main.yml:58: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apparmor/tasks/main.yml:69: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt/defaults/main.yml:103: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -52,6 +55,7 @@ ansible/roles/apt/defaults/main.yml:468: var-spacing: Jinja2 variables and filte
 ansible/roles/apt/defaults/main.yml:469: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt/defaults/main.yml:587: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt/defaults/main.yml:650: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/apt/tasks/main.yml:1: schema: {'name': 'Enable extra architectures', 'ansible.builtin.command': 'dpkg --add-architecture {{ item }}', 'with_flattened': ['{{ apt__extra_architectures }}', '{{ apt__group_extra_architectures }}', '{{ apt__host_extra_architectures }}'], 'when': 'item not in ansible_facts.ansible_local.apt.foreign_architectures|d()', 'notify': ['Refresh host facts']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/apt/tasks/main.yml:105: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt/tasks/main.yml:134: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_cacher_ng/defaults/main.yml:204: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -68,6 +72,7 @@ ansible/roles/apt_install/defaults/main.yml:87: var-spacing: Jinja2 variables an
 ansible/roles/apt_install/defaults/main.yml:119: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_install/defaults/main.yml:274: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_install/defaults/main.yml:296: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/apt_install/tasks/main.yml:1: schema: {'name': 'Apply requested packages configuration', 'ansible.builtin.debconf': {'name': '{{ item.name }}', 'question': '{{ item.question | d(omit) }}', 'selection': '{{ item.selection | d(omit) }}', 'setting': '{{ item.setting | d(omit) }}', 'unseen': '{{ item.unseen | d(omit) }}', 'value': '{{ item.value | d(omit) }}', 'answer': '{{ item.answer | d(omit) }}', 'vtype': '{{ item.vtype | d(omit) }}'}, 'with_flattened': ['{{ apt_install__debconf }}', '{{ apt_install__group_debconf }}', '{{ apt_install__host_debconf }}'], 'when': 'item.name|d()'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/apt_install/tasks/main.yml:41: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_install/tasks/main.yml:67: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_listchanges/defaults/main.yml:49: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -75,6 +80,7 @@ ansible/roles/apt_listchanges/defaults/main.yml:60: var-spacing: Jinja2 variable
 ansible/roles/apt_mark/defaults/main.yml:36: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_mark/defaults/main.yml:52: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_mark/tasks/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/apt_preferences/tasks/main.yml:1: schema: {'name': 'Remove legacy APT preferences', 'ansible.builtin.file': {'dest': '/etc/apt/preferences.d/{{ item.filename | d((item.role | d(item.by_role | d("pin"))) + "_" + ((item.package.split(" ")[0] if item.package is string else item.package[0]) if item.package|d() else (item.packages.split(" ")[0] if item.packages is string else item.packages[0])) + (item.suffix | d("")) + ".pref") | replace("*","all") }}', 'state': 'absent'}, 'with_flattened': ['{{ apt_preferences_list|d([]) }}', '{{ apt_preferences_group_list|d([]) }}', '{{ apt_preferences_host_list|d([]) }}', '{{ apt_preferences_dependent_list|d([]) }}', '{{ apt_preferences__list }}', '{{ apt_preferences__group_list }}', '{{ apt_preferences__host_list }}', '{{ apt_preferences__dependent_list }}'], 'when': '("." in item.role|d(item.by_role|d("")))'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/apt_preferences/tasks/main.yml:9: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_preferences/tasks/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/apt_preferences/tasks/main.yml:76: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -83,6 +89,7 @@ ansible/roles/apt_proxy/defaults/main.yml:189: var-spacing: Jinja2 variables and
 ansible/roles/atd/defaults/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/atd/defaults/main.yml:116: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/atd/defaults/main.yml:137: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/atd/tasks/main.yml:1: schema: {'name': 'Configure /etc/at.allow', 'ansible.builtin.lineinfile': {'dest': '/etc/at.allow', 'regexp': '^{{ item }}$', 'line': '{{ item }}', 'state': 'present', 'create': True, 'owner': 'root', 'group': 'daemon', 'mode': '0640'}, 'with_flattened': ['{{ atd_default_allow }}', '{{ atd_allow }}', '{{ atd_group_allow }}', '{{ atd_host_allow }}'], 'when': '(atd_enabled|bool and (atd_default_allow|d() or atd_allow|d() or atd_group_allow|d() or atd_host_allow|d()) and item|d())', 'tags': ['role::atd:users']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/atd/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/authorized_keys/tasks/main.yml:52: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/authorized_keys/tasks/main.yml:77: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -94,6 +101,7 @@ ansible/roles/avahi/defaults/main.yml:344: var-spacing: Jinja2 variables and fil
 ansible/roles/avahi/defaults/main.yml:416: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/avahi/tasks/avahi_alias.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/avahi/tasks/main.yml:119: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/backup2l/tasks/main.yml:1: schema: {'name': 'Add paths to backup in an include file', 'ansible.builtin.lineinfile': {'dest': '{{ backup2l__include_file }}', 'regexp': '^{{ item.path | d(item) }}$', 'line': '{{ item.path | d(item) }}', 'state': '{{ item.state | d("present") }}', 'create': True, 'mode': '0644'}, 'with_flattened': ['{{ backup2l__default_include }}', '{{ backup2l__include }}', '{{ backup2l__group_include }}', '{{ backup2l__host_include }}'], 'when': 'backup2l__srclist_from_file|bool'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/bitcoind/defaults/main.yml:94: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/bitcoind/defaults/main.yml:100: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/boxbackup/tasks/configure_clients.yml:11: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -116,7 +124,9 @@ ansible/roles/cran/defaults/main.yml:72: var-spacing: Jinja2 variables and filte
 ansible/roles/cran/defaults/main.yml:155: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/cran/defaults/main.yml:177: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/cran/defaults/main.yml:189: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/cran/tasks/main.yml:1: schema: {'name': 'Manage R packages', 'cran': {'name': '{{ item.name  | d(item) }}', 'repo': '{{ item.repo  | d(cran__upstream_mirror) }}', 'state': '{{ item.state | d("present") }}'}, 'with_flattened': ['{{ cran__r_packages }}', '{{ cran__group_r_packages }}', '{{ cran__host_r_packages }}', '{{ cran__dependent_r_packages }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/cron/defaults/main.yml:67: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/cryptsetup/tasks/main.yml:1: schema: {'name': 'Create keyfile and backup directories on the remote system', 'ansible.builtin.file': {'path': '{{ item.path }}', 'state': 'directory', 'owner': 'root', 'group': 'root', 'mode': '0700'}, 'when': 'item.condition', 'with_flattened': [{'path': '{{ cryptsetup__keyfile_remote_location }}', 'condition': '{{ (cryptsetup__combined_devices | selectattr("remote_keyfile", "undefined") | list | length) > 0 }}'}, {'path': '{{ cryptsetup__header_backup_remote_location }}', 'condition': '{{ ((cryptsetup__combined_devices | selectattr("backup_header", "defined") | selectattr("backup_header") | list | length) > 0) or (cryptsetup__header_backup|bool and ((cryptsetup__combined_devices | selectattr("backup_header", "undefined") | list | length) > 0)) }}'}]} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/cryptsetup/tasks/main.yml:52: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/cryptsetup/tasks/manage_devices.yml:14: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/cryptsetup/tasks/manage_devices.yml:25: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -149,6 +159,7 @@ ansible/roles/cryptsetup/tasks/manage_devices.yml:445: var-spacing: Jinja2 varia
 ansible/roles/cryptsetup/tasks/manage_devices.yml:456: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/debops_api/defaults/main.yml:28: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/debops_api/defaults/main.yml:83: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/debops_api/tasks/main.yml:1: schema: {'name': 'Configuring cron jobs', 'ansible.builtin.cron': {'cron_file': '{{ item.cron_file    | d(omit) }}', 'day': '{{ item.day          | d(omit) }}', 'hour': '{{ item.hour         | d(omit) }}', 'job': '{{ item.job          | d(debops_api__cron_script) }}', 'minute': '{{ item.minute       | d(omit) }}', 'month': '{{ item.month        | d(omit) }}', 'name': '{{ item.name         | d(item) }}', 'special_time': '{{ item.special_time | d(omit) }}', 'state': '{{ item.state        | d(omit) }}', 'user': '{{ item.user         | d(debops_api__user) }}', 'weekday': '{{ item.weekday      | d(omit) }}'}, 'with_flattened': '{{ debops_api__cron_entries }}', 'tags': ['role::debops_api:cron']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/debops_api/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/debops_legacy/defaults/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/debops_legacy/defaults/main.yml:52: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -206,6 +217,7 @@ ansible/roles/dnsmasq/tasks/main.yml:106: var-spacing: Jinja2 variables and filt
 ansible/roles/docker_gen/defaults/main.yml:173: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/docker_gen/defaults/main.yml:179: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/docker_gen/defaults/main.yml:185: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/docker_gen/tasks/main.yml:1: schema: {'name': 'Create required directories', 'ansible.builtin.file': {'path': '{{ item }}', 'state': 'directory', 'owner': 'root', 'group': 'root', 'mode': '0755'}, 'with_flattened': [['{{ docker_gen__src }}', '{{ docker_gen__lib }}', '{{ docker_gen__templates }}'], ['{{ ((docker_gen__nginx_dest | dirname) if (docker_gen__nginx|d() and docker_gen__nginx) else []) }}']]} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/docker_gen/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/docker_registry/defaults/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/docker_registry/defaults/main.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -248,6 +260,7 @@ ansible/roles/docker_server/defaults/main.yml:417: var-spacing: Jinja2 variables
 ansible/roles/docker_server/defaults/main.yml:423: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/docker_server/defaults/main.yml:450: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/docker_server/defaults/main.yml:463: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/docker_server/tasks/main.yml:1: schema: {'name': 'Install Python packages in virtualenv', 'ansible.builtin.pip': {'name': '{{ item.name | d(item) }}', 'version': '{{ item.version | d(omit) }}', 'virtualenv': '{{ docker_server__virtualenv }}', 'state': '{{ item.state | d("present") }}'}, 'with_flattened': ['{{ docker_server__default_pip_packages }}', '{{ docker_server__pip_packages }}'], 'when': 'docker_server__install_virtualenv'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/docker_server/tasks/main.yml:21: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/dokuwiki/defaults/main.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/dokuwiki/defaults/main.yml:72: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -268,6 +281,7 @@ ansible/roles/dokuwiki/defaults/main.yml:354: var-spacing: Jinja2 variables and 
 ansible/roles/dokuwiki/defaults/main.yml:603: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/dokuwiki/defaults/main.yml:611: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/dokuwiki/defaults/main.yml:623: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/dokuwiki/tasks/main.yml:1: schema: {'name': 'Remove specified plugins if requested', 'ansible.builtin.file': {'path': '{{ dokuwiki__git_checkout + "/lib/plugins/" + item.dest }}', 'state': 'absent'}, 'with_flattened': ['{{ dokuwiki__default_plugins }}', '{{ dokuwiki__plugins }}'], 'when': "(dokuwiki__plugins_enabled|bool and (item.dest|d() and item.dest) and (item.state|d() and item.state == 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/dovecot/defaults/main.yml:43: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/dovecot/defaults/main.yml:53: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/dovecot/defaults/main.yml:160: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -315,6 +329,7 @@ ansible/roles/dropbear_initramfs/defaults/main.yml:78: var-spacing: Jinja2 varia
 ansible/roles/dropbear_initramfs/defaults/main.yml:114: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/dropbear_initramfs/defaults/main.yml:186: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/dropbear_initramfs/defaults/main.yml:220: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/dropbear_initramfs/tasks/main.yml:1: schema: {'name': 'Configure authorized ssh keys', 'ansible.posix.authorized_key': {'key': "{{ (item.sshkeys if item.sshkeys is string else (item.sshkeys | unique | join('\n') | string)) if item.sshkeys|d() else '' }}", 'user': '{{ item.user | d("root") }}', 'path': '{{ "/etc/initramfs-tools/root/.ssh/authorized_keys" if ("dropbear" in dropbear_initramfs__base_packages) else "/etc/dropbear-initramfs/authorized_keys" }}', 'key_options': '{{ ((item.options if item.options is string else item.options|join(",")) if item.options is defined else ( (dropbear_initramfs__authorized_keys_options if dropbear_initramfs__authorized_keys_options is string else dropbear_initramfs__authorized_keys_options|join(",")) if dropbear_initramfs__authorized_keys_options != omit else "" ) ) + ( (("," + item.key_options) if item.key_options is string else ("," + item.key_options|join(","))) if item.key_options|d() else "" ) }}', 'state': '{{ (item.state | d("present")) if (dropbear_initramfs__deploy_state == "present") else "absent" }}', 'exclusive': '{{ item.exclusive | d(omit) }}', 'manage_dir': False}, 'notify': ['Update initramfs'], 'with_flattened': '{{ dropbear_initramfs__combined_authorized_keys }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/dropbear_initramfs/tasks/main.yml:47: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/elastic_co/defaults/main.yml:28: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/elastic_co/defaults/main.yml:37: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -342,6 +357,7 @@ ansible/roles/elasticsearch/defaults/main.yml:760: var-spacing: Jinja2 variables
 ansible/roles/elasticsearch/defaults/main.yml:764: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/elasticsearch/tasks/authentication.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/elasticsearch/tasks/authentication.yml:70: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/elasticsearch/tasks/main.yml:1: schema: {'name': 'Manage data paths', 'ansible.builtin.file': {'path': '{{ item }}', 'state': 'directory', 'owner': '{{ elasticsearch__user }}', 'group': '{{ elasticsearch__group }}', 'mode': '0750'}, 'with_flattened': ['{{ elasticsearch__path_data }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/environment/defaults/main.yml:105: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/environment/tasks/main.yml:6: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/etc_aliases/defaults/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -362,6 +378,7 @@ ansible/roles/etc_aliases/defaults/main.yml:160: var-spacing: Jinja2 variables a
 ansible/roles/etc_aliases/defaults/main.yml:167: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/etc_aliases/defaults/main.yml:191: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/etc_aliases/defaults/main.yml:217: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/etc_services/tasks/main.yml:1: schema: {'name': 'Remove list of local services if requested', 'ansible.builtin.file': {'path': '/etc/services.d/{{ item.filename | default("20_local_service_" + item.name) }}', 'state': 'absent'}, 'with_flattened': '{{ etc_services__combined_list }}', 'when': "((not etc_services__enabled|bool or item.delete|d() or item.state|d('present') == 'absent') and ((item.name|d() and item.port|d()) or item.custom|d()))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/etc_services/tasks/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/etckeeper/defaults/main.yml:35: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/etckeeper/defaults/main.yml:60: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -392,11 +409,14 @@ ansible/roles/etherpad/defaults/main.yml:103: var-spacing: Jinja2 variables and 
 ansible/roles/etherpad/defaults/main.yml:163: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/etherpad/defaults/main.yml:181: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/etherpad/defaults/main.yml:205: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/etherpad/tasks/main.yml:1: schema: {'name': 'Manage Etherpad plugins', 'npm': {'name': '{{ item.name | d(item) }}', 'path': '{{ etherpad_home + "/" + etherpad_repository }}', 'state': '{{ item.state | d("present") }}', 'production': True}, 'with_flattened': ['{{ etherpad__default_plugins }}', '{{ etherpad_plugins }}'], 'become': True, 'become_user': '{{ etherpad_user }}', 'notify': ['Restart etherpad-lite'], 'tags': ['role::etherpad:plugins']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/etherpad/tasks/main.yml:16: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/etherpad/tasks/main.yml:221: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/fail2ban/tasks/main.yml:1: schema: {'name': 'Remove fail2ban jails if requested', 'ansible.builtin.file': {'path': '/etc/fail2ban/jail.local.d/{{ item.filename | default(item.name) }}.local', 'state': 'absent'}, 'with_flattened': ['{{ fail2ban_jails }}', '{{ fail2ban_group_jails }}', '{{ fail2ban_host_jails }}', '{{ fail2ban_dependent_jails }}'], 'when': '((item.name is defined and item.name) and (item.delete is defined and item.delete))'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/ferm/defaults/main.yml:28: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ferm/defaults/main.yml:91: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ferm/defaults/main.yml:563: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/ferm/tasks/main.yml:1: schema: {'name': 'Remove iptables INPUT rules if requested', 'ansible.builtin.file': {'path': '/etc/ferm/filter-input.d/{{ ferm__weight_map | d(item.weight | d("50")) }}_{{ item.filename | d(item.type + "_" + item.name | d((item.dport[0] if item.dport|d() else "rules"))) }}.conf', 'state': 'absent'}, 'with_flattened': ['{{ ferm_input_list }}', '{{ ferm_input_group_list }}', '{{ ferm_input_host_list }}', '{{ ferm_input_dependent_list }}'], 'when': '(ferm__enabled|bool and item.type|d() and (item.delete|d() | bool))', 'register': 'ferm__register_input_rules_del', 'tags': ['role::ferm:rules']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/ferm/tasks/main.yml:16: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ferm/tasks/main.yml:87: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ferm/tasks/main.yml:103: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -413,6 +433,7 @@ ansible/roles/filebeat/defaults/main.yml:394: var-spacing: Jinja2 variables and 
 ansible/roles/filebeat/defaults/main.yml:405: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/filebeat/defaults/main.yml:416: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/filebeat/defaults/main.yml:425: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/firejail/tasks/main.yml:1: schema: {'name': 'Ensure ~/.local/share/applications exists', 'ansible.builtin.file': {'path': '~/.local/share/applications', 'state': 'directory', 'mode': '0755'}, 'become': True, 'become_user': '{{ item.name }}', 'no_log': '{{ debops__no_log | d(True) }}', 'when': 'firejail__deploy_state in ["present"] and item != "root" and item.state|d("present") == "present"', 'with_flattened': '{{ firejail__combined_fix_for_users }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/firejail/tasks/main.yml:100: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/foodsoft/defaults/main.yml:101: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/foodsoft/defaults/main.yml:187: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -422,6 +443,7 @@ ansible/roles/foodsoft/defaults/main.yml:352: var-spacing: Jinja2 variables and 
 ansible/roles/foodsoft/defaults/main.yml:360: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/foodsoft/tasks/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/freeradius/defaults/main.yml:39: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/freeradius/tasks/main.yml:1: schema: {'name': 'Install FreeRADIUS packages', 'ansible.builtin.package': {'name': '{{ item }}', 'state': 'present'}, 'with_flattened': ['{{ freeradius__base_packages }}', '{{ freeradius__packages }}'], 'register': 'freeradius__register_packages', 'until': 'freeradius__register_packages is succeeded'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/freeradius/tasks/main.yml:61: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gitlab/defaults/main.yml:57: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gitlab/defaults/main.yml:88: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -460,11 +482,17 @@ ansible/roles/gitlab_runner/defaults/main.yml:358: var-spacing: Jinja2 variables
 ansible/roles/gitlab_runner/defaults/main.yml:371: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gitlab_runner/defaults/main.yml:393: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gitlab_runner/defaults/main.yml:730: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/gitlab_runner/tasks/main.yml:1: schema: {'name': 'Create required groups', 'ansible.builtin.group': {'name': '{{ item.name if item.name|d() else item }}', 'system': '{{ item.system|bool if item.system is defined else gitlab_runner__system | bool }}', 'state': 'present'}, 'with_flattened': ['{{ gitlab_runner__group }}', '{{ gitlab_runner__additional_groups }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/gitlab_runner/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gitlab_runner/tasks/main.yml:64: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gitlab_runner/tasks/main.yml:91: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gitlab_runner/tasks/main.yml:125: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gitlab_runner/tasks/main.yml:195: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/gitusers/tasks/git-shell.yml:1: schema: {'name': 'Create base directory for user websites', 'ansible.builtin.file': {'path': '{{ gitusers_default_www_prefix }}/{{ item.group | default(item.name + gitusers_name_suffix) }}', 'state': 'directory', 'owner': 'root', 'group': '{{ gitusers_default_www_group }}', 'mode': '0711'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': "((item.name is defined and item.name) and (item.state is undefined or (item.state is defined and item.state != 'absent')))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+ansible/roles/gitusers/tasks/gitusers.yml:1: schema: {'name': 'Manage user accounts without UIDs', 'ansible.builtin.user': {'name': '{{ item.name + gitusers_name_suffix }}', 'state': '{{ item.state | default("present") }}', 'group': '{{ item.group | default(item.name + gitusers_name_suffix) }}', 'comment': '{{ item.comment | default("") }}', 'system': '{{ item.systemuser | default("no") }}', 'shell': '{{ item.shell | default(gitusers_default_shell) }}', 'home': '{{ item.home | default(gitusers_default_home_prefix + "/" + item.name + gitusers_name_suffix) }}', 'createhome': 'no'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': '((item.name is defined and item.name) and (item.uid is undefined or (item.uid is defined and not item.uid)))'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+ansible/roles/gitusers/tasks/groups_absent.yml:1: schema: {'name': 'Remove user groups if requested', 'ansible.builtin.group': {'name': '{{ item.group | default(item.name + gitusers_name_suffix) }}', 'state': 'absent'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': "(item.name is defined and (item.state is defined and item.state == 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+ansible/roles/gitusers/tasks/groups_present.yml:1: schema: {'name': 'Create user groups without GIDs', 'ansible.builtin.group': {'name': '{{ item.group | default(item.name + gitusers_name_suffix) }}', 'system': '{{ item.systemgroup | default("no") }}', 'state': 'present'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': "(((item.name is defined and item.name) and (item.gid is undefined or (item.gid is defined and not item.gid))) and (item.state is undefined or (item.state is defined and item.state != 'absent')))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+ansible/roles/gitusers/tasks/sshkeys.yml:1: schema: {'name': 'Configure authorized SSH keys for users', 'ansible.posix.authorized_key': {'key': '{{ "\\n".join(item.sshkeys) | string }}', 'state': 'present', 'user': '{{ item.name + gitusers_name_suffix }}'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': "((item.name is defined and item.name) and (item.state is undefined or (item.state is defined and item.state != 'absent')) and (item.sshkeys is defined and item.sshkeys))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/golang/defaults/main.yml:123: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/golang/tasks/golang_build_install.yml:53: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/golang/tasks/golang_build_install.yml:118: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -487,8 +515,10 @@ ansible/roles/grub/tasks/main.yml:115: var-spacing: Jinja2 variables and filters
 ansible/roles/grub/tasks/main.yml:149: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gunicorn/defaults/main.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gunicorn/defaults/main.yml:37: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/gunicorn/tasks/newer_releases.yml:1: schema: {'name': 'Ensure that required groups exist', 'ansible.builtin.group': {'name': '{{ item.group }}', 'system': '{{ (item.system|d(True)) | bool }}', 'state': 'present'}, 'with_flattened': ['{{ gunicorn__applications }}', '{{ gunicorn__dependent_applications }}'], 'when': "item.name|d() and item.state|d('present') != 'absent' and item.group|d()"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/gunicorn/tasks/newer_releases.yml:14: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/gunicorn/tasks/newer_releases.yml:25: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/gunicorn/tasks/older_releases.yml:1: schema: {'name': 'Remove gunicorn configuration', 'ansible.builtin.file': {'path': '/etc/gunicorn.d/{{ item.name }}', 'state': 'absent'}, 'with_flattened': ['{{ gunicorn__applications }}', '{{ gunicorn__dependent_applications }}'], 'notify': ['Restart gunicorn'], 'when': "item.name|d() and item.state|d('present') == 'absent'"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/hashicorp/defaults/main.yml:90: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/hashicorp/defaults/main.yml:191: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/hashicorp/defaults/main.yml:273: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -524,6 +554,7 @@ ansible/roles/icinga/defaults/main.yml:651: var-spacing: Jinja2 variables and fi
 ansible/roles/icinga/defaults/main.yml:675: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/icinga/defaults/main.yml:848: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/icinga/defaults/main.yml:871: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/icinga/tasks/main.yml:1: schema: {'name': 'Copy custom files for Icinga', 'ansible.builtin.copy': {'content': '{{ item.content | d(omit) }}', 'src': '{{ item.src     | d(omit) }}', 'dest': '{{ item.dest    | d(omit) }}', 'force': '{{ item.force   | d(omit) }}', 'owner': '{{ item.owner   | d("root") }}', 'group': '{{ item.group   | d("root") }}', 'mode': '{{ item.mode    | d("0755") }}'}, 'with_flattened': ['{{ icinga__custom_files }}', '{{ icinga__group_custom_files }}', '{{ icinga__host_custom_files }}'], 'when': '((item.src|d() or item.content|d()) and item.dest|d() and item.state|d("present") != "absent")'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/icinga/tasks/main.yml:63: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/icinga/tasks/main.yml:143: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/icinga_db/defaults/main.yml:30: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -595,6 +626,7 @@ ansible/roles/ifupdown/defaults/main.yml:180: var-spacing: Jinja2 variables and 
 ansible/roles/ifupdown/defaults/main.yml:181: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ifupdown/defaults/main.yml:202: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ifupdown/defaults/main.yml:207: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/ifupdown/tasks/main.yml:1: schema: {'name': 'Remove custom configuration files', 'ansible.builtin.file': {'path': '{{ item.dest | d(item.path) }}', 'state': 'absent'}, 'with_flattened': ['{{ ifupdown__custom_files }}', '{{ ifupdown__custom_group_files }}', '{{ ifupdown__custom_host_files }}', '{{ ifupdown__custom_dependent_files }}'], 'when': "((item.dest|d() or item.path|d()) and item.state|d('present') == 'absent')"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/ifupdown/tasks/main.yml:70: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ifupdown/tasks/main.yml:81: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ifupdown/tasks/main.yml:107: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -622,6 +654,7 @@ ansible/roles/imapproxy/defaults/main.yml:439: var-spacing: Jinja2 variables and
 ansible/roles/imapproxy/defaults/main.yml:443: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/influxdata/defaults/main.yml:32: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/influxdb/defaults/main.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/influxdb/tasks/manage_contents.yml:1: schema: {'name': 'Drop databases if requested', 'influxdb_database': {'database_name': '{{ item.database | d(item.name) }}', 'state': 'absent', 'hostname': '{{ influxdb__server }}', 'port': '{{ influxdb__port }}', 'ssl': '{{ influxdb__pki }}', 'password': '{{ influxdb__root_password }}', 'proxies': '{{ item.proxies | d(influxdb__proxies | d(omit)) }}', 'validate_certs': '{{ item.validate_certs | d(influxdb__validate_certs | d(True)) }}'}, 'with_flattened': '{{ influxdb__databases + influxdb__dependent_databases|d([]) }}', 'delegate_to': '{{ influxdb__delegate_to }}', 'when': "((item.database|d(False) or item.name|d(False)) and (item.state is defined and item.state == 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/influxdb/tasks/manage_contents.yml:8: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/influxdb/tasks/manage_contents.yml:23: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/influxdb/tasks/manage_contents.yml:39: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -658,6 +691,7 @@ ansible/roles/kibana/defaults/main.yml:443: var-spacing: Jinja2 variables and fi
 ansible/roles/kibana/defaults/main.yml:449: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/kibana/defaults/main.yml:455: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/kibana/defaults/main.yml:766: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/kibana/tasks/main.yml:1: schema: {'name': 'Install Kibana plugins', 'ansible.builtin.command': 'bin/kibana-plugin install {{ item.url | d(item.name) }}', 'args': {'chdir': '/usr/share/kibana'}, 'notify': ['Restart kibana'], 'become': True, 'become_user': '{{ item.user | d(kibana__user) }}', 'with_flattened': ['{{ kibana__combined_plugins }}'], 'when': "(item.name|d() and item.state|d('present') != 'absent' and (item.name if ':' not in item.name else item.name.split(':')[1]) not in kibana__register_plugins.stdout_lines)"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/kibana/tasks/main.yml:139: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/kmod/defaults/main.yml:29: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/kodi/defaults/main.yml:58: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -687,7 +721,9 @@ ansible/roles/librenms/defaults/main.yml:223: var-spacing: Jinja2 variables and 
 ansible/roles/librenms/defaults/main.yml:372: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/librenms/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/libvirt/defaults/main.yml:30: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/libvirt/tasks/manage_networks.yml:1: schema: {'name': 'Stop networks if requested', 'community.libvirt.virt_net': {'name': '{{ item.name }}', 'uri': '{{ libvirt__connections }}', 'state': 'inactive'}, 'with_flattened': '{{ libvirt__networks }}', 'become': False, 'when': "(item.name|d() and (item.state|d() in [ 'inactive', 'undefined', 'absent' ]))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/libvirt/tasks/manage_networks.yml:50: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/libvirt/tasks/manage_pools.yml:1: schema: {'name': 'Stop storage pools if requested', 'virt_pool': {'name': '{{ item.name }}', 'uri': '{{ libvirt__connections }}', 'state': 'inactive'}, 'with_flattened': '{{ libvirt__pools }}', 'become': False, 'register': 'libvirt__register_stop', 'when': "((item.name|d()) and (item.state|d() in [ 'inactive', 'undefined', 'absent' ]))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/libvirt/tasks/manage_pools.yml:72: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/libvirtd/defaults/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/libvirtd/defaults/main.yml:98: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -708,6 +744,7 @@ ansible/roles/lldpd/defaults/main.yml:60: var-spacing: Jinja2 variables and filt
 ansible/roles/lldpd/tasks/main.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/lldpd/tasks/main.yml:63: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/lldpd/tasks/main.yml:73: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/locales/tasks/main.yml:1: schema: {'name': 'Ensure that specified locales exist', 'locale_gen': {'name': '{{ item.name | d(item) }}', 'state': '{{ item.state | d("present") }}'}, 'with_flattened': ['{{ locales__default_list }}', '{{ locales__list }}', '{{ locales__group_list }}', '{{ locales__host_list }}', '{{ locales__dependent_list }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/logrotate/tasks/main.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/logrotate/tasks/main.yml:57: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/lxc/defaults/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -740,6 +777,7 @@ ansible/roles/lxd/defaults/main.yml:223: var-spacing: Jinja2 variables and filte
 ansible/roles/lxd/defaults/main.yml:274: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/lxd/defaults/main.yml:293: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/machine/defaults/main.yml:103: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/machine/tasks/main.yml:1: schema: {'name': 'Remove dynamic MOTD scripts', 'ansible.builtin.file': {'path': '{{ machine__motd_update_dir + "/" + (item.filename | d(("%02d" | format(item.weight|int))|string + "-" + item.name)) }}', 'state': 'absent'}, 'with_flattened': '{{ machine__motd_combined_scripts | debops.debops.parse_kv_items }}', 'register': 'machine__register_motd_scripts_removed', 'when': "(machine__enabled|bool and item.filename|d(item.name) and item.state|d('present') == 'absent' and not item.divert|d(False)|bool)"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/machine/tasks/main.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/machine/tasks/main.yml:77: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/machine/tasks/main.yml:94: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -789,6 +827,7 @@ ansible/roles/mariadb/defaults/main.yml:254: var-spacing: Jinja2 variables and f
 ansible/roles/mariadb/defaults/main.yml:263: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/mariadb/defaults/main.yml:270: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/mariadb/tasks/main.yml:38: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/mariadb/tasks/manage_contents.yml:1: schema: {'name': 'Drop databases if requested', 'community.mysql.mysql_db': {'name': '{{ item.database | d(item.name) }}', 'state': 'absent'}, 'with_flattened': '{{ mariadb__databases + mariadb__dependent_databases + mariadb_databases|d([]) }}', 'delegate_to': '{{ mariadb__delegate_to }}', 'when': "((item.database|d(False) or item.name|d(False)) and (item.state is defined and item.state == 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/mariadb/tasks/manage_contents.yml:6: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/mariadb/tasks/manage_contents.yml:15: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/mariadb/tasks/manage_contents.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -862,6 +901,7 @@ ansible/roles/mosquitto/defaults/main.yml:671: var-spacing: Jinja2 variables and
 ansible/roles/mosquitto/defaults/main.yml:681: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/mosquitto/defaults/main.yml:698: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/mosquitto/defaults/main.yml:708: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/mosquitto/tasks/main.yml:1: schema: {'name': 'Remove user/password entries', 'ansible.builtin.command': 'mosquitto_passwd -D {{ mosquitto__password_file }} {{ item.name | d(item) }}', 'with_flattened': ['{{ mosquitto__auth_users }}', '{{ mosquitto__auth_group_users }}', '{{ mosquitto__auth_host_users }}'], 'when': "(mosquitto__password|bool and item.state|d('present') == 'absent' and (item.name | d(item) in mosquitto__register_passwd.stdout_lines) and mosquitto__version is version_compare('1.4.0', '>='))", 'notify': ['Reload mosquitto'], 'tags': ['role::mosquitto:passwd'], 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/mosquitto/tasks/main.yml:64: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/mount/defaults/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/mount/tasks/main.yml:43: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -906,16 +946,19 @@ ansible/roles/netbox/defaults/main.yml:1019: var-spacing: Jinja2 variables and f
 ansible/roles/netbox/defaults/main.yml:1028: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/netbox/defaults/main.yml:1037: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/netbox/defaults/main.yml:1046: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/netbox/tasks/main.yml:1: schema: {'name': 'Install additional Python modules in virtualenv', 'ansible.builtin.pip': {'name': '{{ item.name | d(item) }}', 'version': '{{ item.version | d(omit) }}', 'virtualenv': '{{ netbox__virtualenv }}'}, 'become': True, 'become_user': '{{ netbox__user }}', 'with_flattened': '{{ netbox__virtualenv_pip_packages }}', 'when': "netbox__register_checkout is changed and item.state|d('present') not in [ 'absent', 'ignore' ]"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/neurodebian/defaults/main.yml:104: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/neurodebian/defaults/main.yml:121: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/neurodebian/defaults/main.yml:236: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/neurodebian/defaults/main.yml:237: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nfs/defaults/main.yml:62: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/nfs/tasks/main.yml:1: schema: {'name': 'Ensure that the NFS mount points exist', 'ansible.builtin.file': {'path': '{{ item.path }}', 'owner': '{{ item.owner | d("root") }}', 'group': '{{ item.group | d("root") }}', 'mode': '{{ item.mode  | d("0755") }}', 'state': 'directory'}, 'with_flattened': ['{{ nfs__shares }}', '{{ nfs__group_shares }}', '{{ nfs__host_shares }}'], 'when': "item.path|d() and item.src|d() and item.state|d('mounted') == 'present'"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/nfs_server/defaults/main.yml:56: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nfs_server/defaults/main.yml:83: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nfs_server/defaults/main.yml:151: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nfs_server/defaults/main.yml:158: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nfs_server/defaults/main.yml:248: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/nfs_server/tasks/main.yml:1: schema: {'name': 'Ensure exported directories exist', 'ansible.builtin.file': {'path': '{{ item.path }}', 'state': 'directory', 'owner': '{{ item.owner | d("root") }}', 'group': '{{ item.group | d("root") }}', 'mode': '{{ item.mode  | d("0755") }}'}, 'with_flattened': ['{{ nfs_server__combined_exports }}'], 'when': "item.path|d() and item.state|d('present') != 'absent' and item.acl|d()"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/nginx/defaults/main.yml:61: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nginx/defaults/main.yml:68: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nginx/defaults/main.yml:74: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -928,11 +971,15 @@ ansible/roles/nginx/defaults/main.yml:500: var-spacing: Jinja2 variables and fil
 ansible/roles/nginx/defaults/main.yml:520: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nginx/defaults/main.yml:532: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nginx/defaults/main.yml:744: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/nginx/tasks/main.yml:1: schema: {'name': 'Assert that no legacy options are used', 'ansible.builtin.assert': {'that': ['((item.csp is defined and item.csp is string) or item.csp is undefined)', '(item.csp_policy is undefined)']}, 'run_once': True, 'delegate_to': 'localhost', 'with_flattened': ['{{ nginx__servers }}', '{{ nginx__default_servers }}', '{{ nginx__internal_servers }}', '{{ nginx__dependent_servers }}', '{{ nginx_servers | d([]) }}', '{{ nginx_default_servers | d([]) }}', '{{ nginx_internal_servers | d([]) }}', '{{ nginx_dependent_servers | d([]) }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/nginx/tasks/main.yml:192: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nginx/tasks/main.yml:204: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/nginx/tasks/nginx_configs.yml:1: schema: {'name': 'Remove nginx maps if requested', 'ansible.builtin.file': {'dest': '/etc/nginx/conf.d/map_{{ item.name }}.conf', 'state': 'absent'}, 'with_flattened': ['{{ nginx__maps }}', '{{ nginx__default_maps }}', '{{ nginx__dependent_maps }}', '{{ nginx_maps |d([]) }}', '{{ nginx_default_maps | d([]) }}', '{{ nginx_dependent_maps | d([]) }}'], 'notify': ['Test nginx and reload'], 'when': "(item.name|d() and ((item.state|d() and item.state == 'absent') or (item.delete|d() and item.delete|bool)))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/nginx/tasks/nginx_configs.yml:15: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nginx/tasks/nginx_configs.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/nginx/tasks/nginx_htpasswd.yml:1: schema: {'name': 'Remove htpasswd files if requested', 'ansible.builtin.file': {'dest': '{{ nginx_private_path + "/" + item.name }}', 'state': 'absent'}, 'with_flattened': ['{{ nginx__htpasswd }}', '{{ nginx__default_htpasswd }}', '{{ nginx__dependent_htpasswd }}', '{{ nginx_htpasswd | d([]) }}'], 'when': "(item.name|d() and (item.state|d() and item.state == 'absent'))", 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/nginx/tasks/nginx_htpasswd.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/nginx/tasks/nginx_servers.yml:1: schema: {'name': 'Create global webroot directories if allowed', 'ansible.builtin.file': {'path': '{{ item.root | d( "{}/sites/{}/{}".format( nginx_www + ("/" + item.owner if item.owner | d() else ""), (item.name if item.name is string else item.name[0]) | d("default"), item.public_dir_name | d(nginx_public_dir_name)) ) }}', 'state': 'directory', 'owner': '{{ item.owner | d(nginx_webroot_owner) }}', 'group': '{{ item.group | d(item.owner | d(nginx_webroot_group)) }}', 'mode': '{{ item.mode | d(nginx_webroot_mode) }}'}, 'with_flattened': ['{{ nginx__servers }}', '{{ nginx__default_servers }}', '{{ nginx__internal_servers }}', '{{ nginx__dependent_servers }}', '{{ nginx_servers | d([]) }}', '{{ nginx_default_servers | d([]) }}', '{{ nginx_internal_servers | d([]) }}', '{{ nginx_dependent_servers | d([]) }}'], 'when': "((item.webroot_create|d(nginx_webroot_create)|bool) and item.state|d('present') != 'absent')"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/nginx/tasks/nginx_servers.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nginx/tasks/nginx_servers.yml:59: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nginx/tasks/nginx_servers.yml:127: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -948,6 +995,7 @@ ansible/roles/nodejs/defaults/main.yml:228: var-spacing: Jinja2 variables and fi
 ansible/roles/nodejs/defaults/main.yml:236: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nodejs/defaults/main.yml:246: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nodejs/defaults/main.yml:250: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/nodejs/tasks/main.yml:1: schema: {'name': 'Install NPM packages', 'npm': {'name': '{{ item.name           | d(item) }}', 'state': '{{ item.state          | d("present") }}', 'global': '{{ (item.global        | d(True)) | bool }}', 'production': '{{ (item.production    | d(nodejs__npm_production_mode)) | bool }}', 'version': '{{ item.version        | d(omit) }}', 'registry': '{{ item.registry       | d(omit) }}', 'executable': '{{ item.executable     | d(omit) }}', 'ignore_scripts': '{{ item.ignore_scripts | d(omit) }}', 'path': '{{ item.path           | d(omit) }}'}, 'with_flattened': ['{{ nodejs__npm_packages }}', '{{ nodejs__npm_group_packages }}', '{{ nodejs__npm_host_packages }}', '{{ nodejs__npm_dependent_packages }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/nodejs/tasks/main.yml:18: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nodejs/tasks/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nslcd/defaults/main.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -981,6 +1029,7 @@ ansible/roles/nullmailer/defaults/main.yml:336: var-spacing: Jinja2 variables an
 ansible/roles/nullmailer/defaults/main.yml:463: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nullmailer/defaults/main.yml:477: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nullmailer/defaults/main.yml:493: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/nullmailer/tasks/main.yml:1: schema: {'name': 'Generate configuration files', 'ansible.builtin.copy': {'dest': '{{ item.dest }}', 'content': "{{ (item.content + '\n') if item.content|d() else ('' if item.content is defined else omit) }}", 'src': '{{ item.src   | d(omit) }}', 'owner': '{{ item.owner | d(omit) }}', 'group': '{{ item.group | d(omit) }}', 'mode': '{{ item.mode  | d(omit) }}'}, 'with_flattened': ['{{ nullmailer__configuration_files }}'], 'notify': ['Restart nullmailer'], 'when': "(nullmailer__deploy_state|d('present') != 'absent' and (item.dest|d() and (item.src|d() or item.content is defined) and item.state|d('present') != 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/nullmailer/tasks/main.yml:32: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nullmailer/tasks/main.yml:47: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/nullmailer/tasks/main_env.yml:20: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -991,6 +1040,7 @@ ansible/roles/opendkim/defaults/main.yml:83: var-spacing: Jinja2 variables and f
 ansible/roles/opendkim/defaults/main.yml:352: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/opendkim/defaults/main.yml:358: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/opendkim/defaults/main.yml:366: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/opendkim/tasks/main.yml:1: schema: {'name': 'Generate DomainKeys on Ansible Controller', 'community.crypto.openssl_privatekey': {'size': '{{ item.size  | d(opendkim__default_key_size) }}', 'type': '{{ (item.type | d("rsa")) | upper }}', 'path': '{{ secret + "/opendkim/domainkeys/" + (item.domain | d(opendkim__domain)) + "_" + (item.selector | d(item.name | d(item))) + ".pem" }}', 'regenerate': '{{ item.regenerate | d("full_idempotence" if ansible_version.full is version("2.10", ">=") else omit) }}'}, 'with_flattened': ['{{ opendkim__combined_keys }}'], 'become': False, 'delegate_to': 'localhost', 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/owncloud/defaults/main.yml:50: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/defaults/main.yml:53: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/defaults/main.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1032,10 +1082,12 @@ ansible/roles/owncloud/defaults/main.yml:2106: var-spacing: Jinja2 variables and
 ansible/roles/owncloud/defaults/main.yml:2275: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/defaults/main.yml:2375: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/defaults/main.yml:2404: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/owncloud/tasks/copy.yml:1: schema: {'name': 'Ensure that parent directories exist', 'ansible.builtin.file': {'path': '{{ (owncloud__data_path + "/" + item.dest) | dirname }}', 'state': 'directory', 'recurse': '{{ item.parent_dirs_recurse | d(True) }}', 'owner': '{{ item.parent_dirs_owner   | d(owncloud__app_user) }}', 'group': '{{ item.parent_dirs_group   | d(owncloud__app_group) }}', 'mode': '{{ item.parent_dirs_mode    | d("0755") }}'}, 'when': '((item.parent_dirs_create|d(True)| bool) and item.dest|d() and item.state|d("present") != \'absent\')', 'with_flattened': ['{{ owncloud__user_files }}', '{{ owncloud__user_files_group }}', '{{ owncloud__user_files_host }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/owncloud/tasks/main_env.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/tasks/main_env.yml:19: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/tasks/run_occ.yml:20: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/tasks/run_occ.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/owncloud/tasks/setup_owncloud.yml:1: schema: {'name': 'Enable required Apache modules', 'apache2_module': {'name': 'php5', 'state': 'present'}, 'when': 'owncloud__webserver == "apache"', 'with_flattened': '{{ owncloud__apache_modules }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/owncloud/tasks/setup_owncloud.yml:64: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/tasks/setup_owncloud.yml:88: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/owncloud/tasks/system_package_management.yml:40: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1056,8 +1108,10 @@ ansible/roles/php/defaults/main.yml:395: var-spacing: Jinja2 variables and filte
 ansible/roles/php/defaults/main.yml:458: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/php/defaults/main.yml:756: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/php/defaults/main.yml:767: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/php/tasks/main.yml:1: schema: {'name': 'Generate php.ini configuration', 'ansible.builtin.template': {'src': 'etc/php/ansible/php.ini.j2', 'dest': '{{ php__etc_base + "/" + item.path | d("ansible/") + (item.filename | d("00-ansible")) + ".ini" }}', 'owner': 'root', 'group': 'root', 'mode': '0644'}, 'with_flattened': ['{{ php__default_configuration }}', '{{ php__configuration }}', '{{ php__group_configuration }}', '{{ php__host_configuration }}', '{{ php__dependent_configuration }}'], 'when': "item.state|d('present') != 'absent'", 'notify': ['Restart php-fpm'], 'tags': ['role::php:config']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/php/tasks/main_env.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/php/tasks/main_env.yml:63: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/php/tasks/packages_absent_for_version.yml:1: schema: {'name': 'Ensure older PHP packages are absent on reset for given PHP version', 'ansible.builtin.apt': {'name': '{{ item is search("php.*-")|ternary(item, php__version_absent + "-" + item) }}', 'state': 'absent'}, 'with_flattened': ['{{ php__server_api_packages }}', '{{ php__base_packages }}', '{{ php__packages }}', '{{ php__group_packages }}', '{{ php__host_packages }}', '{{ php__dependent_packages }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/php/tasks/packages_absent_for_version.yml:9: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/pki/defaults/main.yml:122: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/pki/defaults/main.yml:230: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1087,6 +1141,7 @@ ansible/roles/pki/defaults/main.yml:687: var-spacing: Jinja2 variables and filte
 ansible/roles/pki/defaults/main.yml:802: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/pki/defaults/main.yml:808: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/pki/defaults/main.yml:815: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/pki/tasks/main.yml:1: schema: {'name': 'Initialize PKI realms', 'environment': {'PKI_ROOT': '{{ pki_root }}', 'PKI_ACME': '{{ (item.acme | d(pki_acme)) | bool | lower }}', 'PKI_INTERNAL': '{{ (item.internal | d(pki_internal)) | bool | lower }}', 'PKI_LIBRARY': '{{ item.library | d(pki_library) }}', 'PKI_ACME_LIBRARY': '{{ item.acme_library | d(pki_acme_library) }}'}, 'ansible.builtin.command': '"{{ pki_fact_lib_path }}/pki-realm" init -n "{{ item.name }}"\n--authority-preference "{{ (item.authority_preference | d(pki_authority_preference)) | join(\'/\') }}"\n--library "{{ item.library | d(pki_library) }}"\n--realm-key-size "{{ item.realm_key_size | d(pki_realm_key_size) }}"\n--internal "{{ (item.internal | d(pki_internal)) | bool | lower }}"\n--private-dir-group "{{ item.private_dir_group | d(pki_private_group) }}"\n--private-file-group "{{ item.private_file_group | d(pki_private_group) }}"\n--private-dir-acl-groups "{{ (item.private_dir_acl_groups | d(pki_private_dir_acl_groups)) | join(\'/\') }}"\n--private-file-acl-groups "{{ (item.private_file_acl_groups | d(pki_private_file_acl_groups)) | join(\'/\') }}"\n--acme-ca "{{ item.acme_ca | d(pki_acme_ca) }}"\n--acme-ca-api "{{ item.acme_ca_api | d(pki_acme_ca_api_map) }}"\n--acme-type "{{ item.type | d(pki_acme_type) }}"\n--acme-contacts "{{ item.acme_contacts | d(pki_acme_contacts) | join(\',\') }}"\n--acme-default-subdomains "{{ (item.acme_default_subdomains | d(pki_acme_default_subdomains)) | join(\'/\') }}"\n--acme-challenge-dir "{{ item.acme_challenge_dir | d(pki_acme_challenge_dir) }}"\n--default-domain "{{ item.default_domain | d(pki_default_domain) }}"\n--default-subdomains "{{ (item.default_subdomains | d(pki_default_subdomains)) | join(\'/\') }}"\n--dhparam "{{ (item.dhparam | d(pki_dhparam)) | bool | lower }}"\n--dhparam-file "{{ item.dhparam_file | d(pki_dhparam_file) }}"\n--selfsigned-sign-days "{{ item.selfsigned_sign_days|d(\'365\') }}"\n', 'args': {'creates': '{{ pki_root + "/realms/" + item.name + "/config/realm.conf" }}'}, 'with_flattened': ['{{ pki_realms }}', '{{ pki_group_realms }}', '{{ pki_host_realms }}', '{{ pki_default_realms }}', '{{ pki_dependent_realms }}'], 'when': '(pki_enabled|bool and item.name is defined and (item.enabled|d(True) | bool) and (item.when|d(True) | bool))'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/pki/tasks/main.yml:37: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/pki/tasks/main.yml:404: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/pki/tasks/main.yml:491: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1113,12 +1168,14 @@ ansible/roles/postfix/defaults/main.yml:494: var-spacing: Jinja2 variables and f
 ansible/roles/postfix/defaults/main.yml:1320: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postfix/defaults/main.yml:1330: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postfix/defaults/main.yml:1340: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/postfix/tasks/main.yml:1: schema: {'name': 'Remove Postfix lookup tables', 'ansible.builtin.file': {'path': '/etc/postfix/{{ item.name }}', 'state': 'absent'}, 'with_flattened': ['{{ postfix__combined_lookup_tables | debops.debops.parse_kv_items }}'], 'when': "item.name|d() and item.state|d('present') == 'absent'", 'notify': ['Process Postfix Makefile', 'Check postfix and reload'], 'no_log': '{{ debops__no_log | d(item.no_log) | d(True if (item.mode|d("0644") == "0600") else False) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/postfix/tasks/main.yml:103: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postfix/tasks/main.yml:114: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postgresql/defaults/main.yml:80: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postgresql/defaults/main.yml:97: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postgresql/defaults/main.yml:146: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postgresql/defaults/main.yml:248: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/postgresql/tasks/main.yml:1: schema: {'name': 'Drop PostgreSQL roles if requested', 'community.postgresql.postgresql_user': {'name': '{{ item.name | d(item.role) }}', 'port': '{{ item.port | d(postgresql__port if postgresql__port else omit) }}', 'state': 'absent'}, 'with_flattened': ['{{ postgresql__roles }}', '{{ postgresql_roles|d([]) }}', '{{ postgresql__dependent_roles }}'], 'become': True, 'become_user': '{{ postgresql__user }}', 'delegate_to': '{{ postgresql__delegate_to }}', 'when': "item.state|d('present') == 'absent'", 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/postgresql/tasks/main.yml:25: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postgresql/tasks/main.yml:83: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postgresql/tasks/main.yml:98: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1141,6 +1198,9 @@ ansible/roles/postgresql_server/defaults/main.yml:637: var-spacing: Jinja2 varia
 ansible/roles/postgresql_server/tasks/install_postgresql.yml:18: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postgresql_server/tasks/main.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postgresql_server/tasks/main.yml:67: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/postgresql_server/tasks/manage_autopostgresqlbackup.yml:1: schema: {'name': 'Configure autopostgresqlbackup defaults', 'ansible.builtin.template': {'src': 'etc/default/autopostgresqlbackup.j2', 'dest': '/etc/default/autopostgresqlbackup-{{ item.version | d(postgresql_server__version) }}-{{ item.name }}', 'owner': 'root', 'group': 'root', 'mode': '0644'}, 'with_flattened': ['{{ postgresql_server__clusters }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+ansible/roles/postgresql_server/tasks/manage_clusters.yml:1: schema: {'name': 'Create PostgreSQL clusters', 'environment': {'LANG': '{{ item.locale | d(postgresql_server__locale) }}', 'LC_ALL': '{{ item.locale | d(postgresql_server__locale) }}'}, 'ansible.builtin.command': 'pg_createcluster --user={{ item.user | d(postgresql_server__user) }} --group={{ item.group | d(postgresql_server__group) }} --locale={{ item.locale | d(postgresql_server__locale) }} --start-conf={{ item.start_conf | d(postgresql_server__start_conf) }} --port={{ item.port }} {{ item.version | d(postgresql_server__version) }} {{ item.name }}', 'args': {'creates': '/etc/postgresql/{{ item.version | d(postgresql_server__version) }}/{{ item.name }}/postgresql.conf'}, 'register': 'postgresql_server__register_createcluster', 'with_flattened': ['{{ postgresql_server__clusters }}'], 'when': 'item.name|d() and item.port|d()'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+ansible/roles/postgresql_server/tasks/secure_installation.yml:1: schema: {'name': 'Update default admin password', 'community.postgresql.postgresql_user': {'name': '{{ item.user | d(postgresql_server__user) }}', 'password': '{{ item.admin_password | d(postgresql_server__admin_password) }}', 'encrypted': True, 'port': '{{ item.port }}', 'state': 'present'}, 'with_flattened': ['{{ postgresql_server__clusters }}'], 'become': True, 'become_user': '{{ item.user | d(postgresql_server__user) }}', 'when': ['item.name|d()', 'item.standby is not defined'], 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/postldap/defaults/main.yml:49: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postldap/defaults/main.yml:89: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/postldap/defaults/main.yml:101: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1234,6 +1294,7 @@ ansible/roles/rabbitmq_server/defaults/main.yml:652: var-spacing: Jinja2 variabl
 ansible/roles/rabbitmq_server/defaults/main.yml:659: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/rabbitmq_server/defaults/main.yml:693: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/rabbitmq_server/defaults/main.yml:700: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/rabbitmq_server/tasks/main.yml:1: schema: {'name': 'Manage RabbitMQ plugins', 'community.rabbitmq.rabbitmq_plugin': {'names': '{{ item.name | d(item) }}', 'state': '{{ "enabled" if item.state|d("present") != "absent" else "disabled" }}', 'prefix': '{{ item.prefix | d(omit) }}', 'new_only': True}, 'with_flattened': ['{{ rabbitmq_server__combined_plugins }}'], 'notify': ['Restart rabbitmq-server'], 'tags': ['role::rabbitmq_server:config']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/rabbitmq_server/tasks/main.yml:132: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/rabbitmq_server/tasks/main.yml:182: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/redis_sentinel/defaults/main.yml:38: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1248,6 +1309,7 @@ ansible/roles/reprepro/tasks/configure_reprepro.yml:96: var-spacing: Jinja2 vari
 ansible/roles/resolvconf/defaults/main.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/resolvconf/defaults/main.yml:261: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/resolvconf/defaults/main.yml:265: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/resources/tasks/main.yml:1: schema: {'name': 'Ensure that template directories exist', 'ansible.builtin.file': {'path': '/{{ item.path }}', 'mode': '{{ item.mode }}', 'state': 'directory'}, 'with_filetree': '{{ (resources__host_templates + resources__group_templates + resources__templates) | flatten }}', 'when': "item.state == 'directory'"} should not be valid under {'required': ['with_filetree']} (schema[tasks])
 ansible/roles/resources/tasks/main.yml:139: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/root_account/defaults/main.yml:80: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/root_account/defaults/main.yml:147: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1324,6 +1386,7 @@ ansible/roles/rstudio_server/defaults/main.yml:54: var-spacing: Jinja2 variables
 ansible/roles/rstudio_server/defaults/main.yml:62: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/rstudio_server/defaults/main.yml:83: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/rstudio_server/defaults/main.yml:190: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/rstudio_server/tasks/main.yml:1: schema: {'name': 'Allow specified user accounts to access RStudio Server', 'ansible.builtin.user': {'name': '{{ item.name|d(item) }}', 'groups': '{{ rstudio_server__auth_group }}', 'append': True}, 'with_flattened': ['{{ rstudio_server__allow_users }}', '{{ rstudio_server__group_allow_users }}', '{{ rstudio_server__host_allow_users }}'], 'when': "item.name|d(item) in getent_passwd.keys() and item.state|d('present') != 'absent'"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/rstudio_server/tasks/main.yml:41: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/rsyslog/defaults/main.yml:101: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/rsyslog/defaults/main.yml:108: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1361,9 +1424,11 @@ ansible/roles/rsyslog/tasks/main.yml:120: var-spacing: Jinja2 variables and filt
 ansible/roles/rsyslog/tasks/main.yml:134: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/rsyslog/tasks/main.yml:149: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/ruby/defaults/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/ruby/tasks/main.yml:1: schema: {'name': 'Install Ruby gems', 'gem': {'name': '{{ item.name if item.name|d() else item }}', 'state': '{{ item.state                | d("present") }}', 'user_install': '{{ item.user_install         | d(False) }}', 'version': '{{ item.version              | d(omit) }}', 'repository': '{{ item.repository           | d(omit) }}', 'include_doc': '{{ item.include_doc          | d(omit) }}', 'build_flags': '{{ item.build_flags          | d(omit) }}', 'executable': '{{ item.executable           | d(omit) }}', 'include_dependencies': '{{ item.include_dependencies | d(omit) }}'}, 'with_flattened': ['{{ ruby__gems }}', '{{ ruby__group_gems }}', '{{ ruby__host_gems }}', '{{ ruby__dependent_gems }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/ruby/tasks/main.yml:18: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/salt/defaults/main.yml:114: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/salt/defaults/main.yml:158: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/samba/tasks/main.yml:1: schema: {'name': 'Create root Samba directories', 'ansible.builtin.file': {'path': '{{ item }}', 'state': 'directory', 'owner': 'root', 'group': 'root', 'mode': '0751'}, 'with_flattened': ['{{ samba__path }}', '{{ samba__homes_path }}', '{{ samba__shares_path }}'], 'when': "('samba' in samba__base_packages)"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/saslauthd/defaults/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/saslauthd/defaults/main.yml:66: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/saslauthd/defaults/main.yml:119: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1405,6 +1470,7 @@ ansible/roles/slapd/tasks/slapd_tasks.yml:6: var-spacing: Jinja2 variables and f
 ansible/roles/slapd/tasks/slapd_tasks.yml:21: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/smstools/defaults/main.yml:158: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/snapshot_snapper/tasks/configure_snapper_volume.yml:8: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/snapshot_snapper/tasks/main.yml:1: schema: {'name': 'Copy diverted configuration file to original location', 'ansible.builtin.copy': {'src': '{{ item }}.dpkg-divert', 'dest': '{{ item }}', 'remote_src': True, 'force': False, 'owner': 'root', 'group': 'root', 'mode': '0644'}, 'when': 'snapshot_snapper__updatedb_diverted_register is changed', 'with_flattened': '{{ snapshot_snapper__divert_files }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/snmpd/defaults/main.yml:89: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/snmpd/defaults/main.yml:130: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/snmpd/defaults/main.yml:290: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1433,6 +1499,7 @@ ansible/roles/sshd/defaults/main.yml:893: var-spacing: Jinja2 variables and filt
 ansible/roles/sshd/defaults/main.yml:911: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/sshd/defaults/main.yml:929: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/sshd/defaults/main.yml:939: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/sshd/tasks/main.yml:1: schema: {'name': 'Get list of already scanned host fingerprints', 'ansible.builtin.shell': "set -o nounset -o pipefail -o errexit && ssh-keygen -f {{ sshd__known_hosts_file }} -F {{ item }} | grep -q '^# Host {{ item }} found'", 'args': {'executable': 'bash'}, 'with_flattened': ['{{ sshd__known_hosts }}', '{{ sshd__group_known_hosts }}', '{{ sshd__host_known_hosts }}'], 'when': 'item is defined and item', 'register': 'sshd__register_known_hosts', 'changed_when': False, 'failed_when': False, 'check_mode': False, 'tags': ['role::sshd:known_hosts']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/sshd/tasks/main.yml:94: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/sshd/tasks/main.yml:200: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/sshd/tasks/main.yml:224: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1525,6 +1592,7 @@ ansible/roles/system_users/tasks/main.yml:329: var-spacing: Jinja2 variables and
 ansible/roles/system_users/tasks/main.yml:351: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/system_users/tasks/main.yml:374: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/system_users/tasks/main.yml:391: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/tcpwrappers/tasks/main.yml:1: schema: {'name': 'Remove hosts.allow entries if requested', 'ansible.builtin.file': {'path': '/etc/hosts.allow.d/{{ item.weight | default("50") }}_{{ item.filename | d((item.daemon if item.daemon is string else item.daemon[0]) + "_allow") }}', 'state': 'absent'}, 'with_flattened': ['{{ tcpwrappers__allow }}', '{{ tcpwrappers__group_allow }}', '{{ tcpwrappers__host_allow }}', '{{ tcpwrappers__dependent_allow }}', '{{ tcpwrappers__localhost_allow }}', '{{ tcpwrappers_allow | d([]) }}', '{{ tcpwrappers_group_allow | d([]) }}', '{{ tcpwrappers_host_allow | d([]) }}', '{{ tcpwrappers_dependent_allow | d([]) }}'], 'when': "((item.daemon|d() or item.daemons|d()) and item.state|d() and item.state == 'absent')"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/tcpwrappers/tasks/main.yml:35: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/telegraf/defaults/main.yml:45: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/telegraf/tasks/main.yml:35: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1562,6 +1630,7 @@ ansible/roles/unbound/defaults/main.yml:178: var-spacing: Jinja2 variables and f
 ansible/roles/unbound/defaults/main.yml:179: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/unbound/defaults/main.yml:180: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/unbound/defaults/main.yml:196: var-spacing: Jinja2 variables and filters should have spaces before and after.
+ansible/roles/unbound/tasks/main.yml:1: schema: {'name': 'Remove DNS zones if requested', 'ansible.builtin.file': {'path': '/etc/unbound/unbound.conf.d/zone_{{ item.name }}.conf', 'state': 'absent'}, 'with_flattened': ['{{ unbound__parsed_zones }}'], 'notify': ['Check unbound configuration and reload'], 'when': "item.name|d() and item.state|d('present') == 'absent'"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 ansible/roles/users/defaults/main.yml:122: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/users/tasks/main.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
 ansible/roles/users/tasks/main.yml:50: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1621,12 +1690,14 @@ roles/apache/defaults/main.yml:656: var-spacing: Jinja2 variables and filters sh
 roles/apache/defaults/main.yml:1000: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apache/defaults/main.yml:1020: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apache/tasks/apache_module_state.yml:8: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/apache/tasks/main.yml:1: schema: {'name': 'Divert sites-available configuration', 'dpkg_divert': {'path': '{{ apache__config_path + "/sites-available/" + item.filename|d( | flatten | first | d("default")) + ".conf" }}', 'divert': '{{ (item.divert | d(apache__config_path + "/sites-available/" + item.divert_filename|d(item.filename|d( | flatten | first | d("default"))) + ".conf") + item.divert_suffix|d(".dpkg-divert")) }}'}, 'when': '(item.type|d(apache__vhost_type) in ["divert"])', 'with_flattened': '{{ apache__combined_vhosts }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/apache/tasks/main.yml:32: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apache/tasks/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apache/tasks/main.yml:62: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apache/tasks/main.yml:77: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apache/tasks/main.yml:99: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apache/tasks/main.yml:136: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/apache/tasks/main_env.yml:1: schema: {'name': 'Ensure base packages are in there desired state', 'ansible.builtin.package': {'name': '{{ item }}', 'state': '{{ "present" if (apache__deploy_state == "present") else "absent" }}'}, 'with_flattened': ['{{ apache__base_packages  }}'], 'register': 'apache__register_base_packages', 'until': 'apache__register_base_packages is succeeded', 'tags': ['role::apache:pkgs']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/apt_cacher_ng/defaults/main.yml:204: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apt_cacher_ng/defaults/main.yml:214: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apt_cacher_ng/defaults/main.yml:224: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1634,6 +1705,7 @@ roles/apt_cacher_ng/defaults/main.yml:502: var-spacing: Jinja2 variables and fil
 roles/apt_cacher_ng/defaults/main.yml:578: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apt_cacher_ng/tasks/state_present.yml:18: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apt_cacher_ng/tasks/state_present.yml:48: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/apt_preferences/tasks/main.yml:1: schema: {'name': 'Remove legacy APT preferences', 'ansible.builtin.file': {'dest': '/etc/apt/preferences.d/{{ item.filename | d((item.role | d(item.by_role | d("pin"))) + "_" + ((item.package.split(" ")[0] if item.package is string else item.package[0]) if item.package|d() else (item.packages.split(" ")[0] if item.packages is string else item.packages[0])) + (item.suffix | d("")) + ".pref") | replace("*","all") }}', 'state': 'absent'}, 'with_flattened': ['{{ apt_preferences_list|d([]) }}', '{{ apt_preferences_group_list|d([]) }}', '{{ apt_preferences_host_list|d([]) }}', '{{ apt_preferences_dependent_list|d([]) }}', '{{ apt_preferences__list }}', '{{ apt_preferences__group_list }}', '{{ apt_preferences__host_list }}', '{{ apt_preferences__dependent_list }}'], 'when': '("." in item.role|d(item.by_role|d("")))'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/apt_preferences/tasks/main.yml:9: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apt_preferences/tasks/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/apt_preferences/tasks/main.yml:76: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1647,6 +1719,7 @@ roles/avahi/defaults/main.yml:344: var-spacing: Jinja2 variables and filters sho
 roles/avahi/defaults/main.yml:416: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/avahi/tasks/avahi_alias.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/avahi/tasks/main.yml:119: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/backup2l/tasks/main.yml:1: schema: {'name': 'Add paths to backup in an include file', 'ansible.builtin.lineinfile': {'dest': '{{ backup2l__include_file }}', 'regexp': '^{{ item.path | d(item) }}$', 'line': '{{ item.path | d(item) }}', 'state': '{{ item.state | d("present") }}', 'create': True, 'mode': '0644'}, 'with_flattened': ['{{ backup2l__default_include }}', '{{ backup2l__include }}', '{{ backup2l__group_include }}', '{{ backup2l__host_include }}'], 'when': 'backup2l__srclist_from_file|bool'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/controller/defaults/main.yml:62: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/controller/handlers/main.yml:6: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/controller/handlers/main.yml:13: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1663,7 +1736,9 @@ roles/cran/defaults/main.yml:72: var-spacing: Jinja2 variables and filters shoul
 roles/cran/defaults/main.yml:155: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/cran/defaults/main.yml:177: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/cran/defaults/main.yml:189: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/cran/tasks/main.yml:1: schema: {'name': 'Manage R packages', 'cran': {'name': '{{ item.name  | d(item) }}', 'repo': '{{ item.repo  | d(cran__upstream_mirror) }}', 'state': '{{ item.state | d("present") }}'}, 'with_flattened': ['{{ cran__r_packages }}', '{{ cran__group_r_packages }}', '{{ cran__host_r_packages }}', '{{ cran__dependent_r_packages }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/cron/defaults/main.yml:67: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/cryptsetup/tasks/main.yml:1: schema: {'name': 'Create keyfile and backup directories on the remote system', 'ansible.builtin.file': {'path': '{{ item.path }}', 'state': 'directory', 'owner': 'root', 'group': 'root', 'mode': '0700'}, 'when': 'item.condition', 'with_flattened': [{'path': '{{ cryptsetup__keyfile_remote_location }}', 'condition': '{{ (cryptsetup__combined_devices | selectattr("remote_keyfile", "undefined") | list | length) > 0 }}'}, {'path': '{{ cryptsetup__header_backup_remote_location }}', 'condition': '{{ ((cryptsetup__combined_devices | selectattr("backup_header", "defined") | selectattr("backup_header") | list | length) > 0) or (cryptsetup__header_backup|bool and ((cryptsetup__combined_devices | selectattr("backup_header", "undefined") | list | length) > 0)) }}'}]} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/cryptsetup/tasks/main.yml:52: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/cryptsetup/tasks/manage_devices.yml:14: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/cryptsetup/tasks/manage_devices.yml:25: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1696,6 +1771,7 @@ roles/cryptsetup/tasks/manage_devices.yml:445: var-spacing: Jinja2 variables and
 roles/cryptsetup/tasks/manage_devices.yml:456: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/debops_api/defaults/main.yml:28: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/debops_api/defaults/main.yml:83: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/debops_api/tasks/main.yml:1: schema: {'name': 'Configuring cron jobs', 'ansible.builtin.cron': {'cron_file': '{{ item.cron_file    | d(omit) }}', 'day': '{{ item.day          | d(omit) }}', 'hour': '{{ item.hour         | d(omit) }}', 'job': '{{ item.job          | d(debops_api__cron_script) }}', 'minute': '{{ item.minute       | d(omit) }}', 'month': '{{ item.month        | d(omit) }}', 'name': '{{ item.name         | d(item) }}', 'special_time': '{{ item.special_time | d(omit) }}', 'state': '{{ item.state        | d(omit) }}', 'user': '{{ item.user         | d(debops_api__user) }}', 'weekday': '{{ item.weekday      | d(omit) }}'}, 'with_flattened': '{{ debops_api__cron_entries }}', 'tags': ['role::debops_api:cron']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/debops_api/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/dhcpd/defaults/main.yml:48: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/dhcpd/defaults/main.yml:56: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1739,6 +1815,7 @@ roles/dnsmasq/tasks/main.yml:106: var-spacing: Jinja2 variables and filters shou
 roles/docker_gen/defaults/main.yml:173: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/docker_gen/defaults/main.yml:179: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/docker_gen/defaults/main.yml:185: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/docker_gen/tasks/main.yml:1: schema: {'name': 'Create required directories', 'ansible.builtin.file': {'path': '{{ item }}', 'state': 'directory', 'owner': 'root', 'group': 'root', 'mode': '0755'}, 'with_flattened': [['{{ docker_gen__src }}', '{{ docker_gen__lib }}', '{{ docker_gen__templates }}'], ['{{ ((docker_gen__nginx_dest | dirname) if (docker_gen__nginx|d() and docker_gen__nginx) else []) }}']]} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/docker_gen/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/docker_registry/defaults/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/docker_registry/defaults/main.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1781,6 +1858,7 @@ roles/docker_server/defaults/main.yml:417: var-spacing: Jinja2 variables and fil
 roles/docker_server/defaults/main.yml:423: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/docker_server/defaults/main.yml:450: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/docker_server/defaults/main.yml:463: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/docker_server/tasks/main.yml:1: schema: {'name': 'Install Python packages in virtualenv', 'ansible.builtin.pip': {'name': '{{ item.name | d(item) }}', 'version': '{{ item.version | d(omit) }}', 'virtualenv': '{{ docker_server__virtualenv }}', 'state': '{{ item.state | d("present") }}'}, 'with_flattened': ['{{ docker_server__default_pip_packages }}', '{{ docker_server__pip_packages }}'], 'when': 'docker_server__install_virtualenv'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/docker_server/tasks/main.yml:21: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/dokuwiki/defaults/main.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/dokuwiki/defaults/main.yml:72: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1801,6 +1879,7 @@ roles/dokuwiki/defaults/main.yml:354: var-spacing: Jinja2 variables and filters 
 roles/dokuwiki/defaults/main.yml:603: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/dokuwiki/defaults/main.yml:611: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/dokuwiki/defaults/main.yml:623: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/dokuwiki/tasks/main.yml:1: schema: {'name': 'Remove specified plugins if requested', 'ansible.builtin.file': {'path': '{{ dokuwiki__git_checkout + "/lib/plugins/" + item.dest }}', 'state': 'absent'}, 'with_flattened': ['{{ dokuwiki__default_plugins }}', '{{ dokuwiki__plugins }}'], 'when': "(dokuwiki__plugins_enabled|bool and (item.dest|d() and item.dest) and (item.state|d() and item.state == 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/dovecot/defaults/main.yml:43: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/dovecot/defaults/main.yml:53: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/dovecot/defaults/main.yml:160: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1870,6 +1949,7 @@ roles/elasticsearch/defaults/main.yml:760: var-spacing: Jinja2 variables and fil
 roles/elasticsearch/defaults/main.yml:764: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/elasticsearch/tasks/authentication.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/elasticsearch/tasks/authentication.yml:70: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/elasticsearch/tasks/main.yml:1: schema: {'name': 'Manage data paths', 'ansible.builtin.file': {'path': '{{ item }}', 'state': 'directory', 'owner': '{{ elasticsearch__user }}', 'group': '{{ elasticsearch__group }}', 'mode': '0750'}, 'with_flattened': ['{{ elasticsearch__path_data }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/etc_aliases/defaults/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etc_aliases/defaults/main.yml:63: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etc_aliases/defaults/main.yml:71: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1888,6 +1968,7 @@ roles/etc_aliases/defaults/main.yml:160: var-spacing: Jinja2 variables and filte
 roles/etc_aliases/defaults/main.yml:167: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etc_aliases/defaults/main.yml:191: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etc_aliases/defaults/main.yml:217: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/etc_services/tasks/main.yml:1: schema: {'name': 'Remove list of local services if requested', 'ansible.builtin.file': {'path': '/etc/services.d/{{ item.filename | default("20_local_service_" + item.name) }}', 'state': 'absent'}, 'with_flattened': '{{ etc_services__combined_list }}', 'when': "((not etc_services__enabled|bool or item.delete|d() or item.state|d('present') == 'absent') and ((item.name|d() and item.port|d()) or item.custom|d()))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/etc_services/tasks/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etesync/defaults/main.yml:200: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etesync/defaults/main.yml:208: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1904,11 +1985,14 @@ roles/etherpad/defaults/main.yml:103: var-spacing: Jinja2 variables and filters 
 roles/etherpad/defaults/main.yml:163: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etherpad/defaults/main.yml:181: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etherpad/defaults/main.yml:205: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/etherpad/tasks/main.yml:1: schema: {'name': 'Manage Etherpad plugins', 'npm': {'name': '{{ item.name | d(item) }}', 'path': '{{ etherpad_home + "/" + etherpad_repository }}', 'state': '{{ item.state | d("present") }}', 'production': True}, 'with_flattened': ['{{ etherpad__default_plugins }}', '{{ etherpad_plugins }}'], 'become': True, 'become_user': '{{ etherpad_user }}', 'notify': ['Restart etherpad-lite'], 'tags': ['role::etherpad:plugins']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/etherpad/tasks/main.yml:16: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/etherpad/tasks/main.yml:221: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/fail2ban/tasks/main.yml:1: schema: {'name': 'Remove fail2ban jails if requested', 'ansible.builtin.file': {'path': '/etc/fail2ban/jail.local.d/{{ item.filename | default(item.name) }}.local', 'state': 'absent'}, 'with_flattened': ['{{ fail2ban_jails }}', '{{ fail2ban_group_jails }}', '{{ fail2ban_host_jails }}', '{{ fail2ban_dependent_jails }}'], 'when': '((item.name is defined and item.name) and (item.delete is defined and item.delete))'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/ferm/defaults/main.yml:28: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ferm/defaults/main.yml:91: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ferm/defaults/main.yml:563: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/ferm/tasks/main.yml:1: schema: {'name': 'Remove iptables INPUT rules if requested', 'ansible.builtin.file': {'path': '/etc/ferm/filter-input.d/{{ ferm__weight_map | d(item.weight | d("50")) }}_{{ item.filename | d(item.type + "_" + item.name | d((item.dport[0] if item.dport|d() else "rules"))) }}.conf', 'state': 'absent'}, 'with_flattened': ['{{ ferm_input_list }}', '{{ ferm_input_group_list }}', '{{ ferm_input_host_list }}', '{{ ferm_input_dependent_list }}'], 'when': '(ferm__enabled|bool and item.type|d() and (item.delete|d() | bool))', 'register': 'ferm__register_input_rules_del', 'tags': ['role::ferm:rules']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/ferm/tasks/main.yml:16: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ferm/tasks/main.yml:87: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ferm/tasks/main.yml:103: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1926,6 +2010,7 @@ roles/filebeat/defaults/main.yml:405: var-spacing: Jinja2 variables and filters 
 roles/filebeat/defaults/main.yml:416: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/filebeat/defaults/main.yml:425: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/freeradius/defaults/main.yml:39: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/freeradius/tasks/main.yml:1: schema: {'name': 'Install FreeRADIUS packages', 'ansible.builtin.package': {'name': '{{ item }}', 'state': 'present'}, 'with_flattened': ['{{ freeradius__base_packages }}', '{{ freeradius__packages }}'], 'register': 'freeradius__register_packages', 'until': 'freeradius__register_packages is succeeded'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/freeradius/tasks/main.yml:61: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gitlab/defaults/main.yml:57: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gitlab/defaults/main.yml:88: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1964,11 +2049,17 @@ roles/gitlab_runner/defaults/main.yml:358: var-spacing: Jinja2 variables and fil
 roles/gitlab_runner/defaults/main.yml:371: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gitlab_runner/defaults/main.yml:393: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gitlab_runner/defaults/main.yml:730: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/gitlab_runner/tasks/main.yml:1: schema: {'name': 'Create required groups', 'ansible.builtin.group': {'name': '{{ item.name if item.name|d() else item }}', 'system': '{{ item.system|bool if item.system is defined else gitlab_runner__system | bool }}', 'state': 'present'}, 'with_flattened': ['{{ gitlab_runner__group }}', '{{ gitlab_runner__additional_groups }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/gitlab_runner/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gitlab_runner/tasks/main.yml:64: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gitlab_runner/tasks/main.yml:91: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gitlab_runner/tasks/main.yml:125: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gitlab_runner/tasks/main.yml:195: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/gitusers/tasks/git-shell.yml:1: schema: {'name': 'Create base directory for user websites', 'ansible.builtin.file': {'path': '{{ gitusers_default_www_prefix }}/{{ item.group | default(item.name + gitusers_name_suffix) }}', 'state': 'directory', 'owner': 'root', 'group': '{{ gitusers_default_www_group }}', 'mode': '0711'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': "((item.name is defined and item.name) and (item.state is undefined or (item.state is defined and item.state != 'absent')))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+roles/gitusers/tasks/gitusers.yml:1: schema: {'name': 'Manage user accounts without UIDs', 'ansible.builtin.user': {'name': '{{ item.name + gitusers_name_suffix }}', 'state': '{{ item.state | default("present") }}', 'group': '{{ item.group | default(item.name + gitusers_name_suffix) }}', 'comment': '{{ item.comment | default("") }}', 'system': '{{ item.systemuser | default("no") }}', 'shell': '{{ item.shell | default(gitusers_default_shell) }}', 'home': '{{ item.home | default(gitusers_default_home_prefix + "/" + item.name + gitusers_name_suffix) }}', 'createhome': 'no'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': '((item.name is defined and item.name) and (item.uid is undefined or (item.uid is defined and not item.uid)))'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+roles/gitusers/tasks/groups_absent.yml:1: schema: {'name': 'Remove user groups if requested', 'ansible.builtin.group': {'name': '{{ item.group | default(item.name + gitusers_name_suffix) }}', 'state': 'absent'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': "(item.name is defined and (item.state is defined and item.state == 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+roles/gitusers/tasks/groups_present.yml:1: schema: {'name': 'Create user groups without GIDs', 'ansible.builtin.group': {'name': '{{ item.group | default(item.name + gitusers_name_suffix) }}', 'system': '{{ item.systemgroup | default("no") }}', 'state': 'present'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': "(((item.name is defined and item.name) and (item.gid is undefined or (item.gid is defined and not item.gid))) and (item.state is undefined or (item.state is defined and item.state != 'absent')))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+roles/gitusers/tasks/sshkeys.yml:1: schema: {'name': 'Configure authorized SSH keys for users', 'ansible.posix.authorized_key': {'key': '{{ "\\n".join(item.sshkeys) | string }}', 'state': 'present', 'user': '{{ item.name + gitusers_name_suffix }}'}, 'with_flattened': ['{{ gitusers_list }}', '{{ gitusers_group_list }}', '{{ gitusers_host_list }}'], 'when': "((item.name is defined and item.name) and (item.state is undefined or (item.state is defined and item.state != 'absent')) and (item.sshkeys is defined and item.sshkeys))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/golang/defaults/main.yml:123: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/golang/tasks/golang_build_install.yml:53: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/golang/tasks/golang_build_install.yml:118: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -1991,8 +2082,10 @@ roles/grub/tasks/main.yml:115: var-spacing: Jinja2 variables and filters should 
 roles/grub/tasks/main.yml:149: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gunicorn/defaults/main.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gunicorn/defaults/main.yml:37: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/gunicorn/tasks/newer_releases.yml:1: schema: {'name': 'Ensure that required groups exist', 'ansible.builtin.group': {'name': '{{ item.group }}', 'system': '{{ (item.system|d(True)) | bool }}', 'state': 'present'}, 'with_flattened': ['{{ gunicorn__applications }}', '{{ gunicorn__dependent_applications }}'], 'when': "item.name|d() and item.state|d('present') != 'absent' and item.group|d()"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/gunicorn/tasks/newer_releases.yml:14: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/gunicorn/tasks/newer_releases.yml:25: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/gunicorn/tasks/older_releases.yml:1: schema: {'name': 'Remove gunicorn configuration', 'ansible.builtin.file': {'path': '/etc/gunicorn.d/{{ item.name }}', 'state': 'absent'}, 'with_flattened': ['{{ gunicorn__applications }}', '{{ gunicorn__dependent_applications }}'], 'notify': ['Restart gunicorn'], 'when': "item.name|d() and item.state|d('present') == 'absent'"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/hashicorp/defaults/main.yml:90: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/hashicorp/defaults/main.yml:191: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/hashicorp/defaults/main.yml:273: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2021,6 +2114,7 @@ roles/icinga/defaults/main.yml:651: var-spacing: Jinja2 variables and filters sh
 roles/icinga/defaults/main.yml:675: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/icinga/defaults/main.yml:848: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/icinga/defaults/main.yml:871: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/icinga/tasks/main.yml:1: schema: {'name': 'Copy custom files for Icinga', 'ansible.builtin.copy': {'content': '{{ item.content | d(omit) }}', 'src': '{{ item.src     | d(omit) }}', 'dest': '{{ item.dest    | d(omit) }}', 'force': '{{ item.force   | d(omit) }}', 'owner': '{{ item.owner   | d("root") }}', 'group': '{{ item.group   | d("root") }}', 'mode': '{{ item.mode    | d("0755") }}'}, 'with_flattened': ['{{ icinga__custom_files }}', '{{ icinga__group_custom_files }}', '{{ icinga__host_custom_files }}'], 'when': '((item.src|d() or item.content|d()) and item.dest|d() and item.state|d("present") != "absent")'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/icinga/tasks/main.yml:63: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/icinga/tasks/main.yml:143: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/icinga_db/defaults/main.yml:30: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2092,6 +2186,7 @@ roles/ifupdown/defaults/main.yml:180: var-spacing: Jinja2 variables and filters 
 roles/ifupdown/defaults/main.yml:181: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ifupdown/defaults/main.yml:202: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ifupdown/defaults/main.yml:207: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/ifupdown/tasks/main.yml:1: schema: {'name': 'Remove custom configuration files', 'ansible.builtin.file': {'path': '{{ item.dest | d(item.path) }}', 'state': 'absent'}, 'with_flattened': ['{{ ifupdown__custom_files }}', '{{ ifupdown__custom_group_files }}', '{{ ifupdown__custom_host_files }}', '{{ ifupdown__custom_dependent_files }}'], 'when': "((item.dest|d() or item.path|d()) and item.state|d('present') == 'absent')"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/ifupdown/tasks/main.yml:70: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ifupdown/tasks/main.yml:81: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ifupdown/tasks/main.yml:107: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2119,6 +2214,7 @@ roles/imapproxy/defaults/main.yml:439: var-spacing: Jinja2 variables and filters
 roles/imapproxy/defaults/main.yml:443: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/influxdata/defaults/main.yml:32: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/influxdb/defaults/main.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/influxdb/tasks/manage_contents.yml:1: schema: {'name': 'Drop databases if requested', 'influxdb_database': {'database_name': '{{ item.database | d(item.name) }}', 'state': 'absent', 'hostname': '{{ influxdb__server }}', 'port': '{{ influxdb__port }}', 'ssl': '{{ influxdb__pki }}', 'password': '{{ influxdb__root_password }}', 'proxies': '{{ item.proxies | d(influxdb__proxies | d(omit)) }}', 'validate_certs': '{{ item.validate_certs | d(influxdb__validate_certs | d(True)) }}'}, 'with_flattened': '{{ influxdb__databases + influxdb__dependent_databases|d([]) }}', 'delegate_to': '{{ influxdb__delegate_to }}', 'when': "((item.database|d(False) or item.name|d(False)) and (item.state is defined and item.state == 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/influxdb/tasks/manage_contents.yml:8: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/influxdb/tasks/manage_contents.yml:23: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/influxdb/tasks/manage_contents.yml:39: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2152,6 +2248,7 @@ roles/kibana/defaults/main.yml:443: var-spacing: Jinja2 variables and filters sh
 roles/kibana/defaults/main.yml:449: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/kibana/defaults/main.yml:455: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/kibana/defaults/main.yml:766: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/kibana/tasks/main.yml:1: schema: {'name': 'Install Kibana plugins', 'ansible.builtin.command': 'bin/kibana-plugin install {{ item.url | d(item.name) }}', 'args': {'chdir': '/usr/share/kibana'}, 'notify': ['Restart kibana'], 'become': True, 'become_user': '{{ item.user | d(kibana__user) }}', 'with_flattened': ['{{ kibana__combined_plugins }}'], 'when': "(item.name|d() and item.state|d('present') != 'absent' and (item.name if ':' not in item.name else item.name.split(':')[1]) not in kibana__register_plugins.stdout_lines)"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/kibana/tasks/main.yml:139: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/kmod/defaults/main.yml:29: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ldap/defaults/main.yml:33: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2180,7 +2277,9 @@ roles/librenms/defaults/main.yml:223: var-spacing: Jinja2 variables and filters 
 roles/librenms/defaults/main.yml:372: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/librenms/tasks/main.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/libvirt/defaults/main.yml:30: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/libvirt/tasks/manage_networks.yml:1: schema: {'name': 'Stop networks if requested', 'community.libvirt.virt_net': {'name': '{{ item.name }}', 'uri': '{{ libvirt__connections }}', 'state': 'inactive'}, 'with_flattened': '{{ libvirt__networks }}', 'become': False, 'when': "(item.name|d() and (item.state|d() in [ 'inactive', 'undefined', 'absent' ]))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/libvirt/tasks/manage_networks.yml:50: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/libvirt/tasks/manage_pools.yml:1: schema: {'name': 'Stop storage pools if requested', 'virt_pool': {'name': '{{ item.name }}', 'uri': '{{ libvirt__connections }}', 'state': 'inactive'}, 'with_flattened': '{{ libvirt__pools }}', 'become': False, 'register': 'libvirt__register_stop', 'when': "((item.name|d()) and (item.state|d() in [ 'inactive', 'undefined', 'absent' ]))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/libvirt/tasks/manage_pools.yml:72: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/libvirtd/defaults/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/libvirtd/defaults/main.yml:98: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2201,6 +2300,7 @@ roles/lldpd/defaults/main.yml:60: var-spacing: Jinja2 variables and filters shou
 roles/lldpd/tasks/main.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/lldpd/tasks/main.yml:63: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/lldpd/tasks/main.yml:73: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/locales/tasks/main.yml:1: schema: {'name': 'Ensure that specified locales exist', 'locale_gen': {'name': '{{ item.name | d(item) }}', 'state': '{{ item.state | d("present") }}'}, 'with_flattened': ['{{ locales__default_list }}', '{{ locales__list }}', '{{ locales__group_list }}', '{{ locales__host_list }}', '{{ locales__dependent_list }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/logrotate/tasks/main.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/logrotate/tasks/main.yml:57: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/lxc/defaults/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2277,6 +2377,7 @@ roles/mariadb/defaults/main.yml:254: var-spacing: Jinja2 variables and filters s
 roles/mariadb/defaults/main.yml:263: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/mariadb/defaults/main.yml:270: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/mariadb/tasks/main.yml:38: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/mariadb/tasks/manage_contents.yml:1: schema: {'name': 'Drop databases if requested', 'community.mysql.mysql_db': {'name': '{{ item.database | d(item.name) }}', 'state': 'absent'}, 'with_flattened': '{{ mariadb__databases + mariadb__dependent_databases + mariadb_databases|d([]) }}', 'delegate_to': '{{ mariadb__delegate_to }}', 'when': "((item.database|d(False) or item.name|d(False)) and (item.state is defined and item.state == 'absent'))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/mariadb/tasks/manage_contents.yml:6: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/mariadb/tasks/manage_contents.yml:15: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/mariadb/tasks/manage_contents.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2350,6 +2451,7 @@ roles/mosquitto/defaults/main.yml:671: var-spacing: Jinja2 variables and filters
 roles/mosquitto/defaults/main.yml:681: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/mosquitto/defaults/main.yml:698: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/mosquitto/defaults/main.yml:708: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/mosquitto/tasks/main.yml:1: schema: {'name': 'Remove user/password entries', 'ansible.builtin.command': 'mosquitto_passwd -D {{ mosquitto__password_file }} {{ item.name | d(item) }}', 'with_flattened': ['{{ mosquitto__auth_users }}', '{{ mosquitto__auth_group_users }}', '{{ mosquitto__auth_host_users }}'], 'when': "(mosquitto__password|bool and item.state|d('present') == 'absent' and (item.name | d(item) in mosquitto__register_passwd.stdout_lines) and mosquitto__version is version_compare('1.4.0', '>='))", 'notify': ['Reload mosquitto'], 'tags': ['role::mosquitto:passwd'], 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/mosquitto/tasks/main.yml:64: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/mount/defaults/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/mount/tasks/main.yml:43: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2394,16 +2496,19 @@ roles/netbox/defaults/main.yml:1019: var-spacing: Jinja2 variables and filters s
 roles/netbox/defaults/main.yml:1028: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/netbox/defaults/main.yml:1037: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/netbox/defaults/main.yml:1046: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/netbox/tasks/main.yml:1: schema: {'name': 'Install additional Python modules in virtualenv', 'ansible.builtin.pip': {'name': '{{ item.name | d(item) }}', 'version': '{{ item.version | d(omit) }}', 'virtualenv': '{{ netbox__virtualenv }}'}, 'become': True, 'become_user': '{{ netbox__user }}', 'with_flattened': '{{ netbox__virtualenv_pip_packages }}', 'when': "netbox__register_checkout is changed and item.state|d('present') not in [ 'absent', 'ignore' ]"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/neurodebian/defaults/main.yml:104: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/neurodebian/defaults/main.yml:121: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/neurodebian/defaults/main.yml:236: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/neurodebian/defaults/main.yml:237: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nfs/defaults/main.yml:62: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/nfs/tasks/main.yml:1: schema: {'name': 'Ensure that the NFS mount points exist', 'ansible.builtin.file': {'path': '{{ item.path }}', 'owner': '{{ item.owner | d("root") }}', 'group': '{{ item.group | d("root") }}', 'mode': '{{ item.mode  | d("0755") }}', 'state': 'directory'}, 'with_flattened': ['{{ nfs__shares }}', '{{ nfs__group_shares }}', '{{ nfs__host_shares }}'], 'when': "item.path|d() and item.src|d() and item.state|d('mounted') == 'present'"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/nfs_server/defaults/main.yml:56: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nfs_server/defaults/main.yml:83: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nfs_server/defaults/main.yml:151: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nfs_server/defaults/main.yml:158: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nfs_server/defaults/main.yml:248: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/nfs_server/tasks/main.yml:1: schema: {'name': 'Ensure exported directories exist', 'ansible.builtin.file': {'path': '{{ item.path }}', 'state': 'directory', 'owner': '{{ item.owner | d("root") }}', 'group': '{{ item.group | d("root") }}', 'mode': '{{ item.mode  | d("0755") }}'}, 'with_flattened': ['{{ nfs_server__combined_exports }}'], 'when': "item.path|d() and item.state|d('present') != 'absent' and item.acl|d()"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/nginx/defaults/main.yml:61: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nginx/defaults/main.yml:68: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nginx/defaults/main.yml:74: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2416,11 +2521,15 @@ roles/nginx/defaults/main.yml:500: var-spacing: Jinja2 variables and filters sho
 roles/nginx/defaults/main.yml:520: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nginx/defaults/main.yml:532: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nginx/defaults/main.yml:744: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/nginx/tasks/main.yml:1: schema: {'name': 'Assert that no legacy options are used', 'ansible.builtin.assert': {'that': ['((item.csp is defined and item.csp is string) or item.csp is undefined)', '(item.csp_policy is undefined)']}, 'run_once': True, 'delegate_to': 'localhost', 'with_flattened': ['{{ nginx__servers }}', '{{ nginx__default_servers }}', '{{ nginx__internal_servers }}', '{{ nginx__dependent_servers }}', '{{ nginx_servers | d([]) }}', '{{ nginx_default_servers | d([]) }}', '{{ nginx_internal_servers | d([]) }}', '{{ nginx_dependent_servers | d([]) }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/nginx/tasks/main.yml:192: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nginx/tasks/main.yml:204: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/nginx/tasks/nginx_configs.yml:1: schema: {'name': 'Remove nginx maps if requested', 'ansible.builtin.file': {'dest': '/etc/nginx/conf.d/map_{{ item.name }}.conf', 'state': 'absent'}, 'with_flattened': ['{{ nginx__maps }}', '{{ nginx__default_maps }}', '{{ nginx__dependent_maps }}', '{{ nginx_maps |d([]) }}', '{{ nginx_default_maps | d([]) }}', '{{ nginx_dependent_maps | d([]) }}'], 'notify': ['Test nginx and reload'], 'when': "(item.name|d() and ((item.state|d() and item.state == 'absent') or (item.delete|d() and item.delete|bool)))"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/nginx/tasks/nginx_configs.yml:15: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nginx/tasks/nginx_configs.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/nginx/tasks/nginx_htpasswd.yml:1: schema: {'name': 'Remove htpasswd files if requested', 'ansible.builtin.file': {'dest': '{{ nginx_private_path + "/" + item.name }}', 'state': 'absent'}, 'with_flattened': ['{{ nginx__htpasswd }}', '{{ nginx__default_htpasswd }}', '{{ nginx__dependent_htpasswd }}', '{{ nginx_htpasswd | d([]) }}'], 'when': "(item.name|d() and (item.state|d() and item.state == 'absent'))", 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/nginx/tasks/nginx_htpasswd.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/nginx/tasks/nginx_servers.yml:1: schema: {'name': 'Create global webroot directories if allowed', 'ansible.builtin.file': {'path': '{{ item.root | d( "{}/sites/{}/{}".format( nginx_www + ("/" + item.owner if item.owner | d() else ""), (item.name if item.name is string else item.name[0]) | d("default"), item.public_dir_name | d(nginx_public_dir_name)) ) }}', 'state': 'directory', 'owner': '{{ item.owner | d(nginx_webroot_owner) }}', 'group': '{{ item.group | d(item.owner | d(nginx_webroot_group)) }}', 'mode': '{{ item.mode | d(nginx_webroot_mode) }}'}, 'with_flattened': ['{{ nginx__servers }}', '{{ nginx__default_servers }}', '{{ nginx__internal_servers }}', '{{ nginx__dependent_servers }}', '{{ nginx_servers | d([]) }}', '{{ nginx_default_servers | d([]) }}', '{{ nginx_internal_servers | d([]) }}', '{{ nginx_dependent_servers | d([]) }}'], 'when': "((item.webroot_create|d(nginx_webroot_create)|bool) and item.state|d('present') != 'absent')"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/nginx/tasks/nginx_servers.yml:31: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nginx/tasks/nginx_servers.yml:59: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nginx/tasks/nginx_servers.yml:127: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2436,6 +2545,7 @@ roles/nodejs/defaults/main.yml:228: var-spacing: Jinja2 variables and filters sh
 roles/nodejs/defaults/main.yml:236: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nodejs/defaults/main.yml:246: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nodejs/defaults/main.yml:250: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/nodejs/tasks/main.yml:1: schema: {'name': 'Install NPM packages', 'npm': {'name': '{{ item.name           | d(item) }}', 'state': '{{ item.state          | d("present") }}', 'global': '{{ (item.global        | d(True)) | bool }}', 'production': '{{ (item.production    | d(nodejs__npm_production_mode)) | bool }}', 'version': '{{ item.version        | d(omit) }}', 'registry': '{{ item.registry       | d(omit) }}', 'executable': '{{ item.executable     | d(omit) }}', 'ignore_scripts': '{{ item.ignore_scripts | d(omit) }}', 'path': '{{ item.path           | d(omit) }}'}, 'with_flattened': ['{{ nodejs__npm_packages }}', '{{ nodejs__npm_group_packages }}', '{{ nodejs__npm_host_packages }}', '{{ nodejs__npm_dependent_packages }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/nodejs/tasks/main.yml:18: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nodejs/tasks/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/nslcd/defaults/main.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2457,6 +2567,7 @@ roles/opendkim/defaults/main.yml:83: var-spacing: Jinja2 variables and filters s
 roles/opendkim/defaults/main.yml:352: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/opendkim/defaults/main.yml:358: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/opendkim/defaults/main.yml:366: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/opendkim/tasks/main.yml:1: schema: {'name': 'Generate DomainKeys on Ansible Controller', 'community.crypto.openssl_privatekey': {'size': '{{ item.size  | d(opendkim__default_key_size) }}', 'type': '{{ (item.type | d("rsa")) | upper }}', 'path': '{{ secret + "/opendkim/domainkeys/" + (item.domain | d(opendkim__domain)) + "_" + (item.selector | d(item.name | d(item))) + ".pem" }}', 'regenerate': '{{ item.regenerate | d("full_idempotence" if ansible_version.full is version("2.10", ">=") else omit) }}'}, 'with_flattened': ['{{ opendkim__combined_keys }}'], 'become': False, 'delegate_to': 'localhost', 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/owncloud/defaults/main.yml:50: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/defaults/main.yml:53: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/defaults/main.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2498,10 +2609,12 @@ roles/owncloud/defaults/main.yml:2106: var-spacing: Jinja2 variables and filters
 roles/owncloud/defaults/main.yml:2275: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/defaults/main.yml:2375: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/defaults/main.yml:2404: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/owncloud/tasks/copy.yml:1: schema: {'name': 'Ensure that parent directories exist', 'ansible.builtin.file': {'path': '{{ (owncloud__data_path + "/" + item.dest) | dirname }}', 'state': 'directory', 'recurse': '{{ item.parent_dirs_recurse | d(True) }}', 'owner': '{{ item.parent_dirs_owner   | d(owncloud__app_user) }}', 'group': '{{ item.parent_dirs_group   | d(owncloud__app_group) }}', 'mode': '{{ item.parent_dirs_mode    | d("0755") }}'}, 'when': '((item.parent_dirs_create|d(True)| bool) and item.dest|d() and item.state|d("present") != \'absent\')', 'with_flattened': ['{{ owncloud__user_files }}', '{{ owncloud__user_files_group }}', '{{ owncloud__user_files_host }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/owncloud/tasks/main_env.yml:10: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/tasks/main_env.yml:19: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/tasks/run_occ.yml:20: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/tasks/run_occ.yml:42: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/owncloud/tasks/setup_owncloud.yml:1: schema: {'name': 'Enable required Apache modules', 'apache2_module': {'name': 'php5', 'state': 'present'}, 'when': 'owncloud__webserver == "apache"', 'with_flattened': '{{ owncloud__apache_modules }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/owncloud/tasks/setup_owncloud.yml:64: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/tasks/setup_owncloud.yml:88: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/owncloud/tasks/system_package_management.yml:40: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2519,8 +2632,10 @@ roles/php/defaults/main.yml:395: var-spacing: Jinja2 variables and filters shoul
 roles/php/defaults/main.yml:458: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/php/defaults/main.yml:756: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/php/defaults/main.yml:767: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/php/tasks/main.yml:1: schema: {'name': 'Generate php.ini configuration', 'ansible.builtin.template': {'src': 'etc/php/ansible/php.ini.j2', 'dest': '{{ php__etc_base + "/" + item.path | d("ansible/") + (item.filename | d("00-ansible")) + ".ini" }}', 'owner': 'root', 'group': 'root', 'mode': '0644'}, 'with_flattened': ['{{ php__default_configuration }}', '{{ php__configuration }}', '{{ php__group_configuration }}', '{{ php__host_configuration }}', '{{ php__dependent_configuration }}'], 'when': "item.state|d('present') != 'absent'", 'notify': ['Restart php-fpm'], 'tags': ['role::php:config']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/php/tasks/main_env.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/php/tasks/main_env.yml:63: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/php/tasks/packages_absent_for_version.yml:1: schema: {'name': 'Ensure older PHP packages are absent on reset for given PHP version', 'ansible.builtin.apt': {'name': '{{ item is search("php.*-")|ternary(item, php__version_absent + "-" + item) }}', 'state': 'absent'}, 'with_flattened': ['{{ php__server_api_packages }}', '{{ php__base_packages }}', '{{ php__packages }}', '{{ php__group_packages }}', '{{ php__host_packages }}', '{{ php__dependent_packages }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/php/tasks/packages_absent_for_version.yml:9: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postconf/defaults/main.yml:93: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postfix/defaults/main.yml:54: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2544,12 +2659,14 @@ roles/postfix/defaults/main.yml:494: var-spacing: Jinja2 variables and filters s
 roles/postfix/defaults/main.yml:1320: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postfix/defaults/main.yml:1330: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postfix/defaults/main.yml:1340: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/postfix/tasks/main.yml:1: schema: {'name': 'Remove Postfix lookup tables', 'ansible.builtin.file': {'path': '/etc/postfix/{{ item.name }}', 'state': 'absent'}, 'with_flattened': ['{{ postfix__combined_lookup_tables | debops.debops.parse_kv_items }}'], 'when': "item.name|d() and item.state|d('present') == 'absent'", 'notify': ['Process Postfix Makefile', 'Check postfix and reload'], 'no_log': '{{ debops__no_log | d(item.no_log) | d(True if (item.mode|d("0644") == "0600") else False) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/postfix/tasks/main.yml:103: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postfix/tasks/main.yml:114: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postgresql/defaults/main.yml:80: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postgresql/defaults/main.yml:97: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postgresql/defaults/main.yml:146: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postgresql/defaults/main.yml:248: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/postgresql/tasks/main.yml:1: schema: {'name': 'Drop PostgreSQL roles if requested', 'community.postgresql.postgresql_user': {'name': '{{ item.name | d(item.role) }}', 'port': '{{ item.port | d(postgresql__port if postgresql__port else omit) }}', 'state': 'absent'}, 'with_flattened': ['{{ postgresql__roles }}', '{{ postgresql_roles|d([]) }}', '{{ postgresql__dependent_roles }}'], 'become': True, 'become_user': '{{ postgresql__user }}', 'delegate_to': '{{ postgresql__delegate_to }}', 'when': "item.state|d('present') == 'absent'", 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/postgresql/tasks/main.yml:25: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postgresql/tasks/main.yml:83: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postgresql/tasks/main.yml:98: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2572,6 +2689,9 @@ roles/postgresql_server/defaults/main.yml:637: var-spacing: Jinja2 variables and
 roles/postgresql_server/tasks/install_postgresql.yml:18: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postgresql_server/tasks/main.yml:27: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postgresql_server/tasks/main.yml:67: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/postgresql_server/tasks/manage_autopostgresqlbackup.yml:1: schema: {'name': 'Configure autopostgresqlbackup defaults', 'ansible.builtin.template': {'src': 'etc/default/autopostgresqlbackup.j2', 'dest': '/etc/default/autopostgresqlbackup-{{ item.version | d(postgresql_server__version) }}-{{ item.name }}', 'owner': 'root', 'group': 'root', 'mode': '0644'}, 'with_flattened': ['{{ postgresql_server__clusters }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+roles/postgresql_server/tasks/manage_clusters.yml:1: schema: {'name': 'Create PostgreSQL clusters', 'environment': {'LANG': '{{ item.locale | d(postgresql_server__locale) }}', 'LC_ALL': '{{ item.locale | d(postgresql_server__locale) }}'}, 'ansible.builtin.command': 'pg_createcluster --user={{ item.user | d(postgresql_server__user) }} --group={{ item.group | d(postgresql_server__group) }} --locale={{ item.locale | d(postgresql_server__locale) }} --start-conf={{ item.start_conf | d(postgresql_server__start_conf) }} --port={{ item.port }} {{ item.version | d(postgresql_server__version) }} {{ item.name }}', 'args': {'creates': '/etc/postgresql/{{ item.version | d(postgresql_server__version) }}/{{ item.name }}/postgresql.conf'}, 'register': 'postgresql_server__register_createcluster', 'with_flattened': ['{{ postgresql_server__clusters }}'], 'when': 'item.name|d() and item.port|d()'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
+roles/postgresql_server/tasks/secure_installation.yml:1: schema: {'name': 'Update default admin password', 'community.postgresql.postgresql_user': {'name': '{{ item.user | d(postgresql_server__user) }}', 'password': '{{ item.admin_password | d(postgresql_server__admin_password) }}', 'encrypted': True, 'port': '{{ item.port }}', 'state': 'present'}, 'with_flattened': ['{{ postgresql_server__clusters }}'], 'become': True, 'become_user': '{{ item.user | d(postgresql_server__user) }}', 'when': ['item.name|d()', 'item.standby is not defined'], 'no_log': '{{ debops__no_log | d(True) }}'} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/postldap/defaults/main.yml:49: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postldap/defaults/main.yml:89: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/postldap/defaults/main.yml:101: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2662,6 +2782,7 @@ roles/rabbitmq_server/defaults/main.yml:652: var-spacing: Jinja2 variables and f
 roles/rabbitmq_server/defaults/main.yml:659: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/rabbitmq_server/defaults/main.yml:693: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/rabbitmq_server/defaults/main.yml:700: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/rabbitmq_server/tasks/main.yml:1: schema: {'name': 'Manage RabbitMQ plugins', 'community.rabbitmq.rabbitmq_plugin': {'names': '{{ item.name | d(item) }}', 'state': '{{ "enabled" if item.state|d("present") != "absent" else "disabled" }}', 'prefix': '{{ item.prefix | d(omit) }}', 'new_only': True}, 'with_flattened': ['{{ rabbitmq_server__combined_plugins }}'], 'notify': ['Restart rabbitmq-server'], 'tags': ['role::rabbitmq_server:config']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/rabbitmq_server/tasks/main.yml:132: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/rabbitmq_server/tasks/main.yml:182: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/redis_sentinel/defaults/main.yml:38: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2751,6 +2872,7 @@ roles/rstudio_server/defaults/main.yml:54: var-spacing: Jinja2 variables and fil
 roles/rstudio_server/defaults/main.yml:62: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/rstudio_server/defaults/main.yml:83: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/rstudio_server/defaults/main.yml:190: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/rstudio_server/tasks/main.yml:1: schema: {'name': 'Allow specified user accounts to access RStudio Server', 'ansible.builtin.user': {'name': '{{ item.name|d(item) }}', 'groups': '{{ rstudio_server__auth_group }}', 'append': True}, 'with_flattened': ['{{ rstudio_server__allow_users }}', '{{ rstudio_server__group_allow_users }}', '{{ rstudio_server__host_allow_users }}'], 'when': "item.name|d(item) in getent_passwd.keys() and item.state|d('present') != 'absent'"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/rstudio_server/tasks/main.yml:41: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/rsyslog/defaults/main.yml:101: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/rsyslog/defaults/main.yml:108: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2788,9 +2910,11 @@ roles/rsyslog/tasks/main.yml:120: var-spacing: Jinja2 variables and filters shou
 roles/rsyslog/tasks/main.yml:134: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/rsyslog/tasks/main.yml:149: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/ruby/defaults/main.yml:34: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/ruby/tasks/main.yml:1: schema: {'name': 'Install Ruby gems', 'gem': {'name': '{{ item.name if item.name|d() else item }}', 'state': '{{ item.state                | d("present") }}', 'user_install': '{{ item.user_install         | d(False) }}', 'version': '{{ item.version              | d(omit) }}', 'repository': '{{ item.repository           | d(omit) }}', 'include_doc': '{{ item.include_doc          | d(omit) }}', 'build_flags': '{{ item.build_flags          | d(omit) }}', 'executable': '{{ item.executable           | d(omit) }}', 'include_dependencies': '{{ item.include_dependencies | d(omit) }}'}, 'with_flattened': ['{{ ruby__gems }}', '{{ ruby__group_gems }}', '{{ ruby__host_gems }}', '{{ ruby__dependent_gems }}']} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/ruby/tasks/main.yml:18: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/salt/defaults/main.yml:114: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/salt/defaults/main.yml:158: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/samba/tasks/main.yml:1: schema: {'name': 'Create root Samba directories', 'ansible.builtin.file': {'path': '{{ item }}', 'state': 'directory', 'owner': 'root', 'group': 'root', 'mode': '0751'}, 'with_flattened': ['{{ samba__path }}', '{{ samba__homes_path }}', '{{ samba__shares_path }}'], 'when': "('samba' in samba__base_packages)"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/saslauthd/defaults/main.yml:26: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/saslauthd/defaults/main.yml:66: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/saslauthd/defaults/main.yml:119: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2899,6 +3023,7 @@ roles/system_groups/defaults/main.yml:137: var-spacing: Jinja2 variables and fil
 roles/system_groups/defaults/main.yml:149: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/system_groups/defaults/main.yml:160: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/system_groups/defaults/main.yml:168: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/tcpwrappers/tasks/main.yml:1: schema: {'name': 'Remove hosts.allow entries if requested', 'ansible.builtin.file': {'path': '/etc/hosts.allow.d/{{ item.weight | default("50") }}_{{ item.filename | d((item.daemon if item.daemon is string else item.daemon[0]) + "_allow") }}', 'state': 'absent'}, 'with_flattened': ['{{ tcpwrappers__allow }}', '{{ tcpwrappers__group_allow }}', '{{ tcpwrappers__host_allow }}', '{{ tcpwrappers__dependent_allow }}', '{{ tcpwrappers__localhost_allow }}', '{{ tcpwrappers_allow | d([]) }}', '{{ tcpwrappers_group_allow | d([]) }}', '{{ tcpwrappers_host_allow | d([]) }}', '{{ tcpwrappers_dependent_allow | d([]) }}'], 'when': "((item.daemon|d() or item.daemons|d()) and item.state|d() and item.state == 'absent')"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/tcpwrappers/tasks/main.yml:35: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/telegraf/defaults/main.yml:45: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/telegraf/tasks/main.yml:35: var-spacing: Jinja2 variables and filters should have spaces before and after.
@@ -2935,6 +3060,7 @@ roles/unbound/defaults/main.yml:178: var-spacing: Jinja2 variables and filters s
 roles/unbound/defaults/main.yml:179: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/unbound/defaults/main.yml:180: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/unbound/defaults/main.yml:196: var-spacing: Jinja2 variables and filters should have spaces before and after.
+roles/unbound/tasks/main.yml:1: schema: {'name': 'Remove DNS zones if requested', 'ansible.builtin.file': {'path': '/etc/unbound/unbound.conf.d/zone_{{ item.name }}.conf', 'state': 'absent'}, 'with_flattened': ['{{ unbound__parsed_zones }}'], 'notify': ['Check unbound configuration and reload'], 'when': "item.name|d() and item.state|d('present') == 'absent'"} should not be valid under {'required': ['with_flattened']} (schema[tasks])
 roles/wpcli/tasks/main.yml:53: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/zabbix_agent/defaults/main.yml:81: var-spacing: Jinja2 variables and filters should have spaces before and after.
 roles/zabbix_agent/tasks/main.yml:38: var-spacing: Jinja2 variables and filters should have spaces before and after.
