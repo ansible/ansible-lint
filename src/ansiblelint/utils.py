@@ -305,8 +305,12 @@ def _include_children(
     (command, args, kwargs) = tokenize(f"{k}: {v}")
 
     result = path_dwim(basedir, args[0])
-    if not os.path.exists(result):
-        result = path_dwim(os.path.join(os.path.dirname(basedir)), v)
+    while basedir not in ["", "/"]:
+        if os.path.exists(result):
+            break
+        basedir = os.path.dirname(basedir)
+        result = path_dwim(basedir, args[0])
+
     return [Lintable(result, kind=parent_type)]
 
 
