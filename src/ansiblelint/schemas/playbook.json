@@ -35,6 +35,9 @@
           "title": "Name",
           "type": "string"
         },
+        "tags": {
+          "$ref": "#/$defs/tags"
+        },
         "vars": {
           "title": "Vars",
           "type": "object"
@@ -171,8 +174,7 @@
           "$ref": "#/$defs/templated-boolean"
         },
         "port": {
-          "title": "Port",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer"
         },
         "remote_user": {
           "title": "Remote User",
@@ -197,17 +199,7 @@
           "title": "Run Once"
         },
         "tags": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
+          "$ref": "#/$defs/tags",
           "title": "Tags"
         },
         "throttle": {
@@ -215,8 +207,8 @@
           "title": "Throttle"
         },
         "timeout": {
-          "title": "Timeout",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Timeout"
         },
         "vars": {
           "title": "Vars",
@@ -361,8 +353,8 @@
           "type": "boolean"
         },
         "gather_timeout": {
-          "title": "Gather Timeout",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Gather Timeout"
         },
         "handlers": {
           "$ref": "#/$defs/tasks"
@@ -414,8 +406,8 @@
           "type": "string"
         },
         "port": {
-          "title": "Port",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Port"
         },
         "post_tasks": {
           "$ref": "#/$defs/tasks"
@@ -478,17 +470,7 @@
           "type": "string"
         },
         "tags": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
+          "$ref": "#/$defs/tags",
           "title": "Tags"
         },
         "tasks": {
@@ -499,8 +481,8 @@
           "title": "Throttle"
         },
         "timeout": {
-          "title": "Timeout",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Timeout"
         },
         "vars": {
           "title": "Vars",
@@ -606,8 +588,8 @@
           "$ref": "#/$defs/templated-boolean"
         },
         "port": {
-          "title": "Port",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Port"
         },
         "remote_user": {
           "title": "Remote User",
@@ -622,17 +604,7 @@
           "title": "Run Once"
         },
         "tags": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
+          "$ref": "#/$defs/tags",
           "title": "Tags"
         },
         "throttle": {
@@ -640,8 +612,8 @@
           "title": "Throttle"
         },
         "timeout": {
-          "title": "Timeout",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Timeout"
         },
         "vars": {
           "title": "Vars",
@@ -658,13 +630,55 @@
       "title": "play-role",
       "type": "object"
     },
+    "tags": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ],
+      "title": "Tags"
+    },
     "task": {
       "additionalProperties": true,
-      "not": {
-        "required": [
-          "block"
-        ]
-      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "block"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "with_filetree"
+            ]
+          },
+          "title": "with_filetree was moved to with_community.general.filetree in 2.10"
+        },
+        {
+          "not": {
+            "required": [
+              "with_flattened"
+            ]
+          },
+          "title": "with_flattened was moved to with_community.general.flattened in 2.10"
+        },
+        {
+          "not": {
+            "required": [
+              "with_cartesian"
+            ]
+          },
+          "title": "with_cartesian was moved to with_community.general.cartesian in 2.10"
+        }
+      ],
       "properties": {
         "action": {
           "title": "Action",
@@ -679,8 +693,8 @@
           "title": "Args"
         },
         "async": {
-          "title": "Async",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Async"
         },
         "become": {
           "$ref": "#/$defs/templated-boolean",
@@ -726,8 +740,8 @@
           "type": "string"
         },
         "delay": {
-          "title": "Delay",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Delay"
         },
         "delegate_facts": {
           "title": "Delegate Facts",
@@ -821,17 +835,7 @@
           "title": "Run Once"
         },
         "tags": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
+          "$ref": "#/$defs/tags",
           "title": "Tags"
         },
         "throttle": {
@@ -839,8 +843,8 @@
           "title": "Throttle"
         },
         "timeout": {
-          "title": "Timeout",
-          "type": "integer"
+          "$ref": "#/$defs/templated-integer",
+          "title": "Timeout"
         },
         "until": {
           "title": "Until",
@@ -865,9 +869,6 @@
         },
         "with_first_found": {
           "title": "With First Found"
-        },
-        "with_flattened": {
-          "title": "With Flattened"
         },
         "with_indexed_items": {
           "title": "With Indexed Items"

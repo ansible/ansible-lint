@@ -250,8 +250,8 @@
           "type": "string"
         },
         "when": {
-          "title": "When",
-          "type": "string"
+          "$ref": "#/$defs/complex_conditional",
+          "title": "When"
         }
       },
       "title": "Dependency entry",
@@ -832,6 +832,25 @@
       "title": "OpenBSDPlatformModel",
       "type": "object"
     },
+    "OpenWRTPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "OpenWRT",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["17.01", "18.06", "19.07", "21.02", "all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "OpenWRTPlatformModel",
+      "type": "object"
+    },
     "PAN-OSPlatformModel": {
       "properties": {
         "name": {
@@ -1078,6 +1097,22 @@
       },
       "title": "aosPlatformModel",
       "type": "object"
+    },
+    "complex_conditional": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ]
     },
     "eosPlatformModel": {
       "properties": {
