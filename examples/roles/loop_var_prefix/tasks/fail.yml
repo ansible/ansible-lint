@@ -6,7 +6,7 @@
   loop:
     - foo
     - bar
-- name: that should fail due to wrong custom
+- name: that should fail due to wrong prefix
   ansible.builtin.debug:
     var: zz_item
   loop:
