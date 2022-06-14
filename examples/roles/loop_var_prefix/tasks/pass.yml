@@ -1,0 +1,20 @@
+---
+# 0 expected no-loop-var-prefix failures
+- name: that should pass
+  ansible.builtin.debug:
+    var: loop_var_prefix_item
+  loop:
+    - foo
+    - bar
+  loop_control:
+    loop_var: loop_var_prefix_item
+- name: Using a block
+  block:
+    - name: that should also pass
+      ansible.builtin.debug:
+        var: loop_var_prefix_item
+      loop:
+        - foo
+        - bar
+      loop_control:
+        loop_var: loop_var_prefix_item
