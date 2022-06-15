@@ -250,8 +250,8 @@
           "type": "string"
         },
         "when": {
-          "title": "When",
-          "type": "string"
+          "$ref": "#/$defs/complex_conditional",
+          "title": "When"
         }
       },
       "title": "Dependency entry",
@@ -441,6 +441,13 @@
           "title": "Min Ansible Version",
           "type": "string"
         },
+        "namespace": {
+          "markdownDescription": "Used by molecule and ansible-lint to compute FQRN for roles outside collections",
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_]+$",
+          "title": "Namespace Name",
+          "type": "string"
+        },
         "platforms": {
           "items": {
             "anyOf": [
@@ -518,6 +525,9 @@
               },
               {
                 "$ref": "#/$defs/MacOSXPlatformModel"
+              },
+              {
+                "$ref": "#/$defs/MageiaPlatformModel"
               },
               {
                 "$ref": "#/$defs/NXOSPlatformModel"
@@ -748,6 +758,25 @@
       "title": "MacOSXPlatformModel",
       "type": "object"
     },
+    "MageiaPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "Mageia",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["7", "8", "all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "MageiaPlatformModel",
+      "type": "object"
+    },
     "NXOSPlatformModel": {
       "properties": {
         "name": {
@@ -801,6 +830,25 @@
         }
       },
       "title": "OpenBSDPlatformModel",
+      "type": "object"
+    },
+    "OpenWRTPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "OpenWRT",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["17.01", "18.06", "19.07", "21.02", "all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "OpenWRTPlatformModel",
       "type": "object"
     },
     "PAN-OSPlatformModel": {
@@ -1049,6 +1097,22 @@
       },
       "title": "aosPlatformModel",
       "type": "object"
+    },
+    "complex_conditional": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ]
     },
     "eosPlatformModel": {
       "properties": {

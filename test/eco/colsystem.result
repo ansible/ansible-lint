@@ -8,7 +8,6 @@ You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
   - experimental  # all rules tagged as experimental
-  - load-failure  # Failed to load or parse file.
   - no-handler  # Tasks that run when changed should likely be handlers.
   - unnamed-task  # All tasks should be named.
   - yaml  # Violations reported by yamllint.

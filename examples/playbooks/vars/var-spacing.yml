@@ -3,6 +3,8 @@
 # ".bad_var_1", ".bad_var_2", ".bad_var_3", ".invalid_multiline_nested_json", ".invalid_nested_json"
 good_var_1: "{{ good_format }}"
 good_var_2: "Value: {{ good_format }}"
+good_var_3: "{{ good_format | filter }}"
+good_var_4: "Value: {{ good_format | filter }}"
 jinja_escape_1: "{{ '{{' }}"
 jinja_escape_2: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
 jinja_whitespace_control: |
@@ -12,6 +14,9 @@ jinja_whitespace_control: |
 bad_var_1: "{{bad_format}}"
 bad_var_2: "Value: {{ bad_format}}"
 bad_var_3: "{{bad_format }}"
+bad_var_4: "{{ bad_format|filter }}"
+bad_var_5: "Value: {{ bad_format |filter }}"
+bad_var_6: "{{ bad_format| filter }}"
 # spell-checker: disable-next-line
 non_jinja_var: "data = ${lookup{$local_part}lsearch{/etc/aliases}}" # noqa: var-spacing
 json_inside_jinja: "{{ {'test': {'subtest': variable}} }}"

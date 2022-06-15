@@ -1,4 +1,5 @@
 """Optional Ansible-lint rule to enforce use of prefix on role loop vars."""
+import sys
 from typing import TYPE_CHECKING, List
 
 from ansiblelint.config import options
@@ -85,3 +86,34 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
                     )
                 )
         return results
+
+
+# testing code to be loaded only with pytest or when executed the rule file
+if "pytest" in sys.modules:
+
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("test_file", "failures"),
+        (
+            pytest.param(
+                "examples/playbooks/roles/loop_var_prefix/tasks/pass.yml", 0, id="pass"
+            ),
+            pytest.param(
+                "examples/playbooks/roles/loop_var_prefix/tasks/fail.yml", 3, id="fail"
+            ),
+        ),
+    )
+    def test_no_loop_var_prefix(
+        default_rules_collection: RulesCollection, test_file: str, failures: int
+    ) -> None:
+        """Test rule matches."""
+        # Enable checking of loop variable prefixes in roles
+        options.loop_var_prefix = "{role}_"
+        results = Runner(test_file, rules=default_rules_collection).run()
+        assert len(results) == failures
+        for result in results:
+            assert result.message == RoleLoopVarPrefix().shortdesc
