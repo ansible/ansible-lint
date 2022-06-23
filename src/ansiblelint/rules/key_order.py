@@ -14,6 +14,9 @@ class KeyOrderRule(AnsibleLintRule):
     """Ensure specific order of keys in mappings."""
 
     id = "key-order"
+    description = """\
+Keys should be in the specified order. In the default configuration, it only enforces name first. Checking the order of all keys can be anabled by setting 'key_order' in the config
+"""
     shortdesc = __doc__
     severity = "LOW"
     tags = ["formatting", "experimental"]
