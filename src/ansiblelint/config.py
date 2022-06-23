@@ -189,7 +189,7 @@ options = Namespace(
     extra_vars=None,
     enable_list=[],
     skip_action_validation=True,
-    key_order=DEFAULT_KEY_ORDER['default'],
+    key_order=DEFAULT_KEY_ORDER["default"],
     custom_key_order=None,
     rules={},  # Placeholder to set and keep configurations for each rule.
 )

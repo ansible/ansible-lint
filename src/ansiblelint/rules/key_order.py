@@ -1,13 +1,12 @@
 """All tasks should be have name come first."""
 import sys
+from collections import OrderedDict as odict
 from typing import Any, Dict, Optional, Union
 
+from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.testing import RunFromText
-from ansiblelint.config import options
-
-from collections import OrderedDict as odict
 
 
 class KeyOrderRule(AnsibleLintRule):
@@ -24,14 +23,12 @@ Keys should be in the specified order. In the default configuration, it only enf
     needs_raw_task = True
 
     # skipped rules is not a key
-    removed_keys = ['skipped_rules']
+    removed_keys = ["skipped_rules"]
     possible_keys = options.key_order
     if options.custom_key_order:
         possible_keys = options.custom_key_order
 
-    ordered_expected_keys = odict(
-        (key, idx) for idx, key in enumerate(possible_keys)
-    )
+    ordered_expected_keys = odict((key, idx) for idx, key in enumerate(possible_keys))
 
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
@@ -41,19 +38,18 @@ Keys should be in the specified order. In the default configuration, it only enf
         # get the expected order in from the lookup table
         actual_order = odict()
         for attr in keys:
-            if not attr.startswith('__') and (attr not in self.removed_keys):
+            if not attr.startswith("__") and (attr not in self.removed_keys):
                 pos = self.ordered_expected_keys.get(attr)
                 if pos == None:
-                    pos = self.ordered_expected_keys.get('action')
+                    pos = self.ordered_expected_keys.get("action")
                 actual_order[attr] = pos
 
         sorted_actual_order = odict(
             sorted(actual_order.items(), key=lambda item: item[1])
         )
 
-
         if bool(sorted_actual_order != actual_order):
-            text = ','.join(sorted_actual_order.keys())
+            text = ",".join(sorted_actual_order.keys())
             return f"Keys are not in order. Expected order '{text}'"
         return False
 
