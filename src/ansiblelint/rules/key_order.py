@@ -26,6 +26,9 @@ Keys should be in the specified order. In the default configuration, it only enf
     # skipped rules is not a key
     removed_keys = ['skipped_rules']
     possible_keys = options.key_order
+    if options.custom_key_order:
+        possible_keys = options.custom_key_order
+
     ordered_expected_keys = odict(
         (key, idx) for idx, key in enumerate(possible_keys)
     )
