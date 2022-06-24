@@ -41,6 +41,10 @@
         "vars": {
           "title": "Vars",
           "type": "object"
+        },
+        "when": {
+          "$ref": "#/$defs/complex_conditional",
+          "title": "When"
         }
       },
       "type": "object"
