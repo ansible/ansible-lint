@@ -15,8 +15,8 @@ DEFAULT_KINDS = [
     {"ansible-lint-config": "**/.ansible-lint"},
     {"ansible-lint-config": "**/.config/ansible-lint.yml"},
     {"ansible-navigator-config": "**/ansible-navigator.{yaml,yml}"},
-    {"inventory": "**/inventory/**.yml"},
-    {"requirements": "**/meta/requirements.yml"},  # v1 only
+    {"inventory": "**/inventory/**.{yaml,yml}"},
+    {"requirements": "**/meta/requirements.{yaml,yml}"},  # v1 only
     # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
     {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
     {"reno": "**/releasenotes/*/*.{yaml,yml}"},  # reno release notes
@@ -35,7 +35,7 @@ DEFAULT_KINDS = [
         "requirements": "**/molecule/*/{collections,requirements}.{yaml,yml}"
     },  # molecule old collection requirements (v1), ansible 2.8 only
     {"yaml": "**/molecule/*/{base,molecule}.{yaml,yml}"},  # molecule config
-    {"requirements": "**/requirements.yml"},  # v2 and v1
+    {"requirements": "**/requirements.{yaml,yml}"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/{.ansible-lint,.yamllint}"},
     {"yaml": "**/*.{yaml,yml}"},
