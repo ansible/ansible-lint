@@ -8,7 +8,7 @@ on:
   push: # only publishes pushes to the main branch to TestPyPI
     branches: # any integration branch but not tag
       - "main"
-  pull_request:
+  pull_request_target:
   release:
     types:
       - published # It seems that you can publish directly without creating
@@ -246,7 +246,7 @@ jobs:
   check: # This job does nothing and is only used for the branch protection
     if: always()
     permissions:
-      issues: write # allow codenotify to comment on pull-request
+      pull-requests: write # allow codenotify to comment on pull-request
 
     needs:
       - linters
