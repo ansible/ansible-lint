@@ -19,6 +19,16 @@
           ansible.posix.synchronize:
             src: dummy
             dest: dummy
+  rescue:
+    - name: synchronize-in-rescue
+      ansible.posix.synchronize:
+        src: dummy
+        dest: dummy
+  always:
+    - name: synchronize-in-always
+      ansible.posix.synchronize:
+        src: dummy
+        dest: dummy
 
 - name: unarchive-bz2
   ansible.builtin.unarchive:
