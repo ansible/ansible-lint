@@ -59,6 +59,13 @@ configuring
 ```
 
 ```{toctree}
+:caption: Profiles
+:maxdepth: 2
+
+profiles
+```
+
+```{toctree}
 :caption: Rules
 :maxdepth: 4
 

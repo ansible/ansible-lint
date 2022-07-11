@@ -34,7 +34,7 @@ from ansiblelint._internal.rules import (
     LoadingFailureRule,
     RuntimeErrorRule,
 )
-from ansiblelint.config import get_rule_config
+from ansiblelint.config import PROFILES, get_rule_config
 from ansiblelint.config import options as default_options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
@@ -464,3 +464,21 @@ class RulesCollection:
             for name in tags[tag]:
                 result += f"  - {name}\n"
         return result
+
+
+def filter_rules_with_profile(rule_col: RulesCollection, profile: str) -> None:
+    """Unload rules that are not part of the specified profile."""
+    included = set()
+    extends = profile
+    while extends:
+        for rule in PROFILES[extends]["rules"]:
+            included.add(rule)
+        extends = PROFILES[extends].get("extends", None)
+    for rule in list(rule_col.rules):
+        if rule.id not in included:
+            _logger.debug(
+                "Unloading %s rule due to not being part of %s profile.",
+                rule.id,
+                profile,
+            )
+            rule_col.rules.remove(rule)

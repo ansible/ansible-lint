@@ -147,7 +147,7 @@ def _do_transform(result: "LintResult", opts: "Namespace") -> None:
     transformer.run()
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
     path_inject()
@@ -169,6 +169,17 @@ def main(argv: Optional[List[str]] = None) -> int:
     from ansiblelint.runner import _get_matches
 
     rules = RulesCollection(options.rulesdirs)
+
+    if options.profile == []:
+        from ansiblelint.generate_docs import profiles_as_rich
+
+        console.print(profiles_as_rich())
+        return 0
+    if options.profile:
+        from ansiblelint.rules import filter_rules_with_profile
+
+        filter_rules_with_profile(rules, options.profile[0])
+        # When profile is mentioned, we filter-out the rules based on it
 
     if options.listrules or options.listtags:
         return _do_list(rules)

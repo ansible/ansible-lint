@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import yaml
 
-from ansiblelint.config import DEFAULT_KINDS
+from ansiblelint.config import DEFAULT_KINDS, PROFILES
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
     DEFAULT_RULESDIR,
@@ -257,6 +257,18 @@ def get_cli_parser() -> argparse.ArgumentParser:
         default=0,
         action="count",
         help="quieter, reduce verbosity, can be specified twice.",
+    )
+    parser.add_argument(
+        "-P",
+        "--profile",
+        # * allow to distinguish between calling without -P, with -P and
+        # with -P=foo, while '?' does not. We do not support a real list.
+        nargs="*",
+        dest="profile",
+        default=None,  # when called with -P but no arg will load as empty list []
+        action="store",
+        choices=PROFILES.keys(),
+        help="Specify which rules profile to be used, or displays available profiles when no argument is given.",
     )
     parser.add_argument(
         "-p",

@@ -3,7 +3,10 @@ import os
 import re
 from argparse import Namespace
 from functools import lru_cache
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+from ansiblelint.loaders import yaml_from_file
 
 DEFAULT_KINDS = [
     # Do not sort this list, order matters.
@@ -79,6 +82,8 @@ JSON_SCHEMAS = {
     "ansible-navigator-config": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json",
     "arg_specs": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-argument-specs.json",
 }
+
+PROFILES = yaml_from_file(Path(__file__).parent / "data" / "profiles.yml")
 
 options = Namespace(
     cache_dir=None,
