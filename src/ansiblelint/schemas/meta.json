@@ -539,6 +539,9 @@
                 "$ref": "#/$defs/opensusePlatformModel"
               },
               {
+                "$ref": "#/$defs/OpenWRTPlatformModel"
+              },
+              {
                 "$ref": "#/$defs/os10PlatformModel"
               },
               {

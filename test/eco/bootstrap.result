@@ -3,19 +3,15 @@ CMD: ansible-lint -f pep8 -x fqcn-builtins
 RC: 2
 
 STDERR:
-WARNING  Listing 7 violation(s) that are fatal
+WARNING  Listing 4 violation(s) that are fatal
 You can skip specific rules or tags by adding them to your configuration file:
 # .config/ansible-lint.yml
 warn_list:  # or 'skip_list' to silence them completely
-  - experimental  # all rules tagged as experimental
   - var-spacing  # Jinja2 variables and filters should have spaces before and after.
 
 
 
 STDOUT:
-.github/workflows/galaxy.yml:1: schema: Additional properties are not allowed ('jobs', 'true' were unexpected) (schema[galaxy])
-meta/main.yml:1: schema: 7 is not one of ['6.1', '7.1', '7.2', 'all'] (schema[meta])
-requirements.yml:1: schema: None is not of type 'array' (schema[requirements])
 vars/main.yml:18: var-spacing: Jinja2 variables and filters should have spaces before and after.
 vars/main.yml:33: var-spacing: Jinja2 variables and filters should have spaces before and after.
 vars/main.yml:44: var-spacing: Jinja2 variables and filters should have spaces before and after.

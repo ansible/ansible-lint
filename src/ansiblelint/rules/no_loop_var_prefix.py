@@ -1,18 +1,15 @@
 """Optional Ansible-lint rule to enforce use of prefix on role loop vars."""
 import sys
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.config import options
-from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import toidentifier
-from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Optional
 
-    from ansiblelint.constants import odict
+    from ansiblelint.file_utils import Lintable
 
 
 class RoleLoopVarPrefix(AnsibleLintRule):
@@ -31,45 +28,15 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     prefix = ""
     severity = "MEDIUM"
 
-    def matchplay(self, file: Lintable, data: "odict[str, Any]") -> List[MatchError]:
-        """Return matches found for a specific playbook."""
-        results: List[MatchError] = []
+    def matchtask(
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+    ) -> Union[bool, str]:
+        """Return matches for a task."""
+        if not file or not file.role or not options.loop_var_prefix:
+            return False
 
-        if not options.loop_var_prefix:
-            return results
         self.prefix = options.loop_var_prefix.format(role=toidentifier(file.role))
 
-        if file.kind not in ("tasks", "handlers"):
-            return results
-
-        results.extend(self.handle_play(file, data))
-        return results
-
-    def handle_play(
-        self, lintable: Lintable, task: "odict[str, Any]"
-    ) -> List[MatchError]:
-        """Return matches for a playlist."""
-        results = []
-        if "block" in task:
-            results.extend(self.handle_tasks(lintable, task["block"]))
-        else:
-            results.extend(self.handle_task(lintable, task))
-        return results
-
-    def handle_tasks(
-        self, lintable: Lintable, tasks: List["odict[str, Any]"]
-    ) -> List[MatchError]:
-        """Return matches for a list of tasks."""
-        results = []
-        for play in tasks:
-            results.extend(self.handle_play(lintable, play))
-        return results
-
-    def handle_task(
-        self, lintable: Lintable, task: "odict[str, Any]"
-    ) -> List[MatchError]:
-        """Return matches for a specific task."""
-        results = []
         has_loop = "loop" in task
         for key in task.keys():
             if key.startswith("with_"):
@@ -80,12 +47,9 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
             loop_var = loop_control.get("loop_var", "")
 
             if not loop_var or not loop_var.startswith(self.prefix):
-                results.append(
-                    self.create_matcherror(
-                        filename=lintable, linenumber=task[LINE_NUMBER_KEY]
-                    )
-                )
-        return results
+                return True
+
+        return False
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -103,7 +67,7 @@ if "pytest" in sys.modules:
                 "examples/playbooks/roles/loop_var_prefix/tasks/pass.yml", 0, id="pass"
             ),
             pytest.param(
-                "examples/playbooks/roles/loop_var_prefix/tasks/fail.yml", 3, id="fail"
+                "examples/playbooks/roles/loop_var_prefix/tasks/fail.yml", 5, id="fail"
             ),
         ),
     )

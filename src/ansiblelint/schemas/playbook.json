@@ -41,6 +41,10 @@
         "vars": {
           "title": "Vars",
           "type": "object"
+        },
+        "when": {
+          "$ref": "#/$defs/complex_conditional",
+          "title": "When"
         }
       },
       "type": "object"
@@ -349,8 +353,36 @@
           "type": "boolean"
         },
         "gather_subset": {
+          "items": {
+            "anyOf": [
+              {
+                "enum": [
+                  "all",
+                  "min",
+                  "hardware",
+                  "network",
+                  "virtual",
+                  "ohai",
+                  "facter"
+                ],
+                "type": "string"
+              },
+              {
+                "enum": [
+                  "!all",
+                  "!min",
+                  "!hardware",
+                  "!network",
+                  "!virtual",
+                  "!ohai",
+                  "!facter"
+                ],
+                "type": "string"
+              }
+            ]
+          },
           "title": "Gather Subset",
-          "type": "boolean"
+          "type": "array"
         },
         "gather_timeout": {
           "$ref": "#/$defs/templated-integer",
@@ -847,8 +879,8 @@
           "title": "Timeout"
         },
         "until": {
-          "title": "Until",
-          "type": "string"
+          "$ref": "#/$defs/complex_conditional",
+          "title": "Until"
         },
         "vars": {
           "title": "Vars",

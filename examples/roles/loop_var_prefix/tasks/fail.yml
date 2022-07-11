@@ -1,5 +1,5 @@
 ---
-# 3 expected no-loop-var-prefix failures at 3, 9, 19
+# 5 expected no-loop-var-prefix failures at 3, 9, 19, 26, 33
 - name: that should trigger no-loop-var-prefix
   ansible.builtin.debug:
     var: item
@@ -22,3 +22,17 @@
       loop:
         - apples
         - oranges
+  rescue:
+    - name: that should also not pass
+      ansible.builtin.debug:
+        var: item
+      loop:
+        - avocados
+        - kiwis
+  always:
+    - name: that should also not pass
+      ansible.builtin.debug:
+        var: item
+      loop:
+        - bananas
+        - muscats
