@@ -35,6 +35,7 @@ from ansible_compat.prerun import get_cache_dir
 from enrich.console import should_do_markup
 
 from ansiblelint import cli
+from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
 from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
@@ -42,7 +43,6 @@ from ansiblelint.constants import EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
-from ansiblelint._mockings import _perform_mockings_cleanup
 
 if TYPE_CHECKING:
     from argparse import Namespace
