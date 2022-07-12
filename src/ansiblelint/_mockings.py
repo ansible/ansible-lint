@@ -91,3 +91,17 @@ def _perform_mockings() -> None:  # noqa: C901
         pass
     if not link_path.exists():
         link_path.symlink_to(target, target_is_directory=True)
+
+
+def _perform_mockings_cleanup() -> None:  # noqa: C901
+    """Clean up mocked modules and roles."""
+    for role_name in options.mock_roles:
+        if re.match(r"\w+\.\w+\.\w+$", role_name):
+            namespace, collection, role_dir = role_name.split(".")
+            path = f"{options.cache_dir}/collections/ansible_collections/{ namespace }/{ collection }/roles/{ role_dir }/"
+        else:
+            path = f"{options.cache_dir}/roles/{role_name}"
+        try:
+            os.rmdir(path)
+        except OSError:
+            pass

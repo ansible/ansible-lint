@@ -35,6 +35,7 @@ from ansible_compat.prerun import get_cache_dir
 from enrich.console import should_do_markup
 
 from ansiblelint import cli
+from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
 from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
@@ -214,6 +215,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                 )
 
     app.render_matches(result.matches)
+
+    _perform_mockings_cleanup()
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
 
