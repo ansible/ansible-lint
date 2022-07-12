@@ -42,6 +42,7 @@ from ansiblelint.constants import EXIT_CONTROL_C_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
+from ansiblelint._mockings import _perform_mockings_cleanup
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -214,6 +215,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                 )
 
     app.render_matches(result.matches)
+
+    _perform_mockings_cleanup()
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
 
