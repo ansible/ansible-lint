@@ -26,12 +26,9 @@ class TaskNoLocalAction(AnsibleLintRule):
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         """Return matches for a task."""
-        action = task.get("action")
-        if not isinstance(action, dict):
-            return False
-
-        if "local_action" in action.keys():
-            return True
+        if "old_style" in task.keys():
+            if task["old_style"] == "local_action":
+                return True
 
         return False
 
