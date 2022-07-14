@@ -27,7 +27,7 @@ class TaskNoLocalAction(AnsibleLintRule):
     ) -> Union[bool, str]:
         """Return matches for a task."""
         if "old_style" in task.keys():
-            if task["old_style"] == "local_action":
+            if "local_action" in task["old_style"]:
                 return True
 
         return False
