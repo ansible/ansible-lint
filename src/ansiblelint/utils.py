@@ -604,6 +604,12 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         del arguments["argv"]
 
     result["action"].update(arguments)
+
+    # check if invocated with old style module
+    for k in ["action", "local_action"]:
+        if k in sanitized_task.keys():
+            result["action"][k] = True
+
     return result
 
 
