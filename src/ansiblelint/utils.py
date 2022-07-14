@@ -605,8 +605,9 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
 
     result["action"].update(arguments)
 
-    # check if invocated with old style module
-    for k in ["action", "local_action"]:
+    # check if module invocated with old style
+    old_style_keys = ["local_action"]
+    for k in old_style_keys:
         if k in sanitized_task.keys():
             result["old_style"] = k
     return result
