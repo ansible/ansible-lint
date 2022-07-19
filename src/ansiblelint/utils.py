@@ -541,22 +541,6 @@ def _extract_ansible_parsed_keys_from_task(
     return result
 
 
-def _extract_old_style_keys_from_task(
-    result: Dict[str, Any],
-    task: Dict[str, Any],
-    keys: Tuple[str, ...],
-) -> Dict[str, Any]:
-    """Return a dict with existing key in task."""
-    # check if module invocated with old style
-    for k in keys:
-        if k in task.keys():
-            if "old_style" in result.keys():
-                result["old_style"].append(k)
-            else:
-                result["old_style"] = [k]
-    return result
-
-
 def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
     result: Dict[str, Any] = {}
@@ -620,11 +604,6 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
         del arguments["argv"]
 
     result["action"].update(arguments)
-
-    # check if module invocated with old style
-    old_style_keys = ("local_action",)
-    result = _extract_old_style_keys_from_task(result, sanitized_task, old_style_keys)
-
     return result
 
 

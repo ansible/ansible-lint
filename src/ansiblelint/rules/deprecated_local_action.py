@@ -18,6 +18,7 @@ class TaskNoLocalAction(AnsibleLintRule):
 
     id = "deprecated-local-action"
     description = "Do not use ``local_action``, use ``delegate_to: localhost``"
+    needs_raw_task = True
     severity = "MEDIUM"
     tags = ["deprecations"]
     version_added = "v4.0.0"
@@ -26,9 +27,9 @@ class TaskNoLocalAction(AnsibleLintRule):
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
         """Return matches for a task."""
-        if "old_style" in task.keys():
-            if "local_action" in task["old_style"]:
-                return True
+        raw_task = task["__raw_task__"]
+        if "local_action" in raw_task.keys():
+            return True
 
         return False
 
