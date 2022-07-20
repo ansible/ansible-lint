@@ -129,7 +129,7 @@ jobs:
           - tox_env: py38
             os: ubuntu-20.04
             python-version: 3.8
-            devel: true
+            devel: false # ansible 2.14 removed support for py38
           - tox_env: py39
             os: ubuntu-20.04
             python-version: 3.9
