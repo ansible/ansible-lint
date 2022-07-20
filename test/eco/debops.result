@@ -1,8 +1,0 @@
-CMD: ansible-lint -f pep8 -x fqcn-builtins
-
-RC: 0
-
-STDERR:
-
-
-STDOUT:

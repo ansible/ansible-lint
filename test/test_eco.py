@@ -39,29 +39,43 @@ def test_eco(repo: str) -> None:
     # consistent results regardless on its location.
 
     # we exclude `fqcn-builtins` until repository owners fix it.
-    args = ["-f", "pep8", "-x", "fqcn-builtins"]
-    result = run_ansible_lint(
-        *args,
-        executable="ansible-lint",
-        cwd=f"{cache_dir}/{repo}",
-    )
+    for step in ["before", "after"]:
 
-    def sanitize_output(text: str) -> str:
-        """Make the output less likely to vary between runs or minor changes."""
-        # replace full path to home directory with ~.
-        result = text.replace(os.path.expanduser("~"), "~")
-        # removes summary line it can change too often on active repositories.
-        result = re.sub(r"^Finished with .+\n", "", result, flags=re.MULTILINE)
+        args = ["-f", "pep8", "-x", "fqcn-builtins"]
+        executable = (
+            "ansible-lint"
+            if step == "after"
+            else f"{pathlib.Path(__file__).parent.parent}/.tox/eco-main/bin/ansible-lint"
+        )
+        result = run_ansible_lint(
+            *args,
+            executable=executable,
+            cwd=f"{cache_dir}/{repo}",
+        )
 
-        return result
+        def sanitize_output(text: str) -> str:
+            """Make the output less likely to vary between runs or minor changes."""
+            # replace full path to home directory with ~.
+            result = text.replace(os.path.expanduser("~"), "~")
+            # removes warning related to PATH alteration
+            result = re.sub(
+                r"^WARNING: PATH altered to include.+\n", "", result, flags=re.MULTILINE
+            )
 
-    result_txt = f"CMD: {shlex.join(result.args)}\n\nRC: {result.returncode}\n\nSTDERR:\n{result.stderr}\n\nSTDOUT:\n{result.stdout}"
+            return result
 
-    with open(f"{my_dir}/{repo}.result", "w", encoding="utf-8") as f:
-        f.write(sanitize_output(result_txt))
-    # fail if result is different than our expected one:
+        # Ensure that cmd looks the same for later diff, even if the path was different
+        result.args[0] = "ansible-lint"
+
+        result_txt = f"CMD: {shlex.join(result.args)}\n\nRC: {result.returncode}\n\nSTDERR:\n{result.stderr}\n\nSTDOUT:\n{result.stdout}"
+
+        os.makedirs(f"{my_dir}/{step}", exist_ok=True)
+        with open(f"{my_dir}/{step}/{repo}.result", "w", encoding="utf-8") as f:
+            f.write(sanitize_output(result_txt))
+
+    # fail if result is different than our expected one
     result = subprocess.run(
-        f"git diff --exit-code test/eco/{repo}.result",
+        f"git --no-pager diff --exit-code --no-index test/eco/before/{repo}.result test/eco/after/{repo}.result",
         shell=True,
         check=False,
         capture_output=True,
