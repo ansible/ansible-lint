@@ -9,6 +9,7 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.yaml_utils import load_yamllint_config
+from yamllint.config import YamlLintConfig
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
@@ -39,6 +40,7 @@ class YamllintRule(AnsibleLintRule):
         if str(file.base_kind) != "text/yaml":
             return matches
 
+        print(file.content)
         for problem in run_yamllint(
             file.content, YamllintRule.config, filepath=file.path
         ):
@@ -70,9 +72,9 @@ class YamllintRule(AnsibleLintRule):
                 # print(skip_list)
 
                 if (
-                        (not match.ignored)
-                        and (match.rule.id not in skip_list)
-                        and (not match.tag not in skip_list)
+                    (not match.ignored)
+                    and (match.rule.id not in skip_list)
+                    and (match.tag not in skip_list)
                 ):
                     filtered_matches.append(match)
 
@@ -126,6 +128,50 @@ if "pytest" in sys.modules:
             assert expected[idx] in result.message
             assert isinstance(result.tag, str)
             assert result.tag.startswith("yaml[")
+
+    @pytest.mark.parametrize(
+        ("file", "yamllint_config", "expected",),
+        (
+            (
+                "examples/yamllint/invalid.yml",
+                "examples/yamllint/yamllint-warning.yaml",
+                [
+                    'missing document start "---"',
+                ]
+            ),
+            (
+                "examples/yamllint/valid.yml",
+                "examples/yamllint/yamllint-warning.yaml",
+                [],
+            ),
+        ),
+        ids=(
+            "invalid",
+            "valid",
+        ),
+    )
+    def test_yamllint_warnings(file: str, yamllint_config: str, expected: List[str]) -> None:
+        """Validate that warning-level issues in yamllint don't results in
+        errors in ansible-lint."""
+        lintable = Lintable(file)
+
+        rules = RulesCollection(options=options)
+
+        yamllint_rule = YamllintRule()
+        yamllint_conf_test = YamlLintConfig(file=yamllint_config)
+        yamllint_conf_test.extend(yamllint_rule.config)
+        yamllint_rule.config = yamllint_conf_test
+
+        rules.register(yamllint_rule)
+
+        results = Runner(lintable, rules=rules).run()
+        assert len(results) == len(expected), results
+        for idx, result in enumerate(results):
+            assert result.filename.endswith(file)
+            assert expected[idx] in result.message
+            assert isinstance(result.tag, str)
+            assert result.tag.startswith("yaml[")
+
 
     def test_yamllint_has_help(default_rules_collection: RulesCollection) -> None:
         """Asserts that we loaded markdown documentation in help property."""

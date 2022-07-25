@@ -85,7 +85,7 @@ class AnsibleLintRule(BaseRule):
         details: str = "",
         filename: Optional[Union[str, Lintable]] = None,
         tag: str = "",
-        ignored: bool = None
+        ignored: bool = None,
     ) -> MatchError:
         """Instantiate a new MatchError."""
         match = MatchError(

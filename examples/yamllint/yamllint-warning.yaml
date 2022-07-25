@@ -1,0 +1,8 @@
+---
+rules:
+  line-length:
+    level: warning
+  trailing-spaces:
+    level: warning
+  key-duplicates:
+    level: warning
