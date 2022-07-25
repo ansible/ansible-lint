@@ -3,13 +3,13 @@ import logging
 import sys
 from typing import TYPE_CHECKING, List
 
+from yamllint.config import YamlLintConfig
 from yamllint.linter import run as run_yamllint
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.yaml_utils import load_yamllint_config
-from yamllint.config import YamlLintConfig
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
@@ -130,14 +130,18 @@ if "pytest" in sys.modules:
             assert result.tag.startswith("yaml[")
 
     @pytest.mark.parametrize(
-        ("file", "yamllint_config", "expected",),
+        (
+            "file",
+            "yamllint_config",
+            "expected",
+        ),
         (
             (
                 "examples/yamllint/invalid.yml",
                 "examples/yamllint/yamllint-warning.yaml",
                 [
                     'missing document start "---"',
-                ]
+                ],
             ),
             (
                 "examples/yamllint/valid.yml",
@@ -150,9 +154,10 @@ if "pytest" in sys.modules:
             "valid",
         ),
     )
-    def test_yamllint_warnings(file: str, yamllint_config: str, expected: List[str]) -> None:
-        """Validate that warning-level issues in yamllint don't results in
-        errors in ansible-lint."""
+    def test_yamllint_warnings(
+        file: str, yamllint_config: str, expected: List[str]
+    ) -> None:
+        """Validate that yamllint warnings don't trigger errors."""
         lintable = Lintable(file)
 
         rules = RulesCollection(options=options)
@@ -171,7 +176,6 @@ if "pytest" in sys.modules:
             assert expected[idx] in result.message
             assert isinstance(result.tag, str)
             assert result.tag.startswith("yaml[")
-
 
     def test_yamllint_has_help(default_rules_collection: RulesCollection) -> None:
         """Asserts that we loaded markdown documentation in help property."""
