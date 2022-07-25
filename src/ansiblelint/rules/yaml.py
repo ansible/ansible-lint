@@ -70,9 +70,9 @@ class YamllintRule(AnsibleLintRule):
                 # print(skip_list)
 
                 if (
-                        (not match.ignored)
-                        and (match.rule.id not in skip_list)
-                        and (not match.tag not in skip_list)
+                    (not match.ignored)
+                    and (match.rule.id not in skip_list)
+                    and (not match.tag not in skip_list)
                 ):
                     filtered_matches.append(match)
 
