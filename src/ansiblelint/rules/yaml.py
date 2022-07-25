@@ -43,10 +43,14 @@ class YamllintRule(AnsibleLintRule):
             file.content, YamllintRule.config, filepath=file.path
         ):
             self.severity = "VERY_LOW"
+            ignored = True
             if problem.level == "error":
                 self.severity = "MEDIUM"
+                ignored = False
             if problem.desc.endswith("(syntax)"):
                 self.severity = "VERY_HIGH"
+                ignored = False
+
             matches.append(
                 self.create_matcherror(
                     message=problem.desc,
@@ -54,6 +58,7 @@ class YamllintRule(AnsibleLintRule):
                     details="",
                     filename=str(file.path),
                     tag=f"yaml[{problem.rule}]",
+                    ignored=ignored,
                 )
             )
 
@@ -63,8 +68,14 @@ class YamllintRule(AnsibleLintRule):
                 # rule.linenumber starts with 1, not zero
                 skip_list = get_rule_skips_from_line(lines[match.linenumber - 1])
                 # print(skip_list)
-                if match.rule.id not in skip_list and match.tag not in skip_list:
+
+                if (
+                        (not match.ignored)
+                        and (match.rule.id not in skip_list)
+                        and (not match.tag not in skip_list)
+                ):
                     filtered_matches.append(match)
+
         return filtered_matches
 
 

@@ -85,6 +85,7 @@ class AnsibleLintRule(BaseRule):
         details: str = "",
         filename: Optional[Union[str, Lintable]] = None,
         tag: str = "",
+        ignored: bool = None
     ) -> MatchError:
         """Instantiate a new MatchError."""
         match = MatchError(
@@ -96,6 +97,9 @@ class AnsibleLintRule(BaseRule):
         )
         if tag:
             match.tag = tag
+        if ignored is not None:
+            match.ignored = ignored
+
         # search through callers to find one of the match* methods
         frame = inspect.currentframe()
         match_type: Optional[str] = None
