@@ -7,9 +7,13 @@ ansible-lint, not from yamllint.
 
 You can fully disable all yamllint violations by adding `yaml` to the `skip_list`.
 
-Specific tag identifiers that are printed at the end of rule name,
-like `yaml[trailing-spaces]` or `yaml[indentation]` can also be be skipped, allowing
-you to have a more fine control.
+Specific tag identifiers that are printed at the end of the rule name,
+like `yaml[trailing-spaces]` or `yaml[indentation]` can also be skipped, allowing
+you to have more control.
+
+Keep in mind that our tool does not take into consideration the warning level
+of yamllint and we consider all matches as errors. Still, if you want to treat
+some of these as warnings, you can add them to `warn_list`.
 
 ### Problematic code
 
