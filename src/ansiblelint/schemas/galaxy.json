@@ -528,6 +528,7 @@
       "type": "array"
     },
     "version": {
+      "markdownDescription": "Version must use [SemVer](https://semver.org/) format, which is more restrictive than [PEP-440](https://peps.python.org/pep-0440/). For example `1.0.0-rc1` is valid but `1.0.0rc` is not.",
       "minLength": 5,
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
       "title": "Version",

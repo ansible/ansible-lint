@@ -199,7 +199,7 @@
       "type": "object"
     },
     "DependencyModel": {
-      "additionalProperties": false,
+      "additionalProperties": true,
       "anyOf": [
         {
           "required": ["role"]
@@ -211,7 +211,7 @@
           "required": ["name"]
         }
       ],
-      "markdownDescription": "See https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-dependencies and https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79",
+      "markdownDescription": "See https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-dependencies and https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79\n\nOther keys are treated as role [parameters](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#passing-different-parameters).",
       "properties": {
         "become": {
           "title": "Become",
@@ -852,6 +852,35 @@
         }
       },
       "title": "OpenWRTPlatformModel",
+      "type": "object"
+    },
+    "OracleLinuxPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "OracleLinux",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": [
+              "8.0",
+              "8.1",
+              "8.2",
+              "8.3",
+              "8.4",
+              "8.5",
+              "8.6",
+              "9.0",
+              "all"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "OracleLinuxPlatformModel",
       "type": "object"
     },
     "PAN-OSPlatformModel": {

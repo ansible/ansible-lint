@@ -473,23 +473,11 @@
         "serial": {
           "anyOf": [
             {
-              "type": "integer"
-            },
-            {
-              "pattern": "^\\d+\\.?\\d*%?$",
-              "type": "string"
+              "$ref": "#/$defs/templated-integer-or-percent"
             },
             {
               "items": {
-                "anyOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "pattern": "^\\d+\\.?\\d*%?$",
-                    "type": "string"
-                  }
-                ]
+                "$ref": "#/$defs/templated-integer-or-percent"
               },
               "type": "array"
             }
@@ -979,6 +967,21 @@
       "oneOf": [
         {
           "type": "integer"
+        },
+        {
+          "$ref": "#/$defs/full-jinja",
+          "type": "string"
+        }
+      ]
+    },
+    "templated-integer-or-percent": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^\\d+\\.?\\d*%?$",
+          "type": "string"
         },
         {
           "$ref": "#/$defs/full-jinja",
