@@ -60,6 +60,7 @@ warn_list:
   - git-latest
   - experimental # experimental is included in the implicit list
   # - role-name
+  # - yaml[document-start]  # you can also use sub-rule matches
 
 # Some rules can transform files to fix (or make it easier to fix) identified
 # errors. `ansible-lint --write` will reformat YAML files and run these transforms.

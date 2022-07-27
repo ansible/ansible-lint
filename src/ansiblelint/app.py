@@ -104,7 +104,12 @@ class App:
         fixed_failures = 0
         fixed_warnings = 0
         for match in matches:
-            if {match.rule.id, *match.rule.tags}.isdisjoint(self.options.warn_list):
+            # tag can include a sub-rule id: `yaml[document-start]`
+            # rule.id is the generic rule id: `yaml`
+            # *rule.tags is the list of the rule's tags (categories): `style`
+            if {match.tag, match.rule.id, *match.rule.tags}.isdisjoint(
+                self.options.warn_list
+            ):
                 if match.fixed:
                     fixed_failures += 1
                 else:
@@ -129,7 +134,10 @@ class App:
     ) -> "Dict[str, BaseRule]":
         """Extract the list of matched rules, if skippable, from the list of matches."""
         matches_unignored = [match for match in matches if not match.ignored]
-        matched_rules = {match.rule.id: match.rule for match in matches_unignored}
+        # match.tag is more specialized than match.rule.id
+        matched_rules = {
+            match.tag or match.rule.id: match.rule for match in matches_unignored
+        }
         # remove unskippable rules from the list
         for rule_id in list(matched_rules.keys()):
             if "unskippable" in matched_rules[rule_id].tags:
