@@ -104,9 +104,9 @@ class App:
         fixed_failures = 0
         fixed_warnings = 0
         for match in matches:
-            # tag is the potentially more details id such: `yaml[document-start]`
-            # id is the generic rule id, as `yaml`
-            # *tags is the list of tags assigned to rule (categories), such `style`
+            # tag can include a sub-rule id: `yaml[document-start]`
+            # rule.id is the generic rule id: `yaml`
+            # *rule.tags is the list of the rule's tags (categories): `style`
             if {match.tag, match.rule.id, *match.rule.tags}.isdisjoint(
                 self.options.warn_list
             ):
