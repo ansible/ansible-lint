@@ -7,7 +7,7 @@ gradually raise the quality bar.
 To run it with the most strict profile just type `ansible-lint -P production`.
 
 If you want to consult the list of rules from each profile, type
-`ansible-lint -P`. For your convenience, we do also list the same output below.
+`ansible-lint -P`. For your convenience, we also list the same output below.
 
 The rules that have a '\*' suffix, are not implemented yet but we documented
 them with links to their issues.
