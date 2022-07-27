@@ -29,7 +29,7 @@ DEFAULT_KINDS = [
     {"test-meta": "**/tests/integration/targets/*/meta/main.{yaml,yml}"},
     {"meta": "**/meta/main.{yaml,yml}"},
     {"meta-runtime": "**/meta/runtime.{yaml,yml}"},
-    {"arg_specs": "**/roles/**/meta/argument_specs.{yaml,yml}"},  # role argument specs
+    {"arg_specs": "**/meta/argument_specs.{yaml,yml}"},  # role argument specs
     {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
     {
         "requirements": "**/molecule/*/{collections,requirements}.{yaml,yml}"
