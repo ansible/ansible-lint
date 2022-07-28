@@ -1,0 +1,127 @@
+---
+# Do not change sorting order of the primary keys as they also represent how
+# progressive the profiles are, each one extending the one before it.
+min:
+  description: >
+    Ensures that Ansible would be able to load that content, nothing else.
+    None of the rules can be disabled as they are considered fatal errors. You
+    can still add files to exclude list or add missing dependencies, so the
+    right files can be loaded.
+  extends: null
+  rules:
+    internal-error:
+    load-failure:
+    parser-error:
+    syntax-check:
+basic:
+  description: >
+    Basic profile enables a set of rules designed to spot very common coding
+    mistakes, deprecations and require user to follow standardized style and
+    formatting.
+  extends: min
+  rules:
+    command-instead-of-module:
+    command-instead-of-shell:
+    deprecated-bare-vars:
+    deprecated-command-syntax:
+    deprecated-local-action:
+    deprecated-module:
+    inline-env-var:
+    key-order:
+    literal-compare:
+    no-jinja-nesting:
+    jinja: # [jinja[readability]]
+      url: https://github.com/ansible/ansible-lint/issues/2120
+    no-jinja-when:
+    no-tabs:
+    partial-become:
+    playbook-extension:
+    role-name:
+    unnamed-task:
+    var-naming:
+    var-spacing:
+    yaml:
+moderate:
+  description: >
+    The moderate profile is raising the bar a little bit by requiring you to
+    follow few other proven good practices that make the content easier to read
+    and maintain.
+  extends: basic
+  rules:
+    name-templated:
+      url: https://github.com/ansible/ansible-lint/issues/2037
+    name-imperative:
+      url: https://github.com/ansible/ansible-lint/issues/2170
+    name-capital: # schema-related
+      url: https://github.com/ansible/ansible-lint/issues/2169
+    no-shorthand: # schema-related
+      url: https://github.com/ansible/ansible-lint/issues/2117
+    schema: # can cover lots of rules, but not really be able to give best error messages
+    spell-var-name:
+      url: https://github.com/ansible/ansible-lint/issues/2168
+safety:
+  description: >
+    The safety profile require user to avoid risky module calls that can have
+    a non-determinant outcomes and cause security issues in some cases.
+  extends: moderate
+  rules:
+    git-latest:
+    hg-latest:
+    package-latest:
+    risky-file-permissions:
+    risky-octal:
+    risky-shell-pipe:
+shared:
+  extends: safety
+  description: >
+    The shared profile is for those that want to publish their content, roles
+    or collection to either [galaxy](https://galaxy.ansible.com) or to another
+    automation-hub instance. In addition to all the rules related to packaging
+    and publishing, like metadata checks, this also includes some rules that
+    are known to be good practices for keeping the code readable and
+    maintainable.
+  rules:
+    ignore-errors:
+    layout:
+      url: https://github.com/ansible/ansible-lint/issues/1900
+    meta-incorrect:
+    meta-no-info:
+    meta-no-tags:
+    meta-video-links:
+    meta-version:
+      url: https://github.com/ansible/ansible-lint/issues/2103
+    meta-unsupported-ansible:
+      url: https://github.com/ansible/ansible-lint/issues/2102
+    no-changed-when:
+    no-changelog:
+      url: https://github.com/ansible/ansible-lint/issues/2101
+    no-handler:
+    no-relative-paths:
+    max-block-depth:
+      url: https://github.com/ansible/ansible-lint/issues/2173
+    max-tasks:
+      url: https://github.com/ansible/ansible-lint/issues/2172
+    unsafe-loop:
+      # unsafe-loop[prefix] (currently named "no-var-prefix")
+      # [unsafe-loop[var-prefix|iterator]]
+      url: https://github.com/ansible/ansible-lint/issues/2038
+production:
+  description: >
+    The production profile represents the top level of verification and it
+    is required for inclusion in [Ansible Automation Platform (AAP)](https://www.redhat.com/en/technologies/management/ansible)
+    as either validated or certified content.
+  extends: shared
+  rules:
+    avoid-dot-notation:
+      url: https://github.com/ansible/ansible-lint/issues/2174
+    disallowed-ignore: # [sanity]
+      url: https://github.com/ansible/ansible-lint/issues/2121
+    fqcn-builtins:
+    import-task-no-when:
+      url: https://github.com/ansible/ansible-lint/issues/2219
+    meta-no-dependencies:
+      url: https://github.com/ansible/ansible-lint/issues/2159
+    single-entry-point:
+      url: https://github.com/ansible/ansible-lint/issues/2242
+    use-loop:
+      url: https://github.com/ansible/ansible-lint/issues/2204

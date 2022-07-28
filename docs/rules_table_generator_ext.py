@@ -14,7 +14,7 @@ from docutils import statemachine
 
 from ansiblelint import __version__
 from ansiblelint.constants import DEFAULT_RULESDIR
-from ansiblelint.generate_docs import rules_as_md
+from ansiblelint.generate_docs import profiles_as_md, rules_as_md
 from ansiblelint.rules import RulesCollection
 
 
@@ -39,6 +39,20 @@ def _nodes_from_md(
     return node.children
 
 
+class AnsibleLintProfilesDirective(SphinxDirective):
+    """Directive ``ansible-lint-profile-list`` definition."""
+
+    has_content = False
+
+    def run(self) -> List[nodes.Node]:
+        """Generate a node tree in place of the directive."""
+        self.env.note_reread()  # rebuild the current doc unconditionally
+
+        md_rules_table = profiles_as_md()
+
+        return _nodes_from_md(state=self.state, md_source=md_rules_table)
+
+
 class AnsibleLintDefaultRulesDirective(SphinxDirective):
     """Directive ``ansible-lint-default-rules-list`` definition."""
 
@@ -59,6 +73,10 @@ def setup(app: Sphinx) -> Dict[str, Union[bool, str]]:
     app.add_directive(
         "ansible-lint-default-rules-list",
         AnsibleLintDefaultRulesDirective,
+    )
+    app.add_directive(
+        "ansible-lint-profile-list",
+        AnsibleLintProfilesDirective,
     )
 
     return {

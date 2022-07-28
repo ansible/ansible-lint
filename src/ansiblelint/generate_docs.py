@@ -13,6 +13,8 @@ except ImportError:
 from rich.markdown import Markdown
 from rich.table import Table
 
+from ansiblelint.config import PROFILES
+from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.rules import RulesCollection
 
 DOC_HEADER = """
@@ -78,3 +80,35 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
         if rule.severity:
             table.add_row("severity", rule.severity)
         yield table
+
+
+def profiles_as_md() -> str:
+    """Return markdown representation of supported profiles."""
+    result = ""
+    default_rules = RulesCollection([DEFAULT_RULESDIR])
+
+    for name, profile in PROFILES.items():
+        extends = ""
+        if profile.get("extends", None):
+            extends = (
+                f" It extends [{profile['extends']}](#{profile['extends']}) profile."
+            )
+        result += f"## {name}\n\n{profile['description']}{extends}\n"
+        for rule, rule_data in profile["rules"].items():
+            for default_rule in default_rules.rules:
+                if default_rule.id == rule:
+                    result += f"- [{rule}](default_rules.md/#{rule})\n"
+                    break
+            else:
+                url = rule_data.get("url", None)
+                if url:
+                    result += f"- [{rule}]({url})*\n"
+                else:
+                    raise RuntimeError("All planned rules must have an 'url' entry.")
+        result += "\n"
+    return result
+
+
+def profiles_as_rich() -> Markdown:
+    """Return rich representation of supported profiles."""
+    return Markdown(profiles_as_md())
