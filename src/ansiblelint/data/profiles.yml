@@ -77,8 +77,9 @@ shared:
     The shared profile is for those that want to publish their content, roles
     or collection to either [galaxy](https://galaxy.ansible.com) or to another
     automation-hub instance. In addition to all the rules related to packaging
-    and publishin like metadata checks, this also includes some rules that are
-    known to be good practices for keeping the code readable and maintainable.
+    and publishing, like metadata checks, this also includes some rules that
+    are known to be good practices for keeping the code readable and
+    maintainable.
   rules:
     ignore-errors:
     layout:
@@ -107,7 +108,8 @@ shared:
 production:
   description: >
     The production profile represents the top level of verification and it
-    is required for inclusion in AAP as either validated or certified content.
+    is required for inclusion in [Ansible Automation Platform (AAP)](https://www.redhat.com/en/technologies/management/ansible)
+    as either validated or certified content.
   extends: shared
   rules:
     avoid-dot-notation:

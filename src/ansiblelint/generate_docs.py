@@ -86,7 +86,7 @@ def profiles_as_md() -> str:
     """Return markdown representation of supported profiles."""
     result = ""
     default_rules = RulesCollection([DEFAULT_RULESDIR])
-    # breakpoint()
+
     for name, profile in PROFILES.items():
         extends = ""
         if profile.get("extends", None):
