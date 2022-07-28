@@ -103,7 +103,7 @@ if "pytest" in sys.modules:
             (
                 "examples/roles/invalid_requirements_schema/meta/requirements.yml",
                 "requirements",
-                ["'collections' is a required property"],
+                ["{'foo': 'bar'} is not valid under any of the given schemas"],
             ),
             (
                 "examples/roles/invalid_meta_schema/meta/main.yml",
