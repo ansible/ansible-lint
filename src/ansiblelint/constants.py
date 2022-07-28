@@ -65,7 +65,7 @@ FileType = Literal[
 # playbooks and tasks.
 odict = dict  # pylint: disable=invalid-name
 
-# Deprecated tags/ids and their newer names
+# Aliases for deprecated tags/ids and their newer names
 RENAMED_TAGS = {
     "102": "no-jinja-when",
     "104": "deprecated-bare-vars",
@@ -74,7 +74,7 @@ RENAMED_TAGS = {
     "202": "risky-octal",
     "203": "no-tabs",
     "205": "playbook-extension",
-    "206": "var-spacing",
+    "206": "jinja[spacing]",
     "207": "no-jinja-nesting",
     "208": "risky-file-permissions",
     "301": "no-changed-when",
@@ -99,6 +99,7 @@ RENAMED_TAGS = {
     "703": "meta-incorrect",
     "704": "meta-video-links",
     "911": "syntax-check",
+    "var-spacing": "jinja[spacing]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [

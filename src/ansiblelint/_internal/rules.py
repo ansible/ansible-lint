@@ -70,7 +70,7 @@ class BaseRule:
 
     def matchtask(
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
-    ) -> Union[bool, str]:
+    ) -> Union[bool, str, "MatchError"]:
         """Confirm if current rule is matching a specific task.
 
         If ``needs_raw_task`` (a class level attribute) is ``True``, then

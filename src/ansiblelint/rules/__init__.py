@@ -147,34 +147,39 @@ class AnsibleLintRule(BaseRule):
         ):
             return matches
 
-        tasks_iterator = ansiblelint.yaml_utils.iter_tasks_in_file(file, self.id)
-        for raw_task, task, skipped, error in tasks_iterator:
+        tasks_iterator = ansiblelint.yaml_utils.iter_tasks_in_file(file)
+        for raw_task, task, skipped_tags, error in tasks_iterator:
             if error is not None:
                 # normalize_task converts AnsibleParserError to MatchError
                 return [error]
 
-            if skipped or "action" not in task:
+            if self.id in skipped_tags or ("action" not in task):
                 continue
 
             if self.needs_raw_task:
                 task["__raw_task__"] = raw_task
 
             result = self.matchtask(task, file=file)
-
             if not result:
                 continue
 
-            message = None
-            if isinstance(result, str):
-                message = result
-            task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            match = self.create_matcherror(
-                message=message,
-                linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
-                details=task_msg,
-                filename=file,
-            )
-            match.task = task
+            if isinstance(result, MatchError):
+                if result.tag in skipped_tags:
+                    continue
+                match = result
+            else:
+                message = None
+                if isinstance(result, str):
+                    message = result
+                task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
+                match = self.create_matcherror(
+                    message=message,
+                    linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
+                    details=task_msg,
+                    filename=file,
+                )
+                match.task = task
+
             matches.append(match)
         return matches
 

@@ -30,8 +30,7 @@ basic:
     key-order:
     literal-compare:
     no-jinja-nesting:
-    jinja: # [jinja[readability]]
-      url: https://github.com/ansible/ansible-lint/issues/2120
+    jinja:
     no-jinja-when:
     no-tabs:
     partial-become:
@@ -39,7 +38,6 @@ basic:
     role-name:
     unnamed-task:
     var-naming:
-    var-spacing:
     yaml:
 moderate:
   description: >

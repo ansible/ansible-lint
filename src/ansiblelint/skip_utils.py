@@ -46,8 +46,18 @@ _logger = logging.getLogger(__name__)
 def get_rule_skips_from_line(line: str) -> List[str]:
     """Return list of rule ids skipped via comment on the line of yaml."""
     _before_noqa, _noqa_marker, noqa_text = line.partition("# noqa")
-    noqa_text = noqa_text.lstrip(" :")
-    return noqa_text.split()
+    result = []
+    for v in noqa_text.lstrip(" :").split():
+        if v in RENAMED_TAGS:
+            tag = RENAMED_TAGS[v]
+            _logger.warning(
+                "Replaced outdated tag '%s' with '%s', replace it to avoid future regressions.",
+                v,
+                tag,
+            )
+            v = tag
+        result.append(v)
+    return result
 
 
 def append_skipped_rules(
