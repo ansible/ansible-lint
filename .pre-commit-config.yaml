@@ -36,14 +36,14 @@ repos:
           - prettier
           - prettier-plugin-toml
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.0.0
+    rev: v6.5.0
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/sirosen/check-jsonschema
-    rev: 0.16.2
+    rev: 0.17.1
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -82,11 +82,11 @@ repos:
             src/ansiblelint/schemas/.*\.json
           )$
   - repo: https://github.com/PyCQA/doc8
-    rev: 0.11.2
+    rev: v1.0.0
     hooks:
       - id: doc8
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.26.3
+    rev: v1.27.1
     hooks:
       - id: yamllint
         exclude: >
@@ -112,7 +112,7 @@ repos:
       - id: black
         language_version: python3
   - repo: https://github.com/pycqa/flake8.git
-    rev: 4.0.1
+    rev: 5.0.2
     hooks:
       - id: flake8
         language_version: python3
@@ -122,7 +122,7 @@ repos:
           - flake8-docstrings>=1.5.0
           - flake8-pytest-style>=1.2.2
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.961
+    rev: v0.971
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -149,7 +149,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.14.4
+    rev: v2.14.5
     hooks:
       - id: pylint
         additional_dependencies:

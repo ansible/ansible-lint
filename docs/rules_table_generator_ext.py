@@ -4,13 +4,10 @@
 
 from typing import Dict, List, Union
 
+from docutils import nodes, statemachine
 from sphinx.application import Sphinx
 from sphinx.util.docutils import SphinxDirective
-from sphinx.util.nodes import nested_parse_with_titles, nodes
-
-# isort: split
-
-from docutils import statemachine
+from sphinx.util.nodes import nested_parse_with_titles
 
 from ansiblelint import __version__
 from ansiblelint.constants import DEFAULT_RULESDIR
