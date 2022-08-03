@@ -186,6 +186,7 @@ class Lintable:
 
         # determine base file kind (yaml, xml, ini, ...)
         self.base_kind = kind_from_path(self.path, base=True)
+        self.abspath = self.path.absolute()
 
     def __getitem__(self, key: Any) -> Any:
         """Provide compatibility subscriptable support."""
@@ -265,7 +266,7 @@ class Lintable:
 
     def __hash__(self) -> int:
         """Return a hash value of the lintables."""
-        return hash((self.name, self.kind))
+        return hash((self.name, self.kind, self.abspath))
 
     def __eq__(self, other: object) -> bool:
         """Identify whether the other object represents the same rule match."""
