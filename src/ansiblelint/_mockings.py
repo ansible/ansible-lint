@@ -74,6 +74,10 @@ def _perform_mockings() -> None:  # noqa: C901
     if not yaml:
         # ignore empty galaxy.yml file
         return
+    if isinstance(yaml, list):
+        raise RuntimeError(
+            "Invalid galaxy.yml file contains a sequence instead of a mapping."
+        )
     namespace = yaml.get("namespace", None)
     collection = yaml.get("name", None)
     if not namespace or not collection:
