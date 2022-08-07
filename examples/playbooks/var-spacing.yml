@@ -29,23 +29,23 @@
           {{- good_format -}}
     - name: bad variable format
       ansible.builtin.debug:
-        msg: "{{bad_format}}"
+        msg: "{{bad_format}}" # <-- 1
     - name: bad variable format
       ansible.builtin.debug:
-        msg: "Value: {{ bad_format}}"
+        msg: "Value: {{ bad_format}}" # <-- 2
     - name: bad variable format
       ansible.builtin.debug:
-        msg: "{{bad_format }}"
+        msg: "{{bad_format }}" # <-- 3
     - name: bad variable filter format
       ansible.builtin.debug:
-        msg: "{{ bad_format|filter }}"
+        msg: "{{ bad_format|filter }}" # <-- 4
     - name: bad variable filter format
       ansible.builtin.debug:
-        msg: "Value: {{ bad_format |filter }}"
+        msg: "Value: {{ bad_format |filter }}" # <-- 5
     - name: bad variable filter format
       ansible.builtin.debug:
-        msg: "{{ bad_format| filter }}"
-    - name: not a jinja variable # noqa var-spacing
+        msg: "{{ bad_format| filter }}" # <-- 6
+    - name: not a jinja variable # noqa: var-spacing
       ansible.builtin.debug:
         # spell-checker: disable-next-line
         msg: data = ${lookup{$local_part}lsearch{/etc/aliases}}
@@ -70,7 +70,7 @@
 
     - name: Invalid single line nested JSON
       ansible.builtin.debug:
-        msg: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1)}}"
+        msg: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1)}}" # <-- 7
 
     - name: Valid multiline nested JSON false positive
       ansible.builtin.debug:
@@ -81,6 +81,7 @@
 
     - name: Invalid multiline nested JSON
       ansible.builtin.debug:
+        # <-- 8
         msg: >-
           {{ {'dummy_2': {'nested_dummy_1': value_1,
                           'nested_dummy_2': value_2}} |

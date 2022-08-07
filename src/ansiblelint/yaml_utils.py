@@ -96,11 +96,11 @@ def load_yamllint_config() -> YamlLintConfig:
 
 
 def iter_tasks_in_file(
-    lintable: Lintable, rule_id: str
-) -> Iterator[Tuple[Dict[str, Any], Dict[str, Any], bool, Optional[MatchError]]]:
+    lintable: Lintable,
+) -> Iterator[Tuple[Dict[str, Any], Dict[str, Any], List[str], Optional[MatchError]]]:
     """Iterate over tasks in file.
 
-    This yields a 4-tuple of raw_task, normalized_task, skipped, and error.
+    This yields a 4-tuple of raw_task, normalized_task, skip_tags, and error.
 
     raw_task:
         When looping through the tasks in the file, each "raw_task" is minimally
@@ -110,8 +110,8 @@ def iter_tasks_in_file(
         by ansible into python objects and the action key gets normalized. If the task
         should be skipped (skipped is True) or normalizing it fails (error is not None)
         then this is just the raw_task instead of a normalized copy.
-    skipped:
-        Whether or not the task should be skipped according to tags or skipped_rules.
+    skip_tags:
+        List of tags found to be skipped, from tags block or noqa comments
     error:
         This is normally None. It will be a MatchError when the raw_task cannot be
         normalized due to an AnsibleParserError.
@@ -131,24 +131,22 @@ def iter_tasks_in_file(
     for raw_task in raw_tasks:
         err: Optional[MatchError] = None
 
-        # An empty `tags` block causes `None` to be returned if
-        # the `or []` is not present - `task.get('tags', [])`
-        # does not suffice.
-        skipped_in_task_tag = "skip_ansible_lint" in (raw_task.get("tags") or [])
-        skipped_in_yaml_comment = rule_id in raw_task.get("skipped_rules", ())
-        skipped = skipped_in_task_tag or skipped_in_yaml_comment
-        if skipped:
-            yield raw_task, raw_task, skipped, err
-            continue
+        skip_tags: List[str] = raw_task.get("skipped_rules", [])
 
         try:
             normalized_task = normalize_task(raw_task, str(lintable.path))
         except MatchError as err:
             # normalize_task converts AnsibleParserError to MatchError
-            yield raw_task, raw_task, skipped, err
+            yield raw_task, raw_task, skip_tags, err
             return
 
-        yield raw_task, normalized_task, skipped, err
+        if "skip_ansible_lint" in (raw_task.get("tags") or []):
+            skip_tags.append("skip_ansible_lint")
+        if skip_tags:
+            yield raw_task, normalized_task, skip_tags, err
+            continue
+
+        yield raw_task, normalized_task, skip_tags, err
 
 
 def nested_items_path(

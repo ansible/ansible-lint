@@ -51,16 +51,16 @@ PLAYBOOK = """\
       become_user: alice
       action: ansible.builtin.git
 
-    - name: test YAML and var-spacing
+    - name: test YAML and jinja[spacing]
       ansible.builtin.get_url:
         # noqa: risky-file-permissions
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf
         dest: "{{dest_proj_path}}/foo.conf"
-    - name: test YAML and var-spacing (skipped)
+    - name: test YAML and jinja[spacing] (skipped)
       ansible.builtin.get_url:
         # noqa: risky-file-permissions
         url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf  # noqa yaml
-        dest: "{{dest_proj_path}}/foo.conf"  # noqa var-spacing
+        dest: "{{dest_proj_path}}/foo.conf"  # noqa jinja[spacing]
 
     - name: test deprecated-command-syntax
       ansible.builtin.command: creates=B chmod 644 A
@@ -115,7 +115,7 @@ def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:
 @pytest.mark.parametrize(
     ("playbook_src", "results_num"),
     (
-        (PLAYBOOK, 7),
+        (PLAYBOOK, 8),
         (ROLE_TASKS_WITH_BLOCK_BECOME, 0),
     ),
     ids=("generic", "with block become inheritance"),

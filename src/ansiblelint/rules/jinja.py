@@ -1,4 +1,4 @@
-"""Rule for checking whitespace around variables."""
+"""Rule for checking content of jinja template strings."""
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 
@@ -11,17 +11,22 @@ from ansible.parsing.yaml.objects import AnsibleUnicode
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
-from ansiblelint.utils import parse_yaml_from_file
+from ansiblelint.utils import LINE_NUMBER_KEY, parse_yaml_from_file, task_to_str
 from ansiblelint.yaml_utils import nested_items_path
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
+# Please note that current implementation is only able to report
+# `jinja[spacing]` occurrences, formerly named `var-spacing`. We aim to refactor
+# the implementation to replace currently unreliable regex with use of jinja2
+# parser. That will also allow use to implement additional checks.
 
-class VariableHasSpacesRule(AnsibleLintRule):
-    """Jinja2 variables and filters should have spaces before and after."""
 
-    id = "var-spacing"
+class JinjaRule(AnsibleLintRule):
+    """Rule that looks inside jinja2 templates."""
+
+    id = "jinja"
     severity = "LOW"
     tags = ["formatting"]
     version_added = "v6.3.0"
@@ -34,14 +39,21 @@ class VariableHasSpacesRule(AnsibleLintRule):
 
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+    ) -> Union[bool, str, "MatchError"]:
         for _, v, _ in nested_items_path(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
                 if bool(self.bracket_regex.search(cleaned)) or bool(
                     self.pipe_spacing_regex.search(cleaned)
                 ):
-                    return self.shortdesc.format(var_name=v)
+                    task_msg = "Task/Handler: " + task_to_str(task)
+                    return self.create_matcherror(
+                        message=f"Jinja2 variables and filters should have spaces before and after. ({v})",
+                        linenumber=task[LINE_NUMBER_KEY],
+                        details=task_msg,
+                        filename=file,
+                        tag=f"{self.id}[spacing]",
+                    )
         return False
 
     def matchyaml(self, file: Lintable) -> List["MatchError"]:
@@ -67,6 +79,7 @@ class VariableHasSpacesRule(AnsibleLintRule):
                                 linenumber=v.ansible_pos[1],
                                 message=self.shortdesc.format(var_name=v),
                                 details=f".{'.'.join(path_elem)}",
+                                tag="jinja[spacing]",
                             )
                         )
             if raw_results:
@@ -102,7 +115,7 @@ if "pytest" in sys.modules:  # noqa: C901
     def fixture_lint_error_lines(test_playbook: str) -> List[int]:
         """Get VarHasSpacesRules linting results on test_playbook."""
         collection = RulesCollection()
-        collection.register(VariableHasSpacesRule())
+        collection.register(JinjaRule())
         lintable = Lintable(test_playbook)
         results = Runner(lintable, rules=collection).run()
         return list(map(lambda item: item.linenumber, results))
@@ -148,7 +161,7 @@ if "pytest" in sys.modules:  # noqa: C901
     ) -> List["MatchError"]:
         """Get VarHasSpacesRules linting results on test_vars."""
         collection = RulesCollection()
-        collection.register(VariableHasSpacesRule())
+        collection.register(JinjaRule())
         lintable = Lintable(test_varsfile_path)
         results = Runner(lintable, rules=collection).run()
         return results

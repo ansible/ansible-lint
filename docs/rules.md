@@ -80,10 +80,10 @@ If the rule is line-based, `# noqa [rule_id]` must be at the end of the
 particular line to be skipped
 
 ```yaml
-- name: this would typically fire LineTooLongRule 204 and var-spacing
+- name: this would typically fire LineTooLongRule 204 and jinja[spacing]
   get_url:
     url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf # noqa 204
-    dest: "{{dest_proj_path}}/foo.conf" # noqa var-spacing
+    dest: "{{dest_proj_path}}/foo.conf" # noqa jinja[spacing]
 ```
 
 It's also a good practice to comment the reasons why a task is being skipped.

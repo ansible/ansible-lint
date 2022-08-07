@@ -28,9 +28,7 @@ def fixture_empty_lintable() -> Lintable:
 
 def test_iter_tasks_in_file_with_empty_file(empty_lintable: Lintable) -> None:
     """Make sure that iter_tasks_in_file returns early when files are empty."""
-    res = list(
-        ansiblelint.yaml_utils.iter_tasks_in_file(empty_lintable, "some-rule-id")
-    )
+    res = list(ansiblelint.yaml_utils.iter_tasks_in_file(empty_lintable))
     assert not res
 
 
