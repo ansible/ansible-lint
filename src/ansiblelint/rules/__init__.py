@@ -65,10 +65,6 @@ class AnsibleLintRule(BaseRule):
         """Return a configured value for given key string."""
         return self.rule_config.get(key, None)
 
-    def __repr__(self) -> str:
-        """Return a AnsibleLintRule instance representation."""
-        return self.id + ": " + self.shortdesc
-
     @staticmethod
     def unjinja(text: str) -> str:
         """Remove jinja2 bits from a string."""

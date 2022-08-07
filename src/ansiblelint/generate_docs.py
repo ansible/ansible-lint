@@ -100,6 +100,8 @@ def profiles_as_md() -> str:
                     result += f"- [{rule}](default_rules.md/#{rule})\n"
                     break
             else:
+                if not rule_data:
+                    raise RuntimeError(f"Rule {rule} has no data.")
                 url = rule_data.get("url", None)
                 if url:
                     result += f"- [{rule}]({url})*\n"

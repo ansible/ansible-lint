@@ -109,6 +109,10 @@ class BaseRule:
         """Enable us to sort rules by their id."""
         return self.id < other.id
 
+    def __repr__(self) -> str:
+        """Return a AnsibleLintRule instance representation."""
+        return self.id + ": " + self.shortdesc
+
 
 # pylint: enable=unused-argument
 

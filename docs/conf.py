@@ -40,9 +40,8 @@ sys.path.insert(0, str(Path(__file__).parent.resolve()))
 sys.path.insert(0, os.path.join("ansible", "lib"))
 sys.path.append(os.path.abspath("_themes"))
 
-VERSION = "2.6"
+VERSION = "latest"
 AUTHOR = "Ansible, Inc"
-
 
 # General configuration
 # ---------------------
@@ -103,7 +102,7 @@ apidoc_toc_file: Optional[str] = None
 
 # General substitutions.
 project = "Ansible Lint Documentation"
-copyright = "2013-2021 Ansible, Inc"  # pylint: disable=redefined-builtin
+copyright = "Ansible Lint project contributors"  # pylint: disable=redefined-builtin
 
 github_url = "https://github.com"
 github_repo_org = "ansible"
@@ -121,10 +120,10 @@ extlinks = {
 intersphinx_mapping = {
     "ansible": ("https://docs.ansible.com/ansible/devel/", None),
     "ansible-core": ("https://docs.ansible.com/ansible-core/devel/", None),
-    "packaging": ("https://packaging.rtfd.io/en/latest", None),
+    "packaging": ("https://packaging.pypa.io/en/latest", None),
     "pytest": ("https://docs.pytest.org/en/latest", None),
     "python": ("https://docs.python.org/3", None),
-    "rich": ("https://rich.rtfd.io/en/stable", None),
+    "rich": ("https://rich.readthedocs.io/en/stable", None),
 }
 
 # The default replacements for |version| and |release|, also used in various
@@ -139,7 +138,7 @@ release = VERSION
 # non-false value, then it is used:
 # today = ''
 # Else, today_fmt is used as the format for a strftime call.
-today_fmt = "%B %d, %Y"
+today_fmt = "%F"  # ISO date format
 
 # List of documents that shouldn't be included in the build.
 # unused_docs = []
@@ -191,7 +190,7 @@ html_theme_options = {
 
 html_context = {
     "display_github": "True",
-    "github_user": "ansible-community",
+    "github_user": "ansible",
     "github_repo": "ansible-lint",
     "github_version": "main/docs/",
     "current_version": version,
