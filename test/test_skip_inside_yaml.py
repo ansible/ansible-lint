@@ -103,7 +103,8 @@ def test_role_tasks(default_text_runner: RunFromText) -> None:
     results = default_text_runner.run_role_tasks_main(ROLE_TASKS)
     assert len(results) == 1, results
     assert results[0].linenumber == 2
-    assert results[0].rule.id == "unnamed-task"
+    assert results[0].tag == "name[missing]"
+    assert results[0].rule.id == "name"
 
 
 def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:

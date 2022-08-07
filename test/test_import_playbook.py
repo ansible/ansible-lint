@@ -14,5 +14,5 @@ def test_task_hook_import_playbook(default_rules_collection: RulesCollection) ->
     assert len(results) == 2
     # Assures we detected the issues from imported playbook
     assert "Commands should not change things" in results_text
-    assert "unnamed-task" in results_text
+    assert "[name]" in results_text
     assert "All tasks should be named" in results_text
