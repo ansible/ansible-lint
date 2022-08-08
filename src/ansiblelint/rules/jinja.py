@@ -109,7 +109,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.fixture(name="test_playbook")
     def fixture_test_playbook() -> str:
         """Return test cases playbook path."""
-        return "examples/playbooks/var-spacing.yml"
+        return "examples/playbooks/jinja-spacing.yml"
 
     @pytest.fixture(name="lint_error_lines")
     def fixture_lint_error_lines(test_playbook: str) -> List[int]:
@@ -153,7 +153,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.fixture(name="test_varsfile_path")
     def fixture_test_varsfile_path() -> str:
         """Return test cases vars file path."""
-        return "examples/playbooks/vars/var-spacing.yml"
+        return "examples/playbooks/vars/jinja-spacing.yml"
 
     @pytest.fixture(name="lint_error_results_varsfile")
     def fixture_lint_error_results_varsfile(
