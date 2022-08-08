@@ -1,9 +1,11 @@
 """PyTest fixtures for testing the project."""
 import os
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING, Generator, Iterator
 
 import pytest
+from _pytest.fixtures import FixtureRequest
+from filelock import FileLock
 
 if TYPE_CHECKING:
     from typing import List  # pylint: disable=ungrouped-imports
@@ -50,3 +52,17 @@ def pytest_collection_modifyitems(items: "List[nodes.Item]", config: "Config") -
             item.add_marker(skip_other)
         elif not do_regenerate and "formatting_fixtures" in item.keywords:
             item.add_marker(skip_formatting_fixture)
+
+
+@pytest.fixture(autouse=True)
+def _block_on_serial_mark(request: FixtureRequest) -> Generator[None, None, None]:
+    """Ensure that tests with serial marker do not run at the same time."""
+    # https://github.com/pytest-dev/pytest-xdist/issues/84
+    # https://github.com/pytest-dev/pytest-xdist/issues/385
+    os.makedirs(".tox", exist_ok=True)
+    if request.node.get_closest_marker("serial"):
+        # pylint: disable=abstract-class-instantiated
+        with FileLock(".tox/semaphore.lock"):
+            yield
+    else:
+        yield

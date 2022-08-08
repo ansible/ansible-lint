@@ -288,6 +288,7 @@ def test_logger_debug(caplog: LogCaptureFixture) -> None:
     assert expected_info in caplog.record_tuples
 
 
+@pytest.mark.serial()
 def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     """Test that run without arguments it will detect and lint the entire repository."""
     cmd = [

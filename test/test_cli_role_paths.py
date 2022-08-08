@@ -71,6 +71,7 @@ def test_run_inside_role_dir(local_test_dir: str) -> None:
     assert "Use shell only when shell functionality is required" in result.stdout
 
 
+@pytest.mark.serial()
 def test_run_role_three_dir_deep(local_test_dir: str) -> None:
     """Tests execution from deep inside a role."""
     cwd = local_test_dir
