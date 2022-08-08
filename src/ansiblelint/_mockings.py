@@ -53,6 +53,7 @@ def _write_module_stub(
         f.write(body)
 
 
+# pylint: disable=too-many-branches
 def _perform_mockings() -> None:  # noqa: C901
     """Mock modules and roles."""
     for role_name in options.mock_roles:
@@ -61,6 +62,10 @@ def _perform_mockings() -> None:  # noqa: C901
             path = f"{options.cache_dir}/collections/ansible_collections/{ namespace }/{ collection }/roles/{ role_dir }/"
         else:
             path = f"{options.cache_dir}/roles/{role_name}"
+        # Avoid error from makedirs if destination is a broken symlink
+        if os.path.islink(path) and not os.path.exists(path):
+            _logger.warning("Removed broken symlink from %s", path)
+            os.unlink(path)
         os.makedirs(path, exist_ok=True)
 
     if options.mock_modules:
@@ -86,13 +91,15 @@ def _perform_mockings() -> None:  # noqa: C901
         f"{options.cache_dir}/collections/ansible_collections/{ namespace }"
     )
     collections_path.mkdir(parents=True, exist_ok=True)
-    link_path = collections_path / collection
+    link_path = pathlib.Path(collections_path / collection)
     target = pathlib.Path(options.project_dir).absolute()
-    try:
-        while os.readlink(link_path) != target:
-            link_path.unlink()
-    except FileNotFoundError:
-        pass
+    if link_path.exists():
+        try:
+            if os.readlink(link_path) != target:
+                raise OSError()
+        # OSError could also be raised by readlink
+        except (OSError, FileNotFoundError):
+            link_path.unlink(missing_ok=True)
     if not link_path.exists():
         link_path.symlink_to(target, target_is_directory=True)
 
