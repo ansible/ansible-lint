@@ -131,6 +131,7 @@ repos:
           - ansible-compat>=2.2.0
           - ansible-core
           - enrich
+          - filelock
           - flaky
           - pytest
           - rich>=11.0.0
@@ -157,6 +158,7 @@ repos:
           - ansible-core
           - docutils
           - enrich
+          - filelock
           - flaky
           - jsonschema>=4.9.0
           - pytest

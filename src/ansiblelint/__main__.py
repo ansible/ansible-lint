@@ -33,6 +33,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir
 from enrich.console import should_do_markup
+from filelock import FileLock
 
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
@@ -103,6 +104,11 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
 
     options.configured = True
     options.cache_dir = get_cache_dir(options.project_dir)
+
+    # add a lock file so we do not have two instances running inside at the same time
+    os.makedirs(options.cache_dir, exist_ok=True)
+    options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
+    options.cache_dir_lock.acquire()
 
 
 def _do_list(rules: "RulesCollection") -> int:
@@ -228,6 +234,8 @@ def main(argv: Optional[List[str]] = None) -> int:  # noqa: C901
     app.render_matches(result.matches)
 
     _perform_mockings_cleanup()
+    options.cache_dir_lock.release()
+    os.unlink(options.cache_dir_lock.lock_file)
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
 
