@@ -52,7 +52,7 @@ enable_list:
   - yaml
 # Report only a subset of tags and fully ignore any others
 # tags:
-#   - var-spacing
+#   - jinja[spacing]
 
 # This makes the linter display but not fail for rules/tags listed below:
 warn_list:
