@@ -256,10 +256,15 @@ def _previous_revision() -> Iterator[None]:
     ).stdout
     path = pathlib.Path(worktree_dir)
     path.mkdir(parents=True, exist_ok=True)
-    os.system(f"git worktree add -f {worktree_dir} 2>/dev/null")
+    subprocess.run(
+        ["git", "worktree", "add", "-f", worktree_dir],
+        shell=True,
+        stderr=subprocess.DEVNULL,
+        check=True,
+    )
     try:
         with cwd(worktree_dir):
-            os.system(f"git checkout {revision}")
+            subprocess.run(["git", "checkout", revision], shell=True, check=True)
             yield
     finally:
         options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
