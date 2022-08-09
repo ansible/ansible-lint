@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import yaml
 
-from ansiblelint.config import DEFAULT_KINDS, PROFILES
+from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
     DEFAULT_RULESDIR,
@@ -367,7 +367,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         default=[],
         action="append",
         help="only warn about these rules, unless overridden in "
-        "config file defaults to 'experimental'",
+        f"config file. Current version default value is: {', '.join(DEFAULT_WARN_LIST)}",
     )
     parser.add_argument(
         "--enable-list",
@@ -443,7 +443,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         "rulesdir": [],
         "skip_list": [],
         "tags": [],
-        "warn_list": ["experimental", "role-name"],
+        "warn_list": DEFAULT_WARN_LIST,
         "mock_modules": [],
         "mock_roles": [],
         "enable_list": [],
