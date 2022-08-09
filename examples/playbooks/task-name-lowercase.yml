@@ -1,0 +1,6 @@
+---
+- hosts: all
+  tasks:
+    - name: this task has a name is not correctly capitalized
+      ansible.builtin.command: echo "Hello World"
+      changed_when: false

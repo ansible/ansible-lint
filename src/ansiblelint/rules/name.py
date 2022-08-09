@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class NameRule(AnsibleLintRule):
-    """All tasks should be named."""
+    """Rule for checking task names and their content."""
 
     id = "name"
     description = (
@@ -26,9 +26,20 @@ class NameRule(AnsibleLintRule):
     def matchtask(
         self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str, MatchError]:
-        if not task.get("name"):
+        name = task.get("name")
+        if not name:
             return self.create_matcherror(
-                linenumber=task["__line__"], tag="name[missing]", filename=file
+                message="All tasks should be named.",
+                linenumber=task["__line__"],
+                tag="name[missing]",
+                filename=file,
+            )
+        if not name[0].isupper():
+            return self.create_matcherror(
+                message="All names should start with an uppercase letter.",
+                linenumber=task["__line__"],
+                tag="name[casing]",
+                filename=file,
             )
         return False
 
@@ -54,3 +65,14 @@ if "pytest" in sys.modules:  # noqa: C901
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 4
+
+    def test_rule_name_lowercase() -> None:
+        """Negative test for a task that starts with lowercase."""
+        collection = RulesCollection()
+        collection.register(NameRule())
+        failure = "examples/playbooks/task-name-lowercase.yml"
+        bad_runner = Runner(failure, rules=collection)
+        errs = bad_runner.run()
+        assert len(errs) == 1
+        assert errs[0].tag == "name[casing]"
+        assert errs[0].rule.id == "name"

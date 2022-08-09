@@ -8,6 +8,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from ansiblelint.loaders import yaml_from_file
 
+DEFAULT_WARN_LIST = ["experimental", "name[casing]", "role-name"]
+
 DEFAULT_KINDS = [
     # Do not sort this list, order matters.
     {"jinja2": "**/*.j2"},  # jinja2 templates are not always parsable as something else
