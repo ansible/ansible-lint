@@ -8,7 +8,8 @@ Extra care should be taken when considering adding any dependency. Removing
 most dependencies on Ansible internals is desired as these can change
 without any warning.
 
-```{command-output} pipdeptree -p ansible-lint
+```{command-output} _PIP_USE_IMPORTLIB_METADATA=0 pipdeptree -p ansible-lint
+  :shell:
 
 ```
 
