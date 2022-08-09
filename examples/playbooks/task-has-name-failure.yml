@@ -1,9 +1,11 @@
 ---
 - hosts: all
   tasks:
-    - ansible.builtin.command: echo "no name"
-    - name:
+    - ansible.builtin.command: echo "no name" # <-- 1
+      changed_when: false
+    - name: "" # <-- 2
       ansible.builtin.command: echo "empty name"
-    - ansible.builtin.debug:
+      changed_when: false
+    - ansible.builtin.debug: # <-- 3
         msg: Debug without a name
-    - ansible.builtin.meta: flush_handlers
+    - ansible.builtin.meta: flush_handlers # <-- 4

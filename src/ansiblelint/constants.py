@@ -100,6 +100,7 @@ RENAMED_TAGS = {
     "704": "meta-video-links",
     "911": "syntax-check",
     "var-spacing": "jinja[spacing]",
+    "unnamed-task": "name[missing]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [

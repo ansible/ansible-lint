@@ -150,19 +150,19 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                                             "__file__": Path(
                                                 "examples/playbooks/noqa-nested.yml"
                                             ),
-                                            "skipped_rules": ["unnamed-task"],
+                                            "skipped_rules": ["name[missing]"],
                                         }
                                     ],
                                     "__line__": 6,
                                     "__file__": Path(
                                         "examples/playbooks/noqa-nested.yml"
                                     ),
-                                    "skipped_rules": ["unnamed-task"],
+                                    "skipped_rules": ["name[missing]"],
                                 }
                             ],
                             "__line__": 4,
                             "__file__": Path("examples/playbooks/noqa-nested.yml"),
-                            "skipped_rules": ["unnamed-task"],
+                            "skipped_rules": ["name[missing]"],
                         }
                     ],
                     "__line__": 2,

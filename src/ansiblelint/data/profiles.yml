@@ -36,7 +36,7 @@ basic:
     partial-become:
     playbook-extension:
     role-name:
-    unnamed-task:
+    name:
     var-naming:
     yaml:
 moderate:
