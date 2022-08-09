@@ -134,7 +134,7 @@ if "pytest" in sys.modules:  # noqa: C901
     SUCCESS_PERMISSIONS_PRESENT = """
 - hosts: all
   tasks:
-    - name: permissions not missing and numeric
+    - name: Permissions not missing and numeric
       file:
         path: foo
         mode: 0600
@@ -143,7 +143,7 @@ if "pytest" in sys.modules:  # noqa: C901
     SUCCESS_PERMISSIONS_PRESENT_GET_URL = """
 - hosts: all
   tasks:
-    - name: permissions not missing and numeric
+    - name: Permissions not missing and numeric
       get_url:
         url: http://foo
         dest: foo
@@ -153,7 +153,7 @@ if "pytest" in sys.modules:  # noqa: C901
     SUCCESS_ABSENT_STATE = """
 - hosts: all
   tasks:
-    - name: permissions missing while state is absent is fine
+    - name: Permissions missing while state is absent is fine
       file:
         path: foo
         state: absent
@@ -162,7 +162,7 @@ if "pytest" in sys.modules:  # noqa: C901
     SUCCESS_DEFAULT_STATE = """
 - hosts: all
   tasks:
-    - name: permissions missing while state is file (default) is fine
+    - name: Permissions missing while state is file (default) is fine
       file:
         path: foo
 """
@@ -170,7 +170,7 @@ if "pytest" in sys.modules:  # noqa: C901
     SUCCESS_LINK_STATE = """
 - hosts: all
   tasks:
-    - name: permissions missing while state is link is fine
+    - name: Permissions missing while state is link is fine
       file:
         path: foo2
         src: foo
@@ -180,7 +180,7 @@ if "pytest" in sys.modules:  # noqa: C901
     SUCCESS_CREATE_FALSE = """
 - hosts: all
   tasks:
-    - name: file edit when create is false
+    - name: File edit when create is false
       lineinfile:
         path: foo
         create: false
@@ -190,7 +190,7 @@ if "pytest" in sys.modules:  # noqa: C901
     SUCCESS_REPLACE = """
 - hosts: all
   tasks:
-    - name: replace should not require mode
+    - name: Replace should not require mode
       replace:
         path: foo
 """
@@ -198,15 +198,15 @@ if "pytest" in sys.modules:  # noqa: C901
     SUCCESS_RECURSE = """
 - hosts: all
   tasks:
-    - name: file with recursive does not require mode
+    - name: File with recursive does not require mode
       file:
         state: directory
         recurse: yes
-    - name: permissions not missing and numeric (fqcn)
+    - name: Permissions not missing and numeric (fqcn)
       ansible.builtin.file:
         path: bar
         mode: 755
-    - name: file edit when create is false (fqcn)
+    - name: File edit when create is false (fqcn)
       ansible.builtin.lineinfile:
         path: foo
         create: false
@@ -216,7 +216,7 @@ if "pytest" in sys.modules:  # noqa: C901
     FAIL_PRESERVE_MODE = """
 - hosts: all
   tasks:
-    - name: file does not allow preserve value for mode
+    - name: File does not allow preserve value for mode
       file:
         path: foo
         mode: preserve
@@ -225,11 +225,11 @@ if "pytest" in sys.modules:  # noqa: C901
     FAIL_MISSING_PERMISSIONS_TOUCH = """
 - hosts: all
   tasks:
-    - name: permissions missing and might create file
+    - name: Permissions missing and might create file
       file:
         path: foo
         state: touch
-    - name: permissions missing and might create file (fqcn)
+    - name: Permissions missing and might create file (fqcn)
       ansible.builtin.file:
         path: foo
         state: touch
@@ -238,11 +238,11 @@ if "pytest" in sys.modules:  # noqa: C901
     FAIL_MISSING_PERMISSIONS_DIRECTORY = """
 - hosts: all
   tasks:
-    - name: permissions missing and might create directory
+    - name: Permissions missing and might create directory
       file:
         path: foo
         state: directory
-    - name: lineinfile when create is true (fqcn)
+    - name: Lineinfile when create is true (fqcn)
       ansible.builtin.lineinfile:
         path: foo
         create: true
@@ -253,7 +253,7 @@ if "pytest" in sys.modules:  # noqa: C901
 ---
 - hosts: all
   tasks:
-    - name: permissions missing
+    - name: Permissions missing
       # noqa: fqcn-builtins
       get_url:
         url: http://foo
@@ -263,7 +263,7 @@ if "pytest" in sys.modules:  # noqa: C901
     FAIL_LINEINFILE_CREATE = """
 - hosts: all
   tasks:
-    - name: lineinfile when create is true
+    - name: Lineinfile when create is true
       lineinfile:
         path: foo
         create: true
@@ -273,7 +273,7 @@ if "pytest" in sys.modules:  # noqa: C901
     FAIL_REPLACE_PRESERVE = """
 - hosts: all
   tasks:
-    - name: replace does not allow preserve mode
+    - name: Replace does not allow preserve mode
       replace:
         path: foo
         mode: preserve
@@ -282,7 +282,7 @@ if "pytest" in sys.modules:  # noqa: C901
     FAIL_PERMISSION_COMMENT = """
 - hosts: all
   tasks:
-    - name: permissions is only a comment
+    - name: Permissions is only a comment
       file:
         path: foo
         owner: root
@@ -294,7 +294,7 @@ if "pytest" in sys.modules:  # noqa: C901
     FAIL_INI_PERMISSION = """
 - hosts: all
   tasks:
-    - name: permissions needed if create is used
+    - name: Permissions needed if create is used
       ini_file:
         path: foo
         create: true
@@ -303,7 +303,7 @@ if "pytest" in sys.modules:  # noqa: C901
     FAIL_INI_PRESERVE = """
 - hosts: all
   tasks:
-    - name: ini_file does not accept preserve mode
+    - name: Ini_file does not accept preserve mode
       ini_file:
         path: foo
         create: true

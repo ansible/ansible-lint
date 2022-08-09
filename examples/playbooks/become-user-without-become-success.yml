@@ -10,7 +10,7 @@
 - hosts: localhost
 
   tasks:
-    - name: foo
+    - name: Foo
       ansible.builtin.command: whoami
       become_user: postgres
       become: true

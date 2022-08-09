@@ -1,12 +1,12 @@
 ---
 - hosts: localhost
   tasks:
-    - name: command without checks
+    - name: Command without checks
       ansible.builtin.command: echo blah
       args:
         chdir: X
 
-    - name: shell without checks
+    - name: Shell without checks
       ansible.builtin.shell: echo blah
       args:
         chdir: X

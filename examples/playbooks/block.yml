@@ -6,21 +6,21 @@
 
   tasks:
     - block:
-        - name: successful debug message
+        - name: Successful debug message
           debug: msg='i execute normally'
-        - name: failure command
+        - name: Failure command
           ansible.builtin.command: /bin/false
           changed_when: false
-        - name: never reached debug message
+        - name: Never reached debug message
           debug: msg='i never execute, cause ERROR!'
       rescue:
-        - name: exception debug message
+        - name: Exception debug message
           ansible.builtin.debug: msg='I caught an error'
-        - name: another failure command
+        - name: Another failure command
           ansible.builtin.command: /bin/false
           changed_when: false
-        - name: another missed debug message
+        - name: Another missed debug message
           debug: msg='I also never execute :-('
       always:
-        - name: always reached debug message
+        - name: Always reached debug message
           ansible.builtin.debug: msg="this always executes"

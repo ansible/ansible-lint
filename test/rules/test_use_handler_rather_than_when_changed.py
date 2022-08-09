@@ -4,17 +4,17 @@ from ansiblelint.rules.no_handler import UseHandlerRatherThanWhenChangedRule
 from ansiblelint.testing import RunFromText
 
 SUCCESS_TASKS = """
-- name: print helpful error message
+- name: Print helpful error message
   debug:
     var: result
   when: result.failed
 
-- name: do something when hello is output
+- name: Do something when hello is output
   debug:
     msg: why isn't this a handler
   when: result.stdout == "hello"
 
-- name: never actually debug
+- name: Never actually debug
   debug:
     var: result
   when: False
@@ -25,7 +25,7 @@ SUCCESS_TASKS = """
   when:
     - false
 
-- name: check when with a list
+- name: Check when with a list
   debug:
     var: result
   when:
@@ -35,31 +35,31 @@ SUCCESS_TASKS = """
 
 
 FAIL_TASKS = """
-- name: execute command
+- name: Execute command
   command: echo hello
   register: result
 
-- name: this should be a handler
+- name: This should be a handler
   debug:
     msg: why isn't this a handler
   when: result.changed
 
-- name: this should be a handler 2
+- name: This should be a handler 2
   debug:
     msg: why isn't this a handler
   when: result|changed
 
-- name: this should be a handler 3
+- name: This should be a handler 3
   debug:
     msg: why isn't this a handler
   when: result.changed == true
 
-- name: this should be a handler 4
+- name: This should be a handler 4
   debug:
     msg: why isn't this a handler
   when: result['changed'] == true
 
-- name: this should be a handler 5
+- name: This should be a handler 5
   debug:
     msg: why isn't this a handler
   when:

@@ -10,7 +10,7 @@ IMPORTED_PLAYBOOK = """\
 ---
 - hosts: all
   tasks:
-    - name: success
+    - name: Success
       ansible.builtin.fail: msg="fail"
       when: false
 """
@@ -20,7 +20,7 @@ MAIN_PLAYBOOK = """\
 - hosts: all
 
   tasks:
-    - name: should be shell  # noqa command-instead-of-shell no-changed-when
+    - name: Should be shell  # noqa command-instead-of-shell no-changed-when
       ansible.builtin.shell: echo lol
 
 - import_playbook: imported_playbook.yml

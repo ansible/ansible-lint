@@ -38,39 +38,39 @@ if "pytest" in sys.modules:
   tasks:
     - no_log: true
       shell: echo hello
-      name: task with no_log on top
+      name: Task with no_log on top
     - when: true
-      name: task with when on top
+      name: Task with when on top
       shell: echo hello
     - delegate_to: localhost
-      name: delegate_to on top
+      name: Delegate_to on top
       shell: echo hello
     - loop:
         - 1
         - 2
-      name: loopy
+      name: Loopy
       command: echo {{ item }}
     - become: true
-      name: become first
+      name: Become first
       shell: echo hello
     - register: test
       shell: echo hello
-      name: register first
+      name: Register first
 """
 
     PLAY_SUCCESS = """---
 - hosts: localhost
   tasks:
-    - name: test
+    - name: Test
       command: echo "test"
-    - name: test2
+    - name: Test2
       debug:
         msg: "Debug without a name"
     - name: Flush handlers
       meta: flush_handlers
     - no_log: true  # noqa key-order
       shell: echo hello
-      name: task with no_log on top
+      name: Task with no_log on top
 """
 
     @pytest.mark.parametrize("rule_runner", (KeyOrderRule,), indirect=["rule_runner"])

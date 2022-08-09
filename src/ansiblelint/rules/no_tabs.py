@@ -47,12 +47,12 @@ class NoTabsRule(AnsibleLintRule):
 RULE_EXAMPLE = r"""---
 - hosts: localhost
   tasks:
-    - name: should not trigger no-tabs rules
+    - name: Should not trigger no-tabs rules
       lineinfile:
         path: some.txt
         regexp: '^\t$'
         line: 'string with \t inside'
-    - name: foo
+    - name: Foo
       debug:
         msg: "Presence of \t should trigger no-tabs here."
 """

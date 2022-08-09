@@ -2,50 +2,50 @@
 # Should raise jinja[spacing] at tasks line 23, 26, 29, 54, 65
 - hosts: all
   tasks:
-    - name: good variable format
+    - name: Good variable format
       ansible.builtin.debug:
         msg: "{{ good_format }}"
-    - name: good variable format
+    - name: Good variable format
       ansible.builtin.debug:
         msg: "Value: {{ good_format }}"
-    - name: good variable filter format
+    - name: Good variable filter format
       ansible.builtin.debug:
         msg: "{{ good_format | filter }}"
-    - name: good variable filter format
+    - name: Good variable filter format
       ansible.builtin.debug:
         msg: "Value: {{ good_format | filter }}"
-    - name: jinja escaping allowed
+    - name: Jinja escaping allowed
       ansible.builtin.debug:
         msg: "{{ '{{' }}"
-    - name: jinja escaping allowed
+    - name: Jinja escaping allowed
       # noqa: 306
       ansible.builtin.shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
       changed_when: false
-    - name: jinja whitespace control allowed
+    - name: Jinja whitespace control allowed
       ansible.builtin.debug:
         msg: |
           {{ good_format }}/
           {{- good_format }}
           {{- good_format -}}
-    - name: bad variable format
+    - name: Bad variable format
       ansible.builtin.debug:
         msg: "{{bad_format}}" # <-- 1
-    - name: bad variable format
+    - name: Bad variable format
       ansible.builtin.debug:
         msg: "Value: {{ bad_format}}" # <-- 2
-    - name: bad variable format
+    - name: Bad variable format
       ansible.builtin.debug:
         msg: "{{bad_format }}" # <-- 3
-    - name: bad variable filter format
+    - name: Bad variable filter format
       ansible.builtin.debug:
         msg: "{{ bad_format|filter }}" # <-- 4
-    - name: bad variable filter format
+    - name: Bad variable filter format
       ansible.builtin.debug:
         msg: "Value: {{ bad_format |filter }}" # <-- 5
-    - name: bad variable filter format
+    - name: Bad variable filter format
       ansible.builtin.debug:
         msg: "{{ bad_format| filter }}" # <-- 6
-    - name: not a jinja variable # noqa: jinja[spacing]
+    - name: Not a jinja variable # noqa: jinja[spacing]
       ansible.builtin.debug:
         # spell-checker: disable-next-line
         msg: data = ${lookup{$local_part}lsearch{/etc/aliases}}

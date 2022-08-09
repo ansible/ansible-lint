@@ -29,13 +29,13 @@ FAIL_PLAY = """---
     CamelCaseButErrorIgnored: true  # noqa: var-naming
 
   tasks:
-    - name: foo
+    - name: Foo
       ansible.builtin.set_fact:
         "{{ 'test_' }}var": "value"  # valid
-    - name: bar
+    - name: Bar
       ansible.builtin.set_fact:
         CamelCaseButErrorIgnored: true  # noqa: var-naming
-    - name: test in a block
+    - name: Test in a block
       block:
         - name:
           ansible.builtin.set_fact:

@@ -1,12 +1,12 @@
 ---
 # 5 expected no-loop-var-prefix failures at 3, 9, 19, 26, 33
-- name: that should trigger no-loop-var-prefix
+- name: That should trigger no-loop-var-prefix
   ansible.builtin.debug:
     var: item
   loop:
     - foo
     - bar
-- name: that should fail due to wrong prefix
+- name: That should fail due to wrong prefix
   ansible.builtin.debug:
     var: zz_item
   loop:
@@ -16,21 +16,21 @@
     loop_var: zz_item
 - name: Using a block
   block:
-    - name: that should also not pass
+    - name: That should also not pass
       ansible.builtin.debug:
         var: item
       loop:
         - apples
         - oranges
   rescue:
-    - name: that should also not pass
+    - name: That should also not pass
       ansible.builtin.debug:
         var: item
       loop:
         - avocados
         - kiwis
   always:
-    - name: that should also not pass
+    - name: That should also not pass
       ansible.builtin.debug:
         var: item
       loop:

@@ -45,7 +45,7 @@ if "pytest" in sys.modules:
     IGNORE_ERRORS_TRUE = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
       ignore_errors: true
 """
@@ -53,7 +53,7 @@ if "pytest" in sys.modules:
     IGNORE_ERRORS_FALSE = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
       ignore_errors: false
 """
@@ -61,7 +61,7 @@ if "pytest" in sys.modules:
     IGNORE_ERRORS_CHECK_MODE = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
       ignore_errors: "{{ ansible_check_mode }}"
 """
@@ -69,7 +69,7 @@ if "pytest" in sys.modules:
     IGNORE_ERRORS_REGISTER = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
       ignore_errors: true
       register: ignore_errors_register
@@ -78,7 +78,7 @@ if "pytest" in sys.modules:
     FAILED_WHEN = """
 - hosts: all
   tasks:
-    - name: disable apport
+    - name: Disable apport
       become: 'yes'
       lineinfile:
         line: "enabled=0"

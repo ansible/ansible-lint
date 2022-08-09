@@ -1,6 +1,6 @@
 ---
 -  # nothing, checks bug #849
-- name: test include
+- name: Test include
   action: funny value=clown
   args:
     key: value

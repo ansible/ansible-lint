@@ -20,7 +20,7 @@ def _change_into_examples_dir(request: FixtureRequest) -> Generator[None, None, 
 
 @pytest.mark.usefixtures("_change_into_examples_dir")
 def test_example(default_rules_collection: RulesCollection) -> None:
-    """example.yml is expected to have 16 match errors inside."""
+    """example.yml is expected to have exact number of errors inside."""
     result = Runner("playbooks/example.yml", rules=default_rules_collection).run()
     assert len(result) == 17
 

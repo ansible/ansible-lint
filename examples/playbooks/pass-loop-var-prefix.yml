@@ -2,15 +2,15 @@
 - hosts: localhost
   tasks:
     # validate that we did not trigger loop-var-prefix on playbooks
-    - name: that should pass
+    - name: That should pass
       ansible.builtin.debug:
         var: item
       loop:
         - foo
         - bar
-    - name: a block
+    - name: A block
       block:
-        - name: that should also pass
+        - name: That should also pass
           ansible.builtin.debug:
             var: item
           loop:

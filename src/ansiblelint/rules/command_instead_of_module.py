@@ -112,60 +112,60 @@ if "pytest" in sys.modules:  # noqa: C901
     APT_GET = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
 """
 
     GIT_COMMANDS_OK = """
 - hosts: all
   tasks:
-    - name: print current git branch
+    - name: Print current git branch
       command: git branch
-    - name: print git log
+    - name: Print git log
       command: git log
-    - name: install git lfs support
+    - name: Install git lfs support
       command: git lfs install
 """
 
     RESTART_SSHD = """
 - hosts: all
   tasks:
-    - name: restart sshd
+    - name: Restart sshd
       command: systemctl restart sshd
 """
 
     SYSTEMCTL_STATUS = """
 - hosts: all
   tasks:
-    - name: show systemctl service status
+    - name: Show systemctl service status
       command: systemctl status systemd-timesyncd
 """
 
     SYSTEMD_ENVIRONMENT = """
 - hosts: all
   tasks:
-    - name: show systemd environment
+    - name: Show systemd environment
       command: systemctl show-environment
 """
 
     SYSTEMD_RUNLEVEL = """
 - hosts: all
   tasks:
-    - name: set systemd runlevel
+    - name: Set systemd runlevel
       command: systemctl set-default multi-user.target
 """
 
     YUM_UPDATE = """
 - hosts: all
   tasks:
-    - name: run yum update
+    - name: Run yum update
       command: yum update
 """
 
     YUM_CLEAN = """
 - hosts: all
   tasks:
-    - name: clear yum cache
+    - name: Clear yum cache
       command: yum clean all
 """
 

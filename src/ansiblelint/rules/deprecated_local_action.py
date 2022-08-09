@@ -42,13 +42,13 @@ if "pytest" in sys.modules:
     from ansiblelint.testing import RunFromText
 
     FAIL_TASK = """
-    - name: task example
+    - name: Task example
       local_action:
         module: boto3_facts
     """
 
     SUCCESS_TASK = """
-    - name: task example
+    - name: Task example
       boto3_facts:
       delegate_to: localhost # local_action
     """
