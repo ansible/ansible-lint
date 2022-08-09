@@ -2,8 +2,8 @@
 - hosts: whatever
 
   tasks:
-    - name: hello world
+    - name: Hello world
       action: debug msg="Hello!" # noqa: fqcn-builtins
 
-    - name: this should be fine too
+    - name: This should be fine too
       action: file state=touch dest=./wherever mode=0600 # noqa: fqcn-builtins

@@ -35,7 +35,7 @@ FAIL_TASK_1LN = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: one-level nesting
+    - name: One-level nesting
       ansible.builtin.set_fact:
         var_one: "2*(1+2) is {{ 2 * {{ 1 + 2 }} }}"
 """,
@@ -47,7 +47,7 @@ FAIL_TASK_1LN_M = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: one-level multiline nesting
+    - name: One-level multiline nesting
       ansible.builtin.set_fact:
         var_one_ml: >
           2*(1+2) is {{ 2 *
@@ -62,7 +62,7 @@ FAIL_TASK_2LN = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: two-level nesting
+    - name: Two-level nesting
       ansible.builtin.set_fact:
         var_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }} }} }}"
 """,
@@ -74,7 +74,7 @@ FAIL_TASK_2LN_M = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: two-level multiline nesting
+    - name: Two-level multiline nesting
       ansible.builtin.set_fact:
         var_two_ml: >
           2*(1+(3-1)) is {{ 2 *
@@ -90,7 +90,7 @@ FAIL_TASK_W_5LN = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: five-level wild nesting
+    - name: Five-level wild nesting
       ansible.builtin.set_fact:
         var_three_wld: "{{ {{ {{ {{ {{ 234 }} }} }} }} }}"
 """,
@@ -102,7 +102,7 @@ FAIL_TASK_W_5LN_M = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: five-level wild multiline nesting
+    - name: Five-level wild multiline nesting
       ansible.builtin.set_fact:
         var_three_wld_ml: >
           {{
@@ -123,7 +123,7 @@ SUCCESS_TASK_P = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: non-nested example
+    - name: Non-nested example
       ansible.builtin.set_fact:
         var_one: "number for 'one' is {{ 2 * 1 }}"
 """,
@@ -135,7 +135,7 @@ SUCCESS_TASK_P_M = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: multiline non-nested example
+    - name: Multiline non-nested example
       ansible.builtin.set_fact:
         var_one_ml: >
           number for 'one' is {{
@@ -149,7 +149,7 @@ SUCCESS_TASK_2P = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: nesting far from each other
+    - name: Nesting far from each other
       ansible.builtin.set_fact:
         var_two: "number for 'two' is {{ 2 * 1 }} and number for 'three' is {{ 4 - 1 }}"
 """,
@@ -161,7 +161,7 @@ SUCCESS_TASK_2P_M = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: multiline nesting far from each other
+    - name: Multiline nesting far from each other
       ansible.builtin.set_fact:
         var_two_ml: >
           number for 'two' is {{ 2 * 1
@@ -176,7 +176,7 @@ SUCCESS_TASK_C_2P = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: nesting close to each other
+    - name: Nesting close to each other
       ansible.builtin.set_fact:
         var_three: "number for 'ten' is {{ 2 - 1 }}{{ 3 - 3 }}"
 """,
@@ -188,7 +188,7 @@ SUCCESS_TASK_C_2P_M = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: multiline nesting close to each other
+    - name: Multiline nesting close to each other
       ansible.builtin.set_fact:
         var_three_ml: >
           number for 'ten' is {{
@@ -203,7 +203,7 @@ SUCCESS_TASK_PRINT = Lintable(
 ---
 - hosts: all
   tasks:
-    - name: print curly braces
+    - name: Print curly braces
       ansible.builtin.debug:
         msg: docker image inspect my_image --format='{{'{{'}}.Size{{'}}'}}'
 """,

@@ -32,15 +32,15 @@ if TYPE_CHECKING:
 FAIL_PLAY = """---
 - hosts: localhost
   tasks:
-  - name: shell no pipe
+  - name: Shell no pipe
     ansible.builtin.shell: echo hello
     changed_when: false
 
-  - name: shell with jinja filter
+  - name: Shell with jinja filter
     ansible.builtin.shell: echo {{ "hello"|upper }}
     changed_when: false
 
-  - name: shell with jinja filter (fqcn)
+  - name: Sshell with jinja filter (fqcn)
     ansible.builtin.shell: echo {{ "hello"|upper }}
     changed_when: false
 """
@@ -48,47 +48,47 @@ FAIL_PLAY = """---
 SUCCESS_PLAY = """---
 - hosts: localhost
   tasks:
-  - name: shell with pipe
+  - name: Shell with pipe
     ansible.builtin.shell: echo hello | true  # noqa: risky-shell-pipe
     changed_when: false
 
-  - name: shell with redirect
+  - name: Shell with redirect
     ansible.builtin.shell: echo hello >  /tmp/hello
     changed_when: false
 
-  - name: chain two shell commands
+  - name: Chain two shell commands
     ansible.builtin.shell: echo hello && echo goodbye
     changed_when: false
 
-  - name: run commands in succession
+  - name: Run commands in succession
     ansible.builtin.shell: echo hello ; echo goodbye
     changed_when: false
 
-  - name: use variables
+  - name: Use variables
     ansible.builtin.shell: echo $HOME $USER
     changed_when: false
 
-  - name: use * for globbing
+  - name: Use * for globbing
     ansible.builtin.shell: ls foo*
     changed_when: false
 
-  - name: use ? for globbing
+  - name: Use ? for globbing
     ansible.builtin.shell: ls foo?
     changed_when: false
 
-  - name: use [] for globbing
+  - name: Use [] for globbing
     ansible.builtin.shell: ls foo[1,2,3]
     changed_when: false
 
-  - name: use shell generator
+  - name: Use shell generator
     ansible.builtin.shell: ls foo{.txt,.xml}
     changed_when: false
 
-  - name: use backticks
+  - name: Use backticks
     ansible.builtin.shell: ls `ls foo*`
     changed_when: false
 
-  - name: use shell with cmd
+  - name: Use shell with cmd
     ansible.builtin.shell:
       cmd: |
         set -x

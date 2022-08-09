@@ -222,7 +222,7 @@ def test_guess_project_dir(tmp_path: Path) -> None:
 BASIC_PLAYBOOK = """
 - name: "playbook"
   tasks:
-    - name: hello
+    - name: Hello
       debug:
         msg: 'world'
 """

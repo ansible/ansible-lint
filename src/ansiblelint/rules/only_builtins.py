@@ -40,9 +40,9 @@ if "pytest" in sys.modules:
     SUCCESS_PLAY = """
 - hosts: localhost
   tasks:
-  - name: a block
+  - name: A block
     block:
-    - name: shell (fqcn)
+    - name: Shell (fqcn)
       ansible.builtin.shell: echo This rule should not get matched by the only-builtins rule
     """
 

@@ -71,7 +71,7 @@ are), add at the end of any line in the task. You can skip multiple rules via
 a space-separated list.
 
 ```yaml
-- name: this would typically fire git-latest and partial-become
+- name: This would typically fire git-latest and partial-become
   become_user: alice # noqa git-latest partial-become
   git: src=/path/to/git/repo dest=checkout
 ```
@@ -80,7 +80,7 @@ If the rule is line-based, `# noqa [rule_id]` must be at the end of the
 particular line to be skipped
 
 ```yaml
-- name: this would typically fire LineTooLongRule 204 and jinja[spacing]
+- name: This would typically fire LineTooLongRule 204 and jinja[spacing]
   get_url:
     url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf # noqa 204
     dest: "{{dest_proj_path}}/foo.conf" # noqa jinja[spacing]
@@ -97,15 +97,15 @@ A less-preferred method of skipping is to skip all task-based rules for a task
 works with the _command_ or _shell_ modules only. Examples:
 
 ```yaml
-- name: this would typically fire deprecated-command-syntax
+- name: This would typically fire deprecated-command-syntax
   command: warn=no chmod 644 X
 
-- name: this would typically fire command-instead-of-module
+- name: This would typically fire command-instead-of-module
   command: git pull --rebase
   args:
     warn: false
 
-- name: this would typically fire git-latest
+- name: This would typically fire git-latest
   git: src=/path/to/git/repo dest=checkout
   tags:
     - skip_ansible_lint

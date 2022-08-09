@@ -1,5 +1,5 @@
 ---
-- name: a named block task
+- name: A named block task
   block:
     - name: an assertion
       ansible.builtin.assert:
@@ -7,11 +7,11 @@
   rescue: # null
   always: {}
 - block:
-    - name: another assertion
+    - name: Another assertion
       ansible.builtin.assert:
         fail_msg: bar
   rescue: {}
   always:
-    - name: yet another assertion
+    - name: Yet another assertion
       ansible.builtin.assert:
         fail_msg: baz

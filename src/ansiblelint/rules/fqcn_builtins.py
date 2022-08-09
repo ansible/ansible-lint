@@ -106,14 +106,14 @@ if "pytest" in sys.modules:
     SUCCESS_PLAY = """
 - hosts: localhost
   tasks:
-  - name: shell (fqcn)
+  - name: Shell (fqcn)
     ansible.builtin.shell: echo This rule should not get matched by the fqcn-builtins rule
     """
 
     FAIL_PLAY = """
 - hosts: localhost
   tasks:
-  - name: shell (fqcn)
+  - name: Shell (fqcn)
     shell: echo This rule should get matched by the fqcn-builtins rule
     """
 

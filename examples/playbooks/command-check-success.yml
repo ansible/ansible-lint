@@ -1,53 +1,53 @@
 ---
 - hosts: localhost
   tasks:
-    - name: command with creates check
+    - name: Command with creates check
       ansible.builtin.command: echo blah
       args:
         creates: Z
 
-    - name: command with removes check
+    - name: Command with removes check
       ansible.builtin.command: echo blah
       args:
         removes: Z
 
-    - name: command with changed_when
+    - name: Command with changed_when
       ansible.builtin.command: echo blah
       changed_when: false
 
-    - name: command with inline creates
+    - name: Command with inline creates
       ansible.builtin.command: creates=Z echo blah
 
-    - name: command with inline removes
+    - name: Command with inline removes
       ansible.builtin.command: removes=Z echo blah
 
-    - name: command with cmd
+    - name: Command with cmd
       command:
         cmd: echo blah
       args:
         creates: Z
 
-    - name: shell with creates check
+    - name: Use shell with creates check
       shell: echo blah
       args:
         creates: Z
 
-    - name: shell with removes check
+    - name: Use shell with removes check
       shell: echo blah
       args:
         removes: Z
 
-    - name: shell with changed_when
+    - name: Use shell with changed_when
       shell: echo blah
       changed_when: false
 
-    - name: shell with inline creates
+    - name: Use shell with inline creates
       shell: creates=Z echo blah
 
-    - name: shell with inline removes
+    - name: Use shell with inline removes
       shell: removes=Z echo blah
 
-    - name: shell with cmd
+    - name: Use shell with cmd
       shell:
         cmd: echo blah
       args:
@@ -55,6 +55,6 @@
 
 - hosts: localhost
   handlers:
-    - name: restart something
+    - name: Restart something
       command: do something
     - include: handlers/included-handlers.yml

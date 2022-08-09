@@ -3,5 +3,5 @@
 
 - hosts: localhost
   tasks:
-    - name: invalid syntax
+    - name: Invalid syntax
       x.y.z.w: {}

@@ -6,42 +6,42 @@
     bracket: and close bracket
 
   tasks:
-    - name: unset variable
+    - name: Unset variable
       action: ansible.builtin.command echo {{this_variable}} is not set in this playbook
 
-    - name: trailing whitespace
+    - name: Trailing whitespace
       action: ansible.builtin.command echo do nothing   
 
-    - name: git check
+    - name: Run git check
       action: ansible.builtin.git a=b c=d
 
-    - name: git check 2
+    - name: Run git check 2
       action: ansible.builtin.git version=HEAD c=d
 
-    - name: git check 3
+    - name: Run git check 3
       ansible.builtin.git: version=a1b2c3d4 repo=xyz bobbins=d
 
-    - name: executing git through command
+    - name: Executing git through command
       action: ansible.builtin.command git clone blah
 
-    - name: executing git through command
+    - name: Executing git through command
       action: ansible.builtin.command chdir=bobbins creates=whatever /usr/bin/git clone blah
 
-    - name: using git module
+    - name: Using git module
       action: ansible.builtin.git repo=blah
 
-    - name: passing git as an argument to another task
+    - name: Passing git as an argument to another task
       action: ansible.builtin.debug msg="{{item}}"
       with_items:
       - git  # yamllint wrong indentation
       - bobbins
 
-    - name: yum latest
+    - name: Yum latest
       ansible.builtin.yum: state=latest name=httpd
 
     - ansible.builtin.debug: msg="debug task without a name"
 
-    - name: apt latest
+    - name: Run apt latest
       ansible.builtin.apt: state=latest name=apache2
 
     - ansible.builtin.meta: flush_handlers

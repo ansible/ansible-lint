@@ -44,7 +44,7 @@ For example, this task registers the ``shell`` output and uses the return code
 to define when the task has changed.
 
 ```yaml
-    - name: handle shell output with return code
+    - name: Handle shell output with return code
       ansible.builtin.shell: cat {{ my_file|quote }}
       register: my_output
       changed_when: my_output.rc != 0
@@ -54,7 +54,7 @@ The following example will trigger the rule since the task does not
 handle the output of the ``command``.
 
 ```yaml
-    - name: does not handle any output or return codes
+    - name: Does not handle any output or return codes
       ansible.builtin.command: cat {{ my_file|quote }}
 ```
     """
@@ -85,7 +85,7 @@ if "pytest" in sys.modules:
     NO_CHANGE_COMMAND_RC = """
 - hosts: all
   tasks:
-    - name: handle command output with return code
+    - name: Handle command output with return code
       ansible.builtin.command: cat {{ my_file|quote }}
       register: my_output
       changed_when: my_output.rc != 0
@@ -94,7 +94,7 @@ if "pytest" in sys.modules:
     NO_CHANGE_SHELL_RC = """
 - hosts: all
   tasks:
-    - name: handle shell output with return code
+    - name: Handle shell output with return code
       ansible.builtin.shell: cat {{ my_file|quote }}
       register: my_output
       changed_when: my_output.rc != 0
@@ -103,7 +103,7 @@ if "pytest" in sys.modules:
     NO_CHANGE_SHELL_FALSE = """
 - hosts: all
   tasks:
-    - name: handle shell output with false changed_when
+    - name: Handle shell output with false changed_when
       ansible.builtin.shell: cat {{ my_file|quote }}
       register: my_output
       changed_when: false
@@ -112,7 +112,7 @@ if "pytest" in sys.modules:
     NO_CHANGE_ARGS = """
 - hosts: all
   tasks:
-    - name: command with argument
+    - name: Command with argument
       command: createfile.sh
       args:
         creates: /tmp/????unknown_files????
@@ -121,7 +121,7 @@ if "pytest" in sys.modules:
     NO_CHANGE_REGISTER_FAIL = """
 - hosts: all
   tasks:
-    - name: register command output, but cat still does not change anything
+    - name: Register command output, but cat still does not change anything
       ansible.builtin.command: cat {{ my_file|quote }}
       register: my_output
 """
@@ -132,14 +132,14 @@ if "pytest" in sys.modules:
   tasks:
     - block:
         - block:
-            - name: basic command task, should fail
+            - name: Basic command task, should fail
               ansible.builtin.command: cat my_file
 """
 
     NO_CHANGE_SHELL_FAIL = """
 - hosts: all
   tasks:
-    - name: basic shell task, should fail
+    - name: Basic shell task, should fail
       shell: cat my_file
 """
 

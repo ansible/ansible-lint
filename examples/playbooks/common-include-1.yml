@@ -2,8 +2,8 @@
 - hosts: localhost
   gather_facts: false
   tasks:
-    - name: some include
+    - name: Some include
       ansible.builtin.include: tasks/included-with-lint.yml
-    - name: some include_tasks with file and jinja2
+    - name: Some include_tasks with file and jinja2
       ansible.builtin.include_tasks:
         file: "{{ 'tasks/included-with-lint.yml' }}"

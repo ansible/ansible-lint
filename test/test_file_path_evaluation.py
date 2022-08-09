@@ -15,35 +15,35 @@ LAYOUT_IMPORTS: Dict[str, str] = {
         - hosts: target
           gather_facts: false
           tasks:
-            - name: from main import task 1
+            - name: From main import task 1
               ansible.builtin.import_tasks: tasks/task_1.yml
         """
     ),
     "tasks/task_1.yml": textwrap.dedent(
         """\
         ---
-        - name: from task 1 import task 2
+        - name: From task 1 import task 2
           ansible.builtin.import_tasks: tasks/task_2.yml
         """
     ),
     "tasks/task_2.yml": textwrap.dedent(
         """\
         ---
-        - name: from task 2 import subtask 1
+        - name: From task 2 import subtask 1
           ansible.builtin.import_tasks: tasks/subtasks/subtask_1.yml
         """
     ),
     "tasks/subtasks/subtask_1.yml": textwrap.dedent(
         """\
         ---
-        - name: from subtask 1 import subtask 2
+        - name: From subtask 1 import subtask 2
           import_tasks: tasks/subtasks/subtask_2.yml
         """
     ),
     "tasks/subtasks/subtask_2.yml": textwrap.dedent(
         """\
         ---
-        - name: from subtask 2 do something
+        - name: From subtask 2 do something
           debug:  # <-- expected to raise fqcn-builtins
             msg: |
               Something...
@@ -58,35 +58,35 @@ LAYOUT_INCLUDES: Dict[str, str] = {
         - hosts: target
           gather_facts: false
           tasks:
-            - name: from main import task 1
+            - name: From main import task 1
               include_tasks: tasks/task_1.yml
         """
     ),
     "tasks/task_1.yml": textwrap.dedent(
         """\
         ---
-        - name: from task 1 import task 2
+        - name: From task 1 import task 2
           include_tasks: tasks/task_2.yml
         """
     ),
     "tasks/task_2.yml": textwrap.dedent(
         """\
         ---
-        - name: from task 2 import subtask 1
+        - name: From task 2 import subtask 1
           include_tasks: tasks/subtasks/subtask_1.yml
         """
     ),
     "tasks/subtasks/subtask_1.yml": textwrap.dedent(
         """\
         ---
-        - name: from subtask 1 import subtask 2
+        - name: From subtask 1 import subtask 2
           include_tasks: tasks/subtasks/subtask_2.yml
         """
     ),
     "tasks/subtasks/subtask_2.yml": textwrap.dedent(
         """\
         ---
-        - name: from subtask 2 do something
+        - name: From subtask 2 do something
           debug:  # <-- expected to raise fqcn-builtins
             msg: |
               Something...

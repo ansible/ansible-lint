@@ -171,9 +171,9 @@ def nested_items_path(
 
     .. code-block:: yaml
 
-        - name: a play
+        - name: A play
           tasks:
-          - name: a task
+          - name: A task
             debug:
               msg: foobar
 
@@ -747,9 +747,9 @@ class FormattedYAML(YAML):
         .. code:: yaml
 
             ---
-            - name: playbook
+            - name: A playbook
               tasks:
-              - name: task
+              - name: Task
 
         This example indents all sequences including the root-level:
 
@@ -764,9 +764,9 @@ class FormattedYAML(YAML):
         .. code:: yaml
 
             ---
-              - name: playbook
+              - name: Playbook
                 tasks:
-                  - name: task
+                  - name: Task
 
         This example indents all sequences except at the root-level:
 
@@ -781,9 +781,9 @@ class FormattedYAML(YAML):
         .. code:: yaml
 
             ---
-            - name: playbook
+            - name: Playbook
               tasks:
-                - name: task
+                - name: Task
         """
         # Default to reading/dumping YAML 1.1 (ruamel.yaml defaults to 1.2)
         self._yaml_version_default: Tuple[int, int] = (1, 1)

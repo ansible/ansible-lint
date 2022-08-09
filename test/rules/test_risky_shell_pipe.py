@@ -8,10 +8,10 @@ FAIL_TASKS = """
 - hosts: localhost
   become: no
   tasks:
-    - name: pipeline without pipefail
+    - name: Pipeline without pipefail
       shell: false | cat
 
-    - name: pipeline with or and pipe, no pipefail
+    - name: Pipeline with or and pipe, no pipefail
       shell: false || true | cat
 
     - shell: |
@@ -23,46 +23,46 @@ SUCCESS_TASKS = """
 - hosts: localhost
   become: no
   tasks:
-    - name: pipeline with pipefail
+    - name: Pipeline with pipefail
       shell: set -o pipefail && false | cat
 
-    - name: pipeline with pipefail, multi-line
+    - name: Pipeline with pipefail, multi-line
       shell: |
         set -o pipefail
         false | cat
 
-    - name: pipeline with pipefail, complex set
+    - name: Pipeline with pipefail, complex set
       shell: |
         set -e -x -o pipefail
         false | cat
 
-    - name: pipeline with pipefail, complex set
+    - name: Pipeline with pipefail, complex set
       shell: |
         set -e -x -o pipefail
         false | cat
 
-    - name: pipeline with pipefail, complex set
+    - name: Pipeline with pipefail, complex set
       shell: |
         set -eo pipefail
         false | cat
 
-    - name: pipeline with pipefail not at first line
+    - name: Pipeline with pipefail not at first line
       shell: |
         echo foo
         set -eo pipefail
         false | cat
 
-    - name: pipeline without pipefail, ignoring errors
+    - name: Pipeline without pipefail, ignoring errors
       shell: false | cat
       ignore_errors: true
 
-    - name: non-pipeline without pipefail
+    - name: Non-pipeline without pipefail
       shell: "true"
 
-    - name: command without pipefail
+    - name: Command without pipefail
       command: "true"
 
-    - name: shell with or
+    - name: Shell with or
       shell:
         false || true
 
@@ -70,7 +70,7 @@ SUCCESS_TASKS = """
         set -o pipefail
         df | grep '/dev'
 
-    - name: should not fail due to ignore_errors being true
+    - name: Should not fail due to ignore_errors being true
       shell: false | cat
       ignore_errors: true
 """

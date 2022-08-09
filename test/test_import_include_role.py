@@ -10,7 +10,7 @@ from ansiblelint.runner import Runner
 
 ROLE_TASKS_MAIN = """\
 ---
-- name: shell instead of command
+- name: Shell instead of command
   shell: echo hello world
   changed_when: false
 """
@@ -25,7 +25,7 @@ PLAY_IMPORT_ROLE = """\
 - hosts: all
 
   tasks:
-    - name: some import
+    - name: Some import
       import_role:
         name: test-role
 """
@@ -35,7 +35,7 @@ PLAY_IMPORT_ROLE_FQCN = """\
 - hosts: all
 
   tasks:
-    - name: some import
+    - name: Some import
       ansible.builtin.import_role:
         name: test-role
 """
@@ -45,7 +45,7 @@ PLAY_IMPORT_ROLE_INLINE = """\
 - hosts: all
 
   tasks:
-    - name: some import
+    - name: Some import
       import_role: name=test-role
 """
 
@@ -54,7 +54,7 @@ PLAY_INCLUDE_ROLE = """\
 - hosts: all
 
   tasks:
-    - name: some import
+    - name: Some import
       include_role:
         name: test-role
         tasks_from: world
@@ -65,7 +65,7 @@ PLAY_INCLUDE_ROLE_FQCN = """\
 - hosts: all
 
   tasks:
-    - name: some import
+    - name: Some import
       ansible.builtin.include_role:
         name: test-role
         tasks_from: world
@@ -76,7 +76,7 @@ PLAY_INCLUDE_ROLE_INLINE = """\
 - hosts: all
 
   tasks:
-    - name: some import
+    - name: Some import
       include_role: name=test-role tasks_from=world
 """
 

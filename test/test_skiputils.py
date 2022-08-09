@@ -59,7 +59,7 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                     "hosts": "localhost",
                     "tasks": [
                         {
-                            "name": "this would typically fire git-latest and partial-become",
+                            "name": "This would typically fire git-latest and partial-become",
                             "become_user": "alice",
                             "git": "src=/path/to/git/repo dest=checkout",
                             "__line__": 4,
@@ -75,7 +75,7 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                     "hosts": "localhost",
                     "tasks": [
                         {
-                            "name": "this would typically fire git-latest and partial-become",
+                            "name": "This would typically fire git-latest and partial-become",
                             "become_user": "alice",
                             "git": "src=/path/to/git/repo dest=checkout",
                             "__line__": 4,
@@ -95,14 +95,14 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                     "hosts": "localhost",
                     "tasks": [
                         {
-                            "name": "example of multi-level block",
+                            "name": "Example of multi-level block",
                             "block": [
                                 {
                                     "name": "2nd level",
                                     "block": [
                                         {
                                             "ansible.builtin.debug": {
-                                                "msg": "test unnamed task in block",
+                                                "msg": "Test unnamed task in block",
                                                 "__line__": 9,
                                                 "__file__": Path(
                                                     "examples/playbooks/noqa-nested.yml"
@@ -133,14 +133,14 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                     "hosts": "localhost",
                     "tasks": [
                         {
-                            "name": "example of multi-level block",
+                            "name": "Example of multi-level block",
                             "block": [
                                 {
                                     "name": "2nd level",
                                     "block": [
                                         {
                                             "ansible.builtin.debug": {
-                                                "msg": "test unnamed task in block",
+                                                "msg": "Test unnamed task in block",
                                                 "__line__": 9,
                                                 "__file__": Path(
                                                     "examples/playbooks/noqa-nested.yml"

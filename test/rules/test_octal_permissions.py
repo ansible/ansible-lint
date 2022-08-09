@@ -11,39 +11,39 @@ SUCCESS_TASKS = """
   vars:
     varset: varset
   tasks:
-    - name: octal permissions test success (0600)
+    - name: Octal permissions test success (0600)
       file:
         path: foo
         mode: 0600
 
-    - name: octal permissions test success (0000)
+    - name: Octal permissions test success (0000)
       file:
         path: foo
         mode: 0000
 
-    - name: octal permissions test success (02000)
+    - name: Octal permissions test success (02000)
       file:
         path: bar
         mode: 02000
 
-    - name: octal permissions test success (02751)
+    - name: Octal permissions test success (02751)
       file:
         path: bar
         mode: 02751
 
-    - name: octal permissions test success (0777)
+    - name: Octal permissions test success (0777)
       file: path=baz mode=0777
 
-    - name: octal permissions test success (0711)
+    - name: Octal permissions test success (0711)
       file: path=baz mode=0711
 
-    - name:  permissions test success (0777)
+    - name: Permissions test success (0777)
       file: path=baz mode=u+rwx
 
-    - name: octal permissions test success (777)
+    - name: Octal permissions test success (777)
       file: path=baz mode=777
 
-    - name: octal permissions test success (733)
+    - name: Octal permissions test success (733)
       file: path=baz mode=733
 """
 
@@ -53,22 +53,22 @@ FAIL_TASKS = """
   vars:
     varset: varset
   tasks:
-    - name: octal permissions test fail (600)
+    - name: Octal permissions test fail (600)
       file:
         path: foo
         mode: 600
 
-    - name: octal permissions test fail (710)
+    - name: Octal permissions test fail (710)
       file:
         path: foo
         mode: 710
 
-    - name: octal permissions test fail (123)
+    - name: Octal permissions test fail (123)
       file:
         path: foo
         mode: 123
 
-    - name: octal permissions test fail (2000)
+    - name: Octal permissions test fail (2000)
       file:
         path: bar
         mode: 2000
