@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -30,14 +31,14 @@ class NameRule(AnsibleLintRule):
         if not name:
             return self.create_matcherror(
                 message="All tasks should be named.",
-                linenumber=task["__line__"],
+                linenumber=task[LINE_NUMBER_KEY],
                 tag="name[missing]",
                 filename=file,
             )
         if not name[0].isupper():
             return self.create_matcherror(
                 message="All names should start with an uppercase letter.",
-                linenumber=task["__line__"],
+                linenumber=task[LINE_NUMBER_KEY],
                 tag="name[casing]",
                 filename=file,
             )

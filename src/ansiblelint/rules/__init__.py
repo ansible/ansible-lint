@@ -105,6 +105,16 @@ class AnsibleLintRule(BaseRule):
             frame = frame.f_back  # get the parent frame for the next iteration
         return match
 
+    @staticmethod
+    def _enrich_matcherror_with_task_details(
+        match: MatchError, task: Dict[str, Any]
+    ) -> None:
+        match.task = task
+        if not match.details:
+            match.details = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
+        if match.linenumber < task[ansiblelint.utils.LINE_NUMBER_KEY]:
+            match.linenumber = task[ansiblelint.utils.LINE_NUMBER_KEY]
+
     def matchlines(self, file: "Lintable") -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.match:
@@ -167,14 +177,13 @@ class AnsibleLintRule(BaseRule):
                 message = None
                 if isinstance(result, str):
                     message = result
-                task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
                 match = self.create_matcherror(
                     message=message,
                     linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
-                    details=task_msg,
                     filename=file,
                 )
-                match.task = task
+
+            self._enrich_matcherror_with_task_details(match, task)
 
             matches.append(match)
         return matches
