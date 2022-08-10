@@ -25,10 +25,10 @@ DEFAULT_KINDS = [
     # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
     {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
     {"reno": "**/releasenotes/*/*.{yaml,yml}"},  # reno release notes
+    {"tasks": "**/tasks/**/*.{yaml,yml}"},
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
     {"role": "**/roles/*/"},
-    {"tasks": "**/tasks/**/*.{yaml,yml}"},
     {"handlers": "**/handlers/*.{yaml,yml}"},
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
     {"test-meta": "**/tests/integration/targets/*/meta/main.{yaml,yml}"},
