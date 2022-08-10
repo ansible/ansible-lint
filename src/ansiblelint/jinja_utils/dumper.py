@@ -1,4 +1,4 @@
-"""Jinja template/expression utils for transforms."""
+"""Jinja template/expression dumper utils for transforms."""
 
 from io import StringIO
 from typing import List, Optional, TextIO, Union, cast

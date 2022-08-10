@@ -1,4 +1,4 @@
-"""Jinja template/expression utils for transforms."""
+"""Jinja AST whitespace annotator."""
 
 from contextlib import contextmanager
 from dataclasses import dataclass
