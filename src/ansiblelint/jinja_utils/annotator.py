@@ -144,11 +144,11 @@ class WhitespaceAnnotator(NodeVisitor):
         start_marker_string: str  # {{, {%
         end_marker_string: str  # }}, %}
         if block:
-            start_marker_string = self.environment.variable_start_string
-            end_marker_string = self.environment.variable_end_string
-        else:
             start_marker_string = self.environment.block_start_string
             end_marker_string = self.environment.block_end_string
+        else:
+            start_marker_string = self.environment.variable_start_string
+            end_marker_string = self.environment.variable_end_string
 
         # child nodes count as part of this block
         ranges = self._whitespace_ranges = []
