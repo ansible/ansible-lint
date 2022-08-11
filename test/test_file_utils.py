@@ -139,6 +139,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
 @pytest.mark.parametrize(
     ("path", "kind"),
     (
+        ("tasks/run_test_playbook.yml", "tasks"),
         ("foo/playbook.yml", "playbook"),
         ("playbooks/foo.yml", "playbook"),
         ("playbooks/roles/foo.yml", "yaml"),
