@@ -40,6 +40,11 @@ class BaseRule:
     link: str = ""
     has_dynamic_tags: bool = False
     needs_raw_task: bool = False
+    # We use _order to sort rules and to ensure that some run before others,
+    # _order 0 for internal rules
+    # _order 1 for rules that check that data can be loaded
+    # _order 5 implicit for normal rules
+    _order: int = 5
 
     @property
     def shortdesc(self) -> str:
@@ -107,7 +112,7 @@ class BaseRule:
 
     def __lt__(self, other: "BaseRule") -> bool:
         """Enable us to sort rules by their id."""
-        return self.id < other.id
+        return (self._order, self.id) < (other._order, other.id)
 
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
@@ -130,6 +135,7 @@ class RuntimeErrorRule(BaseRule):
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v5.0.0"
+    _order = 0
 
 
 class AnsibleParserErrorRule(BaseRule):
@@ -140,6 +146,7 @@ class AnsibleParserErrorRule(BaseRule):
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v5.0.0"
+    _order = 0
 
 
 class LoadingFailureRule(BaseRule):
@@ -151,3 +158,4 @@ class LoadingFailureRule(BaseRule):
     tags = ["core", "unskippable"]
     version_added = "v4.3.0"
     help = LOAD_FAILURE_MD
+    _order = 0

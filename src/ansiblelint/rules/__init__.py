@@ -372,7 +372,11 @@ class RulesCollection:
 
     def __iter__(self) -> Iterator[BaseRule]:
         """Return the iterator over the rules in the RulesCollection."""
-        return iter(self.rules)
+        return iter(sorted(self.rules))
+
+    def alphabetical(self) -> Iterator[BaseRule]:
+        """Return an iterator over the rules in the RulesCollection in alphabetical order."""
+        return iter(sorted(self.rules, key=lambda x: x.id))
 
     def __len__(self) -> int:
         """Return the length of the RulesCollection data."""
