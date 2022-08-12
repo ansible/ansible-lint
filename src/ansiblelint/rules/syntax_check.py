@@ -45,6 +45,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     severity = "VERY_HIGH"
     tags = ["core", "unskippable"]
     version_added = "v5.0.0"
+    _order = 0
 
     @staticmethod
     # pylint: disable=too-many-locals

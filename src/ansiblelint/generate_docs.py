@@ -31,14 +31,14 @@ _logger = logging.getLogger(__name__)
 
 def rules_as_str(rules: RulesCollection) -> str:
     """Return rules as string."""
-    return str(rules)
+    return "\n".join([str(rule) for rule in rules.alphabetical()])
 
 
 def rules_as_md(rules: RulesCollection) -> str:
     """Return md documentation for a list of rules."""
     result = DOC_HEADER
 
-    for rule in rules:
+    for rule in rules.alphabetical():
 
         # because title == rule.id we get the desired labels for free
         # and we do not have to insert `(target_header)=`
@@ -64,7 +64,7 @@ def rules_as_md(rules: RulesCollection) -> str:
 def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
     """Print documentation for a list of rules, returns empty string."""
     width = max(16, *[len(rule.id) for rule in rules])
-    for rule in rules:
+    for rule in rules.alphabetical():
         table = Table(show_header=True, header_style="title", box=box.MINIMAL)
         table.add_column(rule.id, style="dim", width=width)
         table.add_column(Markdown(rule.shortdesc))

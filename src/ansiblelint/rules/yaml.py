@@ -26,6 +26,8 @@ class YamllintRule(AnsibleLintRule):
     config = load_yamllint_config()
     has_dynamic_tags = True
     link = "https://yamllint.readthedocs.io/en/stable/rules.html"
+    # ensure this rule runs before most of other common rules
+    _order = 1
 
     def __init__(self) -> None:
         """Construct a rule instance."""
