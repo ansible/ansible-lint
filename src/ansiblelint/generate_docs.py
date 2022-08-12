@@ -31,7 +31,7 @@ _logger = logging.getLogger(__name__)
 
 def rules_as_str(rules: RulesCollection) -> str:
     """Return rules as string."""
-    return '\n'.join([str(rule) for rule in rules.alphabetical()])
+    return "\n".join([str(rule) for rule in rules.alphabetical()])
 
 
 def rules_as_md(rules: RulesCollection) -> str:
