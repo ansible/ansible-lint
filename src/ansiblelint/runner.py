@@ -104,7 +104,7 @@ class Runner:
             for path in self.exclude_paths
         )
 
-    def run(self) -> List[MatchError]:
+    def run(self) -> List[MatchError]:  # noqa: C901
         """Execute the linting process."""
         files: List[Lintable] = []
         matches: List[MatchError] = []
@@ -114,6 +114,18 @@ class Runner:
             if self.is_excluded(str(lintable.path.resolve())):
                 _logger.debug("Excluded %s", lintable)
                 self.lintables.remove(lintable)
+            try:
+                lintable.data
+            except RuntimeError as exc:
+                matches.append(
+                    MatchError(
+                        filename=str(lintable.path),
+                        message=str(exc),
+                        details=str(exc.__cause__),
+                        rule=LoadingFailureRule(),
+                    )
+                )
+                lintable.stop_processing = True
 
         # -- phase 1 : syntax check in parallel --
         def worker(lintable: Lintable) -> List[MatchError]:
@@ -122,7 +134,7 @@ class Runner:
 
         # playbooks: List[Lintable] = []
         for lintable in self.lintables:
-            if lintable.kind != "playbook":
+            if lintable.kind != "playbook" or lintable.stop_processing:
                 continue
             files.append(lintable)
 
