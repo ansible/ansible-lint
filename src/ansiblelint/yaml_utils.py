@@ -38,7 +38,7 @@ import ansiblelint.skip_utils
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.utils import get_action_tasks, normalize_task, parse_yaml_linenumbers
+from ansiblelint.utils import get_action_tasks, normalize_task
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -121,7 +121,7 @@ def iter_tasks_in_file(
 
     :return: raw_task, normalized_task, skipped, error
     """
-    data = parse_yaml_linenumbers(lintable)
+    data = lintable.data
     if not data:
         return
     data = ansiblelint.skip_utils.append_skipped_rules(data, lintable)

@@ -21,7 +21,7 @@ formatting_after_fixtures_dir = fixtures_dir / "formatting-after"
 @pytest.fixture(name="empty_lintable")
 def fixture_empty_lintable() -> Lintable:
     """Return a Lintable with no contents."""
-    lintable = Lintable("__empty_file__")
+    lintable = Lintable("__empty_file__.yaml")
     lintable._content = ""  # pylint: disable=protected-access
     return lintable
 
