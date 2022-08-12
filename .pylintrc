@@ -17,6 +17,9 @@ disable =
     line-too-long,
     # TODO(ssbarnea): remove temporary skips adding during initial adoption:
     duplicate-code,
+    # unable to disable it inside tests
+    # https://github.com/PyCQA/pylint/issues/850
+    cyclic-import,
 
 [TYPECHECK]
 # pylint is unable to detect Namespace attributes and will throw a E1101

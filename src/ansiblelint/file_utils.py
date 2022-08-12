@@ -144,6 +144,7 @@ class Lintable:
         self.filename: str = str(name)
         self.dir: str = ""
         self.kind: Optional[FileType] = None
+        self._data: Any = None
 
         if isinstance(name, str):
             self.name = normpath(name)
@@ -277,6 +278,22 @@ class Lintable:
     def __repr__(self) -> str:
         """Return user friendly representation of a lintable."""
         return f"{self.name} ({self.kind})"
+
+    @property
+    def data(self) -> Any:
+        """Return loaded data representation for current file, if possible."""
+        if not self._data:
+            if str(self.base_kind) == "text/yaml":
+                from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
+                    parse_yaml_linenumbers,
+                )
+
+                self._data = parse_yaml_linenumbers(self)
+            else:
+                raise NotImplementedError(
+                    f"We do not know how to load data from {self.path} {self.kind}[{self.base_kind}]"
+                )
+        return self._data
 
 
 # pylint: disable=redefined-outer-name

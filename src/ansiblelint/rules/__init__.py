@@ -193,7 +193,7 @@ class AnsibleLintRule(BaseRule):
         if not self.matchplay or str(file.base_kind) != "text/yaml":
             return matches
 
-        yaml = ansiblelint.utils.parse_yaml_linenumbers(file)
+        yaml = file.data
         # yaml returned can be an AnsibleUnicode (a string) when the yaml
         # file contains a single string. YAML spec allows this but we consider
         # this an fatal error.
