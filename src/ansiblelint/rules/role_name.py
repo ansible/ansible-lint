@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
 
-ROLE_NAME_REGEX = r"^[a-z][a-z0-9_]+$"
+ROLE_NAME_REGEX = r"^[a-z][a-z0-9_]*$"
 
 
 def _remove_prefix(text: str, prefix: str) -> str:
@@ -41,7 +41,7 @@ def _remove_prefix(text: str, prefix: str) -> str:
 
 class RoleNames(AnsibleLintRule):
     # Unable to use f-strings due to flake8 bug with AST parsing
-    """Role name {0} does not match ``^[a-z][a-z0-9_]+$`` pattern."""
+    """Role name {0} does not match ``^[a-z][a-z0-9_]*$`` pattern."""
 
     id = "role-name"
     description = (
