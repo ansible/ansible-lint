@@ -709,12 +709,15 @@ def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
     ]
 
 
-@lru_cache(maxsize=128)
-def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
+@lru_cache(maxsize=None)
+def parse_yaml_linenumbers(  # noqa: max-complexity: 12
+    lintable: Lintable,
+) -> Union[AnsibleBaseYAMLObject, AnsibleBaseYAMLObject]:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
+    result = []
 
     def compose_node(parent: yaml.nodes.Node, index: int) -> yaml.nodes.Node:
         # the line number where the previous token has ended (plus empty lines)
@@ -745,12 +748,22 @@ def parse_yaml_linenumbers(lintable: Lintable) -> AnsibleBaseYAMLObject:
         loader = AnsibleLoader(lintable.content, **kwargs)
         loader.compose_node = compose_node
         loader.construct_mapping = construct_mapping
-        data = loader.get_single_data()
+        # while Ansible only accepts single documents, we also need to load
+        # multi-documents, as we attempt to load any YAML file, not only
+        # Ansible managed ones.
+        while True:
+            data = loader.get_data()
+            if data is None:
+                break
+            result.append(data)
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as exc:
-        logging.exception(exc)
-        # pylint: disable=raise-missing-from
-        raise SystemExit(f"Failed to parse YAML in {lintable.path}: {str(exc)}")
-    return data
+        raise RuntimeError("Failed to load YAML file") from exc
+
+    if len(result) == 0:
+        return None  # empty documents
+    if len(result) == 1:
+        return result[0]
+    return result
 
 
 def get_first_cmd_arg(task: Dict[str, Any]) -> Any:

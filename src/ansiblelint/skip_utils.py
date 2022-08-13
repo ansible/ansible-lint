@@ -88,7 +88,7 @@ def append_skipped_rules(
     return yaml_skip
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=None)
 def load_data(file_text: str) -> Any:
     """Parse ``file_text`` as yaml and return parsed structure.
 
