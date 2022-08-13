@@ -96,10 +96,16 @@ if "pytest" in sys.modules:
                 "yaml",
                 [],
             ),
+            (
+                "examples/yamllint/multi-document.yaml",
+                "yaml",
+                [],
+            ),
         ),
         ids=(
             "invalid",
             "valid",
+            "multi-document",
         ),
     )
     def test_yamllint(file: str, expected_kind: str, expected: List[str]) -> None:
