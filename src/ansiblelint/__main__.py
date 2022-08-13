@@ -235,7 +235,7 @@ def main(argv: Optional[List[str]] = None) -> int:  # noqa: C901
 
     _perform_mockings_cleanup()
     options.cache_dir_lock.release()
-    os.unlink(options.cache_dir_lock.lock_file)
+    pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
 
