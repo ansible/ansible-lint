@@ -22,7 +22,7 @@
 import logging
 from functools import lru_cache
 from itertools import product
-from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Sequence, Set
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
 
 _logger = logging.getLogger(__name__)
-
+_found_deprecated_tags: Set[str] = set()
 
 # playbook: Sequence currently expects only instances of one of the two
 # classes below but we should consider avoiding this chimera.
@@ -46,15 +46,18 @@ _logger = logging.getLogger(__name__)
 def get_rule_skips_from_line(line: str) -> List[str]:
     """Return list of rule ids skipped via comment on the line of yaml."""
     _before_noqa, _noqa_marker, noqa_text = line.partition("# noqa")
+
     result = []
     for v in noqa_text.lstrip(" :").split():
         if v in RENAMED_TAGS:
             tag = RENAMED_TAGS[v]
-            _logger.warning(
-                "Replaced outdated tag '%s' with '%s', replace it to avoid future regressions.",
-                v,
-                tag,
-            )
+            if v not in _found_deprecated_tags:
+                _logger.warning(
+                    "Replaced outdated tag '%s' with '%s', replace it to avoid future regressions",
+                    v,
+                    tag,
+                )
+                _found_deprecated_tags.add(v)
             v = tag
         result.append(v)
     return result
