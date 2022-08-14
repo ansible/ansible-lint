@@ -25,6 +25,11 @@ class Token:
     # .type: str
     # .value: Any  # declared as str, but this can be int, float, str, etc
 
+    # Many tokens come in a pair. This is the other token in this pair.
+    # For example: matching brackets in an expression
+    # or sthe start/close of vars, blocks, comments.
+    pair: Optional["Token"] = None
+
 
 def normalize_newlines(source: str) -> str:
     """normalize newlines in template source like lexer.tokeniter does."""
@@ -43,6 +48,7 @@ def something(
     state: Optional[str] = None,
 ):
     normalized_source = normalize_newlines(source)
+    paired_tokens: List[Token] = []
     previous_token: Optional[Token] = None
 
     for index, token_tuple in enumerate(lexer.tokeniter(source, name, filename, state)):
@@ -62,4 +68,38 @@ def something(
         token = previous_token = Token(
             index, start_pos, end_pos, lineno, token, value_str, jinja_token
         )
+
+        is_pair_opener = is_pair_closer = False
+        # see if this token should have a pair
+        if token == TOKEN_OPERATOR:
+            if value_str in ("{", "(", "["):
+                is_pair_opener = True
+            elif value_str in ("}", ")", "]"):
+                is_pair_closer = True
+        elif token in (
+            TOKEN_BLOCK_BEGIN,
+            TOKEN_VARIABLE_BEGIN,
+            TOKEN_RAW_BEGIN,
+            TOKEN_COMMENT_BEGIN,
+            TOKEN_LINESTATEMENT_BEGIN,
+            TOKEN_LINECOMMENT_BEGIN,
+        ):
+            is_pair_opener = True
+        elif token in (
+            TOKEN_BLOCK_END,
+            TOKEN_VARIABLE_END,
+            TOKEN_RAW_END,
+            TOKEN_COMMENT_END,
+            TOKEN_LINESTATEMENT_END,
+            TOKEN_LINECOMMENT_END,
+        ):
+            is_pair_closer = True
+
+        if is_pair_opener:
+            paired_tokens.append(token)
+        elif is_pair_closer:
+            open_token = paired_tokens.pop()
+            open_token.pair = token
+            token.pair = open_token
+
         yield token
