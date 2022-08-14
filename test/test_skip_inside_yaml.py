@@ -1,7 +1,7 @@
 """Tests related to use of inline noqa."""
 import pytest
 
-from ansiblelint.testing import RunFromText
+from ansiblelint.testing import RunFromText, run_ansible_lint
 
 ROLE_TASKS = """\
 ---
@@ -74,16 +74,6 @@ PLAYBOOK = """\
         - skip_ansible_lint
 """
 
-ROLE_META = """\
----
-galaxy_info:  # noqa meta-no-info
-  author: your name  # noqa meta-incorrect
-  description: missing min_ansible_version and platforms. author default not changed
-  license: MIT
-  min_ansible_version: "2.10"
-  platforms: []
-"""
-
 ROLE_TASKS_WITH_BLOCK_BECOME = """\
 ---
 - hosts: localhost
@@ -129,7 +119,10 @@ def test_playbook(
     assert len(results) == results_num
 
 
-def test_role_meta(default_text_runner: RunFromText) -> None:
-    """Check that role meta can contain skips."""
-    results = default_text_runner.run_role_meta_main(ROLE_META)
-    assert len(results) == 0
+def test_role_meta() -> None:
+    """Test running from inside meta folder."""
+    role_path = "examples/roles/meta_noqa"
+
+    result = run_ansible_lint("-v", role_path)
+    assert len(result.stdout) == 0
+    assert result.returncode == 0

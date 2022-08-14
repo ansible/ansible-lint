@@ -421,6 +421,8 @@ class RulesCollection:
                 ]
 
         for rule in self.rules:
+            if rule.id == "syntax-check":
+                continue
             if (
                 not tags
                 or rule.has_dynamic_tags
