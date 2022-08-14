@@ -395,7 +395,7 @@ class RulesCollection:
         """Combine rules."""
         self.rules.extend(more)
 
-    def run(
+    def run(  # noqa: max-complexity: 12
         self,
         file: Lintable,
         tags: Optional[Set[str]] = None,

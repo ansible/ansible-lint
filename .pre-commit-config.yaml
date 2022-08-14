@@ -40,7 +40,7 @@ repos:
           - prettier
           - prettier-plugin-toml
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.5.0
+    rev: v6.6.0
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -116,7 +116,7 @@ repos:
       - id: black
         language_version: python3
   - repo: https://github.com/pycqa/flake8.git
-    rev: 5.0.2
+    rev: 5.0.4
     hooks:
       - id: flake8
         language_version: python3

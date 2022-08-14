@@ -117,9 +117,8 @@ def iter_tasks_in_file(
         normalized due to an AnsibleParserError.
 
     :param lintable: The playbook or tasks/handlers yaml file to get tasks from
-    :param rule_id: The current rule id to allow calculating skipped.
 
-    :return: raw_task, normalized_task, skipped, error
+    Yields raw_task, normalized_task, skipped, error
     """
     data = lintable.data
     if not data:
