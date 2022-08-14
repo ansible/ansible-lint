@@ -1,4 +1,6 @@
 """Optional rule for avoiding keeping owner/group when transferring files."""
+from __future__ import annotations
+
 import re
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
@@ -31,7 +33,7 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
     tags = ["opt-in"]
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         """Return matches for a task."""
         action = task.get("action")

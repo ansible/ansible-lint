@@ -18,6 +18,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import annotations
+
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
@@ -111,7 +113,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
     version_added = "historic"
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         # Use unjinja so that we don't match on jinja filters
         # rather than pipes

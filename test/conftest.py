@@ -1,4 +1,6 @@
 """PyTest fixtures for testing the project."""
+from __future__ import annotations
+
 import os
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Iterator
@@ -24,7 +26,7 @@ def cwd(path: str) -> Iterator[None]:
         os.chdir(old_pwd)
 
 
-def pytest_addoption(parser: "Parser") -> None:
+def pytest_addoption(parser: Parser) -> None:
     """Add --regenerate-formatting-fixtures option to pytest."""
     parser.addoption(
         "--regenerate-formatting-fixtures",
@@ -34,7 +36,7 @@ def pytest_addoption(parser: "Parser") -> None:
     )
 
 
-def pytest_collection_modifyitems(items: "List[nodes.Item]", config: "Config") -> None:
+def pytest_collection_modifyitems(items: List[nodes.Item], config: Config) -> None:
     """Skip tests based on --regenerate-formatting-fixtures option."""
     do_regenerate = config.getoption("--regenerate-formatting-fixtures")
     skip_other = pytest.mark.skip(

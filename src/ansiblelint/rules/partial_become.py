@@ -18,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import annotations
 
 import sys
 from functools import reduce
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
-def _get_subtasks(data: "odict[str, Any]") -> List[Any]:
+def _get_subtasks(data: odict[str, Any]) -> List[Any]:
     result: List[Any] = []
     block_names = [
         "tasks",
@@ -49,7 +50,7 @@ def _get_subtasks(data: "odict[str, Any]") -> List[Any]:
     return result
 
 
-def _nested_search(term: str, data: "odict[str, Any]") -> Any:
+def _nested_search(term: str, data: odict[str, Any]) -> Any:
     if data and term in data:
         return True
     return reduce(
@@ -57,7 +58,7 @@ def _nested_search(term: str, data: "odict[str, Any]") -> Any:
     )
 
 
-def _become_user_without_become(becomeuserabove: bool, data: "odict[str, Any]") -> Any:
+def _become_user_without_become(becomeuserabove: bool, data: odict[str, Any]) -> Any:
     if "become" in data:
         # If become is in lineage of tree then correct
         return False
@@ -96,9 +97,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     tags = ["unpredictability"]
     version_added = "historic"
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
         if file.kind == "playbook":
             result = _become_user_without_become(False, data)
             if result:

@@ -1,4 +1,6 @@
 """Implementation of no-jinja-when rule."""
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 from ansiblelint.rules import AnsibleLintRule
@@ -29,10 +31,8 @@ class NoFormattingInWhenRule(AnsibleLintRule):
             return True
         return when.find("{{") == -1 and when.find("}}") == -1
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
-        errors: List["MatchError"] = []
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
+        errors: List[MatchError] = []
         if isinstance(data, dict):
             if "roles" not in data or data["roles"] is None:
                 return errors
@@ -53,6 +53,6 @@ class NoFormattingInWhenRule(AnsibleLintRule):
         return errors
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         return "when" in task and not self._is_valid(task["when"])

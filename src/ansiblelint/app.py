@@ -1,4 +1,6 @@
 """Application."""
+from __future__ import annotations
+
 import logging
 import os
 from dataclasses import dataclass
@@ -44,7 +46,7 @@ class SummarizedResults:
 class App:
     """App class represents an execution of the linter."""
 
-    def __init__(self, options: "Namespace"):
+    def __init__(self, options: Namespace):
         """Construct app run based on already loaded configuration."""
         options.skip_list = _sanitize_list_options(options.skip_list)
         options.warn_list = _sanitize_list_options(options.warn_list)
@@ -122,7 +124,7 @@ class App:
         return SummarizedResults(failures, warnings, fixed_failures, fixed_warnings)
 
     @staticmethod
-    def count_lintables(files: "Set[Lintable]") -> Tuple[int, int]:
+    def count_lintables(files: Set[Lintable]) -> Tuple[int, int]:
         """Count total and modified files."""
         files_count = len(files)
         changed_files_count = len([file for file in files if file.updated])
@@ -131,7 +133,7 @@ class App:
     @staticmethod
     def _get_matched_skippable_rules(
         matches: List[MatchError],
-    ) -> "Dict[str, BaseRule]":
+    ) -> Dict[str, BaseRule]:
         """Extract the list of matched rules, if skippable, from the list of matches."""
         matches_unignored = [match for match in matches if not match.ignored]
         # match.tag is more specialized than match.rule.id
@@ -144,9 +146,7 @@ class App:
                 matched_rules.pop(rule_id)
         return matched_rules
 
-    def report_outcome(
-        self, result: "LintResult", mark_as_success: bool = False
-    ) -> int:
+    def report_outcome(self, result: LintResult, mark_as_success: bool = False) -> int:
         """Display information about how to skip found rules.
 
         Returns exit code, 2 if errors were found, 0 when only warnings were found.
@@ -224,7 +224,7 @@ warn_list:  # or 'skip_list' to silence them completely
 
 
 def choose_formatter_factory(
-    options_list: "Namespace",
+    options_list: Namespace,
 ) -> Type[formatters.BaseFormatter[Any]]:
     """Select an output formatter based on the incoming command line arguments."""
     r: Type[formatters.BaseFormatter[Any]] = formatters.Formatter

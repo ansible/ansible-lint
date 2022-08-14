@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import annotations
 
 import re
 from pathlib import Path
@@ -58,11 +59,11 @@ class RoleNames(AnsibleLintRule):
         """Save precompiled regex."""
         self._re = re.compile(ROLE_NAME_REGEX)
 
-    def matchdir(self, lintable: "Lintable") -> List["MatchError"]:
+    def matchdir(self, lintable: Lintable) -> List[MatchError]:
         return self.matchyaml(lintable)
 
-    def matchyaml(self, file: Lintable) -> List["MatchError"]:
-        result: List["MatchError"] = []
+    def matchyaml(self, file: Lintable) -> List[MatchError]:
+        result: List[MatchError] = []
 
         if file.kind not in ("meta", "role"):
             return result

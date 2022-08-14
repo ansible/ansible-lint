@@ -1,6 +1,7 @@
 """Implementation for deprecated-local-action rule."""
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
+from __future__ import annotations
 
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
@@ -24,7 +25,7 @@ class TaskNoLocalAction(AnsibleLintRule):
     version_added = "v4.0.0"
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         """Return matches for a task."""
         raw_task = task["__raw_task__"]

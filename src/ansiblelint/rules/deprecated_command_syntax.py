@@ -19,6 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from __future__ import annotations
+
 import os
 from typing import TYPE_CHECKING, Any, Dict, Union
 
@@ -55,7 +57,7 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     }
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         if task["action"]["__ansible_module__"] in self._commands:
             first_cmd_arg = get_first_cmd_arg(task)

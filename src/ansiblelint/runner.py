@@ -1,4 +1,6 @@
 """Runner implementation."""
+from __future__ import annotations
+
 import logging
 import multiprocessing
 import multiprocessing.pool
@@ -38,12 +40,12 @@ class Runner:
     def __init__(
         self,
         *lintables: Union[Lintable, str],
-        rules: "RulesCollection",
+        rules: RulesCollection,
         tags: FrozenSet[Any] = frozenset(),
         skip_list: Optional[List[str]] = None,
         exclude_paths: Optional[List[str]] = None,
         verbosity: int = 0,
-        checked_files: Optional[Set[Lintable]] = None
+        checked_files: Optional[Set[Lintable]] = None,
     ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
@@ -201,7 +203,7 @@ class Runner:
                 visited.add(lintable)
 
 
-def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
+def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
 
     lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
@@ -214,7 +216,7 @@ def _get_matches(rules: "RulesCollection", options: "Namespace") -> LintResult:
         skip_list=options.skip_list,
         exclude_paths=options.exclude_paths,
         verbosity=options.verbosity,
-        checked_files=checked_files
+        checked_files=checked_files,
     )
     matches.extend(runner.run())
 

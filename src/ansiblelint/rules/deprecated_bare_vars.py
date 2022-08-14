@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from __future__ import annotations
+
 import os
 import re
 from typing import TYPE_CHECKING, Any, Dict, Union
@@ -49,7 +51,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     _glob = re.compile("[][*?]")
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         loop_type = next((key for key in task if key.startswith("with_")), None)
         if loop_type:

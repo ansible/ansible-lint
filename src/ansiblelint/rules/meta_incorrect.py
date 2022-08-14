@@ -1,5 +1,6 @@
 """Implementation of meta-incorrect rule."""
 # Copyright (c) 2018, Ansible Project
+from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
@@ -31,9 +32,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     tags = ["metadata"]
     version_added = "v4.0.0"
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
         if file.kind != "meta":
             return []
 

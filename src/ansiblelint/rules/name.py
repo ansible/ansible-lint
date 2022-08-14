@@ -1,4 +1,6 @@
 """Implementation of NameRule."""
+from __future__ import annotations
+
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
@@ -25,7 +27,7 @@ class NameRule(AnsibleLintRule):
     version_added = "historic"
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str, MatchError]:
         name = task.get("name")
         if not name:

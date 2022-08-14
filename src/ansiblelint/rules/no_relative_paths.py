@@ -2,6 +2,8 @@
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ansiblelint.rules import AnsibleLintRule
@@ -31,7 +33,7 @@ class RoleRelativePath(AnsibleLintRule):
     }
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         module = task["action"]["__ansible_module__"]
         if module not in self._module_to_path_folder:

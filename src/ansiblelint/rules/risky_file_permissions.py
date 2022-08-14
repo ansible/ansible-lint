@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """MissingFilePermissionsRule used with ansible-lint."""
+from __future__ import annotations
+
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Set, Union
 
@@ -86,7 +88,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
 
     # pylint: disable=too-many-return-statements
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         module = task["action"]["__ansible_module__"]
         mode = task["action"].get("mode", None)
