@@ -34,7 +34,11 @@ def test_eco(repo: str) -> None:
     if os.path.exists(f"{cache_dir}/{repo}/.git"):
         subprocess.run("git pull", cwd=f"{cache_dir}/{repo}", shell=True, check=True)
     else:
-        subprocess.run(f"git clone {url} {cache_dir}/{repo}", shell=True, check=True)
+        subprocess.run(
+            f"git clone --recurse-submodules {url} {cache_dir}/{repo}",
+            shell=True,
+            check=True,
+        )
     # run ansible lint and paths from user home in order to produce
     # consistent results regardless on its location.
 
