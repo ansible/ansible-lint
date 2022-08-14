@@ -108,7 +108,7 @@ def test_runner_unicode_format(
     """Check that all formatters are unicode-friendly."""
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
     runner = Runner(
-        Lintable("examples/playbooks/unicode.yml", "playbook"),
+        Lintable("examples/playbooks/unicode.yml", kind="playbook"),
         rules=default_rules_collection,
     )
 
