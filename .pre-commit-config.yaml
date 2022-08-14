@@ -13,6 +13,10 @@ ci:
     - pip-compile-upgrade
 default_language_version:
   python: python3.9
+exclude: >
+  (?x)^(
+    examples/broken/yaml-with-tabs/invalid-due-tabs.yaml
+  )$
 repos:
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint

@@ -144,6 +144,7 @@ class Lintable:
         self.filename: str = str(name)
         self.dir: str = ""
         self.kind: Optional[FileType] = None
+        self.stop_processing = False  # Set to stop other rules from running
         self._data: Any = None
 
         if isinstance(name, str):
@@ -289,10 +290,7 @@ class Lintable:
                 )
 
                 self._data = parse_yaml_linenumbers(self)
-            else:
-                raise NotImplementedError(
-                    f"We do not know how to load data from {self.path} {self.kind}[{self.base_kind}]"
-                )
+            # will remain None if we do not know how to load that file-type
         return self._data
 
 
