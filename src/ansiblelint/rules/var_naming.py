@@ -1,4 +1,6 @@
 """Implementation of var-naming rule."""
+from __future__ import annotations
+
 import keyword
 import re
 import sys
@@ -98,12 +100,10 @@ class VariableNamingRule(AnsibleLintRule):
         # safety measure.
         return not bool(self.re_pattern.match(ident))
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
         """Return matches found for a specific playbook."""
-        results: List["MatchError"] = []
-        raw_results: List["MatchError"] = []
+        results: List[MatchError] = []
+        raw_results: List[MatchError] = []
 
         # If the Play uses the 'vars' section to set variables
         our_vars = data.get("vars", {})
@@ -155,10 +155,10 @@ class VariableNamingRule(AnsibleLintRule):
 
         return False
 
-    def matchyaml(self, file: Lintable) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> List[MatchError]:
         """Return matches for variables defined in vars files."""
-        results: List["MatchError"] = []
-        raw_results: List["MatchError"] = []
+        results: List[MatchError] = []
+        raw_results: List[MatchError] = []
         meta_data: Dict[AnsibleUnicode, Any] = {}
 
         if str(file.kind) == "vars":

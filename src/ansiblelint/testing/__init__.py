@@ -1,4 +1,5 @@
 """Test utils for ansible-lint."""
+from __future__ import annotations
 
 import os
 import shutil
@@ -33,11 +34,11 @@ class RunFromText:
         """Initialize a RunFromText instance with rules collection."""
         self.collection = collection
 
-    def _call_runner(self, path: str) -> List["MatchError"]:
+    def _call_runner(self, path: str) -> List[MatchError]:
         runner = Runner(path, rules=self.collection)
         return runner.run()
 
-    def run_playbook(self, playbook_text: str) -> List["MatchError"]:
+    def run_playbook(self, playbook_text: str) -> List[MatchError]:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yml", prefix="playbook"
@@ -47,7 +48,7 @@ class RunFromText:
             results = self._call_runner(fh.name)
         return results
 
-    def run_role_tasks_main(self, tasks_main_text: str) -> List["MatchError"]:
+    def run_role_tasks_main(self, tasks_main_text: str) -> List[MatchError]:
         """Lints received text as tasks."""
         role_path = tempfile.mkdtemp(prefix="role_")
         tasks_path = os.path.join(role_path, "tasks")
@@ -58,7 +59,7 @@ class RunFromText:
         shutil.rmtree(role_path)
         return results
 
-    def run_role_meta_main(self, meta_main_text: str) -> List["MatchError"]:
+    def run_role_meta_main(self, meta_main_text: str) -> List[MatchError]:
         """Lints received text as meta."""
         role_path = tempfile.mkdtemp(prefix="role_")
         meta_path = os.path.join(role_path, "meta")
@@ -69,7 +70,7 @@ class RunFromText:
         shutil.rmtree(role_path)
         return results
 
-    def run_role_defaults_main(self, defaults_main_text: str) -> List["MatchError"]:
+    def run_role_defaults_main(self, defaults_main_text: str) -> List[MatchError]:
         """Lints received text as vars file in defaults."""
         role_path = tempfile.mkdtemp(prefix="role_")
         defaults_path = os.path.join(role_path, "defaults")
@@ -85,7 +86,7 @@ def run_ansible_lint(
     *argv: str,
     cwd: Optional[str] = None,
     executable: Optional[str] = None,
-    env: Optional[Dict[str, str]] = None
+    env: Optional[Dict[str, str]] = None,
 ) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
     if not executable:

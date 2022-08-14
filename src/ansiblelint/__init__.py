@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """Main ansible-lint package."""
+from __future__ import annotations
+
 from ansiblelint.version import __version__
 
 __all__ = ("__version__",)

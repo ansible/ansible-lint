@@ -1,4 +1,6 @@
 """Validate ansiblelint.skip_utils."""
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict
 
@@ -174,8 +176,8 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
 )
 def test_append_skipped_rules(
     lintable: Lintable,
-    yaml: "AnsibleBaseYAMLObject",
-    expected_form: "AnsibleBaseYAMLObject",
+    yaml: AnsibleBaseYAMLObject,
+    expected_form: AnsibleBaseYAMLObject,
 ) -> None:
     """Check that it appends skipped_rules properly."""
     assert append_skipped_rules(yaml, lintable) == expected_form

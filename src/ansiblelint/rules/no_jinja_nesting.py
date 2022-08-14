@@ -22,6 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from __future__ import annotations
+
 import re
 from typing import TYPE_CHECKING, Any, Dict, Union
 
@@ -50,7 +52,7 @@ class NestedJinjaRule(AnsibleLintRule):
     pattern = re.compile(r"{{(?:[^{}]*)?[^'\"]{{")
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         command = "".join(
             str(value)

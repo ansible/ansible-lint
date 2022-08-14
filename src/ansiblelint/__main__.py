@@ -20,6 +20,8 @@
 # THE SOFTWARE.
 """Command line implementation."""
 
+from __future__ import annotations
+
 import errno
 import logging
 import os
@@ -111,7 +113,7 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     options.cache_dir_lock.acquire()
 
 
-def _do_list(rules: "RulesCollection") -> int:
+def _do_list(rules: RulesCollection) -> int:
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
     from ansiblelint.generate_docs import rules_as_md, rules_as_rich, rules_as_str
@@ -136,7 +138,7 @@ def _do_list(rules: "RulesCollection") -> int:
 
 
 # noinspection PyShadowingNames
-def _do_transform(result: "LintResult", opts: "Namespace") -> None:
+def _do_transform(result: LintResult, opts: Namespace) -> None:
     """Create and run Transformer."""
     if "yaml" in opts.skip_list:
         # The transformer rewrites yaml files, but the user requested to skip

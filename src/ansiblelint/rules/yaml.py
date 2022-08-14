@@ -1,4 +1,6 @@
 """Implementation of yaml linting rule (yamllint integration)."""
+from __future__ import annotations
+
 import logging
 import sys
 from typing import TYPE_CHECKING, List
@@ -34,10 +36,10 @@ class YamllintRule(AnsibleLintRule):
         # customize id by adding the one reported by yamllint
         self.id = self.__class__.id
 
-    def matchyaml(self, file: Lintable) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> List[MatchError]:
         """Return matches found for a specific YAML text."""
-        matches: List["MatchError"] = []
-        filtered_matches: List["MatchError"] = []
+        matches: List[MatchError] = []
+        filtered_matches: List[MatchError] = []
         if str(file.base_kind) != "text/yaml":
             return matches
 

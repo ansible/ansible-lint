@@ -115,7 +115,7 @@ class AnsibleLintRule(BaseRule):
         if match.linenumber < task[ansiblelint.utils.LINE_NUMBER_KEY]:
             match.linenumber = task[ansiblelint.utils.LINE_NUMBER_KEY]
 
-    def matchlines(self, file: "Lintable") -> List[MatchError]:
+    def matchlines(self, file: Lintable) -> List[MatchError]:
         matches: List[MatchError] = []
         if not self.match:
             return matches

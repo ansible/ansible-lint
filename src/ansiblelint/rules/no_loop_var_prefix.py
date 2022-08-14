@@ -1,4 +1,6 @@
 """Optional Ansible-lint rule to enforce use of prefix on role loop vars."""
+from __future__ import annotations
+
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
@@ -29,7 +31,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     severity = "MEDIUM"
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         """Return matches for a task."""
         if not file or not file.role or not options.loop_var_prefix:

@@ -1,4 +1,6 @@
 """Output formatters."""
+from __future__ import annotations
+
 import hashlib
 import json
 import os
@@ -41,7 +43,7 @@ class BaseFormatter(Generic[T]):
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self._base_dir)
 
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: MatchError) -> str:
         """Format a match error."""
         return str(match)
 
@@ -54,7 +56,7 @@ class BaseFormatter(Generic[T]):
 class Formatter(BaseFormatter):  # type: ignore
     """Default output formatter of ansible-lint."""
 
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: MatchError) -> str:
         _id = getattr(match.rule, "id", "000")
         result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
         if match.tag:
@@ -72,7 +74,7 @@ class Formatter(BaseFormatter):  # type: ignore
 class QuietFormatter(BaseFormatter[Any]):
     """Brief output formatter for ansible-lint."""
 
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: MatchError) -> str:
         return (
             f"[error_code]{match.rule.id}[/] "
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
@@ -82,7 +84,7 @@ class QuietFormatter(BaseFormatter[Any]):
 class ParseableFormatter(BaseFormatter[Any]):
     """Parseable uses PEP8 compatible format."""
 
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: MatchError) -> str:
         result = (
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}: "
             f"[error_code]{match.rule.id}[/]"
@@ -111,7 +113,7 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
     Supported levels: debug, warning, error
     """
 
-    def format(self, match: "MatchError") -> str:
+    def format(self, match: MatchError) -> str:
         """Prepare a match instance for reporting as a GitHub Actions annotation."""
         level = self._severity_to_level(match.rule.severity)
         file_path = self._format_path(match.filename or "")
@@ -146,7 +148,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
     https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#user-content-data-types
     """
 
-    def format_result(self, matches: List["MatchError"]) -> str:
+    def format_result(self, matches: List[MatchError]) -> str:
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             raise RuntimeError(
@@ -211,7 +213,7 @@ class SarifFormatter(BaseFormatter[Any]):
         "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
     )
 
-    def format_result(self, matches: List["MatchError"]) -> str:
+    def format_result(self, matches: List[MatchError]) -> str:
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             raise RuntimeError(
@@ -253,7 +255,7 @@ class SarifFormatter(BaseFormatter[Any]):
         )
 
     def _extract_results(
-        self, matches: List["MatchError"]
+        self, matches: List[MatchError]
     ) -> Tuple[List[Any], List[Any]]:
         rules = {}
         results = []
@@ -263,7 +265,7 @@ class SarifFormatter(BaseFormatter[Any]):
             results.append(self._to_sarif_result(match))
         return list(rules.values()), results
 
-    def _to_sarif_rule(self, match: "MatchError") -> Dict[str, Any]:
+    def _to_sarif_rule(self, match: MatchError) -> Dict[str, Any]:
         rule: Dict[str, Any] = {
             "id": match.rule.id,
             "name": match.rule.id,
@@ -283,7 +285,7 @@ class SarifFormatter(BaseFormatter[Any]):
             rule["helpUri"] = match.rule.link
         return rule
 
-    def _to_sarif_result(self, match: "MatchError") -> Dict[str, Any]:
+    def _to_sarif_result(self, match: MatchError) -> Dict[str, Any]:
         result: Dict[str, Any] = {
             "ruleId": match.rule.id,
             "message": {

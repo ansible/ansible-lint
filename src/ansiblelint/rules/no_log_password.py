@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """NoLogPasswordsRule used with ansible-lint."""
+from __future__ import annotations
+
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
@@ -38,7 +40,7 @@ class NoLogPasswordsRule(AnsibleLintRule):
     version_added = "v5.0.9"
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
 
         if task["action"]["__ansible_module__"] == "user" and (

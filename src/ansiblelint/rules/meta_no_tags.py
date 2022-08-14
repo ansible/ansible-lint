@@ -1,12 +1,14 @@
 """Implementation of meta-no-tags rule."""
-
-# Copyright (c) 2018, Ansible Project
+from __future__ import annotations
 
 import re
 import sys
 from typing import TYPE_CHECKING, List
 
 from ansiblelint.rules import AnsibleLintRule
+
+# Copyright (c) 2018, Ansible Project
+
 
 if TYPE_CHECKING:
     from typing import Any
@@ -30,9 +32,7 @@ class MetaTagValidRule(AnsibleLintRule):
 
     TAG_REGEXP = re.compile("^[a-z0-9]+$")
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
         if file.kind != "meta":
             return []
 
@@ -101,7 +101,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
     )
-    def test_valid_tag_rule(rule_runner: "Any") -> None:
+    def test_valid_tag_rule(rule_runner: Any) -> None:
         """Test rule matches."""
         results = rule_runner.run_role_meta_main(META_TAG_VALID)
         assert "Use 'galaxy_tags' rather than 'categories'" in str(results)

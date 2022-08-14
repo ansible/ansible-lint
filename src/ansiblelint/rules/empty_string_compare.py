@@ -2,6 +2,8 @@
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 
+from __future__ import annotations
+
 import re
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
@@ -30,7 +32,7 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
     empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         for k, v, _ in nested_items_path(task):
             if k == "when":

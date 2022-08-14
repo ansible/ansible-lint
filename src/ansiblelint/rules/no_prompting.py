@@ -1,4 +1,6 @@
 """Implementation of no-prompting rule."""
+from __future__ import annotations
+
 import sys
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
@@ -25,9 +27,7 @@ class NoPromptingRule(AnsibleLintRule):
     severity = "VERY_LOW"
     version_added = "v6.0.3"
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
         """Return matches found for a specific playbook."""
         # If the Play uses the 'vars_prompt' section to set variables
 
@@ -47,7 +47,7 @@ class NoPromptingRule(AnsibleLintRule):
         ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         """Return matches for ansible.builtin.pause tasks."""
         # We do not want to trigger this rule if pause has either seconds or

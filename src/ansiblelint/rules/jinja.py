@@ -1,6 +1,7 @@
 """Rule for checking content of jinja template strings."""
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
+from __future__ import annotations
 
 import re
 import sys
@@ -39,7 +40,7 @@ class JinjaRule(AnsibleLintRule):
 
     def matchtask(
         self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str, "MatchError"]:
+    ) -> Union[bool, str, MatchError]:
         for _, v, _ in nested_items_path(task):
             if isinstance(v, str):
                 cleaned = self.exclude_json_re.sub("", v)
@@ -56,11 +57,11 @@ class JinjaRule(AnsibleLintRule):
                     )
         return False
 
-    def matchyaml(self, file: Lintable) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> List[MatchError]:
         """Return matches for variables defined in vars files."""
         data: Dict[str, Any] = {}
-        raw_results: List["MatchError"] = []
-        results: List["MatchError"] = []
+        raw_results: List[MatchError] = []
+        results: List[MatchError] = []
 
         if str(file.kind) == "vars":
             data = parse_yaml_from_file(str(file.path))
@@ -158,7 +159,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.fixture(name="lint_error_results_varsfile")
     def fixture_lint_error_results_varsfile(
         test_varsfile_path: str,
-    ) -> List["MatchError"]:
+    ) -> List[MatchError]:
         """Get VarHasSpacesRules linting results on test_vars."""
         collection = RulesCollection()
         collection.register(JinjaRule())
@@ -169,7 +170,7 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_var_spacing_vars(
         error_expected_details_varsfile: List[str],
         error_expected_lines_varsfile: List[int],
-        lint_error_results_varsfile: List["MatchError"],
+        lint_error_results_varsfile: List[MatchError],
     ) -> None:
         """Ensure that expected error details are matching found linting error details."""
         details = list(map(lambda item: item.details, lint_error_results_varsfile))

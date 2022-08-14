@@ -1,6 +1,8 @@
 """Implementation of no-tabs rule."""
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
+from __future__ import annotations
+
 import sys
 from typing import TYPE_CHECKING, Any, Dict, Union
 
@@ -29,7 +31,7 @@ class NoTabsRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
+        self, task: Dict[str, Any], file: Optional[Lintable] = None
     ) -> Union[bool, str]:
         for k, v, parent_path in nested_items_path(task):
             if isinstance(k, str) and "\t" in k:
