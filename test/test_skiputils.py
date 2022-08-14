@@ -19,7 +19,8 @@ if TYPE_CHECKING:
 
 PLAYBOOK_WITH_NOQA = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   vars:
     SOME_VAR_NOQA: "Foo"  # noqa var-naming
     SOME_VAR: "Bar"
