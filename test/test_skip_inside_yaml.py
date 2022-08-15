@@ -1,4 +1,6 @@
 """Tests related to use of inline noqa."""
+import pytest
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.testing import RunFromText, run_ansible_lint
@@ -51,13 +53,17 @@ def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:
     assert len(results) == 4
 
 
-def test_skip_playbook(default_rules_collection: RulesCollection) -> None:
+@pytest.mark.parametrize(
+    ("lintable", "expected"),
+    (pytest.param("examples/playbooks/test_skip_inside_yaml.yml", 6, id="yaml"),),
+)
+def test_inline_skips(
+    default_rules_collection: RulesCollection, lintable: str, expected: int
+) -> None:
     """Check that playbooks can contain skips."""
-    results = Runner(
-        "examples/playbooks/test_skip_inside_yaml.yml", rules=default_rules_collection
-    ).run()
+    results = Runner(lintable, rules=default_rules_collection).run()
 
-    assert len(results) == 8
+    assert len(results) == expected
 
 
 def test_role_meta() -> None:
