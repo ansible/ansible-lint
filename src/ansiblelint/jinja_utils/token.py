@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Iterator, Literal, Optional
 
 from dataclasses import dataclass
 from jinja2.lexer import newline_re, Lexer, Token as JinjaToken
@@ -33,7 +33,7 @@ class Token:
     pair: Optional["Token"] = None
 
     # chomp indicator (only used for start/end pairs) aka strip_sign
-    chomp: Literal['+', '-', ''] = ""
+    chomp: Literal["+", "-", ""] = ""
 
 
 def pre_iter_normalize_newlines(source: str, keep_trailing_newline: bool) -> str:
@@ -46,13 +46,13 @@ def pre_iter_normalize_newlines(source: str, keep_trailing_newline: bool) -> str
     return "\n".join(lines)
 
 
-def itertoken(
+def tokeniter(
     lexer: Lexer,
     source: str,
     name: Optional[str] = None,
     filename: Optional[str] = None,
     state: Optional[str] = None,
-):
+) -> Iterator[Token]:
     normalized_source = pre_iter_normalize_newlines(source, lexer.keep_trailing_newline)
     paired_tokens: List[Token] = []
 
