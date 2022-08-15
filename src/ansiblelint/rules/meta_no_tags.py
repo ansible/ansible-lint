@@ -32,11 +32,12 @@ class MetaTagValidRule(AnsibleLintRule):
 
     TAG_REGEXP = re.compile("^[a-z0-9]+$")
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> List[MatchError]:
+        """Find violations inside meta files."""
         if file.kind != "meta":
             return []
 
-        galaxy_info = data.get("galaxy_info", None)
+        galaxy_info = file.data.get("galaxy_info", None)
         if not galaxy_info:
             return []
 
