@@ -207,8 +207,6 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, dict):
             yaml = [yaml]
 
-        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, file)
-
         for play in yaml:
 
             # Bug #849

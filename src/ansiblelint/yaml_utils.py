@@ -34,7 +34,6 @@ from ruamel.yaml.scalarint import ScalarInt
 from ruamel.yaml.tokens import CommentToken
 from yamllint.config import YamlLintConfig
 
-import ansiblelint.skip_utils
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
@@ -123,7 +122,6 @@ def iter_tasks_in_file(
     data = lintable.data
     if not data:
         return
-    data = ansiblelint.skip_utils.append_skipped_rules(data, lintable)
 
     raw_tasks = get_action_tasks(data, lintable)
 

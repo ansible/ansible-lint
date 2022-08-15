@@ -21,6 +21,7 @@
 """Utils related to inline skipping of rules."""
 from __future__ import annotations
 
+import collections.abc
 import logging
 from functools import lru_cache
 from itertools import product
@@ -28,6 +29,7 @@ from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Sequence
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML
+from ruamel.yaml.composer import ComposerError
 
 from ansiblelint.config import used_old_tags
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, RENAMED_TAGS
@@ -103,17 +105,34 @@ def load_data(file_text: str) -> Any:
     :return: Parsed yaml
     """
     yaml = YAML()
-    return yaml.load(file_text)
+    # Ruamel role is not to validate the yaml file, so we ignore duplicate keys:
+    yaml.allow_duplicate_keys = True
+    try:
+        return yaml.load(file_text)
+    except ComposerError:
+        # load fails on multi-documents with ComposerError exception
+        return yaml.load_all(file_text)
 
 
-def _append_skipped_rules(
+def _append_skipped_rules(  # noqa: max-complexity: 12
     pyyaml_data: AnsibleBaseYAMLObject, lintable: Lintable
 ) -> Optional[AnsibleBaseYAMLObject]:
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
+    skipped_rules = _get_rule_skips_from_yaml(ruamel_data)
 
     if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
-        pyyaml_data[0]["skipped_rules"] = _get_rule_skips_from_yaml(ruamel_data)
+        # AnsibleMapping, dict
+        if hasattr(pyyaml_data, "get"):
+            pyyaml_data["skipped_rules"] = skipped_rules
+        # AnsibleSequence, list
+        elif (
+            not isinstance(pyyaml_data, str)
+            and isinstance(pyyaml_data, collections.abc.Sequence)
+            and skipped_rules
+        ):
+            pyyaml_data[0]["skipped_rules"] = skipped_rules
+
         return pyyaml_data
 
     # create list of blocks of tasks or nested tasks
@@ -141,6 +160,10 @@ def _append_skipped_rules(
         if not pyyaml_task and not ruamel_task:
             continue
 
+        # AnsibleUnicode or str
+        if isinstance(pyyaml_task, str):
+            continue
+
         if pyyaml_task.get("name") != ruamel_task.get("name"):
             raise RuntimeError("Error in matching skip comment to a task")
         pyyaml_task["skipped_rules"] = _get_rule_skips_from_yaml(ruamel_task)
@@ -162,12 +185,16 @@ def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> List[Any]:
 
 def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, None]:
     """Get list of tasks from list made of tasks and nested tasks."""
+    if not task_blocks:
+        return
 
     def get_nested_tasks(task: Any) -> Generator[Any, None, None]:
         if not task or not is_nested_task(task):
             return
         for k in NESTED_TASK_KEYS:
             if k in task and task[k]:
+                if hasattr(task[k], "get"):
+                    continue
                 for subtask in task[k]:
                     yield from get_nested_tasks(subtask)
                     yield subtask
@@ -178,9 +205,14 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
         yield task
 
 
-def _get_rule_skips_from_yaml(yaml_input: Sequence[Any]) -> Sequence[Any]:
+def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
+    yaml_input: Sequence[Any],
+) -> Sequence[Any]:
     """Traverse yaml for comments with rule skips and return list of rules."""
     yaml_comment_obj_strings = []
+
+    if isinstance(yaml_input, str):
+        return []
 
     def traverse_yaml(obj: Any) -> None:
         yaml_comment_obj_strings.append(str(obj.ca.items))
@@ -195,7 +227,8 @@ def _get_rule_skips_from_yaml(yaml_input: Sequence[Any]) -> Sequence[Any]:
         else:
             return
 
-    traverse_yaml(yaml_input)
+    if isinstance(yaml_input, (dict, list)):
+        traverse_yaml(yaml_input)
 
     rule_id_list = []
     for comment_obj_str in yaml_comment_obj_strings:
@@ -215,6 +248,10 @@ def normalize_tag(tag: str) -> str:
 
 def is_nested_task(task: Dict[str, Any]) -> bool:
     """Check if task includes block/always/rescue."""
+    # Cannot really trust the input
+    if isinstance(task, str):
+        return False
+
     for key in NESTED_TASK_KEYS:
         if task.get(key):
             return True
