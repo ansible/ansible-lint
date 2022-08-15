@@ -290,6 +290,13 @@ class Lintable:
                 )
 
                 self._data = parse_yaml_linenumbers(self)
+                # Lazy import to avoid delays and cyclic-imports
+                if "append_skipped_rules" not in globals():
+                    # pylint: disable=import-outside-toplevel
+                    from ansiblelint.skip_utils import append_skipped_rules
+
+                self._data = append_skipped_rules(self._data, self)
+
             # will remain None if we do not know how to load that file-type
         return self._data
 
