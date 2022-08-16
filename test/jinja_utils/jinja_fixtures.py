@@ -389,8 +389,8 @@ class CoreTagsFixtures:
 
 
 class FilterFixtures:
-    # from jinja's tests/idtracking.py TestFilter
-    # skipped many of the fixtures
+    # from jinja's tests/test_idtracking.py TestFilter
+    # this only has some fixtures
     groupby = """
         {%- for grouper, list in [{'foo': 1, 'bar': 2},
                                   {'foo': 2, 'bar': 3},
@@ -402,6 +402,34 @@ class FilterFixtures:
         {%- for grouper, list in [('a', 1), ('a', 2), ('b', 1)]|groupby(0) -%}
             {{ grouper }}{% for x in list %}:{{ x.1 }}{% endfor %}|
         {%- endfor %}"""
+
+
+class TrimBlocksFixtures:
+    # from jinja's tests/test_lexnparse.py TestTrimBlocks
+    trim = "    {% if True %}\n    {% endif %}"
+    no_trim = "    {% if True +%}\n    {% endif %}"
+    no_trim_outer = "{% if True %}X{% endif +%}\nmore things"
+    lstrip_no_trim = "    {% if True +%}\n    {% endif %}"
+    trim_blocks_false_with_no_trim_block1 = "    {% if True %}\n    {% endif %}"
+    trim_blocks_false_with_no_trim_block2 = "    {% if True +%}\n    {% endif %}"
+    trim_blocks_false_with_no_trim_comment1 = "    {# comment #}\n    "
+    trim_blocks_false_with_no_trim_comment2 = "    {# comment +#}\n    "
+    trim_blocks_false_with_no_trim_raw1 = "    {% raw %}{% endraw %}\n    "
+    trim_blocks_false_with_no_trim_raw2 = "    {% raw %}{% endraw +%}\n    "
+    trim_nested = "    {% if True %}\na {% if True %}\nb {% endif %}\nc {% endif %}"
+    no_trim_nested = (
+        "    {% if True +%}\na {% if True +%}\nb {% endif +%}\nc {% endif %}"
+    )
+    comment_trim = """    {# comment #}\n\n  """
+    comment_no_trim = """    {# comment +#}\n\n  """
+    multiple_comment_trim_lstrip = (
+        "   {# comment #}\n\n{# comment2 #}\n   \n{# comment3 #}\n\n "
+    )
+    multiple_comment_no_trim_lstrip = (
+        "   {# comment +#}\n\n{# comment2 +#}\n   \n{# comment3 +#}\n\n "
+    )
+    raw_trim_lstrip = "{{x}}{% raw %}\n\n    {% endraw %}\n\n{{ y }}"
+    raw_no_trim_lstrip = "{{x}}{% raw %}\n\n      {% endraw +%}\n\n{{ y }}"
 
 
 # TODO: maybe get template examples from jinja's

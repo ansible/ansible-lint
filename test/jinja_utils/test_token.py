@@ -3,12 +3,13 @@ from typing import Literal, Tuple
 import pytest
 
 from ansible.template import Templar
-from jinja2.lexer import Lexer, TOKEN_INITIAL, TOKEN_EOF
+from jinja2 import lexer as j2tokens
+from jinja2.lexer import Lexer
 
 from ansiblelint.utils import ansible_templar
-from ansiblelint.jinja_utils.token import Token, tokeniter
+from ansiblelint.jinja_utils.token import Token, tokeniter, BEGIN_TOKENS, END_TOKENS
 
-from .jinja_fixtures import CoreTagsFixtures, FilterFixtures
+from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
 
 
 @pytest.fixture
@@ -27,6 +28,8 @@ def lexer(templar: Templar) -> Lexer:
     ("template_source", "jinja_token_count", "token_pairs_count", "expected_chomps"),
     (
         # jinja_token_count is the number of tokens + 2 (INITIAL, and EOF)
+        ("{{ [{'nested': ({'dict': [('tuple',), ()]}, {})}, {}] }}", 31, 10, ()),
+        # these use fixtures from Jinja's test suite:
         (CoreTagsFixtures.simple_for, 14, 3, ()),
         (CoreTagsFixtures.for_else, 16, 3, ()),
         (CoreTagsFixtures.for_else_scoping_item, 18, 5, ()),
@@ -93,7 +96,25 @@ def lexer(templar: Templar) -> Lexer:
         (CoreTagsFixtures.with_with_argument_scoping, 46, 7, ("-", "-", "-", "-")),
         (FilterFixtures.groupby, 83, 13, ("-", "-", "-")),
         (FilterFixtures.groupby_tuple_index, 55, 11, ("-", "-", "-")),
-        # ^^ 61 tests
+        (TrimBlocksFixtures.trim, 11, 2, ()),
+        (TrimBlocksFixtures.no_trim, 11, 2, ("+",)),
+        (TrimBlocksFixtures.no_trim_outer, 11, 2, ("+",)),
+        (TrimBlocksFixtures.lstrip_no_trim, 11, 2, ("+",)),
+        (TrimBlocksFixtures.trim_blocks_false_with_no_trim_block1, 11, 2, ()),
+        (TrimBlocksFixtures.trim_blocks_false_with_no_trim_block2, 11, 2, ("+",)),
+        (TrimBlocksFixtures.trim_blocks_false_with_no_trim_comment1, 4, 1, ()),
+        (TrimBlocksFixtures.trim_blocks_false_with_no_trim_comment2, 4, 1, ("+",)),
+        (TrimBlocksFixtures.trim_blocks_false_with_no_trim_raw1, 4, 1, ()),
+        (TrimBlocksFixtures.trim_blocks_false_with_no_trim_raw2, 4, 1, ("+",)),
+        (TrimBlocksFixtures.trim_nested, 20, 4, ()),
+        (TrimBlocksFixtures.no_trim_nested, 20, 4, ("+", "+", "+")),
+        (TrimBlocksFixtures.comment_trim, 4, 1, ()),
+        (TrimBlocksFixtures.comment_no_trim, 4, 1, ("+",)),
+        (TrimBlocksFixtures.multiple_comment_trim_lstrip, 6, 3, ()),
+        (TrimBlocksFixtures.multiple_comment_no_trim_lstrip, 6, 3, ("+", "+", "+")),
+        (TrimBlocksFixtures.raw_trim_lstrip, 10, 3, ()),
+        (TrimBlocksFixtures.raw_no_trim_lstrip, 10, 3, ("+",)),
+        # ^^ 79 tests
     ),
 )
 def test_tokeniter(
@@ -112,14 +133,14 @@ def test_tokeniter(
         assert token.start_pos <= token.end_pos
 
         if i == 0:
-            assert token.token == TOKEN_INITIAL
+            assert token.token == j2tokens.TOKEN_INITIAL
             assert token.start_pos == 0
             assert token.end_pos == 0
             assert token.pair is None
             assert token.chomp == ""
             continue
         elif i == last_index:
-            assert token.token == TOKEN_EOF
+            assert token.token == j2tokens.TOKEN_EOF
             assert token.end_pos == len(template_source)
             assert token.pair is None
             assert token.chomp == ""
@@ -130,12 +151,41 @@ def test_tokeniter(
             next_token = tokens[i + 1]
             assert token.end_pos <= next_token.start_pos
 
-        if token.pair is not None:
+        if token.pair is None:
+            assert token.chomp == ""
+        else:
+            assert token.chomp in ("+", "-", "")
+
             assert token.pair != token
             assert token.pair.pair is not None
             assert token.pair.pair == token
-
-        assert token.chomp in ("+", "-", "")
+            if token.token == j2tokens.TOKEN_OPERATOR and token.jinja_token.type in (
+                j2tokens.TOKEN_LBRACKET,
+                j2tokens.TOKEN_RBRACKET,
+                j2tokens.TOKEN_LBRACE,
+                j2tokens.TOKEN_RBRACE,
+                j2tokens.TOKEN_LPAREN,
+                j2tokens.TOKEN_RPAREN,
+            ):
+                for left, right in (
+                    (j2tokens.TOKEN_LBRACKET, j2tokens.TOKEN_RBRACKET),
+                    (j2tokens.TOKEN_LBRACE, j2tokens.TOKEN_RBRACE),
+                    (j2tokens.TOKEN_LPAREN, j2tokens.TOKEN_RPAREN),
+                ):
+                    if token.jinja_token.type == left:
+                        assert token.pair.jinja_token.type == right
+                        break
+                    if token.jinja_token.type == right:
+                        assert token.pair.jinja_token.type == left
+                        break
+            elif token.token in BEGIN_TOKENS + END_TOKENS:
+                for left, right in zip(BEGIN_TOKENS, END_TOKENS):
+                    if token.token == left:
+                        assert token.pair.token == right
+                        break
+                    if token.token == right:
+                        assert token.pair.token == left
+                        break
 
     # jinja_token is None if lexer.wrap() skips it (eg whitespace)
     jinja_tokens = [t.jinja_token for t in tokens if t.jinja_token is not None]

@@ -23,6 +23,7 @@ from jinja2.lexer import (
 )
 
 
+# BEGIN_TOKENS and END_TOKENS should be in the same order (for tests)
 BEGIN_TOKENS = (
     TOKEN_BLOCK_BEGIN,
     TOKEN_VARIABLE_BEGIN,
@@ -137,12 +138,24 @@ def tokeniter(
             if normalized_source[end_pos - 1] in ("+", "-"):
                 # chomp = normalized_source[end_pos]
                 chomp = value_str[-1]  # value_str = "{%-"
+            elif raw_token == TOKEN_RAW_BEGIN:
+                # value_str = "{%- raw %}"
+                if "+" in value_str:
+                    chomp = "+"
+                elif "-" in value_str:
+                    chomp = "-"
 
         elif raw_token in END_TOKENS:
             is_pair_closer = True
             if normalized_source[start_pos] in ("+", "-"):
                 # chomp = normalized_source[start_pos]
                 chomp = value_str[0]  # value_str = "-%}\n    "
+            elif raw_token == TOKEN_RAW_END:
+                # value_str = "{% endraw -%}"
+                if "+" in value_str:
+                    chomp = "+"
+                elif "-" in value_str:
+                    chomp = "-"
 
         token = Token(
             index=index,
