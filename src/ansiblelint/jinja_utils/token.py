@@ -188,3 +188,59 @@ def tokeniter(
         value_str="",
         jinja_token=JinjaToken(lineno, TOKEN_EOF, ""),
     )
+
+
+class Tokens:
+    """A collection of Tokens."""
+    def __init__(
+        self,
+        lexer: Lexer,
+        source: str,
+        name: Optional[str] = None,
+        filename: Optional[str] = None,
+        state: Optional[str] = None,
+    ):
+        # We need to go through all the tokens to populate the token pair details
+        self.tokens = tuple(tokeniter(lexer, source, name, filename, state))
+        self.index = 0
+        self.source_position = 0
+
+    @property
+    def current(self) -> Token:
+        return self.tokens[self.index]
+
+    def __iter__(self) -> "Tokens":
+        return self
+
+    def __next__(self) -> Token:
+        try:
+            token = self.current
+        except IndexError:
+            # reset for the next iteration, but leave source_position alone
+            # for subsequent inspection.
+            self.index = 0
+            raise StopIteration
+        self.index += 1
+        self.source_position = token.end_pos
+        return token
+
+    def __index__(self) -> int:
+        return self.index
+
+    def __bool__(self) -> bool:
+        return self.index < len(self.tokens)
+
+    @property
+    def end(self) -> bool:
+        return not self
+
+    def __len__(self) -> int:
+        return len(self.tokens)
+
+    def __getitem__(self, index: int):
+        return self.tokens[index]
+
+    def __contains__(self, item: Token) -> bool:
+        if not isinstance(item, Token):
+            return False
+        return 0 <= item.index < len(self) and item == self[item.index]

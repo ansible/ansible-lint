@@ -7,7 +7,7 @@ from jinja2 import lexer as j2tokens
 from jinja2.lexer import Lexer
 
 from ansiblelint.utils import ansible_templar
-from ansiblelint.jinja_utils.token import Token, tokeniter, BEGIN_TOKENS, END_TOKENS
+from ansiblelint.jinja_utils.token import Tokens, BEGIN_TOKENS, END_TOKENS
 
 from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
 
@@ -117,14 +117,14 @@ def lexer(templar: Templar) -> Lexer:
         # ^^ 79 tests
     ),
 )
-def test_tokeniter(
+def test_tokens_iterator(
     lexer: Lexer,
     template_source: str,
     jinja_token_count: int,
     token_pairs_count: int,
     expected_chomps: Tuple[Literal["+", "-"], ...],
 ):
-    tokens = [t for t in tokeniter(lexer, template_source)]
+    tokens = Tokens(lexer, template_source)
     tokens_count = len(tokens)
     last_index = tokens_count - 1
 
