@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Fixture for src/ansiblelint/rules/name.py::test_rule_name_lowercase
+  hosts: all
   tasks:
     - name: this task has a name is not correctly capitalized
       ansible.builtin.command: echo "Hello World"

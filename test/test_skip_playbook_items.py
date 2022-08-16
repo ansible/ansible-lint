@@ -5,7 +5,8 @@ from ansiblelint.testing import RunFromText
 
 PLAYBOOK_PRE_TASKS = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Bad git 1  # noqa git-latest
       action: ansible.builtin.git a=b c=d
@@ -20,7 +21,8 @@ PLAYBOOK_PRE_TASKS = """\
 
 PLAYBOOK_POST_TASKS = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Bad git 1  # noqa git-latest
       action: ansible.builtin.git a=b c=d
@@ -35,7 +37,8 @@ PLAYBOOK_POST_TASKS = """\
 
 PLAYBOOK_HANDLERS = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Bad git 1  # noqa git-latest
       action: ansible.builtin.git a=b c=d
@@ -50,14 +53,16 @@ PLAYBOOK_HANDLERS = """\
 
 PLAYBOOK_TWO_PLAYS = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Bad git 1  # noqa git-latest
       action: ansible.builtin.git a=b c=d
     - name: Bad git 2
       action: ansible.builtin.git a=b c=d
 
-- hosts: all
+- name: Fixture 2
+  hosts: all
   tasks:
     - name: Bad git 3  # noqa git-latest
       action: ansible.builtin.git a=b c=d
@@ -67,7 +72,8 @@ PLAYBOOK_TWO_PLAYS = """\
 
 PLAYBOOK_WITH_BLOCK = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Bad git 1  # noqa git-latest
       action: ansible.builtin.git a=b c=d

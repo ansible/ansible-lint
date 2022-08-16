@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Fixture for examples/playbooks/rule-only-builtins.yml
+  hosts: localhost
   tasks:
     - name: Sysctl
       # while next module is mocked in our config, we still want to see that

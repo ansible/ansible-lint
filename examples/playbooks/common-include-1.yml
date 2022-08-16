@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Fixture for test_files_not_scanned_twice
+  hosts: localhost
   gather_facts: false
   tasks:
     - name: Some include

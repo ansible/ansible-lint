@@ -698,7 +698,7 @@ def test_get_path_to_play(
         # playbook with subtasks blocks
         pytest.param(
             "examples/playbooks/blockincludes.yml",
-            13,
+            14,
             [0, "tasks", 0, "block", 1, "block", 0, "block", 1, "block", 0],
             id="playbook-deeply_nested_task",
         ),

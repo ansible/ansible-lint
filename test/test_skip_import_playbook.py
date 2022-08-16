@@ -8,7 +8,8 @@ from ansiblelint.runner import Runner
 
 IMPORTED_PLAYBOOK = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Success
       ansible.builtin.fail: msg="fail"
@@ -17,7 +18,8 @@ IMPORTED_PLAYBOOK = """\
 
 MAIN_PLAYBOOK = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
 
   tasks:
     - name: Should be shell  # noqa command-instead-of-shell no-changed-when

@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     # cspell:disable-next-line
     - name: Some тест
