@@ -110,7 +110,7 @@ def tokeniter(
     for index, token_tuple in enumerate(
         lexer.tokeniter(source, name, filename, state), 1
     ):
-        lineno, raw_token, value_str = token_tuple
+        lineno, token_type, value_str = token_tuple
 
         start_pos = normalized_source.index(value_str, end_pos)
         consumed = len(value_str)
@@ -127,30 +127,30 @@ def tokeniter(
         chomp: Literal["+", "-", ""] = ""
 
         # see if this token should have a pair
-        if raw_token == TOKEN_OPERATOR:
+        if token_type == TOKEN_OPERATOR:
             if value_str in ("{", "(", "["):
                 is_pair_opener = True
             elif value_str in ("}", ")", "]"):
                 is_pair_closer = True
 
-        elif raw_token in BEGIN_TOKENS:
+        elif token_type in BEGIN_TOKENS:
             is_pair_opener = True
             if normalized_source[end_pos - 1] in ("+", "-"):
                 # chomp = normalized_source[end_pos]
                 chomp = value_str[-1]  # value_str = "{%-"
-            elif raw_token == TOKEN_RAW_BEGIN:
+            elif token_type == TOKEN_RAW_BEGIN:
                 # value_str = "{%- raw %}"
                 if "+" in value_str:
                     chomp = "+"
                 elif "-" in value_str:
                     chomp = "-"
 
-        elif raw_token in END_TOKENS:
+        elif token_type in END_TOKENS:
             is_pair_closer = True
             if normalized_source[start_pos] in ("+", "-"):
                 # chomp = normalized_source[start_pos]
                 chomp = value_str[0]  # value_str = "-%}\n    "
-            elif raw_token == TOKEN_RAW_END:
+            elif token_type == TOKEN_RAW_END:
                 # value_str = "{% endraw -%}"
                 if "+" in value_str:
                     chomp = "+"
@@ -162,7 +162,7 @@ def tokeniter(
             start_pos=start_pos,
             end_pos=end_pos,
             lineno=lineno,
-            token=raw_token,
+            token=token_type,
             value_str=value_str,
             jinja_token=jinja_token,
             # pair gets added later if needed
