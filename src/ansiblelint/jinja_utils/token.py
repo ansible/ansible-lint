@@ -106,7 +106,9 @@ def tokeniter(
         jinja_token=JinjaToken(1, TOKEN_INITIAL, ""),
     )
 
-    for index, token_tuple in enumerate(lexer.tokeniter(source, name, filename, state), 1):
+    for index, token_tuple in enumerate(
+        lexer.tokeniter(source, name, filename, state), 1
+    ):
         lineno, raw_token, value_str = token_tuple
 
         start_pos = normalized_source.index(value_str, end_pos)
@@ -132,7 +134,7 @@ def tokeniter(
 
         elif raw_token in BEGIN_TOKENS:
             is_pair_opener = True
-            if normalized_source[end_pos-1] in ("+", "-"):
+            if normalized_source[end_pos - 1] in ("+", "-"):
                 # chomp = normalized_source[end_pos]
                 chomp = value_str[-1]  # value_str = "{%-"
 
@@ -165,7 +167,7 @@ def tokeniter(
         yield token
 
     yield Token(
-        index=index+1,
+        index=index + 1,
         start_pos=end_pos,
         end_pos=len(normalized_source),
         lineno=lineno,
@@ -173,4 +175,3 @@ def tokeniter(
         value_str="",
         jinja_token=JinjaToken(lineno, TOKEN_EOF, ""),
     )
-

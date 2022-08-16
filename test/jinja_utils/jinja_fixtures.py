@@ -18,7 +18,6 @@ class AST:
         [nodes.Assign(nodes.Name("foo", "store"), nodes.Name("bar", "load")), for_loop]
     )
 
-
     title_block = nodes.Block(
         "title", [nodes.Output([nodes.TemplateData("Page Title")])], False, False
     )
@@ -227,7 +226,9 @@ class CoreTags:
     # for_loop_errors_1 =  # raises UndefinedError
     for_loop_errors = """{% for item in [] %}...{% else
         %}{{ loop }}{% endfor %}"""
-    for_loop_filter_1 = "{% for item in range(10) if item is even %}[{{ item }}]{% endfor %}"
+    for_loop_filter_1 = (
+        "{% for item in range(10) if item is even %}[{{ item }}]{% endfor %}"
+    )
     for_loop_filter_2 = """
         {%- for item in range(10) if item is even %}[{{
             loop.index }}:{{ item }}]{% endfor %}"""
@@ -263,8 +264,12 @@ class CoreTags:
         {%- macro item(a) %}...{{ a }}...{% endmacro %}
         {{- item(2) -}}
         """
-    for_unpacking = "{% for a, b, c in [[1, 2, 3]] %}{{ a }}|{{ b }}|{{ c }}{% endfor %}"
-    for_intended_scoping_with_set_1 = "{% for item in seq %}{{ x }}{% set x = item %}{{ x }}{% endfor %}"
+    for_unpacking = (
+        "{% for a, b, c in [[1, 2, 3]] %}{{ a }}|{{ b }}|{{ c }}{% endfor %}"
+    )
+    for_intended_scoping_with_set_1 = (
+        "{% for item in seq %}{{ x }}{% set x = item %}{{ x }}{% endfor %}"
+    )
     for_intended_scoping_with_set_2 = (
         "{% set x = 9 %}{% for item in seq %}{{ x }}"
         "{% set x = item %}{{ x }}{% endfor %}"
@@ -309,7 +314,9 @@ class CoreTags:
 {% set caller = 42 %}\
 {% macro test() %}{{ caller is not defined }}{% endmacro %}\
 {{ test() }}"""
-    macros_include_env_dict = {"include": "{% macro test(foo) %}[{{ foo }}]{% endmacro %}"}
+    macros_include_env_dict = {
+        "include": "{% macro test(foo) %}[{{ foo }}]{% endmacro %}"
+    }
     macros_include = '{% from "include" import test %}{{ test("foo") }}'
     macros_macro_api = (
         "{% macro foo(a, b) %}{% endmacro %}"
@@ -333,7 +340,9 @@ class CoreTags:
     # set_set_invalid =  # raises TemplateSyntaxError, TemplateRuntimeError
     # set_namespace_redefined =  # raises TemplateRuntimeError
     set_namespace = "{% set ns = namespace() %}{% set ns.bar = '42' %}{{ ns.bar }}"
-    set_namespace_block = "{% set ns = namespace() %}{% set ns.bar %}42{% endset %}{{ ns.bar }}"
+    set_namespace_block = (
+        "{% set ns = namespace() %}{% set ns.bar %}42{% endset %}{{ ns.bar }}"
+    )
     set_init_namespace = (
         "{% set ns = namespace(d, self=37) %}"
         "{% set ns.b = 42 %}"
@@ -357,8 +366,12 @@ class CoreTags:
         "{{ magic(ns) }}"
         "{{ ns.a }}|{{ ns.b }}"
     )
-    set_block_escaping_filtered = "{% set foo | trim %}<em>{{ test }}</em>    {% endset %}foo: {{ foo }}"
-    set_block_filtered = "{% set foo | trim | length | string %} 42    {% endset %}{{ foo }}"
+    set_block_escaping_filtered = (
+        "{% set foo | trim %}<em>{{ test }}</em>    {% endset %}foo: {{ foo }}"
+    )
+    set_block_filtered = (
+        "{% set foo | trim | length | string %} 42    {% endset %}{{ foo }}"
+    )
     # set_block_filtered_set =  # uses custom filter: _myfilter
 
     # from jinja's tests/test_core_tags.py TestWith

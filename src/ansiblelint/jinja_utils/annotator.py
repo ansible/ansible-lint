@@ -15,7 +15,7 @@ def annotate_whitespace(
     node: nodes.Template,
     environment: Environment,
     raw_template: str,
-    ) -> nodes.Template:
+) -> nodes.Template:
     """Annotate a jinja2 AST with info about whitespace.
 
     This is based on jinja2.compiler.generate
@@ -99,7 +99,7 @@ class WhitespaceAnnotator(NodeVisitor):
         start_chomp: bool = False,
         end_chomp: bool = False,
         end_marker: Optional[int] = None,
-        whitespace_ranges: Tuple[Tuple[int, int], ...] =(),
+        whitespace_ranges: Tuple[Tuple[int, int], ...] = (),
     ) -> None:
         # some nodes have multiple block tags
         # so this has whitespace info for each tag
@@ -179,12 +179,12 @@ class WhitespaceAnnotator(NodeVisitor):
         self.chomp_to(ranges)
 
         end_marker = self.seek(end_marker_string)
-        end_chomp = self.stream[end_marker-1] == "-"
+        end_chomp = self.stream[end_marker - 1] == "-"
         # end_preserve_ws = self.stream[end_marker-1] == "+"
         if end_chomp:
             self.chomp_to(ranges)
         end = self._index
-        
+
         self.annotate(
             child_node,
             start=start,
@@ -276,8 +276,7 @@ class WhitespaceAnnotator(NodeVisitor):
     # -- Statement Visitors
 
     def visit_Template(self, node: nodes.Template) -> None:
-        """Template is the root node.
-        """
+        """Template is the root node."""
         ranges = []
         self.generic_visit(node)
         end = self._index
@@ -368,7 +367,7 @@ class WhitespaceAnnotator(NodeVisitor):
                 self.seek("without")
                 self.chomp_to(ranges)
                 self.seek("context")
-            elif "with" == self.stream[index:index+4]:
+            elif "with" == self.stream[index : index + 4]:
                 # with context (implicit default) explicitly specified
                 self.seek("with")
                 self.chomp_to(ranges)
@@ -397,7 +396,7 @@ class WhitespaceAnnotator(NodeVisitor):
                 self.seek("with")
                 self.chomp_to(ranges)
                 self.seek("context")
-            elif "without" == self.stream[index:index+7]:
+            elif "without" == self.stream[index : index + 7]:
                 # without context (implicit default) explicitly specified
                 self.seek("without")
                 self.chomp_to(ranges)
@@ -438,7 +437,7 @@ class WhitespaceAnnotator(NodeVisitor):
                 self.seek("with")
                 self.chomp_to(ranges)
                 self.seek("context")
-            elif "without" == self.stream[index:index+7]:
+            elif "without" == self.stream[index : index + 7]:
                 # without context (implicit default) explicitly specified
                 self.seek("without")
                 self.chomp_to(ranges)
@@ -627,7 +626,7 @@ class WhitespaceAnnotator(NodeVisitor):
         start = self._index
         index = self.seek(node.name)
         if start != index:
-            ranges.append((start, index)) 
+            ranges.append((start, index))
         self.chomp_to(ranges)
         self.seek(".")
         self.chomp_to(ranges)
@@ -655,7 +654,7 @@ class WhitespaceAnnotator(NodeVisitor):
         start = self._index
         index = self.seek("(")
         if start != index:
-            ranges.append((start, index)) 
+            ranges.append((start, index))
         self.chomp_to(ranges)
         for idx, item in enumerate(node.items):
             if idx:
@@ -681,7 +680,7 @@ class WhitespaceAnnotator(NodeVisitor):
         start = self._index
         index = self.seek("[")
         if start != index:
-            ranges.append((start, index)) 
+            ranges.append((start, index))
         self.chomp_to(ranges)
         for idx, item in enumerate(node.items):
             if idx:
@@ -707,7 +706,7 @@ class WhitespaceAnnotator(NodeVisitor):
         start = self._index
         index = self.seek("{")
         if start != index:
-            ranges.append((start, index)) 
+            ranges.append((start, index))
         self.chomp_to(ranges)
 
         item: nodes.Pair
@@ -745,7 +744,7 @@ class WhitespaceAnnotator(NodeVisitor):
         after_left = self._index
         index = self.seek(node.operator)
         if after_left != index:
-            ranges.append((after_left, index)) 
+            ranges.append((after_left, index))
         self.chomp_to(ranges)
 
         self.visit(node.right)
@@ -776,7 +775,7 @@ class WhitespaceAnnotator(NodeVisitor):
 
         index = self.seek(node.operator)
         if start != index:
-            ranges.append((start, index)) 
+            ranges.append((start, index))
         self.chomp_to(ranges)
 
         self.visit(node.node)
@@ -852,7 +851,7 @@ class WhitespaceAnnotator(NodeVisitor):
         start = self._index
         index = self.seek(operators[node.op])
         if start != index:
-            ranges.append((start, index)) 
+            ranges.append((start, index))
         self.chomp_to(ranges)
         self.visit(node.expr)
         end = self._index
@@ -928,7 +927,7 @@ class WhitespaceAnnotator(NodeVisitor):
         before = self._index
         index = self.seek(node.name)
         if before != index:
-            ranges.append((before, index)) 
+            ranges.append((before, index))
         self.chomp_to(ranges)
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             self.seek("(")
@@ -954,13 +953,13 @@ class WhitespaceAnnotator(NodeVisitor):
         before = self._index
         index = self.seek("is")
         if before != index:
-            ranges.append((before, index)) 
+            ranges.append((before, index))
         self.chomp_to(ranges)
         if negate:
             before = self._index
             index = self.seek("not")
             if before != index:
-                ranges.append((before, index)) 
+                ranges.append((before, index))
             self.chomp_to(ranges)
         self.seek(node.name)
         self.chomp_to(ranges)
@@ -1026,7 +1025,7 @@ class WhitespaceAnnotator(NodeVisitor):
         start = self._index
         index = self.seek(node.key)
         if start != index:
-            ranges.append((start, index)) 
+            ranges.append((start, index))
         self.chomp_to(ranges)
         self.seek("=")
         self.chomp_to(ranges)
