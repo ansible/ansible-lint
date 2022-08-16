@@ -1,7 +1,44 @@
-from typing import Iterator, Literal, Optional
+from typing import Iterator, List, Literal, Optional
 
 from dataclasses import dataclass
-from jinja2.lexer import newline_re, Lexer, Token as JinjaToken
+from jinja2.lexer import (
+    Lexer,
+    TOKEN_BLOCK_BEGIN,
+    TOKEN_BLOCK_END,
+    TOKEN_COMMENT_BEGIN,
+    TOKEN_COMMENT_END,
+    TOKEN_EOF,
+    TOKEN_INITIAL,
+    TOKEN_LINECOMMENT_BEGIN,
+    TOKEN_LINECOMMENT_END,
+    TOKEN_LINESTATEMENT_BEGIN,
+    TOKEN_LINESTATEMENT_END,
+    TOKEN_OPERATOR,
+    TOKEN_RAW_BEGIN,
+    TOKEN_RAW_END,
+    TOKEN_VARIABLE_BEGIN,
+    TOKEN_VARIABLE_END,
+    Token as JinjaToken,
+    newline_re,
+)
+
+
+BEGIN_TOKENS = (
+    TOKEN_BLOCK_BEGIN,
+    TOKEN_VARIABLE_BEGIN,
+    TOKEN_RAW_BEGIN,
+    TOKEN_COMMENT_BEGIN,
+    TOKEN_LINESTATEMENT_BEGIN,
+    TOKEN_LINECOMMENT_BEGIN,
+)
+END_TOKENS = (
+    TOKEN_BLOCK_END,
+    TOKEN_VARIABLE_END,
+    TOKEN_RAW_END,
+    TOKEN_COMMENT_END,
+    TOKEN_LINESTATEMENT_END,
+    TOKEN_LINECOMMENT_END,
+)
 
 
 @dataclass  # this is mutable and DOES change after creation
@@ -55,11 +92,24 @@ def tokeniter(
 ) -> Iterator[Token]:
     normalized_source = pre_iter_normalize_newlines(source, lexer.keep_trailing_newline)
     paired_tokens: List[Token] = []
+    index = 0
+    start_pos = end_pos = 0
+    lineno = 1
 
-    for index, token_tuple in enumerate(lexer.tokeniter(source, name, filename, state)):
+    yield Token(
+        index=index,
+        start_pos=start_pos,
+        end_pos=end_pos,
+        lineno=lineno,
+        token=TOKEN_INITIAL,
+        value_str="",
+        jinja_token=JinjaToken(1, TOKEN_INITIAL, ""),
+    )
+
+    for index, token_tuple in enumerate(lexer.tokeniter(source, name, filename, state), 1):
         lineno, raw_token, value_str = token_tuple
 
-        start_pos = normalized_source.index(value_str)
+        start_pos = normalized_source.index(value_str, end_pos)
         consumed = len(value_str)
         end_pos = start_pos + consumed
 
@@ -71,7 +121,7 @@ def tokeniter(
             jinja_token = None
 
         is_pair_opener = is_pair_closer = False
-        chomp: str = ""
+        chomp: Literal["+", "-", ""] = ""
 
         # see if this token should have a pair
         if raw_token == TOKEN_OPERATOR:
@@ -79,33 +129,29 @@ def tokeniter(
                 is_pair_opener = True
             elif value_str in ("}", ")", "]"):
                 is_pair_closer = True
-        elif raw_token in (
-            TOKEN_BLOCK_BEGIN,
-            TOKEN_VARIABLE_BEGIN,
-            TOKEN_RAW_BEGIN,
-            TOKEN_COMMENT_BEGIN,
-            TOKEN_LINESTATEMENT_BEGIN,
-            TOKEN_LINECOMMENT_BEGIN,
-        ):
+
+        elif raw_token in BEGIN_TOKENS:
             is_pair_opener = True
-            if normalized_source[end_pos] in ("+", "-"):
-                chomp = normalized_source[end_pos]
-                end_pos += 1
-        elif raw_token in (
-            TOKEN_BLOCK_END,
-            TOKEN_VARIABLE_END,
-            TOKEN_RAW_END,
-            TOKEN_COMMENT_END,
-            TOKEN_LINESTATEMENT_END,
-            TOKEN_LINECOMMENT_END,
-        ):
+            if normalized_source[end_pos-1] in ("+", "-"):
+                # chomp = normalized_source[end_pos]
+                chomp = value_str[-1]  # value_str = "{%-"
+
+        elif raw_token in END_TOKENS:
             is_pair_closer = True
-            if normalized_source[start_pos-1] in ("+", "-"):
-                chomp = normalized_source[start_pos-1]
-                start_pos -= 1
+            if normalized_source[start_pos] in ("+", "-"):
+                # chomp = normalized_source[start_pos]
+                chomp = value_str[0]  # value_str = "-%}\n    "
 
         token = Token(
-            index, start_pos, end_pos, lineno, raw_token, value_str, jinja_token, chomp
+            index=index,
+            start_pos=start_pos,
+            end_pos=end_pos,
+            lineno=lineno,
+            token=raw_token,
+            value_str=value_str,
+            jinja_token=jinja_token,
+            # pair gets added later if needed
+            chomp=chomp,
         )
 
         # we assume the template is valid and was previously fully parsed
@@ -117,3 +163,14 @@ def tokeniter(
             token.pair = open_token
 
         yield token
+
+    yield Token(
+        index=index+1,
+        start_pos=end_pos,
+        end_pos=len(normalized_source),
+        lineno=lineno,
+        token=TOKEN_EOF,
+        value_str="",
+        jinja_token=JinjaToken(lineno, TOKEN_EOF, ""),
+    )
+

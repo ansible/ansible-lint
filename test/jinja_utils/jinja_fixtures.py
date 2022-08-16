@@ -1,5 +1,8 @@
 """This file contains copies of jinja's test suite data which is BSD (3-clause) licensed."""
 
+from jinja2 import nodes
+
+
 # use classes to group the fixtures
 class AST:
     # from jinja's tests/idtracking.py
@@ -273,10 +276,10 @@ class CoreTags:
         %}...{% else %}XXX{% endif %}"""
     elifs = "\n".join(f"{{% elif a == {i} %}}{i}" for i in range(1, 1000))
     if_elif_deep = f"{{% if a == 0 %}}0{elifs}{{% else %}}x{{% endif %}}"
-    if_else = "{% if false %}XXX{% else %}...{% endif %}")
-    if_empty = "[{% if true %}{% else %}{% endif %}]")
+    if_else = "{% if false %}XXX{% else %}...{% endif %}"
+    if_empty = "[{% if true %}{% else %}{% endif %}]"
     if_complete = "{% if a %}A{% elif b %}B{% elif c == d %}C{% else %}D{% endif %}"
-    if_no_scope_1 = "{% if a %}{% set foo = 1 %}{% endif %}{{ foo }}")
+    if_no_scope_1 = "{% if a %}{% set foo = 1 %}{% endif %}{{ foo }}"
     if_no_scope_2 = "{% if true %}{% set foo = 1 %}{% endif %}{{ foo }}"
 
     # from jinja's tests/test_core_tags.py TestMacros
@@ -307,7 +310,7 @@ class CoreTags:
 {% macro test() %}{{ caller is not defined }}{% endmacro %}\
 {{ test() }}"""
     macros_include_env_dict = {"include": "{% macro test(foo) %}[{{ foo }}]{% endmacro %}"}
-    macros_include = '{% from "include" import test %}{{ test("foo") }}')
+    macros_include = '{% from "include" import test %}{{ test("foo") }}'
     macros_macro_api = (
         "{% macro foo(a, b) %}{% endmacro %}"
         "{% macro bar() %}{{ varargs }}{{ kwargs }}{% endmacro %}"
@@ -324,7 +327,7 @@ class CoreTags:
     """
 
     # from jinja's tests/test_core_tags.py TestSet
-    set_normal = "{% set foo = 1 %}{{ foo }}")
+    set_normal = "{% set foo = 1 %}{{ foo }}"
     set_block = "{% set foo %}42{% endset %}{{ foo }}"
     set_block_escaping = "{% set foo %}<em>{{ test }}</em>{% endset %}foo: {{ foo }}"
     # set_set_invalid =  # raises TemplateSyntaxError, TemplateRuntimeError
