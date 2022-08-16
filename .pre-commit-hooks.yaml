@@ -5,7 +5,7 @@
 - id: ansible-lint
   name: Ansible-lint
   description: This hook runs ansible-lint.
-  entry: ansible-lint --force-color
+  entry: python3 -m ansiblelint -v --force-color
   language: python
   # do not pass files to ansible-lint, see:
   # https://github.com/ansible-community/ansible-lint/issues/611
@@ -13,7 +13,8 @@
   always_run: true
   additional_dependencies:
     # https://github.com/pre-commit/pre-commit/issues/1526
-    # if you want to use only the base ansible version for linting,
-    # replace 'community' extra with 'core' or just mention the exact
-    # version of Ansible you want to install as a dependency.
-    - .[community]
+    # If you want to use specific version of ansible-core or ansible, feel
+    # free to override `additional_dependencies` in your own hook config
+    # file.
+    - .
+    - ansible-core>=2.13.3

@@ -44,6 +44,7 @@ jobs:
           - TOXENV: docs
           - TOXENV: eco
           - TOXENV: packaging
+          - TOXENV: validate-hook
 
     steps:
       - name: Check out src from Git
