@@ -175,7 +175,7 @@ class AST:
     )
 
 
-class CoreTags:
+class CoreTagsFixtures:
     # from jinja's tests/test_core_tags.py TestForLoop
     simple_for = "{% for item in seq %}{{ item }}{% endfor %}"
     for_else = "{% for item in seq %}XXX{% else %}...{% endfor %}"
@@ -387,8 +387,24 @@ class CoreTags:
         {%- endwith -%}
         """
 
-    # TODO: maybe get template examples from jinja's
-    #       tests/test_ext.py
-    #       tests/test_filters.py TestFilter
-    #       tests/test_imports.py TestImports, TestIncludes
-    #       tests/test_inheritance.py TestInheritance
+
+class FilterFixtures:
+    # from jinja's tests/idtracking.py TestFilter
+    # skipped many of the fixtures
+    groupby = """
+        {%- for grouper, list in [{'foo': 1, 'bar': 2},
+                                  {'foo': 2, 'bar': 3},
+                                  {'foo': 1, 'bar': 1},
+                                  {'foo': 3, 'bar': 4}]|groupby('foo') -%}
+            {{ grouper }}{% for x in list %}: {{ x.foo }}, {{ x.bar }}{% endfor %}|
+        {%- endfor %}"""
+    groupby_tuple_index = """
+        {%- for grouper, list in [('a', 1), ('a', 2), ('b', 1)]|groupby(0) -%}
+            {{ grouper }}{% for x in list %}:{{ x.1 }}{% endfor %}|
+        {%- endfor %}"""
+
+
+# TODO: maybe get template examples from jinja's
+#       tests/test_ext.py
+#       tests/test_imports.py TestImports, TestIncludes
+#       tests/test_inheritance.py TestInheritance
