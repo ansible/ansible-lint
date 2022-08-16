@@ -22,7 +22,8 @@ ROLE_TASKS_WORLD = """\
 
 PLAY_IMPORT_ROLE = """\
 ---
-- hosts: all
+- name: Test fixture
+  hosts: all
 
   tasks:
     - name: Some import
@@ -32,7 +33,8 @@ PLAY_IMPORT_ROLE = """\
 
 PLAY_IMPORT_ROLE_FQCN = """\
 ---
-- hosts: all
+- name: Test fixture
+  hosts: all
 
   tasks:
     - name: Some import
@@ -42,8 +44,8 @@ PLAY_IMPORT_ROLE_FQCN = """\
 
 PLAY_IMPORT_ROLE_INLINE = """\
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
     - name: Some import
       import_role: name=test-role
@@ -51,8 +53,8 @@ PLAY_IMPORT_ROLE_INLINE = """\
 
 PLAY_INCLUDE_ROLE = """\
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
     - name: Some import
       include_role:
@@ -62,8 +64,8 @@ PLAY_INCLUDE_ROLE = """\
 
 PLAY_INCLUDE_ROLE_FQCN = """\
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
     - name: Some import
       ansible.builtin.include_role:
@@ -73,8 +75,8 @@ PLAY_INCLUDE_ROLE_FQCN = """\
 
 PLAY_INCLUDE_ROLE_INLINE = """\
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
     - name: Some import
       include_role: name=test-role tasks_from=world

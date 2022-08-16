@@ -37,7 +37,8 @@ ROLE_TASKS_WITH_BLOCK = """\
 
 PLAYBOOK = """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Test hg-latest
       action: ansible.builtin.hg
@@ -76,7 +77,8 @@ PLAYBOOK = """\
 
 ROLE_TASKS_WITH_BLOCK_BECOME = """\
 ---
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   tasks:
     - name: Foo
       become: true

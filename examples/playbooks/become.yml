@@ -1,6 +1,6 @@
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
     - name: Clone content repository
       ansible.builtin.git:

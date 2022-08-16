@@ -32,7 +32,8 @@ if TYPE_CHECKING:
 
 
 FAIL_PLAY = """---
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   tasks:
   - name: Shell no pipe
     ansible.builtin.shell: echo hello
@@ -48,7 +49,8 @@ FAIL_PLAY = """---
 """
 
 SUCCESS_PLAY = """---
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   tasks:
   - name: Shell with pipe
     ansible.builtin.shell: echo hello | true  # noqa: risky-shell-pipe

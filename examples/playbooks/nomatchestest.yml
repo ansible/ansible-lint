@@ -1,6 +1,6 @@
 ---
-- hosts: whatever
-
+- name: Fixture
+  hosts: whatever
   tasks:
     - name: Hello world
       action: debug msg="Hello!" # noqa: fqcn-builtins

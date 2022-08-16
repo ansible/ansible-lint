@@ -33,7 +33,8 @@ FAIL_TASK_1LN = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: One-level nesting
       ansible.builtin.set_fact:
@@ -45,7 +46,8 @@ FAIL_TASK_1LN_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: One-level multiline nesting
       ansible.builtin.set_fact:
@@ -60,7 +62,8 @@ FAIL_TASK_2LN = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Two-level nesting
       ansible.builtin.set_fact:
@@ -72,7 +75,8 @@ FAIL_TASK_2LN_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Two-level multiline nesting
       ansible.builtin.set_fact:
@@ -88,7 +92,8 @@ FAIL_TASK_W_5LN = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Five-level wild nesting
       ansible.builtin.set_fact:
@@ -100,7 +105,8 @@ FAIL_TASK_W_5LN_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Five-level wild multiline nesting
       ansible.builtin.set_fact:
@@ -121,7 +127,8 @@ SUCCESS_TASK_P = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Non-nested example
       ansible.builtin.set_fact:
@@ -133,7 +140,8 @@ SUCCESS_TASK_P_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Multiline non-nested example
       ansible.builtin.set_fact:
@@ -147,7 +155,8 @@ SUCCESS_TASK_2P = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Nesting far from each other
       ansible.builtin.set_fact:
@@ -159,7 +168,8 @@ SUCCESS_TASK_2P_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Multiline nesting far from each other
       ansible.builtin.set_fact:
@@ -174,7 +184,8 @@ SUCCESS_TASK_C_2P = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Nesting close to each other
       ansible.builtin.set_fact:
@@ -186,7 +197,8 @@ SUCCESS_TASK_C_2P_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Multiline nesting close to each other
       ansible.builtin.set_fact:
@@ -201,7 +213,8 @@ SUCCESS_TASK_PRINT = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     - name: Print curly braces
       ansible.builtin.debug:

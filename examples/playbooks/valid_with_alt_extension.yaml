@@ -1,6 +1,7 @@
 ---
 # Used to validate that we also accept .yaml extension on playbooks
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   tasks:
     - ansible.builtin.debug: # <-- should notify about missing 'name'
         msg: hello!

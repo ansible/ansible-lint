@@ -7,7 +7,8 @@ from ansiblelint.testing import RunFromText
 
 PB_WITH_NULL_TASKS = """\
 ---
-- hosts: all
+- name: Fixture for test_null_tasks
+  hosts: all
   tasks:
 """
 

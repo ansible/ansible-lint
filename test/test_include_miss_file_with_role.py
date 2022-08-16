@@ -29,7 +29,8 @@ PLAY_MISS_INCLUDE = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   roles:
     - include_miss
 """,
