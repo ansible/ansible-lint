@@ -42,4 +42,5 @@ python:
       path: .
       extra_requirements:
         - docs
+        - test
   system_packages: false
