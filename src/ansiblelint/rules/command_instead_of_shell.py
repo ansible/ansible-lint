@@ -40,11 +40,11 @@ FAIL_PLAY = """---
     changed_when: false
 
   - name: Shell with jinja filter
-    ansible.builtin.shell: echo {{ "hello"|upper }}
+    ansible.builtin.shell: echo {{ "hello" | upper }}
     changed_when: false
 
   - name: Sshell with jinja filter (fqcn)
-    ansible.builtin.shell: echo {{ "hello"|upper }}
+    ansible.builtin.shell: echo {{ "hello" | upper }}
     changed_when: false
 """
 
@@ -143,7 +143,13 @@ if "pytest" in sys.modules:
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
-    @pytest.mark.parametrize(("text", "expected"), ((SUCCESS_PLAY, 0), (FAIL_PLAY, 3)))
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        (
+            pytest.param(SUCCESS_PLAY, 0, id="good"),
+            pytest.param(FAIL_PLAY, 3, id="bad"),
+        ),
+    )
     def test_rule_command_instead_of_shell(
         default_text_runner: RunFromText, text: str, expected: int
     ) -> None:

@@ -594,7 +594,9 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     if "_raw_params" in arguments:
-        result["action"]["__ansible_arguments__"] = arguments["_raw_params"].split(" ")
+        # Doing a split here is really bad as it would break jinja2 templating
+        # parsing of the template must happen before any kind of split.
+        result["action"]["__ansible_arguments__"] = [arguments["_raw_params"]]
         del arguments["_raw_params"]
     else:
         result["action"]["__ansible_arguments__"] = []
@@ -772,7 +774,7 @@ def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
         if "cmd" in task["action"]:
             first_cmd_arg = task["action"]["cmd"].split()[0]
         else:
-            first_cmd_arg = task["action"]["__ansible_arguments__"][0]
+            first_cmd_arg = task["action"]["__ansible_arguments__"][0].split()[0]
     except IndexError:
         return None
     return first_cmd_arg
@@ -784,7 +786,7 @@ def get_second_cmd_arg(task: Dict[str, Any]) -> Any:
         if "cmd" in task["action"]:
             second_cmd_arg = task["action"]["cmd"].split()[1]
         else:
-            second_cmd_arg = task["action"]["__ansible_arguments__"][1]
+            second_cmd_arg = task["action"]["__ansible_arguments__"][0].split()[1]
     except IndexError:
         return None
     return second_cmd_arg
