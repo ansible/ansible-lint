@@ -105,6 +105,8 @@ class VariableNamingRule(AnsibleLintRule):
         results: List[MatchError] = []
         raw_results: List[MatchError] = []
 
+        if not data:
+            return results
         # If the Play uses the 'vars' section to set variables
         our_vars = data.get("vars", {})
         for key in our_vars.keys():
@@ -161,7 +163,7 @@ class VariableNamingRule(AnsibleLintRule):
         raw_results: List[MatchError] = []
         meta_data: Dict[AnsibleUnicode, Any] = {}
 
-        if str(file.kind) == "vars":
+        if str(file.kind) == "vars" and file.data:
             meta_data = parse_yaml_from_file(str(file.path))
             for key in meta_data.keys():
                 if self.is_invalid_variable_name(key):
