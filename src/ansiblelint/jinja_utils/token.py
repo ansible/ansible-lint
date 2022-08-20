@@ -1,4 +1,4 @@
-from typing import Iterator, List, Literal, Optional
+from typing import Iterator, List, Literal, Optional, Tuple
 
 from dataclasses import dataclass
 from jinja2.lexer import (
@@ -192,6 +192,7 @@ def tokeniter(
 
 class Tokens:
     """A collection of Tokens."""
+
     def __init__(
         self,
         lexer: Lexer,
@@ -208,6 +209,20 @@ class Tokens:
     @property
     def current(self) -> Token:
         return self.tokens[self.index]
+
+    def seek(self, token_type: str) -> Tuple[List[Token], Optional[Token]]:
+        skipped = []
+        while True:
+            try:
+                token = next(self)
+            except StopIteration:
+                return skipped, None
+            if token.token == token_type or (
+                token.jinja_token is not None and token.jinja_token.type == token_type
+            ):
+                break
+            skipped.append(token)
+        return skipped, token
 
     def __iter__(self) -> "Tokens":
         return self
