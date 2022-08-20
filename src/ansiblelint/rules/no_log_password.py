@@ -63,10 +63,18 @@ class NoLogPasswordsRule(AnsibleLintRule):
         # No no_log and no_log: False behave the same way
         # and should return a failure (return True), so we
         # need to invert the boolean
+        no_log = task.get("no_log", False)
+
+        if (
+            isinstance(no_log, str)
+            and no_log.startswith("{{")
+            and no_log.endswith("}}")
+        ):
+            # we cannot really evaluate jinja expressions
+            return False
+
         return bool(
-            has_password
-            and not convert_to_boolean(task.get("no_log", False))
-            and len(has_loop) > 0
+            has_password and not convert_to_boolean(no_log) and len(has_loop) > 0
         )
 
 
@@ -88,6 +96,12 @@ if "pytest" in sys.modules:
     NO_LOG_FALSE = """
 - hosts: all
   tasks:
+    - name: Use of jinja for no_log is valid
+      user:
+          name: john_doe
+          user_password: "{{ item }}"
+          state: absent
+      no_log: "{{ False }}"
     - name: Fail when no_log is set to False
       user:
         name: john_doe
@@ -229,7 +243,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
     )
-    def test_password_lock_yes(rule_runner: RunFromText) -> None:
+    def test_no_log_password_lock_yes(rule_runner: RunFromText) -> None:
         """The task only locks the user."""
         results = rule_runner.run_playbook(PASSWORD_LOCK_YES)
         assert len(results) == 0
