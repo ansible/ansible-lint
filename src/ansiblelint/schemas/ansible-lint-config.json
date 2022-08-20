@@ -1,4 +1,19 @@
 {
+  "$defs": {
+    "rule": {
+      "additionalProperties": false,
+      "properties": {
+        "exclude_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Glob-like paths to be excluded.",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
   "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-lint.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
@@ -64,6 +79,62 @@
       "default": true,
       "title": "Quiet",
       "type": "boolean"
+    },
+    "rules": {
+      "additionalProperties": {
+        "$ref": "#/$defs/rule"
+      },
+      "propertyNames": {
+        "enum": [
+          "command-instead-of-module",
+          "command-instead-of-shell",
+          "deprecated-bare-vars",
+          "deprecated-command-syntax",
+          "deprecated-local-action",
+          "deprecated-module",
+          "empty-string-compare",
+          "fqcn-builtins",
+          "git-latest",
+          "hg-latest",
+          "ignore-errors",
+          "inline-env-var",
+          "internal-error",
+          "jinja",
+          "key-order",
+          "literal-compare",
+          "load-failure",
+          "meta-incorrect",
+          "meta-no-info",
+          "meta-no-tags",
+          "meta-video-links",
+          "name",
+          "no-changed-when",
+          "no-handler",
+          "no-jinja-nesting",
+          "no-jinja-when",
+          "no-log-password",
+          "no-loop-var-prefix",
+          "no-prompting",
+          "no-relative-paths",
+          "no-same-owner",
+          "no-tabs",
+          "only-builtins",
+          "package-latest",
+          "parser-error",
+          "partial-become",
+          "playbook-extension",
+          "risky-file-permissions",
+          "risky-octal",
+          "risky-shell-pipe",
+          "role-name",
+          "schema",
+          "syntax-check",
+          "var-naming",
+          "yaml"
+        ]
+      },
+      "title": "Rules specific configuration.",
+      "type": "object"
     },
     "rulesdir": {
       "items": {
