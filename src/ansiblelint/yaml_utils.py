@@ -204,6 +204,10 @@ def nested_items_path(
 
     :returns: each iteration yields the key (of the parent dict) or the index (lists)
     """
+    # As typing and mypy cannot effectively ensure we are called only with
+    # valid data, we better ignore NoneType
+    if data_collection is None:
+        return
     yield from _nested_items_path(data_collection=data_collection, parent_path=[])
 
 

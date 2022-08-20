@@ -64,9 +64,9 @@ def test_nested_items_path() -> None:
         "string",
         42,
         1.234,
-        None,
         ("tuple",),
         {"set"},
+        # NoneType is no longer include, as we assume we have to ignore it
     ),
 )
 def test_nested_items_path_raises_typeerror(invalid_data_input: Any) -> None:
