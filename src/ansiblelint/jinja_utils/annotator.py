@@ -117,7 +117,11 @@ class NodeAnnotator(NodeVisitor):
     def token_pair_expression(self, node: nodes.Node, left_token: str):
         pre_tokens, start_token = self.tokens.seek(left_token)
         stop_token = start_token.pair
-        start_index = start_token.index
+        if hasattr(node, "tokens"):
+            # some nodes consist of multiple blocks. In that case, just extend the end.
+            start_index = node.tokens[0]
+        else:
+            start_index = start_token.index
 
         yield pre_tokens, start_token, stop_token
 
