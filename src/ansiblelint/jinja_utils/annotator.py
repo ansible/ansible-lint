@@ -636,14 +636,13 @@ class NodeAnnotator(NodeVisitor):
 
         self.visit(node.left, parent=node)
 
-        values = []
         try:
             op_token = j2tokens.operators[node.operator]
         except KeyError:
-            op_token = j2tokens.TOKEN_NAME
-            values.append(node.operator)  # and, or
+            self.tokens.seek(j2tokens.TOKEN_NAME, node.operator)  # and, or
+        else:
+            self.tokens.seek(op_token)
 
-        self.tokens.seek(op_token, *values)
         self.visit(node.right, parent=node)
 
     visit_Add = _binary_op
