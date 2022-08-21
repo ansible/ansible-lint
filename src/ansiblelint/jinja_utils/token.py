@@ -210,16 +210,22 @@ class Tokens:
     def current(self) -> Token:
         return self.tokens[self.index]
 
-    def seek(self, token_type: str) -> Tuple[List[Token], Optional[Token]]:
+    def seek(
+        self, token_type: str, value: Optional[str] = None
+    ) -> Tuple[List[Token], Optional[Token]]:
         skipped = []
         while True:
             try:
                 token = next(self)
             except StopIteration:
                 return skipped, None
-            if token.token == token_type or (
-                token.jinja_token is not None and token.jinja_token.type == token_type
-            ):
+            if (
+                token.token == token_type
+                or (
+                    token.jinja_token is not None
+                    and token.jinja_token.type == token_type
+                )
+            ) and (value is None or value == token.value_str):
                 break
             skipped.append(token)
         return skipped, token
