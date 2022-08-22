@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import List
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -12,7 +11,7 @@ from ansiblelint import cli
 
 
 @pytest.fixture(name="base_arguments")
-def fixture_base_arguments() -> List[str]:
+def fixture_base_arguments() -> list[str]:
     """Define reusable base arguments for tests in current module."""
     return ["../test/skiptasks.yml"]
 
@@ -33,7 +32,7 @@ def fixture_base_arguments() -> List[str]:
     ),
 )
 def test_ensure_config_are_equal(
-    base_arguments: List[str], args: List[str], config: str
+    base_arguments: list[str], args: list[str], config: str
 ) -> None:
     """Check equality of the CLI options to config files."""
     command = base_arguments + args
@@ -89,7 +88,7 @@ def test_ensure_config_are_equal(
     ),
 )
 def test_ensure_write_cli_does_not_consume_lintables(
-    base_arguments: List[str], with_base: bool, args: List[str], config: str
+    base_arguments: list[str], with_base: bool, args: list[str], config: str
 ) -> None:
     """Check equality of the CLI --write options to config files."""
     cli_parser = cli.get_cli_parser()
@@ -106,7 +105,7 @@ def test_ensure_write_cli_does_not_consume_lintables(
     assert file_value == cli_value
 
 
-def test_config_can_be_overridden(base_arguments: List[str]) -> None:
+def test_config_can_be_overridden(base_arguments: list[str]) -> None:
     """Check that config can be overridden from CLI."""
     no_override = cli.get_config(base_arguments + ["-t", "bad_tag"])
 
@@ -117,7 +116,7 @@ def test_config_can_be_overridden(base_arguments: List[str]) -> None:
     assert no_override.tags + ["skip_ansible_lint"] == overridden.tags
 
 
-def test_different_config_file(base_arguments: List[str]) -> None:
+def test_different_config_file(base_arguments: list[str]) -> None:
     """Ensures an alternate config_file can be used."""
     diff_config = cli.get_config(
         base_arguments + ["-c", "test/fixtures/ansible-config.yml"]
@@ -127,7 +126,7 @@ def test_different_config_file(base_arguments: List[str]) -> None:
     assert diff_config.verbosity == no_config.verbosity
 
 
-def test_expand_path_user_and_vars_config_file(base_arguments: List[str]) -> None:
+def test_expand_path_user_and_vars_config_file(base_arguments: list[str]) -> None:
     """Ensure user and vars are expanded when specified as exclude_paths."""
     config1 = cli.get_config(
         base_arguments + ["-c", "test/fixtures/exclude-paths-with-expands.yml"]
@@ -155,7 +154,7 @@ def test_path_from_config_do_not_depend_on_cwd(
 
 
 def test_path_from_cli_depend_on_cwd(
-    base_arguments: List[str], monkeypatch: MonkeyPatch
+    base_arguments: list[str], monkeypatch: MonkeyPatch
 ) -> None:
     """Check that CLI-provided paths are relative to CWD."""
     # Issue 572
@@ -181,13 +180,13 @@ def test_path_from_cli_depend_on_cwd(
         pytest.param("/dev/null/ansible-config-missing.yml", id="missing"),
     ),
 )
-def test_config_failure(base_arguments: List[str], config_file: str) -> None:
+def test_config_failure(base_arguments: list[str], config_file: str) -> None:
     """Ensures specific config files produce error code 3."""
     with pytest.raises(SystemExit, match="^3$"):
         cli.get_config(base_arguments + ["-c", config_file])
 
 
-def test_extra_vars_loaded(base_arguments: List[str]) -> None:
+def test_extra_vars_loaded(base_arguments: list[str]) -> None:
     """Ensure ``extra_vars`` option is loaded from file config."""
     config = cli.get_config(
         base_arguments + ["-c", "test/fixtures/config-with-extra-vars.yml"]

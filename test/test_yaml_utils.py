@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from io import StringIO
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any
 
 import pytest
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -173,7 +173,7 @@ def test_custom_ruamel_yaml_emitter(
     map_indent: int,
     sequence_indent: int,
     sequence_dash_offset: int,
-    alternate_emitter: Optional[Emitter],
+    alternate_emitter: Emitter | None,
     expected_output: str,
 ) -> None:
     """Test ``ruamel.yaml.YAML.dump()`` sequence formatting and quotes."""
@@ -193,7 +193,7 @@ def test_custom_ruamel_yaml_emitter(
 
 
 @pytest.fixture(name="yaml_formatting_fixtures")
-def fixture_yaml_formatting_fixtures(fixture_filename: str) -> Tuple[str, str, str]:
+def fixture_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]:
     """Get the contents for the formatting fixture files.
 
     To regenerate these fixtures, please run ``test/fixtures/test_regenerate_formatting_fixtures.py``.
@@ -218,7 +218,7 @@ def fixture_yaml_formatting_fixtures(fixture_filename: str) -> Tuple[str, str, s
     ),
 )
 def test_formatted_yaml_loader_dumper(
-    yaml_formatting_fixtures: Tuple[str, str, str],
+    yaml_formatting_fixtures: tuple[str, str, str],
     fixture_filename: str,
 ) -> None:
     """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
@@ -262,10 +262,10 @@ def fixture_lintable(file_path: str) -> Lintable:
 
 
 @pytest.fixture(name="ruamel_data")
-def fixture_ruamel_data(lintable: Lintable) -> Union[CommentedMap, CommentedSeq]:
+def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
     """Return the loaded YAML data for the Lintable."""
     yaml = ansiblelint.yaml_utils.FormattedYAML()
-    data: Union[CommentedMap, CommentedSeq] = yaml.loads(lintable.content)
+    data: CommentedMap | CommentedSeq = yaml.loads(lintable.content)
     return data
 
 
@@ -481,8 +481,8 @@ def fixture_ruamel_data(lintable: Lintable) -> Union[CommentedMap, CommentedSeq]
 def test_get_path_to_play(
     lintable: Lintable,
     line_number: int,
-    ruamel_data: Union[CommentedMap, CommentedSeq],
-    expected_path: List[Union[int, str]],
+    ruamel_data: CommentedMap | CommentedSeq,
+    expected_path: list[int | str],
 ) -> None:
     """Ensure ``get_path_to_play`` returns the expected path given a file + line."""
     path_to_play = ansiblelint.yaml_utils.get_path_to_play(
@@ -835,8 +835,8 @@ def test_get_path_to_play(
 def test_get_path_to_task(
     lintable: Lintable,
     line_number: int,
-    ruamel_data: Union[CommentedMap, CommentedSeq],
-    expected_path: List[Union[int, str]],
+    ruamel_data: CommentedMap | CommentedSeq,
+    expected_path: list[int | str],
 ) -> None:
     """Ensure ``get_task_to_play`` returns the expected path given a file + line."""
     path_to_task = ansiblelint.yaml_utils.get_path_to_task(
@@ -861,7 +861,7 @@ def test_get_path_to_task(
 def test_get_path_to_play_raises_value_error_for_bad_line_number(
     lintable: Lintable,
     line_number: int,
-    ruamel_data: Union[CommentedMap, CommentedSeq],
+    ruamel_data: CommentedMap | CommentedSeq,
 ) -> None:
     """Ensure ``get_path_to_play`` raises ValueError for line_number < 1."""
     with pytest.raises(
@@ -877,7 +877,7 @@ def test_get_path_to_play_raises_value_error_for_bad_line_number(
 def test_get_path_to_task_raises_value_error_for_bad_line_number(
     lintable: Lintable,
     line_number: int,
-    ruamel_data: Union[CommentedMap, CommentedSeq],
+    ruamel_data: CommentedMap | CommentedSeq,
 ) -> None:
     """Ensure ``get_task_to_play`` raises ValueError for line_number < 1."""
     with pytest.raises(

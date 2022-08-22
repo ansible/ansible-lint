@@ -5,7 +5,7 @@ import os
 import pathlib
 import shutil
 from argparse import Namespace
-from typing import Iterator, List, Set, Tuple
+from typing import Iterator
 
 import pytest
 
@@ -19,7 +19,7 @@ from ansiblelint.transformer import Transformer
 @pytest.fixture(name="copy_examples_dir")
 def fixture_copy_examples_dir(
     tmp_path: pathlib.Path, config_options: Namespace
-) -> Iterator[Tuple[pathlib.Path, pathlib.Path]]:
+) -> Iterator[tuple[pathlib.Path, pathlib.Path]]:
     """Fixture that copies the examples/ dir into a tmpdir."""
     examples_dir = pathlib.Path("examples")
 
@@ -68,7 +68,7 @@ def fixture_runner_result(
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
     config_options: Namespace,
-    copy_examples_dir: Tuple[pathlib.Path, pathlib.Path],
+    copy_examples_dir: tuple[pathlib.Path, pathlib.Path],
     playbook: str,
     runner_result: LintResult,
     transformed: bool,
@@ -150,7 +150,7 @@ def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
         (["rule-id", "rule-id", "rule-id"], {"rule-id"}),
     ),
 )
-def test_effective_write_set(write_list: List[str], expected: Set[str]) -> None:
+def test_effective_write_set(write_list: list[str], expected: set[str]) -> None:
     """Make sure effective_write_set handles all/none keywords correctly."""
     actual = Transformer.effective_write_set(write_list)
     assert actual == expected

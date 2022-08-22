@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # documentation build configuration file, created by
 # sphinx-quickstart on Sat Sep 27 13:23:22 2008-2009.
@@ -19,7 +18,6 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional
 
 import pkg_resources
 
@@ -90,7 +88,7 @@ source_suffix = {
 # The master toctree document.
 master_doc = "index"
 
-apidoc_excluded_paths: List[str] = []
+apidoc_excluded_paths: list[str] = []
 apidoc_extra_args = [
     "--implicit-namespaces",
     "--private",  # include “_private” modules
@@ -99,7 +97,7 @@ apidoc_module_dir = "../src/ansiblelint"
 apidoc_module_first = False
 apidoc_output_dir = "pkg"
 apidoc_separate_modules = True
-apidoc_toc_file: Optional[str] = None
+apidoc_toc_file: str | None = None
 
 # General substitutions.
 project = "Ansible Lint Documentation"
@@ -284,38 +282,42 @@ linkcheck_anchors_ignore = [
 
 nitpicky = True
 nitpick_ignore = [
+    ("py:class", "AnsibleBaseYAMLObject"),
+    ("py:class", "BasePathLike"),
+    ("py:class", "CommentedMap"),
+    ("py:class", "CommentedSeq"),
+    ("py:class", "CompletedProcess"),
+    ("py:class", "FileType"),
+    ("py:class", "LintResult"),
+    ("py:class", "Lintable"),
+    ("py:class", "MatchError"),
+    ("py:class", "Namespace"),
+    ("py:class", "Path"),
+    ("py:class", "Pattern"),
+    ("py:class", "RulesCollection"),
+    ("py:class", "StreamType"),  # used in Emitter's type annotation
+    ("py:class", "Templar"),
+    ("py:class", "_pytest.fixtures.SubRequest"),
     ("py:class", "ansible.parsing.yaml.objects.AnsibleBaseYAMLObject"),
     ("py:class", "ansible.template.Templar"),
-    ("py:class", "Templar"),
-    ("py:class", "Lintable"),
-    ("py:class", "yaml"),
-    ("py:class", "role"),
-    ("py:class", "requirements"),
     ("py:class", "handlers"),
-    ("py:class", "tasks"),
     ("py:class", "meta"),
-    ("py:class", "playbook"),
-    ("py:class", "AnsibleBaseYAMLObject"),
-    ("py:class", "Namespace"),
-    ("py:class", "RulesCollection"),
-    ("py:class", "_pytest.fixtures.SubRequest"),
-    ("py:class", "MatchError"),
-    ("py:class", "Pattern"),
     ("py:class", "odict"),
-    ("py:class", "LintResult"),
-    ("py:class", "ruamel.yaml.main.YAML"),
+    ("py:class", "playbook"),
+    ("py:class", "requirements"),
+    ("py:class", "role"),
+    ("py:class", "ruamel.yaml.comments.CommentedMap"),
+    ("py:class", "ruamel.yaml.comments.CommentedSeq"),
     ("py:class", "ruamel.yaml.constructor.RoundTripConstructor"),
     ("py:class", "ruamel.yaml.emitter.Emitter"),
-    ("py:class", "StreamType"),  # used in Emitter's type annotation
     ("py:class", "ruamel.yaml.emitter.ScalarAnalysis"),
+    ("py:class", "ruamel.yaml.main.YAML"),
     ("py:class", "ruamel.yaml.nodes.ScalarNode"),
     ("py:class", "ruamel.yaml.representer.RoundTripRepresenter"),
     ("py:class", "ruamel.yaml.scalarint.ScalarInt"),
     ("py:class", "ruamel.yaml.tokens.CommentToken"),
-    ("py:class", "ruamel.yaml.comments.CommentedMap"),
-    ("py:class", "ruamel.yaml.comments.CommentedSeq"),
-    ("py:class", "CommentedMap"),
-    ("py:class", "CommentedSeq"),
+    ("py:class", "tasks"),
+    ("py:class", "yaml"),
     ("py:class", "yamllint.config.YamlLintConfig"),
     ("py:obj", "Any"),
     ("py:obj", "ansiblelint.formatters.T"),

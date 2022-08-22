@@ -5,7 +5,7 @@ import json
 import re
 import subprocess
 import sys
-from typing import Any, List
+from typing import Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.app import get_app
@@ -51,7 +51,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
 
     @staticmethod
     # pylint: disable=too-many-locals
-    def _get_ansible_syntax_check_matches(lintable: Lintable) -> List[MatchError]:
+    def _get_ansible_syntax_check_matches(lintable: Lintable) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
         if lintable.kind != "playbook":
             return []
@@ -79,10 +79,9 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             run = subprocess.run(
                 cmd,
                 stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
                 shell=False,  # needed when command is a list
-                universal_newlines=True,
+                text=True,
                 check=False,
                 env=env,
             )

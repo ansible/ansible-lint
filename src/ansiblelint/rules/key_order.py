@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
@@ -20,8 +20,8 @@ class KeyOrderRule(AnsibleLintRule):
     needs_raw_task = True
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         raw_task = task["__raw_task__"]
         if "name" in raw_task:
             attribute_list = [*raw_task]

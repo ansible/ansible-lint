@@ -6,7 +6,6 @@ import os
 import pathlib
 import re
 import sys
-from typing import Optional
 
 from ansiblelint.config import options
 from ansiblelint.constants import ANSIBLE_MOCKED_MODULE, INVALID_CONFIG_RC
@@ -44,8 +43,8 @@ def _make_module_stub(module_name: str) -> None:
 def _write_module_stub(
     filename: str,
     name: str,
-    namespace: Optional[str] = None,
-    collection: Optional[str] = None,
+    namespace: str | None = None,
+    collection: str | None = None,
 ) -> None:
     """Write module stub to disk."""
     body = ANSIBLE_MOCKED_MODULE.format(

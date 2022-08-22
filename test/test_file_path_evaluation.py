@@ -3,14 +3,13 @@ from __future__ import annotations
 
 import textwrap
 from pathlib import Path
-from typing import Dict
 
 import pytest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
-LAYOUT_IMPORTS: Dict[str, str] = {
+LAYOUT_IMPORTS: dict[str, str] = {
     "main.yml": textwrap.dedent(
         """\
         ---
@@ -53,7 +52,7 @@ LAYOUT_IMPORTS: Dict[str, str] = {
     ),
 }
 
-LAYOUT_INCLUDES: Dict[str, str] = {
+LAYOUT_INCLUDES: dict[str, str] = {
     "main.yml": textwrap.dedent(
         """\
         ---
@@ -107,7 +106,7 @@ LAYOUT_INCLUDES: Dict[str, str] = {
 def test_file_path_evaluation(
     tmp_path: Path,
     default_rules_collection: RulesCollection,
-    ansible_project_layout: Dict[str, str],
+    ansible_project_layout: dict[str, str],
 ) -> None:
     """Test file path evaluation when using import_tasks / include_tasks in the project.
 

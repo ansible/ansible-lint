@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -34,7 +34,7 @@ class BaseRule:
     """Root class used by Rules."""
 
     id: str = ""
-    tags: List[str] = []
+    tags: list[str] = []
     description: str = ""
     help: str = ""  # markdown help (automatically loaded from `<rule>.md`)
     version_added: str = ""
@@ -53,7 +53,7 @@ class BaseRule:
         """Return the short description of the rule, basically the docstring."""
         return self.__doc__ or ""
 
-    def getmatches(self, file: Lintable) -> List[MatchError]:
+    def getmatches(self, file: Lintable) -> list[MatchError]:
         """Return all matches while ignoring exceptions."""
         matches = []
         if not file.path.is_dir():
@@ -71,13 +71,13 @@ class BaseRule:
             matches.extend(self.matchdir(file))
         return matches
 
-    def matchlines(self, file: Lintable) -> List[MatchError]:
+    def matchlines(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific line."""
         return []
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str, MatchError]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str | MatchError:
         """Confirm if current rule is matching a specific task.
 
         If ``needs_raw_task`` (a class level attribute) is ``True``, then
@@ -86,19 +86,19 @@ class BaseRule:
         """
         return False
 
-    def matchtasks(self, file: Lintable) -> List[MatchError]:
+    def matchtasks(self, file: Lintable) -> list[MatchError]:
         """Return matches for a tasks file."""
         return []
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""
         return []
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
         return []
 
-    def matchdir(self, lintable: Lintable) -> List[MatchError]:
+    def matchdir(self, lintable: Lintable) -> list[MatchError]:
         """Return matches for lintable folders."""
         return []
 
@@ -106,7 +106,7 @@ class BaseRule:
         """Return a verbose representation of the rule."""
         return self.id + ": " + self.shortdesc + "\n  " + self.description
 
-    def match(self, line: str) -> Union[bool, str]:
+    def match(self, line: str) -> bool | str:
         """Confirm if current rule matches the given string."""
         return False
 

@@ -1,7 +1,7 @@
 """Console coloring and terminal support."""
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 import rich
 from rich.console import Console
@@ -19,7 +19,7 @@ _theme = Theme(
         "filename": "blue",
     }
 )
-console_options: Dict[str, Any] = {"emoji": False, "theme": _theme, "soft_wrap": True}
+console_options: dict[str, Any] = {"emoji": False, "theme": _theme, "soft_wrap": True}
 console_options_stderr = console_options.copy()
 console_options_stderr["stderr"] = True
 
@@ -27,7 +27,7 @@ console = rich.get_console()
 console_stderr = Console(**console_options_stderr)
 
 
-def reconfigure(new_options: Dict[str, Any]) -> None:
+def reconfigure(new_options: dict[str, Any]) -> None:
     """Reconfigure console options."""
     global console_options  # pylint: disable=global-statement,invalid-name
     global console_stderr  # pylint: disable=global-statement,invalid-name,global-variable-not-assigned

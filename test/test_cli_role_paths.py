@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Dict
 
 import pytest
 
@@ -159,7 +158,7 @@ def test_run_single_role_path_with_roles_path_env(local_test_dir: str) -> None:
     ((True, {"GITHUB_ACTIONS": "true", "GITHUB_WORKFLOW": "foo"}), (False, None)),
     ids=("on", "off"),
 )
-def test_run_playbook_github(result: bool, env: Dict[str, str]) -> None:
+def test_run_playbook_github(result: bool, env: dict[str, str]) -> None:
     """Call ansible-lint simulating GitHub Actions environment."""
     cwd = str(Path(__file__).parent.parent.resolve())
     role_path = "examples/playbooks/example.yml"

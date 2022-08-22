@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -135,7 +134,7 @@ def fixture_playbook_path(request: SubRequest, tmp_path: Path) -> str:
     indirect=("playbook_path",),
 )
 def test_import_role2(
-    default_rules_collection: RulesCollection, playbook_path: str, messages: List[str]
+    default_rules_collection: RulesCollection, playbook_path: str, messages: list[str]
 ) -> None:
     """Test that include_role digs deeper than import_role."""
     runner = Runner(

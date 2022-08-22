@@ -30,7 +30,7 @@ import shutil
 import subprocess
 import sys
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Iterator
 
 from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir
@@ -83,7 +83,7 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def initialize_options(arguments: Optional[List[str]] = None) -> None:
+def initialize_options(arguments: list[str] | None = None) -> None:
     """Load config options and store them inside options module."""
     new_options = cli.get_config(arguments or [])
     new_options.cwd = pathlib.Path.cwd()
@@ -120,7 +120,7 @@ def _do_list(rules: RulesCollection) -> int:
 
     if options.listrules:
 
-        _rule_format_map: Dict[str, Callable[..., Any]] = {
+        _rule_format_map: dict[str, Callable[..., Any]] = {
             "plain": rules_as_str,
             "rich": rules_as_rich,
             "md": rules_as_md,
@@ -155,7 +155,7 @@ def _do_transform(result: LintResult, opts: Namespace) -> None:
     transformer.run()
 
 
-def main(argv: Optional[List[str]] = None) -> int:  # noqa: C901
+def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
     path_inject()
@@ -252,7 +252,7 @@ def _previous_revision() -> Iterator[None]:
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD^1"],
         check=True,
-        universal_newlines=True,
+        text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
     ).stdout
@@ -279,7 +279,7 @@ def _run_cli_entrypoint() -> None:
     """
     try:
         sys.exit(main(sys.argv))
-    except IOError as exc:
+    except OSError as exc:
         # NOTE: Only "broken pipe" is acceptable to ignore
         if exc.errno != errno.EPIPE:
             raise

@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import os
-from typing import List
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
@@ -18,11 +17,11 @@ class PlaybookExtension(AnsibleLintRule):
     description = 'Playbooks should have the ".yml" or ".yaml" extension'
     severity = "MEDIUM"
     tags = ["formatting"]
-    done: List[str] = []
+    done: list[str] = []
     version_added = "v4.0.0"
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
-        result: List[MatchError] = []
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
+        result: list[MatchError] = []
         if file.kind != "playbook":
             return result
         path = str(file.path)

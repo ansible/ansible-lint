@@ -131,6 +131,7 @@ pyproject
 pyproject.toml
 pypy
 pytest
+pyupgrade
 pyyaml
 relpath
 reportversion

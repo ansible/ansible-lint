@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import convert_to_boolean
@@ -33,8 +33,8 @@ class ShellWithoutPipefail(AnsibleLintRule):
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         if task["__ansible_action_type__"] != "task":
             return False
 

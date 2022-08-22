@@ -22,7 +22,7 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg
@@ -57,8 +57,8 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     }
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         if task["action"]["__ansible_module__"] in self._commands:
             first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:

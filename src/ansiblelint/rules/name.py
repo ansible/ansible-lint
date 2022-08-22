@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
@@ -27,8 +27,8 @@ class NameRule(AnsibleLintRule):
     version_added = "historic"
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str, MatchError]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str | MatchError:
         name = task.get("name")
         if not name:
             return self.create_matcherror(

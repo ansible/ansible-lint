@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from yamllint.linter import run as run_yamllint
 
@@ -36,10 +36,10 @@ class YamllintRule(AnsibleLintRule):
         # customize id by adding the one reported by yamllint
         self.id = self.__class__.id
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""
-        matches: List[MatchError] = []
-        filtered_matches: List[MatchError] = []
+        matches: list[MatchError] = []
+        filtered_matches: list[MatchError] = []
         if str(file.base_kind) != "text/yaml":
             return matches
 
@@ -110,7 +110,7 @@ if "pytest" in sys.modules:
             "multi-document",
         ),
     )
-    def test_yamllint(file: str, expected_kind: str, expected: List[str]) -> None:
+    def test_yamllint(file: str, expected_kind: str, expected: list[str]) -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(file)
         assert lintable.kind == expected_kind

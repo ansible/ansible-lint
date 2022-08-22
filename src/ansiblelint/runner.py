@@ -8,7 +8,7 @@ import os
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, FrozenSet, Generator, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, Generator
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
@@ -29,8 +29,8 @@ _logger = logging.getLogger(__name__)
 class LintResult:
     """Class that tracks result of linting."""
 
-    matches: List[MatchError]
-    files: Set[Lintable]
+    matches: list[MatchError]
+    files: set[Lintable]
 
 
 class Runner:
@@ -39,17 +39,17 @@ class Runner:
     # pylint: disable=too-many-arguments
     def __init__(
         self,
-        *lintables: Union[Lintable, str],
+        *lintables: Lintable | str,
         rules: RulesCollection,
-        tags: FrozenSet[Any] = frozenset(),
-        skip_list: Optional[List[str]] = None,
-        exclude_paths: Optional[List[str]] = None,
+        tags: frozenset[Any] = frozenset(),
+        skip_list: list[str] | None = None,
+        exclude_paths: list[str] | None = None,
         verbosity: int = 0,
-        checked_files: Optional[Set[Lintable]] = None,
+        checked_files: set[Lintable] | None = None,
     ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
-        self.lintables: Set[Lintable] = set()
+        self.lintables: set[Lintable] = set()
 
         if skip_list is None:
             skip_list = []
@@ -73,7 +73,7 @@ class Runner:
             checked_files = set()
         self.checked_files = checked_files
 
-    def _update_exclude_paths(self, exclude_paths: List[str]) -> None:
+    def _update_exclude_paths(self, exclude_paths: list[str]) -> None:
         if exclude_paths:
             # These will be (potentially) relative paths
             paths = ansiblelint.file_utils.expand_paths_vars(exclude_paths)
@@ -106,10 +106,10 @@ class Runner:
             for path in self.exclude_paths
         )
 
-    def run(self) -> List[MatchError]:  # noqa: C901
+    def run(self) -> list[MatchError]:  # noqa: C901
         """Execute the linting process."""
-        files: List[Lintable] = []
-        matches: List[MatchError] = []
+        files: list[Lintable] = []
+        matches: list[MatchError] = []
 
         # remove exclusions
         for lintable in self.lintables.copy():
@@ -130,7 +130,7 @@ class Runner:
                 lintable.stop_processing = True
 
         # -- phase 1 : syntax check in parallel --
-        def worker(lintable: Lintable) -> List[MatchError]:
+        def worker(lintable: Lintable) -> list[MatchError]:
             # pylint: disable=protected-access
             return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
 
@@ -181,8 +181,8 @@ class Runner:
 
         return sorted(set(matches))
 
-    def _emit_matches(self, files: List[Lintable]) -> Generator[MatchError, None, None]:
-        visited: Set[Lintable] = set()
+    def _emit_matches(self, files: list[Lintable]) -> Generator[MatchError, None, None]:
+        visited: set[Lintable] = set()
         while visited != self.lintables:
             for lintable in self.lintables - visited:
                 try:
@@ -208,7 +208,7 @@ def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
     lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
     matches = []
-    checked_files: Set[Lintable] = set()
+    checked_files: set[Lintable] = set()
     runner = Runner(
         *lintables,
         rules=rules,

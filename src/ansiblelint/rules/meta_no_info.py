@@ -3,7 +3,7 @@
 # Copyright (c) 2018, Ansible Project
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generator, List
+from typing import TYPE_CHECKING, Generator
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
@@ -26,7 +26,7 @@ META_INFO = tuple(
 
 
 def _platform_info_errors_itr(
-    platforms: List[odict[str, str]],
+    platforms: list[odict[str, str]],
 ) -> Generator[str, None, None]:
     if not isinstance(platforms, list):
         yield "Platforms should be a list of dictionaries"
@@ -41,8 +41,8 @@ def _platform_info_errors_itr(
 
 def _galaxy_info_errors_itr(
     galaxy_info: odict[str, Any],
-    info_list: Tuple[str, ...] = META_INFO,
-    str_info_list: Tuple[str, ...] = META_STR_INFO,
+    info_list: tuple[str, ...] = META_INFO,
+    str_info_list: tuple[str, ...] = META_STR_INFO,
 ) -> Generator[str, None, None]:
     for info in info_list:
         g_info = galaxy_info.get(info, False)
@@ -50,8 +50,7 @@ def _galaxy_info_errors_itr(
             if info in str_info_list and not isinstance(g_info, str):
                 yield f"{info} should be a string"
             elif info == "platforms":
-                for err in _platform_info_errors_itr(g_info):
-                    yield err
+                yield from _platform_info_errors_itr(g_info)
         else:
             yield f"Role info should contain {info}"
 
@@ -67,7 +66,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
     tags = ["metadata"]
     version_added = "v4.0.0"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         if file.kind != "meta":
             return []
 

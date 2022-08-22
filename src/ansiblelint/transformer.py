@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 from argparse import Namespace
-from typing import Dict, List, Optional, Set, Union, cast
+from typing import Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -35,13 +35,13 @@ class Transformer:
         """Initialize a Transformer instance."""
         self.write_set = self.effective_write_set(options.write_list)
 
-        self.matches: List[MatchError] = result.matches
-        self.files: Set[Lintable] = result.files
+        self.matches: list[MatchError] = result.matches
+        self.files: set[Lintable] = result.files
 
         file: Lintable
         # pylint: disable=undefined-variable
-        lintables: Dict[str, Lintable] = {file.filename: file for file in result.files}
-        self.matches_per_file: Dict[Lintable, List[MatchError]] = {
+        lintables: dict[str, Lintable] = {file.filename: file for file in result.files}
+        self.matches_per_file: dict[Lintable, list[MatchError]] = {
             file: [] for file in result.files
         }
 
@@ -55,7 +55,7 @@ class Transformer:
             self.matches_per_file[lintable].append(match)
 
     @staticmethod
-    def effective_write_set(write_list: List[str]) -> Set[str]:
+    def effective_write_set(write_list: list[str]) -> set[str]:
         """Simplify write_list based on ``"none"`` and ``"all"`` keywords.
 
         ``"none"`` resets the enabled rule transforms.
@@ -88,7 +88,7 @@ class Transformer:
                 data = ""
                 file_is_yaml = False
 
-            ruamel_data: Optional[Union[CommentedMap, CommentedSeq]] = None
+            ruamel_data: CommentedMap | CommentedSeq | None = None
             if file_is_yaml:
                 # We need a fresh YAML() instance for each load because ruamel.yaml
                 # stores intermediate state during load which could affect loading
@@ -115,9 +115,9 @@ class Transformer:
     def _do_transforms(
         self,
         file: Lintable,
-        data: Union[CommentedMap, CommentedSeq, str],
+        data: CommentedMap | CommentedSeq | str,
         file_is_yaml: bool,
-        matches: List[MatchError],
+        matches: list[MatchError],
     ) -> None:
         """Do Rule-Transforms handling any last-minute MatchError inspections."""
         for match in sorted(matches):

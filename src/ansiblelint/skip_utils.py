@@ -25,7 +25,7 @@ import collections.abc
 import logging
 from functools import lru_cache
 from itertools import product
-from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Sequence, Set
+from typing import TYPE_CHECKING, Any, Generator, Sequence
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
 
 _logger = logging.getLogger(__name__)
-_found_deprecated_tags: Set[str] = set()
+_found_deprecated_tags: set[str] = set()
 
 # playbook: Sequence currently expects only instances of one of the two
 # classes below but we should consider avoiding this chimera.
@@ -47,7 +47,7 @@ _found_deprecated_tags: Set[str] = set()
 # ansible.parsing.yaml.objects.AnsibleSequence
 
 
-def get_rule_skips_from_line(line: str) -> List[str]:
+def get_rule_skips_from_line(line: str) -> list[str]:
     """Return list of rule ids skipped via comment on the line of yaml."""
     _before_noqa, _noqa_marker, noqa_text = line.partition("# noqa")
 
@@ -116,7 +116,7 @@ def load_data(file_text: str) -> Any:
 
 def _append_skipped_rules(  # noqa: max-complexity: 12
     pyyaml_data: AnsibleBaseYAMLObject, lintable: Lintable
-) -> Optional[AnsibleBaseYAMLObject]:
+) -> AnsibleBaseYAMLObject | None:
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
     skipped_rules = _get_rule_skips_from_yaml(ruamel_data)
@@ -171,7 +171,7 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
     return pyyaml_data
 
 
-def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> List[Any]:
+def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> list[Any]:
     """Return parts of playbook that contains tasks, and nested tasks.
 
     :param playbook: playbook yaml from yaml parser.
@@ -200,8 +200,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
                     yield subtask
 
     for task in task_blocks:
-        for sub_task in get_nested_tasks(task):
-            yield sub_task
+        yield from get_nested_tasks(task)
         yield task
 
 
@@ -246,7 +245,7 @@ def normalize_tag(tag: str) -> str:
     return tag
 
 
-def is_nested_task(task: Dict[str, Any]) -> bool:
+def is_nested_task(task: dict[str, Any]) -> bool:
     """Check if task includes block/always/rescue."""
     # Cannot really trust the input
     if isinstance(task, str):

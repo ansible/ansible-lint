@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
@@ -51,7 +51,7 @@ class RoleNames(AnsibleLintRule):
     )
     link = "https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory"
     severity = "HIGH"
-    done: List[str] = []  # already noticed roles list
+    done: list[str] = []  # already noticed roles list
     tags = ["deprecations", "metadata"]
     version_added = "v4.3.0"
 
@@ -59,11 +59,11 @@ class RoleNames(AnsibleLintRule):
         """Save precompiled regex."""
         self._re = re.compile(ROLE_NAME_REGEX)
 
-    def matchdir(self, lintable: Lintable) -> List[MatchError]:
+    def matchdir(self, lintable: Lintable) -> list[MatchError]:
         return self.matchyaml(lintable)
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
-        result: List[MatchError] = []
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
+        result: list[MatchError] = []
 
         if file.kind not in ("meta", "role"):
             return result

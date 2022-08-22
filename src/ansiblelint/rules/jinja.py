@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any
 
 import jinja2
 from ansible.parsing.yaml.objects import AnsibleUnicode
@@ -40,8 +40,8 @@ class JinjaRule(AnsibleLintRule):
         return self._tag2msg[tag].format(value=value, reformatted=reformatted)
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str, MatchError]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str | MatchError:
         for _, v, _ in nested_items_path(task):
             if isinstance(v, str):
                 reformatted, details, tag = self.check_whitespace(v)
@@ -55,11 +55,11 @@ class JinjaRule(AnsibleLintRule):
                     )
         return False
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
-        data: Dict[str, Any] = {}
-        raw_results: List[MatchError] = []
-        results: List[MatchError] = []
+        data: dict[str, Any] = {}
+        raw_results: list[MatchError] = []
+        results: list[MatchError] = []
 
         if str(file.kind) == "vars":
             data = parse_yaml_from_file(str(file.path))
@@ -90,7 +90,7 @@ class JinjaRule(AnsibleLintRule):
             results.extend(super().matchyaml(file))
         return results
 
-    def lex(self, text: str) -> List[Tuple[int, str, str]]:
+    def lex(self, text: str) -> list[tuple[int, str, str]]:
         """Parse jinja template."""
         # https://github.com/pallets/jinja/issues/1711
         self.env.keep_trailing_newline = True
@@ -105,7 +105,7 @@ class JinjaRule(AnsibleLintRule):
             )
         return tokens
 
-    def unlex(self, tokens: List[Any]) -> str:
+    def unlex(self, tokens: list[Any]) -> str:
         """Return original text by compiling the lex output."""
         result = ""
         last_lineno = 1
@@ -121,7 +121,7 @@ class JinjaRule(AnsibleLintRule):
     # pylint: disable=too-many-branches,too-many-statements,too-many-locals
     def check_whitespace(  # noqa: max-complexity: 13
         self, text: str
-    ) -> Tuple[str, str, str]:
+    ) -> tuple[str, str, str]:
         """Check spacing inside given jinja2 template string.
 
         We aim to match Python Black formatting rules.
@@ -158,12 +158,12 @@ class JinjaRule(AnsibleLintRule):
         pre_spaced_operators = spaced_operators
         post_spaced_operators = spaced_operators | space_folowed_operators
 
-        def in_expression(tokens: List[Any]) -> str:
+        def in_expression(tokens: list[Any]) -> str:
             """Check if tokens represent an unfinished expression.
 
             Returns last unclosed {[( or empty string.
             """
-            opened: List[str] = []
+            opened: list[str] = []
             pairs = {
                 ")": "(",
                 "]": "[",
@@ -337,13 +337,13 @@ if "pytest" in sys.modules:  # noqa: C901
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     @pytest.fixture(name="error_expected_lines")
-    def fixture_error_expected_lines() -> List[int]:
+    def fixture_error_expected_lines() -> list[int]:
         """Return list of expected error lines."""
         return [31, 34, 37, 40, 43, 46, 72, 83]
 
     # 21 68
     @pytest.fixture(name="lint_error_lines")
-    def fixture_lint_error_lines() -> List[int]:
+    def fixture_lint_error_lines() -> list[int]:
         """Get VarHasSpacesRules linting results on test_playbook."""
         collection = RulesCollection()
         collection.register(JinjaRule())
@@ -352,7 +352,7 @@ if "pytest" in sys.modules:  # noqa: C901
         return list(map(lambda item: item.linenumber, results))
 
     def test_jinja_spacing_playbook(
-        error_expected_lines: List[int], lint_error_lines: List[int]
+        error_expected_lines: list[int], lint_error_lines: list[int]
     ) -> None:
         """Ensure that expected error lines are matching found linting error lines."""
         # list unexpected error lines or non-matching error lines

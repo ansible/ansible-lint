@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -38,7 +38,7 @@ def fixture_test_rules_collection() -> RulesCollection:
     return collection
 
 
-def dict_to_files(parent_dir: Path, file_dict: Dict[str, Any]) -> None:
+def dict_to_files(parent_dir: Path, file_dict: dict[str, Any]) -> None:
     """Write a nested dict to a file and directory structure below parent_dir."""
     for file, content in file_dict.items():
         if isinstance(content, dict):
@@ -75,7 +75,7 @@ def fixture_playbook_path(request: SubRequest, tmp_path: Path) -> str:
     indirect=("playbook_path",),
 )
 def test_role_name(
-    test_rules_collection: RulesCollection, playbook_path: str, messages: List[str]
+    test_rules_collection: RulesCollection, playbook_path: str, messages: list[str]
 ) -> None:
     """Lint a playbook and compare the expected messages with the actual messages."""
     runner = Runner(playbook_path, rules=test_rules_collection)

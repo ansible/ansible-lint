@@ -1,7 +1,7 @@
 """Generic tests for AnsibleLintRule class."""
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -18,7 +18,7 @@ def test_unjinja() -> None:
 
 
 @pytest.mark.parametrize("rule_config", ({}, dict(foo=True, bar=1)))
-def test_rule_config(rule_config: Dict[str, Any], monkeypatch: MonkeyPatch) -> None:
+def test_rule_config(rule_config: dict[str, Any], monkeypatch: MonkeyPatch) -> None:
     """Check that a rule config is inherited from options."""
     rule_id = "rule-0"
     monkeypatch.setattr(AnsibleLintRule, "id", rule_id)

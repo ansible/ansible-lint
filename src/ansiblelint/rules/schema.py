@@ -6,7 +6,7 @@ import logging
 import os
 import sys
 from functools import lru_cache
-from typing import Any, List
+from typing import Any
 
 import yaml
 from jsonschema import validate
@@ -53,7 +53,7 @@ class ValidateSchemaRule(AnsibleLintRule):
         with open(schema_file, encoding="utf-8") as f:
             return json.load(f)
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return JSON validation errors found as a list of MatchError(s)."""
         result = []
         if file.kind not in JSON_SCHEMAS:
@@ -200,7 +200,7 @@ if "pytest" in sys.modules:
             "argspecs-broken",
         ),
     )
-    def test_schema(file: str, expected_kind: str, expected: List[str]) -> None:
+    def test_schema(file: str, expected_kind: str, expected: list[str]) -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(file)
         assert lintable.kind == expected_kind

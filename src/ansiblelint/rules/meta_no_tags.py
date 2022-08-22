@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -32,7 +32,7 @@ class MetaTagValidRule(AnsibleLintRule):
 
     TAG_REGEXP = re.compile("^[a-z0-9]+$")
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Find violations inside meta files."""
         if file.kind != "meta":
             return []

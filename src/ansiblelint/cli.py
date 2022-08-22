@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CLI parser setup and helpers."""
 from __future__ import annotations
 
@@ -8,7 +7,7 @@ import os
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence, Union
+from typing import Any, Callable, Sequence
 
 import yaml
 
@@ -33,7 +32,7 @@ _PATH_VARS = [
 
 
 def expand_to_normalized_paths(
-    config: Dict[str, Any], base_dir: Optional[str] = None
+    config: dict[str, Any], base_dir: str | None = None
 ) -> None:
     """Mutate given config normalizing any path values in it."""
     # config can be None (-c /dev/null)
@@ -53,7 +52,7 @@ def expand_to_normalized_paths(
         config[paths_var] = normalized_paths
 
 
-def load_config(config_file: str) -> Dict[Any, Any]:
+def load_config(config_file: str) -> dict[Any, Any]:
     """Load configuration from disk."""
     config_path = None
     if config_file:
@@ -67,7 +66,7 @@ def load_config(config_file: str) -> Dict[Any, Any]:
         return {}
 
     try:
-        with open(config_path, "r", encoding="utf-8") as stream:
+        with open(config_path, encoding="utf-8") as stream:
             config = yaml.safe_load(stream)
             # We want to allow passing /dev/null to disable config use
             if config is None:
@@ -94,7 +93,7 @@ def load_config(config_file: str) -> Dict[Any, Any]:
     return config
 
 
-def get_config_path(config_file: Optional[str] = None) -> Optional[str]:
+def get_config_path(config_file: str | None = None) -> str | None:
     """Return local config file."""
     if config_file:
         project_filenames = [config_file]
@@ -122,8 +121,8 @@ class AbspathArgAction(argparse.Action):
         self,
         parser: argparse.ArgumentParser,
         namespace: Namespace,
-        values: Union[str, Sequence[Any], None],
-        option_string: Optional[str] = None,
+        values: str | Sequence[Any] | None,
+        option_string: str | None = None,
     ) -> None:
         if isinstance(values, (str, Path)):
             values = [values]
@@ -143,16 +142,16 @@ class WriteArgAction(argparse.Action):
     # noinspection PyShadowingBuiltins
     def __init__(  # pylint: disable=too-many-arguments,redefined-builtin
         self,
-        option_strings: List[str],
+        option_strings: list[str],
         dest: str,
-        nargs: Optional[Union[int, str]] = None,
+        nargs: int | str | None = None,
         const: Any = None,
         default: Any = None,
-        type: Optional[Callable[[str], Any]] = None,
-        choices: Optional[List[Any]] = None,
+        type: Callable[[str], Any] | None = None,
+        choices: list[Any] | None = None,
         required: bool = False,
-        help: Optional[str] = None,
-        metavar: Optional[str] = None,
+        help: str | None = None,
+        metavar: str | None = None,
     ) -> None:
         """Create the argparse action with WriteArg-specific defaults."""
         if nargs is not None:
@@ -176,8 +175,8 @@ class WriteArgAction(argparse.Action):
         self,
         parser: argparse.ArgumentParser,
         namespace: Namespace,
-        values: Union[str, Sequence[Any], None],
-        option_string: Optional[str] = None,
+        values: str | Sequence[Any] | None,
+        option_string: str | None = None,
     ) -> None:
         lintables = getattr(namespace, "lintables", None)
         if not lintables and isinstance(values, str):
@@ -200,8 +199,8 @@ class WriteArgAction(argparse.Action):
 
     @classmethod
     def merge_write_list_config(
-        cls, from_file: List[str], from_cli: List[str]
-    ) -> List[str]:
+        cls, from_file: list[str], from_cli: list[str]
+    ) -> list[str]:
         """Combine the write_list from file config with --write CLI arg.
 
         Handles the implicit "all" when "__default__" is present and file config is empty.
@@ -429,7 +428,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespace:
+def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespace:
     """Combine the file config with the CLI args."""
     bools = (
         "display_relative_path",
@@ -509,7 +508,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     return cli_config
 
 
-def get_config(arguments: List[str]) -> Namespace:
+def get_config(arguments: list[str]) -> Namespace:
     """Extract the config based on given args."""
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
@@ -545,7 +544,7 @@ def print_help(file: Any = sys.stdout) -> None:
     get_cli_parser().print_help(file=file)
 
 
-def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
+def get_rules_dirs(rulesdir: list[str], use_default: bool = True) -> list[str]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
     default_custom_rulesdir = os.environ.get(

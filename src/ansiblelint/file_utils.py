@@ -12,7 +12,7 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Union, cast
+from typing import TYPE_CHECKING, Any, Iterator, cast
 
 # import wcmatch
 import wcmatch.pathlib
@@ -46,7 +46,7 @@ def abspath(path: str, base_dir: str) -> str:
     return os.path.normpath(path)
 
 
-def normpath(path: Union[str, BasePathLike]) -> str:
+def normpath(path: str | BasePathLike) -> str:
     """
     Normalize a path in order to provide a more consistent output.
 
@@ -66,7 +66,7 @@ def normpath(path: Union[str, BasePathLike]) -> str:
 
 
 @contextmanager
-def cwd(path: Union[str, BasePathLike]) -> Iterator[None]:
+def cwd(path: str | BasePathLike) -> Iterator[None]:
     """Context manager for temporary changing current working directory."""
     old_pwd = os.getcwd()
     os.chdir(path)
@@ -85,7 +85,7 @@ def expand_path_vars(path: str) -> str:
     return path
 
 
-def expand_paths_vars(paths: List[str]) -> List[str]:
+def expand_paths_vars(paths: list[str]) -> list[str]:
     """Expand the environment or ~ variables in a list."""
     paths = [expand_path_vars(p) for p in paths]
     return paths
@@ -137,15 +137,15 @@ class Lintable:
 
     def __init__(
         self,
-        name: Union[str, Path],
-        content: Optional[str] = None,
-        kind: Optional[FileType] = None,
+        name: str | Path,
+        content: str | None = None,
+        kind: FileType | None = None,
     ):
         """Create a Lintable instance."""
         # Filename is effective file on disk, for stdin is a namedtempfile
         self.filename: str = str(name)
         self.dir: str = ""
-        self.kind: Optional[FileType] = None
+        self.kind: FileType | None = None
         self.stop_processing = False  # Set to stop other rules from running
         self._data: Any = None
 
@@ -304,7 +304,7 @@ class Lintable:
 
 
 # pylint: disable=redefined-outer-name
-def discover_lintables(options: Namespace) -> Dict[str, Any]:
+def discover_lintables(options: Namespace) -> dict[str, Any]:
     """Find all files that we know how to lint."""
     # git is preferred as it also considers .gitignore
     git_command_present = [
@@ -320,14 +320,14 @@ def discover_lintables(options: Namespace) -> Dict[str, Any]:
 
     try:
         out_present = subprocess.check_output(
-            git_command_present, stderr=subprocess.STDOUT, universal_newlines=True
+            git_command_present, stderr=subprocess.STDOUT, text=True
         ).split("\x00")[:-1]
         _logger.info(
             "Discovered files to lint using: %s", " ".join(git_command_present)
         )
 
         out_absent = subprocess.check_output(
-            git_command_absent, stderr=subprocess.STDOUT, universal_newlines=True
+            git_command_absent, stderr=subprocess.STDOUT, text=True
         ).split("\x00")[:-1]
         _logger.info("Excluded removed files using: %s", " ".join(git_command_absent))
 
@@ -361,7 +361,7 @@ def strip_dotslash_prefix(fname: str) -> str:
     return fname[2:] if fname.startswith("./") else fname
 
 
-def guess_project_dir(config_file: Optional[str]) -> str:
+def guess_project_dir(config_file: str | None) -> str:
     """Return detected project dir or current working directory."""
     path = None
     if config_file is not None:
@@ -373,9 +373,8 @@ def guess_project_dir(config_file: Optional[str]) -> str:
         try:
             result = subprocess.run(
                 ["git", "rev-parse", "--show-toplevel"],
-                stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                universal_newlines=True,
+                capture_output=True,
+                text=True,
                 check=True,
             )
 
@@ -402,7 +401,7 @@ def guess_project_dir(config_file: Optional[str]) -> str:
     return path
 
 
-def expand_dirs_in_lintables(lintables: Set[Lintable]) -> None:
+def expand_dirs_in_lintables(lintables: set[Lintable]) -> None:
     """Return all recognized lintables within given directory."""
     should_expand = False
 

@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 import re
-from typing import Union
 
 
-def strip_ansi_escape(data: Union[str, bytes]) -> str:
+def strip_ansi_escape(data: str | bytes) -> str:
     """Remove all ANSI escapes from string or bytes.
 
     If bytes is passed instead of string, it will be converted to string
