@@ -28,7 +28,7 @@ class BaseFormatter(Generic[T]):
         display_relative_path (bool): whether to show path as relative or absolute
     """
 
-    def __init__(self, base_dir: Union[str, Path], display_relative_path: bool) -> None:
+    def __init__(self, base_dir: str | Path, display_relative_path: bool) -> None:
         """Initialize a BaseFormatter instance."""
         if isinstance(base_dir, str):
             base_dir = Path(base_dir)
@@ -37,7 +37,7 @@ class BaseFormatter(Generic[T]):
 
         self._base_dir = base_dir if display_relative_path else None
 
-    def _format_path(self, path: Union[str, Path]) -> Union[str, Path]:
+    def _format_path(self, path: str | Path) -> str | Path:
         if not self._base_dir or not path:
             return path
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
@@ -148,7 +148,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
     https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#user-content-data-types
     """
 
-    def format_result(self, matches: List[MatchError]) -> str:
+    def format_result(self, matches: list[MatchError]) -> str:
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             raise RuntimeError(
@@ -157,7 +157,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
 
         result = []
         for match in matches:
-            issue: Dict[str, Any] = {}
+            issue: dict[str, Any] = {}
             issue["type"] = "issue"
             issue["check_name"] = match.tag or match.rule.id  # rule-id[subrule-id]
             issue["categories"] = match.rule.tags
@@ -213,7 +213,7 @@ class SarifFormatter(BaseFormatter[Any]):
         "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
     )
 
-    def format_result(self, matches: List[MatchError]) -> str:
+    def format_result(self, matches: list[MatchError]) -> str:
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             raise RuntimeError(
@@ -255,8 +255,8 @@ class SarifFormatter(BaseFormatter[Any]):
         )
 
     def _extract_results(
-        self, matches: List[MatchError]
-    ) -> Tuple[List[Any], List[Any]]:
+        self, matches: list[MatchError]
+    ) -> tuple[list[Any], list[Any]]:
         rules = {}
         results = []
         for match in matches:
@@ -265,8 +265,8 @@ class SarifFormatter(BaseFormatter[Any]):
             results.append(self._to_sarif_result(match))
         return list(rules.values()), results
 
-    def _to_sarif_rule(self, match: MatchError) -> Dict[str, Any]:
-        rule: Dict[str, Any] = {
+    def _to_sarif_rule(self, match: MatchError) -> dict[str, Any]:
+        rule: dict[str, Any] = {
             "id": match.rule.id,
             "name": match.rule.id,
             "shortDescription": {
@@ -285,8 +285,8 @@ class SarifFormatter(BaseFormatter[Any]):
             rule["helpUri"] = match.rule.link
         return rule
 
-    def _to_sarif_result(self, match: MatchError) -> Dict[str, Any]:
-        result: Dict[str, Any] = {
+    def _to_sarif_result(self, match: MatchError) -> dict[str, Any]:
+        result: dict[str, Any] = {
             "ruleId": match.rule.id,
             "message": {
                 "text": match.details,

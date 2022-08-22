@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import LINE_NUMBER_KEY
@@ -27,7 +27,7 @@ class NoPromptingRule(AnsibleLintRule):
     severity = "VERY_LOW"
     version_added = "v6.0.3"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
         # If the Play uses the 'vars_prompt' section to set variables
 
@@ -47,8 +47,8 @@ class NoPromptingRule(AnsibleLintRule):
         ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         """Return matches for ansible.builtin.pause tasks."""
         # We do not want to trigger this rule if pause has either seconds or
         # minutes defined, as that does not make it blocking.

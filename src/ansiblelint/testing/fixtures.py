@@ -11,7 +11,7 @@ import copy
 import os
 from argparse import Namespace
 from pathlib import Path
-from typing import Iterator, Union
+from typing import Iterator
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -33,7 +33,7 @@ def fixture_play_file_path(tmp_path: Path) -> str:
 
 @pytest.fixture
 def runner(
-    play_file_path: Union[Lintable, str], default_rules_collection: RulesCollection
+    play_file_path: Lintable | str, default_rules_collection: RulesCollection
 ) -> Runner:
     """Fixture to return a Runner() instance."""
     return Runner(play_file_path, rules=default_rules_collection)

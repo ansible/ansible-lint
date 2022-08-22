@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
@@ -21,8 +21,8 @@ class OnlyBuiltinsRule(AnsibleLintRule):
     tags = ["opt-in", "experimental"]
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         fqcn_builtin = task["action"]["__ansible_module_original__"].startswith(
             "ansible.builtin."
         )

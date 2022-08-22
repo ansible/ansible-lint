@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import functools
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.file_utils import Lintable, normpath
@@ -28,15 +28,15 @@ class MatchError(ValueError):
     # pylint: disable=too-many-arguments
     def __init__(
         self,
-        message: Optional[str] = None,
+        message: str | None = None,
         # most linters report use (1,1) base, including yamllint and flake8
         # we should never report line 0 or column 0 in output.
         linenumber: int = 1,
-        column: Optional[int] = None,
+        column: int | None = None,
         details: str = "",
-        filename: Optional[Union[str, Lintable]] = None,
+        filename: str | Lintable | None = None,
         rule: BaseRule = RuntimeErrorRule(),
-        tag: Optional[str] = None,  # optional fine-graded tag
+        tag: str | None = None,  # optional fine-graded tag
     ) -> None:
         """Initialize a MatchError instance."""
         super().__init__(message)
@@ -75,11 +75,11 @@ class MatchError(ValueError):
         self.tag = tag
 
         # optional indicator on how this error was found
-        self.match_type: Optional[str] = None
+        self.match_type: str | None = None
         # for task matches, save the normalized task object (useful for transforms)
-        self.task: Optional[Dict[str, Any]] = None
+        self.task: dict[str, Any] | None = None
         # path to the problem area, like: [0,"pre_tasks",3] for [0].pre_tasks[3]
-        self.yaml_path: List[Union[int, str]] = []
+        self.yaml_path: list[int | str] = []
         # True when a transform has resolved this MatchError
         self.fixed = False
 

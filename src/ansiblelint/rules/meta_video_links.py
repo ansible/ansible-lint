@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY
@@ -35,7 +35,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
         "youtube": re.compile(r"https://youtu\.be/([0-9A-Za-z-_]+)"),
     }
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         if file.kind != "meta":
             return []
 

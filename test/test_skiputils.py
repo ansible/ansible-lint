@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -216,6 +216,6 @@ def test_append_skipped_rules(
         ),
     ),
 )
-def test_is_nested_task(task: Dict[str, Any], expected: bool) -> None:
+def test_is_nested_task(task: dict[str, Any], expected: bool) -> None:
     """Test is_nested_task() returns expected bool."""
     assert is_nested_task(task) == expected

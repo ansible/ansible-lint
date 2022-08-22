@@ -22,7 +22,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -67,8 +67,8 @@ handle the output of the ``command``.
     _commands = ["command", "shell", "raw"]
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         # tasks in a block are "meta" type
         if task["__ansible_action_type__"] in ["task", "meta"]:
             if task["action"]["__ansible_module__"] in self._commands:

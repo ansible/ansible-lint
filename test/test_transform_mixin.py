@@ -11,13 +11,13 @@ if TYPE_CHECKING:
     from typing import Any, Dict, List, MutableMapping, MutableSequence, Type, Union
 
 
-DUMMY_MAP: Dict[str, Any] = {
+DUMMY_MAP: dict[str, Any] = {
     "foo": "text",
     "bar": {"some": "text2"},
     "fruits": ["apple", "orange"],
     "answer": [{"forty-two": ["life", "universe", "everything"]}],
 }
-DUMMY_LIST: List[Dict[str, Any]] = [
+DUMMY_LIST: list[dict[str, Any]] = [
     {"foo": "text"},
     {"bar": {"some": "text2"}, "fruits": ["apple", "orange"]},
     {"answer": [{"forty-two": ["life", "universe", "everything"]}]},
@@ -42,9 +42,9 @@ DUMMY_LIST: List[Dict[str, Any]] = [
     ),
 )
 def test_seek_with_bad_path(
-    yaml_path: List[Union[int, str]],
-    data: Union[MutableMapping[str, Any], MutableSequence[Any], str],
-    expected_error: Type[Exception],
+    yaml_path: list[int | str],
+    data: MutableMapping[str, Any] | MutableSequence[Any] | str,
+    expected_error: type[Exception],
 ) -> None:
     """Verify that TransformMixin.seek() propagates errors."""
     with pytest.raises(expected_error):
@@ -124,8 +124,8 @@ def test_seek_with_bad_path(
     ),
 )
 def test_seek(
-    yaml_path: List[Union[int, str]],
-    data: Union[MutableMapping[str, Any], MutableSequence[Any], str],
+    yaml_path: list[int | str],
+    data: MutableMapping[str, Any] | MutableSequence[Any] | str,
     expected: Any,
 ) -> None:
     """Ensure TransformMixin.seek() retrieves the correct data."""

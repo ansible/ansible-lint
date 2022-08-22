@@ -4,7 +4,7 @@ from __future__ import annotations
 import keyword
 import re
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from ansible.parsing.yaml.objects import AnsibleUnicode
 
@@ -100,10 +100,10 @@ class VariableNamingRule(AnsibleLintRule):
         # safety measure.
         return not bool(self.re_pattern.match(ident))
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
-        results: List[MatchError] = []
-        raw_results: List[MatchError] = []
+        results: list[MatchError] = []
+        raw_results: list[MatchError] = []
 
         if not data:
             return results
@@ -133,8 +133,8 @@ class VariableNamingRule(AnsibleLintRule):
         return results
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         """Return matches for task based variables."""
         # If the task uses the 'vars' section to set variables
         our_vars = task.get("vars", {})
@@ -157,11 +157,11 @@ class VariableNamingRule(AnsibleLintRule):
 
         return False
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
-        results: List[MatchError] = []
-        raw_results: List[MatchError] = []
-        meta_data: Dict[AnsibleUnicode, Any] = {}
+        results: list[MatchError] = []
+        raw_results: list[MatchError] = []
+        meta_data: dict[AnsibleUnicode, Any] = {}
 
         if str(file.kind) == "vars" and file.data:
             meta_data = parse_yaml_from_file(str(file.path))

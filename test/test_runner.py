@@ -21,7 +21,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, List, Set, Type
+from typing import Any
 
 import pytest
 
@@ -55,7 +55,7 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath(
 def test_runner(
     default_rules_collection: RulesCollection,
     playbook: str,
-    exclude: List[str],
+    exclude: list[str],
     length: int,
 ) -> None:
     """Test that runner can go through any corner cases."""
@@ -105,7 +105,7 @@ def test_runner_exclude_globs(
 )
 def test_runner_unicode_format(
     default_rules_collection: RulesCollection,
-    formatter_cls: Type[formatters.BaseFormatter[Any]],
+    formatter_cls: type[formatters.BaseFormatter[Any]],
 ) -> None:
     """Check that all formatters are unicode-friendly."""
     formatter = formatter_cls(os.getcwd(), display_relative_path=True)
@@ -132,7 +132,7 @@ def test_runner_with_directory(
 
 def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> None:
     """Ensure that lintables aren't double-checked."""
-    checked_files: Set[Lintable] = set()
+    checked_files: set[Lintable] = set()
 
     filename = os.path.abspath("examples/playbooks/common-include-1.yml")
     runner = Runner(

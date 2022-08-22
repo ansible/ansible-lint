@@ -3,8 +3,6 @@
 """Sphinx extension for generating the rules table document."""
 from __future__ import annotations
 
-from typing import Dict, List, Union
-
 from docutils import nodes, statemachine
 from sphinx.application import Sphinx
 from sphinx.util.docutils import SphinxDirective
@@ -19,7 +17,7 @@ from ansiblelint.rules import RulesCollection
 def _nodes_from_md(
     state: statemachine.State,
     md_source: str,
-) -> List[nodes.Node]:
+) -> list[nodes.Node]:
     """Turn an MD string into a list of nodes.
 
     These nodes can be used in the document.
@@ -42,7 +40,7 @@ class AnsibleLintProfilesDirective(SphinxDirective):
 
     has_content = False
 
-    def run(self) -> List[nodes.Node]:
+    def run(self) -> list[nodes.Node]:
         """Generate a node tree in place of the directive."""
         self.env.note_reread()  # rebuild the current doc unconditionally
 
@@ -56,7 +54,7 @@ class AnsibleLintDefaultRulesDirective(SphinxDirective):
 
     has_content = False
 
-    def run(self) -> List[nodes.Node]:
+    def run(self) -> list[nodes.Node]:
         """Generate a node tree in place of the directive."""
         self.env.note_reread()  # rebuild the current doc unconditionally
 
@@ -66,7 +64,7 @@ class AnsibleLintDefaultRulesDirective(SphinxDirective):
         return _nodes_from_md(state=self.state, md_source=md_rules_table)
 
 
-def setup(app: Sphinx) -> Dict[str, Union[bool, str]]:
+def setup(app: Sphinx) -> dict[str, bool | str]:
     """Initialize the Sphinx extension."""
     app.add_directive(
         "ansible-lint-default-rules-list",

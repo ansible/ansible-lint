@@ -5,7 +5,7 @@ import logging
 import os
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, List, Tuple, Type
+from typing import TYPE_CHECKING, Any
 
 from ansible_compat.runtime import Runtime
 
@@ -58,7 +58,7 @@ class App:
 
         self.runtime = Runtime(isolated=True)
 
-    def render_matches(self, matches: List[MatchError]) -> None:
+    def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
 
@@ -99,7 +99,7 @@ class App:
             for match in matches:
                 console.print(formatter.format(match), markup=False, highlight=False)
 
-    def count_results(self, matches: List[MatchError]) -> SummarizedResults:
+    def count_results(self, matches: list[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
         failures = 0
         warnings = 0
@@ -124,7 +124,7 @@ class App:
         return SummarizedResults(failures, warnings, fixed_failures, fixed_warnings)
 
     @staticmethod
-    def count_lintables(files: Set[Lintable]) -> Tuple[int, int]:
+    def count_lintables(files: set[Lintable]) -> tuple[int, int]:
         """Count total and modified files."""
         files_count = len(files)
         changed_files_count = len([file for file in files if file.updated])
@@ -132,8 +132,8 @@ class App:
 
     @staticmethod
     def _get_matched_skippable_rules(
-        matches: List[MatchError],
-    ) -> Dict[str, BaseRule]:
+        matches: list[MatchError],
+    ) -> dict[str, BaseRule]:
         """Extract the list of matched rules, if skippable, from the list of matches."""
         matches_unignored = [match for match in matches if not match.ignored]
         # match.tag is more specialized than match.rule.id
@@ -225,9 +225,9 @@ warn_list:  # or 'skip_list' to silence them completely
 
 def choose_formatter_factory(
     options_list: Namespace,
-) -> Type[formatters.BaseFormatter[Any]]:
+) -> type[formatters.BaseFormatter[Any]]:
     """Select an output formatter based on the incoming command line arguments."""
-    r: Type[formatters.BaseFormatter[Any]] = formatters.Formatter
+    r: type[formatters.BaseFormatter[Any]] = formatters.Formatter
     if options_list.format == "quiet":
         r = formatters.QuietFormatter
     elif options_list.format in ("json", "codeclimate"):
@@ -239,7 +239,7 @@ def choose_formatter_factory(
     return r
 
 
-def _sanitize_list_options(tag_list: List[str]) -> List[str]:
+def _sanitize_list_options(tag_list: list[str]) -> list[str]:
     """Normalize list options."""
     # expand comma separated entries
     tags = set()

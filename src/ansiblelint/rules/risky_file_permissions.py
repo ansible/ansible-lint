@@ -21,7 +21,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Set, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -37,7 +37,7 @@ _modules_with_preserve = (
     "template",
 )
 
-_MODULES: Set[str] = {
+_MODULES: set[str] = {
     "archive",
     "community.general.archive",
     "assemble",
@@ -55,7 +55,7 @@ _MODULES: Set[str] = {
     # 'unarchive',  # disabled because .tar.gz files can have permissions inside
 }
 
-_MODULES_WITH_CREATE: Dict[str, bool] = {
+_MODULES_WITH_CREATE: dict[str, bool] = {
     "blockinfile": False,
     "ansible.builtin.blockinfile": False,
     "htpasswd": True,
@@ -88,8 +88,8 @@ class MissingFilePermissionsRule(AnsibleLintRule):
 
     # pylint: disable=too-many-return-statements
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         module = task["action"]["__ansible_module__"]
         mode = task["action"].get("mode", None)
 

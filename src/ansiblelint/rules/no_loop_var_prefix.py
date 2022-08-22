@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.config import options
 from ansiblelint.rules import AnsibleLintRule
@@ -31,8 +31,8 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     severity = "MEDIUM"
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         """Return matches for a task."""
         if not file or not file.role or not options.loop_var_prefix:
             return False

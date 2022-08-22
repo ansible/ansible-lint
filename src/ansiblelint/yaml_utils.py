@@ -13,10 +13,7 @@ from typing import (
     Callable,
     Dict,
     Iterator,
-    List,
-    Optional,
     Pattern,
-    Set,
     Tuple,
     Union,
     cast,
@@ -98,7 +95,7 @@ def load_yamllint_config() -> YamlLintConfig:
 
 def iter_tasks_in_file(
     lintable: Lintable,
-) -> Iterator[Tuple[Dict[str, Any], Dict[str, Any], List[str], Optional[MatchError]]]:
+) -> Iterator[tuple[dict[str, Any], dict[str, Any], list[str], MatchError | None]]:
     """Iterate over tasks in file.
 
     This yields a 4-tuple of raw_task, normalized_task, skip_tags, and error.
@@ -128,9 +125,9 @@ def iter_tasks_in_file(
     raw_tasks = get_action_tasks(data, lintable)
 
     for raw_task in raw_tasks:
-        err: Optional[MatchError] = None
+        err: MatchError | None = None
 
-        skip_tags: List[str] = raw_task.get("skipped_rules", [])
+        skip_tags: list[str] = raw_task.get("skipped_rules", [])
 
         try:
             normalized_task = normalize_task(raw_task, str(lintable.path))
@@ -149,8 +146,8 @@ def iter_tasks_in_file(
 
 
 def nested_items_path(
-    data_collection: Union[Dict[Any, Any], List[Any]],
-) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
+    data_collection: dict[Any, Any] | list[Any],
+) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate a nested data structure, yielding key/index, value, and parent_path.
 
     This is a recursive function that calls itself for each nested layer of data.
@@ -214,9 +211,9 @@ def nested_items_path(
 
 
 def _nested_items_path(
-    data_collection: Union[Dict[Any, Any], List[Any]],
-    parent_path: List[Union[str, int]],
-) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
+    data_collection: dict[Any, Any] | list[Any],
+    parent_path: list[str | int],
+) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate through data_collection (internal implementation of nested_items_path).
 
     This is a separate function because callers of nested_items_path should
@@ -250,14 +247,14 @@ def _nested_items_path(
 def get_path_to_play(
     lintable: Lintable,
     line_number: int,  # 1-based
-    ruamel_data: Union[CommentedMap, CommentedSeq],
-) -> List[Union[str, int]]:
+    ruamel_data: CommentedMap | CommentedSeq,
+) -> list[str | int]:
     """Get the path to the play in the given file at the given line number."""
     if line_number < 1:
         raise ValueError(f"expected line_number >= 1, got {line_number}")
     if lintable.kind != "playbook" or not isinstance(ruamel_data, CommentedSeq):
         return []
-    lc: "LineCol"  # lc uses 0-based counts # pylint: disable=invalid-name
+    lc: LineCol  # lc uses 0-based counts # pylint: disable=invalid-name
     # line_number is 1-based. Convert to 0-based.
     line_index = line_number - 1
 
@@ -292,8 +289,8 @@ def get_path_to_play(
 def get_path_to_task(
     lintable: Lintable,
     line_number: int,  # 1-based
-    ruamel_data: Union[CommentedMap, CommentedSeq],
-) -> List[Union[str, int]]:
+    ruamel_data: CommentedMap | CommentedSeq,
+) -> list[str | int]:
     """Get the path to the task in the given file at the given line number."""
     if line_number < 1:
         raise ValueError(f"expected line_number >= 1, got {line_number}")
@@ -311,7 +308,7 @@ def get_path_to_task(
 def _get_path_to_task_in_playbook(
     line_number: int,  # 1-based
     ruamel_data: CommentedSeq,
-) -> List[Union[str, int]]:
+) -> list[str | int]:
     """Get the path to the task in the given playbook data at the given line number."""
     last_play_index = len(ruamel_data)
     for play_index, play in enumerate(ruamel_data):
@@ -348,7 +345,7 @@ def _get_path_to_task_in_playbook(
             )
             if task_path:
                 # mypy gets confused without this typehint
-                tasks_keyword_path: List[Union[int, str]] = [
+                tasks_keyword_path: list[int | str] = [
                     play_index,
                     tasks_keyword,
                 ]
@@ -360,10 +357,10 @@ def _get_path_to_task_in_playbook(
 def _get_path_to_task_in_tasks_block(
     line_number: int,  # 1-based
     tasks_block: CommentedSeq,
-    last_line_number: Optional[int] = None,  # 1-based
-) -> List[Union[str, int]]:
+    last_line_number: int | None = None,  # 1-based
+) -> list[str | int]:
     """Get the path to the task in the given tasks block at the given line number."""
-    task: Optional[CommentedMap]
+    task: CommentedMap | None
     # line_number and last_line_number are 1-based. Convert to 0-based.
     line_index = line_number - 1
     last_line_index = None if last_line_number is None else last_line_number - 1
@@ -393,7 +390,7 @@ def _get_path_to_task_in_tasks_block(
             )
             if subtask_path:
                 # mypy gets confused without this typehint
-                task_path: List[Union[str, int]] = [task_index]
+                task_path: list[str | int] = [task_index]
                 return task_path + list(subtask_path)
 
         assert isinstance(task.lc.line, int)
@@ -420,9 +417,9 @@ def _get_path_to_task_in_tasks_block(
 def _get_path_to_task_in_nested_tasks_block(
     line_number: int,  # 1-based
     task: CommentedMap,
-    nested_task_keys: Set[str],
-    next_task_line_index: Optional[int] = None,  # 0-based
-) -> List[Union[str, int]]:
+    nested_task_keys: set[str],
+    next_task_line_index: int | None = None,  # 0-based
+) -> list[str | int]:
     """Get the path to the task in the given nested tasks block."""
     # loop through the keys in line order
     task_keys = list(task.keys())
@@ -468,9 +465,7 @@ class OctalIntYAML11(ScalarInt):
         return ScalarInt.__new__(cls, *args, **kwargs)
 
     @staticmethod
-    def represent_octal(
-        representer: RoundTripRepresenter, data: "OctalIntYAML11"
-    ) -> Any:
+    def represent_octal(representer: RoundTripRepresenter, data: OctalIntYAML11) -> Any:
         """Return a YAML 1.1 octal representation.
 
         Based on ruamel.yaml.representer.RoundTripRepresenter.represent_octal_int()
@@ -724,11 +719,11 @@ class FormattedYAML(YAML):
     def __init__(
         self,
         *,
-        typ: Optional[str] = None,
+        typ: str | None = None,
         pure: bool = False,
         output: Any = None,
         # input: Any = None,
-        plug_ins: Optional[List[str]] = None,
+        plug_ins: list[str] | None = None,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -789,8 +784,8 @@ class FormattedYAML(YAML):
                 - name: Task
         """
         # Default to reading/dumping YAML 1.1 (ruamel.yaml defaults to 1.2)
-        self._yaml_version_default: Tuple[int, int] = (1, 1)
-        self._yaml_version: Union[str, Tuple[int, int]] = self._yaml_version_default
+        self._yaml_version_default: tuple[int, int] = (1, 1)
+        self._yaml_version: str | tuple[int, int] = self._yaml_version_default
 
         super().__init__(typ=typ, pure=pure, output=output, plug_ins=plug_ins)
 
@@ -851,7 +846,7 @@ class FormattedYAML(YAML):
         # )
 
     @staticmethod
-    def _defaults_from_yamllint_config() -> Dict[str, Union[bool, int, str]]:
+    def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:
         """Extract FormattedYAML-relevant settings from yamllint config if possible."""
         config = {
             "explicit_start": True,
@@ -897,7 +892,7 @@ class FormattedYAML(YAML):
         return cast(Dict[str, Union[bool, int, str]], config)
 
     @property  # type: ignore[override]
-    def version(self) -> Union[str, Tuple[int, int]]:  # type: ignore[override]
+    def version(self) -> str | tuple[int, int]:  # type: ignore[override]
         """Return the YAML version used to parse or dump.
 
         Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
@@ -908,7 +903,7 @@ class FormattedYAML(YAML):
         return self._yaml_version
 
     @version.setter
-    def version(self, value: Optional[Union[str, Tuple[int, int]]]) -> None:
+    def version(self, value: str | tuple[int, int] | None) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.
@@ -929,7 +924,7 @@ class FormattedYAML(YAML):
 
     def dumps(self, data: Any) -> str:
         """Dump YAML document to string (including its preamble_comment)."""
-        preamble_comment: Optional[str] = getattr(data, "preamble_comment", None)
+        preamble_comment: str | None = getattr(data, "preamble_comment", None)
         self._prevent_wrapping_flow_style(data)
         with StringIO() as stream:
             if preamble_comment:
@@ -953,9 +948,7 @@ class FormattedYAML(YAML):
                     # so, switch it to block style to avoid the line wrap.
                     fa.set_block_style()
 
-    def _predict_indent_length(
-        self, parent_path: List[Union[str, int]], key: Any
-    ) -> int:
+    def _predict_indent_length(self, parent_path: list[str | int], key: Any) -> int:
         indent = 0
 
         # each parent_key type tells us what the indent is for the next level.
@@ -987,7 +980,7 @@ class FormattedYAML(YAML):
     # So, we need to identify whitespace-only lines to drop spaces before reading.
     _whitespace_only_lines_re = re.compile(r"^ +$", re.MULTILINE)
 
-    def _pre_process_yaml(self, text: str) -> Tuple[str, Optional[str]]:
+    def _pre_process_yaml(self, text: str) -> tuple[str, str | None]:
         """Handle known issues with ruamel.yaml loading.
 
         Preserve blank lines despite extra whitespace.
@@ -1044,7 +1037,7 @@ class FormattedYAML(YAML):
         text = text.rstrip("\n") + "\n"
 
         lines = text.splitlines(keepends=True)
-        full_line_comments: List[Tuple[int, str]] = []
+        full_line_comments: list[tuple[int, str]] = []
         for i, line in enumerate(lines):
             stripped = line.lstrip()
             if not stripped:

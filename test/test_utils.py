@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2013-2014 Will Thames <will@thames.id.au>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +27,7 @@ import subprocess
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Sequence
 
 import pytest
 from _pytest.capture import CaptureFixture
@@ -72,7 +70,7 @@ def test_tokenize(
     string: str,
     expected_cmd: str,
     expected_args: Sequence[str],
-    expected_kwargs: Dict[str, Any],
+    expected_kwargs: dict[str, Any],
 ) -> None:
     """Test that tokenize works for different input types."""
     (cmd, args, kwargs) = utils.tokenize(string)
@@ -104,7 +102,7 @@ def test_tokenize(
     ),
 )
 def test_normalize(
-    reference_form: Dict[str, Any], alternate_forms: Tuple[Dict[str, Any]]
+    reference_form: dict[str, Any], alternate_forms: tuple[dict[str, Any]]
 ) -> None:
     """Test that tasks specified differently are normalized same way."""
     normal_form = utils.normalize_task(reference_form, "tasks.yml")
@@ -180,7 +178,7 @@ def test_normalize_complex_command() -> None:
         ),
     ),
 )
-def test_normalize_task_v2(task: Dict[str, Any], expected_form: Dict[str, Any]) -> None:
+def test_normalize_task_v2(task: dict[str, Any], expected_form: dict[str, Any]) -> None:
     """Check that it normalizes task and returns the expected form."""
     assert utils.normalize_task_v2(task) == expected_form
 
@@ -338,7 +336,7 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
     options = cli.get_config(["--exclude", "foo"])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Namespace) -> List[str]:
+    def mockreturn(options: Namespace) -> list[str]:
         return ["foo/playbook.yml", "bar/playbook.yml"]
 
     monkeypatch.setattr(utils, "discover_lintables", mockreturn)
@@ -364,7 +362,7 @@ _CUSTOM_RULEDIRS = [
     ),
 )
 def test_get_rules_dirs(
-    user_ruledirs: List[str], use_default: bool, expected: List[str]
+    user_ruledirs: list[str], use_default: bool, expected: list[str]
 ) -> None:
     """Test it returns expected dir lists."""
     assert get_rules_dirs(user_ruledirs, use_default) == expected
@@ -384,9 +382,9 @@ def test_get_rules_dirs(
     ),
 )
 def test_get_rules_dirs_with_custom_rules(
-    user_ruledirs: List[str],
+    user_ruledirs: list[str],
     use_default: bool,
-    expected: List[str],
+    expected: list[str],
     monkeypatch: MonkeyPatch,
 ) -> None:
     """Test it returns expected dir lists when custom rules exist."""

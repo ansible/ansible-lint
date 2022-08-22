@@ -31,17 +31,7 @@ from argparse import Namespace
 from collections.abc import ItemsView, Mapping
 from functools import lru_cache
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generator,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Generator, Sequence
 
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
@@ -136,7 +126,7 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 }
 
 
-def tokenize(line: str) -> Tuple[str, List[str], Dict[str, str]]:
+def tokenize(line: str) -> tuple[str, list[str], dict[str, str]]:
     """Parse a string task invocation."""
     tokens = line.lstrip().split(" ")
     if tokens[0] == "-":
@@ -175,7 +165,7 @@ def _set_collections_basedir(basedir: str) -> None:
     AnsibleCollectionConfig.playbook_paths = basedir
 
 
-def find_children(lintable: Lintable) -> List[Lintable]:  # noqa: C901
+def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
     """Traverse children of a single file or folder."""
     if not lintable.path.exists():
         return []
@@ -245,11 +235,11 @@ def template(
 
 
 def play_children(
-    basedir: str, item: Tuple[str, Any], parent_type: FileType, playbook_dir: str
-) -> List[Lintable]:
+    basedir: str, item: tuple[str, Any], parent_type: FileType, playbook_dir: str
+) -> list[Lintable]:
     """Flatten the traversed play tasks."""
     # pylint: disable=unused-argument
-    delegate_map: Dict[str, Callable[[str, Any, Any, FileType], List[Lintable]]] = {
+    delegate_map: dict[str, Callable[[str, Any, Any, FileType], list[Lintable]]] = {
         "tasks": _taskshandlers_children,
         "pre_tasks": _taskshandlers_children,
         "post_tasks": _taskshandlers_children,
@@ -283,7 +273,7 @@ def play_children(
 
 def _include_children(
     basedir: str, k: str, v: Any, parent_type: FileType
-) -> List[Lintable]:
+) -> list[Lintable]:
     # handle special case include_tasks: name=filename.yml
     if (
         k in ["include_tasks", "ansible.builtin.include_tasks"]
@@ -316,9 +306,9 @@ def _include_children(
 
 
 def _taskshandlers_children(
-    basedir: str, k: str, v: Union[None, Any], parent_type: FileType
-) -> List[Lintable]:
-    results: List[Lintable] = []
+    basedir: str, k: str, v: None | Any, parent_type: FileType
+) -> list[Lintable]:
+    results: list[Lintable] = []
     if v is None:
         raise MatchError(
             message="A malformed block was encountered while loading a block.",
@@ -380,7 +370,7 @@ def _taskshandlers_children(
 
 
 def _get_task_handler_children_for_tasks_or_playbooks(
-    task_handler: Dict[str, Any],
+    task_handler: dict[str, Any],
     basedir: str,
     k: Any,
     parent_type: FileType,
@@ -419,7 +409,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     )
 
 
-def _validate_task_handler_action_for_role(th_action: Dict[str, Any]) -> None:
+def _validate_task_handler_action_for_role(th_action: dict[str, Any]) -> None:
     """Verify that the task handler action is valid for role include."""
     module = th_action["__ansible_module__"]
 
@@ -434,9 +424,9 @@ def _validate_task_handler_action_for_role(th_action: Dict[str, Any]) -> None:
 
 def _roles_children(
     basedir: str, k: str, v: Sequence[Any], parent_type: FileType, main: str = "main"
-) -> List[Lintable]:
+) -> list[Lintable]:
     # pylint: disable=unused-argument # parent_type)
-    results: List[Lintable] = []
+    results: list[Lintable] = []
     for role in v:
         if isinstance(role, dict):
             if "role" in role or "name" in role:
@@ -455,7 +445,7 @@ def _roles_children(
     return results
 
 
-def _rolepath(basedir: str, role: str) -> Optional[str]:
+def _rolepath(basedir: str, role: str) -> str | None:
     role_path = None
 
     possible_paths = [
@@ -487,8 +477,8 @@ def _rolepath(basedir: str, role: str) -> Optional[str]:
 
 
 def _look_for_role_files(
-    basedir: str, role: str, main: Optional[str] = "main"
-) -> List[Lintable]:
+    basedir: str, role: str, main: str | None = "main"
+) -> list[Lintable]:
     # pylint: disable=unused-argument # main
     role_path = _rolepath(basedir, role)
     if not role_path:
@@ -507,12 +497,12 @@ def _look_for_role_files(
     return results
 
 
-def _kv_to_dict(v: str) -> Dict[str, Any]:
+def _kv_to_dict(v: str) -> dict[str, Any]:
     (command, args, kwargs) = tokenize(v)
     return dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs)
 
 
-def _sanitize_task(task: Dict[str, Any]) -> Dict[str, Any]:
+def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
     """Return a stripped-off task structure compatible with new Ansible.
 
     This helper takes a copy of the incoming task and drops
@@ -528,10 +518,10 @@ def _sanitize_task(task: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _extract_ansible_parsed_keys_from_task(
-    result: Dict[str, Any],
-    task: Dict[str, Any],
-    keys: Tuple[str, ...],
-) -> Dict[str, Any]:
+    result: dict[str, Any],
+    task: dict[str, Any],
+    keys: tuple[str, ...],
+) -> dict[str, Any]:
     """Return a dict with existing key in task."""
     for (k, v) in list(task.items()):
         if k in keys:
@@ -542,9 +532,9 @@ def _extract_ansible_parsed_keys_from_task(
     return result
 
 
-def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
-    result: Dict[str, Any] = {}
+    result: dict[str, Any] = {}
     ansible_parsed_keys = ("action", "local_action", "args", "delegate_to")
 
     if is_nested_task(task):
@@ -610,7 +600,7 @@ def normalize_task_v2(task: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
-def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
+def normalize_task(task: dict[str, Any], filename: str) -> dict[str, Any]:
     """Unify task-like object structures."""
     ansible_action_type = task.get("__ansible_action_type__", "task")
     if "__ansible_action_type__" in task:
@@ -621,7 +611,7 @@ def normalize_task(task: Dict[str, Any], filename: str) -> Dict[str, Any]:
     return task
 
 
-def task_to_str(task: Dict[str, Any]) -> str:
+def task_to_str(task: dict[str, Any]) -> str:
     """Make a string identifier for the given task."""
     name = task.get("name")
     if name:
@@ -649,8 +639,8 @@ def task_to_str(task: Dict[str, Any]) -> str:
 
 
 def extract_from_list(
-    blocks: AnsibleBaseYAMLObject, candidates: List[str], recursive: bool = False
-) -> List[Any]:
+    blocks: AnsibleBaseYAMLObject, candidates: list[str], recursive: bool = False
+) -> list[Any]:
     """Get action tasks from block structures."""
     results = []
     for block in blocks:
@@ -670,7 +660,7 @@ def extract_from_list(
     return results
 
 
-def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[Any]:
+def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> list[Any]:
     """Add action markers to task objects."""
     results = []
     for action in actions:
@@ -682,7 +672,7 @@ def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> List[An
     return results
 
 
-def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
+def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
     """Get a flattened list of action tasks from the file."""
     tasks = []
     if file.kind in ["tasks", "handlers"]:
@@ -697,25 +687,23 @@ def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> List[Any]:
     return [
         task
         for task in tasks
-        if set(
-            [
-                "include",
-                "include_tasks",
-                "import_playbook",
-                "import_tasks",
-                "ansible.builtin.include",
-                "ansible.builtin.include_tasks",
-                "ansible.builtin.import_playbook",
-                "ansible.builtin.import_tasks",
-            ]
-        ).isdisjoint(task.keys())
+        if {
+            "include",
+            "include_tasks",
+            "import_playbook",
+            "import_tasks",
+            "ansible.builtin.include",
+            "ansible.builtin.include_tasks",
+            "ansible.builtin.import_playbook",
+            "ansible.builtin.import_tasks",
+        }.isdisjoint(task.keys())
     ]
 
 
 @lru_cache(maxsize=None)
 def parse_yaml_linenumbers(  # noqa: max-complexity: 12
     lintable: Lintable,
-) -> Union[AnsibleBaseYAMLObject, AnsibleBaseYAMLObject]:
+) -> AnsibleBaseYAMLObject | AnsibleBaseYAMLObject:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
@@ -769,7 +757,7 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
     return result
 
 
-def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
+def get_first_cmd_arg(task: dict[str, Any]) -> Any:
     """Extract the first arg from a cmd task."""
     try:
         if "cmd" in task["action"]:
@@ -781,7 +769,7 @@ def get_first_cmd_arg(task: Dict[str, Any]) -> Any:
     return first_cmd_arg
 
 
-def get_second_cmd_arg(task: Dict[str, Any]) -> Any:
+def get_second_cmd_arg(task: dict[str, Any]) -> Any:
     """Extract the second arg from a cmd task."""
     try:
         if "cmd" in task["action"]:
@@ -834,10 +822,10 @@ def is_playbook(filename: str) -> bool:
 
 # pylint: disable=too-many-statements
 def get_lintables(
-    opts: Namespace = Namespace(), args: Optional[List[str]] = None
-) -> List[Lintable]:
+    opts: Namespace = Namespace(), args: list[str] | None = None
+) -> list[Lintable]:
     """Detect files and directories that are lintable."""
-    lintables: List[Lintable] = []
+    lintables: list[Lintable] = []
 
     # passing args bypass auto-detection mode
     if args:
@@ -877,7 +865,7 @@ def get_lintables(
     return lintables
 
 
-def _extend_with_roles(lintables: List[Lintable]) -> None:
+def _extend_with_roles(lintables: list[Lintable]) -> None:
     """Detect roles among lintables and adds them to the list."""
     for lintable in lintables:
         parts = lintable.path.parent.parts
@@ -898,8 +886,8 @@ def convert_to_boolean(value: Any) -> bool:
 
 
 def nested_items(
-    data: Union[Dict[Any, Any], List[Any]], parent: str = ""
-) -> Generator[Tuple[Any, Any, str], None, None]:
+    data: dict[Any, Any] | list[Any], parent: str = ""
+) -> Generator[tuple[Any, Any, str], None, None]:
     """Iterate a nested data structure."""
     warnings.warn(
         "Call to deprecated function ansiblelint.utils.nested_items. "

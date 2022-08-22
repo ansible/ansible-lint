@@ -58,7 +58,7 @@ class AnsibleLintRule(BaseRule):
     """AnsibleLintRule should be used as base for writing new rules."""
 
     @property
-    def rule_config(self) -> Dict[str, Any]:
+    def rule_config(self) -> dict[str, Any]:
         """Retrieve rule specific configuration."""
         return get_rule_config(self.id)
 
@@ -78,10 +78,10 @@ class AnsibleLintRule(BaseRule):
     # pylint: disable=too-many-arguments
     def create_matcherror(
         self,
-        message: Optional[str] = None,
+        message: str | None = None,
         linenumber: int = 1,
         details: str = "",
-        filename: Optional[Union[str, Lintable]] = None,
+        filename: str | Lintable | None = None,
         tag: str = "",
     ) -> MatchError:
         """Instantiate a new MatchError."""
@@ -96,7 +96,7 @@ class AnsibleLintRule(BaseRule):
             match.tag = tag
         # search through callers to find one of the match* methods
         frame = inspect.currentframe()
-        match_type: Optional[str] = None
+        match_type: str | None = None
         while not match_type and frame is not None:
             func_name = frame.f_code.co_name
             match_type = match_types.get(func_name, None)
@@ -109,7 +109,7 @@ class AnsibleLintRule(BaseRule):
 
     @staticmethod
     def _enrich_matcherror_with_task_details(
-        match: MatchError, task: Dict[str, Any]
+        match: MatchError, task: dict[str, Any]
     ) -> None:
         match.task = task
         if not match.details:
@@ -117,8 +117,8 @@ class AnsibleLintRule(BaseRule):
         if match.linenumber < task[ansiblelint.utils.LINE_NUMBER_KEY]:
             match.linenumber = task[ansiblelint.utils.LINE_NUMBER_KEY]
 
-    def matchlines(self, file: Lintable) -> List[MatchError]:
-        matches: List[MatchError] = []
+    def matchlines(self, file: Lintable) -> list[MatchError]:
+        matches: list[MatchError] = []
         if not self.match:
             return matches
         # arrays are 0-based, line numbers are 1-based
@@ -146,8 +146,8 @@ class AnsibleLintRule(BaseRule):
             matches.append(matcherror)
         return matches
 
-    def matchtasks(self, file: Lintable) -> List[MatchError]:
-        matches: List[MatchError] = []
+    def matchtasks(self, file: Lintable) -> list[MatchError]:
+        matches: list[MatchError] = []
         if (
             not self.matchtask
             or file.kind not in ["handlers", "tasks", "playbook"]
@@ -190,8 +190,8 @@ class AnsibleLintRule(BaseRule):
             matches.append(match)
         return matches
 
-    def matchyaml(self, file: Lintable) -> List[MatchError]:
-        matches: List[MatchError] = []
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
+        matches: list[MatchError] = []
         if not self.matchplay or str(file.base_kind) != "text/yaml":
             return matches
 
@@ -236,7 +236,7 @@ class TransformMixin:
         self,
         match: MatchError,
         lintable: Lintable,
-        data: Union[CommentedMap, CommentedSeq, str],
+        data: CommentedMap | CommentedSeq | str,
     ) -> None:
         """Transform ``data`` to try to fix the MatchError identified by this rule.
 
@@ -272,8 +272,8 @@ class TransformMixin:
 
     @staticmethod
     def seek(
-        yaml_path: List[Union[int, str]],
-        data: Union[MutableMapping[str, Any], MutableSequence[Any], str],
+        yaml_path: list[int | str],
+        data: MutableMapping[str, Any] | MutableSequence[Any] | str,
     ) -> Any:
         """Get the element identified by ``yaml_path`` in ``data``.
 
@@ -345,7 +345,7 @@ class RulesCollection:
 
     def __init__(
         self,
-        rulesdirs: Optional[List[str]] = None,
+        rulesdirs: list[str] | None = None,
         options: Namespace = default_options,
     ) -> None:
         """Initialize a RulesCollection instance."""
@@ -353,7 +353,7 @@ class RulesCollection:
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = expand_paths_vars(rulesdirs)
-        self.rules: List[BaseRule] = []
+        self.rules: list[BaseRule] = []
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
         self.rules.extend(
@@ -391,18 +391,18 @@ class RulesCollection:
         """Return the length of the RulesCollection data."""
         return len(self.rules)
 
-    def extend(self, more: List[AnsibleLintRule]) -> None:
+    def extend(self, more: list[AnsibleLintRule]) -> None:
         """Combine rules."""
         self.rules.extend(more)
 
     def run(  # noqa: max-complexity: 12
         self,
         file: Lintable,
-        tags: Optional[Set[str]] = None,
-        skip_list: Optional[List[str]] = None,
-    ) -> List[MatchError]:
+        tags: set[str] | None = None,
+        skip_list: list[str] | None = None,
+    ) -> list[MatchError]:
         """Run all the rules against the given lintable."""
-        matches: List[MatchError] = []
+        matches: list[MatchError] = []
         if tags is None:
             tags = set()
         if skip_list is None:
@@ -412,7 +412,7 @@ class RulesCollection:
             try:
                 if file.content is not None:  # loads the file content
                     pass
-            except (IOError, UnicodeDecodeError) as exc:
+            except (OSError, UnicodeDecodeError) as exc:
                 return [
                     MatchError(
                         message=str(exc),

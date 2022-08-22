@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import sys
 from functools import reduce
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import LINE_NUMBER_KEY
@@ -33,8 +33,8 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
-def _get_subtasks(data: odict[str, Any]) -> List[Any]:
-    result: List[Any] = []
+def _get_subtasks(data: odict[str, Any]) -> list[Any]:
+    result: list[Any] = []
     block_names = [
         "tasks",
         "pre_tasks",
@@ -97,7 +97,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     tags = ["unpredictability"]
     version_added = "historic"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> List[MatchError]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         if file.kind == "playbook":
             result = _become_user_without_become(False, data)
             if result:

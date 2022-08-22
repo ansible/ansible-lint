@@ -6,7 +6,7 @@ import re
 from argparse import Namespace
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from ansiblelint.loaders import yaml_from_file
 
@@ -122,13 +122,13 @@ options = Namespace(
 )
 
 # Used to store detected tag deprecations
-used_old_tags: Dict[str, str] = {}
+used_old_tags: dict[str, str] = {}
 
 # Used to store collection list paths (with mock paths if needed)
-collection_list: List[str] = []
+collection_list: list[str] = []
 
 
-def get_rule_config(rule_id: str) -> Dict[str, Any]:
+def get_rule_config(rule_id: str) -> dict[str, Any]:
     """Get configurations for the rule ``rule_id``."""
     rule_config = options.rules.get(rule_id, {})
     if not isinstance(rule_config, dict):
@@ -136,7 +136,7 @@ def get_rule_config(rule_id: str) -> Dict[str, Any]:
     return rule_config
 
 
-@lru_cache()
+@lru_cache
 def ansible_collections_path() -> str:
     """Return collection path variable for current version of Ansible."""
     # respect Ansible behavior, which is to load old name if present
@@ -146,7 +146,7 @@ def ansible_collections_path() -> str:
     return "ANSIBLE_COLLECTIONS_PATH"
 
 
-def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
+def parse_ansible_version(stdout: str) -> tuple[str, str | None]:
     """Parse output of 'ansible --version'."""
     # Ansible can produce extra output before displaying version in debug mode.
 

@@ -36,7 +36,7 @@ def pytest_addoption(parser: Parser) -> None:
     )
 
 
-def pytest_collection_modifyitems(items: List[nodes.Item], config: Config) -> None:
+def pytest_collection_modifyitems(items: list[nodes.Item], config: Config) -> None:
     """Skip tests based on --regenerate-formatting-fixtures option."""
     do_regenerate = config.getoption("--regenerate-formatting-fixtures")
     skip_other = pytest.mark.skip(

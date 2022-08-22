@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.yaml_utils import nested_items_path
@@ -31,8 +31,8 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
     literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         for k, v, _ in nested_items_path(task):
             if k == "when":
                 if isinstance(v, str):

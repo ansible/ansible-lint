@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansible.utils.sentinel import Sentinel
 
@@ -33,8 +33,8 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
     tags = ["opt-in"]
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         """Return matches for a task."""
         action = task.get("action")
         if not isinstance(action, dict):
@@ -51,7 +51,7 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
         return False
 
     @staticmethod
-    def handle_synchronize(task: Any, action: Dict[str, Any]) -> bool:
+    def handle_synchronize(task: Any, action: dict[str, Any]) -> bool:
         """Process a synchronize task."""
         if task.get("delegate_to") != Sentinel:
             return False
@@ -62,7 +62,7 @@ https://zuul-ci.org/docs/zuul-jobs/policy.html\
         return False
 
     @staticmethod
-    def handle_unarchive(task: Any, action: Dict[str, Any]) -> bool:
+    def handle_unarchive(task: Any, action: dict[str, Any]) -> bool:
         """Process unarchive task."""
         delegate_to = task.get("delegate_to")
         if (

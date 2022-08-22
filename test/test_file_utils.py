@@ -5,7 +5,7 @@ import os
 import time
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any
 
 import pytest
 from _pytest.capture import CaptureFixture
@@ -58,7 +58,7 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
     ),
 )
 def test_expand_paths_vars(
-    test_path: Union[str, Path], expected: str, monkeypatch: MonkeyPatch
+    test_path: str | Path, expected: str, monkeypatch: MonkeyPatch
 ) -> None:
     """Ensure that tilde and env vars are expanded in paths lists."""
     monkeypatch.setenv("TEST_PATH", "/test/path")
@@ -199,7 +199,7 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
     options = cli.get_config([])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Namespace) -> Dict[str, Any]:
+    def mockreturn(options: Namespace) -> dict[str, Any]:
         return {path: kind}
 
     # assert Lintable is able to determine file type
