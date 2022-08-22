@@ -5,6 +5,8 @@ file:
 
 pytest_plugins = ['ansiblelint.testing']
 """
+from __future__ import annotations
+
 import copy
 import os
 from argparse import Namespace

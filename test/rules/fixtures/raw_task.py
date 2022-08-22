@@ -1,4 +1,6 @@
 """Test Rule that needs_raw_task."""
+from __future__ import annotations
+
 from typing import Any, Dict, Optional, Union
 
 from ansiblelint.file_utils import Lintable

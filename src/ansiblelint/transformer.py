@@ -1,4 +1,6 @@
 """Transformer implementation."""
+from __future__ import annotations
+
 import logging
 from argparse import Namespace
 from typing import Dict, List, Optional, Set, Union, cast

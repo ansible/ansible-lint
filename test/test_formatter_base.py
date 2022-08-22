@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 """Tests related to base formatter."""
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any, Union
 

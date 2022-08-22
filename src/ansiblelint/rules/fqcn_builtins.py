@@ -1,4 +1,6 @@
 """Rule definition for usage of fully qualified collection names for builtins."""
+from __future__ import annotations
+
 import sys
 from typing import Any, Dict, Optional, Union
 

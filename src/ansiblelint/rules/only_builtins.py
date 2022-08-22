@@ -1,4 +1,6 @@
 """Rule definition for usage of builtin actions only."""
+from __future__ import annotations
+
 import sys
 from typing import Any, Dict, Optional, Union
 

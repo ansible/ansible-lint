@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """CLI parser setup and helpers."""
+from __future__ import annotations
+
 import argparse
 import logging
 import os

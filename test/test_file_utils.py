@@ -1,4 +1,6 @@
 """Tests for file utility functions."""
+from __future__ import annotations
+
 import os
 import time
 from argparse import Namespace
