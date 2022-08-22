@@ -67,7 +67,7 @@ FAIL_TASK_2LN = Lintable(
   tasks:
     - name: Two-level nesting
       ansible.builtin.set_fact:
-        var_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }} }} }}"
+        var_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }}}} }}"
 """,
 )
 
@@ -218,7 +218,7 @@ SUCCESS_TASK_PRINT = Lintable(
   tasks:
     - name: Print curly braces
       ansible.builtin.debug:
-        msg: docker image inspect my_image --format='{{'{{'}}.Size{{'}}'}}'
+        msg: docker image inspect my_image --format='{{ '{{' }}.Size{{ '}}' }}'
 """,
 )
 
@@ -235,44 +235,64 @@ def _playbook_file(tmp_path: Path, request: SubRequest) -> None:
 @pytest.mark.parametrize(
     "_playbook_file",
     (
-        pytest.param([FAIL_TASK_1LN], id="file includes one-level nesting"),
-        pytest.param([FAIL_TASK_1LN_M], id="file includes one-level multiline nesting"),
-        pytest.param([FAIL_TASK_2LN], id="file includes two-level nesting"),
-        pytest.param([FAIL_TASK_2LN_M], id="file includes two-level multiline nesting"),
-        pytest.param([FAIL_TASK_W_5LN], id="file includes five-level wild nesting"),
-        pytest.param(
-            [FAIL_TASK_W_5LN_M], id="file includes five-level wild multiline nesting"
-        ),
+        pytest.param([FAIL_TASK_1LN], id="one-level nesting"),
+        pytest.param([FAIL_TASK_1LN_M], id="one-level multiline nesting"),
+        pytest.param([FAIL_TASK_2LN], id="two-level nesting"),
+        pytest.param([FAIL_TASK_2LN_M], id="two-level multiline nesting"),
+        pytest.param([FAIL_TASK_W_5LN], id="five-level wild nesting"),
+        pytest.param([FAIL_TASK_W_5LN_M], id="five-level wild multiline nesting"),
     ),
     indirect=["_playbook_file"],
 )
 @pytest.mark.usefixtures("_playbook_file")
 def test_including_wrong_nested_jinja(runner: Runner) -> None:
     """Check that broken Jinja nesting produces a violation."""
-    rule_violations = runner.run()
-    assert rule_violations[0].rule.id == "no-jinja-nesting"
+    found = False
+    for match in runner.run():
+        if match.rule.id == "no-jinja-nesting":
+            found = True
+            break
+    assert found, "Failed to spot no-jinja-nesting in test results."
 
 
 @pytest.mark.parametrize(
     "_playbook_file",
     (
-        pytest.param([SUCCESS_TASK_P], id="file includes non-nested example"),
         pytest.param(
-            [SUCCESS_TASK_P_M], id="file includes multiline non-nested example"
+            # file includes non-nested example
+            [SUCCESS_TASK_P],
+            id="1",
         ),
-        pytest.param([SUCCESS_TASK_2P], id="file includes nesting far from each other"),
         pytest.param(
+            # file includes multiline non-nested example
+            [SUCCESS_TASK_P_M],
+            id="2",
+        ),
+        pytest.param(
+            # file includes nesting far from each other
+            [SUCCESS_TASK_2P],
+            id="3",
+        ),
+        pytest.param(
+            # file includes multiline nesting far from each other
             [SUCCESS_TASK_2P_M],
-            id="file includes multiline nesting far from each other",
+            id="4",
         ),
         pytest.param(
-            [SUCCESS_TASK_C_2P], id="file includes nesting close to each other"
+            # file includes nesting close to each other
+            [SUCCESS_TASK_C_2P],
+            id="5",
         ),
         pytest.param(
+            # file includes multiline nesting close to each other
             [SUCCESS_TASK_C_2P_M],
-            id="file includes multiline nesting close to each other",
+            id="6",
         ),
-        pytest.param([SUCCESS_TASK_PRINT], id="file includes print curly braces"),
+        pytest.param(
+            # file includes print curly braces
+            [SUCCESS_TASK_PRINT],
+            id="7",
+        ),
     ),
     indirect=["_playbook_file"],
 )

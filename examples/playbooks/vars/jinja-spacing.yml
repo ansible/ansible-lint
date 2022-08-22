@@ -1,5 +1,5 @@
 ---
-# Should raise jinja[spacing] at line [12, 13, 14, 27, 33], at following variables.
+# Should raise jinja[spacing] at line [14, 15, 16, 17, 18, 19, 22, 32, 38], at following variables.
 # ".bad_var_1", ".bad_var_2", ".bad_var_3", ".invalid_multiline_nested_json", ".invalid_nested_json"
 good_var_1: "{{ good_format }}"
 good_var_2: "Value: {{ good_format }}"
@@ -11,12 +11,12 @@ jinja_whitespace_control: |
   {{ good_format }}/
   {{- good_format }}
   {{- good_format -}}
-bad_var_1: "{{bad_format}}"
-bad_var_2: "Value: {{ bad_format}}"
-bad_var_3: "{{bad_format }}"
-bad_var_4: "{{ bad_format|filter }}"
-bad_var_5: "Value: {{ bad_format |filter }}"
-bad_var_6: "{{ bad_format| filter }}"
+bad_var_1: "{{bad_format}}" # <-- 1
+bad_var_2: "Value: {{ bad_format}}" # <-- 2
+bad_var_3: "{{bad_format }}" # <-- 3
+bad_var_4: "{{ bad_format|filter }}" # <-- 4
+bad_var_5: "Value: {{ bad_format |filter }}" # <-- 5
+bad_var_6: "{{ bad_format| filter }}" # <-- 6
 # spell-checker: disable-next-line
 non_jinja_var: "data = ${lookup{$local_part}lsearch{/etc/aliases}}" # noqa: jinja[spacing]
 json_inside_jinja: "{{ {'test': {'subtest': variable}} }}"
@@ -29,13 +29,13 @@ multiline_vars: # Assert that no false positive on multiline exists
       http://example.com/{{
       case2 }}
 valid_nested_json: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1) }}"
-invalid_nested_json: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1)}}"
+invalid_nested_json: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1)}}" # <-- 7
 
 valid_multiline_nested_json: >-
   {{ {'dummy_2': {'nested_dummy_1': value_1,
                   'nested_dummy_2': value_2}} |
   combine(dummy_1) }}
-invalid_multiline_nested_json: >-
+invalid_multiline_nested_json: >- # <-- 8
   {{ {'dummy_2': {'nested_dummy_1': value_1,
                   'nested_dummy_2': value_2}} |
   combine(dummy_1)}}

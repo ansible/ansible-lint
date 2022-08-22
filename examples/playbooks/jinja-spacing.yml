@@ -1,6 +1,7 @@
 ---
 # Should raise jinja[spacing] at tasks line 23, 26, 29, 54, 65
-- hosts: all
+- name: Fixture for testing jinja2[spacing]
+  hosts: all
   tasks:
     - name: Good variable format
       ansible.builtin.debug:
@@ -18,7 +19,7 @@
       ansible.builtin.debug:
         msg: "{{ '{{' }}"
     - name: Jinja escaping allowed
-      # noqa: 306
+      # noqa: risky-shell-pipe
       ansible.builtin.shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
       changed_when: false
     - name: Jinja whitespace control allowed
@@ -56,10 +57,10 @@
       vars:
         cases:
           case1: >-
-            http://example.com/{{
+            http://foo.com/{{
               case1 }}
           case2: >-
-            http://example.com/{{
+            http://bar.com/{{
             case2 }}
       ansible.builtin.debug:
         var: cases
