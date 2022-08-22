@@ -1,4 +1,6 @@
 """Store configuration options as a singleton."""
+from __future__ import annotations
+
 import os
 import re
 from argparse import Namespace

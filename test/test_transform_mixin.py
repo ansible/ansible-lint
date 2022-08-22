@@ -1,10 +1,15 @@
 """Tests for TransformMixin."""
+from __future__ import annotations
 
-from typing import Any, Dict, List, MutableMapping, MutableSequence, Type, Union
+from typing import TYPE_CHECKING
 
 import pytest
 
 from ansiblelint.rules import TransformMixin
+
+if TYPE_CHECKING:
+    from typing import Any, Dict, List, MutableMapping, MutableSequence, Type, Union
+
 
 DUMMY_MAP: Dict[str, Any] = {
     "foo": "text",

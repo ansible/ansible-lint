@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 # spell-checker:ignore dwim
 """Generic utility helpers."""
+from __future__ import annotations
 
 import contextlib
 import inspect

@@ -14,6 +14,7 @@
 # serve to show the default value.
 """Documentation Configuration."""
 # pylint: disable=invalid-name
+from __future__ import annotations
 
 import os
 import sys

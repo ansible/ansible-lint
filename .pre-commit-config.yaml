@@ -125,6 +125,7 @@ repos:
           # - flake8-black>=0.1.1
           - flake8-docstrings>=1.5.0
           - flake8-pytest-style>=1.2.2
+          - flake8-future-annotations>=0.0.3
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.971
     hooks:

@@ -1,5 +1,7 @@
 """Utility helpers to simplify working with yaml-based data."""
 # pylint: disable=too-many-lines
+from __future__ import annotations
+
 import functools
 import logging
 import os

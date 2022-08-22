@@ -1,4 +1,6 @@
 """All internal ansible-lint rules."""
+from __future__ import annotations
+
 import copy
 import glob
 import importlib.util

@@ -1,4 +1,6 @@
 """Exceptions and error representations."""
+from __future__ import annotations
+
 import functools
 from typing import Any, Dict, List, Optional, Union
 

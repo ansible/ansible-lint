@@ -1,4 +1,6 @@
 """Tests for yaml-related utility functions."""
+from __future__ import annotations
+
 from io import StringIO
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Union

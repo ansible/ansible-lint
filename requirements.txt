@@ -26,6 +26,7 @@ enrich==1.2.7
 execnet==1.9.0
 filelock==3.7.1
 flake8==5.0.4
+flake8-future-annotations==0.0.5
 flaky==3.7.0
 idna==3.3
 imagesize==1.4.1

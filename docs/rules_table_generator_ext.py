@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 # Requires Python 3.6+
 """Sphinx extension for generating the rules table document."""
+from __future__ import annotations
 
 from typing import Dict, List, Union
 
