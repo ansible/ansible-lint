@@ -35,14 +35,14 @@ from typing import TYPE_CHECKING, Any, Callable, Iterator
 from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir
 from enrich.console import should_do_markup
-from filelock import FileLock
+from filelock import FileLock, Timeout
 
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
 from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
-from ansiblelint.constants import EXIT_CONTROL_C_RC
+from ansiblelint.constants import EXIT_CONTROL_C_RC, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
@@ -110,7 +110,13 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     # add a lock file so we do not have two instances running inside at the same time
     os.makedirs(options.cache_dir, exist_ok=True)
     options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
-    options.cache_dir_lock.acquire()
+    try:
+        options.cache_dir_lock.acquire(timeout=60)
+    except Timeout:
+        _logger.error(
+            "Timeout waiting for another instance of ansible-lint to release the lock."
+        )
+        sys.exit(LOCK_TIMEOUT_RC)
 
 
 def _do_list(rules: RulesCollection) -> int:
