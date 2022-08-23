@@ -237,7 +237,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           name: ${{ matrix.tox_env }}
-          fail_ci_if_error: true # optional (default = false)
+          fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
           verbose: true # optional (default = false)
       - name: Archive logs
         uses: actions/upload-artifact@v3
