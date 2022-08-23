@@ -19,10 +19,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
 
-ROLE_NAME_REGEX = r"^[a-z][a-z0-9_]+$"
+ROLE_NAME_REGEX = r"^[a-z][a-z0-9_]*$"
 
 
 def _remove_prefix(text: str, prefix: str) -> str:
@@ -41,7 +42,7 @@ def _remove_prefix(text: str, prefix: str) -> str:
 
 class RoleNames(AnsibleLintRule):
     # Unable to use f-strings due to flake8 bug with AST parsing
-    """Role name {0} does not match ``^[a-z][a-z0-9_]+$`` pattern."""
+    """Role name {0} does not match ``^[a-z][a-z0-9_]*$`` pattern."""
 
     id = "role-name"
     description = (
@@ -50,7 +51,7 @@ class RoleNames(AnsibleLintRule):
     )
     link = "https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory"
     severity = "HIGH"
-    done: List[str] = []  # already noticed roles list
+    done: list[str] = []  # already noticed roles list
     tags = ["deprecations", "metadata"]
     version_added = "v4.3.0"
 
@@ -58,11 +59,11 @@ class RoleNames(AnsibleLintRule):
         """Save precompiled regex."""
         self._re = re.compile(ROLE_NAME_REGEX)
 
-    def matchdir(self, lintable: "Lintable") -> List["MatchError"]:
+    def matchdir(self, lintable: Lintable) -> list[MatchError]:
         return self.matchyaml(lintable)
 
-    def matchyaml(self, file: Lintable) -> List["MatchError"]:
-        result: List["MatchError"] = []
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
+        result: list[MatchError] = []
 
         if file.kind not in ("meta", "role"):
             return result

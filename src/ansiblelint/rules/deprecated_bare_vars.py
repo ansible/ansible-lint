@@ -20,9 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from __future__ import annotations
+
 import os
 import re
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -49,8 +51,8 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     _glob = re.compile("[][*?]")
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         loop_type = next((key for key in task if key.startswith("with_")), None)
         if loop_type:
             if loop_type in [
@@ -58,6 +60,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 "with_together",
                 "with_flattened",
                 "with_filetree",
+                "with_community.general.filetree",
             ]:
                 # These loops can either take a list defined directly in the task
                 # or a variable that is a list itself.  When a single variable is used
@@ -77,8 +80,8 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
         return False
 
     def _matchvar(
-        self, varstring: str, task: Dict[str, Any], loop_type: str
-    ) -> Union[bool, str]:
+        self, varstring: str, task: dict[str, Any], loop_type: str
+    ) -> bool | str:
         if isinstance(varstring, str) and not self._jinja.match(varstring):
             valid = loop_type == "with_fileglob" and bool(
                 self._jinja.search(varstring) or self._glob.search(varstring)
@@ -89,8 +92,8 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
             )
             if not valid:
                 message = (
-                    "Found a bare variable '{0}' used in a '{1}' loop."
-                    + " You should use the full variable syntax ('{{{{ {0} }}}}')"
+                    "Possible bare variable '{0}' used in a '{1}' loop."
+                    + " You should use the full variable syntax ('{{{{ {0} }}}}') or convert it to a list if that is not really a variable."
                 )
                 return message.format(task[loop_type], loop_type)
         return False

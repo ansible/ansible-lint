@@ -1,16 +1,17 @@
-# -*- coding: utf-8 -*-
 """CLI parser setup and helpers."""
+from __future__ import annotations
+
 import argparse
 import logging
 import os
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence, Union
+from typing import Any, Callable, Sequence
 
 import yaml
 
-from ansiblelint.config import DEFAULT_KINDS
+from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
     DEFAULT_RULESDIR,
@@ -31,7 +32,7 @@ _PATH_VARS = [
 
 
 def expand_to_normalized_paths(
-    config: Dict[str, Any], base_dir: Optional[str] = None
+    config: dict[str, Any], base_dir: str | None = None
 ) -> None:
     """Mutate given config normalizing any path values in it."""
     # config can be None (-c /dev/null)
@@ -51,7 +52,7 @@ def expand_to_normalized_paths(
         config[paths_var] = normalized_paths
 
 
-def load_config(config_file: str) -> Dict[Any, Any]:
+def load_config(config_file: str) -> dict[Any, Any]:
     """Load configuration from disk."""
     config_path = None
     if config_file:
@@ -65,8 +66,11 @@ def load_config(config_file: str) -> Dict[Any, Any]:
         return {}
 
     try:
-        with open(config_path, "r", encoding="utf-8") as stream:
+        with open(config_path, encoding="utf-8") as stream:
             config = yaml.safe_load(stream)
+            # We want to allow passing /dev/null to disable config use
+            if config is None:
+                return {}
             if not isinstance(config, dict):
                 _logger.error("Invalid configuration file %s", config_path)
                 sys.exit(INVALID_CONFIG_RC)
@@ -89,7 +93,7 @@ def load_config(config_file: str) -> Dict[Any, Any]:
     return config
 
 
-def get_config_path(config_file: Optional[str] = None) -> Optional[str]:
+def get_config_path(config_file: str | None = None) -> str | None:
     """Return local config file."""
     if config_file:
         project_filenames = [config_file]
@@ -101,11 +105,11 @@ def get_config_path(config_file: Optional[str] = None) -> Optional[str]:
             filename = os.path.abspath(os.path.join(parent, project_filename))
             if os.path.exists(filename):
                 return filename
-            if os.path.exists(os.path.abspath(os.path.join(parent, ".git"))):
-                # Avoid looking outside .git folders as we do not want end-up
-                # picking config files from upper level projects if current
-                # project has no config.
-                return None
+        if os.path.exists(os.path.abspath(os.path.join(parent, ".git"))):
+            # Avoid looking outside .git folders as we do not want end-up
+            # picking config files from upper level projects if current
+            # project has no config.
+            return None
         (parent, tail) = os.path.split(parent)
     return None
 
@@ -117,8 +121,8 @@ class AbspathArgAction(argparse.Action):
         self,
         parser: argparse.ArgumentParser,
         namespace: Namespace,
-        values: Union[str, Sequence[Any], None],
-        option_string: Optional[str] = None,
+        values: str | Sequence[Any] | None,
+        option_string: str | None = None,
     ) -> None:
         if isinstance(values, (str, Path)):
             values = [values]
@@ -138,16 +142,16 @@ class WriteArgAction(argparse.Action):
     # noinspection PyShadowingBuiltins
     def __init__(  # pylint: disable=too-many-arguments,redefined-builtin
         self,
-        option_strings: List[str],
+        option_strings: list[str],
         dest: str,
-        nargs: Optional[Union[int, str]] = None,
+        nargs: int | str | None = None,
         const: Any = None,
         default: Any = None,
-        type: Optional[Callable[[str], Any]] = None,
-        choices: Optional[List[Any]] = None,
+        type: Callable[[str], Any] | None = None,
+        choices: list[Any] | None = None,
         required: bool = False,
-        help: Optional[str] = None,
-        metavar: Optional[str] = None,
+        help: str | None = None,
+        metavar: str | None = None,
     ) -> None:
         """Create the argparse action with WriteArg-specific defaults."""
         if nargs is not None:
@@ -171,8 +175,8 @@ class WriteArgAction(argparse.Action):
         self,
         parser: argparse.ArgumentParser,
         namespace: Namespace,
-        values: Union[str, Sequence[Any], None],
-        option_string: Optional[str] = None,
+        values: str | Sequence[Any] | None,
+        option_string: str | None = None,
     ) -> None:
         lintables = getattr(namespace, "lintables", None)
         if not lintables and isinstance(values, str):
@@ -195,8 +199,8 @@ class WriteArgAction(argparse.Action):
 
     @classmethod
     def merge_write_list_config(
-        cls, from_file: List[str], from_cli: List[str]
-    ) -> List[str]:
+        cls, from_file: list[str], from_cli: list[str]
+    ) -> list[str]:
         """Combine the write_list from file config with --write CLI arg.
 
         Handles the implicit "all" when "__default__" is present and file config is empty.
@@ -213,18 +217,39 @@ def get_cli_parser() -> argparse.ArgumentParser:
     """Initialize an argument parser."""
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
+    listing_group = parser.add_mutually_exclusive_group()
+    listing_group.add_argument(
         "-L",
+        "--list-rules",
         dest="listrules",
         default=False,
         action="store_true",
-        help="list all the rules",
+        help="List all the rules. For listing rules only the following formats "
+        "for argument -f are supported: {plain, rich, md}",
+    )
+    listing_group.add_argument(
+        "-T",
+        "--list-tags",
+        dest="listtags",
+        action="store_true",
+        help="List all the tags and the rules they cover. Increase the verbosity level "
+        "with `-v` to include 'opt-in' tag and its rules.",
     )
     parser.add_argument(
         "-f",
+        "--format",
         dest="format",
         default="rich",
-        choices=["rich", "plain", "rst", "json", "codeclimate", "quiet", "pep8"],
+        choices=[
+            "rich",
+            "plain",
+            "md",
+            "json",
+            "codeclimate",
+            "quiet",
+            "pep8",
+            "sarif",
+        ],
         help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
     parser.add_argument(
@@ -235,7 +260,20 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="quieter, reduce verbosity, can be specified twice.",
     )
     parser.add_argument(
+        "-P",
+        "--profile",
+        # * allow to distinguish between calling without -P, with -P and
+        # with -P=foo, while '?' does not. We do not support a real list.
+        nargs="*",
+        dest="profile",
+        default=None,  # when called with -P but no arg will load as empty list []
+        action="store",
+        choices=PROFILES.keys(),
+        help="Specify which rules profile to be used, or displays available profiles when no argument is given.",
+    )
+    parser.add_argument(
         "-p",
+        "--parseable",
         dest="parseable",
         default=False,
         action="store_true",
@@ -259,6 +297,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-r",
+        "--rules-dir",
         action=AbspathArgAction,
         dest="rulesdir",
         default=[],
@@ -301,13 +340,11 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-t",
+        "--tags",
         dest="tags",
         action="append",
         default=[],
         help="only check rules whose id/tags match these values",
-    )
-    parser.add_argument(
-        "-T", dest="listtags", action="store_true", help="list all the tags"
     )
     parser.add_argument(
         "-v",
@@ -318,6 +355,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-x",
+        "--skip-list",
         dest="skip_list",
         default=[],
         action="append",
@@ -325,11 +363,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-w",
+        "--warn-list",
         dest="warn_list",
         default=[],
         action="append",
         help="only warn about these rules, unless overridden in "
-        "config file defaults to 'experimental'",
+        f"config file. Current version default value is: {', '.join(DEFAULT_WARN_LIST)}",
     )
     parser.add_argument(
         "--enable-list",
@@ -363,6 +402,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-c",
+        "--config-file",
         dest="config_file",
         help="Specify configuration file to use. By default it will look for '.ansible-lint' or '.config/ansible-lint.yml'",
     )
@@ -388,7 +428,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespace:
+def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespace:
     """Combine the file config with the CLI args."""
     bools = (
         "display_relative_path",
@@ -404,7 +444,7 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
         "rulesdir": [],
         "skip_list": [],
         "tags": [],
-        "warn_list": ["experimental", "role-name"],
+        "warn_list": DEFAULT_WARN_LIST,
         "mock_modules": [],
         "mock_roles": [],
         "enable_list": [],
@@ -468,10 +508,17 @@ def merge_config(file_config: Dict[Any, Any], cli_config: Namespace) -> Namespac
     return cli_config
 
 
-def get_config(arguments: List[str]) -> Namespace:
+def get_config(arguments: list[str]) -> Namespace:
     """Extract the config based on given args."""
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
+
+    if options.listrules and options.format not in ["plain", "rich", "md"]:
+        parser.error(
+            f"argument -f: invalid choice: '{options.format}'. "
+            f"In combination with argument -L only 'plain', "
+            f"'rich' or 'md' are supported with -f."
+        )
 
     file_config = load_config(options.config_file)
 
@@ -497,7 +544,7 @@ def print_help(file: Any = sys.stdout) -> None:
     get_cli_parser().print_help(file=file)
 
 
-def get_rules_dirs(rulesdir: List[str], use_default: bool = True) -> List[str]:
+def get_rules_dirs(rulesdir: list[str], use_default: bool = True) -> list[str]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
     default_custom_rulesdir = os.environ.get(

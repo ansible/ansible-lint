@@ -1,9 +1,11 @@
 """Rule definition for ansible syntax check."""
+from __future__ import annotations
+
 import json
 import re
 import subprocess
 import sys
-from typing import Any, List
+from typing import Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.app import get_app
@@ -45,32 +47,43 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     severity = "VERY_HIGH"
     tags = ["core", "unskippable"]
     version_added = "v5.0.0"
+    _order = 0
 
     @staticmethod
-    def _get_ansible_syntax_check_matches(lintable: Lintable) -> List[MatchError]:
+    # pylint: disable=too-many-locals
+    def _get_ansible_syntax_check_matches(lintable: Lintable) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
         if lintable.kind != "playbook":
             return []
 
         with timed_info("Executing syntax check on %s", lintable.path):
-            extra_vars_cmd = []
+            # To avoid noisy warnings we pass localhost as current inventory:
+            # [WARNING]: No inventory was parsed, only implicit localhost is available
+            # [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+            args = ["-i", "localhost,"]
             if options.extra_vars:
-                extra_vars_cmd = ["--extra-vars", json.dumps(options.extra_vars)]
+                args.extend(["--extra-vars", json.dumps(options.extra_vars)])
             cmd = [
                 "ansible-playbook",
                 "--syntax-check",
-                *extra_vars_cmd,
+                *args,
                 str(lintable.path),
             ]
+
+            # To reduce noisy warnings like
+            # CryptographyDeprecationWarning: Blowfish has been deprecated
+            # https://github.com/paramiko/paramiko/issues/2038
+            env = get_app(offline=True).runtime.environ.copy()
+            env["PYTHONWARNINGS"] = "ignore"
+
             run = subprocess.run(
                 cmd,
                 stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
                 shell=False,  # needed when command is a list
-                universal_newlines=True,
+                text=True,
                 check=False,
-                env=get_app().runtime.environ,
+                env=env,
             )
             result = []
         if run.returncode != 0:

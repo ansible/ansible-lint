@@ -1,9 +1,11 @@
 """Application."""
+from __future__ import annotations
+
 import logging
 import os
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, List, Tuple, Type
+from typing import TYPE_CHECKING, Any
 
 from ansible_compat.runtime import Runtime
 
@@ -44,7 +46,7 @@ class SummarizedResults:
 class App:
     """App class represents an execution of the linter."""
 
-    def __init__(self, options: "Namespace"):
+    def __init__(self, options: Namespace):
         """Construct app run based on already loaded configuration."""
         options.skip_list = _sanitize_list_options(options.skip_list)
         options.warn_list = _sanitize_list_options(options.warn_list)
@@ -56,12 +58,15 @@ class App:
 
         self.runtime = Runtime(isolated=True)
 
-    def render_matches(self, matches: List[MatchError]) -> None:
+    def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
 
-        if isinstance(self.formatter, formatters.CodeclimateJSONFormatter):
-            # If formatter CodeclimateJSONFormatter is chosen,
+        if isinstance(
+            self.formatter,
+            (formatters.CodeclimateJSONFormatter, formatters.SarifFormatter),
+        ):
+            # If formatter CodeclimateJSONFormatter or SarifFormatter is chosen,
             # then print only the matches in JSON
             console.print(
                 self.formatter.format_result(matches), markup=False, highlight=False
@@ -94,14 +99,19 @@ class App:
             for match in matches:
                 console.print(formatter.format(match), markup=False, highlight=False)
 
-    def count_results(self, matches: List[MatchError]) -> SummarizedResults:
+    def count_results(self, matches: list[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
         failures = 0
         warnings = 0
         fixed_failures = 0
         fixed_warnings = 0
         for match in matches:
-            if {match.rule.id, *match.rule.tags}.isdisjoint(self.options.warn_list):
+            # tag can include a sub-rule id: `yaml[document-start]`
+            # rule.id is the generic rule id: `yaml`
+            # *rule.tags is the list of the rule's tags (categories): `style`
+            if {match.tag, match.rule.id, *match.rule.tags}.isdisjoint(
+                self.options.warn_list
+            ):
                 if match.fixed:
                     fixed_failures += 1
                 else:
@@ -114,7 +124,7 @@ class App:
         return SummarizedResults(failures, warnings, fixed_failures, fixed_warnings)
 
     @staticmethod
-    def count_lintables(files: "Set[Lintable]") -> Tuple[int, int]:
+    def count_lintables(files: set[Lintable]) -> tuple[int, int]:
         """Count total and modified files."""
         files_count = len(files)
         changed_files_count = len([file for file in files if file.updated])
@@ -122,20 +132,21 @@ class App:
 
     @staticmethod
     def _get_matched_skippable_rules(
-        matches: List[MatchError],
-    ) -> "Dict[str, BaseRule]":
+        matches: list[MatchError],
+    ) -> dict[str, BaseRule]:
         """Extract the list of matched rules, if skippable, from the list of matches."""
         matches_unignored = [match for match in matches if not match.ignored]
-        matched_rules = {match.rule.id: match.rule for match in matches_unignored}
+        # match.tag is more specialized than match.rule.id
+        matched_rules = {
+            match.tag or match.rule.id: match.rule for match in matches_unignored
+        }
         # remove unskippable rules from the list
         for rule_id in list(matched_rules.keys()):
             if "unskippable" in matched_rules[rule_id].tags:
                 matched_rules.pop(rule_id)
         return matched_rules
 
-    def report_outcome(
-        self, result: "LintResult", mark_as_success: bool = False
-    ) -> int:
+    def report_outcome(self, result: LintResult, mark_as_success: bool = False) -> int:
         """Display information about how to skip found rules.
 
         Returns exit code, 2 if errors were found, 0 when only warnings were found.
@@ -213,20 +224,22 @@ warn_list:  # or 'skip_list' to silence them completely
 
 
 def choose_formatter_factory(
-    options_list: "Namespace",
-) -> Type[formatters.BaseFormatter[Any]]:
+    options_list: Namespace,
+) -> type[formatters.BaseFormatter[Any]]:
     """Select an output formatter based on the incoming command line arguments."""
-    r: Type[formatters.BaseFormatter[Any]] = formatters.Formatter
+    r: type[formatters.BaseFormatter[Any]] = formatters.Formatter
     if options_list.format == "quiet":
         r = formatters.QuietFormatter
     elif options_list.format in ("json", "codeclimate"):
         r = formatters.CodeclimateJSONFormatter
+    elif options_list.format == "sarif":
+        r = formatters.SarifFormatter
     elif options_list.parseable or options_list.format == "pep8":
         r = formatters.ParseableFormatter
     return r
 
 
-def _sanitize_list_options(tag_list: List[str]) -> List[str]:
+def _sanitize_list_options(tag_list: list[str]) -> list[str]:
     """Normalize list options."""
     # expand comma separated entries
     tags = set()
@@ -237,12 +250,12 @@ def _sanitize_list_options(tag_list: List[str]) -> List[str]:
 
 
 @lru_cache(maxsize=1)
-def get_app() -> App:
+def get_app(offline: bool = False) -> App:
     """Return the application instance."""
     app = App(options=default_options)
     # Make linter use the cache dir from compat
     default_options.cache_dir = app.runtime.cache_dir
 
-    app.runtime.prepare_environment()
+    app.runtime.prepare_environment(offline=offline)
     _perform_mockings()
     return app

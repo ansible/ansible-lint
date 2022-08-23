@@ -1,6 +1,7 @@
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
     # cspell:disable-next-line
-    - name: тест
+    - name: Some тест
       ansible.builtin.command: uname

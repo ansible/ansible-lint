@@ -6,12 +6,12 @@ from ansiblelint.rules.literal_compare import ComparisonToLiteralBoolRule
 from ansiblelint.testing import RunFromText
 
 PASS_WHEN = """
-- name: example task
+- name: Example task
   debug:
     msg: test
   when: my_var
 
-- name: another example task
+- name: Another example task
   debug:
     msg: test
   when:
@@ -20,33 +20,33 @@ PASS_WHEN = """
 """
 
 PASS_WHEN_NOT_FALSE = """
-- name: example task
+- name: Example task
   debug:
     msg: test
   when: not my_var
 """
 
 PASS_WHEN_NOT_NULL = """
-- name: example task
+- name: Example task
   debug:
     msg: test
   when: my_var not None
 """
 
 FAIL_LITERAL_TRUE = """
-- name: example task
+- name: Example task
   debug:
     msg: test
   when: my_var == True
 """
 
 FAIL_LITERAL_FALSE = """
-- name: example task
+- name: Example task
   debug:
     msg: test
   when: my_var == false
 
-- name: another example task
+- name: Another example task
   debug:
     msg: test
   when:

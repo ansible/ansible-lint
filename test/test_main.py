@@ -24,9 +24,8 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
     proc = subprocess.run(
         [f"{py_path}/ansible-lint", "--version"],
         check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True,
+        capture_output=True,
+        text=True,
         env=env,
     )
     warning_found = "PATH altered to include" in proc.stderr

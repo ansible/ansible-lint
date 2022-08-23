@@ -1,0 +1,10 @@
+---
+- name: Fixture for examples/playbooks/rule-only-builtins.yml
+  hosts: localhost
+  tasks:
+    - name: Sysctl
+      # while next module is mocked in our config, we still want to see that
+      # only-builtins rules gets matched
+      fake_namespace.fake_collection.fake_module:
+        name: vm.swappiness
+        value: "5"

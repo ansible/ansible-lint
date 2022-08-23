@@ -23,3 +23,11 @@ updates:
       - skip-changelog
     versioning-strategy: lockfile-only
     open-pull-requests-limit: 0 # neutered
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "skip-changelog"

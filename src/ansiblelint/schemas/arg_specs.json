@@ -1,0 +1,250 @@
+{
+  "$defs": {
+    "datatype": {
+      "enum": [
+        "str",
+        "list",
+        "dict",
+        "bool",
+        "int",
+        "float",
+        "path",
+        "raw",
+        "jsonarg",
+        "json",
+        "bytes",
+        "bits"
+      ],
+      "type": "string"
+    },
+    "deprecated_alias": {
+      "properties": {
+        "collection_name": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": ["name"],
+      "type": "object"
+    },
+    "entry_point": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "description": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "additionalProperties": {
+            "$ref": "#/$defs/option"
+          },
+          "type": "object"
+        },
+        "seealso": {
+          "items": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "module": {
+                    "type": "string"
+                  }
+                },
+                "required": ["module"],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "plugin": {
+                    "type": "string"
+                  },
+                  "plugin_type": {
+                    "type": "string"
+                  }
+                },
+                "required": ["plugin", "plugin_type"],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "ref": {
+                    "type": "string"
+                  }
+                },
+                "required": ["description", "ref"],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "link": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["description", "link", "name"],
+                "type": "object"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "short_description": {
+          "type": "string"
+        },
+        "version_added": {
+          "type": "string"
+        }
+      },
+      "required": ["options"],
+      "title": "Entry Point",
+      "type": "object"
+    },
+    "option": {
+      "additionalProperties": false,
+      "aliases": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "apply_defaults": {
+        "type": "string"
+      },
+      "deprecated_aliases": {
+        "items": {
+          "$ref": "#/$defs/deprecated_alias"
+        },
+        "type": "array"
+      },
+      "markdownDescription": "xxx",
+      "options": {
+        "$ref": "#/$defs/option"
+      },
+      "properties": {
+        "choices": {
+          "type": "array"
+        },
+        "default": {
+          "default": "None"
+        },
+        "description": {
+          "description": "Detailed explanation of what this option does. It should be written in full sentences.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "elements": {
+          "$ref": "#/$defs/datatype"
+        },
+        "fallback": {
+          "default": "None",
+          "type": "string"
+        },
+        "no_log": {
+          "default": false,
+          "type": "boolean"
+        },
+        "option-name": {
+          "description": "The name of the option/argument.",
+          "type": "string"
+        },
+        "options": {
+          "additionalProperties": {
+            "$ref": "#/$defs/option"
+          },
+          "type": "object"
+        },
+        "required": {
+          "default": false,
+          "type": "boolean"
+        },
+        "type": {
+          "$ref": "#/$defs/datatype",
+          "markdownDescription": "See [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec"
+        },
+        "version_added": {
+          "type": "string"
+        }
+      },
+      "removed_at_date": {
+        "type": "string"
+      },
+      "removed_from_collection": {
+        "type": "string"
+      },
+      "removed_in_version": {
+        "type": "string"
+      },
+      "title": "Option"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-argument-specs.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
+  "examples": ["meta/argument_specs.yml"],
+  "markdownDescription": "Add entry point, usually `main`.\nSee [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)",
+  "properties": {
+    "argument_specs": {
+      "additionalProperties": {
+        "$ref": "#/$defs/entry_point"
+      },
+      "markdownDescription": "Add entry point, usually `main`.\nSee [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)"
+    }
+  },
+  "title": "Ansible Argument Specs Schema"
+}

@@ -1,13 +1,6 @@
 """Constants used by AnsibleLint."""
 import os.path
-import sys
-
-# mypy/pylint idiom for py36-py38 compatibility
-# https://github.com/python/typeshed/issues/3500#issuecomment-560958608
-if sys.version_info >= (3, 8):
-    from typing import Literal  # pylint: disable=no-name-in-module
-else:
-    from typing_extensions import Literal
+from typing import Literal
 
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
@@ -71,14 +64,8 @@ FileType = Literal[
 # odict is the base class used to represent data model of Ansible
 # playbooks and tasks.
 odict = dict  # pylint: disable=invalid-name
-if sys.version_info[:2] < (3, 7):
-    try:
-        # pylint: disable=unused-import
-        from collections import OrderedDict as odict  # noqa: 401
-    except ImportError:
-        pass
 
-# Deprecated tags/ids and their newer names
+# Aliases for deprecated tags/ids and their newer names
 RENAMED_TAGS = {
     "102": "no-jinja-when",
     "104": "deprecated-bare-vars",
@@ -87,7 +74,7 @@ RENAMED_TAGS = {
     "202": "risky-octal",
     "203": "no-tabs",
     "205": "playbook-extension",
-    "206": "var-spacing",
+    "206": "jinja[spacing]",
     "207": "no-jinja-nesting",
     "208": "risky-file-permissions",
     "301": "no-changed-when",
@@ -112,6 +99,8 @@ RENAMED_TAGS = {
     "703": "meta-incorrect",
     "704": "meta-video-links",
     "911": "syntax-check",
+    "var-spacing": "jinja[spacing]",
+    "unnamed-task": "name[missing]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [

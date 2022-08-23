@@ -1,5 +1,6 @@
 ---
-- hosts: webservers
+- name: Fixture
+  hosts: webservers
   vars:
     varset: varset
   tasks:

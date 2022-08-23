@@ -2,9 +2,11 @@
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 
+from __future__ import annotations
+
 import re
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.yaml_utils import nested_items_path
@@ -30,8 +32,8 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
     empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         for k, v, _ in nested_items_path(task):
             if k == "when":
                 if isinstance(v, str):
@@ -59,7 +61,7 @@ if "pytest" in sys.modules:
     SUCCESS_PLAY = """
 - hosts: all
   tasks:
-    - name: shut down
+    - name: Shut down
       shell: |
         /sbin/shutdown -t now
         echo $var == ""
@@ -69,10 +71,10 @@ if "pytest" in sys.modules:
     FAIL_PLAY = """
 - hosts: all
   tasks:
-  - name: shut down
+  - name: Shut down
     command: /sbin/shutdown -t now
     when: ansible_os_family == ""
-  - name: shut down
+  - name: Shut down
     command: /sbin/shutdown -t now
     when: ansible_os_family !=""
 """

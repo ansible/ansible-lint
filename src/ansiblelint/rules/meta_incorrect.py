@@ -1,7 +1,8 @@
 """Implementation of meta-incorrect rule."""
 # Copyright (c) 2018, Ansible Project
+from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import LINE_NUMBER_KEY
@@ -25,19 +26,17 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         ("license", "license (GPLv2, CC-BY, etc)"),
         ("license", "license (GPL-2.0-or-later, MIT, etc)"),
     ]
-    values = ", ".join(sorted(set((f[0] for f in field_defaults))))
+    values = ", ".join(sorted({f[0] for f in field_defaults}))
     description = f"meta/main.yml default values should be changed for: {values}"
     severity = "HIGH"
     tags = ["metadata"]
     version_added = "v4.0.0"
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         if file.kind != "meta":
             return []
 
-        galaxy_info = data.get("galaxy_info", None)
+        galaxy_info = file.data.get("galaxy_info", None)
         if not galaxy_info:
             return []
 
@@ -45,10 +44,12 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         for field, default in self.field_defaults:
             value = galaxy_info.get(field, None)
             if value and value == default:
+                if "meta-incorrect" in file.data.get("skipped_rules", []):
+                    continue
                 results.append(
                     self.create_matcherror(
                         filename=file,
-                        linenumber=data[LINE_NUMBER_KEY],
+                        linenumber=file.data[LINE_NUMBER_KEY],
                         message=f"Should change default metadata: {field}",
                     )
                 )

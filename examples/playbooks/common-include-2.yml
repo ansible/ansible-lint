@@ -1,6 +1,7 @@
 ---
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   gather_facts: false
   tasks:
-    - name: some include
+    - name: Some include
       ansible.builtin.include_tasks: tasks/included-with-lint.yml

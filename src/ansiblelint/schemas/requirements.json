@@ -1,0 +1,135 @@
+{
+  "$defs": {
+    "CollectionModel": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "type": {
+          "enum": ["galaxy", "url", "file", "git", "dir", "subdirs"],
+          "title": "Type",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "title": "CollectionModel",
+      "type": "object"
+    },
+    "CollectionStringModel": {
+      "title": "CollectionStringModel",
+      "type": "string"
+    },
+    "IncludeModel": {
+      "properties": {
+        "include": {
+          "title": "Include",
+          "type": "string"
+        }
+      },
+      "required": ["include"],
+      "title": "IncludeModel",
+      "type": "object"
+    },
+    "RequirementsV2Model": {
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": ["collections"]
+        },
+        {
+          "required": ["roles"]
+        }
+      ],
+      "properties": {
+        "collections": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/CollectionModel"
+              },
+              {
+                "$ref": "#/$defs/CollectionStringModel"
+              }
+            ]
+          },
+          "title": "Collections",
+          "type": "array"
+        },
+        "roles": {
+          "items": {
+            "$ref": "#/$defs/RoleModel"
+          },
+          "title": "Roles",
+          "type": "array"
+        }
+      },
+      "title": "Requirements v2",
+      "type": "object"
+    },
+    "RoleModel": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "scm": {
+          "anyOf": [
+            {
+              "enum": ["git"],
+              "type": "string"
+            },
+            {
+              "enum": ["hg"],
+              "type": "string"
+            }
+          ],
+          "default": "git",
+          "title": "Scm"
+        },
+        "src": {
+          "title": "Src",
+          "type": "string"
+        },
+        "version": {
+          "default": "master",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "title": "Role",
+      "type": "object"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-requirements.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "anyOf": [
+    {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/RoleModel"
+          },
+          {
+            "$ref": "#/$defs/IncludeModel"
+          }
+        ]
+      },
+      "type": "array"
+    },
+    {
+      "$ref": "#/$defs/RequirementsV2Model"
+    }
+  ],
+  "examples": ["requirements.yml"],
+  "title": "Ansible Requirements Schema"
+}

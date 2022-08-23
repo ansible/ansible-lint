@@ -1,6 +1,8 @@
 """IgnoreErrorsRule used with ansible-lint."""
+from __future__ import annotations
+
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -25,8 +27,8 @@ class IgnoreErrorsRule(AnsibleLintRule):
     version_added = "v5.0.7"
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         if (
             task.get("ignore_errors")
             and task.get("ignore_errors") != "{{ ansible_check_mode }}"
@@ -45,7 +47,7 @@ if "pytest" in sys.modules:
     IGNORE_ERRORS_TRUE = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
       ignore_errors: true
 """
@@ -53,7 +55,7 @@ if "pytest" in sys.modules:
     IGNORE_ERRORS_FALSE = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
       ignore_errors: false
 """
@@ -61,7 +63,7 @@ if "pytest" in sys.modules:
     IGNORE_ERRORS_CHECK_MODE = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
       ignore_errors: "{{ ansible_check_mode }}"
 """
@@ -69,7 +71,7 @@ if "pytest" in sys.modules:
     IGNORE_ERRORS_REGISTER = """
 - hosts: all
   tasks:
-    - name: run apt-get update
+    - name: Run apt-get update
       command: apt-get update
       ignore_errors: true
       register: ignore_errors_register
@@ -78,7 +80,7 @@ if "pytest" in sys.modules:
     FAILED_WHEN = """
 - hosts: all
   tasks:
-    - name: disable apport
+    - name: Disable apport
       become: 'yes'
       lineinfile:
         line: "enabled=0"

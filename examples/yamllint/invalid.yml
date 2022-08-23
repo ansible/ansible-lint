@@ -1,0 +1,9 @@
+# missing document-start
+foo: ...
+foo: ...  # <-- key-duplicates
+bar: ...       # <-- wrong comment indentation
+
+# next line has trailing-spaces:
+other: aaa   
+
+# ^ empty-lines

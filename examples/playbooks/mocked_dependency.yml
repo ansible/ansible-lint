@@ -4,7 +4,7 @@
     - mocked_role
     - fake_namespace.fake_collection.fake_role
   tasks:
-    - name: some task
+    - name: Some task
       zuul_return: {}
-    - name: mocked module from collection
+    - name: Mocked module from collection
       fake_namespace.fake_collection.fake_module: {}

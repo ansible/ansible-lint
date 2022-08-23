@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "ActionGroup": {
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "#/$defs/Metadata"
+          }
+        ]
+      },
+      "type": "array"
+    },
+    "Metadata": {
+      "properties": {
+        "metadata": {
+          "properties": {
+            "extend_group": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Redirect": {
+      "properties": {
+        "redirect": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
+  "description": "See https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory",
+  "examples": ["**/meta/runtime.yml"],
+  "properties": {
+    "action_groups": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ActionGroup"
+      },
+      "description": "A mapping of groups and the list of action plugin and module names they contain. They may also have a special ‘metadata’ dictionary in the list, which can be used to include actions from other groups.",
+      "title": "Action Groups",
+      "type": "object"
+    },
+    "import_redirection": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Redirect"
+      },
+      "description": "A mapping of names for Python import statements and their redirected locations.",
+      "title": "Import Redirection",
+      "type": "object"
+    },
+    "plugin_routing": {
+      "markdownDescription": "Content in a collection that Ansible needs to load from another location or that has been deprecated/removed. The top level keys of plugin_routing are types of plugins, with individual plugin names as subkeys. To define a new location for a plugin, set the redirect field to another name. To deprecate a plugin, use the deprecation field to provide a custom warning message and the removal version or date. If the plugin has been renamed or moved to a new location, the redirect field should also be provided. If a plugin is being removed entirely, tombstone can be used for the fatal error message and removal version or date.",
+      "properties": {
+        "inventory": {},
+        "module_utils": {},
+        "modules": {}
+      },
+      "title": "Plugin Routing",
+      "type": "object"
+    },
+    "requires_ansible": {
+      "examples": [">=2.10,<2.11"],
+      "title": "The version of Ansible Core (ansible-core) required to use the collection. Multiple versions can be separated with a comma.",
+      "type": "string"
+    }
+  },
+  "title": "Ansible Meta Runtime Schema",
+  "type": "object"
+}

@@ -1,5 +1,4 @@
 """Tests for nested-jinja rule."""
-# -*- coding: utf-8 -*-
 # Author: Adrián Tóth <adtoth@redhat.com>
 #
 # Copyright (c) 2020, Red Hat, Inc.
@@ -33,9 +32,10 @@ FAIL_TASK_1LN = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: one-level nesting
+    - name: One-level nesting
       ansible.builtin.set_fact:
         var_one: "2*(1+2) is {{ 2 * {{ 1 + 2 }} }}"
 """,
@@ -45,9 +45,10 @@ FAIL_TASK_1LN_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: one-level multiline nesting
+    - name: One-level multiline nesting
       ansible.builtin.set_fact:
         var_one_ml: >
           2*(1+2) is {{ 2 *
@@ -60,11 +61,12 @@ FAIL_TASK_2LN = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: two-level nesting
+    - name: Two-level nesting
       ansible.builtin.set_fact:
-        var_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }} }} }}"
+        var_two: "2*(1+(3-1)) is {{ 2 * {{ 1 + {{ 3 - 1 }}}} }}"
 """,
 )
 
@@ -72,9 +74,10 @@ FAIL_TASK_2LN_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: two-level multiline nesting
+    - name: Two-level multiline nesting
       ansible.builtin.set_fact:
         var_two_ml: >
           2*(1+(3-1)) is {{ 2 *
@@ -88,9 +91,10 @@ FAIL_TASK_W_5LN = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: five-level wild nesting
+    - name: Five-level wild nesting
       ansible.builtin.set_fact:
         var_three_wld: "{{ {{ {{ {{ {{ 234 }} }} }} }} }}"
 """,
@@ -100,9 +104,10 @@ FAIL_TASK_W_5LN_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: five-level wild multiline nesting
+    - name: Five-level wild multiline nesting
       ansible.builtin.set_fact:
         var_three_wld_ml: >
           {{
@@ -121,9 +126,10 @@ SUCCESS_TASK_P = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: non-nested example
+    - name: Non-nested example
       ansible.builtin.set_fact:
         var_one: "number for 'one' is {{ 2 * 1 }}"
 """,
@@ -133,9 +139,10 @@ SUCCESS_TASK_P_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: multiline non-nested example
+    - name: Multiline non-nested example
       ansible.builtin.set_fact:
         var_one_ml: >
           number for 'one' is {{
@@ -147,9 +154,10 @@ SUCCESS_TASK_2P = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: nesting far from each other
+    - name: Nesting far from each other
       ansible.builtin.set_fact:
         var_two: "number for 'two' is {{ 2 * 1 }} and number for 'three' is {{ 4 - 1 }}"
 """,
@@ -159,9 +167,10 @@ SUCCESS_TASK_2P_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: multiline nesting far from each other
+    - name: Multiline nesting far from each other
       ansible.builtin.set_fact:
         var_two_ml: >
           number for 'two' is {{ 2 * 1
@@ -174,9 +183,10 @@ SUCCESS_TASK_C_2P = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: nesting close to each other
+    - name: Nesting close to each other
       ansible.builtin.set_fact:
         var_three: "number for 'ten' is {{ 2 - 1 }}{{ 3 - 3 }}"
 """,
@@ -186,9 +196,10 @@ SUCCESS_TASK_C_2P_M = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: multiline nesting close to each other
+    - name: Multiline nesting close to each other
       ansible.builtin.set_fact:
         var_three_ml: >
           number for 'ten' is {{
@@ -201,11 +212,12 @@ SUCCESS_TASK_PRINT = Lintable(
     "playbook.yml",
     """\
 ---
-- hosts: all
+- name: Fixture
+  hosts: all
   tasks:
-    - name: print curly braces
+    - name: Print curly braces
       ansible.builtin.debug:
-        msg: docker image inspect my_image --format='{{'{{'}}.Size{{'}}'}}'
+        msg: docker image inspect my_image --format='{{ '{{' }}.Size{{ '}}' }}'
 """,
 )
 
@@ -222,44 +234,64 @@ def _playbook_file(tmp_path: Path, request: SubRequest) -> None:
 @pytest.mark.parametrize(
     "_playbook_file",
     (
-        pytest.param([FAIL_TASK_1LN], id="file includes one-level nesting"),
-        pytest.param([FAIL_TASK_1LN_M], id="file includes one-level multiline nesting"),
-        pytest.param([FAIL_TASK_2LN], id="file includes two-level nesting"),
-        pytest.param([FAIL_TASK_2LN_M], id="file includes two-level multiline nesting"),
-        pytest.param([FAIL_TASK_W_5LN], id="file includes five-level wild nesting"),
-        pytest.param(
-            [FAIL_TASK_W_5LN_M], id="file includes five-level wild multiline nesting"
-        ),
+        pytest.param([FAIL_TASK_1LN], id="one-level nesting"),
+        pytest.param([FAIL_TASK_1LN_M], id="one-level multiline nesting"),
+        pytest.param([FAIL_TASK_2LN], id="two-level nesting"),
+        pytest.param([FAIL_TASK_2LN_M], id="two-level multiline nesting"),
+        pytest.param([FAIL_TASK_W_5LN], id="five-level wild nesting"),
+        pytest.param([FAIL_TASK_W_5LN_M], id="five-level wild multiline nesting"),
     ),
     indirect=["_playbook_file"],
 )
 @pytest.mark.usefixtures("_playbook_file")
 def test_including_wrong_nested_jinja(runner: Runner) -> None:
     """Check that broken Jinja nesting produces a violation."""
-    rule_violations = runner.run()
-    assert rule_violations[0].rule.id == "no-jinja-nesting"
+    found = False
+    for match in runner.run():
+        if match.rule.id == "no-jinja-nesting":
+            found = True
+            break
+    assert found, "Failed to spot no-jinja-nesting in test results."
 
 
 @pytest.mark.parametrize(
     "_playbook_file",
     (
-        pytest.param([SUCCESS_TASK_P], id="file includes non-nested example"),
         pytest.param(
-            [SUCCESS_TASK_P_M], id="file includes multiline non-nested example"
+            # file includes non-nested example
+            [SUCCESS_TASK_P],
+            id="1",
         ),
-        pytest.param([SUCCESS_TASK_2P], id="file includes nesting far from each other"),
         pytest.param(
+            # file includes multiline non-nested example
+            [SUCCESS_TASK_P_M],
+            id="2",
+        ),
+        pytest.param(
+            # file includes nesting far from each other
+            [SUCCESS_TASK_2P],
+            id="3",
+        ),
+        pytest.param(
+            # file includes multiline nesting far from each other
             [SUCCESS_TASK_2P_M],
-            id="file includes multiline nesting far from each other",
+            id="4",
         ),
         pytest.param(
-            [SUCCESS_TASK_C_2P], id="file includes nesting close to each other"
+            # file includes nesting close to each other
+            [SUCCESS_TASK_C_2P],
+            id="5",
         ),
         pytest.param(
+            # file includes multiline nesting close to each other
             [SUCCESS_TASK_C_2P_M],
-            id="file includes multiline nesting close to each other",
+            id="6",
         ),
-        pytest.param([SUCCESS_TASK_PRINT], id="file includes print curly braces"),
+        pytest.param(
+            # file includes print curly braces
+            [SUCCESS_TASK_PRINT],
+            id="7",
+        ),
     ),
     indirect=["_playbook_file"],
 )

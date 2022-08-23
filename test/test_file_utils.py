@@ -1,9 +1,11 @@
 """Tests for file utility functions."""
+from __future__ import annotations
+
 import os
 import time
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any
 
 import pytest
 from _pytest.capture import CaptureFixture
@@ -56,7 +58,7 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
     ),
 )
 def test_expand_paths_vars(
-    test_path: Union[str, Path], expected: str, monkeypatch: MonkeyPatch
+    test_path: str | Path, expected: str, monkeypatch: MonkeyPatch
 ) -> None:
     """Ensure that tilde and env vars are expanded in paths lists."""
     monkeypatch.setenv("TEST_PATH", "/test/path")
@@ -139,6 +141,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
 @pytest.mark.parametrize(
     ("path", "kind"),
     (
+        ("tasks/run_test_playbook.yml", "tasks"),
         ("foo/playbook.yml", "playbook"),
         ("playbooks/foo.yml", "playbook"),
         ("playbooks/roles/foo.yml", "yaml"),
@@ -165,6 +168,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
             "roles/foo/molecule/scenario3/collections.yml",
             "requirements",
         ),  # requirements
+        ("roles/foo/meta/argument_specs.yml", "arg_specs"),  # role argument specs
         # tasks files:
         ("tasks/directory with spaces/main.yml", "tasks"),  # tasks
         ("tasks/requirements.yml", "tasks"),  # tasks
@@ -195,7 +199,7 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
     options = cli.get_config([])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Namespace) -> Dict[str, Any]:
+    def mockreturn(options: Namespace) -> dict[str, Any]:
         return {path: kind}
 
     # assert Lintable is able to determine file type
@@ -221,7 +225,7 @@ def test_guess_project_dir(tmp_path: Path) -> None:
 BASIC_PLAYBOOK = """
 - name: "playbook"
   tasks:
-    - name: hello
+    - name: Hello
       debug:
         msg: 'world'
 """

@@ -1,8 +1,10 @@
 """Implementation of no-tabs rule."""
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
+from __future__ import annotations
+
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.yaml_utils import nested_items_path
@@ -29,8 +31,8 @@ class NoTabsRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         for k, v, parent_path in nested_items_path(task):
             if isinstance(k, str) and "\t" in k:
                 return True
@@ -47,12 +49,12 @@ class NoTabsRule(AnsibleLintRule):
 RULE_EXAMPLE = r"""---
 - hosts: localhost
   tasks:
-    - name: should not trigger no-tabs rules
+    - name: Should not trigger no-tabs rules
       lineinfile:
         path: some.txt
         regexp: '^\t$'
         line: 'string with \t inside'
-    - name: foo
+    - name: Foo
       debug:
         msg: "Presence of \t should trigger no-tabs here."
 """
@@ -63,7 +65,7 @@ if "pytest" in sys.modules:
     import pytest
 
     @pytest.mark.parametrize("rule_runner", (NoTabsRule,), indirect=["rule_runner"])
-    def test_no_tabs_rule(rule_runner: "Any") -> None:
+    def test_no_tabs_rule(rule_runner: Any) -> None:
         """Test rule matches."""
         results = rule_runner.run_playbook(RULE_EXAMPLE)
         assert results[0].linenumber == 9

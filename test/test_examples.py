@@ -20,16 +20,16 @@ def _change_into_examples_dir(request: FixtureRequest) -> Generator[None, None, 
 
 @pytest.mark.usefixtures("_change_into_examples_dir")
 def test_example(default_rules_collection: RulesCollection) -> None:
-    """example.yml is expected to have 16 match errors inside."""
+    """example.yml is expected to have exact number of errors inside."""
     result = Runner("playbooks/example.yml", rules=default_rules_collection).run()
-    assert len(result) == 16
+    assert len(result) == 17
 
 
 @pytest.mark.parametrize(
     ("filename", "line", "column"),
     (
         pytest.param(
-            "examples/playbooks/syntax-error-string.yml", 1, 1, id="syntax-error-string"
+            "examples/playbooks/syntax-error-string.yml", 6, 7, id="syntax-error"
         ),
         pytest.param("examples/playbooks/syntax-error.yml", 2, 3, id="syntax-error"),
     ),

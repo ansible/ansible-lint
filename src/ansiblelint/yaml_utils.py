@@ -1,5 +1,7 @@
 """Utility helpers to simplify working with yaml-based data."""
 # pylint: disable=too-many-lines
+from __future__ import annotations
+
 import functools
 import logging
 import os
@@ -11,10 +13,7 @@ from typing import (
     Callable,
     Dict,
     Iterator,
-    List,
-    Optional,
     Pattern,
-    Set,
     Tuple,
     Union,
     cast,
@@ -34,11 +33,10 @@ from ruamel.yaml.scalarint import ScalarInt
 from ruamel.yaml.tokens import CommentToken
 from yamllint.config import YamlLintConfig
 
-import ansiblelint.skip_utils
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.utils import get_action_tasks, normalize_task, parse_yaml_linenumbers
+from ansiblelint.utils import get_action_tasks, normalize_task
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -59,6 +57,11 @@ rules:
   # you can easily change it or disable in your .yamllint file.
   line-length:
     max: 160
+  # We are adding an extra space inside braces as that's how prettier does it
+  # and we are trying not to fight other linters.
+  braces:
+    min-spaces-inside: 0  # yamllint defaults to 0
+    max-spaces-inside: 1  # yamllint defaults to 0
 """
 
 
@@ -77,7 +80,7 @@ def load_yamllint_config() -> YamlLintConfig:
         + "/yamllint/config",
     ]:
         if os.path.isfile(file):
-            _logger.warning(
+            _logger.debug(
                 "Loading custom %s config file, this extends our "
                 "internal yamllint config.",
                 file,
@@ -91,11 +94,11 @@ def load_yamllint_config() -> YamlLintConfig:
 
 
 def iter_tasks_in_file(
-    lintable: Lintable, rule_id: str
-) -> Iterator[Tuple[Dict[str, Any], Dict[str, Any], bool, Optional[MatchError]]]:
+    lintable: Lintable,
+) -> Iterator[tuple[dict[str, Any], dict[str, Any], list[str], MatchError | None]]:
     """Iterate over tasks in file.
 
-    This yields a 4-tuple of raw_task, normalized_task, skipped, and error.
+    This yields a 4-tuple of raw_task, normalized_task, skip_tags, and error.
 
     raw_task:
         When looping through the tasks in the file, each "raw_task" is minimally
@@ -105,50 +108,46 @@ def iter_tasks_in_file(
         by ansible into python objects and the action key gets normalized. If the task
         should be skipped (skipped is True) or normalizing it fails (error is not None)
         then this is just the raw_task instead of a normalized copy.
-    skipped:
-        Whether or not the task should be skipped according to tags or skipped_rules.
+    skip_tags:
+        List of tags found to be skipped, from tags block or noqa comments
     error:
         This is normally None. It will be a MatchError when the raw_task cannot be
         normalized due to an AnsibleParserError.
 
     :param lintable: The playbook or tasks/handlers yaml file to get tasks from
-    :param rule_id: The current rule id to allow calculating skipped.
 
-    :return: raw_task, normalized_task, skipped, error
+    Yields raw_task, normalized_task, skipped, error
     """
-    data = parse_yaml_linenumbers(lintable)
+    data = lintable.data
     if not data:
         return
-    data = ansiblelint.skip_utils.append_skipped_rules(data, lintable)
 
     raw_tasks = get_action_tasks(data, lintable)
 
     for raw_task in raw_tasks:
-        err: Optional[MatchError] = None
+        err: MatchError | None = None
 
-        # An empty `tags` block causes `None` to be returned if
-        # the `or []` is not present - `task.get('tags', [])`
-        # does not suffice.
-        skipped_in_task_tag = "skip_ansible_lint" in (raw_task.get("tags") or [])
-        skipped_in_yaml_comment = rule_id in raw_task.get("skipped_rules", ())
-        skipped = skipped_in_task_tag or skipped_in_yaml_comment
-        if skipped:
-            yield raw_task, raw_task, skipped, err
-            continue
+        skip_tags: list[str] = raw_task.get("skipped_rules", [])
 
         try:
             normalized_task = normalize_task(raw_task, str(lintable.path))
         except MatchError as err:
             # normalize_task converts AnsibleParserError to MatchError
-            yield raw_task, raw_task, skipped, err
+            yield raw_task, raw_task, skip_tags, err
             return
 
-        yield raw_task, normalized_task, skipped, err
+        if "skip_ansible_lint" in (raw_task.get("tags") or []):
+            skip_tags.append("skip_ansible_lint")
+        if skip_tags:
+            yield raw_task, normalized_task, skip_tags, err
+            continue
+
+        yield raw_task, normalized_task, skip_tags, err
 
 
 def nested_items_path(
-    data_collection: Union[Dict[Any, Any], List[Any]],
-) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
+    data_collection: dict[Any, Any] | list[Any],
+) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate a nested data structure, yielding key/index, value, and parent_path.
 
     This is a recursive function that calls itself for each nested layer of data.
@@ -168,9 +167,9 @@ def nested_items_path(
 
     .. code-block:: yaml
 
-        - name: a play
+        - name: A play
           tasks:
-          - name: a task
+          - name: A task
             debug:
               msg: foobar
 
@@ -204,13 +203,17 @@ def nested_items_path(
 
     :returns: each iteration yields the key (of the parent dict) or the index (lists)
     """
+    # As typing and mypy cannot effectively ensure we are called only with
+    # valid data, we better ignore NoneType
+    if data_collection is None:
+        return
     yield from _nested_items_path(data_collection=data_collection, parent_path=[])
 
 
 def _nested_items_path(
-    data_collection: Union[Dict[Any, Any], List[Any]],
-    parent_path: List[Union[str, int]],
-) -> Iterator[Tuple[Any, Any, List[Union[str, int]]]]:
+    data_collection: dict[Any, Any] | list[Any],
+    parent_path: list[str | int],
+) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate through data_collection (internal implementation of nested_items_path).
 
     This is a separate function because callers of nested_items_path should
@@ -244,14 +247,14 @@ def _nested_items_path(
 def get_path_to_play(
     lintable: Lintable,
     line_number: int,  # 1-based
-    ruamel_data: Union[CommentedMap, CommentedSeq],
-) -> List[Union[str, int]]:
+    ruamel_data: CommentedMap | CommentedSeq,
+) -> list[str | int]:
     """Get the path to the play in the given file at the given line number."""
     if line_number < 1:
         raise ValueError(f"expected line_number >= 1, got {line_number}")
     if lintable.kind != "playbook" or not isinstance(ruamel_data, CommentedSeq):
         return []
-    lc: "LineCol"  # lc uses 0-based counts # pylint: disable=invalid-name
+    lc: LineCol  # lc uses 0-based counts # pylint: disable=invalid-name
     # line_number is 1-based. Convert to 0-based.
     line_index = line_number - 1
 
@@ -286,8 +289,8 @@ def get_path_to_play(
 def get_path_to_task(
     lintable: Lintable,
     line_number: int,  # 1-based
-    ruamel_data: Union[CommentedMap, CommentedSeq],
-) -> List[Union[str, int]]:
+    ruamel_data: CommentedMap | CommentedSeq,
+) -> list[str | int]:
     """Get the path to the task in the given file at the given line number."""
     if line_number < 1:
         raise ValueError(f"expected line_number >= 1, got {line_number}")
@@ -297,7 +300,7 @@ def get_path_to_task(
     if lintable.kind == "playbook":
         assert isinstance(ruamel_data, CommentedSeq)
         return _get_path_to_task_in_playbook(line_number, ruamel_data)
-    # if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno"]:
+    # if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
 
     return []
 
@@ -305,7 +308,7 @@ def get_path_to_task(
 def _get_path_to_task_in_playbook(
     line_number: int,  # 1-based
     ruamel_data: CommentedSeq,
-) -> List[Union[str, int]]:
+) -> list[str | int]:
     """Get the path to the task in the given playbook data at the given line number."""
     last_play_index = len(ruamel_data)
     for play_index, play in enumerate(ruamel_data):
@@ -342,7 +345,7 @@ def _get_path_to_task_in_playbook(
             )
             if task_path:
                 # mypy gets confused without this typehint
-                tasks_keyword_path: List[Union[int, str]] = [
+                tasks_keyword_path: list[int | str] = [
                     play_index,
                     tasks_keyword,
                 ]
@@ -354,10 +357,10 @@ def _get_path_to_task_in_playbook(
 def _get_path_to_task_in_tasks_block(
     line_number: int,  # 1-based
     tasks_block: CommentedSeq,
-    last_line_number: Optional[int] = None,  # 1-based
-) -> List[Union[str, int]]:
+    last_line_number: int | None = None,  # 1-based
+) -> list[str | int]:
     """Get the path to the task in the given tasks block at the given line number."""
-    task: Optional[CommentedMap]
+    task: CommentedMap | None
     # line_number and last_line_number are 1-based. Convert to 0-based.
     line_index = line_number - 1
     last_line_index = None if last_line_number is None else last_line_number - 1
@@ -387,7 +390,7 @@ def _get_path_to_task_in_tasks_block(
             )
             if subtask_path:
                 # mypy gets confused without this typehint
-                task_path: List[Union[str, int]] = [task_index]
+                task_path: list[str | int] = [task_index]
                 return task_path + list(subtask_path)
 
         assert isinstance(task.lc.line, int)
@@ -414,9 +417,9 @@ def _get_path_to_task_in_tasks_block(
 def _get_path_to_task_in_nested_tasks_block(
     line_number: int,  # 1-based
     task: CommentedMap,
-    nested_task_keys: Set[str],
-    next_task_line_index: Optional[int] = None,  # 0-based
-) -> List[Union[str, int]]:
+    nested_task_keys: set[str],
+    next_task_line_index: int | None = None,  # 0-based
+) -> list[str | int]:
     """Get the path to the task in the given nested tasks block."""
     # loop through the keys in line order
     task_keys = list(task.keys())
@@ -462,9 +465,7 @@ class OctalIntYAML11(ScalarInt):
         return ScalarInt.__new__(cls, *args, **kwargs)
 
     @staticmethod
-    def represent_octal(
-        representer: RoundTripRepresenter, data: "OctalIntYAML11"
-    ) -> Any:
+    def represent_octal(representer: RoundTripRepresenter, data: OctalIntYAML11) -> Any:
         """Return a YAML 1.1 octal representation.
 
         Based on ruamel.yaml.representer.RoundTripRepresenter.represent_octal_int()
@@ -490,6 +491,9 @@ class CustomConstructor(RoundTripConstructor):
         """
         ret = super().construct_yaml_int(node)
         if self.resolver.processing_version == (1, 1) and isinstance(ret, int):
+            # Do not rewrite zero as octal.
+            if ret == 0:
+                return ret
             # see if we've got an octal we need to preserve.
             value_su = self.construct_scalar(node)
             try:
@@ -531,6 +535,9 @@ class FormattedEmitter(Emitter):
     """
 
     preferred_quote = '"'  # either " or '
+
+    min_spaces_inside = 0
+    max_spaces_inside = 1
 
     _sequence_indent = 2
     _sequence_dash_offset = 0  # Should be _sequence_indent - 2
@@ -592,13 +599,20 @@ class FormattedEmitter(Emitter):
         indention: bool = False,  # (sic) ruamel.yaml has this typo in their API
     ) -> None:
         """Make sure that flow maps get whitespace by the curly braces."""
+        # We try to go with one whitespace by the curly braces and adjust accordingly
+        # to what min_spaces_inside and max_spaces_inside are set to.
+        # This assumes min_spaces_inside <= max_spaces_inside
+        spaces_inside = min(
+            max(1, self.min_spaces_inside),
+            self.max_spaces_inside if self.max_spaces_inside != -1 else 1,
+        )
         # If this is the end of the flow mapping that isn't on a new line:
         if (
             indicator == "}"
             and (self.column or 0) > (self.indent or 0)
             and not self._in_empty_flow_map
         ):
-            indicator = " }"
+            indicator = (" " * spaces_inside) + "}"
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
@@ -607,7 +621,7 @@ class FormattedEmitter(Emitter):
                 self._in_empty_flow_map = True
             else:
                 self.column += 1
-                self.stream.write(" ")
+                self.stream.write(" " * spaces_inside)
                 self._in_empty_flow_map = False
 
     # "/n/n" results in one blank line (end the previous line, then newline).
@@ -705,11 +719,11 @@ class FormattedYAML(YAML):
     def __init__(
         self,
         *,
-        typ: Optional[str] = None,
+        typ: str | None = None,
         pure: bool = False,
         output: Any = None,
         # input: Any = None,
-        plug_ins: Optional[List[str]] = None,
+        plug_ins: list[str] | None = None,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -731,9 +745,9 @@ class FormattedYAML(YAML):
         .. code:: yaml
 
             ---
-            - name: playbook
+            - name: A playbook
               tasks:
-              - name: task
+              - name: Task
 
         This example indents all sequences including the root-level:
 
@@ -748,9 +762,9 @@ class FormattedYAML(YAML):
         .. code:: yaml
 
             ---
-              - name: playbook
+              - name: Playbook
                 tasks:
-                  - name: task
+                  - name: Task
 
         This example indents all sequences except at the root-level:
 
@@ -765,13 +779,13 @@ class FormattedYAML(YAML):
         .. code:: yaml
 
             ---
-            - name: playbook
+            - name: Playbook
               tasks:
-                - name: task
+                - name: Task
         """
         # Default to reading/dumping YAML 1.1 (ruamel.yaml defaults to 1.2)
-        self._yaml_version_default: Tuple[int, int] = (1, 1)
-        self._yaml_version: Union[str, Tuple[int, int]] = self._yaml_version_default
+        self._yaml_version_default: tuple[int, int] = (1, 1)
+        self._yaml_version: str | tuple[int, int] = self._yaml_version_default
 
         super().__init__(typ=typ, pure=pure, output=output, plug_ins=plug_ins)
 
@@ -785,6 +799,9 @@ class FormattedYAML(YAML):
         self.width: int = config["width"]  # type: ignore[assignment]
         indent_sequences: bool = cast(bool, config["indent_sequences"])
         preferred_quote: str = cast(str, config["preferred_quote"])  # either ' or "
+
+        min_spaces_inside: int = cast(int, config["min_spaces_inside"])
+        max_spaces_inside: int = cast(int, config["max_spaces_inside"])
 
         self.default_flow_style = False
         self.compact_seq_seq = True  # type: ignore[assignment] # dash after dash
@@ -803,6 +820,10 @@ class FormattedYAML(YAML):
             FormattedEmitter.preferred_quote = preferred_quote
         # NB: default_style affects preferred_quote as well.
         # self.default_style ∈ None (default), '', '"', "'", '|', '>'
+
+        # spaces inside braces for flow mappings
+        FormattedEmitter.min_spaces_inside = min_spaces_inside
+        FormattedEmitter.max_spaces_inside = max_spaces_inside
 
         # We need a custom constructor to preserve Octal formatting in YAML 1.1
         self.Constructor = CustomConstructor
@@ -825,7 +846,7 @@ class FormattedYAML(YAML):
         # )
 
     @staticmethod
-    def _defaults_from_yamllint_config() -> Dict[str, Union[bool, int, str]]:
+    def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:
         """Extract FormattedYAML-relevant settings from yamllint config if possible."""
         config = {
             "explicit_start": True,
@@ -833,18 +854,28 @@ class FormattedYAML(YAML):
             "width": 160,
             "indent_sequences": True,
             "preferred_quote": '"',
+            "min_spaces_inside": 0,
+            "max_spaces_inside": 1,
         }
         for rule, rule_config in load_yamllint_config().rules.items():
             if not rule_config:
                 # rule disabled
                 continue
 
+            # refactor this if ... elif ... elif ... else monstrosity using match/case (PEP 634) once python 3.10 is mandatory
             if rule == "document-start":
                 config["explicit_start"] = rule_config["present"]
             elif rule == "document-end":
                 config["explicit_end"] = rule_config["present"]
             elif rule == "line-length":
                 config["width"] = rule_config["max"]
+            elif rule == "braces":
+                min_spaces_inside = rule_config["min-spaces-inside"]
+                if min_spaces_inside:
+                    config["min_spaces_inside"] = int(min_spaces_inside)
+                max_spaces_inside = rule_config["max-spaces-inside"]
+                if max_spaces_inside:
+                    config["max_spaces_inside"] = int(max_spaces_inside)
             elif rule == "indentation":
                 indent_sequences = rule_config["indent-sequences"]
                 # one of: bool, "whatever", "consistent"
@@ -861,7 +892,7 @@ class FormattedYAML(YAML):
         return cast(Dict[str, Union[bool, int, str]], config)
 
     @property  # type: ignore[override]
-    def version(self) -> Union[str, Tuple[int, int]]:  # type: ignore[override]
+    def version(self) -> str | tuple[int, int]:  # type: ignore[override]
         """Return the YAML version used to parse or dump.
 
         Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
@@ -872,7 +903,7 @@ class FormattedYAML(YAML):
         return self._yaml_version
 
     @version.setter
-    def version(self, value: Optional[Union[str, Tuple[int, int]]]) -> None:
+    def version(self, value: str | tuple[int, int] | None) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.
@@ -893,7 +924,7 @@ class FormattedYAML(YAML):
 
     def dumps(self, data: Any) -> str:
         """Dump YAML document to string (including its preamble_comment)."""
-        preamble_comment: Optional[str] = getattr(data, "preamble_comment", None)
+        preamble_comment: str | None = getattr(data, "preamble_comment", None)
         self._prevent_wrapping_flow_style(data)
         with StringIO() as stream:
             if preamble_comment:
@@ -917,9 +948,7 @@ class FormattedYAML(YAML):
                     # so, switch it to block style to avoid the line wrap.
                     fa.set_block_style()
 
-    def _predict_indent_length(
-        self, parent_path: List[Union[str, int]], key: Any
-    ) -> int:
+    def _predict_indent_length(self, parent_path: list[str | int], key: Any) -> int:
         indent = 0
 
         # each parent_key type tells us what the indent is for the next level.
@@ -951,7 +980,7 @@ class FormattedYAML(YAML):
     # So, we need to identify whitespace-only lines to drop spaces before reading.
     _whitespace_only_lines_re = re.compile(r"^ +$", re.MULTILINE)
 
-    def _pre_process_yaml(self, text: str) -> Tuple[str, Optional[str]]:
+    def _pre_process_yaml(self, text: str) -> tuple[str, str | None]:
         """Handle known issues with ruamel.yaml loading.
 
         Preserve blank lines despite extra whitespace.
@@ -1008,7 +1037,7 @@ class FormattedYAML(YAML):
         text = text.rstrip("\n") + "\n"
 
         lines = text.splitlines(keepends=True)
-        full_line_comments: List[Tuple[int, str]] = []
+        full_line_comments: list[tuple[int, str]] = []
         for i, line in enumerate(lines):
             stripped = line.lstrip()
             if not stripped:

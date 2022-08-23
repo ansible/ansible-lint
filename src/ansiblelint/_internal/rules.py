@@ -1,6 +1,8 @@
 """Internally used rule classes."""
+from __future__ import annotations
+
 import logging
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -10,29 +12,48 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 _logger = logging.getLogger(__name__)
+LOAD_FAILURE_MD = """\
+## load-failure
+
+Linter failed to process a YAML file, probably because it is either:
+
+* contains unsupported encoding (only UTF-8 is supported)
+* not an Ansible file
+* it contains some unsupported custom YAML objects (`!!` prefix)
+* it was not able to decrypt an inline `!vault` block.
+
+This violation **is not** skippable, so it cannot be added to the `warn_list`
+or the `skip_list`. If a vault decryption issue cannot be avoided, the
+offending file can be added to `exclude_paths` configuration.
+"""
 
 
 # Derived rules are likely to want to access class members, so:
-# pylint: disable=no-self-use
 # pylint: disable=unused-argument
 class BaseRule:
     """Root class used by Rules."""
 
     id: str = ""
-    tags: List[str] = []
+    tags: list[str] = []
     description: str = ""
+    help: str = ""  # markdown help (automatically loaded from `<rule>.md`)
     version_added: str = ""
     severity: str = ""
     link: str = ""
     has_dynamic_tags: bool = False
     needs_raw_task: bool = False
+    # We use _order to sort rules and to ensure that some run before others,
+    # _order 0 for internal rules
+    # _order 1 for rules that check that data can be loaded
+    # _order 5 implicit for normal rules
+    _order: int = 5
 
     @property
     def shortdesc(self) -> str:
         """Return the short description of the rule, basically the docstring."""
         return self.__doc__ or ""
 
-    def getmatches(self, file: "Lintable") -> List["MatchError"]:
+    def getmatches(self, file: Lintable) -> list[MatchError]:
         """Return all matches while ignoring exceptions."""
         matches = []
         if not file.path.is_dir():
@@ -40,7 +61,7 @@ class BaseRule:
                 try:
                     matches.extend(method(file))
                 except Exception as exc:  # pylint: disable=broad-except
-                    _logger.debug(
+                    _logger.warning(
                         "Ignored exception from %s.%s: %s",
                         self.__class__.__name__,
                         method,
@@ -50,13 +71,13 @@ class BaseRule:
             matches.extend(self.matchdir(file))
         return matches
 
-    def matchlines(self, file: "Lintable") -> List["MatchError"]:
+    def matchlines(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific line."""
         return []
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str | MatchError:
         """Confirm if current rule is matching a specific task.
 
         If ``needs_raw_task`` (a class level attribute) is ``True``, then
@@ -65,21 +86,19 @@ class BaseRule:
         """
         return False
 
-    def matchtasks(self, file: "Lintable") -> List["MatchError"]:
+    def matchtasks(self, file: Lintable) -> list[MatchError]:
         """Return matches for a tasks file."""
         return []
 
-    def matchyaml(self, file: "Lintable") -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""
         return []
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
         return []
 
-    def matchdir(self, lintable: "Lintable") -> List["MatchError"]:
+    def matchdir(self, lintable: Lintable) -> list[MatchError]:
         """Return matches for lintable folders."""
         return []
 
@@ -87,16 +106,19 @@ class BaseRule:
         """Return a verbose representation of the rule."""
         return self.id + ": " + self.shortdesc + "\n  " + self.description
 
-    def match(self, line: str) -> Union[bool, str]:
+    def match(self, line: str) -> bool | str:
         """Confirm if current rule matches the given string."""
         return False
 
-    def __lt__(self, other: "BaseRule") -> bool:
+    def __lt__(self, other: BaseRule) -> bool:
         """Enable us to sort rules by their id."""
-        return self.id < other.id
+        return (self._order, self.id) < (other._order, other.id)
+
+    def __repr__(self) -> str:
+        """Return a AnsibleLintRule instance representation."""
+        return self.id + ": " + self.shortdesc
 
 
-# pylint: enable=no-self-use
 # pylint: enable=unused-argument
 
 
@@ -113,6 +135,7 @@ class RuntimeErrorRule(BaseRule):
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v5.0.0"
+    _order = 0
 
 
 class AnsibleParserErrorRule(BaseRule):
@@ -123,6 +146,7 @@ class AnsibleParserErrorRule(BaseRule):
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v5.0.0"
+    _order = 0
 
 
 class LoadingFailureRule(BaseRule):
@@ -131,5 +155,7 @@ class LoadingFailureRule(BaseRule):
     id = "load-failure"
     description = "Linter failed to process a YAML file, possible not an Ansible file."
     severity = "VERY_HIGH"
-    tags = ["core"]
+    tags = ["core", "unskippable"]
     version_added = "v4.3.0"
+    help = LOAD_FAILURE_MD
+    _order = 0

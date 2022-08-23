@@ -18,9 +18,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import annotations
 
+import sys
 from functools import reduce
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import LINE_NUMBER_KEY
@@ -31,8 +33,8 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
-def _get_subtasks(data: "odict[str, Any]") -> List[Any]:
-    result: List[Any] = []
+def _get_subtasks(data: odict[str, Any]) -> list[Any]:
+    result: list[Any] = []
     block_names = [
         "tasks",
         "pre_tasks",
@@ -48,7 +50,7 @@ def _get_subtasks(data: "odict[str, Any]") -> List[Any]:
     return result
 
 
-def _nested_search(term: str, data: "odict[str, Any]") -> Any:
+def _nested_search(term: str, data: odict[str, Any]) -> Any:
     if data and term in data:
         return True
     return reduce(
@@ -56,7 +58,7 @@ def _nested_search(term: str, data: "odict[str, Any]") -> Any:
     )
 
 
-def _become_user_without_become(becomeuserabove: bool, data: "odict[str, Any]") -> Any:
+def _become_user_without_become(becomeuserabove: bool, data: odict[str, Any]) -> Any:
     if "become" in data:
         # If become is in lineage of tree then correct
         return False
@@ -95,9 +97,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     tags = ["unpredictability"]
     version_added = "historic"
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         if file.kind == "playbook":
             result = _become_user_without_become(False, data)
             if result:
@@ -109,3 +109,27 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
                     )
                 ]
         return []
+
+
+# testing code to be loaded only with pytest or when executed the rule file
+if "pytest" in sys.modules:
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    def test_partial_become_positive() -> None:
+        """Positive test for partial-become."""
+        collection = RulesCollection()
+        collection.register(BecomeUserWithoutBecomeRule())
+        success = "examples/playbooks/become-user-without-become-success.yml"
+        good_runner = Runner(success, rules=collection)
+        assert [] == good_runner.run()
+
+    def test_partial_become_negative() -> None:
+        """Negative test for partial-become."""
+        collection = RulesCollection()
+        collection.register(BecomeUserWithoutBecomeRule())
+        failure = "examples/playbooks/become-user-without-become-failure.yml"
+        bad_runner = Runner(failure, rules=collection)
+        errs = bad_runner.run()
+        assert len(errs) == 3

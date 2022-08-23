@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   gather_facts: false
   tags:
     - "{{ foo }}"

@@ -1,9 +1,9 @@
 ---
-- name: test bad command
+- name: Test bad command
   action: command mkdir blah
 
-- name: test bad command v2
+- name: Test bad command v2
   command: mkdir blah
 
-- name: test bad local command
+- name: Test bad local command
   local_action: shell touch foo

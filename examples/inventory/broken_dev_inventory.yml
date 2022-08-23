@@ -1,0 +1,3 @@
+---
+all:
+  foo: {} # invalid based on inventory json schema

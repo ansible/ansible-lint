@@ -1,12 +1,14 @@
 """Implementation of meta-no-tags rule."""
-
-# Copyright (c) 2018, Ansible Project
+from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
+
+# Copyright (c) 2018, Ansible Project
+
 
 if TYPE_CHECKING:
     from typing import Any
@@ -30,13 +32,12 @@ class MetaTagValidRule(AnsibleLintRule):
 
     TAG_REGEXP = re.compile("^[a-z0-9]+$")
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
+        """Find violations inside meta files."""
         if file.kind != "meta":
             return []
 
-        galaxy_info = data.get("galaxy_info", None)
+        galaxy_info = file.data.get("galaxy_info", None)
         if not galaxy_info:
             return []
 
@@ -101,10 +102,10 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
     )
-    def test_valid_tag_rule(rule_runner: "Any") -> None:
+    def test_valid_tag_rule(rule_runner: Any) -> None:
         """Test rule matches."""
         results = rule_runner.run_role_meta_main(META_TAG_VALID)
-        assert "Use 'galaxy_tags' rather than 'categories'" in str(results)
+        assert "Use 'galaxy_tags' rather than 'categories'" in str(results), results
         assert "Expected 'categories' to be a list" in str(results)
         assert "invalid: 'my s q l'" in str(results)
         assert "invalid: 'MYTAG'" in str(results)

@@ -1,6 +1,7 @@
 """Tests related to role imports."""
+from __future__ import annotations
+
 from pathlib import Path
-from typing import List
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -10,7 +11,7 @@ from ansiblelint.runner import Runner
 
 ROLE_TASKS_MAIN = """\
 ---
-- name: shell instead of command
+- name: Shell instead of command
   shell: echo hello world
   changed_when: false
 """
@@ -22,39 +23,41 @@ ROLE_TASKS_WORLD = """\
 
 PLAY_IMPORT_ROLE = """\
 ---
-- hosts: all
+- name: Test fixture
+  hosts: all
 
   tasks:
-    - name: some import
+    - name: Some import
       import_role:
         name: test-role
 """
 
 PLAY_IMPORT_ROLE_FQCN = """\
 ---
-- hosts: all
+- name: Test fixture
+  hosts: all
 
   tasks:
-    - name: some import
+    - name: Some import
       ansible.builtin.import_role:
         name: test-role
 """
 
 PLAY_IMPORT_ROLE_INLINE = """\
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
-    - name: some import
+    - name: Some import
       import_role: name=test-role
 """
 
 PLAY_INCLUDE_ROLE = """\
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
-    - name: some import
+    - name: Some import
       include_role:
         name: test-role
         tasks_from: world
@@ -62,10 +65,10 @@ PLAY_INCLUDE_ROLE = """\
 
 PLAY_INCLUDE_ROLE_FQCN = """\
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
-    - name: some import
+    - name: Some import
       ansible.builtin.include_role:
         name: test-role
         tasks_from: world
@@ -73,10 +76,10 @@ PLAY_INCLUDE_ROLE_FQCN = """\
 
 PLAY_INCLUDE_ROLE_INLINE = """\
 ---
-- hosts: all
-
+- name: Fixture
+  hosts: all
   tasks:
-    - name: some import
+    - name: Some import
       include_role: name=test-role tasks_from=world
 """
 
@@ -131,7 +134,7 @@ def fixture_playbook_path(request: SubRequest, tmp_path: Path) -> str:
     indirect=("playbook_path",),
 )
 def test_import_role2(
-    default_rules_collection: RulesCollection, playbook_path: str, messages: List[str]
+    default_rules_collection: RulesCollection, playbook_path: str, messages: list[str]
 ) -> None:
     """Test that include_role digs deeper than import_role."""
     runner = Runner(

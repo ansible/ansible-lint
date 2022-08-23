@@ -1,6 +1,6 @@
 ---
 - hosts: localhost
-  name: become_user without become play
+  name: Use of become_user without become play
   become_user: root
 
   tasks:
@@ -10,7 +10,7 @@
 - hosts: localhost
 
   tasks:
-    - name: become_user without become task
+    - name: Use of become_user without become task
       ansible.builtin.command: whoami
       become_user: postgres
       changed_when: false
@@ -18,11 +18,11 @@
 - hosts: localhost
 
   tasks:
-    - name: a block with become and become_user on different tasks
+    - name: A block with become and become_user on different tasks
       block:
-        - name: become
+        - name: Sample become
           become: true
           ansible.builtin.command: whoami
-        - name: become_user
+        - name: Sample become_user
           become_user: postgres
           ansible.builtin.command: whoami

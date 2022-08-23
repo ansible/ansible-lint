@@ -1,0 +1,19 @@
+---
+- hosts: all
+  vars_prompt:
+    - name: username
+      prompt: What is your username?
+      private: false
+
+    - name: password
+      prompt: What is your password?
+
+  tasks:
+    - name: Pause for 5 minutes to build app cache
+      ansible.builtin.pause:
+        minutes: 5 # should not trigger because minutes is mentioned
+
+    - name: A helpful reminder of what to look out for post-update
+      ansible.builtin.pause:
+        # should trigger no-prompting as neither seconds/minutes are mentioned
+        prompt: "Make sure org.foo.FooOverload exception is not present"

@@ -1,8 +1,9 @@
 """Implementation of meta-video-links rule."""
 # Copyright (c) 2018, Ansible Project
+from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY
@@ -34,13 +35,11 @@ class MetaVideoLinksRule(AnsibleLintRule):
         "youtube": re.compile(r"https://youtu\.be/([0-9A-Za-z-_]+)"),
     }
 
-    def matchplay(
-        self, file: "Lintable", data: "odict[str, Any]"
-    ) -> List["MatchError"]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
         if file.kind != "meta":
             return []
 
-        galaxy_info = data.get("galaxy_info", None)
+        galaxy_info = file.data.get("galaxy_info", None)
         if not galaxy_info:
             return []
 
@@ -54,7 +53,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
             if not isinstance(video, dict):
                 results.append(
                     self.create_matcherror(
-                        "Expected item in 'video_links' to be " "a dictionary",
+                        "Expected item in 'video_links' to be a dictionary",
                         filename=file,
                     )
                 )

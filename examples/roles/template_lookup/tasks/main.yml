@@ -5,6 +5,6 @@
 # in a role is not handled by `delegate_map`.
 # Ref: https://github.com/ansible-community/ansible-lint/blob/v5.0.12/src/ansiblelint/utils.py#L305
 - block:
-    - name: bug demo
+    - name: Bug demo
       ansible.builtin.debug:
         msg: '{{ lookup("file", "a_file") }}'

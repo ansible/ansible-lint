@@ -20,6 +20,8 @@
 # THE SOFTWARE.
 """Command line implementation."""
 
+from __future__ import annotations
+
 import errno
 import logging
 import os
@@ -28,13 +30,15 @@ import shutil
 import subprocess
 import sys
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Iterator
 
 from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir
 from enrich.console import should_do_markup
+from filelock import FileLock
 
 from ansiblelint import cli
+from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
 from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
@@ -79,7 +83,7 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def initialize_options(arguments: Optional[List[str]] = None) -> None:
+def initialize_options(arguments: list[str] | None = None) -> None:
     """Load config options and store them inside options module."""
     new_options = cli.get_config(arguments or [])
     new_options.cwd = pathlib.Path.cwd()
@@ -103,18 +107,23 @@ def initialize_options(arguments: Optional[List[str]] = None) -> None:
     options.configured = True
     options.cache_dir = get_cache_dir(options.project_dir)
 
+    # add a lock file so we do not have two instances running inside at the same time
+    os.makedirs(options.cache_dir, exist_ok=True)
+    options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
+    options.cache_dir_lock.acquire()
 
-def _do_list(rules: "RulesCollection") -> int:
+
+def _do_list(rules: RulesCollection) -> int:
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
-    from ansiblelint.generate_docs import rules_as_rich, rules_as_rst, rules_as_str
+    from ansiblelint.generate_docs import rules_as_md, rules_as_rich, rules_as_str
 
     if options.listrules:
 
-        _rule_format_map: Dict[str, Callable[..., Any]] = {
+        _rule_format_map: dict[str, Callable[..., Any]] = {
             "plain": rules_as_str,
             "rich": rules_as_rich,
-            "rst": rules_as_rst,
+            "md": rules_as_md,
         }
 
         console.print(_rule_format_map[options.format](rules), highlight=False)
@@ -129,7 +138,7 @@ def _do_list(rules: "RulesCollection") -> int:
 
 
 # noinspection PyShadowingNames
-def _do_transform(result: "LintResult", opts: "Namespace") -> None:
+def _do_transform(result: LintResult, opts: Namespace) -> None:
     """Create and run Transformer."""
     if "yaml" in opts.skip_list:
         # The transformer rewrites yaml files, but the user requested to skip
@@ -146,7 +155,7 @@ def _do_transform(result: "LintResult", opts: "Namespace") -> None:
     transformer.run()
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
     path_inject()
@@ -162,12 +171,23 @@ def main(argv: Optional[List[str]] = None) -> int:
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
 
-    app = get_app()
+    app = get_app(offline=options.offline)
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import _get_matches
 
     rules = RulesCollection(options.rulesdirs)
+
+    if options.profile == []:
+        from ansiblelint.generate_docs import profiles_as_rich
+
+        console.print(profiles_as_rich())
+        return 0
+    if options.profile:
+        from ansiblelint.rules import filter_rules_with_profile
+
+        filter_rules_with_profile(rules, options.profile[0])
+        # When profile is mentioned, we filter-out the rules based on it
 
     if options.listrules or options.listtags:
         return _do_list(rules)
@@ -215,6 +235,10 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     app.render_matches(result.matches)
 
+    _perform_mockings_cleanup()
+    options.cache_dir_lock.release()
+    pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
+
     return app.report_outcome(result, mark_as_success=mark_as_success)
 
 
@@ -228,16 +252,21 @@ def _previous_revision() -> Iterator[None]:
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD^1"],
         check=True,
-        universal_newlines=True,
+        text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
-    ).stdout
+    ).stdout.strip()
     path = pathlib.Path(worktree_dir)
     path.mkdir(parents=True, exist_ok=True)
-    os.system(f"git worktree add -f {worktree_dir} 2>/dev/null")
+    # Run check will fail if worktree_dir already exists
+    # pylint: disable=subprocess-run-check
+    subprocess.run(
+        ["git", "worktree", "add", "-f", worktree_dir],
+        stderr=subprocess.DEVNULL,
+    )
     try:
         with cwd(worktree_dir):
-            os.system(f"git checkout {revision}")
+            subprocess.run(["git", "checkout", revision], check=True)
             yield
     finally:
         options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
@@ -250,14 +279,14 @@ def _run_cli_entrypoint() -> None:
     """
     try:
         sys.exit(main(sys.argv))
-    except IOError as exc:
+    except OSError as exc:
         # NOTE: Only "broken pipe" is acceptable to ignore
         if exc.errno != errno.EPIPE:
             raise
     except KeyboardInterrupt:
         sys.exit(EXIT_CONTROL_C_RC)
     except RuntimeError as exc:
-        raise SystemExit from exc
+        raise SystemExit(exc) from exc
 
 
 def path_inject() -> None:
@@ -274,11 +303,12 @@ def path_inject() -> None:
         ansible_path = os.path.dirname(ansible_path)
     py_path = os.path.dirname(sys.executable)
     # Determine if we need to manipulate PATH
-    if ansible_path not in paths or py_path != ansible_path:  # pragma: no cover
-        # tested by test_call_from_outside_venv but coverage cannot detect it
-        paths.insert(0, py_path)
-        os.environ["PATH"] = os.pathsep.join(paths)
-        print(f"WARNING: PATH altered to include {py_path}", file=sys.stderr)
+    for path in (ansible_path, py_path):
+        if path and path not in paths:  # pragma: no cover
+            # tested by test_call_from_outside_venv but coverage cannot detect it
+            paths.insert(0, path)
+            os.environ["PATH"] = os.pathsep.join(paths)
+            print(f"WARNING: PATH altered to include {path}", file=sys.stderr)
 
 
 if __name__ == "__main__":

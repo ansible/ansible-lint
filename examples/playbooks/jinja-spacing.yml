@@ -1,0 +1,89 @@
+---
+# Should raise jinja[spacing] at tasks line 23, 26, 29, 54, 65
+- name: Fixture for testing jinja2[spacing]
+  hosts: all
+  tasks:
+    - name: Good variable format
+      ansible.builtin.debug:
+        msg: "{{ good_format }}"
+    - name: Good variable format
+      ansible.builtin.debug:
+        msg: "Value: {{ good_format }}"
+    - name: Good variable filter format
+      ansible.builtin.debug:
+        msg: "{{ good_format | filter }}"
+    - name: Good variable filter format
+      ansible.builtin.debug:
+        msg: "Value: {{ good_format | filter }}"
+    - name: Jinja escaping allowed
+      ansible.builtin.debug:
+        msg: "{{ '{{' }}"
+    - name: Jinja escaping allowed
+      # noqa: risky-shell-pipe
+      ansible.builtin.shell: docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'
+      changed_when: false
+    - name: Jinja whitespace control allowed
+      ansible.builtin.debug:
+        msg: |
+          {{ good_format }}/
+          {{- good_format }}
+          {{- good_format -}}
+    - name: Bad variable format
+      ansible.builtin.debug:
+        msg: "{{bad_format}}" # <-- 1
+    - name: Bad variable format
+      ansible.builtin.debug:
+        msg: "Value: {{ bad_format}}" # <-- 2
+    - name: Bad variable format
+      ansible.builtin.debug:
+        msg: "{{bad_format }}" # <-- 3
+    - name: Bad variable filter format
+      ansible.builtin.debug:
+        msg: "{{ bad_format|filter }}" # <-- 4
+    - name: Bad variable filter format
+      ansible.builtin.debug:
+        msg: "Value: {{ bad_format |filter }}" # <-- 5
+    - name: Bad variable filter format
+      ansible.builtin.debug:
+        msg: "{{ bad_format| filter }}" # <-- 6
+    - name: Not a jinja variable # noqa: jinja[spacing]
+      ansible.builtin.debug:
+        # spell-checker: disable-next-line
+        msg: data = ${lookup{$local_part}lsearch{/etc/aliases}}
+    - name: JSON inside jinja is valid
+      ansible.builtin.debug:
+        msg: "{{ {'test': {'subtest': variable}} }}"
+    - name: Avoid false positive on multiline
+      vars:
+        cases:
+          case1: >-
+            http://foo.com/{{
+              case1 }}
+          case2: >-
+            http://bar.com/{{
+            case2 }}
+      ansible.builtin.debug:
+        var: cases
+
+    - name: Valid single line nested JSON false positive
+      ansible.builtin.debug:
+        msg: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1) }}"
+
+    - name: Invalid single line nested JSON
+      ansible.builtin.debug:
+        msg: "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1)}}" # <-- 7
+
+    - name: Valid multiline nested JSON false positive
+      ansible.builtin.debug:
+        msg: >-
+          {{ {'dummy_2': {'nested_dummy_1': value_1,
+                          'nested_dummy_2': value_2}} |
+          combine(dummy_1) }}
+
+    - name: Invalid multiline nested JSON
+      ansible.builtin.debug:
+        # <-- 8
+        msg: >-
+          {{ {'dummy_2': {'nested_dummy_1': value_1,
+                          'nested_dummy_2': value_2}} |
+          combine(dummy_1)}}

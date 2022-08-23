@@ -52,7 +52,7 @@ enable_list:
   - yaml
 # Report only a subset of tags and fully ignore any others
 # tags:
-#   - var-spacing
+#   - jinja[spacing]
 
 # This makes the linter display but not fail for rules/tags listed below:
 warn_list:
@@ -60,6 +60,7 @@ warn_list:
   - git-latest
   - experimental # experimental is included in the implicit list
   # - role-name
+  # - yaml[document-start]  # you can also use sub-rule matches
 
 # Some rules can transform files to fix (or make it easier to fix) identified
 # errors. `ansible-lint --write` will reformat YAML files and run these transforms.

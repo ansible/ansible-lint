@@ -17,5 +17,7 @@ ignorePaths:
   - docs/requirements.in
   # Test fixtures generated from outside
   - test/**/*.result
+  - src/ansiblelint/schemas/*.json
   # Other
   - "*.svg"
+allowCompoundWords: true

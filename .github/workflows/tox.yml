@@ -22,6 +22,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
+env:
+  FORCE_COLOR: 1 # tox, pytest, ansible-lint
+  PY_COLORS: 1
+  TOX_PARALLEL_NO_SPINNER: 1
+
 jobs:
   linters:
     name: >-
@@ -39,17 +44,15 @@ jobs:
           - TOXENV: docs
           - TOXENV: eco
           - TOXENV: packaging
-    env:
-      TOX_PARALLEL_NO_SPINNER: 1
-      FORCE_COLOR: 1
+          - TOXENV: validate-hook
 
     steps:
       - name: Check out src from Git
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0 # needed by setuptools-scm
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       # - name: set PY_SHA256
@@ -74,8 +77,7 @@ jobs:
       - name: Log installed dists
         run: >-
           python -m pip freeze --all
-      - name: >-
-          Initialize tox envs
+      - name: Initialize tox envs
         run: >-
           python -m
           tox
@@ -90,7 +92,7 @@ jobs:
           python -m tox --parallel auto --parallel-live
         env: ${{ matrix.env }}
       - name: Archive logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: logs.zip
           path: .tox/**/log/
@@ -110,28 +112,25 @@ jobs:
       # proof that we failed to catch a bug by not running it. Using
       # distribution should be preferred instead of custom builds.
       matrix:
+        name:
+          - py38
+        tox_env:
+          - py38
         python-version:
-          # keep list sorted as it determines UI order too
           - 3.8
-          - 3.9
-          - "3.10"
         os:
           # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
           - ubuntu-20.04
         # - windows-latest
         # - windows-2016
         include:
-          # windows-2022 WSL does timeout running tests, likely caused but some
-          # extreme (>10x) performance degradation compared with windows-2019
-          # https://github.com/actions/virtual-environments/issues/4856
-          - name: py39 (wsl)
-            tox_env: py39
-            os: windows-2019
-            shell: "wsl-bash {0}"
+          # keep list sorted as it determines UI order too
+          # linux
+          # py38 is first and comes from matrix
           - tox_env: py38
             os: ubuntu-20.04
             python-version: 3.8
-            devel: true
+            devel: false # ansible 2.14 removed support for py38
           - tox_env: py39
             os: ubuntu-20.04
             python-version: 3.9
@@ -140,6 +139,11 @@ jobs:
             os: ubuntu-20.04
             python-version: "3.10"
             devel: true
+          - tox_env: py311
+            os: ubuntu-20.04
+            python-version: "~3.11.0-0" # see https://github.com/actions/setup-python/issues/213#issuecomment-1146676713
+            devel: true
+          # macos
           - name: py38 (macos)
             tox_env: py38
             os: macOS-latest
@@ -148,15 +152,20 @@ jobs:
             tox_env: py310
             os: macOS-latest
             python-version: "3.10"
+          # windows-2022 WSL does timeout running tests, likely caused but some
+          # extreme (>10x) performance degradation compared with windows-2019
+          # https://github.com/actions/virtual-environments/issues/4856
+          - name: py39 (wsl)
+            tox_env: py39
+            os: windows-2019
+            shell: "wsl-bash {0}"
 
     env:
-      TOX_PARALLEL_NO_SPINNER: 1
-      FORCE_COLOR: 1
       # vars safe to be passed to wsl:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:TOX_PARALLEL_NO_SPINNER
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 616
+      PYTEST_REQPASS: 694
 
     steps:
       - name: Activate WSL1
@@ -169,12 +178,13 @@ jobs:
           sudo sysctl -w net.link.generic.system.hwcksum_tx=0
           sudo sysctl -w net.link.generic.system.hwcksum_rx=0
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # needed by setuptools-scm
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        if: "!contains(matrix.shell, 'wsl')"
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -196,8 +206,7 @@ jobs:
       - name: Log installed dists
         run: >-
           python3 -m pip freeze --all
-      - name: >-
-          Initialize tox envs
+      - name: Initialize tox envs
         run: >-
           python3 -m
           tox
@@ -225,13 +234,13 @@ jobs:
         run: coverage combine .tox/.coverage.*
       - name: Upload coverage data
         if: "runner.os == 'Linux'"
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           name: ${{ matrix.tox_env }}
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
       - name: Archive logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: logs.zip
           path: .tox/**/log/
@@ -246,6 +255,8 @@ jobs:
 
   check: # This job does nothing and is only used for the branch protection
     if: always()
+    permissions:
+      pull-requests: write # allow codenotify to comment on pull-request
 
     needs:
       - linters
@@ -258,3 +269,13 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           jobs: ${{ toJSON(needs) }}
+
+      - name: Check out src from Git
+        uses: actions/checkout@v3
+
+      - name: Notify repository owners about lint change affecting them
+        uses: sourcegraph/codenotify@v0.6.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # https://github.com/sourcegraph/codenotify/issues/19
+        continue-on-error: true

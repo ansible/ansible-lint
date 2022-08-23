@@ -1,6 +1,8 @@
 """Rule definition for usage of fully qualified collection names for builtins."""
+from __future__ import annotations
+
 import sys
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
@@ -91,8 +93,8 @@ class FQCNBuiltinsRule(AnsibleLintRule):
     tags = ["formatting"]
 
     def matchtask(
-        self, task: Dict[str, Any], file: Optional[Lintable] = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         return task["action"]["__ansible_module_original__"] in builtins
 
 
@@ -106,14 +108,14 @@ if "pytest" in sys.modules:
     SUCCESS_PLAY = """
 - hosts: localhost
   tasks:
-  - name: shell (fqcn)
+  - name: Shell (fqcn)
     ansible.builtin.shell: echo This rule should not get matched by the fqcn-builtins rule
     """
 
     FAIL_PLAY = """
 - hosts: localhost
   tasks:
-  - name: shell (fqcn)
+  - name: Shell (fqcn)
     shell: echo This rule should get matched by the fqcn-builtins rule
     """
 

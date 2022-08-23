@@ -1,9 +1,10 @@
 """Test the codeclimate JSON formatter."""
+from __future__ import annotations
+
 import json
 import pathlib
 import subprocess
 import sys
-from typing import List, Optional
 
 import pytest
 
@@ -16,8 +17,8 @@ class TestCodeclimateJSONFormatter:
     """Unit test for CodeclimateJSONFormatter."""
 
     rule = AnsibleLintRule()
-    matches: List[MatchError] = []
-    formatter: Optional[CodeclimateJSONFormatter] = None
+    matches: list[MatchError] = []
+    formatter: CodeclimateJSONFormatter | None = None
 
     def setup_class(self) -> None:
         """Set up few MatchError objects."""

@@ -19,7 +19,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from typing import TYPE_CHECKING, Any, Dict, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -90,8 +92,8 @@ class OctalPermissionsRule(AnsibleLintRule):
         )
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         if task["action"]["__ansible_module__"] in self._modules:
             mode = task["action"].get("mode", None)
 

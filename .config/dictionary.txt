@@ -76,6 +76,7 @@ isdir
 isdisjoint
 iskeyword
 isort
+jsonschema
 junitxml
 kubernetes
 libera
@@ -130,6 +131,7 @@ pyproject
 pyproject.toml
 pypy
 pytest
+pyupgrade
 pyyaml
 relpath
 reportversion
@@ -139,6 +141,7 @@ rmtree
 ruamel
 rulesdir
 rulesdirs
+sarif
 sdist
 sdists
 setenv
@@ -178,8 +181,10 @@ unignored
 unimported
 unindented
 unjinja
+unlex
 unnormalized
 unskippable
+unspaced
 unsubscriptable
 untemplated
 uwsgi
@@ -198,18 +203,22 @@ xfail
 xunit
 zuul
 
-# Contributors
-Sorin
-Sbarnea
-geerlingguy
-ssbarnea
-robertdebock
-drybjed
-Tsukinowa
-Chamoulaud
-awcrosby
-willthames
-konstruktoid
+# names and usernames
 Adrián
+Cacqueray
+Chamoulaud
+Sbarnea
+Sorin
+Tsukinowa
 Tóth
+arxcruz
+awcrosby
+drybjed
+geerlingguy
+konstruktoid
+nilashishc
+nxos
+robertdebock
+ssbarnea
+willthames
 yatesr

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2013-2014 Will Thames <will@thames.id.au>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """Tests for generic utility functions."""
+from __future__ import annotations
 
 import logging
 import os
@@ -28,12 +27,13 @@ import subprocess
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Sequence
 
 import pytest
 from _pytest.capture import CaptureFixture
 from _pytest.logging import LogCaptureFixture
 from _pytest.monkeypatch import MonkeyPatch
+from ansible.utils.sentinel import Sentinel
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
@@ -70,7 +70,7 @@ def test_tokenize(
     string: str,
     expected_cmd: str,
     expected_args: Sequence[str],
-    expected_kwargs: Dict[str, Any],
+    expected_kwargs: dict[str, Any],
 ) -> None:
     """Test that tokenize works for different input types."""
     (cmd, args, kwargs) = utils.tokenize(string)
@@ -102,7 +102,7 @@ def test_tokenize(
     ),
 )
 def test_normalize(
-    reference_form: Dict[str, Any], alternate_forms: Tuple[Dict[str, Any]]
+    reference_form: dict[str, Any], alternate_forms: tuple[dict[str, Any]]
 ) -> None:
     """Test that tasks specified differently are normalized same way."""
     normal_form = utils.normalize_task(reference_form, "tasks.yml")
@@ -128,6 +128,59 @@ def test_normalize_complex_command() -> None:
     assert utils.normalize_task(task3, "tasks.yml") == utils.normalize_task(
         task4, "tasks.yml"
     )
+
+
+@pytest.mark.parametrize(
+    ("task", "expected_form"),
+    (
+        pytest.param(
+            dict(
+                name="ensure apache is at the latest version",
+                yum={"name": "httpd", "state": "latest"},
+            ),
+            dict(
+                delegate_to=Sentinel,
+                name="ensure apache is at the latest version",
+                action={
+                    "__ansible_module__": "yum",
+                    "__ansible_module_original__": "yum",
+                    "__ansible_arguments__": [],
+                    "name": "httpd",
+                    "state": "latest",
+                },
+            ),
+        ),
+        pytest.param(
+            dict(
+                name="Attempt and graceful roll back",
+                block=[
+                    {
+                        "name": "Install httpd and memcached",
+                        "ansible.builtin.yum": ["httpd", "memcached"],
+                        "state": "present",
+                    }
+                ],
+            ),
+            dict(
+                name="Attempt and graceful roll back",
+                block=[
+                    {
+                        "name": "Install httpd and memcached",
+                        "ansible.builtin.yum": ["httpd", "memcached"],
+                        "state": "present",
+                    }
+                ],
+                action={
+                    "__ansible_module__": "block/always/rescue",
+                    "__ansible_module_original__": "block/always/rescue",
+                },
+            ),
+        ),
+    ),
+)
+def test_normalize_task_v2(task: dict[str, Any], expected_form: dict[str, Any]) -> None:
+    """Check that it normalizes task and returns the expected form."""
+    assert utils.normalize_task_v2(task) == expected_form
 
 
 def test_extract_from_list() -> None:
@@ -240,6 +293,8 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
         sys.executable,
         "-m",
         "ansiblelint",
+        "-x",
+        "schema",  # exclude schema as our test file would fail it
         "-v",
         "-p",
         "--nocolor",
@@ -260,7 +315,7 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     # An expected rule match from our examples
     assert (
         "examples/playbooks/empty_playbook.yml:1: "
-        "syntax-check Empty playbook, nothing to do" in out
+        "syntax-check: Empty playbook, nothing to do" in out
     )
     # assures that our ansible-lint config exclude was effective in excluding github files
     assert "Identified: .github/" not in out
@@ -281,7 +336,7 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
     options = cli.get_config(["--exclude", "foo"])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Namespace) -> List[str]:
+    def mockreturn(options: Namespace) -> list[str]:
         return ["foo/playbook.yml", "bar/playbook.yml"]
 
     monkeypatch.setattr(utils, "discover_lintables", mockreturn)
@@ -307,7 +362,7 @@ _CUSTOM_RULEDIRS = [
     ),
 )
 def test_get_rules_dirs(
-    user_ruledirs: List[str], use_default: bool, expected: List[str]
+    user_ruledirs: list[str], use_default: bool, expected: list[str]
 ) -> None:
     """Test it returns expected dir lists."""
     assert get_rules_dirs(user_ruledirs, use_default) == expected
@@ -327,9 +382,9 @@ def test_get_rules_dirs(
     ),
 )
 def test_get_rules_dirs_with_custom_rules(
-    user_ruledirs: List[str],
+    user_ruledirs: list[str],
     use_default: bool,
-    expected: List[str],
+    expected: list[str],
     monkeypatch: MonkeyPatch,
 ) -> None:
     """Test it returns expected dir lists when custom rules exist."""

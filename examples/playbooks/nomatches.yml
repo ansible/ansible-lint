@@ -2,8 +2,8 @@
 - hosts: whatever
 
   tasks:
-    - name: hello world
+    - name: Hello world
       ansible.builtin.action: debug msg="Hello!"
 
-    - name: this should be fine too
+    - name: This should be fine too
       ansible.builtin.action: file state=touch mode=0644 dest=./wherever

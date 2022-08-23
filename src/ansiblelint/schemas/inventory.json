@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "group": {
+      "properties": {
+        "children": {
+          "patternProperties": {
+            "[a-zA-Z-_0-9]": {
+              "$ref": "#/$defs/group"
+            }
+          }
+        },
+        "hosts": {
+          "patternProperties": {
+            "[a-zA-Z.-_0-9]": {
+              "type": ["object", "null"]
+            }
+          },
+          "type": ["object", "string"]
+        },
+        "vars": {
+          "type": "object"
+        }
+      },
+      "type": ["object", "null"]
+    },
+    "special-group": {
+      "additionalProperties": false,
+      "properties": {
+        "children": {
+          "type": ["object", "null"]
+        },
+        "groups": {
+          "type": ["object", "null"]
+        },
+        "hosts": {
+          "type": ["object", "null"]
+        },
+        "vars": {
+          "type": ["object", "null"]
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": true,
+  "description": "Ansible Inventory Schema",
+  "examples": [
+    "inventory.yaml",
+    "inventory.yml",
+    "inventory/*.yml",
+    "inventory/*.yaml"
+  ],
+  "markdownDescription": "All keys at top levels are groups with `all` and `ungrouped` having a special meaning.\n\nSee [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)",
+  "properties": {
+    "all": {
+      "$ref": "#/$defs/special-group"
+    },
+    "ungrouped": {
+      "$ref": "#/$defs/group"
+    }
+  },
+  "title": "Ansible Inventory Schema",
+  "type": "object"
+}

@@ -1,7 +1,7 @@
 """Tests related to our logging/verbosity setup."""
+from __future__ import annotations
 
 import os
-from typing import List, Tuple
 
 import pytest
 
@@ -17,7 +17,6 @@ from ansiblelint.testing import run_ansible_lint
         (
             "",
             [
-                ("WARNING  Loading custom .yamllint config file,", False),
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("DEBUG ", True),
                 ("INFO ", True),
@@ -42,7 +41,6 @@ from ansiblelint.testing import run_ansible_lint
         (
             "-v",
             [
-                ("WARNING  Loading custom .yamllint config file,", False),
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
                 ("DEBUG ", True),
@@ -51,7 +49,7 @@ from ansiblelint.testing import run_ansible_lint
         (
             "-vv",
             [
-                ("WARNING  Loading custom .yamllint config file,", False),
+                ("DEBUG    Loading custom .yamllint config file,", False),
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
                 ("DEBUG    Effective yamllint rules used", False),
@@ -60,7 +58,7 @@ from ansiblelint.testing import run_ansible_lint
         (
             "-vvvvvvvvvvvvvvvvvvvvvvvvv",
             [
-                ("WARNING  Loading custom .yamllint config file,", False),
+                ("DEBUG    Loading custom .yamllint config file,", False),
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
                 ("DEBUG    Effective yamllint rules used", False),
@@ -76,7 +74,7 @@ from ansiblelint.testing import run_ansible_lint
         'really loquacious but with more "v"s -- same as -vv',
     ),
 )
-def test_default_verbosity(verbosity: str, substrs: List[Tuple[str, bool]]) -> None:
+def test_default_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> None:
     """Checks that our default verbosity displays (only) warnings."""
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture, to produce a warning.

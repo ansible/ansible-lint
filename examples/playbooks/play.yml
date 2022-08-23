@@ -2,5 +2,5 @@
 - hosts: bobbins
 
   tasks:
-    - name: a bad play
+    - name: A bad play
       action: ansible.builtin.command service blah restart

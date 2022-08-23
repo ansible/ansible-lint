@@ -1,0 +1,562 @@
+{
+  "$comment": "Generated from ansible.json, do not edit.",
+  "$defs": {
+    "become_method": {
+      "markdownDescription": "See [become](https://docs.ansible.com/ansible/latest/user_guide/become.html)",
+      "oneOf": [
+        {
+          "enum": [
+            "sudo",
+            "su",
+            "pbrun",
+            "pfexec",
+            "runas",
+            "dzdo",
+            "ksu",
+            "doas",
+            "machinectl"
+          ],
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/full-jinja"
+        }
+      ],
+      "title": "Become Method"
+    },
+    "block": {
+      "properties": {
+        "always": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/task"
+              },
+              {
+                "$ref": "#/$defs/block"
+              }
+            ]
+          },
+          "title": "Always",
+          "type": "array"
+        },
+        "any_errors_fatal": {
+          "title": "Any Errors Fatal",
+          "type": "boolean"
+        },
+        "become": {
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Become"
+        },
+        "become_exe": {
+          "title": "Become Exe",
+          "type": "string"
+        },
+        "become_flags": {
+          "title": "Become Flags",
+          "type": "string"
+        },
+        "become_method": {
+          "$ref": "#/$defs/become_method"
+        },
+        "become_user": {
+          "title": "Become User",
+          "type": "string"
+        },
+        "block": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/task"
+              },
+              {
+                "$ref": "#/$defs/block"
+              }
+            ]
+          },
+          "markdownDescription": "Blocks create logical groups of tasks. Blocks also offer ways to handle task errors, similar to exception handling in many programming languages. See [blocks](https://docs.ansible.com/ansible/latest/user_guide/playbooks_blocks.html)",
+          "title": "Block",
+          "type": "array"
+        },
+        "check_mode": {
+          "$ref": "#/$defs/complex_conditional",
+          "title": "Check Mode"
+        },
+        "collections": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Collections",
+          "type": "array"
+        },
+        "connection": {
+          "title": "Connection",
+          "type": "string"
+        },
+        "debugger": {
+          "title": "Debugger",
+          "type": "string"
+        },
+        "delegate_facts": {
+          "title": "Delegate Facts",
+          "type": "boolean"
+        },
+        "delegate_to": {
+          "title": "Delegate To",
+          "type": "string"
+        },
+        "diff": {
+          "title": "Diff",
+          "type": "boolean"
+        },
+        "environment": {
+          "$ref": "#/$defs/environment"
+        },
+        "ignore_errors": {
+          "$ref": "#/$defs/ignore_errors"
+        },
+        "ignore_unreachable": {
+          "title": "Ignore Unreachable",
+          "type": "boolean"
+        },
+        "module_defaults": {
+          "title": "Module Defaults"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "no_log": {
+          "$ref": "#/$defs/templated-boolean"
+        },
+        "port": {
+          "$ref": "#/$defs/templated-integer"
+        },
+        "remote_user": {
+          "title": "Remote User",
+          "type": "string"
+        },
+        "rescue": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/task"
+              },
+              {
+                "$ref": "#/$defs/block"
+              }
+            ]
+          },
+          "title": "Rescue",
+          "type": "array"
+        },
+        "run_once": {
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Run Once"
+        },
+        "tags": {
+          "$ref": "#/$defs/tags",
+          "title": "Tags"
+        },
+        "throttle": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Throttle"
+        },
+        "timeout": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Timeout"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        },
+        "when": {
+          "$ref": "#/$defs/complex_conditional",
+          "title": "When"
+        }
+      },
+      "required": [
+        "block"
+      ],
+      "type": "object"
+    },
+    "complex_conditional": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "environment": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "$ref": "#/$defs/full-jinja"
+        }
+      ],
+      "title": "Environment"
+    },
+    "full-jinja": {
+      "pattern": "^\\{\\{.*\\}\\}$",
+      "type": "string"
+    },
+    "ignore_errors": {
+      "$ref": "#/$defs/templated-boolean",
+      "markdownDescription": "See [ignore_errors](https://docs.ansible.com/ansible/latest/user_guide/playbooks_error_handling.html#ignoring-failed-commands)",
+      "title": "Ignore Errors"
+    },
+    "no_log": {
+      "$ref": "#/$defs/templated-boolean",
+      "markdownDescription": "Use for protecting sensitive data. See [no_log](https://docs.ansible.com/ansible/latest/reference_appendices/logging.html)",
+      "title": "no_log"
+    },
+    "tags": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ],
+      "title": "Tags"
+    },
+    "task": {
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "block"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "with_filetree"
+            ]
+          },
+          "title": "with_filetree was moved to with_community.general.filetree in 2.10"
+        },
+        {
+          "not": {
+            "required": [
+              "with_flattened"
+            ]
+          },
+          "title": "with_flattened was moved to with_community.general.flattened in 2.10"
+        },
+        {
+          "not": {
+            "required": [
+              "with_cartesian"
+            ]
+          },
+          "title": "with_cartesian was moved to with_community.general.cartesian in 2.10"
+        }
+      ],
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "any_errors_fatal": {
+          "title": "Any Errors Fatal",
+          "type": "boolean"
+        },
+        "args": {
+          "$ref": "#/$defs/templated-object",
+          "title": "Args"
+        },
+        "async": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Async"
+        },
+        "become": {
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Become"
+        },
+        "become_exe": {
+          "title": "Become Exe",
+          "type": "string"
+        },
+        "become_flags": {
+          "title": "Become Flags",
+          "type": "string"
+        },
+        "become_method": {
+          "$ref": "#/$defs/become_method"
+        },
+        "become_user": {
+          "title": "Become User",
+          "type": "string"
+        },
+        "changed_when": {
+          "$ref": "#/$defs/complex_conditional",
+          "markdownDescription": "See [changed_when](https://docs.ansible.com/ansible/latest/user_guide/playbooks_error_handling.html#defining-changed)",
+          "title": "Changed When"
+        },
+        "check_mode": {
+          "$ref": "#/$defs/complex_conditional",
+          "title": "Check Mode"
+        },
+        "collections": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Collections",
+          "type": "array"
+        },
+        "connection": {
+          "title": "Connection",
+          "type": "string"
+        },
+        "debugger": {
+          "title": "Debugger",
+          "type": "string"
+        },
+        "delay": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Delay"
+        },
+        "delegate_facts": {
+          "title": "Delegate Facts",
+          "type": "boolean"
+        },
+        "delegate_to": {
+          "title": "Delegate To",
+          "type": "string"
+        },
+        "diff": {
+          "title": "Diff",
+          "type": "boolean"
+        },
+        "environment": {
+          "$ref": "#/$defs/environment"
+        },
+        "failed_when": {
+          "$ref": "#/$defs/complex_conditional",
+          "title": "Failed When"
+        },
+        "ignore_errors": {
+          "$ref": "#/$defs/ignore_errors"
+        },
+        "ignore_unreachable": {
+          "title": "Ignore Unreachable",
+          "type": "boolean"
+        },
+        "local_action": {
+          "title": "Local Action",
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "loop": {
+          "title": "Loop",
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "loop_control": {
+          "title": "Loop Control"
+        },
+        "module_defaults": {
+          "title": "Module Defaults"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "no_log": {
+          "$ref": "#/$defs/no_log"
+        },
+        "notify": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Notify"
+        },
+        "poll": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Poll"
+        },
+        "port": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Port"
+        },
+        "register": {
+          "title": "Register",
+          "type": "string"
+        },
+        "remote_user": {
+          "title": "Remote User",
+          "type": "string"
+        },
+        "retries": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Retries"
+        },
+        "run_once": {
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Run Once"
+        },
+        "tags": {
+          "$ref": "#/$defs/tags",
+          "title": "Tags"
+        },
+        "throttle": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Throttle"
+        },
+        "timeout": {
+          "$ref": "#/$defs/templated-integer",
+          "title": "Timeout"
+        },
+        "until": {
+          "$ref": "#/$defs/complex_conditional",
+          "title": "Until"
+        },
+        "vars": {
+          "title": "Vars",
+          "type": "object"
+        },
+        "when": {
+          "$ref": "#/$defs/complex_conditional",
+          "title": "When"
+        },
+        "with_dict": {
+          "title": "With Dict"
+        },
+        "with_fileglob": {
+          "title": "With Fileglob"
+        },
+        "with_filetree": {
+          "title": "With Filetree"
+        },
+        "with_first_found": {
+          "title": "With First Found"
+        },
+        "with_indexed_items": {
+          "title": "With Indexed Items"
+        },
+        "with_ini": {
+          "title": "With Ini"
+        },
+        "with_inventory_hostnames": {
+          "title": "With Inventory Hostnames"
+        },
+        "with_items": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/full-jinja"
+            },
+            {
+              "type": "array"
+            }
+          ],
+          "markdownDescription": "See [loops](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#loops)",
+          "title": "With Items"
+        },
+        "with_lines": {
+          "title": "With Lines"
+        },
+        "with_random_choice": {
+          "title": "With Random Choice"
+        },
+        "with_sequence": {
+          "title": "With Sequence"
+        },
+        "with_subelements": {
+          "title": "With Subelements"
+        },
+        "with_together": {
+          "title": "With Together"
+        }
+      },
+      "title": "task",
+      "type": "object"
+    },
+    "templated-boolean": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/$defs/full-jinja",
+          "type": "string"
+        }
+      ]
+    },
+    "templated-integer": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "$ref": "#/$defs/full-jinja",
+          "type": "string"
+        }
+      ]
+    },
+    "templated-object": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "$ref": "#/$defs/full-jinja",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "examples": [
+    "tasks/*.yml",
+    "handlers/*.yml"
+  ],
+  "items": {
+    "anyOf": [
+      {
+        "$ref": "#/$defs/task"
+      },
+      {
+        "$ref": "#/$defs/block"
+      }
+    ]
+  },
+  "title": "Ansible Tasks Schema",
+  "type": [
+    "array",
+    "null"
+  ]
+}

@@ -29,34 +29,34 @@
 
   tasks:
     ### Testing with_items loops
-    - name: with_items loop using static list
+    - name: Use with_items loop using static list
       debug:
         msg: "{{ item }}"
       with_items:
         - foo
         - bar
 
-    - name: with_items using a static hash
+    - name: Use with_items using a static hash
       debug:
         msg: "{{ item.key }} - {{ item.value }}"
       with_items:
         - { key: foo, value: 1 }
         - { key: bar, value: 2 }
 
-    - name: with_items loop using variable
+    - name: Use with_items loop using variable
       debug:
         msg: "{{ item }}"
       with_items: "{{ my_list }}"
 
     ### Testing with_nested loops
-    - name: with_nested loop using static lists
+    - name: Use with_nested loop using static lists
       debug:
         msg: "{{ item[0] }} - {{ item[1] }}"
       with_nested:
         - [foo, bar]
         - ["1", "2", "3"]
 
-    - name: with_nested loop using variable list and static
+    - name: Use with_nested loop using variable list and static
       debug:
         msg: "{{ item[0] }} - {{ item[1] }}"
       with_nested:
@@ -64,102 +64,102 @@
         - ["1", "2", "3"]
 
     ### Testing with_dict
-    - name: with_dict loop using variable
+    - name: Use with_dict loop using variable
       debug:
         msg: "{{ item.key }} - {{ item.value }}"
       with_dict: "{{ my_dict }}"
 
     ### Testing with_dict with a default empty dictionary
-    - name: with_dict loop using variable and default
+    - name: Use with_dict loop using variable and default
       debug:
         msg: "{{ item.key }} - {{ item.value }}"
       with_dict: "{{ uwsgi_ini | default({}) }}"
 
     ### Testing with_file
-    - name: with_file loop using static files list
+    - name: Use with_file loop using static files list
       debug:
         msg: "{{ item }}"
       with_file:
         - foo.txt
         - bar.txt
 
-    - name: with_file loop using list of filenames
+    - name: Use with_file loop using list of filenames
       debug:
         msg: "{{ item }}"
       with_file: "{{ my_filenames }}"
 
     ### Testing with_fileglob
-    - name: with_fileglob loop using list of *.txt
+    - name: Use with_fileglob loop using list of *.txt
       debug:
         msg: "{{ item }}"
       with_fileglob:
         - "*.txt"
 
     ### Testing non-list form of with_fileglob
-    - name: with_fileglob loop using single value *.txt
+    - name: Use with_fileglob loop using single value *.txt
       debug:
         msg: "{{ item }}"
       with_fileglob: "*.txt"
 
     ### Testing non-list form of with_fileglob with trailing templated pattern
-    - name: with_fileglob loop using templated pattern
+    - name: Use with_fileglob loop using templated pattern
       debug:
         msg: "{{ item }}"
       with_fileglob: foo{{ glob }}
 
     ### Testing with_together
-    - name: with_together loop using variable lists
+    - name: Use with_together loop using variable lists
       debug:
         msg: "{{ item.0 }} - {{ item.1 }}"
       with_together:
         - "{{ my_list }}"
         - "{{ my_list2 }}"
 
-    - name: with_subelements loop
+    - name: Use with_subelements loop
       debug:
         msg: "{{ item }}"
       with_subelements:
         - "{{ my_list_of_dicts }}"
         - bar
 
-    - name: with_sequence loop
+    - name: Use with_sequence loop
       debug:
         msg: "{{ item }}"
       with_sequence: count=2
 
-    - name: with_random_choice loop
+    - name: Use with_random_choice loop
       debug:
         msg: "{{ item }}"
       with_random_choice: "{{ my_list }}"
 
-    - name: with_first_found loop with static files list
+    - name: Use with_first_found loop with static files list
       debug:
         msg: "{{ item }}"
       with_first_found:
         - foo.txt
         - bar.txt
 
-    - name: with_first_found loop with list of filenames
+    - name: Use with_first_found loop with list of filenames
       debug:
         msg: "{{ item }}"
       with_first_found: "{{ my_filenames }}"
 
-    - name: with_indexed_items loop
+    - name: Use with_indexed_items loop
       debug:
         msg: "{{ item.0 }} {{ item.1 }}"
       with_indexed_items: "{{ my_list }}"
 
-    - name: with_ini loop
+    - name: Use with_ini loop
       debug:
         msg: "{{ item }}"
       with_ini: value[1-2] section=section1 file=foo.ini re=true
 
-    - name: with_inventory_hostnames loop
+    - name: Use with_inventory_hostnames loop
       debug:
         msg: "{{ item }}"
       with_inventory_hostnames: all
 
-    - name: test more complex jinja is also allowed
+    - name: Test more complex jinja is also allowed
       debug:
         msg: "{{ item }}"
       with_items: >-

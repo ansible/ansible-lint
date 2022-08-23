@@ -18,8 +18,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import annotations
+
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -30,65 +32,67 @@ if TYPE_CHECKING:
 
 
 FAIL_PLAY = """---
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   tasks:
-  - name: shell no pipe
+  - name: Shell no pipe
     ansible.builtin.shell: echo hello
     changed_when: false
 
-  - name: shell with jinja filter
-    ansible.builtin.shell: echo {{ "hello"|upper }}
+  - name: Shell with jinja filter
+    ansible.builtin.shell: echo {{ "hello" | upper }}
     changed_when: false
 
-  - name: shell with jinja filter (fqcn)
-    ansible.builtin.shell: echo {{ "hello"|upper }}
+  - name: Sshell with jinja filter (fqcn)
+    ansible.builtin.shell: echo {{ "hello" | upper }}
     changed_when: false
 """
 
 SUCCESS_PLAY = """---
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   tasks:
-  - name: shell with pipe
+  - name: Shell with pipe
     ansible.builtin.shell: echo hello | true  # noqa: risky-shell-pipe
     changed_when: false
 
-  - name: shell with redirect
+  - name: Shell with redirect
     ansible.builtin.shell: echo hello >  /tmp/hello
     changed_when: false
 
-  - name: chain two shell commands
+  - name: Chain two shell commands
     ansible.builtin.shell: echo hello && echo goodbye
     changed_when: false
 
-  - name: run commands in succession
+  - name: Run commands in succession
     ansible.builtin.shell: echo hello ; echo goodbye
     changed_when: false
 
-  - name: use variables
+  - name: Use variables
     ansible.builtin.shell: echo $HOME $USER
     changed_when: false
 
-  - name: use * for globbing
+  - name: Use * for globbing
     ansible.builtin.shell: ls foo*
     changed_when: false
 
-  - name: use ? for globbing
+  - name: Use ? for globbing
     ansible.builtin.shell: ls foo?
     changed_when: false
 
-  - name: use [] for globbing
+  - name: Use [] for globbing
     ansible.builtin.shell: ls foo[1,2,3]
     changed_when: false
 
-  - name: use shell generator
+  - name: Use shell generator
     ansible.builtin.shell: ls foo{.txt,.xml}
     changed_when: false
 
-  - name: use backticks
+  - name: Use backticks
     ansible.builtin.shell: ls `ls foo*`
     changed_when: false
 
-  - name: use shell with cmd
+  - name: Use shell with cmd
     ansible.builtin.shell:
       cmd: |
         set -x
@@ -111,11 +115,17 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
     version_added = "historic"
 
     def matchtask(
-        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
-    ) -> Union[bool, str]:
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str:
         # Use unjinja so that we don't match on jinja filters
         # rather than pipes
         if task["action"]["__ansible_module__"] in ["shell", "ansible.builtin.shell"]:
+            # Since Ansible 2.4, the `command` module does not accept setting
+            # the `executable`. If the user needs to set it, they have to use
+            # the `shell` module.
+            if "executable" in task["action"]:
+                return False
+
             if "cmd" in task["action"]:
                 jinja_stripped_cmd = self.unjinja(task["action"].get("cmd", []))
             else:
@@ -133,7 +143,13 @@ if "pytest" in sys.modules:
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
-    @pytest.mark.parametrize(("text", "expected"), ((SUCCESS_PLAY, 0), (FAIL_PLAY, 3)))
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        (
+            pytest.param(SUCCESS_PLAY, 0, id="good"),
+            pytest.param(FAIL_PLAY, 3, id="bad"),
+        ),
+    )
     def test_rule_command_instead_of_shell(
         default_text_runner: RunFromText, text: str, expected: int
     ) -> None:

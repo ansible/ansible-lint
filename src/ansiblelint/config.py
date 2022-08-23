@@ -1,33 +1,48 @@
 """Store configuration options as a singleton."""
+from __future__ import annotations
+
 import os
 import re
 from argparse import Namespace
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, Tuple
+from pathlib import Path
+from typing import Any
+
+from ansiblelint.loaders import yaml_from_file
+
+DEFAULT_WARN_LIST = ["experimental", "name[casing]", "name[play]", "role-name"]
 
 DEFAULT_KINDS = [
     # Do not sort this list, order matters.
     {"jinja2": "**/*.j2"},  # jinja2 templates are not always parsable as something else
     {"jinja2": "**/*.j2.*"},
+    {"yaml": ".github/**/*.{yaml,yml}"},  # github workflows
     {"text": "**/templates/**/*.*"},  # templates are likely not validable
-    {"inventory": "**/inventory/**.yml"},
-    {"requirements": "**/meta/requirements.yml"},  # v1 only
+    {"execution-environment": "**/execution-environment.yml"},
+    {"ansible-lint-config": "**/.ansible-lint"},
+    {"ansible-lint-config": "**/.config/ansible-lint.yml"},
+    {"ansible-navigator-config": "**/ansible-navigator.{yaml,yml}"},
+    {"inventory": "**/inventory/**.{yaml,yml}"},
+    {"requirements": "**/meta/requirements.{yaml,yml}"},  # v1 only
     # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
     {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
     {"reno": "**/releasenotes/*/*.{yaml,yml}"},  # reno release notes
+    {"tasks": "**/tasks/**/*.{yaml,yml}"},
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
     {"role": "**/roles/*/"},
-    {"tasks": "**/tasks/**/*.{yaml,yml}"},
     {"handlers": "**/handlers/*.{yaml,yml}"},
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
+    {"test-meta": "**/tests/integration/targets/*/meta/main.{yaml,yml}"},
     {"meta": "**/meta/main.{yaml,yml}"},
+    {"meta-runtime": "**/meta/runtime.{yaml,yml}"},
+    {"arg_specs": "**/meta/argument_specs.{yaml,yml}"},  # role argument specs
     {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
     {
         "requirements": "**/molecule/*/{collections,requirements}.{yaml,yml}"
     },  # molecule old collection requirements (v1), ansible 2.8 only
     {"yaml": "**/molecule/*/{base,molecule}.{yaml,yml}"},  # molecule config
-    {"requirements": "**/requirements.yml"},  # v2 and v1
+    {"requirements": "**/requirements.{yaml,yml}"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/{.ansible-lint,.yamllint}"},
     {"yaml": "**/*.{yaml,yml}"},
@@ -53,6 +68,26 @@ BASE_KINDS = [
     {"text/yaml": "**/.*.{yaml,yml}"},
 ]
 
+
+# Maps kinds to JSON schemas
+# See https://www.schemastore.org/json/
+JSON_SCHEMAS = {
+    # Do not use anchors in these URLs because python-jsonschema does not support them:
+    "playbook": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json",
+    "tasks": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json",
+    "vars": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-vars.json",
+    "requirements": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-requirements.json",
+    "meta": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
+    "galaxy": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json",
+    "execution-environment": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json",
+    "meta-runtime": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
+    "inventory": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json",
+    "ansible-lint-config": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-lint.json",
+    "ansible-navigator-config": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json",
+    "arg_specs": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-argument-specs.json",
+}
+
+PROFILES = yaml_from_file(Path(__file__).parent / "data" / "profiles.yml")
 
 options = Namespace(
     cache_dir=None,
@@ -87,13 +122,13 @@ options = Namespace(
 )
 
 # Used to store detected tag deprecations
-used_old_tags: Dict[str, str] = {}
+used_old_tags: dict[str, str] = {}
 
 # Used to store collection list paths (with mock paths if needed)
-collection_list: List[str] = []
+collection_list: list[str] = []
 
 
-def get_rule_config(rule_id: str) -> Dict[str, Any]:
+def get_rule_config(rule_id: str) -> dict[str, Any]:
     """Get configurations for the rule ``rule_id``."""
     rule_config = options.rules.get(rule_id, {})
     if not isinstance(rule_config, dict):
@@ -101,7 +136,7 @@ def get_rule_config(rule_id: str) -> Dict[str, Any]:
     return rule_config
 
 
-@lru_cache()
+@lru_cache
 def ansible_collections_path() -> str:
     """Return collection path variable for current version of Ansible."""
     # respect Ansible behavior, which is to load old name if present
@@ -111,7 +146,7 @@ def ansible_collections_path() -> str:
     return "ANSIBLE_COLLECTIONS_PATH"
 
 
-def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
+def parse_ansible_version(stdout: str) -> tuple[str, str | None]:
     """Parse output of 'ansible --version'."""
     # Ansible can produce extra output before displaying version in debug mode.
 

@@ -1,0 +1,500 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "additionalProperties": false,
+    "properties": {
+        "ansible-navigator": {
+            "additionalProperties": false,
+            "properties": {
+                "ansible": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "cmdline": {
+                            "description": "Extra parameters passed to the corresponding command",
+                            "type": "string"
+                        },
+                        "config": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "help": {
+                                    "default": false,
+                                    "description": "Help options for ansible-config command in stdout mode",
+                                    "enum": [
+                                        true,
+                                        false
+                                    ],
+                                    "type": "boolean"
+                                },
+                                "path": {
+                                    "description": "Specify the path to the ansible configuration file",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "doc": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "help": {
+                                    "default": false,
+                                    "description": "Help options for ansible-doc command in stdout mode",
+                                    "enum": [
+                                        true,
+                                        false
+                                    ],
+                                    "type": "boolean"
+                                },
+                                "plugin": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "name": {
+                                            "description": "Specify the plugin name",
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "default": "module",
+                                            "description": "Specify the plugin type, 'become', 'cache', 'callback', 'cliconf', 'connection', 'httpapi', 'inventory', 'lookup', 'module', 'netconf', 'shell', 'strategy' or 'vars'",
+                                            "enum": [
+                                                "become",
+                                                "cache",
+                                                "callback",
+                                                "cliconf",
+                                                "connection",
+                                                "httpapi",
+                                                "inventory",
+                                                "lookup",
+                                                "module",
+                                                "netconf",
+                                                "shell",
+                                                "strategy",
+                                                "vars"
+                                            ],
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "inventory": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "entries": {
+                                    "description": "Specify an inventory file path or comma separated host list",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                },
+                                "help": {
+                                    "default": false,
+                                    "description": "Help options for ansible-inventory command in stdout mode",
+                                    "enum": [
+                                        true,
+                                        false
+                                    ],
+                                    "type": "boolean"
+                                }
+                            }
+                        },
+                        "playbook": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "help": {
+                                    "default": false,
+                                    "description": "Help options for ansible-playbook command in stdout mode",
+                                    "enum": [
+                                        true,
+                                        false
+                                    ],
+                                    "type": "boolean"
+                                },
+                                "path": {
+                                    "description": "Specify the playbook name",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "type": "object"
+                },
+                "ansible-builder": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "help": {
+                            "default": false,
+                            "description": "Help options for ansible-builder command in stdout mode",
+                            "enum": [
+                                true,
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "workdir": {
+                            "default": ".",
+                            "description": "Specify the path that contains ansible-builder manifest files",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "ansible-lint": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "config": {
+                            "description": "Specify the path to the ansible-lint configuration file",
+                            "type": "string"
+                        },
+                        "lintables": {
+                            "description": "Path to files on which to run ansible-lint",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "ansible-runner": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "artifact-dir": {
+                            "description": "The directory path to store artifacts generated by ansible-runner",
+                            "type": "string"
+                        },
+                        "rotate-artifacts-count": {
+                            "description": "Keep ansible-runner artifact directories, for last n runs, if set to 0 artifact directories won't be deleted",
+                            "type": "integer"
+                        },
+                        "timeout": {
+                            "description": "The timeout value after which ansible-runner will forcefully stop the execution",
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                },
+                "app": {
+                    "default": "welcome",
+                    "description": "Subcommands",
+                    "enum": [
+                        "builder",
+                        "collections",
+                        "config",
+                        "doc",
+                        "exec",
+                        "images",
+                        "inventory",
+                        "lint",
+                        "replay",
+                        "run",
+                        "settings",
+                        "welcome"
+                    ],
+                    "type": "string"
+                },
+                "collection-doc-cache-path": {
+                    "default": "~/.cache/ansible-navigator/collection_doc_cache.db",
+                    "description": "The path to collection doc cache",
+                    "type": "string"
+                },
+                "color": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "enable": {
+                            "default": true,
+                            "description": "Enable the use of color for mode interactive and stdout",
+                            "enum": [
+                                true,
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "osc4": {
+                            "default": true,
+                            "description": "Enable or disable terminal color changing support with OSC 4",
+                            "enum": [
+                                true,
+                                false
+                            ],
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                },
+                "editor": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "command": {
+                            "default": "vi +{line_number} {filename}",
+                            "description": "Specify the editor command",
+                            "type": "string"
+                        },
+                        "console": {
+                            "default": true,
+                            "description": "Specify if the editor is console based",
+                            "enum": [
+                                true,
+                                false
+                            ],
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                },
+                "exec": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "command": {
+                            "default": "/bin/bash",
+                            "description": "Specify the command to run within the execution environment",
+                            "type": "string"
+                        },
+                        "shell": {
+                            "default": true,
+                            "description": "Specify the exec command should be run in a shell",
+                            "enum": [
+                                true,
+                                false
+                            ],
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                },
+                "execution-environment": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "container-engine": {
+                            "default": "auto",
+                            "description": "Specify the container engine (auto=podman then docker)",
+                            "enum": [
+                                "auto",
+                                "podman",
+                                "docker"
+                            ],
+                            "type": "string"
+                        },
+                        "container-options": {
+                            "description": "Extra parameters passed to the container engine command",
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "enabled": {
+                            "default": true,
+                            "description": "Enable or disable the use of an execution environment",
+                            "enum": [
+                                true,
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "environment-variables": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "pass": {
+                                    "description": "Specify an existing environment variable to be passed through to and set within the execution environment (--penv MY_VAR)",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                },
+                                "set": {
+                                    "description": "Specify an environment variable and a value to be set within the execution environment (--senv MY_VAR=42)",
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "image": {
+                            "default": "quay.io/ansible/creator-ee:v0.4.2",
+                            "description": "Specify the name of the execution environment image",
+                            "type": "string"
+                        },
+                        "pull": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "arguments": {
+                                    "description": "Specify any additional parameters that should be added to the pull command when pulling an execution environment from a container registry. e.g. --pa='--tls-verify=false'",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                },
+                                "policy": {
+                                    "default": "tag",
+                                    "description": "Specify the image pull policy always:Always pull the image, missing:Pull if not locally available, never:Never pull the image, tag:if the image tag is 'latest', always pull the image, otherwise pull if not locally available",
+                                    "enum": [
+                                        "always",
+                                        "missing",
+                                        "never",
+                                        "tag"
+                                    ],
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "volume-mounts": {
+                            "additionalProperties": false,
+                            "description": "Specify volume to be bind mounted within an execution environment (--eev /home/user/test:/home/user/test:Z)",
+                            "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                    "dest": {
+                                        "type": "string"
+                                    },
+                                    "options": {
+                                        "type": "string"
+                                    },
+                                    "src": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "src",
+                                    "dest"
+                                ],
+                                "type": "object"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "images": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "details": {
+                            "default": [
+                                "everything"
+                            ],
+                            "description": "Provide detailed information about the selected execution environment image",
+                            "items": {
+                                "enum": [
+                                    "ansible_collections",
+                                    "ansible_version",
+                                    "everything",
+                                    "os_release",
+                                    "python_packages",
+                                    "python_version",
+                                    "redhat_release",
+                                    "system_packages"
+                                ],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "inventory-columns": {
+                    "description": "Specify a host attribute to show in the inventory view",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "logging": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "append": {
+                            "default": true,
+                            "description": "Specify if log messages should be appended to an existing log file, otherwise a new log file will be created per session",
+                            "enum": [
+                                true,
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "file": {
+                            "default": "./ansible-navigator.log",
+                            "description": "Specify the full path for the ansible-navigator log file",
+                            "type": "string"
+                        },
+                        "level": {
+                            "default": "warning",
+                            "description": "Specify the ansible-navigator log level",
+                            "enum": [
+                                "debug",
+                                "info",
+                                "warning",
+                                "error",
+                                "critical"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "mode": {
+                    "default": "interactive",
+                    "description": "Specify the user-interface mode",
+                    "enum": [
+                        "stdout",
+                        "interactive"
+                    ],
+                    "type": "string"
+                },
+                "playbook-artifact": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "enable": {
+                            "default": true,
+                            "description": "Enable or disable the creation of artifacts for completed playbooks. Note: not compatible with '--mode stdout' when playbooks require user input",
+                            "enum": [
+                                true,
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "replay": {
+                            "description": "Specify the path for the playbook artifact to replay",
+                            "type": "string"
+                        },
+                        "save-as": {
+                            "default": "{playbook_dir}/{playbook_name}-artifact-{time_stamp}.json",
+                            "description": "Specify the name for artifacts created from completed playbooks.The following placeholders are available: {playbook_dir}, {playbook_name}, {playbook_status}, and {time_stamp}",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "settings": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "effective": {
+                            "default": false,
+                            "description": "Show the effective settings. Defaults, CLI parameters, environment variables, and the settings file will be combined",
+                            "type": "boolean"
+                        },
+                        "sample": {
+                            "default": false,
+                            "description": "Generate a sample settings file",
+                            "type": "boolean"
+                        },
+                        "schema": {
+                            "default": "json",
+                            "description": "Generate a schema for the settings file ('json'= draft-07 JSON Schema)",
+                            "enum": [
+                                "json"
+                            ],
+                            "type": "string"
+                        },
+                        "sources": {
+                            "default": false,
+                            "description": "Show the source of each current settings entry",
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "time-zone": {
+                    "default": "UTC",
+                    "description": "Specify the IANA time zone to use or 'local' to use the system time zone",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "required": [
+        "ansible-navigator"
+    ],
+    "title": "ansible-navigator settings v2.1",
+    "type": "object",
+    "version": "2.1"
+}

@@ -1,4 +1,4 @@
-# spell-checker:ignore bcond pkgversion buildrequires autosetup PYTHONPATH noarch buildroot bindir sitelib numprocesses
+# spell-checker:ignore bcond pkgversion buildrequires autosetup PYTHONPATH noarch buildroot bindir sitelib numprocesses clib
 # All tests require Internet access
 # to test in mock use:  --enable-network --with check
 # to test in a privileged environment use:
@@ -82,7 +82,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/ansible_lint-*.dist-info/
 %{_bindir}/ansible-lint
 %license COPYING
-%doc docs/* README.rst
+%doc docs/* README.md
 
 %changelog
 Available at https://github.com/ansible-community/ansible-lint/releases

@@ -4,31 +4,31 @@ from ansiblelint.rules.no_relative_paths import RoleRelativePath
 from ansiblelint.testing import RunFromText
 
 FAIL_TASKS = """
-- name: template example
+- name: Template example
   template:
     src: ../templates/foo.j2
     dest: /etc/file.conf
-- name: copy example
+- name: Copy example
   copy:
     src: ../files/foo.conf
     dest: /etc/foo.conf
 # Removed from test suite as module is no longer part of core
-# - name: win_template example
+# - name: Some win_template example
 #   win_template:
 #     src: ../win_templates/file.conf.j2
 #     dest: file.conf
-# - name: win_copy example
+# - name: Some win_copy example
 #   win_copy:
 #     src: ../files/foo.conf
 #     dest: renamed-foo.conf
 """
 
 SUCCESS_TASKS = """
-- name: content example with no src
+- name: Content example with no src
   copy:
     content: '# This file was moved to /etc/other.conf'
     dest: /etc/mine.conf
-# - name: content example with no src
+# - name: Content example with no src
 #   win_copy:
 #     content: '# This file was moved to /etc/other.conf'
 #     dest: /etc/mine.conf

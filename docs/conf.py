@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # documentation build configuration file, created by
 # sphinx-quickstart on Sat Sep 27 13:23:22 2008-2009.
@@ -14,11 +13,11 @@
 # serve to show the default value.
 """Documentation Configuration."""
 # pylint: disable=invalid-name
+from __future__ import annotations
 
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional
 
 import pkg_resources
 
@@ -40,9 +39,8 @@ sys.path.insert(0, str(Path(__file__).parent.resolve()))
 sys.path.insert(0, os.path.join("ansible", "lib"))
 sys.path.append(os.path.abspath("_themes"))
 
-VERSION = "2.6"
+VERSION = "latest"
 AUTHOR = "Ansible, Inc"
-
 
 # General configuration
 # ---------------------
@@ -82,12 +80,15 @@ except pkg_resources.DistributionNotFound:
 templates_path = [".templates"]
 
 # The suffix of source filenames.
-source_suffix = ".rst"
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 # The master toctree document.
 master_doc = "index"
 
-apidoc_excluded_paths: List[str] = []
+apidoc_excluded_paths: list[str] = []
 apidoc_extra_args = [
     "--implicit-namespaces",
     "--private",  # include “_private” modules
@@ -96,11 +97,11 @@ apidoc_module_dir = "../src/ansiblelint"
 apidoc_module_first = False
 apidoc_output_dir = "pkg"
 apidoc_separate_modules = True
-apidoc_toc_file: Optional[str] = None
+apidoc_toc_file: str | None = None
 
 # General substitutions.
 project = "Ansible Lint Documentation"
-copyright = "2013-2021 Ansible, Inc"  # pylint: disable=redefined-builtin
+copyright = "Ansible Lint project contributors"  # pylint: disable=redefined-builtin
 
 github_url = "https://github.com"
 github_repo_org = "ansible"
@@ -118,10 +119,10 @@ extlinks = {
 intersphinx_mapping = {
     "ansible": ("https://docs.ansible.com/ansible/devel/", None),
     "ansible-core": ("https://docs.ansible.com/ansible-core/devel/", None),
-    "packaging": ("https://packaging.rtfd.io/en/latest", None),
+    "packaging": ("https://packaging.pypa.io/en/latest", None),
     "pytest": ("https://docs.pytest.org/en/latest", None),
     "python": ("https://docs.python.org/3", None),
-    "rich": ("https://rich.rtfd.io/en/latest", None),
+    "rich": ("https://rich.readthedocs.io/en/stable", None),
 }
 
 # The default replacements for |version| and |release|, also used in various
@@ -136,7 +137,7 @@ release = VERSION
 # non-false value, then it is used:
 # today = ''
 # Else, today_fmt is used as the format for a strftime call.
-today_fmt = "%B %d, %Y"
+today_fmt = "%F"  # ISO date format
 
 # List of documents that shouldn't be included in the build.
 # unused_docs = []
@@ -188,7 +189,7 @@ html_theme_options = {
 
 html_context = {
     "display_github": "True",
-    "github_user": "ansible-community",
+    "github_user": "ansible",
     "github_repo": "ansible-lint",
     "github_version": "main/docs/",
     "current_version": version,
@@ -281,41 +282,45 @@ linkcheck_anchors_ignore = [
 
 nitpicky = True
 nitpick_ignore = [
+    ("py:class", "AnsibleBaseYAMLObject"),
+    ("py:class", "BasePathLike"),
+    ("py:class", "CommentedMap"),
+    ("py:class", "CommentedSeq"),
+    ("py:class", "CompletedProcess"),
+    ("py:class", "FileType"),
+    ("py:class", "LintResult"),
+    ("py:class", "Lintable"),
+    ("py:class", "MatchError"),
+    ("py:class", "Namespace"),
+    ("py:class", "Path"),
+    ("py:class", "Pattern"),
+    ("py:class", "RulesCollection"),
+    ("py:class", "StreamType"),  # used in Emitter's type annotation
+    ("py:class", "Templar"),
+    ("py:class", "TextIO"),
+    ("py:class", "_pytest.fixtures.SubRequest"),
     ("py:class", "ansible.parsing.yaml.objects.AnsibleBaseYAMLObject"),
     ("py:class", "ansible.template.Templar"),
-    ("py:class", "Templar"),
-    ("py:class", "Lintable"),
-    ("py:class", "yaml"),
-    ("py:class", "role"),
-    ("py:class", "requirements"),
     ("py:class", "handlers"),
-    ("py:class", "tasks"),
+    ("py:class", "jinja2.environment.Environment"),
     ("py:class", "meta"),
-    ("py:class", "playbook"),
-    ("py:class", "AnsibleBaseYAMLObject"),
-    ("py:class", "Namespace"),
-    ("py:class", "RulesCollection"),
-    ("py:class", "_pytest.fixtures.SubRequest"),
-    ("py:class", "MatchError"),
-    ("py:class", "Pattern"),
     ("py:class", "odict"),
-    ("py:class", "LintResult"),
-    ("py:class", "ruamel.yaml.main.YAML"),
+    ("py:class", "playbook"),
+    ("py:class", "requirements"),
+    ("py:class", "role"),
+    ("py:class", "ruamel.yaml.comments.CommentedMap"),
+    ("py:class", "ruamel.yaml.comments.CommentedSeq"),
     ("py:class", "ruamel.yaml.constructor.RoundTripConstructor"),
     ("py:class", "ruamel.yaml.emitter.Emitter"),
-    ("py:class", "StreamType"),  # used in Emitter's type annotation
     ("py:class", "ruamel.yaml.emitter.ScalarAnalysis"),
+    ("py:class", "ruamel.yaml.main.YAML"),
     ("py:class", "ruamel.yaml.nodes.ScalarNode"),
     ("py:class", "ruamel.yaml.representer.RoundTripRepresenter"),
     ("py:class", "ruamel.yaml.scalarint.ScalarInt"),
     ("py:class", "ruamel.yaml.tokens.CommentToken"),
-    ("py:class", "ruamel.yaml.comments.CommentedMap"),
-    ("py:class", "ruamel.yaml.comments.CommentedSeq"),
-    ("py:class", "CommentedMap"),
-    ("py:class", "CommentedSeq"),
+    ("py:class", "tasks"),
+    ("py:class", "yaml"),
     ("py:class", "yamllint.config.YamlLintConfig"),
-    ("py:class", "jinja2.environment.Environment"),
-    ("py:class", "TextIO"),
     ("py:obj", "Any"),
     ("py:obj", "ansiblelint.formatters.T"),
 ]
@@ -323,3 +328,5 @@ nitpick_ignore_regex = [
     ("py:class", r"jinja2\.nodes\..*"),
     ("py:class", r"jinja2\.visitor\..*"),
 ]
+
+myst_heading_anchors = 3

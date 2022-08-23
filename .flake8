@@ -40,6 +40,8 @@ max-line-length = 100
 extend-ignore =
   E203,
   E501,
+  DAR104,  # We use type annotations instead
+  DAR301,  # https://github.com/terrencepreilly/darglint/issues/165
   F401,  # duplicate of pylint W0611 (unused-import)
   F821,  # duplicate of pylint E0602 (undefined-variable)
   F841,  # duplicate of pylint W0612 (unused-variable)
@@ -47,19 +49,21 @@ extend-ignore =
 
 # Allow certain violations in certain files:
 per-file-ignores =
-  # FIXME: D100 Missing docstring in public module
-  # FIXME: D101 Missing docstring in public class
   # FIXME: D102 Missing docstring in public method
-  # FIXME: drop these once they're made simpler
-  # Ref: https://github.com/ansible-community/ansible-lint/issues/744
-  src/ansiblelint/cli.py: D101 D102
-  src/ansiblelint/formatters/__init__.py: D101 D102
-  src/ansiblelint/rules/*.py: D100 D101 D102
-  src/ansiblelint/rules/__init__.py: D100 D101 D102
+  src/ansiblelint/cli.py: D102
+  src/ansiblelint/formatters/__init__.py: D102
+  src/ansiblelint/rules/*.py: D102
+  src/ansiblelint/rules/__init__.py: D102
+
+  # FIXME: C901 Function is too complex
+  # FIXME: refactor _defaults_from_yamllint_config using match case
+  #        once python 3.10 is mandatory
+  # Ref: https://github.com/ansible/ansible-lint/pull/2077
+  src/ansiblelint/yaml_utils.py: C901
 
   # FIXME: drop these once they're fixed
   # Ref: https://github.com/ansible-community/ansible-lint/issues/725
-  test/*: D100 D101 D102
+  test/*: D102
 
 # flake8-pytest-style
 # PT001:
