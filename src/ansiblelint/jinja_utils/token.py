@@ -1,8 +1,7 @@
+from dataclasses import dataclass
 from typing import Iterator, List, Literal, Optional, Tuple
 
-from dataclasses import dataclass
 from jinja2.lexer import (
-    Lexer,
     TOKEN_BLOCK_BEGIN,
     TOKEN_BLOCK_END,
     TOKEN_COMMENT_BEGIN,
@@ -18,10 +17,10 @@ from jinja2.lexer import (
     TOKEN_RAW_END,
     TOKEN_VARIABLE_BEGIN,
     TOKEN_VARIABLE_END,
-    Token as JinjaToken,
-    newline_re,
+    Lexer,
 )
-
+from jinja2.lexer import Token as JinjaToken
+from jinja2.lexer import newline_re
 
 # BEGIN_TOKENS and END_TOKENS should be in the same order (for tests)
 BEGIN_TOKENS = (

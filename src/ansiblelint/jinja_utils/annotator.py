@@ -3,12 +3,13 @@
 from contextlib import contextmanager
 from typing import Any, List, Optional, Tuple, Union, cast
 
-from jinja2 import lexer as j2tokens, nodes
+from jinja2 import lexer as j2tokens
+from jinja2 import nodes
 from jinja2.compiler import operators as operands
 from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor
 
-from .token import pre_iter_normalize_newlines, Token, Tokens
+from .token import Token, Tokens, pre_iter_normalize_newlines
 
 
 def annotate(
@@ -94,7 +95,9 @@ class NodeAnnotator(NodeVisitor):
         yield pre_tokens, start_token, stop_token
 
         stop_index = stop_token.index
-        assert self.tokens.index <= stop_index  # how could child nodes pass the end token?!
+        assert (
+            self.tokens.index <= stop_index
+        )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index
         node.tokens = (start_index, stop_index)
 
@@ -110,7 +113,9 @@ class NodeAnnotator(NodeVisitor):
         yield pre_tokens, start_token, stop_token
 
         stop_index = stop_token.index
-        assert self.tokens.index <= stop_index  # how could child nodes pass the end token?!
+        assert (
+            self.tokens.index <= stop_index
+        )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index
         node.tokens = (start_index, stop_index)
 
@@ -126,7 +131,9 @@ class NodeAnnotator(NodeVisitor):
         yield pre_tokens, start_token, stop_token
 
         stop_index = stop_token.index
-        assert self.tokens.index <= stop_index  # how could child nodes pass the end token?!
+        assert (
+            self.tokens.index <= stop_index
+        )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index
         node.tokens = (start_index, stop_index)
 
@@ -311,7 +318,9 @@ class NodeAnnotator(NodeVisitor):
             index = self._index
             if node.with_context:
                 self.seek_past(j2tokens.TOKEN_NAME, "with", "context")
-            elif "without" == self.stream[index : index + 7]:  # TODO: how to peek for without
+            elif (
+                "without" == self.stream[index : index + 7]
+            ):  # TODO: how to peek for without
                 # without context (implicit default) explicitly specified
                 self.seek_past(j2tokens.TOKEN_NAME, "without", "context")
 
@@ -342,7 +351,9 @@ class NodeAnnotator(NodeVisitor):
             # import defaults to "without context"
             if node.with_context:
                 self.seek_past(j2tokens.TOKEN_NAME, "with", "context")
-            elif "without" == self.stream[index : index + 7]:  # TODO: how to peek for without
+            elif (
+                "without" == self.stream[index : index + 7]
+            ):  # TODO: how to peek for without
                 # without context (implicit default) explicitly specified
                 self.seek_past(j2tokens.TOKEN_NAME, "without", "context")
 

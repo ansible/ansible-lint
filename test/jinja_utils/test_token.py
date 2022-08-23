@@ -1,13 +1,12 @@
 from typing import Literal, Tuple
 
 import pytest
-
 from ansible.template import Templar
 from jinja2 import lexer as j2tokens
 from jinja2.lexer import Lexer
 
+from ansiblelint.jinja_utils.token import BEGIN_TOKENS, END_TOKENS, Tokens
 from ansiblelint.utils import ansible_templar
-from ansiblelint.jinja_utils.token import Tokens, BEGIN_TOKENS, END_TOKENS
 
 from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
 
