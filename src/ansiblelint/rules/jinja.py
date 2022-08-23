@@ -243,7 +243,7 @@ class JinjaRule(AnsibleLintRule):
                         if token[1] in begin_types:
                             avoid_spacing = True
                             break
-                        if token[1] == "operator" and token[2] in (":", ""):
+                        if token[1] == "operator" and token[2] in (":", "", "["):
                             avoid_spacing = True
                             break
                         if token[1] in ("operator", "integer", "string", "name"):
@@ -299,7 +299,7 @@ class JinjaRule(AnsibleLintRule):
                             "(",
                         ):
                             tokens.pop()
-                        elif tokens[-2][2] == ":" and in_expression(tokens) == "[":
+                        elif tokens[-2][2] != "," and in_expression(tokens) == "[":
                             tokens.pop()
                 else:
                     if tokens[-2][1] == "operator" and tokens[-2][2] in ("-", "+"):
@@ -524,6 +524,20 @@ if "pytest" in sys.modules:  # noqa: C901
                 "{{ foo[2:4] }}",
                 "spacing",
                 id="33",
+            ),
+            pytest.param(
+                # negative array index
+                "{{ foo[-1] }}",
+                "{{ foo[-1] }}",
+                "spacing",
+                id="34",
+            ),
+            pytest.param(
+                # negative array index, repair
+                "{{ foo[- 1] }}",
+                "{{ foo[-1] }}",
+                "spacing",
+                id="35",
             ),
         ),
     )
