@@ -255,18 +255,18 @@ def _previous_revision() -> Iterator[None]:
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
-    ).stdout
+    ).stdout.strip()
     path = pathlib.Path(worktree_dir)
     path.mkdir(parents=True, exist_ok=True)
+    # Run check will fail if worktree_dir already exists
+    # pylint: disable=subprocess-run-check
     subprocess.run(
         ["git", "worktree", "add", "-f", worktree_dir],
-        shell=True,
         stderr=subprocess.DEVNULL,
-        check=True,
     )
     try:
         with cwd(worktree_dir):
-            subprocess.run(["git", "checkout", revision], shell=True, check=True)
+            subprocess.run(["git", "checkout", revision], check=True)
             yield
     finally:
         options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
