@@ -60,7 +60,7 @@ def normpath(path: str | BasePathLike) -> str:
     relpath = os.path.relpath(str(path))
     path_absolute = os.path.abspath(str(path))
     # we avoid returning relative paths that end-up at root level
-    if path_absolute in relpath:
+    if path_absolute in relpath or vars(options).get("progressive"):
         return path_absolute
     return relpath
 
