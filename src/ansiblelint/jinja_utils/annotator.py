@@ -598,10 +598,27 @@ class NodeAnnotator(NodeVisitor):
     def visit_Const(self, node: nodes.Const, parent: nodes.Node) -> None:
         """Visit a constant value (``int``, ``str``, etc) in the stream."""
         # We are using repr() here to handle quoting strings.
-        # TODO: handle alt quotes
-        self.tokens.seek(j2tokens.TOKEN_INTEGER, repr(node.value))
-        self.tokens.seek(j2tokens.TOKEN_FLOAT, repr(node.value))
-        self.tokens.seek(j2tokens.TOKEN_STRING, repr(node.value))
+        if node.value is None or isinstance(node.value, bool):
+            _, token = self.tokens.seek(j2tokens.TOKEN_NAME)
+            start_index, end_index = token.index, token.index
+        if isinstance(node.value, int):
+            _, token = self.tokens.seek(j2tokens.TOKEN_INTEGER)
+            start_index, end_index = token.index, token.index
+        elif isinstance(node.value, float):
+            _, token = self.tokens.seek(j2tokens.TOKEN_FLOAT)
+            start_index, end_index = token.index, token.index
+        elif isinstance(node.value, str):
+            # string consumes multiple tokens
+            _, token = self.tokens.seek(j2tokens.TOKEN_STRING)
+            start_index, end_index = token.index, token.index
+            last_token = next(self.tokens)
+            while (
+                last_token.jinja_token is None
+                or last_token.type == j2tokens.TOKEN_STRING
+            ):
+                end_index = last_token.index
+                last_token = next(self.tokens)
+        node.tokens = (start_index, end_index)
 
     def visit_TemplateData(self, node: nodes.TemplateData, parent: nodes.Node) -> None:
         """a constant string (between Jinja blocks)."""
