@@ -302,7 +302,10 @@ class JinjaRule(AnsibleLintRule):
                         elif tokens[-2][2] != "," and in_expression(tokens) == "[":
                             tokens.pop()
                 else:
-                    if tokens[-2][1] == "operator" and tokens[-2][2] in ("-", "+"):
+                    if (
+                        tokens[-2][1] == "operator"
+                        and tokens[-2][2] in spaced_operators
+                    ):
                         avoid_spacing = False
                         for token in tokens[:-2][::-1]:
                             if token[1] in begin_types:
@@ -539,6 +542,7 @@ if "pytest" in sys.modules:  # noqa: C901
                 "spacing",
                 id="35",
             ),
+            pytest.param("{{ a ~'b' }}", "{{ a ~ 'b' }}", "spacing", id="36"),
         ),
     )
     def test_jinja(text: str, expected: str, tag: str) -> None:
