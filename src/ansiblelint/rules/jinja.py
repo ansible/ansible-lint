@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__package__)
+KEYWORDS_WITH_IMPLICIT_TEMPLATE = ("changed_when", "failed_when", "until", "when")
 
 
 class JinjaRule(AnsibleLintRule):
@@ -42,9 +43,9 @@ class JinjaRule(AnsibleLintRule):
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str | MatchError:
-        for _, v, _ in nested_items_path(task):
+        for key, v, _ in nested_items_path(task):
             if isinstance(v, str):
-                reformatted, details, tag = self.check_whitespace(v)
+                reformatted, details, tag = self.check_whitespace(v, key=key)
                 if reformatted != v:
                     return self.create_matcherror(
                         message=self._msg(tag=tag, value=v, reformatted=reformatted),
@@ -64,9 +65,9 @@ class JinjaRule(AnsibleLintRule):
         if str(file.kind) == "vars":
             data = parse_yaml_from_file(str(file.path))
             # pylint: disable=unused-variable
-            for k, v, path in nested_items_path(data):
+            for key, v, path in nested_items_path(data):
                 if isinstance(v, AnsibleUnicode):
-                    reformatted, details, tag = self.check_whitespace(v)
+                    reformatted, details, tag = self.check_whitespace(v, key=key)
                     if reformatted != v:
                         results.append(
                             self.create_matcherror(
@@ -120,7 +121,7 @@ class JinjaRule(AnsibleLintRule):
 
     # pylint: disable=too-many-branches,too-many-statements,too-many-locals
     def check_whitespace(  # noqa: max-complexity: 13
-        self, text: str
+        self, text: str, key: str
     ) -> tuple[str, str, str]:
         """Check spacing inside given jinja2 template string.
 
@@ -157,6 +158,11 @@ class JinjaRule(AnsibleLintRule):
         space_folowed_operators = {",", ";", ":"}
         pre_spaced_operators = spaced_operators
         post_spaced_operators = spaced_operators | space_folowed_operators
+
+        implicit = False
+        if key in KEYWORDS_WITH_IMPLICIT_TEMPLATE:
+            text = "{{ " + text + " }}"
+            implicit = True
 
         def in_expression(tokens: list[Any]) -> str:
             """Check if tokens represent an unfinished expression.
@@ -323,6 +329,17 @@ class JinjaRule(AnsibleLintRule):
 
         # finalize
         reformatted = self.unlex(tokens)
+
+        # We remove the {{ }} that we added for implicit fields checking
+        if implicit:
+            if (
+                reformatted
+                and reformatted.startswith("{{ ")
+                and reformatted.endswith(" }}")
+            ):
+                reformatted = reformatted[3:-3]
+            text = text[3:-3]
+
         failed = reformatted != text
         details = (
             f"Jinja2 template rewrite recommendation: `{reformatted}`."
@@ -548,6 +565,30 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_jinja(text: str, expected: str, tag: str) -> None:
         """Tests our ability to spot spacing errors inside jinja2 templates."""
         rule = JinjaRule()
-        reformatted, details, returned_tag = rule.check_whitespace(text)
+        reformatted, details, returned_tag = rule.check_whitespace(text, key="name")
+        assert tag == returned_tag, details
+        assert expected == reformatted
+
+    @pytest.mark.parametrize(
+        ("text", "expected", "tag"),
+        (
+            pytest.param(
+                "1+2",
+                "1 + 2",
+                "spacing",
+                id="0",
+            ),
+            pytest.param(
+                "- 1",
+                "-1",
+                "spacing",
+                id="1",
+            ),
+        ),
+    )
+    def test_jinja_implicit(text: str, expected: str, tag: str) -> None:
+        """Tests our ability to spot spacing errors implicit jinja2 templates."""
+        rule = JinjaRule()
+        reformatted, details, returned_tag = rule.check_whitespace(text, key="when")
         assert tag == returned_tag, details
         assert expected == reformatted
