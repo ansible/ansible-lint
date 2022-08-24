@@ -237,6 +237,8 @@ def _nested_items_path(
             f"of type '{type(data_collection)}'"
         )
     for key, value in convert_data_collection_to_tuples():
+        if key in ("skipped_rules", "__file__", "__line__"):
+            continue
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
             yield from _nested_items_path(
