@@ -99,7 +99,7 @@ class NodeAnnotator(NodeVisitor):
             self.tokens.index <= stop_index
         )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index
-        node.tokens = (start_index, stop_index)
+        node.tokens = (start_index, stop_index + 1)
 
     @contextmanager
     def token_pair_variable(self, node: nodes.Node):
@@ -116,8 +116,8 @@ class NodeAnnotator(NodeVisitor):
         assert (
             self.tokens.index <= stop_index
         )  # how could child nodes pass the end token?!
-        self.tokens.index = stop_index
-        node.tokens = (start_index, stop_index)
+        self.tokens.index = stop_index + 1
+        node.tokens = (start_index, stop_index + 1)
 
     def token_pair_expression(self, node: nodes.Node, left_token: str):
         pre_tokens, start_token = self.tokens.seek(left_token)
@@ -134,8 +134,8 @@ class NodeAnnotator(NodeVisitor):
         assert (
             self.tokens.index <= stop_index
         )  # how could child nodes pass the end token?!
-        self.tokens.index = stop_index
-        node.tokens = (start_index, stop_index)
+        self.tokens.index = stop_index + 1
+        node.tokens = (start_index, stop_index + 1)
 
     # -- Various compilation helpers
 
@@ -587,76 +587,102 @@ class NodeAnnotator(NodeVisitor):
         """Visit a ``Name`` expression in the stream."""
         # ctx is one of: load, store, param
         # load named var, store named var, or store named function parameter
-        self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
+        _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
+        node.tokens = (token.index, token.index + 1)
 
     def visit_NSRef(self, node: nodes.NSRef, parent: nodes.Node) -> None:
         """Visit a ref to namespace value assignment in the stream."""
-        self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
+        _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
+        start_index = token.index
         self.tokens.seek(j2tokens.TOKEN_DOT)
-        self.tokens.seek(j2tokens.TOKEN_NAME, node.attr)
+        _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.attr)
+        stop_index = token.index
+        node.tokens = (start_index, stop_index + 1)
 
     def visit_Const(self, node: nodes.Const, parent: nodes.Node) -> None:
         """Visit a constant value (``int``, ``str``, etc) in the stream."""
         # We are using repr() here to handle quoting strings.
         if node.value is None or isinstance(node.value, bool):
             _, token = self.tokens.seek(j2tokens.TOKEN_NAME)
-            start_index, end_index = token.index, token.index
+            start_index, stop_index = token.index, token.index
         if isinstance(node.value, int):
             _, token = self.tokens.seek(j2tokens.TOKEN_INTEGER)
-            start_index, end_index = token.index, token.index
+            start_index, stop_index = token.index, token.index
         elif isinstance(node.value, float):
             _, token = self.tokens.seek(j2tokens.TOKEN_FLOAT)
-            start_index, end_index = token.index, token.index
+            start_index, stop_index = token.index, token.index
         elif isinstance(node.value, str):
             # string consumes multiple tokens
             _, token = self.tokens.seek(j2tokens.TOKEN_STRING)
-            start_index, end_index = token.index, token.index
+            start_index, stop_index = token.index, token.index
             last_token = next(self.tokens)
             while (
                 last_token.jinja_token is None
                 or last_token.type == j2tokens.TOKEN_STRING
             ):
-                end_index = last_token.index
+                stop_index = last_token.index
                 last_token = next(self.tokens)
-        node.tokens = (start_index, end_index)
+        node.tokens = (start_index, stop_index + 1)
 
     def visit_TemplateData(self, node: nodes.TemplateData, parent: nodes.Node) -> None:
         """a constant string (between Jinja blocks)."""
-        self.tokens.seek(j2tokens.TOKEN_DATA, node.data)
+        _, token = self.tokens.seek(j2tokens.TOKEN_DATA, node.data)
+        node.tokens = (token.index, token.index + 1)
 
     def visit_Tuple(self, node: nodes.Tuple, parent: nodes.Node) -> None:
         """Visit a ``Tuple`` in the stream."""
-        # TODO: handle ctx = load or store
+        # parse_primary (const, etc)
+        #    -> explicit_parentheses=True
+        #    -> with_condexpr=True
+        # variable {{ }} -> with_condexpr=True
+        # assign <target> = <expr> ->
+        #    target -> simplified=True || parse_primary
+        #    expr -> with_condexpr=True
+        # for <target> in <expr>
+        #    target -> simplified=True
+        #    expr -> with_condexpr=False
+        # if <test>
+        #    test -> with_condexpr=False
+        if isinstance(parent, nodes.For):
+        # TODO: () is optional (as in for...in)
+        #       final comma is also optional
         with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
             for idx, item in enumerate(node.items):
                 if idx:
                     self.tokens.seek(j2tokens.TOKEN_COMMA)
                 self.visit(item, parent=node)
-            if self.stream[self._index] == j2tokens.TOKEN_COMMA:
-                self.tokens.seek(j2tokens.TOKEN_COMMA)
+            # if self.stream[self._index] == j2tokens.TOKEN_COMMA:
+            #     self.tokens.seek(j2tokens.TOKEN_COMMA)
 
     def visit_List(self, node: nodes.List, parent: nodes.Node) -> None:
         """Visit a ``List`` in the stream."""
+        # TODO: final comma is optional
         with self.token_pair_expression(node, j2tokens.TOKEN_LBRACKET):
             for idx, item in enumerate(node.items):
                 if idx:
                     self.tokens.seek(j2tokens.TOKEN_COMMA)
                 self.visit(item, parent=node)
-            if self.stream[self._index] == j2tokens.TOKEN_COMMA:
-                self.tokens.seek(j2tokens.TOKEN_COMMA)
+            # if self.stream[self._index] == j2tokens.TOKEN_COMMA:
+            #     self.tokens.seek(j2tokens.TOKEN_COMMA)
 
     def visit_Dict(self, node: nodes.Dict, parent: nodes.Node) -> None:
         """Visit a ``Dict`` in the stream."""
+        # TODO: final comma is optional
         with self.token_pair_expression(node, j2tokens.TOKEN_LBRACE):
             item: nodes.Pair
             for idx, item in enumerate(node.items):
                 if idx:
                     self.tokens.seek(j2tokens.TOKEN_COMMA)
-                self.visit(item.key, parent=node)
-                self.tokens.seek(j2tokens.TOKEN_COLON)
-                self.visit(item.value, parent=node)
-            if self.stream[self._index] == j2tokens.TOKEN_COMMA:
-                self.tokens.seek(j2tokens.TOKEN_COMMA)
+                self.visit(item, parent=node)
+            # if self.stream[self._index] == j2tokens.TOKEN_COMMA:
+            #     self.tokens.seek(j2tokens.TOKEN_COMMA)
+
+    def visit_Pair(self, node: nodes.Pair, parent: nodes.Node) -> None:
+        """Visit a  Key/Value ``Pair`` in a Dict."""
+        self.visit(item.key, parent=node)
+        self.tokens.seek(j2tokens.TOKEN_COLON)
+        self.visit(item.value, parent=node)
+        node.tokens = (item.key.tokens[0], item.value.tokens[1])
 
     def _binary_op(self, node: nodes.BinExpr, parent: nodes.Node) -> None:
         """Visit a ``BinExpr`` (left and right op) in the stream."""
