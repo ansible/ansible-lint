@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING, Iterator
 
 import pytest
 
+# pylint: disable=wildcard-import,unused-wildcard-import
+from ansiblelint.testing.fixtures import *  # noqa: F403
+
 if TYPE_CHECKING:
     from typing import List  # pylint: disable=ungrouped-imports
 
