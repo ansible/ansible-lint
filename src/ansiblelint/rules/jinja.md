@@ -15,18 +15,39 @@ curious how black would reformat a small sniped feel free to visit
 include the entire jinja2 template, so instead of `{{ 1+2==3 }}`, do paste
 only `1+2==3`.
 
+In ansible, `changed_when`, `failed_when`, `until`, `when` are considered to
+use implicit jinja2 templating, meaning that they do not require `{{ }}`. Our
+rule will suggest the removal of the braces for these fields.
+
 ## Problematic code
 
 ```yaml
 ---
-foo: "{{some|dict2items}}" # <-- jinja[spacing]
-bar: "{{ & }}" # <-- jinja[invalid]
+- name: Some task
+  vars:
+    foo: "{{some|dict2items}}" # <-- jinja[spacing]
+    bar: "{{ & }}" # <-- jinja[invalid]
+  when: "{{ foo | bool }}" # <-- jinja[spacing] - 'when' has implicit templating
 ```
 
 ## Correct code
 
 ```yaml
 ---
-foo: "{{ some | dict2items }}"
-bar: "{{ '&' }}"
+- name: Some task
+  vars:
+    foo: "{{ some | dict2items }}"
+    bar: "{{ '&' }}"
+  when: foo | bool
 ```
+
+## Current limitations
+
+In its current form, this rule presents the following limitations:
+
+- Jinja2 blocks that have newlines in them will not be reformatted because we
+  consider that the user deliberately wanted to format them in a particular way.
+- Jinja2 blocks that use tilde as a binary operation are ignored because black
+  does not support tilde as a binary operator. Example: `{{ a ~ b }}`.
+- Jinja2 blocks that use dot notation with numbers are ignored because python
+  and black do not allow it. Example: `{{ foo.0.bar }}`

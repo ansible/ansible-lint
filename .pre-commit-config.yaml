@@ -141,6 +141,7 @@ repos:
         additional_dependencies:
           - ansible-compat>=2.2.0
           - ansible-core
+          - black
           - enrich
           - filelock
           - flaky
@@ -167,6 +168,7 @@ repos:
         additional_dependencies:
           - ansible-compat>=2.2.0
           - ansible-core
+          - black
           - docutils
           - enrich
           - filelock
