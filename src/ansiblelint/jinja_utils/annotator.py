@@ -631,51 +631,101 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Tuple(self, node: nodes.Tuple, parent: nodes.Node) -> None:
         """Visit a ``Tuple`` in the stream."""
-        # parse_primary (const, etc)
-        #    -> explicit_parentheses=True
-        #    -> with_condexpr=True
-        # variable {{ }} -> with_condexpr=True
-        # assign <target> = <expr> ->
-        #    target -> simplified=True || parse_primary
-        #    expr -> with_condexpr=True
-        # for <target> in <expr>
-        #    target -> simplified=True
-        #    expr -> with_condexpr=False
-        # if <test>
-        #    test -> with_condexpr=False
-        if isinstance(parent, nodes.For):
-        # TODO: () is optional (as in for...in)
-        #       final comma is also optional
-        with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
+        if not node.items:
+            # empty tuple
+            with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
+                pass
+
+        # parentheses are optional in many contexts
+        # parser creates tuples inthese contexts+options:
+        #   parse_primary (const, etc)
+        #      -> explicit_parentheses=True
+        #      -> with_condexpr=True
+        #   variable {{ }} -> with_condexpr=True
+        #   assign <target> = <expr> ->
+        #      target -> simplified=True || parse_primary
+        #      expr -> with_condexpr=True
+        #   for <target> in <expr>
+        #      target -> simplified=True
+        #      expr -> with_condexpr=False
+        #   if <test>
+        #      test -> with_condexpr=False
+        found_lparen = False
+        pair_wrapper = nullcontext()
+
+        # pass first item and any lparen
+        self.visit(node.items[0], parent=node)
+        index, after_index = node.items[0].tokens
+
+        def is_lparen(token: Token) -> bool:
+            if token.type == j2tokens.TOKEN_LPAREN and token.pair.index >= after_index:
+                # the child consumed our lparen
+                self.tokens.index = index
+                pair_wrapper = self.token_pair_expression(node, j2tokens.TOKEN_LPAREN)
+                return True
+            return False
+
+        found_lparen = is_lparen(self.tokens[index])
+
+        if found_lparen:
+            # remove parentheses from child
+            node.items[0].tokens[0] = index + 1
+        else:
+            # find non-whitespace token before child
+            tokens = []
+            for token in reversed(self.tokens[:index]):
+                if token.jinja_token is None:
+                    tokens.append(token)
+                    continue
+                tokens.append(token)
+                break
+            if tokens:
+                token = tokens[-1]
+                found_lparen = is_lparen(tokens[index])
+
+        with pair_wrapper:
             for idx, item in enumerate(node.items):
-                if idx:
-                    self.tokens.seek(j2tokens.TOKEN_COMMA)
+                if idx == 0:
+                    # already visited above
+                    self.tokens.index = after_index
+                    continue
+                self.tokens.seek(j2tokens.TOKEN_COMMA)
                 self.visit(item, parent=node)
-            # if self.stream[self._index] == j2tokens.TOKEN_COMMA:
-            #     self.tokens.seek(j2tokens.TOKEN_COMMA)
+        # final comma is also optional and gets skipped with parentheses pair
+        if not found_lparen:
+            # we need to check for the final comma
+            after_index = node.items[-1].tokens[1]
+            tokens = []
+            for token in self.tokens[after_index:]:
+                if token.jinja_token is None:
+                    tokens.append(token)
+                    continue
+                tokens.append(token)
+                break
+            if tokens:
+                token = tokens[-1]
+                if token.type == j2tokens.TOKEN_COMMA:
+                    self.tokens.index = token.index + 1
+            node.tokens = (index, self.tokens.index)
 
     def visit_List(self, node: nodes.List, parent: nodes.Node) -> None:
         """Visit a ``List`` in the stream."""
-        # TODO: final comma is optional
         with self.token_pair_expression(node, j2tokens.TOKEN_LBRACKET):
             for idx, item in enumerate(node.items):
                 if idx:
                     self.tokens.seek(j2tokens.TOKEN_COMMA)
                 self.visit(item, parent=node)
-            # if self.stream[self._index] == j2tokens.TOKEN_COMMA:
-            #     self.tokens.seek(j2tokens.TOKEN_COMMA)
+        # final comma is optional and gets skipped with brackets pair
 
     def visit_Dict(self, node: nodes.Dict, parent: nodes.Node) -> None:
         """Visit a ``Dict`` in the stream."""
-        # TODO: final comma is optional
         with self.token_pair_expression(node, j2tokens.TOKEN_LBRACE):
             item: nodes.Pair
             for idx, item in enumerate(node.items):
                 if idx:
                     self.tokens.seek(j2tokens.TOKEN_COMMA)
                 self.visit(item, parent=node)
-            # if self.stream[self._index] == j2tokens.TOKEN_COMMA:
-            #     self.tokens.seek(j2tokens.TOKEN_COMMA)
+        # final comma is optional and gets skipped with braces pair
 
     def visit_Pair(self, node: nodes.Pair, parent: nodes.Node) -> None:
         """Visit a  Key/Value ``Pair`` in a Dict."""
