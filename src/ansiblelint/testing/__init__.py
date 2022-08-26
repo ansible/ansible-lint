@@ -87,13 +87,18 @@ def run_ansible_lint(
     cwd: str | None = None,
     executable: str | None = None,
     env: dict[str, str] | None = None,
+    offline: bool = True,
 ) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
+    args = [*argv]
+    if offline:
+        args.insert(0, "--offline")
+
     if not executable:
         executable = sys.executable
-        args = [sys.executable, "-m", "ansiblelint", *argv]
+        args = [sys.executable, "-m", "ansiblelint", *args]
     else:
-        args = [executable, *argv]
+        args = [executable, *args]
 
     # It is not safe to pass entire env for testing as other tests would
     # pollute the env, causing weird behaviors, so we pass only a safe list of
