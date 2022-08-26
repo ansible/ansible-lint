@@ -202,7 +202,7 @@ jobs:
       #       ${{ runner.os }}-
       - name: Install tox
         run: |
-          python3 -m pip install --upgrade tox 'coverage[toml]'
+          python3 -m pip install --upgrade tox
       - name: Log installed dists
         run: >-
           python3 -m pip freeze --all
@@ -231,7 +231,7 @@ jobs:
           TOXENV: ${{ matrix.tox_env }}-devel
       - name: Combine coverage data
         # produce a single .coverage file at repo root
-        run: coverage combine .tox/.coverage.*
+        run: tox -e coverage
       - name: Upload coverage data
         if: "runner.os == 'Linux'"
         uses: codecov/codecov-action@v3
