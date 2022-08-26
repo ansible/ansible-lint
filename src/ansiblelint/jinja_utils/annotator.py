@@ -226,6 +226,10 @@ class NodeAnnotator(NodeVisitor):
             with self.token_pair_variable(child_node):
                 self.visit(child_node, parent=node)
 
+        self.annotate(
+            node, start=node.nodes[0].tokens[0], end=node.nodes[-1].tokens[0] + 1
+        )
+
     def visit_Block(self, node: nodes.Block, parent: nodes.Node) -> None:
         """Visit a ``Block`` in the stream.
 
@@ -274,12 +278,10 @@ class NodeAnnotator(NodeVisitor):
             if node.ignore_missing:
                 self.seek_past(j2tokens.TOKEN_NAME, "ignore", "missing")
             # include defaults to "with context"
-            index = self._index
             if not node.with_context:
                 self.seek_past(j2tokens.TOKEN_NAME, "without", "context")
-            elif "with" == self.stream[index : index + 4]:  # TODO: how to peek for with
-                # with context (implicit default) explicitly specified
-                self.seek_past(j2tokens.TOKEN_NAME, "with", "context")
+            # with context (implicit default) may be explicitly specified
+            # but will be skipped via the block pair.
 
     def visit_Import(self, node: nodes.Import, parent: nodes.Node) -> None:
         """Visit an ``Import`` block in the stream.
@@ -293,14 +295,10 @@ class NodeAnnotator(NodeVisitor):
             self.visit(node.template, parent=node)
             self.seek_past(j2tokens.TOKEN_NAME, "as", node.target)
             # import defaults to "without context"
-            index = self._index
             if node.with_context:
                 self.seek_past(j2tokens.TOKEN_NAME, "with", "context")
-            elif (
-                "without" == self.stream[index : index + 7]
-            ):  # TODO: how to peek for without
-                # without context (implicit default) explicitly specified
-                self.seek_past(j2tokens.TOKEN_NAME, "without", "context")
+            # without context (implicit default) may be explicitly specified
+            # but will be skipped via the block pair.
 
     def visit_FromImport(self, node: nodes.FromImport, parent: nodes.Node) -> None:
         """Visit a ``FromImport`` block in the stream.
@@ -320,16 +318,11 @@ class NodeAnnotator(NodeVisitor):
                     self.seek_past(j2tokens.TOKEN_NAME, name[0], "as", name[1])
                 else:  # str
                     self.tokens.seek(j2tokens.TOKEN_NAME, name)
-                # TODO: trailing comma?
-            index = self._index
-            # import defaults to "without context"
+                # final comma is also optional and gets skipped with block pair
             if node.with_context:
                 self.seek_past(j2tokens.TOKEN_NAME, "with", "context")
-            elif (
-                "without" == self.stream[index : index + 7]
-            ):  # TODO: how to peek for without
-                # without context (implicit default) explicitly specified
-                self.seek_past(j2tokens.TOKEN_NAME, "without", "context")
+            # without context (implicit default) may be explicitly specified
+            # but will be skipped via the block pair.
 
     def visit_For(self, node: nodes.For, parent: nodes.Node) -> None:
         """Visit a ``For`` block in the stream.
@@ -576,8 +569,7 @@ class NodeAnnotator(NodeVisitor):
                 tokens.append(token)
                 break
             if tokens:
-                token = tokens[-1]
-                found_lparen = is_lparen(tokens[index])
+                found_lparen = is_lparen(tokens[-1])
 
         if found_lparen:
             self.tokens.index = index
@@ -650,6 +642,7 @@ class NodeAnnotator(NodeVisitor):
             self.tokens.seek(op_token)
 
         self.visit(node.right, parent=node)
+        self.annotate(node, start=node.left.tokens[0], end=node.right.tokens[1])
 
     visit_Add = _binary_op
     visit_Sub = _binary_op
@@ -663,8 +656,9 @@ class NodeAnnotator(NodeVisitor):
 
     def _unary_op(self, node: nodes.UnaryExpr, parent: nodes.Node) -> None:
         """Visit an ``UnaryExpr`` (one node with one op) in the stream."""
-        self.tokens.seek(j2tokens.operators[node.operator])
+        _, token = self.tokens.seek(j2tokens.operators[node.operator])
         self.visit(node.node, parent=node)
+        self.annotate(node, start=token.index, end=node.node.tokens[1])
 
     visit_Pos = _unary_op
     visit_Neg = _unary_op
@@ -673,9 +667,11 @@ class NodeAnnotator(NodeVisitor):
         """Visit a negated expression in the stream."""
         if isinstance(node.node, nodes.Test):
             self.visit_Test(node.node, parent=node, negate=True)
+            self.annotate(node, start=node.node.tokens[0], end=node.node.tokens[1])
         else:  # _unary_op with a name token
-            self.tokens.seek(j2tokens.TOKEN_NAME, node.operator)
+            _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.operator)
             self.visit(node.node, parent=node)
+            self.annotate(node, start=token.index, end=node.node.tokens[1])
 
     def visit_Concat(self, node: nodes.Concat, parent: nodes.Node) -> None:
         """Visit a string concatenation expression in the stream.
@@ -687,6 +683,7 @@ class NodeAnnotator(NodeVisitor):
             if idx:
                 self.tokens.seek(j2tokens.TOKEN_TILDE)
             self.visit(expr, parent=node)
+        self.annotate(node, start=node.nodes[0].tokens[0], end=node.nodes[-1].tokens[1])
 
     def visit_Compare(self, node: nodes.Compare, parent: nodes.Node) -> None:
         """Visit a ``Compare`` operator in the stream."""
@@ -699,6 +696,8 @@ class NodeAnnotator(NodeVisitor):
             self.visit(operand, parent=node)
         # spell-checker:enable
 
+        self.annotate(node, start=node.expr.tokens[0], end=node.ops[-1].tokens[1])
+
     def visit_Operand(self, node: nodes.Operand, parent: nodes.Node) -> None:
         """Visit an ``Operand`` in the stream."""
         _, token = self.tokens.seek(operands[node.op])
@@ -710,7 +709,8 @@ class NodeAnnotator(NodeVisitor):
         # node.ctx is only ever "load". Not sure this would change if it wasn't.
         self.visit(node.node, parent=node)
         self.tokens.seek(j2tokens.TOKEN_DOT)
-        self.tokens.seek(j2tokens.TOKEN_NAME, node.attr)
+        _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.attr)
+        self.annotate(node, start=node.node.tokens[0], end=token.index + 1)
 
     def visit_Getitem(self, node: nodes.Getitem, parent: nodes.Node) -> None:
         """Visit a ``Getitem`` expression in the stream."""
@@ -718,39 +718,64 @@ class NodeAnnotator(NodeVisitor):
         self.visit(node.node, parent=node)
         with self.token_pair_expression(node, j2tokens.TOKEN_LBRACKET):
             self.visit(node.arg, parent=node)
+        start_index = node.node.tokens[0]
+        end_index = node.tokens[1]
+        self.annotate(node, start=start_index, end=end_index)
 
     def visit_Slice(self, node: nodes.Slice, parent: nodes.Node) -> None:
         """Visit a ``Slice`` expression in the stream."""
+        start_index = end_index = None
         if node.start is not None:
             self.visit(node.start, parent=node)
-        self.tokens.seek(j2tokens.TOKEN_COLON)
+            start_index = node.start.tokens[0]
+            end_index = node.start.tokens[1]
+        _, token = self.tokens.seek(j2tokens.TOKEN_COLON)
+        if start_index is None:
+            start_index = token.index
+            end_index = token.index
         if node.stop is not None:
             self.visit(node.stop, parent=node)
+            end_index = node.stop.tokens[1]
         if node.step is not None:
             self.tokens.seek(j2tokens.TOKEN_COLON)
             self.visit(node.step, parent=node)
+            end_index = node.step.tokens[1]
+        self.annotate(node, start=start_index, end=end_index)
 
     def visit_Filter(self, node: nodes.Filter, parent: nodes.Node) -> None:
         """Visit a Jinja ``Filter`` in the stream."""
+        start_index = None
         if node.node is not None:
             self.visit(node.node, parent=node)
-            self.tokens.seek(j2tokens.TOKEN_PIPE)
-        self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
+            _, token = self.tokens.seek(j2tokens.TOKEN_PIPE)
+            start_index = node.node.tokens[0]
+        _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
+        end_index = token.index
+        if start_index is None:
+            start_index = token.index
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             self.signature(node)
+        if hasattr(node, "tokens"):
+            end_index = node.tokens[1]
+        self.annotate(node, start=start_index, end=end_index)
 
     def visit_Test(
         self, node: nodes.Test, parent: nodes.Node, negate: bool = False
     ) -> None:
         """Visit a Jinja ``Test`` in the stream."""
         self.visit(node.node, parent=node)
+        start_index = node.node.tokens[0]
         names = ["is"]
         if negate:
             names.append("not")
         names.append(node.name)
-        self.seek_past(j2tokens.TOKEN_NAME, *names)
+        _, token = self.seek(j2tokens.TOKEN_NAME, *names)
+        end_index = token.index
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             self.signature(node)
+        if hasattr(node, "tokens"):
+            end_index = node.tokens[1]
+        self.annotate(node, start=start_index, end=end_index)
 
     def visit_CondExpr(self, node: nodes.CondExpr, parent: nodes.Node) -> None:
         """Visit a conditional expression in the stream.
@@ -760,16 +785,23 @@ class NodeAnnotator(NodeVisitor):
             {{ foo if bar else baz }}
         """
         self.visit(node.expr1, parent=node)
+        start_index = node.expr1.tokens[0]
         self.tokens.seek(j2tokens.TOKEN_NAME, "if")
         self.visit(node.test, parent=node)
+        end_index = node.test.tokens[1]
         if node.expr2 is not None:
             self.tokens.seek(j2tokens.TOKEN_NAME, "else")
             self.visit(node.expr2, parent=node)
+            end_index = node.expr2.tokens[1]
+        self.annotate(node, start=start_index, end=end_index)
 
     def visit_Call(self, node: nodes.Call, parent: nodes.Node) -> None:
         """Visit a function ``Call`` expression in the stream."""
         self.visit(node.node, parent=node)
+        start_index = node.node.tokens[0]
         self.signature(node)
+        end_index = node.tokens[1]
+        self.annotate(node, start=start_index, end=end_index)
 
     def visit_Keyword(self, node: nodes.Keyword, parent: nodes.Node) -> None:
         """Visit a dict ``Keyword`` expression in the stream."""
