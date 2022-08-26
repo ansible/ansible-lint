@@ -87,7 +87,7 @@ def run_ansible_lint(
     cwd: str | None = None,
     executable: str | None = None,
     env: dict[str, str] | None = None,
-    offline: bool = True
+    offline: bool = True,
 ) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
     args = [*argv]
