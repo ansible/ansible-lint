@@ -67,9 +67,10 @@ class NodeAnnotator(NodeVisitor):
         start: int,
         end: int,
     ) -> None:
-        node.tokens = self.tokens[start:end]
+        node.tokens = (start, end)
 
-    def get_chomp_index(self, pre_tokens: List[Token]) -> int:
+    @staticmethod
+    def get_chomp_index(pre_tokens: List[Token]) -> int:
         whitespace_tokens = []
         for token in reversed(pre_tokens):
             if token.jinja_token is None:
@@ -99,7 +100,7 @@ class NodeAnnotator(NodeVisitor):
             self.tokens.index <= stop_index
         )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index
-        node.tokens = (start_index, stop_index + 1)
+        self.annotate(node, start=start_index, end=stop_index + 1)
 
     @contextmanager
     def token_pair_variable(self, node: nodes.Node):
@@ -117,7 +118,7 @@ class NodeAnnotator(NodeVisitor):
             self.tokens.index <= stop_index
         )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index + 1
-        node.tokens = (start_index, stop_index + 1)
+        self.annotate(node, start=start_index, end=stop_index + 1)
 
     def token_pair_expression(self, node: nodes.Node, left_token: str):
         pre_tokens, start_token = self.tokens.seek(left_token)
@@ -135,7 +136,7 @@ class NodeAnnotator(NodeVisitor):
             self.tokens.index <= stop_index
         )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index + 1
-        node.tokens = (start_index, stop_index + 1)
+        self.annotate(node, start=start_index, end=stop_index + 1)
 
     # -- Various compilation helpers
 
@@ -588,7 +589,7 @@ class NodeAnnotator(NodeVisitor):
         # ctx is one of: load, store, param
         # load named var, store named var, or store named function parameter
         _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
-        node.tokens = (token.index, token.index + 1)
+        self.annotate(node, start=token.index, end=token.index + 1)
 
     def visit_NSRef(self, node: nodes.NSRef, parent: nodes.Node) -> None:
         """Visit a ref to namespace value assignment in the stream."""
@@ -597,7 +598,7 @@ class NodeAnnotator(NodeVisitor):
         self.tokens.seek(j2tokens.TOKEN_DOT)
         _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.attr)
         stop_index = token.index
-        node.tokens = (start_index, stop_index + 1)
+        self.annotate(node, start=start_index, end=stop_index + 1)
 
     def visit_Const(self, node: nodes.Const, parent: nodes.Node) -> None:  # Literal
         """Visit a Literal constant value (``int``, ``str``, etc) in the stream."""
@@ -624,12 +625,12 @@ class NodeAnnotator(NodeVisitor):
                 last_token = next(self.tokens)
         else:
             raise ValueError(f"Const node.value has unexpected type: {type(node.value)}")
-        node.tokens = (start_index, stop_index + 1)
+        self.annotate(node, start=start_index, end=stop_index + 1)
 
     def visit_TemplateData(self, node: nodes.TemplateData, parent: nodes.Node) -> None:
         """Visit a Literal constant string (between Jinja blocks)."""
         _, token = self.tokens.seek(j2tokens.TOKEN_DATA, node.data)
-        node.tokens = (token.index, token.index + 1)
+        self.annotate(node, start=token.index, end=token.index + 1)
 
     def visit_Tuple(self, node: nodes.Tuple, parent: nodes.Node) -> None:
         """Visit a Literal ``Tuple`` in the stream."""
@@ -710,7 +711,7 @@ class NodeAnnotator(NodeVisitor):
                 token = tokens[-1]
                 if token.type == j2tokens.TOKEN_COMMA:
                     self.tokens.index = token.index + 1
-            node.tokens = (index, self.tokens.index)
+            self.annotate(node, start=index, end=self.tokens.index)
 
     def visit_List(self, node: nodes.List, parent: nodes.Node) -> None:
         """Visit a Literal ``List`` in the stream."""
@@ -736,7 +737,7 @@ class NodeAnnotator(NodeVisitor):
         self.visit(node.key, parent=node)
         self.tokens.seek(j2tokens.TOKEN_COLON)
         self.visit(node.value, parent=node)
-        node.tokens = (node.key.tokens[0], node.value.tokens[1])
+        self.annotate(node, start=node.key.tokens[0], end=node.value.tokens[1])
 
     def _binary_op(self, node: nodes.BinExpr, parent: nodes.Node) -> None:
         """Visit a ``BinExpr`` (left and right op) in the stream."""
@@ -805,7 +806,7 @@ class NodeAnnotator(NodeVisitor):
         """Visit an ``Operand`` in the stream."""
         _, token = self.tokens.seek(operands[node.op])
         self.visit(node.expr, parent=node)
-        node.tokens = (token.index, node.expr.tokens[1])
+        self.annotate(node, start=token.index, end=node.expr.tokens[1])
 
     def visit_Getattr(self, node: nodes.Getattr, parent: nodes.Node) -> None:
         """Visit a ``Getattr`` expression in the stream."""
@@ -878,7 +879,7 @@ class NodeAnnotator(NodeVisitor):
         _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.key)
         self.tokens.seek(j2tokens.TOKEN_ASSIGN)
         self.visit(node.value, parent=node)
-        node.tokens = (token.index, node.value.tokens[1])
+        self.annotate(node, start=token.index, end=node.value.tokens[1])
 
     # -- Unused nodes for extensions
 
