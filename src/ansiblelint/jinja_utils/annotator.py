@@ -93,7 +93,7 @@ class NodeAnnotator(NodeVisitor):
         else:
             start_index = start_token.index
 
-        yield pre_tokens, start_token, stop_token
+        yield
 
         stop_index = stop_token.index
         assert (
@@ -111,7 +111,7 @@ class NodeAnnotator(NodeVisitor):
         else:
             start_index = start_token.index
 
-        yield pre_tokens, start_token, stop_token
+        yield
 
         stop_index = stop_token.index
         assert (
@@ -120,6 +120,7 @@ class NodeAnnotator(NodeVisitor):
         self.tokens.index = stop_index + 1
         self.annotate(node, start=start_index, end=stop_index + 1)
 
+    @contextmanager
     def token_pair_expression(self, node: nodes.Node, left_token: str):
         pre_tokens, start_token = self.tokens.seek(left_token)
         stop_token = start_token.pair
@@ -129,7 +130,7 @@ class NodeAnnotator(NodeVisitor):
         else:
             start_index = start_token.index
 
-        yield pre_tokens, start_token, stop_token
+        yield
 
         stop_index = stop_token.index
         assert (
@@ -215,18 +216,14 @@ class NodeAnnotator(NodeVisitor):
         Output is a ``{{ }}`` statement (aka ``print`` or output statement).
         """
         for child_node in node.iter_child_nodes():
-            child_node.parent = node
+            # child_node.parent = node
             # child_node might be TemplateData which is outside {{ }}
             if isinstance(child_node, nodes.TemplateData):
                 self.visit(child_node, parent=node)
                 continue
 
             # child_node is one of the expression nodes surrounded by {{ }}
-            with self.token_pair_variable(child_node) as (
-                pre_tokens,
-                start_token,
-                stop_token,
-            ):
+            with self.token_pair_variable(child_node):
                 self.visit(child_node, parent=node)
 
     def visit_Block(self, node: nodes.Block, parent: nodes.Node) -> None:
@@ -245,19 +242,11 @@ class NodeAnnotator(NodeVisitor):
             block_name_tokens.append("scoped")
         if node.required:
             block_name_tokens.append("required")
-        with self.token_pair_block(node, *block_name_tokens) as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, *block_name_tokens):
             pass
         for child_node in node.body:
             self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endblock") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endblock"):
             pass
 
     def visit_Extends(self, node: nodes.Extends, parent: nodes.Node) -> None:
@@ -267,11 +256,7 @@ class NodeAnnotator(NodeVisitor):
 
             {% extends name %}
         """
-        with self.token_pair_block(node, "extends") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "extends"):
             self.visit(node.template, parent=node)
 
     def visit_Include(self, node: nodes.Include, parent: nodes.Node) -> None:
@@ -284,11 +269,7 @@ class NodeAnnotator(NodeVisitor):
             {% include name ignore missing without context %}
             {% include name without context %}
         """
-        with self.token_pair_block(node, "include") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "include"):
             self.visit(node.template, parent=node)
             if node.ignore_missing:
                 self.seek_past(j2tokens.TOKEN_NAME, "ignore", "missing")
@@ -308,11 +289,7 @@ class NodeAnnotator(NodeVisitor):
             {% import expr as name %}
             {% import expr as name without context %}
         """
-        with self.token_pair_block(node, "import") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "import"):
             self.visit(node.template, parent=node)
             self.seek_past(j2tokens.TOKEN_NAME, "as", node.target)
             # import defaults to "without context"
@@ -333,11 +310,7 @@ class NodeAnnotator(NodeVisitor):
             {% from expr import expr as name %}
             {% from expr import expr as name without context %}
         """
-        with self.token_pair_block(node, "from") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "from"):
             self.visit(node.template, parent=node)
             self.tokens.seek(j2tokens.TOKEN_NAME, "import")
             for idx, name in enumerate(node.names):
@@ -367,11 +340,7 @@ class NodeAnnotator(NodeVisitor):
             {% for target in iter recursive %}block{% endfor %}
             {% for target in iter %}block{% else %}block{% endfor %}
         """
-        with self.token_pair_block(node, "for") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "for"):
             self.visit(node.target, parent=node)
             self.tokens.seek(j2tokens.TOKEN_NAME, "in")
             self.visit(node.iter, parent=node)
@@ -383,63 +352,35 @@ class NodeAnnotator(NodeVisitor):
         for child_node in node.body:
             self.visit(child_node, parent=node)
         if node.else_:
-            with self.token_pair_block(node, "else") as (
-                pre_tokens,
-                start_token,
-                stop_token,
-            ):
+            with self.token_pair_block(node, "else"):
                 pass
             for child_node in node.else_:
                 self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endfor") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endfor"):
             pass
 
     def visit_If(self, node: nodes.If, parent: nodes.Node) -> None:
         """Visit an ``If`` block in the stream."""
-        with self.token_pair_block(node, "if") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "if"):
             self.visit(node.test, parent=node)
         for child_node in node.body:
             self.visit(child_node, parent=node)
         for elif_node in node.elif_:
-            with self.token_pair_block(node, "elif") as (
-                pre_tokens,
-                start_token,
-                stop_token,
-            ):
+            with self.token_pair_block(node, "elif"):
                 self.visit(elif_node.test, parent=node)
             for child_node in elif_node.body:
                 self.visit(child_node, parent=node)
         if node.else_:
-            with self.token_pair_block(node, "else") as (
-                pre_tokens,
-                start_token,
-                stop_token,
-            ):
+            with self.token_pair_block(node, "else"):
                 pass
             for child_node in node.else_:
                 self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endif") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endif"):
             pass
 
     def visit_With(self, node: nodes.With, parent: nodes.Node) -> None:
         """Visit a ``With`` statement (manual scopes) in the stream."""
-        with self.token_pair_block(node, "with") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "with"):
             first = True
             for target, expr in zip(node.targets, node.values):
                 if first:
@@ -451,11 +392,7 @@ class NodeAnnotator(NodeVisitor):
                 self.visit(expr, parent=node)
         for child_node in node.body:
             self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endwith") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endwith"):
             pass
 
     def visit_ExprStmt(self, node: nodes.ExprStmt, parent: nodes.Node) -> None:
@@ -466,11 +403,7 @@ class NodeAnnotator(NodeVisitor):
         ExprStmt
             A statement that evaluates an expression and discards the result.
         """
-        with self.token_pair_block(node, "do") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "do"):
             self.visit(node.node, parent=node)
 
     def visit_Assign(self, node: nodes.Assign, parent: nodes.Node) -> None:
@@ -480,11 +413,7 @@ class NodeAnnotator(NodeVisitor):
 
             {% set var = value %}
         """
-        with self.token_pair_block(node, "set") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "set"):
             self.visit(node.target, parent=node)
             self.tokens.seek(j2tokens.TOKEN_ASSIGN)
             self.visit(node.node, parent=node)
@@ -497,19 +426,11 @@ class NodeAnnotator(NodeVisitor):
 
             {% set var %}value{% endset %}
         """
-        with self.token_pair_block(node, "set") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "set"):
             self.visit(node.target, parent=node)
         for child_node in node.body:
             self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endset") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endset"):
             pass
 
     # noinspection DuplicatedCode
@@ -520,19 +441,11 @@ class NodeAnnotator(NodeVisitor):
 
             {% filter <filter> %}block{% endfilter %}
         """
-        with self.token_pair_block(node, "filter") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "filter"):
             self.visit(node.filter, parent=node)
         for child_node in node.body:
             self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endfilter") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endfilter"):
             pass
 
     def visit_Macro(self, node: nodes.Macro, parent: nodes.Node) -> None:
@@ -542,19 +455,11 @@ class NodeAnnotator(NodeVisitor):
 
             {% macro name(args/defaults) %}block{% endmacro %}
         """
-        with self.token_pair_block(node, "macro", node.name) as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "macro", node.name):
             self.macro_signature(node)
         for child_node in node.body:
             self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endmacro") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endmacro"):
             pass
 
     def visit_CallBlock(self, node: nodes.CallBlock, parent: nodes.Node) -> None:
@@ -565,21 +470,13 @@ class NodeAnnotator(NodeVisitor):
             {% call macro() %}block{% endcall %}
             {% call(args/defaults) macro() %}block{% endcall %}
         """
-        with self.token_pair_block(node, "call") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "call"):
             if node.args:
                 self.macro_signature(node)
             self.visit(node.call, parent=node)
         for child_node in node.body:
             self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endcall") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endcall"):
             pass
 
     # -- Expression Visitors
@@ -775,10 +672,10 @@ class NodeAnnotator(NodeVisitor):
     def visit_Not(self, node: nodes.Not, parent: nodes.Node) -> None:
         """Visit a negated expression in the stream."""
         if isinstance(node.node, nodes.Test):
-            return self.visit_Test(node.node, parent=node, negate=True)
+            self.visit_Test(node.node, parent=node, negate=True)
         else:  # _unary_op with a name token
             self.tokens.seek(j2tokens.TOKEN_NAME, node.operator)
-            return self.visit(node.node, parent=node)
+            self.visit(node.node, parent=node)
 
     def visit_Concat(self, node: nodes.Concat, parent: nodes.Node) -> None:
         """Visit a string concatenation expression in the stream.
@@ -916,11 +813,7 @@ class NodeAnnotator(NodeVisitor):
         parent: nodes.Node,  # pylint: disable=unused-argument
     ) -> None:
         """Visit a ``Continue`` block for the LoopControlExtension in the stream."""
-        with self.token_pair_block(node, "continue") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "continue"):
             pass
 
     # noinspection PyUnusedLocal
@@ -928,11 +821,7 @@ class NodeAnnotator(NodeVisitor):
         self, node: nodes.Break, parent: nodes.Node
     ) -> None:  # pylint: disable=unused-argument
         """Visit a ``Break`` block for the LoopControlExtension in the stream."""
-        with self.token_pair_block(node, "break") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "break"):
             pass
 
     # def visit_Scope(self, node: nodes.Scope, parent: nodes.Node) -> None:
@@ -959,17 +848,9 @@ class NodeAnnotator(NodeVisitor):
             # unknown Modifier block
             self.generic_visit(node)
             return
-        with self.token_pair_block(node, "autoescape") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "autoescape"):
             self.visit(autoescape, parent=node)
         for child_node in node.body:
             self.visit(child_node, parent=node)
-        with self.token_pair_block(node, "endautoescape") as (
-            pre_tokens,
-            start_token,
-            stop_token,
-        ):
+        with self.token_pair_block(node, "endautoescape"):
             pass
