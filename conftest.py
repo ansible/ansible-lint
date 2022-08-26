@@ -8,7 +8,7 @@ import pytest
 
 # checking if user is running pytest without installing test dependencies:
 missing = []
-for module in ["ansible", "black", "flake8", "flaky", "mypy", "pylint", "pytest_cov"]:
+for module in ["ansible", "black", "flake8", "flaky", "mypy", "pylint"]:
     if not importlib.util.find_spec(module):
         missing.append(module)
 if missing:

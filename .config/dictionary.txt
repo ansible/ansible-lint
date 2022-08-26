@@ -112,6 +112,7 @@ pipefail
 piptools
 pipx
 pkgcache  # linux
+pkgs
 pluggy
 podman
 prerun
