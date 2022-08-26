@@ -307,11 +307,18 @@ def is_valid_rule(rule: Any) -> bool:
 
 
 # pylint: disable=too-many-nested-blocks
-def load_plugins(directory: str) -> Iterator[AnsibleLintRule]:
+def load_plugins(  # noqa: max-complexity: 11
+    directory: str,
+) -> Iterator[AnsibleLintRule]:
     """Yield a rule class."""
     for pluginfile in glob.glob(os.path.join(directory, "[A-Za-z]*.py")):
 
         pluginname = os.path.basename(pluginfile.replace(".py", ""))
+
+        #  conftest.py is a special file used by pytest, not a rule
+        if pluginname == "conftest":
+            continue
+
         spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
 
         # https://github.com/python/typeshed/issues/2793

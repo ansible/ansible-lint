@@ -149,7 +149,7 @@ if "pytest" in sys.modules:
         "rule_runner", (CommandHasChangesCheckRule,), indirect=["rule_runner"]
     )
     def test_no_change_command_rc(rule_runner: Any) -> None:
-        """This should pass since *_when is used."""
+        """This should pass since ``*_when`` is used."""
         results = rule_runner.run_playbook(NO_CHANGE_COMMAND_RC)
         assert len(results) == 0
 
@@ -157,7 +157,7 @@ if "pytest" in sys.modules:
         "rule_runner", (CommandHasChangesCheckRule,), indirect=["rule_runner"]
     )
     def test_no_change_shell_rc(rule_runner: Any) -> None:
-        """This should pass since *_when is used."""
+        """This should pass since ``*_when`` is used."""
         results = rule_runner.run_playbook(NO_CHANGE_SHELL_RC)
         assert len(results) == 0
 
@@ -165,7 +165,7 @@ if "pytest" in sys.modules:
         "rule_runner", (CommandHasChangesCheckRule,), indirect=["rule_runner"]
     )
     def test_no_change_shell_false(rule_runner: Any) -> None:
-        """This should pass since *_when is used."""
+        """This should pass since ``*_when`` is used."""
         results = rule_runner.run_playbook(NO_CHANGE_SHELL_FALSE)
         assert len(results) == 0
 
