@@ -15,20 +15,20 @@ if TYPE_CHECKING:
 
 
 class UseTemplateInsteadOfCopyRule(AnsibleLintRule):
-    id = 'template-instead-of-copy'
-    shortdesc = 'Templated files should use template instead of copy'
+    id = "template-instead-of-copy"
+    shortdesc = "Templated files should use template instead of copy"
     description = (
-        'Items which are templated should use ``template`` instead of '
-        '``copy`` with ``content`` to ensure correctness.'
+        "Items which are templated should use ``template`` instead of "
+        "``copy`` with ``content`` to ensure correctness."
     )
-    severity = 'MEDIUM'
-    tags = ['unpredictability']
-    version_added = 'custom'
+    severity = "MEDIUM"
+    tags = ["unpredictability"]
+    version_added = "custom"
 
     def matchtask(
-        self, task: Dict[str, Any], file: 'Optional[Lintable]' = None
+        self, task: Dict[str, Any], file: "Optional[Lintable]" = None
     ) -> Union[bool, str]:
-        if task['action']['__ansible_module__'] == 'copy':
-            if task['action'].get('content'):
+        if task["action"]["__ansible_module__"] == "copy":
+            if task["action"].get("content"):
                 return True
         return False
