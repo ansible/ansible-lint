@@ -1,6 +1,6 @@
 """Jinja AST whitespace annotator."""
 
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from typing import Any, List, Optional, Tuple, Union, cast
 
 from jinja2 import lexer as j2tokens
@@ -599,13 +599,13 @@ class NodeAnnotator(NodeVisitor):
         stop_index = token.index
         node.tokens = (start_index, stop_index + 1)
 
-    def visit_Const(self, node: nodes.Const, parent: nodes.Node) -> None:
-        """Visit a constant value (``int``, ``str``, etc) in the stream."""
+    def visit_Const(self, node: nodes.Const, parent: nodes.Node) -> None:  # Literal
+        """Visit a Literal constant value (``int``, ``str``, etc) in the stream."""
         # We are using repr() here to handle quoting strings.
         if node.value is None or isinstance(node.value, bool):
             _, token = self.tokens.seek(j2tokens.TOKEN_NAME)
             start_index, stop_index = token.index, token.index
-        if isinstance(node.value, int):
+        elif isinstance(node.value, int):
             _, token = self.tokens.seek(j2tokens.TOKEN_INTEGER)
             start_index, stop_index = token.index, token.index
         elif isinstance(node.value, float):
@@ -618,19 +618,21 @@ class NodeAnnotator(NodeVisitor):
             last_token = next(self.tokens)
             while (
                 last_token.jinja_token is None
-                or last_token.type == j2tokens.TOKEN_STRING
+                or last_token.token == j2tokens.TOKEN_STRING
             ):
                 stop_index = last_token.index
                 last_token = next(self.tokens)
+        else:
+            raise ValueError(f"Const node.value has unexpected type: {type(node.value)}")
         node.tokens = (start_index, stop_index + 1)
 
     def visit_TemplateData(self, node: nodes.TemplateData, parent: nodes.Node) -> None:
-        """a constant string (between Jinja blocks)."""
+        """Visit a Literal constant string (between Jinja blocks)."""
         _, token = self.tokens.seek(j2tokens.TOKEN_DATA, node.data)
         node.tokens = (token.index, token.index + 1)
 
     def visit_Tuple(self, node: nodes.Tuple, parent: nodes.Node) -> None:
-        """Visit a ``Tuple`` in the stream."""
+        """Visit a Literal ``Tuple`` in the stream."""
         if not node.items:
             # empty tuple
             with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
@@ -650,24 +652,20 @@ class NodeAnnotator(NodeVisitor):
         #      expr -> with_condexpr=False
         #   if <test>
         #      test -> with_condexpr=False
-        found_lparen = False
-        pair_wrapper = nullcontext()
 
         # pass first item and any lparen
         self.visit(node.items[0], parent=node)
         index, after_index = node.items[0].tokens
 
-        def is_lparen(token: Token) -> bool:
-            if token.type == j2tokens.TOKEN_LPAREN and token.pair.index >= after_index:
-                # the child consumed our lparen
-                self.tokens.index = index
-                pair_wrapper = self.token_pair_expression(node, j2tokens.TOKEN_LPAREN)
+        def is_lparen(token_: Token) -> bool:
+            if token_.token == j2tokens.TOKEN_LPAREN and token_.pair.index >= after_index:
                 return True
             return False
 
         found_lparen = is_lparen(self.tokens[index])
 
         if found_lparen:
+            # the child consumed our lparen
             # remove parentheses from child
             node.items[0].tokens[0] = index + 1
         else:
@@ -682,6 +680,12 @@ class NodeAnnotator(NodeVisitor):
             if tokens:
                 token = tokens[-1]
                 found_lparen = is_lparen(tokens[index])
+
+        if found_lparen:
+            self.tokens.index = index
+            pair_wrapper = self.token_pair_expression(node, j2tokens.TOKEN_LPAREN)
+        else:
+            pair_wrapper = nullcontext()
 
         with pair_wrapper:
             for idx, item in enumerate(node.items):
@@ -709,7 +713,7 @@ class NodeAnnotator(NodeVisitor):
             node.tokens = (index, self.tokens.index)
 
     def visit_List(self, node: nodes.List, parent: nodes.Node) -> None:
-        """Visit a ``List`` in the stream."""
+        """Visit a Literal ``List`` in the stream."""
         with self.token_pair_expression(node, j2tokens.TOKEN_LBRACKET):
             for idx, item in enumerate(node.items):
                 if idx:
@@ -718,7 +722,7 @@ class NodeAnnotator(NodeVisitor):
         # final comma is optional and gets skipped with brackets pair
 
     def visit_Dict(self, node: nodes.Dict, parent: nodes.Node) -> None:
-        """Visit a ``Dict`` in the stream."""
+        """Visit a Literal ``Dict`` in the stream."""
         with self.token_pair_expression(node, j2tokens.TOKEN_LBRACE):
             item: nodes.Pair
             for idx, item in enumerate(node.items):
@@ -728,11 +732,11 @@ class NodeAnnotator(NodeVisitor):
         # final comma is optional and gets skipped with braces pair
 
     def visit_Pair(self, node: nodes.Pair, parent: nodes.Node) -> None:
-        """Visit a  Key/Value ``Pair`` in a Dict."""
-        self.visit(item.key, parent=node)
+        """Visit a Key/Value ``Pair`` in a Dict."""
+        self.visit(node.key, parent=node)
         self.tokens.seek(j2tokens.TOKEN_COLON)
-        self.visit(item.value, parent=node)
-        node.tokens = (item.key.tokens[0], item.value.tokens[1])
+        self.visit(node.value, parent=node)
+        node.tokens = (node.key.tokens[0], node.value.tokens[1])
 
     def _binary_op(self, node: nodes.BinExpr, parent: nodes.Node) -> None:
         """Visit a ``BinExpr`` (left and right op) in the stream."""
@@ -799,8 +803,9 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Operand(self, node: nodes.Operand, parent: nodes.Node) -> None:
         """Visit an ``Operand`` in the stream."""
-        self.tokens.seek(operands[node.op])
+        _, token = self.tokens.seek(operands[node.op])
         self.visit(node.expr, parent=node)
+        node.tokens = (token.index, node.expr.tokens[1])
 
     def visit_Getattr(self, node: nodes.Getattr, parent: nodes.Node) -> None:
         """Visit a ``Getattr`` expression in the stream."""
@@ -870,9 +875,10 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Keyword(self, node: nodes.Keyword, parent: nodes.Node) -> None:
         """Visit a dict ``Keyword`` expression in the stream."""
-        self.tokens.seek(j2tokens.TOKEN_NAME, node.key)
+        _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.key)
         self.tokens.seek(j2tokens.TOKEN_ASSIGN)
         self.visit(node.value, parent=node)
+        node.tokens = (token.index, node.value.tokens[1])
 
     # -- Unused nodes for extensions
 
