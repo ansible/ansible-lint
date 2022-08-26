@@ -71,14 +71,3 @@ def fixture_config_options() -> Iterator[Namespace]:
     original_options = copy.deepcopy(options)
     yield options
     options = original_options
-
-
-@pytest.fixture
-def _play_files(tmp_path: Path, request: SubRequest) -> None:
-    if request.param is None:
-        return
-    for play_file in request.param:
-        print(play_file.name)
-        path = tmp_path / play_file.name
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        path.write_text(play_file.content)

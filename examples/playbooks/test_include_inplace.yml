@@ -1,0 +1,4 @@
+---
+- hosts: all
+  roles:
+    - include_in_the_place
