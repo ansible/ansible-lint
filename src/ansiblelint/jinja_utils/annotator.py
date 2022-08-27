@@ -5,7 +5,6 @@ from typing import Any, List, Optional, Tuple, Union, cast
 
 from jinja2 import lexer as j2tokens
 from jinja2 import nodes
-from jinja2.compiler import operators as operands
 from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor
 
@@ -355,10 +354,7 @@ class NodeAnnotator(NodeVisitor):
         for child_node in node.body:
             self.visit(child_node, parent=node)
         for elif_node in node.elif_:
-            with self.token_pair_block(node, "elif"):
-                self.visit(elif_node.test, parent=node)
-            for child_node in elif_node.body:
-                self.visit(child_node, parent=node)
+            self.visit_Elif(elif_node, parent=node)
         if node.else_:
             with self.token_pair_block(node, "else"):
                 pass
@@ -366,6 +362,15 @@ class NodeAnnotator(NodeVisitor):
                 self.visit(child_node, parent=node)
         with self.token_pair_block(node, "endif"):
             pass
+
+    def visit_Elif(self, node: nodes.If, parent: nodes.Node) -> None:
+        with self.token_pair_block(node, "elif"):
+            self.visit(node.test, parent=node)
+        start_index, stop_index = node.tokens
+        for child_node in node.body:
+            self.visit(child_node, parent=node)
+            stop_index = child_node.tokens[1]
+        self.annotate(node, start=start_index, end=stop_index)
 
     def visit_With(self, node: nodes.With, parent: nodes.Node) -> None:
         """Visit a ``With`` statement (manual scopes) in the stream."""
@@ -417,6 +422,8 @@ class NodeAnnotator(NodeVisitor):
         """
         with self.token_pair_block(node, "set"):
             self.visit(node.target, parent=node)
+            if node.filter is not None:
+                self.visit(node.filter, parent=node)
         for child_node in node.body:
             self.visit(child_node, parent=node)
         with self.token_pair_block(node, "endset"):
@@ -503,14 +510,13 @@ class NodeAnnotator(NodeVisitor):
             _, token = self.tokens.seek(j2tokens.TOKEN_STRING)
             start_index, stop_index = token.index, token.index
             token = self.tokens.current
-            while (
-                token.jinja_token is None
-                or token.token == j2tokens.TOKEN_STRING
-            ):
+            while token.jinja_token is None or token.token == j2tokens.TOKEN_STRING:
                 stop_index = token.index
                 token = next(self.tokens)
         else:
-            raise ValueError(f"Const node.value has unexpected type: {type(node.value)}")
+            raise ValueError(
+                f"Const node.value has unexpected type: {type(node.value)}"
+            )
         self.annotate(node, start=start_index, end=stop_index + 1)
 
     def visit_TemplateData(self, node: nodes.TemplateData, parent: nodes.Node) -> None:
@@ -540,21 +546,19 @@ class NodeAnnotator(NodeVisitor):
         #      expr -> with_condexpr=False
         #   if <test>
         #      test -> with_condexpr=False
-        token = self.tokens.current
+        initial_index = self.tokens.index
 
         # pass first item and any lparen
         self.visit(node.items[0], parent=node)
         item_index, after_index = node.items[0].tokens
         start_index = item_index
 
-        def is_lparen(token_: Token) -> bool:
-            if token_.token == j2tokens.TOKEN_LPAREN and token_.pair.index >= after_index:
-                return True
-            return False
-
         found_lparen = False
-        for token in self.tokens[token.index:item_index]:
-            found_lparen = is_lparen(token)
+        for token in self.tokens[initial_index:item_index]:
+            found_lparen = token.token == j2tokens.TOKEN_LPAREN or (
+                token.jinja_token is not None
+                and token.jinja_token.type == j2tokens.TOKEN_LPAREN
+            )
             if found_lparen:
                 break
 
@@ -588,6 +592,8 @@ class NodeAnnotator(NodeVisitor):
                 token = tokens[-1]
                 if token.token == j2tokens.TOKEN_COMMA:
                     self.tokens.index = token.index + 1
+                else:
+                    self.tokens.index = after_index
             self.annotate(node, start=start_index, end=self.tokens.index)
 
     def visit_List(self, node: nodes.List, parent: nodes.Node) -> None:
@@ -688,7 +694,7 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Operand(self, node: nodes.Operand, parent: nodes.Node) -> None:
         """Visit an ``Operand`` in the stream."""
-        _, token = self.tokens.seek(operands[node.op])
+        _, token = self.tokens.seek(node.op)
         self.visit(node.expr, parent=node)
         self.annotate(node, start=token.index, end=node.expr.tokens[1])
 
@@ -704,10 +710,27 @@ class NodeAnnotator(NodeVisitor):
         """Visit a ``Getitem`` expression in the stream."""
         # node.ctx is only ever "load". Not sure this would change if it wasn't.
         self.visit(node.node, parent=node)
-        with self.token_pair_expression(node, j2tokens.TOKEN_LBRACKET):
+        start_index, after_index = node.node.tokens
+
+        # Getitem can use [] or . notation, so look for a dot
+        tokens = []
+        for token in self.tokens[after_index:]:
+            if token.jinja_token is None:
+                tokens.append(token)
+                continue
+            tokens.append(token)
+            break
+
+        if tokens[-1].jinja_token.type == j2tokens.TOKEN_DOT:
+            # <node>.<arg> notation
+            self.tokens.seek(j2tokens.TOKEN_DOT)
             self.visit(node.arg, parent=node)
-        start_index = node.node.tokens[0]
-        end_index = node.tokens[1]
+            end_index = node.arg.tokens[1]
+        else:
+            # <node>[<arg>] notation
+            with self.token_pair_expression(node, j2tokens.TOKEN_LBRACKET):
+                self.visit(node.arg, parent=node)
+            end_index = node.tokens[1]
         self.annotate(node, start=start_index, end=end_index)
 
     def visit_Slice(self, node: nodes.Slice, parent: nodes.Node) -> None:
@@ -732,15 +755,16 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Filter(self, node: nodes.Filter, parent: nodes.Node) -> None:
         """Visit a Jinja ``Filter`` in the stream."""
-        start_index = None
-        if node.node is not None:
+        if node.node is None:
+            # can be None in an AssignBlock or FilterBlock
+            _, token = self.tokens.seek(j2tokens.TOKEN_PIPE)
+            start_index = token.index
+        else:
             self.visit(node.node, parent=node)
             _, token = self.tokens.seek(j2tokens.TOKEN_PIPE)
             start_index = node.node.tokens[0]
         _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
         end_index = token.index
-        if start_index is None:
-            start_index = token.index
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             self.signature(node)
         if hasattr(node, "tokens"):
