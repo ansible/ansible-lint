@@ -80,6 +80,7 @@ jsonschema
 junitxml
 kubernetes
 libera
+libyaml
 lineinfile
 lintable
 literalinclude
@@ -112,6 +113,7 @@ pipefail
 piptools
 pipx
 pkgcache  # linux
+pkgs
 pluggy
 podman
 prerun

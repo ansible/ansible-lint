@@ -1,0 +1,3 @@
+---
+# should produce a malformed error from ansible syntax check
+- oops this is invalid
