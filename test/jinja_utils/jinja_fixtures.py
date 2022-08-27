@@ -175,6 +175,13 @@ class AST:
     )
 
 
+class ExtendedAPIFixtures:
+    # from jinja's tests/test_api.py TestExtendedAPI
+    item_and_attribute_1 = "{{ foo.items()|list }}"
+    item_and_attribute_2 = '{{ foo|attr("items")()|list }}'
+    item_and_attribute_3 = '{{ foo["items"] }}'
+
+
 class CoreTagsFixtures:
     # from jinja's tests/test_core_tags.py TestForLoop
     simple_for = "{% for item in seq %}{{ item }}{% endfor %}"

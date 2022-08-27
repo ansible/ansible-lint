@@ -9,7 +9,7 @@ from jinja2.visitor import NodeVisitor
 
 from ansiblelint.jinja_utils.annotator import annotate
 
-from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures, InheritanceFixtures, ExtensionsFixtures
+from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures, InheritanceFixtures, ExtensionsFixtures, ExtendedAPIFixtures
 
 
 @pytest.mark.parametrize(
@@ -17,6 +17,9 @@ from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
     (
         ("{{ [{'nested': ({'dict': [('tuple',), ()]}, {})}, {}] }}", ()),
         # these use fixtures from Jinja's test suite:
+        (ExtendedAPIFixtures.item_and_attribute_1, ()),
+        (ExtendedAPIFixtures.item_and_attribute_2, ()),
+        (ExtendedAPIFixtures.item_and_attribute_3, ()),
         (CoreTagsFixtures.simple_for, ()),
         (CoreTagsFixtures.for_else, ()),
         (CoreTagsFixtures.for_else_scoping_item, ()),
