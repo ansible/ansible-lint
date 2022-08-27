@@ -181,7 +181,7 @@ def tokeniter(
     yield Token(
         index=index + 1,
         start_pos=end_pos,
-        end_pos=len(normalized_source),
+        end_pos=len(source),
         lineno=lineno,
         token=TOKEN_EOF,
         value_str="",
