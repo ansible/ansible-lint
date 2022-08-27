@@ -5,3 +5,6 @@
     - name: this task has a name is not correctly capitalized
       ansible.builtin.command: echo "Hello World"
       changed_when: false
+    - name: 测试 should not trigger name[case] rule!
+      ansible.builtin.command: echo "Hello World"
+      changed_when: false
