@@ -202,7 +202,7 @@ class Tokens:
     ):
         # We need to go through all the tokens to populate the token pair details
         self.tokens = tuple(tokeniter(lexer, source, name, filename, state))
-        self.index = 0
+        self.index = -1
         self.source_position = 0
 
     @property
@@ -213,34 +213,46 @@ class Tokens:
         self, token_type: str, value: Optional[str] = None
     ) -> Tuple[List[Token], Optional[Token]]:
         skipped = []
+        # start with the current token
+        token = self.current
         while True:
-            try:
-                token = next(self)
-            except StopIteration:
-                return skipped, None
             if (
                 token.token == token_type
                 or (
                     token.jinja_token is not None
                     and token.jinja_token.type == token_type
                 )
-            ) and (value is None or value == token.value_str):
+            ) and (
+                value is None
+                or value == token.value_str
+                # for strings, value_str includes quotes but jinja_token.value does not
+                or (token.jinja_token is not None and value == token.jinja_token.value)
+            ):
                 break
             skipped.append(token)
+            try:
+                token = next(self)
+            except StopIteration:
+                return skipped, None
+        # the next seek should start from the next token
+        try:
+            next(self)
+        except StopIteration:
+            pass
         return skipped, token
 
     def __iter__(self) -> "Tokens":
         return self
 
     def __next__(self) -> Token:
+        self.index += 1
         try:
             token = self.current
         except IndexError:
             # reset for the next iteration, but leave source_position alone
             # for subsequent inspection.
-            self.index = 0
+            self.index = -1
             raise StopIteration
-        self.index += 1
         self.source_position = token.end_pos
         return token
 
@@ -248,7 +260,7 @@ class Tokens:
         return self.index
 
     def __bool__(self) -> bool:
-        return self.index < len(self.tokens)
+        return 0 <= self.index < len(self.tokens)
 
     @property
     def end(self) -> bool:
