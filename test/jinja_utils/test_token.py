@@ -6,13 +6,12 @@ from jinja2.lexer import Lexer
 
 from ansiblelint.jinja_utils.token import BEGIN_TOKENS, END_TOKENS, Tokens
 
-from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures, InheritanceFixtures
+from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures, InheritanceFixtures, ExtensionsFixtures
 
 
 @pytest.mark.parametrize(
     ("template_source", "jinja_token_count", "token_pairs_count", "expected_chomps"),
     (
-        # jinja_token_count is the number of tokens + 2 (INITIAL, and EOF)
         ("{{ [{'nested': ({'dict': [('tuple',), ()]}, {})}, {}] }}", 29, 10, ()),
         # these use fixtures from Jinja's test suite:
         (CoreTagsFixtures.simple_for, 12, 3, ()),
@@ -172,6 +171,25 @@ from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
         (InheritanceFixtures.level3_required_level3, 4, 1, ()),
         (InheritanceFixtures.required_with_scope_default1, 20, 4, ()),
         (InheritanceFixtures.required_with_scope_child1, 14, 4, ()),
+        (ExtensionsFixtures.extend_late, 10, 3, ()),
+        (ExtensionsFixtures.loop_controls_1, 34, 7, ("-", "-", "-", "-")),
+        (ExtensionsFixtures.loop_controls_2, 32, 7, ("-", "-", "-", "-")),
+        (ExtensionsFixtures.do, 37, 8, ("-", "-", "-", "-")),
+        (ExtensionsFixtures.extension_nodes, 3, 1, ()),
+        (ExtensionsFixtures.contextreference_node_passes_context, 9, 2, ()),
+        (ExtensionsFixtures.contextreference_node_can_pass_locals, 14, 4, ()),
+        # (ExtensionsFixtures.preprocessor_extension, 1, 0, ()),  # odd
+        # (ExtensionsFixtures.streamfilter_extension, 1, 0, ()),  # odd
+        (ExtensionsFixtures.debug, 5, 1, ()),
+        (ExtensionsFixtures.scope, 44, 7, ("-", "-", "-", "-")),
+        (ExtensionsFixtures.auto_escape_scoped_setting_1, 22, 5, ()),
+        (ExtensionsFixtures.auto_escape_scoped_setting_2, 22, 5, ()),
+        (ExtensionsFixtures.auto_escape_nonvolatile_1, 11, 2, ()),
+        (ExtensionsFixtures.auto_escape_nonvolatile_2, 18, 4, ()),
+        (ExtensionsFixtures.auto_escape_volatile, 18, 4, ()),
+        (ExtensionsFixtures.auto_escape_scoping, 22, 6, ()),
+        (ExtensionsFixtures.auto_escape_volatile_scoping, 40, 9, ()),
+        (ExtensionsFixtures.auto_escape_overlay_scopes, 42, 10, ("-", "-", "-", "-", "-", "-")),
     ),
 )
 def test_tokens_iterator(

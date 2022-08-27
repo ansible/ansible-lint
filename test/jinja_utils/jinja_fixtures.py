@@ -433,6 +433,7 @@ class TrimBlocksFixtures:
 
 
 class ImportsFixtures:
+    # from jinja's tests/test_imports.py
     context_imports_1 = '{% import "module" as m %}{{ m.test() }}'
     context_imports_2 = '{% import "module" as m without context %}{{ m.test() }}'
     context_imports_3 = '{% import "module" as m with context %}{{ m.test() }}'
@@ -467,6 +468,7 @@ class ImportsFixtures:
 
 
 class IncludesFixtures:
+    # from jinja's tests/test_imports.py
     context_include_1 = '{% include "header" %}'
     context_include_2 = '{% include "header" with context %}'
     context_include_3 = '{% include "header" without context %}'
@@ -498,6 +500,7 @@ class IncludesFixtures:
 
 
 class InheritanceFixtures:
+    # from jinja's tests/test_inheritance.py
     layout = """\
 |{% block block1 %}block 1 from layout{% endblock %}
 |{% block block2 %}block 2 from layout{% endblock %}
@@ -622,5 +625,76 @@ endblock %}{% endblock %}"""
     # duplicate_required_or_scoped =  # raises TemplateSyntaxError
     # fixed_macro_scoping_bug =  # raises TemplateRuntimeError
 
-# TODO: maybe get template examples from jinja's
-#       tests/test_ext.py
+
+class ExtensionsFixtures:
+    # from jinja's tests/test_ext.py TestExtensions
+    extend_late = '{% autoescape true %}{{ "<test>" }}{% endautoescape %}'
+    loop_controls_1 = """
+        {%- for item in [1, 2, 3, 4] %}
+            {%- if item % 2 == 0 %}{% continue %}{% endif -%}
+            {{ item }}
+        {%- endfor %}"""
+    loop_controls_2 = """
+        {%- for item in [1, 2, 3, 4] %}
+            {%- if item > 2 %}{% break %}{% endif -%}
+            {{ item }}
+        {%- endfor %}"""
+    do = """
+        {%- set items = [] %}
+        {%- for char in "foo" %}
+            {%- do items.append(loop.index0 ~ char) %}
+        {%- endfor %}{{ items|join(', ') }}"""
+    extension_nodes = "{% test %}"
+    contextreference_node_passes_context = '{% set test_var="test_content" %}{% test %}'
+    contextreference_node_can_pass_locals = '{% for test_var in ["test_content"] %}{% test %}{% endfor %}'
+    preprocessor_extension = "{[[TEST]]}"
+    streamfilter_extension = "Foo _(bar) Baz"
+    debug = "Hello\n{% debug %}\nGoodbye"
+    scope = """\
+        {%- scope a=1, b=2, c=b, d=e, e=5 -%}
+            {{ a }}|{{ b }}|{{ c }}|{{ d }}|{{ e }}
+        {%- endscope -%}
+        """
+    auto_escape_scoped_setting_1 = """
+        {{ "<HelloWorld>" }}
+        {% autoescape false %}
+            {{ "<HelloWorld>" }}
+        {% endautoescape %}
+        {{ "<HelloWorld>" }}
+        """
+    auto_escape_scoped_setting_2 = """
+        {{ "<HelloWorld>" }}
+        {% autoescape true %}
+            {{ "<HelloWorld>" }}
+        {% endautoescape %}
+        {{ "<HelloWorld>" }}
+        """
+    auto_escape_nonvolatile_1 = '{{ {"foo": "<test>"}|xmlattr|escape }}'
+    auto_escape_nonvolatile_2 = (
+        '{% autoescape false %}{{ {"foo": "<test>"}'
+        "|xmlattr|escape }}{% endautoescape %}"
+    )
+    auto_escape_volatile = (
+        '{% autoescape foo %}{{ {"foo": "<test>"}'
+        "|xmlattr|escape }}{% endautoescape %}"
+    )
+    auto_escape_scoping = (
+        '{% autoescape true %}{% set x = "<x>" %}{{ x }}'
+        '{% endautoescape %}{{ x }}{{ "<y>" }}'
+    )
+    auto_escape_volatile_scoping = """
+        {% autoescape val %}
+            {% macro foo(x) %}
+                [{{ x }}]
+            {% endmacro %}
+            {{ foo().__class__.__name__ }}
+        {% endautoescape %}
+        {{ '<testing>' }}
+        """
+    auto_escape_overlay_scopes = """
+        {{- x }}|{% set z = 99 %}
+        {%- overlay %}
+            {{- y }}|{{ z }}|{% for item in x %}[{{ item }}]{% endfor %}
+        {%- endoverlay %}|
+        {{- x -}}
+        """

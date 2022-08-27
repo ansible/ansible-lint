@@ -203,7 +203,8 @@ class NodeAnnotator(NodeVisitor):
     def generic_visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
         """Called if no explicit visitor function exists for a node."""
         for child_node in node.iter_child_nodes():
-            self.visit(child_node, parent=node, *args, **kwargs)
+            kwargs["parent"] = node
+            self.visit(child_node, *args, **kwargs)
 
     def visit_Output(self, node: nodes.Output, parent: nodes.Node) -> None:
         """Visit an ``Output`` node in the stream.
@@ -216,6 +217,8 @@ class NodeAnnotator(NodeVisitor):
             if isinstance(child_node, nodes.TemplateData):
                 self.visit(child_node, parent=node)
                 continue
+
+            # TODO: handle extension-injected nodes
 
             # child_node is one of the expression nodes surrounded by {{ }}
             with self.token_pair_variable(child_node):
@@ -868,10 +871,14 @@ class NodeAnnotator(NodeVisitor):
         with self.token_pair_block(node, "break"):
             pass
 
-    # def visit_Scope(self, node: nodes.Scope, parent: nodes.Node) -> None:
-    #     """could be added by extensions.
-    #     Wraps the ScopedEvalContextModifier node for autoescape blocks
-    #     """
+    def visit_Scope(self, node: nodes.Scope, parent: nodes.Node) -> None:
+        """could be added by extensions.
+        Wraps the ScopedEvalContextModifier node for autoescape blocks
+        """
+        self.generic_visit(node)
+        start_index = node.body[0].tokens[0]
+        end_index = node.body[-1].tokens[1]
+        self.annotate(node, start=start_index, end=end_index)
 
     # def visit_OverlayScope(self, node: nodes.OverlayScope, parent: nodes.Node) -> None:
     #     """could be added by extensions."""
@@ -883,7 +890,7 @@ class NodeAnnotator(NodeVisitor):
         self, node: nodes.ScopedEvalContextModifier, parent: nodes.Node
     ) -> None:
         """Visit an ``autoescape``/``endautoescape`` block in the stream."""
-        autoescape = None
+        keyword_node = autoescape = None
         for keyword_node in node.options:
             if keyword_node.key == "autoescape":
                 autoescape = keyword_node.value
@@ -893,7 +900,16 @@ class NodeAnnotator(NodeVisitor):
             self.generic_visit(node)
             return
         with self.token_pair_block(node, "autoescape"):
-            self.visit(autoescape, parent=node)
+            self.visit(keyword_node.value, parent=keyword_node)
+
+        start_index, end_index = node.tokens
+        for token in self.tokens[start_index:end_index]:
+            if token.token == j2tokens.TOKEN_NAME and token.jinja_token.value == "autoescape":
+                start_index = token.index
+                break
+        end_index = keyword_node.value.tokens[1]
+        self.annotate(keyword_node, start=start_index, end=end_index)
+
         for child_node in node.body:
             self.visit(child_node, parent=node)
         with self.token_pair_block(node, "endautoescape"):
