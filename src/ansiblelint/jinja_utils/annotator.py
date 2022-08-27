@@ -53,10 +53,10 @@ class NodeAnnotator(NodeVisitor):
 
     def seek_past(self, token_type: str, *values: str) -> None:
         """Seek past a series of tokens of the same type."""
+        if not values:
+            values = [None]
         for value in values:
             self.tokens.seek(token_type, value)
-        else:
-            self.tokens.seek(token_type)
 
     # -- Annotation Helpers
 
@@ -88,7 +88,7 @@ class NodeAnnotator(NodeVisitor):
         if hasattr(node, "tokens"):
             # some nodes consist of multiple blocks. In that case, just extend the end.
             start_index = node.tokens[0]
-        elif start_token.chomp:
+        elif start_token.chomp and pre_tokens:
             start_index = self.get_chomp_index(pre_tokens)
         else:
             start_index = start_token.index
@@ -96,17 +96,14 @@ class NodeAnnotator(NodeVisitor):
         yield
 
         stop_index = stop_token.index
-        assert (
-            self.tokens.index <= stop_index
-        )  # how could child nodes pass the end token?!
-        self.tokens.index = stop_index
+        self.tokens.index = stop_index + 1
         self.annotate(node, start=start_index, end=stop_index + 1)
 
     @contextmanager
     def token_pair_variable(self, node: nodes.Node):
         pre_tokens, start_token = self.tokens.seek(j2tokens.TOKEN_VARIABLE_BEGIN)
         stop_token = start_token.pair
-        if start_token.chomp:
+        if start_token.chomp and pre_tokens:
             start_index = self.get_chomp_index(pre_tokens)
         else:
             start_index = start_token.index
@@ -760,8 +757,8 @@ class NodeAnnotator(NodeVisitor):
         if negate:
             names.append("not")
         names.append(node.name)
-        _, token = self.seek(j2tokens.TOKEN_NAME, *names)
-        end_index = token.index
+        self.seek_past(j2tokens.TOKEN_NAME, *names)
+        end_index = self.tokens.index
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             self.signature(node)
         if hasattr(node, "tokens"):

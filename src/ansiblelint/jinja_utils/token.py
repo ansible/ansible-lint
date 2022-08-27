@@ -229,7 +229,8 @@ class Tokens:
                 or (token.jinja_token is not None and value == token.jinja_token.value)
             ):
                 break
-            skipped.append(token)
+            if token.token != TOKEN_INITIAL:
+                skipped.append(token)
             try:
                 token = next(self)
             except StopIteration:
