@@ -80,6 +80,7 @@ jsonschema
 junitxml
 kubernetes
 libera
+libyaml
 lineinfile
 lintable
 literalinclude
