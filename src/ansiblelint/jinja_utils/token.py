@@ -103,7 +103,7 @@ def tokeniter(
         lineno=lineno,
         token=TOKEN_INITIAL,
         value_str="",
-        jinja_token=JinjaToken(1, TOKEN_INITIAL, ""),
+        jinja_token=None,
     )
 
     for index, token_tuple in enumerate(
@@ -185,7 +185,7 @@ def tokeniter(
         lineno=lineno,
         token=TOKEN_EOF,
         value_str="",
-        jinja_token=JinjaToken(lineno, TOKEN_EOF, ""),
+        jinja_token=None,
     )
 
 
