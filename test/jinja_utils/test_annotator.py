@@ -8,7 +8,7 @@ from jinja2.visitor import NodeVisitor
 
 from ansiblelint.jinja_utils.annotator import annotate
 
-from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures
+from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures, InheritanceFixtures
 
 
 @pytest.mark.parametrize(
@@ -132,6 +132,43 @@ from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
         (IncludesFixtures.unoptimized_scopes,),
         (IncludesFixtures.import_from_with_context_a,),
         (IncludesFixtures.import_from_with_context,),
+        (InheritanceFixtures.layout,),
+        (InheritanceFixtures.level1,),
+        (InheritanceFixtures.level2,),
+        (InheritanceFixtures.level3,),
+        (InheritanceFixtures.level4,),
+        (InheritanceFixtures.working,),
+        (InheritanceFixtures.double_e,),
+        (InheritanceFixtures.super_a,),
+        (InheritanceFixtures.super_b,),
+        (InheritanceFixtures.super_c,),
+        (InheritanceFixtures.reuse_blocks,),
+        (InheritanceFixtures.preserve_blocks_a,),
+        (InheritanceFixtures.preserve_blocks_b,),
+        (InheritanceFixtures.dynamic_inheritance_default1,),
+        (InheritanceFixtures.dynamic_inheritance_default2,),
+        (InheritanceFixtures.dynamic_inheritance_child,),
+        (InheritanceFixtures.multi_inheritance_default1,),
+        (InheritanceFixtures.multi_inheritance_default2,),
+        (InheritanceFixtures.multi_inheritance_child,),
+        (InheritanceFixtures.scoped_block_default_html,),
+        (InheritanceFixtures.scoped_block,),
+        (InheritanceFixtures.super_in_scoped_block_default_html,),
+        (InheritanceFixtures.super_in_scoped_block,),
+        (InheritanceFixtures.scoped_block_after_inheritance_layout_html,),
+        (InheritanceFixtures.scoped_block_after_inheritance_index_html,),
+        (InheritanceFixtures.scoped_block_after_inheritance_helpers_html,),
+        (InheritanceFixtures.level1_required_default,),
+        (InheritanceFixtures.level1_required_level1,),
+        (InheritanceFixtures.level2_required_default,),
+        (InheritanceFixtures.level2_required_level1,),
+        (InheritanceFixtures.level2_required_level2,),
+        (InheritanceFixtures.level3_required_default,),
+        (InheritanceFixtures.level3_required_level1,),
+        (InheritanceFixtures.level3_required_level2,),
+        (InheritanceFixtures.level3_required_level3,),
+        (InheritanceFixtures.required_with_scope_default1,),
+        (InheritanceFixtures.required_with_scope_child1,),
     ),
 )
 def test_annotate(jinja_env: Environment, template_source: str):

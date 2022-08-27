@@ -6,7 +6,7 @@ from jinja2.lexer import Lexer
 
 from ansiblelint.jinja_utils.token import BEGIN_TOKENS, END_TOKENS, Tokens
 
-from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures
+from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures, InheritanceFixtures
 
 
 @pytest.mark.parametrize(
@@ -135,6 +135,43 @@ from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
         (IncludesFixtures.unoptimized_scopes, 42, 11, ()),
         (IncludesFixtures.import_from_with_context_a, 12, 4, ()),
         (IncludesFixtures.import_from_with_context, 19, 4, ()),
+        (InheritanceFixtures.layout, 35, 8, ()),
+        (InheritanceFixtures.level1, 12, 3, ()),
+        (InheritanceFixtures.level2, 19, 5, ()),
+        (InheritanceFixtures.level3, 20, 5, ()),
+        (InheritanceFixtures.level4, 12, 3, ()),
+        (InheritanceFixtures.working, 29, 7, ()),
+        (InheritanceFixtures.double_e, 33, 8, ()),
+        (InheritanceFixtures.super_a, 18, 4, ()),
+        (InheritanceFixtures.super_b, 18, 5, ()),
+        (InheritanceFixtures.super_c, 32, 9, ()),
+        (InheritanceFixtures.reuse_blocks, 24, 6, ()),
+        (InheritanceFixtures.preserve_blocks_a, 22, 6, ()),
+        (InheritanceFixtures.preserve_blocks_b, 17, 5, ()),
+        (InheritanceFixtures.dynamic_inheritance_default1, 8, 2, ()),
+        (InheritanceFixtures.dynamic_inheritance_default2, 8, 2, ()),
+        (InheritanceFixtures.dynamic_inheritance_child, 12, 3, ()),
+        (InheritanceFixtures.multi_inheritance_default1, 8, 2, ()),
+        (InheritanceFixtures.multi_inheritance_default2, 8, 2, ()),
+        (InheritanceFixtures.multi_inheritance_child, 26, 7, ()),
+        (InheritanceFixtures.scoped_block_default_html, 19, 4, ()),
+        (InheritanceFixtures.scoped_block, 14, 4, ()),
+        (InheritanceFixtures.super_in_scoped_block_default_html, 22, 5, ()),
+        (InheritanceFixtures.super_in_scoped_block, 22, 6, ()),
+        (InheritanceFixtures.scoped_block_after_inheritance_layout_html, 9, 2, ()),
+        (InheritanceFixtures.scoped_block_after_inheritance_index_html, 57, 11, ("-",)),
+        (InheritanceFixtures.scoped_block_after_inheritance_helpers_html, 17, 4, ()),
+        (InheritanceFixtures.level1_required_default, 9, 3, ()),
+        (InheritanceFixtures.level1_required_level1, 12, 3, ()),
+        (InheritanceFixtures.level2_required_default, 8, 2, ()),
+        (InheritanceFixtures.level2_required_level1, 12, 3, ()),
+        (InheritanceFixtures.level2_required_level2, 12, 3, ()),
+        (InheritanceFixtures.level3_required_default, 8, 2, ()),
+        (InheritanceFixtures.level3_required_level1, 4, 1, ()),
+        (InheritanceFixtures.level3_required_level2, 12, 3, ()),
+        (InheritanceFixtures.level3_required_level3, 4, 1, ()),
+        (InheritanceFixtures.required_with_scope_default1, 20, 4, ()),
+        (InheritanceFixtures.required_with_scope_child1, 14, 4, ()),
     ),
 )
 def test_tokens_iterator(

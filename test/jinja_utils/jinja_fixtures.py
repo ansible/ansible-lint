@@ -496,6 +496,131 @@ class IncludesFixtures:
     import_from_with_context_a = "{% macro x() %}{{ foobar }}{% endmacro %}"
     import_from_with_context = "{% set foobar = 42 %}{% from 'a' import x with context %}{{ x() }}"
 
+
+class InheritanceFixtures:
+    layout = """\
+|{% block block1 %}block 1 from layout{% endblock %}
+|{% block block2 %}block 2 from layout{% endblock %}
+|{% block block3 %}
+{% block block4 %}nested block 4 from layout{% endblock %}
+{% endblock %}|"""
+    level1 = """\
+{% extends "layout" %}
+{% block block1 %}block 1 from level1{% endblock %}"""
+    level2 = """\
+{% extends "level1" %}
+{% block block2 %}{% block block5 %}nested block 5 from level2{%
+endblock %}{% endblock %}"""
+    level3 = """\
+{% extends "level2" %}
+{% block block5 %}block 5 from level3{% endblock %}
+{% block block4 %}block 4 from level3{% endblock %}
+"""
+    level4 = """\
+{% extends "level3" %}
+{% block block3 %}block 3 from level4{% endblock %}
+"""
+    working = """\
+{% extends "layout" %}
+{% block block1 %}
+  {% if false %}
+    {% block block2 %}
+      this should work
+    {% endblock %}
+  {% endif %}
+{% endblock %}
+"""
+    double_e = """\
+{% extends "layout" %}
+{% extends "layout" %}
+{% block block1 %}
+  {% if false %}
+    {% block block2 %}
+      this should work
+    {% endblock %}
+  {% endif %}
+{% endblock %}
+"""
+    super_a = (
+        "{% block intro %}INTRO{% endblock %}|"
+        "BEFORE|{% block data %}INNER{% endblock %}|AFTER"
+    )
+    super_b = (
+        '{% extends "a" %}{% block data %}({{ '
+        "super() }}){% endblock %}"
+    )
+    super_c = (
+        '{% extends "b" %}{% block intro %}--{{ '
+        "super() }}--{% endblock %}\n{% block data "
+        "%}[{{ super() }}]{% endblock %}"
+    )
+    reuse_blocks = "{{ self.foo() }}|{% block foo %}42{% endblock %}|{{ self.foo() }}"
+    preserve_blocks_a = (
+        "{% if false %}{% block x %}A{% endblock %}"
+        "{% endif %}{{ self.x() }}"
+    )
+    preserve_blocks_b = '{% extends "a" %}{% block x %}B{{ super() }}{% endblock %}'
+    dynamic_inheritance_default1 = "DEFAULT1{% block x %}{% endblock %}"
+    dynamic_inheritance_default2 = "DEFAULT2{% block x %}{% endblock %}"
+    dynamic_inheritance_child = "{% extends default %}{% block x %}CHILD{% endblock %}"
+    multi_inheritance_default1 = "DEFAULT1{% block x %}{% endblock %}"
+    multi_inheritance_default2 = "DEFAULT2{% block x %}{% endblock %}"
+    multi_inheritance_child = (
+        "{% if default %}{% extends default %}{% else %}"
+        "{% extends 'default1' %}{% endif %}"
+        "{% block x %}CHILD{% endblock %}"
+    )
+    scoped_block_default_html = (
+        "{% for item in seq %}[{% block item scoped %}"
+        "{% endblock %}]{% endfor %}"
+    )
+    scoped_block = "{% extends 'default.html' %}{% block item %}{{ item }}{% endblock %}"
+    super_in_scoped_block_default_html = (
+        "{% for item in seq %}[{% block item scoped %}"
+        "{{ item }}{% endblock %}]{% endfor %}"
+    )
+    super_in_scoped_block = (
+        '{% extends "default.html" %}{% block item %}'
+        "{{ super() }}|{{ item * 2 }}{% endblock %}"
+    )
+    scoped_block_after_inheritance_layout_html = """
+        {% block useless %}{% endblock %}
+        """
+    scoped_block_after_inheritance_index_html = """
+        {%- extends 'layout.html' %}
+        {% from 'helpers.html' import foo with context %}
+        {% block useless %}
+            {% for x in [1, 2, 3] %}
+                {% block testing scoped %}
+                    {{ foo(x) }}
+                {% endblock %}
+            {% endfor %}
+        {% endblock %}
+        """
+    scoped_block_after_inheritance_helpers_html = """
+        {% macro foo(x) %}{{ the_foo + x }}{% endmacro %}
+        """
+    level1_required_default = "{% block x required %}{# comment #}\n {% endblock %}"
+    level1_required_level1 = "{% extends 'default' %}{% block x %}[1]{% endblock %}"
+    level2_required_default = "{% block x required %}{% endblock %}"
+    level2_required_level1 = "{% extends 'default' %}{% block x %}[1]{% endblock %}"
+    level2_required_level2 = "{% extends 'default' %}{% block x %}[2]{% endblock %}"
+    level3_required_default = "{% block x required %}{% endblock %}"
+    level3_required_level1 = "{% extends 'default' %}"
+    level3_required_level2 = "{% extends 'level1' %}{% block x %}[2]{% endblock %}"
+    level3_required_level3 = "{% extends 'level2' %}"
+    # invalid_required =  # raises TemplateSyntaxError
+    required_with_scope_default1 = (
+        "{% for item in seq %}[{% block item scoped required %}"
+        "{% endblock %}]{% endfor %}"
+    )
+    required_with_scope_child1 = (
+        "{% extends 'default1' %}{% block item %}"
+        "{{ item }}{% endblock %}"
+    )
+    # required_with_scope_2 =  # raises TemplateSyntaxError
+    # duplicate_required_or_scoped =  # raises TemplateSyntaxError
+    # fixed_macro_scoping_bug =  # raises TemplateRuntimeError
+
 # TODO: maybe get template examples from jinja's
 #       tests/test_ext.py
-#       tests/test_inheritance.py TestInheritance
