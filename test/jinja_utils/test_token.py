@@ -1,26 +1,12 @@
 from typing import Literal, Tuple
 
 import pytest
-from ansible.template import Templar
 from jinja2 import lexer as j2tokens
 from jinja2.lexer import Lexer
 
 from ansiblelint.jinja_utils.token import BEGIN_TOKENS, END_TOKENS, Tokens
-from ansiblelint.utils import ansible_templar
 
 from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
-
-
-@pytest.fixture
-def templar() -> Templar:
-    basedir = "/base/dir"
-    templatevars = {"playbook_dir": "/a/b/c"}
-    return ansible_templar(basedir, templatevars)
-
-
-@pytest.fixture
-def lexer(templar: Templar) -> Lexer:
-    return templar.environment.lexer
 
 
 @pytest.mark.parametrize(
