@@ -122,7 +122,7 @@ class NodeAnnotator(NodeVisitor):
 
     @contextmanager
     def token_pair_expression(self, node: nodes.Node, left_token: str):
-        pre_tokens, start_token = self.tokens.seek(left_token)
+        _, start_token = self.tokens.seek(left_token)
         stop_token = start_token.pair
         if hasattr(node, "tokens"):
             # some nodes consist of multiple blocks. In that case, just extend the end.
@@ -200,8 +200,7 @@ class NodeAnnotator(NodeVisitor):
         """Template is the root node."""
         initial_token = next(self.tokens)
         self.generic_visit(node)
-        eof_token = next(self.tokens)
-        # TODO: better way to ensure all tokens have been consumed?
+        _, eof_token = self.tokens.seek(j2tokens.TOKEN_EOF)
         assert self.tokens.end
         self.annotate(node, start=initial_token.start_pos, end=eof_token.end_pos)
 
@@ -227,7 +226,7 @@ class NodeAnnotator(NodeVisitor):
                 self.visit(child_node, parent=node)
 
         self.annotate(
-            node, start=node.nodes[0].tokens[0], end=node.nodes[-1].tokens[0] + 1
+            node, start=node.nodes[0].tokens[0], end=node.nodes[-1].tokens[1] + 1
         )
 
     def visit_Block(self, node: nodes.Block, parent: nodes.Node) -> None:
@@ -506,13 +505,13 @@ class NodeAnnotator(NodeVisitor):
             # string consumes multiple tokens
             _, token = self.tokens.seek(j2tokens.TOKEN_STRING)
             start_index, stop_index = token.index, token.index
-            last_token = next(self.tokens)
+            token = self.tokens.current
             while (
-                last_token.jinja_token is None
-                or last_token.token == j2tokens.TOKEN_STRING
+                token.jinja_token is None
+                or token.token == j2tokens.TOKEN_STRING
             ):
-                stop_index = last_token.index
-                last_token = next(self.tokens)
+                stop_index = token.index
+                token = next(self.tokens)
         else:
             raise ValueError(f"Const node.value has unexpected type: {type(node.value)}")
         self.annotate(node, start=start_index, end=stop_index + 1)
@@ -528,6 +527,7 @@ class NodeAnnotator(NodeVisitor):
             # empty tuple
             with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
                 pass
+            return
 
         # parentheses are optional in many contexts
         # parser creates tuples inthese contexts+options:
@@ -543,36 +543,27 @@ class NodeAnnotator(NodeVisitor):
         #      expr -> with_condexpr=False
         #   if <test>
         #      test -> with_condexpr=False
+        token = self.tokens.current
 
         # pass first item and any lparen
         self.visit(node.items[0], parent=node)
-        index, after_index = node.items[0].tokens
+        item_index, after_index = node.items[0].tokens
+        start_index = item_index
 
         def is_lparen(token_: Token) -> bool:
             if token_.token == j2tokens.TOKEN_LPAREN and token_.pair.index >= after_index:
                 return True
             return False
 
-        found_lparen = is_lparen(self.tokens[index])
-
-        if found_lparen:
-            # the child consumed our lparen
-            # remove parentheses from child
-            node.items[0].tokens[0] = index + 1
-        else:
-            # find non-whitespace token before child
-            tokens = []
-            for token in reversed(self.tokens[:index]):
-                if token.jinja_token is None:
-                    tokens.append(token)
-                    continue
-                tokens.append(token)
+        found_lparen = False
+        for token in self.tokens[token.index:item_index]:
+            found_lparen = is_lparen(token)
+            if found_lparen:
                 break
-            if tokens:
-                found_lparen = is_lparen(tokens[-1])
 
         if found_lparen:
-            self.tokens.index = index
+            # reset tokens back to lparen token
+            self.tokens.index = start_index = token.index
             pair_wrapper = self.token_pair_expression(node, j2tokens.TOKEN_LPAREN)
         else:
             pair_wrapper = nullcontext()
@@ -580,14 +571,14 @@ class NodeAnnotator(NodeVisitor):
         with pair_wrapper:
             for idx, item in enumerate(node.items):
                 if idx == 0:
-                    # already visited above
+                    # already visited the first item above
                     self.tokens.index = after_index
                     continue
                 self.tokens.seek(j2tokens.TOKEN_COMMA)
                 self.visit(item, parent=node)
-        # final comma is also optional and gets skipped with parentheses pair
+        # optional final comma gets skipped if parentheses pair is explicit
         if not found_lparen:
-            # we need to check for the final comma
+            # we need to check for the final comma in implicit tuple (w/o parentheses)
             after_index = node.items[-1].tokens[1]
             tokens = []
             for token in self.tokens[after_index:]:
@@ -598,9 +589,9 @@ class NodeAnnotator(NodeVisitor):
                 break
             if tokens:
                 token = tokens[-1]
-                if token.type == j2tokens.TOKEN_COMMA:
+                if token.token == j2tokens.TOKEN_COMMA:
                     self.tokens.index = token.index + 1
-            self.annotate(node, start=index, end=self.tokens.index)
+            self.annotate(node, start=start_index, end=self.tokens.index)
 
     def visit_List(self, node: nodes.List, parent: nodes.Node) -> None:
         """Visit a Literal ``List`` in the stream."""
@@ -614,11 +605,11 @@ class NodeAnnotator(NodeVisitor):
     def visit_Dict(self, node: nodes.Dict, parent: nodes.Node) -> None:
         """Visit a Literal ``Dict`` in the stream."""
         with self.token_pair_expression(node, j2tokens.TOKEN_LBRACE):
-            item: nodes.Pair
-            for idx, item in enumerate(node.items):
+            pair: nodes.Pair
+            for idx, pair in enumerate(node.items):
                 if idx:
                     self.tokens.seek(j2tokens.TOKEN_COMMA)
-                self.visit(item, parent=node)
+                self.visit(pair, parent=node)
         # final comma is optional and gets skipped with braces pair
 
     def visit_Pair(self, node: nodes.Pair, parent: nodes.Node) -> None:
