@@ -8,7 +8,7 @@ from jinja2.visitor import NodeVisitor
 
 from ansiblelint.jinja_utils.annotator import annotate
 
-from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
+from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures
 
 
 @pytest.mark.parametrize(
@@ -97,6 +97,41 @@ from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
         (TrimBlocksFixtures.raw_trim_lstrip,),
         (TrimBlocksFixtures.raw_no_trim_lstrip,),
         # ^^ 79 tests
+        (ImportsFixtures.context_imports_1,),
+        (ImportsFixtures.context_imports_2,),
+        (ImportsFixtures.context_imports_3,),
+        (ImportsFixtures.context_imports_4,),
+        (ImportsFixtures.context_imports_5,),
+        (ImportsFixtures.context_imports_6,),
+        (ImportsFixtures.import_needs_name_1,),
+        (ImportsFixtures.import_needs_name_2,),
+        (ImportsFixtures.trailing_comma_with_context_1,),
+        (ImportsFixtures.trailing_comma_with_context_2,),
+        (ImportsFixtures.trailing_comma_with_context_3,),
+        (ImportsFixtures.trailing_comma_with_context_4,),
+        (ImportsFixtures.trailing_comma_with_context_5,),
+        (ImportsFixtures.exports,),
+        (ImportsFixtures.import_with_globals,),
+        (ImportsFixtures.import_with_globals_override,),
+        (ImportsFixtures.from_import_with_globals,),
+        (IncludesFixtures.context_include_1,),
+        (IncludesFixtures.context_include_2,),
+        (IncludesFixtures.context_include_3,),
+        (IncludesFixtures.choice_includes_1,),
+        (IncludesFixtures.choice_includes_2,),
+        (IncludesFixtures.choice_includes_4,),
+        (IncludesFixtures.choice_includes_5,),
+        (IncludesFixtures.choice_includes_6,),
+        (IncludesFixtures.choice_includes_7,),
+        (IncludesFixtures.choice_includes_8,),
+        (IncludesFixtures.include_ignoring_missing_2,),
+        (IncludesFixtures.include_ignoring_missing_3,),
+        (IncludesFixtures.include_ignoring_missing_4,),
+        (IncludesFixtures.context_include_with_overrides_main,),
+        (IncludesFixtures.context_include_with_overrides_item,),
+        (IncludesFixtures.unoptimized_scopes,),
+        (IncludesFixtures.import_from_with_context_a,),
+        (IncludesFixtures.import_from_with_context,),
     ),
 )
 def test_annotate(jinja_env: Environment, template_source: str):

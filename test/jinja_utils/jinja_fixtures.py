@@ -432,7 +432,70 @@ class TrimBlocksFixtures:
     raw_no_trim_lstrip = "{{x}}{% raw %}\n\n      {% endraw +%}\n\n{{ y }}"
 
 
+class ImportsFixtures:
+    context_imports_1 = '{% import "module" as m %}{{ m.test() }}'
+    context_imports_2 = '{% import "module" as m without context %}{{ m.test() }}'
+    context_imports_3 = '{% import "module" as m with context %}{{ m.test() }}'
+    context_imports_4 = '{% from "module" import test %}{{ test() }}'
+    context_imports_5 = '{% from "module" import test without context %}{{ test() }}'
+    context_imports_6 = '{% from "module" import test with context %}{{ test() }}'
+    import_needs_name_1 = '{% from "foo" import bar %}'
+    import_needs_name_2 = '{% from "foo" import bar, baz %}'
+    # import_needs_name_3 =  # raises TemplateSyntaxError
+    # no_trailing_comma =  # raises TemplateSyntaxError
+    trailing_comma_with_context_1 = '{% from "foo" import bar, baz with context %}'
+    trailing_comma_with_context_2 = '{% from "foo" import bar, baz, with context %}'
+    trailing_comma_with_context_3 = '{% from "foo" import bar, with context %}'
+    trailing_comma_with_context_4 = '{% from "foo" import bar, with, context %}'
+    trailing_comma_with_context_5 = '{% from "foo" import bar, with with context %}'
+    # trailing_comma_with_context_6 =  # raises TemplateSyntaxError
+    # trailing_comma_with_context_7 =  # raises TemplateSyntaxError
+    exports = """
+        {% macro toplevel() %}...{% endmacro %}
+        {% macro __private() %}...{% endmacro %}
+        {% set variable = 42 %}
+        {% for item in [1] %}
+            {% macro notthere() %}{% endmacro %}
+        {% endfor %}
+        """
+    # not_exported = "{% from 'module' import nothing %}{{ nothing() }}"  # raises UndefinedError
+    import_globals = {"foo": 42}
+    import_with_globals = '{% import "module" as m %}{{ m.test() }}'  # with import_globals
+    # with import_globals
+    import_with_globals_override = '{% set foo = 41 %}{% import "module" as m %}{{ m.test() }}'
+    from_import_with_globals = '{% from "module" import test %}{{ test() }}'
+
+
+class IncludesFixtures:
+    context_include_1 = '{% include "header" %}'
+    context_include_2 = '{% include "header" with context %}'
+    context_include_3 = '{% include "header" without context %}'
+    choice_includes_1 = '{% include ["missing", "header"] %}'
+    choice_includes_2 = '{% include ["missing", "missing2"] ignore missing %}'
+    # choice_includes_3 = '{% include ["missing", "missing2"] %}'  # raises Template(s)NotFound
+    choice_includes_4 = '{% include ["missing", "header"] %}'
+    choice_includes_5 = "{% include x %}"
+    choice_includes_6 = '{% include [x, "header"] %}'
+    choice_includes_7 = "{% include x %}"
+    choice_includes_8 = "{% include [x] %}"
+    # include_ignoring_missing_1 = '{% include "missing" %}'  # raises TemplateNotFound
+    include_ignoring_missing_2 = '{% include "missing" ignore missing %}'
+    include_ignoring_missing_3 = '{% include "missing" ignore missing with context %}'
+    include_ignoring_missing_4 = '{% include "missing" ignore missing without context %}'
+    context_include_with_overrides_main = "{% for item in [1, 2, 3] %}{% include 'item' %}{% endfor %}"
+    context_include_with_overrides_item = "{{ item }}"
+    unoptimized_scopes = """
+        {% macro outer(o) %}
+        {% macro inner() %}
+        {% include "o_printer" %}
+        {% endmacro %}
+        {{ inner() }}
+        {% endmacro %}
+        {{ outer("FOO") }}
+        """
+    import_from_with_context_a = "{% macro x() %}{{ foobar }}{% endmacro %}"
+    import_from_with_context = "{% set foobar = 42 %}{% from 'a' import x with context %}{{ x() }}"
+
 # TODO: maybe get template examples from jinja's
 #       tests/test_ext.py
-#       tests/test_imports.py TestImports, TestIncludes
 #       tests/test_inheritance.py TestInheritance
