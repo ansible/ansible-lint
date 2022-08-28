@@ -911,3 +911,120 @@ class ExtensionsFixtures:
         {%- endoverlay %}|
         {{- x -}}
         """
+
+
+class LexerFixtures:
+    # from jinja's tests/test_lexnparse.py TestLexer
+    raw1 = (
+        "{% raw %}foo{% endraw %}|"
+        "{%raw%}{{ bar }}|{% baz %}{%       endraw    %}"
+    )
+    raw2 = "1  {%- raw -%}   2   {%- endraw -%}   3"
+    raw3 = "bar\n{% raw %}\n  {{baz}}2 spaces\n{% endraw %}\nfoo"
+    raw4 = "bar\n{%- raw -%}\n\n  \n  2 spaces\n space{%- endraw -%}\nfoo"
+    # skip some
+    bytefallback = """{{ 'foo'|pprint }}|{{ 'bär'|pprint }}"""
+    lineno_with_strip = """\
+<html>
+    <body>
+    {%- block content -%}
+        <hr>
+        {{ item }}
+    {% endblock %}
+    </body>
+</html>"""
+    start_comment = """{# foo comment
+and bar comment #}
+{% macro blub() %}foo{% endmacro %}
+{{ blub() }}"""
+
+
+class SyntaxFixtures:
+    # from jinja's tests/test_lexnparse.py TestSyntax TestParser
+    slicing = "{{ [1, 2, 3][:] }}|{{ [1, 2, 3][::-1] }}"
+    attr = "{{ foo.bar }}|{{ foo['bar'] }}"
+    subscript = "{{ foo[0] }}|{{ foo[-1] }}"
+    tuple_ = "{{ () }}|{{ (1,) }}|{{ (1, 2) }}"
+    math = "{{ (1 + 1 * 2) - 3 / 2 }}|{{ 2**3 }}"
+    div = "{{ 3 // 2 }}|{{ 3 / 2 }}|{{ 3 % 2 }}"
+    unary = "{{ +3 }}|{{ -3 }}"
+    concat = "{{ [1, 2] ~ 'foo' }}"
+    compare_1 = "{{ 1 > 0 }}"
+    compare_2 = "{{ 1 >= 1 }}"
+    compare_3 = "{{ 2 < 3 }}"
+    compare_4 = "{{ 3 <= 4 }}"
+    compare_5 = "{{ 4 == 4 }}"
+    compare_6 = "{{ 4 != 5 }}"
+    compare_parens = "{{ i * (j < 5) }}"
+    compare_compound_1 = "{{ 4 < 2 < 3 }}"
+    compare_compound_2 = "{{ a < b < c }}"
+    compare_compound_3 = "{{ 4 > 2 > 3 }}"
+    compare_compound_4 = "{{ a > b > c }}"
+    compare_compound_5 = "{{ 4 > 2 < 3 }}"
+    compare_compound_6 = "{{ a > b < c }}"
+    inop = "{{ 1 in [1, 2, 3] }}|{{ 1 not in [1, 2, 3] }}"
+    collection_literal_1 = "{{ [] }}"
+    collection_literal_2 = "{{ {} }}"
+    collection_literal_3 = "{{ () }}"
+    numeric_literal_1 = "{{ 1 }}"
+    numeric_literal_2 = "{{ 123 }}"
+    numeric_literal_3 = "{{ 12_34_56 }}"
+    numeric_literal_4 = "{{ 1.2 }}"
+    numeric_literal_5 = "{{ 34.56 }}"
+    numeric_literal_6 = "{{ 3_4.5_6 }}"
+    numeric_literal_7 = "{{ 1e0 }}"
+    numeric_literal_8 = "{{ 10e1 }}"
+    numeric_literal_9 = "{{ 2.5e100 }}"
+    numeric_literal_10 = "{{ 2.5e+100 }}"
+    numeric_literal_11 = "{{ 25.6e-10 }}"
+    numeric_literal_12 = "{{ 1_2.3_4e5_6 }}"
+    numeric_literal_13 = "{{ 0 }}"
+    numeric_literal_14 = "{{ 0_00 }}"
+    numeric_literal_15 = "{{ 0b1001_1111 }}"
+    numeric_literal_16 = "{{ 0o123 }}"
+    numeric_literal_17 = "{{ 0o1_23 }}"
+    numeric_literal_18 = "{{ 0x123abc }}"
+    numeric_literal_19 = "{{ 0x12_3abc }}"
+    boolean = "{{ true and false }}|{{ false or true }}|{{ not false }}"
+    grouping = "{{ (true and false) or (false and true) and not false }}"
+    django_attr = "{{ [1, 2, 3].0 }}|{{ [[1]].0.0 }}"
+    conditional_expression = """{{ 0 if true else 1 }}"""
+    short_conditional_expression = "<{{ 1 if false }}>"
+    filter_priority = '{{ "foo"|upper + "bar"|upper }}'
+    function_calls_1 = "{{ foo(foo, bar) }}"
+    function_calls_2 = "{{ foo(foo, bar=42) }}"
+    function_calls_3 = "{{ foo(foo, bar=23, *args) }}"
+    function_calls_4 = "{{ foo(foo, *args, bar=23) }}"
+    function_calls_5 = "{{ foo(a, b=c, *d, **e) }}"
+    function_calls_6 = "{{ foo(*foo, bar=42) }}"
+    function_calls_7 = "{{ foo(*foo, **bar) }}"
+    function_calls_8 = "{{ foo(*foo, bar=42, **baz) }}"
+    function_calls_9 = "{{ foo(foo, *args, bar=23, **baz) }}"
+    tuple_expr_1 = "{{ () }}"
+    tuple_expr_2 = "{{ (1, 2) }}"
+    tuple_expr_3 = "{{ (1, 2,) }}"
+    tuple_expr_4 = "{{ 1, }}"
+    tuple_expr_5 = "{{ 1, 2 }}"
+    tuple_expr_6 = "{% for foo, bar in seq %}...{% endfor %}"
+    tuple_expr_7 = "{% for x in foo, bar %}...{% endfor %}"
+    tuple_expr_8 = "{% for x in foo, %}...{% endfor %}"
+    trailing_comma = "{{ (1, 2,) }}|{{ [1, 2,] }}|{{ {1: 2,} }}"
+    block_end_name = "{% block foo %}...{% endblock foo %}"
+    constant_casing_true = "{{ True }}|{{ true }}|{{ TRUE }}"
+    constant_casing_false = "{{ False }}|{{ false }}|{{ FALSE }}"
+    constant_casing_none = "{{ None }}|{{ none }}|{{ NONE }}"
+    chaining_tests = "{{ 42 is string or 42 is number }}"
+    string_concatenation = '{{ "foo" "bar" "baz" }}'
+    not_in = """{{ not 42 in bar }}"""
+    operator_precedence = """{{ 2 * 3 + 4 % 2 + 1 - 2 }}"""
+    raw2 = "{% raw %}{{ FOO }} and {% BAR %}{% endraw %}"
+    const = (
+        "{{ true }}|{{ false }}|{{ none }}|"
+        "{{ none is defined }}|{{ missing is defined }}"
+    )
+    neg_filter_priority = "{{ -1|foo }}"
+    localset = """{% set foo = 0 %}\
+{% for item in [1, 2] %}{% set foo = 1 %}{% endfor %}\
+{{ foo }}"""
+    parse_unary_1 = '{{ -foo["bar"] }}'
+    parse_unary_2 = '{{ -foo["bar"]|abs }}'
