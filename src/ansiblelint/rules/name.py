@@ -69,9 +69,9 @@ class NameRule(AnsibleLintRule):
     def _check_name(
         self, name: str, lintable: Lintable | None, linenumber: int
     ) -> MatchError | None:
-        # This rules applies only to scripts that do have uppercase and
-        # lowercase letter, so we ignore anything else. On Unicode islower()
-        # is not the opposite of islower()
+        # This rules applies only to languages that do have uppercase and
+        # lowercase letter, so we ignore anything else. On Unicode isupper()
+        # is not necessarily the opposite of islower()
         if name[0].isalpha() and name[0].islower() and not name[0].isupper():
             return self.create_matcherror(
                 message="All names should start with an uppercase letter.",
