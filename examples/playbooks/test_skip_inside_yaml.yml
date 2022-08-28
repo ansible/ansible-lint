@@ -4,15 +4,15 @@
   tags:
     - skip_ansible_lint
   tasks:
-    - name: Test hg-latest
+    - name: Test latest[hg]
       action: ansible.builtin.hg
-    - name: Test hg-latest (skipped) # noqa hg-latest
+    - name: Test latest[hg] (skipped) # noqa latest[hg]
       action: ansible.builtin.hg
 
-    - name: Test git-latest and partial-become
+    - name: Test latest[git] and partial-become
       become_user: alice
       action: ansible.builtin.git
-    - name: Test git-latest and partial-become (skipped) # noqa git-latest partial-become
+    - name: Test latest[git] and partial-become (skipped) # noqa latest[git] partial-become
       become_user: alice
       action: ansible.builtin.git
 

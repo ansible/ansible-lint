@@ -13,23 +13,23 @@ ROLE_TASKS = """\
 
 ROLE_TASKS_WITH_BLOCK = """\
 ---
-- name: Bad git 1  # noqa git-latest
+- name: Bad git 1  # noqa latest[git]
   action: ansible.builtin.git a=b c=d
 - name: Bad git 2
   action: ansible.builtin.git a=b c=d
 - name: Block with rescue and always section
   block:
-    - name: Bad git 3  # noqa git-latest
+    - name: Bad git 3  # noqa latest[git]
       action: ansible.builtin.git a=b c=d
     - name: Bad git 4
       action: ansible.builtin.git a=b c=d
   rescue:
-    - name: Bad git 5  # noqa git-latest
+    - name: Bad git 5  # noqa latest[git]
       action: ansible.builtin.git a=b c=d
     - name: Bad git 6
       action: ansible.builtin.git a=b c=d
   always:
-    - name: Bad git 7  # noqa git-latest
+    - name: Bad git 7  # noqa latest[git]
       action: ansible.builtin.git a=b c=d
     - name: Bad git 8
       action: ansible.builtin.git a=b c=d

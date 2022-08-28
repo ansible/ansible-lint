@@ -62,7 +62,7 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                     "hosts": "localhost",
                     "tasks": [
                         {
-                            "name": "This would typically fire git-latest and partial-become",
+                            "name": "This would typically fire latest[git] and partial-become",
                             "become_user": "alice",
                             "git": "src=/path/to/git/repo dest=checkout",
                             "__line__": 4,
@@ -78,12 +78,12 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                     "hosts": "localhost",
                     "tasks": [
                         {
-                            "name": "This would typically fire git-latest and partial-become",
+                            "name": "This would typically fire latest[git] and partial-become",
                             "become_user": "alice",
                             "git": "src=/path/to/git/repo dest=checkout",
                             "__line__": 4,
                             "__file__": Path("examples/playbooks/noqa.yml"),
-                            "skipped_rules": ["git-latest", "partial-become"],
+                            "skipped_rules": ["latest[git]", "partial-become"],
                         }
                     ],
                     "__line__": 2,
