@@ -904,7 +904,10 @@ class NodeAnnotator(NodeVisitor):
 
         start_index, end_index = node.tokens
         for token in self.tokens[start_index:end_index]:
-            if token.token == j2tokens.TOKEN_NAME and token.jinja_token.value == "autoescape":
+            if (
+                token.token == j2tokens.TOKEN_NAME
+                and token.jinja_token.value == "autoescape"
+            ):
                 start_index = token.index
                 break
         end_index = keyword_node.value.tokens[1]

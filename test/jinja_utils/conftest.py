@@ -1,5 +1,4 @@
 import pytest
-
 from ansible.template import Templar
 from jinja2.environment import Environment
 from jinja2.lexer import Lexer

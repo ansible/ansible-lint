@@ -1,7 +1,6 @@
 from typing import Any, Callable, Tuple, Type, Union
 
 import pytest
-
 from jinja2 import nodes
 from jinja2.environment import Environment
 from jinja2.ext import Extension
@@ -9,7 +8,16 @@ from jinja2.visitor import NodeVisitor
 
 from ansiblelint.jinja_utils.annotator import annotate
 
-from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures, InheritanceFixtures, ExtensionsFixtures, ExtendedAPIFixtures
+from .jinja_fixtures import (
+    CoreTagsFixtures,
+    ExtendedAPIFixtures,
+    ExtensionsFixtures,
+    FilterFixtures,
+    ImportsFixtures,
+    IncludesFixtures,
+    InheritanceFixtures,
+    TrimBlocksFixtures,
+)
 
 
 @pytest.mark.parametrize(
@@ -195,7 +203,11 @@ from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
         # (ExtensionsFixtures.auto_escape_overlay_scopes, (MagicScopesExtension)),
     ),
 )
-def test_annotate(jinja_env: Environment, template_source: str, extensions: Tuple[Union[str, Type[Extension]]]):
+def test_annotate(
+    jinja_env: Environment,
+    template_source: str,
+    extensions: Tuple[Union[str, Type[Extension]]],
+):
     for extension in extensions:
         jinja_env.add_extension(extension)
 

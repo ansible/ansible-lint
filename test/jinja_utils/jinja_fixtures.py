@@ -468,9 +468,13 @@ class ImportsFixtures:
         """
     # not_exported = "{% from 'module' import nothing %}{{ nothing() }}"  # raises UndefinedError
     import_globals = {"foo": 42}
-    import_with_globals = '{% import "module" as m %}{{ m.test() }}'  # with import_globals
+    import_with_globals = (
+        '{% import "module" as m %}{{ m.test() }}'  # with import_globals
+    )
     # with import_globals
-    import_with_globals_override = '{% set foo = 41 %}{% import "module" as m %}{{ m.test() }}'
+    import_with_globals_override = (
+        '{% set foo = 41 %}{% import "module" as m %}{{ m.test() }}'
+    )
     from_import_with_globals = '{% from "module" import test %}{{ test() }}'
 
 
@@ -490,8 +494,12 @@ class IncludesFixtures:
     # include_ignoring_missing_1 = '{% include "missing" %}'  # raises TemplateNotFound
     include_ignoring_missing_2 = '{% include "missing" ignore missing %}'
     include_ignoring_missing_3 = '{% include "missing" ignore missing with context %}'
-    include_ignoring_missing_4 = '{% include "missing" ignore missing without context %}'
-    context_include_with_overrides_main = "{% for item in [1, 2, 3] %}{% include 'item' %}{% endfor %}"
+    include_ignoring_missing_4 = (
+        '{% include "missing" ignore missing without context %}'
+    )
+    context_include_with_overrides_main = (
+        "{% for item in [1, 2, 3] %}{% include 'item' %}{% endfor %}"
+    )
     context_include_with_overrides_item = "{{ item }}"
     unoptimized_scopes = """
         {% macro outer(o) %}
@@ -503,7 +511,9 @@ class IncludesFixtures:
         {{ outer("FOO") }}
         """
     import_from_with_context_a = "{% macro x() %}{{ foobar }}{% endmacro %}"
-    import_from_with_context = "{% set foobar = 42 %}{% from 'a' import x with context %}{{ x() }}"
+    import_from_with_context = (
+        "{% set foobar = 42 %}{% from 'a' import x with context %}{{ x() }}"
+    )
 
 
 class InheritanceFixtures:
@@ -555,10 +565,7 @@ endblock %}{% endblock %}"""
         "{% block intro %}INTRO{% endblock %}|"
         "BEFORE|{% block data %}INNER{% endblock %}|AFTER"
     )
-    super_b = (
-        '{% extends "a" %}{% block data %}({{ '
-        "super() }}){% endblock %}"
-    )
+    super_b = '{% extends "a" %}{% block data %}({{ ' "super() }}){% endblock %}"
     super_c = (
         '{% extends "b" %}{% block intro %}--{{ '
         "super() }}--{% endblock %}\n{% block data "
@@ -566,8 +573,7 @@ endblock %}{% endblock %}"""
     )
     reuse_blocks = "{{ self.foo() }}|{% block foo %}42{% endblock %}|{{ self.foo() }}"
     preserve_blocks_a = (
-        "{% if false %}{% block x %}A{% endblock %}"
-        "{% endif %}{{ self.x() }}"
+        "{% if false %}{% block x %}A{% endblock %}" "{% endif %}{{ self.x() }}"
     )
     preserve_blocks_b = '{% extends "a" %}{% block x %}B{{ super() }}{% endblock %}'
     dynamic_inheritance_default1 = "DEFAULT1{% block x %}{% endblock %}"
@@ -581,10 +587,11 @@ endblock %}{% endblock %}"""
         "{% block x %}CHILD{% endblock %}"
     )
     scoped_block_default_html = (
-        "{% for item in seq %}[{% block item scoped %}"
-        "{% endblock %}]{% endfor %}"
+        "{% for item in seq %}[{% block item scoped %}" "{% endblock %}]{% endfor %}"
     )
-    scoped_block = "{% extends 'default.html' %}{% block item %}{{ item }}{% endblock %}"
+    scoped_block = (
+        "{% extends 'default.html' %}{% block item %}{{ item }}{% endblock %}"
+    )
     super_in_scoped_block_default_html = (
         "{% for item in seq %}[{% block item scoped %}"
         "{{ item }}{% endblock %}]{% endfor %}"
@@ -625,8 +632,7 @@ endblock %}{% endblock %}"""
         "{% endblock %}]{% endfor %}"
     )
     required_with_scope_child1 = (
-        "{% extends 'default1' %}{% block item %}"
-        "{{ item }}{% endblock %}"
+        "{% extends 'default1' %}{% block item %}" "{{ item }}{% endblock %}"
     )
     # required_with_scope_2 =  # raises TemplateSyntaxError
     # duplicate_required_or_scoped =  # raises TemplateSyntaxError
@@ -653,7 +659,9 @@ class ExtensionsFixtures:
         {%- endfor %}{{ items|join(', ') }}"""
     extension_nodes = "{% test %}"
     contextreference_node_passes_context = '{% set test_var="test_content" %}{% test %}'
-    contextreference_node_can_pass_locals = '{% for test_var in ["test_content"] %}{% test %}{% endfor %}'
+    contextreference_node_can_pass_locals = (
+        '{% for test_var in ["test_content"] %}{% test %}{% endfor %}'
+    )
     preprocessor_extension = "{[[TEST]]}"
     streamfilter_extension = "Foo _(bar) Baz"
     debug = "Hello\n{% debug %}\nGoodbye"

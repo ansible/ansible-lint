@@ -6,7 +6,16 @@ from jinja2.lexer import Lexer
 
 from ansiblelint.jinja_utils.token import BEGIN_TOKENS, END_TOKENS, Tokens
 
-from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures, ImportsFixtures, IncludesFixtures, InheritanceFixtures, ExtensionsFixtures, ExtendedAPIFixtures
+from .jinja_fixtures import (
+    CoreTagsFixtures,
+    ExtendedAPIFixtures,
+    ExtensionsFixtures,
+    FilterFixtures,
+    ImportsFixtures,
+    IncludesFixtures,
+    InheritanceFixtures,
+    TrimBlocksFixtures,
+)
 
 
 @pytest.mark.parametrize(
@@ -192,7 +201,12 @@ from .jinja_fixtures import CoreTagsFixtures, FilterFixtures, TrimBlocksFixtures
         (ExtensionsFixtures.auto_escape_volatile, 18, 4, ()),
         (ExtensionsFixtures.auto_escape_scoping, 22, 6, ()),
         (ExtensionsFixtures.auto_escape_volatile_scoping, 40, 9, ()),
-        (ExtensionsFixtures.auto_escape_overlay_scopes, 42, 10, ("-", "-", "-", "-", "-", "-")),
+        (
+            ExtensionsFixtures.auto_escape_overlay_scopes,
+            42,
+            10,
+            ("-", "-", "-", "-", "-", "-"),
+        ),
     ),
 )
 def test_tokens_iterator(
