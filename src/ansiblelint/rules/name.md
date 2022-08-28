@@ -1,4 +1,4 @@
-## name
+# name
 
 This rule identifies several problems related to the naming of tasks and plays.
 This is important because these names are the primary way to **identify** and
@@ -14,7 +14,7 @@ This rule can produce messages such:
 If you want to ignore some of the messages above, you can add any of them to
 the `ignore_list`.
 
-### Problematic code
+## Problematic code
 
 ```yaml
 ---
@@ -24,7 +24,7 @@ the `ignore_list`.
       ansible.builtin.command: touch /tmp/.placeholder
 ```
 
-### Correct code
+## Correct code
 
 ```yaml
 ---

@@ -1,5 +1,6 @@
 """Utils to generate rules documentation."""
 import logging
+from pathlib import Path
 from typing import Iterable
 
 from rich import box
@@ -29,6 +30,45 @@ Below you can see the list of default rules Ansible Lint use to evaluate playboo
 _logger = logging.getLogger(__name__)
 
 
+def rules_as_docs(rules: RulesCollection) -> str:
+    """Dump documentation files for all rules, returns only confirmation message.
+
+    That is internally used for building documentation and the API can change
+    at any time.
+    """
+    result = ""
+    dump_path = Path(".") / "docs" / "rules"
+    if not dump_path.exists():
+        raise RuntimeError(f"Failed to find {dump_path} folder for dumping rules.")
+
+    with open(dump_path / ".." / "profiles.md", "w", encoding="utf-8") as f:
+        f.write(profiles_as_md(header=True))
+
+    for rule in rules.alphabetical():
+        result = ""
+        with open(dump_path / f"{rule.id}.md", "w", encoding="utf-8") as f:
+            # because title == rule.id we get the desired labels for free
+            # and we do not have to insert `(target_header)=`
+            title = f"{rule.id}"
+
+            if rule.help:
+                if not rule.help.startswith(f"# {rule.id}"):
+                    raise RuntimeError(
+                        f"Rule {rule.__class__} markdown help does not start with `# {rule.id}` header.\n{rule.help}"
+                    )
+                result = result[1:]
+                result += f"{rule.help}"
+            else:
+                description = rule.description
+                if rule.link:
+                    description += f" [more]({rule.link})"
+
+                result += f"# {title}\n\n**{rule.shortdesc}**\n\n{description}"
+            f.write(result)
+
+    return "All markdown files for rules were dumped!"
+
+
 def rules_as_str(rules: RulesCollection) -> str:
     """Return rules as string."""
     return "\n".join([str(rule) for rule in rules.alphabetical()])
@@ -45,9 +85,9 @@ def rules_as_md(rules: RulesCollection) -> str:
         title = f"{rule.id}"
 
         if rule.help:
-            if not rule.help.startswith(f"## {rule.id}"):
+            if not rule.help.startswith(f"# {rule.id}"):
                 raise RuntimeError(
-                    f"Rule {rule.__class__} markdown help does not start with `## {rule.id}` header.\n{rule.help}"
+                    f"Rule {rule.__class__} markdown help does not start with `# {rule.id}` header.\n{rule.help}"
                 )
             result += f"\n\n{rule.help}"
         else:
@@ -82,10 +122,30 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
         yield table
 
 
-def profiles_as_md() -> str:
+def profiles_as_md(header: bool = False) -> str:
     """Return markdown representation of supported profiles."""
     result = ""
     default_rules = RulesCollection([DEFAULT_RULESDIR])
+
+    if header:
+        result += """<!---
+Do not manually edit, generated from generate_docs.py
+-->
+# Profiles
+
+One of the best ways to run `ansible-lint` is by specifying which rule profile
+you want to use. These profiles stack on top of each other, allowing you to
+gradually raise the quality bar.
+
+To run it with the most strict profile just type `ansible-lint -P production`.
+
+If you want to consult the list of rules from each profile, type
+`ansible-lint -P`. For your convenience, we also list the same output below.
+
+The rules that have a `*` suffix, are not implemented yet but we documented
+them with links to their issues.
+
+"""
 
     for name, profile in PROFILES.items():
         extends = ""
@@ -97,7 +157,7 @@ def profiles_as_md() -> str:
         for rule, rule_data in profile["rules"].items():
             for default_rule in default_rules.rules:
                 if default_rule.id == rule:
-                    result += f"- [{rule}](default_rules.md/#{rule})\n"
+                    result += f"- [{rule}](rules/{rule}.md)\n"
                     break
             else:
                 if not rule_data:

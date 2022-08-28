@@ -116,7 +116,12 @@ def initialize_options(arguments: list[str] | None = None) -> None:
 def _do_list(rules: RulesCollection) -> int:
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
-    from ansiblelint.generate_docs import rules_as_md, rules_as_rich, rules_as_str
+    from ansiblelint.generate_docs import (
+        rules_as_docs,
+        rules_as_md,
+        rules_as_rich,
+        rules_as_str,
+    )
 
     if options.listrules:
 
@@ -124,6 +129,7 @@ def _do_list(rules: RulesCollection) -> int:
             "plain": rules_as_str,
             "rich": rules_as_rich,
             "md": rules_as_md,
+            "docs": rules_as_docs,
         }
 
         console.print(_rule_format_map[options.format](rules), highlight=False)

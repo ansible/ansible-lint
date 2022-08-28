@@ -1,4 +1,4 @@
-## syntax-check
+# syntax-check
 
 Our linter runs `ansible-playbook --syntax-check` on all playbooks, and
 if any of these reports a syntax error, this stops any further processing
@@ -20,7 +20,7 @@ testing fixtures that are invalid on purpose.
 One of the most common sources of errors is failure to assert the presence of
 various variables at the beginning of the playbook.
 
-### Problematic code
+## Problematic code
 
 ```yaml
 ---
@@ -29,7 +29,7 @@ various variables at the beginning of the playbook.
   tasks: []
 ```
 
-### Correct code
+## Correct code
 
 ```yaml
 ---

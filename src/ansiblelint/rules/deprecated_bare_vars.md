@@ -1,4 +1,4 @@
-## deprecated-bare-vars
+# deprecated-bare-vars
 
 This rule identifies possible confusing expressions where it is not clear if
 a variable or string is to be used and asks for clarification.
@@ -6,7 +6,7 @@ a variable or string is to be used and asks for clarification.
 You should either use the full variable syntax ('{{{{ {0} }}}}') or, whenever
 possible, convert it to a list of strings.
 
-### Problematic code
+## Problematic code
 
 ```yaml
 ---
@@ -15,7 +15,7 @@ possible, convert it to a list of strings.
   with_items: foo # <-- deprecated-bare-vars
 ```
 
-### Correct code
+## Correct code
 
 ```yaml
 ---
