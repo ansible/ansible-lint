@@ -5,7 +5,7 @@ if any of these reports a syntax error, this stops any further processing
 of these files.
 
 This error **cannot be disabled** due to being a prerequisite for other steps.
-You can either exclude these files from linting or better assure they can be
+You can exclude these files from linting, but it is better to make sure they can be
 loaded by Ansible. This is often achieved by editing the inventory file and/or
 `ansible.cfg` so ansible can load required variables.
 
