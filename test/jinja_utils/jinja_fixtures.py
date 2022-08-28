@@ -1028,3 +1028,137 @@ class SyntaxFixtures:
 {{ foo }}"""
     parse_unary_1 = '{{ -foo["bar"] }}'
     parse_unary_2 = '{{ -foo["bar"]|abs }}'
+
+
+class JinjaTestsFixtures:
+    # from jinja's tests/test_tests.py TestTestsCase
+    defined = "{{ missing is defined }}|{{ true is defined }}"
+    even = """{{ 1 is even }}|{{ 2 is even }}"""
+    odd = """{{ 1 is odd }}|{{ 2 is odd }}"""
+    lower = """{{ "foo" is lower }}|{{ "FOO" is lower }}"""
+    types = (
+        ("none is none", True),
+        ("false is none", False),
+        ("true is none", False),
+        ("42 is none", False),
+        ("none is true", False),
+        ("false is true", False),
+        ("true is true", True),
+        ("0 is true", False),
+        ("1 is true", False),
+        ("42 is true", False),
+        ("none is false", False),
+        ("false is false", True),
+        ("true is false", False),
+        ("0 is false", False),
+        ("1 is false", False),
+        ("42 is false", False),
+        ("none is boolean", False),
+        ("false is boolean", True),
+        ("true is boolean", True),
+        ("0 is boolean", False),
+        ("1 is boolean", False),
+        ("42 is boolean", False),
+        ("0.0 is boolean", False),
+        ("1.0 is boolean", False),
+        ("3.14159 is boolean", False),
+        ("none is integer", False),
+        ("false is integer", False),
+        ("true is integer", False),
+        ("42 is integer", True),
+        ("3.14159 is integer", False),
+        ("(10 ** 100) is integer", True),
+        ("none is float", False),
+        ("false is float", False),
+        ("true is float", False),
+        ("42 is float", False),
+        ("4.2 is float", True),
+        ("(10 ** 100) is float", False),
+        ("none is number", False),
+        ("false is number", True),
+        ("true is number", True),
+        ("42 is number", True),
+        ("3.14159 is number", True),
+        ("complex is number", True),
+        ("(10 ** 100) is number", True),
+        ("none is string", False),
+        ("false is string", False),
+        ("true is string", False),
+        ("42 is string", False),
+        ('"foo" is string', True),
+        ("none is sequence", False),
+        ("false is sequence", False),
+        ("42 is sequence", False),
+        ('"foo" is sequence', True),
+        ("[] is sequence", True),
+        ("[1, 2, 3] is sequence", True),
+        ("{} is sequence", True),
+        ("none is mapping", False),
+        ("false is mapping", False),
+        ("42 is mapping", False),
+        ('"foo" is mapping', False),
+        ("[] is mapping", False),
+        ("{} is mapping", True),
+        ("mydict is mapping", True),
+        ("none is iterable", False),
+        ("false is iterable", False),
+        ("42 is iterable", False),
+        ('"foo" is iterable', True),
+        ("[] is iterable", True),
+        ("{} is iterable", True),
+        ("range(5) is iterable", True),
+        ("none is callable", False),
+        ("false is callable", False),
+        ("42 is callable", False),
+        ('"foo" is callable', False),
+        ("[] is callable", False),
+        ("{} is callable", False),
+        ("range is callable", True),
+    )
+    upper = '{{ "FOO" is upper }}|{{ "foo" is upper }}'
+    equalto = (
+        "{{ foo is eq 12 }}|"
+        "{{ foo is eq 0 }}|"
+        "{{ foo is eq (3 * 4) }}|"
+        '{{ bar is eq "baz" }}|'
+        '{{ bar is eq "zab" }}|'
+        '{{ bar is eq ("ba" + "z") }}|'
+        "{{ bar is eq bar }}|"
+        "{{ bar is eq foo }}"
+    )
+    compare_aliases = (
+        ("2 is eq 2", True),
+        ("2 is eq 3", False),
+        ("2 is ne 3", True),
+        ("2 is ne 2", False),
+        ("2 is lt 3", True),
+        ("2 is lt 2", False),
+        ("2 is le 2", True),
+        ("2 is le 1", False),
+        ("2 is gt 1", True),
+        ("2 is gt 2", False),
+        ("2 is ge 2", True),
+        ("2 is ge 3", False),
+    )
+    sameas = "{{ foo is sameas false }}|{{ 0 is sameas false }}"
+    no_paren_for_arg1 = "{{ foo is sameas none }}"
+    escaped = "{{ x is escaped }}|{{ y is escaped }}"
+    greaterthan = "{{ 1 is greaterthan 0 }}|{{ 0 is greaterthan 1 }}"
+    lessthan = "{{ 0 is lessthan 1 }}|{{ 1 is lessthan 0 }}"
+    multiple_tests = (
+        "{{ 'us-west-1' is matching '(us-east-1|ap-northeast-1)'"
+        " or 'stage' is matching '(dev|stage)' }}"
+    )
+    in_ = (
+        '{{ "o" is in "foo" }}|'
+        '{{ "foo" is in "foo" }}|'
+        '{{ "b" is in "foo" }}|'
+        "{{ 1 is in ((1, 2)) }}|"
+        "{{ 3 is in ((1, 2)) }}|"
+        "{{ 1 is in [1, 2] }}|"
+        "{{ 3 is in [1, 2] }}|"
+        '{{ "foo" is in {"foo": 1}}}|'
+        '{{ "baz" is in {"bar": 1}}}'
+    )
+    name_undefined = "{{ x is f }}"
+    name_undefined_in_if = "{% if x is defined %}{{ x is f }}{% endif %}"
