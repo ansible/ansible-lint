@@ -396,8 +396,152 @@ class CoreTagsFixtures:
 
 
 class FilterFixtures:
-    # from jinja's tests/test_idtracking.py TestFilter
-    # this only has some fixtures
+    # from jinja's tests/test_filters.py TestFilter
+    capitalize = '{{ "foo bar"|capitalize }}'
+    center = '{{ "foo"|center(9) }}'
+    default = (
+        "{{ missing|default('no') }}|{{ false|default('no') }}|"
+        "{{ false|default('no', true) }}|{{ given|default('no') }}"
+    )
+    dictsort_1 = "{{ foo|dictsort() }}"
+    dictsort_2 = "{{ foo|dictsort(true) }}"
+    dictsort_3 = '{{ foo|dictsort(by="value") }}'
+    dictsort_4 = "{{ foo|dictsort(reverse=true) }}"
+    batch = "{{ foo|batch(3)|list }}|{{ foo|batch(3, 'X')|list }}"
+    slice_ = "{{ foo|slice(3)|list }}|{{ foo|slice(3, 'X')|list }}"
+    escape = """{{ '<">&'|escape }}"""
+    trim = "{{ foo|trim(chars) }}"
+    striptags = """{{ foo|striptags }}"""
+    filesizeformat = (
+        "{{ 100|filesizeformat }}|"
+        "{{ 1000|filesizeformat }}|"
+        "{{ 1000000|filesizeformat }}|"
+        "{{ 1000000000|filesizeformat }}|"
+        "{{ 1000000000000|filesizeformat }}|"
+        "{{ 100|filesizeformat(true) }}|"
+        "{{ 1000|filesizeformat(true) }}|"
+        "{{ 1000000|filesizeformat(true) }}|"
+        "{{ 1000000000|filesizeformat(true) }}|"
+        "{{ 1000000000000|filesizeformat(true) }}"
+    )
+    filesizeformat_issue59 = (
+        "{{ 300|filesizeformat }}|"
+        "{{ 3000|filesizeformat }}|"
+        "{{ 3000000|filesizeformat }}|"
+        "{{ 3000000000|filesizeformat }}|"
+        "{{ 3000000000000|filesizeformat }}|"
+        "{{ 300|filesizeformat(true) }}|"
+        "{{ 3000|filesizeformat(true) }}|"
+        "{{ 3000000|filesizeformat(true) }}"
+    )
+    first = "{{ foo|first }}"
+    float_ = "{{ value|float }}"
+    float_default = "{{ value|float(default=1.0) }}"
+    format_ = "{{ '%s|%s'|format('a', 'b') }}"
+    indent_1 = "{{ foo|indent(2, false, false) }}"
+    indent_2 = "{{ foo|indent(2, false, true) }}"
+    indent_3 = "{{ foo|indent(2, true, false) }}"
+    indent_4 = "{{ foo|indent(2, true, true) }}"
+    indent_5 = '{{ "jinja"|indent }}'
+    indent_6 = '{{ "jinja"|indent(first=true) }}'
+    indent_7 = '{{ "jinja"|indent(blank=true) }}'
+    indent_width_string = "{{ 'jinja\nflask'|indent(width='>>> ', first=True) }}"
+    int_ = "{{ value|int }}"
+    int_base = "{{ value|int(base=base) }}"
+    int_default = "{{ value|int(default=1) }}"
+    join_1 = '{{ [1, 2, 3]|join("|") }}'
+    join_2 = '{{ ["<foo>", "<span>foo</span>"|safe]|join }}'
+    join_attribute = """{{ users|join(', ', 'username') }}"""
+    last = """{{ foo|last }}"""
+    length = """{{ "hello world"|length }}"""
+    lower = """{{ "FOO"|lower }}"""
+    items = """{{ d|items|list }}"""
+    items_undefined = """{{ d|items|list }}"""
+    pprint = """{{ data|pprint }}"""
+    random = '{{ "1234567890"|random }}'
+    reverse = "{{ 'foobar'|reverse|join }}|{{ [1, 2, 3]|reverse|list }}"
+    string = """{{ obj|string }}"""
+    title_1 = """{{ "foo bar"|title }}"""
+    title_2 = """{{ "foo's bar"|title }}"""
+    title_3 = """{{ "foo   bar"|title }}"""
+    title_4 = """{{ "f bar f"|title }}"""
+    title_5 = """{{ "foo-bar"|title }}"""
+    title_6 = """{{ "foo\tbar"|title }}"""
+    title_7 = """{{ "FOO\tBAR"|title }}"""
+    title_8 = """{{ "foo (bar)"|title }}"""
+    title_9 = """{{ "foo {bar}"|title }}"""
+    title_10 = """{{ "foo [bar]"|title }}"""
+    title_11 = """{{ "foo <bar>"|title }}"""
+    title_12 = """{{ data|title }}"""
+    truncate = (
+        '{{ data|truncate(15, true, ">>>") }}|'
+        '{{ data|truncate(15, false, ">>>") }}|'
+        "{{ smalldata|truncate(15) }}"
+    )
+    truncate_very_short = (
+        '{{ "foo bar baz"|truncate(9) }}|{{ "foo bar baz"|truncate(9, true) }}'
+    )
+    truncate_end_length = '{{ "Joel is a slug"|truncate(7, true) }}'
+    upper = '{{ "foo"|upper }}'
+    urlize_1 = '{{ "foo example.org bar"|urlize }}'
+    urlize_2 = (
+        'foo <a href="https://example.org" rel="noopener">' "example.org</a> bar"
+    )
+    urlize_3 = '{{ "foo http://www.example.com/ bar"|urlize }}'
+    urlize_4 = '{{ "foo mailto:email@example.com bar"|urlize }}'
+    urlize_5 = '{{ "foo email@example.com bar"|urlize }}'
+    urlize_rel_policy = '{{ "foo http://www.example.com/ bar"|urlize }}'
+    urlize_target_parameters = (
+        '{{ "foo http://www.example.com/ bar"|urlize(target="_blank") }}'
+    )
+    urlize_extra_schemes_parameters = (
+        '{{ "foo tel:+1-514-555-1234 ftp://localhost bar"|'
+        'urlize(extra_schemes=["tel:", "ftp:"]) }}'
+    )
+    wordcount_1 = '{{ "foo bar baz"|wordcount }}'
+    wordcount_2 = "{{ s|wordcount }}"
+    block = "{% filter lower|escape %}<HEHE>{% endfilter %}"
+    chaining = """{{ ['<foo>', '<bar>']|first|upper|escape }}"""
+    sum_ = """{{ [1, 2, 3, 4, 5, 6]|sum }}"""
+    sum_attributes = """{{ values|sum('value') }}"""
+    sum_attributes_nested = """{{ values|sum('real.value') }}"""
+    sum_attributes_tuple = """{{ values.items()|sum('1') }}"""
+    abs_ = """{{ -1|abs }}|{{ 1|abs }}"""
+    round_positive = (
+        "{{ 2.7|round }}|{{ 2.1|round }}|"
+        "{{ 2.1234|round(3, 'floor') }}|"
+        "{{ 2.1|round(0, 'ceil') }}"
+    )
+    round_negative = (
+        "{{ 21.3|round(-1)}}|"
+        "{{ 21.3|round(-1, 'ceil')}}|"
+        "{{ 21.3|round(-1, 'floor')}}"
+    )
+    xmlattr = (
+        "{{ {'foo': 42, 'bar': 23, 'fish': none, "
+        "'spam': missing, 'blub:blub': '<?>'}|xmlattr }}"
+    )
+    sort1 = "{{ [2, 3, 1]|sort }}|{{ [2, 3, 1]|sort(true) }}"
+    sort2 = '{{ "".join(["c", "A", "b", "D"]|sort) }}'
+    sort3 = """{{ ['foo', 'Bar', 'blah']|sort }}"""
+    sort4 = """{{ items|sort(attribute='value')|join }}"""
+    sort5 = """{{ items|sort(attribute='value.0')|join }}"""
+    sort6 = """{{ items|sort(attribute='value1,value2')|join }}"""
+    sort7 = """{{ items|sort(attribute='value2,value1')|join }}"""
+    sort8 = (
+        """{{ items|sort(attribute='value1.0,value2.0')|join }}"""
+    )
+    unique = '{{ "".join(["b", "A", "a", "b"]|unique) }}'
+    unique_case_sensitive = '{{ "".join(["b", "A", "a", "b"]|unique(true)) }}'
+    unique_attribute = "{{ items|unique(attribute='value')|join }}"
+    min_1 = '{{ ["a", "B"]|min }}'
+    min_2 = '{{ ["a", "B"]|min(case_sensitive=true) }}'
+    min_3 = "{{ []|min }}"
+    max_1 = '{{ ["a", "B"]|max }}'
+    max_2 = '{{ ["a", "B"]|max(case_sensitive=true) }}'
+    max_3 = "{{ []|max }}"
+    min_attribute = '{{ items|min(attribute="value") }}'
+    max_attribute = '{{ items|max(attribute="value") }}'
     groupby = """
         {%- for grouper, list in [{'foo': 1, 'bar': 2},
                                   {'foo': 2, 'bar': 3},
@@ -409,6 +553,60 @@ class FilterFixtures:
         {%- for grouper, list in [('a', 1), ('a', 2), ('b', 1)]|groupby(0) -%}
             {{ grouper }}{% for x in list %}:{{ x.1 }}{% endfor %}|
         {%- endfor %}"""
+    groupby_multi_dot = """
+        {%- for year, list in articles|groupby('date.year') -%}
+            {{ year }}{% for x in list %}[{{ x.title }}]{% endfor %}|
+        {%- endfor %}"""
+    groupby_default = (
+        "{% for city, items in users|groupby('city', default='NY') %}"
+        "{{ city }}: {{ items|map(attribute='name')|join(', ') }}\n"
+        "{% endfor %}"
+    )
+    groupby_case = (
+        "{% for k, vs in data|groupby('k', case_sensitive=cs) %}"
+        "{{ k }}: {{ vs|join(', ', attribute='v') }}\n"
+        "{% endfor %}"
+    )
+    filter_tag = "{% filter upper|replace('FOO', 'foo') %}foobar{% endfilter %}"
+    replace_1 = '{{ string|replace("o", 42) }}'
+    replace_2 = '{{ string|replace("<", 42) }}'
+    replace_3 = '{{ string|replace("o", ">x<") }}'
+    forceescape = "{{ x|forceescape }}"
+    safe_1 = '{{ "<div>foo</div>"|safe }}'
+    safe_2 = '{{ "<div>foo</div>" }}'
+    urlencode = "{{ value|urlencode }}"
+    simple_map = '{{ ["1", "2", "3"]|map("int")|sum }}'
+    map_sum = '{{ [[1,2], [3], [4,5,6]]|map("sum")|list }}'
+    attribute_map = '{{ users|map(attribute="name")|join("|") }}'
+    empty_map = '{{ none|map("upper")|list }}'
+    map_default = '{{ users|map(attribute="lastname", default="smith")|join(", ") }}'
+    map_default_list = '{{ users|map(attribute="lastname", default=["smith","x"])|join(", ") }}'
+    map_default_str = '{{ users|map(attribute="lastname", default="")|join(", ") }}'
+    simple_select = '{{ [1, 2, 3, 4, 5]|select("odd")|join("|") }}'
+    bool_select = '{{ [none, false, 0, 1, 2, 3, 4, 5]|select|join("|") }}'
+    simple_reject = '{{ [1, 2, 3, 4, 5]|reject("odd")|join("|") }}')
+    bool_reject = '{{ [none, false, 0, 1, 2, 3, 4, 5]|reject|join("|") }}'
+    simple_select_attr = '{{ users|selectattr("is_active")|map(attribute="name")|join("|") }}'
+    simple_reject_attr = '{{ users|rejectattr("is_active")|map(attribute="name")|join("|") }}'
+    func_select_attr = '{{ users|selectattr("id", "odd")|map(attribute="name")|join("|") }}'
+    func_reject_attr = '{{ users|rejectattr("id", "odd")|map(attribute="name")|join("|") }}'
+    json_dump = "{{ x|tojson }}"
+    wordwrap = "{{ s|wordwrap(20) }}"
+    filter_undefined = "{{ var|f }}"
+    filter_undefined_in_if = "{%- if x is defined -%}{{ x|f }}{%- else -%}x{% endif %}"
+    filter_undefined_in_elif = (
+        "{%- if x is defined -%}{{ x }}{%- elif y is defined -%}"
+        "{{ y|f }}{%- else -%}foo{%- endif -%}"
+    )
+    filter_undefined_in_else = (
+        "{%- if x is not defined -%}foo{%- else -%}{{ x|f }}{%- endif -%}"
+    )
+    filter_undefined_in_nested_if = (
+        "{%- if x is not defined -%}foo{%- else -%}{%- if y "
+        "is defined -%}{{ y|f }}{%- endif -%}{{ x }}{%- endif -%}"
+    )
+    filter_undefined_in_condexpr_1 = "{{ x|f if x is defined else 'foo' }}"
+    filter_undefined_in_condexpr_2 = "{{ 'foo' if x is not defined else x|f }}"
 
 
 class TrimBlocksFixtures:
