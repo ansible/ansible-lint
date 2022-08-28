@@ -1,6 +1,6 @@
 ## syntax-check
 
-Our linter does run `ansible-playbook --syntax-check` on all playbooks, and
+Our linter runs `ansible-playbook --syntax-check` on all playbooks, and
 if any of these reports a syntax error, this stops any further processing
 of these files.
 
