@@ -9,8 +9,8 @@ You can either exclude these files from linting or better assure they can be
 loaded by Ansible. This is often achieved by editing the inventory file and/or
 `ansible.cfg` so ansible can load required variables.
 
-If undefined variables are the failure reason you could use the jinja
-`default()` filter for providing fallback values, like in the example below.
+If undefined variables cause the failure, you can use the jinja
+`default()` filter to provide fallback values, like in the example below.
 
 This rule is among the few `unskippable` ones, rules that cannot be added
 to `ignore_list` or `warn_list`. One possible workaround is to add the entire
