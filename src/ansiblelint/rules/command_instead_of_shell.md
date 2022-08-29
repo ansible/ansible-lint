@@ -12,9 +12,9 @@ environment variable expansion or chaining multiple commands using pipes.
 - name: Problematic example
   hosts: localhost
   tasks:
-  - name: Echo a message
-    ansible.builtin.shell: echo hello # <-- command is better in this case
-    changed_when: false
+    - name: Echo a message
+      ansible.builtin.shell: echo hello # <-- command is better in this case
+      changed_when: false
 ```
 
 ## Correct Code
@@ -24,7 +24,7 @@ environment variable expansion or chaining multiple commands using pipes.
 - name: Correct example
   hosts: localhost
   tasks:
-  - name: Echo a message
-    ansible.builtin.command: echo hello
-    changed_when: false
+    - name: Echo a message
+      ansible.builtin.command: echo hello
+      changed_when: false
 ```
