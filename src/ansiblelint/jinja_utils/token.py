@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterator, List, Literal, Optional, Tuple
+from typing import Iterator, Literal, Sequence, overload
 
 from jinja2.lexer import (
     TOKEN_BLOCK_BEGIN,
@@ -140,7 +140,7 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
             is_pair_opener = True
             if normalized_source[end_pos - 1] in ("+", "-"):
                 # chomp = normalized_source[end_pos]
-                chomp = value_str[-1]  # value_str = "{%-"
+                chomp = value_str[-1]  # type: ignore # value_str = "{%-"
             elif token_type == TOKEN_RAW_BEGIN:
                 # value_str = "{%- raw %}"
                 if "+" in value_str:
@@ -152,7 +152,7 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
             is_pair_closer = True
             if normalized_source[start_pos] in ("+", "-"):
                 # chomp = normalized_source[start_pos]
-                chomp = value_str[0]  # value_str = "-%}\n    "
+                chomp = value_str[0]  # type: ignore # value_str = "-%}\n    "
             elif token_type == TOKEN_RAW_END:
                 # value_str = "{% endraw -%}"
                 if "+" in value_str:
@@ -293,8 +293,16 @@ class Tokens:
         """Return the tokens count."""
         return len(self.tokens)
 
-    def __getitem__(self, index: int):
+    @overload
+    def __getitem__(self, index: slice) -> Sequence[Token]:
+        """Return the tokens in the given slice."""
+
+    @overload
+    def __getitem__(self, index: int) -> Token:
         """Return the token at the given index."""
+
+    def __getitem__(self, index: int | slice) -> Token | Sequence[Token]:
+        """Return the token(s) at the given index or slice."""
         return self.tokens[index]
 
     def __contains__(self, item: Token) -> bool:
