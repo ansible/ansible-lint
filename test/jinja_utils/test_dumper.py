@@ -1,10 +1,11 @@
 """Tests for utils that dump Jinja expressions."""
+from __future__ import annotations
 
 import pytest
 from jinja2.environment import Environment
 
-# from ansiblelint.transform_utils import TemplateDumper, dump
-from ansiblelint.transform_utils import dump
+# from ansiblelint.jinja_utils.dumper import TemplateDumper, dump
+from ansiblelint.jinja_utils.dumper import dump
 
 
 @pytest.mark.parametrize(

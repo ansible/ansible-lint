@@ -1,4 +1,7 @@
-from typing import Any, Callable, Tuple, Type, Union
+"""Tests for Jinja AST Annotator."""
+from __future__ import annotations
+
+from typing import Any, Tuple, Type, Union
 
 import pytest
 from jinja2 import nodes
@@ -454,8 +457,9 @@ from .jinja_fixtures import (
 def test_annotate(
     jinja_env: Environment,
     template_source: str,
-    extensions: Tuple[Union[str, Type[Extension]]],
+    extensions: tuple[str | type[Extension]],
 ):
+    """Validate sanity of annotated token details on Jinja2 AST."""
     for extension in extensions:
         jinja_env.add_extension(extension)
 
@@ -463,13 +467,16 @@ def test_annotate(
     annotate(ast, jinja_env, raw_template=template_source)
 
     class TestVisitor(NodeVisitor):
+        """Recursive iterator to visit and test each node in a Jinja2 AST tree."""
+
         def generic_visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
-            """Called if no explicit visitor function exists for a node."""
+            """Visit all nodes while tracking parent node."""
             for child_node in node.iter_child_nodes():
                 kwargs["parent"] = node
                 self.visit(child_node, *args, **kwargs)
 
         def visit(self, node: nodes.Node, *args: Any, **kwargs: Any):
+            """Test AST node to ensure it is sane and fits within the parent node."""
             # TODO: make it easier to identify which node had failures
             assert hasattr(node, "tokens")
             assert isinstance(node.tokens, tuple)

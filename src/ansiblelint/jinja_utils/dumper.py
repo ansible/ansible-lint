@@ -1,4 +1,5 @@
 """Jinja template/expression dumper utils for transforms."""
+from __future__ import annotations
 
 from io import StringIO
 from typing import List, Optional, TextIO, Union, cast
@@ -12,8 +13,8 @@ from jinja2.visitor import NodeVisitor
 def dump(
     node: nodes.Template,
     environment: Environment,
-    stream: Optional[TextIO] = None,
-) -> Optional[str]:
+    stream: TextIO | None = None,
+) -> str | None:
     """Dump a jinja2 ast back into a jinja2 template.
 
     This is based on jinja2.compiler.generate
@@ -43,7 +44,7 @@ class TemplateDumper(NodeVisitor):
     def __init__(
         self,
         environment: Environment,
-        stream: Optional[TextIO] = None,
+        stream: TextIO | None = None,
     ):
         """Create a TemplateDumper."""
         if stream is None:
@@ -97,7 +98,7 @@ class TemplateDumper(NodeVisitor):
 
     def signature(
         self,
-        node: Union[nodes.Call, nodes.Filter, nodes.Test],
+        node: nodes.Call | nodes.Filter | nodes.Test,
     ) -> None:
         """Write a function call to the stream for the current node."""
         first = True
@@ -131,7 +132,7 @@ class TemplateDumper(NodeVisitor):
 
     def macro_signature(
         self,
-        node: Union[nodes.Macro, nodes.CallBlock],
+        node: nodes.Macro | nodes.CallBlock,
     ) -> None:
         """Write a Macro or CallBlock signature to the stream for the current node."""
         self.write("(")

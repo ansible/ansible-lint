@@ -1,4 +1,5 @@
-"""Jinja AST whitespace annotator."""
+"""Jinja AST tokens annotator."""
+from __future__ import annotations
 
 from contextlib import contextmanager, nullcontext
 from typing import Any, List, Optional, Tuple, Union, cast
@@ -59,7 +60,8 @@ class NodeAnnotator(NodeVisitor):
 
     def find_lparen(
         self, start_index: int, end_index: int
-    ) -> Tuple[bool, Optional[Token]]:
+    ) -> tuple[bool, Token | None]:
+        """Find a left parentheses token in the range of token indexes."""
         found_lparen = False
         for token in self.tokens[start_index:end_index]:
             found_lparen = token.token == j2tokens.TOKEN_LPAREN or (
@@ -71,6 +73,12 @@ class NodeAnnotator(NodeVisitor):
         return found_lparen, None
 
     def find_containing_pair_start(self, index: int) -> int:
+        """Find the index to the nearest parent pair of tokens.
+
+        Most tokens are contained in some pair of tokens such as ``{{ }}`` or ``( )``.
+        This searches from a given token through earlier tokens until such a pair is
+        found, or until no tokens are left.
+        """
         while index > 0:
             token = self.tokens[index]
             if token.pair is not None:
@@ -91,10 +99,12 @@ class NodeAnnotator(NodeVisitor):
         start: int,
         end: int,
     ) -> None:
+        """Annotate Jinja2 AST Node with token details."""
         node.tokens = (start, end)
 
     @staticmethod
-    def get_chomp_index(pre_tokens: List[Token]) -> int:
+    def get_chomp_index(pre_tokens: list[Token]) -> int:
+        """Find the index of the last non-whitespace token in the given tokens."""
         whitespace_tokens = []
         for token in reversed(pre_tokens):
             if token.jinja_token is None:
@@ -105,6 +115,7 @@ class NodeAnnotator(NodeVisitor):
 
     @contextmanager
     def token_pair_block(self, node: nodes.Node, *names: str):
+        """Find block tokens ``{% %}``, yield, and then annotate the node."""
         pre_tokens, start_token = self.tokens.seek(j2tokens.TOKEN_BLOCK_BEGIN)
         # bypass each of the block's names
         self.seek_past(j2tokens.TOKEN_NAME, *names)
@@ -125,6 +136,7 @@ class NodeAnnotator(NodeVisitor):
 
     @contextmanager
     def token_pair_variable(self, node: nodes.Node):
+        """Find variable tokens ``{{ }}``, yield, and then annotate the node."""
         pre_tokens, start_token = self.tokens.seek(j2tokens.TOKEN_VARIABLE_BEGIN)
         stop_token = start_token.pair
         if start_token.chomp and pre_tokens:
@@ -143,6 +155,7 @@ class NodeAnnotator(NodeVisitor):
 
     @contextmanager
     def token_pair_expression(self, node: nodes.Node, left_token: str):
+        """Find paired tokens ``{}()[]``, yield, and then annotate the node."""
         _, start_token = self.tokens.seek(left_token)
         stop_token = start_token.pair
         if hasattr(node, "tokens"):
@@ -164,7 +177,7 @@ class NodeAnnotator(NodeVisitor):
 
     def signature(
         self,
-        node: Union[nodes.Call, nodes.Filter, nodes.Test],
+        node: nodes.Call | nodes.Filter | nodes.Test,
     ) -> None:
         """Write a function call to the stream for the current node."""
         first = True
@@ -199,7 +212,7 @@ class NodeAnnotator(NodeVisitor):
 
     def macro_signature(
         self,
-        node: Union[nodes.Macro, nodes.CallBlock],
+        node: nodes.Macro | nodes.CallBlock,
     ) -> None:
         """Write a Macro or CallBlock signature to the stream for the current node."""
         with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
@@ -225,7 +238,10 @@ class NodeAnnotator(NodeVisitor):
         self.annotate(node, start=initial_token.start_pos, end=eof_token.end_pos)
 
     def generic_visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
-        """Called if no explicit visitor function exists for a node."""
+        """Visit a generic ``Node``.
+
+        Called if no explicit visitor function exists for a node.
+        """
         for child_node in node.iter_child_nodes():
             kwargs["parent"] = node
             self.visit(child_node, *args, **kwargs)
@@ -262,7 +278,7 @@ class NodeAnnotator(NodeVisitor):
             {% block name scoped required %}block{% endblock %}
             {% block name required %}block{% endblock %}
         """
-        block_name_tokens: List[str] = ["block", node.name]
+        block_name_tokens: list[str] = ["block", node.name]
         # jinja parser only supports one order: scoped required
         if node.scoped:
             block_name_tokens.append("scoped")
@@ -391,6 +407,7 @@ class NodeAnnotator(NodeVisitor):
             pass
 
     def visit_Elif(self, node: nodes.If, parent: nodes.Node) -> None:
+        """Visit an ``If`` block that serves as an elif node in another ``If`` block."""
         with self.token_pair_block(node, "elif"):
             self.visit(node.test, parent=node)
         start_index, stop_index = node.tokens
@@ -931,6 +948,7 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Scope(self, node: nodes.Scope, parent: nodes.Node) -> None:
         """Visit a ``Scope`` node which can be added by extensions.
+
         Wraps the ScopedEvalContextModifier node for autoescape blocks
         """
         self.generic_visit(node)

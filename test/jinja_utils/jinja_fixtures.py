@@ -1,14 +1,22 @@
 """This file contains copies of jinja's test suite data which is BSD (3-clause) licensed."""
+from __future__ import annotations
 
 
 class ExtendedAPIFixtures:
-    # from jinja's tests/test_api.py TestExtendedAPI
+    """Fixtures from jinja's tests/test_api.py TestExtendedAPI."""
+
     item_and_attribute_1 = "{{ foo.items()|list }}"
     item_and_attribute_2 = '{{ foo|attr("items")()|list }}'
     item_and_attribute_3 = '{{ foo["items"] }}'
 
 
 class CoreTagsFixtures:
+    """Core Tags Fixtures from jinja's tests.
+
+    tests/test_async.py TestAsyncForLoop
+    tests/test_core_tags.py TestForLoop TestIfCondition TestMacros TestWith
+    """
+
     # from jinja's tests/test_async.py TestAsyncForLoop
     awaitable_property_slicing = "{% for x in a.b[:1] %}{{ x }}{% endfor %}"
     # from jinja's tests/test_core_tags.py TestForLoop
@@ -224,7 +232,8 @@ class CoreTagsFixtures:
 
 
 class FilterFixtures:
-    # from jinja's tests/test_filters.py TestFilter
+    """Filter Fixtures from jinja's tests/test_filters.py TestFilter."""
+
     capitalize = '{{ "foo bar"|capitalize }}'
     center = '{{ "foo"|center(9) }}'
     default = (
@@ -443,7 +452,8 @@ class FilterFixtures:
 
 
 class TrimBlocksFixtures:
-    # from jinja's tests/test_lexnparse.py TestTrimBlocks
+    """Trim Blocks Fixtures from jinja's tests/test_lexnparse.py TestTrimBlocks."""
+
     trim = "    {% if True %}\n    {% endif %}"
     no_trim = "    {% if True +%}\n    {% endif %}"
     no_trim_outer = "{% if True %}X{% endif +%}\nmore things"
@@ -471,7 +481,8 @@ class TrimBlocksFixtures:
 
 
 class ImportsFixtures:
-    # from jinja's tests/test_imports.py
+    """Imports Fixtures from jinja's tests/test_imports.py."""
+
     context_imports_1 = '{% import "module" as m %}{{ m.test() }}'
     context_imports_2 = '{% import "module" as m without context %}{{ m.test() }}'
     context_imports_3 = '{% import "module" as m with context %}{{ m.test() }}'
@@ -510,7 +521,8 @@ class ImportsFixtures:
 
 
 class IncludesFixtures:
-    # from jinja's tests/test_imports.py
+    """Includes Fixtures from jinja's tests/test_imports.py."""
+
     context_include_1 = '{% include "header" %}'
     context_include_2 = '{% include "header" with context %}'
     context_include_3 = '{% include "header" without context %}'
@@ -548,7 +560,8 @@ class IncludesFixtures:
 
 
 class InheritanceFixtures:
-    # from jinja's tests/test_inheritance.py
+    """Inheritance Fixtures from jinja's tests/test_inheritance.py."""
+
     layout = """\
 |{% block block1 %}block 1 from layout{% endblock %}
 |{% block block2 %}block 2 from layout{% endblock %}
@@ -671,6 +684,8 @@ endblock %}{% endblock %}"""
 
 
 class ExtensionsFixtures:
+    """Extensions Fixtures from jinja's tests/test_inheritance.py."""
+
     # from jinja's tests/test_ext.py TestExtensions
     extend_late = '{% autoescape true %}{{ "<test>" }}{% endautoescape %}'
     loop_controls_1 = """
@@ -747,7 +762,8 @@ class ExtensionsFixtures:
 
 
 class LexerFixtures:
-    # from jinja's tests/test_lexnparse.py TestLexer
+    """Lexer Fixtures from jinja's tests/test_lexnparse.py TestLexer."""
+
     raw1 = "{% raw %}foo{% endraw %}|" "{%raw%}{{ bar }}|{% baz %}{%       endraw    %}"
     raw2 = "1  {%- raw -%}   2   {%- endraw -%}   3"
     raw3 = "bar\n{% raw %}\n  {{baz}}2 spaces\n{% endraw %}\nfoo"
@@ -770,7 +786,8 @@ and bar comment #}
 
 
 class SyntaxFixtures:
-    # from jinja's tests/test_lexnparse.py TestSyntax TestParser
+    """Syntax Fixtures from jinja's tests/test_lexnparse.py TestSyntax TestParser."""
+
     slicing = "{{ [1, 2, 3][:] }}|{{ [1, 2, 3][::-1] }}"
     attr = "{{ foo.bar }}|{{ foo['bar'] }}"
     subscript = "{{ foo[0] }}|{{ foo[-1] }}"
@@ -861,7 +878,8 @@ class SyntaxFixtures:
 
 
 class JinjaTestsFixtures:
-    # from jinja's tests/test_tests.py TestTestsCase
+    """Tests Fixtures from jinja's tests/test_tests.py TestTestsCase."""
+
     defined = "{{ missing is defined }}|{{ true is defined }}"
     even = """{{ 1 is even }}|{{ 2 is even }}"""
     odd = """{{ 1 is odd }}|{{ 2 is odd }}"""

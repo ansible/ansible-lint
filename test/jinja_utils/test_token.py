@@ -1,3 +1,6 @@
+"""Tests for expanded Jinja tokens iteration."""
+from __future__ import annotations
+
 from typing import Literal, Tuple
 
 import pytest
@@ -469,13 +472,14 @@ from .jinja_fixtures import (
     ),
     # spell-checker: enable
 )
-def test_tokens_iterator(
+def test_tokens_iterator(  # noqa: C901  # splitting this up would hurt readability
     lexer: Lexer,
     template_source: str,
     jinja_token_count: int,
     token_pairs_count: int,
-    expected_chomps: Tuple[Literal["+", "-"], ...],
+    expected_chomps: tuple[Literal["+", "-"], ...],
 ):
+    """Validate sanity of iterating over wrapped-lexed tokens in Token."""
     tokens = Tokens(lexer, template_source)
     tokens_count = len(tokens)
     last_index = tokens_count - 1

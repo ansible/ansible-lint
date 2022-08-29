@@ -1,3 +1,6 @@
+"""Expanded Jinja tokens iterator that avoids whitespace/comment/chomp data loss."""
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Iterator, List, Literal, Optional, Tuple
 
@@ -57,7 +60,7 @@ class Token:
     token: str
     value_str: str
 
-    jinja_token: Optional[JinjaToken] = None
+    jinja_token: JinjaToken | None = None
     # jinja_token can have type and str modified by Lexer.wrap()
     # .lineno: int
     # .type: str
@@ -67,14 +70,14 @@ class Token:
     # Many tokens come in a pair. This is the other token in this pair.
     # For example: matching brackets in an expression
     # or the start/close of vars, blocks, comments.
-    pair: Optional["Token"] = None
+    pair: Token | None = None
 
     # chomp indicator (only used for start/end pairs) aka strip_sign
     chomp: Literal["+", "-", ""] = ""
 
 
 def pre_iter_normalize_newlines(source: str, keep_trailing_newline: bool) -> str:
-    """normalize newlines in template source like lexer.tokeniter does."""
+    """Normalize newlines in template source like lexer.tokeniter does."""
     lines = newline_re.split(source)[::2]
 
     if not keep_trailing_newline and lines[-1] == "":
@@ -83,15 +86,16 @@ def pre_iter_normalize_newlines(source: str, keep_trailing_newline: bool) -> str
     return "\n".join(lines)
 
 
-def tokeniter(
+def tokeniter(  # noqa: C901  # splitting this up would hurt readability
     lexer: Lexer,
     source: str,
-    name: Optional[str] = None,
-    filename: Optional[str] = None,
-    state: Optional[str] = None,
+    name: str | None = None,
+    filename: str | None = None,
+    state: str | None = None,
 ) -> Iterator[Token]:
+    """Iterate over the lexed tokens of the given source using our Token wrapper."""
     normalized_source = pre_iter_normalize_newlines(source, lexer.keep_trailing_newline)
-    paired_tokens: List[Token] = []
+    paired_tokens: list[Token] = []
     index = 0
     start_pos = end_pos = 0
     lineno = 1
@@ -115,7 +119,7 @@ def tokeniter(
         consumed = len(value_str)
         end_pos = start_pos + consumed
 
-        jinja_token: Optional[JinjaToken]
+        jinja_token: JinjaToken | None
         try:
             jinja_token = next(lexer.wrap(iter([token_tuple])))
         except StopIteration:
@@ -196,10 +200,11 @@ class Tokens:
         self,
         lexer: Lexer,
         source: str,
-        name: Optional[str] = None,
-        filename: Optional[str] = None,
-        state: Optional[str] = None,
+        name: str | None = None,
+        filename: str | None = None,
+        state: str | None = None,
     ):
+        """Initialize a Tokens instance by lexing the source."""
         # We need to go through all the tokens to populate the token pair details
         self.tokens = tuple(tokeniter(lexer, source, name, filename, state))
         self.index = -1
@@ -207,11 +212,17 @@ class Tokens:
 
     @property
     def current(self) -> Token:
+        """Get the current Token."""
         return self.tokens[self.index]
 
     def seek(
-        self, token_type: str, value: Optional[str] = None
-    ) -> Tuple[List[Token], Optional[Token]]:
+        self, token_type: str, value: str | None = None
+    ) -> tuple[list[Token], Token | None]:
+        """Seek for a token of the given type, and optionally the given value.
+
+        This seeks from the current Token until the target token is consumed.
+        So, the current token is the target token + 1.
+        """
         skipped = []
         # start with the current token
         token = self.current
@@ -242,10 +253,18 @@ class Tokens:
             pass
         return skipped, token
 
-    def __iter__(self) -> "Tokens":
+    def __iter__(self) -> Tokens:
+        """Return this Tokens instance, which is an iterator."""
         return self
 
     def __next__(self) -> Token:
+        """Return the next token, advancing both index and source_position.
+
+        This consumes the current token. The returned token is the new current token.
+        When this reaches the end, StopIteration is raised (as defined by the iterator
+        protocol) and the tokens index gets reset to -1. So, the last token is still
+        the "current" token, but the next iteration will start from the beginning.
+        """
         self.index += 1
         try:
             token = self.current
@@ -258,22 +277,28 @@ class Tokens:
         return token
 
     def __index__(self) -> int:
+        """Return the index of the current token."""
         return self.index
 
     def __bool__(self) -> bool:
+        """Return True if there are still tokens left to consume."""
         return 0 <= self.index < len(self.tokens)
 
     @property
     def end(self) -> bool:
+        """Return True if there are no more tokens left."""
         return not self
 
     def __len__(self) -> int:
+        """Return the tokens count."""
         return len(self.tokens)
 
     def __getitem__(self, index: int):
+        """Return the token at the given index."""
         return self.tokens[index]
 
     def __contains__(self, item: Token) -> bool:
+        """Return True if the given token is the same as the token at the same index."""
         if not isinstance(item, Token):
             return False
         return 0 <= item.index < len(self) and item == self[item.index]
