@@ -56,8 +56,6 @@ extensions = [
     # Third-party extensions:
     "sphinxcontrib.apidoc",
     "sphinxcontrib.programoutput",
-    # Tree-local extensions:
-    "rules_table_generator_ext",  # in-tree extension
 ]
 
 
@@ -324,3 +322,4 @@ nitpick_ignore = [
 ]
 
 myst_heading_anchors = 3
+myst_ref_domains = ("std", "py")

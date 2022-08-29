@@ -1,4 +1,4 @@
-## jinja
+# jinja
 
 This rule can report problems related to jinja2 string templates. The current
 version can report:
@@ -15,7 +15,7 @@ curious how black would reformat a small sniped feel free to visit
 include the entire jinja2 template, so instead of `{{ 1+2==3 }}`, do paste
 only `1+2==3`.
 
-### Problematic code
+## Problematic code
 
 ```yaml
 ---
@@ -23,7 +23,7 @@ foo: "{{some|dict2items}}" # <-- jinja[spacing]
 bar: "{{ & }}" # <-- jinja[invalid]
 ```
 
-### Correct code
+## Correct code
 
 ```yaml
 ---

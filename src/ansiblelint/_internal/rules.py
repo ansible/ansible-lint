@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 LOAD_FAILURE_MD = """\
-## load-failure
+# load-failure
 
 Linter failed to process a YAML file, probably because it is either:
 

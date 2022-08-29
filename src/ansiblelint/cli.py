@@ -248,6 +248,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
             "quiet",
             "pep8",
             "sarif",
+            "docs",  # internally used
         ],
         help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
@@ -512,7 +513,8 @@ def get_config(arguments: list[str]) -> Namespace:
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
 
-    if options.listrules and options.format not in ["plain", "rich", "md"]:
+    # docs is not document, being used for internal documentation building
+    if options.listrules and options.format not in ["plain", "rich", "md", "docs"]:
         parser.error(
             f"argument -f: invalid choice: '{options.format}'. "
             f"In combination with argument -L only 'plain', "
