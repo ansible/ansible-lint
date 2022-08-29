@@ -66,7 +66,7 @@ class Token:
 
     # Many tokens come in a pair. This is the other token in this pair.
     # For example: matching brackets in an expression
-    # or sthe start/close of vars, blocks, comments.
+    # or the start/close of vars, blocks, comments.
     pair: Optional["Token"] = None
 
     # chomp indicator (only used for start/end pairs) aka strip_sign

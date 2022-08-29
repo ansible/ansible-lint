@@ -26,6 +26,7 @@ from .jinja_fixtures import (
 @pytest.mark.parametrize(
     ("template_source", "extensions"),
     (
+        # spell-checker: disable
         ("{{ [{'nested': ({'dict': [('tuple',), ()]}, {})}, {}] }}", ()),
         ("{{ ['slice', 'test', 1, 2, 3][1:3:-1] }}", ()),
         ("{{ ['slice', 'test', 1, 2, 3][2:] }}", ()),
@@ -448,6 +449,7 @@ from .jinja_fixtures import (
         ("{{ " + alias_test[0] + " }}", ())
         for alias_test in JinjaTestsFixtures.compare_aliases
     ),
+    # spell-checker: enable
 )
 def test_annotate(
     jinja_env: Environment,

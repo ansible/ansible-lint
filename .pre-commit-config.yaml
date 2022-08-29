@@ -83,7 +83,8 @@ repos:
       - id: codespell
         exclude: >
           (?x)^(
-            src/ansiblelint/schemas/.*\.json
+            src/ansiblelint/schemas/.*\.json|
+            test/jinja_utils/jinja_fixtures.py
           )$
   - repo: https://github.com/PyCQA/doc8
     rev: v1.0.0

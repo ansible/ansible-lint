@@ -24,6 +24,7 @@ from .jinja_fixtures import (
 @pytest.mark.parametrize(
     ("template_source", "jinja_token_count", "token_pairs_count", "expected_chomps"),
     (
+        # spell-checker: disable
         ("{{ [{'nested': ({'dict': [('tuple',), ()]}, {})}, {}] }}", 29, 10, ()),
         ("{{ ['slice', 'test', 1, 2, 3][1:3:-1] }}", 21, 3, ()),
         ("{{ ['slice', 'test', 1, 2, 3][2:] }}", 17, 3, ()),
@@ -466,6 +467,7 @@ from .jinja_fixtures import (
         ("{{ " + alias_test[0] + " }}", 6, 1, ())
         for alias_test in JinjaTestsFixtures.compare_aliases
     ),
+    # spell-checker: enable
 )
 def test_tokens_iterator(
     lexer: Lexer,

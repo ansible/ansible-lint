@@ -17,6 +17,7 @@ ignorePaths:
   - docs/requirements.in
   # Test fixtures generated from outside
   - test/**/*.result
+  - test/jinja_utils/jinja_fixtures.py
   - src/ansiblelint/schemas/*.json
   # Other
   - "*.svg"

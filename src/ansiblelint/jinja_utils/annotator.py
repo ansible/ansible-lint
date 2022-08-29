@@ -559,8 +559,9 @@ class NodeAnnotator(NodeVisitor):
                 pass
             return
 
+        # spell-checker: disable
         # parentheses are optional in many contexts
-        # parser creates tuples inthese contexts+options:
+        # parser creates tuples in these contexts+options:
         #   parse_primary (const, etc)
         #      -> explicit_parentheses=True
         #      -> with_condexpr=True
@@ -573,6 +574,7 @@ class NodeAnnotator(NodeVisitor):
         #      expr -> with_condexpr=False
         #   if <test>
         #      test -> with_condexpr=False
+        # spell-checker: enable
         initial_index = self.tokens.index
 
         # pass first item and any lparen
@@ -708,12 +710,12 @@ class NodeAnnotator(NodeVisitor):
         """Visit a ``Compare`` operator in the stream."""
         self.visit(node.expr, parent=node)
 
-        # spell-checker:disable
+        # spell-checker: disable
         for operand in node.ops:
             # node.ops: List[Operand]
             # op.op: eq, ne, gt, gteq, lt, lteq, in, notin
             self.visit(operand, parent=node)
-        # spell-checker:enable
+        # spell-checker: enable
 
         self.annotate(node, start=node.expr.tokens[0], end=node.ops[-1].tokens[1])
 
@@ -721,7 +723,7 @@ class NodeAnnotator(NodeVisitor):
         """Visit an ``Operand`` in the stream."""
         if node.op == "in":
             _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.op)
-        elif node.op == "notin":
+        elif node.op == "notin":  # cspell:ignore notin
             _, token = self.tokens.seek(j2tokens.TOKEN_NAME, "not")
             self.tokens.seek(j2tokens.TOKEN_NAME, "in")
         else:
