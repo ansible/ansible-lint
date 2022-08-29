@@ -527,9 +527,7 @@ class FilterFixtures:
     sort5 = """{{ items|sort(attribute='value.0')|join }}"""
     sort6 = """{{ items|sort(attribute='value1,value2')|join }}"""
     sort7 = """{{ items|sort(attribute='value2,value1')|join }}"""
-    sort8 = (
-        """{{ items|sort(attribute='value1.0,value2.0')|join }}"""
-    )
+    sort8 = """{{ items|sort(attribute='value1.0,value2.0')|join }}"""
     unique = '{{ "".join(["b", "A", "a", "b"]|unique) }}'
     unique_case_sensitive = '{{ "".join(["b", "A", "a", "b"]|unique(true)) }}'
     unique_attribute = "{{ items|unique(attribute='value')|join }}"
@@ -579,16 +577,26 @@ class FilterFixtures:
     attribute_map = '{{ users|map(attribute="name")|join("|") }}'
     empty_map = '{{ none|map("upper")|list }}'
     map_default = '{{ users|map(attribute="lastname", default="smith")|join(", ") }}'
-    map_default_list = '{{ users|map(attribute="lastname", default=["smith","x"])|join(", ") }}'
+    map_default_list = (
+        '{{ users|map(attribute="lastname", default=["smith","x"])|join(", ") }}'
+    )
     map_default_str = '{{ users|map(attribute="lastname", default="")|join(", ") }}'
     simple_select = '{{ [1, 2, 3, 4, 5]|select("odd")|join("|") }}'
     bool_select = '{{ [none, false, 0, 1, 2, 3, 4, 5]|select|join("|") }}'
     simple_reject = '{{ [1, 2, 3, 4, 5]|reject("odd")|join("|") }}'
     bool_reject = '{{ [none, false, 0, 1, 2, 3, 4, 5]|reject|join("|") }}'
-    simple_select_attr = '{{ users|selectattr("is_active")|map(attribute="name")|join("|") }}'
-    simple_reject_attr = '{{ users|rejectattr("is_active")|map(attribute="name")|join("|") }}'
-    func_select_attr = '{{ users|selectattr("id", "odd")|map(attribute="name")|join("|") }}'
-    func_reject_attr = '{{ users|rejectattr("id", "odd")|map(attribute="name")|join("|") }}'
+    simple_select_attr = (
+        '{{ users|selectattr("is_active")|map(attribute="name")|join("|") }}'
+    )
+    simple_reject_attr = (
+        '{{ users|rejectattr("is_active")|map(attribute="name")|join("|") }}'
+    )
+    func_select_attr = (
+        '{{ users|selectattr("id", "odd")|map(attribute="name")|join("|") }}'
+    )
+    func_reject_attr = (
+        '{{ users|rejectattr("id", "odd")|map(attribute="name")|join("|") }}'
+    )
     json_dump = "{{ x|tojson }}"
     wordwrap = "{{ s|wordwrap(20) }}"
     filter_undefined = "{{ var|f }}"
@@ -914,10 +922,7 @@ class ExtensionsFixtures:
 
 class LexerFixtures:
     # from jinja's tests/test_lexnparse.py TestLexer
-    raw1 = (
-        "{% raw %}foo{% endraw %}|"
-        "{%raw%}{{ bar }}|{% baz %}{%       endraw    %}"
-    )
+    raw1 = "{% raw %}foo{% endraw %}|" "{%raw%}{{ bar }}|{% baz %}{%       endraw    %}"
     raw2 = "1  {%- raw -%}   2   {%- endraw -%}   3"
     raw3 = "bar\n{% raw %}\n  {{baz}}2 spaces\n{% endraw %}\nfoo"
     raw4 = "bar\n{%- raw -%}\n\n  \n  2 spaces\n space{%- endraw -%}\nfoo"

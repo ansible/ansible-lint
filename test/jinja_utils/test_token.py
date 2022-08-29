@@ -223,9 +223,24 @@ from .jinja_fixtures import (
         (FilterFixtures.wordwrap, 8, 2, ()),
         (FilterFixtures.filter_undefined, 5, 1, ()),
         (FilterFixtures.filter_undefined_in_if, 18, 4, ("-", "-", "-", "-")),
-        (FilterFixtures.filter_undefined_in_elif, 27, 6, ("-", "-", "-", "-", "-", "-", "-", "-")),
-        (FilterFixtures.filter_undefined_in_else, 19, 4, ("-", "-", "-", "-", "-", "-")),
-        (FilterFixtures.filter_undefined_in_nested_if, 31, 7, ("-", "-", "-", "-", "-", "-", "-", "-", "-", "-")),
+        (
+            FilterFixtures.filter_undefined_in_elif,
+            27,
+            6,
+            ("-", "-", "-", "-", "-", "-", "-", "-"),
+        ),
+        (
+            FilterFixtures.filter_undefined_in_else,
+            19,
+            4,
+            ("-", "-", "-", "-", "-", "-"),
+        ),
+        (
+            FilterFixtures.filter_undefined_in_nested_if,
+            31,
+            7,
+            ("-", "-", "-", "-", "-", "-", "-", "-", "-", "-"),
+        ),
         (FilterFixtures.filter_undefined_in_condexpr_1, 11, 1, ()),
         (FilterFixtures.filter_undefined_in_condexpr_2, 12, 1, ()),
         (TrimBlocksFixtures.trim, 9, 2, ()),
@@ -447,8 +462,10 @@ from .jinja_fixtures import (
         (JinjaTestsFixtures.in_, 90, 17, ()),
         (JinjaTestsFixtures.name_undefined, 5, 1, ()),
         (JinjaTestsFixtures.name_undefined_in_if, 14, 3, ()),
-    ) + tuple(
-        ("{{ " + alias_test[0] + " }}", 6, 1, ()) for alias_test in JinjaTestsFixtures.compare_aliases
+    )
+    + tuple(
+        ("{{ " + alias_test[0] + " }}", 6, 1, ())
+        for alias_test in JinjaTestsFixtures.compare_aliases
     ),
 )
 def test_tokens_iterator(

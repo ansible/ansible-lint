@@ -441,10 +441,13 @@ from .jinja_fixtures import (
         (JinjaTestsFixtures.in_, ()),
         (JinjaTestsFixtures.name_undefined, ()),
         (JinjaTestsFixtures.name_undefined_in_if, ()),
-    ) + tuple(
+    )
+    + tuple(
         ("{{ " + type_test[0] + " }}", ()) for type_test in JinjaTestsFixtures.types
-    ) + tuple(
-        ("{{ " + alias_test[0] + " }}", ()) for alias_test in JinjaTestsFixtures.compare_aliases
+    )
+    + tuple(
+        ("{{ " + alias_test[0] + " }}", ())
+        for alias_test in JinjaTestsFixtures.compare_aliases
     ),
 )
 def test_annotate(

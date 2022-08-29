@@ -8,7 +8,7 @@ from jinja2 import nodes
 from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor
 
-from .token import Token, Tokens, pre_iter_normalize_newlines, BEGIN_TOKENS, END_TOKENS
+from .token import BEGIN_TOKENS, END_TOKENS, Token, Tokens, pre_iter_normalize_newlines
 
 
 def annotate(
