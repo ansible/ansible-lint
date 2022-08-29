@@ -328,22 +328,11 @@ def load_plugins(  # noqa: max-complexity: 11
 
         # https://github.com/python/typeshed/issues/2793
         if spec and isinstance(spec.loader, Loader):
-
-            # load rule markdown documentation if found
-            help_md = ""
-            if spec.origin:
-                md_filename = os.path.splitext(spec.origin)[0] + ".md"
-                if os.path.exists(md_filename):
-                    with open(md_filename, encoding="utf-8") as f:
-                        help_md = f.read()
-
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             try:
                 for _, obj in inspect.getmembers(module):
                     if inspect.isclass(obj) and is_valid_rule(obj):
-                        if help_md:
-                            obj.help = help_md
                         yield obj()
 
             except (TypeError, ValueError, AttributeError) as exc:
