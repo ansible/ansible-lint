@@ -58,6 +58,11 @@ class AnsibleLintRule(BaseRule):
     """AnsibleLintRule should be used as base for writing new rules."""
 
     @property
+    def url(self) -> str:
+        """Return rule documentation url."""
+        return self.RULE_DOC_URL + self.id + "/"
+
+    @property
     def rule_config(self) -> dict[str, Any]:
         """Retrieve rule specific configuration."""
         return get_rule_config(self.id)
