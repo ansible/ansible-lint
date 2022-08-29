@@ -1,4 +1,4 @@
-## yaml
+# yaml
 
 Our linter also includes violations reported by [yamllint](https://github.com/adrienverge/yamllint)
 but it uses a slightly different default configuration. We will still load
@@ -15,7 +15,7 @@ Keep in mind that `ansible-lint` does not take into consideration the warning le
 of yamllint; we treat all yamllint matches as errors. So, if you want to treat
 some of these as warnings, add them to `warn_list`.
 
-### Problematic code
+## Problematic code
 
 ```yaml
 # missing document-start
@@ -24,7 +24,7 @@ foo: ...  # <-- key-duplicates
 bar: ...       # <-- wrong comment indentation
 ```
 
-### Correct code
+## Correct code
 
 ```yaml
 ---

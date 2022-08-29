@@ -55,6 +55,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: "pip"
       # - name: set PY_SHA256
       #   run: echo "::set-env name=PY_SHA256::$(python -VV | sha256sum | cut -d' ' -f1)"
       # - name: Pre-commit cache
@@ -165,7 +166,7 @@ jobs:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:TOX_PARALLEL_NO_SPINNER
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 694
+      PYTEST_REQPASS: 698
 
     steps:
       - name: Activate WSL1
@@ -202,7 +203,7 @@ jobs:
       #       ${{ runner.os }}-
       - name: Install tox
         run: |
-          python3 -m pip install --upgrade tox 'coverage[toml]'
+          python3 -m pip install --upgrade tox
       - name: Log installed dists
         run: >-
           python3 -m pip freeze --all
@@ -231,13 +232,14 @@ jobs:
           TOXENV: ${{ matrix.tox_env }}-devel
       - name: Combine coverage data
         # produce a single .coverage file at repo root
-        run: coverage combine .tox/.coverage.*
+        run: tox -e coverage
       - name: Upload coverage data
         if: "runner.os == 'Linux'"
         uses: codecov/codecov-action@v3
         with:
           name: ${{ matrix.tox_env }}
-          fail_ci_if_error: true # optional (default = false)
+          fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
+          token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
       - name: Archive logs
         uses: actions/upload-artifact@v3

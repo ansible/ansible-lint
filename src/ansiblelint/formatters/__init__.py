@@ -58,7 +58,7 @@ class Formatter(BaseFormatter):  # type: ignore
 
     def format(self, match: MatchError) -> str:
         _id = getattr(match.rule, "id", "000")
-        result = f"[error_code]{_id}[/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
+        result = f"[error_code][link={match.rule.url}]{_id}[/link][/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
         if match.tag:
             result += f" [dim][error_code]({self.escape(match.tag)})[/][/]"
         result += (
@@ -208,7 +208,6 @@ class SarifFormatter(BaseFormatter[Any]):
     TOOL_NAME = "Ansible-lint"
     TOOL_URL = "https://github.com/ansible/ansible-lint"
     SARIF_SCHEMA_VERSION = "2.1.0"
-    RULE_DOC_URL = "https://ansible-lint.readthedocs.io/en/latest/default_rules/"
     SARIF_SCHEMA = (
         "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
     )
@@ -278,7 +277,7 @@ class SarifFormatter(BaseFormatter[Any]):
             "help": {
                 "text": str(match.rule.description),
             },
-            "helpUri": self.RULE_DOC_URL + "#" + match.rule.id,
+            "helpUri": match.rule.url,
             "properties": {"tags": match.rule.tags},
         }
         if match.rule.link:

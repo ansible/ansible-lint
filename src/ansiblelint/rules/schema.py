@@ -15,6 +15,7 @@ from jsonschema.exceptions import ValidationError
 from ansiblelint.config import JSON_SCHEMAS
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
+from ansiblelint.loaders import yaml_load_safe
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.schemas import __file__ as schemas_module
 
@@ -61,7 +62,7 @@ class ValidateSchemaRule(AnsibleLintRule):
 
         try:
             # convert yaml to json (keys are converted to strings)
-            yaml_data = yaml.safe_load(file.content)
+            yaml_data = yaml_load_safe(file.content)
             json_data = json.loads(json.dumps(yaml_data))
             validate(
                 instance=json_data,

@@ -2,122 +2,35 @@
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
-PLAY_IN_THE_PLACE = Lintable(
-    "playbook.yml",
-    """\
----
-- hosts: all
-  roles:
-    - include_in_the_place
-""",
-)
 
-PLAY_RELATIVE = Lintable(
-    "playbook.yml",
-    """\
----
-- hosts: all
-  roles:
-    - include_relative
-""",
-)
-
-PLAY_MISS_INCLUDE = Lintable(
-    "playbook.yml",
-    """\
----
-- name: Fixture
-  hosts: all
-  roles:
-    - include_miss
-""",
-)
-
-PLAY_ROLE_INCLUDED_IN_THE_PLACE = Lintable(
-    "roles/include_in_the_place/tasks/main.yml",
-    """\
----
-- include_tasks: included_file.yml
-""",
-)
-
-PLAY_ROLE_INCLUDED_RELATIVE = Lintable(
-    "roles/include_relative/tasks/main.yml",
-    """\
----
-- include_tasks: tasks/included_file.yml
-""",
-)
-
-PLAY_ROLE_INCLUDED_MISS = Lintable(
-    "roles/include_miss/tasks/main.yml",
-    """\
----
-- include_tasks: tasks/noexist_file.yml
-""",
-    kind="tasks",
-)
-
-PLAY_INCLUDED_IN_THE_PLACE = Lintable(
-    "roles/include_in_the_place/tasks/included_file.yml",
-    """\
-- debug:
-    msg: 'was found & included'
-""",
-    kind="tasks",
-)
-
-PLAY_INCLUDED_RELATIVE = Lintable(
-    "roles/include_relative/tasks/included_file.yml",
-    """\
-- debug:
-    msg: 'was found & included'
-""",
-)
-
-
-@pytest.mark.parametrize(
-    "_play_files",
-    (
-        pytest.param(
-            [PLAY_MISS_INCLUDE, PLAY_ROLE_INCLUDED_MISS], id="no exist file include"
-        ),
-    ),
-    indirect=["_play_files"],
-)
-@pytest.mark.usefixtures("_play_files")
-def test_cases_warning_message(runner: Runner) -> None:
+def test_cases_warning_message(default_rules_collection: RulesCollection) -> None:
     """Test that including a non-existing file produces an error."""
-    result = runner.run()
+    playbook_path = "examples/playbooks/play_miss_include.yml"
+    runner = Runner(playbook_path, rules=default_rules_collection)
+    results = runner.run()
 
-    assert len(result) == 1
-    assert "No such file or directory" in result[0].message
+    assert len(runner.lintables) == 3
+    assert len(results) == 1
+    assert "No such file or directory" in results[0].message
 
 
 @pytest.mark.parametrize(
-    "_play_files",
+    "playbook_path",
     (
-        pytest.param(
-            [
-                PLAY_IN_THE_PLACE,
-                PLAY_ROLE_INCLUDED_IN_THE_PLACE,
-                PLAY_INCLUDED_IN_THE_PLACE,
-            ],
-            id="in the place include",
-        ),
-        pytest.param(
-            [PLAY_RELATIVE, PLAY_ROLE_INCLUDED_RELATIVE, PLAY_INCLUDED_RELATIVE],
-            id="relative include",
-        ),
+        pytest.param("examples/playbooks/test_include_inplace.yml", id="inplace"),
+        pytest.param("examples/playbooks/test_include_relative.yml", id="relative"),
     ),
-    indirect=["_play_files"],
 )
-@pytest.mark.usefixtures("_play_files")
-def test_cases_that_do_not_report(runner: Runner, caplog: LogCaptureFixture) -> None:
+def test_cases_that_do_not_report(
+    playbook_path: str,
+    default_rules_collection: RulesCollection,
+    caplog: LogCaptureFixture,
+) -> None:
     """Test that relative inclusions are properly followed."""
+    runner = Runner(playbook_path, rules=default_rules_collection)
     runner.run()
     noexist_message_count = 0
 

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 LOAD_FAILURE_MD = """\
-## load-failure
+# load-failure
 
 Linter failed to process a YAML file, probably because it is either:
 
@@ -47,6 +47,12 @@ class BaseRule:
     # _order 1 for rules that check that data can be loaded
     # _order 5 implicit for normal rules
     _order: int = 5
+    RULE_DOC_URL = "https://ansible-lint.readthedocs.io/en/latest/rules/"
+
+    @property
+    def url(self) -> str:
+        """Return rule documentation url."""
+        return self.link or self.RULE_DOC_URL + self.id + "/"
 
     @property
     def shortdesc(self) -> str:

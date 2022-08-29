@@ -5,10 +5,11 @@ import sys
 from typing import Any
 
 import pytest
+from ansible.module_utils.common.yaml import HAS_LIBYAML
 
 # checking if user is running pytest without installing test dependencies:
 missing = []
-for module in ["ansible", "black", "flake8", "flaky", "mypy", "pylint", "pytest_cov"]:
+for module in ["ansible", "black", "flake8", "flaky", "mypy", "pylint"]:
     if not importlib.util.find_spec(module):
         missing.append(module)
 if missing:
@@ -18,9 +19,17 @@ if missing:
     )
     sys.exit(1)
 
+if not HAS_LIBYAML:
+    # While presence of libyaml is not required for runtime, we keep this error
+    # fatal here in order to be sure that we spot libyaml errors during testing.
+    print(
+        "FATAL: For testing, we require pyyaml to be installed with its native extension, missing it would make testing 3x slower and risk missing essential bugs.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
 
 os.environ["NO_COLOR"] = "1"
-pytest_plugins = ["ansiblelint.testing.fixtures"]
 
 
 # pylint: disable=unused-argument

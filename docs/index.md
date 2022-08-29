@@ -5,7 +5,7 @@
 ## About Ansible Lint
 
 Ansible Lint is a command-line tool for linting **playbooks, roles and
-collections** aimed towards any Ansible users. Its main goal is to promote
+collections** aimed toward any Ansible users. Its main goal is to promote
 proven practices, patterns and behaviors while avoiding common pitfalls that
 can easily lead to bugs or make code harder to maintain.
 
@@ -19,64 +19,34 @@ community contributions and they can always be disabled based individually or
 by category by each user.
 
 [Ansible Galaxy project](https://github.com/ansible/galaxy/) makes use of
-this linter in order to compute quality scores for [Galaxy Hub](https://galaxy.ansible.com)
-contributed content. This does not mean this tool is aimed only to those
+this linter to compute quality scores for [Galaxy Hub](https://galaxy.ansible.com)
+contributed content. This does not mean this tool only targets those
 that want to share their code. Files like `galaxy.yml`, or sections like
 `galaxy_info` inside `meta.yml` help with documentation and maintenance,
 even for unpublished roles or collections.
 
-The project was originally started by [@willthames](https://github.com/willthames/),
+The project was originally started by [@willthames](https://github.com/willthames/)
 and has since been adopted by the Ansible Community team. Its development is
-purely community driven, while keeping permanent communications with other
+purely community driven while keeping permanent communications with other
 Ansible teams.
 
 ```{toctree}
-:caption: Philosophy
-:maxdepth: 3
-
-philosophy
-```
-
-```{toctree}
-:caption: Installing
-:maxdepth: 3
-
-installing
-```
-
-```{toctree}
-:caption: Usage
-:maxdepth: 3
-
-usage
-```
-
-```{toctree}
-:caption: Configuring
-:maxdepth: 3
-
-configuring
-```
-
-```{toctree}
-:caption: Profiles
+:caption: User Guide
 :maxdepth: 2
 
+Philosophy<philosophy>
+installing
+usage
+configuring
 profiles
-```
-
-```{toctree}
-:caption: Rules
-:maxdepth: 4
-
 rules
-custom-rules
-default_rules
 ```
 
 ```{toctree}
-:caption: Contributing
+:caption: Developer Guide
+:maxdepth: 1
 
-contributing
-Private unsupported (dev) API autodoc <pkg/modules>
+Contributing<contributing>
+custom-rules
+Private API <pkg/modules>
 ```

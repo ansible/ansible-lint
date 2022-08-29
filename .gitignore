@@ -64,3 +64,4 @@ src/ansiblelint/_version.py
 .pytest_cache
 test/eco/CODENOTIFY.html
 test/eco
+docs/profiles.md

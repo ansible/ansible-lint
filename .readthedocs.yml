@@ -28,19 +28,25 @@ submodules:
   recursive: true
 
 build:
-  image: latest
-
+  # when using pre_build, "image:" is not supported and os and tools are required
+  os: ubuntu-20.04
+  tools:
+    python: "3.10"
+  jobs:
+    pre_build:
+      - pip install '.[docs,test]'
+      - ansible-lint -L -f docs
 # Optionally set the version of Python and requirements required
 # to build docs
-python:
-  version: "3.8"
-  install:
-    # On https://readthedocs.org/dashboard/ansible-lint/environmentvariables/ we
-    # do have PIP_CONSTRAINTS=requirements.txt which ensures we install only
-    # pinned requirements that that we know to be working.
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs
-        - test
-  system_packages: false
+# python:
+#   version: "3.8"
+#   install:
+#     # On https://readthedocs.org/dashboard/ansible-lint/environmentvariables/ we
+#     # do have PIP_CONSTRAINTS=requirements.txt which ensures we install only
+#     # pinned requirements that that we know to be working.
+#     - method: pip
+#       path: .
+#       extra_requirements:
+#         - docs
+#         - test
+#   system_packages: false
