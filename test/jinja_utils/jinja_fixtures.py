@@ -183,6 +183,8 @@ class ExtendedAPIFixtures:
 
 
 class CoreTagsFixtures:
+    # from jinja's tests/test_async.py TestAsyncForLoop
+    awaitable_property_slicing = "{% for x in a.b[:1] %}{{ x }}{% endfor %}"
     # from jinja's tests/test_core_tags.py TestForLoop
     simple_for = "{% for item in seq %}{{ item }}{% endfor %}"
     for_else = "{% for item in seq %}XXX{% else %}...{% endfor %}"
@@ -484,12 +486,9 @@ class FilterFixtures:
     truncate_end_length = '{{ "Joel is a slug"|truncate(7, true) }}'
     upper = '{{ "foo"|upper }}'
     urlize_1 = '{{ "foo example.org bar"|urlize }}'
-    urlize_2 = (
-        'foo <a href="https://example.org" rel="noopener">' "example.org</a> bar"
-    )
-    urlize_3 = '{{ "foo http://www.example.com/ bar"|urlize }}'
-    urlize_4 = '{{ "foo mailto:email@example.com bar"|urlize }}'
-    urlize_5 = '{{ "foo email@example.com bar"|urlize }}'
+    urlize_2 = '{{ "foo http://www.example.com/ bar"|urlize }}'
+    urlize_3 = '{{ "foo mailto:email@example.com bar"|urlize }}'
+    urlize_4 = '{{ "foo email@example.com bar"|urlize }}'
     urlize_rel_policy = '{{ "foo http://www.example.com/ bar"|urlize }}'
     urlize_target_parameters = (
         '{{ "foo http://www.example.com/ bar"|urlize(target="_blank") }}'
@@ -584,7 +583,7 @@ class FilterFixtures:
     map_default_str = '{{ users|map(attribute="lastname", default="")|join(", ") }}'
     simple_select = '{{ [1, 2, 3, 4, 5]|select("odd")|join("|") }}'
     bool_select = '{{ [none, false, 0, 1, 2, 3, 4, 5]|select|join("|") }}'
-    simple_reject = '{{ [1, 2, 3, 4, 5]|reject("odd")|join("|") }}')
+    simple_reject = '{{ [1, 2, 3, 4, 5]|reject("odd")|join("|") }}'
     bool_reject = '{{ [none, false, 0, 1, 2, 3, 4, 5]|reject|join("|") }}'
     simple_select_attr = '{{ users|selectattr("is_active")|map(attribute="name")|join("|") }}'
     simple_reject_attr = '{{ users|rejectattr("is_active")|map(attribute="name")|join("|") }}'

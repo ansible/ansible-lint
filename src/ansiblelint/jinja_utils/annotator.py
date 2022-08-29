@@ -8,7 +8,7 @@ from jinja2 import nodes
 from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor
 
-from .token import Token, Tokens, pre_iter_normalize_newlines
+from .token import Token, Tokens, pre_iter_normalize_newlines, BEGIN_TOKENS, END_TOKENS
 
 
 def annotate(
@@ -56,6 +56,31 @@ class NodeAnnotator(NodeVisitor):
             values = [None]
         for value in values:
             self.tokens.seek(token_type, value)
+
+    def find_lparen(
+        self, start_index: int, end_index: int
+    ) -> Tuple[bool, Optional[Token]]:
+        found_lparen = False
+        for token in self.tokens[start_index:end_index]:
+            found_lparen = token.token == j2tokens.TOKEN_LPAREN or (
+                token.jinja_token is not None
+                and token.jinja_token.type == j2tokens.TOKEN_LPAREN
+            )
+            if found_lparen:
+                return found_lparen, token
+        return found_lparen, None
+
+    def find_containing_pair_start(self, index: int) -> int:
+        while index > 0:
+            token = self.tokens[index]
+            if token.pair is not None:
+                if token.token in END_TOKENS:
+                    index = token.pair.index - 1
+                    continue
+                elif token.token in BEGIN_TOKENS:
+                    return token.index
+            index -= 1
+        return 0
 
     # -- Annotation Helpers
 
@@ -142,36 +167,35 @@ class NodeAnnotator(NodeVisitor):
         node: Union[nodes.Call, nodes.Filter, nodes.Test],
     ) -> None:
         """Write a function call to the stream for the current node."""
-        with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
-            first = True
-            arg: nodes.Expr
-            for arg in node.args:
-                if first:
-                    first = False
-                else:
-                    self.tokens.seek(j2tokens.TOKEN_COMMA)
-                self.visit(arg, parent=node)
-            # cast because typehint is incorrect on nodes._FilterTestCommon
-            for kwarg in cast(List[nodes.Keyword], node.kwargs):
-                if first:
-                    first = False
-                else:
-                    self.tokens.seek(j2tokens.TOKEN_COMMA)
-                self.visit(kwarg, parent=node)
-            if node.dyn_args:
-                if first:
-                    first = False
-                else:
-                    self.tokens.seek(j2tokens.TOKEN_COMMA)
-                self.tokens.seek(j2tokens.TOKEN_MUL)
-                self.visit(node.dyn_args, parent=node)
-            if node.dyn_kwargs is not None:
-                if first:
-                    first = False
-                else:
-                    self.tokens.seek(j2tokens.TOKEN_COMMA)
-                self.tokens.seek(j2tokens.TOKEN_POW)
-                self.visit(node.dyn_kwargs, parent=node)
+        first = True
+        arg: nodes.Expr
+        for arg in node.args:
+            if first:
+                first = False
+            else:
+                self.tokens.seek(j2tokens.TOKEN_COMMA)
+            self.visit(arg, parent=node)
+        # cast because typehint is incorrect on nodes._FilterTestCommon
+        for kwarg in cast(List[nodes.Keyword], node.kwargs):
+            if first:
+                first = False
+            else:
+                self.tokens.seek(j2tokens.TOKEN_COMMA)
+            self.visit(kwarg, parent=node)
+        if node.dyn_args:
+            if first:
+                first = False
+            else:
+                self.tokens.seek(j2tokens.TOKEN_COMMA)
+            self.tokens.seek(j2tokens.TOKEN_MUL)
+            self.visit(node.dyn_args, parent=node)
+        if node.dyn_kwargs is not None:
+            if first:
+                first = False
+            else:
+                self.tokens.seek(j2tokens.TOKEN_COMMA)
+            self.tokens.seek(j2tokens.TOKEN_POW)
+            self.visit(node.dyn_kwargs, parent=node)
 
     def macro_signature(
         self,
@@ -556,18 +580,13 @@ class NodeAnnotator(NodeVisitor):
         item_index, after_index = node.items[0].tokens
         start_index = item_index
 
-        found_lparen = False
-        for token in self.tokens[initial_index:item_index]:
-            found_lparen = token.token == j2tokens.TOKEN_LPAREN or (
-                token.jinja_token is not None
-                and token.jinja_token.type == j2tokens.TOKEN_LPAREN
-            )
-            if found_lparen:
-                break
+        found_lparen, lparen_token = self.find_lparen(
+            start_index=initial_index, end_index=item_index
+        )
 
         if found_lparen:
             # reset tokens back to lparen token
-            self.tokens.index = start_index = token.index
+            self.tokens.index = start_index = lparen_token.index
             pair_wrapper = self.token_pair_expression(node, j2tokens.TOKEN_LPAREN)
         else:
             pair_wrapper = nullcontext()
@@ -593,7 +612,10 @@ class NodeAnnotator(NodeVisitor):
                 break
             if tokens:
                 token = tokens[-1]
-                if token.token == j2tokens.TOKEN_COMMA:
+                if (
+                    token.jinja_token is not None
+                    and token.jinja_token.type == j2tokens.TOKEN_COMMA
+                ):
                     self.tokens.index = token.index + 1
                 else:
                     self.tokens.index = after_index
@@ -697,7 +719,13 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Operand(self, node: nodes.Operand, parent: nodes.Node) -> None:
         """Visit an ``Operand`` in the stream."""
-        _, token = self.tokens.seek(node.op)
+        if node.op == "in":
+            _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.op)
+        elif node.op == "notin":
+            _, token = self.tokens.seek(j2tokens.TOKEN_NAME, "not")
+            self.tokens.seek(j2tokens.TOKEN_NAME, "in")
+        else:
+            _, token = self.tokens.seek(node.op)
         self.visit(node.expr, parent=node)
         self.annotate(node, start=token.index, end=node.expr.tokens[1])
 
@@ -746,7 +774,7 @@ class NodeAnnotator(NodeVisitor):
         _, token = self.tokens.seek(j2tokens.TOKEN_COLON)
         if start_index is None:
             start_index = token.index
-            end_index = token.index
+            end_index = token.index + 1
         if node.stop is not None:
             self.visit(node.stop, parent=node)
             end_index = node.stop.tokens[1]
@@ -758,18 +786,30 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Filter(self, node: nodes.Filter, parent: nodes.Node) -> None:
         """Visit a Jinja ``Filter`` in the stream."""
-        if node.node is None:
-            # can be None in an AssignBlock or FilterBlock
-            _, token = self.tokens.seek(j2tokens.TOKEN_PIPE)
-            start_index = token.index
-        else:
+        start_index = None
+        # node.node can be None in an AssignBlock or FilterBlock
+        if node.node is not None:
             self.visit(node.node, parent=node)
             _, token = self.tokens.seek(j2tokens.TOKEN_PIPE)
             start_index = node.node.tokens[0]
-        _, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
-        end_index = token.index
+        pre_tokens, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
+        if start_index is None:
+            pipe_tokens = [
+                t
+                for t in pre_tokens
+                if t.jinja_token is not None
+                and t.jinja_token.type == j2tokens.TOKEN_PIPE
+            ]
+            if pipe_tokens:
+                # AssignBlock needs the "|"
+                start_index = pipe_tokens[-1].index
+            else:
+                # FilterBlock has an implicit "|"
+                start_index = token.index
+        end_index = token.index + 1
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
-            self.signature(node)
+            with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
+                self.signature(node)
         if hasattr(node, "tokens"):
             end_index = node.tokens[1]
         self.annotate(node, start=start_index, end=end_index)
@@ -787,9 +827,24 @@ class NodeAnnotator(NodeVisitor):
         self.seek_past(j2tokens.TOKEN_NAME, *names)
         end_index = self.tokens.index
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
-            self.signature(node)
+            pair_start_index = self.find_containing_pair_start(end_index)
+            pair_end_index = self.tokens[pair_start_index].pair.index
+            found_lparen, _ = self.find_lparen(
+                start_index=end_index, end_index=pair_end_index
+            )
+
+            if found_lparen:
+                pair_wrapper = self.token_pair_expression(node, j2tokens.TOKEN_LPAREN)
+            else:
+                pair_wrapper = nullcontext()
+                end_index = None
+
+            with pair_wrapper:
+                self.signature(node)
         if hasattr(node, "tokens"):
             end_index = node.tokens[1]
+        elif end_index is None:
+            end_index = self.tokens.index
         self.annotate(node, start=start_index, end=end_index)
 
     def visit_CondExpr(self, node: nodes.CondExpr, parent: nodes.Node) -> None:
@@ -814,7 +869,8 @@ class NodeAnnotator(NodeVisitor):
         """Visit a function ``Call`` expression in the stream."""
         self.visit(node.node, parent=node)
         start_index = node.node.tokens[0]
-        self.signature(node)
+        with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN):
+            self.signature(node)
         end_index = node.tokens[1]
         self.annotate(node, start=start_index, end=end_index)
 
@@ -872,7 +928,7 @@ class NodeAnnotator(NodeVisitor):
             pass
 
     def visit_Scope(self, node: nodes.Scope, parent: nodes.Node) -> None:
-        """could be added by extensions.
+        """Visit a ``Scope`` node which can be added by extensions.
         Wraps the ScopedEvalContextModifier node for autoescape blocks
         """
         self.generic_visit(node)
