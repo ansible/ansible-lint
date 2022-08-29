@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager, nullcontext
-from typing import Any, ContextManager, Iterator, List, cast
+from typing import Any, ContextManager, Iterator, List, Sequence, cast
 
 from jinja2 import lexer as j2tokens
 from jinja2 import nodes
@@ -17,7 +17,8 @@ from .token import BEGIN_TOKENS, END_TOKENS, Token, Tokens, pre_iter_normalize_n
 class _AnnotatedNode:
     """Our custom Jinja AST annotations."""
 
-    tokens: tuple[int, int]
+    tokens_slice: tuple[int, int]
+    tokens: Sequence[Token]
     parent: nodes.Node
 
 
@@ -110,7 +111,8 @@ class NodeAnnotator(NodeVisitor):
         parent: nodes.Node | None = None,
     ) -> None:
         """Annotate Jinja2 AST Node with token details."""
-        cast(_AnnotatedNode, node).tokens = (start, end)
+        cast(_AnnotatedNode, node).tokens_slice = (start, end)
+        cast(_AnnotatedNode, node).tokens = self.tokens[start:end]
         if parent is not None:
             cast(_AnnotatedNode, node).parent = parent
 
@@ -137,9 +139,9 @@ class NodeAnnotator(NodeVisitor):
         # bypass each of the block's names
         self.seek_past(j2tokens.TOKEN_NAME, *names)
         stop_token = cast(Token, start_token.pair)  # assume there is a matching %}
-        if hasattr(node, "tokens"):
+        if hasattr(node, "tokens_slice"):
             # some nodes consist of multiple blocks. In that case, just extend the end.
-            start_index = cast(_AnnotatedNode, node).tokens[0]
+            start_index = cast(_AnnotatedNode, node).tokens_slice[0]
         elif start_token.chomp and pre_tokens:
             start_index = self.get_chomp_index(pre_tokens)
         else:
@@ -185,9 +187,9 @@ class NodeAnnotator(NodeVisitor):
             raise IndexError(f"Could not find the {left_token} token!")
 
         stop_token = cast(Token, start_token.pair)  # assume there is a matching %}
-        if hasattr(node, "tokens"):
+        if hasattr(node, "tokens_slice"):
             # some nodes consist of multiple blocks. In that case, just extend the end.
-            start_index = cast(_AnnotatedNode, node).tokens[0]
+            start_index = cast(_AnnotatedNode, node).tokens_slice[0]
         else:
             start_index = start_token.index
 
@@ -297,8 +299,8 @@ class NodeAnnotator(NodeVisitor):
 
         self.annotate(
             node,
-            start=cast(_AnnotatedNode, node.nodes[0]).tokens[0],
-            end=cast(_AnnotatedNode, node.nodes[-1]).tokens[1] + 1,
+            start=cast(_AnnotatedNode, node.nodes[0]).tokens_slice[0],
+            end=cast(_AnnotatedNode, node.nodes[-1]).tokens_slice[1] + 1,
             parent=parent,
         )
 
@@ -444,10 +446,10 @@ class NodeAnnotator(NodeVisitor):
         """Visit an ``If`` block that serves as an elif node in another ``If`` block."""
         with self.token_pair_block(node, "elif", parent=parent):
             self.visit(node.test, parent=node)
-        start_index, stop_index = cast(_AnnotatedNode, node).tokens
+        start_index, stop_index = cast(_AnnotatedNode, node).tokens_slice
         for child_node in node.body:
             self.visit(child_node, parent=node)
-            stop_index = cast(_AnnotatedNode, child_node).tokens[1]
+            stop_index = cast(_AnnotatedNode, child_node).tokens_slice[1]
         self.annotate(node, start=start_index, end=stop_index, parent=parent)
 
     def visit_With(self, node: nodes.With, parent: nodes.Node) -> None:
@@ -646,7 +648,7 @@ class NodeAnnotator(NodeVisitor):
 
         # pass first item and any lparen
         self.visit(node.items[0], parent=node)
-        item_index, after_index = cast(_AnnotatedNode, node.items[0]).tokens
+        item_index, after_index = cast(_AnnotatedNode, node.items[0]).tokens_slice
         start_index = item_index
 
         found_lparen, lparen_token = self.find_lparen(
@@ -674,7 +676,7 @@ class NodeAnnotator(NodeVisitor):
         # optional final comma gets skipped if parentheses pair is explicit
         if not found_lparen:
             # we need to check for the final comma in implicit tuple (w/o parentheses)
-            after_index = cast(_AnnotatedNode, node.items[-1]).tokens[1]
+            after_index = cast(_AnnotatedNode, node.items[-1]).tokens_slice[1]
             tokens = []
             for token in self.tokens[after_index:]:
                 if token.jinja_token is None:
@@ -719,8 +721,8 @@ class NodeAnnotator(NodeVisitor):
         self.visit(node.value, parent=node)
         self.annotate(
             node,
-            start=cast(_AnnotatedNode, node.key).tokens[0],
-            end=cast(_AnnotatedNode, node.value).tokens[1],
+            start=cast(_AnnotatedNode, node.key).tokens_slice[0],
+            end=cast(_AnnotatedNode, node.value).tokens_slice[1],
             parent=parent,
         )
 
@@ -740,8 +742,8 @@ class NodeAnnotator(NodeVisitor):
         self.visit(node.right, parent=node)
         self.annotate(
             node,
-            start=cast(_AnnotatedNode, node.left).tokens[0],
-            end=cast(_AnnotatedNode, node.right).tokens[1],
+            start=cast(_AnnotatedNode, node.left).tokens_slice[0],
+            end=cast(_AnnotatedNode, node.right).tokens_slice[1],
             parent=parent,
         )
 
@@ -764,7 +766,7 @@ class NodeAnnotator(NodeVisitor):
         self.annotate(
             node,
             start=token.index,
-            end=cast(_AnnotatedNode, node.node).tokens[1],
+            end=cast(_AnnotatedNode, node.node).tokens_slice[1],
             parent=parent,
         )
 
@@ -777,8 +779,8 @@ class NodeAnnotator(NodeVisitor):
             self.visit_Test(node.node, parent=node, negate=True)
             self.annotate(
                 node,
-                start=cast(_AnnotatedNode, node.node).tokens[0],
-                end=cast(_AnnotatedNode, node.node).tokens[1],
+                start=cast(_AnnotatedNode, node.node).tokens_slice[0],
+                end=cast(_AnnotatedNode, node.node).tokens_slice[1],
                 parent=parent,
             )
         else:  # _unary_op with a name token
@@ -789,7 +791,7 @@ class NodeAnnotator(NodeVisitor):
             self.annotate(
                 node,
                 start=token.index,
-                end=cast(_AnnotatedNode, node.node).tokens[1],
+                end=cast(_AnnotatedNode, node.node).tokens_slice[1],
                 parent=parent,
             )
 
@@ -805,8 +807,8 @@ class NodeAnnotator(NodeVisitor):
             self.visit(expr, parent=node)
         self.annotate(
             node,
-            start=cast(_AnnotatedNode, node.nodes[0]).tokens[0],
-            end=cast(_AnnotatedNode, node.nodes[-1]).tokens[1],
+            start=cast(_AnnotatedNode, node.nodes[0]).tokens_slice[0],
+            end=cast(_AnnotatedNode, node.nodes[-1]).tokens_slice[1],
             parent=parent,
         )
 
@@ -823,8 +825,8 @@ class NodeAnnotator(NodeVisitor):
 
         self.annotate(
             node,
-            start=cast(_AnnotatedNode, node.expr).tokens[0],
-            end=cast(_AnnotatedNode, node.ops[-1]).tokens[1],
+            start=cast(_AnnotatedNode, node.expr).tokens_slice[0],
+            end=cast(_AnnotatedNode, node.ops[-1]).tokens_slice[1],
             parent=parent,
         )
 
@@ -847,7 +849,7 @@ class NodeAnnotator(NodeVisitor):
         self.annotate(
             node,
             start=token.index,
-            end=cast(_AnnotatedNode, node.expr).tokens[1],
+            end=cast(_AnnotatedNode, node.expr).tokens_slice[1],
             parent=parent,
         )
 
@@ -861,7 +863,7 @@ class NodeAnnotator(NodeVisitor):
             raise IndexError(f"Could not find {node.attr} name token!")
         self.annotate(
             node,
-            start=cast(_AnnotatedNode, node.node).tokens[0],
+            start=cast(_AnnotatedNode, node.node).tokens_slice[0],
             end=token.index + 1,
             parent=parent,
         )
@@ -870,7 +872,7 @@ class NodeAnnotator(NodeVisitor):
         """Visit a ``Getitem`` expression in the stream."""
         # node.ctx is only ever "load". Not sure this would change if it wasn't.
         self.visit(node.node, parent=node)
-        start_index, after_index = cast(_AnnotatedNode, node.node).tokens
+        start_index, after_index = cast(_AnnotatedNode, node.node).tokens_slice
 
         # Getitem can use [] or . notation, so look for a dot
         tokens = []
@@ -888,14 +890,14 @@ class NodeAnnotator(NodeVisitor):
             # <node>.<arg> notation
             self.tokens.seek(j2tokens.TOKEN_DOT)
             self.visit(node.arg, parent=node)
-            end_index = cast(_AnnotatedNode, node.arg).tokens[1]
+            end_index = cast(_AnnotatedNode, node.arg).tokens_slice[1]
         else:
             # <node>[<arg>] notation
             with self.token_pair_expression(
                 node, j2tokens.TOKEN_LBRACKET, parent=parent
             ):
                 self.visit(node.arg, parent=node)
-            end_index = cast(_AnnotatedNode, node).tokens[1]
+            end_index = cast(_AnnotatedNode, node).tokens_slice[1]
         self.annotate(node, start=start_index, end=end_index, parent=parent)
 
     def visit_Slice(self, node: nodes.Slice, parent: nodes.Node) -> None:
@@ -903,8 +905,8 @@ class NodeAnnotator(NodeVisitor):
         start_index = end_index = None
         if node.start is not None:
             self.visit(node.start, parent=node)
-            start_index = cast(_AnnotatedNode, node.start).tokens[0]
-            end_index = cast(_AnnotatedNode, node.start).tokens[1]
+            start_index = cast(_AnnotatedNode, node.start).tokens_slice[0]
+            end_index = cast(_AnnotatedNode, node.start).tokens_slice[1]
         _, token = self.tokens.seek(j2tokens.TOKEN_COLON)
         if token is None:
             raise IndexError("Could not find ':' colon token!")
@@ -913,11 +915,11 @@ class NodeAnnotator(NodeVisitor):
             end_index = token.index + 1
         if node.stop is not None:
             self.visit(node.stop, parent=node)
-            end_index = cast(_AnnotatedNode, node.stop).tokens[1]
+            end_index = cast(_AnnotatedNode, node.stop).tokens_slice[1]
         if node.step is not None:
             self.tokens.seek(j2tokens.TOKEN_COLON)
             self.visit(node.step, parent=node)
-            end_index = cast(_AnnotatedNode, node.step).tokens[1]
+            end_index = cast(_AnnotatedNode, node.step).tokens_slice[1]
         self.annotate(node, start=start_index, end=cast(int, end_index), parent=parent)
 
     def visit_Filter(self, node: nodes.Filter, parent: nodes.Node) -> None:
@@ -927,7 +929,7 @@ class NodeAnnotator(NodeVisitor):
         if node.node is not None:
             self.visit(node.node, parent=node)
             _, token = self.tokens.seek(j2tokens.TOKEN_PIPE)
-            start_index = cast(_AnnotatedNode, node.node).tokens[0]
+            start_index = cast(_AnnotatedNode, node.node).tokens_slice[0]
         pre_tokens, token = self.tokens.seek(j2tokens.TOKEN_NAME, node.name)
         if token is None:
             raise IndexError(f"Could not find {node.name} name token!")
@@ -948,8 +950,8 @@ class NodeAnnotator(NodeVisitor):
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN, parent=parent):
                 self.signature(node)
-        if hasattr(node, "tokens"):
-            end_index = cast(_AnnotatedNode, node).tokens[1]
+        if hasattr(node, "tokens_slice"):
+            end_index = cast(_AnnotatedNode, node).tokens_slice[1]
         self.annotate(node, start=start_index, end=end_index, parent=parent)
 
     def visit_Test(
@@ -957,7 +959,7 @@ class NodeAnnotator(NodeVisitor):
     ) -> None:
         """Visit a Jinja ``Test`` in the stream."""
         self.visit(node.node, parent=node)
-        start_index = cast(_AnnotatedNode, node.node).tokens[0]
+        start_index = cast(_AnnotatedNode, node.node).tokens_slice[0]
         names = ["is"]
         if negate:
             names.append("not")
@@ -982,8 +984,8 @@ class NodeAnnotator(NodeVisitor):
 
             with pair_wrapper:
                 self.signature(node)
-        if hasattr(node, "tokens"):
-            end_index = cast(_AnnotatedNode, node).tokens[1]
+        if hasattr(node, "tokens_slice"):
+            end_index = cast(_AnnotatedNode, node).tokens_slice[1]
         elif end_index is None:
             end_index = self.tokens.index
         self.annotate(node, start=start_index, end=end_index, parent=parent)
@@ -996,23 +998,23 @@ class NodeAnnotator(NodeVisitor):
             {{ foo if bar else baz }}
         """
         self.visit(node.expr1, parent=node)
-        start_index = cast(_AnnotatedNode, node.expr1).tokens[0]
+        start_index = cast(_AnnotatedNode, node.expr1).tokens_slice[0]
         self.tokens.seek(j2tokens.TOKEN_NAME, "if")
         self.visit(node.test, parent=node)
-        end_index = cast(_AnnotatedNode, node.test).tokens[1]
+        end_index = cast(_AnnotatedNode, node.test).tokens_slice[1]
         if node.expr2 is not None:
             self.tokens.seek(j2tokens.TOKEN_NAME, "else")
             self.visit(node.expr2, parent=node)
-            end_index = cast(_AnnotatedNode, node.expr2).tokens[1]
+            end_index = cast(_AnnotatedNode, node.expr2).tokens_slice[1]
         self.annotate(node, start=start_index, end=end_index, parent=parent)
 
     def visit_Call(self, node: nodes.Call, parent: nodes.Node) -> None:
         """Visit a function ``Call`` expression in the stream."""
         self.visit(node.node, parent=node)
-        start_index = cast(_AnnotatedNode, node.node).tokens[0]
+        start_index = cast(_AnnotatedNode, node.node).tokens_slice[0]
         with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN, parent=parent):
             self.signature(node)
-        end_index = cast(_AnnotatedNode, node).tokens[1]
+        end_index = cast(_AnnotatedNode, node).tokens_slice[1]
         self.annotate(node, start=start_index, end=end_index, parent=parent)
 
     def visit_Keyword(self, node: nodes.Keyword, parent: nodes.Node) -> None:
@@ -1025,7 +1027,7 @@ class NodeAnnotator(NodeVisitor):
         self.annotate(
             node,
             start=token.index,
-            end=cast(_AnnotatedNode, node.value).tokens[1],
+            end=cast(_AnnotatedNode, node.value).tokens_slice[1],
             parent=parent,
         )
 
@@ -1081,8 +1083,8 @@ class NodeAnnotator(NodeVisitor):
         Wraps the ScopedEvalContextModifier node for autoescape blocks
         """
         self.generic_visit(node)
-        start_index = cast(_AnnotatedNode, node.body[0]).tokens[0]
-        end_index = cast(_AnnotatedNode, node.body[-1]).tokens[1]
+        start_index = cast(_AnnotatedNode, node.body[0]).tokens_slice[0]
+        end_index = cast(_AnnotatedNode, node.body[-1]).tokens_slice[1]
         self.annotate(node, start=start_index, end=end_index, parent=parent)
 
     # def visit_OverlayScope(self, node: nodes.OverlayScope, parent: nodes.Node) -> None:
@@ -1107,7 +1109,7 @@ class NodeAnnotator(NodeVisitor):
         with self.token_pair_block(node, "autoescape", parent=parent):
             self.visit(keyword_node.value, parent=keyword_node)
 
-        start_index, end_index = cast(_AnnotatedNode, node).tokens
+        start_index, end_index = cast(_AnnotatedNode, node).tokens_slice
         for token in self.tokens[start_index:end_index]:
             if (
                 token.token == j2tokens.TOKEN_NAME
@@ -1116,7 +1118,7 @@ class NodeAnnotator(NodeVisitor):
             ):
                 start_index = token.index
                 break
-        end_index = cast(_AnnotatedNode, keyword_node.value).tokens[1]
+        end_index = cast(_AnnotatedNode, keyword_node.value).tokens_slice[1]
         self.annotate(keyword_node, start=start_index, end=end_index, parent=parent)
 
         for child_node in node.body:
