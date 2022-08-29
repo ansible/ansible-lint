@@ -44,6 +44,7 @@ END_TOKENS = (
 )
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass  # this is mutable and DOES change after creation
 class Token:
     """Wrapper around JinjaToken to add details like characters consumed."""
@@ -86,6 +87,7 @@ def pre_iter_normalize_newlines(source: str, keep_trailing_newline: bool) -> str
     return "\n".join(lines)
 
 
+# pylint: disable=too-many-locals,too-many-branches,too-many-arguments
 def tokeniter(  # noqa: C901  # splitting this up would hurt readability
     lexer: Lexer,
     source: str,
@@ -227,6 +229,7 @@ class Tokens:
         # start with the current token
         token = self.current
         while True:
+            # pylint: disable=too-many-boolean-expressions
             if (
                 token.token == token_type
                 or (
@@ -268,11 +271,11 @@ class Tokens:
         self.index += 1
         try:
             token = self.current
-        except IndexError:
+        except IndexError as exc:
             # reset for the next iteration, but leave source_position alone
             # for subsequent inspection.
             self.index = -1
-            raise StopIteration
+            raise StopIteration from exc
         self.source_position = token.end_pos
         return token
 

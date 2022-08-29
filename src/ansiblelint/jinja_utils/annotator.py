@@ -1,4 +1,5 @@
 """Jinja AST tokens annotator."""
+# pylint: disable=too-many-lines
 from __future__ import annotations
 
 from contextlib import contextmanager, nullcontext
@@ -12,6 +13,7 @@ from jinja2.visitor import NodeVisitor
 from .token import BEGIN_TOKENS, END_TOKENS, Token, Tokens, pre_iter_normalize_newlines
 
 
+# pylint: disable=too-few-public-methods
 class _AnnotatedNode:
     """Our custom Jinja AST annotations."""
 
@@ -91,7 +93,7 @@ class NodeAnnotator(NodeVisitor):
                 if token.token in END_TOKENS:
                     index = token.pair.index - 1
                     continue
-                elif token.token in BEGIN_TOKENS:
+                if token.token in BEGIN_TOKENS:
                     return token.index
             index -= 1
         return 0
@@ -278,7 +280,7 @@ class NodeAnnotator(NodeVisitor):
                 self.visit(child_node, parent=node)
                 continue
 
-            # TODO: handle extension-injected nodes
+            # NOTE: this does not handle extension-injected nodes yet
 
             # child_node is one of the expression nodes surrounded by {{ }}
             with self.token_pair_variable(child_node):
