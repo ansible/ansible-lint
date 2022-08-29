@@ -243,7 +243,6 @@ from .jinja_fixtures import (
         (TrimBlocksFixtures.multiple_comment_no_trim_lstrip, ()),
         (TrimBlocksFixtures.raw_trim_lstrip, ()),
         (TrimBlocksFixtures.raw_no_trim_lstrip, ()),
-        # ^^ 79 tests
         (ImportsFixtures.context_imports_1, ()),
         (ImportsFixtures.context_imports_2, ()),
         (ImportsFixtures.context_imports_3, ()),

@@ -261,7 +261,6 @@ from .jinja_fixtures import (
         (TrimBlocksFixtures.multiple_comment_no_trim_lstrip, 4, 3, ("+", "+", "+")),
         (TrimBlocksFixtures.raw_trim_lstrip, 8, 3, ()),
         (TrimBlocksFixtures.raw_no_trim_lstrip, 8, 3, ("+",)),
-        # ^^ 79 tests
         (ImportsFixtures.context_imports_1, 13, 3, ()),
         (ImportsFixtures.context_imports_2, 15, 3, ()),
         (ImportsFixtures.context_imports_3, 15, 3, ()),
