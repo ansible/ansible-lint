@@ -31,10 +31,7 @@ class NameRule(AnsibleLintRule):
         """Return matches found for a specific play (entry in playbook)."""
         if file.kind != "playbook":
             return []
-        if "name" not in data and not any(
-            key in data
-            for key in ["import_playbook", "ansible.builtin.import_playbook"]
-        ):
+        if "name" not in data:
             return [
                 self.create_matcherror(
                     message="All plays should be named.",
