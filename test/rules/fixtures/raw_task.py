@@ -10,11 +10,8 @@ from ansiblelint.rules import AnsibleLintRule
 class RawTaskRule(AnsibleLintRule):
     """Test rule that inspects the raw task."""
 
-    id = "TEST0003"
+    id = "raw-task"
     shortdesc = "Test rule that inspects the raw task"
-    description = (
-        "This is a test rule that looks in a raw task to flag raw action params."
-    )
     tags = ["fake", "dummy", "test3"]
     needs_raw_task = True
 

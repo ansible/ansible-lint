@@ -7,7 +7,7 @@ are hard to identify.
 While using the free-form from the command line is ok, it should never be used
 inside playbooks.
 
-# Problematic Code
+## Problematic Code
 
 ```yaml
 ---
@@ -18,7 +18,7 @@ inside playbooks.
       ansible.builtin.command: creates=B chmod 644 A # <-- do not use shorthand
 ```
 
-# Correct Code
+## Correct Code
 
 ```yaml
 ---

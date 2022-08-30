@@ -19,11 +19,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from test.rules.fixtures import ematcher, raw_task
+
 import pytest
 
 from ansiblelint.file_utils import Lintable
-
-from .rules.fixtures import ematcher, raw_task
 
 
 @pytest.fixture(name="lintable")

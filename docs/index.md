@@ -32,7 +32,7 @@ Ansible teams.
 
 ```{toctree}
 :caption: User Guide
-:maxdepth: 2
+:maxdepth: 1
 
 Philosophy<philosophy>
 installing
