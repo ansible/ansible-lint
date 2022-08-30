@@ -1,8 +1,11 @@
 """Module containing cached JSON schemas."""
+import logging
 import os
 import urllib.request
 
 from ansiblelint.config import JSON_SCHEMAS
+
+_logger = logging.getLogger(__package__)
 
 
 def refresh_schemas() -> int:
@@ -12,6 +15,12 @@ def refresh_schemas() -> int:
     """
     changed = 0
     for kind, url in sorted(JSON_SCHEMAS.items()):
+        if url.startswith("https://raw.githubusercontent.com/ansible/ansible-lint"):
+            _logger.warning(
+                "Skipped updating schema that is part of the ansible-lint repository: %s",
+                url,
+            )
+            continue
         path = f"{os.path.relpath(os.path.dirname(__file__))}/{kind}.json"
         print(f"Refreshing {path} ...")
         with urllib.request.urlopen(url) as response:
