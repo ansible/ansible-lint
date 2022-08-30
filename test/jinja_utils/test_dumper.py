@@ -2,10 +2,21 @@
 from __future__ import annotations
 
 import pytest
+from jinja2 import nodes
 from jinja2.environment import Environment
+
+from ansiblelint.jinja_utils.annotator import annotate
 
 # from ansiblelint.jinja_utils.dumper import TemplateDumper, dump
 from ansiblelint.jinja_utils.dumper import dump
+
+
+@pytest.fixture(name="in_ast")
+def annotated_ast(jinja_env: Environment, in_template: str) -> nodes.Template:
+    in_ast = jinja_env.parse(in_template)
+    # record whitespace details in the AST
+    annotate(in_ast, jinja_env, raw_template=in_template)
+    return in_ast
 
 
 @pytest.mark.parametrize(
@@ -102,17 +113,19 @@ from ansiblelint.jinja_utils.dumper import dump
         ),
     ),
 )
-def test_dump(in_template: str, expected_template: str) -> None:
+def test_dump(
+    jinja_env: Environment,
+    in_ast: nodes.Template,
+    expected_template: str,
+) -> None:
     """Test the jinja template dumping function."""
-    environment = Environment()
-    in_ast = environment.parse(in_template)
     out_template = dump(
         node=in_ast,
-        environment=environment,
+        environment=jinja_env,
         stream=None,
     )
     assert out_template is not None
-    out_ast = environment.parse(out_template)
+    out_ast = jinja_env.parse(out_template)
     assert in_ast == out_ast
     # expected_template may have spacing changes vs out_template
     assert out_template == expected_template
