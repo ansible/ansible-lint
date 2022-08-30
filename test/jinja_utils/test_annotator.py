@@ -475,37 +475,37 @@ def test_annotate(
                 kwargs["parent"] = node
                 self.visit(child_node, *args, **kwargs)
 
-        def visit(self, jinja_node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
+        def visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
             """Test AST node to ensure it is sane and fits within the parent node."""
             # Make it easier to identify which node had failures in the future
 
             # this convinces mypy that the attrs are present
-            node: _AnnotatedNode = cast(_AnnotatedNode, jinja_node)
-            assert hasattr(node, "tokens_slice")
-            assert isinstance(node.tokens_slice, tuple)
-            assert len(node.tokens_slice) == 2
-            assert all(isinstance(index, int) for index in node.tokens_slice)
-            assert node.tokens_slice[0] < node.tokens_slice[1]
-            assert hasattr(node, "tokens")
-            assert node.tokens_slice[0] == node.tokens[0].index
-            assert node.tokens_slice[1] == node.tokens[-1].index + 1
-            assert node.tokens_slice[1] - node.tokens_slice[0] == len(node.tokens)
+            _node: _AnnotatedNode = cast(_AnnotatedNode, node)
+            assert hasattr(_node, "tokens_slice")
+            assert isinstance(_node.tokens_slice, tuple)
+            assert len(_node.tokens_slice) == 2
+            assert all(isinstance(index, int) for index in _node.tokens_slice)
+            assert _node.tokens_slice[0] < _node.tokens_slice[1]
+            assert hasattr(_node, "tokens")
+            assert _node.tokens_slice[0] == _node.tokens[0].index
+            assert _node.tokens_slice[1] == _node.tokens[-1].index + 1
+            assert _node.tokens_slice[1] - _node.tokens_slice[0] == len(_node.tokens)
             if "parent" in kwargs:
                 # only the root node will not have a parent arg.
                 parent: _AnnotatedNode = kwargs["parent"]
-                assert hasattr(node, "parent")
-                assert node.parent == parent
+                assert hasattr(_node, "parent")
+                assert _node.parent == parent
 
                 assert hasattr(parent, "tokens_slice")
                 assert isinstance(parent.tokens_slice, tuple)
-                assert parent.tokens_slice[0] <= node.tokens_slice[0]
-                assert node.tokens_slice[1] <= parent.tokens_slice[1]
+                assert parent.tokens_slice[0] <= _node.tokens_slice[0]
+                assert _node.tokens_slice[1] <= parent.tokens_slice[1]
                 assert hasattr(parent, "tokens")
                 assert parent.tokens_slice[0] == parent.tokens[0].index
                 assert parent.tokens_slice[1] == parent.tokens[-1].index + 1
                 assert parent.tokens_slice[1] - parent.tokens_slice[0] == len(
                     parent.tokens
                 )
-            super().visit(jinja_node, *args, **kwargs)
+            super().visit(node, *args, **kwargs)
 
     TestVisitor().visit(ast)
