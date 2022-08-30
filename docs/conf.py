@@ -285,7 +285,10 @@ nitpick_ignore = [
     ("py:class", "CommentedMap"),
     ("py:class", "CommentedSeq"),
     ("py:class", "CompletedProcess"),
+    ("py:class", "Environment"),
     ("py:class", "FileType"),
+    ("py:class", "JinjaToken"),
+    ("py:class", "Lexer"),
     ("py:class", "LintResult"),
     ("py:class", "Lintable"),
     ("py:class", "MatchError"),
@@ -325,6 +328,7 @@ nitpick_ignore = [
 nitpick_ignore_regex = [
     ("py:class", r"jinja2\.nodes\..*"),
     ("py:class", r"jinja2\.visitor\..*"),
+    ("py:class", r"nodes\..*"),
 ]
 
 myst_heading_anchors = 3
