@@ -4,6 +4,7 @@ from typing import Literal
 
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
+RULE_DOC_URL = "https://ansible-lint.readthedocs.io/en/latest/rules/"
 
 SUCCESS_RC = 0
 VIOLATIONS_FOUND_RC = 2
