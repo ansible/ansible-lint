@@ -285,7 +285,6 @@ class NodeAnnotator(NodeVisitor):
         Output is a ``{{ }}`` statement (aka ``print`` or output statement).
         """
         for child_node in node.iter_child_nodes():
-            # child_node.parent = node
             # child_node might be TemplateData which is outside {{ }}
             if isinstance(child_node, nodes.TemplateData):
                 self.visit(child_node, parent=node)
@@ -776,7 +775,7 @@ class NodeAnnotator(NodeVisitor):
     def visit_Not(self, node: nodes.Not, parent: nodes.Node) -> None:
         """Visit a negated expression in the stream."""
         if isinstance(node.node, nodes.Test):
-            self.visit_Test(node.node, parent=node, negate=True)
+            self.visit_Test(node.node, negate=True, parent=node)
             self.annotate(
                 node,
                 start=cast(_AnnotatedNode, node.node).tokens_slice[0],
@@ -1060,19 +1059,13 @@ class NodeAnnotator(NodeVisitor):
     #     """could be added by extensions. like debug block but w/ locals"""
 
     # noinspection PyUnusedLocal
-    def visit_Continue(
-        self,
-        node: nodes.Continue,
-        parent: nodes.Node,  # pylint: disable=unused-argument
-    ) -> None:
+    def visit_Continue(self, node: nodes.Continue, parent: nodes.Node) -> None:
         """Visit a ``Continue`` block for the LoopControlExtension in the stream."""
         with self.token_pair_block(node, "continue", parent=parent):
             pass
 
     # noinspection PyUnusedLocal
-    def visit_Break(
-        self, node: nodes.Break, parent: nodes.Node
-    ) -> None:  # pylint: disable=unused-argument
+    def visit_Break(self, node: nodes.Break, parent: nodes.Node) -> None:
         """Visit a ``Break`` block for the LoopControlExtension in the stream."""
         with self.token_pair_block(node, "break", parent=parent):
             pass
@@ -1119,7 +1112,7 @@ class NodeAnnotator(NodeVisitor):
                 start_index = token.index
                 break
         end_index = cast(_AnnotatedNode, keyword_node.value).tokens_slice[1]
-        self.annotate(keyword_node, start=start_index, end=end_index, parent=parent)
+        self.annotate(keyword_node, start=start_index, end=end_index, parent=node)
 
         for child_node in node.body:
             self.visit(child_node, parent=node)
