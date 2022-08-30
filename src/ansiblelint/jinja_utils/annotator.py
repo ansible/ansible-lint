@@ -19,6 +19,10 @@ class _AnnotatedNode:
 
     tokens_slice: tuple[int, int]
     tokens: Sequence[Token]
+    # token_pairs has the opening tokens ({{, {%, {#, etc)
+    # for each pair directly associated with the given node.
+    # The closing pair is available as token_pairs[].pair
+    token_pairs: Sequence[Token]
     parent: nodes.Node
 
 
@@ -108,11 +112,15 @@ class NodeAnnotator(NodeVisitor):
         *,
         start: int,
         end: int,
+        pair_open: Token | None = None,
         parent: nodes.Node | None = None,
     ) -> None:
         """Annotate Jinja2 AST Node with token details."""
         cast(_AnnotatedNode, node).tokens_slice = (start, end)
         cast(_AnnotatedNode, node).tokens = self.tokens[start:end]
+        if pair_open is not None:
+            pairs = getattr(cast(_AnnotatedNode, node), "token_pairs", ())
+            cast(_AnnotatedNode, node).token_pairs = (*pairs, pair_open)
         if parent is not None:
             cast(_AnnotatedNode, node).parent = parent
 
@@ -151,7 +159,13 @@ class NodeAnnotator(NodeVisitor):
 
         stop_index = stop_token.index
         self.tokens.index = stop_index + 1
-        self.annotate(node, start=start_index, end=stop_index + 1, parent=parent)
+        self.annotate(
+            node,
+            start=start_index,
+            end=stop_index + 1,
+            pair_open=start_token,
+            parent=parent,
+        )
 
     @contextmanager
     def token_pair_variable(
@@ -175,7 +189,13 @@ class NodeAnnotator(NodeVisitor):
             self.tokens.index <= stop_index
         )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index + 1
-        self.annotate(node, start=start_index, end=stop_index + 1, parent=parent)
+        self.annotate(
+            node,
+            start=start_index,
+            end=stop_index + 1,
+            pair_open=start_token,
+            parent=parent,
+        )
 
     @contextmanager
     def token_pair_expression(
@@ -200,7 +220,13 @@ class NodeAnnotator(NodeVisitor):
             self.tokens.index <= stop_index
         )  # how could child nodes pass the end token?!
         self.tokens.index = stop_index + 1
-        self.annotate(node, start=start_index, end=stop_index + 1, parent=parent)
+        self.annotate(
+            node,
+            start=start_index,
+            end=stop_index + 1,
+            pair_open=start_token,
+            parent=parent,
+        )
 
     # -- Various compilation helpers
 

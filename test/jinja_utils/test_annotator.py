@@ -490,6 +490,9 @@ def test_annotate(
             assert _node.tokens_slice[0] == _node.tokens[0].index
             assert _node.tokens_slice[1] == _node.tokens[-1].index + 1
             assert _node.tokens_slice[1] - _node.tokens_slice[0] == len(_node.tokens)
+            if hasattr(_node, "token_pairs"):
+                for token in _node.token_pairs:
+                    assert token.pair is not None
             if "parent" in kwargs:
                 # only the root node will not have a parent arg.
                 parent: _AnnotatedNode = kwargs["parent"]
