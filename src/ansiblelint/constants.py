@@ -9,6 +9,7 @@ RULE_DOC_URL = "https://ansible-lint.readthedocs.io/en/latest/rules/"
 SUCCESS_RC = 0
 VIOLATIONS_FOUND_RC = 2
 INVALID_CONFIG_RC = 3
+LOCK_TIMEOUT_RC = 4
 EXIT_CONTROL_C_RC = 130
 
 # Minimal version of Ansible we support for runtime
