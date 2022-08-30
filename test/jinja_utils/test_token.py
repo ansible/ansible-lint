@@ -472,6 +472,7 @@ from .jinja_fixtures import (
     ),
     # spell-checker: enable
 )
+# pylint: disable=too-many-locals,too-many-branches,too-many-statements
 def test_tokens_iterator(  # noqa: C901  # splitting this up would hurt readability
     lexer: Lexer,
     template_source: str,
@@ -495,7 +496,7 @@ def test_tokens_iterator(  # noqa: C901  # splitting this up would hurt readabil
             assert token.pair is None
             assert token.chomp == ""
             continue
-        elif i == last_index:
+        if i == last_index:
             assert token.token == j2tokens.TOKEN_EOF
             assert token.end_pos == len(template_source)
             assert token.pair is None

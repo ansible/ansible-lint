@@ -11,22 +11,22 @@ from jinja2.lexer import Lexer
 from ansiblelint.utils import ansible_templar
 
 
-@pytest.fixture
-def templar() -> Templar:
+@pytest.fixture(name="templar")
+def fixture_templar() -> Templar:
     """Initialize an Ansible Templar for each test with dummy info."""
     basedir = "/base/dir"
     templatevars = {"playbook_dir": "/a/b/c"}
     return ansible_templar(basedir, templatevars)
 
 
-@pytest.fixture
-def jinja_env(templar: Templar) -> Environment:
+@pytest.fixture(name="jinja_env")
+def fixture_jinja_env(templar: Templar) -> Environment:
     """Initialize a Jinja2 Environment for each test."""
     # this is AnsibleEnvironment | AnsibleNativeEnvironment
     return cast(Environment, templar.environment)
 
 
-@pytest.fixture
-def lexer(jinja_env: Environment) -> Lexer:
+@pytest.fixture(name="lexer")
+def fixture_lexer(jinja_env: Environment) -> Lexer:
     """Initialize a Jinja2 Lexer for each test."""
     return jinja_env.lexer

@@ -1,4 +1,5 @@
 """This file contains copies of jinja's test suite data which is BSD (3-clause) licensed."""
+# pylint: disable=too-many-lines,too-few-public-methods,implicit-str-concat
 from __future__ import annotations
 
 
