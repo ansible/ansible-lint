@@ -469,15 +469,16 @@ def test_annotate(
     class TestVisitor(NodeVisitor):
         """Recursive iterator to visit and test each node in a Jinja2 AST tree."""
 
-        def generic_visit(self, node: _AnnotatedNode, *args: Any, **kwargs: Any) -> Any:
+        def generic_visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
             """Visit all nodes while tracking parent node."""
-            for child_node in cast(nodes.Node, node).iter_child_nodes():
+            for child_node in node.iter_child_nodes():
                 kwargs["parent"] = node
                 self.visit(child_node, *args, **kwargs)
 
-        def visit(self, node: _AnnotatedNode, *args: Any, **kwargs: Any) -> None:
+        def visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> None:
             """Test AST node to ensure it is sane and fits within the parent node."""
             # Make it easier to identify which node had failures in the future
+            node = cast(_AnnotatedNode, node)
             assert hasattr(node, "tokens_slice")
             assert isinstance(node.tokens_slice, tuple)
             assert len(node.tokens_slice) == 2
@@ -505,4 +506,4 @@ def test_annotate(
                 )
             super().visit(cast(nodes.Node, node), *args, **kwargs)
 
-    TestVisitor().visit(cast(_AnnotatedNode, ast))
+    TestVisitor().visit(ast)
