@@ -1,7 +1,7 @@
 """Tests for Jinja AST Annotator."""
 from __future__ import annotations
 
-from typing import Any, Tuple, Type, Union
+from typing import Any, cast
 
 import pytest
 from jinja2 import nodes
@@ -9,7 +9,7 @@ from jinja2.environment import Environment
 from jinja2.ext import Extension
 from jinja2.visitor import NodeVisitor
 
-from ansiblelint.jinja_utils.annotator import annotate
+from ansiblelint.jinja_utils.annotator import _AnnotatedNode, annotate
 
 from .jinja_fixtures import (
     CoreTagsFixtures,
@@ -469,15 +469,15 @@ def test_annotate(
     class TestVisitor(NodeVisitor):
         """Recursive iterator to visit and test each node in a Jinja2 AST tree."""
 
-        def generic_visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
+        def generic_visit(self, node: _AnnotatedNode, *args: Any, **kwargs: Any) -> Any:
             """Visit all nodes while tracking parent node."""
-            for child_node in node.iter_child_nodes():
+            for child_node in cast(nodes.Node, node).iter_child_nodes():
                 kwargs["parent"] = node
                 self.visit(child_node, *args, **kwargs)
 
-        def visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> None:
+        def visit(self, node: _AnnotatedNode, *args: Any, **kwargs: Any) -> None:
             """Test AST node to ensure it is sane and fits within the parent node."""
-            # TODO: make it easier to identify which node had failures
+            # Make it easier to identify which node had failures in the future
             assert hasattr(node, "tokens_slice")
             assert isinstance(node.tokens_slice, tuple)
             assert len(node.tokens_slice) == 2
@@ -489,7 +489,7 @@ def test_annotate(
             assert node.tokens_slice[1] - node.tokens_slice[0] == len(node.tokens)
             if "parent" in kwargs:
                 # only the root node will not have a parent arg.
-                parent: nodes.Node = kwargs["parent"]
+                parent: _AnnotatedNode = kwargs["parent"]
                 assert hasattr(node, "parent")
                 assert node.parent == parent
 
@@ -503,6 +503,6 @@ def test_annotate(
                 assert parent.tokens_slice[1] - parent.tokens_slice[0] == len(
                     parent.tokens
                 )
-            super().visit(node, *args, **kwargs)
+            super().visit(cast(nodes.Node, node), *args, **kwargs)
 
-    TestVisitor().visit(ast)
+    TestVisitor().visit(cast(_AnnotatedNode, ast))
