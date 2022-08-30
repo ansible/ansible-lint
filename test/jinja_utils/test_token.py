@@ -516,6 +516,7 @@ def test_tokens_iterator(  # noqa: C901  # splitting this up would hurt readabil
             assert token.pair.pair is not None
             assert token.pair.pair == token
             assert token.jinja_token is not None
+            assert token.pair.jinja_token is not None
             if token.token == j2tokens.TOKEN_OPERATOR and token.jinja_token.type in (
                 j2tokens.TOKEN_LBRACKET,
                 j2tokens.TOKEN_RBRACKET,

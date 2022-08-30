@@ -475,7 +475,7 @@ def test_annotate(
                 kwargs["parent"] = node
                 self.visit(child_node, *args, **kwargs)
 
-        def visit(self, jinja_node: nodes.Node, *args: Any, **kwargs: Any) -> None:
+        def visit(self, jinja_node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
             """Test AST node to ensure it is sane and fits within the parent node."""
             # Make it easier to identify which node had failures in the future
 
