@@ -31,11 +31,6 @@ class YamllintRule(AnsibleLintRule):
     # ensure this rule runs before most of other common rules
     _order = 1
 
-    def __init__(self) -> None:
-        """Construct a rule instance."""
-        # customize id by adding the one reported by yamllint
-        self.id = self.__class__.id
-
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""
         matches: list[MatchError] = []

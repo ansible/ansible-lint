@@ -18,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import annotations
 
 import collections
 import os
@@ -155,8 +156,15 @@ def test_rules_id_format() -> None:
     rules = RulesCollection(
         [os.path.abspath("./src/ansiblelint/rules")], options=options
     )
+    keys: set[str] = set()
     for rule in rules:
         assert rule_id_re.match(
             rule.id
         ), f"Rule id {rule.id} did not match our required format."
-    assert len(rules) == 42
+        keys.add(rule.id)
+        assert (
+            rule.help != "" or rule.description or rule.__doc__
+        ), f"Rule {rule.id} must have at least one of:  .help, .description, .__doc__"
+    assert "yaml" in keys, "yaml rule is missing"
+    assert len(rules) == 42  # update this number when adding new rules!
+    assert len(keys) == 42, "Duplicate rule ids?"

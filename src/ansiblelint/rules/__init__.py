@@ -314,12 +314,7 @@ def load_plugins(  # noqa: max-complexity: 11
 
     def all_subclasses(cls: type) -> set[type]:
         return set(cls.__subclasses__()).union(
-            [
-                s
-                for c in cls.__subclasses__()
-                for s in all_subclasses(c)
-                if getattr(s, "id")
-            ]
+            [s for c in cls.__subclasses__() for s in all_subclasses(c)]
         )
 
     orig_sys_path = sys.path.copy()
@@ -330,9 +325,10 @@ def load_plugins(  # noqa: max-complexity: 11
 
         # load all modules in the directory
         for f in Path(directory).glob("*.py"):
-            if "__" not in f.stem:
+            if "__" not in f.stem and f.stem not in "conftest":
                 try:
                     import_module(f"{f.stem}")
+
                 except ImportError as exc:
                     _logger.warning("Ignore loading rule from %s due to %s", f, exc)
     # restore sys.path
@@ -350,7 +346,7 @@ def load_plugins(  # noqa: max-complexity: 11
             if issubclass(rule, BaseRule) and rule.id not in rules:
                 rules[rule.id] = rule()
     for rule in rules.values():  # type: ignore
-        if isinstance(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc):
+        if isinstance(rule, AnsibleLintRule) and bool(rule.id):
             yield rule
 
 
