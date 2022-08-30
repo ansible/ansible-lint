@@ -516,13 +516,19 @@ def test_tokens_iterator(  # noqa: C901  # splitting this up would hurt readabil
             assert token.pair != token
             assert token.pair.pair is not None
             assert token.pair.pair == token
-            if token.token == j2tokens.TOKEN_OPERATOR and token.jinja_token.type in (
-                j2tokens.TOKEN_LBRACKET,
-                j2tokens.TOKEN_RBRACKET,
-                j2tokens.TOKEN_LBRACE,
-                j2tokens.TOKEN_RBRACE,
-                j2tokens.TOKEN_LPAREN,
-                j2tokens.TOKEN_RPAREN,
+            if (
+                token.token == j2tokens.TOKEN_OPERATOR
+                # convince mypy that jinja_token is never None w/ operator tokens:
+                and token.jinja_token is not None
+                and token.jinja_token.type
+                in (
+                    j2tokens.TOKEN_LBRACKET,
+                    j2tokens.TOKEN_RBRACKET,
+                    j2tokens.TOKEN_LBRACE,
+                    j2tokens.TOKEN_RBRACE,
+                    j2tokens.TOKEN_LPAREN,
+                    j2tokens.TOKEN_RPAREN,
+                )
             ):
                 assert token.jinja_token is not None  # is None for comment tokens
                 assert token.pair.jinja_token is not None  # is None for comment tokens
