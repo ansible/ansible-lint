@@ -1,6 +1,8 @@
 """PyTest fixtures for testing jinja_utils."""
 from __future__ import annotations
 
+from typing import cast
+
 import pytest
 from ansible.template import Templar
 from jinja2.environment import Environment

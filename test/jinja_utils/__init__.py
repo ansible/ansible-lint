@@ -1,1 +1,1 @@
-"""Module with tests for Jnsiblelint.jinja_utils.*"""
+"""Module with tests for ansiblelint.jinja_utils.*."""
