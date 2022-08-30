@@ -60,7 +60,7 @@ def test_run_collection(
 ) -> None:
     """Test that default rules match pre-meditated violations."""
     matches = test_rules_collection.run(ematchtestfile)
-    assert len(matches) == 4  # 3 occurrences of BANNED using TEST0001 + 1 for TEST0003
+    assert len(matches) == 4  # 3 occurrences of BANNED using TEST0001 + 1 for raw-task
     assert matches[0].linenumber == 3
 
 
@@ -103,11 +103,11 @@ def test_skip_id(
 ) -> None:
     """Check that skipping valid IDs excludes their violations."""
     matches = test_rules_collection.run(
-        ematchtestfile, skip_list=["TEST0001", "TEST0003"]
+        ematchtestfile, skip_list=["TEST0001", "raw-task"]
     )
     assert len(matches) == 0
     matches = test_rules_collection.run(
-        ematchtestfile, skip_list=["TEST0002", "TEST0003"]
+        ematchtestfile, skip_list=["TEST0002", "raw-task"]
     )
     assert len(matches) == 3
     matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=["TEST0001"])

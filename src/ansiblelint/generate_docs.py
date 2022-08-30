@@ -15,7 +15,7 @@ from rich.markdown import Markdown
 from rich.table import Table
 
 from ansiblelint.config import PROFILES
-from ansiblelint.constants import DEFAULT_RULESDIR
+from ansiblelint.constants import RULE_DOC_URL
 from ansiblelint.rules import RulesCollection
 
 DOC_HEADER = """
@@ -125,7 +125,6 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
 def profiles_as_md(header: bool = False) -> str:
     """Return markdown representation of supported profiles."""
     result = ""
-    default_rules = RulesCollection([DEFAULT_RULESDIR])
 
     if header:
         result += """<!---
@@ -155,18 +154,10 @@ them with links to their issues.
             )
         result += f"## {name}\n\n{profile['description']}{extends}\n"
         for rule, rule_data in profile["rules"].items():
-            for default_rule in default_rules.rules:
-                if default_rule.id == rule:
-                    result += f"- [{rule}](rules/{rule}.md)\n"
-                    break
+            if not rule_data:
+                result += f"- [{rule}]({RULE_DOC_URL}/{rule})\n"
             else:
-                if not rule_data:
-                    raise RuntimeError(f"Rule {rule} has no data.")
-                url = rule_data.get("url", None)
-                if url:
-                    result += f"- [{rule}]({url})*\n"
-                else:
-                    raise RuntimeError("All planned rules must have an 'url' entry.")
+                result += f"- [{rule}]({rule_data['url']})\n"
         result += "\n"
     return result
 

@@ -1,8 +1,12 @@
 """Internally used rule classes."""
 from __future__ import annotations
 
+import inspect
 import logging
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
+
+from ansiblelint.constants import RULE_DOC_URL
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -36,7 +40,6 @@ class BaseRule:
     id: str = ""
     tags: list[str] = []
     description: str = ""
-    help: str = ""  # markdown help (automatically loaded from `<rule>.md`)
     version_added: str = ""
     severity: str = ""
     link: str = ""
@@ -47,12 +50,25 @@ class BaseRule:
     # _order 1 for rules that check that data can be loaded
     # _order 5 implicit for normal rules
     _order: int = 5
-    RULE_DOC_URL = "https://ansible-lint.readthedocs.io/en/latest/rules/"
+    _help: str | None = None
+
+    @property
+    def help(self) -> str:
+        """Return a help markdown string for the rule."""
+        if self._help is None:
+            self._help = ""
+            md_file = (
+                Path(inspect.getfile(self.__class__)).parent
+                / f"{self.id.replace('-', '_')}.md"
+            )
+            if md_file.exists():
+                self._help = md_file.read_text(encoding="utf-8")
+        return self._help
 
     @property
     def url(self) -> str:
         """Return rule documentation url."""
-        return self.link or self.RULE_DOC_URL + self.id + "/"
+        return self.link or RULE_DOC_URL + self.id + "/"
 
     @property
     def shortdesc(self) -> str:
@@ -132,12 +148,6 @@ class RuntimeErrorRule(BaseRule):
     """Unexpected internal error."""
 
     id = "internal-error"
-    description = (
-        "This error can be caused by internal bugs but also by "
-        "custom rules. Instead of just stopping linter we generate the errors and "
-        "continue processing. This allows users to add this rule to their warn list until "
-        "the root cause is fixed."
-    )
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v5.0.0"

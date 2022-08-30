@@ -2,16 +2,15 @@
 from __future__ import annotations
 
 import copy
-import glob
-import importlib.util
 import inspect
 import logging
-import os
 import re
+import sys
 from argparse import Namespace
 from collections import defaultdict
 from functools import lru_cache
-from importlib.abc import Loader
+from importlib import import_module
+from pathlib import Path
 from typing import (
     Any,
     Dict,
@@ -38,6 +37,7 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.config import PROFILES, get_rule_config
 from ansiblelint.config import options as default_options
+from ansiblelint.constants import RULE_DOC_URL
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
 
@@ -60,7 +60,7 @@ class AnsibleLintRule(BaseRule):
     @property
     def url(self) -> str:
         """Return rule documentation url."""
-        return self.RULE_DOC_URL + self.id + "/"
+        return RULE_DOC_URL + self.id + "/"
 
     @property
     def rule_config(self) -> dict[str, Any]:
@@ -306,50 +306,52 @@ class TransformMixin:
         return target
 
 
-def is_valid_rule(rule: Any) -> bool:
-    """Check if given rule is valid or not."""
-    return issubclass(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc)
-
-
 # pylint: disable=too-many-nested-blocks
 def load_plugins(  # noqa: max-complexity: 11
-    directory: str,
+    dirs: list[str],
 ) -> Iterator[AnsibleLintRule]:
     """Yield a rule class."""
-    for pluginfile in glob.glob(os.path.join(directory, "[A-Za-z]*.py")):
 
-        pluginname = os.path.basename(pluginfile.replace(".py", ""))
+    def all_subclasses(cls: type) -> set[type]:
+        return set(cls.__subclasses__()).union(
+            [
+                s
+                for c in cls.__subclasses__()
+                for s in all_subclasses(c)
+                if getattr(s, "id")
+            ]
+        )
 
-        #  conftest.py is a special file used by pytest, not a rule
-        if pluginname == "conftest":
-            continue
+    orig_sys_path = sys.path.copy()
 
-        spec = importlib.util.spec_from_file_location(pluginname, pluginfile)
+    for directory in dirs:
+        if directory not in sys.path:
+            sys.path.append(str(directory))
 
-        # https://github.com/python/typeshed/issues/2793
-        if spec and isinstance(spec.loader, Loader):
+        # load all modules in the directory
+        for f in Path(directory).glob("*.py"):
+            if "__" not in f.stem:
+                try:
+                    import_module(f"{f.stem}")
+                except ImportError as exc:
+                    _logger.warning("Ignore loading rule from %s due to %s", f, exc)
+    # restore sys.path
+    sys.path = orig_sys_path
 
-            # load rule markdown documentation if found
-            help_md = ""
-            if spec.origin:
-                md_filename = os.path.splitext(spec.origin)[0] + ".md"
-                if os.path.exists(md_filename):
-                    with open(md_filename, encoding="utf-8") as f:
-                        help_md = f.read()
-
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            try:
-                for _, obj in inspect.getmembers(module):
-                    if inspect.isclass(obj) and is_valid_rule(obj):
-                        if help_md:
-                            obj.help = help_md
-                        yield obj()
-
-            except (TypeError, ValueError, AttributeError) as exc:
-                _logger.warning(
-                    "Skipped invalid rule from %s due to %s", pluginname, exc
-                )
+    rules: dict[str, BaseRule] = {}
+    for rule in all_subclasses(BaseRule):
+        # we do not return the rules that are not loaded from passed 'directory'
+        # or rules that do not have a valid id. For example, during testing
+        # python may load other rule classes, some outside the tested rule
+        # directories.
+        if getattr(rule, "id") and Path(inspect.getfile(rule)).parent.absolute() in [
+            Path(x).absolute() for x in dirs
+        ]:
+            if issubclass(rule, BaseRule) and rule.id not in rules:
+                rules[rule.id] = rule()
+    for rule in rules.values():  # type: ignore
+        if isinstance(rule, AnsibleLintRule) and bool(rule.id) and bool(rule.shortdesc):
+            yield rule
 
 
 class RulesCollection:
@@ -371,10 +373,8 @@ class RulesCollection:
         self.rules.extend(
             [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()]
         )
-        for rulesdir in self.rulesdirs:
-            _logger.debug("Loading rules from %s", rulesdir)
-            for rule in load_plugins(rulesdir):
-                self.register(rule)
+        for rule in load_plugins(rulesdirs):
+            self.register(rule)
         self.rules = sorted(self.rules)
 
     def register(self, obj: AnsibleLintRule) -> None:

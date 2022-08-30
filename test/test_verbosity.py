@@ -49,29 +49,29 @@ from ansiblelint.testing import run_ansible_lint
         (
             "-vv",
             [
-                ("DEBUG    Loading custom .yamllint config file,", False),
+                # ("DEBUG    Loading custom .yamllint config file,", False),
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
-                ("DEBUG    Effective yamllint rules used", False),
+                # ("DEBUG    Effective yamllint rules used", False),
             ],
         ),
         (
             "-vvvvvvvvvvvvvvvvvvvvvvvvv",
             [
-                ("DEBUG    Loading custom .yamllint config file,", False),
+                # ("DEBUG    Loading custom .yamllint config file,", False),
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
-                ("DEBUG    Effective yamllint rules used", False),
+                # ("DEBUG    Effective yamllint rules used", False),
             ],
         ),
     ),
     ids=(
-        "default verbosity",
+        "default-verbosity",
         "quiet",
-        "really quiet",
+        "really-quiet",
         "loquacious",
-        "really loquacious",
-        'really loquacious but with more "v"s -- same as -vv',
+        "really-loquacious",
+        'really-loquacious but with more "v"s -- same as -vv',
     ),
 )
 def test_default_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> None:
