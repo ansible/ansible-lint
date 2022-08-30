@@ -1,6 +1,7 @@
 """Jinja template/expression dumper utils for transforms."""
 from __future__ import annotations
 
+from contextlib import contextmanager
 from io import StringIO
 from typing import List, TextIO, cast
 
@@ -8,6 +9,8 @@ from jinja2 import nodes
 from jinja2.compiler import operators
 from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor
+
+from .annotator import _AnnotatedNode
 
 
 def dump(
@@ -156,9 +159,12 @@ class TemplateDumper(NodeVisitor):
         Ensure that multiline templates end with a newline.
         Single line templates are probably simple expressions.
         """
+        # TODO: write/preserve whitespace and comments at start
         self.generic_visit(node)
-        if self._line_number > 1 and self._line_position != 0:
-            self.write("\n")
+        # if not self.environment.keep_trailing_newline
+        # if self._line_number > 1 and self._line_position != 0:
+        #     self.write("\n")
+        # TODO: write/preserve whitespace and comments at end
 
     def visit_Output(self, node: nodes.Template) -> None:
         """Write an ``Output`` node to the stream.
@@ -167,12 +173,34 @@ class TemplateDumper(NodeVisitor):
         """
         for child_node in node.iter_child_nodes():
             # child_node might be TemplateData which is outside {{ }}
-            do_var_wrap = not isinstance(child_node, nodes.TemplateData)
-            if do_var_wrap:
-                self.write(f"{self.environment.variable_start_string} ")
-            self.visit(child_node)
-            if do_var_wrap:
-                self.write(f" {self.environment.variable_end_string}")
+            if isinstance(child_node, nodes.TemplateData):
+                self.visit(child_node)
+                continue
+
+            # child_node is one of the expression nodes surrounded by {{ }}
+            with self.token_pair_variable(child_node):
+                self.visit(child_node)
+
+    @contextmanager
+    def token_pair_variable(self, node: nodes.Node):
+        start_string = self.environment.variable_start_string
+        end_string = self.environment.variable_end_string
+
+        # preserve chomped values
+        if hasattr(node, "token_pairs"):
+            # the outermost pair should be {{ }}
+            pair_opener = cast(_AnnotatedNode, node).token_pairs[0]
+            pair_closer = pair_opener.pair
+            if pair_opener.chomp:
+                start_string = pair_opener.value_str
+            if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
+                end_string = pair_closer.value_str
+
+        self.write(f"{start_string} ")
+        # self.write_space(default=" ")
+        yield
+        # self.write_space(default=" ")
+        self.write(f" {end_string}")
 
     def visit_Block(self, node: nodes.Block) -> None:
         """Write a ``Block`` to the stream.

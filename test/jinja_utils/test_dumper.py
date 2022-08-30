@@ -29,18 +29,9 @@ def annotated_ast(jinja_env: Environment, in_template: str) -> nodes.Template:
             "{% set ns = [1, 1, 2] %}\n",
             id="SimpleSetBlockStmt",
         ),
-        # This automatically adds newlines after most block tags (like 'set')
-        # any other whitespace, including chomped whitespace, is discarded
-        # by Jinja2's lexer + parser. Preserving that would require significant
-        # changes to Jinja2. So, the best we can do is find decent heuristics
-        # for when to add new lines.
-        # TODO: We might need to make 'multiline' a setting that gets passed
-        #       into TemplatDumper.__init__ to disable these newlines when a
-        #       single expression is expected.
         pytest.param(
             "{{ good_format }}\n{{- good_format }}\n{{- good_format -}}",
-            # expect the same as input, but actually get:
-            "{{ good_format }}{{ good_format }}{{ good_format }}",
+            "{{ good_format }}\n{{- good_format }}\n{{- good_format -}}",
             id="MultipleVarStmts",
         ),
         pytest.param(
