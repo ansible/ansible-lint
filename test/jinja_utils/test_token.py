@@ -1,7 +1,7 @@
 """Tests for expanded Jinja tokens iteration."""
 from __future__ import annotations
 
-from typing import Literal, Tuple
+from typing import Literal
 
 import pytest
 from jinja2 import lexer as j2tokens

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from io import StringIO
-from typing import List, Optional, TextIO, Union, cast
+from typing import TextIO, cast
 
 from jinja2 import nodes
 from jinja2.compiler import operators
@@ -110,7 +110,7 @@ class TemplateDumper(NodeVisitor):
                 self.write(", ")
             self.visit(arg)
         # cast because typehint is incorrect on nodes._FilterTestCommon
-        for kwarg in cast(List[nodes.Keyword], node.kwargs):
+        for kwarg in cast(list[nodes.Keyword], node.kwargs):
             if first:
                 first = False
             else:
