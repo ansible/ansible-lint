@@ -268,7 +268,7 @@ class NodeAnnotator(NodeVisitor):
             raise IndexError("Could not find the EOF token!")
 
         assert self.tokens.end
-        self.annotate(node, start=initial_token.start_pos, end=eof_token.end_pos)
+        self.annotate(node, start=initial_token.index, end=eof_token.index + 1)
 
     def generic_visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> Any:
         """Visit a generic ``Node``.
