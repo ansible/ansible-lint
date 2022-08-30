@@ -99,7 +99,7 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
     normalized_source = pre_iter_normalize_newlines(source, lexer.keep_trailing_newline)
     paired_tokens: list[Token] = []
     index = 0
-    start_pos = end_pos = 0
+    start_pos = end_pos = prev_token_end_pos = 0
     lineno = 1
 
     yield Token(
@@ -117,7 +117,7 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
     ):
         lineno, token_type, value_str = token_tuple
 
-        start_pos = normalized_source.index(value_str, end_pos)
+        start_pos = normalized_source.index(value_str, prev_token_end_pos)
         consumed = len(value_str)
         end_pos = start_pos + consumed
 
@@ -162,6 +162,19 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
                 elif "-" in value_str:
                     chomp = "-"
 
+        # Jinja2 includes post-chomped whitespace in value_str (eg "-}}\n\n")
+        # but the regex does not capture pre-chomped whitespace (eg "\n\n{{-")
+        # so, recapture chomped whitespace before pair openers.
+        # NB: raw end token is effectively an opener as it includes {% and %}.
+        if (
+            (is_pair_opener or token_type == TOKEN_RAW_END)
+            and chomp == "-"
+            and prev_token_end_pos < start_pos
+        ):
+            whitespace = normalized_source[prev_token_end_pos:start_pos]
+            value_str = whitespace + value_str
+            start_pos = prev_token_end_pos
+
         token = Token(
             index=index,
             start_pos=start_pos,
@@ -183,6 +196,8 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
             token.pair = open_token
 
         yield token
+
+        prev_token_end_pos = token.end_pos
 
     yield Token(
         index=index + 1,
