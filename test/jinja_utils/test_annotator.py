@@ -475,10 +475,12 @@ def test_annotate(
                 kwargs["parent"] = node
                 self.visit(child_node, *args, **kwargs)
 
-        def visit(self, node: nodes.Node, *args: Any, **kwargs: Any) -> None:
+        def visit(self, jinja_node: nodes.Node, *args: Any, **kwargs: Any) -> None:
             """Test AST node to ensure it is sane and fits within the parent node."""
             # Make it easier to identify which node had failures in the future
-            node = cast(_AnnotatedNode, node)
+
+            # this convinces mypy that the attrs are present
+            node: _AnnotatedNode = cast(_AnnotatedNode, jinja_node)
             assert hasattr(node, "tokens_slice")
             assert isinstance(node.tokens_slice, tuple)
             assert len(node.tokens_slice) == 2
@@ -504,6 +506,6 @@ def test_annotate(
                 assert parent.tokens_slice[1] - parent.tokens_slice[0] == len(
                     parent.tokens
                 )
-            super().visit(cast(nodes.Node, node), *args, **kwargs)
+            super().visit(jinja_node, *args, **kwargs)
 
     TestVisitor().visit(ast)
