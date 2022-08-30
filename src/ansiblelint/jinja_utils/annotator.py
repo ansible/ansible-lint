@@ -116,13 +116,14 @@ class NodeAnnotator(NodeVisitor):
         parent: nodes.Node | None = None,
     ) -> None:
         """Annotate Jinja2 AST Node with token details."""
-        cast(_AnnotatedNode, node).tokens_slice = (start, end)
-        cast(_AnnotatedNode, node).tokens = self.tokens[start:end]
+        _node = cast(_AnnotatedNode, node)
+        _node.tokens_slice = (start, end)
+        _node.tokens = self.tokens[start:end]
         if pair_open is not None:
-            pairs = getattr(cast(_AnnotatedNode, node), "token_pairs", ())
-            cast(_AnnotatedNode, node).token_pairs = (*pairs, pair_open)
+            pairs = getattr(_node, "token_pairs", ())
+            _node.token_pairs = (*pairs, pair_open)
         if parent is not None:
-            cast(_AnnotatedNode, node).parent = parent
+            _node.parent = parent
 
     @staticmethod
     def get_chomp_index(pre_tokens: list[Token]) -> int:
