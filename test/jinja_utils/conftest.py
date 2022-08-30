@@ -20,7 +20,8 @@ def templar() -> Templar:
 @pytest.fixture
 def jinja_env(templar: Templar) -> Environment:
     """Initialize a Jinja2 Environment for each test."""
-    return templar.environment
+    # this is AnsibleEnvironment | AnsibleNativeEnvironment
+    return cast(Environment, templar.environment)
 
 
 @pytest.fixture
