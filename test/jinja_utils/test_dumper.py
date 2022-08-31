@@ -67,9 +67,9 @@ def annotated_ast(jinja_env: Environment, in_template: str) -> nodes.Template:
             id="LookupFuncArgQuotes",
         ),
         pytest.param(
-            "{{ true and (false or true) }}",
-            # repr() on bools...
             "{{ True and (False or True) }}",
+            # Jinja supports Title case, but prefers lower
+            "{{ true and (false or true) }}",
             id="OrderedOperations",
         ),
         pytest.param(

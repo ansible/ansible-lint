@@ -457,6 +457,9 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Const(self, node: nodes.Const) -> None:
         """Write a constant value (``int``, ``str``, etc) to the stream."""
+        if node.value is None or isinstance(node.value, bool):
+            self.write(repr(node.value).lower())
+            return
         # We are using repr() here to handle quoting strings.
         self.write(repr(node.value))
 
