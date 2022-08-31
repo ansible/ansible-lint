@@ -225,7 +225,9 @@ html_logo = "https://ansible-lint.readthedocs.io/en/latest/_static/ansible-lint.
 # pixels large.
 #
 # ssbarnea: Do not put SVG here, Safari does not support it: https://caniuse.com/link-icon-svg
-html_favicon = "https://ansible-lint.readthedocs.io/en/latest/_static/images/logo_invert.png"
+html_favicon = (
+    "https://ansible-lint.readthedocs.io/en/latest/_static/images/logo_invert.png"
+)
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
