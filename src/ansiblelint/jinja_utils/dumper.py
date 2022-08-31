@@ -12,6 +12,8 @@ from jinja2.visitor import NodeVisitor
 
 from .annotator import _AnnotatedNode
 
+SPACE = " "
+
 
 def dump(
     node: nodes.Template,
@@ -62,18 +64,22 @@ class TemplateDumper(NodeVisitor):
 
     # -- Various compilation helpers
 
-    def write(self, string: str) -> None:
+    def write(self, *strings: str) -> None:
         """Write a string into the output stream."""
-        self.stream.write(string)
-        len_string = len(string)
-        newline_pos = string.rfind("\n")
-        if newline_pos == -1:
-            self._line_position += len_string
-        else:
-            # - 1 to exclude the \n
-            self._line_position = len_string - newline_pos - 1
-        self._stream_position += len_string
-        self._line_number += string.count("\n")
+        for string in strings:
+            if string is SPACE:
+                # TODO: handle space separately to add newline if needed
+                pass
+            self.stream.write(string)
+            len_string = len(string)
+            newline_pos = string.rfind("\n")
+            if newline_pos == -1:
+                self._line_position += len_string
+            else:
+                # - 1 to exclude the \n
+                self._line_position = len_string - newline_pos - 1
+            self._stream_position += len_string
+            self._line_number += string.count("\n")
 
     @contextmanager
     def token_pair_block(
@@ -96,9 +102,9 @@ class TemplateDumper(NodeVisitor):
 
         self._block_stmt_start_position = self._line_position
         self._block_stmt_start_line = self._line_number
-        self.write(f"{start_string} ")
+        self.write(start_string, SPACE)
         for name in names:
-            self.write(f"{name} ")
+            self.write(name, SPACE)
         yield
         self.write(end_string)
         if (
@@ -127,11 +133,9 @@ class TemplateDumper(NodeVisitor):
             if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
                 end_string = pair_closer.value_str
 
-        self.write(f"{start_string} ")
-        # self.write_space(default=" ")
+        self.write(start_string, SPACE)
         yield
-        # self.write_space(default=" ")
-        self.write(f" {end_string}")
+        self.write(SPACE, end_string)
 
     def signature(
         self,
@@ -144,27 +148,27 @@ class TemplateDumper(NodeVisitor):
             if first:
                 first = False
             else:
-                self.write(", ")
+                self.write(",", SPACE)
             self.visit(arg)
         # cast because typehint is incorrect on nodes._FilterTestCommon
         for kwarg in cast(List[nodes.Keyword], node.kwargs):
             if first:
                 first = False
             else:
-                self.write(", ")
+                self.write(",", SPACE)
             self.visit(kwarg)
         if node.dyn_args:
             if first:
                 first = False
                 self.write("*")
             else:
-                self.write(", *")
+                self.write(",", SPACE, "*")
             self.visit(node.dyn_args)
         if node.dyn_kwargs is not None:
             if first:
                 self.write("**")
             else:
-                self.write(", **")
+                self.write(",", SPACE, "**")
             self.visit(node.dyn_kwargs)
 
     def macro_signature(
@@ -175,13 +179,13 @@ class TemplateDumper(NodeVisitor):
         self.write("(")
         for idx, arg in enumerate(node.args):
             if idx:
-                self.write(", ")
+                self.write(",", SPACE)
             self.visit(arg)
             try:
                 default = node.defaults[idx - len(node.args)]
             except IndexError:
                 continue
-            self.write(" = ")
+            self.write(SPACE, "=", SPACE)
             self.visit(default)
         self.write(")")
 
@@ -260,10 +264,10 @@ class TemplateDumper(NodeVisitor):
         with self.token_pair_block(node, "include"):
             self.visit(node.template)
             if node.ignore_missing:
-                self.write(" ignore missing")
+                self.write(SPACE, "ignore missing")
             # include defaults to "with context" so leave it off
             if not node.with_context:
-                self.write(" without context")
+                self.write(SPACE, "without context")
 
     def visit_Import(self, node: nodes.Import) -> None:
         """Write an ``Import`` block to the stream.
@@ -275,10 +279,10 @@ class TemplateDumper(NodeVisitor):
         """
         with self.token_pair_block(node, "import"):
             self.visit(node.template)
-            self.write(f" as {node.target}")
+            self.write(SPACE, "as", SPACE, node.target)
             # import defaults to "without context" so leave it off
             if node.with_context:
-                self.write(" with context")
+                self.write(SPACE, "with context")
 
     def visit_FromImport(self, node: nodes.FromImport) -> None:
         """Write a ``FromImport`` block to the stream.
@@ -290,17 +294,17 @@ class TemplateDumper(NodeVisitor):
         """
         with self.token_pair_block(node, "from"):
             self.visit(node.template)
-            self.write(" import ")
+            self.write(SPACE, "import", SPACE)
             for idx, name in enumerate(node.names):
                 if idx:
-                    self.write(", ")
+                    self.write(",", SPACE)
                 if isinstance(name, tuple):
-                    self.write(f"{name[0]} as {name[1]}")
+                    self.write(name[0], SPACE, "as", SPACE, name[1])
                 else:  # str
                     self.write(name)
             # import defaults to "without context" so leave it off
             if node.with_context:
-                self.write(" with context")
+                self.write(SPACE, "with context")
 
     def visit_For(self, node: nodes.For) -> None:
         """Write a ``For`` block to the stream.
@@ -315,13 +319,13 @@ class TemplateDumper(NodeVisitor):
         with self.token_pair_block(node, "for", tag_index=tag_index):
             tag_index += 1
             self.visit(node.target)
-            self.write(" in ")
+            self.write(SPACE, "in", SPACE)
             self.visit(node.iter)
             if node.test is not None:
-                self.write(" if ")
+                self.write(SPACE, "if", SPACE)
                 self.visit(node.test)
             if node.recursive:
-                self.write(" recursive")
+                self.write(SPACE, "recursive")
         for child_node in node.body:
             self.visit(child_node)
         if node.else_:
@@ -365,9 +369,9 @@ class TemplateDumper(NodeVisitor):
                 if first:
                     first = False
                 else:
-                    self.write(", ")
+                    self.write(",", SPACE)
                 self.visit(target)
-                self.write(" = ")
+                self.write(SPACE, "=", SPACE)
                 self.visit(expr)
         for child_node in node.body:
             self.visit(child_node)
@@ -394,7 +398,7 @@ class TemplateDumper(NodeVisitor):
         """
         with self.token_pair_block(node, "set"):
             self.visit(node.target)
-            self.write(" = ")
+            self.write(SPACE, "=", SPACE)
             self.visit(node.node)
 
     # noinspection DuplicatedCode
@@ -454,7 +458,7 @@ class TemplateDumper(NodeVisitor):
         with self.token_pair_block(node, "call"):
             if node.args:
                 self.macro_signature(node)
-            self.write(" ")
+            self.write(SPACE)
             self.visit(node.call)
         for child_node in node.body:
             self.visit(child_node)
@@ -493,7 +497,7 @@ class TemplateDumper(NodeVisitor):
         idx = -1
         for idx, item in enumerate(node.items):
             if idx:
-                self.write(", ")
+                self.write(",", SPACE)
             self.visit(item)
         self.write(",)" if idx == 0 else ")")
 
@@ -502,7 +506,7 @@ class TemplateDumper(NodeVisitor):
         self.write("[")
         for idx, item in enumerate(node.items):
             if idx:
-                self.write(", ")
+                self.write(",", SPACE)
             self.visit(item)
         self.write("]")
 
@@ -512,9 +516,9 @@ class TemplateDumper(NodeVisitor):
         item: nodes.Pair
         for idx, item in enumerate(node.items):
             if idx:
-                self.write(", ")
+                self.write(",", SPACE)
             self.visit(item.key)
-            self.write(": ")
+            self.write(":", SPACE)
             self.visit(item.value)
         self.write("}")
 
@@ -534,7 +538,7 @@ class TemplateDumper(NodeVisitor):
     def _binary_op(self, node: nodes.BinExpr) -> None:
         """Write a ``BinExpr`` (left and right op) to the stream."""
         self._visit_possible_binary_op(node.left)
-        self.write(f" {node.operator} ")
+        self.write(SPACE, node.operator, SPACE)
         self._visit_possible_binary_op(node.right)
 
     visit_Add = _binary_op
@@ -549,7 +553,7 @@ class TemplateDumper(NodeVisitor):
 
     def _unary_op(self, node: nodes.UnaryExpr) -> None:
         """Write an ``UnaryExpr`` (one node with one op) to the stream."""
-        self.write(f"{node.operator} ")
+        self.write(node.operator, SPACE)
         self._visit_possible_binary_op(node.node)
 
     visit_Pos = _unary_op
@@ -569,7 +573,7 @@ class TemplateDumper(NodeVisitor):
         """
         for idx, expr in enumerate(node.nodes):
             if idx:
-                self.write(" ~ ")
+                self.write(SPACE, "~", SPACE)
             self.visit(expr)
 
     def visit_Compare(self, node: nodes.Compare) -> None:
@@ -624,7 +628,7 @@ class TemplateDumper(NodeVisitor):
         """Write a Jinja ``Filter`` to the stream."""
         if node.node is not None:
             self.visit(node.node)
-            self.write(" | ")
+            self.write(SPACE, "|", SPACE)
         self.write(node.name)
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             self.write("(")
@@ -635,9 +639,9 @@ class TemplateDumper(NodeVisitor):
         """Write a Jinja ``Test`` to the stream."""
         self.visit(node.node)
         if negate:
-            self.write(" is not ")
+            self.write(SPACE, "is not", SPACE)
         else:
-            self.write(" is ")
+            self.write(SPACE, "is", SPACE)
         self.write(node.name)
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             self.write("(")
@@ -652,10 +656,10 @@ class TemplateDumper(NodeVisitor):
             {{ foo if bar else baz }}
         """
         self.visit(node.expr1)
-        self.write(" if ")
+        self.write(SPACE, "if", SPACE)
         self.visit(node.test)
         if node.expr2 is not None:
-            self.write(" else ")
+            self.write(SPACE, "else", SPACE)
             self.visit(node.expr2)
 
     def visit_Call(self, node: nodes.Call) -> None:
