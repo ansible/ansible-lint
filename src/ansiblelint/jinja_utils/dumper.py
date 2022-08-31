@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from io import StringIO
-from typing import List, TextIO, cast
+from typing import Iterator, List, TextIO, cast
 
 from jinja2 import nodes
 from jinja2.compiler import operators
@@ -75,29 +75,42 @@ class TemplateDumper(NodeVisitor):
         self._stream_position += len_string
         self._line_number += string.count("\n")
 
-    def write_block_stmt(
-        self, *, start: bool = False, name: str = "", end: bool = False
-    ) -> None:
-        """Write a block start and/or block end string to the stream."""
-        if start:
-            self._block_stmt_start_position = self._line_position
-            self._block_stmt_start_line = self._line_number
-            self.write(f"{self.environment.block_start_string} ")
-        if name:
-            self.write(name)
-        if name or end:
-            self.write(" ")
-        if end:
-            self.write(self.environment.block_end_string)
-            if (
-                # if the block starts in the middle of a line, keep it inline.
-                self._block_stmt_start_position == 0
-                # if the block statement uses multiple lines, don't inline the body.
-                or self._block_stmt_start_line != self._line_number
-            ):
+    @contextmanager
+    def token_pair_block(
+        self, node: nodes.Node, *names: str, tag_index: int = 0
+    ) -> Iterator[None]:
+        start_string = self.environment.block_start_string
+        end_string = self.environment.block_end_string
+
+        # preserve chomped values
+        if hasattr(node, "token_pairs"):
+            _node = cast(_AnnotatedNode, node)
+            if len(_node.token_pairs) > tag_index:
+                # the outermost pair should be {{ }}
+                pair_opener = _node.token_pairs[tag_index]
+                pair_closer = pair_opener.pair
+                if pair_opener.chomp:
+                    start_string = pair_opener.value_str
+                if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
+                    end_string = pair_closer.value_str
+
+        self._block_stmt_start_position = self._line_position
+        self._block_stmt_start_line = self._line_number
+        self.write(f"{start_string} ")
+        for name in names:
+            self.write(f"{name} ")
+        yield
+        self.write(end_string)
+        if (
+            # if the block starts in the middle of a line, keep it inline.
+            self._block_stmt_start_position == 0
+            # if the block statement uses multiple lines, don't inline the body.
+            or self._block_stmt_start_line != self._line_number
+        ):
+            if "\n" not in end_string:  # does this make sense?
                 self.write("\n")
-                self._block_stmt_start_position = -1
-                self._block_stmt_start_line = -1
+            self._block_stmt_start_position = -1
+            self._block_stmt_start_line = -1
 
     def signature(
         self,
@@ -212,16 +225,17 @@ class TemplateDumper(NodeVisitor):
             {% block name scoped required %}block{% endblock %}
             {% block name required %}block{% endblock %}
         """
-        self.write_block_stmt(start=True, name="block")
-        self.write(node.name)
+        block_name_tokens: list[str] = ["block", node.name]
         if node.scoped:
-            self.write(" scoped")
+            block_name_tokens.append("scoped")
         if node.required:
-            self.write(" required")
-        self.write_block_stmt(end=True)
+            block_name_tokens.append("required")
+        with self.token_pair_block(node, *block_name_tokens, tag_index=0):
+            pass
         for child_node in node.body:
             self.visit(child_node)
-        self.write_block_stmt(start=True, name="endblock", end=True)
+        with self.token_pair_block(node, "endblock", tag_index=1):
+            pass
 
     def visit_Extends(self, node: nodes.Extends) -> None:
         """Write an ``Extends`` block to the stream.
@@ -230,9 +244,8 @@ class TemplateDumper(NodeVisitor):
 
             {% extends name %}
         """
-        self.write_block_stmt(start=True, name="extends")
-        self.visit(node.template)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "extends"):
+            self.visit(node.template)
 
     def visit_Include(self, node: nodes.Include) -> None:
         """Write an ``Include`` block to the stream.
@@ -244,14 +257,13 @@ class TemplateDumper(NodeVisitor):
             {% include name ignore missing without context %}
             {% include name without context %}
         """
-        self.write_block_stmt(start=True, name="include")
-        self.visit(node.template)
-        if node.ignore_missing:
-            self.write(" ignore missing")
-        # include defaults to "with context" so leave it off
-        if not node.with_context:
-            self.write(" without context")
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "include"):
+            self.visit(node.template)
+            if node.ignore_missing:
+                self.write(" ignore missing")
+            # include defaults to "with context" so leave it off
+            if not node.with_context:
+                self.write(" without context")
 
     def visit_Import(self, node: nodes.Import) -> None:
         """Write an ``Import`` block to the stream.
@@ -261,13 +273,12 @@ class TemplateDumper(NodeVisitor):
             {% import expr as name %}
             {% import expr as name without context %}
         """
-        self.write_block_stmt(start=True, name="import")
-        self.visit(node.template)
-        self.write(f" as {node.target}")
-        # import defaults to "without context" so leave it off
-        if node.with_context:
-            self.write(" with context")
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "import"):
+            self.visit(node.template)
+            self.write(f" as {node.target}")
+            # import defaults to "without context" so leave it off
+            if node.with_context:
+                self.write(" with context")
 
     def visit_FromImport(self, node: nodes.FromImport) -> None:
         """Write a ``FromImport`` block to the stream.
@@ -277,20 +288,19 @@ class TemplateDumper(NodeVisitor):
             {% import expr as name %}
             {% import expr as name without context %}
         """
-        self.write_block_stmt(start=True, name="from")
-        self.visit(node.template)
-        self.write(" import ")
-        for idx, name in enumerate(node.names):
-            if idx:
-                self.write(", ")
-            if isinstance(name, tuple):
-                self.write(f"{name[0]} as {name[1]}")
-            else:  # str
-                self.write(name)
-        # import defaults to "without context" so leave it off
-        if node.with_context:
-            self.write(" with context")
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "from"):
+            self.visit(node.template)
+            self.write(" import ")
+            for idx, name in enumerate(node.names):
+                if idx:
+                    self.write(", ")
+                if isinstance(name, tuple):
+                    self.write(f"{name[0]} as {name[1]}")
+                else:  # str
+                    self.write(name)
+            # import defaults to "without context" so leave it off
+            if node.with_context:
+                self.write(" with context")
 
     def visit_For(self, node: nodes.For) -> None:
         """Write a ``For`` block to the stream.
@@ -301,59 +311,68 @@ class TemplateDumper(NodeVisitor):
             {% for target in iter recursive %}block{% endfor %}
             {% for target in iter %}block{% else %}block{% endfor %}
         """
-        self.write_block_stmt(start=True, name="for")
-        self.visit(node.target)
-        self.write(" in ")
-        self.visit(node.iter)
-        if node.test is not None:
-            self.write(" if ")
-            self.visit(node.test)
-        if node.recursive:
-            self.write(" recursive")
-        self.write_block_stmt(end=True)
+        tag_index = 0
+        with self.token_pair_block(node, "for", tag_index=tag_index):
+            tag_index += 1
+            self.visit(node.target)
+            self.write(" in ")
+            self.visit(node.iter)
+            if node.test is not None:
+                self.write(" if ")
+                self.visit(node.test)
+            if node.recursive:
+                self.write(" recursive")
         for child_node in node.body:
             self.visit(child_node)
         if node.else_:
-            self.write_block_stmt(start=True, name="else", end=True)
+            with self.token_pair_block(node, "else", tag_index=tag_index):
+                tag_index += 1
             for child_node in node.else_:
                 self.visit(child_node)
-        self.write_block_stmt(start=True, name="endfor", end=True)
+        with self.token_pair_block(node, "endfor", tag_index=tag_index):
+            pass
 
     def visit_If(self, node: nodes.If) -> None:
         """Write an ``If`` block to the stream."""
-        self.write_block_stmt(start=True, name="if")
-        self.visit(node.test)
-        self.write_block_stmt(end=True)
+        tag_index = 0
+        with self.token_pair_block(node, "if", tag_index=tag_index):
+            tag_index += 1
+            self.visit(node.test)
         for child_node in node.body:
             self.visit(child_node)
         for elif_node in node.elif_:
-            self.write_block_stmt(start=True, name="elif")
-            self.visit(elif_node.test)
-            self.write_block_stmt(end=True)
-            for child_node in elif_node.body:
-                self.visit(child_node)
+            self.visit_Elif(elif_node)
         if node.else_:
-            self.write_block_stmt(start=True, name="else", end=True)
+            with self.token_pair_block(node, "else", tag_index=tag_index):
+                tag_index += 1
             for child_node in node.else_:
                 self.visit(child_node)
-        self.write_block_stmt(start=True, name="endif", end=True)
+        with self.token_pair_block(node, "endif", tag_index=tag_index):
+            pass
+
+    def visit_Elif(self, node: nodes.If) -> None:
+        """Visit an ``If`` block that serves as an elif node in another ``If`` block."""
+        with self.token_pair_block(node, "elif"):
+            self.visit(node.test)
+        for child_node in node.body:
+            self.visit(child_node)
 
     def visit_With(self, node: nodes.With) -> None:
         """Write a ``With`` statement (manual scopes) to the stream."""
-        self.write_block_stmt(start=True, name="with")
-        first = True
-        for target, expr in zip(node.targets, node.values):
-            if first:
-                first = False
-            else:
-                self.write(", ")
-            self.visit(target)
-            self.write(" = ")
-            self.visit(expr)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "with", tag_index=0):
+            first = True
+            for target, expr in zip(node.targets, node.values):
+                if first:
+                    first = False
+                else:
+                    self.write(", ")
+                self.visit(target)
+                self.write(" = ")
+                self.visit(expr)
         for child_node in node.body:
             self.visit(child_node)
-        self.write_block_stmt(start=True, name="endwith", end=True)
+        with self.token_pair_block(node, "endwith", tag_index=1):
+            pass
 
     def visit_ExprStmt(self, node: nodes.ExprStmt) -> None:
         """Write a ``do`` block to the stream.
@@ -363,9 +382,8 @@ class TemplateDumper(NodeVisitor):
         ExprStmt
             A statement that evaluates an expression and discards the result.
         """
-        self.write_block_stmt(start=True, name="do")
-        self.visit(node.node)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "do"):
+            self.visit(node.node)
 
     def visit_Assign(self, node: nodes.Assign) -> None:
         """Write an ``Assign`` statement to the stream.
@@ -374,11 +392,10 @@ class TemplateDumper(NodeVisitor):
 
             {% set var = value %}
         """
-        self.write_block_stmt(start=True, name="set")
-        self.visit(node.target)
-        self.write(" = ")
-        self.visit(node.node)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "set"):
+            self.visit(node.target)
+            self.write(" = ")
+            self.visit(node.node)
 
     # noinspection DuplicatedCode
     def visit_AssignBlock(self, node: nodes.AssignBlock) -> None:
@@ -388,12 +405,14 @@ class TemplateDumper(NodeVisitor):
 
             {% set var %}value{% endset %}
         """
-        self.write_block_stmt(start=True, name="set")
-        self.visit(node.target)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "set", tag_index=0):
+            self.visit(node.target)
+            if node.filter is not None:
+                self.visit(node.filter)
         for child_node in node.body:
             self.visit(child_node)
-        self.write_block_stmt(start=True, name="endset", end=True)
+        with self.token_pair_block(node, "endset", tag_index=1):
+            pass
 
     # noinspection DuplicatedCode
     def visit_FilterBlock(self, node: nodes.FilterBlock) -> None:
@@ -403,12 +422,12 @@ class TemplateDumper(NodeVisitor):
 
             {% filter <filter> %}block{% endfilter %}
         """
-        self.write_block_stmt(start=True, name="filter")
-        self.visit(node.filter)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "filter", tag_index=0):
+            self.visit(node.filter)
         for child_node in node.body:
             self.visit(child_node)
-        self.write_block_stmt(start=True, name="endfilter", end=True)
+        with self.token_pair_block(node, "endfilter", tag_index=1):
+            pass
 
     def visit_Macro(self, node: nodes.Macro) -> None:
         """Write a ``Macro`` definition block to the stream.
@@ -417,13 +436,12 @@ class TemplateDumper(NodeVisitor):
 
             {% macro name(args/defaults) %}block{% endmacro %}
         """
-        self.write_block_stmt(start=True, name="macro")
-        self.write(node.name)
-        self.macro_signature(node)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "macro", node.name):
+            self.macro_signature(node)
         for child_node in node.body:
             self.visit(child_node)
-        self.write_block_stmt(start=True, name="endmacro", end=True)
+        with self.token_pair_block(node, "endmacro"):
+            pass
 
     def visit_CallBlock(self, node: nodes.CallBlock) -> None:
         """Write a macro ``Call`` block to the stream.
@@ -433,15 +451,15 @@ class TemplateDumper(NodeVisitor):
             {% call macro() %}block{% endcall %}
             {% call(args/defaults) macro() %}block{% endcall %}
         """
-        self.write_block_stmt(start=True, name="call")
-        if node.args:
-            self.macro_signature(node)
-        self.write(" ")
-        self.visit(node.call)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "call"):
+            if node.args:
+                self.macro_signature(node)
+            self.write(" ")
+            self.visit(node.call)
         for child_node in node.body:
             self.visit(child_node)
-        self.write_block_stmt(start=True, name="endcall", end=True)
+        with self.token_pair_block(node, "endcall"):
+            pass
 
     # -- Expression Visitors
 
@@ -469,7 +487,8 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Tuple(self, node: nodes.Tuple) -> None:
         """Write a ``Tuple`` to the stream."""
-        # TODO: handle ctx = load or store
+        # this not distinguish between ctx = load or store
+        # TODO: deal with tuples that should use implicit parentheses
         self.write("(")
         idx = -1
         for idx, item in enumerate(node.items):
@@ -684,12 +703,14 @@ class TemplateDumper(NodeVisitor):
         self, node: nodes.Continue  # pylint: disable=unused-argument
     ) -> None:
         """Write a ``Continue`` block for the LoopControlExtension to the stream."""
-        self.write_block_stmt(start=True, name="continue", end=True)
+        with self.token_pair_block(node, "continue"):
+            pass
 
     # noinspection PyUnusedLocal
     def visit_Break(self, node: nodes.Break) -> None:  # pylint: disable=unused-argument
         """Write a ``Break`` block for the LoopControlExtension to the stream."""
-        self.write_block_stmt(start=True, name="break", end=True)
+        with self.token_pair_block(node, "break"):
+            pass
 
     # def visit_Scope(self, node: nodes.Scope) -> None:
     #     """could be added by extensions.
@@ -715,9 +736,9 @@ class TemplateDumper(NodeVisitor):
             # unknown Modifier block
             self.generic_visit(node)
             return
-        self.write_block_stmt(start=True, name="autoescape")
-        self.visit(autoescape)
-        self.write_block_stmt(end=True)
+        with self.token_pair_block(node, "autoescape"):
+            self.visit(autoescape)
         for child_node in node.body:
             self.visit(child_node)
-        self.write_block_stmt(start=True, name="endautoescape", end=True)
+        with self.token_pair_block(node, "endautoescape"):
+            self.visit(autoescape)
