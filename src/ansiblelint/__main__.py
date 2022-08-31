@@ -111,7 +111,7 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     os.makedirs(options.cache_dir, exist_ok=True)
     options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
     try:
-        options.cache_dir_lock.acquire(timeout=60)
+        options.cache_dir_lock.acquire(timeout=120)
     except Timeout:
         _logger.error(
             "Timeout waiting for another instance of ansible-lint to release the lock."
