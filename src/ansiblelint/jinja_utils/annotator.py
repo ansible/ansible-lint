@@ -24,6 +24,8 @@ class _AnnotatedNode:
     # The closing pair is available as token_pairs[].pair
     token_pairs: Sequence[Token]
     parent: nodes.Node
+    # additional contextual informatioon
+    extras: dict[str, Any]
 
 
 def annotate(
@@ -114,6 +116,7 @@ class NodeAnnotator(NodeVisitor):
         end: int,
         pair_open: Token | None = None,
         parent: nodes.Node | None = None,
+        **extras: Any,
     ) -> None:
         """Annotate Jinja2 AST Node with token details."""
         _node = cast(_AnnotatedNode, node)
@@ -124,6 +127,8 @@ class NodeAnnotator(NodeVisitor):
             _node.token_pairs = (*pairs, pair_open)
         if parent is not None:
             _node.parent = parent
+        if extras:
+            _node.extras = extras
 
     @staticmethod
     def get_chomp_index(pre_tokens: list[Token]) -> int:
@@ -200,7 +205,11 @@ class NodeAnnotator(NodeVisitor):
 
     @contextmanager
     def token_pair_expression(
-        self, node: nodes.Node, left_token: str, parent: nodes.Node | None = None
+        self,
+        node: nodes.Node,
+        left_token: str,
+        parent: nodes.Node | None = None,
+        **annotate_extras: Any,
     ) -> Iterator[None]:
         """Find paired tokens ``{}()[]``, yield, and then annotate the node."""
         _, start_token = self.tokens.seek(left_token)
@@ -227,6 +236,7 @@ class NodeAnnotator(NodeVisitor):
             end=stop_index + 1,
             pair_open=start_token,
             parent=parent,
+            **annotate_extras,
         )
 
     # -- Various compilation helpers
@@ -649,7 +659,9 @@ class NodeAnnotator(NodeVisitor):
         """Visit a Literal ``Tuple`` in the stream."""
         if not node.items:
             # empty tuple
-            with self.token_pair_expression(node, j2tokens.TOKEN_LPAREN, parent=parent):
+            with self.token_pair_expression(
+                node, j2tokens.TOKEN_LPAREN, parent=parent, explicit_parentheses=True
+            ):
                 pass
             return
 
@@ -685,7 +697,7 @@ class NodeAnnotator(NodeVisitor):
             # reset tokens back to lparen token
             self.tokens.index = start_index = cast(Token, lparen_token).index
             pair_wrapper = self.token_pair_expression(
-                node, j2tokens.TOKEN_LPAREN, parent=parent
+                node, j2tokens.TOKEN_LPAREN, parent=parent, explicit_parentheses=True
             )
         else:
             pair_wrapper = nullcontext()
@@ -718,7 +730,13 @@ class NodeAnnotator(NodeVisitor):
                     self.tokens.index = token.index + 1
                 else:
                     self.tokens.index = after_index
-            self.annotate(node, start=start_index, end=self.tokens.index, parent=parent)
+            self.annotate(
+                node,
+                start=start_index,
+                end=self.tokens.index,
+                parent=parent,
+                explicit_parentheses=False,
+            )
 
     def visit_List(self, node: nodes.List, parent: nodes.Node) -> None:
         """Visit a Literal ``List`` in the stream."""

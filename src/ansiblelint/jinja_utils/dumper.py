@@ -493,15 +493,31 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Tuple(self, node: nodes.Tuple) -> None:
         """Write a ``Tuple`` to the stream."""
-        # this not distinguish between ctx = load or store
-        # TODO: deal with tuples that should use implicit parentheses
-        self.write("(")
+        # this not distinguish between node.ctx = load or node.ctx = store
+
+        _node = cast(_AnnotatedNode, node)
+        if hasattr(_node, "extras") and "explicit_parentheses" in _node.extras:
+            # parentheses are optional in many contexts like "for <tuple> in ..."
+            # this gets set by the Annotator based on inspecting the stream of tokens.
+            explicit_parentheses = _node.extras["explicit_parentheses"]
+        else:
+            # If a Tuple node was added by a transform (after annotation),
+            # it might not have extras. Just assume it needs parentheses.
+            explicit_parentheses = True
+
+        if explicit_parentheses:
+            self.write("(")
+
         idx = -1
         for idx, item in enumerate(node.items):
             if idx:
                 self.write(",", SPACE)
             self.visit(item)
-        self.write(",)" if idx == 0 else ")")
+        if idx == 0:
+            self.write(",")
+
+        if explicit_parentheses:
+            self.write("(")
 
     def visit_List(self, node: nodes.List) -> None:
         """Write a ``List`` to the stream."""
