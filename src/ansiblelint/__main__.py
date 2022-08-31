@@ -109,14 +109,17 @@ def initialize_options(arguments: list[str] | None = None) -> None:
 
     # add a lock file so we do not have two instances running inside at the same time
     os.makedirs(options.cache_dir, exist_ok=True)
-    options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
-    try:
-        options.cache_dir_lock.acquire(timeout=120)
-    except Timeout:
-        _logger.error(
-            "Timeout waiting for another instance of ansible-lint to release the lock."
-        )
-        sys.exit(LOCK_TIMEOUT_RC)
+
+    options.cache_dir_lock = None
+    if not options.offline:
+        options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
+        try:
+            options.cache_dir_lock.acquire(timeout=120)
+        except Timeout:
+            _logger.error(
+                "Timeout waiting for another instance of ansible-lint to release the lock."
+            )
+            sys.exit(LOCK_TIMEOUT_RC)
 
 
 def _do_list(rules: RulesCollection) -> int:
@@ -248,8 +251,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     app.render_matches(result.matches)
 
     _perform_mockings_cleanup()
-    options.cache_dir_lock.release()
-    pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
+    if options.cache_dir_lock:
+        options.cache_dir_lock.release()
+        pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
 
