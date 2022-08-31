@@ -63,8 +63,7 @@ safety:
     a non-determinant outcomes and cause security issues in some cases.
   extends: moderate
   rules:
-    git-latest:
-    hg-latest:
+    latest:
     package-latest:
     risky-file-permissions:
     risky-octal:

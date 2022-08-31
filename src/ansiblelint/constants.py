@@ -85,8 +85,8 @@ RENAMED_TAGS = {
     "304": "inline-env-var",
     "305": "command-instead-of-shell",
     "306": "risky-shell-pipe",
-    "401": "git-latest",
-    "402": "hg-latest",
+    "401": "latest[git]",
+    "402": "latest[hg]",
     "403": "package-latest",
     "404": "no-relative-paths",
     "501": "partial-become",
@@ -103,6 +103,8 @@ RENAMED_TAGS = {
     "911": "syntax-check",
     "var-spacing": "jinja[spacing]",
     "unnamed-task": "name[missing]",
+    "git-latest": "latest[git]",
+    "hg-latest": "latest[hg]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [
