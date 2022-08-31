@@ -607,7 +607,6 @@ class NodeAnnotator(NodeVisitor):
 
     def visit_Const(self, node: nodes.Const, parent: nodes.Node) -> None:  # Literal
         """Visit a Literal constant value (``int``, ``str``, etc) in the stream."""
-        # We are using repr() here to handle quoting strings.
         if node.value is None or isinstance(node.value, bool):
             _, token = self.tokens.seek(j2tokens.TOKEN_NAME)
             if token is None:
