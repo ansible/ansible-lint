@@ -178,6 +178,8 @@ html_theme = "sphinx_ansible_theme"
 html_theme_options = {
     "collapse_navigation": False,
     "analytics_id": "UA-128382387-1",
+    # cspell:disable-next-line
+    "tag_manager_id": "GTM-5FGNF6S",
     "style_nav_header_background": "#5bbdbf",
     "style_external_links": True,
     # 'canonical_url': "https://docs.ansible.com/ansible/latest/",
