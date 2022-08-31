@@ -61,15 +61,16 @@ class TemplateDumper(NodeVisitor):
         self._line_number = 1
         self._block_stmt_start_position = -1
         self._block_stmt_start_line = -1
+        self._last_wrote = ""
 
     # -- Various compilation helpers
 
     def write(self, *strings: str) -> None:
         """Write a string into the output stream."""
         for string in strings:
-            if string is SPACE:
-                # TODO: handle space separately to add newline if needed
-                pass
+            if string is SPACE and self._last_wrote is SPACE:
+                # only write one consecutive space
+                continue
             self.stream.write(string)
             len_string = len(string)
             newline_pos = string.rfind("\n")
@@ -80,6 +81,7 @@ class TemplateDumper(NodeVisitor):
                 self._line_position = len_string - newline_pos - 1
             self._stream_position += len_string
             self._line_number += string.count("\n")
+            self._last_wrote = string
 
     @contextmanager
     def token_pair_block(
@@ -104,9 +106,9 @@ class TemplateDumper(NodeVisitor):
         self._block_stmt_start_line = self._line_number
         self.write(start_string, SPACE)
         for name in names:
-            self.write(name, SPACE)
+            self.write(SPACE, name, SPACE)
         yield
-        self.write(end_string)
+        self.write(SPACE, end_string)
         if (
             # if the block starts in the middle of a line, keep it inline.
             self._block_stmt_start_position == 0
@@ -160,15 +162,15 @@ class TemplateDumper(NodeVisitor):
         if node.dyn_args:
             if first:
                 first = False
-                self.write("*")
+                self.write("*")  # must not end in SPACE
             else:
-                self.write(",", SPACE, "*")
+                self.write(",", SPACE, "*")  # must not end in SPACE
             self.visit(node.dyn_args)
         if node.dyn_kwargs is not None:
             if first:
-                self.write("**")
+                self.write("**")  # must not end in SPACE
             else:
-                self.write(",", SPACE, "**")
+                self.write(",", SPACE, "**")  # must not end in SPACE
             self.visit(node.dyn_kwargs)
 
     def macro_signature(
@@ -264,10 +266,10 @@ class TemplateDumper(NodeVisitor):
         with self.token_pair_block(node, "include"):
             self.visit(node.template)
             if node.ignore_missing:
-                self.write(SPACE, "ignore missing")
+                self.write(SPACE, "ignore missing", SPACE)
             # include defaults to "with context" so leave it off
             if not node.with_context:
-                self.write(SPACE, "without context")
+                self.write(SPACE, "without context", SPACE)
 
     def visit_Import(self, node: nodes.Import) -> None:
         """Write an ``Import`` block to the stream.
@@ -279,10 +281,10 @@ class TemplateDumper(NodeVisitor):
         """
         with self.token_pair_block(node, "import"):
             self.visit(node.template)
-            self.write(SPACE, "as", SPACE, node.target)
+            self.write(SPACE, "as", SPACE, node.target, SPACE)
             # import defaults to "without context" so leave it off
             if node.with_context:
-                self.write(SPACE, "with context")
+                self.write(SPACE, "with context", SPACE)
 
     def visit_FromImport(self, node: nodes.FromImport) -> None:
         """Write a ``FromImport`` block to the stream.
@@ -304,7 +306,7 @@ class TemplateDumper(NodeVisitor):
                     self.write(name)
             # import defaults to "without context" so leave it off
             if node.with_context:
-                self.write(SPACE, "with context")
+                self.write(SPACE, "with context", SPACE)
 
     def visit_For(self, node: nodes.For) -> None:
         """Write a ``For`` block to the stream.
@@ -325,7 +327,7 @@ class TemplateDumper(NodeVisitor):
                 self.write(SPACE, "if", SPACE)
                 self.visit(node.test)
             if node.recursive:
-                self.write(SPACE, "recursive")
+                self.write(SPACE, "recursive", SPACE)
         for child_node in node.body:
             self.visit(child_node)
         if node.else_:
@@ -553,7 +555,7 @@ class TemplateDumper(NodeVisitor):
 
     def _unary_op(self, node: nodes.UnaryExpr) -> None:
         """Write an ``UnaryExpr`` (one node with one op) to the stream."""
-        self.write(node.operator, SPACE)
+        self.write(SPACE, node.operator)  # must not end in SPACE
         self._visit_possible_binary_op(node.node)
 
     visit_Pos = _unary_op
@@ -563,7 +565,10 @@ class TemplateDumper(NodeVisitor):
         """Write a negated expression to the stream."""
         if isinstance(node.node, nodes.Test):
             return self.visit_Test(node.node, negate=True)
-        return self._unary_op(node)
+        else:
+            # this is a unary operator
+            self.write(SPACE, node.operator, SPACE)
+            return self._visit_possible_binary_op(node.node)
 
     def visit_Concat(self, node: nodes.Concat) -> None:
         """Write a string concatenation expression to the stream.
@@ -588,7 +593,7 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Operand(self, node: nodes.Operand) -> None:
         """Write an ``Operand`` to the stream."""
-        self.write(f" {operators[node.op]} ")
+        self.write(SPACE, operators[node.op], SPACE)
         self._visit_possible_binary_op(node.expr)
 
     def visit_Getattr(self, node: nodes.Getattr) -> None:
@@ -642,7 +647,7 @@ class TemplateDumper(NodeVisitor):
             self.write(SPACE, "is not", SPACE)
         else:
             self.write(SPACE, "is", SPACE)
-        self.write(node.name)
+        self.write(SPACE, node.name, SPACE)
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
             self.write("(")
             self.signature(node)
@@ -671,7 +676,7 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Keyword(self, node: nodes.Keyword) -> None:
         """Write a dict ``Keyword`` expression to the stream."""
-        self.write(node.key + "=")
+        self.write(node.key, "=")
         self.visit(node.value)
 
     # -- Unused nodes for extensions
