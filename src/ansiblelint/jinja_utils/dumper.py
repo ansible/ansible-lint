@@ -112,6 +112,27 @@ class TemplateDumper(NodeVisitor):
             self._block_stmt_start_position = -1
             self._block_stmt_start_line = -1
 
+    @contextmanager
+    def token_pair_variable(self, node: nodes.Node):
+        start_string = self.environment.variable_start_string
+        end_string = self.environment.variable_end_string
+
+        # preserve chomped values
+        if hasattr(node, "token_pairs"):
+            # the outermost pair should be {{ }}
+            pair_opener = cast(_AnnotatedNode, node).token_pairs[0]
+            pair_closer = pair_opener.pair
+            if pair_opener.chomp:
+                start_string = pair_opener.value_str
+            if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
+                end_string = pair_closer.value_str
+
+        self.write(f"{start_string} ")
+        # self.write_space(default=" ")
+        yield
+        # self.write_space(default=" ")
+        self.write(f" {end_string}")
+
     def signature(
         self,
         node: nodes.Call | nodes.Filter | nodes.Test,
@@ -193,27 +214,6 @@ class TemplateDumper(NodeVisitor):
             # child_node is one of the expression nodes surrounded by {{ }}
             with self.token_pair_variable(child_node):
                 self.visit(child_node)
-
-    @contextmanager
-    def token_pair_variable(self, node: nodes.Node):
-        start_string = self.environment.variable_start_string
-        end_string = self.environment.variable_end_string
-
-        # preserve chomped values
-        if hasattr(node, "token_pairs"):
-            # the outermost pair should be {{ }}
-            pair_opener = cast(_AnnotatedNode, node).token_pairs[0]
-            pair_closer = pair_opener.pair
-            if pair_opener.chomp:
-                start_string = pair_opener.value_str
-            if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
-                end_string = pair_closer.value_str
-
-        self.write(f"{start_string} ")
-        # self.write_space(default=" ")
-        yield
-        # self.write_space(default=" ")
-        self.write(f" {end_string}")
 
     def visit_Block(self, node: nodes.Block) -> None:
         """Write a ``Block`` to the stream.
