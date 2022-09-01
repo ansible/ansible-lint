@@ -82,7 +82,7 @@ class RoleNames(AnsibleLintRule):
             if role_name and not self._re.match(role_name):
                 result.append(
                     self.create_matcherror(
-                        filename=str(file.path),
+                        filename=file,
                         message=self.shortdesc.format(role_name),
                     )
                 )

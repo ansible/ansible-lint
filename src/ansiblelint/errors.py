@@ -34,7 +34,7 @@ class MatchError(ValueError):
         linenumber: int = 1,
         column: int | None = None,
         details: str = "",
-        filename: str | Lintable | None = None,
+        filename: Lintable | None = None,
         rule: BaseRule = RuntimeErrorRule(),
         tag: str | None = None,  # optional fine-graded tag
     ) -> None:

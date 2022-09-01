@@ -21,6 +21,7 @@
 import pathlib
 
 from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import Formatter
 from ansiblelint.rules import AnsibleLintRule
 
@@ -35,7 +36,7 @@ def test_format_coloured_string() -> None:
         message="message",
         linenumber=1,
         details="hello",
-        filename="filename.yml",
+        filename=Lintable("filename.yml"),
         rule=rule,
     )
     formatter.format(match)
@@ -47,7 +48,7 @@ def test_unicode_format_string() -> None:
         message="\U0001f427",
         linenumber=1,
         details="hello",
-        filename="filename.yml",
+        filename=Lintable("filename.yml"),
         rule=rule,
     )
     formatter.format(match)
@@ -59,7 +60,7 @@ def test_dict_format_line() -> None:
         message="xyz",
         linenumber=1,
         details={"hello": "world"},  # type: ignore
-        filename="filename.yml",
+        filename=Lintable("filename.yml"),
         rule=rule,
     )
     formatter.format(match)

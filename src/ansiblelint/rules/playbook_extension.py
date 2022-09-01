@@ -28,5 +28,5 @@ class PlaybookExtension(AnsibleLintRule):
         ext = os.path.splitext(path)
         if ext[1] not in [".yml", ".yaml"] and path not in self.done:
             self.done.append(path)
-            result.append(self.create_matcherror(filename=path))
+            result.append(self.create_matcherror(filename=file))
         return result

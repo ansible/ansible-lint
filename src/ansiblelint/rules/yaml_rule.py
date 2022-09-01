@@ -51,7 +51,7 @@ class YamllintRule(AnsibleLintRule):
                     message=problem.desc,
                     linenumber=problem.line,
                     details="",
-                    filename=str(file.path),
+                    filename=file,
                     tag=f"yaml[{problem.rule}]",
                 )
             )

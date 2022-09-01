@@ -86,7 +86,7 @@ class AnsibleLintRule(BaseRule):
         message: str | None = None,
         linenumber: int = 1,
         details: str = "",
-        filename: str | Lintable | None = None,
+        filename: Lintable | None = None,
         tag: str = "",
     ) -> MatchError:
         """Instantiate a new MatchError."""
@@ -207,7 +207,7 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, str):
             if yaml.startswith("$ANSIBLE_VAULT"):
                 return []
-            return [MatchError(filename=str(file.path), rule=LoadingFailureRule())]
+            return [MatchError(filename=file, rule=LoadingFailureRule())]
         if not yaml:
             return matches
 

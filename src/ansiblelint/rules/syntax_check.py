@@ -75,7 +75,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             result = []
         if run.returncode != 0:
             message = None
-            filename = str(lintable.path)
+            filename = lintable
             linenumber = 1
             column = None
             tag = None
@@ -93,12 +93,12 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             if match:
                 message = match.groupdict()["title"]
                 # Ansible returns absolute paths
-                filename = match.groupdict()["filename"]
+                filename = Lintable(match.groupdict()["filename"])
                 linenumber = int(match.groupdict()["line"])
                 column = int(match.groupdict()["column"])
             elif _empty_playbook_re.search(stderr):
                 message = "Empty playbook, nothing to do"
-                filename = str(lintable.path)
+                filename = lintable
                 tag = "empty-playbook"
 
             if run.returncode == 4:

@@ -119,7 +119,7 @@ class Runner:
             except RuntimeError as exc:
                 matches.append(
                     MatchError(
-                        filename=str(lintable.path),
+                        filename=lintable,
                         message=str(exc),
                         details=str(exc.__cause__),
                         rule=LoadingFailureRule(),
@@ -201,9 +201,7 @@ class Runner:
                     exc.rule = LoadingFailureRule()
                     yield exc
                 except AttributeError:
-                    yield MatchError(
-                        filename=str(lintable.path), rule=LoadingFailureRule()
-                    )
+                    yield MatchError(filename=lintable, rule=LoadingFailureRule())
                 visited.add(lintable)
 
 
