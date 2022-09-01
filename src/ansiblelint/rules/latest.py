@@ -32,10 +32,10 @@ class LatestRule(AnsibleLintRule):
             task["action"]["__ansible_module__"] == "git"
             and task["action"].get("version", "HEAD") == "HEAD"
         ):
-            return self.create_matcherror(tag="latest[git]")
+            return self.create_matcherror(tag="latest[git]", filename=file)
         if (
             task["action"]["__ansible_module__"] == "hg"
             and task["action"].get("revision", "default") == "default"
         ):
-            return self.create_matcherror(tag="latest[hg]")
+            return self.create_matcherror(tag="latest[hg]", filename=file)
         return False
