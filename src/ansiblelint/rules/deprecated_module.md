@@ -27,6 +27,6 @@ Refer to the [Ansible module index](https://docs.ansible.com/ansible/latest/coll
   tasks:
     - name: Configure VLAN ID
       dellemc.enterprise_sonic.sonic_vlans: # <-- Use a platform specific module.
-       config:
-         - vlan_id: 20
+        config:
+          - vlan_id: 20
 ```
