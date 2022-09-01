@@ -9,6 +9,7 @@ import sys
 import pytest
 
 from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import CodeclimateJSONFormatter
 from ansiblelint.rules import AnsibleLintRule
 
@@ -31,7 +32,7 @@ class TestCodeclimateJSONFormatter:
                 message="message",
                 linenumber=1,
                 details="hello",
-                filename="filename.yml",
+                filename=Lintable("filename.yml"),
                 rule=self.rule,
             )
         )
@@ -40,7 +41,7 @@ class TestCodeclimateJSONFormatter:
                 message="message",
                 linenumber=2,
                 details="hello",
-                filename="filename.yml",
+                filename=Lintable("filename.yml"),
                 rule=self.rule,
             )
         )

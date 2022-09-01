@@ -7,7 +7,6 @@ import multiprocessing.pool
 import os
 from dataclasses import dataclass
 from fnmatch import fnmatch
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, Generator
 
 import ansiblelint.skip_utils
@@ -84,7 +83,7 @@ class Runner:
         else:
             self.exclude_paths = []
 
-    def is_excluded(self, file_path: str) -> bool:
+    def is_excluded(self, lintable: Lintable) -> bool:
         """Verify if a file path should be excluded."""
         # Any will short-circuit as soon as something returns True, but will
         # be poor performance for the case where the path under question is
@@ -92,17 +91,16 @@ class Runner:
 
         # Exclusions should be evaluated only using absolute paths in order
         # to work correctly.
-        if not file_path:
+        if not lintable:
             return False
 
-        abs_path = os.path.abspath(file_path)
-        _file_path = Path(file_path)
+        abs_path = str(lintable.abspath)
 
         return any(
             abs_path.startswith(path)
-            or _file_path.match(path)
+            or lintable.path.match(path)
             or fnmatch(str(abs_path), path)
-            or fnmatch(str(_file_path), path)
+            or fnmatch(str(lintable), path)
             for path in self.exclude_paths
         )
 
@@ -113,7 +111,7 @@ class Runner:
 
         # remove exclusions
         for lintable in self.lintables.copy():
-            if self.is_excluded(str(lintable.path.resolve())):
+            if self.is_excluded(lintable):
                 _logger.debug("Excluded %s", lintable)
                 self.lintables.remove(lintable)
             try:
@@ -121,7 +119,7 @@ class Runner:
             except RuntimeError as exc:
                 matches.append(
                     MatchError(
-                        filename=str(lintable.path),
+                        filename=lintable,
                         message=str(exc),
                         details=str(exc.__cause__),
                         rule=LoadingFailureRule(),
@@ -180,7 +178,9 @@ class Runner:
 
         # remove any matches made inside excluded files
         matches = list(
-            filter(lambda match: not self.is_excluded(match.filename), matches)
+            filter(
+                lambda match: not self.is_excluded(Lintable(match.filename)), matches
+            )
         )
 
         return sorted(set(matches))
@@ -191,7 +191,7 @@ class Runner:
             for lintable in self.lintables - visited:
                 try:
                     for child in ansiblelint.utils.find_children(lintable):
-                        if self.is_excluded(str(child.path)):
+                        if self.is_excluded(child):
                             continue
                         self.lintables.add(child)
                         files.append(child)
@@ -201,9 +201,7 @@ class Runner:
                     exc.rule = LoadingFailureRule()
                     yield exc
                 except AttributeError:
-                    yield MatchError(
-                        filename=str(lintable.path), rule=LoadingFailureRule()
-                    )
+                    yield MatchError(filename=lintable, rule=LoadingFailureRule())
                 visited.add(lintable)
 
 

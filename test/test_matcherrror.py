@@ -6,6 +6,7 @@ from typing import Any, Callable
 import pytest
 
 from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules.no_changed_when import CommandHasChangesCheckRule
 from ansiblelint.rules.partial_become import BecomeUserWithoutBecomeRule
 
@@ -75,7 +76,10 @@ def test_matcherror_invalid() -> None:
         # sorting by message
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
-        (MatchError("a", filename="b"), MatchError("a", filename="a")),
+        (
+            MatchError("a", filename=Lintable("b")),
+            MatchError("a", filename=Lintable("a")),
+        ),
         # rule id partial-become > rule id no-changed-when
         (
             MatchError(rule=BecomeUserWithoutBecomeRule()),

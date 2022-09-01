@@ -185,7 +185,7 @@ def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
     basedir = os.path.dirname(str(lintable.path))
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
     if isinstance(playbook_ds, str):
-        raise MatchError(filename=str(lintable.path), rule=LoadingFailureRule())
+        raise MatchError(filename=lintable, rule=LoadingFailureRule())
     for item in _playbook_items(playbook_ds):
         # if lintable.kind not in ["playbook"]:
         #     continue

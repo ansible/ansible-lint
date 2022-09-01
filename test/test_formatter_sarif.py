@@ -9,6 +9,7 @@ import sys
 import pytest
 
 from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import SarifFormatter
 from ansiblelint.rules import AnsibleLintRule
 
@@ -35,7 +36,7 @@ class TestSarifFormatter:
                 linenumber=1,
                 column=10,
                 details="hello",
-                filename="filename.yml",
+                filename=Lintable("filename.yml"),
                 rule=self.rule,
             )
         )
@@ -44,7 +45,7 @@ class TestSarifFormatter:
                 message="message",
                 linenumber=2,
                 details="hello",
-                filename="filename.yml",
+                filename=Lintable("filename.yml"),
                 rule=self.rule,
             )
         )
