@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any
 from functools import total_ordering
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
