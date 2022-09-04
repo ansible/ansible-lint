@@ -12,10 +12,10 @@ loaded by Ansible. This is often achieved by editing the inventory file and/or
 If undefined variables cause the failure, you can use the jinja
 `default()` filter to provide fallback values, like in the example below.
 
-This rule is among the few `unskippable` rules that cannot be added
-to `ignore_list` or `warn_list`. One possible workaround is to add the entire
-file to the `exclude_list`. This is a valid approach for special cases, like
-testing fixtures that are invalid on purpose.
+This rule is among the few `unskippable` rules that cannot be added to
+`skip_list` or `warn_list`. One possible workaround is to add the entire file
+to the `exclude_list`. This is a valid approach for special cases, like testing
+fixtures that are invalid on purpose.
 
 One of the most common sources of errors is failure to assert the presence of
 various variables at the beginning of the playbook.

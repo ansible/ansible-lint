@@ -12,7 +12,7 @@ This rule can produce messages such:
 - `name[play]` - All plays should be named.
 
 If you want to ignore some of the messages above, you can add any of them to
-the `ignore_list`.
+the `skip_list`.
 
 ## Problematic code
 
