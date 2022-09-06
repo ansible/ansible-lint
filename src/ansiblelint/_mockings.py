@@ -92,17 +92,15 @@ def _perform_mockings() -> None:  # noqa: C901
         f"{options.cache_dir}/collections/ansible_collections/{ namespace }"
     )
     collections_path.mkdir(parents=True, exist_ok=True)
-    link_path = pathlib.Path(collections_path / collection)
-    target = pathlib.Path(options.project_dir).absolute()
+    link_path = collections_path / collection
     if link_path.exists():
-        try:
+        if link_path.is_symlink():
             if os.readlink(link_path) != target:
-                raise OSError()
-        # OSError could also be raised by readlink
-        except (OSError, FileNotFoundError):
-            link_path.unlink(missing_ok=True)
-    if not link_path.exists():
-        link_path.symlink_to(target, target_is_directory=True)
+                link_path.unlink()
+        else:
+            return
+    target = pathlib.Path(options.project_dir).absolute()
+    link_path.symlink_to(target, target_is_directory=True)
 
 
 def _perform_mockings_cleanup() -> None:  # noqa: C901
