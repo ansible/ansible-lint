@@ -20,7 +20,7 @@ exclude: >
 repos:
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: v2.7.1
+    rev: v3.0.0-alpha.0
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting
@@ -40,14 +40,14 @@ repos:
           - prettier
           - prettier-plugin-toml
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.6.0
+    rev: v6.8.1
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/sirosen/check-jsonschema
-    rev: 0.17.1
+    rev: 0.18.2
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -78,7 +78,7 @@ repos:
       - id: debug-statements
         language_version: python3
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.1.0
+    rev: v2.2.1
     hooks:
       - id: codespell
         exclude: >
@@ -111,7 +111,7 @@ repos:
           # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
           - --filter-files
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 22.8.0
     hooks:
       - id: black
         language_version: python3
@@ -162,7 +162,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.14.5
+    rev: v2.15.0
     hooks:
       - id: pylint
         additional_dependencies:
