@@ -3,14 +3,18 @@ from __future__ import annotations
 
 import logging
 from argparse import Namespace
-from typing import Union, cast
+from typing import Any, Union, cast
 
+from ansible.template import Templar
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
+from ansiblelint.jinja_utils.yaml_string import JinjaTemplate
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.runner import LintResult
+from ansiblelint.utils import PLAYBOOK_DIR, ansible_templar
 from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
 
 __all__ = ["Transformer"]
@@ -101,6 +105,7 @@ class Transformer:
                     # It is not safe to write this file or data-loss is likely.
                     # Only maps and sequences can preserve comments. Skip it.
                     continue
+                self._process_jinja_in_yaml(file, ruamel_data)
 
             if self.write_set != {"none"}:
                 self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
@@ -141,3 +146,110 @@ class Transformer:
                 ):
                     match.yaml_path = get_path_to_task(file, match.linenumber, data)
             match.rule.transform(match, file, data)
+
+    def _process_jinja_in_yaml(
+        self, file: Lintable, ruamel_data: CommentedMap | CommentedSeq
+    ) -> None:
+        """Iterate over the yaml document to turn jinja templates into JinjaTemplate.
+
+        This modifies the ruamel_data in place.
+        """
+        if file.kind not in ("playbook", "tasks", "handlers", "vars", "inventory"):
+            return
+
+        # each JinjaTemplate instance in a file will use the same jinja_env
+        basedir = file.path.parent
+        template_vars = dict(playbook_dir=PLAYBOOK_DIR or basedir.absolute())
+        templar = ansible_templar(basedir=str(basedir), templatevars=template_vars)
+
+        if isinstance(ruamel_data, CommentedSeq):
+            if file.kind == "playbook":  # a playbook is a list of plays
+                self._process_jinja_in_playbook(templar, ruamel_data)
+            elif file.kind in ("tasks", "handlers"):
+                self._process_jinja_in_tasks_block(templar, ruamel_data)
+        elif isinstance(ruamel_data, CommentedMap):
+            if file.kind == "vars":
+                self._process_jinja_in_vars_block(templar, ruamel_data)
+            elif file.kind == "inventory":
+                self._process_jinja_in_inventory(templar, ruamel_data)
+
+    def _process_jinja_in_playbook(
+        self, templar: Templar, ruamel_data: CommentedSeq
+    ) -> None:
+        play: CommentedMap
+        for play in ruamel_data:
+            for key, value in play.items():
+                if key in PLAYBOOK_TASK_KEYWORDS:
+                    self._process_jinja_in_tasks_block(templar, value)
+                elif key == "roles":
+                    self._process_jinja_in_roles_block(templar, value)
+                elif key == "vars":
+                    self._process_jinja_in_vars_block(templar, value)
+                elif key == "when":
+                    play[key] = self._process_jinja_value(templar, value, implicit=True)
+                else:
+                    play[key] = self._process_jinja_value(templar, value)
+
+    def _process_jinja_in_roles_block(
+        self, templar: Templar, ruamel_data: CommentedSeq
+    ) -> None:
+        role: CommentedMap | str
+        for role in ruamel_data:
+            if not isinstance(role, CommentedMap):
+                continue
+            for key, value in role.items():
+                if key == "vars":
+                    self._process_jinja_in_vars_block(templar, value)
+                elif key == "when":
+                    role[key] = self._process_jinja_value(templar, value, implicit=True)
+                else:
+                    role[key] = self._process_jinja_value(templar, value)
+
+    def _process_jinja_in_tasks_block(
+        self, templar: Templar, ruamel_data: CommentedSeq
+    ) -> None:
+        task: CommentedMap
+        for task in ruamel_data:
+            for key, value in task.items():
+                if key in NESTED_TASK_KEYS:
+                    self._process_jinja_in_tasks_block(templar, value)
+                elif key == "vars":
+                    self._process_jinja_in_vars_block(templar, value)
+                elif key.endswith("when"):
+                    task[key] = self._process_jinja_value(templar, value, implicit=True)
+                else:
+                    task[key] = self._process_jinja_value(templar, value)
+
+    def _process_jinja_in_vars_block(
+        self, templar: Templar, ruamel_data: CommentedMap
+    ) -> None:
+        for key, value in ruamel_data.items():
+            ruamel_data[key] = self._process_jinja_value(templar, value)
+
+    def _process_jinja_in_inventory(
+        self, templar: Templar, ruamel_data: CommentedMap | dict
+    ) -> None:
+        for key, value in ruamel_data.items():
+            if key == "vars":
+                self._process_jinja_in_vars_block(templar, value)
+            elif isinstance(value, dict):
+                self._process_jinja_in_inventory(templar, value)
+
+    def _process_jinja_value(
+        self, templar: Templar, value: Any, implicit: bool = False
+    ) -> Any:
+        if templar.is_possibly_template(value):
+            return JinjaTemplate(
+                value, implicit=implicit, jinja_env=templar.environment
+            )
+        elif isinstance(value, dict):
+            for key, inner_value in value.items():
+                value[key] = self._process_jinja_value(
+                    templar, inner_value, implicit=implicit
+                )
+        elif isinstance(value, list):
+            for index, item in enumerate(value):
+                value[index] = self._process_jinja_value(
+                    templar, item, implicit=implicit
+                )
+        return value

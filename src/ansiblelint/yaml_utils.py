@@ -36,6 +36,7 @@ from yamllint.config import YamlLintConfig
 from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
+from ansiblelint.jinja_utils.yaml_string import JinjaTemplate
 from ansiblelint.utils import get_action_tasks, normalize_task
 
 if TYPE_CHECKING:
@@ -830,6 +831,9 @@ class FormattedYAML(YAML):
         # We need a custom constructor to preserve Octal formatting in YAML 1.1
         self.Constructor = CustomConstructor
         self.Representer.add_representer(OctalIntYAML11, OctalIntYAML11.represent_octal)
+        self.Representer.add_representer(
+            JinjaTemplate, JinjaTemplate.represent_jinja_template_scalar
+        )
 
         # We should preserve_quotes loads all strings as a str subclass that carries
         # a quote attribute. Will the str subclasses cause problems in transforms?
