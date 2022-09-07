@@ -114,6 +114,7 @@ class Runner:
             if self.is_excluded(lintable):
                 _logger.debug("Excluded %s", lintable)
                 self.lintables.remove(lintable)
+                continue
             try:
                 lintable.data
             except RuntimeError as exc:
