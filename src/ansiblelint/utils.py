@@ -94,7 +94,7 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
     # Therefore, for tasks in a role, `basedir` has the form
     # `roles/some_role/tasks`. On the other hand, the search path
     # is `roles/some_role/{files,templates}`. As a result, the
-    # `tasks` part in the basedir should be stripped stripped.
+    # `tasks` part in the basedir should be stripped.
     if os.path.basename(basedir) == "tasks":
         basedir = os.path.dirname(basedir)
 

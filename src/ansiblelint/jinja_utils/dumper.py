@@ -614,7 +614,7 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Getattr(self, node: nodes.Getattr) -> None:
         """Write a ``Getattr`` expression to the stream."""
-        # node.ctx is only ever "load". Not sure this would change if it wasn't.
+        # node.ctx is only ever "load" (which does not change how we write it)
         self.visit(node.node)
         if node.attr in []:  # TODO: which protected names?
             # if this is a protected name (like "items") use [] syntax
@@ -624,7 +624,7 @@ class TemplateDumper(NodeVisitor):
 
     def visit_Getitem(self, node: nodes.Getitem) -> None:
         """Write a ``Getitem`` expression to the stream."""
-        # node.ctx is only ever "load". Not sure this would change if it wasn't.
+        # node.ctx is only ever "load" (which does not change how we write it)
         self.visit(node.node)
         # using . and [] are mostly interchangeable. Prefer . for the simple case
         if isinstance(node.arg, nodes.Const) and isinstance(node.arg.value, int):
