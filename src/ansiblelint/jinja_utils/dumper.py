@@ -77,6 +77,12 @@ class TemplateDumper(NodeVisitor):
         self._block_stmt_start_line = -1
         self._last_wrote = ""
 
+    @property
+    def _max_line_position(self):
+        if self._line_number == 1:
+            return self.max_first_line_length
+        return self.max_line_length
+
     # -- Various compilation helpers
 
     def write(self, *strings: str) -> None:
@@ -85,14 +91,21 @@ class TemplateDumper(NodeVisitor):
             if string is SPACE and self._last_wrote is SPACE:
                 # only write one consecutive space
                 continue
-            self.stream.write(string)
             len_string = len(string)
             newline_pos = string.rfind("\n")
+            line_pos = self._line_position
             if newline_pos == -1:
-                self._line_position += len_string
+                line_pos += len_string
             else:
                 # - 1 to exclude the \n
-                self._line_position = len_string - newline_pos - 1
+                line_pos = len_string - newline_pos - 1
+            if string is SPACE and (line_pos >= self._max_line_position):
+                self.stream.write("\n")
+                self._line_number += 1
+                line_pos = 0
+            else:
+                self.stream.write(string)
+            self._line_position = line_pos
             self._stream_position += len_string
             self._line_number += string.count("\n")
             self._last_wrote = string
