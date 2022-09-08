@@ -113,6 +113,7 @@ def test_dump(
     out_template = dump(
         node=in_ast,
         environment=jinja_env,
+        max_line_length=40,
         stream=None,
     )
     assert out_template is not None

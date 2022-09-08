@@ -18,6 +18,9 @@ SPACE = " "
 def dump(
     node: nodes.Template,
     environment: Environment,
+    max_line_length: int,
+    # in YAML, first line can be shorter than subsequent lines.
+    max_first_line_length: int | None = None,
     stream: TextIO | None = None,
 ) -> str | None:
     """Dump a jinja2 ast back into a jinja2 template.
@@ -27,7 +30,12 @@ def dump(
     if not isinstance(node, nodes.Template):
         raise TypeError("Can't dump non template nodes")
 
-    dumper = TemplateDumper(environment, stream)
+    dumper = TemplateDumper(
+        environment=environment,
+        max_line_length=max_line_length,
+        max_first_line_length=max_first_line_length,
+        stream=stream,
+    )
     dumper.visit(node)
 
     if stream is None:
@@ -49,12 +57,18 @@ class TemplateDumper(NodeVisitor):
     def __init__(
         self,
         environment: Environment,
+        max_line_length: int,
+        max_first_line_length: int | None = None,
         stream: TextIO | None = None,
     ):
         """Create a TemplateDumper."""
         if stream is None:
             stream = StringIO()
+        if max_first_line_length is None:
+            max_first_line_length = max_line_length
         self.environment = environment
+        self.max_line_length = max_line_length
+        self.max_first_line_length = max_first_line_length
         self.stream = stream
         self._stream_position = 0
         self._line_position = 0

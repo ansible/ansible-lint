@@ -51,11 +51,21 @@ class JinjaTemplate(ScalarString):
             self._ast = annotate(ast, self._jinja_env, raw_template=self)
         return self._ast
 
-    def dump(self) -> str:
-        return dump(
+    def dump(
+        self, max_line_length: int, max_first_line_length: int = None
+    ) -> JinjaTemplate:
+        value = dump(
             self.ast,
             environment=self._jinja_env,
+            max_line_length=max_line_length,
+            max_first_line_length=max_first_line_length,
         )
+        ret = JinjaTemplate(value, self._jinja_env, self.implicit, self.anchor)
+        if hasattr(self, "style"):
+            ret.style = self.style
+        if hasattr(self, "comment"):
+            ret.comment = self.comment
+        return ret
 
     @staticmethod
     def represent_jinja_template_scalar(

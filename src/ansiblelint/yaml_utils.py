@@ -714,6 +714,26 @@ class FormattedEmitter(Emitter):
             return
         super().write_version_directive(version_text)
 
+    def process_scalar(self) -> None:
+        if isinstance(self.event.value, JinjaTemplate):
+            max_first_line_length = self.best_width - self.column
+            max_line_length = self.best_width - (self.indent or 0)
+
+            # we need to dump the template before analyze_scalar gets called (in super)
+            # because analyze_scalar should inspect the final template.
+            event = self.event
+            template = event.value.dump(
+                max_first_line_length=max_first_line_length,
+                max_line_length=max_line_length,
+            )
+            event.value = template
+            if hasattr(template, "style") and event.style != template.style:
+                event.style = template.style
+            # force recalculating scalar analysis and style using the final template
+            self.analysis = None
+            self.style = None
+        super().process_scalar()
+
 
 # pylint: disable=too-many-instance-attributes
 class FormattedYAML(YAML):
