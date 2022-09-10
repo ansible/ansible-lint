@@ -1,6 +1,7 @@
 """Expanded Jinja tokens iterator that avoids whitespace/comment/chomp data loss."""
 from __future__ import annotations
 
+from abc import ABC
 from dataclasses import dataclass
 from typing import Iterator, Literal, Sequence, overload
 
@@ -210,7 +211,43 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
     )
 
 
-class Tokens:
+class AbstractTokensCollection(ABC):
+    """An abstract collection of Tokens."""
+
+    tokens: tuple[Token] | list[Token]
+    index: int
+
+    @property
+    def current(self) -> Token:
+        """Get the current Token."""
+        return self.tokens[self.index]
+
+    def __index__(self) -> int:
+        """Return the index of the current token."""
+        return self.index
+
+    def __bool__(self) -> bool:
+        """Return True if there are still tokens left to consume."""
+        return 0 <= self.index < len(self.tokens)
+
+    def __len__(self) -> int:
+        """Return the tokens count."""
+        return len(self.tokens)
+
+    @overload
+    def __getitem__(self, index: slice) -> Sequence[Token]:
+        """Return the tokens in the given slice."""
+
+    @overload
+    def __getitem__(self, index: int) -> Token:
+        """Return the token at the given index."""
+
+    def __getitem__(self, index: int | slice) -> Token | Sequence[Token]:
+        """Return the token(s) at the given index or slice."""
+        return self.tokens[index]
+
+
+class Tokens(AbstractTokensCollection):
     """A collection of Tokens."""
 
     def __init__(
@@ -226,11 +263,6 @@ class Tokens:
         self.tokens = tuple(tokeniter(lexer, source, name, filename, state))
         self.index = -1
         self.source_position = 0
-
-    @property
-    def current(self) -> Token:
-        """Get the current Token."""
-        return self.tokens[self.index]
 
     def seek(
         self, token_type: str, value: str | None = None
@@ -294,37 +326,72 @@ class Tokens:
         self.source_position = token.end_pos
         return token
 
-    def __index__(self) -> int:
-        """Return the index of the current token."""
-        return self.index
-
-    def __bool__(self) -> bool:
-        """Return True if there are still tokens left to consume."""
-        return 0 <= self.index < len(self.tokens)
-
     @property
     def end(self) -> bool:
         """Return True if there are no more tokens left."""
         return not self
-
-    def __len__(self) -> int:
-        """Return the tokens count."""
-        return len(self.tokens)
-
-    @overload
-    def __getitem__(self, index: slice) -> Sequence[Token]:
-        """Return the tokens in the given slice."""
-
-    @overload
-    def __getitem__(self, index: int) -> Token:
-        """Return the token at the given index."""
-
-    def __getitem__(self, index: int | slice) -> Token | Sequence[Token]:
-        """Return the token(s) at the given index or slice."""
-        return self.tokens[index]
 
     def __contains__(self, item: Token) -> bool:
         """Return True if the given token is the same as the token at the same index."""
         if not isinstance(item, Token):
             return False
         return 0 <= item.index < len(self) and item == self[item.index]
+
+
+class TokenStream(AbstractTokensCollection):
+    """A writable stream of Tokens that facilitates backtracking."""
+
+    def __init__(self) -> None:
+        self.index = -1
+        self.tokens = []
+        self.append(TOKEN_INITIAL, "")
+
+    def append(self, token: str, value: str, chomp: Literal["+", "-", ""] = "") -> None:
+        self.tokens.append(
+            Token(
+                index=len(self.tokens),
+                start_pos=-1,
+                end_pos=-1,
+                lineno=-1,
+                token=token,
+                value_str=value,
+                jinja_token=None,
+                chomp=chomp,
+            )
+        )
+
+    def extend(self, *args: Sequence[str, str]) -> None:
+        for token, value in args:
+            self.append(token, value)
+
+    def insert(
+        self, index: int, token: str, value: str, chomp: Literal["+", "-", ""] = ""
+    ) -> None:
+        self.tokens.insert(
+            index,
+            Token(
+                index=index,
+                start_pos=-1,
+                end_pos=-1,
+                lineno=-1,
+                token=token,
+                value_str=value,
+                jinja_token=None,
+                chomp=chomp,
+            )
+        )
+        for i, token in enumerate(self.tokens[index:], index):
+            token.index = i
+
+    def clear(self) -> None:
+        self.tokens.clear()
+
+    def close(self) -> None:
+        self.add(TOKEN_EOF, "")
+
+    def reindex(self) -> None:
+        for index, token in enumerate(self.tokens):
+            token.index = index
+
+    def __str__(self) -> str:
+        return "".join(token.value_str for token in self.tokens)
