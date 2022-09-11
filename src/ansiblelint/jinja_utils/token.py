@@ -343,10 +343,27 @@ class Tokens(AbstractTokensCollection):
 class TokenStream(AbstractTokensCollection):
     """A writable stream of Tokens that facilitates backtracking."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        max_line_length: int,
+        max_first_line_length: int | None = None,
+    ) -> None:
+        if max_first_line_length is None:
+            max_first_line_length = max_line_length
+        self.max_line_length = max_line_length
+        self.max_first_line_length = max_first_line_length
+        self.line_position = 0
+        self.line_number = 1
+
         self.index = -1
         self.tokens = []
         self.append(TOKEN_INITIAL, "")
+
+    @property
+    def _max_line_position(self):
+        if self.line_number == 1:
+            return self.max_first_line_length
+        return self.max_line_length
 
     def append(self, token: str, value: str, chomp: Literal["+", "-", ""] = "") -> None:
         index = len(self.tokens)
@@ -355,6 +372,19 @@ class TokenStream(AbstractTokensCollection):
             if previous.token == TOKEN_WHITESPACE:
                 # no more than one consecutive space
                 return
+
+        len_value = len(value)
+        newline_pos = value.rfind("\n")
+        line_pos = self.line_position
+        if newline_pos == -1:
+            line_pos += len_value
+        else:
+            # - 1 to exclude the \n
+            line_pos = len_value - newline_pos - 1
+        if value is SPACE and (line_pos >= self._max_line_position):
+            value = "\n"
+            line_pos = 0
+
         self.tokens.append(
             Token(
                 index=index,
@@ -368,6 +398,8 @@ class TokenStream(AbstractTokensCollection):
             )
         )
         self.index = index
+        self.line_position = line_pos
+        self.line_number += value.count("\n")
 
     def extend(self, *args: Sequence[str, str]) -> None:
         for token, value in args:
@@ -392,6 +424,7 @@ class TokenStream(AbstractTokensCollection):
         )
         for i, token in enumerate(self.tokens[index:], index):
             token.index = i
+        self.index = len(self.tokens)
 
     def clear(self) -> None:
         self.tokens.clear()
