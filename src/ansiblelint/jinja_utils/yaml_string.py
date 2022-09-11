@@ -39,6 +39,7 @@ class JinjaTemplate(ScalarString):
         implicit: bool = False,
         anchor: Any = None,
     ) -> JinjaTemplate:
+        """Create a new JinjaTemplate ScalarString for use in yaml docs."""
         instance = ScalarString.__new__(cls, value, anchor=anchor)
         instance.implicit = implicit
         instance._ast = None
@@ -47,6 +48,7 @@ class JinjaTemplate(ScalarString):
 
     @property
     def ast(self) -> jinja_nodes.Template:
+        """Return the Jinja AST parsed from this template."""
         if self._ast is None:
             ast = self._jinja_env.parse(self)
             self._ast = annotate(ast, self._jinja_env, raw_template=self)
@@ -55,6 +57,7 @@ class JinjaTemplate(ScalarString):
     def dump(
         self, max_line_length: int, max_first_line_length: int = None
     ) -> JinjaTemplate:
+        """Dump the Jinja AST (possibly modified) back into a template."""
         value = dump(
             self.ast,
             environment=self._jinja_env,
@@ -72,14 +75,18 @@ class JinjaTemplate(ScalarString):
     def represent_jinja_template_scalar(
         representer: RoundTripRepresenter, data: JinjaTemplate
     ) -> yaml_nodes.ScalarNode:
+        """Create a ScalarNode for this JinjaTemplate.
+
+        At this point, the node wraps the data object, but any str() ops on it will
+        return the original template, not the modified AST.
+
+        The serializer/emitter will have to handle calling data.dump() because
+        the Representer does not have info about available line length.
+        """
         tag = "tag:yaml.org,2002:str"
         style = getattr(data, "style", None)
         anchor = data.yaml_anchor(any=True)
         node: yaml_nodes.ScalarNode = representer.represent_scalar(
             tag, data, style=style, anchor=anchor
         )
-        # At this point, the node wraps the data object, but any str() ops on it will
-        # return the original template, not the modified AST.
-        # The serializer/emitter will have to handle calling data.dump() because
-        # the Representer does not have info about available line length.
         return node

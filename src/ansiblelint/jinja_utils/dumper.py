@@ -79,6 +79,7 @@ class TemplateDumper(NodeVisitor):
     def token_pair_block(
         self, node: nodes.Node, *names: str, tag_index: int = 0
     ) -> Iterator[None]:
+        """Wrap context with block {% %} tokens."""
         start_string = self.environment.block_start_string
         end_string = self.environment.block_end_string
 
@@ -124,6 +125,7 @@ class TemplateDumper(NodeVisitor):
 
     @contextmanager
     def token_pair_variable(self, node: nodes.Node):
+        """Wrap context with variable {{ }} tokens."""
         start_string = self.environment.variable_start_string
         end_string = self.environment.variable_end_string
 

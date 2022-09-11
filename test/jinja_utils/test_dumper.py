@@ -13,6 +13,7 @@ from ansiblelint.jinja_utils.dumper import dump
 
 @pytest.fixture(name="in_ast")
 def annotated_ast(jinja_env: Environment, in_template: str) -> nodes.Template:
+    """Return an annotated Jinja AST for the given template."""
     in_ast = jinja_env.parse(in_template)
     # record whitespace details in the AST
     annotate(in_ast, jinja_env, raw_template=in_template)

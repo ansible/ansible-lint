@@ -24,7 +24,7 @@ class _AnnotatedNode:
     # The closing pair is available as token_pairs[].pair
     token_pairs: Sequence[Token]
     parent: nodes.Node
-    # additional contextual informatioon
+    # additional contextual information
     extras: dict[str, Any]
 
 

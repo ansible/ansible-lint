@@ -715,6 +715,7 @@ class FormattedEmitter(Emitter):
         super().write_version_directive(version_text)
 
     def process_scalar(self) -> None:
+        """Handle dumping JinjaTemplate strings given the allowed line length."""
         if isinstance(self.event.value, JinjaTemplate):
             max_first_line_length = self.best_width - self.column
             max_line_length = self.best_width - (self.indent or 0)
