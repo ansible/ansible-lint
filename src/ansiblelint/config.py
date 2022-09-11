@@ -18,6 +18,7 @@ DEFAULT_WARN_LIST = [
     "role-name",
 ]
 
+# Please update constants.FileType
 DEFAULT_KINDS = [
     # Do not sort this list, order matters.
     {"jinja2": "**/*.j2"},  # jinja2 templates are not always parsable as something else
