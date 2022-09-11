@@ -1,7 +1,7 @@
 """Jinja template String representation."""
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from jinja2 import Environment
 from jinja2 import nodes as jinja_nodes
@@ -32,7 +32,7 @@ class JinjaTemplate(ScalarString):
     style: Literal["|", ">", "'", '"', ""]  # allows setting yaml style for template
     comment: str
 
-    def __new__(
+    def __new__(  # pylint: disable=arguments-differ
         cls,
         value: Any,
         jinja_env: Environment,
@@ -44,7 +44,7 @@ class JinjaTemplate(ScalarString):
         instance.implicit = implicit
         instance._ast = None
         instance._jinja_env = jinja_env
-        return instance
+        return cast(JinjaTemplate, instance)
 
     @property
     def ast(self) -> jinja_nodes.Template:
@@ -55,7 +55,7 @@ class JinjaTemplate(ScalarString):
         return self._ast
 
     def dump(
-        self, max_line_length: int, max_first_line_length: int = None
+        self, max_line_length: int, max_first_line_length: int | None = None
     ) -> JinjaTemplate:
         """Dump the Jinja AST (possibly modified) back into a template."""
         value = dump(
@@ -66,9 +66,9 @@ class JinjaTemplate(ScalarString):
         )
         ret = JinjaTemplate(value, self._jinja_env, self.implicit, self.anchor)
         if hasattr(self, "style"):
-            ret.style = self.style
+            ret.style = self.style  # pylint: disable=no-member
         if hasattr(self, "comment"):
-            ret.comment = self.comment
+            ret.comment = self.comment  # pylint: disable=no-member
         return ret
 
     @staticmethod

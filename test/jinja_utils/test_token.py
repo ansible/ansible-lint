@@ -702,7 +702,7 @@ from .jinja_fixtures import (
     ),
     # spell-checker: enable
 )
-# pylint: disable=too-many-locals,too-many-branches,too-many-statements
+# pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
 def test_tokens_iterator(  # noqa: C901  # splitting this up would hurt readability
     lexer: Lexer,
     template_source: str,

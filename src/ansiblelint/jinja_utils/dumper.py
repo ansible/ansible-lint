@@ -12,7 +12,7 @@ from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor
 
 from .annotator import _AnnotatedNode
-from .token import SPACE, TokenStream
+from .token import SPACE, Token, TokenStream
 
 
 def dump(
@@ -89,7 +89,7 @@ class TemplateDumper(NodeVisitor):
             if len(_node.token_pairs) > tag_index:
                 # the outermost pair should be {{ }}
                 pair_opener = _node.token_pairs[tag_index]
-                pair_closer = pair_opener.pair
+                pair_closer = cast(Token, pair_opener.pair)
                 if pair_opener.chomp:
                     start_string = pair_opener.value_str
                 if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
@@ -124,7 +124,7 @@ class TemplateDumper(NodeVisitor):
             self._block_stmt_start_line = -1
 
     @contextmanager
-    def token_pair_variable(self, node: nodes.Node):
+    def token_pair_variable(self, node: nodes.Node) -> Iterator[None]:
         """Wrap context with variable {{ }} tokens."""
         start_string = self.environment.variable_start_string
         end_string = self.environment.variable_end_string
@@ -133,7 +133,7 @@ class TemplateDumper(NodeVisitor):
         if hasattr(node, "token_pairs"):
             # the outermost pair should be {{ }}
             pair_opener = cast(_AnnotatedNode, node).token_pairs[0]
-            pair_closer = pair_opener.pair
+            pair_closer = cast(Token, pair_opener.pair)
             if pair_opener.chomp:
                 start_string = pair_opener.value_str
             if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
@@ -708,14 +708,14 @@ class TemplateDumper(NodeVisitor):
         """Write a negated expression to the stream."""
         if isinstance(node.node, nodes.Test):
             return self.visit_Test(node.node, negate=True)
-        else:
-            # this is a unary operator
-            self.tokens.extend(
-                (j2tokens.TOKEN_WHITESPACE, SPACE),
-                (j2tokens.TOKEN_NAME, node.operator),
-                (j2tokens.TOKEN_WHITESPACE, SPACE),
-            )
-            return self._visit_possible_binary_op(node.node)
+
+        # this is a unary operator
+        self.tokens.extend(
+            (j2tokens.TOKEN_WHITESPACE, SPACE),
+            (j2tokens.TOKEN_NAME, node.operator),
+            (j2tokens.TOKEN_WHITESPACE, SPACE),
+        )
+        return self._visit_possible_binary_op(node.node)
 
     def visit_Concat(self, node: nodes.Concat) -> None:
         """Write a string concatenation expression to the stream.
@@ -782,7 +782,7 @@ class TemplateDumper(NodeVisitor):
         if isinstance(node.arg, nodes.Const) and isinstance(node.arg.value, int):
             self.tokens.extend(
                 (j2tokens.TOKEN_DOT, SPACE),
-                (j2tokens.TOKEN_NAME, node.arg.value),
+                (j2tokens.TOKEN_NAME, str(node.arg.value)),
             )
             return
         self.tokens.append(j2tokens.TOKEN_LBRACKET, "[")

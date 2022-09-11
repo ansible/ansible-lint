@@ -91,7 +91,7 @@ def pre_iter_normalize_newlines(source: str, keep_trailing_newline: bool) -> str
     return "\n".join(lines)
 
 
-# pylint: disable=too-many-locals,too-many-branches,too-many-arguments
+# pylint: disable=too-many-locals,too-many-branches,too-many-arguments,too-many-statements
 def tokeniter(  # noqa: C901  # splitting this up would hurt readability
     lexer: Lexer,
     source: str,
@@ -217,7 +217,7 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
 class AbstractTokensCollection(ABC):
     """An abstract collection of Tokens."""
 
-    tokens: tuple[Token] | list[Token]
+    tokens: tuple[Token, ...] | list[Token]
     index: int
 
     @property
@@ -252,6 +252,8 @@ class AbstractTokensCollection(ABC):
 
 class Tokens(AbstractTokensCollection):
     """A collection of Tokens."""
+
+    tokens: tuple[Token, ...]
 
     def __init__(
         self,
@@ -344,6 +346,8 @@ class Tokens(AbstractTokensCollection):
 class TokenStream(AbstractTokensCollection):
     """A writable stream of Tokens that facilitates backtracking."""
 
+    tokens: list[Token]
+
     def __init__(
         self,
         max_line_length: int,
@@ -362,7 +366,7 @@ class TokenStream(AbstractTokensCollection):
         self.append(TOKEN_INITIAL, "")
 
     @property
-    def _max_line_position(self):
+    def _max_line_position(self) -> int:
         if self.line_number == 1:
             return self.max_first_line_length
         return self.max_line_length
@@ -404,7 +408,7 @@ class TokenStream(AbstractTokensCollection):
         self.line_position = line_pos
         self.line_number += value.count("\n")
 
-    def extend(self, *args: Sequence[str, str]) -> None:
+    def extend(self, *args: tuple[str, str]) -> None:
         """Extend with the given set of Jinja token type and value tuples."""
         for token, value in args:
             self.append(token, value)
@@ -427,8 +431,8 @@ class TokenStream(AbstractTokensCollection):
                 chomp=chomp,
             ),
         )
-        for i, token in enumerate(self.tokens[index:], index):
-            token.index = i
+        for _index, _token in enumerate(self.tokens[index:], start=index):
+            _token.index = _index
         self.index = len(self.tokens)
 
     def clear(self) -> None:

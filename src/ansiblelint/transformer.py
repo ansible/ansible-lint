@@ -227,7 +227,7 @@ class Transformer:
             ruamel_data[key] = self._process_jinja_value(templar, value)
 
     def _process_jinja_in_inventory(
-        self, templar: Templar, ruamel_data: CommentedMap | dict
+        self, templar: Templar, ruamel_data: CommentedMap | dict[str, Any]
     ) -> None:
         for key, value in ruamel_data.items():
             if key == "vars":
@@ -242,7 +242,7 @@ class Transformer:
             return JinjaTemplate(
                 value, implicit=implicit, jinja_env=templar.environment
             )
-        elif isinstance(value, dict):
+        if isinstance(value, dict):
             for key, inner_value in value.items():
                 value[key] = self._process_jinja_value(
                     templar, inner_value, implicit=implicit
