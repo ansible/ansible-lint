@@ -5,7 +5,8 @@ from contextlib import contextmanager
 from io import StringIO
 from typing import Iterator, List, TextIO, cast
 
-from jinja2 import lexer as j2tokens, nodes
+from jinja2 import lexer as j2tokens
+from jinja2 import nodes
 from jinja2.compiler import operators
 from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor

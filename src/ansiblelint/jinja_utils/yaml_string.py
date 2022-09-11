@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from jinja2 import nodes as jinja_nodes, Environment
+from jinja2 import Environment
+from jinja2 import nodes as jinja_nodes
 from ruamel.yaml import nodes as yaml_nodes
 from ruamel.yaml.representer import RoundTripRepresenter
 from ruamel.yaml.scalarstring import ScalarString

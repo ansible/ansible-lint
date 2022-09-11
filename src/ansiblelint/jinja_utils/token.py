@@ -349,6 +349,7 @@ class TokenStream(AbstractTokensCollection):
         max_line_length: int,
         max_first_line_length: int | None = None,
     ) -> None:
+        """Initialize a TokenStream instance."""
         if max_first_line_length is None:
             max_first_line_length = max_line_length
         self.max_line_length = max_line_length
@@ -367,6 +368,7 @@ class TokenStream(AbstractTokensCollection):
         return self.max_line_length
 
     def append(self, token: str, value: str, chomp: Literal["+", "-", ""] = "") -> None:
+        """Add a Jinja token type with the given value."""
         index = len(self.tokens)
         if token == TOKEN_WHITESPACE and value is SPACE:
             previous = self.tokens[index - 1]
@@ -403,12 +405,14 @@ class TokenStream(AbstractTokensCollection):
         self.line_number += value.count("\n")
 
     def extend(self, *args: Sequence[str, str]) -> None:
+        """Extend with the given set of Jinja token type and value tuples."""
         for token, value in args:
             self.append(token, value)
 
     def insert(
         self, index: int, token: str, value: str, chomp: Literal["+", "-", ""] = ""
     ) -> None:
+        """Insert a Jinja token type with the given value at the given index."""
         # this does not prevent duplicate whitespace
         self.tokens.insert(
             index,
@@ -421,21 +425,29 @@ class TokenStream(AbstractTokensCollection):
                 value_str=value,
                 jinja_token=None,
                 chomp=chomp,
-            )
+            ),
         )
         for i, token in enumerate(self.tokens[index:], index):
             token.index = i
         self.index = len(self.tokens)
 
     def clear(self) -> None:
+        """Reset the tokens."""
         self.tokens.clear()
+        self.line_position = 0
+        self.line_number = 1
+        self.index = -1
+        self.append(TOKEN_INITIAL, "")
 
     def close(self) -> None:
-        self.add(TOKEN_EOF, "")
+        """Add the EOF token."""
+        self.append(TOKEN_EOF, "")
 
     def reindex(self) -> None:
+        """Update the indexes for all tokens."""
         for index, token in enumerate(self.tokens):
             token.index = index
 
     def __str__(self) -> str:
+        """Stringify the list of tokens."""
         return "".join(token.value_str for token in self.tokens)
