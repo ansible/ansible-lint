@@ -137,7 +137,7 @@ class TemplateDumper(NodeVisitor):
                 end_string = pair_closer.value_str
 
         self.tokens.extend(
-            (j2tokens.TOKEN_VARIABLE_START, start_string),
+            (j2tokens.TOKEN_VARIABLE_BEGIN, start_string),
             (j2tokens.TOKEN_WHITESPACE, SPACE),
         )
         yield
@@ -237,6 +237,7 @@ class TemplateDumper(NodeVisitor):
         # if self.tokens.line_number > 1 and self.tokens.line_position != 0:
         #     self.tokens.append(j2tokens.TOKEN_WHITESPACE, "\n")
         # TODO: write/preserve whitespace and comments at end
+        self.stream.write(str(self.tokens))
 
     def visit_Output(self, node: nodes.Template) -> None:
         """Write an ``Output`` node to the stream.
@@ -666,9 +667,14 @@ class TemplateDumper(NodeVisitor):
     def _binary_op(self, node: nodes.BinExpr) -> None:
         """Write a ``BinExpr`` (left and right op) to the stream."""
         self._visit_possible_binary_op(node.left)
+        try:
+            op_token = j2tokens.operators[node.operator]
+        except KeyError:
+            # op_token is "and" or "or"
+            op_token = j2tokens.TOKEN_NAME
         self.tokens.extend(
             (j2tokens.TOKEN_WHITESPACE, SPACE),
-            (j2tokens.operators[node.operator], node.operator),
+            (op_token, node.operator),
             (j2tokens.TOKEN_WHITESPACE, SPACE),
         )
         self._visit_possible_binary_op(node.right)

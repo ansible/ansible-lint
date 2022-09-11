@@ -41,7 +41,7 @@ def annotated_ast(jinja_env: Environment, in_template: str) -> nodes.Template:
         ),
         pytest.param(
             """docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'""",
-            """docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{ '}}' }}' | tr -d '"'""",
+            """docker info --format '{{ '{{' }}json .Swarm.LocalNodeState{{\n'}}' }}' | tr -d '"'""",
             id="ComplexTemplateData",
         ),
         pytest.param(
@@ -52,12 +52,12 @@ def annotated_ast(jinja_env: Environment, in_template: str) -> nodes.Template:
         ),
         pytest.param(
             "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1) }}",
-            "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1) }}",
+            "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2':\nvalue_2}} | combine(dummy_1) }}",
             id="DictLiteralWithFilter",
         ),
         pytest.param(
             "{{ {'dummy_2': {'nested_dummy_1': 'value_1',\n'nested_dummy_2': value_2}} |\ncombine(dummy_1)}}",
-            "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2': value_2}} | combine(dummy_1) }}",
+            "{{ {'dummy_2': {'nested_dummy_1': 'value_1', 'nested_dummy_2':\nvalue_2}} | combine(dummy_1) }}",
             id="DictLiteralWithFilterAndNewlines",
         ),
         pytest.param(
@@ -113,7 +113,7 @@ def test_dump(
     out_template = dump(
         node=in_ast,
         environment=jinja_env,
-        max_line_length=40,
+        max_line_length=60,
         stream=None,
     )
     assert out_template is not None

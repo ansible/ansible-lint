@@ -21,6 +21,7 @@ from jinja2.lexer import (
     TOKEN_RAW_END,
     TOKEN_VARIABLE_BEGIN,
     TOKEN_VARIABLE_END,
+    TOKEN_WHITESPACE,
     Lexer,
 )
 from jinja2.lexer import Token as JinjaToken
