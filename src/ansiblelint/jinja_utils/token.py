@@ -44,6 +44,8 @@ END_TOKENS = (
     TOKEN_LINECOMMENT_END,
 )
 
+SPACE = " "
+
 
 # pylint: disable=too-many-instance-attributes
 @dataclass  # this is mutable and DOES change after creation
@@ -347,9 +349,15 @@ class TokenStream(AbstractTokensCollection):
         self.append(TOKEN_INITIAL, "")
 
     def append(self, token: str, value: str, chomp: Literal["+", "-", ""] = "") -> None:
+        index = len(self.tokens)
+        if token == TOKEN_WHITESPACE and value is SPACE:
+            previous = self.tokens[index - 1]
+            if previous.token == TOKEN_WHITESPACE:
+                # no more than one consecutive space
+                return
         self.tokens.append(
             Token(
-                index=len(self.tokens),
+                index=index,
                 start_pos=-1,
                 end_pos=-1,
                 lineno=-1,
@@ -359,6 +367,7 @@ class TokenStream(AbstractTokensCollection):
                 chomp=chomp,
             )
         )
+        self.index = index
 
     def extend(self, *args: Sequence[str, str]) -> None:
         for token, value in args:
@@ -367,6 +376,7 @@ class TokenStream(AbstractTokensCollection):
     def insert(
         self, index: int, token: str, value: str, chomp: Literal["+", "-", ""] = ""
     ) -> None:
+        # this does not prevent duplicate whitespace
         self.tokens.insert(
             index,
             Token(

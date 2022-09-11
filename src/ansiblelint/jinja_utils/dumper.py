@@ -11,9 +11,7 @@ from jinja2.environment import Environment
 from jinja2.visitor import NodeVisitor
 
 from .annotator import _AnnotatedNode
-from .token import TokenStream
-
-SPACE = " "
+from .token import SPACE, TokenStream
 
 
 def dump(
