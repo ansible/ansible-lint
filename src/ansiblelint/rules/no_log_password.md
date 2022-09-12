@@ -1,7 +1,11 @@
 # no-log-password
 
-This rule ensures playbooks do not write passwords to logs.
-Always set the `no_log: True` attribute to protect sensitive data.
+This rule ensures playbooks do not write passwords to logs when using loops.
+Always set the `no_log: true` attribute to protect sensitive data.
+
+While most ansible modules know to mark sensitive data, if you happen to use
+secrets inside a loop, they could end up being logged in some cases. Adding
+an explicit `no_log: true` should prevent accidental exposure.
 
 ## Problematic Code
 
@@ -16,8 +20,10 @@ Always set the `no_log: True` attribute to protect sensitive data.
         comment: John Doe
         uid: 1040
         group: admin
-        password: password
-      no_log: False # <- Sets the no_log attribute to false.
+        password: "{{ item }}"
+      with_items:
+        - wow
+      no_log: false # <- Sets the no_log attribute to false.
 ```
 
 ## Correct Code
@@ -33,6 +39,8 @@ Always set the `no_log: True` attribute to protect sensitive data.
         comment: John Doe
         uid: 1040
         group: admin
-        password: password
-      no_log: True # <- Sets the no_log attribute to a non-false value.
+        password: "{{ item }}"
+      with_items:
+        - wow
+      no_log: true # <- Sets the no_log attribute to a non-false value.
 ```
