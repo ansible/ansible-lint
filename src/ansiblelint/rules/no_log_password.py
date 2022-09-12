@@ -43,10 +43,7 @@ class NoLogPasswordsRule(AnsibleLintRule):
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str:
         if task["action"]["__ansible_module_original__"] == "ansible.builtin.user" and (
-            (
-                task["action"].get("password_lock")
-                or task["action"].get("password_lock")
-            )
+            (task["action"].get("password_lock") or task["action"].get("password_lock"))
             and not task["action"].get("password")
         ):
             has_password = False
@@ -77,7 +74,7 @@ class NoLogPasswordsRule(AnsibleLintRule):
         )
 
 
-if "pytest" in sys.modules:
+if "pytest" in sys.modules:  # noqa: C901
     import pytest
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports

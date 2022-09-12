@@ -16,7 +16,7 @@ an explicit `no_log: true` should prevent accidental exposure.
   tasks:
     - name: Log user passwords
       ansible.builtin.user:
-        name: johnd
+        name: john_doe
         comment: John Doe
         uid: 1040
         group: admin
@@ -35,7 +35,7 @@ an explicit `no_log: true` should prevent accidental exposure.
   tasks:
     - name: Do not log user passwords
       ansible.builtin.user:
-        name: johnd
+        name: john_doe
         comment: John Doe
         uid: 1040
         group: admin
