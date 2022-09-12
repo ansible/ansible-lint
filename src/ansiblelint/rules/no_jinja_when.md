@@ -15,7 +15,7 @@ Using `{{ }}` in conditionals creates a nested expression, which is an Ansible a
   tasks:
     - name: Shut down Debian systems
       ansible.builtin.command: /sbin/shutdown -t now
-      when: "{{ some_host_var }}" # <- Nests a Jinja expression in a conditional statement.
+      when: "{{ ansible_facts['os_family'] == 'Debian' }}" # <- Nests a Jinja expression in a conditional statement.
 ```
 
 ## Correct Code
