@@ -8,19 +8,19 @@ alabaster==0.7.12
 ansible-compat==2.2.0
 ansible-core==2.13.3
 ansible-pygments==0.1.1
-astroid==2.12.5
+astroid==2.12.9
 attrs==22.1.0
 babel==2.10.3
 black==22.8.0
 bracex==2.3.post1
-certifi==2022.6.15
+certifi==2022.6.15.1
 cffi==1.15.1
 charset-normalizer==2.1.1
 click==8.1.3
 commonmark==0.9.1
 coverage==6.4.4
 coverage-enable-subprocess==1.0
-cryptography==37.0.4
+cryptography==38.0.1
 dill==0.3.5.1
 docutils==0.16
 enrich==1.2.7
@@ -35,7 +35,7 @@ importlib-metadata==4.12.0
 iniconfig==1.1.1
 isort==5.10.1
 jinja2==3.1.2
-jsonschema==4.15.0
+jsonschema==4.16.0
 lazy-object-proxy==1.7.1
 markdown-it-py==2.1.0
 markupsafe==2.1.1
@@ -47,21 +47,21 @@ mypy==0.971
 mypy-extensions==0.4.3
 myst-parser==0.18.0
 packaging==21.3
-pathspec==0.10.0
+pathspec==0.10.1
 pbr==5.10.0
-pipdeptree==2.2.1
+pipdeptree==2.3.1
 platformdirs==2.5.2
 pluggy==1.0.0
-psutil==5.9.1
+psutil==5.9.2
 py==1.11.0
 pycodestyle==2.9.1
 pycparser==2.21
 pyflakes==2.5.0
 pygments==2.13.0
-pylint==2.15.0
+pylint==2.15.2
 pyparsing==3.0.9
 pyrsistent==0.18.1
-pytest==7.1.2
+pytest==7.1.3
 pytest-forked==1.4.0
 pytest-plus==0.2
 pytest-xdist==2.5.0
@@ -91,9 +91,8 @@ typing-extensions==4.3.0
 urllib3==1.26.12
 wcmatch==8.4
 wrapt==1.14.1
-yamllint==1.27.1
+yamllint==1.28.0
 zipp==3.8.1
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip
 # setuptools
