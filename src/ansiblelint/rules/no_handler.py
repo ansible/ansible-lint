@@ -54,9 +54,8 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
 
     id = "no-handler"
     description = (
-        "If a task has a ``when: result.changed`` setting, it is effectively "
-        "acting as a handler. You could use notify and move that task to "
-        "handlers."
+        "This task includes a ``when: result.changed`` setting that acts "
+        "as a handler. Use ``changed_when: result.changed`` instead."
     )
     link = "https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html"
     severity = "MEDIUM"
