@@ -3,7 +3,7 @@
 This rule checks conditional statements for Jinja expressions in curly brackets `{{ }}`.
 Ansible processes conditionals statements that use the `when`, `failed_when`, and `changed_when` clauses as Jinja expressions.
 
-An Ansible rule is "always use `{{ }}` except when `when:`".
+An Ansible rule is "always use `{{ }}` except with `when*:`".
 Using `{{ }}` in conditionals creates a nested expression, which is an Ansible anti-pattern and does not produce expected results.
 
 ## Problematic Code
