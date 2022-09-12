@@ -404,8 +404,9 @@
       "additionalProperties": false,
       "properties": {
         "author": {
+          "markdownDescription": "The author of the role as a github username. If that is not a standalone role (outside a collection), you can remove galaxy_info.author field, as collections do not use it.",
           "minLength": 2,
-          "pattern": "[a-z0-9][a-z0-9_]+",
+          "pattern": "^[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}$",
           "title": "Author",
           "type": "string"
         },
@@ -584,7 +585,7 @@
         },
         "role_name": {
           "minLength": 2,
-          "pattern": "[a-z][a-z0-9_]+",
+          "pattern": "^[a-z][a-z0-9_]+$",
           "title": "Role Name",
           "type": "string"
         }
