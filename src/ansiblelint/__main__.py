@@ -209,7 +209,6 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")
-
     result = _get_matches(rules, options)
 
     if options.write_list:
@@ -272,17 +271,26 @@ def _previous_revision() -> Iterator[None]:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
     ).stdout.strip()
+    _logger.info("Previous revision SHA: %s", revision)
     path = pathlib.Path(worktree_dir)
+    if path.exists():
+        shutil.rmtree(worktree_dir)
     path.mkdir(parents=True, exist_ok=True)
     # Run check will fail if worktree_dir already exists
     # pylint: disable=subprocess-run-check
     subprocess.run(
         ["git", "worktree", "add", "-f", worktree_dir],
+        stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     try:
         with cwd(worktree_dir):
-            subprocess.run(["git", "checkout", revision], check=True)
+            subprocess.run(
+                ["git", "checkout", revision],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+            )
             yield
     finally:
         options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
