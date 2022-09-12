@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class GalaxyCollectionVersionRule(AnsibleLintRule):
-    """Rule for checking collection version is greater than 1.0.0"""
+    """Rule for checking collection version is greater than 1.0.0."""
 
     id = "galaxy-collection-version"
     description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0"
@@ -27,7 +27,6 @@ class GalaxyCollectionVersionRule(AnsibleLintRule):
 
     def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
-
         if file.kind != "galaxy":
             return []
         if "version" not in data:
@@ -39,7 +38,7 @@ class GalaxyCollectionVersionRule(AnsibleLintRule):
                     filename=file,
                 )
             ]
-        elif Version(data.get("version")) < Version("1.0.0"):
+        if Version(data.get("version")) < Version("1.0.0"):
             return [
                 self.create_matcherror(
                     message="collection version should be greater than or equal to 1.0.0",
@@ -48,16 +47,19 @@ class GalaxyCollectionVersionRule(AnsibleLintRule):
                     filename=file,
                 )
             ]
+        return []
 
 
 @total_ordering
 class Version:
-    """Simple class to compare arbitrary versions"""
+    """Simple class to compare arbitrary versions."""
 
     def __init__(self, version_string):
+        """Constructs a Version object."""
         self.components = version_string.split(".")
 
     def __eq__(self, other):
+        """Implementation for equality."""
         other = _coerce(other)
         if not isinstance(other, Version):
             return NotImplemented
@@ -65,6 +67,7 @@ class Version:
         return self.components == other.components
 
     def __lt__(self, other):
+        """Implementation for lower-than."""
         other = _coerce(other)
         if not isinstance(other, Version):
             return NotImplemented
