@@ -27,7 +27,9 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         ("license", "license (GPL-2.0-or-later, MIT, etc)"),
     ]
     values = ", ".join(sorted({f[0] for f in field_defaults}))
-    description = f"meta/main.yml default values should be changed for: {values}"
+    description = (
+        f"You should set appropriate values in meta/main.yml for these fields: {values}"
+    )
     severity = "HIGH"
     tags = ["metadata"]
     version_added = "v4.0.0"
