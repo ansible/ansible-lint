@@ -20,7 +20,7 @@ galaxy_info:
 ```yaml
 ---
 galaxy_info:
-  min_ansible_version: 2.8
+  min_ansible_version: "2.8"
   platforms:
     - name: Fedora
       versions:
