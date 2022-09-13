@@ -1,9 +1,9 @@
 # meta-no-info
 
 This rule checks role metadata for missing information.
-Always set appropriate values for the following metadata fields in the `meta/main.yml` file:
+Always set appropriate values for the following metadata fields in the `meta/main.yml` file, under `galaxy_info` key:
 
-- `platform`
+- `platforms`
 - `min_ansible_version`
 
 ## Problematic Code
