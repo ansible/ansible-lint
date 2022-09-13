@@ -3,9 +3,8 @@
 This rule ensures playbooks do not write passwords to logs when using loops.
 Always set the `no_log: true` attribute to protect sensitive data.
 
-While most ansible modules know to mark sensitive data, if you happen to use
-secrets inside a loop, they could end up being logged in some cases. Adding
-an explicit `no_log: true` should prevent accidental exposure.
+While most Ansible modules mask sensitive data, using secrets inside a loop can result in those secrets being logged.
+Explicitly adding `no_log: true` prevents accidentally exposing secrets.
 
 ## Problematic Code
 
