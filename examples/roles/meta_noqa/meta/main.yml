@@ -1,4 +1,5 @@
 ---
+version: 1
 galaxy_info: # noqa meta-incorrect
   author: your-name # noqa meta-no-info
   description: missing min_ansible_version and platforms. author default not changed
