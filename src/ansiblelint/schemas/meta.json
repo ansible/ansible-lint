@@ -400,13 +400,10 @@
       "title": "FreeBSDPlatformModel",
       "type": "object"
     },
-    "GalaxyInfoModel": {
+    "GalaxyInfoModel-v1": {
       "additionalProperties": false,
       "properties": {
         "author": {
-          "markdownDescription": "The author of the role as a github username. If that is not a standalone role (outside a collection), you can remove galaxy_info.author field, as collections do not use it.",
-          "minLength": 2,
-          "pattern": "^[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}$",
           "title": "Author",
           "type": "string"
         },
@@ -450,138 +447,7 @@
           "type": "string"
         },
         "platforms": {
-          "items": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/AIXPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/AlpinePlatformModel"
-              },
-              {
-                "$ref": "#/$defs/AmazonPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/Amazon_Linux_2PlatformModel"
-              },
-              {
-                "$ref": "#/$defs/aosPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/ArchLinuxPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/ClearLinuxPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/CumulusPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/DebianPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/DellOSPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/DevuanPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/DragonFlyBSDPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/ELPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/eosPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/FedoraPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/FreeBSDPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/GenericBSDPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/GenericLinuxPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/GenericUNIXPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/GentooPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/HardenedBSDPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/IOSPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/JunosPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/macOSPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/MacOSXPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/MageiaPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/NXOSPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/OpenBSDPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/opensusePlatformModel"
-              },
-              {
-                "$ref": "#/$defs/OpenWRTPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/os10PlatformModel"
-              },
-              {
-                "$ref": "#/$defs/PAN-OSPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/SLESPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/SmartOSPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/SolarisPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/SynologyPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/TMOSPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/UbuntuPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/vCenterPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/Void_LinuxPlatformModel"
-              },
-              {
-                "$ref": "#/$defs/vSpherePlatformModel"
-              },
-              {
-                "$ref": "#/$defs/WindowsPlatformModel"
-              }
-            ]
-          },
-          "title": "Platforms",
-          "type": "array"
+          "$ref": "#/$defs/platforms"
         },
         "role_name": {
           "minLength": 2,
@@ -596,7 +462,34 @@
         "min_ansible_version",
         "platforms"
       ],
-      "title": "GalaxyInfoModel",
+      "title": "GalaxyInfoModel for old standalone role (v1)",
+      "type": "object"
+    },
+    "GalaxyInfoModel-v2": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "title": "Author",
+          "type": "string"
+        },
+        "company": {
+          "title": "Company",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "license": {
+          "title": "License",
+          "type": "string"
+        },
+        "platforms": {
+          "$ref": "#/$defs/platforms"
+        }
+      },
+      "required": ["description"],
+      "title": "GalaxyInfoModel for role within a collection (v2)",
       "type": "object"
     },
     "GenericBSDPlatformModel": {
@@ -1131,6 +1024,15 @@
       "title": "aosPlatformModel",
       "type": "object"
     },
+    "collections": {
+      "items": {
+        "markdownDescription": "See [Using collections in roles](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-roles) and [collection naming conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_in_groups.html#naming-conventions)",
+        "pattern": "^[a-z_]+\\.[a-z_]+$",
+        "type": "string"
+      },
+      "title": "Collections",
+      "type": "array"
+    },
     "complex_conditional": {
       "oneOf": [
         {
@@ -1245,6 +1147,213 @@
       "title": "os10PlatformModel",
       "type": "object"
     },
+    "platforms": {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/AIXPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/AlpinePlatformModel"
+          },
+          {
+            "$ref": "#/$defs/AmazonPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/Amazon_Linux_2PlatformModel"
+          },
+          {
+            "$ref": "#/$defs/aosPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/ArchLinuxPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/ClearLinuxPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/CumulusPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/DebianPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/DellOSPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/DevuanPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/DragonFlyBSDPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/ELPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/eosPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/FedoraPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/FreeBSDPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/GenericBSDPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/GenericLinuxPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/GenericUNIXPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/GentooPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/HardenedBSDPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/IOSPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/JunosPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/macOSPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/MacOSXPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/MageiaPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/NXOSPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/OpenBSDPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/opensusePlatformModel"
+          },
+          {
+            "$ref": "#/$defs/OpenWRTPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/os10PlatformModel"
+          },
+          {
+            "$ref": "#/$defs/PAN-OSPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/SLESPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/SmartOSPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/SolarisPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/SynologyPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/TMOSPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/UbuntuPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/vCenterPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/Void_LinuxPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/vSpherePlatformModel"
+          },
+          {
+            "$ref": "#/$defs/WindowsPlatformModel"
+          }
+        ]
+      },
+      "title": "Platforms",
+      "type": "array"
+    },
+    "v1": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_duplicates": {
+          "title": "Allow Duplicates",
+          "type": "boolean"
+        },
+        "cloud_platforms": {
+          "items": {
+            "enum": [
+              "amazon",
+              "azure",
+              "centurylink",
+              "google",
+              "openstack",
+              "ovirt",
+              "rackspace",
+              "vmware"
+            ],
+            "type": "string"
+          },
+          "markdownDescription": "Which cloud platforms are supported, existing values can be gathered using the [API](https://galaxy.ansible.com/api/v1/cloud_platforms/)",
+          "title": "Cloud Platforms",
+          "type": "array"
+        },
+        "collections": {
+          "$ref": "#/$defs/collections"
+        },
+        "dependencies": {
+          "items": {
+            "$ref": "#/$defs/DependencyModel"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "galaxy_info": {
+          "$ref": "#/$defs/GalaxyInfoModel-v1"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": ["version"],
+      "title": "Meta Schema v1 (standalone role)",
+      "type": "object"
+    },
+    "v2": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_duplicates": {
+          "title": "Allow Duplicates",
+          "type": "boolean"
+        },
+        "collections": {
+          "$ref": "#/$defs/collections"
+        },
+        "dependencies": {
+          "items": {
+            "$ref": "#/$defs/DependencyModel"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "galaxy_info": {
+          "$ref": "#/$defs/GalaxyInfoModel-v2"
+        },
+        "version": {
+          "const": 2
+        }
+      },
+      "title": "Meta Schema v2 (role inside collection)",
+      "type": "object"
+    },
     "vCenterPlatformModel": {
       "properties": {
         "name": {
@@ -1286,39 +1395,26 @@
   },
   "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
   "$schema": "http://json-schema.org/draft-07/schema",
-  "anyOf": [
-    {
-      "type": "null"
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "allow_duplicates": {
-          "title": "Allow Duplicates",
-          "type": "boolean"
-        },
-        "collections": {
-          "items": {
-            "markdownDescription": "See [Using collections in roles](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-roles) and [collection naming conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_in_groups.html#naming-conventions)",
-            "pattern": "^[a-z_]+\\.[a-z_]+$",
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "dependencies": {
-          "items": {
-            "$ref": "#/$defs/DependencyModel"
-          },
-          "title": "Dependencies",
-          "type": "array"
-        },
-        "galaxy_info": {
-          "$ref": "#/$defs/GalaxyInfoModel"
-        }
-      },
-      "type": "object"
-    }
-  ],
+  "else": {
+    "$ref": "#/$defs/v2"
+  },
   "examples": ["meta/main.yml"],
-  "title": "Ansible Meta Schema"
+  "if": {
+    "properties": {
+      "version": {
+        "const": 1
+      }
+    }
+  },
+  "properties": {
+    "version": {
+      "enum": [1, 2],
+      "type": "integer"
+    }
+  },
+  "then": {
+    "$ref": "#/$defs/v1"
+  },
+  "title": "Ansible Meta Schema v1/v2",
+  "type": "object"
 }
