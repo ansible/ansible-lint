@@ -16,19 +16,18 @@ You should use the `when` clause to run tasks only if a check returns a particul
   hosts: localhost
   tasks:
     - name: Does not handle any output or return codes
-      ansible.builtin.command: cat {{ my_file|quote }} # <- Does not handle the command output.
+      ansible.builtin.command: cat {{ my_file | quote }} # <- Does not handle the command output.
 ```
 
 ## Correct Code
 
 ```yaml
 ---
-# This tasks registers the command`` output and
 - name: Example playbook
   hosts: localhost
   tasks:
     - name: Handle shell output with return code
-      ansible.builtin.command: cat {{ my_file|quote }}
+      ansible.builtin.command: cat {{ my_file | quote }}
       register: my_output # <- Registers the command output.
       changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 ```
