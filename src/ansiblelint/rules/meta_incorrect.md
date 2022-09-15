@@ -26,7 +26,7 @@ galaxy_info:
 ---
 galaxy_info:
   author: Leroy Jenkins
-  description: Lorem ipsum dolor sit amet.
+  description: This role will set you free.
   company: Red Hat
   license: Apache
 ```
