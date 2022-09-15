@@ -185,6 +185,8 @@ html_theme_options = {
     # 'canonical_url': "https://docs.ansible.com/ansible/latest/",
     "vcs_pageview_mode": "edit",
     "navigation_depth": 3,
+    "display_version": False,
+    "logo_only": True,
 }
 
 html_context = {
@@ -195,10 +197,10 @@ html_context = {
     "current_version": version,
     "latest_version": "latest",
     # list specifically out of order to make latest work
-    "available_versions": ("latest", "stable"),
-    "css_files": (),  # overrides to the standard theme
+    "available_versions": ("latest",),
 }
 
+# This appears on the left side of the page, in the header bar
 html_short_title = "Ansible Lint Documentation"
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
@@ -273,7 +275,7 @@ autoclass_content = "both"
 # table width fix via: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
 html_static_path = ["_static"]
 
-html_css_files = [
+html_css_files = [  # relative to html_static_path
     "theme_overrides.css",  # override wide tables in RTD theme
     "ansi.css",
 ]
