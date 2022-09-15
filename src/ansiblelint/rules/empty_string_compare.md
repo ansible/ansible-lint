@@ -3,8 +3,8 @@
 This rule checks for empty string comparison in playbooks.
 To ensure code clarity you should avoid using empty strings in conditional statements with the `when` clause.
 
-- Use `when: var|length > 0` instead of `when: var != ""`.
-- Use `when: var|length == 0` instead of `when: var == ""`.
+- Use `when: var | length > 0` instead of `when: var != ""`.
+- Use `when: var | length == 0` instead of `when: var == ""`.
 
 This is an opt-in rule.
 You must enable it in your Ansible-lint configuration as follows:
