@@ -22,7 +22,7 @@ coverage==6.4.4
 coverage-enable-subprocess==1.0
 cryptography==38.0.1
 dill==0.3.5.1
-docutils==0.16
+docutils==0.17.1
 enrich==1.2.7
 execnet==1.9.0
 filelock==3.8.0
@@ -75,7 +75,7 @@ ruamel-yaml-clib==0.2.6
 snowballstemmer==2.2.0
 sphinx==5.1.1
 sphinx-ansible-theme==0.9.1
-sphinx-rtd-theme==0.5.2
+sphinx-rtd-theme==1.0.0
 sphinxcontrib-apidoc==0.3.0
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
