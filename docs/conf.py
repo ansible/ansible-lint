@@ -218,16 +218,15 @@ html_title = "Ansible Lint Documentation"
 #
 # ssbarnea: Do not put relative path because it will not load from some deeper
 # pages as the relative path will be wrong, probably a bug in our schema.
-html_logo = "https://ansible-lint.readthedocs.io/en/latest/_static/ansible-lint.svg"
+html_logo = "_static/ansible-lint.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
 #
-# ssbarnea: Do not put SVG here, Safari does not support it: https://caniuse.com/link-icon-svg
-html_favicon = (
-    "https://ansible-lint.readthedocs.io/en/latest/_static/images/logo_invert.png"
-)
+# ssbarnea: Do not put SVG or PND here due to limited browser support. The
+# value is relative to config file!
+html_favicon = "_static/images/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
