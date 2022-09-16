@@ -18,7 +18,10 @@ if [ -f "/usr/bin/apt-get" ]; then
     sudo apt-get remove -y ansible pipx || true
     # cspell:disable-next-line
     sudo apt-get install -y --no-install-recommends -o=Dpkg::Use-Pty=0 \
-        git python3-venv python3-pip
+        gcc git python3-venv python3-pip python3-dev libyaml-dev
+    # Some of these might be needed for compiling packages that do not yet
+    # a binary for current platform, like pyyaml on py311
+    pip3 install -v --no-binary :all: --user pyyaml
 fi
 
 which pipx || python3 -m pip install --user pipx

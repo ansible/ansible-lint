@@ -23,7 +23,7 @@ to create a new rule by following the steps below:
 
 - Use a short but clear class name, which must match the filename
 - Pick an unused `id`, the first number is used to determine rule section.
-  Look at [rules](default_rules.md) page and pick one that matches the best
+  Look at [rules](rules.md) page and pick one that matches the best
   your new rule and ee which one fits best.
 - Include `experimental` tag. Any new rule must stay as
   experimental for at least two weeks until this tag is removed in next major

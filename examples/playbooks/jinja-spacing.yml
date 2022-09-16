@@ -82,7 +82,7 @@
 
     - name: Invalid multiline nested JSON
       ansible.builtin.debug:
-        # <-- 8
+        # not an error currently because current implementation skips multiline expressions
         msg: >-
           {{ {'dummy_2': {'nested_dummy_1': value_1,
                           'nested_dummy_2': value_2}} |

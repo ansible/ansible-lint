@@ -56,8 +56,6 @@ extensions = [
     # Third-party extensions:
     "sphinxcontrib.apidoc",
     "sphinxcontrib.programoutput",
-    # Tree-local extensions:
-    "rules_table_generator_ext",  # in-tree extension
 ]
 
 
@@ -180,11 +178,15 @@ html_theme = "sphinx_ansible_theme"
 html_theme_options = {
     "collapse_navigation": False,
     "analytics_id": "UA-128382387-1",
+    # cspell:disable-next-line
+    "tag_manager_id": "GTM-5FGNF6S",
     "style_nav_header_background": "#5bbdbf",
     "style_external_links": True,
     # 'canonical_url': "https://docs.ansible.com/ansible/latest/",
     "vcs_pageview_mode": "edit",
     "navigation_depth": 3,
+    "display_version": False,
+    "logo_only": True,
 }
 
 html_context = {
@@ -195,10 +197,10 @@ html_context = {
     "current_version": version,
     "latest_version": "latest",
     # list specifically out of order to make latest work
-    "available_versions": ("latest", "stable"),
-    "css_files": (),  # overrides to the standard theme
+    "available_versions": ("latest",),
 }
 
+# This appears on the left side of the page, in the header bar
 html_short_title = "Ansible Lint Documentation"
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
@@ -215,12 +217,18 @@ html_title = "Ansible Lint Documentation"
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.
+#
+# ssbarnea: Do not put relative path because it will not load from some deeper
+# pages as the relative path will be wrong, probably a bug in our schema.
 html_logo = "_static/ansible-lint.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = html_logo
+#
+# ssbarnea: Do not put SVG or PND here due to limited browser support. The
+# value is relative to config file!
+html_favicon = "_static/images/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -267,7 +275,7 @@ autoclass_content = "both"
 # table width fix via: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
 html_static_path = ["_static"]
 
-html_css_files = [
+html_css_files = [  # relative to html_static_path
     "theme_overrides.css",  # override wide tables in RTD theme
     "ansi.css",
 ]
@@ -324,3 +332,4 @@ nitpick_ignore = [
 ]
 
 myst_heading_anchors = 3
+myst_ref_domains = ("std", "py")

@@ -31,10 +31,7 @@ class NameRule(AnsibleLintRule):
         """Return matches found for a specific play (entry in playbook)."""
         if file.kind != "playbook":
             return []
-        if "name" not in data and not any(
-            key in data
-            for key in ["import_playbook", "ansible.builtin.import_playbook"]
-        ):
+        if "name" not in data:
             return [
                 self.create_matcherror(
                     message="All plays should be named.",
@@ -69,7 +66,10 @@ class NameRule(AnsibleLintRule):
     def _check_name(
         self, name: str, lintable: Lintable | None, linenumber: int
     ) -> MatchError | None:
-        if not name[0].isupper():
+        # This rules applies only to languages that do have uppercase and
+        # lowercase letter, so we ignore anything else. On Unicode isupper()
+        # is not necessarily the opposite of islower()
+        if name[0].isalpha() and name[0].islower() and not name[0].isupper():
             return self.create_matcherror(
                 message="All names should start with an uppercase letter.",
                 linenumber=linenumber,

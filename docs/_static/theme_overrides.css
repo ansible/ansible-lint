@@ -12,3 +12,7 @@
     overflow: visible !important;
   }
 }
+
+.icon-home {
+  display: none !important;
+}

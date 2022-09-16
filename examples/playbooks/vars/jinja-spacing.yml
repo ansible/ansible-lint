@@ -35,7 +35,7 @@ valid_multiline_nested_json: >-
   {{ {'dummy_2': {'nested_dummy_1': value_1,
                   'nested_dummy_2': value_2}} |
   combine(dummy_1) }}
-invalid_multiline_nested_json: >- # <-- 8
+invalid_multiline_nested_json: >- # ignored multiline expression, for now
   {{ {'dummy_2': {'nested_dummy_1': value_1,
                   'nested_dummy_2': value_2}} |
   combine(dummy_1)}}

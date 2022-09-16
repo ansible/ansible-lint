@@ -25,7 +25,8 @@ MAIN_PLAYBOOK = """\
     - name: Should be shell  # noqa command-instead-of-shell no-changed-when
       ansible.builtin.shell: echo lol
 
-- import_playbook: imported_playbook.yml
+- name: Should not be imported
+  import_playbook: imported_playbook.yml
 """
 
 

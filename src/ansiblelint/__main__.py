@@ -35,14 +35,14 @@ from typing import TYPE_CHECKING, Any, Callable, Iterator
 from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir
 from enrich.console import should_do_markup
-from filelock import FileLock
+from filelock import FileLock, Timeout
 
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
 from ansiblelint.color import console, console_options, reconfigure, render_yaml
 from ansiblelint.config import options
-from ansiblelint.constants import EXIT_CONTROL_C_RC
+from ansiblelint.constants import EXIT_CONTROL_C_RC, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
@@ -109,14 +109,28 @@ def initialize_options(arguments: list[str] | None = None) -> None:
 
     # add a lock file so we do not have two instances running inside at the same time
     os.makedirs(options.cache_dir, exist_ok=True)
-    options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
-    options.cache_dir_lock.acquire()
+
+    options.cache_dir_lock = None
+    if not options.offline:
+        options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
+        try:
+            options.cache_dir_lock.acquire(timeout=120)
+        except Timeout:
+            _logger.error(
+                "Timeout waiting for another instance of ansible-lint to release the lock."
+            )
+            sys.exit(LOCK_TIMEOUT_RC)
 
 
 def _do_list(rules: RulesCollection) -> int:
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
-    from ansiblelint.generate_docs import rules_as_md, rules_as_rich, rules_as_str
+    from ansiblelint.generate_docs import (
+        rules_as_docs,
+        rules_as_md,
+        rules_as_rich,
+        rules_as_str,
+    )
 
     if options.listrules:
 
@@ -124,6 +138,7 @@ def _do_list(rules: RulesCollection) -> int:
             "plain": rules_as_str,
             "rich": rules_as_rich,
             "md": rules_as_md,
+            "docs": rules_as_docs,
         }
 
         console.print(_rule_format_map[options.format](rules), highlight=False)
@@ -194,7 +209,6 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")
-
     result = _get_matches(rules, options)
 
     if options.write_list:
@@ -236,8 +250,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     app.render_matches(result.matches)
 
     _perform_mockings_cleanup()
-    options.cache_dir_lock.release()
-    pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
+    if options.cache_dir_lock:
+        options.cache_dir_lock.release()
+        pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
 
@@ -256,17 +271,26 @@ def _previous_revision() -> Iterator[None]:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
     ).stdout.strip()
+    _logger.info("Previous revision SHA: %s", revision)
     path = pathlib.Path(worktree_dir)
+    if path.exists():
+        shutil.rmtree(worktree_dir)
     path.mkdir(parents=True, exist_ok=True)
     # Run check will fail if worktree_dir already exists
     # pylint: disable=subprocess-run-check
     subprocess.run(
         ["git", "worktree", "add", "-f", worktree_dir],
+        stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     try:
         with cwd(worktree_dir):
-            subprocess.run(["git", "checkout", revision], check=True)
+            subprocess.run(
+                ["git", "checkout", revision],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+            )
             yield
     finally:
         options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]

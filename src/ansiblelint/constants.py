@@ -4,10 +4,12 @@ from typing import Literal
 
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
+RULE_DOC_URL = "https://ansible-lint.readthedocs.io/en/latest/rules/"
 
 SUCCESS_RC = 0
 VIOLATIONS_FOUND_RC = 2
 INVALID_CONFIG_RC = 3
+LOCK_TIMEOUT_RC = 4
 EXIT_CONTROL_C_RC = 130
 
 # Minimal version of Ansible we support for runtime
@@ -83,8 +85,8 @@ RENAMED_TAGS = {
     "304": "inline-env-var",
     "305": "command-instead-of-shell",
     "306": "risky-shell-pipe",
-    "401": "git-latest",
-    "402": "hg-latest",
+    "401": "latest[git]",
+    "402": "latest[hg]",
     "403": "package-latest",
     "404": "no-relative-paths",
     "501": "partial-become",
@@ -101,6 +103,8 @@ RENAMED_TAGS = {
     "911": "syntax-check",
     "var-spacing": "jinja[spacing]",
     "unnamed-task": "name[missing]",
+    "git-latest": "latest[git]",
+    "hg-latest": "latest[hg]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [

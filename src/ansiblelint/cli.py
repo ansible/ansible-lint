@@ -9,8 +9,6 @@ from argparse import Namespace
 from pathlib import Path
 from typing import Any, Callable, Sequence
 
-import yaml
-
 from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
@@ -23,6 +21,7 @@ from ansiblelint.file_utils import (
     guess_project_dir,
     normpath,
 )
+from ansiblelint.loaders import YAMLError, yaml_load_safe
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [
@@ -67,14 +66,14 @@ def load_config(config_file: str) -> dict[Any, Any]:
 
     try:
         with open(config_path, encoding="utf-8") as stream:
-            config = yaml.safe_load(stream)
+            config = yaml_load_safe(stream)
             # We want to allow passing /dev/null to disable config use
             if config is None:
                 return {}
             if not isinstance(config, dict):
                 _logger.error("Invalid configuration file %s", config_path)
                 sys.exit(INVALID_CONFIG_RC)
-    except yaml.YAMLError as exc:
+    except YAMLError as exc:
         _logger.error(exc)
         sys.exit(INVALID_CONFIG_RC)
 
@@ -249,6 +248,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
             "quiet",
             "pep8",
             "sarif",
+            "docs",  # internally used
         ],
         help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
@@ -513,7 +513,8 @@ def get_config(arguments: list[str]) -> Namespace:
     parser = get_cli_parser()
     options = parser.parse_args(arguments)
 
-    if options.listrules and options.format not in ["plain", "rich", "md"]:
+    # docs is not document, being used for internal documentation building
+    if options.listrules and options.format not in ["plain", "rich", "md", "docs"]:
         parser.error(
             f"argument -f: invalid choice: '{options.format}'. "
             f"In combination with argument -L only 'plain', "

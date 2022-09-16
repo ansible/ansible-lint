@@ -209,7 +209,13 @@ class Lintable:
 
     def _populate_content_cache_from_disk(self) -> None:
         # Can raise UnicodeDecodeError
-        self._content = self.path.resolve().read_text(encoding="utf-8")
+        try:
+            self._content = self.path.resolve().read_text(encoding="utf-8")
+        except FileNotFoundError as ex:
+            if vars(options).get("progressive"):
+                self._content = ""
+            else:
+                raise ex
         if self._original_content is None:
             self._original_content = self._content
 

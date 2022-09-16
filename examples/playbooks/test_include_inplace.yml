@@ -1,4 +1,5 @@
 ---
-- hosts: all
+- name: Test fixture
+  hosts: all
   roles:
     - include_in_the_place
