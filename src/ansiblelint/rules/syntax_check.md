@@ -14,7 +14,7 @@ If undefined variables cause the failure, you can use the jinja
 
 This rule is among the few `unskippable` rules that cannot be added to
 `skip_list` or `warn_list`. One possible workaround is to add the entire file
-to the `exclude_list`. This is a valid approach for special cases, like testing
+to the `exclude_paths`. This is a valid approach for special cases, like testing
 fixtures that are invalid on purpose.
 
 One of the most common sources of errors is failure to assert the presence of

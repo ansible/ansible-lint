@@ -12,7 +12,7 @@ In almost all cases you will see more detailed information regarding the
 original error or runtime exception that triggered this rule.
 
 If these files are broken on purpose, like some test fixtures, you need to add
-them to the `exclude_list`.
+them to the `exclude_paths`.
 
 ## Problematic code
 
