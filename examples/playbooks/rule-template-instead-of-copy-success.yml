@@ -1,0 +1,9 @@
+---
+- name: Example playbook
+  hosts: localhost
+  tasks:
+    - name: Write file content
+      ansible.builtin.template:
+        src: foo.txt.j2
+        dest: /tmp/foo.txt
+        mode: 0600
