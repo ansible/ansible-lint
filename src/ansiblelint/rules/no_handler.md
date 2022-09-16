@@ -14,7 +14,7 @@ This rule checks for the correct handling of changes to results or conditions.
   tasks:
     - name: Put YAML file in an S3 bucket
       amazon.aws.aws_s3:
-        bucket: mybucket
+        bucket: "my_bucket"
         mode: put
         object: "file.yaml"
         src: "/home/user/file.yaml"
@@ -31,7 +31,7 @@ This rule checks for the correct handling of changes to results or conditions.
   tasks:
     - name: Put YAML file in an S3 bucket
       amazon.aws.aws_s3:
-        bucket: mybucket
+        bucket: "my_bucket"
         mode: put
         object: "file.yaml"
         src: "/home/user/file.yaml"
