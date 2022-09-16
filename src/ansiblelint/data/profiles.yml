@@ -68,6 +68,7 @@ safety:
     risky-file-permissions:
     risky-octal:
     risky-shell-pipe:
+    template-instead-of-copy:
 shared:
   extends: safety
   description: >
