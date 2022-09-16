@@ -1,7 +1,7 @@
 ---
 name: foo
 namespace: bar
-version: 0.2.3  # <-- that version is not valid, should be 1.0.0 or greater
+version: 0.2.3 # <-- that version is not valid, should be 1.0.0 or greater
 authors:
   - John
 readme: ../README.md
