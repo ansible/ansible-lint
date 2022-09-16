@@ -42,7 +42,7 @@ def rules_as_docs(rules: RulesCollection) -> str:
         raise RuntimeError(f"Failed to find {dump_path} folder for dumping rules.")
 
     with open(dump_path / ".." / "profiles.md", "w", encoding="utf-8") as f:
-        f.write(profiles_as_md(header=True))
+        f.write(profiles_as_md(header=True, docs_url="rules/"))
 
     for rule in rules.alphabetical():
         result = ""
@@ -122,7 +122,7 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
         yield table
 
 
-def profiles_as_md(header: bool = False) -> str:
+def profiles_as_md(header: bool = False, docs_url: str = RULE_DOC_URL) -> str:
     """Return markdown representation of supported profiles."""
     result = ""
 
@@ -155,7 +155,7 @@ them with links to their issues.
         result += f"## {name}\n\n{profile['description']}{extends}\n"
         for rule, rule_data in profile["rules"].items():
             if not rule_data:
-                result += f"- [{rule}]({RULE_DOC_URL}/{rule})\n"
+                result += f"- [{rule}]({docs_url}{rule}/)\n"
             else:
                 result += f"- [{rule}]({rule_data['url']})\n"
         result += "\n"

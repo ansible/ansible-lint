@@ -1,5 +1,5 @@
 [![PyPI version](https://img.shields.io/pypi/v/ansible-lint.svg)](https://pypi.org/project/ansible-lint)
-[![Ansible-lint rules explanation](https://img.shields.io/badge/Ansible--lint-rules%20table-blue.svg)](https://ansible-lint.readthedocs.io/en/latest/default_rules)
+[![Ansible-lint rules explanation](https://img.shields.io/badge/Ansible--lint-rules%20table-blue.svg)](https://ansible-lint.readthedocs.io/default_rules)
 [![Discussions](https://img.shields.io/badge/Discussions-gray.svg)](https://github.com/ansible/ansible-lint/discussions)
 [![GitHub Actions CI/CD](https://github.com/ansible-community/ansible-lint/workflows/gh/badge.svg)](https://github.com/ansible/ansible-lint/actions?query=workflow%3Agh+branch%3Amain+event%3Apush)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ansible-community/ansible-lint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ansible-community/ansible-lint/context:python)
@@ -11,7 +11,7 @@
 potentially be improved. As a community backed project ansible-lint supports
 only the last two major versions of Ansible.
 
-[Visit the Ansible Lint docs site](https://ansible-lint.readthedocs.io/en/latest/)
+[Visit the Ansible Lint docs site](https://ansible-lint.readthedocs.io/)
 
 # Contributing
 
@@ -32,7 +32,7 @@ ansible-lint was created by [Will Thames] and is now maintained as part of the
 [Ansible] by [Red Hat] project.
 
 [ansible]: https://ansible.com
-[contribution guidelines]: https://ansible-lint.readthedocs.io/en/latest/contributing
+[contribution guidelines]: https://ansible-lint.readthedocs.io/contributing
 [gplv3]: https://github.com/ansible-community/ansible-lint/blob/main/COPYING
 [mit]: https://github.com/ansible-community/ansible-lint/blob/main/docs/licenses/LICENSE.mit.txt
 [red hat]: https://redhat.com
