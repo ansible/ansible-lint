@@ -1,7 +1,7 @@
 # literal-compare
 
 This rule checks for literal comparison with the `when` clause.
-Literal comparison, like `when: var == True`,  is unnecessarily complex.
+Literal comparison, like `when: var == True`, is unnecessarily complex.
 Use `when: var` to keep your playbooks simple.
 
 ## Problematic Code

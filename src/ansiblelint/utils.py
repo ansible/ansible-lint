@@ -402,6 +402,11 @@ def _get_task_handler_children_for_tasks_or_playbooks(
                 file_name = file_name["file"]
 
             f = path_dwim(basedir, file_name)
+            while basedir not in ["", "/"]:
+                if os.path.exists(f):
+                    break
+                basedir = os.path.dirname(basedir)
+                f = path_dwim(basedir, file_name)
             return Lintable(f, kind=child_type)
 
     raise LookupError(

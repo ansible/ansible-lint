@@ -1,4 +1,6 @@
 ---
-- hosts: all
+- name: Test fixture
+  hosts: localhost
+  gather_facts: false
   roles:
     - include_relative
