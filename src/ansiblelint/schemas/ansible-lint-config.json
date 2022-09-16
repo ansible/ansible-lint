@@ -95,6 +95,7 @@
           "empty-string-compare",
           "fqcn-builtins",
           "latest",
+          "galaxy-collection-version",
           "ignore-errors",
           "inline-env-var",
           "internal-error",
