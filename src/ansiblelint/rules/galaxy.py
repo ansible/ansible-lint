@@ -1,4 +1,4 @@
-"""Implementation of GalaxyCollectionVersionRule."""
+"""Implementation of GalaxyRule."""
 from __future__ import annotations
 
 import sys
@@ -16,10 +16,10 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
-class GalaxyCollectionVersionRule(AnsibleLintRule):
+class GalaxyRule(AnsibleLintRule):
     """Rule for checking collection version is greater than 1.0.0."""
 
-    id = "galaxy-collection-version"
+    id = "galaxy"
     description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0"
     severity = "MEDIUM"
     tags = ["metadata"]
@@ -34,7 +34,7 @@ class GalaxyCollectionVersionRule(AnsibleLintRule):
                 self.create_matcherror(
                     message="galaxy.yaml should have version tag.",
                     linenumber=data[LINE_NUMBER_KEY],
-                    tag="collection-version-missing[galaxy]",
+                    tag="galaxy[version-missing]",
                     filename=file,
                 )
             ]
@@ -43,7 +43,7 @@ class GalaxyCollectionVersionRule(AnsibleLintRule):
                 self.create_matcherror(
                     message="collection version should be greater than or equal to 1.0.0",
                     linenumber=data[LINE_NUMBER_KEY],
-                    tag="collection-version[galaxy]",
+                    tag="galaxy[version-incorrect]",
                     filename=file,
                 )
             ]
@@ -93,7 +93,7 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_galaxy_collection_version_positive() -> None:
         """Positive test for collection version in galaxy."""
         collection = RulesCollection()
-        collection.register(GalaxyCollectionVersionRule())
+        collection.register(GalaxyRule())
         success = "examples/galaxy.yml"
         good_runner = Runner(success, rules=collection)
         assert [] == good_runner.run()
@@ -101,8 +101,8 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_galaxy_collection_version_negative() -> None:
         """Negative test for collection version in galaxy."""
         collection = RulesCollection()
-        collection.register(GalaxyCollectionVersionRule())
+        collection.register(GalaxyRule())
         failure = "examples/meta/galaxy.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
-        assert len(errs) == 3
+        assert len(errs) == 1
