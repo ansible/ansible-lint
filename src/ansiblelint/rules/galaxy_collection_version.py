@@ -27,7 +27,7 @@ class GalaxyCollectionVersionRule(AnsibleLintRule):
 
     def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
-        if file.kind != "galaxy":
+        if file.kind != "galaxy":  # type: ignore
             return []
         if "version" not in data:
             return [
@@ -54,20 +54,20 @@ class GalaxyCollectionVersionRule(AnsibleLintRule):
 class Version:
     """Simple class to compare arbitrary versions."""
 
-    def __init__(self, version_string):
-        """Constructs a Version object."""
+    def __init__(self, version_string: str):
+        """Construct a Version object."""
         self.components = version_string.split(".")
 
-    def __eq__(self, other):
-        """Implementation for equality."""
+    def __eq__(self, other: object) -> bool:
+        """Implement equality comparison."""
         other = _coerce(other)
         if not isinstance(other, Version):
             return NotImplemented
 
         return self.components == other.components
 
-    def __lt__(self, other):
-        """Implementation for lower-than."""
+    def __lt__(self, other: Version) -> bool:
+        """Implement lower-than operation."""
         other = _coerce(other)
         if not isinstance(other, Version):
             return NotImplemented
@@ -75,12 +75,14 @@ class Version:
         return self.components < other.components
 
 
-def _coerce(other):
+def _coerce(other: object) -> Version:
     if isinstance(other, str):
         other = Version(other)
     if isinstance(other, (int, float)):
         other = Version(str(other))
-    return other
+    if isinstance(other, Version):
+        return other
+    raise NotImplementedError(f"Unable to coerce object type {type(other)} to Version")
 
 
 if "pytest" in sys.modules:  # noqa: C901
