@@ -1,3 +1,4 @@
 ---
-- debug:
+- name: Test Fixture
+  ansible.builtin.debug:
     msg: "was found & included"
