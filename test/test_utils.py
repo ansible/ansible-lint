@@ -221,7 +221,7 @@ def test_extract_from_list_recursive() -> None:
         pytest.param("{{ playbook_dir }}", "/a/b/c", id="simple"),
         pytest.param(
             "{{ 'hello' | doesnotexist }}",
-            "{{ 'hello' | doesnotexist }}",
+            "hello",  # newer implementation ignores unknown filters
             id="unknown_filter",
         ),
         pytest.param(
@@ -238,7 +238,12 @@ def test_extract_from_list_recursive() -> None:
 )
 def test_template(template: str, output: str) -> None:
     """Verify that resolvable template vars and filters get rendered."""
-    result = utils.template("/base/dir", template, dict(playbook_dir="/a/b/c"))
+    result = utils.template(
+        basedir="/base/dir",
+        value=template,
+        variables=dict(playbook_dir="/a/b/c"),
+        fail_on_error=False,
+    )
     assert result == output
 
 

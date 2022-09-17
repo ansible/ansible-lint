@@ -107,9 +107,24 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
 def ansible_template(
     basedir: str, varname: Any, templatevars: Any, **kwargs: Any
 ) -> Any:
-    """Render a templated string."""
+    """Render a templated string by mocking missing filters."""
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
-    return templar.template(varname, **kwargs)
+    while True:
+        try:
+            return templar.template(varname, **kwargs)
+        except AnsibleError as exc:
+            if exc.message.startswith(
+                "template error while templating string: No filter named"
+            ):
+                missing_filter = exc.message.split("'")[1]
+                # Mock the filter to avoid and error from Ansible templating
+                # pylint: disable=protected-access
+                templar.environment.filters._delegatee[missing_filter] = lambda x: x
+                # Record the mocked filter so we can warn the user
+                if missing_filter not in options.mock_filters:
+                    options.mock_filters.append(missing_filter)
+                continue
+            raise
 
 
 LINE_NUMBER_KEY = "__line__"
@@ -215,6 +230,7 @@ def template(
     basedir: str,
     value: Any,
     variables: Any,
+    fail_on_error: bool = False,
     fail_on_undefined: bool = False,
     **kwargs: str,
 ) -> Any:
@@ -230,7 +246,8 @@ def template(
         # I guess the filter doesn't like empty vars...
     except (AnsibleError, ValueError, RepresenterError):
         # templating failed, so just keep value as is.
-        pass
+        if fail_on_error:
+            raise
     return value
 
 

@@ -266,7 +266,7 @@ if "pytest" in sys.modules:  # noqa: C901
 - hosts: all
   tasks:
     - name: Lineinfile when create is true
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: foo
         create: true
         line: some content here
