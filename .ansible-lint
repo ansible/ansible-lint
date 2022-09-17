@@ -39,7 +39,6 @@ use_default_rules: true
 # This makes linter to fully ignore rules/tags listed below
 skip_list:
   - skip_this_tag
-  - latest[git]
 
 # Any rule that has the 'opt-in' tag will not be loaded unless its 'id' is
 # mentioned in the enable_list:
@@ -57,7 +56,6 @@ enable_list:
 # This makes the linter display but not fail for rules/tags listed below:
 warn_list:
   - skip_this_tag
-  - latest[git]
   - experimental # experimental is included in the implicit list
   # - role-name
   # - yaml[document-start]  # you can also use sub-rule matches

@@ -8,7 +8,7 @@ import pathlib
 import subprocess
 import sys
 from argparse import Namespace
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -148,6 +148,7 @@ class Lintable:
         self.kind: FileType | None = None
         self.stop_processing = False  # Set to stop other rules from running
         self._data: Any = None
+        self.line_skips: dict[int, set[str]] = defaultdict(set)
 
         if isinstance(name, str):
             self.name = normpath(name)

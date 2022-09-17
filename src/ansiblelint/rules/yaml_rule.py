@@ -3,16 +3,18 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 from yamllint.linter import run as run_yamllint
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.skip_utils import get_rule_skips_from_line
+from ansiblelint.utils import LINE_NUMBER_KEY
 from ansiblelint.yaml_utils import load_yamllint_config
 
 if TYPE_CHECKING:
+    from typing import Any, Generator
+
     from ansiblelint.errors import MatchError
 
 _logger = logging.getLogger(__name__)
@@ -56,15 +58,53 @@ class YamllintRule(AnsibleLintRule):
                 )
             )
 
-        if matches:
-            lines = file.content.splitlines()
-            for match in matches:
-                # rule.linenumber starts with 1, not zero
-                skip_list = get_rule_skips_from_line(lines[match.linenumber - 1])
-                # print(skip_list)
-                if match.rule.id not in skip_list and match.tag not in skip_list:
-                    filtered_matches.append(match)
+        # Now we save inside the file the skips, so they can be removed later,
+        # especially as these skips can be about other rules than yaml one.
+        _fetch_skips(file.data, file.line_skips)
+
+        for match in matches:
+            last_skips = set()
+
+            for line, skips in file.line_skips.items():
+                if line > match.linenumber:
+                    break
+                last_skips = skips
+            if last_skips.intersection({"skip_ansible_lint", match.rule.id, match.tag}):
+                continue
+            filtered_matches.append(match)
+
         return filtered_matches
+
+
+def _combine_skip_rules(data: Any) -> set[str]:
+    """Return a consolidated list of skipped rules."""
+    result = set(data.get("skipped_rules", []))
+    if "skip_ansible_lint" in data.get("tags", []):
+        result.add("skip_ansible_lint")
+    return result
+
+
+def _fetch_skips(data: Any, collector: dict[int, set[str]]) -> dict[int, set[str]]:
+    """Retrieve a dictionary with line: skips by looking recursively in given JSON structure."""
+    if hasattr(data, "get") and data.get(LINE_NUMBER_KEY):
+        rules = _combine_skip_rules(data)
+        if rules:
+            collector[data.get(LINE_NUMBER_KEY)].update(rules)
+    if isinstance(data, Iterable) and not isinstance(data, str):
+        if isinstance(data, dict):
+            for entry, value in data.items():
+                _fetch_skips(value, collector)
+        else:
+            for entry in data:
+                if (
+                    entry
+                    and LINE_NUMBER_KEY in entry
+                    and "skipped_rules" in entry
+                    and entry["skipped_rules"]
+                ):
+                    collector[entry[LINE_NUMBER_KEY]].update(entry["skipped_rules"])
+                _fetch_skips(entry, collector)
+    return collector
 
 
 # testing code to be loaded only with pytest or when executed the rule file

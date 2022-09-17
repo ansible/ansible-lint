@@ -136,7 +136,7 @@ def iter_tasks_in_file(
             yield raw_task, raw_task, skip_tags, err
             return
 
-        if "skip_ansible_lint" in (raw_task.get("tags") or []):
+        if "skip_ansible_lint" in raw_task.get("tags", []):
             skip_tags.append("skip_ansible_lint")
         if skip_tags:
             yield raw_task, normalized_task, skip_tags, err

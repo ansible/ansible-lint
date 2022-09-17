@@ -166,7 +166,11 @@ class AnsibleLintRule(BaseRule):
                 # normalize_task converts AnsibleParserError to MatchError
                 return [error]
 
-            if self.id in skipped_tags or ("action" not in task):
+            if (
+                self.id in skipped_tags
+                or ("action" not in task)
+                or "skip_ansible_lint" in task.get("tags", [])
+            ):
                 continue
 
             if self.needs_raw_task:
@@ -221,6 +225,9 @@ class AnsibleLintRule(BaseRule):
                 continue
 
             if self.id in play.get("skipped_rules", ()):
+                continue
+
+            if "skip_ansible_lint" in play.get("tags", []):
                 continue
 
             matches.extend(self.matchplay(file, play))
