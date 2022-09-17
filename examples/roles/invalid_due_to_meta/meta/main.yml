@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  standalone: true
   role_name: invalid-due-to-meta # <-- invalid role name
   author: foo
   description: foo

@@ -1,6 +1,5 @@
 ---
 # meta file, determined by ending in meta/main.yml
-version: 1
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-dependencies
 allow_duplicates: true
 dependencies:
@@ -33,6 +32,7 @@ dependencies:
     name: http-role
 
 galaxy_info:
+  standalone: true
   author: foo
   description: Testing meta
   company: Not applicable
