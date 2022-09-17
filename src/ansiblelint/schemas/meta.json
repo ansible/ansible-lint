@@ -400,8 +400,19 @@
       "title": "FreeBSDPlatformModel",
       "type": "object"
     },
-    "GalaxyInfoModel-v1": {
+    "GalaxyInfoModel": {
       "additionalProperties": false,
+      "else": {
+        "$comment": "If standalone is false, then we have a collection role and only description is required",
+        "required": ["description"]
+      },
+      "if": {
+        "properties": {
+          "standalone": {
+            "const": true
+          }
+        }
+      },
       "properties": {
         "author": {
           "title": "Author",
@@ -454,14 +465,23 @@
           "pattern": "^[a-z][a-z0-9_]+$",
           "title": "Role Name",
           "type": "string"
+        },
+        "standalone": {
+          "description:": "Set to true for old standalone roles, or false for new collection roles.",
+          "title": "Standalone",
+          "type": "boolean"
         }
       },
-      "required": [
-        "description",
-        "license",
-        "min_ansible_version",
-        "platforms"
-      ],
+      "then": {
+        "$comment": "Standalone role, so we require several fields.",
+        "required": [
+          "standalone",
+          "description",
+          "license",
+          "min_ansible_version",
+          "platforms"
+        ]
+      },
       "title": "GalaxyInfoModel for old standalone role (v1)",
       "type": "object"
     },
@@ -486,7 +506,8 @@
         },
         "platforms": {
           "$ref": "#/$defs/platforms"
-        }
+        },
+        "standalone": { "const": false }
       },
       "required": ["description"],
       "title": "GalaxyInfoModel for role within a collection (v2)",
@@ -1281,79 +1302,6 @@
       "title": "Platforms",
       "type": "array"
     },
-    "v1": {
-      "additionalProperties": false,
-      "properties": {
-        "allow_duplicates": {
-          "title": "Allow Duplicates",
-          "type": "boolean"
-        },
-        "cloud_platforms": {
-          "items": {
-            "enum": [
-              "amazon",
-              "azure",
-              "centurylink",
-              "google",
-              "openstack",
-              "ovirt",
-              "rackspace",
-              "vmware"
-            ],
-            "type": "string"
-          },
-          "markdownDescription": "Which cloud platforms are supported, existing values can be gathered using the [API](https://galaxy.ansible.com/api/v1/cloud_platforms/)",
-          "title": "Cloud Platforms",
-          "type": "array"
-        },
-        "collections": {
-          "$ref": "#/$defs/collections"
-        },
-        "dependencies": {
-          "items": {
-            "$ref": "#/$defs/DependencyModel"
-          },
-          "title": "Dependencies",
-          "type": "array"
-        },
-        "galaxy_info": {
-          "$ref": "#/$defs/GalaxyInfoModel-v1"
-        },
-        "version": {
-          "const": 1
-        }
-      },
-      "required": ["version"],
-      "title": "Meta Schema v1 (standalone role)",
-      "type": "object"
-    },
-    "v2": {
-      "additionalProperties": false,
-      "properties": {
-        "allow_duplicates": {
-          "title": "Allow Duplicates",
-          "type": "boolean"
-        },
-        "collections": {
-          "$ref": "#/$defs/collections"
-        },
-        "dependencies": {
-          "items": {
-            "$ref": "#/$defs/DependencyModel"
-          },
-          "title": "Dependencies",
-          "type": "array"
-        },
-        "galaxy_info": {
-          "$ref": "#/$defs/GalaxyInfoModel-v2"
-        },
-        "version": {
-          "const": 2
-        }
-      },
-      "title": "Meta Schema v2 (role inside collection)",
-      "type": "object"
-    },
     "vCenterPlatformModel": {
       "properties": {
         "name": {
@@ -1395,26 +1343,28 @@
   },
   "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
   "$schema": "http://json-schema.org/draft-07/schema",
-  "else": {
-    "$ref": "#/$defs/v2"
-  },
   "examples": ["meta/main.yml"],
-  "if": {
-    "properties": {
-      "version": {
-        "const": 1
-      }
-    }
-  },
   "properties": {
-    "version": {
-      "enum": [1, 2],
-      "type": "integer"
+    "additionalProperties": false,
+    "allow_duplicates": {
+      "title": "Allow Duplicates",
+      "type": "boolean"
+    },
+    "collections": {
+      "$ref": "#/$defs/collections"
+    },
+    "dependencies": {
+      "items": {
+        "$ref": "#/$defs/DependencyModel"
+      },
+      "title": "Dependencies",
+      "type": "array"
+    },
+    "galaxy_info": {
+      "$ref": "#/$defs/GalaxyInfoModel"
     }
   },
-  "then": {
-    "$ref": "#/$defs/v1"
-  },
+  "required": ["galaxy_info"],
   "title": "Ansible Meta Schema v1/v2",
   "type": "object"
 }
