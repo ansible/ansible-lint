@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import sys
 from collections import OrderedDict as odict
+from operator import itemgetter
 from typing import Any
 
 from ansiblelint.config import options
@@ -49,7 +50,7 @@ Keys should be in the specified order. In the default configuration, it only enf
         sorted_actual_order = odict(
             sorted(
                 actual_order.items(),
-                key=lambda item: item[1],
+                key=itemgetter(1),
             )
         )
 
