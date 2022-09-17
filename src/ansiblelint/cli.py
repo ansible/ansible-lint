@@ -351,7 +351,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="verbosity",
         action="count",
         help="Increase verbosity level (-vv for more)",
-        default=int(os.environ.get('ANSIBLE_VERBOSITY', 0)),
+        default=int(os.environ.get("ANSIBLE_VERBOSITY", 0)),
     )
     parser.add_argument(
         "-x",
