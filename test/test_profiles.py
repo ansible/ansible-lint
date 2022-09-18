@@ -17,7 +17,7 @@ def test_profile_min() -> None:
     collection.register(ShellWithoutPipefail())
     assert len(collection.rules) == 4, "Failed to register new rule."
 
-    filter_rules_with_profile(collection, "min")
+    filter_rules_with_profile(collection.rules, "min")
     assert (
         len(collection.rules) == 3
     ), "Failed to unload rule that is not part of 'min' profile."
