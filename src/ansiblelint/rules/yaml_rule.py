@@ -79,7 +79,12 @@ class YamllintRule(AnsibleLintRule):
 def _combine_skip_rules(data: Any) -> set[str]:
     """Return a consolidated list of skipped rules."""
     result = set(data.get("skipped_rules", []))
-    if "skip_ansible_lint" in data.get("tags", []):
+    tags = data.get("tags", [])
+    if tags and (
+        isinstance(tags, Iterable)
+        and "skip_ansible_lint" in tags
+        or tags == "skip_ansible_lint"
+    ):
         result.add("skip_ansible_lint")
     return result
 
