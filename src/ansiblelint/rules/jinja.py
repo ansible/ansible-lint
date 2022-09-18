@@ -8,12 +8,14 @@ from typing import TYPE_CHECKING, Any
 
 import black
 import jinja2
+from ansible.errors import AnsibleError
 from ansible.parsing.yaml.objects import AnsibleUnicode
+from yaml.representer import RepresenterError
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
-from ansiblelint.utils import LINE_NUMBER_KEY, parse_yaml_from_file
+from ansiblelint.utils import LINE_NUMBER_KEY, parse_yaml_from_file, template
 from ansiblelint.yaml_utils import nested_items_path
 
 if TYPE_CHECKING:
@@ -49,6 +51,22 @@ class JinjaRule(AnsibleLintRule):
     ) -> bool | str | MatchError:
         for key, v, _ in nested_items_path(task):
             if isinstance(v, str):
+
+                try:
+                    template(
+                        basedir=file.dir if file else ".",
+                        value=v,
+                        variables={},
+                        fail_on_error=True,
+                    )
+                except (AnsibleError, ValueError, RepresenterError) as exc:
+                    return self.create_matcherror(
+                        message=str(exc),
+                        linenumber=task[LINE_NUMBER_KEY],
+                        filename=file,
+                        tag=f"{self.id}[invalid]",
+                    )
+
                 reformatted, details, tag = self.check_whitespace(v, key=key)
                 if reformatted != v:
                     return self.create_matcherror(
@@ -455,11 +473,24 @@ if "pytest" in sys.modules:  # noqa: C901
             pytest.param("{{ item.0.user }}", "{{ item.0.user }}", "spacing", id="39"),
             # Not supported by back, while jinja allows ~ to be binary operator:
             pytest.param("{{ a ~ b }}", "{{ a ~ b }}", "spacing", id="40"),
+            pytest.param(
+                "--format='{{'{{'}}.Size{{'}}'}}'",
+                "--format='{{ '{{' }}.Size{{ '}}' }}'",
+                "spacing",
+                id="41",
+            ),
+            pytest.param(
+                "{{ list_one + {{ list_two | max }} }}",
+                "{{ list_one + {{list_two | max}} }}",
+                "spacing",
+                id="42",
+            ),
         ),
     )
     def test_jinja(text: str, expected: str, tag: str) -> None:
         """Tests our ability to spot spacing errors inside jinja2 templates."""
         rule = JinjaRule()
+
         reformatted, details, returned_tag = rule.check_whitespace(text, key="name")
         assert tag == returned_tag, details
         assert expected == reformatted
@@ -490,3 +521,13 @@ if "pytest" in sys.modules:  # noqa: C901
         reformatted, details, returned_tag = rule.check_whitespace(text, key="when")
         assert tag == returned_tag, details
         assert expected == reformatted
+
+    def test_jinja_invalid() -> None:
+        """Tests our ability to spot spacing errors inside jinja2 templates."""
+        collection = RulesCollection()
+        collection.register(JinjaRule())
+        success = "examples/playbooks/rule-jinja-invalid.yml"
+        errs = Runner(success, rules=collection).run()
+        assert len(errs) == 1
+        assert errs[0].tag == "jinja[invalid]"
+        assert errs[0].rule.id == "jinja"

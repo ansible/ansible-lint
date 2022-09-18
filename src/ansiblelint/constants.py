@@ -77,7 +77,7 @@ RENAMED_TAGS = {
     "203": "no-tabs",
     "205": "playbook-extension",
     "206": "jinja[spacing]",
-    "207": "no-jinja-nesting",
+    "207": "jinja[invalid]",
     "208": "risky-file-permissions",
     "301": "no-changed-when",
     "302": "deprecated-command-syntax",
@@ -105,6 +105,7 @@ RENAMED_TAGS = {
     "unnamed-task": "name[missing]",
     "git-latest": "latest[git]",
     "hg-latest": "latest[hg]",
+    "no-jinja-nesting": "jinja[invalid]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [

@@ -170,6 +170,7 @@ def _do_transform(result: LintResult, opts: Namespace) -> None:
     transformer.run()
 
 
+# pylint: disable=too-many-branches
 def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
@@ -253,6 +254,11 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.cache_dir_lock:
         options.cache_dir_lock.release()
         pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
+    if options.mock_filters:
+        _logger.warning(
+            "The following filters were mocked during the run: %s",
+            ",".join(options.mock_filters),
+        )
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
 
