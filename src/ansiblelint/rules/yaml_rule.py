@@ -94,10 +94,11 @@ def _fetch_skips(data: Any, collector: dict[int, set[str]]) -> dict[int, set[str
         if isinstance(data, dict):
             for entry, value in data.items():
                 _fetch_skips(value, collector)
-        else:
+        else:  # must be some kind of list
             for entry in data:
                 if (
                     entry
+                    and hasattr(data, "get")
                     and LINE_NUMBER_KEY in entry
                     and "skipped_rules" in entry
                     and entry["skipped_rules"]
