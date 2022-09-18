@@ -364,9 +364,12 @@ class RulesCollection:
         self,
         rulesdirs: list[str] | None = None,
         options: Namespace = default_options,
+        profile: list[str] | None = None,
+        conditional: bool = True,
     ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options
+        self.profile = profile or []
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = expand_paths_vars(rulesdirs)
@@ -377,15 +380,21 @@ class RulesCollection:
             [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()]
         )
         for rule in load_plugins(rulesdirs):
-            self.register(rule)
+            self.register(rule, conditional=conditional)
         self.rules = sorted(self.rules)
 
-    def register(self, obj: AnsibleLintRule) -> None:
+        # when we have a profile we unload some of the rules
+        if self.profile:
+            filter_rules_with_profile(self.rules, self.profile[0])
+
+    def register(self, obj: AnsibleLintRule, conditional: bool = False) -> None:
         """Register a rule."""
         # We skip opt-in rules which were not manually enabled.
         # But we do include opt-in rules when listing all rules or tags
         if any(
             [
+                not conditional,
+                self.profile,  # when profile is used we load all rules and filter later
                 "opt-in" not in obj.tags,
                 obj.id in self.options.enable_list,
                 self.options.listrules,
@@ -497,19 +506,36 @@ class RulesCollection:
         return result
 
 
-def filter_rules_with_profile(rule_col: RulesCollection, profile: str) -> None:
+def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:
     """Unload rules that are not part of the specified profile."""
     included = set()
     extends = profile
+    total_rules = len(rule_col)
     while extends:
         for rule in PROFILES[extends]["rules"]:
+            _logger.debug("Activating rule `%s` due to profile `%s`", rule, extends)
             included.add(rule)
         extends = PROFILES[extends].get("extends", None)
-    for rule in list(rule_col.rules):
+    for rule in rule_col:
         if rule.id not in included:
             _logger.debug(
                 "Unloading %s rule due to not being part of %s profile.",
                 rule.id,
                 profile,
             )
-            rule_col.rules.remove(rule)
+            rule_col.remove(rule)
+        else:
+            for tag in ("opt-in", "experimental"):
+                if tag in rule.tags:
+                    _logger.debug(
+                        "Removing tag `%s` from `%s` rule because `%s` profile makes it mandatory.",
+                        tag,
+                        rule.id,
+                        profile,
+                    )
+                    rule.tags.remove(tag)
+                    # rule_col.rules.remove(rule)
+                    # break
+            if "opt-in" in rule.tags:
+                rule.tags.remove("opt-in")
+    _logger.debug("%s/%s rules included in the profile", len(rule_col), total_rules)
