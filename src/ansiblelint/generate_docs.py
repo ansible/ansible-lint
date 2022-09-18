@@ -144,6 +144,12 @@ If you want to consult the list of rules from each profile, type
 The rules that have a `*` suffix, are not implemented yet but we documented
 them with links to their issues.
 
+```{note}
+Special rule tags such `opt-in` and `experimental` are automatically removed
+when a rule is included in a profile, directly or indirectly. This means that
+they will always execute once included.
+```
+
 """
 
     for name, profile in PROFILES.items():

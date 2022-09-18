@@ -22,8 +22,8 @@ class GalaxyRule(AnsibleLintRule):
     id = "galaxy"
     description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0"
     severity = "MEDIUM"
-    tags = ["metadata"]
-    version_added = "v6.5.0 (last update)"
+    tags = ["metadata", "opt-in", "experimental"]
+    version_added = "v6.6.0 (last update)"
 
     def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
