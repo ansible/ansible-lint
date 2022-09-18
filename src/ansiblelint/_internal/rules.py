@@ -84,9 +84,10 @@ class BaseRule:
                     matches.extend(method(file))
                 except Exception as exc:  # pylint: disable=broad-except
                     _logger.warning(
-                        "Ignored exception from %s.%s: %s",
+                        "Ignored exception from %s.%s while processing %s: %s",
                         self.__class__.__name__,
                         method,
+                        str(file),
                         exc,
                     )
         else:

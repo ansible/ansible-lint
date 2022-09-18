@@ -79,7 +79,12 @@ class YamllintRule(AnsibleLintRule):
 def _combine_skip_rules(data: Any) -> set[str]:
     """Return a consolidated list of skipped rules."""
     result = set(data.get("skipped_rules", []))
-    if "skip_ansible_lint" in data.get("tags", []):
+    tags = data.get("tags", [])
+    if tags and (
+        isinstance(tags, Iterable)
+        and "skip_ansible_lint" in tags
+        or tags == "skip_ansible_lint"
+    ):
         result.add("skip_ansible_lint")
     return result
 
@@ -94,10 +99,11 @@ def _fetch_skips(data: Any, collector: dict[int, set[str]]) -> dict[int, set[str
         if isinstance(data, dict):
             for entry, value in data.items():
                 _fetch_skips(value, collector)
-        else:
+        else:  # must be some kind of list
             for entry in data:
                 if (
                     entry
+                    and hasattr(data, "get")
                     and LINE_NUMBER_KEY in entry
                     and "skipped_rules" in entry
                     and entry["skipped_rules"]

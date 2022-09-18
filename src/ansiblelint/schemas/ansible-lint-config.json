@@ -110,7 +110,6 @@
           "name",
           "no-changed-when",
           "no-handler",
-          "no-jinja-nesting",
           "no-jinja-when",
           "no-log-password",
           "no-loop-var-prefix",

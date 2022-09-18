@@ -29,7 +29,6 @@ basic:
     inline-env-var:
     key-order:
     literal-compare:
-    no-jinja-nesting:
     jinja:
     no-jinja-when:
     no-tabs:
