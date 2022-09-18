@@ -402,16 +402,53 @@
     },
     "GalaxyInfoModel": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "standalone": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "$comment": "Standalone role, so we require several fields.",
+            "required": [
+              "author",
+              "standalone",
+              "description",
+              "license",
+              "min_ansible_version"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "standalone": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "$comment": "Collection roles do not use most galaxy fields.",
+            "not": {
+              "required": [
+                "cloud_platforms",
+                "galaxy_tags",
+                "min_ansible_version",
+                "namespace",
+                "platforms",
+                "role_name"
+              ]
+            },
+            "required": ["standalone", "description"]
+          }
+        }
+      ],
       "else": {
         "$comment": "If standalone is false, then we have a collection role and only description is required",
         "required": ["description"]
-      },
-      "if": {
-        "properties": {
-          "standalone": {
-            "const": true
-          }
-        }
       },
       "properties": {
         "author": {
@@ -472,17 +509,7 @@
           "type": "boolean"
         }
       },
-      "then": {
-        "$comment": "Standalone role, so we require several fields.",
-        "required": [
-          "standalone",
-          "description",
-          "license",
-          "min_ansible_version",
-          "platforms"
-        ]
-      },
-      "title": "GalaxyInfoModel for old standalone role (v1)",
+      "title": "GalaxyInfoModel",
       "type": "object"
     },
     "GalaxyInfoModel-v2": {
