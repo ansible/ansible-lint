@@ -214,10 +214,6 @@
           "$ref": "#/$defs/templated-integer",
           "title": "Timeout"
         },
-        "user": {
-          "title": "Remote User",
-          "type": "string"
-        },
         "vars": {
           "title": "Vars",
           "type": "object"
@@ -757,10 +753,6 @@
           "$ref": "#/$defs/templated-integer",
           "title": "Timeout"
         },
-        "user": {
-          "title": "Remote User",
-          "type": "string"
-        },
         "vars": {
           "title": "Vars",
           "type": "object"
@@ -1016,10 +1008,6 @@
         "until": {
           "$ref": "#/$defs/complex_conditional",
           "title": "Until"
-        },
-        "user": {
-          "title": "Remote User",
-          "type": "string"
         },
         "vars": {
           "title": "Vars",
