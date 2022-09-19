@@ -63,10 +63,6 @@ FileType = Literal[
 ]
 
 
-# odict is the base class used to represent data model of Ansible
-# playbooks and tasks.
-odict = dict  # pylint: disable=invalid-name
-
 # Aliases for deprecated tags/ids and their newer names
 RENAMED_TAGS = {
     "102": "no-jinja-when",

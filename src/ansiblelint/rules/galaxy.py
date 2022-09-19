@@ -10,9 +10,6 @@ from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.constants import odict
     from ansiblelint.file_utils import Lintable
 
 
@@ -25,7 +22,7 @@ class GalaxyRule(AnsibleLintRule):
     tags = ["metadata", "opt-in", "experimental"]
     version_added = "v6.6.0 (last update)"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
         if file.kind != "galaxy":  # type: ignore
             return []
