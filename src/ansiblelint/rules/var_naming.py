@@ -9,10 +9,11 @@ from typing import TYPE_CHECKING, Any
 from ansible.parsing.yaml.objects import AnsibleUnicode
 
 from ansiblelint.config import options
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
-from ansiblelint.utils import LINE_NUMBER_KEY, parse_yaml_from_file
+from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
     from ansiblelint.constants import odict

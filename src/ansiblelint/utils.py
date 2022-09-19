@@ -56,6 +56,8 @@ from ansiblelint._internal.rules import (
 from ansiblelint.app import get_app
 from ansiblelint.config import options
 from ansiblelint.constants import (
+    FILENAME_KEY,
+    LINE_NUMBER_KEY,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
     SKIPPED_RULES_KEY,
@@ -131,9 +133,6 @@ def ansible_template(
                 continue
             raise
 
-
-LINE_NUMBER_KEY = "__line__"
-FILENAME_KEY = "__file__"
 
 BLOCK_NAME_TO_ACTION_TYPE_MAP = {
     "tasks": "task",

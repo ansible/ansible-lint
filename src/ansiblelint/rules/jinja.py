@@ -12,10 +12,11 @@ from ansible.errors import AnsibleError
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from yaml.representer import RepresenterError
 
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
-from ansiblelint.utils import LINE_NUMBER_KEY, parse_yaml_from_file, template
+from ansiblelint.utils import parse_yaml_from_file, template
 from ansiblelint.yaml_utils import nested_items_path
 
 if TYPE_CHECKING:

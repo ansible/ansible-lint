@@ -7,10 +7,9 @@ from typing import TYPE_CHECKING, Iterable
 
 from yamllint.linter import run as run_yamllint
 
-from ansiblelint.constants import SKIPPED_RULES_KEY
+from ansiblelint.constants import LINE_NUMBER_KEY, SKIPPED_RULES_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
 from ansiblelint.yaml_utils import load_yamllint_config
 
 if TYPE_CHECKING:
