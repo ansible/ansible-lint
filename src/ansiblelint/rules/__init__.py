@@ -14,11 +14,13 @@ from pathlib import Path
 from typing import (
     Any,
     Dict,
+    Iterable,
     Iterator,
     List,
     MutableMapping,
     MutableSequence,
     Optional,
+    Sequence,
     Set,
     Union,
     cast,
@@ -151,7 +153,14 @@ class AnsibleLintRule(BaseRule):
             matches.append(matcherror)
         return matches
 
-    def matchtasks(self, file: Lintable) -> list[MatchError]:
+    # pylint: disable=too-many-branches
+    def matchtasks(self, file: Lintable) -> list[MatchError]:  # noqa: C901
+        """Call matchtask for each task inside file and return aggregate results.
+
+        Most rules will never need to override matchtasks because its main
+        purpose is to call matchtask for each task/handlers in the same file,
+        and to aggregate the results.
+        """
         matches: list[MatchError] = []
         if (
             not self.matchtask
@@ -180,11 +189,22 @@ class AnsibleLintRule(BaseRule):
             if not result:
                 continue
 
+            if isinstance(result, Iterable) and not isinstance(
+                result, str
+            ):  # list[MatchError]
+                # https://github.com/PyCQA/pylint/issues/6044
+                # pylint: disable=not-an-iterable
+                for match in result:
+                    if match.tag in skipped_tags:
+                        continue
+                    self._enrich_matcherror_with_task_details(match, task)
+                    matches.append(match)
+                continue
             if isinstance(result, MatchError):
                 if result.tag in skipped_tags:
                     continue
                 match = result
-            else:
+            else:  # bool or string
                 message = None
                 if isinstance(result, str):
                     message = result
@@ -195,7 +215,6 @@ class AnsibleLintRule(BaseRule):
                 )
 
             self._enrich_matcherror_with_task_details(match, task)
-
             matches.append(match)
         return matches
 
