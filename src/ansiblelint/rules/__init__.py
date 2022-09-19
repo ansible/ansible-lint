@@ -39,7 +39,7 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.config import PROFILES, get_rule_config
 from ansiblelint.config import options as default_options
-from ansiblelint.constants import RULE_DOC_URL
+from ansiblelint.constants import RULE_DOC_URL, SKIPPED_RULES_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
 
@@ -243,7 +243,7 @@ class AnsibleLintRule(BaseRule):
             if play is None:
                 continue
 
-            if self.id in play.get("skipped_rules", ()):
+            if self.id in play.get(SKIPPED_RULES_KEY, ()):
                 continue
 
             if "skip_ansible_lint" in play.get("tags", []):

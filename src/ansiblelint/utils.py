@@ -55,7 +55,12 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.app import get_app
 from ansiblelint.config import options
-from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, FileType
+from ansiblelint.constants import (
+    NESTED_TASK_KEYS,
+    PLAYBOOK_TASK_KEYWORDS,
+    SKIPPED_RULES_KEY,
+    FileType,
+)
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
@@ -533,7 +538,7 @@ def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
     result = task.copy()
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
-    for k in ["skipped_rules", FILENAME_KEY, LINE_NUMBER_KEY]:
+    for k in [SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY]:
         if k in result:
             del result[k]
     return result

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Iterable
 
 from yamllint.linter import run as run_yamllint
 
+from ansiblelint.constants import SKIPPED_RULES_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import LINE_NUMBER_KEY
@@ -78,7 +79,7 @@ class YamllintRule(AnsibleLintRule):
 
 def _combine_skip_rules(data: Any) -> set[str]:
     """Return a consolidated list of skipped rules."""
-    result = set(data.get("skipped_rules", []))
+    result = set(data.get(SKIPPED_RULES_KEY, []))
     tags = data.get("tags", [])
     if tags and (
         isinstance(tags, Iterable)
@@ -105,10 +106,10 @@ def _fetch_skips(data: Any, collector: dict[int, set[str]]) -> dict[int, set[str
                     entry
                     and hasattr(data, "get")
                     and LINE_NUMBER_KEY in entry
-                    and "skipped_rules" in entry
-                    and entry["skipped_rules"]
+                    and SKIPPED_RULES_KEY in entry
+                    and entry[SKIPPED_RULES_KEY]
                 ):
-                    collector[entry[LINE_NUMBER_KEY]].update(entry["skipped_rules"])
+                    collector[entry[LINE_NUMBER_KEY]].update(entry[SKIPPED_RULES_KEY])
                 _fetch_skips(entry, collector)
     return collector
 

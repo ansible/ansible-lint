@@ -33,7 +33,12 @@ from ruamel.yaml.composer import ComposerError
 from ruamel.yaml.tokens import CommentToken
 
 from ansiblelint.config import used_old_tags
-from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, RENAMED_TAGS
+from ansiblelint.constants import (
+    NESTED_TASK_KEYS,
+    PLAYBOOK_TASK_KEYWORDS,
+    RENAMED_TAGS,
+    SKIPPED_RULES_KEY,
+)
 from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
@@ -133,14 +138,14 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
     ]:
         # AnsibleMapping, dict
         if hasattr(pyyaml_data, "get"):
-            pyyaml_data["skipped_rules"] = skipped_rules
+            pyyaml_data[SKIPPED_RULES_KEY] = skipped_rules
         # AnsibleSequence, list
         elif (
             not isinstance(pyyaml_data, str)
             and isinstance(pyyaml_data, collections.abc.Sequence)
             and skipped_rules
         ):
-            pyyaml_data[0]["skipped_rules"] = skipped_rules
+            pyyaml_data[0][SKIPPED_RULES_KEY] = skipped_rules
 
         return pyyaml_data
 
@@ -175,7 +180,9 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
 
         if pyyaml_task.get("name") != ruamel_task.get("name"):
             raise RuntimeError("Error in matching skip comment to a task")
-        pyyaml_task["skipped_rules"] = _get_rule_skips_from_yaml(ruamel_task, lintable)
+        pyyaml_task[SKIPPED_RULES_KEY] = _get_rule_skips_from_yaml(
+            ruamel_task, lintable
+        )
 
     return pyyaml_data
 
