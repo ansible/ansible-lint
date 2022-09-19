@@ -9,9 +9,6 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.constants import RULE_DOC_URL
 
 if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -117,7 +114,7 @@ class BaseRule:
         """Return matches found for a specific YAML text."""
         return []
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
         return []
 

@@ -28,12 +28,11 @@ from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
-def _get_subtasks(data: odict[str, Any]) -> list[Any]:
+def _get_subtasks(data: dict[str, Any]) -> list[Any]:
     result: list[Any] = []
     block_names = [
         "tasks",
@@ -50,7 +49,7 @@ def _get_subtasks(data: odict[str, Any]) -> list[Any]:
     return result
 
 
-def _nested_search(term: str, data: odict[str, Any]) -> Any:
+def _nested_search(term: str, data: dict[str, Any]) -> Any:
     if data and term in data:
         return True
     return reduce(
@@ -58,7 +57,7 @@ def _nested_search(term: str, data: odict[str, Any]) -> Any:
     )
 
 
-def _become_user_without_become(becomeuserabove: bool, data: odict[str, Any]) -> Any:
+def _become_user_without_become(becomeuserabove: bool, data: dict[str, Any]) -> Any:
     if "become" in data:
         # If become is in lineage of tree then correct
         return False
@@ -97,7 +96,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     tags = ["unpredictability"]
     version_added = "historic"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         if file.kind == "playbook":
             result = _become_user_without_become(False, data)
             if result:

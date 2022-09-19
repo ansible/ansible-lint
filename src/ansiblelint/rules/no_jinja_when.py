@@ -7,9 +7,6 @@ from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -31,7 +28,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
             return True
         return when.find("{{") == -1 and when.find("}}") == -1
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         errors: list[MatchError] = []
         if isinstance(data, dict):
             if "roles" not in data or data["roles"] is None:

@@ -12,7 +12,6 @@ from ansiblelint.rules import AnsibleLintRule
 if TYPE_CHECKING:
     from typing import Any, Tuple
 
-    from ansiblelint.constants import odict
 
 META_STR_INFO = ("author", "description")
 META_INFO = tuple(
@@ -26,7 +25,7 @@ META_INFO = tuple(
 
 
 def _platform_info_errors_itr(
-    platforms: list[odict[str, str]],
+    platforms: list[dict[str, str]],
 ) -> Generator[str, None, None]:
     if not isinstance(platforms, list):
         yield "Platforms should be a list of dictionaries"
@@ -40,7 +39,7 @@ def _platform_info_errors_itr(
 
 
 def _galaxy_info_errors_itr(
-    galaxy_info: odict[str, Any],
+    galaxy_info: dict[str, Any],
     info_list: tuple[str, ...] = META_INFO,
     str_info_list: tuple[str, ...] = META_STR_INFO,
 ) -> Generator[str, None, None]:
@@ -66,7 +65,7 @@ class MetaMainHasInfoRule(AnsibleLintRule):
     tags = ["metadata"]
     version_added = "v4.0.0"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         if file.kind != "meta":
             return []
 
