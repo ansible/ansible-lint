@@ -11,20 +11,7 @@ from collections import defaultdict
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    MutableMapping,
-    MutableSequence,
-    Optional,
-    Sequence,
-    Set,
-    Union,
-    cast,
-)
+from typing import Any, Iterable, Iterator, MutableMapping, MutableSequence, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 

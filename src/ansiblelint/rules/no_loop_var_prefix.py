@@ -9,8 +9,6 @@ from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import toidentifier
 
 if TYPE_CHECKING:
-    from typing import Optional
-
     from ansiblelint.file_utils import Lintable
 
 
