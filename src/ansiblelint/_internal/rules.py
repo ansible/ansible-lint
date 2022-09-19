@@ -100,7 +100,7 @@ class BaseRule:
 
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
-    ) -> bool | str | MatchError:
+    ) -> bool | str | MatchError | list[MatchError]:
         """Confirm if current rule is matching a specific task.
 
         If ``needs_raw_task`` (a class level attribute) is ``True``, then
