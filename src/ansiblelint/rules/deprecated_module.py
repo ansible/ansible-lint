@@ -8,8 +8,6 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from typing import Optional
-
     from ansiblelint.file_utils import Lintable
 
 
