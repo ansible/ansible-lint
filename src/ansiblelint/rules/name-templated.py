@@ -1,8 +1,8 @@
 """Implementation of name-templated rule."""
 from __future__ import annotations
-from math import fabs
 
 import re
+from math import fabs
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.errors import MatchError
@@ -15,13 +15,12 @@ if TYPE_CHECKING:
     from ansiblelint.constants import odict
     from ansiblelint.file_utils import Lintable
 
+
 class NameTemplatedRule(AnsibleLintRule):
     """Rule for checking named template and ends template with {{ }}."""
 
     id = "name-templated"
-    description = (
-        "If {{ }} is found in a task name, require it's presence at the end after a sentence explaining the task"
-    )
+    description = "If {{ }} is found in a task name, require it's presence at the end after a sentence explaining the task"
     severity = "MEDIUM"
     tags = ["idiom"]
     # version_added = "v6.5.0 (last update)"
@@ -68,7 +67,7 @@ class NameTemplatedRule(AnsibleLintRule):
         # This rule will check the name and finds if it has {{ }} pattern at
         # the end of the sentence and also the named template should have the meaningful name
         if name.count("}}") == 1 and name.count("{{") == 1:
-            if re.search('{{ .* }}$', name) == None:
+            if re.search("{{ .* }}$", name) == None:
                 return self.create_matcherror(
                     message="If names has {{ }} it should be at the end of sentence.",
                     linenumber=linenumber,
@@ -76,16 +75,16 @@ class NameTemplatedRule(AnsibleLintRule):
                     filename=lintable,
                 )
         if name.count("}}") == 1 and name.count("{{") == 1:
-            if re.search('{{ .* }}$', name):
+            if re.search("{{ .* }}$", name):
                 name_word = name.split(" ")[-2]
                 print(name_word)
-                if re.search(r'item.\d', name_word) or re.search(r'item', name_word):
+                if re.search(r"item.\d", name_word) or re.search(r"item", name_word):
                     return self.create_matcherror(
-                    message="The named template should be meaningful in {{ }}",
-                    linenumber=linenumber,
-                    tag="name[formatting]",
-                    filename=lintable,
-                )
+                        message="The named template should be meaningful in {{ }}",
+                        linenumber=linenumber,
+                        tag="name[formatting]",
+                        filename=lintable,
+                    )
         if name.count("}}") > 1 or name.count("{{") > 1:
             if name.endswith("}}") == True:
                 return self.create_matcherror(
@@ -95,5 +94,3 @@ class NameTemplatedRule(AnsibleLintRule):
                     filename=lintable,
                 )
         return None
-    
-        
