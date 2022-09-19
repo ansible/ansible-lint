@@ -14,27 +14,27 @@ If necessary you can silence the rule by add a `# noqa: no-handler` comment at t
 - name: Example of no-handler rule
   hosts: localhost
   tasks:
-  - name: Register result of a task
-    ansible.builtin.copy:
-      dest: "/tmp/placeholder"
-      content: "Ansible made this!"
-      mode: 0600
-    register: result # <-- Registers the result of the task.
-  - name: Second command to run
-    ansible.builtin.debug:
-      msg: The placeholder file was modified!
-    when: result.changed # <-- Triggers the no-handler rule.
+    - name: Register result of a task
+      ansible.builtin.copy:
+        dest: "/tmp/placeholder"
+        content: "Ansible made this!"
+        mode: 0600
+      register: result # <-- Registers the result of the task.
+    - name: Second command to run
+      ansible.builtin.debug:
+        msg: The placeholder file was modified!
+      when: result.changed # <-- Triggers the no-handler rule.
 ```
 
 ```yaml
 ---
-    # Optionally silences the rule.
-    when: result.changed # noqa: no-handler
+# Optionally silences the rule.
+when: result.changed # noqa: no-handler
 ```
 
 ## Correct Code
 
-The following code includes the same functionality as the problematic code without recording a `result` variable. 
+The following code includes the same functionality as the problematic code without recording a `result` variable.
 
 ```yaml
 ---
