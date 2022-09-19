@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ansiblelint.constants import SKIPPED_RULES_KEY
+from ansiblelint.constants import LINE_NUMBER_KEY, SKIPPED_RULES_KEY
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
     from typing import Any

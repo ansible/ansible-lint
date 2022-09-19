@@ -120,4 +120,7 @@ NESTED_TASK_KEYS = [
     "rescue",
 ]
 
+# Keys that are used internally when parsing YAML/JSON files
 SKIPPED_RULES_KEY = "__skipped_rules__"
+LINE_NUMBER_KEY = "__line__"
+FILENAME_KEY = "__file__"

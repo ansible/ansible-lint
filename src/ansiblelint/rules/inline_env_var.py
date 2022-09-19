@@ -22,8 +22,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from ansiblelint.constants import FILENAME_KEY, LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import FILENAME_KEY, LINE_NUMBER_KEY, get_first_cmd_arg
+from ansiblelint.utils import get_first_cmd_arg
 
 if TYPE_CHECKING:
     from typing import Optional
