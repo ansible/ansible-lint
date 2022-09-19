@@ -73,37 +73,6 @@ def _perform_mockings() -> None:  # noqa: C901
         for module_name in options.mock_modules:
             _make_module_stub(module_name)
 
-    # if inside a collection repo, symlink it to simulate its installed state
-    if not os.path.exists("galaxy.yml"):
-        return
-    yaml = yaml_from_file("galaxy.yml")
-    if not yaml:
-        # ignore empty galaxy.yml file
-        return
-    if isinstance(yaml, list):
-        raise RuntimeError(
-            "Invalid galaxy.yml file contains a sequence instead of a mapping."
-        )
-    namespace = yaml.get("namespace", None)
-    collection = yaml.get("name", None)
-    if not namespace or not collection:
-        return
-    collections_path = pathlib.Path(
-        f"{options.cache_dir}/collections/ansible_collections/{ namespace }"
-    )
-    collections_path.mkdir(parents=True, exist_ok=True)
-    link_path = pathlib.Path(collections_path / collection)
-    target = pathlib.Path(options.project_dir).absolute()
-    if link_path.exists():
-        try:
-            if os.readlink(link_path) != target:
-                raise OSError()
-        # OSError could also be raised by readlink
-        except (OSError, FileNotFoundError):
-            link_path.unlink(missing_ok=True)
-    if not link_path.exists():
-        link_path.symlink_to(target, target_is_directory=True)
-
 
 def _perform_mockings_cleanup() -> None:  # noqa: C901
     """Clean up mocked modules and roles."""
