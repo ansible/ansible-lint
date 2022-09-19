@@ -119,3 +119,5 @@ NESTED_TASK_KEYS = [
     "always",
     "rescue",
 ]
+
+SKIPPED_RULES_KEY = "__skipped_rules__"

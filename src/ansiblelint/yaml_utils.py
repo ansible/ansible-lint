@@ -33,7 +33,11 @@ from ruamel.yaml.scalarint import ScalarInt
 from ruamel.yaml.tokens import CommentToken
 from yamllint.config import YamlLintConfig
 
-from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS
+from ansiblelint.constants import (
+    NESTED_TASK_KEYS,
+    PLAYBOOK_TASK_KEYWORDS,
+    SKIPPED_RULES_KEY,
+)
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.utils import get_action_tasks, normalize_task
@@ -127,7 +131,7 @@ def iter_tasks_in_file(
     for raw_task in raw_tasks:
         err: MatchError | None = None
 
-        skip_tags: list[str] = raw_task.get("skipped_rules", [])
+        skip_tags: list[str] = raw_task.get(SKIPPED_RULES_KEY, [])
 
         try:
             normalized_task = normalize_task(raw_task, str(lintable.path))
@@ -237,7 +241,7 @@ def _nested_items_path(
             f"of type '{type(data_collection)}'"
         )
     for key, value in convert_data_collection_to_tuples():
-        if key in ("skipped_rules", "__file__", "__line__"):
+        if key in (SKIPPED_RULES_KEY, "__file__", "__line__"):
             continue
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
