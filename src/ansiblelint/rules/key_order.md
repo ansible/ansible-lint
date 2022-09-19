@@ -1,13 +1,14 @@
 # key-order
 
-This rule recommends reordering key names in ansible content in order to make
-code easier to maintain and avoid mistakes.
+This rule recommends reordering key names in ansible content to make
+code easier to maintain and less prone to errors.
 
-Here are some examples of common ordering checks done:
+Here are some examples of common ordering checks done for tasks and handlers:
 
 - `name` must always be the first key for plays, tasks and handlers
-- when present, the `block` key must be the last, avoid accidental indentation
-  bugs moving keys between block and the last task within the block.
+- on tasks, the `block`, `rescue` and `always` keys must be the last keys,
+  as this would avoid accidental miss-indentation errors between the last task
+  and the parent level.
 
 ## Problematic code
 
