@@ -415,7 +415,6 @@
             "$comment": "Standalone role, so we require several fields.",
             "required": [
               "author",
-              "standalone",
               "description",
               "license",
               "min_ansible_version"
@@ -442,7 +441,7 @@
                 "role_name"
               ]
             },
-            "required": ["standalone", "description"]
+            "required": ["description"]
           }
         }
       ],
@@ -510,34 +509,6 @@
         }
       },
       "title": "GalaxyInfoModel",
-      "type": "object"
-    },
-    "GalaxyInfoModel-v2": {
-      "additionalProperties": false,
-      "properties": {
-        "author": {
-          "title": "Author",
-          "type": "string"
-        },
-        "company": {
-          "title": "Company",
-          "type": "string"
-        },
-        "description": {
-          "title": "Description",
-          "type": "string"
-        },
-        "license": {
-          "title": "License",
-          "type": "string"
-        },
-        "platforms": {
-          "$ref": "#/$defs/platforms"
-        },
-        "standalone": { "const": false }
-      },
-      "required": ["description"],
-      "title": "GalaxyInfoModel for role within a collection (v2)",
       "type": "object"
     },
     "GenericBSDPlatformModel": {
