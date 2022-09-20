@@ -1,5 +1,5 @@
 ---
-# 0 expected no-loop-var-prefix failures
+# 0 expected loop-var-prefix failures
 - name: That should pass
   ansible.builtin.debug:
     var: loop_var_prefix_item

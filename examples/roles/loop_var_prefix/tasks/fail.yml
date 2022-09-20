@@ -1,6 +1,6 @@
 ---
-# 5 expected no-loop-var-prefix failures at 3, 9, 19, 26, 33
-- name: That should trigger no-loop-var-prefix
+# 5 expected loop-var-prefix failures at 3, 9, 19, 26, 33
+- name: That should trigger loop-var-prefix
   ansible.builtin.debug:
     var: item
   loop:
