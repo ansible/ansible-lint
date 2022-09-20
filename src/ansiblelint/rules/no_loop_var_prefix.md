@@ -19,20 +19,20 @@ enable_list:
 - name: Example playbook
   hosts: localhost
   tasks:
-  - name: Does not set a prefix for loop variables.
-    ansible.builtin.debug:
-      var: item
-    loop:
-      - foo
-      - bar # <- These items do not have a unique prefix.
-  - name: Sets 
-    ansible.builtin.debug:
-      var: zz_item
-    loop:
-      - foo
-      - bar
-    loop_control:
-      loop_var: zz_item # <- This prefix is not unique.
+    - name: Does not set a prefix for loop variables.
+      ansible.builtin.debug:
+        var: item
+      loop:
+        - foo
+        - bar # <- These items do not have a unique prefix.
+    - name: Sets
+      ansible.builtin.debug:
+        var: zz_item
+      loop:
+        - foo
+        - bar
+      loop_control:
+        loop_var: zz_item # <- This prefix is not unique.
 ```
 
 ## Correct Code
@@ -42,12 +42,12 @@ enable_list:
 - name: Example playbook
   hosts: localhost
   tasks:
-  - name: Sets a unique prefix for loop variables.
-    ansible.builtin.debug:
-      var: zz_item
-    loop:
-      - foo
-      - bar
-    loop_control:
-      loop_var: my_prefix # <- Specifies a unique prefix for loop variables.
+    - name: Sets a unique prefix for loop variables.
+      ansible.builtin.debug:
+        var: zz_item
+      loop:
+        - foo
+        - bar
+      loop_control:
+        loop_var: my_prefix # <- Specifies a unique prefix for loop variables.
 ```
