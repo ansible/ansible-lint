@@ -3,13 +3,11 @@ from __future__ import annotations
 
 import logging
 import os
-import pathlib
 import re
 import sys
 
 from ansiblelint.config import options
 from ansiblelint.constants import ANSIBLE_MOCKED_MODULE, INVALID_CONFIG_RC
-from ansiblelint.loaders import yaml_from_file
 
 _logger = logging.getLogger(__name__)
 
