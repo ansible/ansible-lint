@@ -2,7 +2,7 @@
 
 This rule checks YAML syntax and is an implementation of `yamllint`.
 
-You can disable YAML syntax violations by adding `yaml` to the `skip_list` 
+You can disable YAML syntax violations by adding `yaml` to the `skip_list`
 in your Ansible-lint configuration as follows:
 
 ```yaml
