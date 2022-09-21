@@ -1362,7 +1362,6 @@
       "$ref": "#/$defs/GalaxyInfoModel"
     }
   },
-  "required": ["galaxy_info"],
   "title": "Ansible Meta Schema v1/v2",
-  "type": "object"
+  "type": ["object", "null"]
 }
