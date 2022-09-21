@@ -24,3 +24,7 @@ disable =
 [TYPECHECK]
 # pylint is unable to detect Namespace attributes and will throw a E1101
 generated-members=options.*
+
+[SUMMARY]
+# We don't need the score spamming console, as we either pass or fail
+score=n
