@@ -59,10 +59,49 @@ def normpath(path: str | BasePathLike) -> str:
     # conversion to string in order to allow receiving non string objects
     relpath = os.path.relpath(str(path))
     path_absolute = os.path.abspath(str(path))
+    if path_absolute.startswith(os.getcwd()):
+        return relpath
+    if path_absolute.startswith(os.path.expanduser("~")):
+        return path_absolute.replace(os.path.expanduser("~"), "~")
     # we avoid returning relative paths that end-up at root level
     if path_absolute in relpath:
         return path_absolute
     return relpath
+
+
+# That is needed for compatibility with py38, later was added to Path class
+def is_relative_to(path: Path, *other: Any) -> bool:
+    """Return True if the path is relative to another path or False."""
+    try:
+        path.resolve().absolute().relative_to(*other)
+        return True
+    except ValueError:
+        return False
+
+
+def normpath_path(path: str | BasePathLike) -> Path:
+    """Normalize a path in order to provide a more consistent output.
+
+    - Any symlinks are resolved.
+    - Any paths outside the CWD are resolved to their absolute path.
+    - Any absolute path within current user home directory is compressed to
+      make use of '~', so it is easier to read and more portable.
+    """
+    if not isinstance(path, Path):
+        path = Path(path)
+
+    is_relative = is_relative_to(path, path.cwd())
+    path = path.resolve()
+    if is_relative:
+        path = path.relative_to(path.cwd())
+
+    # Compress any absolute path within current user home directory
+    if path.is_absolute():
+        home = Path.home()
+        if is_relative_to(path, home):
+            path = Path("~") / path.relative_to(home)
+
+    return path
 
 
 @contextmanager
@@ -133,6 +172,8 @@ class Lintable:
 
     Providing file content when creating the object allow creation of in-memory
     instances that do not need files to be present on disk.
+
+    When symlinks are given, they will always be resolved to their target.
     """
 
     def __init__(
@@ -142,8 +183,6 @@ class Lintable:
         kind: FileType | None = None,
     ):
         """Create a Lintable instance."""
-        # Filename is effective file on disk, for stdin is a namedtempfile
-        self.filename: str = str(name)
         self.dir: str = ""
         self.kind: FileType | None = None
         self.stop_processing = False  # Set to stop other rules from running
@@ -151,11 +190,16 @@ class Lintable:
         self.line_skips: dict[int, set[str]] = defaultdict(set)
 
         if isinstance(name, str):
-            self.name = normpath(name)
-            self.path = Path(self.name)
-        else:
-            self.name = str(name)
-            self.path = name
+            name = Path(name)
+        is_relative = is_relative_to(name, str(name.cwd()))
+        name = name.resolve()
+        if is_relative:
+            name = name.relative_to(name.cwd())
+        name = normpath_path(name)
+        self.path = name
+        # Filename is effective file on disk, for stdin is a namedtempfile
+        self.name = self.filename = str(name)
+
         self._content = self._original_content = content
         self.updated = False
 
@@ -312,7 +356,11 @@ class Lintable:
 
 # pylint: disable=redefined-outer-name
 def discover_lintables(options: Namespace) -> dict[str, Any]:
-    """Find all files that we know how to lint."""
+    """Find all files that we know how to lint.
+
+    Return format is normalized, relative for stuff below cwd, ~/ for content
+    under current user and absolute for everything else.
+    """
     # git is preferred as it also considers .gitignore
     git_command_present = [
         "git",

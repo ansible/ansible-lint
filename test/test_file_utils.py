@@ -21,6 +21,7 @@ from ansiblelint.file_utils import (
     expand_paths_vars,
     guess_project_dir,
     normpath,
+    normpath_path,
 )
 
 from .conftest import cwd
@@ -200,7 +201,7 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
 
     # pylint: disable=unused-argument
     def mockreturn(options: Namespace) -> dict[str, Any]:
-        return {path: kind}
+        return {normpath(path): kind}
 
     # assert Lintable is able to determine file type
     lintable_detected = Lintable(path)
@@ -411,3 +412,19 @@ def test_lintable_content_deleter(
     assert tmp_updated_lintable.content == updated_content
     del tmp_updated_lintable.content
     assert tmp_updated_lintable.content == content
+
+
+@pytest.mark.parametrize(
+    ("path", "result"),
+    (
+        pytest.param("foo", "foo", id="rel"),
+        pytest.param(os.path.expanduser("~/xxx"), "~/xxx", id="rel-to-home"),
+        pytest.param("/a/b/c", "/a/b/c", id="absolute"),
+        pytest.param(
+            "examples/playbooks/roles", "examples/roles", id="resolve-symlink"
+        ),
+    ),
+)
+def test_normpath_path(path: str, result: str) -> None:
+    """Tests behavior of normpath."""
+    assert normpath_path(path) == Path(result)
