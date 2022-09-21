@@ -2,18 +2,22 @@
 from __future__ import annotations
 
 import logging
+import re
 import sys
 from collections import namedtuple
 from typing import TYPE_CHECKING, Any
 
 import black
 import jinja2
+from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleParserError
 from ansible.parsing.yaml.objects import AnsibleUnicode
+from jinja2.exceptions import TemplateSyntaxError
 
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
-from ansiblelint.utils import LINE_NUMBER_KEY, parse_yaml_from_file
+from ansiblelint.utils import parse_yaml_from_file, template
 from ansiblelint.yaml_utils import nested_items_path
 
 if TYPE_CHECKING:
@@ -33,6 +37,9 @@ class JinjaRule(AnsibleLintRule):
     severity = "LOW"
     tags = ["formatting"]
     version_added = "v6.5.0"
+    _ansible_error_re = re.compile(
+        r"^(?P<error>.*): (?P<detail>.*)\. String: (?P<string>.*)$", flags=re.MULTILINE
+    )
 
     env = jinja2.Environment(trim_blocks=False)
     _tag2msg = {
@@ -44,11 +51,75 @@ class JinjaRule(AnsibleLintRule):
         """Generate error message."""
         return self._tag2msg[tag].format(value=value, reformatted=reformatted)
 
-    def matchtask(
+    # pylint: disable=too-many-branches
+    def matchtask(  # noqa: C901
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str | MatchError:
         for key, v, _ in nested_items_path(task):
             if isinstance(v, str):
+
+                try:
+                    template(
+                        basedir=file.dir if file else ".",
+                        value=v,
+                        variables={},
+                        fail_on_error=True,  # we later decide which ones to ignore or not
+                    )
+                # ValueError RepresenterError
+                except AnsibleError as exc:
+                    bypass = False
+                    orig_exc = exc.orig_exc if getattr(exc, "orig_exc", None) else exc
+                    match = self._ansible_error_re.match(
+                        getattr(orig_exc, "message", str(orig_exc))
+                    )
+                    if (
+                        isinstance(exc, AnsibleFilterError)
+                        or "unable to locate collection" in orig_exc.message
+                    ):
+                        bypass = True
+                    elif re.match(
+                        r"^the template file (.*) could not be found for the lookup$",
+                        orig_exc.message,
+                    ) or re.match(r"could not locate file in lookup", orig_exc.message):
+                        bypass = True
+                    elif isinstance(orig_exc, AnsibleParserError):
+                        # "An unhandled exception occurred while running the lookup plugin '...'. Error was a <class 'ansible.errors.AnsibleParserError'>, original message: Invalid filename: 'None'. Invalid filename: 'None'"
+
+                        # An unhandled exception occurred while running the lookup plugin 'template'. Error was a <class 'ansible.errors.AnsibleError'>, original message: the template file ... could not be found for the lookup. the template file ... could not be found for the lookup
+
+                        # ansible@devel (2.14) new behavior:
+                        # AnsibleError(TemplateSyntaxError): template error while templating string: Could not load "ipwrap": 'Invalid plugin FQCN (ansible.netcommon.ipwrap): unable to locate collection ansible.netcommon'. String: Foo {{ buildset_registry.host | ipwrap }}. Could not load "ipwrap": 'Invalid plugin FQCN (ansible.netcommon.ipwrap): unable to locate collection ansible.netcommon'
+                        bypass = True
+                    elif (
+                        isinstance(orig_exc, (AnsibleError, TemplateSyntaxError))
+                        and match
+                    ):
+                        error = match.group("error")
+                        detail = match.group("detail")
+                        # string = match.group("string")
+                        if error.startswith("template error while templating string"):
+                            bypass = False
+                        elif detail.startswith("unable to locate collection"):
+                            _logger.debug("Ignored AnsibleError: %s", exc)
+                            bypass = True
+                        else:
+                            # breakpoint()
+                            bypass = False
+                    elif re.match(r"^lookup plugin (.*) not found$", exc.message):
+                        # lookup plugin 'template' not found
+                        bypass = True
+
+                    # AnsibleFilterError: 'obj must be a list of dicts or a nested dict'
+                    # AnsibleError: template error while templating string: expected token ':', got '}'. String: {{ {{ '1' }} }}
+                    # AnsibleError: template error while templating string: unable to locate collection ansible.netcommon. String: Foo {{ buildset_registry.host | ipwrap }}
+                    if not bypass:
+                        return self.create_matcherror(
+                            message=str(exc),
+                            linenumber=task[LINE_NUMBER_KEY],
+                            filename=file,
+                            tag=f"{self.id}[invalid]",
+                        )
+
                 reformatted, details, tag = self.check_whitespace(v, key=key)
                 if reformatted != v:
                     return self.create_matcherror(
@@ -455,11 +526,24 @@ if "pytest" in sys.modules:  # noqa: C901
             pytest.param("{{ item.0.user }}", "{{ item.0.user }}", "spacing", id="39"),
             # Not supported by back, while jinja allows ~ to be binary operator:
             pytest.param("{{ a ~ b }}", "{{ a ~ b }}", "spacing", id="40"),
+            pytest.param(
+                "--format='{{'{{'}}.Size{{'}}'}}'",
+                "--format='{{ '{{' }}.Size{{ '}}' }}'",
+                "spacing",
+                id="41",
+            ),
+            pytest.param(
+                "{{ list_one + {{ list_two | max }} }}",
+                "{{ list_one + {{list_two | max}} }}",
+                "spacing",
+                id="42",
+            ),
         ),
     )
     def test_jinja(text: str, expected: str, tag: str) -> None:
         """Tests our ability to spot spacing errors inside jinja2 templates."""
         rule = JinjaRule()
+
         reformatted, details, returned_tag = rule.check_whitespace(text, key="name")
         assert tag == returned_tag, details
         assert expected == reformatted
@@ -490,3 +574,21 @@ if "pytest" in sys.modules:  # noqa: C901
         reformatted, details, returned_tag = rule.check_whitespace(text, key="when")
         assert tag == returned_tag, details
         assert expected == reformatted
+
+    def test_jinja_invalid() -> None:
+        """Tests our ability to spot spacing errors inside jinja2 templates."""
+        collection = RulesCollection()
+        collection.register(JinjaRule())
+        success = "examples/playbooks/rule-jinja-invalid.yml"
+        errs = Runner(success, rules=collection).run()
+        assert len(errs) == 1
+        assert errs[0].tag == "jinja[invalid]"
+        assert errs[0].rule.id == "jinja"
+
+    def test_jinja_valid() -> None:
+        """Tests our ability to parse jinja, even when variables may not be defined."""
+        collection = RulesCollection()
+        collection.register(JinjaRule())
+        success = "examples/playbooks/rule-jinja-valid.yml"
+        errs = Runner(success, rules=collection).run()
+        assert len(errs) == 0

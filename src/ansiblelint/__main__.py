@@ -170,6 +170,7 @@ def _do_transform(result: LintResult, opts: Namespace) -> None:
     transformer.run()
 
 
+# pylint: disable=too-many-branches
 def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
@@ -191,18 +192,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import _get_matches
 
-    rules = RulesCollection(options.rulesdirs)
+    rules = RulesCollection(options.rulesdirs, profile=options.profile)
 
     if options.profile == []:
         from ansiblelint.generate_docs import profiles_as_rich
 
         console.print(profiles_as_rich())
         return 0
-    if options.profile:
-        from ansiblelint.rules import filter_rules_with_profile
-
-        filter_rules_with_profile(rules, options.profile[0])
-        # When profile is mentioned, we filter-out the rules based on it
 
     if options.listrules or options.listtags:
         return _do_list(rules)
@@ -253,6 +249,11 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.cache_dir_lock:
         options.cache_dir_lock.release()
         pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
+    if options.mock_filters:
+        _logger.warning(
+            "The following filters were mocked during the run: %s",
+            ",".join(options.mock_filters),
+        )
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
 

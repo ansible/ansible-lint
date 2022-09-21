@@ -5,14 +5,11 @@ import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
 
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.constants import odict
     from ansiblelint.file_utils import Lintable
 
 
@@ -22,10 +19,10 @@ class GalaxyRule(AnsibleLintRule):
     id = "galaxy"
     description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0"
     severity = "MEDIUM"
-    tags = ["metadata"]
-    version_added = "v6.5.0 (last update)"
+    tags = ["metadata", "opt-in", "experimental"]
+    version_added = "v6.6.0 (last update)"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
         if file.kind != "galaxy":  # type: ignore
             return []
@@ -38,11 +35,13 @@ class GalaxyRule(AnsibleLintRule):
                     filename=file,
                 )
             ]
-        if Version(data.get("version")) < Version("1.0.0"):
+        version = data.get("version")
+        if Version(version) < Version("1.0.0"):
             return [
                 self.create_matcherror(
                     message="collection version should be greater than or equal to 1.0.0",
-                    linenumber=data[LINE_NUMBER_KEY],
+                    # pylint: disable=protected-access
+                    linenumber=version._line_number,
                     tag="galaxy[version-incorrect]",
                     filename=file,
                 )

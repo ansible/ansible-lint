@@ -4,13 +4,10 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -27,7 +24,7 @@ class NoPromptingRule(AnsibleLintRule):
     severity = "VERY_LOW"
     version_added = "v6.0.3"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
         # If the Play uses the 'vars_prompt' section to set variables
 

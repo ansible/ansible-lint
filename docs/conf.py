@@ -310,7 +310,6 @@ nitpick_ignore = [
     ("py:class", "ansible.template.Templar"),
     ("py:class", "handlers"),
     ("py:class", "meta"),
-    ("py:class", "odict"),
     ("py:class", "playbook"),
     ("py:class", "requirements"),
     ("py:class", "role"),

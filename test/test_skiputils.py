@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
+from ansiblelint.constants import SKIPPED_RULES_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.skip_utils import (
     append_skipped_rules,
@@ -83,7 +84,7 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                             "git": "src=/path/to/git/repo dest=checkout",
                             "__line__": 4,
                             "__file__": Path("examples/playbooks/noqa.yml"),
-                            "skipped_rules": ["latest[git]", "partial-become"],
+                            SKIPPED_RULES_KEY: ["latest[git]", "partial-become"],
                         }
                     ],
                     "__line__": 2,
@@ -153,19 +154,19 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
                                             "__file__": Path(
                                                 "examples/playbooks/noqa-nested.yml"
                                             ),
-                                            "skipped_rules": ["name[missing]"],
+                                            SKIPPED_RULES_KEY: ["name[missing]"],
                                         }
                                     ],
                                     "__line__": 6,
                                     "__file__": Path(
                                         "examples/playbooks/noqa-nested.yml"
                                     ),
-                                    "skipped_rules": ["name[missing]"],
+                                    SKIPPED_RULES_KEY: ["name[missing]"],
                                 }
                             ],
                             "__line__": 4,
                             "__file__": Path("examples/playbooks/noqa-nested.yml"),
-                            "skipped_rules": ["name[missing]"],
+                            SKIPPED_RULES_KEY: ["name[missing]"],
                         }
                     ],
                     "__line__": 2,

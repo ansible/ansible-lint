@@ -55,7 +55,14 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.app import get_app
 from ansiblelint.config import options
-from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, FileType
+from ansiblelint.constants import (
+    FILENAME_KEY,
+    LINE_NUMBER_KEY,
+    NESTED_TASK_KEYS,
+    PLAYBOOK_TASK_KEYWORDS,
+    SKIPPED_RULES_KEY,
+    FileType,
+)
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
@@ -107,13 +114,25 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
 def ansible_template(
     basedir: str, varname: Any, templatevars: Any, **kwargs: Any
 ) -> Any:
-    """Render a templated string."""
+    """Render a templated string by mocking missing filters."""
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
-    return templar.template(varname, **kwargs)
+    while True:
+        try:
+            return templar.template(varname, **kwargs)
+        except AnsibleError as exc:
+            if exc.message.startswith(
+                "template error while templating string: No filter named"
+            ):
+                missing_filter = exc.message.split("'")[1]
+                # Mock the filter to avoid and error from Ansible templating
+                # pylint: disable=protected-access
+                templar.environment.filters._delegatee[missing_filter] = lambda x: x
+                # Record the mocked filter so we can warn the user
+                if missing_filter not in options.mock_filters:
+                    options.mock_filters.append(missing_filter)
+                continue
+            raise
 
-
-LINE_NUMBER_KEY = "__line__"
-FILENAME_KEY = "__file__"
 
 BLOCK_NAME_TO_ACTION_TYPE_MAP = {
     "tasks": "task",
@@ -215,6 +234,7 @@ def template(
     basedir: str,
     value: Any,
     variables: Any,
+    fail_on_error: bool = False,
     fail_on_undefined: bool = False,
     **kwargs: str,
 ) -> Any:
@@ -230,7 +250,8 @@ def template(
         # I guess the filter doesn't like empty vars...
     except (AnsibleError, ValueError, RepresenterError):
         # templating failed, so just keep value as is.
-        pass
+        if fail_on_error:
+            raise
     return value
 
 
@@ -516,7 +537,7 @@ def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
     result = task.copy()
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
-    for k in ["skipped_rules", FILENAME_KEY, LINE_NUMBER_KEY]:
+    for k in [SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY]:
         if k in result:
             del result[k]
     return result

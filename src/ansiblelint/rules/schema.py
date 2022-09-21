@@ -22,8 +22,8 @@ from ansiblelint.schemas import __file__ as schemas_module
 _logger = logging.getLogger(__name__)
 
 DESCRIPTION_MD = """ Returned errors will not include exact line numbers, but they will mention
-the schema name being used as a tag, like ``playbook-schema``,
-``tasks-schema``.
+the schema name being used as a tag, like ``schema[playbook]``,
+``schema[tasks]``.
 
 This rule is not skippable and stops further processing of the file.
 

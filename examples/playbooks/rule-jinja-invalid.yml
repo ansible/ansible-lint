@@ -1,0 +1,9 @@
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - name: Foo # <-- this is valid jinja
+      ansible.builtin.debug:
+        msg: "{{ 'a' b }}" # <-- jinja2[invalid]
+# It should be noted that even ansible --syntax-check fails to spot the jinja
+# error above, but ansible will throw a runtime error when running

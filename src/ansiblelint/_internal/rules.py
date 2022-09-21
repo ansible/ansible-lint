@@ -9,9 +9,6 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.constants import RULE_DOC_URL
 
 if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.constants import odict
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -84,9 +81,10 @@ class BaseRule:
                     matches.extend(method(file))
                 except Exception as exc:  # pylint: disable=broad-except
                     _logger.warning(
-                        "Ignored exception from %s.%s: %s",
+                        "Ignored exception from %s.%s while processing %s: %s",
                         self.__class__.__name__,
                         method,
+                        str(file),
                         exc,
                     )
         else:
@@ -99,7 +97,7 @@ class BaseRule:
 
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
-    ) -> bool | str | MatchError:
+    ) -> bool | str | MatchError | list[MatchError]:
         """Confirm if current rule is matching a specific task.
 
         If ``needs_raw_task`` (a class level attribute) is ``True``, then
@@ -116,7 +114,7 @@ class BaseRule:
         """Return matches found for a specific YAML text."""
         return []
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
         return []
 

@@ -1,0 +1,22 @@
+---
+# https://github.com/ansible/ansible-lint/issues/2464
+# https://github.com/ansible/ansible-lint/issues/2462
+# https://github.com/ansible/ansible-lint/issues/2459
+- name: Fixture to test various jinja parsing bugs that we should ignore
+  hosts: localhost
+  tasks:
+    - name: Foo {{ buildset_registry.host | ipwrap }}
+      ansible.builtin.debug:
+        msg: "{{ lookup('template', 'lookup/redis_server__env_ports.j2') | from_yaml }}"
+      loop: "{{ github_release_query.results | subelements('json.assets', {'skip_missing': True}) }}"
+    - name: Zoo
+      ansible.builtin.debug:
+        msg: "{{ lookup('ansible.builtin.ini', 'SOME_VAR', type='properties', file='/tmp/some-file') }}"
+
+    - name: Generate Dovecot main configuration file
+      ansible.builtin.template:
+        src: '{{ lookup("template_src", "etc/dovecot/dovecot.conf.j2") }}'
+        dest: "/etc/dovecot/dovecot.conf"
+        owner: "root"
+        group: "dovecot"
+        mode: "0640"
