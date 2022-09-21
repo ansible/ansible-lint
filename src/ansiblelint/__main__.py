@@ -27,6 +27,7 @@ import logging
 import os
 import pathlib
 import shutil
+import site
 import subprocess
 import sys
 from contextlib import contextmanager
@@ -323,17 +324,30 @@ def path_inject() -> None:
     # This must be run before we do run any subprocesses, and loading config
     # does this as part of the ansible detection.
     paths = [x for x in os.environ.get("PATH", "").split(os.pathsep) if x]
-    ansible_path = shutil.which("ansible")
-    if ansible_path:
-        ansible_path = os.path.dirname(ansible_path)
+    inject_paths = []
+
+    userbase_bin_path = f"{site.getuserbase()}/bin"
+    if userbase_bin_path not in paths and os.path.exists(
+        f"{userbase_bin_path}/bin/ansible"
+    ):
+        inject_paths.append(userbase_bin_path)
+
     py_path = os.path.dirname(sys.executable)
-    # Determine if we need to manipulate PATH
-    for path in (ansible_path, py_path):
-        if path and path not in paths:  # pragma: no cover
-            # tested by test_call_from_outside_venv but coverage cannot detect it
-            paths.insert(0, path)
-            os.environ["PATH"] = os.pathsep.join(paths)
-            print(f"WARNING: PATH altered to include {path}", file=sys.stderr)
+    if py_path not in paths and os.path.exists(f"{py_path}/ansible"):
+        inject_paths.append(py_path)
+
+    if inject_paths:
+        print(
+            f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
+            file=sys.stderr,
+        )
+        os.environ["PATH"] = os.pathsep.join([*inject_paths, *paths])
+
+    # We do know that finding ansible in PATH does not guarantee that it is
+    # functioning or that is in fact the same version that was installed as
+    # our dependency, but addressing this would be done by ansible-compat.
+    if not shutil.which("ansible"):
+        raise RuntimeError("Failed to find ansible executable in PATH")
 
 
 if __name__ == "__main__":
