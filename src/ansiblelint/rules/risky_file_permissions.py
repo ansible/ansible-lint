@@ -72,9 +72,9 @@ class MissingFilePermissionsRule(AnsibleLintRule):
     description = (
         "Missing or unsupported mode parameter can cause unexpected file "
         "permissions based "
-        "on version of Ansible being used. Be explicit, like ``mode: 0644`` to "
-        "avoid hitting this rule. Special ``preserve`` value is accepted "
-        f"only by {', '.join(_modules_with_preserve)} modules."
+        "on version of Ansible being used. Be explicit, like `mode: 0644` to "
+        "avoid hitting this rule. Special `preserve` value is accepted "
+        f"only by {', '.join([f'`{x}`' for x in _modules_with_preserve])} modules."
     )
     link = "https://github.com/ansible/ansible/issues/71200"
     severity = "VERY_HIGH"
