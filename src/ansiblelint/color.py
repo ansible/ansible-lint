@@ -101,7 +101,9 @@ def _rich_heading_custom_rich_console(
 
 # pylint: disable=redefined-outer-name,unused-argument
 def _rich_codeblock_custom_rich_console(
-    self: rich.markdown.CodeBlock, console: Console, options: rich.console.ConsoleOptions
+    self: rich.markdown.CodeBlock,
+    console: Console,
+    options: rich.console.ConsoleOptions,
 ) -> rich.console.RenderResult:
     code = str(self.text).rstrip()
     syntax = Syntax(
