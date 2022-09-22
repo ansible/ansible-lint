@@ -1,8 +1,8 @@
 """Implementation of NameRule."""
 from __future__ import annotations
 
-import sys
 import re
+import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.errors import MatchError
@@ -86,7 +86,7 @@ class NameRule(AnsibleLintRule):
                 )
             )
         if name.count("}}") == 1 and name.count("{{") == 1:
-            if re.search('{{ .* }}$', name) == None:
+            if re.search("{{ .* }}$", name) == None:
                 results.append(
                     self.create_matcherror(
                         message="If names has {{ }} it should be at the end of sentence.",
@@ -96,16 +96,16 @@ class NameRule(AnsibleLintRule):
                     )
                 )
         if name.count("}}") == 1 and name.count("{{") == 1:
-            if re.search('{{ .* }}$', name):
+            if re.search("{{ .* }}$", name):
                 name_word = name.split(" ")[-2]
                 print(name_word)
-                if re.search(r'item.\d', name_word) or re.search(r'item', name_word):
-                        results.append(
+                if re.search(r"item.\d", name_word) or re.search(r"item", name_word):
+                    results.append(
                         self.create_matcherror(
-                        message="The named template should be meaningful in {{ }}",
-                        linenumber=linenumber,
-                        tag="name[formatting]",
-                        filename=lintable,
+                            message="The named template should be meaningful in {{ }}",
+                            linenumber=linenumber,
+                            tag="name[formatting]",
+                            filename=lintable,
                         )
                     )
         if name.count("}}") > 1 or name.count("{{") > 1:
