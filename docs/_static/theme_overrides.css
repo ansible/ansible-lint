@@ -16,3 +16,9 @@
 .icon-home {
   display: none !important;
 }
+
+/* Avoid using the red text for tt blocks */
+.rst-content code.literal,
+.rst-content tt.literal {
+  color: #888888 !important;
+}
