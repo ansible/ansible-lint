@@ -165,7 +165,7 @@ default_role = "any"
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "sphinx"
+pygments_style = "ansible"
 
 highlight_language = "YAML+Jinja"
 
