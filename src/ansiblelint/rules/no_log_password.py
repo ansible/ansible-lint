@@ -22,8 +22,6 @@ from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import convert_to_boolean
 
 if TYPE_CHECKING:
-    from typing import Optional
-
     from ansiblelint.file_utils import Lintable
 
 

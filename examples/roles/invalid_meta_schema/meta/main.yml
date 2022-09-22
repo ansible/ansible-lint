@@ -1,6 +1,6 @@
 ---
-version: 1 # new requirement
 galaxy_info:
+  standalone: true
   author: foo
   description: false # <-- schema fail as string is expected
   license: XXX

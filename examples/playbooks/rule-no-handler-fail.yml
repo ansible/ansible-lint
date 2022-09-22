@@ -1,0 +1,15 @@
+---
+- name: Example of no-handler rule
+  hosts: localhost
+  tasks:
+    - name: Register result of a task
+      ansible.builtin.copy:
+        dest: "/tmp/placeholder"
+        content: "Ansible made this!"
+        mode: 0600
+      register: result # <-- we register the result of the task
+
+    - name: Second command to run
+      ansible.builtin.debug:
+        msg: The placeholder file was modified!
+      when: result.changed # <-- this triggers no-handler rule

@@ -63,10 +63,6 @@ FileType = Literal[
 ]
 
 
-# odict is the base class used to represent data model of Ansible
-# playbooks and tasks.
-odict = dict  # pylint: disable=invalid-name
-
 # Aliases for deprecated tags/ids and their newer names
 RENAMED_TAGS = {
     "102": "no-jinja-when",
@@ -77,7 +73,7 @@ RENAMED_TAGS = {
     "203": "no-tabs",
     "205": "playbook-extension",
     "206": "jinja[spacing]",
-    "207": "no-jinja-nesting",
+    "207": "jinja[invalid]",
     "208": "risky-file-permissions",
     "301": "no-changed-when",
     "302": "deprecated-command-syntax",
@@ -105,6 +101,7 @@ RENAMED_TAGS = {
     "unnamed-task": "name[missing]",
     "git-latest": "latest[git]",
     "hg-latest": "latest[hg]",
+    "no-jinja-nesting": "jinja[invalid]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [
@@ -118,3 +115,8 @@ NESTED_TASK_KEYS = [
     "always",
     "rescue",
 ]
+
+# Keys that are used internally when parsing YAML/JSON files
+SKIPPED_RULES_KEY = "__skipped_rules__"
+LINE_NUMBER_KEY = "__line__"
+FILENAME_KEY = "__file__"

@@ -26,8 +26,6 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from typing import Optional
-
     from ansiblelint.file_utils import Lintable
 
 
@@ -266,7 +264,7 @@ if "pytest" in sys.modules:  # noqa: C901
 - hosts: all
   tasks:
     - name: Lineinfile when create is true
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: foo
         create: true
         line: some content here

@@ -1,7 +1,7 @@
 # schema
 
 The `schema` rule validates Ansible metadata files against JSON schemas.
-These schemas ensure compatibility of syntax of Ansible content across versions.
+These schemas ensure the compatibility of Ansible syntax content across versions.
 
 This `schema` rule is **mandatory**.
 You cannot use inline `noqa` comments to ignore it.
@@ -11,7 +11,8 @@ This prevents unexpected syntax from triggering multiple rule violations.
 
 ## Validated schema
 
-Ansible-lint currently validates several schema that are maintained in the separate projects and updated independently to ansible-lint.
+Ansible-lint currently validates several schemas that are maintained in
+separate projects and updated independently to ansible-lint.
 
 > Report bugs related to schema in their respective repository and not in the ansible-lint project.
 
@@ -38,16 +39,18 @@ Maintained in the Ansible [schemas](https://github.com/ansible/schemas) project:
 
 ## schema[meta]
 
-For `meta/main.yml` files Ansible-lint requires a `version` key that specifies one of the following Ansible versions:
+For `meta/main.yml` files, Ansible-lint requires a `galaxy_info.standalone`
+property that clarifies if a role is an old standalone one or a new one,
+collection based:
 
-- `1` uses old standalone Ansible roles.
-- `2` uses new Ansible roles contained in a collection.
-
-Ansible-lint requires the `version` key to avoid confusion and provide more specific error messages.
-You must add an explicit version entry to `meta/main.yml` such as:
-
+```yaml
+galaxy_info:
+  standalone: true # <-- this is a standalone role (not part of a collection)
 ```
-version: 1
-```
+
+Ansible-lint requires the `standalone` key to avoid confusion and provide more
+specific error messages. For example, the `meta` schema will require some
+properties only for standalone roles or prevent the use of some properties that
+are not supported by collections.
 
 You cannot use an empty `meta/main.yml` file or use only comments in the `meta/main.yml` file.

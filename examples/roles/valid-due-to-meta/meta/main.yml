@@ -1,6 +1,6 @@
 ---
-version: 1
 galaxy_info:
+  standalone: true
   role_name: valid_due_to_meta
   author: foo
   description: foo
