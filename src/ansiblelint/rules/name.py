@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+import re
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.errors import MatchError
@@ -84,6 +85,40 @@ class NameRule(AnsibleLintRule):
                     filename=lintable,
                 )
             )
+        if name.count("}}") == 1 and name.count("{{") == 1:
+            if re.search('{{ .* }}$', name) == None:
+                results.append(
+                    self.create_matcherror(
+                        message="If names has {{ }} it should be at the end of sentence.",
+                        linenumber=linenumber,
+                        tag="name[formatting]",
+                        filename=lintable,
+                    )
+                )
+        if name.count("}}") == 1 and name.count("{{") == 1:
+            if re.search('{{ .* }}$', name):
+                name_word = name.split(" ")[-2]
+                print(name_word)
+                if re.search(r'item.\d', name_word) or re.search(r'item', name_word):
+                        results.append(
+                        self.create_matcherror(
+                        message="The named template should be meaningful in {{ }}",
+                        linenumber=linenumber,
+                        tag="name[formatting]",
+                        filename=lintable,
+                        )
+                    )
+        if name.count("}}") > 1 or name.count("{{") > 1:
+            if name.endswith("}}") == True:
+                results.append(
+                    self.create_matcherror(
+                        message="If names has {{ }} it should be at the end of sentence.",
+                        linenumber=linenumber,
+                        tag="name[formatting]",
+                        filename=lintable,
+                    )
+                )
+
         return results
 
 
@@ -129,3 +164,13 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(errs) == 1
         assert errs[0].tag == "name[play]"
         assert errs[0].rule.id == "name"
+
+    def test_name_template() -> None:
+        """Negative test for name[templated]."""
+        collection = RulesCollection()
+        collection.register(NameRule())
+        failure = "examples/playbooks/name-templated.yml"
+        bad_runner = Runner(failure, rules=collection)
+        errs = bad_runner.run()
+        assert len(errs) == 1
+        assert errs[0].tag == "name[formatting]"
