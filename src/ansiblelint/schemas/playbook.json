@@ -928,6 +928,11 @@
           "title": "Ignore Unreachable",
           "type": "boolean"
         },
+        "listen": {
+          "markdownDescription": "Applies only to handlers. See [listen](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#handlers-running-when-notified)",
+          "title": "Listen",
+          "type": "string"
+        },
         "local_action": {
           "title": "Local Action",
           "type": [
