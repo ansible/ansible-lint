@@ -1,0 +1,10 @@
+---
+- name: Fixture for src/ansiblelint/rules/name.py::test_name_template(
+  hosts: all
+  tasks:
+    - name: This task {{ sampleService }} name is not correctly templated
+      ansible.builtin.command: echo "Hello World"
+      changed_when: false
+    - name: This task is correctly templated {{ sampleService }}
+      ansible.builtin.command: echo "Hello World"
+      changed_when: false
