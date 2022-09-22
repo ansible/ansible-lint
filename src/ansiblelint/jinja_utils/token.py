@@ -48,6 +48,10 @@ END_TOKENS = (
 SPACE = " "
 
 
+TokenType = str
+ValueStr = str
+Chomp = Literal["+", "-", ""]
+
 # pylint: disable=too-many-instance-attributes
 @dataclass  # this is mutable and DOES change after creation
 class Token:
@@ -62,8 +66,8 @@ class Token:
 
     # data from Lexer.tokeniter
     lineno: int
-    token: str
-    value_str: str
+    token: TokenType
+    value_str: ValueStr
 
     jinja_token: JinjaToken | None = None
     # jinja_token can have type and str modified by Lexer.wrap()
@@ -78,7 +82,7 @@ class Token:
     pair: Token | None = None
 
     # chomp indicator (only used for start/end pairs) aka strip_sign
-    chomp: Literal["+", "-", ""] = ""
+    chomp: Chomp = ""
 
 
 def pre_iter_normalize_newlines(source: str, keep_trailing_newline: bool) -> str:
@@ -133,7 +137,7 @@ def tokeniter(  # noqa: C901  # splitting this up would hurt readability
             jinja_token = None
 
         is_pair_opener = is_pair_closer = False
-        chomp: Literal["+", "-", ""] = ""
+        chomp: Chomp = ""
 
         # see if this token should have a pair
         if token_type == TOKEN_OPERATOR:
@@ -270,7 +274,7 @@ class Tokens(AbstractTokensCollection):
         self.source_position = 0
 
     def seek(
-        self, token_type: str, value: str | None = None
+        self, token_type: TokenType, value: ValueStr | None = None
     ) -> tuple[list[Token], Token | None]:
         """Seek for a token of the given type, and optionally the given value.
 
@@ -371,7 +375,22 @@ class TokenStream(AbstractTokensCollection):
             return self.max_first_line_length
         return self.max_line_length
 
-    def append(self, token: str, value: str, chomp: Literal["+", "-", ""] = "") -> None:
+    @staticmethod
+    def _make_token(
+        index: int, token: TokenType, value: ValueStr, chomp: Chomp = ""
+    ) -> Token:
+        return Token(
+            index=index,
+            start_pos=-1,
+            end_pos=-1,
+            lineno=-1,
+            token=token,
+            value_str=value,
+            jinja_token=None,
+            chomp=chomp,
+        )
+
+    def append(self, token: TokenType, value: ValueStr, chomp: Chomp = "") -> None:
         """Add a Jinja token type with the given value."""
         index = len(self.tokens)
         if token == TOKEN_WHITESPACE and value is SPACE:
@@ -380,6 +399,13 @@ class TokenStream(AbstractTokensCollection):
                 # no more than one consecutive space
                 return
 
+        value = self._advance(value)
+        self.tokens.append(
+            self._make_token(index, token, value, chomp)
+        )
+        self.index = index
+
+    def _advance(self, value: ValueStr):
         len_value = len(value)
         newline_pos = value.rfind("\n")
         line_pos = self.line_position
@@ -392,44 +418,42 @@ class TokenStream(AbstractTokensCollection):
             value = "\n"
             line_pos = 0
 
-        self.tokens.append(
-            Token(
-                index=index,
-                start_pos=-1,
-                end_pos=-1,
-                lineno=-1,
-                token=token,
-                value_str=value,
-                jinja_token=None,
-                chomp=chomp,
-            )
-        )
-        self.index = index
         self.line_position = line_pos
         self.line_number += value.count("\n")
+        return value
 
-    def extend(self, *args: tuple[str, str]) -> None:
+    def extend(self, *args: tuple[TokenType, ValueStr]) -> None:
         """Extend with the given set of Jinja token type and value tuples."""
         for token, value in args:
             self.append(token, value)
 
+    def pair(
+        self,
+        opener: tuple[TokenType, ValueStr, Chomp],
+        closer: tuple[TokenType, ValueStr, Chomp],
+    ) -> Iterator[None]:
+        opener_index = len(self.tokens)
+        opener_value = self._advance(opener[1])
+        opener_token = self._make_token(opener_index, opener[0], opener_value, opener[2])
+        self.tokens.append(opener_token)
+        self.index = opener_index
+        yield
+        closer_index = len(self.tokens)
+        closer_value = self._advance(closer[1])
+        closer_token = self._make_token(closer_index, closer[0], closer_value, closer[2])
+        self.tokens.append(closer_token)
+        self.index = closer_index
+        opener_token.pair = closer_token
+        closer_token.pair = opener_token
+
     def insert(
-        self, index: int, token: str, value: str, chomp: Literal["+", "-", ""] = ""
+        self, index: int, token: TokenType, value: ValueStr, chomp: Chomp = ""
     ) -> None:
         """Insert a Jinja token type with the given value at the given index."""
         # this does not prevent duplicate whitespace
         self.tokens.insert(
             index,
-            Token(
-                index=index,
-                start_pos=-1,
-                end_pos=-1,
-                lineno=-1,
-                token=token,
-                value_str=value,
-                jinja_token=None,
-                chomp=chomp,
-            ),
+            self._make_token(index, token, value, chomp),
         )
         for _index, _token in enumerate(self.tokens[index:], start=index):
             _token.index = _index

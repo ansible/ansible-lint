@@ -82,6 +82,7 @@ class TemplateDumper(NodeVisitor):
         """Wrap context with block {% %} tokens."""
         start_string = self.environment.block_start_string
         end_string = self.environment.block_end_string
+        start_chomp = end_chomp = ""
 
         # preserve chomped values
         if hasattr(node, "token_pairs"):
@@ -92,26 +93,26 @@ class TemplateDumper(NodeVisitor):
                 pair_closer = cast(Token, pair_opener.pair)
                 if pair_opener.chomp:
                     start_string = pair_opener.value_str
+                    start_chomp = pair_opener.chomp
                 if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
                     end_string = pair_closer.value_str
+                    end_chomp = pair_closer.chomp
 
         self._block_stmt_start_position = self.tokens.line_position
         self._block_stmt_start_line = self.tokens.line_number
-        self.tokens.extend(
-            (j2tokens.TOKEN_BLOCK_BEGIN, start_string),
-            (j2tokens.TOKEN_WHITESPACE, SPACE),
-        )
-        for name in names:
-            self.tokens.extend(
-                (j2tokens.TOKEN_WHITESPACE, SPACE),
-                (j2tokens.TOKEN_NAME, name),
-                (j2tokens.TOKEN_WHITESPACE, SPACE),
-            )
-        yield
-        self.tokens.extend(
-            (j2tokens.TOKEN_WHITESPACE, SPACE),
-            (j2tokens.TOKEN_BLOCK_END, end_string),
-        )
+        with self.tokens.pair(
+            (j2tokens.TOKEN_BLOCK_BEGIN, start_string, start_chomp),
+            (j2tokens.TOKEN_BLOCK_END, end_string, end_chomp),
+        ):
+            self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
+            for name in names:
+                self.tokens.extend(
+                    (j2tokens.TOKEN_WHITESPACE, SPACE),
+                    (j2tokens.TOKEN_NAME, name),
+                    (j2tokens.TOKEN_WHITESPACE, SPACE),
+                )
+            yield
+            self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
         if (
             # if the block starts in the middle of a line, keep it inline.
             self._block_stmt_start_position == 0
@@ -128,6 +129,7 @@ class TemplateDumper(NodeVisitor):
         """Wrap context with variable {{ }} tokens."""
         start_string = self.environment.variable_start_string
         end_string = self.environment.variable_end_string
+        start_chomp = end_chomp = ""
 
         # preserve chomped values
         if hasattr(node, "token_pairs"):
@@ -136,18 +138,18 @@ class TemplateDumper(NodeVisitor):
             pair_closer = cast(Token, pair_opener.pair)
             if pair_opener.chomp:
                 start_string = pair_opener.value_str
+                start_chomp = pair_opener.chomp
             if pair_closer.chomp or pair_closer.value_str.endswith("\n"):
                 end_string = pair_closer.value_str
+                end_chomp = pair_closer.chomp
 
-        self.tokens.extend(
-            (j2tokens.TOKEN_VARIABLE_BEGIN, start_string),
-            (j2tokens.TOKEN_WHITESPACE, SPACE),
-        )
-        yield
-        self.tokens.extend(
-            (j2tokens.TOKEN_WHITESPACE, SPACE),
-            (j2tokens.TOKEN_VARIABLE_END, end_string),
-        )
+        with self.tokens.pair(
+            (j2tokens.TOKEN_VARIABLE_BEGIN, start_string, start_chomp),
+            (j2tokens.TOKEN_VARIABLE_END, end_string, end_chomp),
+        ):
+            self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
+            yield
+            self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
 
     def signature(
         self,
