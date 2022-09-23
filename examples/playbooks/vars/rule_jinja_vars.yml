@@ -1,0 +1,5 @@
+# this should not trigger any errors because a 'when' inside
+# a vars files, does not use implicit jinja.
+---
+foo:
+  when: "{{ var }}"
