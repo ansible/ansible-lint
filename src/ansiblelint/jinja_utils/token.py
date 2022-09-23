@@ -381,7 +381,11 @@ class TokenStream(AbstractTokensCollection):
 
     @staticmethod
     def _make_token(
-        index: int, token: TokenType, value: ValueStr, chomp: Chomp = "", priority: Priority = 0
+        index: int,
+        token: TokenType,
+        value: ValueStr,
+        chomp: Chomp = "",
+        priority: Priority = 0,
     ) -> Token:
         return Token(
             index=index,
@@ -412,9 +416,7 @@ class TokenStream(AbstractTokensCollection):
                 return
 
         value = self._advance(value)
-        self.tokens.append(
-            self._make_token(index, token, value, chomp, priority)
-        )
+        self.tokens.append(self._make_token(index, token, value, chomp, priority))
         self.index = index
 
     def _advance(self, value: ValueStr):
@@ -450,13 +452,17 @@ class TokenStream(AbstractTokensCollection):
     ) -> Iterator[None]:
         opener_index = len(self.tokens)
         opener_value = self._advance(opener[1])
-        opener_token = self._make_token(opener_index, opener[0], opener_value, opener[2])
+        opener_token = self._make_token(
+            opener_index, opener[0], opener_value, opener[2]
+        )
         self.tokens.append(opener_token)
         self.index = opener_index
         yield
         closer_index = len(self.tokens)
         closer_value = self._advance(closer[1])
-        closer_token = self._make_token(closer_index, closer[0], closer_value, closer[2])
+        closer_token = self._make_token(
+            closer_index, closer[0], closer_value, closer[2]
+        )
         self.tokens.append(closer_token)
         self.index = closer_index
         opener_token.pair = closer_token
