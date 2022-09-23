@@ -51,6 +51,7 @@ SPACE = " "
 TokenType = str
 ValueStr = str
 Chomp = Literal["+", "-", ""]
+Priority = int
 
 # pylint: disable=too-many-instance-attributes
 @dataclass  # this is mutable and DOES change after creation
@@ -83,6 +84,9 @@ class Token:
 
     # chomp indicator (only used for start/end pairs) aka strip_sign
     chomp: Chomp = ""
+
+    # if a line is too long, it will break at the whitespace token with the highest priority
+    priority: Priority = 0
 
 
 def pre_iter_normalize_newlines(source: str, keep_trailing_newline: bool) -> str:
@@ -377,7 +381,7 @@ class TokenStream(AbstractTokensCollection):
 
     @staticmethod
     def _make_token(
-        index: int, token: TokenType, value: ValueStr, chomp: Chomp = ""
+        index: int, token: TokenType, value: ValueStr, chomp: Chomp = "", priority: Priority = 0
     ) -> Token:
         return Token(
             index=index,
@@ -388,20 +392,28 @@ class TokenStream(AbstractTokensCollection):
             value_str=value,
             jinja_token=None,
             chomp=chomp,
+            priority=priority,
         )
 
-    def append(self, token: TokenType, value: ValueStr, chomp: Chomp = "") -> None:
+    def append(
+        self,
+        token: TokenType,
+        value: ValueStr,
+        chomp: Chomp = "",
+        priority: Priority = 0,
+    ) -> None:
         """Add a Jinja token type with the given value."""
         index = len(self.tokens)
         if token == TOKEN_WHITESPACE and value is SPACE:
             previous = self.tokens[index - 1]
             if previous.token == TOKEN_WHITESPACE:
                 # no more than one consecutive space
+                previous.priority = max(priority, previous.priority)
                 return
 
         value = self._advance(value)
         self.tokens.append(
-            self._make_token(index, token, value, chomp)
+            self._make_token(index, token, value, chomp, priority)
         )
         self.index = index
 
@@ -422,10 +434,14 @@ class TokenStream(AbstractTokensCollection):
         self.line_number += value.count("\n")
         return value
 
-    def extend(self, *args: tuple[TokenType, ValueStr]) -> None:
+    def extend(
+        self, *args: tuple[TokenType, ValueStr] | tuple[TokenType, ValueStr, Priority]
+    ) -> None:
         """Extend with the given set of Jinja token type and value tuples."""
-        for token, value in args:
-            self.append(token, value)
+        for item in args:
+            token, value = item[:2]
+            priority = item[2] if len(item) == 3 else 0
+            self.append(token, value, priority=priority)
 
     def pair(
         self,
@@ -447,13 +463,18 @@ class TokenStream(AbstractTokensCollection):
         closer_token.pair = opener_token
 
     def insert(
-        self, index: int, token: TokenType, value: ValueStr, chomp: Chomp = ""
+        self,
+        index: int,
+        token: TokenType,
+        value: ValueStr,
+        chomp: Chomp = "",
+        priority: Priority = 0,
     ) -> None:
         """Insert a Jinja token type with the given value at the given index."""
         # this does not prevent duplicate whitespace
         self.tokens.insert(
             index,
-            self._make_token(index, token, value, chomp),
+            self._make_token(index, token, value, chomp, priority),
         )
         for _index, _token in enumerate(self.tokens[index:], start=index):
             _token.index = _index
