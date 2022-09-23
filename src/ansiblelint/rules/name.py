@@ -1,6 +1,7 @@
 """Implementation of NameRule."""
 from __future__ import annotations
 
+import re
 import sys
 from typing import TYPE_CHECKING, Any
 
@@ -23,6 +24,7 @@ class NameRule(AnsibleLintRule):
     severity = "MEDIUM"
     tags = ["idiom"]
     version_added = "v6.5.0 (last update)"
+    _re_templated_inside = re.compile(r".*\{\{.*\}\}(.+)$")
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
@@ -81,6 +83,15 @@ class NameRule(AnsibleLintRule):
                     filename=lintable,
                 )
             )
+        if self._re_templated_inside.match(name):
+            results.append(
+                self.create_matcherror(
+                    message="Jinja templates should only be at the end of 'name'",
+                    linenumber=linenumber,
+                    tag="name[template]",
+                    filename=lintable,
+                )
+            )
         return results
 
 
@@ -126,3 +137,13 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(errs) == 1
         assert errs[0].tag == "name[play]"
         assert errs[0].rule.id == "name"
+
+    def test_name_template() -> None:
+        """Negative test for name[templated]."""
+        collection = RulesCollection()
+        collection.register(NameRule())
+        failure = "examples/playbooks/name-templated.yml"
+        bad_runner = Runner(failure, rules=collection)
+        errs = bad_runner.run()
+        assert len(errs) == 1
+        assert errs[0].tag == "name[template]"

@@ -10,6 +10,10 @@ This rule can produce messages such:
   languages that support it.
 - `name[missing]` - All tasks should be named.
 - `name[play]` - All plays should be named.
+- `name[template]` - Jinja templates should only be at the end of 'name'. This
+  helps with the identification of tasks inside the source code when they fail.
+  The use of templating inside `name` keys is discouraged as there
+  are multiple cases where the rendering of the name template is not possible.
 
 If you want to ignore some of the messages above, you can add any of them to
 the `skip_list`.
