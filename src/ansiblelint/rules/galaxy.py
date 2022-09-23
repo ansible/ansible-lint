@@ -93,7 +93,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Positive test for collection version in galaxy."""
         collection = RulesCollection()
         collection.register(GalaxyRule())
-        success = "examples/galaxy.yml"
+        success = "examples/collection/galaxy.yml"
         good_runner = Runner(success, rules=collection)
         assert [] == good_runner.run()
 

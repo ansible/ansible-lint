@@ -99,7 +99,7 @@ if "pytest" in sys.modules:
         ("file", "expected_kind", "expected"),
         (
             (
-                "examples/galaxy.yml",
+                "examples/collection/galaxy.yml",
                 "galaxy",
                 ["'GPL' is not one of"],
             ),
