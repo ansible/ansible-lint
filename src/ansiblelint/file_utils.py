@@ -66,6 +66,8 @@ def normpath(path: str | BasePathLike) -> str:
     # we avoid returning relative paths that end-up at root level
     if path_absolute in relpath:
         return path_absolute
+    if relpath.startswith("../"):
+        return path_absolute
     return relpath
 
 
