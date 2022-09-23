@@ -31,11 +31,13 @@ def test_cases_that_do_not_report(
 ) -> None:
     """Test that relative inclusions are properly followed."""
     runner = Runner(playbook_path, rules=default_rules_collection)
-    runner.run()
+    result = runner.run()
     noexist_message_count = 0
 
     for record in caplog.records:
-        if "Couldn't open" in str(record):
-            noexist_message_count += 1
+        for msg in ("No such file or directory", "Couldn't open"):
+            if msg in str(record):
+                noexist_message_count += 1
 
     assert noexist_message_count == 0
+    assert len(result) == 0

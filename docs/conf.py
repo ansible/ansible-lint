@@ -165,7 +165,7 @@ default_role = "any"
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "sphinx"
+pygments_style = "ansible"
 
 highlight_language = "YAML+Jinja"
 
@@ -185,6 +185,8 @@ html_theme_options = {
     # 'canonical_url': "https://docs.ansible.com/ansible/latest/",
     "vcs_pageview_mode": "edit",
     "navigation_depth": 3,
+    "display_version": False,
+    "logo_only": True,
 }
 
 html_context = {
@@ -195,10 +197,10 @@ html_context = {
     "current_version": version,
     "latest_version": "latest",
     # list specifically out of order to make latest work
-    "available_versions": ("latest", "stable"),
-    "css_files": (),  # overrides to the standard theme
+    "available_versions": ("latest",),
 }
 
+# This appears on the left side of the page, in the header bar
 html_short_title = "Ansible Lint Documentation"
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
@@ -218,16 +220,15 @@ html_title = "Ansible Lint Documentation"
 #
 # ssbarnea: Do not put relative path because it will not load from some deeper
 # pages as the relative path will be wrong, probably a bug in our schema.
-html_logo = "https://ansible-lint.readthedocs.io/en/latest/_static/ansible-lint.svg"
+html_logo = "_static/ansible-lint.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
 #
-# ssbarnea: Do not put SVG here, Safari does not support it: https://caniuse.com/link-icon-svg
-html_favicon = (
-    "https://ansible-lint.readthedocs.io/en/latest/_static/images/logo_invert.png"
-)
+# ssbarnea: Do not put SVG or PND here due to limited browser support. The
+# value is relative to config file!
+html_favicon = "_static/images/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -264,7 +265,7 @@ html_copy_source = False
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
 # base URL from which the finished HTML is served.
-html_use_opensearch = "https://ansible-lint.readthedocs.io/en/latest/"
+html_use_opensearch = "https://ansible-lint.readthedocs.io/"
 
 # If nonempty, this is the file name suffix for HTML files (e.g. ".xhtml").
 # html_file_suffix = ''
@@ -274,7 +275,7 @@ autoclass_content = "both"
 # table width fix via: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
 html_static_path = ["_static"]
 
-html_css_files = [
+html_css_files = [  # relative to html_static_path
     "theme_overrides.css",  # override wide tables in RTD theme
     "ansi.css",
 ]
@@ -309,7 +310,6 @@ nitpick_ignore = [
     ("py:class", "ansible.template.Templar"),
     ("py:class", "handlers"),
     ("py:class", "meta"),
-    ("py:class", "odict"),
     ("py:class", "playbook"),
     ("py:class", "requirements"),
     ("py:class", "role"),

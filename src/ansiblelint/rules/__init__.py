@@ -11,18 +11,7 @@ from collections import defaultdict
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Iterator,
-    List,
-    MutableMapping,
-    MutableSequence,
-    Optional,
-    Set,
-    Union,
-    cast,
-)
+from typing import Any, Iterable, Iterator, MutableMapping, MutableSequence, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -37,7 +26,7 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.config import PROFILES, get_rule_config
 from ansiblelint.config import options as default_options
-from ansiblelint.constants import RULE_DOC_URL
+from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
 
@@ -119,8 +108,8 @@ class AnsibleLintRule(BaseRule):
         match.task = task
         if not match.details:
             match.details = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-        if match.linenumber < task[ansiblelint.utils.LINE_NUMBER_KEY]:
-            match.linenumber = task[ansiblelint.utils.LINE_NUMBER_KEY]
+        if match.linenumber < task[LINE_NUMBER_KEY]:
+            match.linenumber = task[LINE_NUMBER_KEY]
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
@@ -151,7 +140,14 @@ class AnsibleLintRule(BaseRule):
             matches.append(matcherror)
         return matches
 
-    def matchtasks(self, file: Lintable) -> list[MatchError]:
+    # pylint: disable=too-many-branches
+    def matchtasks(self, file: Lintable) -> list[MatchError]:  # noqa: C901
+        """Call matchtask for each task inside file and return aggregate results.
+
+        Most rules will never need to override matchtasks because its main
+        purpose is to call matchtask for each task/handlers in the same file,
+        and to aggregate the results.
+        """
         matches: list[MatchError] = []
         if (
             not self.matchtask
@@ -166,7 +162,11 @@ class AnsibleLintRule(BaseRule):
                 # normalize_task converts AnsibleParserError to MatchError
                 return [error]
 
-            if self.id in skipped_tags or ("action" not in task):
+            if (
+                self.id in skipped_tags
+                or ("action" not in task)
+                or "skip_ansible_lint" in task.get("tags", [])
+            ):
                 continue
 
             if self.needs_raw_task:
@@ -176,22 +176,32 @@ class AnsibleLintRule(BaseRule):
             if not result:
                 continue
 
+            if isinstance(result, Iterable) and not isinstance(
+                result, str
+            ):  # list[MatchError]
+                # https://github.com/PyCQA/pylint/issues/6044
+                # pylint: disable=not-an-iterable
+                for match in result:
+                    if match.tag in skipped_tags:
+                        continue
+                    self._enrich_matcherror_with_task_details(match, task)
+                    matches.append(match)
+                continue
             if isinstance(result, MatchError):
                 if result.tag in skipped_tags:
                     continue
                 match = result
-            else:
+            else:  # bool or string
                 message = None
                 if isinstance(result, str):
                     message = result
                 match = self.create_matcherror(
                     message=message,
-                    linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
+                    linenumber=task[LINE_NUMBER_KEY],
                     filename=file,
                 )
 
             self._enrich_matcherror_with_task_details(match, task)
-
             matches.append(match)
         return matches
 
@@ -220,7 +230,10 @@ class AnsibleLintRule(BaseRule):
             if play is None:
                 continue
 
-            if self.id in play.get("skipped_rules", ()):
+            if self.id in play.get(SKIPPED_RULES_KEY, ()):
+                continue
+
+            if "skip_ansible_lint" in play.get("tags", []):
                 continue
 
             matches.extend(self.matchplay(file, play))
@@ -357,9 +370,12 @@ class RulesCollection:
         self,
         rulesdirs: list[str] | None = None,
         options: Namespace = default_options,
+        profile: list[str] | None = None,
+        conditional: bool = True,
     ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options
+        self.profile = profile or []
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = expand_paths_vars(rulesdirs)
@@ -370,15 +386,21 @@ class RulesCollection:
             [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()]
         )
         for rule in load_plugins(rulesdirs):
-            self.register(rule)
+            self.register(rule, conditional=conditional)
         self.rules = sorted(self.rules)
 
-    def register(self, obj: AnsibleLintRule) -> None:
+        # when we have a profile we unload some of the rules
+        if self.profile:
+            filter_rules_with_profile(self.rules, self.profile[0])
+
+    def register(self, obj: AnsibleLintRule, conditional: bool = False) -> None:
         """Register a rule."""
         # We skip opt-in rules which were not manually enabled.
         # But we do include opt-in rules when listing all rules or tags
         if any(
             [
+                not conditional,
+                self.profile,  # when profile is used we load all rules and filter later
                 "opt-in" not in obj.tags,
                 obj.id in self.options.enable_list,
                 self.options.listrules,
@@ -490,19 +512,36 @@ class RulesCollection:
         return result
 
 
-def filter_rules_with_profile(rule_col: RulesCollection, profile: str) -> None:
+def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:
     """Unload rules that are not part of the specified profile."""
     included = set()
     extends = profile
+    total_rules = len(rule_col)
     while extends:
         for rule in PROFILES[extends]["rules"]:
+            _logger.debug("Activating rule `%s` due to profile `%s`", rule, extends)
             included.add(rule)
         extends = PROFILES[extends].get("extends", None)
-    for rule in list(rule_col.rules):
+    for rule in rule_col:
         if rule.id not in included:
             _logger.debug(
                 "Unloading %s rule due to not being part of %s profile.",
                 rule.id,
                 profile,
             )
-            rule_col.rules.remove(rule)
+            rule_col.remove(rule)
+        else:
+            for tag in ("opt-in", "experimental"):
+                if tag in rule.tags:
+                    _logger.debug(
+                        "Removing tag `%s` from `%s` rule because `%s` profile makes it mandatory.",
+                        tag,
+                        rule.id,
+                        profile,
+                    )
+                    rule.tags.remove(tag)
+                    # rule_col.rules.remove(rule)
+                    # break
+            if "opt-in" in rule.tags:
+                rule.tags.remove("opt-in")
+    _logger.debug("%s/%s rules included in the profile", len(rule_col), total_rules)

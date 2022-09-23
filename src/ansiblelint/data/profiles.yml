@@ -29,7 +29,6 @@ basic:
     inline-env-var:
     key-order:
     literal-compare:
-    no-jinja-nesting:
     jinja:
     no-jinja-when:
     no-tabs:
@@ -68,16 +67,19 @@ safety:
     risky-file-permissions:
     risky-octal:
     risky-shell-pipe:
+    template-instead-of-copy:
 shared:
   extends: safety
   description: >
     The shared profile is for those that want to publish their content, roles
-    or collection to either [galaxy](https://galaxy.ansible.com) or to another
-    automation-hub instance. In addition to all the rules related to packaging
-    and publishing, like metadata checks, this also includes some rules that
-    are known to be good practices for keeping the code readable and
+    or collection to either [galaxy.ansible.com](https://galaxy.ansible.com),
+    [automation-hub](https://console.redhat.com/ansible/automation-hub) or
+    another private instance of these. In addition to all the rules related to
+    packaging and publishing, like metadata checks, this also includes some
+    rules that are known to be good practices for keeping the code readable and
     maintainable.
   rules:
+    galaxy: # <-- applies to both galaxy and automation-hub
     ignore-errors:
     layout:
       url: https://github.com/ansible/ansible-lint/issues/1900

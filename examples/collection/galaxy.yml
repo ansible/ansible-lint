@@ -1,7 +1,7 @@
 ---
 name: foo
 namespace: bar
-version: 1.2.3
+version: 0.0.0 # noqa: galaxy[version-incorrect]
 authors:
   - John
 readme: ../README.md

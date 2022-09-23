@@ -26,7 +26,7 @@ from ansiblelint.runner import Runner
         ),
         pytest.param(
             "examples/playbooks/include-import-tasks-in-role.yml",
-            5,
+            4,
             2,
             id="role_with_task_inclusions",
         ),

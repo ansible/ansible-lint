@@ -14,7 +14,7 @@ Refer to the [Ansible module index](https://docs.ansible.com/ansible/latest/coll
   hosts: localhost
   tasks:
     - name: Configure VLAN ID
-      ansible.netcommon.net_vlan: # <-- This module is deprecated.
+      ansible.netcommon.net_vlan: # <- Uses a deprecated module.
         vlan_id: 20
 ```
 
@@ -26,7 +26,7 @@ Refer to the [Ansible module index](https://docs.ansible.com/ansible/latest/coll
   hosts: localhost
   tasks:
     - name: Configure VLAN ID
-      dellemc.enterprise_sonic.sonic_vlans: # <-- Use a platform specific module.
+      dellemc.enterprise_sonic.sonic_vlans: # <- Uses a platform specific module.
         config:
           - vlan_id: 20
 ```

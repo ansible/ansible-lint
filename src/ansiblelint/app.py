@@ -256,6 +256,6 @@ def get_app(offline: bool = False) -> App:
     # Make linter use the cache dir from compat
     default_options.cache_dir = app.runtime.cache_dir
 
-    app.runtime.prepare_environment(offline=offline)
+    app.runtime.prepare_environment(install_local=True, offline=offline)
     _perform_mockings()
     return app

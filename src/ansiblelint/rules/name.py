@@ -4,14 +4,11 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.constants import odict
     from ansiblelint.file_utils import Lintable
 
 
@@ -27,8 +24,9 @@ class NameRule(AnsibleLintRule):
     tags = ["idiom"]
     version_added = "v6.5.0 (last update)"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
+        results = []
         if file.kind != "playbook":
             return []
         if "name" not in data:
@@ -40,43 +38,50 @@ class NameRule(AnsibleLintRule):
                     filename=file,
                 )
             ]
-        match = self._check_name(
-            data["name"], lintable=file, linenumber=data[LINE_NUMBER_KEY]
+        results.extend(
+            self._check_name(
+                data["name"], lintable=file, linenumber=data[LINE_NUMBER_KEY]
+            )
         )
-        if match:
-            return [match]
-        return []
+        return results
 
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
-    ) -> bool | str | MatchError:
+    ) -> list[MatchError]:
+        results = []
         name = task.get("name")
         if not name:
-            return self.create_matcherror(
-                message="All tasks should be named.",
-                linenumber=task[LINE_NUMBER_KEY],
-                tag="name[missing]",
-                filename=file,
+            results.append(
+                self.create_matcherror(
+                    message="All tasks should be named.",
+                    linenumber=task[LINE_NUMBER_KEY],
+                    tag="name[missing]",
+                    filename=file,
+                )
             )
-        return (
-            self._check_name(name, lintable=file, linenumber=task[LINE_NUMBER_KEY])
-            or False
-        )
+        else:
+            results.extend(
+                self._check_name(name, lintable=file, linenumber=task[LINE_NUMBER_KEY])
+            )
+        return results
 
     def _check_name(
         self, name: str, lintable: Lintable | None, linenumber: int
-    ) -> MatchError | None:
+    ) -> list[MatchError]:
         # This rules applies only to languages that do have uppercase and
         # lowercase letter, so we ignore anything else. On Unicode isupper()
         # is not necessarily the opposite of islower()
+        results = []
         if name[0].isalpha() and name[0].islower() and not name[0].isupper():
-            return self.create_matcherror(
-                message="All names should start with an uppercase letter.",
-                linenumber=linenumber,
-                tag="name[casing]",
-                filename=lintable,
+            results.append(
+                self.create_matcherror(
+                    message="All names should start with an uppercase letter.",
+                    linenumber=linenumber,
+                    tag="name[casing]",
+                    filename=lintable,
+                )
             )
-        return None
+        return results
 
 
 if "pytest" in sys.modules:  # noqa: C901

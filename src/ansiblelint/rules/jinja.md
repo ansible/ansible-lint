@@ -6,7 +6,9 @@ version can report:
 - `jinja[spacing]` when there are no spaces between variables
   and operators, including filters, like `{{ var_name | filter }}`. This
   improves readability and makes it less likely to introduce typos.
-- `jinja[invalid]` when the jinja2 template is invalid
+- `jinja[invalid]` when the jinja2 template is invalid, like `{{ {{ '1' }} }}`,
+  which would result in a runtime error if you try to use it with Ansible, even
+  if it does pass the Ansible syntax check.
 
 As jinja2 syntax is closely following Python one we aim to follow
 [black](https://black.readthedocs.io/en/stable/) formatting rules. If you are

@@ -529,7 +529,8 @@ def get_config(arguments: list[str]) -> Namespace:
 
     if options.project_dir == ".":
         project_dir = guess_project_dir(options.config_file)
-        options.project_dir = normpath(project_dir)
+        options.project_dir = os.path.expanduser(normpath(project_dir))
+
     if not options.project_dir or not os.path.exists(options.project_dir):
         raise RuntimeError(
             f"Failed to determine a valid project_dir: {options.project_dir}"

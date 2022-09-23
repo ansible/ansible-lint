@@ -26,8 +26,6 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from typing import Optional
-
     from ansiblelint.file_utils import Lintable
 
 
@@ -74,9 +72,9 @@ class MissingFilePermissionsRule(AnsibleLintRule):
     description = (
         "Missing or unsupported mode parameter can cause unexpected file "
         "permissions based "
-        "on version of Ansible being used. Be explicit, like ``mode: 0644`` to "
-        "avoid hitting this rule. Special ``preserve`` value is accepted "
-        f"only by {', '.join(_modules_with_preserve)} modules."
+        "on version of Ansible being used. Be explicit, like `mode: 0644` to "
+        "avoid hitting this rule. Special `preserve` value is accepted "
+        f"only by {', '.join([f'`{x}`' for x in _modules_with_preserve])} modules."
     )
     link = "https://github.com/ansible/ansible/issues/71200"
     severity = "VERY_HIGH"
@@ -266,7 +264,7 @@ if "pytest" in sys.modules:  # noqa: C901
 - hosts: all
   tasks:
     - name: Lineinfile when create is true
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: foo
         create: true
         line: some content here

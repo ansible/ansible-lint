@@ -180,7 +180,9 @@ class Runner:
         # remove any matches made inside excluded files
         matches = list(
             filter(
-                lambda match: not self.is_excluded(Lintable(match.filename)), matches
+                lambda match: not self.is_excluded(Lintable(match.filename))
+                and match.tag not in match.lintable.line_skips[match.linenumber],
+                matches,
             )
         )
 

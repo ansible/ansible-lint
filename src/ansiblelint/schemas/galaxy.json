@@ -501,13 +501,13 @@
     },
     "name": {
       "minLength": 2,
-      "pattern": "[a-z][a-z0-9_]+",
+      "pattern": "^[a-z][a-z0-9_]+$",
       "title": "Name",
       "type": "string"
     },
     "namespace": {
       "minLength": 2,
-      "pattern": "[a-z][a-z0-9_]+",
+      "pattern": "^[a-z][a-z0-9_]+$",
       "title": "Namespace",
       "type": "string"
     },

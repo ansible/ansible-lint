@@ -1,0 +1,14 @@
+---
+name: foo
+namespace: bar
+version: 0.2.3 # <-- that version is not valid, should be 1.0.0 or greater
+authors:
+  - John
+readme: ../README.md
+description: "..."
+dependencies:
+  other_namespace.collection1: ">=1.0.0"
+  other_namespace.collection2: ">=2.0.0,<3.0.0"
+  anderson55.my_collection: "*" # note: "*" selects the highest version available
+license:
+  - Apache-2.0

@@ -251,6 +251,27 @@
         {
           "not": {
             "required": [
+              "hosts"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "tasks"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "import_playbook"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
               "with_filetree"
             ]
           },
@@ -362,6 +383,11 @@
         "ignore_unreachable": {
           "title": "Ignore Unreachable",
           "type": "boolean"
+        },
+        "listen": {
+          "markdownDescription": "Applies only to handlers. See [listen](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#handlers-running-when-notified)",
+          "title": "Listen",
+          "type": "string"
         },
         "local_action": {
           "title": "Local Action",

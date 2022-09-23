@@ -115,6 +115,7 @@ options = Namespace(
     verbosity=False,
     warn_list=[],
     kinds=DEFAULT_KINDS,
+    mock_filters=[],
     mock_modules=[],
     mock_roles=[],
     loop_var_prefix=None,

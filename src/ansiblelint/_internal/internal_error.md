@@ -12,7 +12,7 @@ In almost all cases you will see more detailed information regarding the
 original error or runtime exception that triggered this rule.
 
 If these files are broken on purpose, like some test fixtures, you need to add
-them to the `exclude_list`.
+them to the `exclude_paths`.
 
 ## Problematic code
 
@@ -31,3 +31,13 @@ them to the `exclude_list`.
   hosts: localhost
   tasks: []
 ```
+
+## ERROR! No hosts matched the subscripted pattern
+
+If you see this error, it means that you tried to index a host group variable
+that is using an index above its size.
+
+Instead of doing something like `hosts: all[1]` which assumes that you have
+at least two hosts in your current inventory, you better write something like
+`hosts: "{{ all[1] | default([]) }}`, which is safe and do not produce runtime
+errors. Use safe fallbacks to make your code more resilient.

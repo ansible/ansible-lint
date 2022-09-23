@@ -2,9 +2,9 @@
 - name: Fixture
   hosts: all
   tags:
-    - skip_ansible_lint
+    - skip_ansible_lint # should disable error at playbook level
   tasks:
-    - name: Test latest[hg]
+    - name: Test # <-- 0 latest[hg]
       action: ansible.builtin.hg
     - name: Test latest[hg] (skipped) # noqa latest[hg]
       action: ansible.builtin.hg
@@ -16,20 +16,20 @@
       become_user: alice
       action: ansible.builtin.git
 
-    - name: Test YAML and jinja[spacing]
+    - name: Test YAML # <-- 1 jinja[spacing]
       ansible.builtin.get_url:
         # noqa: risky-file-permissions
-        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf
+        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf # <-- 2 yaml[line-length]
         dest: "{{dest_proj_path}}/foo.conf"
     - name: Test YAML and jinja[spacing] (skipped)
       ansible.builtin.get_url:
         # noqa: risky-file-permissions
-        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf # noqa yaml
+        url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf # noqa yaml[line-length]
         dest: "{{dest_proj_path}}/foo.conf" # noqa jinja[spacing]
 
-    - name: Test deprecated-command-syntax
+    - name: Test deprecated-command-syntax # <-- 3 deprecated-command-syntax
       ansible.builtin.command: creates=B chmod 644 A
-    - name: Test deprecated-command-syntax
+    - name: Test deprecated-command-syntax # <-- 4 deprecated-command-syntax
       ansible.builtin.command: warn=yes creates=B chmod 644 A
     - name: Test deprecated-command-syntax (skipped via no warn)
       ansible.builtin.command: warn=no creates=B chmod 644 A

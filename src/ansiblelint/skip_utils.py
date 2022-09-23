@@ -30,9 +30,15 @@ from typing import TYPE_CHECKING, Any, Generator, Sequence
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML
 from ruamel.yaml.composer import ComposerError
+from ruamel.yaml.tokens import CommentToken
 
 from ansiblelint.config import used_old_tags
-from ansiblelint.constants import NESTED_TASK_KEYS, PLAYBOOK_TASK_KEYWORDS, RENAMED_TAGS
+from ansiblelint.constants import (
+    NESTED_TASK_KEYS,
+    PLAYBOOK_TASK_KEYWORDS,
+    RENAMED_TAGS,
+    SKIPPED_RULES_KEY,
+)
 from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
@@ -119,19 +125,27 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
 ) -> AnsibleBaseYAMLObject | None:
     # parse file text using 2nd parser library
     ruamel_data = load_data(lintable.content)
-    skipped_rules = _get_rule_skips_from_yaml(ruamel_data)
+    skipped_rules = _get_rule_skips_from_yaml(ruamel_data, lintable)
 
-    if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
+    if lintable.kind in [
+        "yaml",
+        "requirements",
+        "vars",
+        "meta",
+        "reno",
+        "test-meta",
+        "galaxy",
+    ]:
         # AnsibleMapping, dict
         if hasattr(pyyaml_data, "get"):
-            pyyaml_data["skipped_rules"] = skipped_rules
+            pyyaml_data[SKIPPED_RULES_KEY] = skipped_rules
         # AnsibleSequence, list
         elif (
             not isinstance(pyyaml_data, str)
             and isinstance(pyyaml_data, collections.abc.Sequence)
             and skipped_rules
         ):
-            pyyaml_data[0]["skipped_rules"] = skipped_rules
+            pyyaml_data[0][SKIPPED_RULES_KEY] = skipped_rules
 
         return pyyaml_data
 
@@ -166,7 +180,9 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
 
         if pyyaml_task.get("name") != ruamel_task.get("name"):
             raise RuntimeError("Error in matching skip comment to a task")
-        pyyaml_task["skipped_rules"] = _get_rule_skips_from_yaml(ruamel_task)
+        pyyaml_task[SKIPPED_RULES_KEY] = _get_rule_skips_from_yaml(
+            ruamel_task, lintable
+        )
 
     return pyyaml_data
 
@@ -205,7 +221,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
 
 
 def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
-    yaml_input: Sequence[Any],
+    yaml_input: Sequence[Any], lintable: Lintable
 ) -> Sequence[Any]:
     """Traverse yaml for comments with rule skips and return list of rules."""
     yaml_comment_obj_strings = []
@@ -214,6 +230,17 @@ def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
         return []
 
     def traverse_yaml(obj: Any) -> None:
+        for _, entry in obj.ca.items.items():
+            for v in entry:
+                if isinstance(v, CommentToken):
+                    comment_str = v.value
+                    if comment_str.startswith("# noqa:"):
+                        line = v.start_mark.line + 1  # ruamel line numbers start at 0
+                        # column = v.start_mark.column + 1  # ruamel column numbers start at 0
+                        lintable.line_skips[line].update(
+                            get_rule_skips_from_line(comment_str.strip())
+                        )
+
         yaml_comment_obj_strings.append(str(obj.ca.items))
         if isinstance(obj, dict):
             for _, val in obj.items():
