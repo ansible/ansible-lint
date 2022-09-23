@@ -102,6 +102,7 @@ RENAMED_TAGS = {
     "git-latest": "latest[git]",
     "hg-latest": "latest[hg]",
     "no-jinja-nesting": "jinja[invalid]",
+    "no-loop-var-prefix": "loop-var-prefix",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [

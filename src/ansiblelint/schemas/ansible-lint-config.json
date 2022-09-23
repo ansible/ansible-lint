@@ -112,7 +112,7 @@
           "no-handler",
           "no-jinja-when",
           "no-log-password",
-          "no-loop-var-prefix",
+          "loop-var-prefix",
           "no-prompting",
           "no-relative-paths",
           "no-same-owner",
