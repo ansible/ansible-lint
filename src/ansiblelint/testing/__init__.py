@@ -38,6 +38,10 @@ class RunFromText:
         runner = Runner(path, rules=self.collection)
         return runner.run()
 
+    def run(self, filename: str) -> list[MatchError]:
+        """Lints received filename."""
+        return self._call_runner(filename)
+
     def run_playbook(self, playbook_text: str) -> list[MatchError]:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(

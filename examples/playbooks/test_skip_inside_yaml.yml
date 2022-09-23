@@ -10,11 +10,11 @@
       action: ansible.builtin.hg
 
     - name: Test latest[git] and partial-become
-      become_user: alice
       action: ansible.builtin.git
+      become_user: alice
     - name: Test latest[git] and partial-become (skipped) # noqa latest[git] partial-become
-      become_user: alice
       action: ansible.builtin.git
+      become_user: alice
 
     - name: Test YAML # <-- 1 jinja[spacing]
       ansible.builtin.get_url:
