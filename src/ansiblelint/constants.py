@@ -63,10 +63,6 @@ FileType = Literal[
 ]
 
 
-# odict is the base class used to represent data model of Ansible
-# playbooks and tasks.
-odict = dict  # pylint: disable=invalid-name
-
 # Aliases for deprecated tags/ids and their newer names
 RENAMED_TAGS = {
     "102": "no-jinja-when",
@@ -120,4 +116,7 @@ NESTED_TASK_KEYS = [
     "rescue",
 ]
 
+# Keys that are used internally when parsing YAML/JSON files
 SKIPPED_RULES_KEY = "__skipped_rules__"
+LINE_NUMBER_KEY = "__line__"
+FILENAME_KEY = "__file__"

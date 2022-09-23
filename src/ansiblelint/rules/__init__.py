@@ -11,20 +11,7 @@ from collections import defaultdict
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    MutableMapping,
-    MutableSequence,
-    Optional,
-    Sequence,
-    Set,
-    Union,
-    cast,
-)
+from typing import Any, Iterable, Iterator, MutableMapping, MutableSequence, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -39,7 +26,7 @@ from ansiblelint._internal.rules import (
 )
 from ansiblelint.config import PROFILES, get_rule_config
 from ansiblelint.config import options as default_options
-from ansiblelint.constants import RULE_DOC_URL, SKIPPED_RULES_KEY
+from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
 
@@ -121,8 +108,8 @@ class AnsibleLintRule(BaseRule):
         match.task = task
         if not match.details:
             match.details = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-        if match.linenumber < task[ansiblelint.utils.LINE_NUMBER_KEY]:
-            match.linenumber = task[ansiblelint.utils.LINE_NUMBER_KEY]
+        if match.linenumber < task[LINE_NUMBER_KEY]:
+            match.linenumber = task[LINE_NUMBER_KEY]
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
@@ -210,7 +197,7 @@ class AnsibleLintRule(BaseRule):
                     message = result
                 match = self.create_matcherror(
                     message=message,
-                    linenumber=task[ansiblelint.utils.LINE_NUMBER_KEY],
+                    linenumber=task[LINE_NUMBER_KEY],
                     filename=file,
                 )
 

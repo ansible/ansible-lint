@@ -11,8 +11,6 @@ from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.yaml_utils import nested_items_path
 
 if TYPE_CHECKING:
-    from typing import Optional
-
     from ansiblelint.file_utils import Lintable
 
 

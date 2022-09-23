@@ -165,7 +165,7 @@ default_role = "any"
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "sphinx"
+pygments_style = "ansible"
 
 highlight_language = "YAML+Jinja"
 
@@ -310,7 +310,6 @@ nitpick_ignore = [
     ("py:class", "ansible.template.Templar"),
     ("py:class", "handlers"),
     ("py:class", "meta"),
-    ("py:class", "odict"),
     ("py:class", "playbook"),
     ("py:class", "requirements"),
     ("py:class", "role"),

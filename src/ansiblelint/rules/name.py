@@ -5,14 +5,11 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
 
 if TYPE_CHECKING:
-    from typing import Optional
-
-    from ansiblelint.constants import odict
     from ansiblelint.file_utils import Lintable
 
 
@@ -28,7 +25,7 @@ class NameRule(AnsibleLintRule):
     tags = ["idiom"]
     version_added = "v6.5.0 (last update)"
 
-    def matchplay(self, file: Lintable, data: odict[str, Any]) -> list[MatchError]:
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
         results = []
         if file.kind != "playbook":
