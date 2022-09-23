@@ -101,18 +101,20 @@ class TemplateDumper(NodeVisitor):
         self._block_stmt_start_position = self.tokens.line_position
         self._block_stmt_start_line = self.tokens.line_number
         with self.tokens.pair(
-            (j2tokens.TOKEN_BLOCK_BEGIN, start_string, start_chomp),
-            (j2tokens.TOKEN_BLOCK_END, end_string, end_chomp),
+            (j2tokens.TOKEN_BLOCK_BEGIN, start_string, start_chomp, 0),
+            (j2tokens.TOKEN_BLOCK_END, end_string, end_chomp, 0),
         ):
-            self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
-            for name in names:
-                self.tokens.extend(
-                    (j2tokens.TOKEN_WHITESPACE, SPACE),
-                    (j2tokens.TOKEN_NAME, name),
-                    (j2tokens.TOKEN_WHITESPACE, SPACE),
-                )
-            yield
-            self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
+            with self.tokens.pair(
+                (j2tokens.TOKEN_WHITESPACE, SPACE, "", 10),
+                (j2tokens.TOKEN_WHITESPACE, SPACE, "", 10),
+            ):
+                for name in names:
+                    self.tokens.extend(
+                        (j2tokens.TOKEN_WHITESPACE, SPACE),
+                        (j2tokens.TOKEN_NAME, name),
+                        (j2tokens.TOKEN_WHITESPACE, SPACE),
+                    )
+                yield
         if (
             # if the block starts in the middle of a line, keep it inline.
             self._block_stmt_start_position == 0
@@ -144,36 +146,53 @@ class TemplateDumper(NodeVisitor):
                 end_chomp = pair_closer.chomp
 
         with self.tokens.pair(
-            (j2tokens.TOKEN_VARIABLE_BEGIN, start_string, start_chomp),
-            (j2tokens.TOKEN_VARIABLE_END, end_string, end_chomp),
+            (j2tokens.TOKEN_VARIABLE_BEGIN, start_string, start_chomp, 0),
+            (j2tokens.TOKEN_VARIABLE_END, end_string, end_chomp, 0),
         ):
-            self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
-            yield
-            self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
+            with self.tokens.pair(
+                (j2tokens.TOKEN_WHITESPACE, SPACE, "", 10),
+                (j2tokens.TOKEN_WHITESPACE, SPACE, "", 10),
+            ):
+                yield
 
     def token_pair_paren(self, explicit: bool = True) -> Iterator[None]:
         """Wrap context with a pair of () tokens."""
         with self.tokens.pair(
-            (j2tokens.TOKEN_LPAREN, "(" if explicit else "", ""),
-            (j2tokens.TOKEN_RPAREN, ")" if explicit else "", ""),
+            (j2tokens.TOKEN_LPAREN, "(" if explicit else "", "", 0),
+            (j2tokens.TOKEN_RPAREN, ")" if explicit else "", "", 0),
         ):
-            yield
+            with self.tokens.pair(
+                # possible newline, but no space otherwise
+                (j2tokens.TOKEN_WHITESPACE, "", "", 10),
+                (j2tokens.TOKEN_WHITESPACE, "", "", 10),
+            ):
+                yield
 
     def token_pair_bracket(self) -> Iterator[None]:
         """Wrap context with a pair of [] tokens."""
         with self.tokens.pair(
-            (j2tokens.TOKEN_LBRACKET, "[", ""),
-            (j2tokens.TOKEN_RBRACKET, "]", ""),
+            (j2tokens.TOKEN_LBRACKET, "[", "", 0),
+            (j2tokens.TOKEN_RBRACKET, "]", "", 0),
         ):
-            yield
+            with self.tokens.pair(
+                # possible newline, but no space otherwise
+                (j2tokens.TOKEN_WHITESPACE, "", "", 10),
+                (j2tokens.TOKEN_WHITESPACE, "", "", 10),
+            ):
+                yield
 
     def token_pair_brace(self) -> Iterator[None]:
         """Wrap context with a pair of {} tokens."""
         with self.tokens.pair(
-            (j2tokens.TOKEN_LBRACE, "{", ""),
-            (j2tokens.TOKEN_RBRACE, "}", ""),
+            (j2tokens.TOKEN_LBRACE, "{", "", 0),
+            (j2tokens.TOKEN_RBRACE, "}", "", 0),
         ):
-            yield
+            with self.tokens.pair(
+                # possible newline, but no space otherwise
+                (j2tokens.TOKEN_WHITESPACE, "", "", 10),
+                (j2tokens.TOKEN_WHITESPACE, "", "", 10),
+            ):
+                yield
 
     def signature(
         self,

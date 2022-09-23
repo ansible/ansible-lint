@@ -447,26 +447,21 @@ class TokenStream(AbstractTokensCollection):
 
     def pair(
         self,
-        opener: tuple[TokenType, ValueStr, Chomp],
-        closer: tuple[TokenType, ValueStr, Chomp],
+        opener: tuple[TokenType, ValueStr, Chomp, Priority],
+        closer: tuple[TokenType, ValueStr, Chomp, Priority],
     ) -> Iterator[None]:
-        opener_index = len(self.tokens)
-        opener_value = self._advance(opener[1])
-        opener_token = self._make_token(
-            opener_index, opener[0], opener_value, opener[2]
-        )
-        self.tokens.append(opener_token)
-        self.index = opener_index
+        def add_token(item: tuple[TokenType, ValueStr, Chomp, Priority]):
+            index = len(self.tokens)
+            value = self._advance(item[1])
+            token = self._make_token(
+                index, item[0], value, chomp=item[2], priority=item[3]
+            )
+            self.tokens.append(token)
+            self.index = index
+
+        add_token(opener)
         yield
-        closer_index = len(self.tokens)
-        closer_value = self._advance(closer[1])
-        closer_token = self._make_token(
-            closer_index, closer[0], closer_value, closer[2]
-        )
-        self.tokens.append(closer_token)
-        self.index = closer_index
-        opener_token.pair = closer_token
-        closer_token.pair = opener_token
+        add_token(closer)
 
     def insert(
         self,
