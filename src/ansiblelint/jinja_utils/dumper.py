@@ -151,6 +151,30 @@ class TemplateDumper(NodeVisitor):
             yield
             self.tokens.append(j2tokens.TOKEN_WHITESPACE, SPACE)
 
+    def token_pair_paren(self, explicit: bool = True) -> Iterator[None]:
+        """Wrap context with a pair of () tokens."""
+        with self.tokens.pair(
+            (j2tokens.TOKEN_LPAREN, "(" if explicit else "", ""),
+            (j2tokens.TOKEN_RPAREN, ")" if explicit else "", ""),
+        ):
+            yield
+
+    def token_pair_bracket(self) -> Iterator[None]:
+        """Wrap context with a pair of [] tokens."""
+        with self.tokens.pair(
+            (j2tokens.TOKEN_LBRACKET, "[", ""),
+            (j2tokens.TOKEN_RBRACKET, "]", ""),
+        ):
+            yield
+
+    def token_pair_brace(self) -> Iterator[None]:
+        """Wrap context with a pair of {} tokens."""
+        with self.tokens.pair(
+            (j2tokens.TOKEN_LBRACE, "{", ""),
+            (j2tokens.TOKEN_RBRACE, "}", ""),
+        ):
+            yield
+
     def signature(
         self,
         node: nodes.Call | nodes.Filter | nodes.Test,
@@ -208,25 +232,24 @@ class TemplateDumper(NodeVisitor):
         node: nodes.Macro | nodes.CallBlock,
     ) -> None:
         """Write a Macro or CallBlock signature to the stream for the current node."""
-        self.tokens.append(j2tokens.TOKEN_LPAREN, "(")
-        for idx, arg in enumerate(node.args):
-            if idx:
+        with self.token_pair_paren():
+            for idx, arg in enumerate(node.args):
+                if idx:
+                    self.tokens.extend(
+                        (j2tokens.TOKEN_COMMA, ","),
+                        (j2tokens.TOKEN_WHITESPACE, SPACE),
+                    )
+                self.visit(arg)
+                try:
+                    default = node.defaults[idx - len(node.args)]
+                except IndexError:
+                    continue
                 self.tokens.extend(
-                    (j2tokens.TOKEN_COMMA, ","),
+                    (j2tokens.TOKEN_WHITESPACE, SPACE),
+                    (j2tokens.TOKEN_ASSIGN, "="),
                     (j2tokens.TOKEN_WHITESPACE, SPACE),
                 )
-            self.visit(arg)
-            try:
-                default = node.defaults[idx - len(node.args)]
-            except IndexError:
-                continue
-            self.tokens.extend(
-                (j2tokens.TOKEN_WHITESPACE, SPACE),
-                (j2tokens.TOKEN_ASSIGN, "="),
-                (j2tokens.TOKEN_WHITESPACE, SPACE),
-            )
-            self.visit(default)
-        self.tokens.append(j2tokens.TOKEN_RPAREN, ")")
+                self.visit(default)
 
     # -- Statement Visitors
 
@@ -609,52 +632,45 @@ class TemplateDumper(NodeVisitor):
             # it might not have extras. Just assume it needs parentheses.
             explicit_parentheses = True
 
-        if explicit_parentheses:
-            self.tokens.append(j2tokens.TOKEN_LPAREN, "(")
-
-        idx = -1
-        for idx, item in enumerate(node.items):
-            if idx:
-                self.tokens.extend(
-                    (j2tokens.TOKEN_COMMA, ","),
-                    (j2tokens.TOKEN_WHITESPACE, SPACE),
-                )
-            self.visit(item)
-        if idx == 0:
-            self.tokens.append(j2tokens.TOKEN_COMMA, ",")
-
-        if explicit_parentheses:
-            self.tokens.append(j2tokens.TOKEN_RPAREN, ")")
+        with self.token_pair_paren(explicit=explicit_parentheses):
+            idx = -1
+            for idx, item in enumerate(node.items):
+                if idx:
+                    self.tokens.extend(
+                        (j2tokens.TOKEN_COMMA, ","),
+                        (j2tokens.TOKEN_WHITESPACE, SPACE),
+                    )
+                self.visit(item)
+            if idx == 0:
+                self.tokens.append(j2tokens.TOKEN_COMMA, ",")
 
     def visit_List(self, node: nodes.List) -> None:
         """Write a ``List`` to the stream."""
-        self.tokens.append(j2tokens.TOKEN_LBRACKET, "[")
-        for idx, item in enumerate(node.items):
-            if idx:
-                self.tokens.extend(
-                    (j2tokens.TOKEN_COMMA, ","),
-                    (j2tokens.TOKEN_WHITESPACE, SPACE),
-                )
-            self.visit(item)
-        self.tokens.append(j2tokens.TOKEN_RBRACKET, "]")
+        with self.token_pair_bracket():
+            for idx, item in enumerate(node.items):
+                if idx:
+                    self.tokens.extend(
+                        (j2tokens.TOKEN_COMMA, ","),
+                        (j2tokens.TOKEN_WHITESPACE, SPACE),
+                    )
+                self.visit(item)
 
     def visit_Dict(self, node: nodes.Dict) -> None:
         """Write a ``Dict`` to the stream."""
-        self.tokens.append(j2tokens.TOKEN_LBRACE, "{")
-        item: nodes.Pair
-        for idx, item in enumerate(node.items):
-            if idx:
+        with self.token_pair_brace():
+            item: nodes.Pair
+            for idx, item in enumerate(node.items):
+                if idx:
+                    self.tokens.extend(
+                        (j2tokens.TOKEN_COMMA, ","),
+                        (j2tokens.TOKEN_WHITESPACE, SPACE),
+                    )
+                self.visit(item.key)
                 self.tokens.extend(
-                    (j2tokens.TOKEN_COMMA, ","),
+                    (j2tokens.TOKEN_COLON, ":"),
                     (j2tokens.TOKEN_WHITESPACE, SPACE),
                 )
-            self.visit(item.key)
-            self.tokens.extend(
-                (j2tokens.TOKEN_COLON, ":"),
-                (j2tokens.TOKEN_WHITESPACE, SPACE),
-            )
-            self.visit(item.value)
-        self.tokens.append(j2tokens.TOKEN_RBRACE, "}")
+                self.visit(item.value)
 
     def _visit_possible_binary_op(self, node: nodes.Expr) -> None:
         """Wrap binary_ops in parentheses if needed.
@@ -663,9 +679,8 @@ class TemplateDumper(NodeVisitor):
         binary_op does not get wrapped in parentheses.
         """
         if isinstance(node, nodes.BinExpr):
-            self.tokens.append(j2tokens.TOKEN_LPAREN, "(")
-            self.visit(node)
-            self.tokens.append(j2tokens.TOKEN_RPAREN, ")")
+            with self.token_pair_paren():
+                self.visit(node)
         else:
             self.visit(node)
 
@@ -765,11 +780,8 @@ class TemplateDumper(NodeVisitor):
         self.visit(node.node)
         if node.attr in []:  # TODO: which protected names?
             # if this is a protected name (like "items") use [] syntax
-            self.tokens.extend(
-                (j2tokens.TOKEN_LBRACKET, SPACE),
-                (j2tokens.TOKEN_NAME, repr(node.attr)),
-                (j2tokens.TOKEN_RBRACKET, SPACE),
-            )
+            with self.token_pair_bracket():
+                self.tokens.append(j2tokens.TOKEN_NAME, repr(node.attr))
             return
         self.tokens.extend(
             (j2tokens.TOKEN_DOT, SPACE),
@@ -787,9 +799,8 @@ class TemplateDumper(NodeVisitor):
                 (j2tokens.TOKEN_NAME, str(node.arg.value)),
             )
             return
-        self.tokens.append(j2tokens.TOKEN_LBRACKET, "[")
-        self.visit(node.arg)
-        self.tokens.append(j2tokens.TOKEN_RBRACKET, "]")
+        with self.token_pair_bracket():
+            self.visit(node.arg)
 
     def visit_Slice(self, node: nodes.Slice) -> None:
         """Write a ``Slice`` expression to the stream."""
@@ -813,9 +824,8 @@ class TemplateDumper(NodeVisitor):
             )
         self.tokens.append(j2tokens.TOKEN_NAME, node.name)
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
-            self.tokens.append(j2tokens.TOKEN_LPAREN, "(")
-            self.signature(node)
-            self.tokens.append(j2tokens.TOKEN_RPAREN, ")")
+            with self.token_pair_paren():
+                self.signature(node)
 
     def visit_Test(self, node: nodes.Test, negate: bool = False) -> None:
         """Write a Jinja ``Test`` to the stream."""
@@ -833,9 +843,8 @@ class TemplateDumper(NodeVisitor):
             (j2tokens.TOKEN_WHITESPACE, SPACE),
         )
         if any((node.args, node.kwargs, node.dyn_args, node.dyn_kwargs)):
-            self.tokens.append(j2tokens.TOKEN_LPAREN, "(")
-            self.signature(node)
-            self.tokens.append(j2tokens.TOKEN_RPAREN, ")")
+            with self.token_pair_paren():
+                self.signature(node)
 
     def visit_CondExpr(self, node: nodes.CondExpr) -> None:
         """Write a conditional expression to the stream.
@@ -862,9 +871,8 @@ class TemplateDumper(NodeVisitor):
     def visit_Call(self, node: nodes.Call) -> None:
         """Write a function ``Call`` expression to the stream."""
         self.visit(node.node)
-        self.tokens.append(j2tokens.TOKEN_LPAREN, "(")
-        self.signature(node)
-        self.tokens.append(j2tokens.TOKEN_RPAREN, ")")
+        with self.token_pair_paren():
+            self.signature(node)
 
     def visit_Keyword(self, node: nodes.Keyword) -> None:
         """Write a dict ``Keyword`` expression to the stream."""
