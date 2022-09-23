@@ -24,6 +24,7 @@ class NameRule(AnsibleLintRule):
     severity = "MEDIUM"
     tags = ["idiom"]
     version_added = "v6.5.0 (last update)"
+    _re_templated_inside = re.compile(r".*\{\{.*\}\}(.+)$")
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
@@ -82,40 +83,15 @@ class NameRule(AnsibleLintRule):
                     filename=lintable,
                 )
             )
-        if name.count("}}") == 1 and name.count("{{") == 1:
-            if re.search("{{ .* }}$", name) == None:
-                results.append(
-                    self.create_matcherror(
-                        message="If names has {{ }} it should be at the end of sentence.",
-                        linenumber=linenumber,
-                        tag="name[formatting]",
-                        filename=lintable,
-                    )
+        if self._re_templated_inside.match(name):
+            results.append(
+                self.create_matcherror(
+                    message="Jinja templates should only be at the end of 'name'",
+                    linenumber=linenumber,
+                    tag="name[template]",
+                    filename=lintable,
                 )
-        if name.count("}}") == 1 and name.count("{{") == 1:
-            if re.search("{{ .* }}$", name):
-                name_word = name.split(" ")[-2]
-                print(name_word)
-                if re.search(r"item.\d", name_word) or re.search(r"item", name_word):
-                    results.append(
-                        self.create_matcherror(
-                            message="The named template should be meaningful in {{ }}",
-                            linenumber=linenumber,
-                            tag="name[formatting]",
-                            filename=lintable,
-                        )
-                    )
-        if name.count("}}") > 1 or name.count("{{") > 1:
-            if name.endswith("}}") == True:
-                results.append(
-                    self.create_matcherror(
-                        message="If names has {{ }} it should be at the end of sentence.",
-                        linenumber=linenumber,
-                        tag="name[formatting]",
-                        filename=lintable,
-                    )
-                )
-
+            )
         return results
 
 
@@ -170,4 +146,4 @@ if "pytest" in sys.modules:  # noqa: C901
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 1
-        assert errs[0].tag == "name[formatting]"
+        assert errs[0].tag == "name[template]"
