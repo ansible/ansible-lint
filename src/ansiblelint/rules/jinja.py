@@ -280,7 +280,7 @@ class JinjaRule(AnsibleLintRule):
         except jinja2.exceptions.TemplateSyntaxError as exc:
             return "", str(exc.message), "invalid"
         # https://github.com/PyCQA/pylint/issues/7433 - py311 only
-        # pylint: disable=c-extension-no-member
+        # pylint: disable=c-extension-no-member,I1101
         except (NotImplementedError, black.parsing.InvalidInput) as exc:
             # black is not able to recognize all valid jinja2 templates, so we
             # just ignore InvalidInput errors.

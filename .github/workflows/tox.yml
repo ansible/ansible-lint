@@ -234,13 +234,12 @@ jobs:
         # produce a single .coverage file at repo root
         run: tox -e coverage
       - name: Upload coverage data
-        if: "runner.os == 'Linux'"
         uses: codecov/codecov-action@v3
         with:
           name: ${{ matrix.tox_env }}
-          fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
+          fail_ci_if_error: true # see https://github.com/codecov/codecov-action/issues/598
           token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true # optional (default = false)
+          # verbose: true # optional (default = false)
       - name: Archive logs
         uses: actions/upload-artifact@v3
         with:

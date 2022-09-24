@@ -1,10 +1,15 @@
 ---
 codecov:
+  notify:
+    # number below is total number of py* workflow runs we have, as we do not
+    # want to report incomplete coverage just because one did not finish yet.
+    # https://docs.codecov.com/docs/notifications#preventing-notifications-until-after-n-builds
+    after_n_builds: 7
   require_ci_to_pass: true
 comment: false
 coverage:
   status:
-    patch: false
+    patch: off
     project:
       default:
         threshold: 0.5%
