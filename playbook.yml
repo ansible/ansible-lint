@@ -1,6 +1,7 @@
 ---
-- hosts: localhost
+- name: Example
+  hosts: localhost
   tasks:
-    - shell:
-        cmd: |
-          if [ $FOO != false ]; then
+    - name: Play name
+      debug:
+        msg: "Hello {{ ansible_facts.env | list }}!"

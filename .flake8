@@ -40,6 +40,7 @@ max-line-length = 100
 extend-ignore =
   E203,
   E501,
+  C901, # complexity is also measured by pylint: too-many-branches
   DAR104,  # We use type annotations instead
   DAR301,  # https://github.com/terrencepreilly/darglint/issues/165
   F401,  # duplicate of pylint W0611 (unused-import)
