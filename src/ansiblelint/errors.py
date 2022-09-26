@@ -20,6 +20,8 @@ class MatchError(ValueError):
     instance.
     """
 
+    tag = ""
+
     # IMPORTANT: any additional comparison protocol methods must return
     # IMPORTANT: `NotImplemented` singleton to allow the check to use the
     # IMPORTANT: other object's fallbacks.
@@ -74,7 +76,7 @@ class MatchError(ValueError):
         self.ignored = False  # If set it will be displayed but not counted as failure
         # This can be used by rules that can report multiple errors type, so
         # we can still filter by them.
-        self.tag = tag
+        self.tag = tag or rule.id
 
         # optional indicator on how this error was found
         self.match_type: str | None = None

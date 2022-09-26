@@ -103,7 +103,6 @@ class JinjaRule(AnsibleLintRule):
                             _logger.debug("Ignored AnsibleError: %s", exc)
                             bypass = True
                         else:
-                            # breakpoint()
                             bypass = False
                     elif re.match(r"^lookup plugin (.*) not found$", exc.message):
                         # lookup plugin 'template' not found

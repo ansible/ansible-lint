@@ -38,6 +38,9 @@ basic:
     name:
     var-naming:
     yaml:
+  skip_list: # just because we enable them in following profiles
+    - name[template]
+    - name[casing]
 moderate:
   description: >
     The moderate profile is raising the bar a little bit by requiring you to
@@ -45,12 +48,10 @@ moderate:
     and maintain.
   extends: basic
   rules:
-    name-templated:
-      url: https://github.com/ansible/ansible-lint/issues/2037
-    name-imperative:
+    name[template]:
+    name[imperative]:
       url: https://github.com/ansible/ansible-lint/issues/2170
-    name-capital: # schema-related
-      url: https://github.com/ansible/ansible-lint/issues/2169
+    name[casing]:
     no-shorthand: # schema-related
       url: https://github.com/ansible/ansible-lint/issues/2117
     schema: # can cover lots of rules, but not really be able to give best error messages
