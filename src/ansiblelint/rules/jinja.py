@@ -119,7 +119,9 @@ class JinjaRule(AnsibleLintRule):
                             tag=f"{self.id}[invalid]",
                         )
 
-                reformatted, details, tag = self.check_whitespace(v, key=key)
+                reformatted, details, tag = self.check_whitespace(
+                    v, key=key, lintable=file
+                )
                 if reformatted != v:
                     return self.create_matcherror(
                         message=self._msg(tag=tag, value=v, reformatted=reformatted),
@@ -141,7 +143,9 @@ class JinjaRule(AnsibleLintRule):
             # pylint: disable=unused-variable
             for key, v, path in nested_items_path(data):
                 if isinstance(v, AnsibleUnicode):
-                    reformatted, details, tag = self.check_whitespace(v, key=key)
+                    reformatted, details, tag = self.check_whitespace(
+                        v, key=key, lintable=file
+                    )
                     if reformatted != v:
                         results.append(
                             self.create_matcherror(
@@ -197,7 +201,7 @@ class JinjaRule(AnsibleLintRule):
 
     # pylint: disable=too-many-branches,too-many-statements,too-many-locals
     def check_whitespace(  # noqa: max-complexity: 13
-        self, text: str, key: str
+        self, text: str, key: str, lintable: Lintable | None = None
     ) -> tuple[str, str, str]:
         """Check spacing inside given jinja2 template string.
 
@@ -228,7 +232,15 @@ class JinjaRule(AnsibleLintRule):
         implicit = False
 
         # implicit templates do not have the {{ }} wrapping
-        if key in KEYWORDS_WITH_IMPLICIT_TEMPLATE:
+        if (
+            key in KEYWORDS_WITH_IMPLICIT_TEMPLATE
+            and lintable
+            and lintable.kind
+            in (
+                "playbook",
+                "task",
+            )
+        ):
             implicit = True
             text = cook(text, implicit=implicit)
 
@@ -545,7 +557,9 @@ if "pytest" in sys.modules:  # noqa: C901
         """Tests our ability to spot spacing errors inside jinja2 templates."""
         rule = JinjaRule()
 
-        reformatted, details, returned_tag = rule.check_whitespace(text, key="name")
+        reformatted, details, returned_tag = rule.check_whitespace(
+            text, key="name", lintable=Lintable("playbook.yml")
+        )
         assert tag == returned_tag, details
         assert expected == reformatted
 
@@ -572,9 +586,28 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_jinja_implicit(text: str, expected: str, tag: str) -> None:
         """Tests our ability to spot spacing errors implicit jinja2 templates."""
         rule = JinjaRule()
-        reformatted, details, returned_tag = rule.check_whitespace(text, key="when")
+        # implicit jinja2 are working only inside playbooks and tasks
+        lintable = Lintable(name="playbook.yml", kind="playbook")
+        reformatted, details, returned_tag = rule.check_whitespace(
+            text, key="when", lintable=lintable
+        )
         assert tag == returned_tag, details
         assert expected == reformatted
+
+    @pytest.mark.parametrize(
+        ("lintable", "matches"),
+        (pytest.param("examples/playbooks/vars/rule_jinja_vars.yml", 0, id="0"),),
+    )
+    def test_jinja_file(lintable: str, matches: int) -> None:
+        """Tests our ability to process var filesspot spacing errors."""
+        collection = RulesCollection()
+        collection.register(JinjaRule())
+        errs = Runner(lintable, rules=collection).run()
+        assert len(errs) == matches
+        for err in errs:
+            assert isinstance(err, JinjaRule)
+            assert errs[0].tag == "jinja[invalid]"
+            assert errs[0].rule.id == "jinja"
 
     def test_jinja_invalid() -> None:
         """Tests our ability to spot spacing errors inside jinja2 templates."""
