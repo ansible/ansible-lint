@@ -75,6 +75,7 @@ class VariableNamingRule(AnsibleLintRule):
     severity = "MEDIUM"
     tags = ["idiom", "experimental"]
     version_added = "v5.0.10"
+    needs_raw_task = True
     re_pattern = re.compile(options.var_naming_pattern or "^[a-z_][a-z0-9_]*$")
 
     def is_invalid_variable_name(self, ident: str) -> bool:
@@ -144,9 +145,11 @@ class VariableNamingRule(AnsibleLintRule):
 
         # If the task uses the 'set_fact' module
         ansible_module = task["action"]["__ansible_module__"]
-        ansible_action = task["action"]
         if ansible_module == "set_fact":
-            for key in ansible_action.keys():
+            set_fact_raw_task = task["__raw_task__"]["ansible.builtin.set_fact"]
+            for key in set_fact_raw_task.keys():
+                if key in ["__line__", "__file__"]:
+                    continue
                 if self.is_invalid_variable_name(key):
                     return "Task uses 'set_fact' to define variables that violates variable naming standards"
 
