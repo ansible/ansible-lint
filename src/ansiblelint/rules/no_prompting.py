@@ -34,11 +34,10 @@ class NoPromptingRule(AnsibleLintRule):
         vars_prompt = data.get("vars_prompt", None)
         if not vars_prompt:
             return []
-
         return [
             self.create_matcherror(
                 message="Play uses vars_prompt",
-                linenumber=vars_prompt[LINE_NUMBER_KEY],
+                linenumber=vars_prompt[0][LINE_NUMBER_KEY],
                 filename=file,
             )
         ]
@@ -70,5 +69,6 @@ if "pytest" in sys.modules:
         rules = RulesCollection(options=options)
         rules.register(NoPromptingRule())
         results = Runner("examples/playbooks/no-prompting.yml", rules=rules).run()
-        assert len(results) == 1
-        assert results[0].rule.id == "no-prompting"
+        assert len(results) == 2
+        for result in results:
+            assert result.rule.id == "no-prompting"

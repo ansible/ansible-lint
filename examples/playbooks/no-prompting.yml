@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Fixture for testing no-prompting rule, lines 5,17
+  hosts: all
   vars_prompt:
     - name: username
       prompt: What is your username?
