@@ -160,10 +160,15 @@ they will always execute once included.
             )
         result += f"## {name}\n\n{profile['description']}{extends}\n"
         for rule, rule_data in profile["rules"].items():
+            if "[" in rule:
+                url = f"{docs_url}{rule.split('[')[0]}/"
+            else:
+                url = f"{docs_url}{rule}/"
             if not rule_data:
-                result += f"- [{rule}]({docs_url}{rule}/)\n"
+                result += f"- [{rule}]({url})\n"
             else:
                 result += f"- [{rule}]({rule_data['url']})\n"
+
         result += "\n"
     return result
 
