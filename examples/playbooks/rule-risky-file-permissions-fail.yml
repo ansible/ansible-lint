@@ -1,0 +1,88 @@
+# Fixture for RiskyFilePermissionsRule should return 11 occurrences
+---
+- name: FAIL_INI_PRESERVE
+  hosts: all
+  tasks:
+    - name: Ini_file does not accept preserve mode
+      community.general.ini_file:
+        path: foo
+        create: true
+        mode: preserve
+
+- name: FAIL_INI_PERMISSION
+  hosts: all
+  tasks:
+    - name: Permissions needed if create is used
+      community.general.ini_file:
+        path: foo
+        create: true
+
+- name: FAIL_PRESERVE_MODE
+  hosts: all
+  tasks:
+    - name: File does not allow preserve value for mode
+      ansible.builtin.file:
+        path: foo
+        mode: preserve
+
+- name: FAIL_MISSING_PERMISSIONS_TOUCH
+  hosts: all
+  tasks:
+    - name: Permissions missing and might create file
+      file:
+        path: foo
+        state: touch
+    - name: Permissions missing and might create file (fqcn)
+      ansible.builtin.file:
+        path: foo
+        state: touch
+
+- name: FAIL_MISSING_PERMISSIONS_DIRECTORY
+  hosts: all
+  tasks:
+    - name: Permissions missing and might create directory
+      file:
+        path: foo
+        state: directory
+    - name: Lineinfile when create is true (fqcn)
+      ansible.builtin.lineinfile:
+        path: foo
+        create: true
+        line: some content here
+
+- name: FAIL_MISSING_PERMISSIONS_GET_URL
+  hosts: all
+  tasks:
+    - name: Permissions missing
+      # noqa: fqcn-builtins
+      get_url:
+        url: http://foo
+        dest: foo
+
+- name: FAIL_LINEINFILE_CREATE
+  hosts: all
+  tasks:
+    - name: Lineinfile when create is true
+      ansible.builtin.lineinfile:
+        path: foo
+        create: true
+        line: some content here
+
+- name: FAIL_REPLACE_PRESERVE
+  hosts: all
+  tasks:
+    - name: Replace does not allow preserve mode
+      replace:
+        path: foo
+        mode: preserve
+
+- name: FAIL_PERMISSION_COMMENT
+  hosts: all
+  tasks:
+    - name: Permissions is only a comment
+      file:
+        path: foo
+        owner: root
+        group: root
+        state: directory
+        # mode: 0755

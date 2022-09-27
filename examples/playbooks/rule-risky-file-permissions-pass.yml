@@ -1,0 +1,75 @@
+# Fixture for RiskyFilePermissionsRule should pass
+---
+- name: SUCCESS_PERMISSIONS_PRESENT
+  hosts: all
+  tasks:
+    - name: Permissions not missing and numeric
+      ansible.builtin.file:
+        path: foo
+        mode: 0600
+
+- name: SUCCESS_PERMISSIONS_PRESENT_GET_URL
+  hosts: all
+  tasks:
+    - name: Permissions not missing and numeric
+      ansible.builtin.get_url:
+        url: http://foo
+        dest: foo
+        mode: 0600
+
+- name: SUCCESS_ABSENT_STATE
+  hosts: all
+  tasks:
+    - name: Permissions missing while state is absent is fine
+      ansible.builtin.file:
+        path: foo
+        state: absent
+
+- name: SUCCESS_DEFAULT_STATE
+  hosts: all
+  tasks:
+    - name: Permissions missing while state is file (default) is fine
+      ansible.builtin.file:
+        path: foo
+
+- name: SUCCESS_LINK_STATE
+  hosts: all
+  tasks:
+    - name: Permissions missing while state is link is fine
+      ansible.builtin.file:
+        path: foo2
+        src: foo
+        state: link
+
+- name: SUCCESS_CREATE_FALSE
+  hosts: all
+  tasks:
+    - name: File edit when create is false
+      ansible.builtin.lineinfile:
+        path: foo
+        create: false
+        line: some content here
+
+- name: SUCCESS_REPLACE
+  hosts: all
+  tasks:
+    - name: Replace should not require mode
+      ansible.builtin.replace:
+        path: foo
+
+- name: SUCCESS_RECURSE
+  hosts: all
+  tasks:
+    - name: File with recursive does not require mode
+      ansible.builtin.file:
+        state: directory
+        recurse: true
+    - name: Permissions not missing and numeric (fqcn)
+      ansible.builtin.file:
+        path: bar
+        mode: 755 # noqa: risky-octal
+    - name: File edit when create is false (fqcn)
+      ansible.builtin.lineinfile:
+        path: foo
+        create: false
+        line: some content here
