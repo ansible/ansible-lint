@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 from ansible.parsing.yaml.objects import AnsibleUnicode
 
 from ansiblelint.config import options
-from ansiblelint.constants import LINE_NUMBER_KEY
+from ansiblelint.constants import LINE_NUMBER_KEY, SUCCESS_RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
@@ -196,7 +196,10 @@ if "pytest" in sys.modules:
 
     import pytest
 
-    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
+    from ansiblelint.testing import (  # pylint: disable=ungrouped-imports
+        RunFromText,
+        run_ansible_lint,
+    )
 
     @pytest.mark.parametrize(
         "rule_runner", (VariableNamingRule,), indirect=["rule_runner"]
@@ -233,3 +236,14 @@ if "pytest" in sys.modules:
             set(expected_error_lines).symmetric_difference(set(lines))
         )
         assert len(error_lines_difference) == 0
+
+    def test_var_naming_with_pattern() -> None:
+        """Test rule matches."""
+        role_path = "examples/roles/var_naming_pattern/tasks/main.yml"
+        conf_path = "examples/roles/var_naming_pattern/.ansible-lint"
+        result = run_ansible_lint(
+            f"--config-file={conf_path}",
+            role_path,
+        )
+        assert result.returncode == SUCCESS_RC
+        assert "var-naming" not in result.stdout

@@ -1,0 +1,2 @@
+---
+var_naming_pattern: "^[a-z][a-z0-9_]*[a-z0-9]__[a-z][a-z0-9_]*[a-z0-9]$"
