@@ -5,5 +5,5 @@
   tags:
     - "{{ foo }}"
   tasks:
-    - name: Run custom module
+    - name: Run custom module # noqa: fqcn[module]
       fake_module: {}

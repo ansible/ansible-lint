@@ -42,10 +42,10 @@ def test_eco(repo: str) -> None:
     # run ansible lint and paths from user home in order to produce
     # consistent results regardless on its location.
 
-    # we exclude `fqcn-builtins` until repository owners fix it.
+    # we exclude `fqcn[builtin]` until repository owners fix it.
     for step in ["before", "after"]:
 
-        args = ["-f", "pep8", "-x", "fqcn-builtins"]
+        args = ["-f", "pep8", "-x", "fqcn[builtin]"]
         executable = (
             "ansible-lint"
             if step == "after"
