@@ -1,6 +1,7 @@
 """PyTest Fixtures."""
 import importlib
 import os
+import subprocess
 import sys
 from typing import Any
 
@@ -18,6 +19,14 @@ if missing:
         file=sys.stderr,
     )
     sys.exit(1)
+# we need to be sure that we have the requirements installed as some tests
+# might depend on these.
+subprocess.run(
+    ["ansible-galaxy", "collection", "install", "-r", "requirements.yml"],
+    check=True,
+    text=True,
+    capture_output=True,
+)
 
 if not HAS_LIBYAML and sys.version_info >= (3, 9, 0):
     # While presence of libyaml is not required for runtime, we keep this error
