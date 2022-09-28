@@ -66,7 +66,7 @@ class Formatter(BaseFormatter):  # type: ignore
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
         )
         if match.details:
-            result += f" [dim]{match.details}[/]"
+            result += f" [dim]{self.escape(str(match.details))}[/]"
         result += "\n"
         return result
 
