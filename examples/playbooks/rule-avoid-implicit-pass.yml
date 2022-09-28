@@ -4,6 +4,6 @@
   tasks:
     - name: Write file content
       ansible.builtin.copy:
-        content: "Some {{ foo }}" # <-- this is the problem
+        content: "Some {{ foo }}"
         dest: /tmp/foo.txt
         mode: 0600
