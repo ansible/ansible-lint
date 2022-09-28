@@ -28,6 +28,8 @@ from ansiblelint.rules import AnsibleLintRule
 rule = AnsibleLintRule()
 rule.id = "TCF0001"
 formatter = Formatter(pathlib.Path.cwd(), display_relative_path=True)
+# These details would generate a rich rendering error if not escaped:
+DETAILS = "Some [/tmp/foo] details."
 
 
 def test_format_coloured_string() -> None:
@@ -35,7 +37,7 @@ def test_format_coloured_string() -> None:
     match = MatchError(
         message="message",
         linenumber=1,
-        details="hello",
+        details=DETAILS,
         filename=Lintable("filename.yml"),
         rule=rule,
     )
@@ -47,7 +49,7 @@ def test_unicode_format_string() -> None:
     match = MatchError(
         message="\U0001f427",
         linenumber=1,
-        details="hello",
+        details=DETAILS,
         filename=Lintable("filename.yml"),
         rule=rule,
     )
