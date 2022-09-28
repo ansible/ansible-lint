@@ -18,38 +18,6 @@ from ansiblelint.utils import parse_yaml_from_file
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
-
-# Should raise var-naming at line [4, 8, 18, 20].
-FAIL_PLAY = """---
-- hosts: localhost
-  vars:
-    CamelCaseIsBad: false  # invalid
-    this_is_valid:  # valid because content is a dict, not a variable
-      CamelCase: ...
-      ALL_CAPS: ...
-    ALL_CAPS_ARE_BAD_TOO: ...  # invalid
-    CamelCaseButErrorIgnored: true  # noqa: var-naming
-
-  tasks:
-    - name: Foo
-      ansible.builtin.set_fact:
-        "{{ 'test_' }}var": "value"  # valid
-    - name: Bar
-      ansible.builtin.set_fact:
-        CamelCaseButErrorIgnored: true  # noqa: var-naming
-    - name: Test in a block
-      block:
-        - name:
-          ansible.builtin.set_fact:
-            CamelCaseIsBad: "{{ BAD }}" # invalid
-          vars:
-            ALL_CAPS_ARE_BAD_TOO: "{{ MoreBad }}" # invalid
-      vars:
-        BAD: false # invalid
-        MoreBad: ... # invalid
-"""
-
-
 # Should raise var-naming at line [2, 6].
 FAIL_VARS = """---
 CamelCaseIsBad: false  # invalid
@@ -121,6 +89,7 @@ class VariableNamingRule(AnsibleLintRule):
                         message="Play defines variable '"
                         + key
                         + "' within 'vars' section that violates variable naming standards",
+                        tag=f"var-naming[{key}]",
                     )
                 )
         if raw_results:
@@ -135,30 +104,52 @@ class VariableNamingRule(AnsibleLintRule):
 
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
-    ) -> bool | str:
+    ) -> list[MatchError]:
         """Return matches for task based variables."""
+        results = []
         # If the task uses the 'vars' section to set variables
         our_vars = task.get("vars", {})
         for key in our_vars.keys():
             if self.is_invalid_variable_name(key):
-                return "Task defines variables within 'vars' section that violates variable naming standards"
+                results.append(
+                    self.create_matcherror(
+                        filename=file,
+                        linenumber=our_vars[LINE_NUMBER_KEY],
+                        message=f"Task defines variable within 'vars' section that violates variable naming standards: {key}",
+                        tag=f"var-naming[{key}]",
+                    )
+                )
 
         # If the task uses the 'set_fact' module
         ansible_module = task["action"]["__ansible_module__"]
         if ansible_module == "set_fact":
-            set_fact_raw_task = task["__raw_task__"]["ansible.builtin.set_fact"]
-            for key in set_fact_raw_task.keys():
-                if key in ["__line__", "__file__"]:
-                    continue
+            for key in filter(
+                lambda x: isinstance(x, str) and not x.startswith("__"),
+                task["action"].keys(),
+            ):
                 if self.is_invalid_variable_name(key):
-                    return "Task uses 'set_fact' to define variables that violates variable naming standards"
+                    results.append(
+                        self.create_matcherror(
+                            filename=file,
+                            linenumber=task["action"][LINE_NUMBER_KEY],
+                            message=f"Task uses 'set_fact' to define variables that violates variable naming standards: {key}",
+                            tag=f"var-naming[{key}]",
+                        )
+                    )
 
         # If the task registers a variable
         registered_var = task.get("register", None)
         if registered_var and self.is_invalid_variable_name(registered_var):
-            return "Task registers a variable that violates variable naming standards"
+            results.append(
+                self.create_matcherror(
+                    filename=file,
+                    linenumber=0,
+                    message=f"Task registers a variable that violates variable naming standards: {registered_var}",
+                    tag=f"var-naming[{registered_var}]",
+                )
+            )
 
-        return False
+        return results
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
@@ -206,13 +197,13 @@ if "pytest" in sys.modules:
     )
     def test_invalid_var_name_playbook(rule_runner: RunFromText) -> None:
         """Test rule matches."""
-        results = rule_runner.run_playbook(FAIL_PLAY)
-        assert len(results) == 4
+        results = rule_runner.run("examples/playbooks/rule-var-naming-fail.yml")
+        assert len(results) == 6
         for result in results:
             assert result.rule.id == VariableNamingRule.id
 
         # list unexpected error lines or non-matching error lines
-        expected_error_lines = [4, 8, 18, 20]
+        expected_error_lines = [5, 9, 21, 21, 26, 28]
         lines = [i.linenumber for i in results]
         error_lines_difference = list(
             set(expected_error_lines).symmetric_difference(set(lines))

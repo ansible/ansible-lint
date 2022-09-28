@@ -1,0 +1,28 @@
+---
+- name: Fixture
+  hosts: localhost
+  vars:
+    CamelCaseIsBad: false # invalid
+    this_is_valid: # valid because content is a dict, not a variable
+      CamelCase: ...
+      ALL_CAPS: ...
+    ALL_CAPS_ARE_BAD_TOO: ... # invalid
+    CamelCaseButErrorIgnored: true # noqa: var-naming
+
+  tasks:
+    - name: Foo
+      ansible.builtin.set_fact:
+        "{{ 'test_' }}var": "value" # valid
+    - name: Bar
+      ansible.builtin.set_fact:
+        CamelCaseButErrorIgnored: true # noqa: var-naming
+    - name: Test in a block
+      vars:
+        BAD: false # invalid
+        MoreBad: ... # invalid
+      block:
+        - name: Foo
+          vars:
+            ALL_CAPS_ARE_BAD_TOO: "{{ MoreBad }}" # invalid
+          ansible.builtin.set_fact:
+            CamelCaseIsBad: "{{ BAD }}" # invalid

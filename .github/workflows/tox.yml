@@ -166,7 +166,7 @@ jobs:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:TOX_PARALLEL_NO_SPINNER
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 700
+      PYTEST_REQPASS: 701
 
     steps:
       - name: Activate WSL1
