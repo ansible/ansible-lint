@@ -103,7 +103,7 @@ RENAMED_TAGS = {
     "hg-latest": "latest[hg]",
     "no-jinja-nesting": "jinja[invalid]",
     "no-loop-var-prefix": "loop-var-prefix",
-    "fqcn-builtins": "fqcn[builtin]",
+    "fqcn-builtins": "fqcn[action-core]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [

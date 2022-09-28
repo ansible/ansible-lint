@@ -101,21 +101,22 @@ class FQCNBuiltinsRule(AnsibleLintRule):
         if module in builtins:
             result.append(
                 self.create_matcherror(
-                    message="Use FQCN for builtin actions.",
+                    message=f"Use FQCN for builtin module actions ({module}).",
                     details=f"Use `ansible.builtin.{module}` or `ansible.legacy.{module}` instead.",
                     filename=file,
                     linenumber=task["__line__"],
-                    tag="fqcn[builtin]",
+                    tag="fqcn[action-core]",
                 )
             )
+        # Add here implementation for fqcn[action-redirect]
         elif module != "block/always/rescue" and module.count(".") != 2:
             result.append(
                 self.create_matcherror(
-                    message="Use FQCN for actions, such `namespace.collection_name.action`.",
+                    message=f"Use FQCN for module actions, such `<namespace>.<collection>.{module}`.",
                     details=f"Action `{module}` is not FQCN.",
                     filename=file,
                     linenumber=task["__line__"],
-                    tag="fqcn[module]",
+                    tag="fqcn[action]",
                 )
             )
         return result
@@ -132,15 +133,15 @@ if "pytest" in sys.modules:
 - hosts: localhost
   tasks:
   - name: Shell (fqcn)
-    ansible.builtin.shell: echo This rule should not get matched by the fqcn[builtin] rule
+    ansible.builtin.shell: echo This rule should not get matched by the fqcn rule
     """
 
     FAIL_PLAY = """
 - hosts: localhost
   tasks:
-  - name: Shell (fqcn[builtin])
-    shell: echo This rule should get matched by the fqcn[builtin] rule
-  - name: Shell (fqcn[module])
+  - name: Shell (fqcn[action-core])
+    shell: echo This rule should get matched by the fqcn rule
+  - name: Shell (fqcn[action])
     ini_file:
         path: /tmp/test.ini
     """
@@ -152,10 +153,13 @@ if "pytest" in sys.modules:
         """Test rule matches."""
         results = rule_runner.run_playbook(FAIL_PLAY)
         assert len(results) == 2
-        assert results[0].tag == "fqcn[builtin]"
-        assert "Use FQCN for builtin actions" in results[0].message
-        assert results[1].tag == "fqcn[module]"
-        assert "Use FQCN for module calls" in results[1].message
+        assert results[0].tag == "fqcn[action-core]"
+        assert "Use FQCN for builtin module actions" in results[0].message
+        assert results[1].tag == "fqcn[action]"
+        assert (
+            "Use FQCN for module actions, such `<namespace>.<collection>"
+            in results[1].message
+        )
 
     @pytest.mark.parametrize(
         "rule_runner", (FQCNBuiltinsRule,), indirect=["rule_runner"]

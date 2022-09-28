@@ -45,7 +45,7 @@ LAYOUT_IMPORTS: dict[str, str] = {
         """\
         ---
         - name: From subtask 2 do something
-          debug:  # <-- expected to raise fqcn[builtin]
+          debug:  # <-- expected to raise fqcn[action-core]
             msg: |
               Something...
         """
@@ -88,7 +88,7 @@ LAYOUT_INCLUDES: dict[str, str] = {
         """\
         ---
         - name: From subtask 2 do something
-          debug:  # <-- expected to raise fqcn[builtin]
+          debug:  # <-- expected to raise fqcn[action-core]
             msg: |
               Something...
         """

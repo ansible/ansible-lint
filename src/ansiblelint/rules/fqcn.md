@@ -5,22 +5,22 @@ This rule checks for fully-qualified collection names (FQCN) in Ansible content.
 Declaring an FQCN ensures that an action uses code from the correct namespace.
 This avoids ambiguity and conflicts that can cause operations to fail or produce unexpected results.
 
-The ``fqcn`` rule has the following checks:
+The `fqcn` rule has the following checks:
 
 - `fqcn[action]` - Checks all actions for FQCNs.
-- `fqcn[action-internal]` - Checks for FQCNs from the `ansible.legacy` or `ansible.builtin` collection.
+- `fqcn[action-core]` - Checks for FQCNs from the `ansible.legacy` or `ansible.builtin` collection.
 - `fqcn[action-redirect]` - Provides the correct FQCN to replace short actions.
 
-## Internal actions
-
+```{note}
 In most cases you should declare the `ansible.builtin` collection for internal Ansible actions.
 You should declare the `ansible.legacy` collection if you use local overrides with actions, such with as the ``shell`` module.
+```
 
-## Collections key
-
-This rule does not apply to actions in the `collections:` key.
-The `collections:` key provided a temporary mechanism for users transitioning to Ansible 2.9.
-You should rewrite any content that uses the  `collections:` key and avoid it where possible.
+```{warning}
+This rule does not take [`collections` keyword](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#simplifying-module-names-with-the-collections-keyword) into consideration.
+The `collections` keyword provided a temporary mechanism transitioning to Ansible 2.9.
+You should rewrite any content that uses the `collections:` key and avoid it where possible.
+```
 
 ## Problematic Code
 
