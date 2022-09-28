@@ -1,26 +1,26 @@
 # fqcn
 
-This rule checks the use of fully-qualified collection names (FQCN) inside
-ansible content.
+This rule checks for fully-qualified collection names (FQCN) in Ansible content.
 
-```{warning}
-Current implementation does not consider the value of `collections:` keys, so
-you need to just specify the full name of every action. Collections key was
-a transitional mechanism introduced for Ansible 2.9 compatibility and we
-recommend you avoid using these as they can easily confuse users and create
-bugs when moving some tasks from one location to another.
-```
+Declaring an FQCN ensures that an action uses code from the correct namespace.
+This avoids ambiguity and conflicts that can cause operations to fail or produce unexpected results.
 
-For internal **actions**, if you do not specify the FQCN, Ansible uses the
-`ansible.legacy` collection for some modules by default. You can use local
-overrides with the `ansible.legacy` collection but not with the
-`ansible.builtin` collection.
+The ``fqcn`` rule has the following checks:
 
-This rule can generate the following error messages:
+- `fqcn[action]` - Checks all actions for FQCNs.
+- `fqcn[action-internal]` - Checks for FQCNs from the `ansible.legacy` or `ansible.builtin` collection.
+- `fqcn[action-redirect]` - Provides the correct FQCN to replace short actions.
 
-- `fqcn[action-internal]` - Use the FQCN for the module known as being builtin.
-- `fqcn[action-redirect]` - Replace short action with its FQCN redirect.
-- `fqcn[action]` - Use FQCN for any action, to avoid accidents.
+## Internal actions
+
+In most cases you should declare the `ansible.builtin` collection for internal Ansible actions.
+You should declare the `ansible.legacy` collection if you use local overrides with actions, such with as the ``shell`` module.
+
+## Collections key
+
+This rule does not apply to actions in the `collections:` key.
+The `collections:` key provided a temporary mechanism for users transitioning to Ansible 2.9.
+You should rewrite any content that uses the  `collections:` key and avoid it where possible.
 
 ## Problematic Code
 
@@ -30,7 +30,7 @@ This rule can generate the following error messages:
   hosts: all
   tasks:
     - name: Create an SSH connection
-      shell: ssh ssh_user@{{ ansible_ssh_host }} # <- This does not use the FQCN for the shell module.
+      shell: ssh ssh_user@{{ ansible_ssh_host }} # <- Does not use the FQCN for the shell module.
 ```
 
 ## Correct Code
@@ -41,7 +41,8 @@ This rule can generate the following error messages:
   hosts: all
   tasks:
     - name: Create an SSH connection
-      ansible.legacy.shell: ssh ssh_user@{{ ansible_ssh_host }} -o IdentityFile=path/to/my_rsa # <- This uses the FQCN for the legacy shell module to allow local overrides.
+      # Use the FQCN for the legacy shell module and allow local overrides.
+      ansible.legacy.shell: ssh ssh_user@{{ ansible_ssh_host }} -o IdentityFile=path/to/my_rsa
 ```
 
 ```yaml
@@ -50,5 +51,6 @@ This rule can generate the following error messages:
   hosts: all
   tasks:
     - name: Create an SSH connection
-      ansible.builtin.shell: ssh ssh_user@{{ ansible_ssh_host }} # <- This uses the FQCN for the builtin shell module.
+      # Use the FQCN for the builtin shell module.
+      ansible.builtin.shell: ssh ssh_user@{{ ansible_ssh_host }}
 ```
