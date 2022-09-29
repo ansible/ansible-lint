@@ -11,13 +11,14 @@ from typing import Any
 from ansiblelint.loaders import yaml_from_file
 
 DEFAULT_WARN_LIST = [
+    "avoid-implicit",
     "experimental",
+    "fqcn[action]",
+    "fqcn[redirect]",
     "jinja[spacing]",  # warning until we resolve all reported false-positives
     "name[casing]",
     "name[play]",
     "role-name",
-    "fqcn[action]",
-    "fqcn[redirect]",
 ]
 
 DEFAULT_KINDS = [

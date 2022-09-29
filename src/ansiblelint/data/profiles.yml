@@ -63,12 +63,12 @@ safety:
     a non-determinant outcomes and cause security issues in some cases.
   extends: moderate
   rules:
+    avoid-implicit:
     latest:
     package-latest:
     risky-file-permissions:
     risky-octal:
     risky-shell-pipe:
-    template-instead-of-copy:
 shared:
   extends: safety
   description: >

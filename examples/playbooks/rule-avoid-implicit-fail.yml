@@ -3,7 +3,7 @@
   hosts: localhost
   tasks:
     - name: Write file content
-      ansible.builtin.template:
-        src: foo.txt.j2
+      ansible.builtin.copy:
+        content: { "foo": "bar" } # <-- avoid-implicit[copy-content]
         dest: /tmp/foo.txt
         mode: 0600
