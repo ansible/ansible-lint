@@ -115,7 +115,7 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     if not options.offline:
         options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
         try:
-            options.cache_dir_lock.acquire(timeout=120)
+            options.cache_dir_lock.acquire(timeout=180)
         except Timeout:
             _logger.error(
                 "Timeout waiting for another instance of ansible-lint to release the lock."
