@@ -8,7 +8,7 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 
 # fqcn_builtins was added in 5.1.0 as FQCNBuiltinsRule, renamed to fqcn_builtins in 6.0.0
-from ansiblelint.rules.fqcn_builtins import builtins
+from ansiblelint.rules.fqcn import builtins
 from ansiblelint.skip_utils import is_nested_task
 
 

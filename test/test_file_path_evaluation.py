@@ -45,7 +45,7 @@ LAYOUT_IMPORTS: dict[str, str] = {
         """\
         ---
         - name: From subtask 2 do something
-          debug:  # <-- expected to raise fqcn-builtins
+          debug:  # <-- expected to raise fqcn[action-core]
             msg: |
               Something...
         """
@@ -88,7 +88,7 @@ LAYOUT_INCLUDES: dict[str, str] = {
         """\
         ---
         - name: From subtask 2 do something
-          debug:  # <-- expected to raise fqcn-builtins
+          debug:  # <-- expected to raise fqcn[action-core]
             msg: |
               Something...
         """
@@ -121,4 +121,4 @@ def test_file_path_evaluation(
     result = Runner(str(tmp_path), rules=default_rules_collection).run()
 
     assert len(result) == 1
-    assert result[0].rule.id == "fqcn-builtins"
+    assert result[0].rule.id == "fqcn"

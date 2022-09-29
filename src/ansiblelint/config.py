@@ -16,6 +16,8 @@ DEFAULT_WARN_LIST = [
     "name[casing]",
     "name[play]",
     "role-name",
+    "fqcn[action]",
+    "fqcn[redirect]",
 ]
 
 DEFAULT_KINDS = [

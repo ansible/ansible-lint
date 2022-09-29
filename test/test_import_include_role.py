@@ -138,7 +138,9 @@ def test_import_role2(
 ) -> None:
     """Test that include_role digs deeper than import_role."""
     runner = Runner(
-        playbook_path, rules=default_rules_collection, skip_list=["fqcn-builtins"]
+        playbook_path,
+        rules=default_rules_collection,
+        skip_list=["fqcn[action-core]"],
     )
     results = runner.run()
     for message in messages:

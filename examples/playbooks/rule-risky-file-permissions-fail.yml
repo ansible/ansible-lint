@@ -54,7 +54,7 @@
   hosts: all
   tasks:
     - name: Permissions missing
-      # noqa: fqcn-builtins
+      # noqa: fqcn[action-core]
       get_url:
         url: http://foo
         dest: foo
