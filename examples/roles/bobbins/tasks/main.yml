@@ -1,3 +1,7 @@
 ---
 - name: Test tasks
   action: git a=b c=d
+
+- name: Import tasks
+  ansible.builtin.import_tasks:
+    file: imported_tasks.yml
