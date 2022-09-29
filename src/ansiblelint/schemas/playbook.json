@@ -1195,6 +1195,12 @@
           "default": 8,
           "title": "Salt Size",
           "type": "integer"
+        },
+        "unsafe": {
+          "default": false,
+          "markdownDescription": "See [unsafe](https://docs.ansible.com/ansible/latest/user_guide/playbooks_prompts.html#allowing-special-characters-in-vars-prompt-values)",
+          "title": "Unsafe",
+          "type": "boolean"
         }
       },
       "required": [
