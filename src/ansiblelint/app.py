@@ -3,18 +3,21 @@ from __future__ import annotations
 
 import logging
 import os
-from dataclasses import dataclass
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any
 
 from ansible_compat.runtime import Runtime
+from rich.markup import escape
+from rich.table import Table
 
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
+from ansiblelint.config import PROFILES
 from ansiblelint.config import options as default_options
-from ansiblelint.constants import SUCCESS_RC, VIOLATIONS_FOUND_RC
+from ansiblelint.constants import RULE_DOC_URL, SUCCESS_RC, VIOLATIONS_FOUND_RC
 from ansiblelint.errors import MatchError
+from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -26,21 +29,6 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__package__)
-
-
-@dataclass
-class SummarizedResults:
-    """The statistics about an ansible-lint run."""
-
-    failures: int = 0
-    warnings: int = 0
-    fixed_failures: int = 0
-    fixed_warnings: int = 0
-
-    @property
-    def fixed(self) -> int:
-        """Get total fixed count."""
-        return self.fixed_failures + self.fixed_warnings
 
 
 class App:
@@ -101,27 +89,34 @@ class App:
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
-        failures = 0
-        warnings = 0
-        fixed_failures = 0
-        fixed_warnings = 0
+        result = SummarizedResults()
+
         for match in matches:
             # tag can include a sub-rule id: `yaml[document-start]`
             # rule.id is the generic rule id: `yaml`
             # *rule.tags is the list of the rule's tags (categories): `style`
+            if match.tag not in result.tag_stats:
+                result.tag_stats[match.tag] = TagStats(
+                    tag=match.tag, count=1, associated_tags=match.rule.tags
+                )
+            else:
+                result.tag_stats[match.tag].count += 1
+
             if {match.tag, match.rule.id, *match.rule.tags}.isdisjoint(
                 self.options.warn_list
             ):
+                # not in warn_list
                 if match.fixed:
-                    fixed_failures += 1
+                    result.fixed_failures += 1
                 else:
-                    failures += 1
+                    result.failures += 1
             else:
+                result.tag_stats[match.tag].warning = True
                 if match.fixed:
-                    fixed_warnings += 1
+                    result.fixed_warnings += 1
                 else:
-                    warnings += 1
-        return SummarizedResults(failures, warnings, fixed_failures, fixed_warnings)
+                    result.warnings += 1
+        return result
 
     @staticmethod
     def count_lintables(files: set[Lintable]) -> tuple[int, int]:
@@ -207,10 +202,32 @@ warn_list:  # or 'skip_list' to silence them completely
         return VIOLATIONS_FOUND_RC
 
     @staticmethod
-    def report_summary(
+    def report_summary(  # pylint: disable=too-many-branches,too-many-locals
         summary: SummarizedResults, changed_files_count: int, files_count: int
     ) -> None:
         """Report match and file counts."""
+        # sort the stats by profiles
+        idx = 0
+        rule_order = {}
+
+        for profile, profile_config in PROFILES.items():
+            for rule in profile_config["rules"]:
+                # print(profile, rule)
+                rule_order[rule] = (idx, profile)
+                idx += 1
+        _logger.debug("Determined rule-profile order: %s", rule_order)
+        failed_profiles = set()
+        for tag, tag_stats in summary.tag_stats.items():
+            if tag in rule_order:
+                tag_stats.order, tag_stats.profile = rule_order.get(tag, (idx, ""))
+            elif "[" in tag:
+                tag_stats.order, tag_stats.profile = rule_order.get(
+                    tag.split("[")[0], (idx, "")
+                )
+            if tag_stats.profile:
+                failed_profiles.add(tag_stats.profile)
+        summary.sort()
+
         if changed_files_count:
             console_stderr.print(f"Modified {changed_files_count} files.")
 
@@ -219,6 +236,48 @@ warn_list:  # or 'skip_list' to silence them completely
         if summary.fixed:
             msg += f", and fixed {summary.fixed} issue(s)"
         msg += f" on {files_count} files."
+
+        # determine which profile passed
+        summary.passed_profile = ""
+        passed_profile_count = 0
+        for profile in PROFILES.keys():
+            if profile in failed_profiles:
+                break
+            if profile != summary.passed_profile:
+                summary.passed_profile = profile
+                passed_profile_count += 1
+
+        if summary.tag_stats:
+            table = Table(
+                title="Rule Violation Summary",
+                collapse_padding=True,
+                box=None,
+                show_lines=False,
+            )
+            table.add_column("count", justify="right")
+            table.add_column("tag")
+            table.add_column("profile")
+            table.add_column("rule associated tags")
+            for tag, stats in summary.tag_stats.items():
+                table.add_row(
+                    str(stats.count),
+                    f"[link={RULE_DOC_URL}{ tag.split('[')[0] }]{escape(tag)}[/link]",
+                    stats.profile,
+                    f"{', '.join(stats.associated_tags)}{' (warning)' if stats.warning else ''}",
+                    style="yellow" if stats.warning else "red",
+                )
+            # rate stars for the top 5 profiles (min would not get
+            rating = 5 - (len(PROFILES.keys()) - passed_profile_count)
+            if 0 < rating < 6:
+                stars = f"Rated as {rating}/5 stars."
+            else:
+                stars = "No rating."
+
+            console_stderr.print(table)
+            console_stderr.print()
+
+            if summary.passed_profile:
+                msg += f" Code passed [white bold]{summary.passed_profile}[/] profile. {stars}"
 
         console_stderr.print(msg)
 
