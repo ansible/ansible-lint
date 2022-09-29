@@ -23,6 +23,8 @@ from ansiblelint.file_utils import (
     normpath,
     normpath_path,
 )
+from ansiblelint.rules import RulesCollection
+from ansiblelint.runner import Runner
 
 from .conftest import cwd
 
@@ -428,3 +430,23 @@ def test_lintable_content_deleter(
 def test_normpath_path(path: str, result: str) -> None:
     """Tests behavior of normpath."""
     assert normpath_path(path) == Path(result)
+
+
+def test_bug_2513(
+    tmp_path: Path,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Regression test for bug 2513.
+
+    Test that when CWD is outside ~, and argument is like ~/playbook.yml
+    we will still be able to process the files.
+    See: https://github.com/ansible/ansible-lint/issues/2513
+    """
+    filename = "~/.cache/ansible-lint/playbook.yml"
+    os.makedirs(os.path.dirname(os.path.expanduser(filename)), exist_ok=True)
+    lintable = Lintable(filename, content="---\n- hosts: all\n")
+    lintable.write(force=True)
+    with cwd(str(tmp_path)):
+        results = Runner(filename, rules=default_rules_collection).run()
+        assert len(results) == 1
+        assert results[0].rule.id == "name"

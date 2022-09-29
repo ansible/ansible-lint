@@ -54,7 +54,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 "ansible-playbook",
                 "--syntax-check",
                 *args,
-                str(lintable.path),
+                str(lintable.path.expanduser()),
             ]
 
             # To reduce noisy warnings like

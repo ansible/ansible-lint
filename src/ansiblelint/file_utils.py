@@ -237,7 +237,7 @@ class Lintable:
 
         # determine base file kind (yaml, xml, ini, ...)
         self.base_kind = kind_from_path(self.path, base=True)
-        self.abspath = self.path.absolute()
+        self.abspath = self.path.expanduser().absolute()
 
     def __getitem__(self, key: Any) -> Any:
         """Provide compatibility subscriptable support."""
@@ -257,7 +257,7 @@ class Lintable:
     def _populate_content_cache_from_disk(self) -> None:
         # Can raise UnicodeDecodeError
         try:
-            self._content = self.path.resolve().read_text(encoding="utf-8")
+            self._content = self.path.expanduser().resolve().read_text(encoding="utf-8")
         except FileNotFoundError as ex:
             if vars(options).get("progressive"):
                 self._content = ""
@@ -319,7 +319,9 @@ class Lintable:
         if not force and not self.updated:
             # No changes to write.
             return
-        self.path.resolve().write_text(self._content or "", encoding="utf-8")
+        self.path.expanduser().resolve().write_text(
+            self._content or "", encoding="utf-8"
+        )
 
     def __hash__(self) -> int:
         """Return a hash value of the lintables."""
