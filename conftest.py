@@ -21,12 +21,15 @@ if missing:
     sys.exit(1)
 # we need to be sure that we have the requirements installed as some tests
 # might depend on these.
-subprocess.run(
-    ["ansible-galaxy", "collection", "install", "-r", "requirements.yml"],
-    check=True,
-    text=True,
-    capture_output=True,
-)
+try:
+    subprocess.check_output(
+        ["ansible-galaxy", "collection", "install", "-r", "requirements.yml"],
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+except subprocess.CalledProcessError as exc:
+    print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)
+    sys.exit(1)
 
 if not HAS_LIBYAML and sys.version_info >= (3, 9, 0):
     # While presence of libyaml is not required for runtime, we keep this error
