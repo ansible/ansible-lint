@@ -678,7 +678,7 @@ class FormattedEmitter(Emitter):
         """Clean up extra new lines and spaces in comments.
 
         ruamel.yaml treats new or empty lines as comments.
-        See: https://stackoverflow.com/a/42712747/1134951
+        See: https://stackoverflow.com/questions/42708668/removing-all-blank-lines-but-not-comments-in-ruamel-yaml/42712747#42712747
         """
         value: str = comment.value
         if (
@@ -992,7 +992,7 @@ class FormattedYAML(YAML):
         Preserve blank lines despite extra whitespace.
         Preserve any preamble (aka header) comments before "---".
 
-        For more on preamble comments, see: https://stackoverflow.com/a/70287507/1134951
+        For more on preamble comments, see: https://stackoverflow.com/questions/70286108/python-ruamel-yaml-package-how-to-get-header-comment-lines/70287507#70287507
         """
         text = self._whitespace_only_lines_re.sub("", text)
 
@@ -1034,7 +1034,7 @@ class FormattedYAML(YAML):
         Make sure there's only one newline at the end of the file.
 
         Fix the indent of full-line comments to match the indent of the next line.
-        See: https://stackoverflow.com/a/71355688/1134951
+        See: https://stackoverflow.com/questions/71354698/how-can-i-use-the-ruamel-yaml-rtsc-mode/71355688#71355688
         Also, removes "#" protection from strings that prevents them from being
         identified as full line comments in post-processing.
 
