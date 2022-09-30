@@ -4,11 +4,15 @@
   vars:
     varset: varset
   tasks:
-    - block:
-        - ansible.builtin.include_tasks: tasks/nestedincludes.yml
+    - name: I am a block
+      block:
+        - name: Include under block
+          ansible.builtin.include_tasks: tasks/nestedincludes.yml
         # - block:
         #     - include_tasks: "{{ varnotset }}.yml"
       rescue:
-        - ansible.builtin.include_tasks: "{{ varset }}.yml"
+        - name: Include under rescue
+          ansible.builtin.include_tasks: "{{ varset }}.yml"
       always:
-        - ansible.builtin.include_tasks: tasks/directory with spaces/main.yml
+        - name: Include under always
+          ansible.builtin.include_tasks: tasks/directory with spaces/main.yml

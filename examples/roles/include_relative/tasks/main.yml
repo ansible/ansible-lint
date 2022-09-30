@@ -1,5 +1,7 @@
 ---
 # ansible allow paths relative to role directory
-- include_tasks: tasks/included_file.yml
+- name: 1st include
+  ansible.builtin.include_tasks: tasks/included_file.yml
 # relative to the current file, same effect as previous line
-- include_tasks: included_file.yml
+- name: 2nd include
+  ansible.builtin.include_tasks: included_file.yml

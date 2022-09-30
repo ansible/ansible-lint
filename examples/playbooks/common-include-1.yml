@@ -4,7 +4,7 @@
   gather_facts: false
   tasks:
     - name: Some include
-      ansible.builtin.include: tasks/included-with-lint.yml
+      ansible.builtin.import_tasks: tasks/included-with-lint.yml
     - name: Some include_tasks with file and jinja2
       ansible.builtin.include_tasks:
         file: "{{ 'tasks/included-with-lint.yml' }}"
