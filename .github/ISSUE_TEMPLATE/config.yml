@@ -3,10 +3,10 @@
 blank_issues_enabled: false # default is true
 contact_links:
   - name: Feature requests
-    url: https://github.com/ansible-community/ansible-lint/discussions/categories/ideas
+    url: https://github.com/ansible/ansible-lint/discussions/categories/ideas
     about: Suggest an idea for this project
   - name: Discussions
-    url: https://github.com/ansible-community/ansible-lint/discussions/
+    url: https://github.com/ansible/ansible-lint/discussions/
     about: Any kind of questions should go on the forum.
   - name: Security bug report
     url: https://docs.ansible.com/ansible/latest/community/reporting_bugs_and_features.html

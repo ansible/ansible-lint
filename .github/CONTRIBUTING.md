@@ -32,7 +32,7 @@ ansible-lint works only with supported Ansible versions at the time it was relea
 
 Automated tests will be run against all PRs for flake8 compliance
 and Ansible compatibility — to check before pushing commits, just
-use [tox](https://tox.wiki/).
+use [tox](https://tox.wiki/en/latest/).
 
 % DO-NOT-REMOVE-deps-snippet-PLACEHOLDER
 
@@ -58,6 +58,6 @@ As with all Ansible projects, we have a [Code of Conduct].
 [ansible communication]: https://docs.ansible.com/ansible/latest/community/communication.html
 [code of conduct]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html
 [creating your fork on github]: https://guides.github.com/activities/forking/
-[discussions]: https://github.com/ansible-community/ansible-lint/discussions
+[discussions]: https://github.com/ansible/ansible-lint/discussions
 [supported ansible versions]: https://docs.ansible.com/ansible-core/devel/reference_appendices/release_and_maintenance.html#ansible-core-release-cycle
 [tox]: https://tox.readthedocs.io

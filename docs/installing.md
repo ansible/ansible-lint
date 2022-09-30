@@ -10,7 +10,7 @@ Installing on Windows is not supported because we use symlinks inside Python
 packages.
 
 Our project does not ship a container. Please avoid raising any bugs
-related to containers and use the [discussions](https://github.com/ansible-community/ansible-lint/discussions) forum instead.
+related to containers and use the [discussions](https://github.com/ansible/ansible-lint/discussions) forum instead.
 
 We recommend you to try [creator-ee](https://github.com/ansible/creator-ee/),
 which is a container that also carries ansible-lint.
@@ -42,4 +42,4 @@ pip3 install git+https://github.com/ansible-community/ansible-lint.git
 [installing_from_source]: https://pypi.org/project/pip/
 [pip3]: https://pypi.org/project/pip/
 [pipx]: https://pypa.github.io/pipx/
-[pypa user guide]: https://packaging.python.org/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date
+[pypa user guide]: https://packaging.python.org/en/latest/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date

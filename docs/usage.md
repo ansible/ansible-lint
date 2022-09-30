@@ -106,7 +106,7 @@ ansible-lint.
    :nostderr: true
 ```
 
-[annotation]: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
+[annotation]: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 [github actions]: https://github.com/features/actions
 
 ## Specifying Rules at Runtime

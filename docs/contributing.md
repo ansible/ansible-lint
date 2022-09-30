@@ -45,4 +45,4 @@ to create a new rule by following the steps below:
 - Build the docs using {command}`tox -e docs` and check that the new rule is
   displayed correctly in them.
 
-[metatagvalidrule]: https://github.com/ansible-community/ansible-lint/blob/main/src/ansiblelint/rules/meta_no_tags.py
+[metatagvalidrule]: https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/rules/meta_no_tags.py

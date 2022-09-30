@@ -7,7 +7,7 @@ messaging and usually have additional features like the ability to retry.
 In the unlikely case that the rule triggers false positives, you can disable it
 by adding a comment like `# noqa: command-instead-of-module` to the same line.
 
-You can check the [source](https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/rules/command_instead_of_module.py#L48)
+You can check the [source](https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/rules/command_instead_of_module.py)
 of the rule for all the known commands that trigger the rule and their allowed
 list arguments of exceptions and raise a pull request to improve them.
 

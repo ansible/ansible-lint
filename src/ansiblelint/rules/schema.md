@@ -16,7 +16,7 @@ separate projects and updated independently to ansible-lint.
 
 > Report bugs related to schema in their respective repository and not in the ansible-lint project.
 
-Maintained in the [ansible-lint](https://github.com/ansible/ansible-lint.git) project:
+Maintained in the [ansible-lint](https://github.com/ansible/ansible-lint) project:
 
 - `schema[ansible-lint-config]` validates [ansible-lint configuration](https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/schemas/ansible-lint-config.json)
 
