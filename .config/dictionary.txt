@@ -32,6 +32,7 @@ chgrp
 chkconfig
 codeclimate
 codecov
+codeql
 codespell
 colorama
 commitlint
