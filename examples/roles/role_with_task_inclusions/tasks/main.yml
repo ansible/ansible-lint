@@ -1,7 +1,10 @@
 ---
-- include_tasks: included_tasks.yml
-- import_tasks: imported_tasks.yml
-- include_tasks:
+- name: Include 1
+  ansible.builtin.include_tasks: included_tasks.yml
+- name: Include 2
+  ansible.builtin.import_tasks: imported_tasks.yml
+- name: Include 3
+  ansible.builtin.include_tasks:
     file: included_tasks.yml
     apply:
       tags: some_tag

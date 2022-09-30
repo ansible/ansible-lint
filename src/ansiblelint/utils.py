@@ -696,8 +696,7 @@ def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
     # Add sub-elements of block/rescue/always to tasks list
     tasks.extend(extract_from_list(tasks, NESTED_TASK_KEYS, recursive=True))
 
-    # Include the FQCN task names as this happens before normalize
-    return [task for task in tasks if INCLUSION_ACTION_NAMES.isdisjoint(task.keys())]
+    return tasks
 
 
 @lru_cache(maxsize=None)

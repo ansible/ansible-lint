@@ -2,6 +2,6 @@
 - name: Example
   hosts: localhost
   tasks:
-    - name: Play name
-      debug:
-        msg: "Hello {{ ansible_facts.env | list }}!"
+    - name: include extra tasks
+      ansible.builtin.include_tasks:
+        file: /dev/null

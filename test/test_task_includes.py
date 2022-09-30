@@ -9,19 +9,19 @@ from ansiblelint.runner import Runner
 @pytest.mark.parametrize(
     ("filename", "file_count", "match_count"),
     (
-        pytest.param("examples/playbooks/blockincludes.yml", 4, 6, id="blockincludes"),
+        pytest.param("examples/playbooks/blockincludes.yml", 4, 3, id="blockincludes"),
         pytest.param(
             "examples/playbooks/blockincludes2.yml",
             4,
             3,
             id="blockincludes2",
         ),
-        pytest.param("examples/playbooks/taskincludes.yml", 3, 1, id="taskincludes"),
-        pytest.param("examples/playbooks/taskimports.yml", 5, 2, id="taskimports"),
+        pytest.param("examples/playbooks/taskincludes.yml", 3, 6, id="taskincludes"),
+        pytest.param("examples/playbooks/taskimports.yml", 5, 3, id="taskimports"),
         pytest.param(
             "examples/playbooks/include-in-block.yml",
             3,
-            2,
+            1,
             id="include-in-block",
         ),
         pytest.param(

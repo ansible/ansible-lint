@@ -1,2 +1,3 @@
 ---
-- include_tasks: included_file.yml
+- name: Include a task
+  ansible.builtin.include_tasks: included_file.yml

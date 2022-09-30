@@ -4,9 +4,13 @@
   vars:
     varset: tasks/simple_task.yml
   tasks:
-    - import_tasks: tasks/nestedincludes.yml
+    - name: Import 1 # noqa: fqcn
+      import_tasks: tasks/nestedincludes.yml
     # - import_tasks: "{{ varnotset }}.yml"
-    - import_tasks: "{{ varset }}"
-    - import_tasks: tasks/directory with spaces/main.yml
+    - name: Import 2 # noqa: fqcn
+      import_tasks: "{{ varset }}"
+    - name: Import 3 # noqa: fqcn
+      import_tasks: tasks/directory with spaces/main.yml
     # Import tasks by FQCN as well to ensure they load
-    - ansible.builtin.import_tasks: tasks/passing_task.yml
+    - name: Import 4
+      ansible.builtin.import_tasks: tasks/passing_task.yml

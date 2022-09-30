@@ -2,4 +2,5 @@
 - name: Fixture
   hosts: all
   tasks:
-    - ansible.builtin.include_tasks: tasks/include-in-block-inner.yml
+    - name: Include
+      ansible.builtin.include_tasks: tasks/include-in-block-inner.yml

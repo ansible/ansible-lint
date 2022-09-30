@@ -1,2 +1,3 @@
 ---
-- include_tasks: tasks/noexist_file.yml
+- name: Include a missing file
+  ansible.builtin.include_tasks: tasks/noexist_file.yml
