@@ -57,6 +57,7 @@ from ansiblelint.app import get_app
 from ansiblelint.config import options
 from ansiblelint.constants import (
     FILENAME_KEY,
+    INCLUSION_ACTION_NAMES,
     LINE_NUMBER_KEY,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
@@ -296,17 +297,7 @@ def _include_children(
     basedir: str, k: str, v: Any, parent_type: FileType
 ) -> list[Lintable]:
     # handle special case include_tasks: name=filename.yml
-    if (
-        k
-        in [
-            "include_tasks",
-            "ansible.builtin.include_tasks",
-            "import_tasks",
-            "ansible.builtin.import_tasks",
-        ]
-        and isinstance(v, dict)
-        and "file" in v
-    ):
+    if k in INCLUSION_ACTION_NAMES and isinstance(v, dict) and "file" in v:
         v = v["file"]
 
     # we cannot really parse any jinja2 in includes, so we ignore them
@@ -406,17 +397,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     child_type = k if parent_type == "playbook" else parent_type
 
     # Include the FQCN task names as this happens before normalize
-    task_include_keys = (
-        "include",
-        "include_tasks",
-        "import_playbook",
-        "import_tasks",
-        "ansible.builtin.include",
-        "ansible.builtin.include_tasks",
-        "ansible.builtin.import_playbook",
-        "ansible.builtin.import_tasks",
-    )
-    for task_handler_key in task_include_keys:
+    for task_handler_key in INCLUSION_ACTION_NAMES:
 
         with contextlib.suppress(KeyError):
 
@@ -437,7 +418,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             return Lintable(f, kind=child_type)
 
     raise LookupError(
-        f'The node contains none of: {", ".join(task_include_keys)}',
+        f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}',
     )
 
 
@@ -716,20 +697,7 @@ def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
     tasks.extend(extract_from_list(tasks, NESTED_TASK_KEYS, recursive=True))
 
     # Include the FQCN task names as this happens before normalize
-    return [
-        task
-        for task in tasks
-        if {
-            "include",
-            "include_tasks",
-            "import_playbook",
-            "import_tasks",
-            "ansible.builtin.include",
-            "ansible.builtin.include_tasks",
-            "ansible.builtin.import_playbook",
-            "ansible.builtin.import_tasks",
-        }.isdisjoint(task.keys())
-    ]
+    return [task for task in tasks if INCLUSION_ACTION_NAMES.isdisjoint(task.keys())]
 
 
 @lru_cache(maxsize=None)
