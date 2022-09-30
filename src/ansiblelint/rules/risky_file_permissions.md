@@ -24,11 +24,8 @@ Modules that are checked:
 - [`community.general.ini_file`](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html)
 
 ```{warning}
-This rule does not take [module_defaults](https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html)
-configuration into account, and there are no plans to implement such feature,
-mainly because when a task is moved from one location to another, its behavior
-might change without noticing.
-```
+This rule does not take [module_defaults](https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html) configuration into account.
+There are currently no plans to implement this feature because changing task location can also change task behavior.
 
 ## Problematic code
 
