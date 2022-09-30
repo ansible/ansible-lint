@@ -23,6 +23,11 @@ Modules that are checked:
 - [`community.general.archive`](https://docs.ansible.com/ansible/latest/collections/community/general/archive_module.html)
 - [`community.general.ini_file`](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html)
 
+```{warning}
+This rule does not take [module_defaults](https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html) configuration into account.
+There are currently no plans to implement this feature because changing task location can also change task behavior.
+```
+
 ## Problematic code
 
 ```yaml
