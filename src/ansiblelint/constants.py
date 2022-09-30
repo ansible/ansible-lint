@@ -122,3 +122,15 @@ NESTED_TASK_KEYS = [
 SKIPPED_RULES_KEY = "__skipped_rules__"
 LINE_NUMBER_KEY = "__line__"
 FILENAME_KEY = "__file__"
+
+
+INCLUSION_ACTION_NAMES = {
+    "include",
+    "include_tasks",
+    "import_playbook",
+    "import_tasks",
+    "ansible.builtin.include",
+    "ansible.builtin.include_tasks",
+    "ansible.builtin.import_playbook",
+    "ansible.builtin.import_tasks",
+}
