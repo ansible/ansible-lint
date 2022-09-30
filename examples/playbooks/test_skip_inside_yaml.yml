@@ -28,13 +28,13 @@
         dest: "{{dest_proj_path}}/foo.conf" # noqa jinja[spacing]
 
     - name: Test deprecated-command-syntax # <-- 3 deprecated-command-syntax
-      ansible.builtin.command: creates=B chmod 644 A
+      ansible.builtin.command: creates=B chmod 644 A # noqa: no-shorthand
     - name: Test deprecated-command-syntax # <-- 4 deprecated-command-syntax
-      ansible.builtin.command: warn=yes creates=B chmod 644 A
+      ansible.builtin.command: warn=yes creates=B chmod 644 A # noqa: no-shorthand
     - name: Test deprecated-command-syntax (skipped via no warn)
-      ansible.builtin.command: warn=no creates=B chmod 644 A
+      ansible.builtin.command: warn=no creates=B chmod 644 A # noqa: no-shorthand
     - name: Test deprecated-command-syntax (skipped via skip_ansible_lint)
-      ansible.builtin.command: creates=B chmod 644 A
+      ansible.builtin.command: creates=B chmod 644 A # noqa: no-shorthand
       tags:
         - skip_ansible_lint
 
