@@ -197,7 +197,7 @@ warn_list:  # or 'skip_list' to silence them completely
             console_stderr.print(render_yaml(msg))
             self.report_summary(summary, changed_files_count, files_count)
 
-        if mark_as_success or not summary.failures:
+        if not self.options.strict and (mark_as_success or not summary.failures):
             return SUCCESS_RC
         return VIOLATIONS_FOUND_RC
 

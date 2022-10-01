@@ -129,6 +129,7 @@ options = Namespace(
     extra_vars=None,
     enable_list=[],
     skip_action_validation=True,
+    strict=False,
     rules={},  # Placeholder to set and keep configurations for each rule.
 )
 

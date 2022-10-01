@@ -313,6 +313,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Keep default rules when using -r",
     )
     parser.add_argument(
+        "-s",
+        "--strict",
+        action="store_true",
+        default=False,
+        dest="strict",
+        help="Return non-zero exit code on warnings as well as errors",
+    )
+    parser.add_argument(
         "--write",
         dest="write_list",
         # this is a tri-state argument that takes an optional comma separated list:
