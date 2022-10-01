@@ -3,7 +3,7 @@
   ansible.builtin.import_playbook: playbook-imported.yml
 
 - name: Importing playbook from collection
-  import_playbook: community.molecule.validate
+  import_playbook: community.molecule.validate # noqa: fqcn
 
 - name: Importing playbook using jinja2
-  import_playbook: "{{ 'community.molecule.validate' }}"
+  import_playbook: "{{ 'community.molecule.validate' }}" # noqa: fqcn

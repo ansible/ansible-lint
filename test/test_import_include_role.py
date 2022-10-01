@@ -12,13 +12,14 @@ from ansiblelint.runner import Runner
 ROLE_TASKS_MAIN = """\
 ---
 - name: Shell instead of command
-  shell: echo hello world
+  shell: echo hello world # noqa fqcn no-shorthand
   changed_when: false
 """
 
 ROLE_TASKS_WORLD = """\
 ---
-- debug: msg="this is a task without a name"
+- ansible.builtin.debug:
+    msg: "this is a task without a name"
 """
 
 PLAY_IMPORT_ROLE = """\
@@ -27,7 +28,7 @@ PLAY_IMPORT_ROLE = """\
   hosts: all
 
   tasks:
-    - name: Some import
+    - name: Some import # noqa: fqcn
       import_role:
         name: test-role
 """
@@ -49,7 +50,7 @@ PLAY_IMPORT_ROLE_INLINE = """\
   hosts: all
   tasks:
     - name: Some import
-      import_role: name=test-role
+      import_role: name=test-role  # noqa: no-shorthand fqcn
 """
 
 PLAY_INCLUDE_ROLE = """\
@@ -80,7 +81,7 @@ PLAY_INCLUDE_ROLE_INLINE = """\
   hosts: all
   tasks:
     - name: Some import
-      include_role: name=test-role tasks_from=world
+      include_role: name=test-role tasks_from=world  # noqa: no-shorthand
 """
 
 

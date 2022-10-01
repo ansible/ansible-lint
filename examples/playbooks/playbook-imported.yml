@@ -4,7 +4,8 @@
   connection: local
   gather_facts: false
   tasks:
-    - ansible.builtin.command: echo "no name" # should generate unnamed-task
+    - ansible.builtin.command:
+        cmd: echo "no name" # should generate unnamed-task
     - name: Another task
       ansible.builtin.debug:
         msg: debug message

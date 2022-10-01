@@ -1,2 +1,3 @@
 ---
-- command: echo this is a task without a name
+- command: # noqa: fqcn
+    cmd: echo this is a task without a name # noqa: no-shorthand

@@ -34,15 +34,18 @@ FAIL_PLAY = """---
   hosts: localhost
   tasks:
   - name: Shell no pipe
-    ansible.builtin.shell: echo hello
+    ansible.builtin.shell:
+      cmd: echo hello
     changed_when: false
 
   - name: Shell with jinja filter
-    ansible.builtin.shell: echo {{ "hello" | upper }}
+    ansible.builtin.shell:
+      cmd: echo {{ "hello" | upper }}
     changed_when: false
 
   - name: Sshell with jinja filter (fqcn)
-    ansible.builtin.shell: echo {{ "hello" | upper }}
+    ansible.builtin.shell:
+      cmd: echo {{ "hello" | upper }}
     changed_when: false
 """
 
@@ -51,43 +54,53 @@ SUCCESS_PLAY = """---
   hosts: localhost
   tasks:
   - name: Shell with pipe
-    ansible.builtin.shell: echo hello | true  # noqa: risky-shell-pipe
+    ansible.builtin.shell:
+      cmd: echo hello | true  # noqa: risky-shell-pipe
     changed_when: false
 
   - name: Shell with redirect
-    ansible.builtin.shell: echo hello >  /tmp/hello
+    ansible.builtin.shell:
+      cmd: echo hello >  /tmp/hello
     changed_when: false
 
   - name: Chain two shell commands
-    ansible.builtin.shell: echo hello && echo goodbye
+    ansible.builtin.shell:
+      cmd: echo hello && echo goodbye
     changed_when: false
 
   - name: Run commands in succession
-    ansible.builtin.shell: echo hello ; echo goodbye
+    ansible.builtin.shell:
+      cmd: echo hello ; echo goodbye
     changed_when: false
 
   - name: Use variables
-    ansible.builtin.shell: echo $HOME $USER
+    ansible.builtin.shell:
+      cmd: echo $HOME $USER
     changed_when: false
 
   - name: Use * for globbing
-    ansible.builtin.shell: ls foo*
+    ansible.builtin.shell:
+      cmd: ls foo*
     changed_when: false
 
   - name: Use ? for globbing
-    ansible.builtin.shell: ls foo?
+    ansible.builtin.shell:
+      cmd: ls foo?
     changed_when: false
 
   - name: Use [] for globbing
-    ansible.builtin.shell: ls foo[1,2,3]
+    ansible.builtin.shell:
+      cmd: ls foo[1,2,3]
     changed_when: false
 
   - name: Use shell generator
-    ansible.builtin.shell: ls foo{.txt,.xml}
+    ansible.builtin.shell:
+      cmd: ls foo{.txt,.xml}
     changed_when: false
 
   - name: Use backticks
-    ansible.builtin.shell: ls `ls foo*`
+    ansible.builtin.shell:
+      cmd: ls `ls foo*`
     changed_when: false
 
   - name: Use shell with cmd

@@ -11,7 +11,7 @@ IMPORTED_PLAYBOOK = """\
 - name: Fixture
   hosts: all
   tasks:
-    - name: Success
+    - name: Success # noqa: no-shorthand
       ansible.builtin.fail: msg="fail"
       when: false
 """
@@ -22,7 +22,7 @@ MAIN_PLAYBOOK = """\
   hosts: all
 
   tasks:
-    - name: Should be shell  # noqa command-instead-of-shell no-changed-when
+    - name: Should be shell  # noqa command-instead-of-shell no-changed-when no-shorthand
       ansible.builtin.shell: echo lol
 
 - name: Should not be imported

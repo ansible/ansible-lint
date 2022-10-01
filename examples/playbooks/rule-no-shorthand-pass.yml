@@ -1,0 +1,9 @@
+---
+- name: Example with discouraged shorthand syntax
+  hosts: localhost
+  tasks:
+    - name: Create a placefolder file
+      ansible.builtin.command:
+        cmd: touch foo
+        chdir: /tmp
+      changed_when: false
