@@ -61,6 +61,7 @@ from ansiblelint.constants import (
     LINE_NUMBER_KEY,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
+    ROLE_IMPORT_ACTION_NAMES,
     SKIPPED_RULES_KEY,
     FileType,
 )
@@ -348,13 +349,7 @@ def _taskshandlers_children(
             results.append(children)
             continue
 
-        including_commands = (
-            "import_role",
-            "ansible.builtin.import_role",
-            "include_role",
-            "ansible.builtin.include_role",
-        )
-        if any(x in task_handler for x in including_commands):
+        if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
             # lgtm [py/unreachable-statement]
             task_handler = normalize_task_v2(task_handler)
             _validate_task_handler_action_for_role(task_handler["action"])
@@ -632,23 +627,23 @@ def task_to_str(task: dict[str, Any]) -> str:
     action = task.get("action")
     if isinstance(action, str) or not isinstance(action, dict):
         return str(action)
-    args = " ".join(
-        [
-            f"{k}={v}"
-            for (k, v) in action.items()
-            if k
-            not in [
-                "__ansible_module__",
-                "__ansible_module_original__",
-                "__ansible_arguments__",
-                LINE_NUMBER_KEY,
-                FILENAME_KEY,
-            ]
+    args = [
+        f"{k}={v}"
+        for (k, v) in action.items()
+        if k
+        not in [
+            "__ansible_module__",
+            "__ansible_module_original__",
+            "__ansible_arguments__",
+            LINE_NUMBER_KEY,
+            FILENAME_KEY,
         ]
-    )
+    ]
+
     for item in action.get("__ansible_arguments__", []):
-        args += f" {item}"
-    return f"{action['__ansible_module__']} {args}"
+        args.append(str(item))
+
+    return f"{action['__ansible_module__']} {' '.join(args)}"
 
 
 def extract_from_list(
