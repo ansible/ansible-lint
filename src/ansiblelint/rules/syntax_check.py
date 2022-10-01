@@ -5,9 +5,10 @@ import json
 import re
 import subprocess
 import sys
+from dataclasses import dataclass
 from typing import Any
 
-from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
+from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule, WarningRule
 from ansiblelint.app import get_app
 from ansiblelint.config import options
 from ansiblelint.errors import MatchError
@@ -16,14 +17,44 @@ from ansiblelint.logger import timed_info
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import strip_ansi_escape
 
-_ansible_syntax_check_re = re.compile(
-    r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in "
-    r"'(?P<filename>.*)': line (?P<line>\d+), column (?P<column>\d+)",
-    re.MULTILINE | re.S | re.DOTALL,
-)
 
-_empty_playbook_re = re.compile(
-    r"^ERROR! Empty playbook, nothing to do", re.MULTILINE | re.S | re.DOTALL
+@dataclass
+class KnownError:
+    """Class that tracks result of linting."""
+
+    tag: str
+    regex: re.Pattern[str]
+
+
+OUTPUT_PATTERNS = (
+    KnownError(
+        tag="missing-file",
+        regex=re.compile(
+            # do not use <filename> capture group for this because we want to report original file, not the missing target one
+            r"(?P<title>Unable to retrieve file contents)\n(?P<details>Could not find or access '(?P<value>.*)'[^\n]*)",
+            re.MULTILINE | re.S | re.DOTALL,
+        ),
+    ),
+    KnownError(
+        tag="specific",
+        regex=re.compile(
+            r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in '(?P<filename>.*)': line (?P<line>\d+), column (?P<column>\d+)",
+            re.MULTILINE | re.S | re.DOTALL,
+        ),
+    ),
+    KnownError(
+        tag="empty-playbook",
+        regex=re.compile(
+            "Empty playbook, nothing to do", re.MULTILINE | re.S | re.DOTALL
+        ),
+    ),
+    KnownError(
+        tag="malformed",
+        regex=re.compile(
+            "^ERROR! (?P<title>A malformed block was encountered while loading a block[^\n]*)",
+            re.MULTILINE | re.S | re.DOTALL,
+        ),
+    ),
 )
 
 
@@ -32,7 +63,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
 
     id = "syntax-check"
     severity = "VERY_HIGH"
-    tags = ["core", "unskippable"]
+    tags = ["core"]
     version_added = "v5.0.0"
     _order = 0
 
@@ -40,6 +71,8 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     # pylint: disable=too-many-locals
     def _get_ansible_syntax_check_matches(lintable: Lintable) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
+        default_rule: BaseRule = AnsibleSyntaxCheckRule()
+        results = []
         if lintable.kind != "playbook":
             return []
 
@@ -72,7 +105,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 check=False,
                 env=env,
             )
-            result = []
+
         if run.returncode != 0:
             message = None
             filename = lintable
@@ -89,40 +122,56 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             else:
                 details = stdout
 
-            match = _ansible_syntax_check_re.search(stderr)
-            if match:
-                message = match.groupdict()["title"]
-                # Ansible returns absolute paths
-                filename = Lintable(match.groupdict()["filename"])
-                linenumber = int(match.groupdict()["line"])
-                column = int(match.groupdict()["column"])
-            elif _empty_playbook_re.search(stderr):
-                message = "Empty playbook, nothing to do"
-                filename = lintable
-                tag = "empty-playbook"
+            for pattern in OUTPUT_PATTERNS:
+                rule = default_rule
+                match = re.search(pattern.regex, stderr)
+                if match:
+                    groups = match.groupdict()
+                    title = groups.get("title", match.group(0))
+                    details = groups.get("details", "")
+                    linenumber = int(groups.get("line", 1))
 
-            if run.returncode == 4:
-                rule: BaseRule = AnsibleSyntaxCheckRule()
-            else:
-                rule = RuntimeErrorRule()
-                if not message:
-                    message = (
-                        f"Unexpected error code {run.returncode} from "
-                        f"execution of: {' '.join(cmd)}"
+                    if "filename" in groups:
+                        filename = Lintable(groups["filename"])
+                    else:
+                        filename = lintable
+                    column = int(groups.get("column", 1))
+
+                    if pattern.tag == "empty-playbook":
+                        rule = WarningRule()
+
+                    # breakpoint()
+                    results.append(
+                        MatchError(
+                            message=title,
+                            filename=filename,
+                            linenumber=linenumber,
+                            column=column,
+                            rule=rule,
+                            details=details,
+                            tag=f"{rule.id}[{pattern.tag}]",
+                        )
                     )
 
-            result.append(
-                MatchError(
-                    message=message,
-                    filename=filename,
-                    linenumber=linenumber,
-                    column=column,
-                    rule=rule,
-                    details=details,
-                    tag=tag,
+            if not results:
+                rule = RuntimeErrorRule()
+                message = (
+                    f"Unexpected error code {run.returncode} from "
+                    f"execution of: {' '.join(cmd)}"
                 )
-            )
-        return result
+                results.append(
+                    MatchError(
+                        message=message,
+                        filename=filename,
+                        linenumber=linenumber,
+                        column=column,
+                        rule=rule,
+                        details=details,
+                        tag=tag,
+                    )
+                )
+
+        return results
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -155,7 +204,7 @@ if "pytest" in sys.modules:
         # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
         assert result[0].filename.endswith("/empty_playbook.yml")
-        assert result[0].tag == "empty-playbook"
+        assert result[0].tag == "warning[empty-playbook]"
         assert result[0].message == "Empty playbook, nothing to do"
         assert len(result) == 1
 

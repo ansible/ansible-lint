@@ -11,15 +11,15 @@ from ansiblelint.rules.risky_shell_pipe import ShellWithoutPipefail
 def test_profile_min() -> None:
     """Asserts our ability to unload rules based on profile."""
     collection = RulesCollection()
-    assert len(collection.rules) == 3, "Unexpected number of implicit rules."
+    assert len(collection.rules) == 4, "Unexpected number of implicit rules."
     # register one extra rule that we know not to be part of "min" profile
 
     collection.register(ShellWithoutPipefail())
-    assert len(collection.rules) == 4, "Failed to register new rule."
+    assert len(collection.rules) == 5, "Failed to register new rule."
 
     filter_rules_with_profile(collection.rules, "min")
     assert (
-        len(collection.rules) == 3
+        len(collection.rules) == 4
     ), "Failed to unload rule that is not part of 'min' profile."
 
 
