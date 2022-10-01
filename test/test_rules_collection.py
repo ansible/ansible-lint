@@ -53,7 +53,7 @@ def fixture_bracketsmatchtestfile() -> Lintable:
 def test_load_collection_from_directory(test_rules_collection: RulesCollection) -> None:
     """Test that custom rules extend the default ones."""
     # two detected rules plus the internal ones
-    assert len(test_rules_collection) == 6
+    assert len(test_rules_collection) == 7
 
 
 def test_run_collection(
@@ -166,5 +166,5 @@ def test_rules_id_format() -> None:
             rule.help != "" or rule.description or rule.__doc__
         ), f"Rule {rule.id} must have at least one of:  .help, .description, .__doc__"
     assert "yaml" in keys, "yaml rule is missing"
-    assert len(rules) == 46  # update this number when adding new rules!
+    assert len(rules) == 47  # update this number when adding new rules!
     assert len(keys) == len(rules), "Duplicate rule ids?"

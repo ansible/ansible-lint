@@ -311,6 +311,7 @@ nitpick_ignore = [
     ("py:class", "handlers"),
     ("py:class", "meta"),
     ("py:class", "playbook"),
+    ("py:class", "re.Pattern"),
     ("py:class", "requirements"),
     ("py:class", "role"),
     ("py:class", "ruamel.yaml.comments.CommentedMap"),

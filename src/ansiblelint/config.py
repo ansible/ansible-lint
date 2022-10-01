@@ -19,6 +19,7 @@ DEFAULT_WARN_LIST = [
     "name[casing]",
     "name[play]",
     "role-name",
+    "warning[empty-playbook]",  # because ansible considers it warning only
 ]
 
 DEFAULT_KINDS = [

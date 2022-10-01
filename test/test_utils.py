@@ -319,8 +319,8 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     assert "Excluded removed files using: git ls-files --deleted -z" in err
     # An expected rule match from our examples
     assert (
-        "examples/playbooks/empty_playbook.yml:1: "
-        "syntax-check: Empty playbook, nothing to do" in out
+        "examples/playbooks/empty_playbook.yml:1:1: "
+        "warning: Empty playbook, nothing to do" in out
     )
     # assures that our ansible-lint config exclude was effective in excluding github files
     assert "Identified: .github/" not in out

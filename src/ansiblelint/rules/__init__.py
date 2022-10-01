@@ -23,6 +23,7 @@ from ansiblelint._internal.rules import (
     BaseRule,
     LoadingFailureRule,
     RuntimeErrorRule,
+    WarningRule,
 )
 from ansiblelint.config import PROFILES, get_rule_config
 from ansiblelint.config import options as default_options
@@ -383,7 +384,12 @@ class RulesCollection:
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
         self.rules.extend(
-            [RuntimeErrorRule(), AnsibleParserErrorRule(), LoadingFailureRule()]
+            [
+                RuntimeErrorRule(),
+                AnsibleParserErrorRule(),
+                LoadingFailureRule(),
+                WarningRule(),
+            ]
         )
         for rule in load_plugins(rulesdirs):
             self.register(rule, conditional=conditional)

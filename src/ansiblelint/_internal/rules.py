@@ -173,3 +173,14 @@ class LoadingFailureRule(BaseRule):
     version_added = "v4.3.0"
     help = LOAD_FAILURE_MD
     _order = 0
+
+
+class WarningRule(BaseRule):
+    """Other warnings detected during run."""
+
+    id = "warning"
+    severity = "LOW"
+    # should remain experimental as that would keep it warning only
+    tags = ["core", "experimental"]
+    version_added = "v6.8.0"
+    _order = 0
