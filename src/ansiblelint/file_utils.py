@@ -423,7 +423,7 @@ def strip_dotslash_prefix(fname: str) -> str:
 def guess_project_dir(config_file: str | None) -> str:
     """Return detected project dir or current working directory."""
     path = None
-    if config_file is not None:
+    if config_file is not None and config_file != "/dev/null":
         target = pathlib.Path(config_file)
         if target.exists():
             # for config inside .config, we return the parent dir as project dir

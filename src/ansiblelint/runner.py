@@ -35,7 +35,7 @@ class LintResult:
 class Runner:
     """Runner class performs the linting process."""
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self,
         *lintables: Lintable | str,
@@ -45,10 +45,12 @@ class Runner:
         exclude_paths: list[str] | None = None,
         verbosity: int = 0,
         checked_files: set[Lintable] | None = None,
+        project_dir: str | None = None,
     ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.lintables: set[Lintable] = set()
+        self.project_dir = os.path.abspath(project_dir) if project_dir else None
 
         if skip_list is None:
             skip_list = []
@@ -95,6 +97,11 @@ class Runner:
             return False
 
         abs_path = str(lintable.abspath)
+        if self.project_dir and not abs_path.startswith(self.project_dir):
+            _logger.debug(
+                "Skipping %s as it is outside of the project directory.", abs_path
+            )
+            return True
 
         return any(
             abs_path.startswith(path)
@@ -222,6 +229,7 @@ def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
         exclude_paths=options.exclude_paths,
         verbosity=options.verbosity,
         checked_files=checked_files,
+        project_dir=options.project_dir,
     )
     matches.extend(runner.run())
 
