@@ -14,6 +14,10 @@ syntax. Be sure you pass a dictionary to the module, so the short-hand parsing
 is never triggered.
 ```
 
+As `raw` module only accepts free-form, we trigger `no-shorthand[raw]` only if
+we detect the presence of `executable=` inside raw calls. We advice the
+explicit use of `args:` dictionary for configuring the executable to be run.
+
 ## Problematic code
 
 ```yaml
