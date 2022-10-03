@@ -218,11 +218,21 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
     assert lintable_detected.kind == result[lintable_expected.name]
 
 
-def test_guess_project_dir(tmp_path: Path) -> None:
+def test_guess_project_dir_tmp_path(tmp_path: Path) -> None:
     """Verify guess_project_dir()."""
     with cwd(str(tmp_path)):
         result = guess_project_dir(None)
         assert result == str(tmp_path)
+
+
+def test_guess_project_dir_dotconfig() -> None:
+    """Verify guess_project_dir()."""
+    with cwd("examples"):
+        assert os.path.exists(
+            ".config/ansible-lint.yml"
+        ), "Test requires config file inside .config folder."
+        result = guess_project_dir(".config/ansible-lint.yml")
+        assert result == str(os.getcwd())
 
 
 BASIC_PLAYBOOK = """
