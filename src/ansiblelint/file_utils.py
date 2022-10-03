@@ -427,9 +427,11 @@ def guess_project_dir(config_file: str | None) -> str:
         target = pathlib.Path(config_file)
         if target.exists():
             # for config inside .config, we return the parent dir as project dir
-            if target.name == ".config":
-                target = target.parent
-            path = str(target.parent.absolute())
+            cfg_path = target.parent
+            if cfg_path.parts[-1] == ".config":
+                path = str(cfg_path.parent.absolute())
+            else:
+                path = str(cfg_path.absolute())
 
     if path is None:
         try:
