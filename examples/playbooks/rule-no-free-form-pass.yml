@@ -1,5 +1,5 @@
 ---
-- name: Example with discouraged shorthand syntax
+- name: Example with discouraged free-form syntax
   hosts: localhost
   tasks:
     - name: Create a placefolder file

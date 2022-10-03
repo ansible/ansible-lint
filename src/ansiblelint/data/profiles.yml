@@ -53,7 +53,7 @@ moderate:
     name[imperative]:
       url: https://github.com/ansible/ansible-lint/issues/2170
     name[casing]:
-    no-shorthand: # schema-related
+    no-free-form: # schema-related
       url: https://github.com/ansible/ansible-lint/issues/2117
     spell-var-name:
       url: https://github.com/ansible/ansible-lint/issues/2168
