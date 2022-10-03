@@ -33,4 +33,3 @@ enable_list:
 ## Correct Code
 
 Correct code for this rule is to omit `vars_prompt` and the `ansible.builtin.pause` module from your playbook.
-
