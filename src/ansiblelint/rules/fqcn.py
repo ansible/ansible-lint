@@ -109,7 +109,7 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                 )
             )
         # Add here implementation for fqcn[action-redirect]
-        elif module != "block/always/rescue" and module.count(".") != 2:
+        elif module != "block/always/rescue" and module.count(".") < 2:
             result.append(
                 self.create_matcherror(
                     message=f"Use FQCN for module actions, such `<namespace>.<collection>.{module}`.",
@@ -134,6 +134,10 @@ if "pytest" in sys.modules:
   tasks:
   - name: Shell (fqcn)
     ansible.builtin.shell: echo This rule should not get matched by the fqcn rule
+  - name: Use FQCN with more than 3 parts
+    community.general.system.sudoers:
+      name: should-not-be-here
+      state: absent
     """
 
     FAIL_PLAY = """
