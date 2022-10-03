@@ -7,3 +7,8 @@
         cmd: touch foo
         chdir: /tmp
       changed_when: false
+    - name: Use raw to echo
+      ansible.builtin.raw: echo foo
+      args:
+        executable: /bin/bash
+      changed_when: false
