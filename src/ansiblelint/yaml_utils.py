@@ -568,7 +568,7 @@ class FormattedEmitter(Emitter):
     #     To silence we have to ignore[override] both the @property and the method.
 
     @property  # type: ignore[override]
-    def best_sequence_indent(self) -> int:  # type: ignore[override]
+    def best_sequence_indent(self) -> int:
         """Return the configured sequence_indent or 2 for root level."""
         return 2 if self._is_root_level_sequence else self._sequence_indent
 
@@ -578,7 +578,7 @@ class FormattedEmitter(Emitter):
         self._sequence_indent = value
 
     @property  # type: ignore[override]
-    def sequence_dash_offset(self) -> int:  # type: ignore[override]
+    def sequence_dash_offset(self) -> int:
         """Return the configured sequence_dash_offset or 0 for root level."""
         return 0 if self._is_root_level_sequence else self._sequence_dash_offset
 
@@ -898,7 +898,7 @@ class FormattedYAML(YAML):
         return cast(Dict[str, Union[bool, int, str]], config)
 
     @property  # type: ignore[override]
-    def version(self) -> str | tuple[int, int]:  # type: ignore[override]
+    def version(self) -> str | tuple[int, int]:
         """Return the YAML version used to parse or dump.
 
         Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.

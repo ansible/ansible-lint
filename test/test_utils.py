@@ -212,7 +212,7 @@ def test_extract_from_list_recursive() -> None:
     assert list(block["block"]) == test_list
 
     test_list_recursive = utils.extract_from_list(blocks, ["block"], recursive=True)
-    assert block["block"] + block["block"][0]["block"] == test_list_recursive  # type: ignore
+    assert block["block"] + block["block"][0]["block"] == test_list_recursive
 
 
 @pytest.mark.parametrize(
