@@ -34,15 +34,16 @@ class NoShorthandRule(AnsibleLintRule):
 
         action_value = task["__raw_task__"].get(action, None)
         if task["action"].get("__ansible_module__", None) == "raw":
-            if isinstance(action_value, str) and "executable=" in action_value:
-                results.append(
-                    self.create_matcherror(
-                        message="Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
-                        linenumber=task[LINE_NUMBER_KEY],
-                        filename=file,
-                        tag=f"{self.id}[raw]",
+            if isinstance(action_value, str):
+                if "executable=" in action_value:
+                    results.append(
+                        self.create_matcherror(
+                            message="Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
+                            linenumber=task[LINE_NUMBER_KEY],
+                            filename=file,
+                            tag=f"{self.id}[raw]",
+                        )
                     )
-                )
             else:
                 results.append(
                     MatchError(
@@ -75,7 +76,7 @@ if "pytest" in sys.modules:  # noqa: C901
         ("file", "expected"),
         (
             pytest.param("examples/playbooks/rule-no-shorthand-pass.yml", 0, id="pass"),
-            pytest.param("examples/playbooks/rule-no-shorthand-fail.yml", 1, id="fail"),
+            pytest.param("examples/playbooks/rule-no-shorthand-fail.yml", 2, id="fail"),
         ),
     )
     def test_rule_no_shorthand(

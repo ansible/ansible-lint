@@ -27,6 +27,9 @@ explicit use of `args:` dictionary for configuring the executable to be run.
   tasks:
     - name: Create a placefolder file
       ansible.builtin.command: chdir=/tmp touch foo # <-- don't use shorthand
+    - name: Use raw to echo
+      ansible.builtin.raw: executable=/bin/bash echo foo # <-- don't use executable=
+      changed_when: false
 ```
 
 ## Correct code
@@ -40,4 +43,9 @@ explicit use of `args:` dictionary for configuring the executable to be run.
       ansible.builtin.command:
         cmd: touch foo # <-- ansible will not touch it
         chdir: /tmp
+    - name: Use raw to echo
+      ansible.builtin.raw: echo foo
+      args:
+        executable: /bin/bash # <-- explicit is better
+      changed_when: false
 ```
