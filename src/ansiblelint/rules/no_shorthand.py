@@ -4,6 +4,7 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
+from ansiblelint._internal.rules import WarningRule
 from ansiblelint.constants import INCLUSION_ACTION_NAMES, LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
@@ -32,7 +33,27 @@ class NoShorthandRule(AnsibleLintRule):
             return results
 
         action_value = task["__raw_task__"].get(action, None)
-        if isinstance(action_value, str) and "=" in action_value:
+        if task["action"].get("__ansible_module__", None) == "raw":
+            if isinstance(action_value, str) and "executable=" in action_value:
+                results.append(
+                    self.create_matcherror(
+                        message="Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
+                        linenumber=task[LINE_NUMBER_KEY],
+                        filename=file,
+                        tag=f"{self.id}[raw]",
+                    )
+                )
+            else:
+                results.append(
+                    MatchError(
+                        message="Passing a non string value to `raw` module is neither document nor supported.",
+                        linenumber=task[LINE_NUMBER_KEY],
+                        filename=file,
+                        tag="warning[raw-non-string]",
+                        rule=WarningRule(),
+                    )
+                )
+        elif isinstance(action_value, str) and "=" in action_value:
             results.append(
                 self.create_matcherror(
                     message=f"Avoid using shorthand (free-form) when calling module actions. ({action})",
