@@ -4,7 +4,23 @@ This rule checks for relative paths in the `ansible.builtin.copy` and `ansible.b
 
 Relative paths in a task most often direct Ansible to remote files and directories on managed nodes.
 In the `ansible.builtin.copy` and `ansible.builtin.template` modules, the `src` argument refers to local files and directories on the control node.
-For this reason you should always provide an absolute path to resources with the `src` argument.
+
+```{note}
+For `copy` best location to store files is inside `files/` folder within the
+playbook/role directory. For `template` the recommended location is `templates/`
+folder, also within the playbook/role directory.
+
+For this reason, for `src`, you should either:
+- Do not specify a path, or use a sub-folder of either `files/` or `templates/`.
+- Use absolute path if the resources are above your Ansible playbook/role
+```
+
+```{warning}
+Avoid storing files or templates inside the same directory as your playbook or
+tasks files. Doing this is a bad practice and also will generate linting
+warning in the future. Imagine the user confusion if these files also happen
+to be YAML.
+```
 
 See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pathing.html#task-paths) in the Ansible documentation for more information.
 
@@ -17,7 +33,7 @@ See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pat
   tasks:
     - name: Template a file to /etc/file.conf
       ansible.builtin.template:
-        src: ../mytemplates/foo.j2 # <- Uses a relative path in the src argument.
+        src: ../my_templates/foo.j2 # <- Uses a relative path in the src argument.
         dest: /etc/file.conf
         owner: bin
         group: wheel
@@ -28,7 +44,7 @@ See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pat
 - name: Example playbook
   hosts: all
   vars:
-    source_path: ../../mytemplates/foo.j2 # <- Sets a variable to a relative path.
+    source_path: ../../my_templates/foo.j2 # <- Sets a variable to a relative path.
   tasks:
     - name: Copy a file to /etc/file.conf
       ansible.builtin.copy:
@@ -48,7 +64,7 @@ See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pat
   tasks:
     - name: Template a file to /etc/file.conf
       ansible.builtin.template:
-        src: /path/to/mytemplates/foo.j2 # <- Uses an absolute path in the src argument.
+        src: foo.j2 # <- Uses a path from inside templates/ directory.
         dest: /etc/file.conf
         owner: bin
         group: wheel
@@ -59,7 +75,7 @@ See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pat
 - name: Example playbook
   hosts: all
   vars:
-    source_path: /path/to/mytemplates/foo.j2 # <- Sets a variable to an absolute path.
+    source_path: foo.j2 # <- Uses a path from inside files/ directory.
   tasks:
     - name: Copy a file to /etc/file.conf
       ansible.builtin.copy:
