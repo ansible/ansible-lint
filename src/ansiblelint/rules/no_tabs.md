@@ -1,7 +1,7 @@
 # no-tabs
 
 This rule checks for the tab character.
-The ``/t`` tab character can result in unexpected display or formatting issues.
+The `/t` tab character can result in unexpected display or formatting issues.
 You should always use spaces instead of tabs.
 
 ```{note}
