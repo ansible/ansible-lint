@@ -7,8 +7,8 @@ In the `ansible.builtin.copy` and `ansible.builtin.template` modules, the `src` 
 
 The recommended locations to store files are as follows:
 
-* Use the `files/` folder in the playbook or role directory for the `copy` module.
-* Use the `templates/` folder in the playbook or role directory for the `template` module.
+- Use the `files/` folder in the playbook or role directory for the `copy` module.
+- Use the `templates/` folder in the playbook or role directory for the `template` module.
 
 These folders allow you to omit the path or use a sub-folder when specifying files with the `src` argument.
 
