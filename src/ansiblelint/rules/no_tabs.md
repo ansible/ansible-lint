@@ -4,7 +4,7 @@ This rule checks for the tab character.
 The ``/t`` tab character can result in unexpected display or formatting issues.
 You should always use spaces instead of tabs.
 
-```note
+```{note}
 This rule does not trigger alerts for tab characters in the ``ansible.builtin.lineinfile`` module.
 ```
 
