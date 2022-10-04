@@ -1,6 +1,6 @@
 # only-builtins
 
-This rule checks that playbooks use actions from the ``ansible.builtin`` collection only.
+This rule checks that playbooks use actions from the `ansible.builtin` collection only.
 
 This is an opt-in rule.
 You must enable it in your Ansible-lint configuration as follows:
