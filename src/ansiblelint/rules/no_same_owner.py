@@ -14,18 +14,13 @@ if TYPE_CHECKING:
 
 
 class NoSameOwnerRule(AnsibleLintRule):
-    """Owner should not be kept between different hosts."""
+    """Do not preserve the owner and group when transferring files across hosts."""
 
     id = "no-same-owner"
     description = """
 Optional rule that highlights dangers of assuming that user/group on the remote
 machines may not exist on ansible controller or vice versa. Owner and group
 should not be preserved when transferring files between them.
-
-This rule is not enabled by default and was inspired by Zuul execution policy.
-See:
-https://zuul-ci.org/docs/zuul-jobs/policy.html\
-#preservation-of-owner-between-executor-and-remote
 """
     severity = "LOW"
     tags = ["opt-in"]
