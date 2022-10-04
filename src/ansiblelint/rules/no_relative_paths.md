@@ -1,10 +1,10 @@
 # no-relative-paths
 
-This rule checks for relative paths in the ``ansible.builtin.copy`` and ``ansible.builtin.template`` modules.
+This rule checks for relative paths in the `ansible.builtin.copy` and `ansible.builtin.template` modules.
 
 Relative paths in a task most often direct Ansible to remote files and directories on managed nodes.
-In the ``ansible.builtin.copy`` and ``ansible.builtin.template`` modules, the ``src`` argument refers to local files and directories on the control node.
-For this reason you should always provide an absolute path to resources with the ``src`` argument.
+In the `ansible.builtin.copy` and `ansible.builtin.template` modules, the `src` argument refers to local files and directories on the control node.
+For this reason you should always provide an absolute path to resources with the `src` argument.
 
 See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pathing.html#task-paths) in the Ansible documentation for more information.
 
@@ -21,7 +21,7 @@ See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pat
         dest: /etc/file.conf
         owner: bin
         group: wheel
-        mode: '0644'
+        mode: "0644"
 ```
 
 ```yaml
@@ -36,7 +36,7 @@ See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pat
         dest: /etc/foo.conf
         owner: foo
         group: foo
-        mode: '0644'
+        mode: "0644"
 ```
 
 ## Correct Code
@@ -52,7 +52,7 @@ See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pat
         dest: /etc/file.conf
         owner: bin
         group: wheel
-        mode: '0644'
+        mode: "0644"
 ```
 
 ```yaml
@@ -67,5 +67,5 @@ See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pat
         dest: /etc/foo.conf
         owner: foo
         group: foo
-        mode: '0644'
+        mode: "0644"
 ```

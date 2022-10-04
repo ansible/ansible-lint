@@ -16,9 +16,7 @@ class RoleRelativePath(AnsibleLintRule):
     """The src argument should not use a relative path."""
 
     id = "no-relative-paths"
-    description = (
-        "The ``copy`` and ``template`` modules should not use relative path for ``src``."
-    )
+    description = "The ``copy`` and ``template`` modules should not use relative path for ``src``."
     severity = "HIGH"
     tags = ["idiom"]
     version_added = "v4.0.0"
