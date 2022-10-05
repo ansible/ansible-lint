@@ -2,12 +2,12 @@
 
 This rule checks that package managers install software in a controlled, safe manner.
 
-Package manager modules, such as ``ansible.builtin.yum``, include a ``state`` parameter that configures how Ansible installs software.
-In production environments, you should set ``state`` to ``present`` and specify a target version to ensure that packages are installed to a planned and tested version. 
+Package manager modules, such as `ansible.builtin.yum`, include a `state` parameter that configures how Ansible installs software.
+In production environments, you should set `state` to `present` and specify a target version to ensure that packages are installed to a planned and tested version.
 
-Setting ``state`` to ``latest`` not only installs software, it performs an update and installs additional packages.
+Setting `state` to `latest` not only installs software, it performs an update and installs additional packages.
 This can result in performance degradation or loss of service.
-If you do want to update packages to the latest version, you should also set the ``update_only`` parameter to ``true`` to avoid installing additional packages.
+If you do want to update packages to the latest version, you should also set the `update_only` parameter to `true` to avoid installing additional packages.
 
 ## Problematic Code
 
