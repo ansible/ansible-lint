@@ -2,7 +2,7 @@
 
 This rule checks that privilege escalation is activated when changing users.
 
-To perform an action as a different user with the ``become_user`` directive, you must set ``become: true``.
+To perform an action as a different user with the `become_user` directive, you must set `become: true`.
 
 ## Problematic Code
 
