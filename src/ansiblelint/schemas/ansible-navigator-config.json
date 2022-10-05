@@ -304,7 +304,7 @@
                             "type": "object"
                         },
                         "image": {
-                            "default": "quay.io/ansible/creator-ee:v0.4.2",
+                            "default": "quay.io/ansible/creator-ee:v0.9.1",
                             "description": "Specify the name of the execution environment image",
                             "type": "string"
                         },

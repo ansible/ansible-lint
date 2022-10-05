@@ -34,7 +34,6 @@ BuildRequires:  git
 %endif
 # Named based on fedora 35:
 Requires:       ansible-core >= 2.12.0
-Requires:       python3-enrich
 Requires:       python3-packaging
 Requires:       python3-pyyaml
 Requires:       python3-rich
