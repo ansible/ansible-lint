@@ -31,11 +31,10 @@ import site
 import subprocess
 import sys
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Iterator
+from typing import TYPE_CHECKING, Any, Callable, Iterator, TextIO
 
 from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir
-from enrich.console import should_do_markup
 from filelock import FileLock, Timeout
 
 from ansiblelint import cli
@@ -348,6 +347,51 @@ def path_inject() -> None:
     # our dependency, but addressing this would be done by ansible-compat.
     if not shutil.which("ansible"):
         raise RuntimeError("Failed to find ansible executable in PATH")
+
+
+# Based on Ansible implementation
+def to_bool(value: Any) -> bool:
+    """Return a bool for the arg."""
+    if value is None or isinstance(value, bool):
+        return bool(value)
+    if isinstance(value, str):
+        value = value.lower()
+    if value in ("yes", "on", "1", "true", 1):
+        return True
+    return False
+
+
+def should_do_markup(stream: TextIO = sys.stdout) -> bool:
+    """Decide about use of ANSI colors."""
+    py_colors = None
+
+    # https://xkcd.com/927/
+    for env_var in ["PY_COLORS", "CLICOLOR", "FORCE_COLOR", "ANSIBLE_FORCE_COLOR"]:
+        value = os.environ.get(env_var, None)
+        if value is not None:
+            py_colors = to_bool(value)
+            break
+
+    # If deliberately disabled colors
+    if os.environ.get("NO_COLOR", None):
+        return False
+
+    # User configuration requested colors
+    if py_colors is not None:
+        return to_bool(py_colors)
+
+    term = os.environ.get("TERM", "")
+    if "xterm" in term:
+        return True
+
+    if term == "dumb":
+        return False
+
+    # Use tty detection logic as last resort because there are numerous
+    # factors that can make isatty return a misleading value, including:
+    # - stdin.isatty() is the only one returning true, even on a real terminal
+    # - stderr returning false if user user uses a error stream coloring solution
+    return stream.isatty()
 
 
 if __name__ == "__main__":
