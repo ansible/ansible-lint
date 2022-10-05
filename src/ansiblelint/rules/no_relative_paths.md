@@ -5,21 +5,20 @@ This rule checks for relative paths in the `ansible.builtin.copy` and `ansible.b
 Relative paths in a task most often direct Ansible to remote files and directories on managed nodes.
 In the `ansible.builtin.copy` and `ansible.builtin.template` modules, the `src` argument refers to local files and directories on the control node.
 
-```{note}
-For `copy` best location to store files is inside `files/` folder within the
-playbook/role directory. For `template` the recommended location is `templates/`
-folder, also within the playbook/role directory.
+The recommended locations to store files are as follows:
 
-For this reason, for `src`, you should either:
-- Do not specify a path, or use a sub-folder of either `files/` or `templates/`.
-- Use absolute path if the resources are above your Ansible playbook/role
+- Use the `files/` folder in the playbook or role directory for the `copy` module.
+- Use the `templates/` folder in the playbook or role directory for the `template` module.
+
+These folders allow you to omit the path or use a sub-folder when specifying files with the `src` argument.
+
+```{note}
+If resources are outside your Ansible playbook or role directory you should use an absolute path with the `src` argument.
 ```
 
 ```{warning}
-Avoid storing files or templates inside the same directory as your playbook or
-tasks files. Doing this is a bad practice and also will generate linting
-warning in the future. Imagine the user confusion if these files also happen
-to be YAML.
+Do not store resources at the same directory level as your Ansible playbook or tasks files.
+Doing this can result in disorganized projects and cause user confusion when distinguishing between resources of the same type, such as YAML.
 ```
 
 See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pathing.html#task-paths) in the Ansible documentation for more information.
