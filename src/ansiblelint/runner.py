@@ -188,6 +188,7 @@ class Runner:
         matches = list(
             filter(
                 lambda match: not self.is_excluded(Lintable(match.filename))
+                and hasattr(match, "lintable")
                 and match.tag not in match.lintable.line_skips[match.linenumber],
                 matches,
             )
