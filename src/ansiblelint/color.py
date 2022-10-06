@@ -54,11 +54,10 @@ DEFAULT_STYLES.update(
 _theme = Theme(
     {
         "info": "cyan",
-        "warning": "dim yellow",
+        "warning": "yellow",
         "danger": "bold red",
         "title": "yellow",
-        "error_code": "bright_red",
-        "error_title": "red",
+        "error": "bright_red",
         "filename": "blue",
     }
 )

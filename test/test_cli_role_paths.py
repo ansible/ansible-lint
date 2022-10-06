@@ -169,7 +169,7 @@ def test_run_playbook_github(result: bool, env: dict[str, str]) -> None:
     result_gh = run_ansible_lint(role_path, cwd=cwd, env=env)
 
     expected = (
-        "::warning file=examples/playbooks/example.yml,line=44,severity=VERY_LOW::package-latest "
+        "::error file=examples/playbooks/example.yml,line=44,severity=VERY_LOW,title=package-latest::"
         "Package installs should not use latest"
     )
     assert (expected in result_gh.stdout) is result

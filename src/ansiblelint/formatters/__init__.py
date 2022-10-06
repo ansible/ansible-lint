@@ -58,9 +58,9 @@ class Formatter(BaseFormatter):  # type: ignore
 
     def format(self, match: MatchError) -> str:
         _id = getattr(match.rule, "id", "000")
-        result = f"[error_code][link={match.rule.url}]{_id}[/link][/][dim]:[/] [error_title]{self.escape(match.message)}[/]"
-        if match.tag:
-            result += f" [dim][error_code]({self.escape(match.tag)})[/][/]"
+        result = f"[{match.level}][bold][link={match.rule.url}]{self.escape(match.tag)}[/link][/][/][dim]:[/] [{match.level}]{self.escape(match.message)}[/]"
+        if match.level != "error":
+            result += f" [dim][{match.level}]({match.level})[/][/]"
         result += (
             "\n"
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
@@ -76,7 +76,7 @@ class QuietFormatter(BaseFormatter[Any]):
 
     def format(self, match: MatchError) -> str:
         return (
-            f"[error_code]{match.rule.id}[/] "
+            f"[{match.level}]{match.rule.id}[/] "
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
         )
 
@@ -86,20 +86,20 @@ class ParseableFormatter(BaseFormatter[Any]):
 
     def format(self, match: MatchError) -> str:
         result = (
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}: "
-            f"[error_code]{match.rule.id}[/]"
+            f"[filename]{self._format_path(match.filename or '')}[/][dim]:{match.position}:[/] "
+            f"[{match.level}][bold]{self.escape(match.tag)}[/bold]"
+            f": {match.message}"
+            if not options.quiet
+            else "[/]"
         )
+        if match.level != "error":
+            result += f" [dim][{match.level}]({match.level})[/][/]"
 
-        if not options.quiet:
-            result += f": [dim]{match.message}[/]"
-
-        if match.tag:
-            result += f" [dim][error_code]({self.escape(match.tag)})[/][/]"
         return result
 
 
 class AnnotationsFormatter(BaseFormatter):  # type: ignore
-    # https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
+    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-a-warning-message
     """Formatter for emitting violations as GitHub Workflow Commands.
 
     These commands trigger the GHA Workflow runners platform to post violations
@@ -115,10 +115,8 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
 
     def format(self, match: MatchError) -> str:
         """Prepare a match instance for reporting as a GitHub Actions annotation."""
-        level = self._severity_to_level(match.rule.severity)
         file_path = self._format_path(match.filename or "")
         line_num = match.linenumber
-        rule_id = match.rule.id
         severity = match.rule.severity
         violation_details = self.escape(match.message)
         if match.column:
@@ -126,18 +124,9 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
         else:
             col = ""
         return (
-            f"::{level} file={file_path},line={line_num}{col},severity={severity}"
-            f"::{rule_id} {violation_details}"
+            f"::{match.level} file={file_path},line={line_num}{col},severity={severity},title={match.tag}"
+            f"::{violation_details}"
         )
-
-    @staticmethod
-    def _severity_to_level(severity: str) -> str:
-        if severity in ["VERY_LOW", "LOW"]:
-            return "warning"
-        if severity in ["INFO"]:
-            return "debug"
-        # ['MEDIUM', 'HIGH', 'VERY_HIGH'] or anything else
-        return "error"
 
 
 class CodeclimateJSONFormatter(BaseFormatter[Any]):
@@ -161,7 +150,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             issue["type"] = "issue"
             issue["check_name"] = match.tag or match.rule.id  # rule-id[subrule-id]
             issue["categories"] = match.rule.tags
-            issue["severity"] = self._severity_to_level(match.rule.severity)
+            issue["severity"] = self._severity_to_level(match)
             issue["description"] = self.escape(str(match.message))
             issue["fingerprint"] = hashlib.sha256(
                 repr(match).encode("utf-8")
@@ -184,7 +173,11 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
         return json.dumps(result)
 
     @staticmethod
-    def _severity_to_level(severity: str) -> str:
+    def _severity_to_level(match: MatchError) -> str:
+        if match.level != "error":
+            return "info"
+        severity = match.rule.severity
+
         if severity in ["LOW"]:
             return "minor"
         if severity in ["MEDIUM"]:
@@ -205,7 +198,7 @@ class SarifFormatter(BaseFormatter[Any]):
     """
 
     BASE_URI_ID = "SRCROOT"
-    TOOL_NAME = "Ansible-lint"
+    TOOL_NAME = "ansible-lint"
     TOOL_URL = "https://github.com/ansible/ansible-lint"
     SARIF_SCHEMA_VERSION = "2.1.0"
     SARIF_SCHEMA = (
@@ -267,12 +260,12 @@ class SarifFormatter(BaseFormatter[Any]):
     def _to_sarif_rule(self, match: MatchError) -> dict[str, Any]:
         rule: dict[str, Any] = {
             "id": match.rule.id,
-            "name": match.rule.id,
+            "name": match.tag,
             "shortDescription": {
                 "text": self.escape(str(match.message)),
             },
             "defaultConfiguration": {
-                "level": self._to_sarif_level(match.rule.severity),
+                "level": self._to_sarif_level(match),
             },
             "help": {
                 "text": str(match.rule.description),
@@ -311,10 +304,6 @@ class SarifFormatter(BaseFormatter[Any]):
         return result
 
     @staticmethod
-    def _to_sarif_level(severity: str) -> str:
-        if severity in ["VERY_HIGH", "HIGH", "MEDIUM"]:
-            return "error"
-        if severity in ["LOW"]:
-            return "warning"
-        # VERY_LOW, INFO or anything else
-        return "note"
+    def _to_sarif_level(match: MatchError) -> str:
+        # sarif accepts only 4 levels: error, warning, note, none
+        return match.level

@@ -5,6 +5,7 @@ import functools
 from typing import Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
+from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable, normpath
 
 
@@ -86,6 +87,13 @@ class MatchError(ValueError):
         self.yaml_path: list[int | str] = []
         # True when a transform has resolved this MatchError
         self.fixed = False
+
+    @functools.cached_property
+    def level(self) -> str:
+        """Return the level of the rule: error, warning or notice."""
+        if {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(options.warn_list):
+            return "error"
+        return "warning"
 
     def __repr__(self) -> str:
         """Return a MatchError instance representation."""
