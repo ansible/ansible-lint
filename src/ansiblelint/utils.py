@@ -118,19 +118,24 @@ def ansible_template(
 ) -> Any:
     """Render a templated string by mocking missing filters."""
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
-    while True:
+    # pylint: disable=unused-variable
+    for i in range(3):
         try:
             return templar.template(varname, **kwargs)
         except AnsibleError as exc:
-            if exc.message.startswith(
-                "template error while templating string: No filter named"
+            if (
+                exc.message.startswith("template error while templating string:")
+                and "'" in exc.message
             ):
                 missing_filter = exc.message.split("'")[1]
+                if missing_filter == "end of print statement":
+                    raise
                 # Mock the filter to avoid and error from Ansible templating
                 # pylint: disable=protected-access
                 templar.environment.filters._delegatee[missing_filter] = lambda x: x
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
+                    _logger.debug("Mocking missing filter %s", missing_filter)
                     options.mock_filters.append(missing_filter)
                 continue
             raise
