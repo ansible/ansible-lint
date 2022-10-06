@@ -29,6 +29,22 @@ warn_list:
 
 See the [list of yamllint rules](https://yamllint.readthedocs.io/en/stable/rules.html) for more information.
 
+Some of the detailed error codes that you might see are:
+
+- `yaml[brackets]` - _too few spaces inside empty brackets_, or _too many spaces inside brackets_
+- `yaml[colons]` - _too many spaces before colon_, or _too many spaces after colon_
+- `yaml[commas]` - _too many spaces before comma_, or _too few spaces after comma_
+- `yaml[comments-indentation]` - _Comment not indented like content_
+- `yaml[comments]` - _Too few spaces before comment_, or _Missing starting space in comment_
+- `yaml[document-start]` - _missing document start "---"_ or _found forbidden document start "---"_
+- `yaml[empty-lines]` - _too many blank lines (...> ...)_
+- `yaml[indentation]` - _Wrong indentation: expected ... but found ..._
+- `yaml[key-duplicates]` - _Duplication of key "..." in mapping_
+- `yaml[new-line-at-end-of-file]` - _No new line character at the end of file_
+- `yaml[syntax]` - YAML syntax is broken
+- `yaml[trailing-spaces]` - Spaces are found at the end of lines
+- `yaml[truthy]` - _Truthy value should be one of ..._
+
 ## Problematic code
 
 ```yaml

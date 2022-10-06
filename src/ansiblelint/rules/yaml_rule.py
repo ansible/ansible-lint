@@ -50,7 +50,8 @@ class YamllintRule(AnsibleLintRule):
                 self.severity = "VERY_HIGH"
             matches.append(
                 self.create_matcherror(
-                    message=problem.desc,
+                    # yamllint does return lower-case sentences
+                    message=problem.desc.capitalize(),
                     linenumber=problem.line,
                     details="",
                     filename=file,
@@ -129,9 +130,9 @@ if "pytest" in sys.modules:
                 "examples/yamllint/invalid.yml",
                 "yaml",
                 [
-                    'missing document start "---"',
-                    'duplication of key "foo" in mapping',
-                    "trailing spaces",
+                    'Missing document start "---"',
+                    'Duplication of key "foo" in mapping',
+                    "Trailing spaces",
                 ],
             ),
             (
