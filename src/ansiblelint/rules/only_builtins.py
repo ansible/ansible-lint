@@ -58,7 +58,8 @@ if "pytest" in sys.modules:
             "examples/playbooks/rule-only-builtins.yml",
         )
         assert result.returncode == VIOLATIONS_FOUND_RC
-        assert "Finished with 1 failure(s)" in result.stderr
+        assert "Failed" in result.stderr
+        assert "1 failure(s)" in result.stderr
         assert "only-builtins" in result.stdout
 
     @pytest.mark.parametrize(

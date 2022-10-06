@@ -3,8 +3,10 @@
   hosts: all
   tasks:
     - name: This task has a name
-      ansible.builtin.command: echo "Hello World"
+      ansible.builtin.command: echo "Hello World" # noqa: no-free-form
+      changed_when: false
     - name: Debug task with name
-      ansible.builtin.debug: msg="Hello World"
+      ansible.builtin.debug: msg="Hello World" # noqa: no-free-form
     - name: Flush handler with name
       ansible.builtin.meta: flush_handlers
+      changed_when: false
