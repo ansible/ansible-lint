@@ -17,10 +17,13 @@ If you do want to update packages to the latest version, you should also set the
   hosts: localhost
   tasks:
     - name: Install Ansible
-      ansible.builtin.yum: name=ansible state=latest # <- Installs the latest package.
+      ansible.builtin.yum:
+        name: ansible
+        state: latest # <- Installs the latest package.
 
     - name: Install Ansible-lint
-      ansible.builtin.pip: name=ansible-lint
+      ansible.builtin.pip:
+        name: ansible-lint
       args:
         state: latest # <- Installs the latest package.
 
@@ -44,10 +47,13 @@ If you do want to update packages to the latest version, you should also set the
   hosts: localhost
   tasks:
     - name: Install Ansible
-      ansible.builtin.yum: name=ansible-2.12.7.0 state=present # <- Pins the version to install with yum.
+      ansible.builtin.yum:
+        name: ansible-2.12.7.0
+        state: present # <- Pins the version to install with yum.
 
     - name: Install Ansible-lint
-      ansible.builtin.pip: name=ansible-lint
+      ansible.builtin.pip:
+        name: ansible-lint
       args:
         state: present
         version: 5.4.0 # <- Pins the version to install with pip.
