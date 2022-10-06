@@ -193,7 +193,7 @@ warn_list:  # or 'skip_list' to silence them completely
                 "because 'yaml' is in 'skip_list'."
             )
 
-        if (result.matches or changed_files_count) and not self.options.quiet:
+        if not self.options.quiet:
             console_stderr.print(render_yaml(msg))
             self.report_summary(summary, changed_files_count, files_count)
 
@@ -231,12 +231,6 @@ warn_list:  # or 'skip_list' to silence them completely
         if changed_files_count:
             console_stderr.print(f"Modified {changed_files_count} files.")
 
-        msg = "Finished with "
-        msg += f"{summary.failures} failure(s), {summary.warnings} warning(s)"
-        if summary.fixed:
-            msg += f", and fixed {summary.fixed} issue(s)"
-        msg += f" on {files_count} files."
-
         # determine which profile passed
         summary.passed_profile = ""
         passed_profile_count = 0
@@ -247,6 +241,7 @@ warn_list:  # or 'skip_list' to silence them completely
                 summary.passed_profile = profile
                 passed_profile_count += 1
 
+        stars = ""
         if summary.tag_stats:
             table = Table(
                 title="Rule Violation Summary",
@@ -269,15 +264,25 @@ warn_list:  # or 'skip_list' to silence them completely
             # rate stars for the top 5 profiles (min would not get
             rating = 5 - (len(PROFILES.keys()) - passed_profile_count)
             if 0 < rating < 6:
-                stars = f"Rated as {rating}/5 stars."
-            else:
-                stars = "No rating."
+                stars = f", {rating}/5 star rating"
 
             console_stderr.print(table)
             console_stderr.print()
 
-            if summary.passed_profile:
-                msg += f" Code passed [white bold]{summary.passed_profile}[/] profile. {stars}"
+        if summary.failures:
+            msg = "[red][bold]Failed[/][/] after "
+        else:
+            msg = "[green]Passed[/] with "
+
+        if summary.passed_profile:
+            msg += f"[bold]{summary.passed_profile}[/] profile"
+        if stars:
+            msg += stars
+
+        msg += f": {summary.failures} failure(s), {summary.warnings} warning(s)"
+        if summary.fixed:
+            msg += f", and fixed [/]{summary.fixed} issue(s)"
+        msg += f" on {files_count} files."
 
         console_stderr.print(msg)
 
