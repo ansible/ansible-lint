@@ -185,14 +185,14 @@ repos:
     hooks:
       - id: pip-compile
         name: pip-compile
-        entry: python3.9 -m piptools compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras
+        entry: python3.9 -m piptools compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core
         language: system
         files: ^(setup\.cfg|=constraints\.txt)$
         pass_filenames: false
         stages: [manual]
       - id: pip-compile-upgrade
         name: pip-compile-upgrade
-        entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras
+        entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core
         language: system
         files: ^(setup\.cfg|=constraints\.txt)$
         pass_filenames: false
