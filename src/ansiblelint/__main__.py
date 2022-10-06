@@ -121,6 +121,10 @@ def initialize_options(arguments: list[str] | None = None) -> None:
             )
             sys.exit(LOCK_TIMEOUT_RC)
 
+    # Avoid extra output noise from Ansible about using devel versions
+    if "ANSIBLE_DEVEL_WARNING" not in os.environ:
+        os.environ["ANSIBLE_DEVEL_WARNING"] = "false"
+
 
 def _do_list(rules: RulesCollection) -> int:
     # On purpose lazy-imports to avoid pre-loading Ansible
