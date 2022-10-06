@@ -27,7 +27,7 @@ class ShellWithoutPipefail(AnsibleLintRule):
     tags = ["command-shell"]
     version_added = "v4.1.0"
 
-    _pipefail_re = re.compile(r"^\s*set.*[+-][A-z]*o\s*pipefail", re.M)
+    _pipefail_re = re.compile(r"^\s*set.*[+-][A-Za-z]*o\s*pipefail", re.M)
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
 
     def matchtask(
