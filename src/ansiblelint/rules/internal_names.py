@@ -8,7 +8,6 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 
-
 COLLECTIONS_WITH_FLATMAPPING = [
     "community.general",
     "community.network",
