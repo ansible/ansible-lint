@@ -55,6 +55,7 @@ docstrings
 doctest
 doctrees
 docutils
+edgeos
 ematcher
 ematchtestfile
 execnet
