@@ -135,9 +135,7 @@ if "pytest" in sys.modules:
   - name: Shell (fqcn)
     ansible.builtin.shell: echo This rule should not get matched by the fqcn rule
   - name: Use FQCN with more than 3 parts
-    community.foo.bar.baz:
-      name: should-not-be-here
-      state: absent
+    testns.test_collection.subdir.test_module_1:
     """
 
     FAIL_PLAY = """
@@ -170,5 +168,7 @@ if "pytest" in sys.modules:
     )
     def test_fqcn_builtin_pass(rule_runner: RunFromText) -> None:
         """Test rule does not match."""
-        results = rule_runner.run_playbook(SUCCESS_PLAY)
+        results = rule_runner.run_playbook(
+            SUCCESS_PLAY, project_dir="test/local-content"
+        )
         assert len(results) == 0, results

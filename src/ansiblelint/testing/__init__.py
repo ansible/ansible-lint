@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from ansiblelint.app import get_app
 from ansiblelint.rules import RulesCollection
@@ -34,22 +34,29 @@ class RunFromText:
         """Initialize a RunFromText instance with rules collection."""
         self.collection = collection
 
-    def _call_runner(self, path: str) -> list[MatchError]:
-        runner = Runner(path, rules=self.collection)
+    def _call_runner(
+        self, path: str, project_dir: Optional[str] = None
+    ) -> list[MatchError]:
+        runner = Runner(path, rules=self.collection, project_dir=project_dir)
         return runner.run()
 
     def run(self, filename: str) -> list[MatchError]:
         """Lints received filename."""
         return self._call_runner(filename)
 
-    def run_playbook(self, playbook_text: str) -> list[MatchError]:
+    def run_playbook(
+        self, playbook_text: str, project_dir: Optional[str] = None
+    ) -> list[MatchError]:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yml", prefix="playbook"
+            mode="w",
+            suffix=".yml",
+            prefix="playbook",
+            dir=project_dir,
         ) as fh:
             fh.write(playbook_text)
             fh.flush()
-            results = self._call_runner(fh.name)
+            results = self._call_runner(fh.name, project_dir=project_dir)
         return results
 
     def run_role_tasks_main(self, tasks_main_text: str) -> list[MatchError]:
