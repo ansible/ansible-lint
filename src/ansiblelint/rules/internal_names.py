@@ -17,7 +17,7 @@ COLLECTIONS_WITH_FLATMAPPING = [
 class InternalNamesRule(AnsibleLintRule):
     """Avoid internal names for actions."""
 
-    id = "internal_names"
+    id = "internal-names"
     severity = "VERY_HIGH"
     description = "Check whether actions are using internal names from collections names that should not be used."
     tags = ["formatting"]
@@ -40,7 +40,7 @@ class InternalNamesRule(AnsibleLintRule):
                         details=f"Use `{collection}.{parts[-1]}` instead.",
                         filename=file,
                         linenumber=task["__line__"],
-                        tag=f"internal_names[{collection}]",
+                        tag=f"internal-names[{collection}]",
                     )
                 )
         return result
@@ -68,11 +68,11 @@ if "pytest" in sys.modules:
     FAIL_PLAY = """
 - hosts: localhost
   tasks:
-  - name: Internal name for community.general (internal_names[community.general])
+  - name: Internal name for community.general (internal-names[community.general])
     community.general.system.sudoers:
       name: should-not-be-here
       state: absent
-  - name: Internal name for community.network (internal_names[community.network])
+  - name: Internal name for community.network (internal-names[community.network])
     community.network.network.edgeos.edgeos_facts:
       gather_subset: all
     """
@@ -84,12 +84,12 @@ if "pytest" in sys.modules:
         """Test rule matches."""
         results = rule_runner.run_playbook(FAIL_PLAY)
         assert len(results) == 2
-        assert results[0].tag == "internal_names[community.general]"
+        assert results[0].tag == "internal-names[community.general]"
         assert (
             "Do not use internal names for community.general module actions"
             in results[0].message
         )
-        assert results[1].tag == "internal_names[community.network]"
+        assert results[1].tag == "internal-names[community.network]"
         assert (
             "Do not use internal names for community.network module actions"
             in results[1].message
