@@ -129,6 +129,8 @@ if "pytest" in sys.modules:
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
+    # TODO: replace community.general.system.sudoers with another collection where
+    #       such FQCNs are **not** internal names!
     SUCCESS_PLAY = """
 - hosts: localhost
   tasks:
