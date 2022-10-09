@@ -129,15 +129,13 @@ if "pytest" in sys.modules:
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
-    # TODO: replace community.general.system.sudoers with another collection where
-    #       such FQCNs are **not** internal names!
     SUCCESS_PLAY = """
 - hosts: localhost
   tasks:
   - name: Shell (fqcn)
     ansible.builtin.shell: echo This rule should not get matched by the fqcn rule
   - name: Use FQCN with more than 3 parts
-    community.general.system.sudoers:
+    community.foo.bar.baz:
       name: should-not-be-here
       state: absent
     """
