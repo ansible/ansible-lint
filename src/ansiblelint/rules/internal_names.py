@@ -36,7 +36,7 @@ class InternalNamesRule(AnsibleLintRule):
             if len(parts) > 3:
                 result.append(
                     self.create_matcherror(
-                        message=f"Do not use internal name for {collection} module actions ({module}).",
+                        message=f"Do not use internal names for {collection} module actions ({module}).",
                         details=f"Use `{collection}.{parts[-1]}` instead.",
                         filename=file,
                         linenumber=task["__line__"],
@@ -61,7 +61,7 @@ if "pytest" in sys.modules:
       name: should-not-be-here
       state: absent
   - name: Correct name for community.network
-    community.network.network.edgeos.edgeos_facts:
+    community.network.edgeos_facts:
       gather_subset: all
     """
 
@@ -73,7 +73,7 @@ if "pytest" in sys.modules:
       name: should-not-be-here
       state: absent
   - name: Internal name for community.network (internal_names[community.network])
-    community.network.edgeos_facts:
+    community.network.network.edgeos.edgeos_facts:
       gather_subset: all
     """
 
@@ -86,12 +86,12 @@ if "pytest" in sys.modules:
         assert len(results) == 2
         assert results[0].tag == "internal_names[community.general]"
         assert (
-            "Do not use internal names for community.network module actions"
+            "Do not use internal names for community.general module actions"
             in results[0].message
         )
         assert results[1].tag == "internal_names[community.network]"
         assert (
-            "Do not use internal names for community.general module actions"
+            "Do not use internal names for community.network module actions"
             in results[1].message
         )
 
