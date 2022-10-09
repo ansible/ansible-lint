@@ -35,7 +35,7 @@ class RunFromText:
         self.collection = collection
 
     def _call_runner(
-        self, path: str, project_dir: Optional[str] = None
+        self, path: str, project_dir: str | None = None
     ) -> list[MatchError]:
         runner = Runner(path, rules=self.collection, project_dir=project_dir)
         return runner.run()
@@ -45,7 +45,7 @@ class RunFromText:
         return self._call_runner(filename)
 
     def run_playbook(
-        self, playbook_text: str, project_dir: Optional[str] = None
+        self, playbook_text: str, project_dir: str | None = None
     ) -> list[MatchError]:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(
