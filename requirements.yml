@@ -6,5 +6,6 @@ collections:
   # that collection is used during ansible-lint testing for validating our
   # ability to detect non-core modules.
   - name: ansible.posix
-  # that collection is used during ansible-lint own testing
+  # these collections are used during ansible-lint own testing
   - name: community.general
+  - name: community.network
