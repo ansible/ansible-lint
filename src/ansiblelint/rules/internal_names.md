@@ -20,7 +20,7 @@ The `internal_names` rule has the following checks:
   tasks:
     - name: Create an SSH connection
       community.general.system.ufw: # <- Does use an internal FQCN for the ufw module
-        ...
+        state: enabled
 ```
 
 ## Correct Code
@@ -30,5 +30,6 @@ The `internal_names` rule has the following checks:
   hosts: all
   tasks:
     - name: Create an SSH connection
-      community.general.ufw: ...
+      community.general.ufw:
+        state: enabled
 ```
