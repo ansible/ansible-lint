@@ -26,7 +26,7 @@ class InternalNamesRule(AnsibleLintRule):
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> list[MatchError]:
-        result = []
+        result: list[MatchError] = []
         module = task["action"]["__ansible_module_original__"]
         parts = module.split(".")
         if len(parts) <= 3:
