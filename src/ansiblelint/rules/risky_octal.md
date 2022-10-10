@@ -22,7 +22,7 @@ Modules that are checked:
         path: /etc/foo.conf
         owner: foo
         group: foo
-        mode: 644 
+        mode: 644
 ```
 
 ## Correct Code
@@ -37,11 +37,11 @@ Modules that are checked:
         path: /etc/foo.conf
         owner: foo
         group: foo
-        mode: 0644   # <- Leading zero will prevent Numeric file permissions to behave in unexpected ways.
+        mode: 0644 # <- Leading zero will prevent Numeric file permissions to behave in unexpected ways.
     - name: Safe example of declaring Numeric file permissions (2nd solution)
       ansible.builtin.file:
         path: /etc/foo.conf
         owner: foo
         group: foo
-        mode: '644'  # <- Being in a string will prevent Numeric file permissions to behave in unexpected ways.
+        mode: "644" # <- Being in a string will prevent Numeric file permissions to behave in unexpected ways.
 ```
