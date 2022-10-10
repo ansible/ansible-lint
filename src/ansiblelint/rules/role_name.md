@@ -26,7 +26,7 @@ For more information see the [roles directory](https://docs.ansible.com/ansible/
 - name: Example playbook
   hosts: localhost
   roles:
-    - myRole1 # <- Starts with an alphabetic character.
+    - myrole1 # <- Starts with an alphabetic character.
     - myrole2 # <- Contains only alphanumeric characters.
     - myrole_3 # <- Contains only lowercase alphabetic characters.
 ```
