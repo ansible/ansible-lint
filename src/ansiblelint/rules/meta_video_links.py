@@ -33,7 +33,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
     }
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
-        if file.kind != "meta":
+        if file.kind != "meta" or not file.data:
             return []
 
         galaxy_info = file.data.get("galaxy_info", None)

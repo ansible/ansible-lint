@@ -34,7 +34,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     version_added = "v4.0.0"
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
-        if file.kind != "meta":
+        if file.kind != "meta" or not file.data:
             return []
 
         galaxy_info = file.data.get("galaxy_info", None)
