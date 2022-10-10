@@ -88,9 +88,7 @@ class ParseableFormatter(BaseFormatter[Any]):
         result = (
             f"[filename]{self._format_path(match.filename or '')}[/][dim]:{match.position}:[/] "
             f"[{match.level}][bold]{self.escape(match.tag)}[/bold]"
-            f": {match.message}"
-            if not options.quiet
-            else "[/]"
+            f"{ f': {match.message}' if not options.quiet else '' }[/]"
         )
         if match.level != "error":
             result += f" [dim][{match.level}]({match.level})[/][/]"

@@ -281,7 +281,7 @@ warn_list:  # or 'skip_list' to silence them completely
 
         msg += f": {summary.failures} failure(s), {summary.warnings} warning(s)"
         if summary.fixed:
-            msg += f", and fixed [/]{summary.fixed} issue(s)"
+            msg += f", and fixed {summary.fixed} issue(s)"
         msg += f" on {files_count} files."
 
         console_stderr.print(msg)
