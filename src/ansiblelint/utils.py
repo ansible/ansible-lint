@@ -702,7 +702,7 @@ def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
 @lru_cache(maxsize=None)
 def parse_yaml_linenumbers(  # noqa: max-complexity: 12
     lintable: Lintable,
-) -> AnsibleBaseYAMLObject | AnsibleBaseYAMLObject:
+) -> AnsibleBaseYAMLObject:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
@@ -746,7 +746,11 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
             if data is None:
                 break
             result.append(data)
-    except (yaml.parser.ParserError, yaml.scanner.ScannerError) as exc:
+    except (
+        yaml.parser.ParserError,
+        yaml.scanner.ScannerError,
+        yaml.constructor.ConstructorError,
+    ) as exc:
         raise RuntimeError("Failed to load YAML file") from exc
 
     if len(result) == 0:
