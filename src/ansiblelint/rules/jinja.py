@@ -62,7 +62,7 @@ class JinjaRule(AnsibleLintRule):
                     template(
                         basedir=file.dir if file else ".",
                         value=v,
-                        variables={},
+                        variables=task.get("vars", {}),
                         fail_on_error=True,  # we later decide which ones to ignore or not
                     )
                 # ValueError RepresenterError
