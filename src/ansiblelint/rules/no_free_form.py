@@ -1,6 +1,7 @@
 """Implementation of NoFreeFormRune."""
 from __future__ import annotations
 
+import re
 import sys
 from typing import TYPE_CHECKING, Any
 
@@ -22,6 +23,9 @@ class NoFreeFormRune(AnsibleLintRule):
     tags = ["syntax", "risk", "experimental"]
     version_added = "v6.8.0"
     needs_raw_task = True
+    cmd_shell_re = re.compile(
+        r"(chdir|creates|executable|removes|stdin|stdin_add_newline|warn)="
+    )
 
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
@@ -55,13 +59,23 @@ class NoFreeFormRune(AnsibleLintRule):
                     )
                 )
         elif isinstance(action_value, str) and "=" in action_value:
-            results.append(
-                self.create_matcherror(
-                    message=f"Avoid using free-form when calling module actions. ({action})",
-                    linenumber=task[LINE_NUMBER_KEY],
-                    filename=file,
+            fail = False
+            if task["action"].get("__ansible_module__") in (
+                "command",
+                "shell",
+            ):
+                if self.cmd_shell_re.match(action_value):
+                    fail = True
+            else:
+                fail = True
+            if fail:
+                results.append(
+                    self.create_matcherror(
+                        message=f"Avoid using free-form when calling module actions. ({action})",
+                        linenumber=task[LINE_NUMBER_KEY],
+                        filename=file,
+                    )
                 )
-            )
         return results
 
 
