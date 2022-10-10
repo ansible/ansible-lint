@@ -1,6 +1,6 @@
 # risky-octal
 
-This rule checks that Octal/Numeric file permissions must contain leading zero or be a string. 
+This rule checks that octal file permissions either contain a leading zero or are a string value.
 
 Modules that are checked:
 
