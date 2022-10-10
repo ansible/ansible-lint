@@ -150,6 +150,9 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             issue["type"] = "issue"
             issue["check_name"] = match.tag or match.rule.id  # rule-id[subrule-id]
             issue["categories"] = match.rule.tags
+            if match.rule.url:
+                # https://github.com/codeclimate/platform/issues/68
+                issue["url"] = match.rule.url
             issue["severity"] = self._severity_to_level(match)
             issue["description"] = self.escape(str(match.message))
             issue["fingerprint"] = hashlib.sha256(
