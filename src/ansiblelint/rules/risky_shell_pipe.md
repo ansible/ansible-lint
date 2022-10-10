@@ -1,10 +1,10 @@
 # risky-shell-pipe
 
-This rule checks for the bash ``pipefail`` option with the Ansible ``shell`` module.
+This rule checks for the bash `pipefail` option with the Ansible `shell` module.
 
-You should always set ``pipefail`` when piping output from the ``shell`` module to another command.
-The return status of a pipeline is the exit status of the command in the ``shell`` module.
-The ``pipefail`` option ensures that tasks fail as expected if the first command fails.
+You should always set `pipefail` when piping output from the `shell` module to another command.
+The return status of a pipeline is the exit status of the command in the `shell` module.
+The `pipefail` option ensures that tasks fail as expected if the first command fails.
 
 ## Problematic Code
 
