@@ -86,6 +86,7 @@ libyaml
 lineinfile
 lintable
 literalinclude
+localectl
 matchtask
 matchyaml
 maxdepth
