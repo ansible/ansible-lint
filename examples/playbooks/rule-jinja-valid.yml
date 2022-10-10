@@ -20,3 +20,9 @@
         owner: "root"
         group: "dovecot"
         mode: "0640"
+    - name: Bug https://github.com/ansible/ansible-lint/issues/2569
+      ansible.builtin.include_tasks:
+        file: /dev/null
+      vars:
+        ns_vars: {}
+        x: "{{ lookup('ansible.builtin.template', 'namespace.yaml.j2', template_vars=ns_vars) | from_yaml }}"
