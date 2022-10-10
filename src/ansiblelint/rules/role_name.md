@@ -2,7 +2,7 @@
 
 This rule checks role names to ensure they conform with requirements.
 
-Role names must contain only lowercase alphanumeric characters and the underscore ``_`` character.
+Role names must contain only lowercase alphanumeric characters and the underscore `_` character.
 Role names must also start with an alpabetic character.
 
 For more information see the [roles directory](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory) topic in Ansible documentation.
