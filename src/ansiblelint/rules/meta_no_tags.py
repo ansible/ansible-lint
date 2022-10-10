@@ -33,7 +33,7 @@ class MetaTagValidRule(AnsibleLintRule):
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Find violations inside meta files."""
-        if file.kind != "meta":
+        if file.kind != "meta" or not file.data:
             return []
 
         galaxy_info = file.data.get("galaxy_info", None)
