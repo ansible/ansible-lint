@@ -1,0 +1,32 @@
+# role-name
+
+This rule checks role names to ensure they conform with requirements.
+
+Role names must contain only lowercase alphanumeric characters and the underscore `_` character.
+Role names must also start with an alphabetic character.
+
+For more information see the [roles directory](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory) topic in Ansible documentation.
+
+## Problematic Code
+
+```yaml
+---
+- name: Example playbook
+  hosts: localhost
+  roles:
+    - 1myrole # <- Does not start with an alphabetic character.
+    - myrole2[*^ # <- Contains invalid special characters.
+    - myRole_3 # <- Contains uppercase alphabetic characters.
+```
+
+## Correct Code
+
+```yaml
+---
+- name: Example playbook
+  hosts: localhost
+  roles:
+    - myRole1 # <- Starts with an alphabetic character.
+    - myrole2 # <- Contains only alphanumeric characters.
+    - myrole_3 # <- Contains only lowercase alphabetic characters.
+```

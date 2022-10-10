@@ -95,6 +95,7 @@ mkdocs
 mkdtemp
 mockings
 mypy
+myrole
 nestedincludes
 nocolor
 nodeps
