@@ -4,11 +4,8 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.config import options
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.text import toidentifier
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -19,8 +16,7 @@ class RunOnce(AnsibleLintRule):
 
     id = "run-once"
     link = (
-        "https://docs.ansible.com/ansible/latest/user_guide/"
-        "playbooks_loops.html#defining-inner-and-outer-variable-names-with-loop-var"
+        "https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html"
     )
     description = """\
 When using Run Once, we should avoid using strategy as free.\
