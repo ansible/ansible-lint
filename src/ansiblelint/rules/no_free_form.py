@@ -1,4 +1,4 @@
-"""Implementation of NoFreeFormRune."""
+"""Implementation of NoFreeFormRule."""
 from __future__ import annotations
 
 import re
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
-class NoFreeFormRune(AnsibleLintRule):
+class NoFreeFormRule(AnsibleLintRule):
     """Rule for detecting discouraged free-form syntax for action modules."""
 
     id = "no-free-form"
@@ -106,5 +106,5 @@ if "pytest" in sys.modules:  # noqa: C901
         results = Runner(file, rules=default_rules_collection).run()
 
         for result in results:
-            assert result.rule.id == NoFreeFormRune.id, result
+            assert result.rule.id == NoFreeFormRule.id, result
         assert len(results) == expected
