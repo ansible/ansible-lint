@@ -15,9 +15,8 @@ For more information see the [creating valid variable names](https://docs.ansibl
   hosts: localhost
   vars:
     CamelCase: true # <- Contains a mix of lowercase and uppercase characters.
-    this_is_valid: # <- This is a dict, not a variable
-      ALL_CAPS: bar # <- Contains only uppercase characters.
-      v@r!able: baz # <- Contains special characters.
+    ALL_CAPS: bar # <- Contains only uppercase characters.
+    v@r!able: baz # <- Contains special characters.
 ```
 
 ## Correct Code
@@ -28,7 +27,6 @@ For more information see the [creating valid variable names](https://docs.ansibl
   hosts: localhost
   vars:
     lowercase: true # <- Contains only lowercase characters.
-    this_is_valid:
-      no_caps: bar # <- Does not contains uppercase characters.
-      variable: baz # <- Does not contain special characters.
+    no_caps: bar # <- Does not contains uppercase characters.
+    variable: baz # <- Does not contain special characters.
 ```
