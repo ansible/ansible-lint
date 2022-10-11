@@ -40,7 +40,7 @@ When using Run Once, we should avoid using strategy as free.\
             self.create_matcherror(
                 message="Play uses strategy: free",
                 filename=file,
-                tag="run_once[warning]"
+                tag="run_once[warning]",
             )
         ]
 
@@ -58,7 +58,7 @@ When using Run Once, we should avoid using strategy as free.\
             self.create_matcherror(
                 message="Using run_once may behave differently if strategy is set to free.",
                 filename=file,
-                tag="run_once[warning]"
+                tag="run_once[warning]",
             )
         ]
 
@@ -74,12 +74,8 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         ("test_file", "failure"),
         (
-            pytest.param(
-                "examples/playbooks/run-once-pass.yml", 0, id="pass"
-            ),
-            pytest.param(
-                "examples/playbooks/run-once-fail.yml", 2, id="fail"
-            ),
+            pytest.param("examples/playbooks/run-once-pass.yml", 0, id="pass"),
+            pytest.param("examples/playbooks/run-once-fail.yml", 2, id="fail"),
         ),
     )
     def test_run_once(
