@@ -83,7 +83,6 @@ if "pytest" in sys.modules:
     ) -> None:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()
-        # breakpoint()
         for result in results:
             assert result.rule.id == RunOnce().id
         assert len(results) == failure
