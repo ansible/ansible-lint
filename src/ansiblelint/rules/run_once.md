@@ -21,7 +21,7 @@ For more information see the following topics in Ansible documentation:
   hosts: all
   strategy: free # <-- avoid use of strategy as free
   gather_facts: false
-  run_once: true  # <-- when using run_once
+  run_once: true # <-- when using run_once
   tasks:
     - name: Task with run_once
       ansible.builtin.debug:
