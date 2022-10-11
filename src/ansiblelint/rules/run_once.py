@@ -15,9 +15,7 @@ class RunOnce(AnsibleLintRule):
     """Run once should use strategy other than free."""
 
     id = "run-once"
-    link = (
-        "https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html"
-    )
+    link = "https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html"
     description = """\
 When using Run Once, we should avoid using strategy as free.\
 """
