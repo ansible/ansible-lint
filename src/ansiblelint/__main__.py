@@ -214,8 +214,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.write_list:
         _do_transform(result, options)
 
-    mark_as_success = False
+    mark_as_success = True
     if result.matches and options.progressive:
+        mark_as_success = False
         _logger.info(
             "Matches found, running again on previous revision in order to detect regressions"
         )
@@ -246,6 +247,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
                     " progressive mode.",
                     ignored,
                 )
+
+    if options.strict and result.matches:
+        mark_as_success = False
 
     app.render_matches(result.matches)
 
