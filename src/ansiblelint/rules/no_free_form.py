@@ -61,8 +61,14 @@ class NoFreeFormRune(AnsibleLintRule):
         elif isinstance(action_value, str) and "=" in action_value:
             fail = False
             if task["action"].get("__ansible_module__") in (
+                "ansible.builtin.command",
+                "ansible.builtin.shell",
+                "ansible.windows.win_command",
+                "ansible.windows.win_shell",
                 "command",
                 "shell",
+                "win_command",
+                "win_shell",
             ):
                 if self.cmd_shell_re.match(action_value):
                     fail = True
