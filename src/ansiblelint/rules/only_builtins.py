@@ -52,6 +52,7 @@ if "pytest" in sys.modules:
         """Test rule matches."""
         result = run_ansible_lint(
             "--config-file=/dev/null",
+            "--strict",
             "--warn-list=",
             "--enable-list",
             "only-builtins",
