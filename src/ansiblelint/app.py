@@ -193,17 +193,23 @@ warn_list:  # or 'skip_list' to silence them completely
                 "because 'yaml' is in 'skip_list'."
             )
 
+        if summary.failures:
+            mark_as_success = False
+
         if not self.options.quiet:
             console_stderr.print(render_yaml(msg))
-            self.report_summary(summary, changed_files_count, files_count)
+            self.report_summary(
+                summary, changed_files_count, files_count, is_success=mark_as_success
+            )
 
-        if not self.options.strict and (mark_as_success or not summary.failures):
-            return SUCCESS_RC
-        return VIOLATIONS_FOUND_RC
+        return SUCCESS_RC if mark_as_success else VIOLATIONS_FOUND_RC
 
     @staticmethod
     def report_summary(  # pylint: disable=too-many-branches,too-many-locals
-        summary: SummarizedResults, changed_files_count: int, files_count: int
+        summary: SummarizedResults,
+        changed_files_count: int,
+        files_count: int,
+        is_success: bool,
     ) -> None:
         """Report match and file counts."""
         # sort the stats by profiles
@@ -269,10 +275,10 @@ warn_list:  # or 'skip_list' to silence them completely
             console_stderr.print(table)
             console_stderr.print()
 
-        if summary.failures:
-            msg = "[red][bold]Failed[/][/] after "
-        else:
+        if is_success:
             msg = "[green]Passed[/] with "
+        else:
+            msg = "[red][bold]Failed[/][/] after "
 
         if summary.passed_profile:
             msg += f"[bold]{summary.passed_profile}[/] profile"

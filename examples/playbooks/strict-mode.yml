@@ -1,0 +1,7 @@
+---
+- name: Fixture for test_strict
+  hosts: localhost
+  tasks:
+    - ansible.builtin.debug: # <-- name should be first key (warning)
+        msg: "Hello World"
+      name: Display debug information
