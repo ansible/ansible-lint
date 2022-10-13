@@ -529,13 +529,16 @@ def get_config(arguments: list[str]) -> Namespace:
             f"'rich' or 'md' are supported with -f."
         )
 
+    # save info about custom config file, as options.config_file may be modified by merge_config
+    has_custom_config = not options.config_file
+
     file_config = load_config(options.config_file)
 
     config = merge_config(file_config, options)
 
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
 
-    if options.project_dir == ".":
+    if has_custom_config and options.project_dir == ".":
         project_dir = guess_project_dir(options.config_file)
         options.project_dir = os.path.expanduser(normpath(project_dir))
 
