@@ -124,7 +124,7 @@ class Runner:
                 continue
             try:
                 lintable.data
-            except RuntimeError as exc:
+            except (RuntimeError, FileNotFoundError) as exc:
                 matches.append(
                     MatchError(
                         filename=lintable,

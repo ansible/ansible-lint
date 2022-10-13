@@ -859,6 +859,10 @@ def get_lintables(
                 _logger.debug("Ignored %s due to: %s", path, exc)
                 continue
 
+            if path.is_symlink() and not path.exists():
+                _logger.warning("Ignored broken symlink %s -> %s", path, path.resolve())
+                continue
+
             lintables.append(Lintable(path))
 
         # stage 2: guess roles from current lintables, as there is no unique
