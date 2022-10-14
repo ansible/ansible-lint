@@ -23,6 +23,7 @@ def fixture_base_arguments() -> list[str]:
         (["-q"], "test/fixtures/quiet.yml"),
         (["-r", "test/fixtures/rules/"], "test/fixtures/rulesdir.yml"),
         (["-R", "-r", "test/fixtures/rules/"], "test/fixtures/rulesdir-defaults.yml"),
+        (["-s"], "test/fixtures/strict.yml"),
         (["-t", "skip_ansible_lint"], "test/fixtures/tags.yml"),
         (["-v"], "test/fixtures/verbosity.yml"),
         (["-x", "bad_tag"], "test/fixtures/skip-tags.yml"),
