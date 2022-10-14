@@ -157,6 +157,11 @@
       "title": "Skip List",
       "type": "array"
     },
+    "strict": {
+      "default": false,
+      "title": "Strict",
+      "type": "boolean"
+    },
     "tags": {
       "items": {
         "type": "string"

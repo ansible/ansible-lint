@@ -10,6 +10,7 @@ exclude_paths:
   - test/fixtures/formatting-prettier/
 # parseable: true
 # quiet: true
+# strict: true
 # verbosity: 1
 
 # Mock modules or roles in order to pass ansible-playbook --syntax-check
