@@ -442,6 +442,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
         "display_relative_path",
         "parseable",
         "quiet",
+        "strict",
         "use_default_rules",
         "progressive",
         "offline",
