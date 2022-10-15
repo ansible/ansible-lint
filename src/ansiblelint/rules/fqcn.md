@@ -7,9 +7,9 @@ This avoids ambiguity and conflicts that can cause operations to fail or produce
 
 The `fqcn` rule has the following checks:
 
-- `fqcn[action]` - Checks all actions for FQCNs.
+- `fqcn[action]` - Use FQCN for module actions, such ...
 - `fqcn[action-core]` - Checks for FQCNs from the `ansible.legacy` or `ansible.builtin` collection.
-- `fqcn[action-redirect]` - Provides the correct FQCN to replace short actions.
+- `fqcn[canonical]` - You should use canonical module name ... instead of ...
 
 ```{note}
 In most cases you should declare the `ansible.builtin` collection for internal Ansible actions.
@@ -21,6 +21,21 @@ This rule does not take [`collections` keyword](https://docs.ansible.com/ansible
 The `collections` keyword provided a temporary mechanism transitioning to Ansible 2.9.
 You should rewrite any content that uses the `collections:` key and avoid it where possible.
 ```
+
+## Canonical module names
+
+Canonical module names are also known as **resolved module names** and they
+are to be preferred for most cases. Many Ansible modules have multiple aliases
+and redirects, as these were created over time while the content was refactored.
+Still, all of them do finally resolve to the same module name, but not without
+adding some performance overhead. As very old aliases are at some point removed,
+it makes to just refresh the content to make it point to the current canonical
+name.
+
+The only exception for using a canonical name is if your code still needs to
+be compatible with a very old version of Ansible, one that does not know how
+to resolve that name. If you find yourself in such a situation, feel free to
+add this rule to the ignored list.
 
 ## Problematic Code
 
