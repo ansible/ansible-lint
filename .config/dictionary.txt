@@ -186,6 +186,7 @@ ungrouped
 unignored
 unimported
 unindented
+uninstallation
 unjinja
 unlex
 unnormalized

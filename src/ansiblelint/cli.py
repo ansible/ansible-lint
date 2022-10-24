@@ -474,11 +474,13 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
         return cli_config
 
     for entry in bools:
-        v = getattr(cli_config, entry) or file_config.pop(entry, False)
+        file_value = file_config.pop(entry, False)
+        v = getattr(cli_config, entry) or file_value
         setattr(cli_config, entry, v)
 
     for entry, default in scalar_map.items():
-        v = getattr(cli_config, entry, None) or file_config.pop(entry, default)
+        file_value = file_config.pop(entry, default)
+        v = getattr(cli_config, entry, None) or file_value
         setattr(cli_config, entry, v)
 
     # if either commandline parameter or config file option is set merge

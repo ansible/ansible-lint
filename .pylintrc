@@ -1,3 +1,7 @@
+[MAIN]
+extension-pkg-allow-list =
+    black.parsing,
+
 [IMPORTS]
 preferred-modules =
     py:pathlib,
@@ -11,6 +15,9 @@ good-names =i,j,k,ex,Run,_,f,fh,v,id,T
 ignore-paths=^src/ansiblelint/_version.*$
 
 [MESSAGES CONTROL]
+
+# increase from default is 50 which is too aggressive
+max-statements = 60
 
 disable =
     # On purpose disabled as we rely on black
