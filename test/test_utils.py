@@ -326,8 +326,6 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks
     assert "Identified: test/test/always-run-success.yml" not in err
-    # assure that zuul_return missing module is not reported
-    assert "examples/playbooks/mocked_dependency.yml" not in out
     assert "Executing syntax check on examples/playbooks/mocked_dependency.yml" in err
 
 
