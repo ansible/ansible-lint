@@ -19,5 +19,8 @@ def test_strict(strict: bool, returncode: int, message: str) -> None:
     result = run_ansible_lint(*args)
     assert result.returncode == returncode
     assert "key-order[task]" in result.stdout
-    summary_line = result.stderr.splitlines()[-1]
-    assert message in summary_line
+    for summary_line in result.stderr.splitlines():
+        if summary_line.startswith(message):
+            break
+    else:
+        pytest.fail(f"Failed to find {message} inside stderr output")
