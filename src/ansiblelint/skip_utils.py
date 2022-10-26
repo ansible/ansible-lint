@@ -127,7 +127,10 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
     # parse file text using 2nd parser library
     try:
         ruamel_data = load_data(lintable.content)
-    except ScannerError:
+    except ScannerError as exc:
+        _logger.debug(
+            "Ignored loading skipped rules from file %s due to: %s", lintable, exc
+        )
         # For unparsable file types, we return empty skip lists
         return None
     skipped_rules = _get_rule_skips_from_yaml(ruamel_data, lintable)
