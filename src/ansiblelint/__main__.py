@@ -41,7 +41,7 @@ from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
 from ansiblelint.color import console, console_options, reconfigure, render_yaml
-from ansiblelint.config import options
+from ansiblelint.config import get_version_warning, options
 from ansiblelint.constants import EXIT_CONTROL_C_RC, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.skip_utils import normalize_tag
@@ -87,10 +87,6 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     """Load config options and store them inside options module."""
     new_options = cli.get_config(arguments or [])
     new_options.cwd = pathlib.Path.cwd()
-
-    if new_options.version:
-        print(f"ansible-lint {__version__} using ansible {ansible_version()}")
-        sys.exit(0)
 
     if new_options.colored is None:
         new_options.colored = should_do_markup()
@@ -186,6 +182,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     console_options["force_terminal"] = options.colored
     reconfigure(console_options)
+
+    if options.version:
+        console.print(
+            f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]"
+        )
+        console.print(get_version_warning())
+        sys.exit(0)
 
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
