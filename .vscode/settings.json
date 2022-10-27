@@ -1,0 +1,37 @@
+{
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "evenBetterToml.formatter.allowedBlankLines": 2,
+    "files.exclude": {
+        "*.egg-info": true,
+        ".pytest_cache": true,
+        ".tox": true,
+        "__pycache__": true
+    },
+    "git.ignoreLimitWarning": true,
+    "grammarly.domain": "technical",
+    "grammarly.files.include": [
+        "**/*.txt",
+        "**/*.md"
+    ],
+    "grammarly.hideUnavailablePremiumAlerts": true,
+    "grammarly.showExamples": true,
+    "python.formatting.provider": "black",
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyCategorySeverity.error": "Warning",
+    "python.linting.mypyEnabled": true,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "restructuredtext.confPath": "${workspaceFolder}/docs/docsite/rst",
+    "restructuredtext.languageServer.disabled": true,
+    "sortLines.filterBlankLines": true,
+    "yaml.completion": true,
+    "yaml.customTags": [
+        "!encrypted/pkcs1-oaep scalar",
+        "!vault scalar"
+    ],
+    "yaml.format.enable": false,
+    "yaml.validate": true
+}
