@@ -1,9 +1,18 @@
-// spell-checker:ignore esbenp
 {
     "recommendations": [
+        "ExecutableBookProject.myst-highlight",
+        "Tyriar.sort-lines",
         "esbenp.prettier-vscode",
+        "hbenl.vscode-test-explorer",
+        "ms-python.isort",
         "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-vscode.live-server",
         "redhat.ansible",
         "redhat.vscode-yaml",
+        "shardulm94.trailing-spaces",
+        "tamasfe.even-better-toml",
+        "timonwong.shellcheck",
+        "znck.grammarly",
     ]
 }
