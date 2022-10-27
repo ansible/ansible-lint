@@ -192,10 +192,7 @@ def parse_ansible_version(stdout: str) -> tuple[str, str | None]:
 
 def in_venv() -> bool:
     """Determine whether Python is running from a venv."""
-    if (
-        hasattr(sys, "real_prefix")
-        or os.environ.get('CONDA_EXE', None) is not None
-    ):
+    if hasattr(sys, "real_prefix") or os.environ.get("CONDA_EXE", None) is not None:
         return True
 
     pfx = getattr(sys, "base_prefix", sys.prefix)
