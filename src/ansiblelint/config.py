@@ -192,27 +192,28 @@ def parse_ansible_version(stdout: str) -> tuple[str, str | None]:
 
 def in_venv() -> bool:
     """Determine whether Python is running from a venv."""
-    if hasattr(sys, "real_prefix"):
+    if hasattr(sys, "real_prefix") or os.environ.get("CONDA_EXE", None) is not None:
         return True
+
     pfx = getattr(sys, "base_prefix", sys.prefix)
     return pfx != sys.prefix
 
 
 def guess_install_method() -> str:
     """Guess if pip upgrade command should be used."""
+    package_name = "ansible-lint"
     pip = ""
     if in_venv():
         _logger.debug("Found virtualenv, assuming `pip3 install` will work.")
-        pip = f"pip install --upgrade {__package__}"
+        pip = f"pip install --upgrade {package_name}"
     elif __file__.startswith(os.path.expanduser("~/.local/lib")):
         _logger.debug(
             "Found --user installation, assuming `pip3 install --user` will work."
         )
-        pip = f"pip3 install --user --upgrade {__package__}"
+        pip = f"pip3 install --user --upgrade {package_name}"
 
     # By default we assume pip is not safe to be used
     use_pip = False
-    package_name = "ansible-lint"
     try:
         # Use pip to detect if is safe to use it to upgrade the package.
         # We do imports here to for performance and reasons, and also in order
