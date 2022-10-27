@@ -6,8 +6,8 @@ You can use `loop_var` to specify a prefix for loop variables and ensure they ar
 
 This rule can produce the following messages:
 
-- `[loop-var-prefix[missing]` - Replace unsafe implicit `item` loop variable by adding `loop_var: <loop_var_prefix>...`.
-- `[loop-var-prefix[wrong]` - Loop variable should start with <loop_var_prefix>
+- `[loop-var-prefix[missing]` - Replace any unsafe implicit `item` loop variable by adding `loop_var: <loop_var_prefix>...`.
+- `[loop-var-prefix[wrong]` - Ensure loop variables start with `<loop_var_prefix>`.
 
 This is an opt-in rule.
 You must enable it in your Ansible-lint configuration as follows:
@@ -30,7 +30,7 @@ enable_list:
       loop:
         - foo
         - bar # <- These items do not have a unique prefix.
-    - name: Sets
+    - name: Sets a prefix that is not unique.
       ansible.builtin.debug:
         var: zz_item
       loop:
