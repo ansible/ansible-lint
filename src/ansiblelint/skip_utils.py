@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, Any, Generator, Sequence
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML
 from ruamel.yaml.composer import ComposerError
+from ruamel.yaml.scanner import ScannerError
 from ruamel.yaml.tokens import CommentToken
 
 from ansiblelint.config import used_old_tags
@@ -124,7 +125,14 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
     pyyaml_data: AnsibleBaseYAMLObject, lintable: Lintable
 ) -> AnsibleBaseYAMLObject | None:
     # parse file text using 2nd parser library
-    ruamel_data = load_data(lintable.content)
+    try:
+        ruamel_data = load_data(lintable.content)
+    except ScannerError as exc:
+        _logger.debug(
+            "Ignored loading skipped rules from file %s due to: %s", lintable, exc
+        )
+        # For unparsable file types, we return empty skip lists
+        return None
     skipped_rules = _get_rule_skips_from_yaml(ruamel_data, lintable)
 
     if lintable.kind in [

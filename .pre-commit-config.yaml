@@ -161,7 +161,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.15.3
+    rev: v2.15.5
     hooks:
       - id: pylint
         additional_dependencies:

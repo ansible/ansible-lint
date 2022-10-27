@@ -13,7 +13,7 @@ from rich.table import Table
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
-from ansiblelint.config import PROFILES
+from ansiblelint.config import PROFILES, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RULE_DOC_URL, SUCCESS_RC, VIOLATIONS_FOUND_RC
 from ansiblelint.errors import MatchError
@@ -204,8 +204,8 @@ warn_list:  # or 'skip_list' to silence them completely
 
         return SUCCESS_RC if mark_as_success else VIOLATIONS_FOUND_RC
 
-    @staticmethod
     def report_summary(  # pylint: disable=too-many-branches,too-many-locals
+        self,
         summary: SummarizedResults,
         changed_files_count: int,
         files_count: int,
@@ -289,6 +289,11 @@ warn_list:  # or 'skip_list' to silence them completely
         if summary.fixed:
             msg += f", and fixed {summary.fixed} issue(s)"
         msg += f" on {files_count} files."
+
+        if not self.options.offline:
+            version_warning = get_version_warning()
+            if version_warning:
+                msg += f"\n{version_warning}"
 
         console_stderr.print(msg)
 

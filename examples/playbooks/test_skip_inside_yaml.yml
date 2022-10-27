@@ -5,8 +5,8 @@
     - skip_ansible_lint # should disable error at playbook level
   tasks:
     - name: Test # <-- 0 latest[hg]
-      action: ansible.builtin.hg
-    - name: Test latest[hg] (skipped) # noqa latest[hg]
+      action: ansible.builtin.hg # noqa fqcn[canonical]
+    - name: Test latest[hg] (skipped) # noqa latest[hg] fqcn[canonical]
       action: ansible.builtin.hg
 
     - name: Test latest[git] and partial-become
