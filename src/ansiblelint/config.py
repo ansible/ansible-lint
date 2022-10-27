@@ -227,7 +227,6 @@ def guess_install_method() -> str:
             from pip._internal.metadata import get_default_environment
             from pip._internal.req.req_uninstall import uninstallation_paths
 
-        try:
             dist = get_default_environment().get_distribution(package_name)
             if dist:
                 logging.debug("Found %s dist", dist)
@@ -236,10 +235,9 @@ def guess_install_method() -> str:
             else:
                 logging.debug("Skipping %s as it is not installed.", package_name)
                 use_pip = False
-        except UninstallationError as exc:
-            logging.debug(exc)
-            use_pip = False
-    except ImportError:
+    except (UninstallationError, AttributeError, ImportError) as exc:
+        # On Fedora 36, we got a AttributeError exception from pip that we want to avoid
+        logging.debug(exc)
         use_pip = False
 
     # We only want to recommend pip for upgrade if it looks safe to do so.
