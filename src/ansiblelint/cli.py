@@ -250,7 +250,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
             "sarif",
             "docs",  # internally used
         ],
-        help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
+        help="stdout formatting, since v6.8.5, `json` is an alias for `sarif` instead of `codeclimate`. (default: %(default)s)",
     )
     parser.add_argument(
         "-q",

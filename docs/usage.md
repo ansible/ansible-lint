@@ -22,6 +22,36 @@ associated tags.
    :returncode: 0
 ```
 
+## Output formats
+
+As we support various output formats, you should be aware of the following
+things:
+
+- `rich` is the default output format and is a little bit more verbose and
+  colored.
+- `plain` is a simplified version of rich, that should lack colors.
+- `md` is used internally to generate markdown documentation for rules, so it
+  should not be used when linting.
+- `json` output is an alias for `sarif` output since `v6.8.5`, before this
+  being an alias for `codeclimate` output. We made this change because the
+  older format was limiting and did not have a proper method to differentiate
+  between errors and warnings.
+- `codeclimate` format uses [`CodeClimate JSON SPEC` format](https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md)
+  and was the first JSON file format we added support for. Since `v6.8.5` we no
+  longer modify the severity field based on the rule level (warning or error).
+  Adding or removing rules from the `warn_list`, no longer alters the outcome
+  of this format. Due to these limitations, we discourage the use of this file
+  format, recommending migrating to `sarif` instead.
+- `quiet` is a very brief file format we still support for compatibility
+  reasons. It is not recommended to use it for new projects.
+- `pep8` is a condensed output format that matches the famous pep8 python
+  linter.
+- `sarif` is the most advanced output format and it is recommended for
+  integration with 3rd party tools. It is based on the open OASIS standard
+  named [SARIF](https://sarifweb.azurewebsites.net/)
+- `docs` format is used for internal documentation generation and should not be
+  used when linting.
+
 ## Temporary files
 
 As part of the execution, the linter will likely need to create a cache of

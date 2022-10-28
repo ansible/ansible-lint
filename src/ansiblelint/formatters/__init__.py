@@ -175,8 +175,6 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
 
     @staticmethod
     def _severity_to_level(match: MatchError) -> str:
-        if match.level != "error":
-            return "info"
         severity = match.rule.severity
 
         if severity in ["LOW"]:
