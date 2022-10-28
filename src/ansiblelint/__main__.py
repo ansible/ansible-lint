@@ -187,7 +187,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         console.print(
             f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]"
         )
-        console.print(get_version_warning())
+        msg = get_version_warning()
+        if msg:
+            console.print(msg)
         sys.exit(0)
 
     initialize_logger(options.verbosity)
