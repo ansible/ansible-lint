@@ -16,9 +16,7 @@ class RunOnce(AnsibleLintRule):
 
     id = "run-once"
     link = "https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html"
-    description = """\
-When using Run Once, we should avoid using strategy as free.\
-"""
+    description = "When using run_once, we should avoid using strategy as free."
 
     tags = ["idiom", "experimental"]
     severity = "MEDIUM"
@@ -38,7 +36,7 @@ When using Run Once, we should avoid using strategy as free.\
             self.create_matcherror(
                 message="Play uses strategy: free",
                 filename=file,
-                tag="run_once[warning]",
+                tag="run_once[play]",
             )
         ]
 
@@ -56,7 +54,7 @@ When using Run Once, we should avoid using strategy as free.\
             self.create_matcherror(
                 message="Using run_once may behave differently if strategy is set to free.",
                 filename=file,
-                tag="run_once[warning]",
+                tag="run_once[task]",
             )
         ]
 

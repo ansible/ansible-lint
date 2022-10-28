@@ -1,11 +1,11 @@
 # run-once
 
-This rule warns against use of run_once with strategy set to free.
+This rule warns against the use of `run_once` when `strategy` is set to `free`.
 
 This rule can produce the following messages:
 
-- `run_once[warning]`: Play uses strategy: free (warning). # <-- at play level
-- `run_once[warning]`: Using run_once may behave differently if strategy is set to free. (warning) # <-- at task level
+- `run_once[play]`: Play uses `strategy: free`.
+- `run_once[task]`: Using `run_once` may behave differently if `strategy` is set to `free`.
 
 For more information see the following topics in Ansible documentation:
 
