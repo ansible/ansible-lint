@@ -22,7 +22,7 @@ coverage-enable-subprocess==1.0
 cryptography==38.0.1
 dill==0.3.6
 docutils==0.17.1
-exceptiongroup==1.0.0rc9
+exceptiongroup==1.0.0
 execnet==1.9.0
 filelock==3.8.0
 flake8==5.0.4
@@ -35,7 +35,7 @@ iniconfig==1.1.1
 isort==5.10.1
 jinja2==3.1.2
 jsonschema==4.16.0
-lazy-object-proxy==1.7.1
+lazy-object-proxy==1.8.0
 markdown-it-py==2.1.0
 markupsafe==2.1.1
 mccabe==0.7.0
@@ -60,6 +60,7 @@ pylint==2.15.5
 pyparsing==3.0.9
 pyrsistent==0.18.1
 pytest==7.2.0
+pytest-mock==3.10.0
 pytest-plus==0.2
 pytest-xdist==3.0.2
 pytz==2022.5
@@ -83,7 +84,7 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
 subprocess-tee==0.3.5
 tomli==2.0.1
-tomlkit==0.11.5
+tomlkit==0.11.6
 typing-extensions==4.4.0
 urllib3==1.26.12
 wcmatch==8.4.1
