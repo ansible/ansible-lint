@@ -117,17 +117,21 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                 self.module_aliases[target] = target
 
         if module != self.module_aliases[module]:
-            module_alias = self.module_aliases.get(module, "")
+            module_alias = self.module_aliases[module]
             if module_alias.startswith("ansible.builtin"):
-                result.append(
-                    self.create_matcherror(
-                        message=f"Use FQCN for builtin module actions ({module}).",
-                        details=f"Use `ansible.builtin.{module}` or `ansible.legacy.{module}` instead.",
-                        filename=file,
-                        linenumber=task["__line__"],
-                        tag="fqcn[action-core]",
-                    )
+                legacy_module = module_alias.replace(
+                    "ansible.builtin.", "ansible.legacy.", 1
                 )
+                if module != legacy_module:
+                    result.append(
+                        self.create_matcherror(
+                            message=f"Use FQCN for builtin module actions ({module}).",
+                            details=f"Use `{module_alias}` or `{legacy_module}` instead.",
+                            filename=file,
+                            linenumber=task["__line__"],
+                            tag="fqcn[action-core]",
+                        )
+                    )
             else:
                 if module.count(".") < 2:
                     result.append(
@@ -172,6 +176,8 @@ if "pytest" in sys.modules:
     community.general.system.sudoers:
       name: should-not-be-here
       state: absent
+  - name: Command with legacy FQCN
+    ansible.legacy.command: echo This rule should not get matched by the fqcn rule
     """
 
     FAIL_PLAY = """
