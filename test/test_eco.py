@@ -22,6 +22,18 @@ eco_repos = {
 }
 
 
+def sanitize_output(text: str) -> str:
+    """Make the output less likely to vary between runs or minor changes."""
+    # replace full path to home directory with ~.
+    result = text.replace(os.path.expanduser("~"), "~")
+    # removes warning related to PATH alteration
+    result = re.sub(
+        r"^WARNING: PATH altered to include.+\n", "", result, flags=re.MULTILINE
+    )
+
+    return result
+
+
 @pytest.mark.eco()
 @pytest.mark.parametrize(("repo"), (eco_repos.keys()))
 def test_eco(repo: str) -> None:
@@ -55,19 +67,10 @@ def test_eco(repo: str) -> None:
             cwd=f"{cache_dir}/{repo}",
         )
 
-        def sanitize_output(text: str) -> str:
-            """Make the output less likely to vary between runs or minor changes."""
-            # replace full path to home directory with ~.
-            result = text.replace(os.path.expanduser("~"), "~")
-            # removes warning related to PATH alteration
-            result = re.sub(
-                r"^WARNING: PATH altered to include.+\n", "", result, flags=re.MULTILINE
-            )
-
-            return result
-
         # Ensure that cmd looks the same for later diff, even if the path was different
         result.args[0] = "ansible-lint"
+        # sort stderr because parallel runs can
+        result.stderr = "\n".join(sorted(result.stderr.split("\n")))
 
         result_txt = f"CMD: {shlex.join(result.args)}\n\nRC: {result.returncode}\n\nSTDERR:\n{result.stderr}\n\nSTDOUT:\n{result.stdout}"
 
