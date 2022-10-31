@@ -23,8 +23,9 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
+from ansiblelint.constants import ROLE_IMPORT_ACTION_NAMES
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import parse_yaml_from_file
@@ -53,11 +54,29 @@ class RoleNames(AnsibleLintRule):
     severity = "HIGH"
     done: list[str] = []  # already noticed roles list
     tags = ["deprecations", "metadata"]
-    version_added = "v4.3.0"
+    version_added = "v6.8.5"
 
     def __init__(self) -> None:
         """Save precompiled regex."""
         self._re = re.compile(ROLE_NAME_REGEX)
+
+    def matchtask(
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> list[MatchError]:
+        results = []
+        if task["action"]["__ansible_module__"] in ROLE_IMPORT_ACTION_NAMES:
+            name = task["action"].get("name", "")
+            # breakpoint()
+            if "/" in name:
+                results.append(
+                    self.create_matcherror(
+                        "Avoid using paths when importing roles.",
+                        filename=file,
+                        linenumber=task["__line__"],
+                        tag=f"{self.id}[path]",
+                    )
+                )
+        return results
 
     def matchdir(self, lintable: Lintable) -> list[MatchError]:
         return self.matchyaml(lintable)
