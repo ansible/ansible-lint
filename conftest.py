@@ -6,7 +6,6 @@ import sys
 from typing import Any
 
 import pytest
-from ansible.module_utils.common.yaml import HAS_LIBYAML
 
 # checking if user is running pytest without installing test dependencies:
 missing = []
@@ -22,14 +21,30 @@ if missing:
 # we need to be sure that we have the requirements installed as some tests
 # might depend on these.
 try:
+    from ansible_compat.prerun import get_cache_dir
+
+    cache_dir = get_cache_dir(".")
     subprocess.check_output(
-        ["ansible-galaxy", "collection", "install", "-r", "requirements.yml"],
+        [
+            "ansible-galaxy",
+            "collection",
+            "install",
+            "-p",
+            f"{cache_dir}/collections",
+            "-r",
+            "requirements.yml",
+        ],
         stderr=subprocess.PIPE,
         text=True,
     )
 except subprocess.CalledProcessError as exc:
     print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)
     sys.exit(1)
+
+# flake8: noqa: E402
+from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-position
+    HAS_LIBYAML,
+)
 
 if not HAS_LIBYAML and sys.version_info >= (3, 9, 0):
     # While presence of libyaml is not required for runtime, we keep this error
