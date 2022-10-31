@@ -50,11 +50,11 @@ def test_example_syntax_error(
 
 def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
-    get_app(offline=True)
+    app = get_app(offline=True)
     result = Runner(
         "examples/playbooks/custom_module.yml", rules=default_rules_collection
     ).run()
-    assert len(result) == 0
+    assert len(result) == 0, f"{app.runtime.cache_dir}"
 
 
 def test_full_vault(default_rules_collection: RulesCollection) -> None:

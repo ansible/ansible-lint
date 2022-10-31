@@ -19,10 +19,6 @@ if TYPE_CHECKING:
 else:
     CompletedProcess = subprocess.CompletedProcess
 
-# Emulate command line execution initialization as without it Ansible module
-# would be loaded with incomplete module/role/collection list.
-app = get_app(offline=True)
-
 # pylint: disable=wrong-import-position
 from ansiblelint.runner import Runner  # noqa: E402
 
@@ -30,12 +26,20 @@ from ansiblelint.runner import Runner  # noqa: E402
 class RunFromText:
     """Use Runner on temp files created from testing text snippets."""
 
+    app = None
+
     def __init__(self, collection: RulesCollection) -> None:
         """Initialize a RunFromText instance with rules collection."""
+        # Emulate command line execution initialization as without it Ansible module
+        # would be loaded with incomplete module/role/collection list.
+        if not self.app:
+            self.app = get_app(offline=True)
+
         self.collection = collection
 
     def _call_runner(self, path: str) -> list[MatchError]:
         runner = Runner(path, rules=self.collection)
+        # breakpoint()
         return runner.run()
 
     def run(self, filename: str) -> list[MatchError]:
