@@ -136,8 +136,10 @@ INCLUSION_ACTION_NAMES = {
 }
 
 ROLE_IMPORT_ACTION_NAMES = {
-    "import_role",
     "ansible.builtin.import_role",
-    "include_role",
     "ansible.builtin.include_role",
+    "ansible.legacy.import_role",
+    "ansible.legacy.include_role",
+    "import_role",
+    "include_role",
 }

@@ -37,6 +37,7 @@ DEFAULT_WARN_LIST = [
     "name[play]",
     "role-name",
     "warning[empty-playbook]",  # because ansible considers it warning only
+    "role-name[path]",  # too new
 ]
 
 DEFAULT_KINDS = [
@@ -285,8 +286,8 @@ def get_version_warning() -> str:
     elif current_version < new_version:
         msg = f"""[warning]A new release of ansible-lint is available: [red]{current_version}[/] → [green][link={html_url}]{new_version}[/][/][/]"""
 
-    pip = guess_install_method()
-    if pip:
-        msg += f" Upgrade by running: [info]{pip}[/]"
+        pip = guess_install_method()
+        if pip:
+            msg += f" Upgrade by running: [info]{pip}[/]"
 
     return msg

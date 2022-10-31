@@ -34,6 +34,7 @@ from _pytest.capture import CaptureFixture
 from _pytest.logging import LogCaptureFixture
 from _pytest.monkeypatch import MonkeyPatch
 from ansible.utils.sentinel import Sentinel
+from ansible_compat.runtime import Runtime
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
@@ -41,6 +42,8 @@ from ansiblelint.cli import get_rules_dirs
 from ansiblelint.constants import VIOLATIONS_FOUND_RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.testing import run_ansible_lint
+
+runtime = Runtime()
 
 
 @pytest.mark.parametrize(
@@ -251,7 +254,9 @@ def test_template(template: str, output: str) -> None:
     ("role", "expect_warning"),
     (
         ("template_lookup", False),
-        ("template_lookup_missing", True),
+        # With 2.15 ansible replaced the runtime Warning about inability to
+        # open a file in file lookup with a full error.
+        ("template_lookup_missing", runtime.version_in_range(upper="2.14")),
     ),
 )
 def test_template_lookup(role: str, expect_warning: bool) -> None:
