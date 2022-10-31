@@ -196,7 +196,6 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
 
-    app = get_app(offline=options.offline)
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import _get_matches
@@ -212,6 +211,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.listrules or options.listtags:
         return _do_list(rules)
 
+    app = get_app(offline=options.offline)
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")
     result = _get_matches(rules, options)
