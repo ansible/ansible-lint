@@ -43,7 +43,7 @@ from ansiblelint.constants import VIOLATIONS_FOUND_RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.testing import run_ansible_lint
 
-runtime = Runtime()
+runtime = Runtime(max_retries=1)
 
 
 @pytest.mark.parametrize(

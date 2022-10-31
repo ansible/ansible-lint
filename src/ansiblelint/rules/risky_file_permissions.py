@@ -151,6 +151,8 @@ if "pytest" in sys.modules:  # noqa: C901
         collection.register(MissingFilePermissionsRule())
         runner = RunFromText(collection)
         results = runner.run(file)
-        assert len(results) == expected
+        assert len(results) == expected, f"{runner.app.runtime.cache_dir}"
         for result in results:
-            assert result.tag == "risky-file-permissions"
+            assert (
+                result.tag == "risky-file-permissions"
+            ), f"{runner.app.runtime.cache_dir}"

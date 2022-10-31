@@ -5,7 +5,7 @@
 #    pip-compile --extra=docs --extra=test --no-annotate --output-file=requirements.txt --strip-extras --unsafe-package=ansible-core setup.cfg
 #
 alabaster==0.7.12
-ansible-compat==2.2.1
+ansible-compat==2.2.3
 ansible-pygments==0.1.1
 astroid==2.12.12
 attrs==22.1.0

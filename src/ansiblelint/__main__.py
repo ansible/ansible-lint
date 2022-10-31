@@ -103,9 +103,15 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     options.configured = True
     options.cache_dir = get_cache_dir(options.project_dir)
 
-    # add a lock file so we do not have two instances running inside at the same time
     os.makedirs(options.cache_dir, exist_ok=True)
 
+    # Dump the project directory inside the cache so we can debug them or
+    # even clean them later.
+    if not os.path.exists(f"{options.cache_dir}/.src"):
+        with open(f"{options.cache_dir}/.src", "w", encoding="utf-8") as f:
+            f.write(os.path.abspath(options.project_dir))
+
+    # add a lock file so we do not have two instances running inside at the same time
     options.cache_dir_lock = None
     if not options.offline:
         options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
@@ -196,7 +202,6 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
 
-    app = get_app(offline=options.offline)
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import _get_matches
@@ -212,6 +217,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.listrules or options.listtags:
         return _do_list(rules)
 
+    app = get_app(offline=options.offline)
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")
     result = _get_matches(rules, options)
