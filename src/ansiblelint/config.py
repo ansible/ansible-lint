@@ -225,7 +225,6 @@ def guess_install_method() -> str:
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             # pylint: disable=import-outside-toplevel
-            from pip._internal.exceptions import UninstallationError
             from pip._internal.metadata import get_default_environment
             from pip._internal.req.req_uninstall import uninstallation_paths
 
@@ -237,7 +236,8 @@ def guess_install_method() -> str:
             else:
                 logging.debug("Skipping %s as it is not installed.", package_name)
                 use_pip = False
-    except (UninstallationError, AttributeError, ImportError) as exc:
+    # pylint: disable=broad-except
+    except Exception as exc:
         # On Fedora 36, we got a AttributeError exception from pip that we want to avoid
         logging.debug(exc)
         use_pip = False

@@ -5,6 +5,7 @@ from typing import Generator
 import pytest
 from _pytest.fixtures import FixtureRequest
 
+from ansiblelint.app import get_app
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.testing import run_ansible_lint
@@ -49,10 +50,11 @@ def test_example_syntax_error(
 
 def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
+    app = get_app(offline=True)
     result = Runner(
         "examples/playbooks/custom_module.yml", rules=default_rules_collection
     ).run()
-    assert len(result) == 0
+    assert len(result) == 0, f"{app.runtime.cache_dir}"
 
 
 def test_full_vault(default_rules_collection: RulesCollection) -> None:

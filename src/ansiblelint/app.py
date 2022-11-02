@@ -193,7 +193,7 @@ warn_list:  # or 'skip_list' to silence them completely
                 "because 'yaml' is in 'skip_list'."
             )
 
-        if summary.failures:
+        if mark_as_success and summary.failures and not self.options.progressive:
             mark_as_success = False
 
         if not self.options.quiet:
