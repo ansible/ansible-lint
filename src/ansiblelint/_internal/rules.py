@@ -99,11 +99,32 @@ class BaseRule:
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str | MatchError | list[MatchError]:
         """Confirm if current rule is matching a specific task.
-
         If ``needs_raw_task`` (a class level attribute) is ``True``, then
         the original task (before normalization) will be made available under
         ``task["__raw_task__"]``.
         """
+
+        # checks if block exists under tasks,
+        # if yes then checks for keywords to be added
+        # to the tasks under block
+        block = task.get("block", None)
+        if block:
+            when = task.get("when", None)
+            become = task.get("become", None)
+            become_user = task.get("become_user", None)
+            collections = task.get("collections", None)
+
+            if when or become or become_user or collections:
+                for item in block:
+                    if when:
+                        item["when"] = when
+                    if become:
+                        item["become"] = become
+                    if become_user:
+                        item["become_user"] = become_user
+                    if collections:
+                        item["collections"] = collections
+
         return False
 
     def matchtasks(self, file: Lintable) -> list[MatchError]:
