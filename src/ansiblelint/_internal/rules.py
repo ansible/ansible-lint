@@ -99,6 +99,7 @@ class BaseRule:
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str | MatchError | list[MatchError]:
         """Confirm if current rule is matching a specific task.
+
         If ``needs_raw_task`` (a class level attribute) is ``True``, then
         the original task (before normalization) will be made available under
         ``task["__raw_task__"]``.
