@@ -93,7 +93,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             # To reduce noisy warnings like
             # CryptographyDeprecationWarning: Blowfish has been deprecated
             # https://github.com/paramiko/paramiko/issues/2038
-            env = get_app(offline=True).runtime.environ.copy()
+            env = get_app().runtime.environ.copy()
             env["PYTHONWARNINGS"] = "ignore"
 
             run = subprocess.run(
