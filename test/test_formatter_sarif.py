@@ -38,7 +38,7 @@ class TestSarifFormatter:
                 details="hello",
                 filename=Lintable("filename.yml"),
                 rule=self.rule,
-                tag="yaml[test]"
+                tag="yaml[test]",
             )
         )
         self.matches.append(
@@ -48,7 +48,7 @@ class TestSarifFormatter:
                 details="hello",
                 filename=Lintable("filename.yml"),
                 rule=self.rule,
-                tag="yaml[test]"
+                tag="yaml[test]",
             )
         )
         self.formatter = SarifFormatter(pathlib.Path.cwd(), display_relative_path=True)
