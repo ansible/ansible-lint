@@ -1,9 +1,5 @@
 """Assure samples produced desire outcomes."""
-import os
-from typing import Generator
-
 import pytest
-from _pytest.fixtures import FixtureRequest
 
 from ansiblelint.app import get_app
 from ansiblelint.rules import RulesCollection
@@ -11,19 +7,12 @@ from ansiblelint.runner import Runner
 from ansiblelint.testing import run_ansible_lint
 
 
-@pytest.fixture
-def _change_into_examples_dir(request: FixtureRequest) -> Generator[None, None, None]:
-    # pylint: disable=unused-argument
-    os.chdir("examples")
-    yield
-    os.chdir("..")
-
-
-@pytest.mark.usefixtures("_change_into_examples_dir")
 def test_example(default_rules_collection: RulesCollection) -> None:
     """example.yml is expected to have exact number of errors inside."""
-    result = Runner("playbooks/example.yml", rules=default_rules_collection).run()
-    assert len(result) == 21
+    result = Runner(
+        "examples/playbooks/example.yml", rules=default_rules_collection
+    ).run()
+    assert len(result) == 19
 
 
 @pytest.mark.parametrize(
@@ -50,7 +39,7 @@ def test_example_syntax_error(
 
 def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
-    app = get_app(offline=True)
+    app = get_app()
     result = Runner(
         "examples/playbooks/custom_module.yml", rules=default_rules_collection
     ).run()
