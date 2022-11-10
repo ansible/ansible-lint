@@ -256,7 +256,7 @@ def test_template(template: str, output: str) -> None:
         ("template_lookup", False),
         # With 2.15 ansible replaced the runtime Warning about inability to
         # open a file in file lookup with a full error.
-        ("template_lookup_missing", runtime.version_in_range(upper="2.14")),
+        ("template_lookup_missing", runtime.version_in_range(upper="2.15")),
     ),
 )
 def test_template_lookup(role: str, expect_warning: bool) -> None:
