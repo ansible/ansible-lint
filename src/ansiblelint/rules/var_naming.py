@@ -201,14 +201,9 @@ if "pytest" in sys.modules:
         assert len(results) == 6
         for result in results:
             assert result.rule.id == VariableNamingRule.id
-
-        # list unexpected error lines or non-matching error lines
-        expected_error_lines = [5, 9, 21, 21, 26, 28]
-        lines = [i.linenumber for i in results]
-        error_lines_difference = list(
-            set(expected_error_lines).symmetric_difference(set(lines))
-        )
-        assert len(error_lines_difference) == 0
+        # We are not checking line numbers because they can vary between
+        # different versions of ruamel.yaml (and depending on presence/absence
+        # of its c-extension)
 
     @pytest.mark.parametrize(
         "rule_runner", (VariableNamingRule,), indirect=["rule_runner"]
