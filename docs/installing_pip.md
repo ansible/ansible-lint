@@ -1,0 +1,11 @@
+(install-ansible-lint-pip)=
+
+# Installing Ansible-lint with pip
+
+You can install Ansible-lint with either the [pip3] or [pipx] Python package manager.
+Use [pipx] to isolate Ansible-lint from your current Python environment as an alternative to creating a virtual environment.
+
+```bash
+# This also installs ansible-core if it is not already installed
+pip3 install "ansible-lint"
+```

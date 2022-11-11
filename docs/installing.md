@@ -1,45 +1,27 @@
 (installing-lint)=
 
-# Installing
+# Installing Ansible-lint
 
 ```{contents} Topics
 
 ```
 
-Installing on Windows is not supported because we use symlinks inside Python
-packages.
+Install Ansible-lint to apply rules and follow best practices with your automation content.
 
-Our project does not ship a container. Please avoid raising any bugs
-related to containers and use the [discussions](https://github.com/ansible/ansible-lint/discussions) forum instead.
-
-We recommend you to try [creator-ee](https://github.com/ansible/creator-ee/),
-which is a container that also carries ansible-lint.
-
-## Using pip or pipx
-
-You can use either [pip3] or [pipx] to install it; the latter one
-automatically isolates the linter from your current python environment.
-That approach may avoid having to deal with particularities of installing
-python packages, like creating a virtual environment, activating it, installing
-using `--user` or fixing potential conflicts if not using virtualenvs.
-
-```bash
-# This will also install ansible-core if needed
-pip3 install "ansible-lint"
+```{note}
+Ansible-lint does not currently support installation on Windows systems.
 ```
 
-(installing-from-source)=
+For a container image, we recommend using [creator-ee](https://github.com/ansible/creator-ee/), which includes Ansible-lint.
+If you have a use case that the `creator-ee` container does satisfy, please contact the team through the [discussions](https://github.com/ansible/ansible-lint/discussions) forum.
 
-## From Source
+You can also run Ansible-lint on your source code with the [Ansible-lint GitHub action](https://github.com/marketplace/actions/ansible-lint) instead of installing it directly.
 
-**Note**: pip 19.0+ is required for installation. Please consult with the
-[PyPA User Guide] to learn more about managing Pip versions.
+```{toctree}
+:maxdepth: 1
 
-```bash
-pip3 install git+https://github.com/ansible/ansible-lint.git
+installing_pip
+installing_dnf
+installing_source
+
 ```
-
-[installing_from_source]: https://pypi.org/project/pip/
-[pip3]: https://pypi.org/project/pip/
-[pipx]: https://pypa.github.io/pipx/
-[pypa user guide]: https://packaging.python.org/en/latest/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date
