@@ -2,7 +2,7 @@
 # .ansible-lint
 # exclude_paths included in this file are parsed relative to this file's location
 # and not relative to the CWD of execution. CLI arguments passed to the --exclude
-# option will be parsed relative to the CWD of execution.
+# option are parsed relative to the CWD of execution.
 exclude_paths:
   - .cache/ # implicit unless exclude_paths is defined in config
   - .github/
@@ -37,12 +37,12 @@ use_default_rules: true
 # rulesdir:
 #   - ./rule/directory/
 
-# This makes linter to fully ignore rules/tags listed below
+# Ansible-lint completely ignores rules or tags listed below
 skip_list:
   - skip_this_tag
 
-# Any rule that has the 'opt-in' tag will not be loaded unless its 'id' is
-# mentioned in the enable_list:
+# Ansible-lint does not automatically load rules that have the 'opt-in' tag.
+# You must enable opt-in rules by listing each rule 'id' below.
 enable_list:
   - empty-string-compare # opt-in
   - no-log-password # opt-in
@@ -54,7 +54,7 @@ enable_list:
 # tags:
 #   - jinja[spacing]
 
-# This makes the linter display but not fail for rules/tags listed below:
+# Ansible-lint does not fail on warnings from the rules or tags listed below
 warn_list:
   - skip_this_tag
   - experimental # experimental is included in the implicit list
