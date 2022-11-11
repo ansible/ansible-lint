@@ -256,7 +256,7 @@ def test_template(template: str, output: str) -> None:
         ("template_lookup", False),
         # With 2.15 ansible replaced the runtime Warning about inability to
         # open a file in file lookup with a full error.
-        ("template_lookup_missing", runtime.version_in_range(upper="2.14")),
+        ("template_lookup_missing", runtime.version_in_range(upper="2.15.0.dev0")),
     ),
 )
 def test_template_lookup(role: str, expect_warning: bool) -> None:
@@ -273,7 +273,9 @@ def test_template_lookup(role: str, expect_warning: bool) -> None:
         )
     )
     result = run_ansible_lint("-v", task_path)
-    assert ("Unable to find" in result.stderr) == expect_warning
+    # 2.13 or older will not attempt to install when in offline mode
+    if not runtime.version_in_range(upper="2.14.0.dev0"):
+        assert ("Unable to find" in result.stderr) == expect_warning
 
 
 def test_task_to_str_unicode() -> None:
