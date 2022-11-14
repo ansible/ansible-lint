@@ -1,8 +1,8 @@
 (install-ansible-lint-pip)=
 
-# Installing Ansible-lint with pip
+# Installing the latest version of Ansible-lint
 
-You can install Ansible-lint with either the [pip3] or [pipx] Python package manager.
+You can install the most recent version of Ansible-lint with the [pip3] or [pipx] Python package manager.
 Use [pipx] to isolate Ansible-lint from your current Python environment as an alternative to creating a virtual environment.
 
 ```bash
