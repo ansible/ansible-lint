@@ -1,0 +1,13 @@
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - name: Shell (fqcn) # noqa: command-instead-of-shell
+      changed_when: false
+      ansible.builtin.shell: echo This rule should not get matched by the fqcn rule
+    - name: Use FQCN with more than 3 parts
+      community.general.system.sudoers:
+        name: should-not-be-here
+        state: absent
+    - name: Command with legacy FQCN
+      ansible.legacy.command: echo This rule should not get matched by the fqcn rule
