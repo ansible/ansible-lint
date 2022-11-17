@@ -331,6 +331,9 @@ def get_app(offline: bool = False) -> App:
     # Make linter use the cache dir from compat
     default_options.cache_dir = app.runtime.cache_dir
 
-    app.runtime.prepare_environment(install_local=True, offline=offline)
+    # mocking must happen before prepare_environment or galaxy install might
+    # fail.
     _perform_mockings()
+    app.runtime.prepare_environment(install_local=True, offline=offline)
+
     return app
