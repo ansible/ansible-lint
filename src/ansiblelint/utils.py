@@ -182,7 +182,7 @@ def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignor
 
     # "if play" prevents failure if the play sequence contains None,
     # which is weird but currently allowed by Ansible
-    # https://github.com/ansible-community/ansible-lint/issues/849
+    # https://github.com/ansible/ansible-lint/issues/849
     return [item for play in pb_data if play for item in play.items()]  # type: ignore
 
 

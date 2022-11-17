@@ -53,7 +53,7 @@ to <mailto:security@ansible.com>.
 
 As with all Ansible projects, we have a [Code of Conduct].
 
-[.flake8]: https://github.com/ansible-community/ansible-lint/blob/main/.flake8
+[.flake8]: https://github.com/ansible/ansible-lint/blob/main/.flake8
 [ansible announce]: https://groups.google.com/forum/#!forum/ansible-announce
 [ansible communication]: https://docs.ansible.com/ansible/latest/community/communication.html
 [code of conduct]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html
