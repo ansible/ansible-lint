@@ -37,8 +37,8 @@ either a git commit sha or tag of ansible-lint containing
 `.pre-commit-hooks.yaml`.
 
 ```yaml
-- repo: https://github.com/ansible-community/ansible-lint.git
-  rev: ... # put latest release tag from https://github.com/ansible-community/ansible-lint/releases/
+- repo: https://github.com/ansible/ansible-lint.git
+  rev: ... # put latest release tag from https://github.com/ansible/ansible-lint/releases/
   hooks:
     - id: ansible-lint
 ```

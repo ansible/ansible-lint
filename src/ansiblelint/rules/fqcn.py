@@ -9,7 +9,7 @@ from ansible.plugins.loader import module_loader
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
 _logger = logging.getLogger(__name__)
 
@@ -163,49 +163,24 @@ class FQCNBuiltinsRule(AnsibleLintRule):
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
 
-    import pytest
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
-    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
-
-    SUCCESS_PLAY = """
-- hosts: localhost
-  tasks:
-  - name: Shell (fqcn)
-    ansible.builtin.shell: echo This rule should not get matched by the fqcn rule
-  - name: Use FQCN with more than 3 parts
-    community.general.system.sudoers:
-      name: should-not-be-here
-      state: absent
-  - name: Command with legacy FQCN
-    ansible.legacy.command: echo This rule should not get matched by the fqcn rule
-    """
-
-    FAIL_PLAY = """
-- hosts: localhost
-  tasks:
-  - name: Shell (fqcn[action-core])
-    shell: echo This rule should get matched by the fqcn rule
-  - name: Shell (fqcn[action])
-    ini_file:
-        path: /tmp/test.ini
-    """
-
-    @pytest.mark.parametrize(
-        "rule_runner", (FQCNBuiltinsRule,), indirect=["rule_runner"]
-    )
-    def test_fqcn_builtin_fail(rule_runner: RunFromText) -> None:
+    def test_fqcn_builtin_fail() -> None:
         """Test rule matches."""
-        results = rule_runner.run_playbook(FAIL_PLAY)
+        collection = RulesCollection()
+        collection.register(FQCNBuiltinsRule())
+        success = "examples/playbooks/rule-fqcn-fail.yml"
+        results = Runner(success, rules=collection).run()
         assert len(results) == 2
         assert results[0].tag == "fqcn[action-core]"
         assert "Use FQCN for builtin module actions" in results[0].message
         assert results[1].tag == "fqcn[action]"
         assert "Use FQCN for module actions, such" in results[1].message
 
-    @pytest.mark.parametrize(
-        "rule_runner", (FQCNBuiltinsRule,), indirect=["rule_runner"]
-    )
-    def test_fqcn_builtin_pass(rule_runner: RunFromText) -> None:
+    def test_fqcn_builtin_pass() -> None:
         """Test rule does not match."""
-        results = rule_runner.run_playbook(SUCCESS_PLAY)
+        collection = RulesCollection()
+        collection.register(FQCNBuiltinsRule())
+        success = "examples/playbooks/rule-fqcn-pass.yml"
+        results = Runner(success, rules=collection).run()
         assert len(results) == 0, results
