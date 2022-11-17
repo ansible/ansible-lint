@@ -1,6 +1,7 @@
 """Application."""
 from __future__ import annotations
 
+import itertools
 import logging
 import os
 from functools import lru_cache
@@ -84,7 +85,7 @@ class App:
         # If run under GitHub Actions we also want to emit output recognized by it.
         if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("GITHUB_WORKFLOW"):
             formatter = formatters.AnnotationsFormatter(self.options.cwd, True)
-            for match in matches:
+            for match in itertools.chain(fatal_matches, ignored_matches):
                 console.print(formatter.format(match), markup=False, highlight=False)
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
