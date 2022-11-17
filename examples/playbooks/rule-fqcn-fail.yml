@@ -1,0 +1,10 @@
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - name: Shell (fqcn[action-core]) # noqa: command-instead-of-shell
+      shell: echo This rule should get matched by the fqcn rule
+    - name: Shell (fqcn[action])
+      ini_file:
+        path: /tmp/test.ini
+        mode: 0644

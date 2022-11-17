@@ -63,6 +63,7 @@ class RunFromText:
         os.makedirs(tasks_path)
         with open(os.path.join(tasks_path, "main.yml"), "w", encoding="utf-8") as fh:
             fh.write(tasks_main_text)
+            fh.flush()
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results
@@ -74,6 +75,7 @@ class RunFromText:
         os.makedirs(meta_path)
         with open(os.path.join(meta_path, "main.yml"), "w", encoding="utf-8") as fh:
             fh.write(meta_main_text)
+            fh.flush()
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results
@@ -85,6 +87,7 @@ class RunFromText:
         os.makedirs(defaults_path)
         with open(os.path.join(defaults_path, "main.yml"), "w", encoding="utf-8") as fh:
             fh.write(defaults_main_text)
+            fh.flush()
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results
