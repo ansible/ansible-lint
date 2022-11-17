@@ -20,4 +20,3 @@ ignorePaths:
   - src/ansiblelint/schemas/*.json
   # Other
   - "*.svg"
-allowCompoundWords: true
