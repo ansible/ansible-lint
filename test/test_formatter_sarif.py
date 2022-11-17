@@ -38,6 +38,7 @@ class TestSarifFormatter:
                 details="hello",
                 filename=Lintable("filename.yml"),
                 rule=self.rule,
+                tag="yaml[test]",
             )
         )
         self.matches.append(
@@ -47,6 +48,7 @@ class TestSarifFormatter:
                 details="hello",
                 filename=Lintable("filename.yml"),
                 rule=self.rule,
+                tag="yaml[test]",
             )
         )
         self.formatter = SarifFormatter(pathlib.Path.cwd(), display_relative_path=True)
@@ -84,8 +86,8 @@ class TestSarifFormatter:
         assert driver["informationUri"] == SarifFormatter.TOOL_URL
         rules = driver["rules"]
         assert len(rules) == 1
-        assert rules[0]["id"] == self.matches[0].rule.id
-        assert rules[0]["name"] == self.matches[0].rule.id
+        assert rules[0]["id"] == self.matches[0].tag
+        assert rules[0]["name"] == self.matches[0].tag
         assert rules[0]["shortDescription"]["text"] == self.matches[0].message
         assert rules[0]["defaultConfiguration"]["level"] == "error"
         assert rules[0]["help"]["text"] == self.matches[0].rule.description
@@ -94,8 +96,8 @@ class TestSarifFormatter:
         results = sarif["runs"][0]["results"]
         assert len(results) == 2
         for i, result in enumerate(results):
-            assert result["ruleId"] == self.matches[i].rule.id
-            assert result["message"]["text"] == self.matches[i].details
+            assert result["ruleId"] == self.matches[i].tag
+            assert result["message"]["text"] == self.matches[0].message
             assert (
                 result["locations"][0]["physicalLocation"]["artifactLocation"]["uri"]
                 == self.matches[i].filename
