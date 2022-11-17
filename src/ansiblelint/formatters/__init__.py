@@ -255,17 +255,17 @@ class SarifFormatter(BaseFormatter[Any]):
         rules = {}
         results = []
         for match in matches:
-            if match.rule.id not in rules:
-                rules[match.rule.id] = self._to_sarif_rule(match)
+            if match.tag not in rules:
+                rules[match.tag] = self._to_sarif_rule(match)
             results.append(self._to_sarif_result(match))
         return list(rules.values()), results
 
     def _to_sarif_rule(self, match: MatchError) -> dict[str, Any]:
         rule: dict[str, Any] = {
-            "id": match.rule.id,
+            "id": match.tag,
             "name": match.tag,
             "shortDescription": {
-                "text": self.escape(str(match.message)),
+                "text": str(match.message),
             },
             "defaultConfiguration": {
                 "level": self._to_sarif_level(match),
@@ -282,9 +282,9 @@ class SarifFormatter(BaseFormatter[Any]):
 
     def _to_sarif_result(self, match: MatchError) -> dict[str, Any]:
         result: dict[str, Any] = {
-            "ruleId": match.rule.id,
+            "ruleId": match.tag,
             "message": {
-                "text": match.details,
+                "text": str(match.message),
             },
             "locations": [
                 {
