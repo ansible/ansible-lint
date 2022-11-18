@@ -1,6 +1,6 @@
 (configuring-ansible-lint)=
 
-# Configuring Ansible-lint
+# Configuration
 
 ```{contents} Topics
 
