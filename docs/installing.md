@@ -1,6 +1,6 @@
 (installing-lint)=
 
-# Installing Ansible-lint
+# Installation methods
 
 ```{contents} Topics
 

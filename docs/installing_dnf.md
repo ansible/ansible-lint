@@ -1,6 +1,6 @@
 (install-ansible-lint-dnf)=
 
-# Installing Ansible-lint on RHEL
+# Installing on RHEL
 
 Ansible Automation Platform users can install Ansible-lint on Red Hat Enterprise Linux (RHEL) with the `dnf` package manager.
 

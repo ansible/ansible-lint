@@ -1,6 +1,6 @@
 (install-ansible-lint-source)=
 
-# Installing Ansible-lint from source code
+# Installing from source code
 
 **Note**: pip 19.0+ is required for installation from the source repository.
 Please consult the [PyPA User Guide] to learn more about managing Pip versions.
