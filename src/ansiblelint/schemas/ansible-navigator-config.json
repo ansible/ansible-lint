@@ -448,7 +448,7 @@
                         },
                         "save-as": {
                             "default": "{playbook_dir}/{playbook_name}-artifact-{time_stamp}.json",
-                            "description": "Specify the name for artifacts created from completed playbooks.The following placeholders are available: {playbook_dir}, {playbook_name}, {playbook_status}, and {time_stamp}",
+                            "description": "Specify the name for artifacts created from completed playbooks. The following placeholders are available: {playbook_dir}, {playbook_name}, {playbook_status}, and {time_stamp}",
                             "type": "string"
                         }
                     },
