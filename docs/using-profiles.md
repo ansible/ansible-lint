@@ -1,6 +1,6 @@
 (using-lint-profiles)=
 
-# Applying lint profiles
+# Applying profiles
 
 Ansible-lint profiles allow content creators to progressively improve the quality of Ansible playbooks, roles, and collections.
 
