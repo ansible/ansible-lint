@@ -4,7 +4,7 @@
 
 Define and use your own sets of rules with Ansible-lint.
 
-## Ansible-lint rule definitions
+## Rule definitions
 
 You define each custom rule in a unique Python class file.
 Default rules are named _DeprecatedVariableRule.py_, etc.
