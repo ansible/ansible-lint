@@ -7,7 +7,8 @@ Ansible-lint profiles allow content creators to progressively improve the qualit
 During early development cycles, you need Ansible-lint rules to be less strict.
 Starting with the minimal profile ensures that Ansible can load your content.
 As you move to the next stage of developing content, you can gradually apply profiles to avoid common pitfalls and brittle complexity.
-Then, when you are ready to publish or share your content, you can use the ``shared`` and ``production`` profiles with much stricter rules that harden security and guarantee reliability.
+Then, when you are ready to publish or share your content, you can use the ``shared`` and ``production`` profiles with much stricter rules.
+These profiles harden security, guarantee reliability, and ensure your Ansible content is easy for others to contribute to and use.
 
 ```{note}
 Tags such as `opt-in` and `experimental` do not take effect for rules that are included in profiles, directly or indirectly.
