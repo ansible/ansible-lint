@@ -102,12 +102,12 @@ To automatically load custom rules, do the following:
 
 2. Configure the \[options\] section of the `setup.cfg` of your custom rules Python package as in the following example:
 
-    ```yaml
-    [options]
-    packages =
-        ansiblelint.rules.custom.<your_custom_rules_subdir>
-    package_dir =
-        ansiblelint.rules.custom.<your_custom_rules_subdir> = <your_rules_source_code_subdir>
-    ```
+   ```yaml
+   [options]
+   packages =
+       ansiblelint.rules.custom.<your_custom_rules_subdir>
+   package_dir =
+       ansiblelint.rules.custom.<your_custom_rules_subdir> = <your_rules_source_code_subdir>
+   ```
 
 3. Install the Python package into `<ansible_lint_custom_rules_dir>/custom/<your_custom_rules_subdir>/`.
