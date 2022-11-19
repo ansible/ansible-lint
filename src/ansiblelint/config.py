@@ -96,25 +96,6 @@ BASE_KINDS = [
     {"text/yaml": "**/.*.{yaml,yml}"},
 ]
 
-
-# Maps kinds to JSON schemas
-# See https://www.schemastore.org/json/
-JSON_SCHEMAS = {
-    # Do not use anchors in these URLs because python-jsonschema does not support them:
-    "playbook": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json",
-    "tasks": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json",
-    "vars": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-vars.json",
-    "requirements": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-requirements.json",
-    "meta": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json",
-    "galaxy": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json",
-    "execution-environment": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json",
-    "meta-runtime": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json",
-    "inventory": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json",
-    "ansible-lint-config": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json",
-    "ansible-navigator-config": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json",
-    "arg_specs": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-argument-specs.json",
-}
-
 PROFILES = yaml_from_file(Path(__file__).parent / "data" / "profiles.yml")
 
 options = Namespace(
