@@ -11,6 +11,7 @@ ci:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
     - pip-compile-upgrade
+    - schemas
 default_language_version:
   python: python3.9
 exclude: >
@@ -185,6 +186,11 @@ repos:
   - # keep at bottom as these are slower
     repo: local
     hooks:
+      - id: schemas
+        name: update json schemas
+        entry: python3 src/ansiblelint/schemas/__init__.py
+        language: python
+        stages: [manual]
       - id: pip-compile
         name: pip-compile
         entry: python3.9 -m piptools compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core

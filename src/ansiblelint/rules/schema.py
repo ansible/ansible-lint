@@ -12,14 +12,15 @@ import yaml
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from ansiblelint.config import JSON_SCHEMAS
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.loaders import yaml_load_safe
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.schemas import JSON_SCHEMAS
 from ansiblelint.schemas import __file__ as schemas_module
 
 _logger = logging.getLogger(__name__)
+
 
 DESCRIPTION_MD = """ Returned errors will not include exact line numbers, but they will mention
 the schema name being used as a tag, like ``schema[playbook]``,
