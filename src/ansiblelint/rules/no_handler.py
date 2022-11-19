@@ -136,7 +136,7 @@ if "pytest" in sys.modules:
         "rule_runner", (UseHandlerRatherThanWhenChangedRule,), indirect=["rule_runner"]
     )
     def test_succeed_when_and(rule_runner: Any) -> None:
-        """See https://github.com/ansible-community/ansible-lint/issues/1526."""
+        """See https://github.com/ansible/ansible-lint/issues/1526."""
         results = rule_runner.run_playbook(SUCCEED_WHEN_AND)
         assert len(results) == 0
 

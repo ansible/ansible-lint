@@ -182,7 +182,7 @@ class JinjaRule(AnsibleLintRule):
         new_text = self.unlex(tokens)
         if text != new_text:
             _logger.debug(
-                "Unable to perform full roundrip lex-unlex on jinja template (expected when '-' modifier is used): {text} -> {new_text}"
+                "Unable to perform full roundtrip lex-unlex on jinja template (expected when '-' modifier is used): {text} -> {new_text}"
             )
         return tokens
 

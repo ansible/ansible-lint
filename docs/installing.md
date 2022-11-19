@@ -36,7 +36,7 @@ pip3 install "ansible-lint"
 [PyPA User Guide] to learn more about managing Pip versions.
 
 ```bash
-pip3 install git+https://github.com/ansible-community/ansible-lint.git
+pip3 install git+https://github.com/ansible/ansible-lint.git
 ```
 
 [installing_from_source]: https://pypi.org/project/pip/

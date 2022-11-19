@@ -12,7 +12,7 @@ Release:        1%{?dist}
 Summary:        Ansible-lint checks ansible content for common mistakes
 
 License:        MIT
-URL:            https://github.com/ansible-community/ansible-lint
+URL:            https://github.com/ansible/ansible-lint
 Source0:        %{pypi_source}
 
 BuildArch:      noarch
@@ -84,4 +84,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %doc docs/* README.md
 
 %changelog
-Available at https://github.com/ansible-community/ansible-lint/releases
+Available at https://github.com/ansible/ansible-lint/releases

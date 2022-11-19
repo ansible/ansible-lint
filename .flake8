@@ -63,7 +63,7 @@ per-file-ignores =
   src/ansiblelint/yaml_utils.py: C901
 
   # FIXME: drop these once they're fixed
-  # Ref: https://github.com/ansible-community/ansible-lint/issues/725
+  # Ref: https://github.com/ansible/ansible-lint/issues/725
   test/*: D102
 
 # flake8-pytest-style
