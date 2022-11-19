@@ -1,0 +1,49 @@
+{
+    "ansible-lint-config": {
+        "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json"
+    },
+    "ansible-navigator-config": {
+        "etag": "259a168c473dc88b5def7ea8c7ed28365e46a8abf894cd08fcd57613508e1f26",
+        "url": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json"
+    },
+    "arg_specs": {
+        "etag": "cf3e180b9f9a1980ce491905db37bae4968be10bd0e45fb2096e0e360d4a4912",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-argument-specs.json"
+    },
+    "execution-environment": {
+        "etag": "b2c0e183aabbef8fd83e61e26af2fb1d9a2c8f6549599a24ebf7ccada4c11a81",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json"
+    },
+    "galaxy": {
+        "etag": "2bf1bc8df72c9063463daabddcb707e9ec6923633e4b66343237e39be102f63b",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json"
+    },
+    "inventory": {
+        "etag": "4bf635a87d034c9316c441ab441ef63689059bf96ecd652339ee86200a707f0f",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-inventory.json"
+    },
+    "meta": {
+        "etag": "ffa1e3f48e1f3dbc2b6a0f18fd27676980bac4c94b39e6c072d55ee5ec27449e",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta.json"
+    },
+    "meta-runtime": {
+        "etag": "21c8e4c37930a1c9b135101fcac6c4ef52cfbfe5a724d27612e7ec067cfc5a6a",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-meta-runtime.json"
+    },
+    "playbook": {
+        "etag": "3d3d803a7bba95bb159ad65c2b22c8961264308ef32c7e379d9d30ba3efeecae",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json"
+    },
+    "requirements": {
+        "etag": "9805cd5cc2eb54de699fb9bc7a81db6321ab916d068bdd04e98ea58c8a7855e5",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-requirements.json"
+    },
+    "tasks": {
+        "etag": "68f5b5e1a568199617f777438c434006d9d6cfcd468a0f8b6bf8d1ce8d74af70",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json"
+    },
+    "vars": {
+        "etag": "91faa0cc8adc0adf365a095efa948f8df21fcfc86ac742013b3429d5ea9a6092",
+        "url": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-vars.json"
+    }
+}

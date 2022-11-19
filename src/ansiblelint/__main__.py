@@ -170,7 +170,7 @@ def _do_transform(result: LintResult, opts: Namespace) -> None:
     transformer.run()
 
 
-# pylint: disable=too-many-branches
+# pylint: disable=too-many-branches,too-many-statements
 def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
@@ -195,6 +195,15 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
+
+    if not options.offline:
+        # refresh schemas must happen before loading rules
+        if "ansiblelint.schemas" in sys.modules:
+            raise RuntimeError("ansiblelint.schemas should not be loaded yet")
+        # pylint: disable=import-outside-toplevel
+        from ansiblelint.schemas import refresh_schemas
+
+        refresh_schemas()
 
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
