@@ -38,7 +38,7 @@ Philosophy<philosophy>
 installing
 usage
 configuring
-profiles
+using-profiles
 rules
 ```
 

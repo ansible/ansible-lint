@@ -132,22 +132,10 @@ Do not manually edit, generated from generate_docs.py
 -->
 # Profiles
 
-One of the best ways to run `ansible-lint` is by specifying which rule profile
-you want to use. These profiles stack on top of each other, allowing you to
-gradually raise the quality bar.
-
-To run it with the most strict profile just type `ansible-lint --profile=production`.
-
-If you want to consult the list of rules from each profile, type
-`ansible-lint -P`. For your convenience, we also list the same output below.
-
-The rules that have a `*` suffix, are not implemented yet but we documented
-them with links to their issues.
+Ansible-lint profiles gradually increase the strictness of rules as your Ansible content lifecycle.
 
 ```{note}
-Special rule tags such `opt-in` and `experimental` are automatically removed
-when a rule is included in a profile, directly or indirectly. This means that
-they will always execute once included.
+Rules with `*` in the suffix are not yet implemented but are documented with linked GitHub issues.
 ```
 
 """

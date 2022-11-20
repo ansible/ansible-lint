@@ -3,10 +3,10 @@
 # progressive the profiles are, each one extending the one before it.
 min:
   description: >
-    Ensures that Ansible would be able to load that content, nothing else.
-    None of the rules can be disabled as they are considered fatal errors. You
-    can still add files to exclude list or add missing dependencies, so the
-    right files can be loaded.
+    The `min` profile ensures that Ansible can load content.
+    Rules in this profile are mandatory because they prevent fatal errors.
+    You can add files to the exclude list or provide dependencies to load the
+    correct files.
   extends: null
   rules:
     internal-error:
@@ -15,9 +15,7 @@ min:
     syntax-check:
 basic:
   description: >
-    Basic profile enables a set of rules designed to spot very common coding
-    mistakes, deprecations and require user to follow standardized style and
-    formatting.
+    The `basic` profile prevents common coding issues and enforces standard styles and formatting.
   extends: min
   rules:
     command-instead-of-module:
@@ -44,9 +42,7 @@ basic:
     - name[casing]
 moderate:
   description: >
-    The moderate profile is raising the bar a little bit by requiring you to
-    follow few other proven good practices that make the content easier to read
-    and maintain.
+    The `moderate` profile ensures that content adheres to best practices for making content easier to read and maintain.
   extends: basic
   rules:
     name[template]:
@@ -59,8 +55,7 @@ moderate:
       url: https://github.com/ansible/ansible-lint/issues/2168
 safety:
   description: >
-    The safety profile require user to avoid risky module calls that can have
-    a non-determinant outcomes and cause security issues in some cases.
+    The `safety` profile avoids module calls that can have non-determinant outcomes or security concerns.
   extends: moderate
   rules:
     avoid-implicit:
@@ -72,13 +67,12 @@ safety:
 shared:
   extends: safety
   description: >
-    The shared profile is for those that want to publish their content, roles
-    or collection to either [galaxy.ansible.com](https://galaxy.ansible.com),
-    [automation-hub](https://console.redhat.com/ansible/automation-hub) or
-    another private instance of these. In addition to all the rules related to
-    packaging and publishing, like metadata checks, this also includes some
-    rules that are known to be good practices for keeping the code readable and
-    maintainable.
+    The `shared` profile ensures that content follows best practices for packaging and publishing.
+    This profile is intended for content creators who want to make Ansible
+    playbooks, roles, or collections available from
+    [galaxy.ansible.com](https://galaxy.ansible.com),
+    [automation-hub](https://console.redhat.com/ansible/automation-hub),
+    or a private instance.
   rules:
     galaxy: # <-- applies to both galaxy and automation-hub
     ignore-errors:
@@ -107,9 +101,9 @@ shared:
       url: https://github.com/ansible/ansible-lint/issues/2038
 production:
   description: >
-    The production profile represents the top level of verification and it
-    is required for inclusion in [Ansible Automation Platform (AAP)](https://www.redhat.com/en/technologies/management/ansible)
-    as either validated or certified content.
+    The `production` profile ensures that content meets requirements for
+    inclusion in [Ansible Automation Platform (AAP)](https://www.redhat.com/en/technologies/management/ansible)
+    as validated or certified content.
   extends: shared
   rules:
     avoid-dot-notation:
