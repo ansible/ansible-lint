@@ -1,26 +1,35 @@
-(configuring-lint)=
+(configuring-ansible-lint)=
 
-# Configuring
+# Configuration
 
 ```{contents} Topics
 
 ```
 
-## Configuration File
+Customize how Ansible-lint runs against automation content to suit your needs.
+You can ignore certain rules, enable `opt-in` rules, and control various other settings.
 
-Ansible-lint supports local configuration via a `.ansible-lint` or
-`.config/ansible-lint.yml` configuration files. Ansible-lint checks the
-working directory for the presence of this file and applies any configuration
-found there. The configuration file location can also be overridden via the
-`-c path/to/file` CLI flag.
+Ansible-lint loads configuration from a file in the current working directory or from a file that you specify in the command line.
+If you provide configuration on both via a config file and on the command line, list values are merged (for example `exclude_paths`) and **True** is preferred for boolean values like `quiet`.
 
-When configuration file is not found in current directory, the tool will try
-to look for one in parent directories but it will not go outside current git
-repository.
+## Using local configuration files
 
-If a value is provided on both the command line and via a config file, the
-values will be merged (if a list like **exclude_paths**), or the **True** value
-will be preferred, in the case of something like **quiet**.
+Specify Ansible-lint configuration in either `.ansible-lint` or `.config/ansible-lint.yml` in your current working directory.
+
+```{note}
+If Ansible-lint cannot find a configuration file in the current directory it attempts to locate it in a parent directory.
+However Ansible-lint does not try to load configuration that is outside the git repository.
+```
+
+## Specifying configuration files
+
+Use the `-c <filename>` CLI flag with command line invocations of Ansible-lint, for example:
+
+```bash
+ansible-lint -c path/to/ansible-lint-dev.yml
+```
+
+## Ansible-lint configuration
 
 The following values are supported, and function identically to their CLI
 counterparts:
@@ -29,12 +38,11 @@ counterparts:
 :language: yaml
 ```
 
-## Pre-commit Setup
+## Pre-commit setup
 
-To use ansible-lint with [pre-commit], just add the following to your local
-repo's `.pre-commit-config.yaml` file. Make sure to change **rev:** to be
-either a git commit sha or tag of ansible-lint containing
-`.pre-commit-hooks.yaml`.
+To use Ansible-lint with [pre-commit], add the following to the `.pre-commit-config.yaml` file in your local repository.
+
+Change **rev:** to either a commit sha or tag of Ansible-lint that contains `.pre-commit-hooks.yaml`.
 
 ```yaml
 - repo: https://github.com/ansible/ansible-lint.git
