@@ -128,31 +128,28 @@ jobs:
           # keep list sorted as it determines UI order too
           # linux
           # py38 is first and comes from matrix
-          - tox_env: py38
+          - tox_env: py38 # no devel for 3.8 as core dropped support for it
             os: ubuntu-20.04
             python-version: 3.8
-            devel: false # ansible 2.14 removed support for py38
-          - tox_env: py39
+          - tox_env: py39,py39-devel
             os: ubuntu-20.04
             python-version: 3.9
-            devel: true
           - tox_env: py310
             os: ubuntu-20.04
             python-version: "3.10"
-            devel: true
-          - tox_env: py311
+          - tox_env: py311,py311-devel
             os: ubuntu-20.04
-            python-version: "~3.11.0-0" # see https://github.com/actions/setup-python/issues/213#issuecomment-1146676713
-            devel: true
+            python-version: "3.11"
           # macos
           - name: py38 (macos)
             tox_env: py38
             os: macOS-latest
             python-version: 3.8
-          - name: py310 (macos)
-            tox_env: py310
+            devel: false # ansible 2.14 removed support for py38
+          - name: py311 (macos)
+            tox_env: py311,py311-devel
             os: macOS-latest
-            python-version: "3.10"
+            python-version: "3.11"
           # windows-2022 WSL does timeout running tests, likely caused but some
           # extreme (>10x) performance degradation compared with windows-2019
           # https://github.com/actions/virtual-environments/issues/4856
@@ -190,58 +187,37 @@ jobs:
             ~/.ansible/galaxy_cache
             ~/.ansible/collections/ansible_collections
             ~/.ansible/roles/
-          key: galaxy-${{ hashFiles('requirements.yml') }}
+          key: galaxy-${{ matrix.name }}-${{ hashFiles('requirements.yml') }}
 
       - name: Set up Python ${{ matrix.python-version }}
         if: "!contains(matrix.shell, 'wsl')"
         uses: actions/setup-python@v4
         with:
+          cache: pip
           python-version: ${{ matrix.python-version }}
 
       - name: Run ./tools/test-setup.sh
-        run: |
-          ./tools/test-setup.sh
+        run: ./tools/test-setup.sh
 
-      # - name: Pip cache
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ env.PY_SHA256 }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tox.ini') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('pytest.ini') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-      #       ${{ runner.os }}-
       - name: Install tox
         run: |
-          python3 -m pip install --upgrade tox
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade tox tox-extra
+
       - name: Log installed dists
-        run: >-
-          python3 -m pip freeze --all
-      - name: Initialize tox envs
-        run: >-
-          python3 -m
-          tox
-          --parallel auto
-          --parallel-live
-          --notest
-          --skip-missing-interpreters false
-          -vv
-        env:
-          TOXENV: ${{ matrix.tox_env }}
+        run: python3 -m pip freeze --all
+
+      - name: Initialize tox envs ${{ matrix.tox_env }}
+        run: python3 -m tox --notest --skip-missing-interpreters false -vv -e ${{ matrix.tox_env }}
+
       # sequential run improves browsing experience (almost no speed impact)
       - name: "Test with tox: ${{ matrix.tox_env }}"
-        run: |
-          python3 -m tox
-        env:
-          TOXENV: ${{ matrix.tox_env }}
-      - name: "Test with tox: ${{ matrix.tox_env }}-devel"
-        if: ${{ matrix.devel }}
-        run: |
-          python3 -m tox
-        env:
-          TOXENV: ${{ matrix.tox_env }}-devel
+        run: python3 -m tox -e ${{ matrix.tox_env }}
+
       - name: Combine coverage data
         # produce a single .coverage file at repo root
         run: tox -e coverage
+
       - name: Upload coverage data
         if: "runner.os == 'Linux'"
         uses: codecov/codecov-action@v3
@@ -250,6 +226,7 @@ jobs:
           fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
+
       - name: Archive logs
         uses: actions/upload-artifact@v3
         with:
@@ -257,6 +234,7 @@ jobs:
           path: .tox/**/log/
         # https://github.com/actions/upload-artifact/issues/123
         continue-on-error: true
+
       - name: Report junit failures
         # cspell:disable-next-line
         uses: shyim/junit-report-annotations-action@3d2e5374f2b13e70f6f3209a21adfdbc42c466ae
