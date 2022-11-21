@@ -72,6 +72,11 @@ warn_list:
 # Offline mode disables installation of requirements.yml
 offline: false
 
+# Return success if number of violations compared with previous git
+# commit has not increased. This feature works only in git
+# repositories.
+progressive: false
+
 # Define required Ansible's variables to satisfy syntax check
 extra_vars:
   foo: bar
