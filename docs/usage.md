@@ -19,8 +19,8 @@ After you install Ansible-lint, run `ansible-lint --help` to display available c
 
 Ansible-lint prints output on both `stdout` and `stderr`.
 
-* `stdout` displays rule violations.
-* `stderr` displays logging and free-form messages like statistics.
+- `stdout` displays rule violations.
+- `stderr` displays logging and free-form messages like statistics.
 
 Most `ansible-lint` examples use pep8 as the output format (`-p`) which is machine parseable.
 
