@@ -284,9 +284,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="progressive",
         default=False,
         action="store_true",
-        help="Return success if it detects a reduction in number"
-        " of violations compared with previous git commit. This "
-        "feature works only in git repositories.",
+        help="Return success if number of violations compared with"
+        "previous git commit has not increased. This feature works"
+        "only in git repositories.",
     )
     parser.add_argument(
         "--project-dir",
