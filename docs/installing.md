@@ -27,13 +27,17 @@ Use [pipx] to isolate Ansible-lint from your current Python environment as an al
 pip3 install "ansible-lint"
 ```
 
-## Installing on CentOS, Fedora, and RHEL
+## Installing on Fedora and RHEL
 
-You can install Ansible-lint on CentOS, Fedora, or Red Hat Enterprise Linux (RHEL) with the `dnf` package manager.
+You can install Ansible-lint on Fedora, or Red Hat Enterprise Linux (RHEL) with the `dnf` package manager.
 
 ```bash
-# This also installs ansible-core if it is not already installed
-dnf install "ansible-lint"
+dnf install ansible-lint
+```
+
+```{note}
+On RHEL, `ansible-lint` package is part of "Red Hat Ansible Automation Platform" subscription, which needs
+to be activated.
 ```
 
 ## Installing from source code
