@@ -33,7 +33,7 @@ class RunFromText:
         # Emulate command line execution initialization as without it Ansible module
         # would be loaded with incomplete module/role/collection list.
         if not self.app:
-            self.app = get_app(offline=True)
+            self.app = get_app()
 
         self.collection = collection
 

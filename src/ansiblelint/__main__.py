@@ -211,7 +211,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.listrules or options.listtags:
         return _do_list(rules)
 
-    app = get_app(offline=options.offline)
+    app = get_app()
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")
     result = _get_matches(rules, options)
