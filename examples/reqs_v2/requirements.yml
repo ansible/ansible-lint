@@ -1,5 +1,8 @@
 ---
 roles:
   - name: geerlingguy.mysql
+    src: https://github.com/geerlingguy/ansible-role-mysql
+    version: 4.2.0
+
 collections:
-  - name: ssbarnea.molecule
+  - name: https://galaxy.ansible.com/download/community-molecule-0.1.0.tar.gz

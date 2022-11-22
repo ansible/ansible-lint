@@ -1,3 +1,10 @@
 ---
 # v1 requirements test file
-- src: geerlingguy.mysql
+
+# As Jeff never created releases on hit repo, we are unable to download tar.gz
+# archives, so we need to use the slower git cloning instead.
+# - src: https://github.com/geerlingguy/mysql/archive/refs/tags/4.2.0.tar.gz
+
+- name: geerlingguy.mysql
+  src: https://github.com/geerlingguy/ansible-role-mysql
+  version: 4.2.0
