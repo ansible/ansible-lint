@@ -333,9 +333,17 @@ def get_app() -> App:
     # Make linter use the cache dir from compat
     default_options.cache_dir = app.runtime.cache_dir
 
+    role_name_check = 0
+    if "role-name" in app.options.warn_list:
+        role_name_check = 1
+    elif "role-name" in app.options.skip_list:
+        role_name_check = 2
+
     # mocking must happen before prepare_environment or galaxy install might
     # fail.
     _perform_mockings()
-    app.runtime.prepare_environment(install_local=True, offline=offline)
+    app.runtime.prepare_environment(
+        install_local=True, offline=offline, role_name_check=role_name_check
+    )
 
     return app

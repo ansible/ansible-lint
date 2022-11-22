@@ -94,15 +94,26 @@ def test_run_playbook(local_test_dir: str) -> None:
     assert "Use shell only when shell functionality is required" in result.stdout
 
 
-def test_run_role_name_invalid(local_test_dir: str) -> None:
+@pytest.mark.parametrize(
+    ("args", "expected_msg"),
+    (
+        pytest.param(
+            [], "role-name: Role name invalid-name does not match", id="normal"
+        ),
+        pytest.param(["--skip-list", "role-name"], "", id="skipped"),
+    ),
+)
+def test_run_role_name_invalid(
+    local_test_dir: str, args: list[str], expected_msg: str
+) -> None:
     """Test run with a role with invalid name."""
     cwd = local_test_dir
     role_path = "roles/invalid-name"
 
-    result = run_ansible_lint(role_path, cwd=cwd)
-    assert "role-name: Role name invalid-name does not match" in strip_ansi_escape(
-        result.stdout
-    )
+    result = run_ansible_lint(*args, role_path, cwd=cwd)
+    assert result.returncode == (2 if expected_msg else 0), result
+    if expected_msg:
+        assert expected_msg in strip_ansi_escape(result.stdout)
 
 
 def test_run_role_name_with_prefix(local_test_dir: str) -> None:
