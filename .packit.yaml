@@ -17,10 +17,13 @@ jobs:
   - job: copr_build
     metadata:
       targets:
-        # - fedora-34  # has no https://src.fedoraproject.org/rpms/python-build
-        - fedora-35
-        - fedora-36
-        # - centos-stream-9  # has no https://src.fedoraproject.org/rpms/python-build
+        # See https://packit.dev/docs/configuration/#aliases
+        # API to get available targets: https://api.dev.testing-farm.io/v0.1/composes/public
+        - fedora-stable
+        - fedora-development
+        # Missing python3-build see https://bugzilla.redhat.com/show_bug.cgi?id=2129071
+        # - centos-stream-9-aarch64
+        # - centos-stream-9-x86_64
     trigger: pull_request
   # - job: tests
   #   trigger: pull_request
