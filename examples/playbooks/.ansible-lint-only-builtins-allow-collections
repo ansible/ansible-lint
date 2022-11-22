@@ -1,0 +1,6 @@
+# Mock modules or roles in order to pass ansible-playbook --syntax-check
+mock_modules:
+  - fake_namespace.fake_collection.fake_module
+
+only_builtins_allow_collections:
+  - fake_namespace.fake_collection
