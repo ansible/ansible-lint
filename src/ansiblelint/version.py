@@ -8,6 +8,8 @@ except ImportError:
 
         __version__ = pkg_resources.get_distribution("ansible-lint").version
     except Exception:  # pylint: disable=broad-except
-        __version__ = "unknown"
+        # this is the fallback SemVer version picked by setuptools_scm when tag
+        # information is not available.
+        __version__ = "0.1.dev1"
 
 __all__ = ("__version__",)

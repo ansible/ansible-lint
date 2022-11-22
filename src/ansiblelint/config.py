@@ -229,9 +229,14 @@ def guess_install_method() -> str:
 
 def get_version_warning() -> str:
     """Display warning if current version is outdated."""
+    # 0.1dev1 is special fallback version
+    if __version__ == "0.1.dev1":
+        return ""
+
     msg = ""
     data = {}
     current_version = Version(__version__)
+
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
     cache_file = f"{CACHE_DIR}/latest.json"
@@ -260,7 +265,6 @@ def get_version_warning() -> str:
 
     html_url = data["html_url"]
     new_version = Version(data["tag_name"][1:])  # removing v prefix from tag
-    # breakpoint()
 
     if current_version > new_version:
         msg = "[dim]You are using a pre-release version of ansible-lint.[/]"
