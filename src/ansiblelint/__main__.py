@@ -345,6 +345,19 @@ def path_inject() -> None:
     # This must be run before we do run any subprocesses, and loading config
     # does this as part of the ansible detection.
     paths = [x for x in os.environ.get("PATH", "").split(os.pathsep) if x]
+
+    # Expand ~ in PATH as it known to break many tools
+    expanded = False
+    for idx, path in enumerate(paths):
+        if "~" in path:
+            paths[idx] = os.path.expanduser(path)
+            expanded = True
+    if expanded:
+        print(
+            "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
+            file=sys.stderr,
+        )
+
     inject_paths = []
 
     userbase_bin_path = f"{site.getuserbase()}/bin"
@@ -362,6 +375,7 @@ def path_inject() -> None:
             f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
             file=sys.stderr,
         )
+    if inject_paths or expanded:
         os.environ["PATH"] = os.pathsep.join([*inject_paths, *paths])
 
     # We do know that finding ansible in PATH does not guarantee that it is
