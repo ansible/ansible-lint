@@ -18,6 +18,7 @@ Sshell
 TOXENV
 TYPECHECK
 WSLENV
+aarch64
 abspath
 addoption
 addopts
