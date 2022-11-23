@@ -371,12 +371,14 @@ class RulesCollection:
         self,
         rulesdirs: list[str] | None = None,
         options: Namespace = default_options,
-        profile: list[str] | None = None,
+        profile_name: str | None = None,
         conditional: bool = True,
     ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options
-        self.profile = profile or []
+        self.profile = []
+        if profile_name:
+            self.profile = PROFILES[profile_name]
         if rulesdirs is None:
             rulesdirs = []
         self.rulesdirs = expand_paths_vars(rulesdirs)
@@ -396,8 +398,8 @@ class RulesCollection:
         self.rules = sorted(self.rules)
 
         # when we have a profile we unload some of the rules
-        if self.profile:
-            filter_rules_with_profile(self.rules, self.profile[0])
+        if profile_name:
+            filter_rules_with_profile(self.rules, profile_name)
 
     def register(self, obj: AnsibleLintRule, conditional: bool = False) -> None:
         """Register a rule."""

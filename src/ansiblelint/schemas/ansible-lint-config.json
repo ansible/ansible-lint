@@ -19,6 +19,11 @@
   "additionalProperties": false,
   "examples": [".ansible-lint", ".config/ansible-lint.yml"],
   "properties": {
+    "profile": {
+      "title": "Profile",
+      "type": ["null", "string"],
+      "enum": ["min", "basic", "moderate", "safety", "shared", "production", null]
+    },
     "enable_list": {
       "items": {
         "type": "string"

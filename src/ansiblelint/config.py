@@ -130,6 +130,7 @@ options = Namespace(
     skip_action_validation=True,
     strict=False,
     rules={},  # Placeholder to set and keep configurations for each rule.
+    profile=None,
 )
 
 # Used to store detected tag deprecations

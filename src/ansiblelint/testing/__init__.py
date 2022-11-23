@@ -39,7 +39,6 @@ class RunFromText:
 
     def _call_runner(self, path: str) -> list[MatchError]:
         runner = Runner(path, rules=self.collection)
-        # breakpoint()
         return runner.run()
 
     def run(self, filename: str) -> list[MatchError]:
