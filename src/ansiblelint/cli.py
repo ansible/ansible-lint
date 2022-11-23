@@ -461,6 +461,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
         "mock_modules": [],
         "mock_roles": [],
         "enable_list": [],
+        "only_builtins_allow_collections": [],
         # do not include "write_list" here. See special logic below.
     }
 

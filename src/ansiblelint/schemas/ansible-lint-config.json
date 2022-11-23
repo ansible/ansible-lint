@@ -56,6 +56,13 @@
       "title": "Loop Var Prefix",
       "type": "string"
     },
+    "only_builtins_allow_collections": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Only Builtins Allow Collections",
+      "type": "array"
+    },
     "mock_modules": {
       "items": {
         "type": "string"
