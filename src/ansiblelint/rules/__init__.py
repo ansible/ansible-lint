@@ -409,8 +409,8 @@ class RulesCollection:
                 self.profile,  # when profile is used we load all rules and filter later
                 "opt-in" not in obj.tags,
                 obj.id in self.options.enable_list,
-                self.options.listrules,
-                self.options.listtags,
+                self.options.list_rules,
+                self.options.list_tags,
             ]
         ):
             self.rules.append(obj)
@@ -483,7 +483,7 @@ class RulesCollection:
             [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)]
         )
 
-    def listtags(self) -> str:
+    def list_tags(self) -> str:
         """Return a string with all the tags in the RulesCollection."""
         tag_desc = {
             "command-shell": "Specific to use of command and shell modules",

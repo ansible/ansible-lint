@@ -132,7 +132,7 @@ def _do_list(rules: RulesCollection) -> int:
         rules_as_str,
     )
 
-    if options.listrules:
+    if options.list_rules:
 
         _rule_format_map: dict[str, Callable[..., Any]] = {
             "plain": rules_as_str,
@@ -144,8 +144,8 @@ def _do_list(rules: RulesCollection) -> int:
         console.print(_rule_format_map[options.format](rules), highlight=False)
         return 0
 
-    if options.listtags:
-        console.print(render_yaml(rules.listtags()))
+    if options.list_tags:
+        console.print(render_yaml(rules.list_tags()))
         return 0
 
     # we should not get here!
@@ -202,13 +202,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     rules = RulesCollection(options.rulesdirs, profile=options.profile)
 
-    if options.profile == []:
+    if options.list_profiles:
         from ansiblelint.generate_docs import profiles_as_rich
 
         console.print(profiles_as_rich())
         return 0
 
-    if options.listrules or options.listtags:
+    if options.list_rules or options.list_tags:
         return _do_list(rules)
 
     app = get_app()
