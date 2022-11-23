@@ -17,10 +17,10 @@ If a rule is in a profile, Ansible-lint applies that rule to the content.
 
 After you install and configure `ansible-lint`, you can apply profiles as follows:
 
-1. View available profiles with the `-P` flag.
+1. View available profiles with the `--list-profiles` flag.
 
    ```bash
-   ansible-lint -P
+   ansible-lint --list-profiles
    ```
 
 2. Specify a profile with the `--profile` parameter to lint your content with those rules, for example:

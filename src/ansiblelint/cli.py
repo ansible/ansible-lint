@@ -218,9 +218,17 @@ def get_cli_parser() -> argparse.ArgumentParser:
 
     listing_group = parser.add_mutually_exclusive_group()
     listing_group.add_argument(
+        "-P",
+        "--list-profiles",
+        dest="list_profiles",
+        default=False,
+        action="store_true",
+        help="List all profiles, no formatting options available.",
+    )
+    listing_group.add_argument(
         "-L",
         "--list-rules",
-        dest="listrules",
+        dest="list_rules",
         default=False,
         action="store_true",
         help="List all the rules. For listing rules only the following formats "
@@ -229,7 +237,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     listing_group.add_argument(
         "-T",
         "--list-tags",
-        dest="listtags",
+        dest="list_tags",
         action="store_true",
         help="List all the tags and the rules they cover. Increase the verbosity level "
         "with `-v` to include 'opt-in' tag and its rules.",
@@ -260,16 +268,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="quieter, reduce verbosity, can be specified twice.",
     )
     parser.add_argument(
-        "-P",
         "--profile",
-        # * allow to distinguish between calling without -P, with -P and
-        # with -P=foo, while '?' does not. We do not support a real list.
-        nargs="*",
         dest="profile",
-        default=None,  # when called with -P but no arg will load as empty list []
+        default=None,
         action="store",
         choices=PROFILES.keys(),
-        help="Specify which rules profile to be used, or displays available profiles when no argument is given.",
+        help="Specify which rules profile to be used.",
     )
     parser.add_argument(
         "-p",
@@ -525,7 +529,7 @@ def get_config(arguments: list[str]) -> Namespace:
     options = parser.parse_args(arguments)
 
     # docs is not document, being used for internal documentation building
-    if options.listrules and options.format not in ["plain", "rich", "md", "docs"]:
+    if options.list_rules and options.format not in ["plain", "rich", "md", "docs"]:
         parser.error(
             f"argument -f: invalid choice: '{options.format}'. "
             f"In combination with argument -L only 'plain', "

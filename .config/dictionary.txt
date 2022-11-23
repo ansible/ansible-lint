@@ -139,8 +139,6 @@ lineinfile
 linkcheck
 lintable
 lintables
-listrules
-listtags
 literalinclude
 localectl
 matchdir
