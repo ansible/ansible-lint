@@ -140,7 +140,6 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                     if pattern.tag == "empty-playbook":
                         rule = WarningRule()
 
-                    # breakpoint()
                     results.append(
                         MatchError(
                             message=title,

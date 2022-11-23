@@ -19,7 +19,7 @@
   "additionalProperties": false,
   "examples": [".ansible-lint", ".config/ansible-lint.yml"],
   "properties": {
-    "profiles": {
+    "profile": {
       "title": "Profile",
       "type": ["null", "string"],
       "enum": ["min", "basic", "moderate", "safety", "shared", "production", null]

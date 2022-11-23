@@ -200,7 +200,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import _get_matches
 
-    rules = RulesCollection(options.rulesdirs, profile=options.profile)
+    rules = RulesCollection(options.rulesdirs, profile_name=options.profile)
 
     if options.list_profiles:
         from ansiblelint.generate_docs import profiles_as_rich

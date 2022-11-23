@@ -66,7 +66,6 @@ class RoleNames(AnsibleLintRule):
         results = []
         if task["action"]["__ansible_module__"] in ROLE_IMPORT_ACTION_NAMES:
             name = task["action"].get("name", "")
-            # breakpoint()
             if "/" in name:
                 results.append(
                     self.create_matcherror(
