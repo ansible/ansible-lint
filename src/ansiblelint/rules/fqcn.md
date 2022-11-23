@@ -17,7 +17,7 @@ You should declare the `ansible.legacy` collection if you use local overrides wi
 ```
 
 ```{warning}
-This rule does not take [`collections` keyword](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#simplifying-module-names-with-the-collections-keyword) into consideration.
+This rule does not take [`collections` keyword](https://docs.ansible.com/ansible/latest/collections_guide/collections_using_playbooks.html#simplifying-module-names-with-the-collections-keyword) into consideration.
 The `collections` keyword provided a temporary mechanism transitioning to Ansible 2.9.
 You should rewrite any content that uses the `collections:` key and avoid it where possible.
 ```
