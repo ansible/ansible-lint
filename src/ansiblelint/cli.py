@@ -464,10 +464,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
         # do not include "write_list" here. See special logic below.
     }
 
-    scalar_map = {
-        "loop_var_prefix": None,
-        "project_dir": ".",
-    }
+    scalar_map = {"loop_var_prefix": None, "project_dir": ".", "profile": None}
 
     if not file_config:
         # use defaults if we don't have a config file and the commandline

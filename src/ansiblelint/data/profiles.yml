@@ -65,7 +65,6 @@ safety:
     risky-octal:
     risky-shell-pipe:
 shared:
-  extends: safety
   description: >
     The `shared` profile ensures that content follows best practices for packaging and publishing.
     This profile is intended for content creators who want to make Ansible
@@ -73,6 +72,7 @@ shared:
     [galaxy.ansible.com](https://galaxy.ansible.com),
     [automation-hub](https://console.redhat.com/ansible/automation-hub),
     or a private instance.
+  extends: safety
   rules:
     galaxy: # <-- applies to both galaxy and automation-hub
     ignore-errors:
