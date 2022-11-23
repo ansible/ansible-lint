@@ -209,7 +209,7 @@ jobs:
 
       - name: Initialize tox envs ${{ matrix.tox_env }}
         run: python3 -m tox --notest --skip-missing-interpreters false -vv -e ${{ matrix.tox_env }}
-        timeout-minutes: 3 # average is under 1
+        timeout-minutes: 5 # average is under 1, but macos can be over 3
 
       # sequential run improves browsing experience (almost no speed impact)
       - name: "Test with tox: ${{ matrix.tox_env }}"
