@@ -54,10 +54,9 @@ if "pytest" in sys.modules:
       ansible.builtin.shell: echo This rule should not get matched by the only-builtins rule
     """
 
-    def test_only_builtin_fail() -> None:
+    def test_only_builtins_fail() -> None:
         """Test rule matches."""
         result = run_ansible_lint(
-            "--config-file=/dev/null",
             "--strict",
             "--warn-list=",
             "--enable-list",
@@ -66,8 +65,8 @@ if "pytest" in sys.modules:
         )
         assert result.returncode == VIOLATIONS_FOUND_RC
         assert "Failed" in result.stderr
-        assert "1 failure(s)" in result.stderr
-        assert "only-builtins" in result.stdout
+        assert "1 warning(s)" in result.stderr
+        assert "only-builtins: Use only builtin actions" in result.stdout
 
     def test_only_builtins_allow_collections() -> None:
         """Test rule doesn't match."""
