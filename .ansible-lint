@@ -101,3 +101,11 @@ kinds:
   # - vars: "**/vars/*.yml"
   # - meta: "**/meta/main.yml"
   - yaml: "**/*.yaml-too"
+
+# List of additional collections to allow in only-builtins rule.
+# only_builtins_allow_collections:
+#   - example_ns.example_collection
+
+# List of additions modules to allow in only-builtins rule.
+# only_builtins_allow_modules:
+#   - example_module
