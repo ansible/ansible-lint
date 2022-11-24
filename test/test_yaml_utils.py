@@ -884,3 +884,23 @@ def test_get_path_to_task_raises_value_error_for_bad_line_number(
         ValueError, match=f"expected line_number >= 1, got {line_number}"
     ):
         ansiblelint.yaml_utils.get_path_to_task(lintable, line_number, ruamel_data)
+
+
+@pytest.mark.parametrize(
+    ("before", "after"),
+    (
+        pytest.param(None, None, id="1"),
+        pytest.param(1, 1, id="2"),
+        pytest.param({}, {}, id="3"),
+        pytest.param({"__file__": 1}, {}, id="simple"),
+        pytest.param({"foo": {"__file__": 1}}, {"foo": {}}, id="nested"),
+        pytest.param([{"foo": {"__file__": 1}}], [{"foo": {}}], id="nested-in-lint"),
+        pytest.param({"foo": [{"__file__": 1}]}, {"foo": [{}]}, id="nested-in-lint"),
+    ),
+)
+def test_deannotate(
+    before: Any,
+    after: Any,
+) -> None:
+    """Ensure deannotate works as intended."""
+    assert ansiblelint.yaml_utils.deannotate(before) == after
