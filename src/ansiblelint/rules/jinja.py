@@ -34,6 +34,7 @@ DEANNOTATE_KEYS = ("__file__", "__line__", "__start_line__", "__end_line__")
 
 def deannotate(data: Any) -> Any:
     """Remove our annotations like __file__ and __line__ and return a JSON serializable object."""
+    result: dict[Any, Any] = {}
     if isinstance(data, dict):
         result = data.copy()
         for key, value in data.items():
