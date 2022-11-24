@@ -34,6 +34,7 @@ from ruamel.yaml.tokens import CommentToken
 from yamllint.config import YamlLintConfig
 
 from ansiblelint.constants import (
+    ANNOTATION_KEYS,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
     SKIPPED_RULES_KEY,
@@ -67,6 +68,21 @@ rules:
     min-spaces-inside: 0  # yamllint defaults to 0
     max-spaces-inside: 1  # yamllint defaults to 0
 """
+
+
+def deannotate(data: Any) -> Any:
+    """Remove our annotations like __file__ and __line__ and return a JSON serializable object."""
+    if isinstance(data, dict):
+        result = data.copy()
+        for key, value in data.items():
+            if key in ANNOTATION_KEYS:
+                del result[key]
+            else:
+                result[key] = deannotate(value)
+        return result
+    if isinstance(data, list):
+        return [deannotate(item) for item in data if item not in ANNOTATION_KEYS]
+    return data
 
 
 @functools.lru_cache(maxsize=1)
