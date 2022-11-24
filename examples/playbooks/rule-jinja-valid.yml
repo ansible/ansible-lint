@@ -26,3 +26,23 @@
       vars:
         ns_vars: {}
         x: "{{ lookup('ansible.builtin.template', 'namespace.yaml.j2', template_vars=ns_vars) | from_yaml }}"
+
+# https://github.com/ansible/ansible-lint/issues/2697
+- name: Test linter
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Passed linter
+      ansible.builtin.debug:
+        msg: "{{ test | to_json }}"
+      vars:
+        test:
+          one: two
+          param: "{{ ansible_host }}"
+    - name: Failed linter
+      ansible.builtin.debug:
+        msg: "{{ test | to_json }}"
+      vars:
+        test:
+          one: two
+          param: no jinja

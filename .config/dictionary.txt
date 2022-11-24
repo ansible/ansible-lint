@@ -74,6 +74,7 @@ createfile
 darglint
 dataclasses
 dbservers
+deannotate
 debops
 decryptable
 delenv
