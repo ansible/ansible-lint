@@ -28,9 +28,12 @@ class OnlyBuiltinsRule(AnsibleLintRule):
 
         is_builtin = module.startswith("ansible.builtin.") or module in builtins
 
-        is_manually_allowed = any(
-            module.startswith(f"{prefix}.")
-            for prefix in options.only_builtins_allow_collections
+        is_manually_allowed = (
+            any(
+                module.startswith(f"{prefix}.")
+                for prefix in options.only_builtins_allow_collections
+            )
+            or module in options.only_builtins_allow_modules
         )
 
         return not is_builtin and not is_manually_allowed and not is_nested_task(task)
@@ -65,12 +68,12 @@ if "pytest" in sys.modules:
         )
         assert result.returncode == VIOLATIONS_FOUND_RC
         assert "Failed" in result.stderr
-        assert "1 warning(s)" in result.stderr
+        assert "2 warning(s)" in result.stderr
         assert "only-builtins: Use only builtin actions" in result.stdout
 
-    def test_only_builtins_allow_collections() -> None:
+    def test_only_builtins_allow() -> None:
         """Test rule doesn't match."""
-        conf_path = "examples/playbooks/.ansible-lint-only-builtins-allow-collections"
+        conf_path = "examples/playbooks/.ansible-lint-only-builtins-allow"
         result = run_ansible_lint(
             f"--config-file={conf_path}",
             "--strict",

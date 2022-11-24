@@ -8,3 +8,5 @@
       fake_namespace.fake_collection.fake_module:
         name: vm.swappiness
         value: "5"
+    - name: Some task
+      zuul_return: {}

@@ -4,3 +4,5 @@ mock_modules:
 
 only_builtins_allow_collections:
   - fake_namespace.fake_collection
+only_builtins_allow_modules:
+  - zuul_return
