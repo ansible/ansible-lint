@@ -26,7 +26,11 @@ class OnlyBuiltinsRule(AnsibleLintRule):
     ) -> bool | str:
         module = task["action"]["__ansible_module_original__"]
 
-        is_builtin = module.startswith("ansible.builtin.") or module.startswith("ansible.legacy.") or module in builtins
+        is_builtin = (
+            module.startswith("ansible.builtin.")
+            or module.startswith("ansible.legacy.")
+            or module in builtins
+        )
 
         is_manually_allowed = any(
             module.startswith(f"{prefix}.")
