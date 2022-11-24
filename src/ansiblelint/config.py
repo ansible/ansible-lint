@@ -123,6 +123,7 @@ options = Namespace(
     mock_roles=[],
     loop_var_prefix=None,
     only_builtins_allow_collections=[],
+    only_builtins_allow_modules=[],
     var_naming_pattern=None,
     offline=False,
     project_dir=".",  # default should be valid folder (do not use None here)

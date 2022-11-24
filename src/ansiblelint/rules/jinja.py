@@ -18,7 +18,7 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.utils import parse_yaml_from_file, template
-from ansiblelint.yaml_utils import nested_items_path
+from ansiblelint.yaml_utils import deannotate, nested_items_path
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
@@ -28,24 +28,6 @@ _logger = logging.getLogger(__package__)
 KEYWORDS_WITH_IMPLICIT_TEMPLATE = ("changed_when", "failed_when", "until", "when")
 
 Token = namedtuple("Token", "lineno token_type value")
-
-DEANNOTATE_KEYS = ("__file__", "__line__", "__start_line__", "__end_line__")
-
-
-def deannotate(data: Any) -> Any:
-    """Remove our annotations like __file__ and __line__ and return a JSON serializable object."""
-    if isinstance(data, dict):
-        result = data.copy()
-        for key, value in data.items():
-            if key in DEANNOTATE_KEYS:
-                del result[key]
-            elif isinstance(value, list):
-                for i, item in enumerate(value):
-                    value[i] = deannotate(item)
-            elif isinstance(value, dict):
-                result[key] = deannotate(value)
-        return result
-    return result
 
 
 class JinjaRule(AnsibleLintRule):

@@ -63,6 +63,13 @@
       "title": "Only Builtins Allow Collections",
       "type": "array"
     },
+    "only_builtins_allow_modules": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Only Builtins Allow Modules",
+      "type": "array"
+    },
     "mock_modules": {
       "items": {
         "type": "string"
