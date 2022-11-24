@@ -26,7 +26,11 @@ class OnlyBuiltinsRule(AnsibleLintRule):
     ) -> bool | str:
         module = task["action"]["__ansible_module_original__"]
 
-        is_builtin = module.startswith("ansible.builtin.") or module in builtins
+        is_builtin = (
+            module.startswith("ansible.builtin.")
+            or module.startswith("ansible.legacy.")
+            or module in builtins
+        )
 
         is_manually_allowed = (
             any(
@@ -55,6 +59,8 @@ if "pytest" in sys.modules:
     block:
     - name: Shell (fqcn)
       ansible.builtin.shell: echo This rule should not get matched by the only-builtins rule
+    - name: Command with legacy FQCN
+      ansible.legacy.command: echo This rule should not get matched by the only-builtins rule
     """
 
     def test_only_builtins_fail() -> None:
