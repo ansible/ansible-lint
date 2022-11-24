@@ -34,6 +34,7 @@ from ruamel.yaml.tokens import CommentToken
 from yamllint.config import YamlLintConfig
 
 from ansiblelint.constants import (
+    ANNOTATION_KEYS,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
     SKIPPED_RULES_KEY,
@@ -41,7 +42,6 @@ from ansiblelint.constants import (
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.utils import get_action_tasks, normalize_task
-from ansiblelint.constants import ANNOTATION_KEYS
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
