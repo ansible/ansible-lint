@@ -29,6 +29,24 @@ KEYWORDS_WITH_IMPLICIT_TEMPLATE = ("changed_when", "failed_when", "until", "when
 
 Token = namedtuple("Token", "lineno token_type value")
 
+DEANNOTATE_KEYS = ("__file__", "__line__", "__start_line__", "__end_line__")
+
+
+def deannotate(data: Any) -> Any:
+    """Remove our annotations like __file__ and __line__ and return a JSON serializable object."""
+    if isinstance(data, dict):
+        result = data.copy()
+        for key, value in data.items():
+            if key in DEANNOTATE_KEYS:
+                del result[key]
+            elif isinstance(value, list):
+                for i, item in enumerate(value):
+                    value[i] = deannotate(item)
+            elif isinstance(value, dict):
+                result[key] = deannotate(value)
+        return result
+    return result
+
 
 class JinjaRule(AnsibleLintRule):
     """Rule that looks inside jinja2 templates."""
@@ -62,7 +80,7 @@ class JinjaRule(AnsibleLintRule):
                     template(
                         basedir=file.dir if file else ".",
                         value=v,
-                        variables=task.get("vars", {}),
+                        variables=deannotate(task.get("vars", {})),
                         fail_on_error=True,  # we later decide which ones to ignore or not
                     )
                 # ValueError RepresenterError
