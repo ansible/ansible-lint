@@ -27,16 +27,17 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
     age = int(time.time() - store_file.stat().st_mtime)
 
     # never check for updated schemas more than once a day
-    if min_age_seconds < age:
+    if min_age_seconds > age:
         return 0
     if not os.access(store_file, os.W_OK):
         _logger.debug(
             "Skipping schema update due to lack of writing rights on %s", store_file
         )
-        return 0
+        return -1
     _logger.debug("Checking for updated schemas...")
 
     changed = 0
+    # breakpoint()
     for kind, data in JSON_SCHEMAS.items():
         url = data["url"]
         if "#" in url:
@@ -61,18 +62,13 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
                     content = response.read().decode("utf-8")
                     etag = response.headers["etag"].strip('"')
                     if etag != data.get("etag", ""):
-                        data["etag"] = etag
+                        JSON_SCHEMAS[kind]["etag"] = etag
                         changed += 1
-                        print(etag)
-                with open(f"{path}", "r+", encoding="utf-8") as f_out:
-                    _logger.info("Schema %s was updated", kind)
-                    if f_out.read() != content:
-                        f_out.seek(0)
+                    with open(f"{path}", "w", encoding="utf-8") as f_out:
+                        _logger.info("Schema %s was updated", kind)
                         f_out.write(content)
                         f_out.truncate()
-                    else:
-                        path.touch()
-                    changed += 1
+                        os.fsync(f_out.fileno())
         except urllib.error.HTTPError as exc:
             if exc.code == 304:
                 _logger.debug("Schema %s is not modified", url)
