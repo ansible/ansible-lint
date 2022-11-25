@@ -10,7 +10,7 @@ def strip_ansi_escape(data: str | bytes) -> str:
     If bytes is passed instead of string, it will be converted to string
     using UTF-8.
     """
-    if isinstance(data, bytes):
+    if isinstance(data, bytes):  # pragma: no branch
         data = data.decode("utf-8")
 
     return re.sub(r"\x1b[^m]*m", "", data)

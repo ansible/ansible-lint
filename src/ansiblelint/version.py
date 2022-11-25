@@ -1,7 +1,7 @@
 """Ansible-lint version information."""
 try:
     from ._version import version as __version__
-except ImportError:
+except ImportError:  # pragma: no branch
 
     try:
         import pkg_resources

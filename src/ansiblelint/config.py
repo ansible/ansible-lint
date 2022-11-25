@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import logging
 import os
-import re
 import sys
 import time
 import urllib.request
@@ -145,7 +144,7 @@ collection_list: list[str] = []
 def get_rule_config(rule_id: str) -> dict[str, Any]:
     """Get configurations for the rule ``rule_id``."""
     rule_config = options.rules.get(rule_id, {})
-    if not isinstance(rule_config, dict):
+    if not isinstance(rule_config, dict):  # pragma: no branch
         raise RuntimeError(f"Invalid rule config for {rule_id}: {rule_config}")
     return rule_config
 
@@ -154,25 +153,13 @@ def get_rule_config(rule_id: str) -> dict[str, Any]:
 def ansible_collections_path() -> str:
     """Return collection path variable for current version of Ansible."""
     # respect Ansible behavior, which is to load old name if present
-    for env_var in ["ANSIBLE_COLLECTIONS_PATHS", "ANSIBLE_COLLECTIONS_PATH"]:
+    for env_var in [
+        "ANSIBLE_COLLECTIONS_PATHS",
+        "ANSIBLE_COLLECTIONS_PATH",
+    ]:  # pragma: no cover
         if env_var in os.environ:
             return env_var
     return "ANSIBLE_COLLECTIONS_PATH"
-
-
-def parse_ansible_version(stdout: str) -> tuple[str, str | None]:
-    """Parse output of 'ansible --version'."""
-    # Ansible can produce extra output before displaying version in debug mode.
-
-    # ansible-core 2.11+: 'ansible [core 2.11.3]'
-    match = re.search(r"^ansible \[(?:core|base) ([^\]]+)\]", stdout, re.MULTILINE)
-    if match:
-        return match.group(1), None
-    # ansible-base 2.10 and Ansible 2.9: 'ansible 2.x.y'
-    match = re.search(r"^ansible ([^\s]+)", stdout, re.MULTILINE)
-    if match:
-        return match.group(1), None
-    return "", f"FATAL: Unable parse ansible cli version: {stdout}"
 
 
 def in_venv() -> bool:
@@ -233,14 +220,14 @@ def guess_install_method() -> str:
 def get_version_warning() -> str:
     """Display warning if current version is outdated."""
     # 0.1dev1 is special fallback version
-    if __version__ == "0.1.dev1":
+    if __version__ == "0.1.dev1":  # pragma: no cover
         return ""
 
     msg = ""
     data = {}
     current_version = Version(__version__)
 
-    if not os.path.exists(CACHE_DIR):
+    if not os.path.exists(CACHE_DIR):  # pragma: no cover
         os.makedirs(CACHE_DIR)
     cache_file = f"{CACHE_DIR}/latest.json"
     refresh = True
@@ -260,7 +247,7 @@ def get_version_warning() -> str:
                 data = json.load(url)
                 with open(cache_file, "w", encoding="utf-8") as f:
                     json.dump(data, f)
-        except (URLError, HTTPError) as exc:
+        except (URLError, HTTPError) as exc:  # pragma: no cover
             _logger.debug(
                 "Unable to fetch latest version from %s due to: %s", release_url, exc
             )

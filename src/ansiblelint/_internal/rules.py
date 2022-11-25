@@ -65,7 +65,12 @@ class BaseRule:
     @property
     def url(self) -> str:
         """Return rule documentation url."""
-        return self.link or RULE_DOC_URL + self.id + "/"
+        url = self.link
+        if not url:
+            url = RULE_DOC_URL
+            if self.id:
+                url += self.id + "/"
+        return url
 
     @property
     def shortdesc(self) -> str:

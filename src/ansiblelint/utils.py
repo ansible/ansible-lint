@@ -307,7 +307,7 @@ def _include_children(
         v = v["file"]
 
     # we cannot really parse any jinja2 in includes, so we ignore them
-    if "{{" in v:
+    if "{{" in v:  # pragma: no branch
         return []
 
     if "import_playbook" in k and COLLECTION_PLAY_RE.match(v):
@@ -402,7 +402,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
         with contextlib.suppress(KeyError):
 
             # ignore empty tasks
-            if not task_handler:
+            if not task_handler:  # pragma: no branch
                 continue
 
             file_name = task_handler[task_handler_key]
@@ -478,12 +478,12 @@ def _rolepath(basedir: str, role: str) -> str | None:
 
     possible_paths.append(path_dwim(basedir, ""))
 
-    for path_option in possible_paths:
+    for path_option in possible_paths:  # pragma: no branch
         if os.path.isdir(path_option):
             role_path = path_option
             break
 
-    if role_path:
+    if role_path:  # pragma: no branch
         add_all_plugin_dirs(role_path)
 
     return role_path
@@ -494,7 +494,7 @@ def _look_for_role_files(
 ) -> list[Lintable]:
     # pylint: disable=unused-argument # main
     role_path = _rolepath(basedir, role)
-    if not role_path:
+    if not role_path:  # pragma: no branch
         return []
 
     results = []
