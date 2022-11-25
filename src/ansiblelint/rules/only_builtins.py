@@ -7,8 +7,6 @@ from typing import Any
 from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-
-# fqcn_builtins was added in 5.1.0 as FQCNBuiltinsRule, renamed to fqcn_builtins in 6.0.0
 from ansiblelint.rules.fqcn import builtins
 from ansiblelint.skip_utils import is_nested_task
 
@@ -26,21 +24,18 @@ class OnlyBuiltinsRule(AnsibleLintRule):
     ) -> bool | str:
         module = task["action"]["__ansible_module_original__"]
 
-        is_builtin = (
-            module.startswith("ansible.builtin.")
-            or module.startswith("ansible.legacy.")
-            or module in builtins
+        allowed_collections = [
+            "ansible.builtin",
+            "ansible.legacy",
+        ] + options.only_builtins_allow_collections
+        allowed_modules = builtins + options.only_builtins_allow_modules
+
+        is_allowed = (
+            any(module.startswith(f"{prefix}.") for prefix in allowed_collections)
+            or module in allowed_modules
         )
 
-        is_manually_allowed = (
-            any(
-                module.startswith(f"{prefix}.")
-                for prefix in options.only_builtins_allow_collections
-            )
-            or module in options.only_builtins_allow_modules
-        )
-
-        return not is_builtin and not is_manually_allowed and not is_nested_task(task)
+        return not is_allowed and not is_nested_task(task)
 
 
 # testing code to be loaded only with pytest or when executed the rule file
