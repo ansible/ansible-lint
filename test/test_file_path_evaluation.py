@@ -24,28 +24,28 @@ LAYOUT_IMPORTS: dict[str, str] = {
     "tasks/task_1.yml": textwrap.dedent(
         """\
         ---
-        - name: From task 1 import task 2
+        - name: task_1 | From task 1 import task 2
           ansible.builtin.import_tasks: tasks/task_2.yml
         """
     ),
     "tasks/task_2.yml": textwrap.dedent(
         """\
         ---
-        - name: From task 2 import subtask 1
+        - name: task_2 | From task 2 import subtask 1
           ansible.builtin.import_tasks: tasks/subtasks/subtask_1.yml
         """
     ),
     "tasks/subtasks/subtask_1.yml": textwrap.dedent(
         """\
         ---
-        - name: From subtask 1 import subtask 2
+        - name: subtask_1 | From subtask 1 import subtask 2
           ansible.builtin.import_tasks: tasks/subtasks/subtask_2.yml
         """
     ),
     "tasks/subtasks/subtask_2.yml": textwrap.dedent(
         """\
         ---
-        - name: From subtask 2 do something
+        - name: subtask_2 | From subtask 2 do something
           debug:  # <-- expected to raise fqcn[action-core]
             msg: |
               Something...
@@ -68,28 +68,28 @@ LAYOUT_INCLUDES: dict[str, str] = {
     "tasks/task_1.yml": textwrap.dedent(
         """\
         ---
-        - name: From task 1 import task 2
+        - name: task_1 | From task 1 import task 2
           ansible.builtin.include_tasks: tasks/task_2.yml
         """
     ),
     "tasks/task_2.yml": textwrap.dedent(
         """\
         ---
-        - name: From task 2 import subtask 1
+        - name: task_2 | From task 2 import subtask 1
           ansible.builtin.include_tasks: tasks/subtasks/subtask_1.yml
         """
     ),
     "tasks/subtasks/subtask_1.yml": textwrap.dedent(
         """\
         ---
-        - name: From subtask 1 import subtask 2
+        - name: subtask_1 | From subtask 1 import subtask 2
           ansible.builtin.include_tasks: tasks/subtasks/subtask_2.yml
         """
     ),
     "tasks/subtasks/subtask_2.yml": textwrap.dedent(
         """\
         ---
-        - name: From subtask 2 do something
+        - name: subtask_2 | From subtask 2 do something
           debug:  # <-- expected to raise fqcn[action-core]
             msg: |
               Something...

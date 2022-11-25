@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 import sys
+from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
@@ -10,7 +11,7 @@ from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from ansiblelint.file_utils import Lintable
+    from ansiblelint.file_utils import Lintable  # noqa: F811
 
 
 class NameRule(AnsibleLintRule):
@@ -23,7 +24,7 @@ class NameRule(AnsibleLintRule):
     )
     severity = "MEDIUM"
     tags = ["idiom"]
-    version_added = "v6.5.0 (last update)"
+    version_added = "v6.9.1 (last update)"
     _re_templated_inside = re.compile(r".*\{\{.*\}\}(.+)$")
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
@@ -63,8 +64,47 @@ class NameRule(AnsibleLintRule):
             )
         else:
             results.extend(
+                self._prefix_check(
+                    name, lintable=file, linenumber=task[LINE_NUMBER_KEY]
+                )
+            )
+            task_name = name.split("|")
+            if len(task_name) > 1:
+                name = task_name[1].strip()
+            results.extend(
                 self._check_name(name, lintable=file, linenumber=task[LINE_NUMBER_KEY])
             )
+        return results
+
+    def _prefix_check(
+        self, name: str, lintable: Lintable | None, linenumber: int
+    ) -> list[MatchError]:
+
+        results: list[MatchError] = []
+        if lintable is None:
+            return []
+
+        if self._collection:
+            prefix = self._collection.options.task_name_prefix.format(
+                stem=lintable.path.stem
+            )
+            if (
+                lintable.kind == "tasks"
+                and lintable.path.stem != "main"
+                and not name.startswith(prefix)
+            ):
+                # For the moment in order to raise errors this rule needs to be
+                # enabled manually. Still, we do allow use of prefixes even without
+                # having to enable the rule.
+                if "name[prefix]" in self._collection.options.enable_list:
+                    results.append(
+                        self.create_matcherror(
+                            message=f"Task name should start with '{prefix}'.",
+                            linenumber=linenumber,
+                            tag="name[prefix]",
+                            filename=lintable,
+                        )
+                    )
         return results
 
     def _check_name(
@@ -97,6 +137,8 @@ class NameRule(AnsibleLintRule):
 
 if "pytest" in sys.modules:  # noqa: C901
 
+    from ansiblelint.config import options
+    from ansiblelint.file_utils import Lintable  # noqa: F811
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
@@ -116,6 +158,22 @@ if "pytest" in sys.modules:  # noqa: C901
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 5
+
+    def test_name_prefix_negative() -> None:
+        """Negative test for unnamed-task."""
+        custom_options = deepcopy(options)
+        custom_options.enable_list = ["name[prefix]"]
+        collection = RulesCollection(options=custom_options)
+        collection.register(NameRule())
+        failure = Lintable(
+            "examples/playbooks/tasks/name-prefix-fail.yml", kind="tasks"
+        )
+        bad_runner = Runner(failure, rules=collection)
+        results = bad_runner.run()
+        assert len(results) == 3
+        assert results[0].tag == "name[casing]"
+        assert results[1].tag == "name[prefix]"
+        assert results[2].tag == "name[prefix]"
 
     def test_rule_name_lowercase() -> None:
         """Negative test for a task that starts with lowercase."""

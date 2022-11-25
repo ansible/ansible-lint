@@ -104,6 +104,11 @@
       "title": "Quiet",
       "type": "boolean"
     },
+    "task_name_prefix": {
+      "title": "Allow custom prefix for task[prefix]",
+      "type": "string",
+      "default": "{stem} | "
+    },
     "rules": {
       "additionalProperties": {
         "$ref": "#/$defs/rule"

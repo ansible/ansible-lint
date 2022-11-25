@@ -1,32 +1,32 @@
 ---
-- name: Synchronize-delegate
+- name: pass | Synchronize-delegate
   ansible.posix.synchronize:
     src: dummy
     dest: dummy
   delegate_to: localhost
 
-- name: Synchronize-no-same-owner
+- name: pass | Synchronize-no-same-owner
   ansible.posix.synchronize:
     src: dummy
     dest: dummy
     owner: false
     group: false
 
-- name: Unarchive-no-same-owner
+- name: pass | Unarchive-no-same-owner
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.gz"
     dest: dummy
     extra_opts:
       - --no-same-owner
 
-- name: Unarchive-remote-src
+- name: pass | Unarchive-remote-src
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.gz"
     dest: dummy
     extra_opts:
       - --no-same-owner
 
-- name: Unarchive-unknown-file-ending
+- name: pass | Unarchive-unknown-file-ending
   ansible.builtin.unarchive:
     src: "{{ file }}"
     dest: dummy
