@@ -70,4 +70,3 @@ potentially be improved.
 %doc docs/ README.md
 
 %changelog
-Available at https://github.com/ansible/ansible-lint/releases
