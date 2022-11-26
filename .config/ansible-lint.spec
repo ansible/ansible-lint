@@ -11,7 +11,7 @@ Version:        VERSION_PLACEHOLDER
 Release:        1%{?dist}
 Summary:        Ansible-lint checks ansible content for common mistakes
 
-License:        MIT
+License:        GPL-3.0-or-later AND MIT
 URL:            https://github.com/ansible/ansible-lint
 Source0:        %{pypi_source}
 
@@ -66,8 +66,8 @@ potentially be improved.
 
 %files -f %{pyproject_files}
 %{_bindir}/ansible-lint
-%license COPYING
-%doc docs/* README.md
+%license COPYING docs/licenses/LICENSE.mit.txt
+%doc docs/ README.md
 
 %changelog
 Available at https://github.com/ansible/ansible-lint/releases
