@@ -45,6 +45,7 @@ potentially be improved.
 
 %install
 %pyproject_install
+%pyproject_save_files ansiblelint
 
 
 %if %{with check}
@@ -62,9 +63,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %endif
 
 
-%files
-%{python3_sitelib}/ansiblelint/
-%{python3_sitelib}/ansible_lint-*.dist-info/
+%files -f %{pyproject_files}
 %{_bindir}/ansible-lint
 %license COPYING
 %doc docs/* README.md
