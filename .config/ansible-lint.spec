@@ -48,10 +48,11 @@ potentially be improved.
 %pyproject_save_files ansiblelint
 
 
-%if %{with check}
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-  pytest-3 \
+# Don't try to import tests that import pytest which isn't available at runtime
+%pyproject_check_import -e 'ansiblelint.testing*' -e 'ansiblelint.rules.conftest'
+%if %{with check}
+%pytest \
   -v \
   --disable-pytest-warnings \
   --numprocesses=auto \
