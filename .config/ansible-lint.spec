@@ -23,7 +23,7 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-pytest-xdist
 BuildRequires:  python%{python3_pkgversion}-libselinux
-BuildRequires:  git
+BuildRequires:  git-core
 %endif
 
 
