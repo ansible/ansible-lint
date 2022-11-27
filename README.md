@@ -1,5 +1,5 @@
 [![PyPI version](https://img.shields.io/pypi/v/ansible-lint.svg)](https://pypi.org/project/ansible-lint)
-[![Ansible-lint rules explanation](https://img.shields.io/badge/Ansible--lint-rules%20table-blue.svg)](https://ansible-lint.readthedocs.io/default_rules)
+[![Ansible-lint rules explanation](https://img.shields.io/badge/Ansible--lint-rules-blue.svg)](https://ansible-lint.readthedocs.io/rules/)
 [![Discussions](https://img.shields.io/badge/Discussions-gray.svg)](https://github.com/ansible/ansible-lint/discussions)
 [![GitHub Actions CI/CD](https://github.com/ansible/ansible-lint/workflows/gh/badge.svg)](https://github.com/ansible/ansible-lint/actions?query=workflow%3Agh+branch%3Amain+event%3Apush)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ansible/ansible-lint.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ansible-community/ansible-lint/context:python)
