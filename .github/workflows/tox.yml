@@ -202,7 +202,7 @@ jobs:
       - name: Install tox
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade tox tox-extra
+          python3 -m pip install --upgrade tox "tox-extra<1.0.0"
 
       - name: Log installed dists
         run: python3 -m pip freeze --all
