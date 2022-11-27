@@ -19,8 +19,10 @@ jobs:
       targets:
         # See https://packit.dev/docs/configuration/#aliases
         # API to get available targets: https://api.dev.testing-farm.io/v0.1/composes/public
-        - fedora-stable
-        - fedora-development
+        - fedora-rawhide-x86_64
+        - fedora-rawhide-aarch64
+        - fedora-37-x86_64
+        - fedora-37-aarch64
         # Missing python3-build see https://bugzilla.redhat.com/show_bug.cgi?id=2129071
         # - centos-stream-9-aarch64
         # - centos-stream-9-x86_64
