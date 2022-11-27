@@ -74,7 +74,7 @@ jobs:
       - name: Install tox
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade tox
+          python3 -m pip install --upgrade git+https://github.com/tox-dev/tox.git@rewrite
       - name: Log installed dists
         run: >-
           python -m pip freeze --all
