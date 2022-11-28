@@ -1,0 +1,17 @@
+---
+- name: Fixture to validate module options pass scenario
+  hosts: localhost
+  tasks:
+    - name: Clone content repository
+      ansible.builtin.git:
+        repo: "{{ archive_services_repo_url }}"
+        dest: /home/www
+        accept_hostkey: true
+        version: master
+        update: false
+
+    - name: Enable service httpd and ensure it is not masked
+      ansible.builtin.systemd:
+        name: httpd
+        enabled: false
+        masked: false

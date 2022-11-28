@@ -48,6 +48,7 @@ skip_list:
 # Ansible-lint does not automatically load rules that have the 'opt-in' tag.
 # You must enable opt-in rules by listing each rule 'id' below.
 enable_list:
+  - args
   - empty-string-compare # opt-in
   - no-log-password # opt-in
   - no-same-owner # opt-in

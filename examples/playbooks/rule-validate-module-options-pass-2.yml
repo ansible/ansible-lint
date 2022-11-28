@@ -1,0 +1,10 @@
+---
+- name: Fixture to validate module options action pass scenarios
+  hosts: localhost
+  tasks:
+    - name: Copy a new "ntp.conf" file into place with backup
+      ansible.builtin.copy:
+        src: /mine/ntp.conf
+        dest: /etc/ntp.conf
+        backup: true
+        mode: 0600

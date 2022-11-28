@@ -69,7 +69,7 @@ if "pytest" in sys.modules:
         )
         assert result.returncode == VIOLATIONS_FOUND_RC
         assert "Failed" in result.stderr
-        assert "2 warning(s)" in result.stderr
+        assert "warning(s)" in result.stderr
         assert "only-builtins: Use only builtin actions" in result.stdout
 
     def test_only_builtins_allow() -> None:
