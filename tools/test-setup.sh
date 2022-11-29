@@ -21,16 +21,9 @@ if [ -f "/usr/bin/apt-get" ]; then
         gcc git python3-venv python3-pip python3-dev libyaml-dev
     # Some of these might be needed for compiling packages that do not yet
     # a binary for current platform, like pyyaml on py311
-    pip3 install -v --no-binary :all: --user pyyaml
+    # pip3 install -v --no-binary :all: --user pyyaml
 fi
-
-which pipx || python3 -m pip install --user pipx
-which -a pipx
-which pre-commit || pipx install pre-commit
-which tox || pipx install tox
 
 # Log some useful info in case of unexpected failures:
 uname
 python3 --version
-tox --version
-pre-commit --version
