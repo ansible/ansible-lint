@@ -583,7 +583,7 @@ class FormattedEmitter(Emitter):
     #     https://github.com/python/mypy/issues/4125
     #     To silence we have to ignore[override] both the @property and the method.
 
-    @property  # type: ignore[override]
+    @property
     def best_sequence_indent(self) -> int:
         """Return the configured sequence_indent or 2 for root level."""
         return 2 if self._is_root_level_sequence else self._sequence_indent
@@ -593,7 +593,7 @@ class FormattedEmitter(Emitter):
         """Configure how many columns to indent each sequence item (including the '-')."""
         self._sequence_indent = value
 
-    @property  # type: ignore[override]
+    @property
     def sequence_dash_offset(self) -> int:
         """Return the configured sequence_dash_offset or 0 for root level."""
         return 0 if self._is_root_level_sequence else self._sequence_dash_offset

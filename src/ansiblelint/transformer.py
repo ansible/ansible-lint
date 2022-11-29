@@ -38,8 +38,6 @@ class Transformer:
         self.matches: list[MatchError] = result.matches
         self.files: set[Lintable] = result.files
 
-        file: Lintable
-        # pylint: disable=undefined-variable
         lintables: dict[str, Lintable] = {file.filename: file for file in result.files}
         self.matches_per_file: dict[Lintable, list[MatchError]] = {
             file: [] for file in result.files

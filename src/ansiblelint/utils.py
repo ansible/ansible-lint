@@ -880,7 +880,7 @@ def _extend_with_roles(lintables: list[Lintable]) -> None:
             role = lintable.path
             while role.parent.name != "roles" and role.name:
                 role = role.parent
-            if role.exists and not role.is_file():
+            if role.exists() and not role.is_file():
                 lintable = Lintable(role, kind="role")
                 if lintable not in lintables:
                     _logger.debug("Added role: %s", lintable)
