@@ -40,12 +40,18 @@ max-line-length = 100
 extend-ignore =
   E203,
   E501,
-  C901, # complexity is also measured by pylint: too-many-branches
-  DAR104,  # We use type annotations instead
-  DAR301,  # https://github.com/terrencepreilly/darglint/issues/165
-  F401,  # duplicate of pylint W0611 (unused-import)
-  F821,  # duplicate of pylint E0602 (undefined-variable)
-  F841,  # duplicate of pylint W0612 (unused-variable)
+  # complexity is also measured by pylint: too-many-branches
+  C901,
+  # We use type annotations instead
+  DAR104,
+  # https://github.com/terrencepreilly/darglint/issues/165
+  DAR301,
+  # duplicate of pylint W0611 (unused-import)
+  F401,
+  # duplicate of pylint E0602 (undefined-variable)
+  F821,
+  # duplicate of pylint W0612 (unused-variable)
+  F841,
   H,
 
 # Allow certain violations in certain files:

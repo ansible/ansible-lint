@@ -114,8 +114,6 @@ class AnsibleLintRule(BaseRule):
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
-        if not self.match:
-            return matches
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
         for (prev_line_no, line) in enumerate(file.content.split("\n")):
@@ -151,8 +149,7 @@ class AnsibleLintRule(BaseRule):
         """
         matches: list[MatchError] = []
         if (
-            not self.matchtask
-            or file.kind not in ["handlers", "tasks", "playbook"]
+            file.kind not in ["handlers", "tasks", "playbook"]
             or str(file.base_kind) != "text/yaml"
         ):
             return matches
@@ -208,7 +205,7 @@ class AnsibleLintRule(BaseRule):
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
-        if not self.matchplay or str(file.base_kind) != "text/yaml":
+        if str(file.base_kind) != "text/yaml":
             return matches
 
         yaml = file.data

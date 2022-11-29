@@ -212,7 +212,7 @@ class Lintable:
             role = self.path
             while role.parent.name != "roles" and role.name:
                 role = role.parent
-            if role.exists:
+            if role.exists():
                 self.role = role.name
 
         if str(self.path) in ["/dev/stdin", "-"]:

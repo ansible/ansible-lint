@@ -27,7 +27,7 @@ Maintained in the [ansible-navigator](https://github.com/ansible/ansible-navigat
 Maintained in the Ansible [schemas](https://github.com/ansible/schemas) project:
 
 - `schema[arg_specs]` validates [module argument specs](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)
-- `schema[execution-environment]` validates [execution environments](https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html#ees)
+- `schema[execution-environment]` validates [execution environments](https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html)
 - `schema[galaxy]` validates [collection metadata](https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html).
 - `schema[inventory]` validates [inventory files](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) that match `inventory/*.yml`.
 - `schema[meta-runtime]` validates [runtime information](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory-and-runtime-yml) that matches `meta/runtime.yml`
