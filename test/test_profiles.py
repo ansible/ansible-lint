@@ -38,4 +38,7 @@ def test_profile_listing(capfd: CaptureFixture[str]) -> None:
 
     # Confirmation that it runs in auto-detect mode
     assert "command-instead-of-module" in out
-    assert err == ""
+    if sys.version_info < (3, 9):
+        assert "ansible-lint is no longer tested" in err
+    else:
+        assert err == ""
