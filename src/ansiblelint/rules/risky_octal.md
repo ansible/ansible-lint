@@ -1,6 +1,12 @@
 # risky-octal
 
-This rule checks that octal file permissions either contain a leading zero or are a string value.
+This rule checks that octal file permissions are strings that contain a leading
+zero or are written in [symbolic modes](https://www.gnu.org/software/findutils/manual/html_node/find_html/Symbolic-Modes.html),
+such as `u+rwx` or `u=rw,g=r,o=r`.
+
+Using integers or octal values in YAML can result in unexpected behavior.
+For example, the YAML loader interprets `0644` as the decimal number `420` but
+putting `644` there will produce very different results.
 
 Modules that are checked:
 
@@ -43,5 +49,5 @@ Modules that are checked:
         path: /etc/foo.conf
         owner: foo
         group: foo
-        mode: "644" # <- Being in a string will prevent Numeric file permissions to behave in unexpected ways.
+        mode: "0644" # <- Being in a string will prevent Numeric file permissions to behave in unexpected ways.
 ```

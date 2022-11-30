@@ -1,0 +1,25 @@
+---
+- name: Fixture for testing risky-octal rule
+  hosts: hosts
+  vars:
+    varset: varset
+  tasks:
+    - name: Octal permissions test fail (600)
+      ansible.builtin.file:
+        path: foo
+        mode: 600
+
+    - name: Octal permissions test fail (710)
+      ansible.builtin.file:
+        path: foo
+        mode: 710
+
+    - name: Octal permissions test fail (123)
+      ansible.builtin.file:
+        path: foo
+        mode: 123
+
+    - name: Octal permissions test fail (2000)
+      ansible.builtin.file:
+        path: bar
+        mode: 2000

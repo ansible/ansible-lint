@@ -21,9 +21,11 @@
 
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, RulesCollection
+from ansiblelint.runner import Runner
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -98,6 +100,93 @@ class OctalPermissionsRule(AnsibleLintRule):
             if isinstance(mode, str):
                 return False
 
-            if isinstance(mode, int):
-                return self.is_invalid_permission(mode)
+            if isinstance(mode, int) and self.is_invalid_permission(mode):
+                return f'`mode: {mode}` should have a string value with leading zero `mode: "0{mode:o}"` or use symbolic mode.'
         return False
+
+
+if "pytest" in sys.modules:
+    import pytest
+
+    VALID_MODES = [
+        0o777,
+        0o775,
+        0o770,
+        0o755,
+        0o750,
+        0o711,
+        0o710,
+        0o700,
+        0o666,
+        0o664,
+        0o660,
+        0o644,
+        0o640,
+        0o600,
+        0o555,
+        0o551,
+        0o550,
+        0o511,
+        0o510,
+        0o500,
+        0o444,
+        0o440,
+        0o400,
+    ]
+
+    INVALID_MODES = [
+        777,
+        775,
+        770,
+        755,
+        750,
+        711,
+        710,
+        700,
+        666,
+        664,
+        660,
+        644,
+        640,
+        622,
+        620,
+        600,
+        555,
+        551,
+        550,  # 511 == 0o777, 510 == 0o776, 500 == 0o764
+        444,
+        440,
+        400,
+    ]
+
+    @pytest.mark.parametrize(
+        ("file", "failures"),
+        (
+            pytest.param("examples/playbooks/rule-risky-octal-pass.yml", 0, id="pass"),
+            pytest.param("examples/playbooks/rule-risky-octal-fail.yml", 4, id="fail"),
+        ),
+    )
+    def test_octal(file: str, failures: int) -> None:
+        """Test that octal permissions are valid."""
+        collection = RulesCollection()
+        collection.register(OctalPermissionsRule())
+        results = Runner(file, rules=collection).run()
+        assert len(results) == failures
+        for result in results:
+            assert result.rule.id == "risky-octal"
+
+    def test_octal_valid_modes() -> None:
+        """Test that octal modes are valid."""
+        rule = OctalPermissionsRule()
+        for mode in VALID_MODES:
+            assert not rule.is_invalid_permission(
+                mode
+            ), f"0o{mode:o} should be a valid mode"
+
+    def test_octal_invalid_modes() -> None:
+        """Test that octal modes are invalid."""
+        rule = OctalPermissionsRule()
+        for mode in INVALID_MODES:
+            assert rule.is_invalid_permission(
+                mode
+            ), f"{mode:d} should be an invalid mode"
