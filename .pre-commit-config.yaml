@@ -142,8 +142,8 @@ repos:
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=2.2.5
-          - ansible-core
+          - ansible-compat>=2.2.6
+          - ansible-core>=2.14.0
           - black
           - filelock
           - flaky
@@ -168,8 +168,8 @@ repos:
     hooks:
       - id: pylint
         additional_dependencies:
-          - ansible-compat>=2.2.5
-          - ansible-core
+          - ansible-compat>=2.2.6
+          - ansible-core>=2.14.0
           - black
           - docutils
           - filelock
