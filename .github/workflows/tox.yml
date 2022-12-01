@@ -51,25 +51,20 @@ jobs:
           - tox_env: lint
           - tox_env: pkg,hook,docs
           - tox_env: eco # slow, keep separated
-          # py38 is first and comes from matrix
-          - tox_env: py38 # no devel for 3.8 as core dropped support for it
-            os: ubuntu-20.04
-            python-version: 3.8
           - tox_env: py39,py39-devel
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             python-version: 3.9
           - tox_env: py310
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             python-version: "3.10"
           - tox_env: py311,py311-devel
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             python-version: "3.11"
           # macos
-          - name: py38 (macos)
-            tox_env: py38
+          - name: py39 (macos)
+            tox_env: py39,py39-devel
             os: macOS-latest
-            python-version: 3.8
-            devel: false # ansible 2.14 removed support for py38
+            python-version: 3.9
           - name: py311 (macos)
             tox_env: py311,py311-devel
             os: macOS-latest

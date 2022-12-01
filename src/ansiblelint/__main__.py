@@ -40,7 +40,13 @@ from filelock import FileLock, Timeout
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
-from ansiblelint.color import console, console_options, reconfigure, render_yaml
+from ansiblelint.color import (
+    console,
+    console_options,
+    console_stderr,
+    reconfigure,
+    render_yaml,
+)
 from ansiblelint.config import get_version_warning, options
 from ansiblelint.constants import EXIT_CONTROL_C_RC, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
@@ -170,6 +176,16 @@ def _do_transform(result: LintResult, opts: Namespace) -> None:
     transformer.run()
 
 
+def support_banner() -> None:
+    """Display support banner when running on unsupported platform."""
+    if sys.version_info < (3, 9, 0):
+        prefix = "::warning::" if "GITHUB_ACTION" in os.environ else "WARNING: "
+        console_stderr.print(
+            f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will soon require 3.9. Do not report bugs for this version.",
+            style="bold red",
+        )
+
+
 # pylint: disable=too-many-branches,too-many-statements
 def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
@@ -190,7 +206,10 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         msg = get_version_warning()
         if msg:
             console.print(msg)
+        support_banner()
         sys.exit(0)
+    else:
+        support_banner()
 
     initialize_logger(options.verbosity)
     _logger.debug("Options: %s", options)
