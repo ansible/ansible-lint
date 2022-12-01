@@ -82,7 +82,7 @@ jobs:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:TOX_PARALLEL_NO_SPINNER
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 723
+      PYTEST_REQPASS: 724
 
     steps:
       - name: Activate WSL1
@@ -136,12 +136,12 @@ jobs:
         run: python3 -m tox -e ${{ matrix.tox_env }}
 
       - name: Combine coverage data
-        if: "(matrix.cover || false) && runner.os == 'Linux'"
+        if: ${{ startsWith(matrix.tox_env, 'py') }}
         # produce a single .coverage file at repo root
         run: tox -e coverage
 
       - name: Upload coverage data
-        if: "(matrix.cover || false) && runner.os == 'Linux'"
+        if: ${{ startsWith(matrix.tox_env, 'py') }}
         uses: codecov/codecov-action@v3
         with:
           name: ${{ matrix.tox_env }}
@@ -156,13 +156,6 @@ jobs:
           path: .tox/**/log/
         # https://github.com/actions/upload-artifact/issues/123
         continue-on-error: true
-
-      - name: Report junit failures
-        # cspell:disable-next-line
-        uses: shyim/junit-report-annotations-action@3d2e5374f2b13e70f6f3209a21adfdbc42c466ae
-        with:
-          path: .tox/junit.*.xml
-        if: always() && (matrix.cover || false)
 
       - name: Report failure if git reports dirty status
         run: |

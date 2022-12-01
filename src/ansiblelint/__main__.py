@@ -117,14 +117,14 @@ def initialize_options(arguments: list[str] | None = None) -> None:
         options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
         try:
             options.cache_dir_lock.acquire(timeout=180)
-        except Timeout:
+        except Timeout:  # pragma: no cover
             _logger.error(
                 "Timeout waiting for another instance of ansible-lint to release the lock."
             )
             sys.exit(LOCK_TIMEOUT_RC)
 
     # Avoid extra output noise from Ansible about using devel versions
-    if "ANSIBLE_DEVEL_WARNING" not in os.environ:
+    if "ANSIBLE_DEVEL_WARNING" not in os.environ:  # pragma: no branch
         os.environ["ANSIBLE_DEVEL_WARNING"] = "false"
 
 
@@ -347,11 +347,11 @@ def _run_cli_entrypoint() -> None:
         sys.exit(main(sys.argv))
     except OSError as exc:
         # NOTE: Only "broken pipe" is acceptable to ignore
-        if exc.errno != errno.EPIPE:
+        if exc.errno != errno.EPIPE:  # pragma: no cover
             raise
-    except KeyboardInterrupt:
+    except KeyboardInterrupt:  # pragma: no cover
         sys.exit(EXIT_CONTROL_C_RC)
-    except RuntimeError as exc:
+    except RuntimeError as exc:  # pragma: no cover
         raise SystemExit(exc) from exc
 
 
@@ -416,7 +416,7 @@ def to_bool(value: Any) -> bool:
     return False
 
 
-def should_do_markup(stream: TextIO = sys.stdout) -> bool:
+def should_do_markup(stream: TextIO = sys.stdout) -> bool:  # pragma: no cover
     """Decide about use of ANSI colors."""
     py_colors = None
 

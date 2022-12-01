@@ -207,7 +207,7 @@ class Runner:
                         self.lintables.add(child)
                         files.append(child)
                 except MatchError as exc:
-                    if not exc.filename:
+                    if not exc.filename:  # pragma: no branch
                         exc.filename = str(lintable.path)
                     exc.rule = LoadingFailureRule()
                     yield exc

@@ -1,4 +1,5 @@
 """Module containing cached JSON schemas."""
+# pragma: no cover
 import sys
 
 from .main import refresh_schemas

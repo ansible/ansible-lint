@@ -15,6 +15,7 @@ source_pkgs = ["ansiblelint"]
 branch = true
 parallel = true
 concurrency = ["multiprocessing", "thread"]
+data_file = ".tox/.coverage"
 
 [tool.coverage.paths]
 source = ["src", ".tox/*/site-packages"]
@@ -22,6 +23,9 @@ source = ["src", ".tox/*/site-packages"]
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 omit = ["*/src/ansible_compat/*", "test/*"]
+fail_under = 88
+skip_covered = true
+skip_empty = true
 
 [tool.isort]
 profile = "black"
