@@ -9,6 +9,8 @@ on:
     branches: # any integration branch but not tag
       - "main"
   pull_request:
+    branches:
+      - "main"
   release:
     types:
       - published # It seems that you can publish directly without creating
@@ -102,14 +104,15 @@ jobs:
         with:
           fetch-depth: 0 # needed by setuptools-scm
 
-      - name: Set cache for galaxy
+      - name: Set caches
         uses: actions/cache@v3
         with:
           path: |
             ~/.ansible/galaxy_cache
             ~/.ansible/collections/ansible_collections
             ~/.ansible/roles/
-          key: galaxy-${{ matrix.name }}-${{ hashFiles('requirements.yml') }}
+            ~/.cache/pre-commit
+          key: galaxy-${{ matrix.name }}-${{ hashFiles('requirements.yml', '.pre-commit-config.yaml', 'pyproject.toml') }}
 
       - name: Set up Python ${{ matrix.python-version || '3.9' }}
         if: "!contains(matrix.shell, 'wsl')"
