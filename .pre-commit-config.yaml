@@ -10,10 +10,7 @@ ci:
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
-    - pip-compile-upgrade
     - schemas
-default_language_version:
-  python: python3.9
 exclude: >
   (?x)^(
     .vscode/extensions.json|
@@ -21,6 +18,9 @@ exclude: >
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml
   )$
 repos:
+  - repo: meta
+    hooks:
+      - id: check-useless-excludes
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
     rev: v3.0.0-alpha.4
@@ -131,7 +131,7 @@ repos:
           - flake8-future-annotations>=0.0.3
   - repo: https://github.com/asottile/pyupgrade
     # keep it after flake8
-    rev: v3.2.2
+    rev: v3.2.3
     hooks:
       - id: pyupgrade
         args: ["--py38-plus"]
@@ -144,10 +144,10 @@ repos:
         additional_dependencies:
           - ansible-compat>=2.2.6
           - ansible-core>=2.14.0
-          - black
+          - black>=22.10.0
           - filelock
           - flaky
-          - pytest
+          - pytest>=7.2.0
           - rich>=11.0.0
           - ruamel.yaml
           - sphinx>=4.4.0
@@ -170,12 +170,12 @@ repos:
         additional_dependencies:
           - ansible-compat>=2.2.6
           - ansible-core>=2.14.0
-          - black
+          - black>=22.10.0
           - docutils
           - filelock
           - flaky
           - jsonschema>=4.9.0
-          - pytest
+          - pytest>=7.2.0
           - pyyaml
           - rich>=11.0.0
           - ruamel.yaml
@@ -183,6 +183,26 @@ repos:
           - typing_extensions
           - wcmatch
           - yamllint
+  - repo: https://github.com/jazzband/pip-tools
+    rev: 6.11.0
+    hooks:
+      - id: pip-compile
+        entry: pip-compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core
+        language: python
+        files: ^requirements\.(in|txt)$
+        alias: deps
+        language_version: "3.9" # minimal we support officially
+        additional_dependencies:
+          - pip>=22.3.1
+      - id: pip-compile
+        entry: pip-compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
+        language: python
+        files: ^requirements\.(in|txt)$
+        alias: up
+        stages: [manual]
+        language_version: "3.9" # minimal we support officially
+        additional_dependencies:
+          - pip>=22.3.1
   - # keep at bottom as these are slower
     repo: local
     hooks:
@@ -190,18 +210,4 @@ repos:
         name: update json schemas
         entry: python3 src/ansiblelint/schemas/__main__.py
         language: python
-        stages: [manual]
-      - id: pip-compile
-        name: pip-compile
-        entry: python3.9 -m piptools compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core
-        language: system
-        files: ^(setup\.cfg|=constraints\.txt)$
-        pass_filenames: false
-        stages: [manual]
-      - id: pip-compile-upgrade
-        name: pip-compile-upgrade
-        entry: python3.9 -m piptools compile -q --upgrade --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core
-        language: system
-        files: ^(setup\.cfg|=constraints\.txt)$
-        pass_filenames: false
         stages: [manual]
