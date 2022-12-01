@@ -181,7 +181,7 @@ def support_banner() -> None:
     if sys.version_info < (3, 9, 0):
         prefix = "::warning::" if "GITHUB_ACTION" in os.environ else "WARNING: "
         console_stderr.print(
-            f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will require 3.9 very soon. Do not file bugs for this version.",
+            f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will soon require 3.9. Do not report bugs for this version.",
             style="bold red",
         )
 
