@@ -1,9 +1,8 @@
 ---
 name: Bug report
 about: >
-  Create a bug report. Please test against the main branch before
-  submitting it. For anything else, please use discussions
-  link below.
+  Create a bug report. Ensure that it does reproduce on the main branch with
+  python >=3.9.  For anything else, please use the discussion link below.
 labels: bug, new
 ---
 
@@ -18,27 +17,23 @@ labels: bug, new
 
 - Bug Report
 
-##### Ansible and Ansible Lint details
+##### OS / ENVIRONMENT
 
 <!--- Paste verbatim output between triple backticks -->
 
 ```console (paste below)
-ansible --version
-
 ansible-lint --version
-
 ```
+
+<!--- Provide all relevant information below, e.g. target OS versions, network
+ device firmware, etc. -->
 
 - ansible installation method: one of source, pip, OS package
 - ansible-lint installation method: one of source, pip, OS package
 
-##### OS / ENVIRONMENT
-
-<!--- Provide all relevant information below, e.g. target OS versions, network device firmware, etc. -->
-
 ##### STEPS TO REPRODUCE
 
-<!--- Describe exactly how to reproduce the problem, using a minimal test-case -->
+<!--- Describe exactly how to reproduce the problem, using a minimal test case -->
 
 <!--- Paste example playbooks or commands between triple backticks below -->
 
@@ -56,14 +51,14 @@ Possible security bugs should be reported via email to `security@ansible.com`
 
 ##### Actual Behavior
 
-<!--- Describe what actually happened. If possible run with extra verbosity (-vvvv) -->
+<!--- Describe what happened. If possible run with extra verbosity (-vvvv) -->
 
-Please give some details of what is actually happening.
+Please give some details of what is happening.
 Include a [minimum complete verifiable example] with:
 
-- playbook
-- output of running ansible-lint
-- if you're getting a stack trace, output of
+- minimized playbook to reproduce the error
+- the output of running ansible-lint including the command line used
+- if you're getting a stack trace, also the output of
   `ansible-playbook --syntax-check playbook`
 
 <!--- Paste verbatim command output between triple backticks -->
