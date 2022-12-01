@@ -1,0 +1,42 @@
+---
+- name: Fixture for testing risky-octal rule
+  hosts: hosts
+  vars:
+    varset: varset
+  tags:
+    - no-free-form
+  tasks:
+    - name: Octal permissions test success (0600)
+      ansible.builtin.file:
+        path: foo
+        mode: 0600
+
+    - name: Octal permissions test success (0000)
+      ansible.builtin.file:
+        path: foo
+        mode: 0000
+
+    - name: Octal permissions test success (02000)
+      ansible.builtin.file:
+        path: bar
+        mode: 02000
+
+    - name: Octal permissions test success (02751)
+      ansible.builtin.file:
+        path: bar
+        mode: 02751
+
+    - name: Octal permissions test success (0777)
+      ansible.builtin.file: path=baz mode=0777 # noqa: no-free-form
+
+    - name: Octal permissions test success (0711)
+      ansible.builtin.file: path=baz mode=0711 # noqa: no-free-form
+
+    - name: Permissions test success (0777)
+      ansible.builtin.file: path=baz mode=u+rwx # noqa: no-free-form
+
+    - name: Octal permissions test success (777)
+      ansible.builtin.file: path=baz mode=777 # noqa: no-free-form
+
+    - name: Octal permissions test success (733)
+      ansible.builtin.file: path=baz mode=733 # noqa: no-free-form
