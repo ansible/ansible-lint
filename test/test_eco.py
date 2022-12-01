@@ -59,7 +59,7 @@ def test_eco(repo: str) -> None:
         executable = (
             "ansible-lint"
             if step == "after"
-            else f"{pathlib.Path(__file__).parent.parent}/.tox/eco-main/bin/ansible-lint"
+            else f"{pathlib.Path(__file__).parent.parent}/.tox/venv/bin/ansible-lint"
         )
         result = run_ansible_lint(
             *args,
