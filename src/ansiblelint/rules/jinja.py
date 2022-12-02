@@ -206,6 +206,7 @@ class JinjaRule(AnsibleLintRule):
         """Check spacing inside given jinja2 template string.
 
         We aim to match Python Black formatting rules.
+        :raises NotImplementedError: On few cases where valid jinja is not valid Python.
 
         :returns: (string, string, string)  reformatted text, detailed error, error tag
         """

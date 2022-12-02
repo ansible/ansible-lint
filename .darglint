@@ -1,4 +1,6 @@
 [darglint]
 docstring_style=sphinx
+ignore=DAR101
 enable=DAR104
+
 strictness=long
