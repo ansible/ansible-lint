@@ -146,7 +146,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Positive test for unnamed-task."""
         collection = RulesCollection()
         collection.register(NameRule())
-        success = "examples/playbooks/task-has-name-success.yml"
+        success = "examples/playbooks/rule-name-missing-pass.yml"
         good_runner = Runner(success, rules=collection)
         assert [] == good_runner.run()
 
@@ -154,7 +154,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Negative test for unnamed-task."""
         collection = RulesCollection()
         collection.register(NameRule())
-        failure = "examples/playbooks/task-has-name-failure.yml"
+        failure = "examples/playbooks/rule-name-missing-fail.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 5
@@ -166,7 +166,7 @@ if "pytest" in sys.modules:  # noqa: C901
         collection = RulesCollection(options=custom_options)
         collection.register(NameRule())
         failure = Lintable(
-            "examples/playbooks/tasks/name-prefix-fail.yml", kind="tasks"
+            "examples/playbooks/tasks/rule-name-prefix-fail.yml", kind="tasks"
         )
         bad_runner = Runner(failure, rules=collection)
         results = bad_runner.run()
@@ -179,7 +179,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Negative test for a task that starts with lowercase."""
         collection = RulesCollection()
         collection.register(NameRule())
-        failure = "examples/playbooks/task-name-lowercase.yml"
+        failure = "examples/playbooks/rule-name-casing.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 1
@@ -190,7 +190,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Positive test for name[play]."""
         collection = RulesCollection()
         collection.register(NameRule())
-        success = "examples/playbooks/play-name-missing.yml"
+        success = "examples/playbooks/rule-name-play-fail.yml"
         errs = Runner(success, rules=collection).run()
         assert len(errs) == 1
         assert errs[0].tag == "name[play]"
@@ -200,7 +200,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Negative test for name[templated]."""
         collection = RulesCollection()
         collection.register(NameRule())
-        failure = "examples/playbooks/name-templated.yml"
+        failure = "examples/playbooks/rule-name-templated-fail.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 1
