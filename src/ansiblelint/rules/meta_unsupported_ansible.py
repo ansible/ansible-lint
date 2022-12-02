@@ -34,13 +34,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
     tags = ["metadata", "opt-in", "experimental"]
     version_added = "v6.8.6 (last update)"
 
-    supported_ansible = [
-        "2.9.10",
-        "2.11",
-        "2.12",
-        "2.13",
-        "2.14"
-    ]
+    supported_ansible = ["2.9.10", "2.11", "2.12", "2.13", "2.14"]
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Find violations inside meta files."""
@@ -52,7 +46,9 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
         print(version_required)
 
         if version_required:
-            if not any(version in version_required for version in self.supported_ansible):
+            if not any(
+                version in version_required for version in self.supported_ansible
+            ):
                 return [
                     self.create_matcherror(
                         message="requires_ansible key must be set to a supported version.",
@@ -75,13 +71,19 @@ if "pytest" in sys.modules:
         ("test_file", "failures"),
         (
             pytest.param(
-                "examples/meta_runtime_version_checks/pass/meta/runtime.yml", 0, id="pass"
+                "examples/meta_runtime_version_checks/pass/meta/runtime.yml",
+                0,
+                id="pass",
             ),
             pytest.param(
-                "examples/meta_runtime_version_checks/fail_0/meta/runtime.yml", 1, id="fail0"
+                "examples/meta_runtime_version_checks/fail_0/meta/runtime.yml",
+                1,
+                id="fail0",
             ),
             pytest.param(
-                "examples/meta_runtime_version_checks/fail_1/meta/runtime.yml", 1, id="fail1"
+                "examples/meta_runtime_version_checks/fail_1/meta/runtime.yml",
+                1,
+                id="fail1",
             ),
         ),
     )

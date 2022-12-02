@@ -7,6 +7,7 @@ This rule can produce messages such:
 - `requires_ansible` key must be set to a supported version.
 
 Currently supported versions of ansible-core are:
+
 - `2.9.10`
 - `2.11.x`
 - `2.12.x`
@@ -19,7 +20,6 @@ Currently supported versions of ansible-core are:
 # runtime.yml
 ---
 requires_ansible: ">=2.9"
-
 ```
 
 ## Correct code
@@ -28,5 +28,4 @@ requires_ansible: ">=2.9"
 # runtime.yml
 ---
 requires_ansible: ">=2.9.10"
-
 ```
