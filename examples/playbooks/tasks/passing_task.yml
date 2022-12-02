@@ -1,4 +1,4 @@
 ---
-- name: Simple task to include which generates no errors
+- name: passing_task | Simple task to include which generates no errors
   ansible.builtin.assert:
     that: true

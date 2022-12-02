@@ -50,6 +50,7 @@ enable_list:
   - empty-string-compare # opt-in
   - no-log-password # opt-in
   - no-same-owner # opt-in
+  - name[prefix] # opt-in
   # add yaml here if you want to avoid ignoring yaml checks when yamllint
   # library is missing. Normally its absence just skips using that rule.
   - yaml
@@ -109,3 +110,6 @@ kinds:
 # List of additions modules to allow in only-builtins rule.
 # only_builtins_allow_modules:
 #   - example_module
+
+# Allow setting custom prefix for name[prefix] rule
+task_name_prefix: "{stem} | "

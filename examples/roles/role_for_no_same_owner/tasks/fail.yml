@@ -1,69 +1,69 @@
 ---
-- name: Block
+- name: fail | Block
   block:
-    - name: Synchronize-in-block
+    - name: fail | Synchronize-in-block
       ansible.posix.synchronize:
         src: dummy
         dest: dummy
 
-- name: Synchronize
+- name: fail | Synchronize
   ansible.posix.synchronize:
     src: dummy
     dest: dummy
 
-- name: Nested-block
+- name: fail | Nested-block
   block:
-    - name: Synchronize
+    - name: fail | Synchronize
       block:
-        - name: Synchronize-in-deep-block
+        - name: fail | Synchronize-in-deep-block
           ansible.posix.synchronize:
             src: dummy
             dest: dummy
   rescue:
-    - name: Synchronize-in-rescue
+    - name: fail | Synchronize-in-rescue
       ansible.posix.synchronize:
         src: dummy
         dest: dummy
   always:
-    - name: Synchronize-in-always
+    - name: fail | Synchronize-in-always
       ansible.posix.synchronize:
         src: dummy
         dest: dummy
 
-- name: Unarchive-bz2
+- name: fail | Unarchive-bz2
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.bz2"
     dest: dummy
 
-- name: Unarchive delegated
+- name: fail | Unarchive delegated
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.bz2"
     dest: dummy
   delegate_to: localhost
 
-- name: Unarchive-gz
+- name: fail | Unarchive-gz
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.gz"
     dest: dummy
 
-- name: Unarchive-tar
+- name: fail | Unarchive-tar
   ansible.builtin.unarchive:
     src: "{{ file }}.tar"
     dest: dummy
 
-- name: Unarchive-xz
+- name: fail | Unarchive-xz
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.xz"
     dest: dummy
 
-- name: Unarchive-zip
+- name: fail | Unarchive-zip
   ansible.builtin.unarchive:
     src: "{{ file }}.zip"
     dest: dummy
     extra_opts:
       - -X
 
-- name: Unarchive-zip-same-owner
+- name: fail | Unarchive-zip-same-owner
   ansible.builtin.unarchive:
     src: "{{ file }}.zip"
     dest: dummy

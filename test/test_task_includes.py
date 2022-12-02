@@ -40,6 +40,7 @@ def test_included_tasks(
 ) -> None:
     """Check if number of loaded files is correct."""
     lintable = Lintable(filename)
+    default_rules_collection.options.enable_list = ["name[prefix]"]
     runner = Runner(lintable, rules=default_rules_collection)
     result = runner.run()
     assert len(runner.lintables) == file_count

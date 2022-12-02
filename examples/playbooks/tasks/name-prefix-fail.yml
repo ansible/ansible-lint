@@ -1,0 +1,13 @@
+---
+- name: name-prefix-fail | this is not correctly capitalized
+  ansible.builtin.assert:
+    that: true
+- name: This is missing the prefix
+  ansible.builtin.assert:
+    that: true
+- name: name | This prefix is incomplete
+  ansible.builtin.assert:
+    that: true
+- name: name-prefix-fail | This is correctly named
+  ansible.builtin.assert:
+    that: true

@@ -34,6 +34,7 @@ DEFAULT_WARN_LIST = [
     "jinja[spacing]",  # warning until we resolve all reported false-positives
     "name[casing]",
     "name[play]",
+    "name[prefix]",
     "role-name",
     "warning[empty-playbook]",  # because ansible considers it warning only
     "role-name[path]",  # too new
@@ -132,6 +133,7 @@ options = Namespace(
     strict=False,
     rules={},  # Placeholder to set and keep configurations for each rule.
     profile=None,
+    task_name_prefix="{stem} | ",
 )
 
 # Used to store detected tag deprecations

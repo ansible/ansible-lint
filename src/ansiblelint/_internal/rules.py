@@ -11,6 +11,7 @@ from ansiblelint.constants import RULE_DOC_URL
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.rules import RulesCollection
 
 _logger = logging.getLogger(__name__)
 LOAD_FAILURE_MD = """\
@@ -48,6 +49,8 @@ class BaseRule:
     # _order 5 implicit for normal rules
     _order: int = 5
     _help: str | None = None
+    # Added when a rule is registered into a collection, gives access to options
+    _collection: RulesCollection | None = None
 
     @property
     def help(self) -> str:
