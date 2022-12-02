@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  standalone: true
+  author: foo-bar # <-- that is a valid author name because is a valid github username
+  description: foo
+  min_ansible_version: "2.9"
+  company: foo
+  license: MIT
+  platforms:
+    - name: Alpine
+      versions:
+        - all

@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  gather_facts: non
+  tasks:
+    - ansible.builtin.debug:
+        msg: foo

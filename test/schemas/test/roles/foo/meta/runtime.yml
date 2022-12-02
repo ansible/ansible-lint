@@ -1,0 +1,39 @@
+# Based on https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory
+requires_ansible: ">=2.10,<2.11"
+plugin_routing:
+  inventory:
+    kubevirt:
+      redirect: community.general.kubevirt
+    my_inventory:
+      tombstone:
+        removal_version: "2.0.0"
+        warning_text: my_inventory has been removed. Please use other_inventory instead.
+  modules:
+    my_module:
+      deprecation:
+        removal_date: "2021-11-30"
+        warning_text:
+          my_module will be removed in a future release of this collection. Use
+          another.collection.new_module instead.
+      redirect: another.collection.new_module
+    podman_image:
+      redirect: containers.podman.podman_image
+  module_utils:
+    ec2:
+      redirect: amazon.aws.ec2
+    util_dir.subdir.my_util:
+      redirect: namespace.name.my_util
+import_redirection:
+  ansible.module_utils.old_utility:
+    redirect: ansible_collections.namespace_name.collection_name.plugins.module_utils.new_location
+action_groups:
+  groupname:
+    # The special metadata dictionary. All action/module names should be strings.
+    - metadata:
+        extend_group:
+          - another.collection.groupname
+          - another_group
+    - my_action
+  another_group:
+    - my_module
+    - another.collection.another_module

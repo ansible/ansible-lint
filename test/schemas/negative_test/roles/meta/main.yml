@@ -1,0 +1,10 @@
+galaxy_info:
+  description: bar
+  min_ansible_version: "2.9"
+  company: foo
+  license: MIT
+  galaxy_tags: database # <-- invalid, must be a list of strings
+  platforms:
+    - name: Alpine
+      versions:
+        - all

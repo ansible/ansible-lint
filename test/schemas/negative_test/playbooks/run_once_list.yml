@@ -1,0 +1,8 @@
+- hosts: localhost
+  tasks:
+    - name: foo2
+      ansible.builtin.debug:
+        msg: foo!
+      run_once: # invalid due to schema, also ansible does not allow lists
+        - "{{ true }}"
+        - xxx

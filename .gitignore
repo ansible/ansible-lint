@@ -65,3 +65,5 @@ src/ansiblelint/_version.py
 test/eco/CODENOTIFY.html
 test/eco
 docs/profiles.md
+test/schemas/node_modules
+.envrc

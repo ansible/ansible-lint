@@ -1,0 +1,13 @@
+---
+- name: var_files should accept null
+  hosts: localhost
+  vars_files: null
+
+- name: var_files should accept string
+  hosts: localhost
+  vars_files: /dev/null
+
+- name: var_files should accept array[string]
+  hosts: localhost
+  vars_files:
+    - /dev/null

@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  tasks:
+    - name: that should pass
+      ansible.builtin.debug:
+        var: item
+      loop:
+        - foo
+        - bar

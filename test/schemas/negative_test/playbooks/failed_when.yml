@@ -1,0 +1,6 @@
+- hosts: localhost
+  tasks:
+    - name: foo
+      ansible.builtin.debug:
+        msg: foo!
+      failed_when: 123 # <- not ok

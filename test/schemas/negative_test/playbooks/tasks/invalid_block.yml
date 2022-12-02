@@ -1,0 +1,2 @@
+---
+- block: {} # <-- invalid, should be array

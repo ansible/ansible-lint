@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  environment: # <- valid
+    FOO: BAR
+
+- hosts: localhost
+  environment: "{{ foo }}" # <- valid

@@ -1,0 +1,16 @@
+- command: echo 123
+  with_items: []
+
+- command: echo 123
+  with_items:
+    - 1
+    - foo
+    - {}
+    - []
+
+- command: echo 123
+  vars:
+    my_list:
+      - 1
+      - 2
+  with_items: "{{ my_list }}"

@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  gather_subset:
+    - all
+    - "!network"
+  tasks:
+    - ansible.builtin.debug:
+        msg: foo
+
+- hosts: localhost
+  gather_subset:
+    - all
+  tasks:
+    - ansible.builtin.debug:
+        msg: bar

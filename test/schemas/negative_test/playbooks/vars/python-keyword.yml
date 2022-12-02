@@ -1,0 +1,3 @@
+---
+async: ... # invalid var name
+lambda: ... # invalid var name

@@ -1,0 +1,4 @@
+- action: foo
+  args: {}
+- action: foo
+  args: "{{ {} }}"

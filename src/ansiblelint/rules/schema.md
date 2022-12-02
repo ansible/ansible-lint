@@ -24,8 +24,6 @@ Maintained in the [ansible-navigator](https://github.com/ansible/ansible-navigat
 
 - `schema[ansible-navigator]` validates [ansible-navigator configuration](https://github.com/ansible/ansible-navigator/blob/main/src/ansible_navigator/data/ansible-navigator.json)
 
-Maintained in the Ansible [schemas](https://github.com/ansible/schemas) project:
-
 - `schema[arg_specs]` validates [module argument specs](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)
 - `schema[execution-environment]` validates [execution environments](https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html)
 - `schema[galaxy]` validates [collection metadata](https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html).

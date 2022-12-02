@@ -1,0 +1,46 @@
+collections:
+  - foo.bar
+dependencies:
+  - name: ansible-role-foo
+    version: "1.0"
+  - name: ansible-role-bar
+    version: "1.0"
+  # from Bitbucket
+  - src: git+http://bitbucket.org/willthames/git-ansible-galaxy
+    version: v1.4
+
+  # from Bitbucket, alternative syntax and caveats
+  - src: http://bitbucket.org/willthames/hg-ansible-galaxy
+    scm: hg
+
+  # from galaxy
+  - src: community.molecule
+
+  # from GitHub
+  - src: https://github.com/bennojoy/nginx
+
+  # from GitHub, overriding the name and specifying a specific tag
+  - src: https://github.com/bennojoy/nginx
+    version: master
+    name: nginx_role
+
+  # from GitLab or other git-based scm
+  - src: git@gitlab.company.com:my-group/my-repo.git
+    scm: git
+    version: "0.1" # quoted, so YAML doesn't parse this as a floating-point value
+
+  # from a web server, where the role is packaged in a tar.gz
+  - src: https://some.webserver.example.com/files/master.tar.gz
+    name: http-role
+
+galaxy_info:
+  author: John Doe
+  company: foo
+  description: foo
+  license: MIT
+  min_ansible_version: "2.9"
+  # standalone: true
+  platforms:
+    - name: Alpine
+      versions:
+        - all

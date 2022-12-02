@@ -1,0 +1,34 @@
+---
+# https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#with-flattened
+- hosts: localhost
+  tasks:
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_list: [] # <-- valid
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_items: [] # <-- valid
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_indexed_items: []
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_together: []
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_dict: {}
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_sequence: []
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_subelements: []
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_nested: []
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_random_choice: []
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_fileglob: []

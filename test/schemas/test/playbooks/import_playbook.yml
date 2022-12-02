@@ -1,0 +1,9 @@
+- ansible.builtin.import_playbook: other.yml
+
+- import_playbook: other.yml
+  tags:
+    - foo
+
+- import_playbook: other.yml
+  when:
+    - foo is true

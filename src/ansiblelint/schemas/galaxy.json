@@ -446,7 +446,7 @@
       "title": "SPDXLicenseEnum"
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-galaxy.json",
+  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible-galaxy.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
   "examples": ["galaxy.yml"],

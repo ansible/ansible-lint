@@ -1,0 +1,74 @@
+---
+# https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation
+argument_specs:
+  main:
+    short_description: The main entry point for the role.
+    description: "a longer description"
+    version_added: 1.2.3
+    author: Foobar Baz
+    options:
+      my_app_int:
+        type: "int"
+        required: false
+        default: 42
+        description: "The integer value, defaulting to 42."
+        no_log: false
+        version_added: 1.0.0
+
+      my_app_str:
+        type: "str"
+        required: true
+        description:
+          - The string value.
+          - Has some more text.
+        choices:
+          - foo
+          - bar
+          - baz
+
+      top_level:
+        type: dict
+        description: Contains more content.
+        options:
+          sub_option:
+            type: list
+            elements: int
+            description: A list of special integers.
+            choices:
+              - 1
+              - 2
+              - 3
+              - 123
+
+    seealso:
+      - module: community.foo.bar
+      - module: community.foo.baz
+        description: Baz bam!
+      - plugin: community.foo.bam
+        plugin_type: lookup
+      - plugin: community.foo.bar
+        plugin_type: lookup
+        description: A lookup plugin.
+      - ref: developer_guide
+        description: A link into the Ansible documentation.
+      - link: https://docs.ansible.com/
+        name: The Ansible documentation.
+        description: A link to the Ansible documentation.
+
+  alternate:
+    short_description: The alternate entry point for the my_app role.
+    author:
+      - Foobar Baz
+      - Bert Foo
+    options:
+      my_app_int:
+        type: "int"
+        required: false
+        default: 1024
+        description: "The integer value, defaulting to 1024."
+
+  third:
+    description:
+      - First paragraph.
+      - Second paragraph.
+    options: {}

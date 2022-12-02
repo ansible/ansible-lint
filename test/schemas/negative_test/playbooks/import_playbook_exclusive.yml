@@ -1,0 +1,4 @@
+---
+# invalid because you cannot have both entries in the same time:
+- ansible.builtin.import_playbook: foo.yml
+  import_playbook: other.yml

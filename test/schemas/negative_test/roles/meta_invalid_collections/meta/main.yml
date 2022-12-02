@@ -1,0 +1,11 @@
+# role inside a collection
+collections:
+  - FOO.BAR # invalid pattern, need to use lowercase
+galaxy_info:
+  standalone: false
+  description: foo
+  license: bar
+  platforms:
+    - name: Fedora
+      versions:
+        - all

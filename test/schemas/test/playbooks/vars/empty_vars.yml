@@ -1,0 +1,2 @@
+---
+# Ensure we allow empty var files, matching Ansible behavior

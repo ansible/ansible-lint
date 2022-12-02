@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_flattened: foo # moved to community.general in 2.10

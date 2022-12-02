@@ -1,0 +1,3 @@
+- name: foo
+  hosts: localhost # <-- not allowed with import_playbook
+  import_playbook: included.yml

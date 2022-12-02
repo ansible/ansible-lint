@@ -1,0 +1,7 @@
+# https://docs.ansible.com/ansible/latest/galaxy/user_guide.html
+collections:
+  - doo.bar
+  - name: geerlingguy.php_roles
+    version: 0.9.3
+    source: https://galaxy.ansible.com
+roles: []

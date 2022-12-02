@@ -1,0 +1,11 @@
+- ansible.builtin.debug:
+    msg: foo
+    no_log: true # valid
+    vars:
+      some_var: true
+
+- ansible.builtin.debug:
+    msg: foo
+    no_log: "{{ some_var }}" # valid too
+    vars:
+      some_var: true

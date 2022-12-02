@@ -1,0 +1,23 @@
+- hosts: localhost
+  roles:
+    - role: foo
+      tags: foo # <-- allowed
+    - role: foo
+      tags: # <-- allowed
+        - foo
+        - bar
+  tags: # <-- allowed
+    - foo
+    - bar
+  tasks:
+    - ansible.builtin.debug:
+        msg: "..."
+      tags: # <-- allowed
+        - foo
+        - bar
+    - ansible.builtin.debug:
+        msg: "..."
+      tags: # <-- allowed
+        - foo
+- hosts: localhost
+  tags: foo # <-- allowed

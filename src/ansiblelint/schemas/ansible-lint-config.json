@@ -19,11 +19,6 @@
   "additionalProperties": false,
   "examples": [".ansible-lint", ".config/ansible-lint.yml"],
   "properties": {
-    "profile": {
-      "title": "Profile",
-      "type": ["null", "string"],
-      "enum": ["min", "basic", "moderate", "safety", "shared", "production", null]
-    },
     "enable_list": {
       "items": {
         "type": "string"
@@ -56,20 +51,6 @@
       "title": "Loop Var Prefix",
       "type": "string"
     },
-    "only_builtins_allow_collections": {
-      "items": {
-        "type": "string"
-      },
-      "title": "Only Builtins Allow Collections",
-      "type": "array"
-    },
-    "only_builtins_allow_modules": {
-      "items": {
-        "type": "string"
-      },
-      "title": "Only Builtins Allow Modules",
-      "type": "array"
-    },
     "mock_modules": {
       "items": {
         "type": "string"
@@ -89,25 +70,47 @@
       "title": "Offline",
       "type": "boolean"
     },
-    "progressive": {
-      "default": false,
-      "title": "Progressive",
-      "type": "boolean"
+    "only_builtins_allow_collections": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Only Builtins Allow Collections",
+      "type": "array"
+    },
+    "only_builtins_allow_modules": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Only Builtins Allow Modules",
+      "type": "array"
     },
     "parseable": {
       "default": true,
       "title": "Parseable",
       "type": "boolean"
     },
+    "profile": {
+      "enum": [
+        "min",
+        "basic",
+        "moderate",
+        "safety",
+        "shared",
+        "production",
+        null
+      ],
+      "title": "Profile",
+      "type": ["null", "string"]
+    },
+    "progressive": {
+      "default": false,
+      "title": "Progressive",
+      "type": "boolean"
+    },
     "quiet": {
       "default": true,
       "title": "Quiet",
       "type": "boolean"
-    },
-    "task_name_prefix": {
-      "title": "Allow custom prefix for task[prefix]",
-      "type": "string",
-      "default": "{stem} | "
     },
     "rules": {
       "additionalProperties": {
@@ -197,6 +200,11 @@
       },
       "title": "Tags",
       "type": "array"
+    },
+    "task_name_prefix": {
+      "default": "{stem} | ",
+      "title": "Allow custom prefix for task[prefix]",
+      "type": "string"
     },
     "use_default_rules": {
       "default": true,

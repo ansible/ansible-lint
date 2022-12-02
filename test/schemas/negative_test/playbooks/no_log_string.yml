@@ -1,0 +1,7 @@
+- hosts: localhost
+  vars:
+    some_var: true
+  tasks:
+    - ansible.builtin.debug:
+        msg: foo
+      no_log: some_var # <-- bad, jinja use must be explicit

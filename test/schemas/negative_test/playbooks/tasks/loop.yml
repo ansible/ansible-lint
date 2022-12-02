@@ -1,0 +1,3 @@
+- ansible.builtin.debug:
+    var: item
+  loop: {} # <-- map is not valid

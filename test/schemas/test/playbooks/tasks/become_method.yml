@@ -1,0 +1,7 @@
+- command: echo 123
+  become_method: sudo
+
+- command: echo 123
+  vars:
+    sudo_var: doo
+  become_method: "{{ sudo_var }}" # templating is ok

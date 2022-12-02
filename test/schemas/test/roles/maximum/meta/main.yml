@@ -1,0 +1,20 @@
+allow_duplicates: true
+galaxy_info:
+  author: John Doe
+  standalone: true # v1 role meta (standalone)
+  description: maximum
+  min_ansible_version: "2.9"
+  company: foo
+  license: MIT
+  galaxy_tags: # ensure galaxy_tags is allowed
+    - database
+  platforms:
+    - name: Alpine
+      versions:
+        - all
+dependencies:
+  - role: foo
+    vars: {}
+    when:
+      - foo
+      - bar

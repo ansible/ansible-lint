@@ -1,0 +1,3 @@
+---
+- hosts: localhost
+  become: yes # <- invalid based on json schema
