@@ -1,0 +1,35 @@
+- name: foo
+  ansible.builtin.import_playbook: included.yml
+
+- hosts: #  to check if lists are allowed:
+    - localhost
+    - webservers
+  # validate serial allows strings like percentage value
+  serial: 10%
+  handlers:
+    - name: handler 1
+      ansible.builtin.debug:
+        msg: "I am handler 1"
+      listen: "always handler"
+
+- hosts: localhost
+  serial: 1 # validate serial allows integer
+
+- hosts: localhost
+  serial: "{{ 1 }}" # jinja also ok
+
+- hosts: localhost
+  serial: # validate serial allows these too:
+    - 123
+    - 10%
+    - "{{ some }}" # jinja also ok
+
+- hosts: localhost
+  tasks:
+    - debug:
+        msg: "failed_when should accept booleans"
+      failed_when: false
+
+    - debug:
+        msg: "failed_when should allow strings"
+      failed_when: "'foo' in 'foobar'"

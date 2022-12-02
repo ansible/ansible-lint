@@ -1,0 +1,14 @@
+- ansible.builtin.debug:
+    msg: "valid"
+  until: true
+
+- ansible.builtin.debug:
+    msg: "valid"
+  until:
+    - "foo not in bar"
+
+- ansible.builtin.debug:
+    msg: "valid"
+  until:
+    - "'1' in ['1', '2', '3']"
+    - "foo is not defined"

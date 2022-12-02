@@ -1,0 +1,2 @@
+- action: foo
+  when: 123 # invalid, number is not accepted

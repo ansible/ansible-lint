@@ -1,0 +1,5 @@
+- hosts: localhost
+  pre_tasks: []
+  post_tasks: []
+  tasks: []
+  handlers: []

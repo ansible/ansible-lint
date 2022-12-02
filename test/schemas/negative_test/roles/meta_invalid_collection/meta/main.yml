@@ -1,0 +1,10 @@
+collections:
+  - foo # invalid pattern
+galaxy_info:
+  standalone: false # role inside a collection
+  description: foo
+  license: bar
+  platforms:
+    - name: Fedora
+      versions:
+        - all

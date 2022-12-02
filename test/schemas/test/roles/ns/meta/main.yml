@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  author: John Doe
+  standalone: true
+  description: foo
+  min_ansible_version: "2.9"
+  namespace: foo_bar
+  company: foo
+  license: MIT
+  platforms:
+    - name: Alpine
+      versions:
+        - all

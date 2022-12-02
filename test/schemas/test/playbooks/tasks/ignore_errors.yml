@@ -1,0 +1,7 @@
+- command: echo 123
+  ignore_errors: true
+
+- command: echo 123
+  vars:
+    should_ignore_errors: true
+  ignore_errors: "{{ should_ignore_errors }}"

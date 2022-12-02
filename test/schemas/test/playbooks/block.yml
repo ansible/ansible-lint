@@ -1,0 +1,10 @@
+- hosts: localhost
+  tasks:
+    - debug:
+        msg: task under no block
+    - block:
+        - debug:
+            msg: task under one level of block
+        - block:
+            - debug:
+                msg: task under two levels of block

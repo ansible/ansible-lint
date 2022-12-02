@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  tasks:
+    - name: that should pass
+      ansible.builtin.debug:
+        var: item
+      loop: 123 # <-- number is not valid

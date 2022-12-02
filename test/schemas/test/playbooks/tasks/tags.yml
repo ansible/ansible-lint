@@ -1,0 +1,29 @@
+- command: echo 123
+  tags:
+    - foo
+    - bar
+
+- command: echo 123
+  tags: foo
+
+- block:
+    - command: echo 123
+      tags:
+        - foo
+        - bar
+
+    - command: echo 123
+      tags: foo
+  tags:
+    - foo
+    - bar
+
+- block:
+    - command: echo 123
+      tags:
+        - foo
+        - bar
+
+    - command: echo 123
+      tags: foo
+  tags: foo

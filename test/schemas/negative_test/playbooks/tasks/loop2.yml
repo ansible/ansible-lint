@@ -1,0 +1,3 @@
+- ansible.builtin.debug:
+    var: item
+  loop: 123 # <-- number is not valid

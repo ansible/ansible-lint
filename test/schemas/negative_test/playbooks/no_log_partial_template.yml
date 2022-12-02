@@ -1,0 +1,7 @@
+- hosts: localhost
+  vars:
+    some_var: true
+  tasks:
+    - ansible.builtin.debug:
+        msg: foo
+      no_log: "foo-{{ some_var }}" # <-- partial templating not allowed here

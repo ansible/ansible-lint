@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  gather_subset:
+    - invalid
+  tasks:
+    - ansible.builtin.debug:
+        msg: foo

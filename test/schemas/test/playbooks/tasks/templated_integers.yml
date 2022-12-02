@@ -1,0 +1,5 @@
+- debug:
+    msg: foo
+  retries: "{{ 2 }}" # <-- valid
+  port: "{{ 80 }}" # <-- valid
+  poll: "{{ 2 }}" # <-- valid

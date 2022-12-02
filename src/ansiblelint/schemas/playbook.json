@@ -1214,7 +1214,7 @@
       "type": "object"
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-playbook.json",
+  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible-playbook.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "examples": [
     "playbooks/*.yml",

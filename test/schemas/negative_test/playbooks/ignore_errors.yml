@@ -1,0 +1,6 @@
+- hosts: localhost
+  tasks:
+    - command: echo 123
+      vars:
+        should_ignore_errors: true
+      ignore_errors: should_ignore_errors # invalid due to missing {{ }}

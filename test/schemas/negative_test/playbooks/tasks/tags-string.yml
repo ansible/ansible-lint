@@ -1,0 +1,3 @@
+- ansible.builtin.debug:
+    msg: foo
+  tags: 123 # <-- not allowed

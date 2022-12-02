@@ -10,4 +10,6 @@ ignore: |
   examples/playbooks/example.yml
   examples/playbooks/syntax-error-string.yml
   examples/playbooks/vars/not_decryptable.yml
+  test/schemas/negative_test/**/*.yml
+  test/schemas/test/**/*.yml
 # ignore added because this file includes on-purpose errors

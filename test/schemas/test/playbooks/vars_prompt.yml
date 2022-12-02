@@ -1,0 +1,11 @@
+- name: Fixture
+  hosts: localhost
+  vars_prompt:
+    - name: username
+      prompt: What is your username?
+      private: false
+      unsafe: false
+
+    - name: password
+      prompt: What is your password?
+      default: "secret"

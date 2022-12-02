@@ -1,5 +1,5 @@
 {
-  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-ee.json",
+  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible-ee.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
   "description": "See https://docs.ansible.com/automation-controller/latest/html/userguide/ee_reference.html",

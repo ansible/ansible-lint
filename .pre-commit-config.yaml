@@ -15,6 +15,9 @@ exclude: >
   (?x)^(
     .vscode/extensions.json|
     .vscode/settings.json|
+    test/schemas/data/licenses.json|
+    test/schemas/package-lock.json|
+    test/schemas/negative_test|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml
   )$
 repos:
@@ -29,6 +32,7 @@ repos:
         # Temporary excludes so we can gradually normalize the formatting
         exclude: >
           (?x)^(
+            .*\.md$|
             examples/other/some.j2.yaml|
             examples/playbooks/example.yml|
             examples/playbooks/multiline-brackets.*|
@@ -37,11 +41,16 @@ repos:
             examples/playbooks/with-skip-tag-id.yml|
             examples/yamllint/.*|
             test/fixtures/formatting-before/.*|
-            src/ansiblelint/schemas/.*
+            test/schemas/data/.*|
+            test/schemas/(negative_test|test)/.*\.md|
+            src/ansiblelint/schemas/(molecule|tasks|playbook).json|
+            src/ansiblelint/schemas/ansible-navigator-config.json
           )$
+        always_run: true
         additional_dependencies:
           - prettier
           - prettier-plugin-toml
+          - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v6.15.0
     hooks:
@@ -86,6 +95,9 @@ repos:
       - id: codespell
         exclude: >
           (?x)^(
+            .config/dictionary.txt|
+            test/schemas/negative_test/.*|
+            test/schemas/test/.*|
             src/ansiblelint/schemas/.*\.json
           )$
   - repo: https://github.com/PyCQA/doc8

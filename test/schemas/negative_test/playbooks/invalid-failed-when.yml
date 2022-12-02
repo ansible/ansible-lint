@@ -1,0 +1,15 @@
+- hosts: localhost
+  tasks:
+    - debug:
+        msg: "failed_when should not accept numeric"
+      failed_when: 123
+
+    - debug:
+        msg: "failed_when should not accept sequence"
+      failed_when:
+        - foo
+        - bar
+
+    - debug:
+        msg: "failed_when should not accept map"
+      failed_when: {}

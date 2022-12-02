@@ -1,0 +1,12 @@
+- name: foo
+  ansible.builtin.debug:
+    msg: foo!
+  become: "{{ firewalld_become }}" # <- valid
+
+- name: foo block
+  become: "{{ firewalld_become }}" # <- valid
+  block:
+    - name: foo
+      ansible.builtin.debug:
+        msg: foo!
+      become: "{{ firewalld_become }}" # <- valid

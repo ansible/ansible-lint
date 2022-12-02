@@ -1,0 +1,3 @@
+- local_action:
+    module: ansible.builtin.debug
+    msg: hello

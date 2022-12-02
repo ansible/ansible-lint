@@ -1,0 +1,5 @@
+- hosts: localhost
+  pre_tasks: foo # <-- must be array
+  post_tasks: {} # <-- must be array
+  tasks: 1 # <-- must be array
+  handlers: 1.0 # <-- must be array

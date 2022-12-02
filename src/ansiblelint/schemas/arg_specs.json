@@ -233,7 +233,7 @@
       "title": "Option"
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-argument-specs.json",
+  "$id": "https://raw.githubusercontent.com/ansible/ansiblelint/main/src/ansiblelint/schemas/ansible-argument-specs.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
   "examples": ["meta/argument_specs.yml"],

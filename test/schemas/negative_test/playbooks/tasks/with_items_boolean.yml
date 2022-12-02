@@ -1,0 +1,2 @@
+- command: echo 123
+  with_items: true # invalid, must be a list or templated string

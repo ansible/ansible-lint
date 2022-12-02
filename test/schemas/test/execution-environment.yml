@@ -1,0 +1,21 @@
+---
+# Example from https://docs.ansible.com/automation-controller/latest/html/userguide/ee_reference.html
+version: 1
+
+build_arg_defaults:
+  EE_BASE_IMAGE: "quay.io/ansible/ansible-runner:stable-2.10-devel"
+
+ansible_config: "ansible.cfg"
+
+dependencies:
+  galaxy: requirements.yml
+  python: requirements.txt
+  system: bindep.txt
+
+additional_build_steps:
+  prepend: |
+    RUN whoami
+    RUN cat /etc/os-release
+  append:
+    - RUN echo This is a post-install command!
+    - RUN ls -la /etc

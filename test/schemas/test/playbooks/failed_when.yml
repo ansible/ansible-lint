@@ -1,0 +1,18 @@
+- hosts: localhost
+  tasks:
+    - name: foo
+      ansible.builtin.debug:
+        msg: foo!
+      failed_when: false # <- valid
+
+    - name: foo
+      ansible.builtin.debug:
+        msg: foo!
+      failed_when: "string is valid too" # <- valid
+
+    - name: foo
+      ansible.builtin.debug:
+        msg: foo!
+      failed_when: # <- lists are valid too
+        - foo
+        - bar

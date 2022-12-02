@@ -1,0 +1,11 @@
+- name: notify single handler
+  ansible.builtin.debug:
+    msg: task with single handler
+  notify: handler1
+
+- name: notify multiple handlers
+  ansible.builtin.debug:
+    msg: task with multiple handlers
+  notify:
+    - handler1
+    - handler2

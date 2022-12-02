@@ -1,0 +1,3 @@
+- hosts: localhost
+  user: foo # <-- allowed, alias to remote_user
+  tasks: []

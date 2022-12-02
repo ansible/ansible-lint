@@ -1,0 +1,6 @@
+- hosts: localhost
+  tasks:
+    - name: foo2
+      ansible.builtin.debug:
+        msg: foo!
+      run_once: "{{ true }}" # valid

@@ -1,0 +1,9 @@
+foo: bar
+_foo: bar
+foo_var_xxx: "{{ sss }}"
+in_job: ...
+nested:
+  pear: fruit
+  apple: fruit
+sso_force_handlers: ...
+force_handlers_foo: ...

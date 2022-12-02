@@ -28,8 +28,6 @@ the schema name being used as a tag, like ``schema[playbook]``,
 
 This rule is not skippable and stops further processing of the file.
 
-Schema bugs should be reported towards [schemas](https://github.com/ansible/schemas) project instead of ansible-lint.
-
 If incorrect schema was picked, you might want to either:
 
 * move the file to standard location, so its file is detected correctly.

@@ -1,0 +1,10 @@
+- command: echo 123
+  changed_when: false
+
+- command: echo 123
+  changed_when: '"1" in ["1", "2", "3"]'
+
+- command: echo 123
+  changed_when: # valid, all items must evaluate as true (AND)
+    - "foo is defined"
+    - '"1" in ["1", "2", "3"]'

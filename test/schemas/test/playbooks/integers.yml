@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  vars:
+    some: 0
+  gather_timeout: "{{ some }}"
+  tasks:
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      async: 0
+      poll: 0
+      delay: 0
+      timeout: 0
+      port: 0
+    - ansible.builtin.debug:
+        msg: "{{ item }}"
+      async: "{{ some }}"
+      poll: "{{ some }}"
+      delay: "{{ some }}"
+      timeout: "{{ some }}"
+      port: "{{ some }}"
+
+- hosts: localhost
+  gather_timeout: 0
