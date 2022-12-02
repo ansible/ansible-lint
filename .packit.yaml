@@ -15,18 +15,22 @@ srpm_build_deps:
   - python3-setuptools_scm
 jobs:
   - job: copr_build
-    metadata:
-      targets:
-        # See https://packit.dev/docs/configuration/#aliases
-        # API to get available targets: https://api.dev.testing-farm.io/v0.1/composes/public
-        - fedora-rawhide-x86_64
-        - fedora-rawhide-aarch64
-        - fedora-37-x86_64
-        - fedora-37-aarch64
-        # Missing python3-build see https://bugzilla.redhat.com/show_bug.cgi?id=2129071
-        # - centos-stream-9-aarch64
-        # - centos-stream-9-x86_64
+    targets:
+      - fedora-rawhide-aarch64 # one on PR should be enough
     trigger: pull_request
+  - job: copr_build
+    trigger: commit
+    branch: main
+    targets:
+      # See https://packit.dev/docs/configuration/#aliases
+      # API to get available targets: https://api.dev.testing-farm.io/v0.1/composes/public
+      - fedora-rawhide-x86_64
+      - fedora-rawhide-aarch64
+      - fedora-37-x86_64
+      - fedora-37-aarch64
+      # Missing python3-build see https://bugzilla.redhat.com/show_bug.cgi?id=2129071
+      # - centos-stream-9-aarch64
+      # - centos-stream-9-x86_64
   # - job: tests
   #   trigger: pull_request
   #   metadata:
