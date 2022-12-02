@@ -7,7 +7,8 @@
         "*.egg-info": true,
         ".pytest_cache": true,
         ".tox": true,
-        "__pycache__": true
+        "__pycache__": true,
+        "build": true
     },
     "git.ignoreLimitWarning": true,
     "grammarly.domain": "technical",

@@ -43,6 +43,7 @@ extend-ignore =
   # complexity is also measured by pylint: too-many-branches
   C901,
   # We use type annotations instead
+  DAR101,
   DAR104,
   # https://github.com/terrencepreilly/darglint/issues/165
   DAR301,

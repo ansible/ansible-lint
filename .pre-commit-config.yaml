@@ -187,17 +187,17 @@ repos:
     rev: 6.11.0
     hooks:
       - id: pip-compile
-        entry: pip-compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core
         language: python
-        files: ^requirements\.(in|txt)$
+        files: ^(requirements\.txt|pyproject\.toml)$
         alias: deps
         language_version: "3.9" # minimal we support officially
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
         language: python
-        files: ^requirements\.(in|txt)$
+        files: ^(requirements\.txt|pyproject\.toml)$
         alias: up
         stages: [manual]
         language_version: "3.9" # minimal we support officially
