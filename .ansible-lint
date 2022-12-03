@@ -34,7 +34,7 @@ loop_var_prefix: "{role}_"
 # Enforce variable names to follow pattern below, in addition to Ansible own
 # requirements, like avoiding python identifiers. To disable add `var-naming`
 # to skip_list.
-# var_naming_pattern: "^[a-z_][a-z0-9_]*$"
+var_naming_pattern: "^[a-z_][a-z0-9_]*$"
 
 use_default_rules: true
 # Load custom rules from this specific folder
