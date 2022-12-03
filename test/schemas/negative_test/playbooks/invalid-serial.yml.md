@@ -68,9 +68,9 @@
   {
     "instancePath": "/0/serial",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{.*\\}\\}$\"",
+    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
     "params": {
-      "pattern": "^\\{\\{.*\\}\\}$"
+      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -163,7 +163,7 @@ stdout:
         },
         {
           "path": "$[0].serial",
-          "message": "'10%BAD' does not match '^\\\\{\\\\{.*\\\\}\\\\}$'"
+          "message": "'10%BAD' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
         },
         {
           "path": "$[0].serial",

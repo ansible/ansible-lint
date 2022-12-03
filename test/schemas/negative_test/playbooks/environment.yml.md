@@ -59,9 +59,9 @@
   {
     "instancePath": "/0/environment",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{.*\\}\\}$\"",
+    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
     "params": {
-      "pattern": "^\\{\\{.*\\}\\}$"
+      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -128,7 +128,7 @@ stdout:
         },
         {
           "path": "$[0].environment",
-          "message": "'{{ foo }}-123' does not match '^\\\\{\\\\{.*\\\\}\\\\}$'"
+          "message": "'{{ foo }}-123' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
         }
       ]
     }

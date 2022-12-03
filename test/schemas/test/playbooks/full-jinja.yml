@@ -1,0 +1,9 @@
+---
+- name: Test that schema allows multiline-jinja
+  hosts: localhost
+  # https://github.com/ansible/ansible-lint/issues/2772
+  become: >-
+    {{
+      true
+    }}
+  tasks: []
