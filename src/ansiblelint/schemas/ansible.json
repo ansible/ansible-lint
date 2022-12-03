@@ -145,8 +145,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -319,8 +319,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -685,8 +685,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -893,8 +893,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"

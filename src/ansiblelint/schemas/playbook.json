@@ -154,8 +154,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -334,8 +334,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -706,8 +706,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -915,8 +915,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -1214,7 +1214,7 @@
       "type": "object"
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible-playbook.json",
+  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/playbook.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "examples": [
     "playbooks/*.yml",

@@ -10,7 +10,7 @@
   "scripts": {
     "compile": "tsc -p ./src",
     "deps": "npx npm-check-updates -u && npm install --ignore-scripts",
-    "test": "mocha"
+    "test": "python3 src/rebuild.py && mocha"
   },
   "devDependencies": {
     "@types/chai": "^4.3.3",
