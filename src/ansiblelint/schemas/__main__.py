@@ -2,7 +2,7 @@
 # pragma: no cover
 import sys
 
-from .main import refresh_schemas
+from ansiblelint.schemas.main import refresh_schemas
 
 if __name__ == "__main__":
 

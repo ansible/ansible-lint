@@ -14,9 +14,9 @@
   {
     "instancePath": "/0/ignore_errors",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{.*\\}\\}$\"",
+    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
     "params": {
-      "pattern": "^\\{\\{.*\\}\\}$"
+      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -50,9 +50,9 @@
   {
     "instancePath": "/0/ignore_errors",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{.*\\}\\}$\"",
+    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
     "params": {
-      "pattern": "^\\{\\{.*\\}\\}$"
+      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -103,7 +103,7 @@ stdout:
         },
         {
           "path": "$[0].ignore_errors",
-          "message": "'should_ignore_errors' does not match '^\\\\{\\\\{.*\\\\}\\\\}$'"
+          "message": "'should_ignore_errors' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
         },
         {
           "path": "$[0].ignore_errors",
@@ -115,7 +115,7 @@ stdout:
         },
         {
           "path": "$[0].ignore_errors",
-          "message": "'should_ignore_errors' does not match '^\\\\{\\\\{.*\\\\}\\\\}$'"
+          "message": "'should_ignore_errors' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
         },
         {
           "path": "$[0]",
