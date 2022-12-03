@@ -211,6 +211,11 @@
       "title": "Use Default Rules",
       "type": "boolean"
     },
+    "var_naming_pattern": {
+      "default": "^[a-z_][a-z0-9_]*$",
+      "title": "Regex used to verify variable names",
+      "type": "string"
+    },
     "verbosity": {
       "default": 0,
       "title": "Verbosity",
