@@ -106,8 +106,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -367,8 +367,8 @@
           "type": "string"
         },
         "diff": {
-          "title": "Diff",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Diff"
         },
         "environment": {
           "$ref": "#/$defs/environment"
@@ -564,7 +564,7 @@
       ]
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible-tasks.json",
+  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/tasks.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "examples": [
     "tasks/*.yml",

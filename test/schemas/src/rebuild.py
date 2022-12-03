@@ -80,7 +80,7 @@ if __name__ == "__main__":
         invalid_var_names.remove("__peg_parser__")
     print("Updating invalid var names")
 
-    with open("f/ansible-vars.json", "r+", encoding="utf-8") as f:
+    with open("f/vars.json", "r+", encoding="utf-8") as f:
         vars_schema = json.load(f)
         vars_schema["anyOf"][0]["patternProperties"] = {
             f"^(?!({'|'.join(invalid_var_names)})$)[a-zA-Z_][\\w]*$": {}
@@ -121,7 +121,7 @@ if __name__ == "__main__":
         sub_json["$comment"] = "Generated from ansible.json, do not edit."
         sub_json[
             "$id"
-        ] = f"https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible-{subschema}.json"
+        ] = f"https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/{subschema}.json"
 
         # Remove all unreferenced ($ref) definitions ($defs) recursively
         while True:
@@ -135,6 +135,6 @@ if __name__ == "__main__":
             if not spare:
                 break
 
-        with open(f"f/ansible-{subschema}.json", "w", encoding="utf-8") as f:
+        with open(f"f/{subschema}.json", "w", encoding="utf-8") as f:
             json.dump(sub_json, f, indent=2, sort_keys=True)
             f.write("\n")
