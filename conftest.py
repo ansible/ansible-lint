@@ -7,7 +7,6 @@ from importlib.util import find_spec
 from test.cache import refresh_cache
 from typing import Any
 
-
 # checking if user is running pytest without installing test dependencies:
 missing = []
 for module in ["ansible", "black", "flake8", "flaky", "mypy", "pylint"]:

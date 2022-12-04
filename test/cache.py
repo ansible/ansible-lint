@@ -7,6 +7,7 @@ import time
 import urllib.request
 from pathlib import Path
 from urllib.request import Request
+
 import pytest
 
 _logger = logging.getLogger(__package__)

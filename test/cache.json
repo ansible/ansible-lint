@@ -1,37 +1,37 @@
 {
-    "ansible-posix-1.4.0.tar.gz": {
-        "etag": "2b6b3e03ebcce2b2388d13b3f67672d9",
-        "url": "https://galaxy.ansible.com/download/ansible-posix-1.4.0.tar.gz",
-        "web": "https://galaxy.ansible.com/ansible/posix"
-    },
-    "community-general-6.0.1.tar.gz": {
-        "etag": "e98fa4caba01e3ed4832dc22009d12de",
-        "url": "https://galaxy.ansible.com/download/community-general-6.0.1.tar.gz"
-    },
-    "community-molecule-0.1.0.tar.gz": {
-        "etag": "6c6e7495c7d945cab5bc8e703399c629",
-        "url": "https://galaxy.ansible.com/download/community-molecule-0.1.0.tar.gz",
-        "web": "https://galaxy.ansible.com/community/molecule"
-    },
-    "community-network-5.0.0.tar.gz": {
-        "etag": "8b7f8df08496175cf8f22121999d7f76",
-        "url": "https://galaxy.ansible.com/download/community-network-5.0.0.tar.gz",
-        "web": "https://galaxy.ansible.com/community/network"
-    },
-    "geerlingguy-php_roles-0.9.3.tar.gz": {
-        "etag": "40eb654ee64a5b1f6b1249815ea518a0",
-        "home": "https://github.com/geerlingguy/php_roles",
-        "url": "https://galaxy.ansible.com/download/geerlingguy-php_roles-0.9.3.tar.gz",
-        "web": "https://galaxy.ansible.com/geerlingguy/php_roles"
-    },
-    "kubernetes-core-2.3.2.tar.gz": {
-        "etag": "9c8e9671548dbff4d5b6744c99521d82",
-        "url": "https://galaxy.ansible.com/download/kubernetes-core-2.3.2.tar.gz",
-        "web": "https://galaxy.ansible.com/kubernetes/core"
-    },
-    "role-geerlingguy.mysql-4.2.0.tar.gz": {
-        "etag": "9f7e0200846a6abb205e86ea2f1b31a93a247d9929a0904f78b29c7816369731",
-        "url": "https://github.com/geerlingguy/ansible-role-mysql/tarball/4.2.0",
-        "web": "https://github.com/geerlingguy/ansible-role-mysql"
-    }
+  "ansible-posix-1.4.0.tar.gz": {
+    "etag": "2b6b3e03ebcce2b2388d13b3f67672d9",
+    "url": "https://galaxy.ansible.com/download/ansible-posix-1.4.0.tar.gz",
+    "web": "https://galaxy.ansible.com/ansible/posix"
+  },
+  "community-general-6.0.1.tar.gz": {
+    "etag": "e98fa4caba01e3ed4832dc22009d12de",
+    "url": "https://galaxy.ansible.com/download/community-general-6.0.1.tar.gz"
+  },
+  "community-molecule-0.1.0.tar.gz": {
+    "etag": "6c6e7495c7d945cab5bc8e703399c629",
+    "url": "https://galaxy.ansible.com/download/community-molecule-0.1.0.tar.gz",
+    "web": "https://galaxy.ansible.com/community/molecule"
+  },
+  "community-network-5.0.0.tar.gz": {
+    "etag": "8b7f8df08496175cf8f22121999d7f76",
+    "url": "https://galaxy.ansible.com/download/community-network-5.0.0.tar.gz",
+    "web": "https://galaxy.ansible.com/community/network"
+  },
+  "geerlingguy-php_roles-0.9.3.tar.gz": {
+    "etag": "40eb654ee64a5b1f6b1249815ea518a0",
+    "home": "https://github.com/geerlingguy/php_roles",
+    "url": "https://galaxy.ansible.com/download/geerlingguy-php_roles-0.9.3.tar.gz",
+    "web": "https://galaxy.ansible.com/geerlingguy/php_roles"
+  },
+  "kubernetes-core-2.3.2.tar.gz": {
+    "etag": "9c8e9671548dbff4d5b6744c99521d82",
+    "url": "https://galaxy.ansible.com/download/kubernetes-core-2.3.2.tar.gz",
+    "web": "https://galaxy.ansible.com/kubernetes/core"
+  },
+  "role-geerlingguy.mysql-4.2.0.tar.gz": {
+    "etag": "9f7e0200846a6abb205e86ea2f1b31a93a247d9929a0904f78b29c7816369731",
+    "url": "https://github.com/geerlingguy/ansible-role-mysql/tarball/4.2.0",
+    "web": "https://github.com/geerlingguy/ansible-role-mysql"
+  }
 }
