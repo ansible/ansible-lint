@@ -107,6 +107,13 @@ jobs:
             ~/.cache/pre-commit
           key: galaxy-${{ matrix.name }}-${{ hashFiles('requirements.yml', '.pre-commit-config.yaml', 'pyproject.toml') }}
 
+      - name: Set fixture cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/ansible-lint/web
+          key: fixtures-${{ hashFiles('test/cache.json') }}
+
       - name: Set up Python ${{ matrix.python-version || '3.9' }}
         if: "!contains(matrix.shell, 'wsl')"
         uses: actions/setup-python@v4

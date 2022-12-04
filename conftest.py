@@ -3,6 +3,10 @@ import importlib
 import os
 import subprocess
 import sys
+from importlib.util import find_spec
+from test.cache import refresh_cache
+from typing import Any
+
 
 # checking if user is running pytest without installing test dependencies:
 missing = []
@@ -15,28 +19,7 @@ if missing:
         file=sys.stderr,
     )
     sys.exit(1)
-# we need to be sure that we have the requirements installed as some tests
-# might depend on these.
-try:
-    from ansible_compat.prerun import get_cache_dir
 
-    cache_dir = get_cache_dir(".")
-    subprocess.check_output(
-        [
-            "ansible-galaxy",
-            "collection",
-            "install",
-            "-p",
-            f"{cache_dir}/collections",
-            "-r",
-            "requirements.yml",
-        ],
-        stderr=subprocess.PIPE,
-        text=True,
-    )
-except subprocess.CalledProcessError as exc:
-    print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)
-    sys.exit(1)
 
 # flake8: noqa: E402
 from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-position
@@ -56,3 +39,34 @@ if not HAS_LIBYAML and sys.version_info >= (3, 9, 0):
 
 
 os.environ["NO_COLOR"] = "1"
+
+
+def pytest_configure(config: Any) -> None:
+
+    if refresh_cache():
+        print("File cache was updated.")
+    else:
+        print("File cache update skipped.", 0)
+
+    # we need to be sure that we have the requirements installed as some tests
+    # might depend on these.
+    # try:
+    #     from ansible_compat.prerun import get_cache_dir
+
+    #     cache_dir = get_cache_dir(".")
+    #     subprocess.check_output(
+    #         [
+    #             "ansible-galaxy",
+    #             "collection",
+    #             "install",
+    #             "-p",
+    #             f"{cache_dir}/collections",
+    #             "-r",
+    #             "requirements.yml",
+    #         ],
+    #         stderr=subprocess.PIPE,
+    #         text=True,
+    #     )
+    # except subprocess.CalledProcessError as exc:
+    #     print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)
+    #     sys.exit(1)
