@@ -64,8 +64,8 @@ if "pytest" in sys.modules:
 
     import pytest
 
-    from ansiblelint.rules import RulesCollection
-    from ansiblelint.runner import Runner
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     @pytest.mark.parametrize(
         ("test_file", "failures"),

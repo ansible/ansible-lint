@@ -3,7 +3,6 @@ import importlib
 import os
 import subprocess
 import sys
-from typing import Any
 
 # checking if user is running pytest without installing test dependencies:
 missing = []
