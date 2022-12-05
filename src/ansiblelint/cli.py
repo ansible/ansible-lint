@@ -495,7 +495,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
     for entry, default in lists_map.items():
         if getattr(cli_config, entry, None) or entry in file_config.keys():
             value = getattr(cli_config, entry, [])
-            value.extend(file_config.pop(entry, []))
+            value.extend(file_config.pop(entry, []) or {})
         else:
             value = default
         setattr(cli_config, entry, value)
