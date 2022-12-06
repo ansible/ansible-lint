@@ -44,12 +44,6 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
             raise RuntimeError(
                 f"Schema URLs cannot contain # due to python-jsonschema limitation: {url}"
             )
-        if url.startswith("https://raw.githubusercontent.com/ansible/ansible-lint"):
-            _logger.debug(
-                "Skipped updating schema that is part of the ansible-lint repository: %s",
-                url,
-            )
-            continue
         path = Path(f"{os.path.relpath(os.path.dirname(__file__))}/{kind}.json")
         _logger.debug("Refreshing %s schema ...", kind)
         request = Request(url)
@@ -69,14 +63,16 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
                         f_out.write(content)
                         f_out.truncate()
                         os.fsync(f_out.fileno())
-        except urllib.error.HTTPError as exc:
-            if exc.code == 304:
+        except (ConnectionError, OSError) as exc:
+            if (
+                isinstance(exc, urllib.error.HTTPError)
+                and getattr(exc, "code", None) == 304
+            ):
                 _logger.debug("Schema %s is not modified", url)
                 continue
-            _logger.warning(
-                "Skipped schema refresh due to unexpected exception: %s", exc
-            )
-            return 0
+            # In case of networking issues, we just stop and use last-known good
+            _logger.debug("Skipped schema refresh due to unexpected exception: %s", exc)
+            break
     if changed:
         with open(store_file, "w", encoding="utf-8") as f_out:
             json.dump(JSON_SCHEMAS, f_out, indent=4, sort_keys=True)
