@@ -49,14 +49,17 @@ jobs:
           # keep list sorted as it determines UI order too
           # linux
           - tox_env: lint
-          - tox_env: pkg,hook,docs
+          - name: pkg-hook-docs
+            tox_env: pkg,hook,docs
           - tox_env: schemas
           - tox_env: eco # slow, keep separated
-          - tox_env: py39,py39-devel
+          - name: py39
+            tox_env: py39,py39-devel
             python-version: 3.9
           - tox_env: py310
             python-version: "3.10"
-          - tox_env: py311,py311-devel
+          - name: py311
+            tox_env: py311,py311-devel
             python-version: "3.11"
           # macos
           - name: py39 (macos)
@@ -77,7 +80,7 @@ jobs:
 
     env:
       # vars safe to be passed to wsl:
-      WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV
+      WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:GITHUB_STEP_SUMMARY
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
       PYTEST_REQPASS: 728
@@ -105,7 +108,7 @@ jobs:
             ~/.ansible/collections/ansible_collections
             ~/.ansible/roles/
             ~/.cache/pre-commit
-          key: galaxy-${{ matrix.name }}-${{ hashFiles('requirements.yml', '.pre-commit-config.yaml', 'pyproject.toml') }}
+          key: galaxy-${{ matrix.name || matrix.tox_env }}-${{ hashFiles('requirements.yml', '.pre-commit-config.yaml', 'pyproject.toml') }}
 
       - name: Set up Python ${{ matrix.python-version || '3.9' }}
         if: "!contains(matrix.shell, 'wsl')"
@@ -163,6 +166,7 @@ jobs:
 
       - name: Report failure if git reports dirty status
         run: |
+          git checkout HEAD -- src/ansiblelint/schemas/__store__.json
           if [[ -n $(git status -s) ]]; then
             # shellcheck disable=SC2016
             echo -n '::error file=git-status::'
