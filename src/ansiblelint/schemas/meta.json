@@ -786,7 +786,9 @@
               "8.4",
               "8.5",
               "8.6",
+              "8.7",
               "9.0",
+              "9.1",
               "all"
             ],
             "type": "string"
@@ -1260,6 +1262,9 @@
           },
           {
             "$ref": "#/$defs/OpenWRTPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/OracleLinuxPlatformModel"
           },
           {
             "$ref": "#/$defs/os10PlatformModel"
