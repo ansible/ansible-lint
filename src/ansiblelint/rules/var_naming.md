@@ -5,7 +5,7 @@ This rule checks variable names to ensure they conform with requirements.
 Variable names must contain only lowercase alphanumeric characters and the underscore `_` character.
 Variable names must also start with either an alphabetic or underscore `_` character.
 
-For more information see the [creating valid variable names](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#creating-valid-variable-names) topic in Ansible documentation.
+For more information see the [creating valid variable names](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#creating-valid-variable-names) topic in Ansible documentation.
 
 ## Problematic Code
 
