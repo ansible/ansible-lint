@@ -21,7 +21,7 @@ Do not store resources at the same directory level as your Ansible playbook or t
 Doing this can result in disorganized projects and cause user confusion when distinguishing between resources of the same type, such as YAML.
 ```
 
-See [task paths](https://docs.ansible.com/ansible/latest/user_guide/playbook_pathing.html#task-paths) in the Ansible documentation for more information.
+See [task paths](https://docs.ansible.com/ansible/latest/playbook_guide/playbook_pathing.html#task-paths) in the Ansible documentation for more information.
 
 ## Problematic Code
 

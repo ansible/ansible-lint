@@ -52,7 +52,7 @@
     "inventory/*.yml",
     "inventory/*.yaml"
   ],
-  "markdownDescription": "All keys at top levels are groups with `all` and `ungrouped` having a special meaning.\n\nSee [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)",
+  "markdownDescription": "All keys at top levels are groups with `all` and `ungrouped` having a special meaning.\n\nSee [How to build your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html)",
   "properties": {
     "all": {
       "$ref": "#/$defs/special-group"

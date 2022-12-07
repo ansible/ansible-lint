@@ -24,6 +24,6 @@
     "host_vars/*.yml",
     "group_vars/*.yml"
   ],
-  "markdownDescription": "See [Using Variables](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html)",
+  "markdownDescription": "See [Using Variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html)",
   "title": "Ansible Vars Schema"
 }

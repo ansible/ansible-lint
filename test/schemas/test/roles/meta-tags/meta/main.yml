@@ -1,5 +1,5 @@
 ---
-# https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-dependencies
+# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies
 dependencies:
   - role: foo
     tags: fruit # simple string allowed

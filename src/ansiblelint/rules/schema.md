@@ -27,13 +27,13 @@ Maintained in the [ansible-navigator](https://github.com/ansible/ansible-navigat
 - `schema[arg_specs]` validates [module argument specs](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)
 - `schema[execution-environment]` validates [execution environments](https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html)
 - `schema[galaxy]` validates [collection metadata](https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html).
-- `schema[inventory]` validates [inventory files](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) that match `inventory/*.yml`.
+- `schema[inventory]` validates [inventory files](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html) that match `inventory/*.yml`.
 - `schema[meta-runtime]` validates [runtime information](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory-and-runtime-yml) that matches `meta/runtime.yml`
-- `schema[meta]` validates metadata for roles that match `meta/main.yml`. See [role-dependencies](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-dependencies) or [role/metadata.py](https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79)) for details.
+- `schema[meta]` validates metadata for roles that match `meta/main.yml`. See [role-dependencies](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies) or [role/metadata.py](https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79)) for details.
 - `schema[playbook]` validates Ansible playbooks.
 - `schema[requirements]` validates Ansible [requirements](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#install-multiple-collections-with-a-requirements-file) files that match `requirements.yml`.
 - `schema[tasks]` validates Ansible task files that match `tasks/**/*.yml`.
-- `schema[vars]` validates Ansible [variables](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html) that match `vars/*.yml` and `defaults/*.yml`.
+- `schema[vars]` validates Ansible [variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) that match `vars/*.yml` and `defaults/*.yml`.
 
 ## schema[meta]
 
