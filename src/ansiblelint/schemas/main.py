@@ -75,7 +75,8 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
             break
     if changed:
         with open(store_file, "w", encoding="utf-8") as f_out:
-            json.dump(JSON_SCHEMAS, f_out, indent=4, sort_keys=True)
+            # formatting should match our .prettierrc.yaml
+            json.dump(JSON_SCHEMAS, f_out, indent=2, sort_keys=True)
     else:
         store_file.touch()
         changed = 1
