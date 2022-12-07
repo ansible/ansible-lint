@@ -100,15 +100,22 @@ jobs:
         with:
           fetch-depth: 0 # needed by setuptools-scm
 
-      - name: Set caches
+      - name: Set pre-commit cache
         uses: actions/cache@v3
+        if: ${{ matrix.tox_env == 'lint' }}
         with:
           path: |
-            ~/.ansible/galaxy_cache
-            ~/.ansible/collections/ansible_collections
-            ~/.ansible/roles/
             ~/.cache/pre-commit
-          key: galaxy-${{ matrix.name || matrix.tox_env }}-${{ hashFiles('requirements.yml', '.pre-commit-config.yaml', 'pyproject.toml') }}
+          key: pre-commit-${{ matrix.name || matrix.tox_env }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Set galaxy cache
+        uses: actions/cache@v3
+        if: ${{ startsWith(matrix.tox_env, 'py') }}
+        with:
+          path: |
+            examples/playbooks/collections/*.tar.gz
+            examples/playbooks/collections/ansible_collections
+          key: galaxy-${{ hashFiles('examples/playbooks/collections/requirements.yml') }}
 
       - name: Set up Python ${{ matrix.python-version || '3.9' }}
         if: "!contains(matrix.shell, 'wsl')"
@@ -129,7 +136,7 @@ jobs:
       - name: Install tox
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade "tox>=4.0.0rc1"
+          python3 -m pip install --upgrade "tox>=4.0.0"
 
       - name: Log installed dists
         run: python3 -m pip freeze --all
