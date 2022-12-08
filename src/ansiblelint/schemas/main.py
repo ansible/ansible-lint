@@ -1,14 +1,39 @@
 """Module containing cached JSON schemas."""
+from __future__ import annotations
+
 import json
 import logging
 import os
 import sys
 import time
 import urllib.request
+from collections import defaultdict
+from functools import lru_cache
 from pathlib import Path
+from typing import Any
 from urllib.request import Request
 
+import jsonschema
+import yaml
+from jsonschema.exceptions import ValidationError
+
+from ansiblelint.file_utils import Lintable
+from ansiblelint.loaders import yaml_load_safe
+
 _logger = logging.getLogger(__package__)
+
+
+class SchemaCacheDict(defaultdict):  # type: ignore
+    """Caching schema store."""
+
+    def __missing__(self, key: str) -> Any:
+        """Load schema on its first use."""
+        value = get_schema(key)
+        self[key] = value
+        return value
+
+
+_schema_cache = SchemaCacheDict()
 
 
 # Maps kinds to JSON schemas
@@ -16,6 +41,34 @@ _logger = logging.getLogger(__package__)
 store_file = Path(f"{__file__}/../__store__.json").resolve()
 with open(store_file, encoding="utf-8") as json_file:
     JSON_SCHEMAS = json.load(json_file)
+
+
+@lru_cache(maxsize=None)
+def get_schema(kind: str) -> Any:
+    """Return the schema for the given kind."""
+    schema_file = os.path.dirname(__file__) + "/" + kind + ".json"
+    with open(schema_file, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def validate_file_schema(file: Lintable) -> list[str]:
+    """Return list of JSON validation errors found."""
+    if file.kind not in JSON_SCHEMAS:
+        return [f"Unable to find JSON Schema '{file.kind}' for '{file.path}' file."]
+    try:
+        # convert yaml to json (keys are converted to strings)
+        yaml_data = yaml_load_safe(file.content)
+        json_data = json.loads(json.dumps(yaml_data))
+        # file.data = json_data
+        jsonschema.validate(
+            instance=json_data,
+            schema=_schema_cache[file.kind],
+        )
+    except yaml.constructor.ConstructorError as exc:
+        return [f"Failed to load YAML file '{file.path}': {exc.problem}"]
+    except ValidationError as exc:
+        return [exc.message]
+    return []
 
 
 # pylint: disable=too-many-branches
@@ -63,6 +116,8 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
                         f_out.write(content)
                         f_out.truncate()
                         os.fsync(f_out.fileno())
+                        # unload possibly loaded schema
+                        del _schema_cache[kind]
         except (ConnectionError, OSError) as exc:
             if (
                 isinstance(exc, urllib.error.HTTPError)
@@ -77,6 +132,8 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         with open(store_file, "w", encoding="utf-8") as f_out:
             # formatting should match our .prettierrc.yaml
             json.dump(JSON_SCHEMAS, f_out, indent=2, sort_keys=True)
+        # clear schema cache
+        get_schema.cache_clear()
     else:
         store_file.touch()
         changed = 1

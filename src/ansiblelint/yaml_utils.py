@@ -1096,3 +1096,33 @@ class FormattedYAML(YAML):
             FormattedEmitter.drop_octothorpe_protection(line) for line in lines
         )
         return text
+
+
+def clean_json(
+    obj: Any,
+    func: Callable[[str], Any] = lambda key: key.startswith("__")
+    if isinstance(key, str)
+    else False,
+) -> Any:
+    """
+    Remove all keys matching the condition from a nested JSON-like object.
+
+    :param obj: a JSON like object to clean, also returned for chaining.
+    :param func: a callable that takes a key in argument and return True for each key to delete
+    """
+    if isinstance(obj, dict):
+        for key in list(obj.keys()):
+            if func(key):
+                del obj[key]
+            else:
+                clean_json(obj[key], func)
+    elif isinstance(obj, list):
+        for i in reversed(range(len(obj))):
+            if func(obj[i]):
+                del obj[i]
+            else:
+                clean_json(obj[i], func)
+    else:
+        # neither a dict nor a list, do nothing
+        pass
+    return obj

@@ -183,6 +183,7 @@ class Lintable:
         name: str | Path,
         content: str | None = None,
         kind: FileType | None = None,
+        base_kind: str = "",
     ):
         """Create a Lintable instance."""
         self.dir: str = ""
@@ -236,7 +237,7 @@ class Lintable:
                 self.dir = str(self.path.parent.resolve())
 
         # determine base file kind (yaml, xml, ini, ...)
-        self.base_kind = kind_from_path(self.path, base=True)
+        self.base_kind = base_kind or kind_from_path(self.path, base=True)
         self.abspath = self.path.expanduser().absolute()
 
     def __getitem__(self, key: Any) -> Any:

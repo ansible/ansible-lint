@@ -16,12 +16,14 @@ from ansiblelint.constants import (
     INVALID_CONFIG_RC,
 )
 from ansiblelint.file_utils import (
+    Lintable,
     abspath,
     expand_path_vars,
     guess_project_dir,
     normpath,
 )
-from ansiblelint.loaders import YAMLError, yaml_load_safe
+from ansiblelint.schemas.main import validate_file_schema
+from ansiblelint.yaml_utils import clean_json
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [
@@ -64,28 +66,18 @@ def load_config(config_file: str) -> dict[Any, Any]:
         # a missing default config file should not trigger an error
         return {}
 
-    try:
-        with open(config_path, encoding="utf-8") as stream:
-            config = yaml_load_safe(stream)
-            # We want to allow passing /dev/null to disable config use
-            if config is None:
-                return {}
-            if not isinstance(config, dict):
-                _logger.error("Invalid configuration file %s", config_path)
-                sys.exit(INVALID_CONFIG_RC)
-    except YAMLError as exc:
-        _logger.error(exc)
+    config_lintable = Lintable(
+        config_path, kind="ansible-lint-config", base_kind="text/yaml"
+    )
+
+    for error in validate_file_schema(config_lintable):
+        _logger.error("Invalid configuration file %s. %s", config_path, error)
         sys.exit(INVALID_CONFIG_RC)
 
+    config = clean_json(config_lintable.data)
+    if not isinstance(config, dict):
+        raise RuntimeError("Schema failed to properly validate the config file.")
     config["config_file"] = config_path
-    # See https://github.com/ansible/ansible-lint/issues/1803
-    if isinstance(config, list):
-        _logger.error(
-            "Invalid configuration '%s', expected YAML mapping in the config file.",
-            config_path,
-        )
-        sys.exit(INVALID_CONFIG_RC)
-
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
 
