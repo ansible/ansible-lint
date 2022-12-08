@@ -178,6 +178,8 @@ repos:
     rev: v2.15.8
     hooks:
       - id: pylint
+        args:
+          - --output-format=colorized
         additional_dependencies:
           - ansible-compat>=2.2.6
           - ansible-core>=2.14.0

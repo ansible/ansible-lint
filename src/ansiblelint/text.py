@@ -2,6 +2,10 @@
 from __future__ import annotations
 
 import re
+from functools import lru_cache
+
+RE_HAS_JINJA = re.compile(r"{[{%#].*[%#}]}", re.DOTALL)
+RE_HAS_GLOB = re.compile("[][*?]")
 
 
 def strip_ansi_escape(data: str | bytes) -> str:
@@ -32,3 +36,15 @@ def removeprefix(self: str, prefix: str) -> str:
     if self.startswith(prefix):
         return self[len(prefix) :]
     return self[:]
+
+
+@lru_cache(maxsize=None)
+def has_jinja(value: str) -> bool:
+    """Return true if a string seems to contain jinja templating."""
+    return bool(isinstance(value, str) and RE_HAS_JINJA.search(value))
+
+
+@lru_cache(maxsize=None)
+def has_glob(value: str) -> bool:
+    """Return true if a string looks like having a glob pattern."""
+    return bool(isinstance(value, str) and RE_HAS_GLOB.search(value))
