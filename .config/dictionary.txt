@@ -160,6 +160,7 @@ jsonfile
 jsonschema
 junitxml
 keepends
+keyserver
 konstruktoid
 kubernetes
 kubevirt
@@ -254,6 +255,7 @@ pytest
 pyupgrade
 pyyaml
 redirections
+reexec
 regexes
 releasenotes
 relpath

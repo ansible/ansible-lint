@@ -50,12 +50,12 @@ def test_role_tasks(default_text_runner: RunFromText) -> None:
 def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:
     """Check that blocks in role tasks can contain skips."""
     results = default_text_runner.run_role_tasks_main(ROLE_TASKS_WITH_BLOCK)
-    assert len(results) == 4
+    assert len(results) == 12
 
 
 @pytest.mark.parametrize(
     ("lintable", "expected"),
-    (pytest.param("examples/playbooks/test_skip_inside_yaml.yml", 7, id="yaml"),),
+    (pytest.param("examples/playbooks/test_skip_inside_yaml.yml", 11, id="yaml"),),
 )
 def test_inline_skips(
     default_rules_collection: RulesCollection, lintable: str, expected: int

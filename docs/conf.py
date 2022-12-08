@@ -291,6 +291,8 @@ linkcheck_anchors_ignore = [
 nitpicky = True
 nitpick_ignore = [
     ("py:class", "AnsibleBaseYAMLObject"),
+    ("py:class", "ansible.module_utils.basic.AnsibleModule"),
+    ("py:class", "ansible.plugins.loader.PluginLoadContext"),
     ("py:class", "BasePathLike"),
     ("py:class", "CommentedMap"),
     ("py:class", "CommentedSeq"),

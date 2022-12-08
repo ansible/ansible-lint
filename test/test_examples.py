@@ -12,7 +12,7 @@ def test_example(default_rules_collection: RulesCollection) -> None:
     result = Runner(
         "examples/playbooks/example.yml", rules=default_rules_collection
     ).run()
-    assert len(result) == 19
+    assert len(result) == 22
 
 
 @pytest.mark.parametrize(

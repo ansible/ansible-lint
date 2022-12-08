@@ -101,11 +101,11 @@ PLAYBOOK_WITH_BLOCK = """\
 @pytest.mark.parametrize(
     ("playbook", "length"),
     (
-        pytest.param(PLAYBOOK_PRE_TASKS, 2, id="PRE_TASKS"),
-        pytest.param(PLAYBOOK_POST_TASKS, 2, id="POST_TASKS"),
-        pytest.param(PLAYBOOK_HANDLERS, 2, id="HANDLERS"),
-        pytest.param(PLAYBOOK_TWO_PLAYS, 2, id="TWO_PLAYS"),
-        pytest.param(PLAYBOOK_WITH_BLOCK, 4, id="WITH_BLOCK"),
+        pytest.param(PLAYBOOK_PRE_TASKS, 6, id="PRE_TASKS"),
+        pytest.param(PLAYBOOK_POST_TASKS, 6, id="POST_TASKS"),
+        pytest.param(PLAYBOOK_HANDLERS, 6, id="HANDLERS"),
+        pytest.param(PLAYBOOK_TWO_PLAYS, 6, id="TWO_PLAYS"),
+        pytest.param(PLAYBOOK_WITH_BLOCK, 12, id="WITH_BLOCK"),
     ),
 )
 def test_pre_tasks(
