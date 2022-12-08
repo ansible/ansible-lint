@@ -23,10 +23,10 @@
 from __future__ import annotations
 
 import os
-import re
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.text import has_glob, has_jinja
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -44,9 +44,6 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     severity = "VERY_HIGH"
     tags = ["deprecations"]
     version_added = "historic"
-
-    _jinja = re.compile(r"{[{%].*[%}]}", re.DOTALL)
-    _glob = re.compile("[][*?]")
 
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
@@ -80,13 +77,13 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     def _matchvar(
         self, varstring: str, task: dict[str, Any], loop_type: str
     ) -> bool | str:
-        if isinstance(varstring, str) and not self._jinja.match(varstring):
+        if isinstance(varstring, str) and not has_jinja(varstring):
             valid = loop_type == "with_fileglob" and bool(
-                self._jinja.search(varstring) or self._glob.search(varstring)
+                has_jinja(varstring) or has_glob(varstring)
             )
 
             valid |= loop_type == "with_filetree" and bool(
-                self._jinja.search(varstring) or varstring.endswith(os.sep)
+                has_jinja(varstring) or varstring.endswith(os.sep)
             )
             if not valid:
                 message = (
