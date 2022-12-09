@@ -216,9 +216,6 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     _logger.debug(os.getcwd())
 
     if not options.offline:
-        # refresh schemas must happen before loading rules
-        if "ansiblelint.schemas" in sys.modules:
-            raise RuntimeError("ansiblelint.schemas should not be loaded yet")
         # pylint: disable=import-outside-toplevel
         from ansiblelint.schemas import refresh_schemas
 

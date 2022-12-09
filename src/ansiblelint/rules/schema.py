@@ -1,23 +1,13 @@
 """Rule definition for JSON Schema Validations."""
 from __future__ import annotations
 
-import json
 import logging
-import os
 import sys
-from functools import lru_cache
-from typing import Any
-
-import yaml
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.loaders import yaml_load_safe
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.schemas import JSON_SCHEMAS
-from ansiblelint.schemas import __file__ as schemas_module
+from ansiblelint.schemas import JSON_SCHEMAS, validate_file_schema
 
 _logger = logging.getLogger(__name__)
 
@@ -45,37 +35,23 @@ class ValidateSchemaRule(AnsibleLintRule):
     tags = ["core", "experimental"]
     version_added = "v6.1.0"
 
-    @staticmethod
-    @lru_cache(maxsize=None)
-    def _get_schema(kind: str) -> Any:
-        """Return the schema for the given kind."""
-        schema_file = os.path.dirname(schemas_module) + "/" + kind + ".json"
-        with open(schema_file, encoding="utf-8") as f:
-            return json.load(f)
-
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return JSON validation errors found as a list of MatchError(s)."""
         result = []
         if file.kind not in JSON_SCHEMAS:
             return []
 
-        try:
-            # convert yaml to json (keys are converted to strings)
-            yaml_data = yaml_load_safe(file.content)
-            json_data = json.loads(json.dumps(yaml_data))
-            validate(
-                instance=json_data,
-                schema=ValidateSchemaRule._get_schema(file.kind),
-            )
-        except yaml.constructor.ConstructorError:
-            _logger.debug(
-                "Ignored failure to load %s for schema validation, as !vault may cause it."
-            )
-            return []
-        except ValidationError as exc:
+        errors = validate_file_schema(file)
+        if errors:
+            if errors[0].startswith("Failed to load YAML file"):
+                _logger.debug(
+                    "Ignored failure to load %s for schema validation, as !vault may cause it."
+                )
+                return []
+
             result.append(
                 MatchError(
-                    message=exc.message,
+                    message=errors[0],
                     filename=file,
                     rule=ValidateSchemaRule(),
                     details=ValidateSchemaRule.description,

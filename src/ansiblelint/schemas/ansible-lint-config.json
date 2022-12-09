@@ -19,6 +19,11 @@
   "additionalProperties": false,
   "examples": [".ansible-lint", ".config/ansible-lint.yml"],
   "properties": {
+    "display_relative_path": {
+      "default": true,
+      "title": "Configure how to display file paths",
+      "type": "boolean"
+    },
     "enable_list": {
       "items": {
         "type": "string"

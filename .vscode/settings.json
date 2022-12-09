@@ -10,6 +10,7 @@
         "__pycache__": true,
         "build": true
     },
+    "python.analysis.exclude": ["build"],
     "git.ignoreLimitWarning": true,
     "grammarly.domain": "technical",
     "grammarly.files.include": [

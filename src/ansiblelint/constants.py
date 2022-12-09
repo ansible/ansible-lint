@@ -60,6 +60,7 @@ FileType = Literal[
     "requirements",
     "role",  # that is a folder!
     "yaml",  # generic yaml file, previously reported as unknown file type
+    "ansible-lint-config",
     "",  # unknown file type
 ]
 
