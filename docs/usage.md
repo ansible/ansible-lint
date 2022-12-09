@@ -59,7 +59,7 @@ When you call `ansible-lint` without arguments, it uses internal heuristics to d
 You can specify the list of **roles** or **playbooks** that you want to lint with the `-p` argument.
 For example, to lint `examples/playbooks/play.yml` and `examples/roles/bobbins`, use the following command:
 
-```{command-output} ansible-lint -p examples/playbooks/play.yml examples/roles/bobbins
+```{command-output} ansible-lint --offline -p examples/playbooks/play.yml examples/roles/bobbins
    :cwd: ..
    :returncode: 2
    :nostderr: true
@@ -70,7 +70,7 @@ For example, to lint `examples/playbooks/play.yml` and `examples/roles/bobbins`,
 Ansible-lint includes an `ansible-lint/examples` folder that contains example playbooks with different rule violations and undesirable characteristics.
 You can run `ansible-lint` on the example playbooks to observe Ansible-lint in action, as follows:
 
-```{command-output} ansible-lint -p examples/playbooks/example.yml
+```{command-output} ansible-lint --offline -p examples/playbooks/example.yml
    :cwd: ..
    :returncode: 2
    :nostderr: true
@@ -78,15 +78,15 @@ You can run `ansible-lint` on the example playbooks to observe Ansible-lint in a
 
 Ansible-lint also handles playbooks that include other playbooks, tasks, handlers, or roles, as the `examples/playbooks/include.yml` example demonstrates.
 
-```{command-output} ansible-lint --force-color --offline -p examples/playbooks/include.yml
+```{command-output} ansible-lint --offline --force-color --offline -p examples/playbooks/include.yml
    :cwd: ..
    :returncode: 2
    :nostderr: true
 ```
 
-You can generate `JSON` reports based on the codeclimate specification as the `examples/playbooks/norole.yml` example demonstrates.
+You can generate `JSON` reports based on the code-climate specification as the `examples/playbooks/norole.yml` example demonstrates.
 
-```{command-output} ansible-lint -f json examples/playbooks/norole.yml
+```{command-output} ansible-lint --offline -f json examples/playbooks/norole.yml
    :cwd: ..
    :returncode: 2
    :nostderr: true
