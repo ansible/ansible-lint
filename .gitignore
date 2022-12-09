@@ -67,3 +67,4 @@ test/eco
 docs/profiles.md
 test/schemas/node_modules
 .envrc
+collections

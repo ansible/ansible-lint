@@ -8,6 +8,6 @@
 - name: name | This prefix is incomplete
   ansible.builtin.assert:
     that: true
-- name: rule-name-prefix-fail | This is correctly named
+- name: rule-name-prefix-fail | This is correctly | named too
   ansible.builtin.assert:
     that: true
