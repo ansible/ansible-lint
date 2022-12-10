@@ -15,6 +15,7 @@ exclude: >
   (?x)^(
     .vscode/extensions.json|
     .vscode/settings.json|
+    examples/broken/encoding.j2|
     test/schemas/data/licenses.json|
     test/schemas/package-lock.json|
     test/schemas/negative_test|
@@ -96,10 +97,13 @@ repos:
         exclude: >
           (?x)^(
             .config/dictionary.txt|
+            examples/broken/encoding.j2|
             test/schemas/negative_test/.*|
             test/schemas/test/.*|
             src/ansiblelint/schemas/.*\.json
           )$
+        additional_dependencies:
+          - tomli
   - repo: https://github.com/PyCQA/doc8
     rev: v1.0.0
     hooks:
@@ -159,6 +163,7 @@ repos:
           - black>=22.10.0
           - filelock
           - pytest>=7.2.0
+          - pyyaml
           - rich>=11.0.0
           - ruamel.yaml
           - sphinx>=4.4.0
@@ -199,7 +204,7 @@ repos:
     rev: 6.11.0
     hooks:
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core
         language: python
         files: ^(requirements\.txt|pyproject\.toml)$
         alias: deps
@@ -207,7 +212,7 @@ repos:
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=requirements.txt setup.cfg --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
         language: python
         files: ^(requirements\.txt|pyproject\.toml)$
         alias: up

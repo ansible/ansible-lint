@@ -2,15 +2,107 @@
 requires = [
   "setuptools >= 63.0.0", # required by pyproject+setuptools_scm integration
   "setuptools_scm[toml] >= 7.0.5", # required for "no-local-version" scheme
-  "wheel",
+
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+# https://peps.python.org/pep-0621/#readme
+requires-python = ">=3.8"
+dynamic = ["version"]
+name = "ansible-lint"
+description = "Checks playbooks for practices and behavior that could potentially be improved"
+readme = "README.md"
+authors = [{ "name" = "Will Thames", "email" = "will@thames.id.au" }]
+maintainers = [{ "name" = "Ansible by Red Hat", "email" = "info@ansible.com" }]
+license = { text = "GPLv3+" }
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python",
+  "Topic :: System :: Systems Administration",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Utilities",
+]
+keywords = ["ansible", "lint"]
+dependencies = [
+  # Special order section for helping pip:
+  "will-not-work-on-windows-try-from-wsl-instead; platform_system=='Windows'",
+  "ansible-core>=2.12.0,<2.14.0; python_version<'3.9'", # GPLv3
+  "ansible-core>=2.12.0; python_version>='3.9'", # GPLv3
+  "ansible-compat>=2.2.7", # GPLv3
+  # alphabetically sorted:
+  "black>=22.8.0", # MIT
+  "filelock>=3.3.0", # The Unlicense
+  "jsonschema>=4.10.0", # MIT, version needed for improved errors
+  "packaging>=21.3", # Apache-2.0,BSD-2-Clause
+  "pyyaml>=5.4.1", # MIT (centos 9 has 5.3.1)
+  "rich>=12.0.0", # MIT
+  "ruamel.yaml>=0.17.21,<0.18", # MIT, next version is planned to have breaking changes
+  "yamllint >= 1.26.3", # GPLv3
+  "wcmatch>=8.1.2", # MIT
+
+]
+
+[project.urls]
+homepage = "https://github.com/ansible/ansible-lint"
+documentation = "https://ansible-lint.readthedocs.io/"
+repository = "https://github.com/ansible/ansible-lint"
+changelog = "https://github.com/ansible/ansible-lint/releases"
+
+[project.optional-dependencies]
+docs = [
+  "myst-parser >= 0.16.1",
+  "pipdeptree >= 2.2.1",
+  "sphinx >= 4.4.0",
+  "sphinx-ansible-theme >= 0.9.1",
+  "sphinx-rtd-theme >= 1.0.0, < 2.0.0", # 1.0.0 broke rendering
+  "sphinxcontrib-apidoc >= 0.3.0",
+  "sphinxcontrib-programoutput2 >= 2.0a1",
+]
+test = [
+  "coverage-enable-subprocess", # see https://github.com/nedbat/coveragepy/issues/1341#issuecomment-1228942657
+  "coverage[toml] >= 6.4.4",
+  "pytest >= 7.2.0",
+  "pytest-mock",
+  "pytest-plus >= 0.2", # for PYTEST_REQPASS
+  "pytest-xdist >= 2.1.0",
+  "psutil", # soft-dep of pytest-xdist
+  "black", # IDE support
+  "mypy", # IDE support
+  "pylint", # IDE support
+  "flake8", # IDE support
+  "flake8-future-annotations", # IDE support
+
+]
+
+[project.scripts]
+ansible-lint = "ansiblelint.__main__:_run_cli_entrypoint"
 
 [tool.black]
 target-version = ["py38"]
 
+[tool.codespell]
+skip = ".tox,.mypy_cache,build,.git,.eggs,pip-wheel-metadata"
+# indention is a typo in ruamel.yaml's API
+ignore-words-list = "indention"
+
 [tool.coverage.run]
-source_pkgs = ["ansiblelint"]
+source = ["src"]
 branch = true
 parallel = true
 concurrency = ["multiprocessing", "thread"]
@@ -28,7 +120,130 @@ skip_empty = true
 
 [tool.isort]
 profile = "black"
-add_imports = "from __future__ import annotations"
+# add_imports = "from __future__ import annotations"
+known_first_party = "ansiblelint"
+known_third_party = "ansible,pytest,ruamel,setuptools,sphinx,yaml"
+# https://black.readthedocs.io/en/stable/the_black_code_style.html#line-length
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
+
+[tool.mypy]
+python_version = 3.9
+color_output = true
+error_summary = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+# disallow_any_unimported = True
+# warn_redundant_casts = True
+# warn_return_any = True
+# warn_unused_configs = True
+# site-packages is here to help vscode mypy integration getting confused
+exclude = "(build|dist|test/local-content|site-packages|~/.pyenv)"
+
+[[tool.mypy.overrides]]
+module = ["ansible.*", "yamllint.*", "ansiblelint._version"]
+ignore_missing_imports = true
+ignore_errors = true
+
+[tool.pylint.MAIN]
+extension-pkg-allow-list = ["black.parsing"]
+
+[tool.pylint.IMPORTS]
+preferred-modules = ["py:pathlib", "unittest:pytest"]
+
+[tool.pylint.MASTER]
+# pylint defaults + f,fh,v,id
+good-names = ["i", "j", "k", "ex", "Run", "_", "f", "fh", "v", "id", "T"]
+# Ignore as being generated:
+ignore-paths = "^src/ansiblelint/_version.*$"
+
+[tool.pylint."MESSAGES CONTROL"]
+# increase from default is 50 which is too aggressive
+max-statements = 60
+disable = [
+  # On purpose disabled as we rely on black
+  "line-too-long",
+  # TODO(ssbarnea): remove temporary skips adding during initial adoption:
+  "duplicate-code",
+  # unable to disable it inside tests
+  # https://github.com/PyCQA/pylint/issues/850
+  "cyclic-import",
+]
+
+[tool.pylint.TYPECHECK]
+# pylint is unable to detect Namespace attributes and will throw a E1101
+generated-members = "options.*"
+
+[tool.pylint.SUMMARY]
+# We don't need the score spamming console, as we either pass or fail
+score = "n"
+
+# spell-checker:ignore filterwarnings norecursedirs optionflags
+[tool.pytest.ini_options]
+# do not add options here as this will likely break either console runs or IDE
+# integration like vscode or pycharm
+addopts = "-p no:pytest_cov"
+# https://code.visualstudio.com/docs/python/testing
+# coverage is re-enabled in `tox.ini`. That approach is safer than
+# `--no-cov` which prevents activation from tox.ini and which also fails
+# when plugin is effectively missing.
+doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
+filterwarnings = [
+  "error",
+  # Ansible originated
+  "ignore:The _yaml extension module is now located at yaml._yaml and its location is subject to change:DeprecationWarning:",
+  # Ansible insides on py310:
+  "ignore:_SixMetaPathImporter:ImportWarning",
+  "ignore:_AnsibleCollectionFinder:ImportWarning",
+  "ignore:_AnsibleCollectionRootPkgLoader:ImportWarning",
+  "ignore:_AnsibleCollectionNSPkgLoader.exec_module:ImportWarning",
+  "ignore:_AnsibleCollectionPkgLoader.exec_module:ImportWarning",
+  "ignore:_AnsiblePathHookFinder.find_spec:ImportWarning",
+  "ignore:The distutils package is deprecated and slated for removal:DeprecationWarning",
+  # TODO: delete the following ignores once Ansible that we support gets rid of `imp`
+  # Ref: https://github.com/ansible/ansible-lint/pull/734
+  "ignore:the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses:DeprecationWarning:ansible.plugins.loader",
+]
+junit_duration_report = "call"
+# Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
+# https://github.com/shyim/junit-report-annotations-action/issues/3#issuecomment-663241378
+junit_family = "xunit1"
+junit_suite_name = "ansible_lint_test_suite"
+minversion = "4.6.6"
+norecursedirs = [
+  "build",
+  "collections",
+  "dist",
+  "docs",
+  "src/ansible_lint.egg-info",
+  ".cache",
+  ".eggs",
+  ".git",
+  ".github",
+  ".tox",
+  "*.egg",
+]
+python_files = [
+  "test_*.py",
+  # Ref: https://docs.pytest.org/en/latest/reference.html#confval-python_files
+  # Needed to discover legacy nose test modules:
+  "Test*.py",
+  # Needed to discover embedded Rule tests
+  "rules/*.py",
+]
+# Using --pyargs instead of testpath as we embed some tests
+# See: https://github.com/pytest-dev/pytest/issues/6451#issuecomment-687043537
+# testpaths =
+xfail_strict = true
+markers = [
+  "eco: Tests effects on a set of 3rd party ansible repositories",
+  "formatting_fixtures: Test that regenerates and tests formatting fixtures (requires prettier on PATH)"
+]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
