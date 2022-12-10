@@ -68,12 +68,6 @@ class NameRule(AnsibleLintRule):
                     name, lintable=file, linenumber=task[LINE_NUMBER_KEY]
                 )
             )
-            task_name = name.split("|")
-            if len(task_name) > 1:
-                name = task_name[1].strip()
-            results.extend(
-                self._check_name(name, lintable=file, linenumber=task[LINE_NUMBER_KEY])
-            )
         return results
 
     def _prefix_check(
@@ -81,30 +75,16 @@ class NameRule(AnsibleLintRule):
     ) -> list[MatchError]:
 
         results: list[MatchError] = []
+        effective_name = name
         if lintable is None:
             return []
 
-        if self._collection:
-            prefix = self._collection.options.task_name_prefix.format(
-                stem=lintable.path.stem
+        if not results:
+            results.extend(
+                self._check_name(
+                    effective_name, lintable=lintable, linenumber=linenumber
+                )
             )
-            if (
-                lintable.kind == "tasks"
-                and lintable.path.stem != "main"
-                and not name.startswith(prefix)
-            ):
-                # For the moment in order to raise errors this rule needs to be
-                # enabled manually. Still, we do allow use of prefixes even without
-                # having to enable the rule.
-                if "name[prefix]" in self._collection.options.enable_list:
-                    results.append(
-                        self.create_matcherror(
-                            message=f"Task name should start with '{prefix}'.",
-                            linenumber=linenumber,
-                            tag="name[prefix]",
-                            filename=lintable,
-                        )
-                    )
         return results
 
     def _check_name(
@@ -114,7 +94,37 @@ class NameRule(AnsibleLintRule):
         # lowercase letter, so we ignore anything else. On Unicode isupper()
         # is not necessarily the opposite of islower()
         results = []
-        if name[0].isalpha() and name[0].islower() and not name[0].isupper():
+        # stage one check prefix
+        effective_name = name
+        if self._collection and lintable:
+            prefix = self._collection.options.task_name_prefix.format(
+                stem=lintable.path.stem
+            )
+            if lintable.kind == "tasks" and lintable.path.stem != "main":
+                if not name.startswith(prefix):
+                    # For the moment in order to raise errors this rule needs to be
+                    # enabled manually. Still, we do allow use of prefixes even without
+                    # having to enable the rule.
+                    if "name[prefix]" in self._collection.options.enable_list:
+                        results.append(
+                            self.create_matcherror(
+                                message=f"Task name should start with '{prefix}'.",
+                                linenumber=linenumber,
+                                tag="name[prefix]",
+                                filename=lintable,
+                            )
+                        )
+                        return results
+                else:
+                    effective_name = name[len(prefix) :]
+                    # breakpoint()
+
+        if (
+            effective_name[0].isalpha()
+            and effective_name[0].islower()
+            and not effective_name[0].isupper()
+        ):
+            # breakpoint()
             results.append(
                 self.create_matcherror(
                     message="All names should start with an uppercase letter.",
@@ -171,6 +181,7 @@ if "pytest" in sys.modules:  # noqa: C901
         bad_runner = Runner(failure, rules=collection)
         results = bad_runner.run()
         assert len(results) == 3
+        # , "\n".join(results)
         assert results[0].tag == "name[casing]"
         assert results[1].tag == "name[prefix]"
         assert results[2].tag == "name[prefix]"
