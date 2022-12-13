@@ -2,9 +2,9 @@
 from time import sleep
 
 import pytest
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
-
 from ansiblelint.schemas import refresh_schemas
 
 
