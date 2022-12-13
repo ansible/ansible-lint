@@ -20,3 +20,11 @@
       # module should produce: 'Unsupported parameters for ansible.builtin.systemd module: foo. Supported parameters include: no_block, state, daemon_reload (daemon-reload), name (service, unit), force, masked, daemon_reexec (daemon-reexec), scope, enabled.'
       ansible.builtin.systemd:
         foo: true
+
+    - name: An invalid call of setup module
+      # setup module in ansible is the only module that has a .. relative
+      # import that used to cause problems
+      ansible.builtin.setup:
+        foo: # this is a nested object which will have the __ injections
+          # that we later need to clean
+          bar: true

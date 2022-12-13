@@ -25,6 +25,7 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.text import has_jinja
+from ansiblelint.yaml_utils import clean_json
 
 _logger = logging.getLogger(__name__)
 
@@ -80,7 +81,8 @@ class ArgsRule(AnsibleLintRule):
             mock_ansible_module, "AnsibleModule", CustomAnsibleModule
         ):
             spec = importlib.util.spec_from_file_location(
-                "plugin", loaded_module.plugin_resolved_path
+                name=loaded_module.resolved_fqcn,
+                location=loaded_module.plugin_resolved_path,
             )
             if spec:
                 assert spec.loader is not None
@@ -106,7 +108,7 @@ class ArgsRule(AnsibleLintRule):
                 with patch.object(
                     sys,
                     "argv",
-                    ["", json.dumps({"ANSIBLE_MODULE_ARGS": module_args})],
+                    ["", json.dumps({"ANSIBLE_MODULE_ARGS": clean_json(module_args)})],
                 ):
                     fio = io.StringIO()
                     failed_msg = ""
@@ -234,12 +236,14 @@ if "pytest" in sys.modules:
         collection.register(ArgsRule())
         success = "examples/playbooks/rule-args-module-fail-1.yml"
         results = Runner(success, rules=collection).run()
-        assert len(results) == 3
+        assert len(results) == 4
         assert results[0].tag == "args[module]"
         assert "missing required arguments" in results[0].message
         assert results[1].tag == "args[module]"
         assert "missing parameter(s) required by " in results[1].message
         assert results[2].tag == "args[module]"
+        assert "Unsupported parameters for" in results[2].message
+        assert results[3].tag == "args[module]"
         assert "Unsupported parameters for" in results[2].message
 
     def test_args_module_pass() -> None:
