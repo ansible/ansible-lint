@@ -21,8 +21,6 @@
 from __future__ import annotations
 
 import logging
-import os
-import os.path
 import subprocess
 import sys
 from argparse import Namespace
@@ -41,7 +39,6 @@ from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
 from ansiblelint.constants import VIOLATIONS_FOUND_RC
 from ansiblelint.file_utils import Lintable
-from ansiblelint.testing import run_ansible_lint
 
 runtime = Runtime()
 
@@ -248,34 +245,6 @@ def test_template(template: str, output: str) -> None:
         fail_on_error=False,
     )
     assert result == output
-
-
-@pytest.mark.parametrize(
-    ("role", "expect_warning"),
-    (
-        ("template_lookup", False),
-        # With 2.15 ansible replaced the runtime Warning about inability to
-        # open a file in file lookup with a full error.
-        ("template_lookup_missing", runtime.version_in_range(upper="2.15.0.dev0")),
-    ),
-)
-def test_template_lookup(role: str, expect_warning: bool) -> None:
-    """Assure lookup plugins used in templates does not trigger Ansible warnings."""
-    task_path = os.path.realpath(
-        os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "..",
-            "examples",
-            "roles",
-            role,
-            "tasks",
-            "main.yml",
-        )
-    )
-    result = run_ansible_lint("-v", task_path)
-    # 2.13 or older will not attempt to install when in offline mode
-    if not runtime.version_in_range(upper="2.14.0.dev0"):
-        assert ("Unable to find" in result.stderr) == expect_warning
 
 
 def test_task_to_str_unicode() -> None:

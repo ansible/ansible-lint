@@ -40,7 +40,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
   },
   "playbook": {
-    "etag": "b52439e4da6993f0af5685885a4d09fa5a36826f90e9047ae2f7d89c9b92cbfa",
+    "etag": "20b5fa542890607ce3d07f4313ae3446c2dd356208e3d4341a982be93d650190",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/playbook.json"
   },
   "requirements": {
@@ -48,7 +48,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
   "tasks": {
-    "etag": "3f2ce23a880f7180cd237382f2fc201c442c4c27d9cf45c90d4d2228f53a020a",
+    "etag": "99258e1cec68edf91850e0c8663cc10ea5386a759b7ff46b9b6d366b548564b5",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/tasks.json"
   },
   "vars": {

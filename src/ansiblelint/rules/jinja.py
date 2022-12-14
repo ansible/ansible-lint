@@ -552,6 +552,12 @@ if "pytest" in sys.modules:  # noqa: C901
                 "spacing",
                 id="42",
             ),
+            pytest.param(
+                "{{ lookup('file'   ,  '/tmp/non-existent',  errors='ignore') }}",
+                "{{ lookup('file', '/tmp/non-existent', errors='ignore') }}",
+                "spacing",
+                id="43",
+            ),
         ),
     )
     def test_jinja(text: str, expected: str, tag: str) -> None:

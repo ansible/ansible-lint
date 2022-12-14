@@ -121,8 +121,16 @@ def ansible_template(
     # pylint: disable=unused-variable
     for i in range(3):
         try:
+            kwargs["disable_lookups"] = True
             return templar.template(varname, **kwargs)
         except AnsibleError as exc:
+            if (
+                "was found, however lookups were disabled from templating"
+                in exc.message
+            ):
+                # ansible core does an early exit when disable_lookup=True but
+                # this happens after the jinja2 syntax already passed.
+                break
             if (
                 exc.message.startswith("template error while templating string:")
                 and "'" in exc.message
