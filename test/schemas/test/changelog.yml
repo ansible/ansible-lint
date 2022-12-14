@@ -1,0 +1,17 @@
+ancestor: 0.5.4
+releases:
+  1.0.0-alpha:
+    release_date: "2020-01-01"
+    codename: "The first public one"
+    changes:
+      release_summary: A bit o markdown text
+      bugfixes:
+        - Fixed bug `#1 <https://example.com>`
+      deprecated_features:
+        - Free form text mentioning a deprecation
+      minor_changes:
+        - Free form text mentioning a minor change
+    modules:
+      - description: foo
+        name: short_module_name
+        namespace: foo

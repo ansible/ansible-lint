@@ -73,6 +73,7 @@ DEFAULT_KINDS = [
     {"requirements": "**/requirements.{yaml,yml}"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/{.ansible-lint,.yamllint}"},
+    {"changelog": "**/changelog.yml"},
     {"yaml": "**/*.{yaml,yml}"},
     {"yaml": "**/.*.{yaml,yml}"},
 ]

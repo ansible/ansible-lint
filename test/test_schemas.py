@@ -1,6 +1,10 @@
 """Test schemas modules."""
 from time import sleep
 
+import pytest
+
+from ansiblelint.rules import RulesCollection
+from ansiblelint.runner import Runner
 from ansiblelint.schemas import refresh_schemas
 
 
@@ -16,3 +20,21 @@ def test_refresh_schemas() -> None:
     sleep(1)
     # should be cached now
     assert refresh_schemas(min_age_seconds=10) == 0
+
+
+@pytest.mark.parametrize(
+    ("file", "expected_tags"),
+    (pytest.param("examples/changelog.yml", ["schema[changelog]"], id="changelog"),),
+)
+def test_schema(
+    default_rules_collection: RulesCollection,
+    file: str,
+    expected_tags: list[str],
+) -> None:
+    """Test that runner can go through any corner cases."""
+    runner = Runner(file, rules=default_rules_collection)
+    matches = runner.run()
+
+    assert len(matches) == len(expected_tags)
+    for i, match in enumerate(matches):
+        assert match.tag == expected_tags[i]

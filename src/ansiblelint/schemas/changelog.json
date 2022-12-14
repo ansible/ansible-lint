@@ -1,0 +1,98 @@
+{
+  "$defs": {
+    "release": {
+      "additionalProperties": false,
+      "properties": {
+        "changes": {
+          "additionalProperties": false,
+          "properties": {
+            "bugfixes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "deprecated_features": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "minor_changes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "release_summary": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "codename": {
+          "type": "string"
+        },
+        "modules": {
+          "items": {
+            "properties": {
+              "description": {
+                "markdownDescription": "Value of `short_description from plugin `DOCUMENTATION`.",
+                "title": "Description",
+                "type": "string"
+              },
+              "name": {
+                "markdownDescription": " It must not be the FQCN, but the name inside the collection.",
+                "pattern": "[a-zA-Z0-9_]+",
+                "title": "Short module name",
+                "type": "string"
+              },
+              "namespace": {
+                "markdownDescription": "Must be `null` for plugin and objects. For modules it must be either empty string. The namespace is used to group new modules by their namespace inside the collection.",
+                "title": "Namespace",
+                "type": ["string", "null"]
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "release_date": {
+          "format": "date",
+          "markdownDescription": "Use ISO-8601 date format, like 2020-12-31",
+          "pattern": "\\d\\d\\d\\d-\\d\\d-\\d\\d",
+          "title": "Date of the release.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "semver": {
+      "pattern": "\\d+.\\d+.\\d+.*",
+      "title": "Version string following SemVer specification.",
+      "type": "string"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/changelog.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
+  "description": "Antsibull Changelog Schema",
+  "examples": ["changelog.yml"],
+  "markdownDescription": "See [Changelog YAML Format](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelog.yaml-format.md)",
+  "properties": {
+    "ancestor": {
+      "$ref": "#/$defs/semver"
+    },
+    "releases": {
+      "patternProperties": {
+        "\\d+.\\d+.\\d+.*": {
+          "$ref": "#/$defs/release",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "title": "Antsibull Changelog Schema",
+  "type": "object"
+}

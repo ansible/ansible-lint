@@ -1,0 +1,4 @@
+---
+- this is invalid
+- as changelog must be object (mapping)
+- not an array (sequence)
