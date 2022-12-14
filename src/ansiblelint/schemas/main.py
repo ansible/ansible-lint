@@ -106,7 +106,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         try:
             with urllib.request.urlopen(request) as response:
                 if response.status == 200:
-                    content = response.read().decode("utf-8")
+                    content = response.read().decode("utf-8").rstrip()
                     etag = response.headers["etag"].strip('"')
                     if etag != data.get("etag", ""):
                         JSON_SCHEMAS[kind]["etag"] = etag
@@ -114,10 +114,12 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
                     with open(f"{path}", "w", encoding="utf-8") as f_out:
                         _logger.info("Schema %s was updated", kind)
                         f_out.write(content)
+                        f_out.write("\n")  # prettier/editors
                         f_out.truncate()
                         os.fsync(f_out.fileno())
                         # unload possibly loaded schema
-                        del _schema_cache[kind]
+                        if kind in _schema_cache:
+                            del _schema_cache[kind]
         except (ConnectionError, OSError) as exc:
             if (
                 isinstance(exc, urllib.error.HTTPError)
@@ -132,6 +134,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         with open(store_file, "w", encoding="utf-8") as f_out:
             # formatting should match our .prettierrc.yaml
             json.dump(JSON_SCHEMAS, f_out, indent=2, sort_keys=True)
+            f_out.write("\n")  # prettier and editors in general
         # clear schema cache
         get_schema.cache_clear()
     else:
