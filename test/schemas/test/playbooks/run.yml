@@ -12,6 +12,13 @@
         msg: "I am handler 1"
       listen: "always handler"
 
+    - name: handler 2
+      ansible.builtin.debug:
+        msg: "I am handler 2"
+      listen: #  to check if lists are allowed:
+        - "list listening handler"
+        - "other listening topic"
+
 - hosts: localhost
   serial: 1 # validate serial allows integer
 

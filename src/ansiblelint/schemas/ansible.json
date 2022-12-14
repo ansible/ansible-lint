@@ -911,9 +911,19 @@
           "type": "boolean"
         },
         "listen": {
-          "markdownDescription": "Applies only to handlers. See [listen](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#handlers-running-when-notified)",
-          "title": "Listen",
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "markdownDescription": "Applies only to handlers. See [listen](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html)",
+          "title": "Listen"
         },
         "local_action": {
           "title": "Local Action",
