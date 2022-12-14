@@ -30,6 +30,8 @@ def sanitize_output(text: str) -> str:
     result = re.sub(
         r"^WARNING: PATH altered to include.+\n", "", result, flags=re.MULTILINE
     )
+    # replace venv path
+    result = result.replace(".tox/venv", ".tox/eco")
 
     return result
 
@@ -84,5 +86,6 @@ def test_eco(repo: str) -> None:
         shell=True,
         check=False,
         capture_output=True,
+        text=True,
     )
-    assert result.returncode == 0, result_txt
+    assert result.returncode == 0, result_txt + f"\nDIFF:\n{result.stdout}"
