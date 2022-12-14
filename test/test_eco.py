@@ -30,6 +30,8 @@ def sanitize_output(text: str) -> str:
     result = re.sub(
         r"^WARNING: PATH altered to include.+\n", "", result, flags=re.MULTILINE
     )
+    # replace venv path
+    result = result.replace(".tox/venv", ".tox/eco")
 
     return result
 
