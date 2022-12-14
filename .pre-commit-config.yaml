@@ -19,7 +19,8 @@ exclude: >
     test/schemas/data/licenses.json|
     test/schemas/package-lock.json|
     test/schemas/negative_test|
-    examples/broken/yaml-with-tabs/invalid-due-tabs.yaml
+    examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
+    examples/playbooks/collections/.*
   )$
 repos:
   - repo: meta
@@ -41,6 +42,7 @@ repos:
             examples/playbooks/with-umlaut-.*|
             examples/playbooks/with-skip-tag-id.yml|
             examples/yamllint/.*|
+            examples/playbooks/collections/.*|
             test/fixtures/formatting-before/.*|
             test/schemas/data/.*|
             test/schemas/(negative_test|test)/.*\.md|
@@ -117,6 +119,7 @@ repos:
             examples/playbooks/templates/.*|
             examples/yamllint/.*|
             examples/other/some.j2.yaml|
+            examples/playbooks/collections/.*|
             test/fixtures/formatting-before/.*
           )$
         files: \.(yaml|yml)$

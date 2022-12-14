@@ -16,21 +16,10 @@ if missing:
     )
     sys.exit(1)
 # we need to be sure that we have the requirements installed as some tests
-# might depend on these.
+# might depend on these. This approach is compatible with GHA caching.
 try:
-    from ansible_compat.prerun import get_cache_dir
-
-    cache_dir = get_cache_dir(".")
     subprocess.check_output(
-        [
-            "ansible-galaxy",
-            "collection",
-            "install",
-            "-p",
-            f"{cache_dir}/collections",
-            "-r",
-            "requirements.yml",
-        ],
+        ["./tools/install-reqs.sh"],
         stderr=subprocess.PIPE,
         text=True,
     )

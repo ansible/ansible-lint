@@ -1,4 +1,5 @@
 """Tests for the --profile feature."""
+import platform
 import subprocess
 import sys
 
@@ -41,4 +42,9 @@ def test_profile_listing(capfd: CaptureFixture[str]) -> None:
     if sys.version_info < (3, 9):
         assert "ansible-lint is no longer tested" in err
     else:
-        assert err == ""
+        # On WSL we might see this warning on stderr:
+        # [WARNING]: Ansible is being run in a world writable directory
+        # WSL2 has "WSL2" in platform name but WSL1 has "microsoft":
+        platform_name = platform.platform().lower()
+        if all(word not in platform_name for word in ["wsl", "microsoft"]):
+            assert err == "", platform_name

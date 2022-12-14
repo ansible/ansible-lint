@@ -76,7 +76,7 @@ warn_list:
 #   - all
 
 # Offline mode disables installation of requirements.yml
-offline: false
+offline: true
 
 # Return success if number of violations compared with previous git
 # commit has not increased. This feature works only in git
