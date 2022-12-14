@@ -84,5 +84,6 @@ def test_eco(repo: str) -> None:
         shell=True,
         check=False,
         capture_output=True,
+        text=True,
     )
-    assert result.returncode == 0, result_txt
+    assert result.returncode == 0, result_txt + f"\nDIFF:\n{result.stdout}"
