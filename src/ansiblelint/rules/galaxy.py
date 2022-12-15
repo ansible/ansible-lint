@@ -25,7 +25,6 @@ class GalaxyRule(AnsibleLintRule):
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
-
         if file.kind != "galaxy":  # type: ignore
             return []
 
