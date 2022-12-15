@@ -1,8 +1,8 @@
 """Implementation of GalaxyRule."""
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
 
@@ -58,9 +58,9 @@ class GalaxyRule(AnsibleLintRule):
         rootpath = os.path.split(str(file.abspath))[0]
         changelog_found = 0
         changelog_paths = [
-            os.path.join(rootpath, 'changelogs', 'changelog.yml'),
-            os.path.join(rootpath, 'CHANGELOG.rst'),
-            os.path.join(rootpath, 'CHANGELOG.md')
+            os.path.join(rootpath, "changelogs", "changelog.yml"),
+            os.path.join(rootpath, "CHANGELOG.rst"),
+            os.path.join(rootpath, "CHANGELOG.md"),
         ]
 
         for path in changelog_paths:
