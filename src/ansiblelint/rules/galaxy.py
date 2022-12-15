@@ -55,12 +55,12 @@ class GalaxyRule(AnsibleLintRule):
         # Changelog Check - building off Galaxy rule as there is no current way to check
         # for a nonexistent file
 
-        rootpath = os.path.split(str(file.abspath))[0]
+        base_path = os.path.split(str(file.abspath))[0]
         changelog_found = 0
         changelog_paths = [
-            os.path.join(rootpath, "changelogs", "changelog.yml"),
-            os.path.join(rootpath, "CHANGELOG.rst"),
-            os.path.join(rootpath, "CHANGELOG.md"),
+            os.path.join(base_path, "changelogs", "changelog.yml"),
+            os.path.join(base_path, "CHANGELOG.rst"),
+            os.path.join(base_path, "CHANGELOG.md"),
         ]
 
         for path in changelog_paths:
@@ -137,12 +137,14 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(errs) == 1
 
     def test_changelog_present() -> None:
+        """Positive test for finding a changelog."""
         collection = RulesCollection()
         collection.register(GalaxyRule())
         good_runner = Runner("examples/collection/galaxy.yml", rules=collection)
         assert [] == good_runner.run()
 
     def test_changelog_missing() -> None:
+        """Negative test for finding a changelog."""
         collection = RulesCollection()
         collection.register(GalaxyRule())
         bad_runner = Runner("examples/no_changelog/galaxy.yml", rules=collection)
