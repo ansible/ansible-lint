@@ -3,21 +3,32 @@
     "release": {
       "additionalProperties": false,
       "properties": {
-        "release_date": {
-          "format": "date",
-          "markdownDescription": "Use ISO-8601 date format, like 2020-12-31",
-          "pattern": "\\d\\d\\d\\d-\\d\\d-\\d\\d",
-          "title": "Date of the release.",
-          "type": "string"
-        },
-        "codename": {
-          "type": "string"
-        },
         "changes": {
           "additionalProperties": false,
           "properties": {
-            "release_summary": {
-              "type": "string"
+            "breaking_changes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "bugfixes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "deprecated_features": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "known_issues": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
             },
             "major_changes": {
               "items": {
@@ -31,17 +42,8 @@
               },
               "type": "array"
             },
-            "breaking_changes": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "deprecated_features": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
+            "release_summary": {
+              "type": "string"
             },
             "removed_features": {
               "items": {
@@ -50,18 +52,6 @@
               "type": "array"
             },
             "security_fixes": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "bugfixes": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "known_issues": {
               "items": {
                 "type": "string"
               },
@@ -76,18 +66,21 @@
           },
           "type": "object"
         },
+        "codename": {
+          "type": "string"
+        },
         "modules": {
           "items": {
             "properties": {
+              "description": {
+                "markdownDescription": "Value of `short_description` from plugin `DOCUMENTATION`.",
+                "title": "Description",
+                "type": "string"
+              },
               "name": {
                 "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
                 "pattern": "[a-zA-Z0-9_]+",
                 "title": "Short module name",
-                "type": "string"
-              },
-              "description": {
-                "markdownDescription": "Value of `short_description` from plugin `DOCUMENTATION`.",
-                "title": "Description",
                 "type": "string"
               },
               "namespace": {
@@ -100,21 +93,21 @@
           },
           "type": "array"
         },
-        "plugins": {
+        "objects": {
           "additionalProperties": false,
           "properties": {
-            "lookup": {
+            "playbook": {
               "items": {
                 "properties": {
-                  "name": {
-                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
-                    "pattern": "[a-zA-Z0-9_]+",
-                    "title": "Lookup name",
-                    "type": "string"
-                  },
                   "description": {
                     "markdownDescription": "Value of `short_description` from plugin `DOCUMENTATION`.",
                     "title": "Description",
+                    "type": "string"
+                  },
+                  "name": {
+                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
+                    "pattern": "[a-zA-Z0-9_]+",
+                    "title": "Short playbook name",
                     "type": "string"
                   },
                   "namespace": {
@@ -125,18 +118,18 @@
               },
               "type": "array"
             },
-            "inventory": {
+            "role": {
               "items": {
                 "properties": {
-                  "name": {
-                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
-                    "pattern": "[a-zA-Z0-9_]+",
-                    "title": "Inventory name",
-                    "type": "string"
-                  },
                   "description": {
                     "markdownDescription": "Value of `short_description` from plugin `DOCUMENTATION`.",
                     "title": "Description",
+                    "type": "string"
+                  },
+                  "name": {
+                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
+                    "pattern": "[a-zA-Z0-9_]+",
+                    "title": "Short role name",
                     "type": "string"
                   },
                   "namespace": {
@@ -150,21 +143,21 @@
           },
           "type": "object"
         },
-        "objects": {
+        "plugins": {
           "additionalProperties": false,
           "properties": {
-            "role": {
+            "inventory": {
               "items": {
                 "properties": {
-                  "name": {
-                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
-                    "pattern": "[a-zA-Z0-9_]+",
-                    "title": "Short role name",
-                    "type": "string"
-                  },
                   "description": {
                     "markdownDescription": "Value of `short_description` from plugin `DOCUMENTATION`.",
                     "title": "Description",
+                    "type": "string"
+                  },
+                  "name": {
+                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
+                    "pattern": "[a-zA-Z0-9_]+",
+                    "title": "Inventory name",
                     "type": "string"
                   },
                   "namespace": {
@@ -175,18 +168,18 @@
               },
               "type": "array"
             },
-            "playbook": {
+            "lookup": {
               "items": {
                 "properties": {
-                  "name": {
-                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
-                    "pattern": "[a-zA-Z0-9_]+",
-                    "title": "Short playbook name",
-                    "type": "string"
-                  },
                   "description": {
                     "markdownDescription": "Value of `short_description` from plugin `DOCUMENTATION`.",
                     "title": "Description",
+                    "type": "string"
+                  },
+                  "name": {
+                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
+                    "pattern": "[a-zA-Z0-9_]+",
+                    "title": "Lookup name",
                     "type": "string"
                   },
                   "namespace": {
@@ -199,6 +192,13 @@
             }
           },
           "type": "object"
+        },
+        "release_date": {
+          "format": "date",
+          "markdownDescription": "Use ISO-8601 date format, like 2020-12-31",
+          "pattern": "\\d\\d\\d\\d-\\d\\d-\\d\\d",
+          "title": "Date of the release.",
+          "type": "string"
         }
       },
       "type": "object"

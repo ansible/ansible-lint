@@ -20,7 +20,7 @@ releases:
       bugfixes:
         - Fixed bug `#1 <https://example.com>`
       known_issues:
-        - A list of strings describing known issues that are currently not fixed or will not be fixed  
+        - A list of strings describing known issues that are currently not fixed or will not be fixed
       trivial:
         - A list of strings describing changes that are too trivial to show in the changelog
     modules:
@@ -44,4 +44,4 @@ releases:
       playbook:
         - name: wipe_personal_data
           description: Wipes all personal data from the database
-          namespace: null    
+          namespace: null
