@@ -2,5 +2,6 @@
   "colors": true,
   "extension": ["ts"],
   "require": "ts-node/register",
+  "slow": "500",
   "spec": "src/**/*.spec.ts"
 }

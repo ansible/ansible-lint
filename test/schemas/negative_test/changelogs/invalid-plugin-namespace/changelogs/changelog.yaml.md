@@ -9,7 +9,7 @@
     "params": {
       "type": "null"
     },
-    "schemaPath": "#/$defs/release/properties/plugins/properties/lookup/items/properties/namespace/type"
+    "schemaPath": "#/$defs/plugin-descriptions/items/properties/namespace/type"
   }
 ]
 ```
@@ -23,7 +23,7 @@ stdout:
   "status": "fail",
   "errors": [
     {
-      "filename": "negative_test/changelogs/invalid-plugin-namespace/changelog.yml",
+      "filename": "negative_test/changelogs/invalid-plugin-namespace/changelogs/changelog.yaml",
       "path": "$.releases.1.0.0.plugins.lookup[0].namespace",
       "message": "'foo' is not of type 'null'",
       "has_sub_errors": false

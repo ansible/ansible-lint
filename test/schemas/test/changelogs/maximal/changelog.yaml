@@ -1,0 +1,59 @@
+---
+# Example of minimal changelogs/changelog.yaml that is considered valid
+ancestor: null
+
+releases:
+  1.0.0-alpha:
+    release_date: "1980-01-01"
+    codename: foo
+    fragments: []
+    changes:
+      release_summary: This is the initial White Rabbit release. Enjoy!
+      major_changes:
+        - The authentication method handling has been rewritten.
+      minor_changes:
+        - foo - Module can now reformat hard disks without asking.
+        - bob lookup - Makes sure Bob isn't there multiple times.
+      breaking_changes:
+        - Due to the security bug in the post module, the module no longer accepts the password
+          option. Please stop using the option and change any password you ever supplied to the
+          module.
+      deprecated_features:
+        - foo - The bar option has been deprecated. Use the username option instead.
+        - send_request - The quick option has been deprecated. Use the protocol option instead.
+      removed_features:
+        - foo - The baz option has been removed. It has never been used anyway.
+      security_fixes:
+        - post - The module accidentally sent your password in plaintext to all servers it could find.
+      bugfixes:
+        - post - The module made PUT requests instead of POST requests.
+        - get - The module will no longer crash if it received invalid JSON data
+      trivial:
+        - something that is not included in release notes
+      known_issues:
+        - som other
+    modules:
+      - name: head
+        description: Make a HEAD request
+        namespace: "net_tools.rest"
+      - name: echo
+        description: Echo params
+        namespace: ""
+    plugins:
+      lookup:
+        - name: reverse
+          description: Reverse magic
+          namespace: null
+      inventory:
+        - name: docker
+          description: Inventory plugin for docker containers
+          namespace: null
+    objects:
+      role:
+        - name: install_reqs
+          description: Install all requirements of this collection
+          namespace: null
+      playbook:
+        - name: wipe_personal_data
+          description: Wipes all personal data from the database
+          namespace: null
