@@ -5,13 +5,43 @@ releases:
     codename: "The first public one"
     changes:
       release_summary: A bit o markdown text
-      bugfixes:
-        - Fixed bug `#1 <https://example.com>`
-      deprecated_features:
-        - Free form text mentioning a deprecation
+      major_changes:
+        - Free form text mentioning a major change
       minor_changes:
         - Free form text mentioning a minor change
+      breaking_changes:
+        - Free form text mentioning a breaking change
+      deprecated_features:
+        - A list of strings describing features deprecated in this release
+      removed_features:
+        - A list of strings describing features removed in this release
+      security_fixes:
+        - A list of strings describing security-relevant bugfixes
+      bugfixes:
+        - Fixed bug `#1 <https://example.com>`
+      known_issues:
+        - A list of strings describing known issues that are currently not fixed or will not be fixed
+      trivial:
+        - A list of strings describing changes that are too trivial to show in the changelog
     modules:
-      - description: foo
-        name: short_module_name
+      - name: short_module_name
+        description: foo
         namespace: foo
+    plugins:
+      lookup:
+        - name: reverse
+          description: Reverse magic
+          namespace: null
+      inventory:
+        - name: docker
+          description: Inventory plugin for docker containers
+          namespace: null
+    objects:
+      role:
+        - name: install_reqs
+          description: Install all requirements of this collection
+          namespace: null
+      playbook:
+        - name: wipe_personal_data
+          description: Wipes all personal data from the database
+          namespace: null

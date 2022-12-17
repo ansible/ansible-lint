@@ -23,7 +23,7 @@ stdout:
   "status": "fail",
   "errors": [
     {
-      "filename": "negative_test/changelogs/unknown-keys/changelog.yml",
+      "filename": "negative_test/changelogs/unknown-keys/changelogs/changelog.yaml",
       "path": "$",
       "message": "Additional properties are not allowed ('release' was unexpected)",
       "has_sub_errors": false
