@@ -3,13 +3,13 @@
 ```json
 [
   {
-    "instancePath": "/releases",
+    "instancePath": "",
     "keyword": "type",
     "message": "must be object",
     "params": {
       "type": "object"
     },
-    "schemaPath": "#/properties/releases/type"
+    "schemaPath": "#/type"
   }
 ]
 ```
@@ -23,9 +23,9 @@ stdout:
   "status": "fail",
   "errors": [
     {
-      "filename": "negative_test/changelogs/no-semver/changelog.yml",
-      "path": "$.releases",
-      "message": "'foo' is not of type 'object'",
+      "filename": "negative_test/changelogs/list/changelogs/changelog.yaml",
+      "path": "$",
+      "message": "['this is invalid', 'as changelog must be object (mapping)', 'not an array (sequence)'] is not of type 'object'",
       "has_sub_errors": false
     }
   ],

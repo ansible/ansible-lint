@@ -1,1 +1,2 @@
+---
 releases: foo # <-- not a semver

@@ -1,0 +1,8 @@
+---
+releases:
+  1.0.0:
+    plugins:
+      lookup:
+        - name: reverse
+          description: Reverse magic
+          namespace: "foo" # namespace must be null for plugins and objects

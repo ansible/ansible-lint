@@ -1,3 +1,4 @@
+---
 releases:
   1.0.0:
     release_date: 01-01-2020 # invalid date format, must be ISO-8601 !

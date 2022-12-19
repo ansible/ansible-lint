@@ -24,7 +24,11 @@ def test_refresh_schemas() -> None:
 
 @pytest.mark.parametrize(
     ("file", "expected_tags"),
-    (pytest.param("examples/changelog.yml", ["schema[changelog]"], id="changelog"),),
+    (
+        pytest.param(
+            "examples/changelogs/changelog.yaml", ["schema[changelog]"], id="changelog"
+        ),
+    ),
 )
 def test_schema(
     default_rules_collection: RulesCollection,

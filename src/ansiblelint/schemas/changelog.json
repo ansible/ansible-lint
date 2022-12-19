@@ -1,11 +1,39 @@
 {
   "$defs": {
+    "plugin-descriptions": {
+      "items": {
+        "properties": {
+          "description": {
+            "markdownDescription": "Value of `short_description` from plugin `DOCUMENTATION`.",
+            "title": "Description",
+            "type": "string"
+          },
+          "name": {
+            "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
+            "pattern": "[a-zA-Z0-9_]+",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "type": "null"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
     "release": {
       "additionalProperties": false,
       "properties": {
         "changes": {
           "additionalProperties": false,
           "properties": {
+            "breaking_changes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
             "bugfixes": {
               "items": {
                 "type": "string"
@@ -18,6 +46,18 @@
               },
               "type": "array"
             },
+            "known_issues": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "major_changes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
             "minor_changes": {
               "items": {
                 "type": "string"
@@ -25,7 +65,27 @@
               "type": "array"
             },
             "release_summary": {
+              "markdownDescription": "This must be valid [reStructuredText](https://en.wikipedia.org/wiki/ReStructuredText).",
+              "title": "Release Summary",
               "type": "string"
+            },
+            "removed_features": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "security_fixes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "trivial": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
             }
           },
           "type": "object"
@@ -33,29 +93,134 @@
         "codename": {
           "type": "string"
         },
+        "fragments": {
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "List of strings representing filenames of changelog framents.",
+          "type": "array"
+        },
         "modules": {
           "items": {
             "properties": {
               "description": {
-                "markdownDescription": "Value of `short_description from plugin `DOCUMENTATION`.",
+                "markdownDescription": "Value of `short_description` from plugin `DOCUMENTATION`.",
                 "title": "Description",
                 "type": "string"
               },
               "name": {
-                "markdownDescription": " It must not be the FQCN, but the name inside the collection.",
+                "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
                 "pattern": "[a-zA-Z0-9_]+",
                 "title": "Short module name",
                 "type": "string"
               },
               "namespace": {
-                "markdownDescription": "Must be `null` for plugin and objects. For modules it must be either empty string. The namespace is used to group new modules by their namespace inside the collection.",
+                "markdownDescription": "Must be `''` for modules directly in `plugins/modules/`, or the dot-separated list of directories the module is in inside the `plugins/modules/` directory. The namespace is used to group new modules by their namespace inside the collection.",
                 "title": "Namespace",
-                "type": ["string", "null"]
+                "type": "string"
               }
             },
             "type": "object"
           },
           "type": "array"
+        },
+        "objects": {
+          "additionalProperties": false,
+          "properties": {
+            "playbook": {
+              "items": {
+                "properties": {
+                  "description": {
+                    "markdownDescription": "A short description of what the playbook does.",
+                    "title": "Description",
+                    "type": "string"
+                  },
+                  "name": {
+                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
+                    "pattern": "[a-zA-Z0-9_]+",
+                    "title": "Short playbook name",
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "null"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "role": {
+              "items": {
+                "properties": {
+                  "description": {
+                    "markdownDescription": "Value of `short_description` from role's argument spec.",
+                    "title": "Description",
+                    "type": "string"
+                  },
+                  "name": {
+                    "markdownDescription": "It must not be the FQCN, but the name inside the collection.",
+                    "pattern": "[a-zA-Z0-9_]+",
+                    "title": "Short role name",
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "null"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "plugins": {
+          "additionalProperties": false,
+          "properties": {
+            "become": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "cache": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "callback": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "cliconf": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "connections": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "filter": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "httpapi": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "inventory": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "lookup": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "netconf": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "shell": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "strategy": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "test": {
+              "$ref": "#/$defs/plugin-descriptions"
+            },
+            "vars": {
+              "$ref": "#/$defs/plugin-descriptions"
+            }
+          },
+          "type": "object"
         },
         "release_date": {
           "format": "date",
@@ -70,15 +235,14 @@
     "semver": {
       "pattern": "\\d+.\\d+.\\d+.*",
       "title": "Version string following SemVer specification.",
-      "type": "string"
+      "type": ["string", "null"]
     }
   },
   "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/changelog.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
-  "description": "Antsibull Changelog Schema",
-  "examples": ["changelog.yml"],
-  "markdownDescription": "See [Changelog YAML Format](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelog.yaml-format.md)",
+  "examples": ["changelogs/changelog.yaml"],
+  "markdownDescription": "Antsibull Changelog Schema is based on [changelog.yaml-format.md](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelog.yaml-format.md).",
   "properties": {
     "ancestor": {
       "$ref": "#/$defs/semver"
