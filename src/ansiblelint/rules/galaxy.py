@@ -15,10 +15,10 @@ if TYPE_CHECKING:
 
 
 class GalaxyRule(AnsibleLintRule):
-    """Rule for checking collection version is greater than 1.0.0."""
+    """Rule for checking collection version is greater than 1.0.0 and checking for changelog."""
 
     id = "galaxy"
-    description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0"
+    description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0 and check for changelog."
     severity = "MEDIUM"
     tags = ["metadata", "opt-in", "experimental"]
     version_added = "v6.6.0 (last update)"
@@ -57,7 +57,7 @@ class GalaxyRule(AnsibleLintRule):
         base_path = os.path.split(str(file.abspath))[0]
         changelog_found = 0
         changelog_paths = [
-            os.path.join(base_path, "changelogs", "changelog.yml"),
+            os.path.join(base_path, "changelogs", "changelog.yaml"),
             os.path.join(base_path, "CHANGELOG.rst"),
             os.path.join(base_path, "CHANGELOG.md"),
         ]

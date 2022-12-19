@@ -43,13 +43,13 @@ description: "..."
 
 # Changelog Details
 
-This rule expects a `CHANGELOG.md` or `.rst` file in the collection root or a `changelogs/changelog.yml` file.
+This rule expects a `CHANGELOG.md` or `.rst` file in the collection root or a `changelogs/changelog.yaml` file.
 
-If a `changelogs/changelog.yml` file exists, the schema will be checked.
+If a `changelogs/changelog.yaml` file exists, the schema will be checked.
 
-# Minimum required changelog.yml file
+# Minimum required changelog.yaml file
 
 ```yaml
-# changelog.yml
+# changelog.yaml
 ---
 releases: {}
