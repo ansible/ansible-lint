@@ -29,55 +29,41 @@ env:
   PY_COLORS: 1
 
 jobs:
+  pre:
+    name: pre
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.generate_matrix.outputs.matrix }}
+    steps:
+      - name: Determine matrix
+        id: generate_matrix
+        uses: coactions/dynamic-matrix@v1
+        with:
+          min_python: "3.9"
+          max_python: "3.11"
+          other_names: |
+            lint
+            pkg,hook,docs
+            schemas
+            eco
+          platforms: linux,macos
+
   build:
-    name: ${{ matrix.name || matrix.tox_env }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
+    needs: pre
     defaults:
       run:
         shell: ${{ matrix.shell || 'bash'}}
     strategy:
       fail-fast: false
+      matrix: ${{ fromJson(needs.pre.outputs.matrix) }}
       # max-parallel: 5
       # The matrix testing goal is to cover the *most likely* environments
       # which are expected to be used by users in production. Avoid adding a
       # combination unless there are good reasons to test it, like having
       # proof that we failed to catch a bug by not running it. Using
       # distribution should be preferred instead of custom builds.
-      matrix:
-        # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
-        include:
-          # keep list sorted as it determines UI order too
-          # linux
-          - tox_env: lint
-          - name: pkg-hook-docs
-            tox_env: pkg,hook,docs
-          - tox_env: schemas
-          - tox_env: eco # slow, keep separated
-          - name: py39
-            tox_env: py39,py39-devel
-            python-version: 3.9
-          - tox_env: py310
-            python-version: "3.10"
-          - name: py311
-            tox_env: py311,py311-devel
-            python-version: "3.11"
-          # macos
-          - name: py39 (macos)
-            tox_env: py39,py39-devel
-            os: macOS-latest
-            python-version: 3.9
-          - name: py311 (macos)
-            tox_env: py311,py311-devel
-            os: macOS-latest
-            python-version: "3.11"
-          # windows-2022 WSL does timeout running tests, likely caused but some
-          # extreme (>10x) performance degradation compared with windows-2019
-          # https://github.com/actions/virtual-environments/issues/4856
-          - name: py39 (wsl)
-            tox_env: py39
-            os: windows-2019
-            shell: "wsl-bash {0}"
-
     env:
       # vars safe to be passed to wsl:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:GITHUB_STEP_SUMMARY
@@ -102,27 +88,27 @@ jobs:
 
       - name: Set pre-commit cache
         uses: actions/cache@v3
-        if: ${{ matrix.tox_env == 'lint' }}
+        if: ${{ matrix.passed_name == 'lint' }}
         with:
           path: |
             ~/.cache/pre-commit
-          key: pre-commit-${{ matrix.name || matrix.tox_env }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit-${{ matrix.name || matrix.passed_name }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Set galaxy cache
         uses: actions/cache@v3
-        if: ${{ startsWith(matrix.tox_env, 'py') }}
+        if: ${{ startsWith(matrix.passed_name, 'py') }}
         with:
           path: |
             examples/playbooks/collections/*.tar.gz
             examples/playbooks/collections/ansible_collections
           key: galaxy-${{ hashFiles('examples/playbooks/collections/requirements.yml') }}
 
-      - name: Set up Python ${{ matrix.python-version || '3.9' }}
+      - name: Set up Python ${{ matrix.python_version || '3.9' }}
         if: "!contains(matrix.shell, 'wsl')"
         uses: actions/setup-python@v4
         with:
           cache: pip
-          python-version: ${{ matrix.python-version || '3.9' }}
+          python-version: ${{ matrix.python_version || '3.9' }}
 
       - uses: actions/setup-node@v3
         with:
@@ -141,24 +127,24 @@ jobs:
       - name: Log installed dists
         run: python3 -m pip freeze --all
 
-      - name: Initialize tox envs ${{ matrix.tox_env }}
-        run: python3 -m tox --notest --skip-missing-interpreters false -vv -e ${{ matrix.tox_env }}
+      - name: Initialize tox envs ${{ matrix.passed_name }}
+        run: python3 -m tox --notest --skip-missing-interpreters false -vv -e ${{ matrix.passed_name }}
         timeout-minutes: 5 # average is under 1, but macos can be over 3
 
       # sequential run improves browsing experience (almost no speed impact)
-      - name: tox -e ${{ matrix.tox_env }}
-        run: python3 -m tox -e ${{ matrix.tox_env }}
+      - name: tox -e ${{ matrix.passed_name }}
+        run: python3 -m tox -e ${{ matrix.passed_name }}
 
       - name: Combine coverage data
-        if: ${{ startsWith(matrix.tox_env, 'py') }}
+        if: ${{ startsWith(matrix.passed_name, 'py') }}
         # produce a single .coverage file at repo root
         run: tox -e coverage
 
       - name: Upload coverage data
-        if: ${{ startsWith(matrix.tox_env, 'py') }}
+        if: ${{ startsWith(matrix.passed_name, 'py') }}
         uses: codecov/codecov-action@v3
         with:
-          name: ${{ matrix.tox_env }}
+          name: ${{ matrix.passed_name }}
           fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
