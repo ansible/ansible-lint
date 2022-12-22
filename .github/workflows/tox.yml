@@ -43,7 +43,7 @@ jobs:
           max_python: "3.11"
           other_names: |
             lint
-            pkg-hook-docs
+            pkg,hook,docs
             schemas
             eco
           platforms: linux,macos
