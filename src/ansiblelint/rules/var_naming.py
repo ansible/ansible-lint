@@ -143,7 +143,7 @@ class VariableNamingRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     filename=file,
-                    linenumber=0,
+                    linenumber=task[LINE_NUMBER_KEY],
                     message=f"Task registers a variable that violates variable naming standards: {registered_var}",
                     tag=f"var-naming[{registered_var}]",
                 )
@@ -198,7 +198,7 @@ if "pytest" in sys.modules:
     def test_invalid_var_name_playbook(rule_runner: RunFromText) -> None:
         """Test rule matches."""
         results = rule_runner.run("examples/playbooks/rule-var-naming-fail.yml")
-        assert len(results) == 6
+        assert len(results) == 7
         for result in results:
             assert result.rule.id == VariableNamingRule.id
         # We are not checking line numbers because they can vary between
