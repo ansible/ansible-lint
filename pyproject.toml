@@ -248,3 +248,9 @@ markers = [
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
 write_to = "src/ansiblelint/_version.py"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed", "**/*.json", "**/*.yml", "**/*.yaml", "**/*.md"]
