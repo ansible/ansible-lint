@@ -14,10 +14,10 @@ For more information see the following topics in Ansible documentation:
 - [run_once(playbook keyword) more info](https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html)
 
 ```{warning}
-This rule will always trigger regardless of the value configured inside 'strategy' field. That is because the effective value used at runtime can be different than the value inside the file (ansible command line arguments).
+This rule will always trigger regardless of the value configured inside 'strategy' field. That is because the effective value used at runtime can be different than the value inside the file. For example, ansible command line arguments can alter it.
 ```
 
-It is perfectly fine adding `# noqa: run_once[task]` to mark the warning as acknowledged and ignored.
+It is perfectly fine to add `# noqa: run_once[task]` to mark the warning as acknowledged and ignored.
 
 ## Problematic Code
 
