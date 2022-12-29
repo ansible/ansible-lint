@@ -471,6 +471,11 @@
           "title": "Galaxy Tags",
           "type": "array"
         },
+        "github_branch": {
+          "markdownDescription": "Optionally specify the branch Galaxy will use when accessing the GitHub repo for this role",
+          "title": "GitHub Branch",
+          "type": "string"
+        },
         "issue_tracker_url": {
           "title": "Issue Tracker Url",
           "type": "string"
@@ -504,7 +509,7 @@
           "type": "string"
         },
         "standalone": {
-          "description:": "Set to true for old standalone roles, or false for new collection roles.",
+          "description": "Set to true for old standalone roles, or false for new collection roles.",
           "title": "Standalone",
           "type": "boolean"
         }
