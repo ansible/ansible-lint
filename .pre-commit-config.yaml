@@ -13,6 +13,7 @@ ci:
     - schemas
 exclude: >
   (?x)^(
+    .config/requirements.*|
     .vscode/extensions.json|
     .vscode/settings.json|
     examples/broken/encoding.j2|
@@ -55,7 +56,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.16.0
+    rev: v6.17.1
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -107,7 +108,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.0.0
+    rev: v1.1.1
     hooks:
       - id: doc8
   - repo: https://github.com/adrienverge/yamllint.git
@@ -126,14 +127,14 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+    rev: 5.11.4
     hooks:
       - id: isort
         args:
           # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
           - --filter-files
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 22.12.0
     hooks:
       - id: black
         language_version: python3
@@ -150,7 +151,7 @@ repos:
           - flake8-future-annotations>=0.0.3
   - repo: https://github.com/asottile/pyupgrade
     # keep it after flake8
-    rev: v3.3.0
+    rev: v3.3.1
     hooks:
       - id: pyupgrade
         args: ["--py38-plus"]
@@ -183,7 +184,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.15.8
+    rev: v2.15.9
     hooks:
       - id: pylint
         args:
@@ -204,20 +205,34 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/jazzband/pip-tools
-    rev: 6.11.0
+    rev: 6.12.1
     hooks:
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core
+        name: lock
+        always_run: true
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras
         language: python
-        files: ^(requirements\.txt|pyproject\.toml)$
-        alias: deps
+        files: ^.config\/requirements.*$
+        alias: lock
+        stages: [manual]
         language_version: "3.9" # minimal we support officially
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
+        name: deps
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --extra lock --strip-extras --unsafe-package ansible-core
         language: python
-        files: ^(requirements\.txt|pyproject\.toml)$
+        files: ^.config\/requirements.*$
+        alias: deps
+        language_version: "3.9" # minimal we support officially
+        always_run: true
+        additional_dependencies:
+          - pip>=22.3.1
+      - id: pip-compile
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
+        language: python
+        always_run: true
+        files: ^.config\/requirements.*$
         alias: up
         stages: [manual]
         language_version: "3.9" # minimal we support officially

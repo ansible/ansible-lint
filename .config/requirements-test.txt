@@ -1,0 +1,12 @@
+coverage-enable-subprocess # see https://github.com/nedbat/coveragepy/issues/1341#issuecomment-1228942657
+coverage[toml] >= 6.4.4
+pytest >= 7.2.0
+pytest-mock
+pytest-plus >= 0.2 # for PYTEST_REQPASS
+pytest-xdist >= 2.1.0
+psutil # soft-dep of pytest-xdist
+black # IDE support
+mypy # IDE support
+pylint # IDE support
+flake8 # IDE support
+flake8-future-annotations # IDE support

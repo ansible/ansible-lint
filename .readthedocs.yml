@@ -42,7 +42,7 @@ build:
 #   version: "3.9"
 #   install:
 #     # On https://readthedocs.org/dashboard/ansible-lint/environmentvariables/ we
-#     # do have PIP_CONSTRAINTS=requirements.txt which ensures we install only
+#     # do have PIP_CONSTRAINTS=.config/requirements.txt which ensures we install only
 #     # pinned requirements that that we know to be working.
 #     - method: pip
 #       path: .
