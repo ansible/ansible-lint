@@ -1,0 +1,10 @@
+---
+# Bug reproducer https://github.com/ansible/ansible-lint/issues/2846
+- name: Play
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  roles:
+    - role: acme.sample4
+      vars:
+        date_ko_1: "{{ lookup('pipe', 'date') }}"

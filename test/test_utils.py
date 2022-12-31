@@ -387,3 +387,8 @@ def test_nested_items() -> None:
         match=r"Call to deprecated function ansiblelint\.utils\.nested_items.*"
     ):
         assert list(utils.nested_items(data)) == items
+
+
+def test_find_children() -> None:
+    """Verify correct function of find_children()."""
+    utils.find_children(Lintable("examples/playbooks/find_children.yml"))
