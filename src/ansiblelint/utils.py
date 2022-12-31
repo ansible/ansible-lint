@@ -448,6 +448,9 @@ def _roles_children(
 ) -> list[Lintable]:
     # pylint: disable=unused-argument # parent_type)
     results: list[Lintable] = []
+    if not v:
+        # typing does not prevent junk from being passed in
+        return results
     for role in v:
         if isinstance(role, dict):
             if "role" in role or "name" in role:
