@@ -1,10 +1,8 @@
 ---
-# Until bug below is sorted we will not allow dependabot to run by itself
-# https://github.com/dependabot/dependabot-core/issues/369
 version: 2
 updates:
   - package-ecosystem: pip
-    directory: /docs
+    directory: /.config/
     schedule:
       day: sunday
       interval: weekly
@@ -12,22 +10,10 @@ updates:
       - dependabot-deps-updates
       - skip-changelog
     versioning-strategy: lockfile-only
-    open-pull-requests-limit: 0 # neutered
-  - package-ecosystem: pip
-    directory: /
-    schedule:
-      day: sunday
-      interval: weekly
-    labels:
-      - dependabot-deps-updates
-      - skip-changelog
-    versioning-strategy: lockfile-only
-    open-pull-requests-limit: 0 # neutered
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 3
+      interval: daily
     labels:
       - "dependencies"
       - "skip-changelog"
