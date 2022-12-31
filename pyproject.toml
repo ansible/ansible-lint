@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 [project]
 # https://peps.python.org/pep-0621/#readme
 requires-python = ">=3.8"
-dynamic = ["version"]
+dynamic = ["version", "dependencies", "optional-dependencies"]
 name = "ansible-lint"
 description = "Checks playbooks for practices and behavior that could potentially be improved"
 readme = "README.md"
@@ -39,56 +39,12 @@ classifiers = [
   "Topic :: Utilities",
 ]
 keywords = ["ansible", "lint"]
-dependencies = [
-  # Special order section for helping pip:
-  "will-not-work-on-windows-try-from-wsl-instead; platform_system=='Windows'",
-  "ansible-core>=2.12.0,<2.14.0; python_version<'3.9'", # GPLv3
-  "ansible-core>=2.12.0; python_version>='3.9'", # GPLv3
-  "ansible-compat>=2.2.7", # GPLv3
-  # alphabetically sorted:
-  "black>=22.8.0", # MIT
-  "filelock>=3.3.0", # The Unlicense
-  "jsonschema>=4.10.0", # MIT, version needed for improved errors
-  "packaging>=21.3", # Apache-2.0,BSD-2-Clause
-  "pyyaml>=5.4.1", # MIT (centos 9 has 5.3.1)
-  "rich>=12.0.0", # MIT
-  "ruamel.yaml>=0.17.21,<0.18", # MIT, next version is planned to have breaking changes
-  "yamllint >= 1.26.3", # GPLv3
-  "wcmatch>=8.1.2", # MIT
-
-]
 
 [project.urls]
 homepage = "https://github.com/ansible/ansible-lint"
 documentation = "https://ansible-lint.readthedocs.io/"
 repository = "https://github.com/ansible/ansible-lint"
 changelog = "https://github.com/ansible/ansible-lint/releases"
-
-[project.optional-dependencies]
-docs = [
-  "myst-parser >= 0.16.1",
-  "pipdeptree >= 2.2.1",
-  "sphinx >= 4.4.0",
-  "sphinx-ansible-theme >= 0.9.1",
-  "sphinx-rtd-theme >= 1.0.0, < 2.0.0", # 1.0.0 broke rendering
-  "sphinxcontrib-apidoc >= 0.3.0",
-  "sphinxcontrib-programoutput2 >= 2.0a1",
-]
-test = [
-  "coverage-enable-subprocess", # see https://github.com/nedbat/coveragepy/issues/1341#issuecomment-1228942657
-  "coverage[toml] >= 6.4.4",
-  "pytest >= 7.2.0",
-  "pytest-mock",
-  "pytest-plus >= 0.2", # for PYTEST_REQPASS
-  "pytest-xdist >= 2.1.0",
-  "psutil", # soft-dep of pytest-xdist
-  "black", # IDE support
-  "mypy", # IDE support
-  "pylint", # IDE support
-  "flake8", # IDE support
-  "flake8-future-annotations", # IDE support
-
-]
 
 [project.scripts]
 ansible-lint = "ansiblelint.__main__:_run_cli_entrypoint"
@@ -244,6 +200,12 @@ markers = [
   "eco: Tests effects on a set of 3rd party ansible repositories",
   "formatting_fixtures: Test that regenerates and tests formatting fixtures (requires prettier on PATH)"
 ]
+
+[tool.setuptools.dynamic]
+optional-dependencies.docs = { file = [".config/requirements-docs.txt"] }
+optional-dependencies.test = { file = [".config/requirements-test.txt"] }
+optional-dependencies.lock = { file = [".config/requirements-lock.txt"] }
+dependencies = { file = [".config/requirements.in"] }
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
