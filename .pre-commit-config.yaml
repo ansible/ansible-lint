@@ -207,7 +207,7 @@ repos:
       - id: pip-compile
         name: lock
         always_run: true
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib
         language: python
         files: ^.config\/requirements.*$
         alias: lock
