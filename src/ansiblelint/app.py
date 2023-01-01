@@ -291,7 +291,9 @@ warn_list:  # or 'skip_list' to silence them completely
             msg += f", and fixed {summary.fixed} issue(s)"
         msg += f" on {files_count} files."
 
-        if not self.options.offline:
+        # on offline mode and when run under pre-commit we do not want to
+        # check for updates.
+        if not self.options.offline and os.environ.get("PRE_COMMIT", "0") != "1":
             version_warning = get_version_warning()
             if version_warning:
                 msg += f"\n{version_warning}"
