@@ -163,21 +163,18 @@ repos:
         args: [--strict]
         additional_dependencies:
           - ansible-compat>=2.2.6
-          - ansible-core>=2.14.0
           - black>=22.10.0
+          - cryptography
           - filelock
+          - jinja2
           - pytest>=7.2.0
-          - pyyaml
           - rich>=11.0.0
           - ruamel.yaml
-          - sphinx>=4.4.0
-          - types-dataclasses
-          - types-docutils
+          - types-PyYAML
           - types-jsonschema>=4.4.2
           - types-pkg_resources
-          - types-pyyaml>=6.0.4
+          - types-setuptools
           - wcmatch
-          - yamllint
         exclude: >
           (?x)^(
             test/local-content/.*|

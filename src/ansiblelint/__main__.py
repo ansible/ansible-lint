@@ -397,8 +397,9 @@ def path_inject() -> None:
     # We do know that finding ansible in PATH does not guarantee that it is
     # functioning or that is in fact the same version that was installed as
     # our dependency, but addressing this would be done by ansible-compat.
-    if not shutil.which("ansible"):
-        raise RuntimeError("Failed to find ansible executable in PATH")
+    for cmd in ("ansible", "git"):
+        if not shutil.which(cmd):
+            raise RuntimeError(f"Failed to find runtime dependency '{cmd}' in PATH")
 
 
 # Based on Ansible implementation
