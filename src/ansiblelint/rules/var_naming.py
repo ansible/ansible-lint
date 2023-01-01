@@ -11,7 +11,8 @@ from ansible.parsing.yaml.objects import AnsibleUnicode
 from ansiblelint.config import options
 from ansiblelint.constants import LINE_NUMBER_KEY, SUCCESS_RC
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, RulesCollection
+from ansiblelint.runner import Runner
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.utils import parse_yaml_from_file
 
@@ -74,7 +75,7 @@ class VariableNamingRule(AnsibleLintRule):
         results: list[MatchError] = []
         raw_results: list[MatchError] = []
 
-        if not data:
+        if not data or file.kind not in ("tasks", "handlers", "playbook", "vars"):
             return results
         # If the Play uses the 'vars' section to set variables
         our_vars = data.get("vars", {})
@@ -193,12 +194,19 @@ if "pytest" in sys.modules:
     )
 
     @pytest.mark.parametrize(
-        "rule_runner", (VariableNamingRule,), indirect=["rule_runner"]
+        ("file", "expected"),
+        (
+            pytest.param("examples/playbooks/rule-var-naming-fail.yml", 7, id="0"),
+            pytest.param("examples/Taskfile.yml", 0, id="1"),
+        ),
     )
-    def test_invalid_var_name_playbook(rule_runner: RunFromText) -> None:
+    def test_invalid_var_name_playbook(file: str, expected: int) -> None:
         """Test rule matches."""
-        results = rule_runner.run("examples/playbooks/rule-var-naming-fail.yml")
-        assert len(results) == 7
+        rules = RulesCollection(options=options)
+        rules.register(VariableNamingRule())
+        results = Runner(Lintable(file), rules=rules).run()
+        # results = rule_runner.run()
+        assert len(results) == expected
         for result in results:
             assert result.rule.id == VariableNamingRule.id
         # We are not checking line numbers because they can vary between

@@ -26,6 +26,7 @@ Sorin
 Sshell
 TOXENV
 TYPECHECK
+Taskfiles
 Tsukinowa
 Tóth
 WSLENV
@@ -306,6 +307,7 @@ subtest
 supervisorctl
 synchronize
 sysvinit
+taskfile
 taskhandler
 taskimports
 taskincludes
