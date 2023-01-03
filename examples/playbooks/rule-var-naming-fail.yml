@@ -26,3 +26,7 @@
             ALL_CAPS_ARE_BAD_TOO: "{{ MoreBad }}" # invalid
           ansible.builtin.set_fact:
             CamelCaseIsBad: "{{ BAD }}" # invalid
+    - name: Test on register
+      ansible.builtin.debug:
+        var: test_var
+      register: CamelCaseIsBad # invalid

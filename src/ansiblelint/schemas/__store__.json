@@ -12,7 +12,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/arg_specs.json"
   },
   "changelog": {
-    "etag": "3749b3e00288947d6aa204710e536d8b0f7abe12bb5c370b4aae526b88a44310",
+    "etag": "f433b08eb8b9c5e358e9e479a79912da4a0f601077b8be52378526c27bc1c13b",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/changelog.json"
   },
   "execution-environment": {
@@ -28,7 +28,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json"
   },
   "meta": {
-    "etag": "c6c6d52c2e952d8708e638b45f350b327e9dd3dd09d30cf072fe5d928598a1bd",
+    "etag": "12af007a9165999f589464911ed2f0497bdf6e591c401cafa864f3b481988653",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json"
   },
   "meta-runtime": {

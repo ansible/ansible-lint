@@ -25,6 +25,7 @@ BuildRequires:  python%{python3_pkgversion}-pytest-xdist
 BuildRequires:  python%{python3_pkgversion}-libselinux
 BuildRequires:  git-core
 %endif
+Requires:       git-core
 
 
 %description

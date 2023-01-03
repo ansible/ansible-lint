@@ -1,0 +1,8 @@
+---
+# Sample taskfile, for testing linter ability to identify it
+version: "3"
+output: group
+vars:
+  HOSTNAME: # <-- this is valid for Taskfiles but not for ansible files
+    sh: echo ${HOSTNAME:-localhost}
+tasks: {}

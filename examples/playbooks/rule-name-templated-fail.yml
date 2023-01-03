@@ -8,3 +8,6 @@
     - name: This task is correctly templated {{ sampleService }}
       ansible.builtin.command: echo "Hello World"
       changed_when: false
+    - name: This task is correctly templated '{{ sampleService }}'
+      ansible.builtin.command: echo "Hello World"
+      changed_when: false
