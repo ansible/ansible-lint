@@ -1,0 +1,1 @@
+requires_ansible: ">= 2.12" # invalid as space is not allowed!

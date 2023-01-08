@@ -72,6 +72,7 @@
     },
     "requires_ansible": {
       "examples": [">=2.10,<2.11"],
+      "pattern": "^[^\\s]*$",
       "title": "The version of Ansible Core (ansible-core) required to use the collection. Multiple versions can be separated with a comma.",
       "type": "string"
     }
