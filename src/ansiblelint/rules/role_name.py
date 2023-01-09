@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import re
+from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -34,11 +35,16 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
 
-ROLE_NAME_REGEX = r"^[a-z][a-z0-9_]*$"
+ROLE_NAME_REGEX = re.compile(r"^[a-z][a-z0-9_]*$")
 
 
 def _remove_prefix(text: str, prefix: str) -> str:
     return re.sub(rf"^{re.escape(prefix)}", "", text)
+
+
+@cache
+def _match_role_name_regex(role_name: str) -> bool:
+    return ROLE_NAME_REGEX.match(role_name) is not None
 
 
 class RoleNames(AnsibleLintRule):
@@ -52,13 +58,8 @@ class RoleNames(AnsibleLintRule):
     )
     link = "https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory"
     severity = "HIGH"
-    done: list[str] = []  # already noticed roles list
     tags = ["deprecations", "metadata"]
     version_added = "v6.8.5"
-
-    def __init__(self) -> None:
-        """Save precompiled regex."""
-        self._re = re.compile(ROLE_NAME_REGEX)
 
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
@@ -95,15 +96,13 @@ class RoleNames(AnsibleLintRule):
             )
 
         role_name = _remove_prefix(role_name, "ansible-role-")
-        if role_name not in self.done:
-            self.done.append(role_name)
-            if role_name and not self._re.match(role_name):
-                result.append(
-                    self.create_matcherror(
-                        filename=file,
-                        message=self.shortdesc.format(role_name),
-                    )
+        if role_name and not _match_role_name_regex(role_name):
+            result.append(
+                self.create_matcherror(
+                    filename=file,
+                    message=self.shortdesc.format(role_name),
                 )
+            )
         return result
 
     @staticmethod
