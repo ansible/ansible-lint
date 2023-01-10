@@ -3,5 +3,5 @@ collections:
   version: 0.1.0
 - name: ansible-posix-1.4.0.tar.gz
   version: 1.4.0
-- name: community-general-6.1.0.tar.gz
-  version: 6.1.0
+- name: community-general-6.2.0.tar.gz
+  version: 6.2.0
