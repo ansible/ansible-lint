@@ -18,7 +18,7 @@ class RoleLoopVarPrefix(AnsibleLintRule):
 
     id = "loop-var-prefix"
     link = (
-        "https://docs.ansible.com/ansible/latest/user_guide/"
+        "https://docs.ansible.com/ansible/latest/playbook_guide/"
         "playbooks_loops.html#defining-inner-and-outer-variable-names-with-loop-var"
     )
     description = """\
