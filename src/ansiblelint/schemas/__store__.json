@@ -28,11 +28,11 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json"
   },
   "meta": {
-    "etag": "12af007a9165999f589464911ed2f0497bdf6e591c401cafa864f3b481988653",
+    "etag": "1f128994877dd4f9d0712ed36930d6f14d7cd9d601b459d9f19fa7104e626f51",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json"
   },
   "meta-runtime": {
-    "etag": "a7391f9074aa150c1d635acd9a3b813df50ba7a71432fa58d8c8964520263977",
+    "etag": "c1633dcafd016a44e2aba7574136983fef3da2bbb74eeb61785424081e8a82a8",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta-runtime.json"
   },
   "molecule": {
