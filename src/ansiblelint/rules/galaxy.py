@@ -1,6 +1,7 @@
 """Implementation of GalaxyRule."""
 from __future__ import annotations
 
+import os
 import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
@@ -14,10 +15,10 @@ if TYPE_CHECKING:
 
 
 class GalaxyRule(AnsibleLintRule):
-    """Rule for checking collection version is greater than 1.0.0."""
+    """Rule for checking collection version is greater than 1.0.0 and checking for changelog."""
 
     id = "galaxy"
-    description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0"
+    description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0 and check for changelog."
     severity = "MEDIUM"
     tags = ["metadata", "opt-in", "experimental"]
     version_added = "v6.6.0 (last update)"
@@ -26,18 +27,21 @@ class GalaxyRule(AnsibleLintRule):
         """Return matches found for a specific play (entry in playbook)."""
         if file.kind != "galaxy":  # type: ignore
             return []
+
+        results = []
+
         if "version" not in data:
-            return [
+            results.append(
                 self.create_matcherror(
                     message="galaxy.yaml should have version tag.",
                     linenumber=data[LINE_NUMBER_KEY],
                     tag="galaxy[version-missing]",
                     filename=file,
                 )
-            ]
+            )
         version = data.get("version")
         if Version(version) < Version("1.0.0"):
-            return [
+            results.append(
                 self.create_matcherror(
                     message="collection version should be greater than or equal to 1.0.0",
                     # pylint: disable=protected-access
@@ -45,8 +49,33 @@ class GalaxyRule(AnsibleLintRule):
                     tag="galaxy[version-incorrect]",
                     filename=file,
                 )
-            ]
-        return []
+            )
+
+        # Changelog Check - building off Galaxy rule as there is no current way to check
+        # for a nonexistent file
+
+        base_path = os.path.split(str(file.abspath))[0]
+        changelog_found = 0
+        changelog_paths = [
+            os.path.join(base_path, "changelogs", "changelog.yaml"),
+            os.path.join(base_path, "CHANGELOG.rst"),
+            os.path.join(base_path, "CHANGELOG.md"),
+        ]
+
+        for path in changelog_paths:
+            if os.path.isfile(path):
+                changelog_found = 1
+
+        if not changelog_found:
+            results.append(
+                self.create_matcherror(
+                    message="No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",
+                    tag="galaxy[no-changelog]",
+                    filename=file,
+                )
+            )
+
+        return results
 
 
 @total_ordering
@@ -103,5 +132,20 @@ if "pytest" in sys.modules:  # noqa: C901
         collection.register(GalaxyRule())
         failure = "examples/meta/galaxy.yml"
         bad_runner = Runner(failure, rules=collection)
+        errs = bad_runner.run()
+        assert len(errs) == 1
+
+    def test_changelog_present() -> None:
+        """Positive test for finding a changelog."""
+        collection = RulesCollection()
+        collection.register(GalaxyRule())
+        good_runner = Runner("examples/collection/galaxy.yml", rules=collection)
+        assert [] == good_runner.run()
+
+    def test_changelog_missing() -> None:
+        """Negative test for finding a changelog."""
+        collection = RulesCollection()
+        collection.register(GalaxyRule())
+        bad_runner = Runner("examples/no_changelog/galaxy.yml", rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 1
