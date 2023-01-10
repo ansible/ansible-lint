@@ -56,7 +56,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         "acting as a handler. You could use ``notify`` and move that task to "
         "``handlers``."
     )
-    link = "https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html"
+    link = "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html#handlers"
     severity = "MEDIUM"
     tags = ["idiom"]
     version_added = "historic"
