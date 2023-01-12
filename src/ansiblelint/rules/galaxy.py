@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
@@ -75,7 +76,19 @@ class GalaxyRule(AnsibleLintRule):
                 )
             )
 
+        _import_collection()
+
         return results
+
+
+def _import_collection() -> None:
+    """Build the collection and try importing it using the galaxy importer to check for errors."""
+    build_cmd = ["ansible-galaxy", "collection", "build", "--force"]
+    result = subprocess.run(build_cmd, capture_output=True, check=False)
+    print("stdout: ", result.stdout)
+    cmd = ["python", "-m", "galaxy_importer.main", "community-vagrant-0.0.0.tar.gz"]
+    import_result = subprocess.run(cmd, capture_output=True, check=False)
+    print("import_result stdout: ", import_result.stdout)
 
 
 @total_ordering

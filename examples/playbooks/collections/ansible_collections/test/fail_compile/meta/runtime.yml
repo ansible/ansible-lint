@@ -1,0 +1,1 @@
+requires_ansible: ">=999.11.0" # Use '>= 2.9.10' instead, if needed
