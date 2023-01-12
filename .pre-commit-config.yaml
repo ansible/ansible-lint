@@ -217,7 +217,7 @@ repos:
           - pip>=22.3.1
       - id: pip-compile
         name: deps
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --extra lock --strip-extras --unsafe-package ansible-core
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core
         language: python
         files: ^.config\/requirements.*$
         alias: deps
