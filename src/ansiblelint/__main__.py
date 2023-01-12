@@ -48,7 +48,7 @@ from ansiblelint.color import (
     render_yaml,
 )
 from ansiblelint.config import get_version_warning, options
-from ansiblelint.constants import EXIT_CONTROL_C_RC, LOCK_TIMEOUT_RC
+from ansiblelint.constants import EXIT_CONTROL_C_RC, GIT_CMD, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
@@ -304,7 +304,7 @@ def _previous_revision() -> Iterator[None]:
     rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
     options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
     revision = subprocess.run(
-        ["git", "rev-parse", "HEAD^1"],
+        [*GIT_CMD, "rev-parse", "HEAD^1"],
         check=True,
         text=True,
         stdout=subprocess.PIPE,
@@ -318,14 +318,14 @@ def _previous_revision() -> Iterator[None]:
     # Run check will fail if worktree_dir already exists
     # pylint: disable=subprocess-run-check
     subprocess.run(
-        ["git", "worktree", "add", "-f", worktree_dir],
+        [*GIT_CMD, "worktree", "add", "-f", worktree_dir],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     try:
         with cwd(worktree_dir):
             subprocess.run(
-                ["git", "checkout", revision],
+                [*GIT_CMD, "checkout", revision],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 check=True,

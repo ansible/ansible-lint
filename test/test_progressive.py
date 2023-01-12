@@ -6,6 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from ansiblelint.constants import GIT_CMD
 from ansiblelint.file_utils import cwd
 
 FAULTY_PLAYBOOK = """---
@@ -29,16 +30,16 @@ CORRECT_PLAYBOOK = """---
 
 def git_init() -> None:
     """Init temporary git repository."""
-    subprocess.run(["git", "init", "--initial-branch=main"], check=True)
-    subprocess.run(["git", "config", "user.email", "test@example.com"], check=True)
-    subprocess.run(["git", "config", "user.name", "test"], check=True)
+    subprocess.run([*GIT_CMD, "init", "--initial-branch=main"], check=True)
+    subprocess.run([*GIT_CMD, "config", "user.email", "test@example.com"], check=True)
+    subprocess.run([*GIT_CMD, "config", "user.name", "test"], check=True)
 
 
 def git_commit(filename: Path, content: str) -> None:
     """Create and commit a file."""
     filename.write_text(content)
-    subprocess.run(["git", "add", filename], check=True)
-    subprocess.run(["git", "commit", "-a", "-m", f"Commit {filename}"], check=True)
+    subprocess.run([*GIT_CMD, "add", filename], check=True)
+    subprocess.run([*GIT_CMD, "commit", "-a", "-m", f"Commit {filename}"], check=True)
 
 
 def run_lint(cmd: list[str]) -> subprocess.CompletedProcess[str]:
