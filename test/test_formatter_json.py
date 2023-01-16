@@ -90,6 +90,28 @@ class TestCodeclimateJSONFormatter:
         assert single_match["location"]["path"] == self.matches[0].filename
         assert "lines" in single_match["location"]
         assert single_match["location"]["lines"]["begin"] == self.matches[0].linenumber
+        assert "positions" not in single_match["location"]
+
+    def test_validate_codeclimate_schema_with_positions(self) -> None:
+        """Test if the returned JSON is a valid codeclimate report (containing 'positions' instead of 'lines')."""
+        assert isinstance(self.formatter, CodeclimateJSONFormatter)
+        result = json.loads(
+            self.formatter.format_result(
+                [
+                    MatchError(
+                        message="message",
+                        linenumber=1,
+                        column=42,
+                        details="hello",
+                        filename=Lintable("filename.yml"),
+                        rule=self.rule,
+                    )
+                ]
+            )
+        )
+        assert result[0]["location"]["positions"]["begin"]["line"] == 1
+        assert result[0]["location"]["positions"]["begin"]["column"] == 42
+        assert "lines" not in result[0]["location"]
 
 
 def test_code_climate_parsable_ignored() -> None:
