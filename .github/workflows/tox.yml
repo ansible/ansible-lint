@@ -69,7 +69,7 @@ jobs:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:GITHUB_STEP_SUMMARY
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 745
+      PYTEST_REQPASS: 747
 
     steps:
       - name: Activate WSL1
