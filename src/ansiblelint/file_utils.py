@@ -19,7 +19,7 @@ import wcmatch.pathlib
 from wcmatch.wcmatch import RECURSIVE, WcMatch
 
 from ansiblelint.config import BASE_KINDS, options
-from ansiblelint.constants import FileType
+from ansiblelint.constants import GIT_CMD, FileType
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3979
@@ -368,14 +368,14 @@ def discover_lintables(options: Namespace) -> dict[str, Any]:
     """
     # git is preferred as it also considers .gitignore
     git_command_present = [
-        "git",
+        *GIT_CMD,
         "ls-files",
         "--cached",
         "--others",
         "--exclude-standard",
         "-z",
     ]
-    git_command_absent = ["git", "ls-files", "--deleted", "-z"]
+    git_command_absent = [*GIT_CMD, "ls-files", "--deleted", "-z"]
     out = None
 
     try:
@@ -437,7 +437,7 @@ def guess_project_dir(config_file: str | None) -> str:
     if path is None:
         try:
             result = subprocess.run(
-                ["git", "rev-parse", "--show-toplevel"],
+                [*GIT_CMD, "rev-parse", "--show-toplevel"],
                 capture_output=True,
                 text=True,
                 check=True,
