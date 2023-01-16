@@ -94,6 +94,7 @@ class TestCodeclimateJSONFormatter:
 
     def test_validate_codeclimate_schema_with_positions(self) -> None:
         """Test if the returned JSON is a valid codeclimate report (containing 'positions' instead of 'lines')."""
+        assert isinstance(self.formatter, CodeclimateJSONFormatter)
         result = json.loads(
             self.formatter.format_result(
                 [
