@@ -145,3 +145,10 @@ ROLE_IMPORT_ACTION_NAMES = {
     "import_role",
     "include_role",
 }
+
+# Newer versions of git might fail to run when different file ownership is
+# found of repo. One example is on GHA runners executing containerized
+# reusable actions, where the mounted volume might have different owner.
+#
+# https://github.com/ansible/ansible-lint-action/issues/138
+GIT_CMD = ["git", "-c", f"safe.directory={os.getcwd()}"]
