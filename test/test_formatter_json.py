@@ -113,6 +113,7 @@ class TestCodeclimateJSONFormatter:
         assert result[0]["location"]["positions"]["begin"]["column"] == 42
         assert "lines" not in result[0]["location"]
 
+
 def test_code_climate_parsable_ignored() -> None:
     """Test that -p option does not alter codeclimate format."""
     cmd = [
