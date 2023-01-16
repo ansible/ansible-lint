@@ -415,7 +415,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="offline",
         action="store_const",
         const=True,
-        help="Disable installation of requirements.yml",
+        help="Disable installation of requirements.yml and schema refreshing",
     )
     parser.add_argument(
         "--version",

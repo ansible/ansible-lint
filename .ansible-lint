@@ -75,7 +75,7 @@ warn_list:
 # write_list:
 #   - all
 
-# Offline mode disables installation of requirements.yml
+# Offline mode disables installation of requirements.yml and schema refreshing
 offline: true
 
 # Return success if number of violations compared with previous git
