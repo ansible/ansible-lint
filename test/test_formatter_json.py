@@ -93,7 +93,7 @@ class TestCodeclimateJSONFormatter:
         assert "positions" not in single_match["location"]
 
     def test_validate_codeclimate_schema_with_positions(self) -> None:
-        """Test if the returned JSON is a valid codeclimate report. (containing 'positions' instead of 'lines')"""
+        """Test if the returned JSON is a valid codeclimate report (containing 'positions' instead of 'lines')."""
         result = json.loads(self.formatter.format_result([
             MatchError(
                 message="message",
