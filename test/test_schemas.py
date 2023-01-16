@@ -1,10 +1,10 @@
 """Test schemas modules."""
-from time import sleep
-import urllib
 import logging
+import urllib
+from time import sleep
+from unittest.mock import DEFAULT, patch
 
 import pytest
-from unittest.mock import patch, DEFAULT
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
@@ -63,8 +63,7 @@ def test_requests_uses_timeout(MockRequest) -> None:
 @patch("urllib.request")
 def test_request_timeouterror_handling(MockRequest, caplog) -> None:
     error_msg = "Simulating handshake operation time out."
-    MockRequest.urlopen.side_effect = urllib.error.URLError(
-        TimeoutError(error_msg))
+    MockRequest.urlopen.side_effect = urllib.error.URLError(TimeoutError(error_msg))
     with caplog.at_level(logging.DEBUG):
         assert refresh_schemas(min_age_seconds=0) == 1
     MockRequest.urlopen.assert_called()
