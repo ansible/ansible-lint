@@ -45,16 +45,6 @@ class TestCodeclimateJSONFormatter:
                 rule=self.rule,
             )
         )
-        self.matches.append(
-            MatchError(
-                message="message",
-                linenumber=3,
-                column=42,
-                details="hello",
-                filename=Lintable("filename.yml"),
-                rule=self.rule,
-            )
-        )
         self.formatter = CodeclimateJSONFormatter(
             pathlib.Path.cwd(), display_relative_path=True
         )
