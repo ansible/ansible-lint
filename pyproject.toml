@@ -62,17 +62,22 @@ source = ["src"]
 branch = true
 parallel = true
 concurrency = ["multiprocessing", "thread"]
-data_file = ".tox/.coverage"
 
+# Keep this default because xml/report do not know to use load it from config file:
+# data_file = ".coverage"
 [tool.coverage.paths]
 source = ["src", ".tox/*/site-packages"]
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 omit = ["*/src/ansible_compat/*", "test/*"]
+# Increase it just so it would pass on any single-python run
 fail_under = 88
 skip_covered = true
 skip_empty = true
+# During development we might remove code (files) with coverage data, and we dont want to fail:
+ignore_errors = true
+show_missing = true
 
 [tool.isort]
 profile = "black"

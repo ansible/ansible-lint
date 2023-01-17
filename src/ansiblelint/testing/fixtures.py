@@ -10,7 +10,6 @@ from __future__ import annotations
 import copy
 import os
 from argparse import Namespace
-from pathlib import Path
 from typing import Iterator
 
 import pytest
@@ -18,25 +17,8 @@ from _pytest.fixtures import SubRequest
 
 from ansiblelint.config import options  # noqa: F401
 from ansiblelint.constants import DEFAULT_RULESDIR
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
 from ansiblelint.testing import RunFromText
-
-
-@pytest.fixture(name="play_file_path")
-def fixture_play_file_path(tmp_path: Path) -> str:
-    """Fixture to return a playbook path."""
-    path = tmp_path / "playbook.yml"
-    return str(path)
-
-
-@pytest.fixture
-def runner(
-    play_file_path: Lintable | str, default_rules_collection: RulesCollection
-) -> Runner:
-    """Fixture to return a Runner() instance."""
-    return Runner(play_file_path, rules=default_rules_collection)
 
 
 @pytest.fixture(name="default_rules_collection")
