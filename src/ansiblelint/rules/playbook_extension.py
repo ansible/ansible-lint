@@ -4,13 +4,15 @@
 from __future__ import annotations
 
 import os
+import sys
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.runner import Runner
 
 
-class PlaybookExtension(AnsibleLintRule):
+class PlaybookExtensionRule(AnsibleLintRule):
     """Use ".yml" or ".yaml" playbook extension."""
 
     id = "playbook-extension"
@@ -30,3 +32,22 @@ class PlaybookExtension(AnsibleLintRule):
             self.done.append(path)
             result.append(self.create_matcherror(filename=file))
         return result
+
+
+if "pytest" in sys.modules:  # noqa: C901
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("file", "expected"),
+        (pytest.param("examples/playbooks/play-without-extension", 1, id="fail"),),
+    )
+    def test_playbook_extension(file: str, expected: int) -> None:
+        """The ini_file module does not accept preserve mode."""
+        rules = RulesCollection()
+        rules.register(PlaybookExtensionRule())
+        results = Runner(Lintable(file, kind="playbook"), rules=rules).run()
+        assert len(results) == expected
+        for result in results:
+            assert result.tag == "playbook-extension"

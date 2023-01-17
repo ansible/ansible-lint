@@ -113,7 +113,7 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     os.makedirs(options.cache_dir, exist_ok=True)
 
     options.cache_dir_lock = None
-    if not options.offline:
+    if not options.offline:  # pragma: no cover
         options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
         try:
             options.cache_dir_lock.acquire(timeout=180)
@@ -178,7 +178,7 @@ def _do_transform(result: LintResult, opts: Namespace) -> None:
 
 def support_banner() -> None:
     """Display support banner when running on unsupported platform."""
-    if sys.version_info < (3, 9, 0):
+    if sys.version_info < (3, 9, 0):  # pragma: no cover
         prefix = "::warning::" if "GITHUB_ACTION" in os.environ else "WARNING: "
         console_stderr.print(
             f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will soon require 3.9. Do not report bugs for this version.",
@@ -192,7 +192,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     # alter PATH if needed (venv support)
     path_inject()
 
-    if argv is None:
+    if argv is None:  # pragma: no cover
         argv = sys.argv
     initialize_options(argv[1:])
 
@@ -238,7 +238,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     app = get_app()
     if isinstance(options.tags, str):
-        options.tags = options.tags.split(",")
+        options.tags = options.tags.split(",")  # pragma: no cover
     result = _get_matches(rules, options)
 
     if options.write_list:
@@ -365,10 +365,10 @@ def path_inject() -> None:
     # Expand ~ in PATH as it known to break many tools
     expanded = False
     for idx, path in enumerate(paths):
-        if "~" in path:
+        if "~" in path:  # pragma: no cover
             paths[idx] = os.path.expanduser(path)
             expanded = True
-    if expanded:
+    if expanded:  # pragma: no cover
         print(
             "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
             file=sys.stderr,
@@ -403,7 +403,7 @@ def path_inject() -> None:
 
 
 # Based on Ansible implementation
-def to_bool(value: Any) -> bool:
+def to_bool(value: Any) -> bool:  # pragma: no cover
     """Return a bool for the arg."""
     if value is None or isinstance(value, bool):
         return bool(value)

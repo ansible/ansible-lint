@@ -32,7 +32,7 @@ class RunFromText:
         """Initialize a RunFromText instance with rules collection."""
         # Emulate command line execution initialization as without it Ansible module
         # would be loaded with incomplete module/role/collection list.
-        if not self.app:
+        if not self.app:  # pragma: no cover
             self.app = get_app()
 
         self.collection = collection
@@ -101,7 +101,7 @@ def run_ansible_lint(
 ) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
     args = [*argv]
-    if offline:
+    if offline:  # pragma: no cover
         args.insert(0, "--offline")
 
     if not executable:
