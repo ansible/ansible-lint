@@ -67,7 +67,7 @@ def test_matcherror_invalid() -> None:
         r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
     )
     with pytest.raises(TypeError, match=expected_err):
-        MatchError()
+        raise MatchError()
 
 
 @pytest.mark.parametrize(
