@@ -3,15 +3,15 @@ from typing import Any
 
 import pytest
 
-from ansiblelint.text import strip_ansi_escape, toidentifier, has_glob, has_jinja
+from ansiblelint.text import has_glob, has_jinja, strip_ansi_escape, toidentifier
 
 
 @pytest.mark.parametrize(
     ("value", "expected"),
     (
         pytest.param("\x1b[1;31mHello", "Hello", id="0"),
-        pytest.param("\x1b[2;37;41mexamplefile.zip", "examplefile.zip", id="1"),
-        pytest.param("Hello\nWorld", "Hello\nWorld", id="2"),
+        pytest.param("\x1b[2;37;41mExample_file.zip", "Example_file.zip", id="1"),
+        pytest.param(b"ansible-lint", "ansible-lint", id="2"),
     ),
 )
 def test_strip_ansi_escape(value: Any, expected: str) -> None:
@@ -24,12 +24,22 @@ def test_strip_ansi_escape(value: Any, expected: str) -> None:
     (
         pytest.param("foo-bar", "foo_bar", id="0"),
         pytest.param("foo--bar", "foo_bar", id="1"),
-        pytest.param("example_test1", "example_test1", id="2"),
     ),
 )
 def test_toidentifier(value: Any, expected: str) -> None:
     """Tests for toidentifier()."""
     assert toidentifier(value) == expected
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    (pytest.param("example_test.zip", "Unable to convert role name", id="0"),),
+)
+def test_toidentifier_fail(value: Any, expected: str) -> None:
+    """Tests for toidentifier()."""
+    with pytest.raises(RuntimeError) as err:
+        toidentifier(value)
+    assert str(err.value).find(expected) > -1
 
 
 @pytest.mark.parametrize(
