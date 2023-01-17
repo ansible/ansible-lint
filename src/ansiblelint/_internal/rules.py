@@ -69,7 +69,7 @@ class BaseRule:
     def url(self) -> str:
         """Return rule documentation url."""
         url = self.link
-        if not url:
+        if not url:  # pragma: no cover
             url = RULE_DOC_URL
             if self.id:
                 url += self.id + "/"
