@@ -83,8 +83,8 @@ def test_tokenize(
     ("reference_form", "alternate_forms"),
     (
         pytest.param(
-            dict(name="hello", action="command chdir=abc echo hello world"),
-            (dict(name="hello", command="chdir=abc echo hello world"),),
+            {"name": "hello", "action": "command chdir=abc echo hello world"},
+            ({"name": "hello", "command": "chdir=abc echo hello world"},),
             id="simple_command",
         ),
         pytest.param(
@@ -113,12 +113,13 @@ def test_normalize(
 
 def test_normalize_complex_command() -> None:
     """Test that tasks specified differently are normalized same way."""
-    task1 = dict(
-        name="hello", action={"module": "pip", "name": "df", "editable": "false"}
-    )
-    task2 = dict(name="hello", pip={"name": "df", "editable": "false"})
-    task3 = dict(name="hello", pip="name=df editable=false")
-    task4 = dict(name="hello", action="pip name=df editable=false")
+    task1 = {
+        "name": "hello",
+        "action": {"module": "pip", "name": "df", "editable": "false"},
+    }
+    task2 = {"name": "hello", "pip": {"name": "df", "editable": "false"}}
+    task3 = {"name": "hello", "pip": "name=df editable=false"}
+    task4 = {"name": "hello", "action": "pip name=df editable=false"}
     assert utils.normalize_task(task1, "tasks.yml") == utils.normalize_task(
         task2, "tasks.yml"
     )
@@ -134,47 +135,47 @@ def test_normalize_complex_command() -> None:
     ("task", "expected_form"),
     (
         pytest.param(
-            dict(
-                name="ensure apache is at the latest version",
-                yum={"name": "httpd", "state": "latest"},
-            ),
-            dict(
-                delegate_to=Sentinel,
-                name="ensure apache is at the latest version",
-                action={
+            {
+                "name": "ensure apache is at the latest version",
+                "yum": {"name": "httpd", "state": "latest"},
+            },
+            {
+                "delegate_to": Sentinel,
+                "name": "ensure apache is at the latest version",
+                "action": {
                     "__ansible_module__": "yum",
                     "__ansible_module_original__": "yum",
                     "__ansible_arguments__": [],
                     "name": "httpd",
                     "state": "latest",
                 },
-            ),
+            },
         ),
         pytest.param(
-            dict(
-                name="Attempt and graceful roll back",
-                block=[
+            {
+                "name": "Attempt and graceful roll back",
+                "block": [
                     {
                         "name": "Install httpd and memcached",
                         "ansible.builtin.yum": ["httpd", "memcached"],
                         "state": "present",
                     }
                 ],
-            ),
-            dict(
-                name="Attempt and graceful roll back",
-                block=[
+            },
+            {
+                "name": "Attempt and graceful roll back",
+                "block": [
                     {
                         "name": "Install httpd and memcached",
                         "ansible.builtin.yum": ["httpd", "memcached"],
                         "state": "present",
                     }
                 ],
-                action={
+                "action": {
                     "__ansible_module__": "block/always/rescue",
                     "__ansible_module_original__": "block/always/rescue",
                 },
-            ),
+            },
         ),
     ),
 )
@@ -241,7 +242,7 @@ def test_template(template: str, output: str) -> None:
     result = utils.template(
         basedir="/base/dir",
         value=template,
-        variables=dict(playbook_dir="/a/b/c"),
+        variables={"playbook_dir": "/a/b/c"},
         fail_on_error=False,
     )
     assert result == output
@@ -249,7 +250,7 @@ def test_template(template: str, output: str) -> None:
 
 def test_task_to_str_unicode() -> None:
     """Ensure that extracting messages from tasks preserves Unicode."""
-    task = dict(fail=dict(msg="unicode é ô à"))
+    task = {"fail": {"msg": "unicode é ô à"}}
     result = utils.task_to_str(utils.normalize_task(task, "filename.yml"))
     assert result == "fail msg=unicode é ô à"
 

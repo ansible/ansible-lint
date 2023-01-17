@@ -300,7 +300,7 @@ def play_children(
             v = template(
                 os.path.abspath(basedir),
                 v,
-                dict(playbook_dir=PLAYBOOK_DIR or os.path.abspath(basedir)),
+                {"playbook_dir": PLAYBOOK_DIR or os.path.abspath(basedir)},
                 fail_on_undefined=False,
             )
             return delegate_map[k](basedir, k, v, parent_type)
@@ -523,7 +523,7 @@ def _look_for_role_files(
 
 def _kv_to_dict(v: str) -> dict[str, Any]:
     (command, args, kwargs) = tokenize(v)
-    return dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs)
+    return {"__ansible_module__": command, "__ansible_arguments__": args, **kwargs}
 
 
 def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
@@ -564,10 +564,10 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
     if is_nested_task(task):
         _extract_ansible_parsed_keys_from_task(result, task, ansible_parsed_keys)
         # Add dummy action for block/always/rescue statements
-        result["action"] = dict(
-            __ansible_module__="block/always/rescue",
-            __ansible_module_original__="block/always/rescue",
-        )
+        result["action"] = {
+            "__ansible_module__": "block/always/rescue",
+            "__ansible_module_original__": "block/always/rescue",
+        }
 
         return result
 
@@ -604,9 +604,10 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
     # the opposite. Mainly we currently consider normalized the module listing
     # used by `ansible-doc -t module -l 2>/dev/null`
     action = removeprefix(action, "ansible.builtin.")
-    result["action"] = dict(
-        __ansible_module__=action, __ansible_module_original__=action_unnormalized
-    )
+    result["action"] = {
+        "__ansible_module__": action,
+        "__ansible_module_original__": action_unnormalized,
+    }
 
     if "_raw_params" in arguments:
         # Doing a split here is really bad as it would break jinja2 templating
