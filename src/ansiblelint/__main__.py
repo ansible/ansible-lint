@@ -369,6 +369,7 @@ def path_inject() -> None:
             paths[idx] = os.path.expanduser(path)
             expanded = True
     if expanded:  # pragma: no cover
+        # flake8: noqa: T201
         print(
             "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
             file=sys.stderr,
@@ -387,6 +388,7 @@ def path_inject() -> None:
         inject_paths.append(py_path)
 
     if inject_paths:
+        # flake8: noqa: T201
         print(
             f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
             file=sys.stderr,

@@ -78,6 +78,7 @@ if __name__ == "__main__":
     invalid_var_names = sorted(list(keyword.kwlist) + play_keywords)
     if "__peg_parser__" in invalid_var_names:
         invalid_var_names.remove("__peg_parser__")
+    # flake8: noqa: T201
     print("Updating invalid var names")
 
     with open("f/vars.json", "r+", encoding="utf-8") as f:
@@ -90,6 +91,7 @@ if __name__ == "__main__":
         f.write("\n")
         f.truncate()
 
+    # flake8: noqa: T201
     print("Compiling subschemas...")
     with open("f/ansible.json", encoding="utf-8") as f:
         combined_json = json.load(f)

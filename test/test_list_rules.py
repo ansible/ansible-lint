@@ -56,7 +56,6 @@ def test_list_rules_with_format_option(
     fakerole = os.path.join("test", "fixtures", "list-rules-tests")
 
     result_list_rules = run_ansible_lint("-f", format_string, "-L", fakerole, cwd=cwd)
-    print(result_list_rules.stdout)
 
     assert (f"invalid choice: '{format_string}'" in result_list_rules.stderr) is result
     assert ("syntax-check" in result_list_rules.stdout) is not result

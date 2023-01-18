@@ -146,7 +146,9 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
 if __name__ == "__main__":
 
     if refresh_schemas():
+        # flake8: noqa: T201
         print("Schemas were updated.")
         sys.exit(1)
     else:
+        # flake8: noqa: T201
         print("Schemas not updated", 0)
