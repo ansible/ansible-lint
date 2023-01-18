@@ -147,5 +147,7 @@ if "pytest" in sys.modules:  # noqa: C901
         collection = RulesCollection()
         collection.register(GalaxyRule())
         bad_runner = Runner("examples/no_changelog/galaxy.yml", rules=collection)
-        errs = bad_runner.run()
-        assert len(errs) == 1
+        result = bad_runner.run()
+        assert len(result) == 1
+        for item in result:
+            assert item.tag == "galaxy[no-changelog]"
