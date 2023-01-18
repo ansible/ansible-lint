@@ -62,6 +62,7 @@ extensions = [
 # Fail safe protection to detect conflicting packages
 try:
     pkg_resources.get_distribution("sphinxcontrib-programoutput")
+    # flake8: noqa: T201
     print(
         "FATAL: We detected presence of sphinxcontrib-programoutput package instead of sphinxcontrib-programoutput2 one. You must be sure the first is not installed.",
         file=sys.stderr,

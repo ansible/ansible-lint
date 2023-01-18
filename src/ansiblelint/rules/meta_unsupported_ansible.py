@@ -43,8 +43,6 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
 
         version_required = file.data.get("requires_ansible", None)
 
-        print(version_required)
-
         if version_required:
             if not any(
                 version in version_required for version in self.supported_ansible
