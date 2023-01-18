@@ -36,7 +36,7 @@ class TestSarifFormatter:
                 linenumber=1,
                 column=10,
                 details="hello",
-                filename=Lintable("filename.yml"),
+                filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
                 tag="yaml[test]",
             )
@@ -46,7 +46,7 @@ class TestSarifFormatter:
                 message="message",
                 linenumber=2,
                 details="hello",
-                filename=Lintable("filename.yml"),
+                filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
                 tag="yaml[test]",
             )

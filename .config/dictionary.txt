@@ -270,6 +270,8 @@ robertdebock
 rolepath
 roundtrip
 ruamel
+rulebook
+rulebooks
 ruledirs
 rulesdir
 rulesdirs

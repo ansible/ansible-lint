@@ -53,6 +53,7 @@ if __name__ == "__main__":
 
 FileType = Literal[
     "playbook",
+    "rulebook",
     "meta",  # role meta
     "meta-runtime",
     "tasks",  # includes pre_tasks, post_tasks

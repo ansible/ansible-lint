@@ -846,14 +846,6 @@ def get_lintables(
     if args:
         for arg in args:
             lintable = Lintable(arg)
-            if lintable.kind in ("yaml", None):
-                _logger.warning(
-                    "Overriding detected file kind '%s' with 'playbook' "
-                    "for given positional argument: %s",
-                    lintable.kind,
-                    arg,
-                )
-                lintable = Lintable(arg, kind="playbook")
             lintables.append(lintable)
     else:
 

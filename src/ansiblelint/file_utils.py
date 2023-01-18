@@ -241,6 +241,24 @@ class Lintable:
         self.base_kind = base_kind or kind_from_path(self.path, base=True)
         self.abspath = self.path.expanduser().absolute()
 
+        if self.kind == "yaml":
+            self._guess_kind()
+
+    def _guess_kind(self) -> None:
+        if self.kind == "yaml":
+            if isinstance(self.data, list) and "hosts" in self.data[0]:
+                if "rules" not in self.data[0]:
+                    self.kind = "playbook"
+                else:
+                    self.kind = "rulebook"
+            # we we failed to guess the more specific kind, we warn user
+            if self.kind == "yaml":
+                _logger.debug(
+                    "Passed '%s' positional argument was identified as generic '%s' file kind.",
+                    self.name,
+                    self.kind,
+                )
+
     def __getitem__(self, key: Any) -> Any:
         """Provide compatibility subscriptable support."""
         if key == "path":
