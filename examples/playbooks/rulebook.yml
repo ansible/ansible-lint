@@ -1,0 +1,21 @@
+---
+# That file is not a valid playbook but it is a valid rulebook that was
+# mistakenly put under a playbook directory.
+- name: Demo rules with kafka as source
+  hosts: localhost
+  sources:
+    - name: kafka
+      kafka:
+        topic: eda
+        host: localhost
+        port: 9092
+        group_id: testing
+  rules:
+    - name:
+      condition: event.i is defined
+      action:
+        debug:
+    - name:
+      condition: event.stop == true
+      action:
+        shutdown:

@@ -1,0 +1,3 @@
+---
+- name: Minimal yaml to determine it as a playbook
+  hosts: localhost

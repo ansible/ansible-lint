@@ -32,7 +32,7 @@ class TestCodeclimateJSONFormatter:
                 message="message",
                 linenumber=1,
                 details="hello",
-                filename=Lintable("filename.yml"),
+                filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
             )
         )
@@ -41,7 +41,7 @@ class TestCodeclimateJSONFormatter:
                 message="message",
                 linenumber=2,
                 details="hello",
-                filename=Lintable("filename.yml"),
+                filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
             )
         )
@@ -103,7 +103,7 @@ class TestCodeclimateJSONFormatter:
                         linenumber=1,
                         column=42,
                         details="hello",
-                        filename=Lintable("filename.yml"),
+                        filename=Lintable("filename.yml", content=""),
                         rule=self.rule,
                     )
                 ]

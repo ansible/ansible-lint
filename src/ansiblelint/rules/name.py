@@ -117,14 +117,12 @@ class NameRule(AnsibleLintRule):
                         return results
                 else:
                     effective_name = name[len(prefix) :]
-                    # breakpoint()
 
         if (
             effective_name[0].isalpha()
             and effective_name[0].islower()
             and not effective_name[0].isupper()
         ):
-            # breakpoint()
             results.append(
                 self.create_matcherror(
                     message="All names should start with an uppercase letter.",

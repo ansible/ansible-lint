@@ -56,6 +56,7 @@ DEFAULT_KINDS = [
     {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
     {"reno": "**/releasenotes/*/*.{yaml,yml}"},  # reno release notes
     {"tasks": "**/tasks/**/*.{yaml,yml}"},
+    {"rulebook": "**/rulebooks/*.{yml,yaml"},
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
     {"role": "**/roles/*/"},

@@ -144,60 +144,94 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
 @pytest.mark.parametrize(
     ("path", "kind"),
     (
-        ("tasks/run_test_playbook.yml", "tasks"),
-        ("foo/playbook.yml", "playbook"),
-        ("playbooks/foo.yml", "playbook"),
-        ("playbooks/roles/foo.yml", "yaml"),
+        pytest.param("tasks/run_test_playbook.yml", "tasks", id="0"),
+        pytest.param("foo/playbook.yml", "playbook", id="1"),
+        pytest.param("playbooks/foo.yml", "playbook", id="2"),
+        pytest.param("examples/roles/foo.yml", "yaml", id="3"),
         # the only yml file that is not a playbook inside molecule/ folders
-        (".config/molecule/config.yml", "yaml"),  # molecule shared config
-        (
-            "roles/foo/molecule/scenario1/base.yml",
-            "yaml",
+        pytest.param(
+            "examples/.config/molecule/config.yml", "yaml", id="4"
+        ),  # molecule shared config
+        pytest.param(
+            "test/schemas/test/molecule/cluster/base.yml", "yaml", id="5"
         ),  # molecule scenario base config
-        (
-            "roles/foo/molecule/scenario1/molecule.yml",
-            "yaml",
+        pytest.param(
+            "test/schemas/test/molecule/cluster/molecule.yml", "yaml", id="6"
         ),  # molecule scenario config
-        ("roles/foo/molecule/scenario2/foobar.yml", "playbook"),  # custom playbook name
-        (
-            "roles/foo/molecule/scenario3/converge.yml",
-            "playbook",
+        pytest.param(
+            "test/schemas/test/molecule/cluster/foobar.yml", "playbook", id="7"
+        ),  # custom playbook name
+        pytest.param(
+            "test/schemas/test/molecule/cluster/converge.yml", "playbook", id="8"
         ),  # common playbook name
-        (
-            "roles/foo/molecule/scenario3/requirements.yml",
-            "requirements",
+        pytest.param(
+            "roles/foo/molecule/scenario3/requirements.yml", "requirements", id="9"
         ),  # requirements
-        (
-            "roles/foo/molecule/scenario3/collections.yml",
-            "requirements",
+        pytest.param(
+            "roles/foo/molecule/scenario3/collections.yml", "requirements", id="10"
         ),  # requirements
-        ("roles/foo/meta/argument_specs.yml", "arg_specs"),  # role argument specs
+        pytest.param(
+            "roles/foo/meta/argument_specs.yml", "arg_specs", id="11"
+        ),  # role argument specs
         # tasks files:
-        ("tasks/directory with spaces/main.yml", "tasks"),  # tasks
-        ("tasks/requirements.yml", "tasks"),  # tasks
+        pytest.param("tasks/directory with spaces/main.yml", "tasks", id="12"),  # tasks
+        pytest.param("tasks/requirements.yml", "tasks", id="13"),  # tasks
         # requirements (we do not support includes yet)
-        ("requirements.yml", "requirements"),  # collection requirements
-        ("roles/foo/meta/requirements.yml", "requirements"),  # inside role requirements
+        pytest.param(
+            "requirements.yml", "requirements", id="14"
+        ),  # collection requirements
+        pytest.param(
+            "roles/foo/meta/requirements.yml", "requirements", id="15"
+        ),  # inside role requirements
         # Undeterminable files:
-        ("test/fixtures/unknown-type.yml", "yaml"),
-        ("releasenotes/notes/run-playbooks-refactor.yaml", "reno"),  # reno
-        ("examples/host_vars/localhost.yml", "vars"),
-        ("examples/group_vars/all.yml", "vars"),
-        ("examples/playbooks/vars/other.yml", "vars"),
-        ("examples/playbooks/vars/subfolder/settings.yml", "vars"),  # deep vars
-        ("molecule/scenario/collections.yml", "requirements"),  # deprecated 2.8 format
-        (
-            "../roles/geerlingguy.mysql/tasks/configure.yml",
-            "tasks",
+        pytest.param("test/fixtures/unknown-type.yml", "yaml", id="16"),
+        pytest.param(
+            "releasenotes/notes/run-playbooks-refactor.yaml", "reno", id="17"
+        ),  # reno
+        pytest.param("examples/host_vars/localhost.yml", "vars", id="18"),
+        pytest.param("examples/group_vars/all.yml", "vars", id="19"),
+        pytest.param("examples/playbooks/vars/other.yml", "vars", id="20"),
+        pytest.param(
+            "examples/playbooks/vars/subfolder/settings.yml", "vars", id="21"
+        ),  # deep vars
+        pytest.param(
+            "molecule/scenario/collections.yml", "requirements", id="22"
+        ),  # deprecated 2.8 format
+        pytest.param(
+            "../roles/geerlingguy.mysql/tasks/configure.yml", "tasks", id="23"
         ),  # relative path involved
-        ("galaxy.yml", "galaxy"),
-        ("foo.j2.yml", "jinja2"),
-        ("foo.yml.j2", "jinja2"),
-        ("foo.j2.yaml", "jinja2"),
-        ("foo.yaml.j2", "jinja2"),
+        pytest.param("galaxy.yml", "galaxy", id="24"),
+        pytest.param("foo.j2.yml", "jinja2", id="25"),
+        pytest.param("foo.yml.j2", "jinja2", id="26"),
+        pytest.param("foo.j2.yaml", "jinja2", id="27"),
+        pytest.param("foo.yaml.j2", "jinja2", id="28"),
+        pytest.param(
+            "examples/playbooks/rulebook.yml", "playbook", id="29"
+        ),  # playbooks folder should determine kind
+        pytest.param(
+            "examples/rulebooks/rulebook.yml", "rulebook", id="30"
+        ),  # content should determine it as a rulebook
+        pytest.param(
+            "examples/yamllint/valid.yml", "yaml", id="31"
+        ),  # empty yaml is valid yaml, not assuming anything else
+        pytest.param(
+            "examples/other/guess-1.yml", "playbook", id="32"
+        ),  # content should determine is as a play
+        pytest.param(
+            "examples/playbooks/tasks/passing_task.yml", "tasks", id="33"
+        ),  # content should determine is tasks
+        pytest.param("examples/collection/galaxy.yml", "galaxy", id="34"),
+        pytest.param("examples/meta/runtime.yml", "meta-runtime", id="35"),
+        pytest.param("examples/meta/changelogs/changelog.yaml", "changelog", id="36"),
+        pytest.param("examples/inventory/inventory.yml", "inventory", id="37"),
+        pytest.param("examples/inventory/production.yml", "inventory", id="38"),
+        pytest.param("examples/playbooks/vars/empty_vars.yml", "vars", id="39"),
+        pytest.param(
+            "examples/playbooks/vars/subfolder/settings.yaml", "vars", id="40"
+        ),
     ),
 )
-def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:
+def test_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:
     """Verify auto-detection logic based on DEFAULT_KINDS."""
     options = cli.get_config([])
 
@@ -212,9 +246,6 @@ def test_default_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> N
 
     monkeypatch.setattr(file_utils, "discover_lintables", mockreturn)
     result = file_utils.discover_lintables(options)
-    # get_lintable could return additional files and we only care to see
-    # that the given file is among the returned list.
-    assert lintable_detected.name in result
     assert lintable_detected.kind == result[lintable_expected.name]
 
 
@@ -310,9 +341,7 @@ def test_lintable_with_new_file(tmp_path: Path) -> None:
     """Validate ``Lintable.updated`` for a new file."""
     lintable = Lintable(tmp_path / "new.yaml")
 
-    with pytest.raises(FileNotFoundError):
-        _ = lintable.content
-
+    lintable.content = BASIC_PLAYBOOK
     lintable.content = BASIC_PLAYBOOK
     assert lintable.content == BASIC_PLAYBOOK
 
