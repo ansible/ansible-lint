@@ -27,8 +27,8 @@ review all of the following details:
 - If you are installing Ansible-lint within a container or system package, you
   should not report the issue here. Contact the relevant container or package
   provider instead.
-- If you are using [poetry](https://python-poetry.org/), read
-  [discussion](https://github.com/ansible/ansible-lint/discussions/2820#discussioncomment-4400380)
+- If you are using [poetry](https://python-poetry.org/), read this
+  [discussion](https://github.com/ansible/ansible-lint/discussions/2820#discussioncomment-4400380).
 
 Pull requests to improve installation instructions are welcome. Any new issues related to
 installation will be closed and locked.
