@@ -18,7 +18,7 @@ Ansible-lint team does not support any installation methods that are not
 mentioned in this document. Before raising any bugs related to installation,
 ensure that you have followed the instructions below:
 
-- The installation method is mentioned in this document
+- You should use installation methods outlined in this document only.
 - You already upgraded the installer (`pip` or `pipx`) to the latest version
   available from pypi.org. If you installed them using your system package, you
   will need to install newer versions.
