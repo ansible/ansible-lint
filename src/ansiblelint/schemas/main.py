@@ -90,7 +90,6 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
     _logger.debug("Checking for updated schemas...")
 
     changed = 0
-    # breakpoint()
     for kind, data in JSON_SCHEMAS.items():
         url = data["url"]
         if "#" in url:

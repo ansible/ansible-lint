@@ -38,7 +38,7 @@ def test_format_coloured_string() -> None:
         message="message",
         linenumber=1,
         details=DETAILS,
-        filename=Lintable("filename.yml"),
+        filename=Lintable("filename.yml", content=""),
         rule=rule,
     )
     formatter.format(match)
@@ -50,7 +50,7 @@ def test_unicode_format_string() -> None:
         message="\U0001f427",
         linenumber=1,
         details=DETAILS,
-        filename=Lintable("filename.yml"),
+        filename=Lintable("filename.yml", content=""),
         rule=rule,
     )
     formatter.format(match)
@@ -62,7 +62,7 @@ def test_dict_format_line() -> None:
         message="xyz",
         linenumber=1,
         details={"hello": "world"},  # type: ignore
-        filename=Lintable("filename.yml"),
+        filename=Lintable("filename.yml", content=""),
         rule=rule,
     )
     formatter.format(match)

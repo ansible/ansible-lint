@@ -77,8 +77,8 @@ def test_matcherror_invalid() -> None:
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
         (
-            MatchError("a", filename=Lintable("b")),
-            MatchError("a", filename=Lintable("a")),
+            MatchError("a", filename=Lintable("b", content="")),
+            MatchError("a", filename=Lintable("a", content="")),
         ),
         # rule id partial-become > rule id no-changed-when
         (
