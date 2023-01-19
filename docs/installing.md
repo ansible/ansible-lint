@@ -30,8 +30,8 @@ review all of the following details:
 - If you are using [poetry](https://python-poetry.org/), read
   [discussion](https://github.com/ansible/ansible-lint/discussions/2820#discussioncomment-4400380)
 
-Pull requests to improve installation instructions are welcome, but please do
-not open new issues as these will be closed and locked.
+Pull requests to improve installation instructions are welcome. Any new issues related to
+installation will be closed and locked.
 ```
 
 For a container image, we recommend using
