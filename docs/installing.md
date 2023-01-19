@@ -14,7 +14,7 @@ Ansible-lint does not currently support installation on Windows systems.
 ```
 
 ```{warning}
-Ansible-lint team does not support any installation methods that are not
+Ansible-lint does not support any installation methods that are not
 mentioned in this document. Before raising any bugs related to installation,
 ensure that you have followed the instructions below:
 
