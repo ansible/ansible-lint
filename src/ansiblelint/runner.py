@@ -155,7 +155,7 @@ class Runner:
         pool.close()
         pool.join()
         for data in return_list:
-            matches.extend(data)
+            matches.extend([match for match in data if match.tag != 'warning[empty-playbook]'])
 
         # -- phase 2 ---
         if not matches:
