@@ -19,9 +19,9 @@ mentioned in this document. Before raising any bugs related to installation,
 review all of the following details:
 
 - You should use installation methods outlined in this document only.
-- You already upgraded the installer (`pip` or `pipx`) to the latest version
-  available from pypi.org. If you installed them using your system package, you
-  will need to install newer versions.
+- You should upgrade the Python installer (`pip` or `pipx`) to the latest version
+  available from pypi.org. If you used a system package manager, you
+  will need to upgrade the installer to a newer version.
 - Installing from git zip archives is not supported but it should work at least
   with main branch and latest versions of pip and setuptools.
 - If you are using a the tool from within a container or system package, you
