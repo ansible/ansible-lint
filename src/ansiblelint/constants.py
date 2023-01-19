@@ -1,5 +1,6 @@
 """Constants used by AnsibleLint."""
 import os.path
+from enum import Enum
 from typing import Literal
 
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
@@ -152,3 +153,15 @@ ROLE_IMPORT_ACTION_NAMES = {
 #
 # https://github.com/ansible/ansible-lint-action/issues/138
 GIT_CMD = ["git", "-c", f"safe.directory={os.getcwd()}"]
+
+
+class States(Enum):
+    """States used are used as sentinel values in various places."""
+
+    NOT_LOADED = "File not loaded"
+    LOAD_FAILED = "File failed to load"
+    UNKNOWN_DATA = "Unknown data"
+
+    def __bool__(self) -> bool:
+        """Ensure all states evaluate as False as booleans."""
+        return False
