@@ -22,8 +22,8 @@ review all of the following details:
 - You should upgrade the Python installer (`pip` or `pipx`) to the latest version
   available from pypi.org. If you used a system package manager, you
   will need to upgrade the installer to a newer version.
-- Installing from git zip archives is not supported but it should work at least
-  with main branch and latest versions of pip and setuptools.
+- If you are installing from a git zip archive, which is not supported but should work,
+  ensure you use the main branch and the latest version of pip and setuptools.
 - If you are using a the tool from within a container or system package, you
   should not report the issue here. Please contact the packager for that.
 - If you are using [poetry](https://python-poetry.org/), read
