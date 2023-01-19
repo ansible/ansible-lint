@@ -14,12 +14,12 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Iterator, cast
 
-# import wcmatch
 import wcmatch.pathlib
 from wcmatch.wcmatch import RECURSIVE, WcMatch
+from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, options
-from ansiblelint.constants import GIT_CMD, FileType
+from ansiblelint.constants import GIT_CMD, FileType, States
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3979
@@ -189,8 +189,9 @@ class Lintable:
         self.dir: str = ""
         self.kind: FileType | None = None
         self.stop_processing = False  # Set to stop other rules from running
-        self._data: Any = None
+        self._data: Any = States.NOT_LOADED
         self.line_skips: dict[int, set[str]] = defaultdict(set)
+        self.exc: Exception | None = None  # Stores data loading exceptions
 
         if isinstance(name, str):
             name = Path(name)
@@ -341,21 +342,34 @@ class Lintable:
     @property
     def data(self) -> Any:
         """Return loaded data representation for current file, if possible."""
-        if not self._data:
-            if str(self.base_kind) == "text/yaml":
-                from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
-                    parse_yaml_linenumbers,
-                )
+        if self._data == States.NOT_LOADED:
+            if self.path.is_dir():
+                self._data = None
+                return self._data
+            try:
+                if str(self.base_kind) == "text/yaml":
+                    from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
+                        parse_yaml_linenumbers,
+                    )
 
-                self._data = parse_yaml_linenumbers(self)
-                # Lazy import to avoid delays and cyclic-imports
-                if "append_skipped_rules" not in globals():
-                    # pylint: disable=import-outside-toplevel
-                    from ansiblelint.skip_utils import append_skipped_rules
+                    self._data = parse_yaml_linenumbers(self)
+                    # Lazy import to avoid delays and cyclic-imports
+                    if "append_skipped_rules" not in globals():
+                        # pylint: disable=import-outside-toplevel
+                        from ansiblelint.skip_utils import append_skipped_rules
 
-                self._data = append_skipped_rules(self._data, self)
+                    self._data = append_skipped_rules(self._data, self)
+                else:
+                    logging.debug(
+                        "data set to None for %s due to being of %s kind.",
+                        self.path,
+                        self.base_kind,
+                    )
+                    self._data = States.UNKNOWN_DATA
 
-            # will remain None if we do not know how to load that file-type
+            except (RuntimeError, FileNotFoundError, YAMLError) as exc:
+                self._data = States.LOAD_FAILED
+                self.exc = exc
         return self._data
 
 
