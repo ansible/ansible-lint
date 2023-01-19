@@ -24,8 +24,9 @@ review all of the following details:
   will need to upgrade the installer to a newer version.
 - If you are installing from a git zip archive, which is not supported but should work,
   ensure you use the main branch and the latest version of pip and setuptools.
-- If you are using a the tool from within a container or system package, you
-  should not report the issue here. Please contact the packager for that.
+- If you are installing Ansible-lint within a container or system package, you
+  should not report the issue here. Contact the relevant container or package
+  provider instead.
 - If you are using [poetry](https://python-poetry.org/), read
   [discussion](https://github.com/ansible/ansible-lint/discussions/2820#discussioncomment-4400380)
 
