@@ -10,6 +10,7 @@ The `fqcn` rule has the following checks:
 - `fqcn[action]` - Use FQCN for module actions, such ...
 - `fqcn[action-core]` - Checks for FQCNs from the `ansible.legacy` or `ansible.builtin` collection.
 - `fqcn[canonical]` - You should use canonical module name ... instead of ...
+- `fqcn[keyword]` - Avoid `collections` keyword by using FQCN for all plugins, modules, roles and playbooks.
 
 ```{note}
 In most cases you should declare the `ansible.builtin` collection for internal Ansible actions.
@@ -17,7 +18,7 @@ You should declare the `ansible.legacy` collection if you use local overrides wi
 ```
 
 ```{warning}
-This rule does not take [`collections` keyword](https://docs.ansible.com/ansible/latest/collections_guide/collections_using_playbooks.html#simplifying-module-names-with-the-collections-keyword) into consideration.
+This rule does not take [`collections` keyword](https://docs.ansible.com/ansible/latest/collections_guide/collections_using_playbooks.html#simplifying-module-names-with-the-collections-keyword) into consideration for resolving content.
 The `collections` keyword provided a temporary mechanism transitioning to Ansible 2.9.
 You should rewrite any content that uses the `collections:` key and avoid it where possible.
 ```
