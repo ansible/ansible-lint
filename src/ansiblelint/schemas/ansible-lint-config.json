@@ -183,6 +183,11 @@
       "title": "Rulesdir",
       "type": "array"
     },
+    "sarif_file": {
+      "default": null,
+      "title": "SARIF Output filename",
+      "type": ["null", "string"]
+    },
     "skip_action_validation": {
       "default": false,
       "title": "Skip Action Validation",

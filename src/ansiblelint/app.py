@@ -88,6 +88,13 @@ class App:
             for match in itertools.chain(fatal_matches, ignored_matches):
                 console.print(formatter.format(match), markup=False, highlight=False)
 
+        # If sarif_file is set, we also dump the results to a sarif file.
+        if self.options.sarif_file:
+            sarif = formatters.SarifFormatter(self.options.cwd, True)
+            json = sarif.format_result(matches)
+            with open(self.options.sarif_file, "w", encoding="utf-8") as sarif_file:
+                sarif_file.write(json)
+
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
         result = SummarizedResults()

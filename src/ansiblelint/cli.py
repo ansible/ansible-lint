@@ -252,6 +252,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         ],
         help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
+    parser.add_argument("--sarif-file", default=None, help="SARIF output file")
     parser.add_argument(
         "-q",
         dest="quiet",
@@ -462,6 +463,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
         "loop_var_prefix": None,
         "project_dir": ".",
         "profile": None,
+        "sarif_file": None,
     }
 
     if not file_config:
