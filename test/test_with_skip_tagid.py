@@ -2,6 +2,7 @@
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.yaml_rule import YamllintRule
 from ansiblelint.runner import Runner
+from ansiblelint.testing import run_ansible_lint
 
 FILE = "examples/playbooks/with-skip-tag-id.yml"
 collection = RulesCollection()
@@ -43,3 +44,15 @@ def test_positive_skip_tag() -> None:
     skip_tag = "yaml[trailing-spaces]"
     good_runner = Runner(FILE, rules=collection, skip_list=[skip_tag])
     assert [] == good_runner.run()
+
+
+def test_run_skip_warning_rule() -> None:
+    """Test that we can skip warning[empty-playbook]."""
+    result = run_ansible_lint(
+        "-x",
+        "warning[empty-playbook]",
+        "examples/playbooks/empty_playbook.yml",
+        executable="ansible-lint",
+    )
+    assert result.returncode == 0
+    assert result.stdout == ""

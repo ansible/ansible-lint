@@ -281,6 +281,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.strict and result.matches:
         mark_as_success = False
 
+    # Remove skipped list items from the result
+    result.matches = [m for m in result.matches if m.tag not in app.options.skip_list]
+
     app.render_matches(result.matches)
 
     _perform_mockings_cleanup()
