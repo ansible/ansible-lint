@@ -281,8 +281,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="progressive",
         default=False,
         action="store_true",
-        help="Return success if number of violations compared with"
-        "previous git commit has not increased. This feature works"
+        help="Return success if number of violations compared with "
+        "previous git commit has not increased. This feature works "
         "only in git repositories.",
     )
     parser.add_argument(
@@ -290,7 +290,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="project_dir",
         default=".",
         help="Location of project/repository, autodetected based on location "
-        " of configuration file.",
+        "of configuration file.",
     )
     parser.add_argument(
         "-r",
@@ -364,7 +364,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="skip_list",
         default=[],
         action="append",
-        help="only check rules whose id/tags do not " "match these values",
+        help="only check rules whose id/tags do not match these values",
     )
     parser.add_argument(
         "-w",
@@ -426,8 +426,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="lintables",
         nargs="*",
         action="extend",
-        help="One or more files or paths. When missing it will "
-        " enable auto-detection mode.",
+        help="One or more files or paths. When missing it will enable auto-detection mode.",
     )
 
     return parser
