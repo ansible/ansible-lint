@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import subprocess
 import sys
+from tempfile import NamedTemporaryFile
 
 import pytest
 
@@ -140,3 +142,26 @@ def test_sarif_parsable_ignored() -> None:
 
     assert result.returncode == result2.returncode
     assert result.stdout == result2.stdout
+
+
+@pytest.mark.parametrize(
+    ("file", "return_code"),
+    (
+        pytest.param("examples/playbooks/valid.yml", 0),
+        pytest.param("playbook.yml", 2),
+    ),
+)
+def test_sarif_file(file: str, return_code: int) -> None:
+    """Test ability to dump sarif file (--sarif-file)."""
+    with NamedTemporaryFile(mode="w", suffix=".sarif", prefix="output") as output_file:
+        cmd = [
+            sys.executable,
+            "-m",
+            "ansiblelint",
+            "--sarif-file",
+            str(output_file.name),
+        ]
+        result = subprocess.run([*cmd, file], check=False, capture_output=True)
+        assert result.returncode == return_code
+        assert os.path.exists(output_file.name)
+        assert os.path.getsize(output_file.name) > 0

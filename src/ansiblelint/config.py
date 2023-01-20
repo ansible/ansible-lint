@@ -136,6 +136,7 @@ options = Namespace(
     rules={},  # Placeholder to set and keep configurations for each rule.
     profile=None,
     task_name_prefix="{stem} | ",
+    sarif_file=None,
 )
 
 # Used to store detected tag deprecations
