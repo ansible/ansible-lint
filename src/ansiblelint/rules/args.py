@@ -214,6 +214,22 @@ class ArgsRule(AnsibleLintRule):
                 )
                 return results
 
+        value_not_in_choices_error = re.search(
+            r"value of (?P<name>.*) must be one of:", error_message
+        )
+        if value_not_in_choices_error:
+            # ignore templated value not in allowed choices
+            choice_key = value_not_in_choices_error.group("name")
+            choice_value = task["action"][choice_key]
+            if has_jinja(choice_value):
+                _logger.debug(
+                    "Value checking ignored for '%s' option in task '%s' at line %s.",
+                    choice_key,
+                    module_name,
+                    task[LINE_NUMBER_KEY],
+                )
+                return results
+
         results.append(
             self.create_matcherror(
                 message=error_message,
