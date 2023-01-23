@@ -15,3 +15,19 @@
         name: httpd
         enabled: false
         masked: false
+
+    - name: Asynchronous yum task
+      ansible.builtin.yum:
+        name: docker-io
+        state: present
+      async: 1000
+      poll: 0
+      register: yum_sleeper
+
+    - name: Wait for asynchronous job to end
+      ansible.builtin.async_status:
+        jid: '{{ yum_sleeper.ansible_job_id }}'
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 10

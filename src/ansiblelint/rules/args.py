@@ -173,6 +173,17 @@ class ArgsRule(AnsibleLintRule):
                 ):
                     # handle special case for set_fact module with key and value
                     continue
+                if (
+                    "missing required arguments: _async_dir" in result_msg
+                    and module_name
+                    in [
+                        "async_status",
+                        "ansible.builtin.async_status",
+                        "ansible.legacy.async_status",
+                    ]
+                ):
+                    # handle special case for async_status module
+                    continue
             if "Supported parameters include" in result_msg and module_name in [
                 "set_fact",
                 "ansible.builtin.set_fact",
