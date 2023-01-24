@@ -84,8 +84,10 @@ def test_validate_progressive_mode_json_output(tmp_path: Path) -> None:
 
 
 def test_validate_progressive_ref(tmp_path: Path) -> None:
-    """Test that a regression is reported when any commit between HEAD
-    and specified revision adds any new violations.
+    """Test progressive mode with a ref set.
+
+    A regression is reported when any commit between HEAD and
+    specified revision adds any new violations.
     """
     cmd = [
         sys.executable,
