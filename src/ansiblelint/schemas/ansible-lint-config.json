@@ -112,7 +112,7 @@
       "title": "Progressive",
       "type": "boolean"
     },
-    "progressive-ref": {
+    "progressive_ref": {
       "default": "HEAD^1",
       "title": "Progressive ref",
       "type": "string"
