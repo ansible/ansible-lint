@@ -286,6 +286,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "only in git repositories.",
     )
     parser.add_argument(
+        "--progressive-ref",
+        dest="progressive_ref",
+        default='HEAD^1',
+        action="store",
+        help="Specify a ref to use for progressive mode."
+    )
+    parser.add_argument(
         "--project-dir",
         dest="project_dir",
         default=".",

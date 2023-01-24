@@ -307,7 +307,7 @@ def _previous_revision() -> Iterator[None]:
     rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
     options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
     revision = subprocess.run(
-        [*GIT_CMD, "rev-parse", "HEAD^1"],
+        [*GIT_CMD, "rev-parse", options.progressive_ref],
         check=True,
         text=True,
         stdout=subprocess.PIPE,
