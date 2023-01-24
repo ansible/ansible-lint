@@ -81,3 +81,26 @@ def test_validate_progressive_mode_json_output(tmp_path: Path) -> None:
         res = run_lint(cmd)
         assert res.returncode == 0
         json.loads(res.stdout)
+
+
+def test_validate_progressive_ref(tmp_path: Path) -> None:
+    """Test that a regression is reported when any commit between HEAD
+    and specified revision adds any new violations.
+    """
+    cmd = [
+        sys.executable,
+        "-m",
+        "ansiblelint",
+        "--progressive",
+        "--progressive-ref=HEAD~3",
+        "-f",
+        "json",
+    ]
+    with cwd(tmp_path):
+        git_init()
+        git_commit(tmp_path / "README.md", "pytest")
+        git_commit(tmp_path / "playbook-faulty.yml", FAULTY_PLAYBOOK)
+        git_commit(tmp_path / "playbook-correct1.yml", CORRECT_PLAYBOOK)
+        git_commit(tmp_path / "playbook-correct2.yml", CORRECT_PLAYBOOK)
+        res = run_lint(cmd)
+        assert res.returncode == 2
