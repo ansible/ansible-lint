@@ -85,6 +85,8 @@ offline: true
 # commit has not increased. This feature works only in git
 # repositories.
 progressive: false
+# Specify a ref to use for progressive mode.
+progressive_ref: HEAD^1
 
 # Define required Ansible's variables to satisfy syntax check
 extra_vars:
