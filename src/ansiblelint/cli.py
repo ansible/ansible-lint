@@ -288,9 +288,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--progressive-ref",
         dest="progressive_ref",
-        default='HEAD^1',
+        default="HEAD^1",
         action="store",
-        help="Specify a ref to use for progressive mode."
+        help="Specify a ref to use for progressive mode.",
     )
     parser.add_argument(
         "--project-dir",
