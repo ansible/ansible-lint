@@ -1,16 +1,16 @@
 # risky-file-permissions
 
 This rule is triggered by various modules that could end up creating new files
-on disk with permissions that might be too open, or unpredictable. Please
-read the documentation of each module carefully to understand the
-implications of using different argument values, as these make the difference
-between using the module safely or not. The fix depends on each module and
-also your particular situation.
+on disk with permissions that might be too open, or unpredictable. Please read
+the documentation of each module carefully to understand the implications of
+using different argument values, as these make the difference between using the
+module safely or not. The fix depends on each module and also your particular
+situation.
 
 Some modules have a `create` argument that defaults to `true`. For those you
-either need to set `create: false` or provide some permissions like
-`mode: 0600` to make the behavior predictable and not dependent on the current
-system settings.
+either need to set `create: false` or provide some permissions like `mode: 0600`
+to make the behavior predictable and not dependent on the current system
+settings.
 
 Modules that are checked:
 
@@ -23,10 +23,10 @@ Modules that are checked:
 - [`community.general.archive`](https://docs.ansible.com/ansible/latest/collections/community/general/archive_module.html)
 - [`community.general.ini_file`](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html)
 
-```{warning}
-This rule does not take [module_defaults](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_module_defaults.html) configuration into account.
-There are currently no plans to implement this feature because changing task location can also change task behavior.
-```
+!!! warning
+
+    This rule does not take [module_defaults](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_module_defaults.html) configuration into account.
+    There are currently no plans to implement this feature because changing task location can also change task behavior.
 
 ## Problematic code
 

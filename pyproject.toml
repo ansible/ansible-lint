@@ -85,7 +85,7 @@ show_missing = true
 profile = "black"
 # add_imports = "from __future__ import annotations"
 known_first_party = "ansiblelint"
-known_third_party = "ansible,pytest,ruamel,setuptools,sphinx,yaml"
+known_third_party = "ansible,pytest,ruamel,setuptools,yaml"
 # https://black.readthedocs.io/en/stable/the_black_code_style.html#line-length
 multi_line_output = 3
 include_trailing_comma = true

@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/meta_incorrect.md

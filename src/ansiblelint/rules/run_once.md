@@ -5,7 +5,8 @@ This rule warns against the use of `run_once` when `strategy` is set to `free`.
 This rule can produce the following messages:
 
 - `run_once[play]`: Play uses `strategy: free`.
-- `run_once[task]`: Using `run_once` may behave differently if `strategy` is set to `free`.
+- `run_once[task]`: Using `run_once` may behave differently if `strategy` is set
+  to `free`.
 
 For more information see the following topics in Ansible documentation:
 
@@ -13,11 +14,12 @@ For more information see the following topics in Ansible documentation:
 - [selecting a strategy](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html#selecting-a-strategy)
 - [run_once(playbook keyword) more info](https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html)
 
-```{warning}
-This rule will always trigger regardless of the value configured inside 'strategy' field. That is because the effective value used at runtime can be different than the value inside the file. For example, ansible command line arguments can alter it.
-```
+!!! warning
 
-It is perfectly fine to add `# noqa: run_once[task]` to mark the warning as acknowledged and ignored.
+    This rule will always trigger regardless of the value configured inside 'strategy' field. That is because the effective value used at runtime can be different than the value inside the file. For example, ansible command line arguments can alter it.
+
+It is perfectly fine to add `# noqa: run_once[task]` to mark the warning as
+acknowledged and ignored.
 
 ## Problematic Code
 
@@ -52,7 +54,7 @@ It is perfectly fine to add `# noqa: run_once[task]` to mark the warning as ackn
   strategy: linear
   gather_facts: false
   tasks: # <-- use noqa to disable rule violations for specific tasks
-    - name: Task with run_once  # noqa: run_once[task]
+    - name: Task with run_once # noqa: run_once[task]
       ansible.builtin.debug:
         msg: "Test"
       run_once: true

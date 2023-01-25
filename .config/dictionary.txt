@@ -47,6 +47,7 @@ autodetected
 autodiscovery
 autodoc
 autofix
+autorefs
 autoupdate
 awcrosby
 backports
@@ -118,6 +119,7 @@ ematchtestfile
 envrc
 execnet
 extlinks
+facelessuser
 facter
 fakerole
 fileglob
@@ -126,6 +128,7 @@ filesspot
 filetree
 fips
 firewalld
+fontawesome
 formatstr
 formetting
 formsyntax
@@ -149,8 +152,8 @@ hwcksum
 idempotency
 importlib
 iniconfig
+inlinehilite
 insertafter
-intersphinx
 ipwrap
 isclass
 iscsi
@@ -173,12 +176,14 @@ libbzip
 libera
 libyaml
 lineinfile
+linenums
 linkcheck
 lintable
 lintables
 literalinclude
 localectl
 machinectl
+magiclink
 markdownlint
 matchdir
 matcherror
@@ -191,6 +196,7 @@ maxdepth
 minversion
 mkdir
 mkdocs
+mkdocstrings
 mkdtemp
 mockings
 mockreturn
@@ -247,6 +253,8 @@ pyenv
 pygments
 pylint
 pylintrc
+pymdown
+pymdownx
 pypa
 pyparsing
 pypi
@@ -296,7 +304,6 @@ skiputils
 slaveinput
 sortfunc
 sourcegraph
-sphinxcontrib
 srpm
 ssbarnea
 stylesheet
@@ -307,6 +314,7 @@ subschema
 subschemas
 substrs
 subtest
+superfences
 supervisorctl
 synchronize
 sysvinit

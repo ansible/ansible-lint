@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/only_builtins.md

@@ -6,40 +6,38 @@ This is important because these names are the primary way to **identify** and
 
 This rule can produce messages as:
 
-- `name[casing]` - All names should start with an uppercase letter for
-  languages that support it.
+- `name[casing]` - All names should start with an uppercase letter for languages
+  that support it.
 - `name[missing]` - All tasks should be named.
 - `name[play]` - All plays should be named.
 - `name[prefix]` - Prefix task names in sub-tasks files. (opt-in)
 - `name[template]` - Jinja templates should only be at the end of 'name'. This
   helps with the identification of tasks inside the source code when they fail.
-  The use of templating inside `name` keys is discouraged as there
-  are multiple cases where the rendering of the name template is not possible.
+  The use of templating inside `name` keys is discouraged as there are multiple
+  cases where the rendering of the name template is not possible.
 
-If you want to ignore some of the messages above, you can add any of them to
-the `skip_list`.
+If you want to ignore some of the messages above, you can add any of them to the
+`skip_list`.
 
 ## name[prefix]
 
-This rule applies only to included task files that are not named
-`main.yml`. It suggests adding the stem of the file as a prefix to the task
-name.
+This rule applies only to included task files that are not named `main.yml`. It
+suggests adding the stem of the file as a prefix to the task name.
 
 For example, if you have a task named `Restart server` inside a file named
-`tasks/deploy.yml`, this rule suggests renaming it to
-`deploy | Restart server`, so it would be easier to identify where it comes
-from.
+`tasks/deploy.yml`, this rule suggests renaming it to `deploy | Restart server`,
+so it would be easier to identify where it comes from.
 
 For the moment, this sub-rule is just an **opt-in**, so you need to add it to
 your `enable_list` to activate it.
 
-```{note}
-This rule was designed by [Red Hat Community of Practice](https://redhat-cop.github.io/automation-good-practices/#_prefix_task_names_in_sub_tasks_files_of_roles). The reasoning behind it being
-that in a complex roles or playbooks with multiple (sub-)tasks file, it becomes
-difficult to understand which task belongs to which file. Adding a prefix, in
-combination with the role’s name automatically added by Ansible, makes it a
-lot easier to follow and troubleshoot a role play.
-```
+!!! note
+
+    This rule was designed by [Red Hat Community of Practice](https://redhat-cop.github.io/automation-good-practices/#_prefix_task_names_in_sub_tasks_files_of_roles). The reasoning behind it being
+    that in a complex roles or playbooks with multiple (sub-)tasks file, it becomes
+    difficult to understand which task belongs to which file. Adding a prefix, in
+    combination with the role’s name automatically added by Ansible, makes it a
+    lot easier to follow and troubleshoot a role play.
 
 ## Problematic code
 

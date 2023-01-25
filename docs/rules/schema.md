@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/schema.md
