@@ -139,7 +139,7 @@ def test_rich_rule_listing() -> None:
     descriptions in the console output.
     """
     rules_path = os.path.abspath("./test/rules/fixtures")
-    result = run_ansible_lint("-r", rules_path, "-f", "rich", "-L")
+    result = run_ansible_lint("-r", rules_path, "-f", "full", "-L")
     assert result.returncode == 0
 
     for rule in RulesCollection([rules_path]):

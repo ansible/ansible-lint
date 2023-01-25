@@ -24,8 +24,8 @@ def test_list_rules_includes_opt_in_rules() -> None:
 @pytest.mark.parametrize(
     ("result", "returncode", "format_string"),
     (
-        (False, 0, "plain"),
-        (False, 0, "rich"),
+        (False, 0, "brief"),
+        (False, 0, "full"),
         (False, 0, "md"),
         (True, 2, "json"),
         (True, 2, "codeclimate"),
@@ -35,7 +35,7 @@ def test_list_rules_includes_opt_in_rules() -> None:
     ),
     ids=(
         "plain",
-        "rich",
+        "full",
         "md",
         "json",
         "codeclimate",
