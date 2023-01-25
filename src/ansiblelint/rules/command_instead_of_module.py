@@ -168,6 +168,13 @@ if "pytest" in sys.modules:  # noqa: C901
       command: yum clean all
 """
 
+    NO_COMMAND = """
+- hosts: all
+  tasks:
+    - name: Clear yum cache
+      command: ""
+"""
+
     @pytest.mark.parametrize(
         "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
@@ -230,4 +237,12 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_yum_clean(rule_runner: RunFromText) -> None:
         """The yum module does not support clearing yum cache."""
         results = rule_runner.run_playbook(YUM_CLEAN)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
+    )
+    def test_no_command(rule_runner: RunFromText) -> None:
+        """If no command is passed it should return 0."""
+        results = rule_runner.run_playbook(NO_COMMAND)
         assert len(results) == 0

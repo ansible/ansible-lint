@@ -43,9 +43,16 @@ FAIL_PLAY = """---
       cmd: echo {{ "hello" | upper }}
     changed_when: false
 
-  - name: Sshell with jinja filter (fqcn)
+  - name: Shell with jinja filter (fqcn)
     ansible.builtin.shell:
       cmd: echo {{ "hello" | upper }}
+    changed_when: false
+
+  - name: Command with executable parameter
+    ansible.builtin.shell:
+      cmd: clear
+    args:
+      executable: /bin/bash
     changed_when: false
 """
 
