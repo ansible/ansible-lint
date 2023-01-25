@@ -89,16 +89,6 @@ def render_yaml(text: str) -> Syntax:
 
 
 # pylint: disable=redefined-outer-name,unused-argument
-def _rich_heading_custom_rich_console(
-    self: rich.markdown.Heading,
-    console: rich.console.Console,
-    options: rich.console.ConsoleOptions,
-) -> rich.console.RenderResult:
-    """Override for rich console heading."""
-    yield f"[bold]{self.level * '#'} {self.text}[/]"
-
-
-# pylint: disable=redefined-outer-name,unused-argument
 def _rich_codeblock_custom_rich_console(
     self: rich.markdown.CodeBlock,
     console: Console,
@@ -115,7 +105,4 @@ def _rich_codeblock_custom_rich_console(
     yield syntax
 
 
-# Monkey-patch rich to alter its rendering of headings
-# https://github.com/python/mypy/issues/2427
-rich.markdown.Heading.__rich_console__ = _rich_heading_custom_rich_console  # type: ignore
 rich.markdown.CodeBlock.__rich_console__ = _rich_codeblock_custom_rich_console  # type: ignore
