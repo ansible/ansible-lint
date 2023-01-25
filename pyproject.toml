@@ -59,7 +59,9 @@ ignore-words-list = "indention"
 
 [tool.coverage.run]
 source = ["src"]
-branch = true
+# Do not use branch until bug is fixes:
+# https://github.com/nedbat/coveragepy/issues/605
+# branch = true
 parallel = true
 concurrency = ["multiprocessing", "thread"]
 
@@ -203,7 +205,7 @@ python_files = [
 xfail_strict = true
 markers = [
   "eco: Tests effects on a set of 3rd party ansible repositories",
-  "formatting_fixtures: Test that regenerates and tests formatting fixtures (requires prettier on PATH)"
+  "formatting_fixtures: Test that regenerates and tests formatting fixtures (requires prettier on PATH)",
 ]
 
 [tool.setuptools.dynamic]
