@@ -74,7 +74,7 @@ jobs:
     steps:
       - name: Activate WSL1
         if: "contains(matrix.shell, 'wsl')"
-        uses: Vampire/setup-wsl@v1
+        uses: Vampire/setup-wsl@v2
 
       - name: MacOS workaround for https://github.com/actions/virtual-environments/issues/1187
         if: ${{ matrix.os == 'macOS-latest' }}
