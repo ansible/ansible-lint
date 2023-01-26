@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/risky_file_permissions.md

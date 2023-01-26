@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/risky_shell_pipe.md

@@ -1,0 +1,1 @@
+../../src/ansiblelint/_internal/internal_error.md

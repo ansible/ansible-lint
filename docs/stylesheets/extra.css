@@ -1,0 +1,174 @@
+/*
+Inspired by https://spec.draculatheme.com/ specification
+*/
+:root {
+  --ansi-red: #ff5555;
+  --ansi-green: #50fa7b;
+  --ansi-blue: #265285;
+  --ansi-yellow: #ffb86c; /* Orange */
+  --ansi-magenta: #bd93f9; /* Purple */
+  --ansi-cyan: #8be9fd;
+  --ansi-black: #282a36;
+  --ansi-white: #f8f8f2;
+}
+
+.-Color-Green,
+.-Color-Faint-Green,
+.-Color-Bold-Green {
+  color: var(--ansi-green);
+}
+.-Color-Red,
+.-Color-Faint-Red,
+.-Color-Bold-Red {
+  color: var(--ansi-red);
+}
+.-Color-Yellow,
+.-Color-Faint-Yellow,
+.-Color-Bold-Yellow {
+  color: var(--ansi-yellow);
+}
+.-Color-Blue,
+.-Color-Faint-Blue,
+.-Color-Bold-Blue {
+  color: var(--ansi-blue);
+}
+.-Color-Magenta,
+.-Color-Faint-Magenta,
+.-Color-Bold-Magenta {
+  color: var(--ansi-magenta);
+}
+.-Color-Cyan,
+.-Color-Faint-Cyan,
+.-Color-Bold-Cyan {
+  color: var(--ansi-cyan);
+}
+.-Color-White,
+.-Color-Faint-White,
+.-Color-Bold-White {
+  color: var(--ansi-white);
+}
+.-Color-Black,
+.-Color-Faint-Black,
+.-Color-Bold-Black {
+  color: var(--ansi-black);
+}
+
+.-Color-Faint {
+  opacity: 0.5;
+}
+
+.-Color-Bold {
+  font-weight: bold;
+}
+
+.-Color-Black-BGBlack,
+.-Color-BGBlack,
+.-Color-Red-BGBlack,
+.-Color-Green-BGBlack,
+.-Color-Yellow-BGBlack,
+.-Color-Blue-BGBlack,
+.-Color-Magenta-BGBlack,
+.-Color-Cyan-BGBlack,
+.-Color-White-BGBlack {
+  background-color: var(--ansi-black);
+}
+
+.-Color-Black-BGRed,
+.-Color-BGRed,
+.-Color-Red-BGRed,
+.-Color-Green-BGRed,
+.-Color-Yellow-BGRed,
+.-Color-Blue-BGRed,
+.-Color-Magenta-BGRed,
+.-Color-Cyan-BGRed,
+.-Color-White-BGRed {
+  background-color: var(--ansi-red);
+}
+
+.-Color-Black-BGGreen,
+.-Color-BGGreen,
+.-Color-Red-BGGreen,
+.-Color-Green-BGGreen,
+.-Color-Yellow-BGGreen,
+.-Color-Blue-BGGreen,
+.-Color-Magenta-BGGreen,
+.-Color-Cyan-BGGreen,
+.-Color-White-BGGreen {
+  background-color: var(--ansi-green);
+}
+
+.-Color-Black-BGYellow,
+.-Color-BGYellow,
+.-Color-Red-BGYellow,
+.-Color-Green-BGYellow,
+.-Color-Yellow-BGYellow,
+.-Color-Blue-BGYellow,
+.-Color-Magenta-BGYellow,
+.-Color-Cyan-BGYellow,
+.-Color-White-BGYellow {
+  background-color: var(--ansi-yellow);
+}
+
+.-Color-Black-BGBlue,
+.-Color-BGBlue,
+.-Color-Red-BGBlue,
+.-Color-Green-BGBlue,
+.-Color-Yellow-BGBlue,
+.-Color-Blue-BGBlue,
+.-Color-Magenta-BGBlue,
+.-Color-Cyan-BGBlue,
+.-Color-White-BGBlue {
+  background-color: var(--ansi-blue);
+}
+
+.-Color-Black-BGMagenta,
+.-Color-BGMagenta,
+.-Color-Red-BGMagenta,
+.-Color-Green-BGMagenta,
+.-Color-Yellow-BGMagenta,
+.-Color-Blue-BGMagenta,
+.-Color-Magenta-BGMagenta,
+.-Color-Cyan-BGMagenta,
+.-Color-White-BGMagenta {
+  background-color: var(--ansi-magenta);
+}
+
+.-Color-Black-BGCyan,
+.-Color-BGCyan,
+.-Color-Red-BGCyan,
+.-Color-Green-BGCyan,
+.-Color-Yellow-BGCyan,
+.-Color-Blue-BGCyan,
+.-Color-Magenta-BGCyan,
+.-Color-Cyan-BGCyan,
+.-Color-White-BGCyan {
+  background-color: var(--ansi-cyan);
+}
+
+.-Color-Black-BGWhite,
+.-Color-BGWhite,
+.-Color-Red-BGWhite,
+.-Color-Green-BGWhite,
+.-Color-Yellow-BGWhite,
+.-Color-Blue-BGWhite,
+.-Color-Magenta-BGWhite,
+.-Color-Cyan-BGWhite,
+.-Color-White-BGWhite {
+  background-color: var(--ansi-white);
+}
+
+.-Color-Black-BGBlack,
+.-Color-Red-BGRed,
+.-Color-Blue-BGBlue {
+  text-shadow: 0 0 1px var(--ansi-white);
+}
+
+.-Color-Green-BGGreen,
+.-Color-Yellow-BGYellow,
+.-Color-Cyan-BGCyan,
+.-Color-White-BGWhite,
+.-Color-Magenta-BGMagenta,
+.-Color-Cyan-BGGreen,
+.-Color-Green-BGCyan {
+  text-shadow: 0 0 1px var(--ansi-black);
+}

@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/inline_env_var.md

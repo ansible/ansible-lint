@@ -1,0 +1,1 @@
+../../src/ansiblelint/_internal/warning.md

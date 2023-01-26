@@ -198,7 +198,6 @@ repos:
           - pyyaml
           - rich>=13.2.0
           - ruamel.yaml
-          - sphinx
           - typing_extensions
           - wcmatch
           - yamllint

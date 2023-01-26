@@ -1,8 +1,11 @@
-myst-parser >= 0.16.1
-pipdeptree >= 2.2.1
-sphinx >= 4.4.0
-sphinx-ansible-theme >= 0.9.1
-sphinx-rtd-theme >= 1.0.0, < 2.0.0 # 1.0.0 broke rendering
-sphinxcontrib-apidoc >= 0.3.0
-sphinxcontrib-programoutput2 >= 2.0a1
-
+cairosvg
+markdown-exec>=1.0.0
+mkdocs-gen-files>=0.4.0
+mkdocs-material-extensions>=1.1.1
+mkdocs-material>=9.0.6
+mkdocs>=1.4.2
+mkdocstrings-python>=0.8.3
+mkdocstrings>=0.20.0
+pillow
+pipdeptree>=2.3.3
+pymdown-extensions>=9.9.2

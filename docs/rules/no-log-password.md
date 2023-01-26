@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/no_log_password.md

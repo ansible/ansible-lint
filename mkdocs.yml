@@ -1,0 +1,195 @@
+---
+site_name: Ansible List Documentation
+site_url: https://ansible-lint.readthedocs.io/
+repo_url: https://github.com/ansible/ansible-lint
+edit_uri: blob/main/docs/
+copyright: Copyright © 2023 Red Hat, Inc.
+docs_dir: docs
+strict: true
+
+extra_css:
+  - stylesheets/extra.css
+
+theme:
+  name: "material"
+  logo: images/logo.svg
+  favicon: images/favicon.ico
+  features:
+    - content.code.copy
+    - content.action.edit
+    - navigation.expand
+    - navigation.sections
+    - navigation.instant
+    - navigation.indexes
+    - navigation.tracking
+    - toc.integrate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: teal
+      accent: blue
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+extra:
+  social:
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/ansible-lint/
+      name: PyPI
+    - icon: fontawesome/solid/scroll
+      link: https://github.com/ansible/ansible-lint/releases
+      name: Releases
+    - icon: simple/mastodon
+      link: https://fosstodon.org/@ansible
+      name: Mastodon
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/ansible
+      name: Twitter
+    - icon: simple/matrix
+      link: https://matrix.to/#/#devtools:ansible.com
+      name: Matrix
+    - icon: fontawesome/solid/comments
+      link: https://github.com/ansible/ansible-lint/discussions
+      name: Discussions
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/ansible/ansible-lint
+      name: GitHub
+
+nav:
+  - User Guide:
+      - home: index.md
+      - philosophy.md
+      - installing.md
+      - usage.md
+      - configuring.md
+      - profiles.md
+  - Rules:
+      - index: rules/index.md
+      - rules/args.md
+      - rules/avoid-implicit.md
+      - rules/command-instead-of-module.md
+      - rules/command-instead-of-shell.md
+      - rules/deprecated-bare-vars.md
+      - rules/deprecated-command-syntax.md
+      - rules/deprecated-local-action.md
+      - rules/deprecated-module.md
+      - rules/empty-string-compare.md
+      - rules/fqcn.md
+      - rules/galaxy.md
+      - rules/ignore-errors.md
+      - rules/inline-env-var.md
+      - rules/internal-error.md
+      - rules/jinja.md
+      - rules/key-order.md
+      - rules/latest.md
+      - rules/literal-compare.md
+      - rules/load-failure.md
+      - rules/loop-var-prefix.md
+      - rules/meta-incorrect.md
+      - rules/meta-no-info.md
+      - rules/meta-no-tags.md
+      - rules/meta-unsupported-ansible.md
+      - rules/meta-video-links.md
+      - rules/name.md
+      - rules/no-changed-when.md
+      - rules/no-free-form.md
+      - rules/no-handler.md
+      - rules/no-jinja-when.md
+      - rules/no-log-password.md
+      - rules/no-prompting.md
+      - rules/no-relative-paths.md
+      - rules/no-same-owner.md
+      - rules/no-tabs.md
+      - rules/only-builtins.md
+      - rules/package-latest.md
+      - rules/parser-error.md
+      - rules/partial-become.md
+      - rules/playbook-extension.md
+      - rules/risky-file-permissions.md
+      - rules/risky-octal.md
+      - rules/risky-shell-pipe.md
+      - rules/role-name.md
+      - rules/run-once.md
+      - rules/schema.md
+      - rules/syntax-check.md
+      - rules/var-naming.md
+      - rules/warning.md
+      - rules/yaml.md
+  - Developer Guide:
+      - Contributing: contributing.md
+      - custom-rules.md
+
+#   - installation.md
+#   - using:
+#       - getting-started.md
+#       - usage.md
+#       - configuration.md
+#   - examples.md
+#   - faq.md
+#   - contributing.md
+#   - tags.md
+#   # - subprocess-tee: '!import https://github.com/pycontribs/subprocess-tee?branch=main&multi_docs=False'
+#   # - xxx: '!import https://github.com/eclipse-opensmartclide/smartclide-docs'
+
+plugins:
+  - autorefs
+  - markdown-exec
+  - gen-files:
+      scripts:
+        - src/ansiblelint/generate_docs.py
+  - search
+  - social
+  - tags
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            # Sphinx is for historical reasons, but we could consider switching if needed
+            # https://mkdocstrings.github.io/griffe/docstrings/
+            docstring_style: sphinx
+            merge_init_into_class: yes
+            show_submodules: yes
+          import:
+            - url: https://docs.ansible.com/ansible/latest/objects.inv
+              domains: [py, std]
+
+markdown_extensions:
+  - admonition
+  - def_list
+  - footnotes
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.magiclink:
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      social_url_shorthand: true
+      social_url_shortener: true
+      user: facelessuser
+      repo: pymdown-extensions
+      normalize_issue_symbols: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      toc_depth: 2
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+        - name: python
+          class: python
+          validator: !!python/name:markdown_exec.validator
+          format: !!python/name:markdown_exec.formatter
