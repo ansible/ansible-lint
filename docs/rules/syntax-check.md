@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/syntax_check.md

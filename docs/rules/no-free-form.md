@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/no_free_form.md

@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/run_once.md

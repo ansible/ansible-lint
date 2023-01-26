@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/literal_compare.md
