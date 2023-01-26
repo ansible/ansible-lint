@@ -56,14 +56,14 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.17.1
+    rev: v6.19.2
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/sirosen/check-jsonschema
-    rev: 0.20.0
+    rev: 0.21.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -169,7 +169,7 @@ repos:
           - filelock
           - jinja2
           - pytest>=7.2.0
-          - rich>=11.0.0
+          - rich>=13.2.0
           - ruamel.yaml
           - types-PyYAML
           - types-jsonschema>=4.4.2
@@ -182,7 +182,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.16.0b0
+    rev: v2.16.0b1
     hooks:
       - id: pylint
         args:
@@ -196,7 +196,7 @@ repos:
           - jsonschema>=4.9.0
           - pytest>=7.2.0
           - pyyaml
-          - rich>=11.0.0
+          - rich>=13.2.0
           - ruamel.yaml
           - sphinx
           - typing_extensions
