@@ -1,5 +1,5 @@
 ---
-site_name: Ansible List Documentation
+site_name: Ansible Lint Documentation
 site_url: https://ansible-lint.readthedocs.io/
 repo_url: https://github.com/ansible/ansible-lint
 edit_uri: blob/main/docs/
