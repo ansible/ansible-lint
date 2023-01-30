@@ -19,6 +19,12 @@ As `raw` module only accepts free-form, we trigger `no-free-form[raw]` only if
 we detect the presence of `executable=` inside raw calls. We advice the explicit
 use of `args:` dictionary for configuring the executable to be run.
 
+This rule can produce messages such:
+
+- `no-free-form` - Free-form syntax is discouraged.
+- `no-free-form[raw-non-string]` - Passing a non string value to `raw` module is
+  neither documented or supported.
+
 ## Problematic code
 
 ```yaml
