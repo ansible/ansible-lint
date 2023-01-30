@@ -1,5 +1,8 @@
 ---
 rules:
+  comments:
+    # prettier compatibility
+    min-spaces-from-content: 1
   document-start:
     present: true
   indentation:
@@ -12,4 +15,5 @@ ignore: |
   examples/playbooks/vars/not_decryptable.yml
   test/schemas/negative_test/**/*.yml
   test/schemas/test/**/*.yml
+
 # ignore added because this file includes on-purpose errors
