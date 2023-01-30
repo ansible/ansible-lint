@@ -1,12 +1,13 @@
 # run-once
 
-This rule warns against the use of `run_once` when `strategy` is set to `free`.
+This rule warns against the use of `run_once` when the `strategy` is set to
+`free`.
 
 This rule can produce the following messages:
 
-- `run_once[play]`: Play uses `strategy: free`.
-- `run_once[task]`: Using `run_once` may behave differently if `strategy` is set
-  to `free`.
+- `run-once[play]`: Play uses `strategy: free`.
+- `run-once[task]`: Using `run_once` may behave differently if the `strategy` is
+  set to `free`.
 
 For more information see the following topics in Ansible documentation:
 
@@ -16,9 +17,9 @@ For more information see the following topics in Ansible documentation:
 
 !!! warning
 
-    This rule will always trigger regardless of the value configured inside 'strategy' field. That is because the effective value used at runtime can be different than the value inside the file. For example, ansible command line arguments can alter it.
+    This rule will always trigger regardless of the value configured inside the 'strategy' field. That is because the effective value used at runtime can be different than the value inside the file. For example, ansible command line arguments can alter it.
 
-It is perfectly fine to add `# noqa: run_once[task]` to mark the warning as
+It is perfectly fine to add `# noqa: run-once[task]` to mark the warning as
 acknowledged and ignored.
 
 ## Problematic Code
@@ -52,9 +53,10 @@ acknowledged and ignored.
 - name: "Example of using run_once with strategy other than free"
   hosts: all
   strategy: linear
+  # strategy: free # noqa: run-once[play] (if using strategy: free can skip it this way)
   gather_facts: false
   tasks: # <-- use noqa to disable rule violations for specific tasks
-    - name: Task with run_once # noqa: run_once[task]
+    - name: Task with run_once # noqa: run-once[task]
       ansible.builtin.debug:
         msg: "Test"
       run_once: true

@@ -4,6 +4,7 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
@@ -36,7 +37,9 @@ class RunOnce(AnsibleLintRule):
             self.create_matcherror(
                 message="Play uses strategy: free",
                 filename=file,
-                tag="run_once[play]",
+                tag=f"{self.id}[play]",
+                # pylint: disable=protected-access
+                linenumber=strategy._line_number,
             )
         ]
 
@@ -54,7 +57,8 @@ class RunOnce(AnsibleLintRule):
             self.create_matcherror(
                 message="Using run_once may behave differently if strategy is set to free.",
                 filename=file,
-                tag="run_once[task]",
+                tag=f"{self.id}[task]",
+                linenumber=task[LINE_NUMBER_KEY],
             )
         ]
 
