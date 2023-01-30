@@ -68,8 +68,8 @@ You can specify the list of **roles** or **playbooks** that you want to lint
 with the `-p` argument. For example, to lint `examples/playbooks/play.yml` and
 `examples/roles/bobbins`, use the following command:
 
-```bash exec="1" source="console"
-ansible-lint --offline -p examples/playbooks/play.yml examples/roles/bobbins || true
+```bash exec="1" source="console" returncode="2"
+ansible-lint --offline -p examples/playbooks/play.yml examples/roles/bobbins
 ```
 
 ## Running example playbooks
@@ -79,23 +79,23 @@ playbooks with different rule violations and undesirable characteristics. You
 can run `ansible-lint` on the example playbooks to observe Ansible-lint in
 action, as follows:
 
-```bash exec="1" source="console"
-ansible-lint --offline -p examples/playbooks/example.yml >/dev/null || true
+```bash exec="1" source="console" returncode="2"
+ansible-lint --offline -p examples/playbooks/example.yml >/dev/null
 ```
 
 Ansible-lint also handles playbooks that include other playbooks, tasks,
 handlers, or roles, as the `examples/playbooks/include.yml` example
 demonstrates.
 
-```bash exec="1" source="console"
-ansible-lint --offline -p examples/playbooks/include.yml 2>/dev/null || true
+```bash exec="1" source="console" returncode="2"
+ansible-lint --offline -p examples/playbooks/include.yml 2>/dev/null
 ```
 
 You can generate `JSON` reports based on the code-climate specification as the
 `examples/playbooks/norole.yml` example demonstrates.
 
-```bash exec="1"  source="tabbed-left" result="json"
-ansible-lint --offline -f json examples/playbooks/norole.yml 2>/dev/null || true
+```bash exec="1" source="tabbed-left" result="json" returncode="2"
+ansible-lint --offline -f json examples/playbooks/norole.yml 2>/dev/null
 ```
 
 ## Specifying rules at runtime
