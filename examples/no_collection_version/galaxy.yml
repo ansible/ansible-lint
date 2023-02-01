@@ -1,0 +1,13 @@
+---
+name: galaxy_no_version
+namespace: test
+readme: ../README.md
+authors:
+  - John
+description: your collection description
+license:
+  - GPL
+  - Apache
+
+dependencies: {}
+repository: http://example.com/repository
