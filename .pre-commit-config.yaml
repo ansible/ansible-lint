@@ -107,10 +107,6 @@ repos:
           )$
         additional_dependencies:
           - tomli
-  - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.1
-    hooks:
-      - id: doc8
   - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.29.0
     hooks:
@@ -127,7 +123,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/PyCQA/isort
-    rev: 5.11.4
+    rev: 5.12.0
     hooks:
       - id: isort
         args:
@@ -163,7 +159,7 @@ repos:
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=2.2.6
+          - ansible-compat>=3.0.1
           - black>=22.10.0
           - cryptography
           - filelock
@@ -188,7 +184,7 @@ repos:
         args:
           - --output-format=colorized
         additional_dependencies:
-          - ansible-compat>=2.2.6
+          - ansible-compat>=3.0.1
           - ansible-core>=2.14.0
           - black>=22.10.0
           - docutils
@@ -198,7 +194,6 @@ repos:
           - pyyaml
           - rich>=13.2.0
           - ruamel.yaml
-          - sphinx
           - typing_extensions
           - wcmatch
           - yamllint
@@ -208,7 +203,7 @@ repos:
       - id: pip-compile
         name: lock
         always_run: true
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core
         language: python
         files: ^.config\/requirements.*$
         alias: lock
@@ -218,7 +213,7 @@ repos:
           - pip>=22.3.1
       - id: pip-compile
         name: deps
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core
         language: python
         files: ^.config\/requirements.*$
         alias: deps
@@ -227,7 +222,7 @@ repos:
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core --upgrade
         language: python
         always_run: true
         files: ^.config\/requirements.*$

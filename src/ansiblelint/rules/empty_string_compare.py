@@ -64,6 +64,11 @@ if "pytest" in sys.modules:
         /sbin/shutdown -t now
         echo $var == ""
       when: ansible_os_family
+    - name: Shut down
+      shell: |
+        /sbin/shutdown -t now
+        echo $var == ""
+      when: [ansible_os_family]
 """
 
     FAIL_PLAY = """
@@ -75,6 +80,9 @@ if "pytest" in sys.modules:
   - name: Shut down
     command: /sbin/shutdown -t now
     when: ansible_os_family !=""
+  - name: Shut down
+    command: /sbin/shutdown -t now
+    when: False
 """
 
     @pytest.mark.parametrize(

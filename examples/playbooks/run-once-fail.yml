@@ -1,9 +1,11 @@
 ---
 - name: "Example with run_once"
   hosts: all
-  strategy: free # <-- avoid use of strategy as free
+  # strategy: free # noqa: run-once[play] (Corrected code example)
+  strategy: free
   gather_facts: false
   tasks:
+    # - name: Task with run_once # noqa run-once[task] (Corrected code example)
     - name: Task with run_once
       ansible.builtin.debug:
         msg: "Test"

@@ -65,6 +65,7 @@ def rules_as_docs(rules: RulesCollection) -> str:
                     description += f" [more]({rule.link})"
 
                 result += f"# {title}\n\n**{rule.shortdesc}**\n\n{description}"
+            result = result.strip() + "\n"
             f.write(result)
 
     return "All markdown files for rules were dumped!"
@@ -144,9 +145,9 @@ Do not manually edit, generated from generate_docs.py
 
 Ansible-lint profiles gradually increase the strictness of rules as your Ansible content lifecycle.
 
-```{note}
-Rules with `*` in the suffix are not yet implemented but are documented with linked GitHub issues.
-```
+!!! note
+
+    Rules with `*` in the suffix are not yet implemented but are documented with linked GitHub issues.
 
 """
 

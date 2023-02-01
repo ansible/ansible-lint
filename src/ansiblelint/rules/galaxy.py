@@ -6,6 +6,8 @@ import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
 
+import pytest
+
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
@@ -39,6 +41,10 @@ class GalaxyRule(AnsibleLintRule):
                     filename=file,
                 )
             )
+            # returning here as it does not make sense
+            # to continue for version check below
+            return results
+
         version = data.get("version")
         if Version(version) < Version("1.0.0"):
             results.append(
@@ -88,16 +94,18 @@ class Version:
 
     def __eq__(self, other: object) -> bool:
         """Implement equality comparison."""
-        other = _coerce(other)
-        if not isinstance(other, Version):
+        try:
+            other = _coerce(other)
+        except NotImplementedError:
             return NotImplemented
 
         return self.components == other.components
 
     def __lt__(self, other: Version) -> bool:
         """Implement lower-than operation."""
-        other = _coerce(other)
-        if not isinstance(other, Version):
+        try:
+            other = _coerce(other)
+        except NotImplementedError:
             return NotImplemented
 
         return self.components < other.components
@@ -135,6 +143,15 @@ if "pytest" in sys.modules:  # noqa: C901
         errs = bad_runner.run()
         assert len(errs) == 1
 
+    def test_galaxy_no_collection_version() -> None:
+        """Test for no collection version in galaxy."""
+        collection = RulesCollection()
+        collection.register(GalaxyRule())
+        failure = "examples/no_collection_version/galaxy.yml"
+        bad_runner = Runner(failure, rules=collection)
+        errs = bad_runner.run()
+        assert len(errs) == 1
+
     def test_changelog_present() -> None:
         """Positive test for finding a changelog."""
         collection = RulesCollection()
@@ -151,3 +168,16 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(result) == 1
         for item in result:
             assert item.tag == "galaxy[no-changelog]"
+
+    def test_version_class() -> None:
+        """Test for version class."""
+        v = Version("1.0.0")
+        assert v == Version("1.0.0")
+
+    def test_coerce() -> None:
+        """Test for _coerce function."""
+        assert _coerce("1.0") == Version("1.0")
+        assert _coerce(1.0) == Version("1.0")
+        expected = "Unable to coerce object type"
+        with pytest.raises(NotImplementedError, match=expected):
+            _coerce(type(Version))
