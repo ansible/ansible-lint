@@ -353,7 +353,7 @@ def get_app() -> App:
     # fail.
     _perform_mockings()
     app.runtime.prepare_environment(
-        install_local=True, offline=offline, role_name_check=role_name_check
+        install_local=(not offline), offline=offline, role_name_check=role_name_check
     )
 
     return app
