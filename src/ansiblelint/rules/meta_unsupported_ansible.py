@@ -31,8 +31,8 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
         "a supported platform version of ansible-core."
     )
     severity = "VERY_HIGH"
-    tags = ["metadata", "opt-in", "experimental"]
-    version_added = "v6.8.6 (last update)"
+    tags = ["metadata"]
+    version_added = "v6.11.0 (last update)"
 
     supported_ansible = ["2.9.10", "2.11", "2.12", "2.13", "2.14"]
 
@@ -42,8 +42,6 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
             return []
 
         version_required = file.data.get("requires_ansible", None)
-
-        print(version_required)
 
         if version_required:
             if not any(

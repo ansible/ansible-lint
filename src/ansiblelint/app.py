@@ -45,7 +45,8 @@ class App:
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
 
-        self.runtime = Runtime(isolated=True)
+        # Without require_module, our _set_collections_basedir may fail
+        self.runtime = Runtime(isolated=True, require_module=True)
 
     def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""
@@ -87,6 +88,13 @@ class App:
             formatter = formatters.AnnotationsFormatter(self.options.cwd, True)
             for match in itertools.chain(fatal_matches, ignored_matches):
                 console.print(formatter.format(match), markup=False, highlight=False)
+
+        # If sarif_file is set, we also dump the results to a sarif file.
+        if self.options.sarif_file:
+            sarif = formatters.SarifFormatter(self.options.cwd, True)
+            json = sarif.format_result(matches)
+            with open(self.options.sarif_file, "w", encoding="utf-8") as sarif_file:
+                sarif_file.write(json)
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
@@ -345,7 +353,7 @@ def get_app() -> App:
     # fail.
     _perform_mockings()
     app.runtime.prepare_environment(
-        install_local=True, offline=offline, role_name_check=role_name_check
+        install_local=(not offline), offline=offline, role_name_check=role_name_check
     )
 
     return app

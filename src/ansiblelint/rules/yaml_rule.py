@@ -172,7 +172,6 @@ if "pytest" in sys.modules:
         """Asserts that we loaded markdown documentation in help property."""
         for collection in default_rules_collection:
             if collection.id == "yaml":
-                print(collection.id)
                 assert collection.help is not None
                 assert len(collection.help) > 100
                 break

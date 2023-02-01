@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Iterable
 
 from rich import box
+from rich.console import RenderableType
 
 # Remove this compatibility try-catch block once we drop support for rich < 10.7.0
 try:
@@ -64,14 +65,24 @@ def rules_as_docs(rules: RulesCollection) -> str:
                     description += f" [more]({rule.link})"
 
                 result += f"# {title}\n\n**{rule.shortdesc}**\n\n{description}"
+            result = result.strip() + "\n"
             f.write(result)
 
     return "All markdown files for rules were dumped!"
 
 
-def rules_as_str(rules: RulesCollection) -> str:
+def rules_as_str(rules: RulesCollection) -> RenderableType:
     """Return rules as string."""
-    return "\n".join([str(rule) for rule in rules.alphabetical()])
+    table = Table(show_header=False, header_style="title", box=box.SIMPLE)
+    for rule in rules.alphabetical():
+        if rule.tags:
+            tag = f"[dim] ({', '.join(rule.tags)})[/dim]"
+        else:
+            tag = ""
+        table.add_row(
+            f"[link={RULE_DOC_URL}{rule.id}/]{rule.id}[/link]", rule.shortdesc + tag
+        )
+    return table
 
 
 def rules_as_md(rules: RulesCollection) -> str:
@@ -134,9 +145,9 @@ Do not manually edit, generated from generate_docs.py
 
 Ansible-lint profiles gradually increase the strictness of rules as your Ansible content lifecycle.
 
-```{note}
-Rules with `*` in the suffix are not yet implemented but are documented with linked GitHub issues.
-```
+!!! note
+
+    Rules with `*` in the suffix are not yet implemented but are documented with linked GitHub issues.
 
 """
 

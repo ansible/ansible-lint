@@ -162,12 +162,13 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             ).hexdigest()
             issue["location"] = {}
             issue["location"]["path"] = self._format_path(match.filename or "")
-            issue["location"]["lines"] = {}
             if match.column:
-                issue["location"]["lines"]["begin"] = {}
-                issue["location"]["lines"]["begin"]["line"] = match.linenumber
-                issue["location"]["lines"]["begin"]["column"] = match.column
+                issue["location"]["positions"] = {}
+                issue["location"]["positions"]["begin"] = {}
+                issue["location"]["positions"]["begin"]["line"] = match.linenumber
+                issue["location"]["positions"]["begin"]["column"] = match.column
             else:
+                issue["location"]["lines"] = {}
                 issue["location"]["lines"]["begin"] = match.linenumber
             if match.details:
                 issue["content"] = {}

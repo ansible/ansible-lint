@@ -28,3 +28,9 @@
         foo: # this is a nested object which will have the __ injections
           # that we later need to clean
           bar: true
+
+    - name: Remove deployment dir
+      # module should produce: 'value of state must be one of: absent, directory, file, hard, link, touch, got: away'
+      ansible.builtin.file:
+        path: /opt/software/deployment
+        state: away

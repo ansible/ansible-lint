@@ -56,14 +56,14 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.17.1
+    rev: v6.19.2
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/sirosen/check-jsonschema
-    rev: 0.19.2
+    rev: 0.21.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -107,12 +107,8 @@ repos:
           )$
         additional_dependencies:
           - tomli
-  - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.1
-    hooks:
-      - id: doc8
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.28.0
+    rev: v1.29.0
     hooks:
       - id: yamllint
         exclude: >
@@ -127,7 +123,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/PyCQA/isort
-    rev: 5.11.4
+    rev: 5.12.0
     hooks:
       - id: isort
         args:
@@ -147,6 +143,7 @@ repos:
           - flake8-2020>=1.6.0
           # - flake8-black>=0.1.1
           - flake8-docstrings>=1.5.0
+          - flake8-print>=5.0
           - flake8-pytest-style>=1.2.2
           - flake8-future-annotations>=0.0.3
   - repo: https://github.com/asottile/pyupgrade
@@ -162,13 +159,13 @@ repos:
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=2.2.6
+          - ansible-compat>=3.0.1
           - black>=22.10.0
           - cryptography
           - filelock
           - jinja2
           - pytest>=7.2.0
-          - rich>=11.0.0
+          - rich>=13.2.0
           - ruamel.yaml
           - types-PyYAML
           - types-jsonschema>=4.4.2
@@ -181,13 +178,13 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.15.9
+    rev: v2.16.0b1
     hooks:
       - id: pylint
         args:
           - --output-format=colorized
         additional_dependencies:
-          - ansible-compat>=2.2.6
+          - ansible-compat>=3.0.1
           - ansible-core>=2.14.0
           - black>=22.10.0
           - docutils
@@ -195,9 +192,8 @@ repos:
           - jsonschema>=4.9.0
           - pytest>=7.2.0
           - pyyaml
-          - rich>=11.0.0
+          - rich>=13.2.0
           - ruamel.yaml
-          - sphinx
           - typing_extensions
           - wcmatch
           - yamllint
@@ -207,7 +203,7 @@ repos:
       - id: pip-compile
         name: lock
         always_run: true
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core
         language: python
         files: ^.config\/requirements.*$
         alias: lock
@@ -217,7 +213,7 @@ repos:
           - pip>=22.3.1
       - id: pip-compile
         name: deps
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --extra lock --strip-extras --unsafe-package ansible-core
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core
         language: python
         files: ^.config\/requirements.*$
         alias: deps
@@ -226,7 +222,7 @@ repos:
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ansible-core --upgrade
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core --upgrade
         language: python
         always_run: true
         files: ^.config\/requirements.*$

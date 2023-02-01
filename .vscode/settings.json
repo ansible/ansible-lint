@@ -2,6 +2,7 @@
     "[markdown]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "editor.formatOnSave": true,
     "evenBetterToml.formatter.allowedBlankLines": 2,
     "files.exclude": {
         "*.egg-info": true,
@@ -10,7 +11,6 @@
         "__pycache__": true,
         "build": true
     },
-    "python.analysis.exclude": ["build"],
     "git.ignoreLimitWarning": true,
     "grammarly.domain": "technical",
     "grammarly.files.include": [
@@ -19,6 +19,9 @@
     ],
     "grammarly.hideUnavailablePremiumAlerts": true,
     "grammarly.showExamples": true,
+    "python.analysis.exclude": [
+        "build"
+    ],
     "python.formatting.provider": "black",
     "python.linting.flake8Enabled": true,
     "python.linting.mypyCategorySeverity.error": "Warning",

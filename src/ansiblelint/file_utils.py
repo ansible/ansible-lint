@@ -14,12 +14,12 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Iterator, cast
 
-# import wcmatch
 import wcmatch.pathlib
 from wcmatch.wcmatch import RECURSIVE, WcMatch
+from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, options
-from ansiblelint.constants import FileType
+from ansiblelint.constants import GIT_CMD, FileType, States
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3979
@@ -189,8 +189,9 @@ class Lintable:
         self.dir: str = ""
         self.kind: FileType | None = None
         self.stop_processing = False  # Set to stop other rules from running
-        self._data: Any = None
+        self._data: Any = States.NOT_LOADED
         self.line_skips: dict[int, set[str]] = defaultdict(set)
+        self.exc: Exception | None = None  # Stores data loading exceptions
 
         if isinstance(name, str):
             name = Path(name)
@@ -239,6 +240,24 @@ class Lintable:
         # determine base file kind (yaml, xml, ini, ...)
         self.base_kind = base_kind or kind_from_path(self.path, base=True)
         self.abspath = self.path.expanduser().absolute()
+
+        if self.kind == "yaml":
+            self._guess_kind()
+
+    def _guess_kind(self) -> None:
+        if self.kind == "yaml":
+            if isinstance(self.data, list) and "hosts" in self.data[0]:
+                if "rules" not in self.data[0]:
+                    self.kind = "playbook"
+                else:
+                    self.kind = "rulebook"
+            # we we failed to guess the more specific kind, we warn user
+            if self.kind == "yaml":
+                _logger.debug(
+                    "Passed '%s' positional argument was identified as generic '%s' file kind.",
+                    self.name,
+                    self.kind,
+                )
 
     def __getitem__(self, key: Any) -> Any:
         """Provide compatibility subscriptable support."""
@@ -341,21 +360,34 @@ class Lintable:
     @property
     def data(self) -> Any:
         """Return loaded data representation for current file, if possible."""
-        if not self._data:
-            if str(self.base_kind) == "text/yaml":
-                from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
-                    parse_yaml_linenumbers,
-                )
+        if self._data == States.NOT_LOADED:
+            if self.path.is_dir():
+                self._data = None
+                return self._data
+            try:
+                if str(self.base_kind) == "text/yaml":
+                    from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
+                        parse_yaml_linenumbers,
+                    )
 
-                self._data = parse_yaml_linenumbers(self)
-                # Lazy import to avoid delays and cyclic-imports
-                if "append_skipped_rules" not in globals():
-                    # pylint: disable=import-outside-toplevel
-                    from ansiblelint.skip_utils import append_skipped_rules
+                    self._data = parse_yaml_linenumbers(self)
+                    # Lazy import to avoid delays and cyclic-imports
+                    if "append_skipped_rules" not in globals():
+                        # pylint: disable=import-outside-toplevel
+                        from ansiblelint.skip_utils import append_skipped_rules
 
-                self._data = append_skipped_rules(self._data, self)
+                    self._data = append_skipped_rules(self._data, self)
+                else:
+                    logging.debug(
+                        "data set to None for %s due to being of %s kind.",
+                        self.path,
+                        self.base_kind,
+                    )
+                    self._data = States.UNKNOWN_DATA
 
-            # will remain None if we do not know how to load that file-type
+            except (RuntimeError, FileNotFoundError, YAMLError) as exc:
+                self._data = States.LOAD_FAILED
+                self.exc = exc
         return self._data
 
 
@@ -368,14 +400,14 @@ def discover_lintables(options: Namespace) -> dict[str, Any]:
     """
     # git is preferred as it also considers .gitignore
     git_command_present = [
-        "git",
+        *GIT_CMD,
         "ls-files",
         "--cached",
         "--others",
         "--exclude-standard",
         "-z",
     ]
-    git_command_absent = ["git", "ls-files", "--deleted", "-z"]
+    git_command_absent = [*GIT_CMD, "ls-files", "--deleted", "-z"]
     out = None
 
     try:
@@ -437,7 +469,7 @@ def guess_project_dir(config_file: str | None) -> str:
     if path is None:
         try:
             result = subprocess.run(
-                ["git", "rev-parse", "--show-toplevel"],
+                [*GIT_CMD, "rev-parse", "--show-toplevel"],
                 capture_output=True,
                 text=True,
                 check=True,

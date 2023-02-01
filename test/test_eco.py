@@ -17,8 +17,6 @@ eco_repos = {
     "docker-rootless": "https://github.com/konstruktoid/ansible-docker-rootless",
     "hardening": "https://github.com/konstruktoid/ansible-role-hardening",
     "mysql": "https://github.com/geerlingguy/ansible-role-mysql.git",
-    "tripleo-ansible": "https://opendev.org/openstack/tripleo-ansible",
-    "zuul-jobs": "https://opendev.org/zuul/zuul-jobs",
 }
 
 

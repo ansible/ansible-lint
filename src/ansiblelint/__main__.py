@@ -48,7 +48,7 @@ from ansiblelint.color import (
     render_yaml,
 )
 from ansiblelint.config import get_version_warning, options
-from ansiblelint.constants import EXIT_CONTROL_C_RC, LOCK_TIMEOUT_RC
+from ansiblelint.constants import EXIT_CONTROL_C_RC, GIT_CMD, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
@@ -113,7 +113,7 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     os.makedirs(options.cache_dir, exist_ok=True)
 
     options.cache_dir_lock = None
-    if not options.offline:
+    if not options.offline:  # pragma: no cover
         options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
         try:
             options.cache_dir_lock.acquire(timeout=180)
@@ -141,13 +141,15 @@ def _do_list(rules: RulesCollection) -> int:
     if options.list_rules:
 
         _rule_format_map: dict[str, Callable[..., Any]] = {
-            "plain": rules_as_str,
-            "rich": rules_as_rich,
+            "brief": rules_as_str,
+            "full": rules_as_rich,
             "md": rules_as_md,
             "docs": rules_as_docs,
         }
 
-        console.print(_rule_format_map[options.format](rules), highlight=False)
+        console.print(
+            _rule_format_map.get(options.format, rules_as_str)(rules), highlight=False
+        )
         return 0
 
     if options.list_tags:
@@ -178,7 +180,7 @@ def _do_transform(result: LintResult, opts: Namespace) -> None:
 
 def support_banner() -> None:
     """Display support banner when running on unsupported platform."""
-    if sys.version_info < (3, 9, 0):
+    if sys.version_info < (3, 9, 0):  # pragma: no cover
         prefix = "::warning::" if "GITHUB_ACTION" in os.environ else "WARNING: "
         console_stderr.print(
             f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will soon require 3.9. Do not report bugs for this version.",
@@ -192,7 +194,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     # alter PATH if needed (venv support)
     path_inject()
 
-    if argv is None:
+    if argv is None:  # pragma: no cover
         argv = sys.argv
     initialize_options(argv[1:])
 
@@ -238,7 +240,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     app = get_app()
     if isinstance(options.tags, str):
-        options.tags = options.tags.split(",")
+        options.tags = options.tags.split(",")  # pragma: no cover
     result = _get_matches(rules, options)
 
     if options.write_list:
@@ -281,6 +283,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.strict and result.matches:
         mark_as_success = False
 
+    # Remove skipped list items from the result
+    result.matches = [m for m in result.matches if m.tag not in app.options.skip_list]
+
     app.render_matches(result.matches)
 
     _perform_mockings_cleanup()
@@ -304,7 +309,7 @@ def _previous_revision() -> Iterator[None]:
     rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
     options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
     revision = subprocess.run(
-        ["git", "rev-parse", "HEAD^1"],
+        [*GIT_CMD, "rev-parse", "HEAD^1"],
         check=True,
         text=True,
         stdout=subprocess.PIPE,
@@ -318,14 +323,14 @@ def _previous_revision() -> Iterator[None]:
     # Run check will fail if worktree_dir already exists
     # pylint: disable=subprocess-run-check
     subprocess.run(
-        ["git", "worktree", "add", "-f", worktree_dir],
+        [*GIT_CMD, "worktree", "add", "-f", worktree_dir],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     try:
         with cwd(worktree_dir):
             subprocess.run(
-                ["git", "checkout", revision],
+                [*GIT_CMD, "checkout", revision],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 check=True,
@@ -365,10 +370,11 @@ def path_inject() -> None:
     # Expand ~ in PATH as it known to break many tools
     expanded = False
     for idx, path in enumerate(paths):
-        if "~" in path:
+        if "~" in path:  # pragma: no cover
             paths[idx] = os.path.expanduser(path)
             expanded = True
-    if expanded:
+    if expanded:  # pragma: no cover
+        # flake8: noqa: T201
         print(
             "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
             file=sys.stderr,
@@ -387,6 +393,7 @@ def path_inject() -> None:
         inject_paths.append(py_path)
 
     if inject_paths:
+        # flake8: noqa: T201
         print(
             f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
             file=sys.stderr,
@@ -403,7 +410,7 @@ def path_inject() -> None:
 
 
 # Based on Ansible implementation
-def to_bool(value: Any) -> bool:
+def to_bool(value: Any) -> bool:  # pragma: no cover
     """Return a bool for the arg."""
     if value is None or isinstance(value, bool):
         return bool(value)

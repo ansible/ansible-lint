@@ -5,7 +5,6 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint._internal.rules import WarningRule
 from ansiblelint.constants import INCLUSION_ACTION_NAMES, LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
@@ -50,12 +49,11 @@ class NoFreeFormRule(AnsibleLintRule):
                     )
             else:
                 results.append(
-                    MatchError(
-                        message="Passing a non string value to `raw` module is neither document nor supported.",
+                    self.create_matcherror(
+                        message="Passing a non string value to `raw` module is neither documented or supported.",
                         linenumber=task[LINE_NUMBER_KEY],
                         filename=file,
-                        tag="warning[raw-non-string]",
-                        rule=WarningRule(),
+                        tag=f"{self.id}[raw-non-string]",
                     )
                 )
         elif isinstance(action_value, str) and "=" in action_value:

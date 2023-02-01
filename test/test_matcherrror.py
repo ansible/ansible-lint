@@ -67,7 +67,7 @@ def test_matcherror_invalid() -> None:
         r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
     )
     with pytest.raises(TypeError, match=expected_err):
-        MatchError()
+        raise MatchError()
 
 
 @pytest.mark.parametrize(
@@ -77,8 +77,8 @@ def test_matcherror_invalid() -> None:
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
         (
-            MatchError("a", filename=Lintable("b")),
-            MatchError("a", filename=Lintable("a")),
+            MatchError("a", filename=Lintable("b", content="")),
+            MatchError("a", filename=Lintable("a", content="")),
         ),
         # rule id partial-become > rule id no-changed-when
         (

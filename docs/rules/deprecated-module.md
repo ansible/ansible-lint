@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/deprecated_module.md

@@ -46,6 +46,7 @@ jobs:
             pkg,hook,docs
             schemas
             eco
+            py-devel
           platforms: linux,macos
 
   build:
@@ -69,12 +70,12 @@ jobs:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:GITHUB_STEP_SUMMARY
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 745
+      PYTEST_REQPASS: 774
 
     steps:
       - name: Activate WSL1
         if: "contains(matrix.shell, 'wsl')"
-        uses: Vampire/setup-wsl@v1
+        uses: Vampire/setup-wsl@v2
 
       - name: MacOS workaround for https://github.com/actions/virtual-environments/issues/1187
         if: ${{ matrix.os == 'macOS-latest' }}

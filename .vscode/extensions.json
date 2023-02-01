@@ -10,6 +10,7 @@
         "ms-vscode.live-server",
         "redhat.ansible",
         "redhat.vscode-yaml",
+        "ryanluker.vscode-coverage-gutters",
         "shardulm94.trailing-spaces",
         "tamasfe.even-better-toml",
         "timonwong.shellcheck",

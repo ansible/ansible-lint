@@ -111,7 +111,6 @@ if "pytest" in sys.modules:
     def test_ignore_errors_check_mode(rule_runner: RunFromText) -> None:
         """The task uses ignore_errors: "{{ ansible_check_mode }}"."""
         results = rule_runner.run_playbook(IGNORE_ERRORS_CHECK_MODE)
-        print(results)
         assert len(results) == 0
 
     @pytest.mark.parametrize(

@@ -214,6 +214,22 @@ class ArgsRule(AnsibleLintRule):
                 )
                 return results
 
+        value_not_in_choices_error = re.search(
+            r"value of (?P<name>.*) must be one of:", error_message
+        )
+        if value_not_in_choices_error:
+            # ignore templated value not in allowed choices
+            choice_key = value_not_in_choices_error.group("name")
+            choice_value = task["action"][choice_key]
+            if has_jinja(choice_value):
+                _logger.debug(
+                    "Value checking ignored for '%s' option in task '%s' at line %s.",
+                    choice_key,
+                    module_name,
+                    task[LINE_NUMBER_KEY],
+                )
+                return results
+
         results.append(
             self.create_matcherror(
                 message=error_message,
@@ -236,7 +252,7 @@ if "pytest" in sys.modules:
         collection.register(ArgsRule())
         success = "examples/playbooks/rule-args-module-fail-1.yml"
         results = Runner(success, rules=collection).run()
-        assert len(results) == 4
+        assert len(results) == 5
         assert results[0].tag == "args[module]"
         assert "missing required arguments" in results[0].message
         assert results[1].tag == "args[module]"
@@ -245,6 +261,8 @@ if "pytest" in sys.modules:
         assert "Unsupported parameters for" in results[2].message
         assert results[3].tag == "args[module]"
         assert "Unsupported parameters for" in results[2].message
+        assert results[4].tag == "args[module]"
+        assert "value of state must be one of" in results[4].message
 
     def test_args_module_pass() -> None:
         """Test rule valid module options."""

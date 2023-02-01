@@ -24,8 +24,8 @@ def test_list_rules_includes_opt_in_rules() -> None:
 @pytest.mark.parametrize(
     ("result", "returncode", "format_string"),
     (
-        (False, 0, "plain"),
-        (False, 0, "rich"),
+        (False, 0, "brief"),
+        (False, 0, "full"),
         (False, 0, "md"),
         (True, 2, "json"),
         (True, 2, "codeclimate"),
@@ -35,7 +35,7 @@ def test_list_rules_includes_opt_in_rules() -> None:
     ),
     ids=(
         "plain",
-        "rich",
+        "full",
         "md",
         "json",
         "codeclimate",
@@ -56,7 +56,6 @@ def test_list_rules_with_format_option(
     fakerole = os.path.join("test", "fixtures", "list-rules-tests")
 
     result_list_rules = run_ansible_lint("-f", format_string, "-L", fakerole, cwd=cwd)
-    print(result_list_rules.stdout)
 
     assert (f"invalid choice: '{format_string}'" in result_list_rules.stderr) is result
     assert ("syntax-check" in result_list_rules.stdout) is not result

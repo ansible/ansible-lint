@@ -4,6 +4,10 @@ import os
 import subprocess
 import sys
 
+# Ensure we always run from the root of the repository
+if os.getcwd() != os.path.dirname(__file__):
+    os.chdir(os.path.dirname(__file__))
+
 # checking if user is running pytest without installing test dependencies:
 missing = []
 for module in ["ansible", "black", "flake8", "mypy", "pylint"]:

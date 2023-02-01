@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, Generator
 import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule
+from ansiblelint.constants import States
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
@@ -122,14 +123,12 @@ class Runner:
                 _logger.debug("Excluded %s", lintable)
                 self.lintables.remove(lintable)
                 continue
-            try:
-                lintable.data
-            except (RuntimeError, FileNotFoundError) as exc:
+            if isinstance(lintable.data, States) and lintable.exc:
                 matches.append(
                     MatchError(
                         filename=lintable,
-                        message=str(exc),
-                        details=str(exc.__cause__),
+                        message=str(lintable.exc),
+                        details=str(lintable.exc.__cause__),
                         rule=LoadingFailureRule(),
                     )
                 )

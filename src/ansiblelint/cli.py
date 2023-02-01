@@ -224,7 +224,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         default=False,
         action="store_true",
         help="List all the rules. For listing rules only the following formats "
-        "for argument -f are supported: {plain, rich, md}",
+        "for argument -f are supported: {brief, full, md} with 'brief' as default.",
     )
     listing_group.add_argument(
         "-T",
@@ -238,10 +238,11 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-f",
         "--format",
         dest="format",
-        default="rich",
+        default=None,
         choices=[
-            "rich",
-            "plain",
+            "brief",
+            # "plain",
+            "full",
             "md",
             "json",
             "codeclimate",
@@ -252,6 +253,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         ],
         help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
+    parser.add_argument("--sarif-file", default=None, help="SARIF output file")
     parser.add_argument(
         "-q",
         dest="quiet",
@@ -280,8 +282,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="progressive",
         default=False,
         action="store_true",
-        help="Return success if number of violations compared with"
-        "previous git commit has not increased. This feature works"
+        help="Return success if number of violations compared with "
+        "previous git commit has not increased. This feature works "
         "only in git repositories.",
     )
     parser.add_argument(
@@ -289,7 +291,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="project_dir",
         default=".",
         help="Location of project/repository, autodetected based on location "
-        " of configuration file.",
+        "of configuration file.",
     )
     parser.add_argument(
         "-r",
@@ -363,7 +365,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="skip_list",
         default=[],
         action="append",
-        help="only check rules whose id/tags do not " "match these values",
+        help="only check rules whose id/tags do not match these values. \
+            e.g: --skip-list=name,run-once",
     )
     parser.add_argument(
         "-w",
@@ -415,7 +418,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="offline",
         action="store_const",
         const=True,
-        help="Disable installation of requirements.yml",
+        help="Disable installation of requirements.yml and schema refreshing",
     )
     parser.add_argument(
         "--version",
@@ -425,8 +428,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="lintables",
         nargs="*",
         action="extend",
-        help="One or more files or paths. When missing it will "
-        " enable auto-detection mode.",
+        help="One or more files or paths. When missing it will enable auto-detection mode.",
     )
 
     return parser
@@ -462,6 +464,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
         "loop_var_prefix": None,
         "project_dir": ".",
         "profile": None,
+        "sarif_file": None,
     }
 
     if not file_config:
@@ -524,10 +527,16 @@ def get_config(arguments: list[str]) -> Namespace:
     options = parser.parse_args(arguments)
 
     # docs is not document, being used for internal documentation building
-    if options.list_rules and options.format not in ["plain", "rich", "md", "docs"]:
+    if options.list_rules and options.format not in [
+        None,
+        "brief",
+        "full",
+        "md",
+        "docs",
+    ]:
         parser.error(
             f"argument -f: invalid choice: '{options.format}'. "
-            f"In combination with argument -L only 'plain', "
+            f"In combination with argument -L only 'brief', "
             f"'rich' or 'md' are supported with -f."
         )
 

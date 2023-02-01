@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/var_naming.md

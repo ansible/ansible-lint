@@ -171,6 +171,7 @@ if "pytest" in sys.modules:
         collection = RulesCollection()
         collection.register(OctalPermissionsRule())
         results = Runner(file, rules=collection).run()
+
         assert len(results) == failures
         for result in results:
             assert result.rule.id == "risky-octal"

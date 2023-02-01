@@ -189,31 +189,31 @@ def test_append_skipped_rules(
     ("task", "expected"),
     (
         pytest.param(
-            dict(
-                name="ensure apache is at the latest version",
-                yum={"name": "httpd", "state": "latest"},
-            ),
+            {
+                "name": "ensure apache is at the latest version",
+                "yum": {"name": "httpd", "state": "latest"},
+            },
             False,
         ),
         pytest.param(
-            dict(
-                name="Attempt and graceful roll back",
-                block=[
+            {
+                "name": "Attempt and graceful roll back",
+                "block": [
                     {"name": "Force a failure", "ansible.builtin.command": "/bin/false"}
                 ],
-                rescue=[
+                "rescue": [
                     {
                         "name": "Force a failure in middle of recovery!",
                         "ansible.builtin.command": "/bin/false",
                     }
                 ],
-                always=[
+                "always": [
                     {
                         "name": "Always do this",
                         "ansible.builtin.debug": {"msg": "This always executes"},
                     }
                 ],
-            ),
+            },
             True,
         ),
     ),

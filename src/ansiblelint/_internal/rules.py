@@ -17,7 +17,7 @@ _logger = logging.getLogger(__name__)
 LOAD_FAILURE_MD = """\
 # load-failure
 
-Linter failed to process a YAML file, probably because it is either:
+"Linter failed to process a file, possible invalid file. Possible reasons:
 
 * contains unsupported encoding (only UTF-8 is supported)
 * not an Ansible file
@@ -69,7 +69,7 @@ class BaseRule:
     def url(self) -> str:
         """Return rule documentation url."""
         url = self.link
-        if not url:
+        if not url:  # pragma: no cover
             url = RULE_DOC_URL
             if self.id:
                 url += self.id + "/"
@@ -175,7 +175,7 @@ class LoadingFailureRule(BaseRule):
     """Failed to load or parse file."""
 
     id = "load-failure"
-    description = "Linter failed to process a YAML file, possible not an Ansible file."
+    description = "Linter failed to process a file, possible invalid file."
     severity = "VERY_HIGH"
     tags = ["core", "unskippable"]
     version_added = "v4.3.0"

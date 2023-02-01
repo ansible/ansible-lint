@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/partial_become.md

@@ -17,7 +17,7 @@ def test_unjinja() -> None:
     assert AnsibleLintRule.unjinja(text) == output
 
 
-@pytest.mark.parametrize("rule_config", ({}, dict(foo=True, bar=1)))
+@pytest.mark.parametrize("rule_config", ({}, {"foo": True, "bar": 1}))
 def test_rule_config(rule_config: dict[str, Any], monkeypatch: MonkeyPatch) -> None:
     """Check that a rule config is inherited from options."""
     rule_id = "rule-0"

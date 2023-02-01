@@ -5,6 +5,6 @@
     - name: Use module from local collection
       testns.test_collection.test_module_2:
     - name: Use filter from local collection
-      assert:
+      ansible.builtin.assert:
         that:
           - 1 | testns.test_collection.test_filter(2) == '1:2'

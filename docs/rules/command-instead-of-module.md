@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/command_instead_of_module.md

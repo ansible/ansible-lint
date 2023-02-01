@@ -90,7 +90,6 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
     _logger.debug("Checking for updated schemas...")
 
     changed = 0
-    # breakpoint()
     for kind, data in JSON_SCHEMAS.items():
         url = data["url"]
         if "#" in url:
@@ -104,7 +103,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         if etag:
             request.add_header("If-None-Match", f'"{data.get("etag")}"')
         try:
-            with urllib.request.urlopen(request) as response:
+            with urllib.request.urlopen(request, timeout=10) as response:
                 if response.status == 200:
                     content = response.read().decode("utf-8").rstrip()
                     etag = response.headers["etag"].strip('"')
@@ -146,7 +145,9 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
 if __name__ == "__main__":
 
     if refresh_schemas():
+        # flake8: noqa: T201
         print("Schemas were updated.")
         sys.exit(1)
     else:
+        # flake8: noqa: T201
         print("Schemas not updated", 0)

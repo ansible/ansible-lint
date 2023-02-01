@@ -1,5 +1,6 @@
 """Constants used by AnsibleLint."""
 import os.path
+from enum import Enum
 from typing import Literal
 
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
@@ -52,6 +53,7 @@ if __name__ == "__main__":
 
 FileType = Literal[
     "playbook",
+    "rulebook",
     "meta",  # role meta
     "meta-runtime",
     "tasks",  # includes pre_tasks, post_tasks
@@ -145,3 +147,22 @@ ROLE_IMPORT_ACTION_NAMES = {
     "import_role",
     "include_role",
 }
+
+# Newer versions of git might fail to run when different file ownership is
+# found of repo. One example is on GHA runners executing containerized
+# reusable actions, where the mounted volume might have different owner.
+#
+# https://github.com/ansible/ansible-lint-action/issues/138
+GIT_CMD = ["git", "-c", f"safe.directory={os.getcwd()}"]
+
+
+class States(Enum):
+    """States used are used as sentinel values in various places."""
+
+    NOT_LOADED = "File not loaded"
+    LOAD_FAILED = "File failed to load"
+    UNKNOWN_DATA = "Unknown data"
+
+    def __bool__(self) -> bool:
+        """Ensure all states evaluate as False as booleans."""
+        return False

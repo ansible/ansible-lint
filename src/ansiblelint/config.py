@@ -56,6 +56,7 @@ DEFAULT_KINDS = [
     {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
     {"reno": "**/releasenotes/*/*.{yaml,yml}"},  # reno release notes
     {"tasks": "**/tasks/**/*.{yaml,yml}"},
+    {"rulebook": "**/rulebooks/*.{yml,yaml"},
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
     {"role": "**/roles/*/"},
@@ -106,7 +107,7 @@ options = Namespace(
     cwd=".",
     display_relative_path=True,
     exclude_paths=[],
-    format="rich",
+    format="brief",
     lintables=[],
     list_rules=False,
     list_tags=False,
@@ -135,6 +136,7 @@ options = Namespace(
     rules={},  # Placeholder to set and keep configurations for each rule.
     profile=None,
     task_name_prefix="{stem} | ",
+    sarif_file=None,
 )
 
 # Used to store detected tag deprecations

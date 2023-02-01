@@ -7,6 +7,7 @@ from typing import Any
 
 from ansible.plugins.loader import module_loader
 
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
@@ -159,6 +160,20 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                     )
         return result
 
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
+        if file.kind != "playbook":
+            return []
+        if "collections" in data:
+            return [
+                self.create_matcherror(
+                    message="Avoid `collections` keyword by using FQCN for all plugins, modules, roles and playbooks.",
+                    linenumber=data[LINE_NUMBER_KEY],
+                    tag="fqcn[keyword]",
+                    filename=file,
+                )
+            ]
+        return []
+
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
@@ -171,11 +186,13 @@ if "pytest" in sys.modules:
         collection.register(FQCNBuiltinsRule())
         success = "examples/playbooks/rule-fqcn-fail.yml"
         results = Runner(success, rules=collection).run()
-        assert len(results) == 2
-        assert results[0].tag == "fqcn[action-core]"
-        assert "Use FQCN for builtin module actions" in results[0].message
-        assert results[1].tag == "fqcn[action]"
-        assert "Use FQCN for module actions, such" in results[1].message
+        assert len(results) == 3
+        assert results[0].tag == "fqcn[keyword]"
+        assert "Avoid `collections` keyword" in results[0].message
+        assert results[1].tag == "fqcn[action-core]"
+        assert "Use FQCN for builtin module actions" in results[1].message
+        assert results[2].tag == "fqcn[action]"
+        assert "Use FQCN for module actions, such" in results[2].message
 
     def test_fqcn_builtin_pass() -> None:
         """Test rule does not match."""

@@ -754,23 +754,23 @@
       "title": "OpenBSDPlatformModel",
       "type": "object"
     },
-    "OpenWRTPlatformModel": {
+    "OpenWrtPlatformModel": {
       "properties": {
         "name": {
-          "const": "OpenWRT",
+          "const": "OpenWrt",
           "title": "Name",
           "type": "string"
         },
         "versions": {
           "default": "all",
           "items": {
-            "enum": ["17.01", "18.06", "19.07", "21.02", "all"],
+            "enum": ["17.01", "18.06", "19.07", "21.02", "22.03", "all"],
             "type": "string"
           },
           "type": "array"
         }
       },
-      "title": "OpenWRTPlatformModel",
+      "title": "OpenWrtPlatformModel",
       "type": "object"
     },
     "OracleLinuxPlatformModel": {
@@ -1268,7 +1268,7 @@
             "$ref": "#/$defs/opensusePlatformModel"
           },
           {
-            "$ref": "#/$defs/OpenWRTPlatformModel"
+            "$ref": "#/$defs/OpenWrtPlatformModel"
           },
           {
             "$ref": "#/$defs/OracleLinuxPlatformModel"
