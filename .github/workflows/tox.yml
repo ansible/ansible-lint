@@ -46,6 +46,7 @@ jobs:
             pkg,hook,docs
             schemas
             eco
+            py-devel
           platforms: linux,macos
 
   build:
