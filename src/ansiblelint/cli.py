@@ -224,7 +224,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         default=False,
         action="store_true",
         help="List all the rules. For listing rules only the following formats "
-        "for argument -f are supported: {plain, rich, md}",
+        "for argument -f are supported: {brief, full, md} with 'brief' as default.",
     )
     listing_group.add_argument(
         "-T",
@@ -238,10 +238,11 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-f",
         "--format",
         dest="format",
-        default="rich",
+        default=None,
         choices=[
-            "rich",
-            "plain",
+            "brief",
+            # "plain",
+            "full",
             "md",
             "json",
             "codeclimate",
@@ -526,10 +527,16 @@ def get_config(arguments: list[str]) -> Namespace:
     options = parser.parse_args(arguments)
 
     # docs is not document, being used for internal documentation building
-    if options.list_rules and options.format not in ["plain", "rich", "md", "docs"]:
+    if options.list_rules and options.format not in [
+        None,
+        "brief",
+        "full",
+        "md",
+        "docs",
+    ]:
         parser.error(
             f"argument -f: invalid choice: '{options.format}'. "
-            f"In combination with argument -L only 'plain', "
+            f"In combination with argument -L only 'brief', "
             f"'rich' or 'md' are supported with -f."
         )
 

@@ -141,13 +141,15 @@ def _do_list(rules: RulesCollection) -> int:
     if options.list_rules:
 
         _rule_format_map: dict[str, Callable[..., Any]] = {
-            "plain": rules_as_str,
-            "rich": rules_as_rich,
+            "brief": rules_as_str,
+            "full": rules_as_rich,
             "md": rules_as_md,
             "docs": rules_as_docs,
         }
 
-        console.print(_rule_format_map[options.format](rules), highlight=False)
+        console.print(
+            _rule_format_map.get(options.format, rules_as_str)(rules), highlight=False
+        )
         return 0
 
     if options.list_tags:
