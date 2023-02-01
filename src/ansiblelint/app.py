@@ -45,7 +45,8 @@ class App:
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
 
-        self.runtime = Runtime(isolated=True)
+        # Without require_module, our _set_collections_basedir may fail
+        self.runtime = Runtime(isolated=True, require_module=True)
 
     def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""

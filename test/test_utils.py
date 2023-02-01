@@ -40,7 +40,7 @@ from ansiblelint.cli import get_rules_dirs
 from ansiblelint.constants import VIOLATIONS_FOUND_RC
 from ansiblelint.file_utils import Lintable
 
-runtime = Runtime()
+runtime = Runtime(require_module=True)
 
 
 @pytest.mark.parametrize(

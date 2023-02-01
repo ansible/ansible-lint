@@ -237,6 +237,15 @@
                     },
                     "type": "object"
                 },
+                "enable-prompts": {
+                    "default": false,
+                    "description": "Enable prompts for password and in playbooks. This will set mode to stdout and disable playbook artifact creation",
+                    "enum": [
+                        true,
+                        false
+                    ],
+                    "type": "boolean"
+                },
                 "exec": {
                     "additionalProperties": false,
                     "properties": {
@@ -356,6 +365,15 @@
                         }
                     },
                     "type": "object"
+                },
+                "format": {
+                    "default": "yaml",
+                    "description": "Specify the format for stdout output.",
+                    "enum": [
+                        "json",
+                        "yaml"
+                    ],
+                    "type": "string"
                 },
                 "images": {
                     "additionalProperties": false,
