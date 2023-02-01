@@ -365,7 +365,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         default=[],
         action="append",
         help="only check rules whose id/tags do not match these values. \
-            e.g: --skip-list name, galaxy, run-once",
+            e.g: --skip-list=name,run-once",
     )
     parser.add_argument(
         "-w",
