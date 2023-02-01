@@ -4,7 +4,7 @@
 #
 #    pip-compile --extra=docs --extra=test --no-annotate --output-file=.config/requirements.txt --resolver=backtracking --strip-extras --unsafe-package=ansible-core --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
-ansible-compat==2.2.7
+ansible-compat==3.0.1
 astroid==2.13.3
 attrs==22.2.0
 black==22.12.0
