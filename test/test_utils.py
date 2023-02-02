@@ -39,6 +39,8 @@ from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
 from ansiblelint.constants import VIOLATIONS_FOUND_RC
 from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import RulesCollection
+from ansiblelint.runner import Runner
 
 runtime = Runtime(require_module=True)
 
@@ -390,3 +392,11 @@ def test_nested_items() -> None:
 def test_find_children() -> None:
     """Verify correct function of find_children()."""
     utils.find_children(Lintable("examples/playbooks/find_children.yml"))
+
+
+def test_find_children_in_task(default_rules_collection: RulesCollection) -> None:
+    """Verify correct function of find_children() in tasks."""
+    Runner(
+        Lintable("examples/playbooks/tasks/bug-2875.yml"),
+        rules=default_rules_collection,
+    ).run()

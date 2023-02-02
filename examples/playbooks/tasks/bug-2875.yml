@@ -1,0 +1,9 @@
+---
+- name: "Reproduce bug #2875"
+  include_tasks: "{{ lookup('first_found', __ff_params) }}"
+  vars:
+    __ff_params:
+      files:
+        - "default.yml"
+      paths:
+        - "{{ role_path }}/tasks/setup"
