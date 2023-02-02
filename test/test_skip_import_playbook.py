@@ -22,7 +22,7 @@ MAIN_PLAYBOOK = """\
   hosts: all
 
   tasks:
-    - name: Should be shell  # noqa command-instead-of-shell no-changed-when no-free-form
+    - name: Should be shell  # noqa: command-instead-of-shell no-changed-when no-free-form
       ansible.builtin.shell: echo lol
 
 - name: Should not be imported

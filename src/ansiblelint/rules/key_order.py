@@ -90,7 +90,7 @@ if "pytest" in sys.modules:
         msg: "Debug without a name"
     - name: Flush handlers
       meta: flush_handlers
-    - no_log: true  # noqa key-order
+    - no_log: true  # noqa: key-order
       shell: echo hello
       name: Task with no_log on top
 """

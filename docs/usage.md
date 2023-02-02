@@ -160,25 +160,25 @@ playbook. In cases like this, Ansible-lint can incorrectly trigger rule
 violations.
 
 To disable rule violations for specific tasks, and mute false positives, add
-`# noqa [rule_id]` to the end of the line. It is best practice to add a comment
+`# noqa: [rule_id]` to the end of the line. It is best practice to add a comment
 that explains why rules are disabled.
 
-You can add the `# noqa [rule_id]` comment to the end of any line in a task. You
-can also skip multiple rules with a space-separated list.
+You can add the `# noqa: [rule_id]` comment to the end of any line in a task.
+You can also skip multiple rules with a space-separated list.
 
 ```yaml
 - name: This task would typically fire git-latest and partial-become rules
-  become_user: alice # noqa git-latest partial-become
+  become_user: alice # noqa: git-latest partial-become
   ansible.builtin.git: src=/path/to/git/repo dest=checkout
 ```
 
-If the rule is line-based, `# noqa [rule_id]` must be at the end of the line.
+If the rule is line-based, `# noqa: [rule_id]` must be at the end of the line.
 
 ```yaml
-- name: This would typically fire LineTooLongRule 204 and jinja[spacing]
+- name: This would typically fire jinja[spacing]
   get_url:
-    url: http://example.com/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/really_long_path/file.conf # noqa 204
-    dest: "{{dest_proj_path}}/foo.conf" # noqa jinja[spacing]
+    url: http://example.com/file.conf
+    dest: "{{dest_proj_path}}/foo.conf" # noqa: jinja[spacing]
 ```
 
 If you want Ansible-lint to skip a rule entirely, use the `-x` command line
