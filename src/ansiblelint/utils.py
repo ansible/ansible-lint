@@ -315,7 +315,7 @@ def _include_children(
         v = v["file"]
 
     # we cannot really parse any jinja2 in includes, so we ignore them
-    if "{{" in v:  # pragma: no branch
+    if not v or "{{" in v:
         return []
 
     if "import_playbook" in k and COLLECTION_PLAY_RE.match(v):
