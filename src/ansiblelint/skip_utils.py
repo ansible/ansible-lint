@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import collections.abc
 import logging
+import re
 from functools import lru_cache
 from itertools import product
 from typing import TYPE_CHECKING, Any, Generator, Sequence
@@ -47,6 +48,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 _found_deprecated_tags: set[str] = set()
+_noqa_comment_re = re.compile(r"^# noqa(\s|:)")
 
 # playbook: Sequence currently expects only instances of one of the two
 # classes below but we should consider avoiding this chimera.
@@ -242,13 +244,12 @@ def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
             for v in entry:
                 if isinstance(v, CommentToken):
                     comment_str = v.value
-                    if comment_str.startswith("# noqa:"):
+                    if _noqa_comment_re.match(comment_str):
                         line = v.start_mark.line + 1  # ruamel line numbers start at 0
                         # column = v.start_mark.column + 1  # ruamel column numbers start at 0
                         lintable.line_skips[line].update(
                             get_rule_skips_from_line(comment_str.strip())
                         )
-
         yaml_comment_obj_strings.append(str(obj.ca.items))
         if isinstance(obj, dict):
             for _, val in obj.items():

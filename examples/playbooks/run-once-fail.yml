@@ -5,7 +5,7 @@
   strategy: free
   gather_facts: false
   tasks:
-    # - name: Task with run_once # noqa run-once[task] (Corrected code example)
+    # - name: Task with run_once # noqa: run-once[task] (Corrected code example)
     - name: Task with run_once
       ansible.builtin.debug:
         msg: "Test"

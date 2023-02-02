@@ -8,7 +8,7 @@ LONG_LINE = """\
 - name: Task example
   debug:
     msg: 'This is a very long text that is used in order to verify the rule that checks for very long lines. We do hope it was long enough to go over the line limit.'
-"""  # noqa 501
+"""  # noqa: E501
 
 
 def test_long_line() -> None:

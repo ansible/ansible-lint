@@ -9,29 +9,29 @@ ROLE_TASKS = """\
 ---
 - ansible.builtin.debug:
     msg: this should fail linting due lack of name
-- ansible.builtin.debug:  # noqa unnamed-task
+- ansible.builtin.debug:  # noqa: unnamed-task
     msg: this should pass due to noqa comment
 """
 
 ROLE_TASKS_WITH_BLOCK = """\
 ---
-- name: Bad git 1  # noqa latest[git]
+- name: Bad git 1  # noqa: latest[git]
   action: ansible.builtin.git a=b c=d
 - name: Bad git 2
   action: ansible.builtin.git a=b c=d
 - name: Block with rescue and always section
   block:
-    - name: Bad git 3  # noqa latest[git]
+    - name: Bad git 3  # noqa: latest[git]
       action: ansible.builtin.git a=b c=d
     - name: Bad git 4
       action: ansible.builtin.git a=b c=d
   rescue:
-    - name: Bad git 5  # noqa latest[git]
+    - name: Bad git 5  # noqa: latest[git]
       action: ansible.builtin.git a=b c=d
     - name: Bad git 6
       action: ansible.builtin.git a=b c=d
   always:
-    - name: Bad git 7  # noqa latest[git]
+    - name: Bad git 7  # noqa: latest[git]
       action: ansible.builtin.git a=b c=d
     - name: Bad git 8
       action: ansible.builtin.git a=b c=d
@@ -55,7 +55,7 @@ def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:
 
 @pytest.mark.parametrize(
     ("lintable", "expected"),
-    (pytest.param("examples/playbooks/test_skip_inside_yaml.yml", 11, id="yaml"),),
+    (pytest.param("examples/playbooks/test_skip_inside_yaml.yml", 10, id="yaml"),),
 )
 def test_inline_skips(
     default_rules_collection: RulesCollection, lintable: str, expected: int

@@ -23,12 +23,12 @@ PLAYBOOK_WITH_NOQA = """\
 - name: Fixture
   hosts: all
   vars:
-    SOME_VAR_NOQA: "Foo"  # noqa var-naming
+    SOME_VAR_NOQA: "Foo"  # noqa: var-naming
     SOME_VAR: "Bar"
   tasks:
     - name: "Set the SOME_OTHER_VAR"
       ansible.builtin.set_fact:
-        SOME_OTHER_VAR_NOQA: "Baz"  # noqa var-naming
+        SOME_OTHER_VAR_NOQA: "Baz"  # noqa: var-naming
         SOME_OTHER_VAR: "Bat"
 """
 

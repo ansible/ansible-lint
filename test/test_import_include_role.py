@@ -12,7 +12,7 @@ from ansiblelint.runner import Runner
 ROLE_TASKS_MAIN = """\
 ---
 - name: Shell instead of command
-  shell: echo hello world # noqa fqcn no-free-form
+  shell: echo hello world # noqa: fqcn no-free-form
   changed_when: false
 """
 
