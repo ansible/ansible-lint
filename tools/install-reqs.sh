@@ -15,12 +15,10 @@ do
     fi
     if [ ${#MISSING[@]} -ne 0 ]; then
         ansible-galaxy collection download -p . -v "${MISSING[@]}"
-        # Downloader will break our requirements.yml on download
-        git checkout -- requirements.yml
     fi
 done
 
 echo "Install requirements.yml ..."
-cat requirements.yml
-ansible-galaxy collection install -r requirements.yml -p .
+ansible-galaxy collection install *.tar.gz -p .
+ansible-galaxy collection list
 popd >/dev/null
