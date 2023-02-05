@@ -242,7 +242,7 @@ class Lintable:
         self.abspath = self.path.expanduser().absolute()
 
         if self.kind == "yaml":
-            self._guess_kind()
+            self.data  # pylint: disable=pointless-statement
 
     def _guess_kind(self) -> None:
         if self.kind == "yaml":
@@ -371,6 +371,11 @@ class Lintable:
                     )
 
                     self._data = parse_yaml_linenumbers(self)
+                    # now that _data is not empty, we can try guessing if playbook or rulebook
+                    # it has to be done before append_skipped_rules() call as it's relying
+                    # on self.kind.
+                    if self.kind == "yaml":
+                        self._guess_kind()
                     # Lazy import to avoid delays and cyclic-imports
                     if "append_skipped_rules" not in globals():
                         # pylint: disable=import-outside-toplevel
