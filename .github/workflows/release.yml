@@ -1,4 +1,5 @@
 ---
+# cspell:ignore mislav
 name: release
 
 on:
@@ -35,3 +36,11 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.pypi_password }}
+
+      - name: Bump homebrew formula
+        uses: mislav/bump-homebrew-formula-action@v2
+        with:
+          # A PR will be sent to github.com/Homebrew/homebrew-core to update this formula:
+          formula-name: ansible-lint
+        env:
+          COMMITTER_TOKEN: ${{ secrets.COMMITTER_TOKEN }}
