@@ -43,7 +43,6 @@ def test_ensure_config_are_equal(
     file_config = cli.load_config(config)
 
     for key, val in file_config.items():
-
         # config_file does not make sense in file_config
         if key == "config_file":
             continue

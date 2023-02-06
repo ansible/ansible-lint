@@ -90,7 +90,6 @@ def rules_as_md(rules: RulesCollection) -> str:
     result = DOC_HEADER
 
     for rule in rules.alphabetical():
-
         # because title == rule.id we get the desired labels for free
         # and we do not have to insert `(target_header)=`
         title = f"{rule.id}"

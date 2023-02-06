@@ -139,7 +139,6 @@ def _do_list(rules: RulesCollection) -> int:
     )
 
     if options.list_rules:
-
         _rule_format_map: dict[str, Callable[..., Any]] = {
             "brief": rules_as_str,
             "full": rules_as_rich,

@@ -78,7 +78,6 @@ should not be preserved when transferring files between them.
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports

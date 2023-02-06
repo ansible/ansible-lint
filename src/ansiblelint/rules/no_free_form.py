@@ -84,7 +84,6 @@ class NoFreeFormRule(AnsibleLintRule):
 
 
 if "pytest" in sys.modules:  # noqa: C901
-
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports

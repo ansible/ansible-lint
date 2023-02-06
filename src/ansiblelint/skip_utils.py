@@ -179,7 +179,6 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
 
     # append skipped_rules for each task
     for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks):
-
         # ignore empty tasks
         if not pyyaml_task and not ruamel_task:
             continue

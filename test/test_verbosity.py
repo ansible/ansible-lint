@@ -89,7 +89,7 @@ def test_default_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> N
     else:
         result = run_ansible_lint(fakerole, cwd=cwd)
 
-    for (substr, invert) in substrs:
+    for substr, invert in substrs:
         if invert:
             assert substr not in result.stderr, result.stderr
         else:

@@ -74,7 +74,6 @@ def is_ref_used(obj: Any, ref: str) -> bool:
 
 
 if __name__ == "__main__":
-
     invalid_var_names = sorted(list(keyword.kwlist) + play_keywords)
     if "__peg_parser__" in invalid_var_names:
         invalid_var_names.remove("__peg_parser__")
