@@ -6,8 +6,6 @@ import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
 
-import pytest
-
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
@@ -103,10 +101,7 @@ class Version:
 
     def __lt__(self, other: Version) -> bool:
         """Implement lower-than operation."""
-        try:
-            other = _coerce(other)
-        except NotImplementedError:
-            return NotImplemented
+        other = _coerce(other)
 
         return self.components < other.components
 
@@ -122,8 +117,9 @@ def _coerce(other: object) -> Version:
 
 
 if "pytest" in sys.modules:  # noqa: C901
+    import pytest
 
-    from ansiblelint.rules import RulesCollection
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
     from ansiblelint.runner import Runner
 
     def test_galaxy_collection_version_positive() -> None:
@@ -173,6 +169,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Test for version class."""
         v = Version("1.0.0")
         assert v == Version("1.0.0")
+        assert v != NotImplemented
 
     def test_coerce() -> None:
         """Test for _coerce function."""

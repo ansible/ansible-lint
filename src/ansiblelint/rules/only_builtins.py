@@ -40,7 +40,6 @@ class OnlyBuiltinsRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-
     # pylint: disable=ungrouped-imports
     import pytest
 
