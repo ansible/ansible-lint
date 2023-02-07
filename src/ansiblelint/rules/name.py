@@ -73,7 +73,6 @@ class NameRule(AnsibleLintRule):
     def _prefix_check(
         self, name: str, lintable: Lintable | None, linenumber: int
     ) -> list[MatchError]:
-
         results: list[MatchError] = []
         effective_name = name
         if lintable is None:
@@ -144,7 +143,6 @@ class NameRule(AnsibleLintRule):
 
 
 if "pytest" in sys.modules:  # noqa: C901
-
     from ansiblelint.config import options
     from ansiblelint.file_utils import Lintable  # noqa: F811
     from ansiblelint.rules import RulesCollection

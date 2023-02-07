@@ -76,7 +76,6 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str:
-
         if task["action"]["__ansible_module__"] not in self._commands:
             return False
 

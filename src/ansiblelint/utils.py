@@ -347,7 +347,6 @@ def _taskshandlers_children(
             rule=RuntimeErrorRule(),
         )
     for task_handler in v:
-
         # ignore empty tasks, `-`
         if not task_handler:
             continue
@@ -406,9 +405,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
 
     # Include the FQCN task names as this happens before normalize
     for task_handler_key in INCLUSION_ACTION_NAMES:
-
         with contextlib.suppress(KeyError):
-
             # ignore empty tasks
             if not task_handler:  # pragma: no branch
                 continue
@@ -547,7 +544,7 @@ def _extract_ansible_parsed_keys_from_task(
     keys: tuple[str, ...],
 ) -> dict[str, Any]:
     """Return a dict with existing key in task."""
-    for (k, v) in list(task.items()):
+    for k, v in list(task.items()):
         if k in keys:
             # we don't want to re-assign these values, which were
             # determined by the ModuleArgsParser() above
@@ -848,9 +845,7 @@ def get_lintables(
             lintable = Lintable(arg)
             lintables.append(lintable)
     else:
-
         for filename in discover_lintables(opts):
-
             path = Path(filename)
             # skip exclusions
             try:

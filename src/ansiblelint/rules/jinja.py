@@ -57,7 +57,6 @@ class JinjaRule(AnsibleLintRule):
     ) -> bool | str | MatchError:
         for key, v, _ in nested_items_path(task):
             if isinstance(v, str):
-
                 try:
                     template(
                         basedir=file.dir if file else ".",
@@ -251,7 +250,6 @@ class JinjaRule(AnsibleLintRule):
         lineno = 1
         try:
             for token in self.lex(text):
-
                 if (
                     expr_type
                     and expr_type.startswith("{%")
@@ -322,7 +320,6 @@ def blacken(text: str) -> str:
 
 
 if "pytest" in sys.modules:  # noqa: C901
-
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports

@@ -116,7 +116,7 @@ class AnsibleLintRule(BaseRule):
         matches: list[MatchError] = []
         # arrays are 0-based, line numbers are 1-based
         # so use prev_line_no as the counter
-        for (prev_line_no, line) in enumerate(file.content.split("\n")):
+        for prev_line_no, line in enumerate(file.content.split("\n")):
             if line.lstrip().startswith("#"):
                 continue
 
@@ -223,7 +223,6 @@ class AnsibleLintRule(BaseRule):
             yaml = [yaml]
 
         for play in yaml:
-
             # Bug #849
             if play is None:
                 continue
