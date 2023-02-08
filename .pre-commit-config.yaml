@@ -161,7 +161,7 @@ repos:
         additional_dependencies:
           - ansible-compat>=3.0.1
           - black>=22.10.0
-          - cryptography
+          - cryptography>=39.0.1
           - filelock
           - jinja2
           - pytest>=7.2.0
