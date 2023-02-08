@@ -3,6 +3,15 @@
 ```json
 [
   {
+    "instancePath": "/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/with_items",
     "keyword": "type",
     "message": "must be string",
@@ -26,15 +35,6 @@
     "message": "must match a schema in anyOf",
     "params": {},
     "schemaPath": "#/properties/with_items/anyOf"
-  },
-  {
-    "instancePath": "/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0",
@@ -65,6 +65,10 @@ stdout:
       },
       "sub_errors": [
         {
+          "path": "$[0]",
+          "message": "'block' is a required property"
+        },
+        {
           "path": "$[0].with_items",
           "message": "True is not valid under any of the given schemas"
         },
@@ -75,10 +79,6 @@ stdout:
         {
           "path": "$[0].with_items",
           "message": "True is not of type 'array'"
-        },
-        {
-          "path": "$[0]",
-          "message": "'block' is a required property"
         }
       ]
     }

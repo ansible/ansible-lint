@@ -3,6 +3,15 @@
 ```json
 [
   {
+    "instancePath": "/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/no_log",
     "keyword": "type",
     "message": "must be boolean",
@@ -28,15 +37,6 @@
       "passingSchemas": null
     },
     "schemaPath": "#/oneOf"
-  },
-  {
-    "instancePath": "/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0/no_log",
@@ -106,6 +106,10 @@ stdout:
           "message": "'some_var' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
         },
         {
+          "path": "$[0]",
+          "message": "'block' is a required property"
+        },
+        {
           "path": "$[0].no_log",
           "message": "'some_var' is not valid under any of the given schemas"
         },
@@ -116,10 +120,6 @@ stdout:
         {
           "path": "$[0].no_log",
           "message": "'some_var' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
-        },
-        {
-          "path": "$[0]",
-          "message": "'block' is a required property"
         }
       ]
     }

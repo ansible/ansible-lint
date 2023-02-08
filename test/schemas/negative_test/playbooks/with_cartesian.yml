@@ -1,5 +1,0 @@
-- hosts: localhost
-  tasks:
-    - ansible.builtin.debug:
-        msg: "{{ item }}"
-      with_cartesian: [] # moved to community.general in 2.10

@@ -48,6 +48,15 @@
     "schemaPath": "#/additionalProperties"
   },
   {
+    "instancePath": "/0/tasks/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/tasks/0/run_once",
     "keyword": "type",
     "message": "must be boolean",
@@ -82,15 +91,6 @@
       "passingSchemas": null
     },
     "schemaPath": "#/oneOf"
-  },
-  {
-    "instancePath": "/0/tasks/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0/tasks/0/run_once",
@@ -198,6 +198,10 @@ stdout:
           "message": "['{{ true }}', 'xxx'] is not of type 'string'"
         },
         {
+          "path": "$[0].tasks[0]",
+          "message": "'block' is a required property"
+        },
+        {
           "path": "$[0].tasks[0].run_once",
           "message": "['{{ true }}', 'xxx'] is not valid under any of the given schemas"
         },
@@ -208,10 +212,6 @@ stdout:
         {
           "path": "$[0].tasks[0].run_once",
           "message": "['{{ true }}', 'xxx'] is not of type 'string'"
-        },
-        {
-          "path": "$[0].tasks[0]",
-          "message": "'block' is a required property"
         }
       ]
     }

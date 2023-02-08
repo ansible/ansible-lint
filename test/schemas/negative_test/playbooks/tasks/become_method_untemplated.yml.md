@@ -3,6 +3,15 @@
 ```json
 [
   {
+    "instancePath": "/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/become_method",
     "keyword": "enum",
     "message": "must be equal to one of the allowed values",
@@ -38,15 +47,6 @@
       "passingSchemas": null
     },
     "schemaPath": "#/oneOf"
-  },
-  {
-    "instancePath": "/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0/become_method",
@@ -126,6 +126,10 @@ stdout:
           "message": "'sudo_var' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
         },
         {
+          "path": "$[0]",
+          "message": "'block' is a required property"
+        },
+        {
           "path": "$[0].become_method",
           "message": "'sudo_var' is not valid under any of the given schemas"
         },
@@ -136,10 +140,6 @@ stdout:
         {
           "path": "$[0].become_method",
           "message": "'sudo_var' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
-        },
-        {
-          "path": "$[0]",
-          "message": "'block' is a required property"
         }
       ]
     }
