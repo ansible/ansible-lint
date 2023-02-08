@@ -146,6 +146,13 @@ generated-members = "options.*"
 # We don't need the score spamming console, as we either pass or fail
 score = "n"
 
+[tool.pyright]
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
+pythonVersion = "3.9"
+include = ["src"]
+# https://github.com/microsoft/pyright/issues/777
+"stubPath" = ""
+
 # spell-checker:ignore filterwarnings norecursedirs optionflags
 [tool.pytest.ini_options]
 # do not add options here as this will likely break either console runs or IDE

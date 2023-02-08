@@ -22,15 +22,18 @@
     "python.analysis.exclude": [
         "build"
     ],
+    "python.analysis.stubPath": ".",
     "python.formatting.provider": "black",
+    "python.linting.flake8Args": [
+        "--ignore=E501,W503"
+    ],
     "python.linting.flake8Enabled": true,
     "python.linting.mypyCategorySeverity.error": "Warning",
     "python.linting.mypyEnabled": true,
-    "python.testing.nosetestsEnabled": false,
+    "python.linting.pylintEnabled": true,
+    "python.terminal.activateEnvironment": true,
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
-    "restructuredtext.confPath": "${workspaceFolder}/docs/docsite/rst",
-    "restructuredtext.languageServer.disabled": true,
     "sortLines.filterBlankLines": true,
     "yaml.completion": true,
     "yaml.customTags": [
@@ -38,5 +41,6 @@
         "!vault scalar"
     ],
     "yaml.format.enable": false,
-    "yaml.validate": true
+    "yaml.validate": true,
+    "evenBetterToml.formatter.alignComments": false
 }
