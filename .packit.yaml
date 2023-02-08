@@ -9,6 +9,8 @@ actions:
   get-current-version:
     - ./tools/get-version.sh
   post-upstream-clone:
+    - "git submodule init"
+    - "git submodule update"
     - ./tools/update-version.sh
 srpm_build_deps:
   - python3-build

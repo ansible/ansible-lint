@@ -20,6 +20,10 @@
 """Main ansible-lint package."""
 from __future__ import annotations
 
+import ansiblelint._vendor
 from ansiblelint.version import __version__
+
+# make vendored top-level modules accessible EARLY
+
 
 __all__ = ("__version__",)

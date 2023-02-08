@@ -4,7 +4,6 @@
 #
 #    pip-compile --no-annotate --output-file=.config/requirements-lock.txt --resolver=backtracking --strip-extras --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
-ansible-compat==3.0.1
 ansible-core==2.14.1 ; python_version >= "3.9"
 attrs==22.2.0
 black==22.12.0
