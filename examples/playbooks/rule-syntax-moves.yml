@@ -1,0 +1,16 @@
+---
+- name: Fixture for syntax[moves]
+  hosts: localhost
+  tasks:
+    - name: 1st
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_flattened: [] # moved to community.general in 2.10
+    - name: 2nd
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_cartesian: [] # moved to community.general in 2.10
+    - name: 3rd
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_filetree: [] # moved to community.general in 2.10

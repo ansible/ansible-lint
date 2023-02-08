@@ -48,6 +48,15 @@
     "schemaPath": "#/additionalProperties"
   },
   {
+    "instancePath": "/0/tasks/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/tasks/0/ignore_errors",
     "keyword": "type",
     "message": "must be boolean",
@@ -73,15 +82,6 @@
       "passingSchemas": null
     },
     "schemaPath": "#/oneOf"
-  },
-  {
-    "instancePath": "/0/tasks/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0/tasks/0/ignore_errors",
@@ -180,6 +180,10 @@ stdout:
           "message": "'should_ignore_errors' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
         },
         {
+          "path": "$[0].tasks[0]",
+          "message": "'block' is a required property"
+        },
+        {
           "path": "$[0].tasks[0].ignore_errors",
           "message": "'should_ignore_errors' is not valid under any of the given schemas"
         },
@@ -190,10 +194,6 @@ stdout:
         {
           "path": "$[0].tasks[0].ignore_errors",
           "message": "'should_ignore_errors' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
-        },
-        {
-          "path": "$[0].tasks[0]",
-          "message": "'block' is a required property"
         }
       ]
     }

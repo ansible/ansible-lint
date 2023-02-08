@@ -3,13 +3,6 @@
 ```json
 [
   {
-    "instancePath": "/0",
-    "keyword": "not",
-    "message": "must NOT be valid",
-    "params": {},
-    "schemaPath": "#/allOf/0/not"
-  },
-  {
     "instancePath": "/0/block",
     "keyword": "type",
     "message": "must be array",
@@ -17,6 +10,13 @@
       "type": "array"
     },
     "schemaPath": "#/properties/block/type"
+  },
+  {
+    "instancePath": "/0",
+    "keyword": "not",
+    "message": "must NOT be valid",
+    "params": {},
+    "schemaPath": "#/allOf/3/not"
   },
   {
     "instancePath": "/0",
@@ -47,12 +47,12 @@ stdout:
       },
       "sub_errors": [
         {
-          "path": "$[0]",
-          "message": "{'block': {}} should not be valid under {'required': ['block']}"
-        },
-        {
           "path": "$[0].block",
           "message": "{} is not of type 'array'"
+        },
+        {
+          "path": "$[0]",
+          "message": "{'block': {}} should not be valid under {'required': ['block']}"
         }
       ]
     }

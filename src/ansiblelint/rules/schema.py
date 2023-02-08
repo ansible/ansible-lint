@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import sys
+from typing import Any
 
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
@@ -24,6 +25,23 @@ If incorrect schema was picked, you might want to either:
 * use ``kinds:`` option in linter config to help it pick correct file type.
 """
 
+pre_checks = {
+    "task": {
+        "with_flattened": {
+            "msg": "with_flattened was moved to with_community.general.flattened in 2.10",
+            "tag": "moves",
+        },
+        "with_filetree": {
+            "msg": "with_filetree was moved to with_community.general.flattened in 2.10",
+            "tag": "moves",
+        },
+        "with_cartesian": {
+            "msg": "with_cartesian was moved to with_community.general.flattened in 2.10",
+            "tag": "moves",
+        },
+    }
+}
+
 
 class ValidateSchemaRule(AnsibleLintRule):
     """Perform JSON Schema Validation for known lintable kinds."""
@@ -34,6 +52,25 @@ class ValidateSchemaRule(AnsibleLintRule):
     severity = "VERY_HIGH"
     tags = ["core", "experimental"]
     version_added = "v6.1.0"
+
+    def matchtask(
+        self, task: dict[str, Any], file: Lintable | None = None
+    ) -> bool | str | MatchError | list[MatchError]:
+        result = []
+        for key in pre_checks["task"]:
+            if key in task:
+                msg = pre_checks["task"][key]["msg"]
+                tag = pre_checks["task"][key]["tag"]
+                result.append(
+                    MatchError(
+                        message=msg,
+                        filename=file,
+                        rule=ValidateSchemaRule(),
+                        details=ValidateSchemaRule.description,
+                        tag=f"schema[{tag}]",
+                    )
+                )
+        return result
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return JSON validation errors found as a list of MatchError(s)."""
@@ -190,3 +227,31 @@ if "pytest" in sys.modules:
             assert result.filename.endswith(file)
             assert expected[idx] in result.message
             assert result.tag == f"schema[{expected_kind}]"
+
+    @pytest.mark.parametrize(
+        ("file", "expected_kind", "expected_tag", "count"),
+        (
+            pytest.param(
+                "examples/playbooks/rule-syntax-moves.yml",
+                "playbook",
+                "schema[moves]",
+                3,
+                id="playbook",
+            ),
+        ),
+    )
+    def test_schema_moves(
+        file: str, expected_kind: str, expected_tag: str, count: int
+    ) -> None:
+        """Validate ability to detect schema[moves]."""
+        lintable = Lintable(file)
+        assert lintable.kind == expected_kind
+
+        rules = RulesCollection(options=options)
+        rules.register(ValidateSchemaRule())
+        results = Runner(lintable, rules=rules).run()
+
+        assert len(results) == count, results
+        for result in results:
+            assert result.filename.endswith(file)
+            assert result.tag == expected_tag

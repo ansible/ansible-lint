@@ -244,13 +244,6 @@
         {
           "not": {
             "required": [
-              "block"
-            ]
-          }
-        },
-        {
-          "not": {
-            "required": [
               "hosts"
             ]
           }
@@ -272,26 +265,9 @@
         {
           "not": {
             "required": [
-              "with_filetree"
+              "block"
             ]
-          },
-          "title": "with_filetree was moved to with_community.general.filetree in 2.10"
-        },
-        {
-          "not": {
-            "required": [
-              "with_flattened"
-            ]
-          },
-          "title": "with_flattened was moved to with_community.general.flattened in 2.10"
-        },
-        {
-          "not": {
-            "required": [
-              "with_cartesian"
-            ]
-          },
-          "title": "with_cartesian was moved to with_community.general.cartesian in 2.10"
+          }
         }
       ],
       "properties": {
@@ -583,10 +559,10 @@
   "items": {
     "anyOf": [
       {
-        "$ref": "#/$defs/task"
+        "$ref": "#/$defs/block"
       },
       {
-        "$ref": "#/$defs/block"
+        "$ref": "#/$defs/task"
       }
     ]
   },
