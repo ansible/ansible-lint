@@ -11,3 +11,4 @@ license:
 
 dependencies: {}
 repository: http://example.com/repository
+tags: [networking, test_tag]

@@ -12,3 +12,4 @@ dependencies:
   anderson55.my_collection: "*" # note: "*" selects the highest version available
 license:
   - Apache-2.0
+tags: [networking, test_tag]

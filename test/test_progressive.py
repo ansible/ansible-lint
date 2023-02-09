@@ -39,7 +39,17 @@ def git_commit(filename: Path, content: str) -> None:
     """Create and commit a file."""
     filename.write_text(content)
     subprocess.run([*GIT_CMD, "add", filename], check=True)
-    subprocess.run([*GIT_CMD, "commit", "-a", "-m", f"Commit {filename}"], check=True)
+    subprocess.run(
+        [
+            *GIT_CMD,
+            "commit",
+            "--no-gpg-sign",
+            "-a",
+            "-m",
+            f"Commit {filename}",
+        ],
+        check=True,
+    )
 
 
 def run_lint(cmd: list[str]) -> subprocess.CompletedProcess[str]:
