@@ -38,7 +38,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
         """Find violations inside meta files.
 
         :param file: Input lintable file that is a match for `meta-runtime`
-        :returns: List of errors matched to the input filey
+        :returns: List of errors matched to the input file
         """
         results = []
 
