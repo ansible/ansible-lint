@@ -38,7 +38,7 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="specific",
         regex=re.compile(
-            r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in '(?P<filename>.*)': line (?P<line>\d+), column (?P<column>\d+)",
+            r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in '(?P<filename>[\w\/\.\-]+)': line (?P<line>\d+), column (?P<column>\d+)",
             re.MULTILINE | re.S | re.DOTALL,
         ),
     ),
