@@ -3,6 +3,15 @@
 ```json
 [
   {
+    "instancePath": "/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/when",
     "keyword": "type",
     "message": "must be boolean",
@@ -37,15 +46,6 @@
       "passingSchemas": null
     },
     "schemaPath": "#/$defs/complex_conditional/oneOf"
-  },
-  {
-    "instancePath": "/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0/when",
@@ -128,6 +128,10 @@ stdout:
           "message": "123 is not of type 'array'"
         },
         {
+          "path": "$[0]",
+          "message": "'block' is a required property"
+        },
+        {
           "path": "$[0].when",
           "message": "123 is not valid under any of the given schemas"
         },
@@ -142,10 +146,6 @@ stdout:
         {
           "path": "$[0].when",
           "message": "123 is not of type 'array'"
-        },
-        {
-          "path": "$[0]",
-          "message": "'block' is a required property"
         }
       ]
     }

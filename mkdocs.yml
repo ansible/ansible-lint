@@ -95,7 +95,7 @@ nav:
       - rules/meta-incorrect.md
       - rules/meta-no-info.md
       - rules/meta-no-tags.md
-      - rules/meta-unsupported-ansible.md
+      - rules/meta-runtime.md
       - rules/meta-video-links.md
       - rules/name.md
       - rules/no-changed-when.md

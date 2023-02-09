@@ -11,6 +11,7 @@ ci:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
     - schemas
+  submodules: true
 exclude: >
   (?x)^(
     .config/requirements.*|
@@ -56,7 +57,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.19.2
+    rev: v6.22.0
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -130,7 +131,7 @@ repos:
           # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
           - --filter-files
   - repo: https://github.com/psf/black
-    rev: 22.12.0
+    rev: 23.1.0
     hooks:
       - id: black
         language_version: python3
@@ -159,14 +160,15 @@ repos:
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=3.0.1
+          - ansible-compat
           - black>=22.10.0
-          - cryptography
+          - cryptography>=39.0.1
           - filelock
           - jinja2
           - pytest>=7.2.0
           - rich>=13.2.0
           - ruamel.yaml
+          - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.4.2
           - types-pkg_resources
@@ -178,13 +180,13 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.16.0b1
+    rev: v2.16.1
     hooks:
       - id: pylint
         args:
           - --output-format=colorized
         additional_dependencies:
-          - ansible-compat>=3.0.1
+          - ansible-compat
           - ansible-core>=2.14.0
           - black>=22.10.0
           - docutils
@@ -198,7 +200,7 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/jazzband/pip-tools
-    rev: 6.12.1
+    rev: 6.12.2
     hooks:
       - id: pip-compile
         name: lock

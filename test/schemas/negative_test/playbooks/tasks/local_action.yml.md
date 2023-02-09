@@ -3,6 +3,15 @@
 ```json
 [
   {
+    "instancePath": "/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/local_action",
     "keyword": "type",
     "message": "must be string,object",
@@ -13,15 +22,6 @@
       ]
     },
     "schemaPath": "#/properties/local_action/type"
-  },
-  {
-    "instancePath": "/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0",
@@ -52,12 +52,12 @@ stdout:
       },
       "sub_errors": [
         {
-          "path": "$[0].local_action",
-          "message": "[] is not of type 'string', 'object'"
-        },
-        {
           "path": "$[0]",
           "message": "'block' is a required property"
+        },
+        {
+          "path": "$[0].local_action",
+          "message": "[] is not of type 'string', 'object'"
         }
       ]
     }

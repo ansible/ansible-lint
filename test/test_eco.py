@@ -54,7 +54,6 @@ def test_eco(repo: str) -> None:
     # run ansible lint and paths from user home in order to produce
     # consistent results regardless on its location.
     for step in ["before", "after"]:
-
         args = ["-f", "pep8"]
         executable = (
             "ansible-lint"

@@ -57,7 +57,6 @@ class NoPromptingRule(AnsibleLintRule):
 
 
 if "pytest" in sys.modules:
-
     from ansiblelint.config import options
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports

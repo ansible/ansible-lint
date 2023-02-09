@@ -57,7 +57,6 @@ class JinjaRule(AnsibleLintRule):
     ) -> bool | str | MatchError:
         for key, v, _ in nested_items_path(task):
             if isinstance(v, str):
-
                 try:
                     template(
                         basedir=file.dir if file else ".",
@@ -251,7 +250,6 @@ class JinjaRule(AnsibleLintRule):
         lineno = 1
         try:
             for token in self.lex(text):
-
                 if (
                     expr_type
                     and expr_type.startswith("{%")
@@ -272,7 +270,8 @@ class JinjaRule(AnsibleLintRule):
                     # pylint: disable=unsupported-membership-test
                     if isinstance(expr_str, str) and "\n" in expr_str:
                         raise NotImplementedError()
-                    expr_str = blacken(expr_str)
+                    leading_spaces = " " * (len(expr_str) - len(expr_str.lstrip()))
+                    expr_str = leading_spaces + blacken(expr_str.lstrip())
                     if tokens[
                         -1
                     ].token_type != "whitespace" and not expr_str.startswith(" "):
@@ -322,7 +321,6 @@ def blacken(text: str) -> str:
 
 
 if "pytest" in sys.modules:  # noqa: C901
-
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
@@ -377,7 +375,8 @@ if "pytest" in sys.modules:  # noqa: C901
             pytest.param("", "", "spacing", id="1"),
             pytest.param("foo", "foo", "spacing", id="2"),
             pytest.param("{##}", "{# #}", "spacing", id="3"),
-            pytest.param("{#  #}", "{# #}", "spacing", id="4"),
+            # we want to keep leading spaces as they might be needed for complex multiline jinja files
+            pytest.param("{#  #}", "{#  #}", "spacing", id="4"),
             pytest.param(
                 "{{-aaa|xx   }}foo\nbar{#some#}\n{%%}",
                 "{{- aaa | xx }}foo\nbar{# some #}\n{% %}",

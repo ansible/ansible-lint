@@ -158,7 +158,6 @@ class Runner:
 
         # -- phase 2 ---
         if not matches:
-
             # do our processing only when ansible syntax check passed in order
             # to avoid causing runtime exceptions. Our processing is not as
             # resilient to be able process garbage.
@@ -216,7 +215,6 @@ class Runner:
 
 
 def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
-
     lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
     matches = []

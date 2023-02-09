@@ -64,12 +64,12 @@ content easier to read and maintain. It extends [basic](#basic) profile.
 The `safety` profile avoids module calls that can have non-determinant outcomes
 or security concerns. It extends [moderate](#moderate) profile.
 
-- [avoid-implicit](rules/avoid-implicit/)
-- [latest](rules/latest/)
-- [package-latest](rules/package-latest/)
-- [risky-file-permissions](rules/risky-file-permissions/)
-- [risky-octal](rules/risky-octal/)
-- [risky-shell-pipe](rules/risky-shell-pipe/)
+- [avoid-implicit](/rules/avoid-implicit/)
+- [latest](/rules/latest/)
+- [package-latest](/rules/package-latest/)
+- [risky-file-permissions](/rules/risky-file-permissions/)
+- [risky-octal](/rules/risky-octal/)
+- [risky-shell-pipe](/rules/risky-shell-pipe/)
 
 ## shared
 
@@ -80,19 +80,18 @@ Ansible playbooks, roles, or collections available from
 [automation-hub](https://console.redhat.com/ansible/automation-hub), or a
 private instance. It extends [safety](#safety) profile.
 
-- [galaxy](rules/galaxy/)
-- [ignore-errors](rules/ignore-errors/)
+- [galaxy](/rules/galaxy/)
+- [ignore-errors](/rules/ignore-errors/)
 - [layout](https://github.com/ansible/ansible-lint/issues/1900)
-- [meta-incorrect](rules/meta-incorrect/)
-- [meta-no-info](rules/meta-no-info/)
-- [meta-no-tags](rules/meta-no-tags/)
-- [meta-video-links](rules/meta-video-links/)
+- [meta-incorrect](/rules/meta-incorrect/)
+- [meta-no-info](/rules/meta-no-info/)
+- [meta-no-tags](/rules/meta-no-tags/)
+- [meta-video-links](/rules/meta-video-links/)
 - [meta-version](https://github.com/ansible/ansible-lint/issues/2103)
-- [meta-unsupported-ansible](https://github.com/ansible/ansible-lint/issues/2102)
-- [no-changed-when](rules/no-changed-when/)
-- [no-changelog](https://github.com/ansible/ansible-lint/issues/2101)
-- [no-handler](rules/no-handler/)
-- [no-relative-paths](rules/no-relative-paths/)
+- [meta-runtime](/rules/meta-runtime/)
+- [no-changed-when](/rules/no-changed-when/)
+- [no-handler](/rules/no-handler/)
+- [no-relative-paths](/rules/no-relative-paths/)
 - [max-block-depth](https://github.com/ansible/ansible-lint/issues/2173)
 - [max-tasks](https://github.com/ansible/ansible-lint/issues/2172)
 - [unsafe-loop](https://github.com/ansible/ansible-lint/issues/2038)
@@ -106,7 +105,7 @@ as validated or certified content. It extends [shared](#shared) profile.
 
 - [avoid-dot-notation](https://github.com/ansible/ansible-lint/issues/2174)
 - [disallowed-ignore](https://github.com/ansible/ansible-lint/issues/2121)
-- [fqcn](rules/fqcn/)
+- [fqcn](/rules/fqcn/)
 - [import-task-no-when](https://github.com/ansible/ansible-lint/issues/2219)
 - [meta-no-dependencies](https://github.com/ansible/ansible-lint/issues/2159)
 - [single-entry-point](https://github.com/ansible/ansible-lint/issues/2242)

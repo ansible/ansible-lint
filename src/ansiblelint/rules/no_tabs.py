@@ -59,7 +59,6 @@ RULE_EXAMPLE = r"""---
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-
     import pytest
 
     @pytest.mark.parametrize("rule_runner", (NoTabsRule,), indirect=["rule_runner"])
