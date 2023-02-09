@@ -88,7 +88,7 @@ private instance. It extends [safety](#safety) profile.
 - [meta-no-tags](rules/meta-no-tags/)
 - [meta-video-links](rules/meta-video-links/)
 - [meta-version](https://github.com/ansible/ansible-lint/issues/2103)
-- [meta-runtime](https://github.com/ansible/ansible-lint/issues/2102)
+- [meta-runtime](/rules/meta-incorrect/)
 - [no-changed-when](rules/no-changed-when/)
 - [no-changelog](https://github.com/ansible/ansible-lint/issues/2101)
 - [no-handler](rules/no-handler/)
