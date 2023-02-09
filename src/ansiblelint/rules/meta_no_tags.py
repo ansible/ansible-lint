@@ -93,6 +93,27 @@ galaxy_info:
     categories: 'my_category_not_in_a_list'
 """
 
+META_TAG_NO_GALAXY_INFO = """
+galaxy_tags: ['database', 'my s q l', 'MYTAG']
+"""
+
+META_TAG_NO_LIST = """
+galaxy_info:
+    galaxy_tags: 'database'
+"""
+
+META_CATEGORIES_AS_LIST = """
+galaxy_info:
+    galaxy_tags: ['database', 'my s q l', 'MYTAG']
+    categories: ['networking', 'posix']
+"""
+
+META_TAGS_NOT_A_STRING = """
+galaxy_info:
+    galaxy_tags: [False, 'database', 'my s q l', 'MYTAG']
+    categories: 'networking'
+"""
+
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
     import pytest
@@ -107,3 +128,36 @@ if "pytest" in sys.modules:
         assert "Expected 'categories' to be a list" in str(results)
         assert "invalid: 'my s q l'" in str(results)
         assert "invalid: 'MYTAG'" in str(results)
+
+    @pytest.mark.parametrize(
+        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+    )
+    def test_no_galaxy_info(rule_runner: Any) -> None:
+        """Test rule matches."""
+        results = rule_runner.run_role_meta_main(META_TAG_NO_GALAXY_INFO)
+        assert results == []
+
+    @pytest.mark.parametrize(
+        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+    )
+    def test_no_galaxy_tags_list(rule_runner: Any) -> None:
+        """Test rule matches."""
+        results = rule_runner.run_role_meta_main(META_TAG_NO_LIST)
+        assert "Expected 'galaxy_tags' to be a list" in str(results)
+
+    @pytest.mark.parametrize(
+        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+    )
+    def test_galaxy_categories_as_list(rule_runner: Any) -> None:
+        """Test rule matches."""
+        results = rule_runner.run_role_meta_main(META_CATEGORIES_AS_LIST)
+        assert "Use 'galaxy_tags' rather than 'categories'" in str(results), results
+        assert "Expected 'categories' to be a list" not in str(results)
+
+    @pytest.mark.parametrize(
+        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+    )
+    def test_tags_not_a_string(rule_runner: Any) -> None:
+        """Test rule matches."""
+        results = rule_runner.run_role_meta_main(META_TAGS_NOT_A_STRING)
+        assert "Tags must be strings" in str(results)

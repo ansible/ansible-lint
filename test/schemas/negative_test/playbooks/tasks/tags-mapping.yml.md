@@ -3,6 +3,15 @@
 ```json
 [
   {
+    "instancePath": "/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/tags",
     "keyword": "type",
     "message": "must be string",
@@ -26,15 +35,6 @@
     "message": "must match a schema in anyOf",
     "params": {},
     "schemaPath": "#/$defs/tags/anyOf"
-  },
-  {
-    "instancePath": "/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0/tags",
@@ -102,6 +102,10 @@ stdout:
           "message": "{} is not of type 'array'"
         },
         {
+          "path": "$[0]",
+          "message": "'block' is a required property"
+        },
+        {
           "path": "$[0].tags",
           "message": "{} is not valid under any of the given schemas"
         },
@@ -112,10 +116,6 @@ stdout:
         {
           "path": "$[0].tags",
           "message": "{} is not of type 'array'"
-        },
-        {
-          "path": "$[0]",
-          "message": "'block' is a required property"
         }
       ]
     }

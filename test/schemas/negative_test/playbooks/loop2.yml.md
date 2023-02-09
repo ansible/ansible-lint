@@ -48,6 +48,15 @@
     "schemaPath": "#/additionalProperties"
   },
   {
+    "instancePath": "/0/tasks/0",
+    "keyword": "required",
+    "message": "must have required property 'block'",
+    "params": {
+      "missingProperty": "block"
+    },
+    "schemaPath": "#/required"
+  },
+  {
     "instancePath": "/0/tasks/0/loop",
     "keyword": "type",
     "message": "must be string,array",
@@ -58,15 +67,6 @@
       ]
     },
     "schemaPath": "#/properties/loop/type"
-  },
-  {
-    "instancePath": "/0/tasks/0",
-    "keyword": "required",
-    "message": "must have required property 'block'",
-    "params": {
-      "missingProperty": "block"
-    },
-    "schemaPath": "#/required"
   },
   {
     "instancePath": "/0/tasks/0",
@@ -126,12 +126,12 @@ stdout:
           "message": "{'name': 'that should pass', 'ansible.builtin.debug': {'var': 'item'}, 'loop': {}} is not valid under any of the given schemas"
         },
         {
-          "path": "$[0].tasks[0].loop",
-          "message": "{} is not of type 'string', 'array'"
-        },
-        {
           "path": "$[0].tasks[0]",
           "message": "'block' is a required property"
+        },
+        {
+          "path": "$[0].tasks[0].loop",
+          "message": "{} is not of type 'string', 'array'"
         }
       ]
     }
