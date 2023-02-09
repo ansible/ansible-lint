@@ -84,7 +84,7 @@ shared:
     meta-video-links:
     meta-version:
       url: https://github.com/ansible/ansible-lint/issues/2103
-    meta-unsupported-ansible:
+    meta-runtime:
       url: https://github.com/ansible/ansible-lint/issues/2102
     no-changed-when:
     no-changelog:
