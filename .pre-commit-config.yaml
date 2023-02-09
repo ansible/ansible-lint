@@ -11,6 +11,7 @@ ci:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
     - schemas
+  submodules: true
 exclude: >
   (?x)^(
     .config/requirements.*|
@@ -159,7 +160,7 @@ repos:
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=3.0.1
+          - ansible-compat
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock
@@ -167,6 +168,7 @@ repos:
           - pytest>=7.2.0
           - rich>=13.2.0
           - ruamel.yaml
+          - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.4.2
           - types-pkg_resources
@@ -184,7 +186,7 @@ repos:
         args:
           - --output-format=colorized
         additional_dependencies:
-          - ansible-compat>=3.0.1
+          - ansible-compat
           - ansible-core>=2.14.0
           - black>=22.10.0
           - docutils
