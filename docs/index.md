@@ -16,7 +16,7 @@ community contributions and they can always be disabled based individually or by
 category by each user.
 
 [Ansible Galaxy project](https://github.com/ansible/galaxy/) makes use of this
-linter to compute quality scores for [Galaxy Hub](https://galaxy.ansible.com)
+linter to compute quality scores for [Galaxy Hub](https://galaxy.ansible.com/)
 contributed content. This does not mean this tool only targets those that want
 to share their code. Files like `galaxy.yml`, or sections like `galaxy_info`
 inside `meta.yml` help with documentation and maintenance, even for unpublished

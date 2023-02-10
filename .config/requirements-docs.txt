@@ -1,6 +1,7 @@
 cairosvg
 markdown-exec>=1.0.0
 mkdocs-gen-files>=0.4.0
+mkdocs-htmlproofer-plugin
 mkdocs-material-extensions>=1.1.1
 mkdocs-material>=9.0.6
 mkdocs>=1.4.2

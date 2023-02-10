@@ -47,10 +47,10 @@ Change **rev:** to either a commit sha or tag of Ansible-lint that contains
 `.pre-commit-hooks.yaml`.
 
 ```yaml
-- repo: https://github.com/ansible/ansible-lint.git
+- repo: https://github.com/ansible/ansible-lint
   rev: ... # put latest release tag from https://github.com/ansible/ansible-lint/releases/
   hooks:
     - id: ansible-lint
 ```
 
-[pre-commit]: https://pre-commit.com
+[pre-commit]: https://pre-commit.com/
