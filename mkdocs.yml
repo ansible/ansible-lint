@@ -147,6 +147,8 @@ plugins:
   - search
   - social
   - tags
+  # https://github.com/manuzhang/mkdocs-htmlproofer-plugin
+  # - htmlproofer
   - mkdocstrings:
       handlers:
         python:

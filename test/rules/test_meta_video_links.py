@@ -6,10 +6,10 @@ from ansiblelint.testing import RunFromText
 META_VIDEO_LINKS = """
 galaxy_info:
   video_links:
-  - url: https://youtu.be/aWmRepTSFKs
+  - url: https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be
     title: Proper format
-  - https://youtu.be/this_is_not_a_dictionary
-  - my_bad_key: https://youtu.be/aWmRepTSFKs
+  - https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be
+  - my_bad_key: https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be
     title: This has a bad key
   - url: www.acme.com/vid
     title: Bad format of url
