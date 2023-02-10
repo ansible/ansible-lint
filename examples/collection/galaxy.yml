@@ -14,3 +14,4 @@ license:
   - GPL # <-- invalid license values based on galaxy schema
   - Apache
 repository: some-url
+tags: [networking, test_tag]

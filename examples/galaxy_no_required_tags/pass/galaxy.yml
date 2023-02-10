@@ -1,0 +1,12 @@
+---
+namespace: bar
+name: foo
+version: 1.0.0 # <-- that version is not valid, should be 1.0.0 or greater
+authors:
+  - John
+readme: ../README.md
+description: "..."
+license:
+  - Apache-2.0
+repository: https://github.com/ansible-collections/community.REPO_NAME
+tags: [networking, test_tag]
