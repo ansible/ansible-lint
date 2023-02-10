@@ -53,6 +53,13 @@ def test_playbook_noqa(default_text_runner: RunFromText) -> None:
     assert len(results) == 1
 
 
+def test_playbook_noqa2(default_text_runner: RunFromText) -> None:
+    """Check that noqa is properly taken into account on vars and tasks."""
+    results = default_text_runner.run_playbook(PLAYBOOK_WITH_NOQA, "test")
+    # Should raise error at "SOME_VAR".
+    assert len(results) == 1
+
+
 @pytest.mark.parametrize(
     ("lintable", "yaml", "expected_form"),
     (
