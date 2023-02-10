@@ -23,7 +23,7 @@ _logger = logging.getLogger(__name__)
 
 
 CACHE_DIR = (
-    os.path.expanduser(os.environ.get("XDG_CONFIG_CACHE", "~/.cache")) + "/ansible-lint"
+    os.path.expanduser(os.environ.get("XDG_CACHE_HOME", "~/.cache")) + "/ansible-lint"
 )
 
 DEFAULT_WARN_LIST = [
