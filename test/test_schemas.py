@@ -1,5 +1,7 @@
 """Test schemas modules."""
 import logging
+import subprocess
+import sys
 import urllib
 from time import sleep
 from typing import Any
@@ -7,9 +9,10 @@ from unittest.mock import DEFAULT, MagicMock, patch
 
 import pytest
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
-from ansiblelint.schemas import refresh_schemas
+from ansiblelint.schemas import refresh_schemas, validate_file_schema
 
 
 def test_refresh_schemas() -> None:
@@ -75,3 +78,22 @@ def test_request_timeouterror_handling(
     mock_request.urlopen.assert_called()
     assert "Skipped schema refresh due to unexpected exception: " in caplog.text
     assert error_msg in caplog.text
+
+
+def test_schema_refresh_cli() -> None:
+    """Ensure that we test the cli schema refresh command."""
+    proc = subprocess.run(
+        [sys.executable, "-m", "ansiblelint.schemas"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert proc.returncode == 0
+
+
+def test_validate_file_schema() -> None:
+    """Test file schema validation failure on unknown file kind."""
+    lintable = Lintable("foo.bar", kind="")
+    result = validate_file_schema(lintable)
+    assert len(result) == 1, result
+    assert "Unable to find JSON Schema" in result[0]

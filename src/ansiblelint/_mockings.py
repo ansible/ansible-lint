@@ -62,7 +62,7 @@ def _perform_mockings() -> None:  # noqa: C901
         else:
             path = f"{options.cache_dir}/roles/{role_name}"
         # Avoid error from makedirs if destination is a broken symlink
-        if os.path.islink(path) and not os.path.exists(path):
+        if os.path.islink(path) and not os.path.exists(path):  # pragma: no cover
             _logger.warning("Removed broken symlink from %s", path)
             os.unlink(path)
         os.makedirs(path, exist_ok=True)

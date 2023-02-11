@@ -114,6 +114,8 @@ def run_ansible_lint(
     # pollute the env, causing weird behaviors, so we pass only a safe list of
     # vars.
     safe_list = [
+        "COVERAGE_FILE",
+        "COVERAGE_PROCESS_START",
         "HOME",
         "LANG",
         "LC_ALL",
@@ -123,6 +125,7 @@ def run_ansible_lint(
         "PYTHONIOENCODING",
         "PYTHONPATH",
         "TERM",
+        "VIRTUAL_ENV",
     ]
 
     if env is None:

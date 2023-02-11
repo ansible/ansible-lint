@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import logging
 import os
-import sys
 import time
 import urllib.request
 from collections import defaultdict
@@ -82,7 +81,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
     # never check for updated schemas more than once a day
     if min_age_seconds > age:
         return 0
-    if not os.access(store_file, os.W_OK):
+    if not os.access(store_file, os.W_OK):  # pragma: no cover
         _logger.debug(
             "Skipping schema update due to lack of writing rights on %s", store_file
         )
@@ -117,7 +116,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
                         f_out.truncate()
                         os.fsync(f_out.fileno())
                         # unload possibly loaded schema
-                        if kind in _schema_cache:
+                        if kind in _schema_cache:  # pragma: no cover
                             del _schema_cache[kind]
         except (ConnectionError, OSError) as exc:
             if (
@@ -129,7 +128,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
             # In case of networking issues, we just stop and use last-known good
             _logger.debug("Skipped schema refresh due to unexpected exception: %s", exc)
             break
-    if changed:
+    if changed:  # pragma: no cover
         with open(store_file, "w", encoding="utf-8") as f_out:
             # formatting should match our .prettierrc.yaml
             json.dump(JSON_SCHEMAS, f_out, indent=2, sort_keys=True)
@@ -140,13 +139,3 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         store_file.touch()
         changed = 1
     return changed
-
-
-if __name__ == "__main__":
-    if refresh_schemas():
-        # flake8: noqa: T201
-        print("Schemas were updated.")
-        sys.exit(1)
-    else:
-        # flake8: noqa: T201
-        print("Schemas not updated", 0)
