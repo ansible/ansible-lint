@@ -44,7 +44,13 @@ use_default_rules: true
 # rulesdir:
 #   - ./rule/directory/
 
-# Ansible-lint completely ignores rules or tags listed below
+# Ansible-lint is able to recognize and load skip rules stored inside
+# `.ansible-lint-ignore` files. To skip a rule just enter filename and tag,
+# like "playbook.yml package-latest" on a new line. Optionally you can add
+# comments after the tag, prefixed by "#". We discourage the use of skip_list
+# below because that will hide violations from the output. When putting ignores
+# inside the ignore file, they are marked as ignored, but still visible, making
+# it easier to address later.
 skip_list:
   - skip_this_tag
 

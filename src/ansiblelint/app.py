@@ -18,6 +18,7 @@ from ansiblelint.config import PROFILES, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RULE_DOC_URL, SUCCESS_RC, VIOLATIONS_FOUND_RC
 from ansiblelint.errors import MatchError
+from ansiblelint.loaders import IGNORE_TXT
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
@@ -101,6 +102,10 @@ class App:
         result = SummarizedResults()
 
         for match in matches:
+            # any ignores match counts as a warning
+            if match.ignored:
+                result.warnings += 1
+                continue
             # tag can include a sub-rule id: `yaml[document-start]`
             # rule.id is the generic rule id: `yaml`
             # *rule.tags is the list of the rule's tags (categories): `style`
@@ -162,24 +167,21 @@ class App:
 
         matched_rules = self._get_matched_skippable_rules(result.matches)
 
-        entries = []
-        for key in sorted(matched_rules.keys()):
-            if {key, *matched_rules[key].tags}.isdisjoint(self.options.warn_list):
-                entries.append(f"  - {key}  # {matched_rules[key].shortdesc}\n")
-        for match in result.matches:
-            if "experimental" in match.rule.tags:
-                entries.append("  - experimental  # all rules tagged as experimental\n")
-                break
-        if entries and not self.options.quiet:
+        if matched_rules and self.options.generate_ignore:
+            console_stderr.print(f"Writing ignore file to {IGNORE_TXT}")
+            lines = set()
+            for rule in result.matches:
+                lines.add(f"{rule.filename} {rule.tag}")
+            with open(IGNORE_TXT, "w", encoding="utf-8") as ignore_file:
+                ignore_file.write(
+                    "# This file contains ignores rule violations for ansible-lint\n"
+                )
+                ignore_file.writelines(sorted(list(lines)))
+                ignore_file.write("\n")
+        elif matched_rules and not self.options.quiet:
             console_stderr.print(
-                "You can skip specific rules or tags by adding them to your "
-                "configuration file:"
+                "Read [link=https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations."
             )
-            msg += """\
-# .config/ansible-lint.yml
-warn_list:  # or 'skip_list' to silence them completely
-"""
-            msg += "".join(sorted(entries))
 
         # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
         # to migrate old tags to new tags. There are a lot of things out there that still
