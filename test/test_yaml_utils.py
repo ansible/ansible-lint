@@ -195,7 +195,7 @@ def test_custom_ruamel_yaml_emitter(
 def fixture_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]:
     """Get the contents for the formatting fixture files.
 
-    To regenerate these fixtures, please run ``test/fixtures/test_regenerate_formatting_fixtures.py``.
+    To regenerate these fixtures, please run ``pytest --regenerate-formatting-fixtures``.
 
     Ideally, prettier should not have to change any ``formatting-after`` fixtures.
     """
