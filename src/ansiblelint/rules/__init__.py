@@ -336,11 +336,7 @@ def load_plugins(  # noqa: max-complexity: 11
         # load all modules in the directory
         for f in Path(directory).glob("*.py"):
             if "__" not in f.stem and f.stem not in "conftest":
-                try:
-                    import_module(f"{f.stem}")
-
-                except ImportError as exc:
-                    _logger.warning("Ignore loading rule from %s due to %s", f, exc)
+                import_module(f"{f.stem}")
     # restore sys.path
     sys.path = orig_sys_path
 
