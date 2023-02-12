@@ -46,12 +46,12 @@ def test_positive_skip_tag() -> None:
     assert [] == good_runner.run()
 
 
-def test_run_skip_warning_rule() -> None:
-    """Test that we can skip syntax-check[empty-playbook]."""
+def test_run_skip_rule() -> None:
+    """Test that we can skip a rule with -x."""
     result = run_ansible_lint(
         "-x",
-        "syntax-check[empty-playbook]",
-        "examples/playbooks/empty_playbook.yml",
+        "name[casing]",
+        "examples/playbooks/rule-name-casing.yml",
         executable="ansible-lint",
     )
     assert result.returncode == 0

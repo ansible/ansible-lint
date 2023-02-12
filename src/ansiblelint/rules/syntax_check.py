@@ -63,7 +63,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
 
     id = "syntax-check"
     severity = "VERY_HIGH"
-    tags = ["core"]
+    tags = ["core", "unskippable"]
     version_added = "v5.0.0"
     _order = 0
 
