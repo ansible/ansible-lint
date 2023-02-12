@@ -36,7 +36,6 @@ DEFAULT_WARN_LIST = [
     "name[play]",
     "name[prefix]",
     "role-name",
-    "warning[empty-playbook]",  # because ansible considers it warning only
     "role-name[path]",  # too new
 ]
 
