@@ -22,7 +22,6 @@
     "python.analysis.exclude": [
         "build"
     ],
-    "python.analysis.stubPath": ".",
     "python.formatting.provider": "black",
     "python.linting.flake8Args": [
         "--ignore=E501,W503"

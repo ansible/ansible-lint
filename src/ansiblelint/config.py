@@ -23,7 +23,7 @@ _logger = logging.getLogger(__name__)
 
 
 CACHE_DIR = (
-    os.path.expanduser(os.environ.get("XDG_CONFIG_CACHE", "~/.cache")) + "/ansible-lint"
+    os.path.expanduser(os.environ.get("XDG_CACHE_HOME", "~/.cache")) + "/ansible-lint"
 )
 
 DEFAULT_WARN_LIST = [
@@ -36,7 +36,6 @@ DEFAULT_WARN_LIST = [
     "name[play]",
     "name[prefix]",
     "role-name",
-    "warning[empty-playbook]",  # because ansible considers it warning only
     "role-name[path]",  # too new
 ]
 

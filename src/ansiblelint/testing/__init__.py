@@ -45,11 +45,11 @@ class RunFromText:
         """Lints received filename."""
         return self._call_runner(filename)
 
-    def run_playbook(self, playbook_text: str) -> list[MatchError]:
+    def run_playbook(
+        self, playbook_text: str, prefix: str = "playbook"
+    ) -> list[MatchError]:
         """Lints received text as a playbook."""
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yml", prefix="playbook"
-        ) as fh:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix=prefix) as fh:
             fh.write(playbook_text)
             fh.flush()
             results = self._call_runner(fh.name)
@@ -114,6 +114,8 @@ def run_ansible_lint(
     # pollute the env, causing weird behaviors, so we pass only a safe list of
     # vars.
     safe_list = [
+        "COVERAGE_FILE",
+        "COVERAGE_PROCESS_START",
         "HOME",
         "LANG",
         "LC_ALL",
@@ -123,6 +125,7 @@ def run_ansible_lint(
         "PYTHONIOENCODING",
         "PYTHONPATH",
         "TERM",
+        "VIRTUAL_ENV",
     ]
 
     if env is None:

@@ -40,7 +40,13 @@ Ansible-lint creates a new cache on the next invocation.
 You should add the `.cache` folder to the `.gitignore` file in your git
 repositories.
 
-## Using progressive mode
+## Using progressive mode (deprecated)
+
+!!! warning
+
+    This feature is deprecated and will be removed in the next major release.
+    We encourage you to use [ignore file](configuring.md#ignoring-rules-for-entire-files)
+    instead.
 
 For easier adoption, Ansible-lint can alert for rule violations that occur since
 the last commit. This allows new code to be merged without any rule violations

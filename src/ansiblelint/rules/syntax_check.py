@@ -8,7 +8,7 @@ import sys
 from dataclasses import dataclass
 from typing import Any
 
-from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule, WarningRule
+from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.app import get_app
 from ansiblelint.config import options
 from ansiblelint.errors import MatchError
@@ -38,7 +38,7 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="specific",
         regex=re.compile(
-            r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in '(?P<filename>.*)': line (?P<line>\d+), column (?P<column>\d+)",
+            r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in '(?P<filename>[\w\/\.\-]+)': line (?P<line>\d+), column (?P<column>\d+)",
             re.MULTILINE | re.S | re.DOTALL,
         ),
     ),
@@ -136,10 +136,6 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                     else:
                         filename = lintable
                     column = int(groups.get("column", 1))
-
-                    if pattern.tag == "empty-playbook":
-                        rule = WarningRule()
-
                     results.append(
                         MatchError(
                             message=title,
@@ -203,7 +199,7 @@ if "pytest" in sys.modules:
         # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
         assert result[0].filename.endswith("/empty_playbook.yml")
-        assert result[0].tag == "warning[empty-playbook]"
+        assert result[0].tag == "syntax-check[empty-playbook]"
         assert result[0].message == "Empty playbook, nothing to do"
         assert len(result) == 1
 

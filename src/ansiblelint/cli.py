@@ -369,6 +369,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
             e.g: --skip-list=name,run-once",
     )
     parser.add_argument(
+        "--generate-ignore",
+        dest="generate_ignore",
+        action="store_true",
+        default=False,
+        help="Generate a text file '.ansible-lint-ignore' that ignores all found violations. Each line contains filename and rule id separated by a space.",
+    )
+    parser.add_argument(
         "-w",
         "--warn-list",
         dest="warn_list",

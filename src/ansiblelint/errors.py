@@ -53,11 +53,11 @@ class MatchError(ValueError):
         self.message = str(message or getattr(rule, "shortdesc", ""))
 
         # Safety measure to ensure we do not end-up with incorrect indexes
-        if linenumber == 0:
+        if linenumber == 0:  # pragma: no cover
             raise RuntimeError(
                 "MatchError called incorrectly as line numbers start with 1"
             )
-        if column == 0:
+        if column == 0:  # pragma: no cover
             raise RuntimeError(
                 "MatchError called incorrectly as column numbers start with 1"
             )

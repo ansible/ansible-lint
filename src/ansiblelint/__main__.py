@@ -50,6 +50,7 @@ from ansiblelint.color import (
 from ansiblelint.config import get_version_warning, options
 from ansiblelint.constants import EXIT_CONTROL_C_RC, GIT_CMD, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
+from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
@@ -216,6 +217,11 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
 
+    if options.progressive:
+        _logger.warning(
+            "Progressive mode is deprecated and will be removed in next major version, use ignore files instead: https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files"
+        )
+
     if not options.offline:
         # pylint: disable=import-outside-toplevel
         from ansiblelint.schemas import refresh_schemas
@@ -282,8 +288,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if options.strict and result.matches:
         mark_as_success = False
 
-    # Remove skipped list items from the result
+    # Remove skip_list items from the result
     result.matches = [m for m in result.matches if m.tag not in app.options.skip_list]
+    # Mark matches as ignored inside ignore file
+    ignore_map = load_ignore_txt()
+    for match in result.matches:
+        if match.tag in ignore_map[match.filename]:
+            match.ignored = True
 
     app.render_matches(result.matches)
 

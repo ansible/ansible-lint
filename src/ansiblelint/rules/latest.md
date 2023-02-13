@@ -25,7 +25,7 @@ branch is not accidental. For these cases, just add a comment such as
   tasks:
     - name: Risky use of git module
       ansible.builtin.git:
-        repo: "https://foosball.example.org/path/to/repo.git"
+        repo: "https://github.com/ansible/ansible-lint"
         version: HEAD # <-- HEAD value is triggering the rule
 ```
 
@@ -38,6 +38,6 @@ branch is not accidental. For these cases, just add a comment such as
   tasks:
     - name: Safe use of git module
       ansible.builtin.git:
-        repo: "https://foosball.example.org/path/to/repo.git"
+        repo: "https://github.com/ansible/ansible-lint"
         version: abcd1234... # <-- that is safe
 ```

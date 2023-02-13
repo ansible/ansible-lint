@@ -59,7 +59,8 @@ As with all Ansible projects, we have a [Code of Conduct].
   https://docs.ansible.com/ansible/latest/community/communication.html
 [code of conduct]:
   https://docs.ansible.com/ansible/latest/community/code_of_conduct.html
-[creating your fork on github]: https://guides.github.com/activities/forking/
+[creating your fork on github]:
+  https://docs.github.com/en/get-started/quickstart/contributing-to-projects
 [discussions]: https://github.com/ansible/ansible-lint/discussions
 [supported ansible versions]:
   https://docs.ansible.com/ansible-core/devel/reference_appendices/release_and_maintenance.html#ansible-core-release-cycle

@@ -47,10 +47,10 @@ def test_positive_skip_tag() -> None:
 
 
 def test_run_skip_warning_rule() -> None:
-    """Test that we can skip warning[empty-playbook]."""
+    """Test that we can skip syntax-check[empty-playbook]."""
     result = run_ansible_lint(
         "-x",
-        "warning[empty-playbook]",
+        "syntax-check[empty-playbook]",
         "examples/playbooks/empty_playbook.yml",
         executable="ansible-lint",
     )

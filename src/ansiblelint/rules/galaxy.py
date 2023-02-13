@@ -28,35 +28,22 @@ class GalaxyRule(AnsibleLintRule):
         if file.kind != "galaxy":  # type: ignore
             return []
 
+        # Defined by Automation Hub Team and Partner Engineering
+        required_tag_list = [
+            "application",
+            "cloud",
+            "database",
+            "infrastructure",
+            "linux",
+            "monitoring",
+            "networking",
+            "security",
+            "storage",
+            "tools",
+            "windows",
+        ]
+
         results = []
-
-        if "version" not in data:
-            results.append(
-                self.create_matcherror(
-                    message="galaxy.yaml should have version tag.",
-                    linenumber=data[LINE_NUMBER_KEY],
-                    tag="galaxy[version-missing]",
-                    filename=file,
-                )
-            )
-            # returning here as it does not make sense
-            # to continue for version check below
-            return results
-
-        version = data.get("version")
-        if Version(version) < Version("1.0.0"):
-            results.append(
-                self.create_matcherror(
-                    message="collection version should be greater than or equal to 1.0.0",
-                    # pylint: disable=protected-access
-                    linenumber=version._line_number,
-                    tag="galaxy[version-incorrect]",
-                    filename=file,
-                )
-            )
-
-        # Changelog Check - building off Galaxy rule as there is no current way to check
-        # for a nonexistent file
 
         base_path = os.path.split(str(file.abspath))[0]
         changelog_found = 0
@@ -70,11 +57,54 @@ class GalaxyRule(AnsibleLintRule):
             if os.path.isfile(path):
                 changelog_found = 1
 
+        galaxy_tag_list = data.get("tags", None)
+
+        # Changelog Check - building off Galaxy rule as there is no current way to check
+        # for a nonexistent file
         if not changelog_found:
             results.append(
                 self.create_matcherror(
                     message="No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",
                     tag="galaxy[no-changelog]",
+                    filename=file,
+                )
+            )
+
+        # Checking if galaxy.yml contains one or more required tags for certification
+        if not galaxy_tag_list or not any(
+            tag in required_tag_list for tag in galaxy_tag_list
+        ):
+            results.append(
+                self.create_matcherror(
+                    message=(
+                        f"galaxy.yaml must have one of the required tags: {required_tag_list}"
+                    ),
+                    tag="galaxy[tags]",
+                    filename=file,
+                )
+            )
+
+        if "version" not in data:
+            results.append(
+                self.create_matcherror(
+                    message="galaxy.yaml should have version tag.",
+                    linenumber=data[LINE_NUMBER_KEY],
+                    tag="galaxy[version-missing]",
+                    filename=file,
+                )
+            )
+            return results
+            # returning here as it does not make sense
+            # to continue for version check below
+
+        version = data.get("version")
+        if Version(version) < Version("1.0.0"):
+            results.append(
+                self.create_matcherror(
+                    message="collection version should be greater than or equal to 1.0.0",
+                    # pylint: disable=protected-access
+                    linenumber=version._line_number,
+                    tag="galaxy[version-incorrect]",
                     filename=file,
                 )
             )
@@ -178,3 +208,25 @@ if "pytest" in sys.modules:  # noqa: C901
         expected = "Unable to coerce object type"
         with pytest.raises(NotImplementedError, match=expected):
             _coerce(type(Version))
+
+    def test_galaxy_tags_pass() -> None:
+        """Test for required tags."""
+        collection = RulesCollection()
+        collection.register(GalaxyRule())
+        bad_runner = Runner(
+            "examples/galaxy_no_required_tags/pass/galaxy.yml", rules=collection
+        )
+        result = bad_runner.run()
+        assert len(result) == 0
+
+    def test_galaxy_tags_fail() -> None:
+        """Test for required tags."""
+        collection = RulesCollection()
+        collection.register(GalaxyRule())
+        bad_runner = Runner(
+            "examples/galaxy_no_required_tags/fail/galaxy.yml", rules=collection
+        )
+        result = bad_runner.run()
+        assert len(result) == 1
+        for item in result:
+            assert item.tag == "galaxy[tags]"

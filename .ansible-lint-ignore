@@ -1,0 +1,3 @@
+# See https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files
+playbook2.yml package-latest # comment
+playbook2.yml foo-bar

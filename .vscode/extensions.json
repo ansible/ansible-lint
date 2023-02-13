@@ -1,6 +1,5 @@
 {
     "recommendations": [
-        "ExecutableBookProject.myst-highlight",
         "Tyriar.sort-lines",
         "esbenp.prettier-vscode",
         "hbenl.vscode-test-explorer",

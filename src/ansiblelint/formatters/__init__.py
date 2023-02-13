@@ -61,6 +61,8 @@ class Formatter(BaseFormatter):  # type: ignore
         result = f"[{match.level}][bold][link={match.rule.url}]{self.escape(match.tag)}[/link][/][/][dim]:[/] [{match.level}]{self.escape(match.message)}[/]"
         if match.level != "error":
             result += f" [dim][{match.level}]({match.level})[/][/]"
+        if match.ignored:
+            result += " [dim]# ignored[/]"
         result += (
             "\n"
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"

@@ -38,6 +38,22 @@ counterparts:
 --8<-- ".ansible-lint"
 ```
 
+## Ignoring rules for entire files
+
+Ansible-lint will load skip rules from `.ansible-lint-ignore` file that is
+adjacent to its config file. The file format is very simple, containing the
+filename and the rule to be ignored. It also supports comments starting with
+`#`.
+
+```yaml title=".ansible-lint-ignore"
+# this is just a comment
+playbook.yml package-latest # disable package-latest rule for playbook.yml
+playbook.yml deprecated-module
+```
+
+The file can also be created by adding `--generate-ignore` to the command line.
+Keep in mind that this will override any existing file content.
+
 ## Pre-commit setup
 
 To use Ansible-lint with [pre-commit], add the following to the
@@ -47,10 +63,10 @@ Change **rev:** to either a commit sha or tag of Ansible-lint that contains
 `.pre-commit-hooks.yaml`.
 
 ```yaml
-- repo: https://github.com/ansible/ansible-lint.git
+- repo: https://github.com/ansible/ansible-lint
   rev: ... # put latest release tag from https://github.com/ansible/ansible-lint/releases/
   hooks:
     - id: ansible-lint
 ```
 
-[pre-commit]: https://pre-commit.com
+[pre-commit]: https://pre-commit.com/
