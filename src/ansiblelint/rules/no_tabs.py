@@ -26,45 +26,38 @@ class NoTabsRule(AnsibleLintRule):
         ("lineinfile", "insertbefore"),
         ("lineinfile", "regexp"),
         ("lineinfile", "line"),
+        ("ansible.builtin.lineinfile", "insertafter"),
+        ("ansible.builtin.lineinfile", "insertbefore"),
+        ("ansible.builtin.lineinfile", "regexp"),
+        ("ansible.builtin.lineinfile", "line"),
+        ("ansible.legacy.lineinfile", "insertafter"),
+        ("ansible.legacy.lineinfile", "insertbefore"),
+        ("ansible.legacy.lineinfile", "regexp"),
+        ("ansible.legacy.lineinfile", "line"),
     ]
 
     def matchtask(
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str:
-        for k, v, parent_path in nested_items_path(task):
+        action = task["action"]["__ansible_module__"]
+        for k, v, _ in nested_items_path(task):
             if isinstance(k, str) and "\t" in k:
                 return True
-            parent_key = "" if not parent_path else parent_path[-1]
-            if (
-                (parent_key, k) not in self.allow_list
-                and isinstance(v, str)
-                and "\t" in v
-            ):
+            if isinstance(v, str) and "\t" in v and (action, k) not in self.allow_list:
                 return True
         return False
 
 
-RULE_EXAMPLE = r"""---
-- hosts: localhost
-  tasks:
-    - name: Should not trigger no-tabs rules
-      lineinfile:
-        path: some.txt
-        regexp: '^\t$'
-        line: 'string with \t inside'
-    - name: Foo
-      debug:
-        msg: "Presence of \t should trigger no-tabs here."
-"""
-
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    import pytest
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
-    @pytest.mark.parametrize("rule_runner", (NoTabsRule,), indirect=["rule_runner"])
-    def test_no_tabs_rule(rule_runner: Any) -> None:
+    def test_no_tabs_rule(default_rules_collection: RulesCollection) -> None:
         """Test rule matches."""
-        results = rule_runner.run_playbook(RULE_EXAMPLE)
-        assert results[0].linenumber == 9
+        results = Runner(
+            "examples/playbooks/rule-no-tabs.yml", rules=default_rules_collection
+        ).run()
+        assert results[0].linenumber == 10
         assert results[0].message == NoTabsRule().shortdesc
         assert len(results) == 1
