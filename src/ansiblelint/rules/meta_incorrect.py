@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ansiblelint.constants import LINE_NUMBER_KEY, SKIPPED_RULES_KEY
+from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
@@ -45,8 +45,6 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         for field, default in self.field_defaults:
             value = galaxy_info.get(field, None)
             if value and value == default:
-                if "meta-incorrect" in file.data.get(SKIPPED_RULES_KEY, []):
-                    continue
                 results.append(
                     self.create_matcherror(
                         filename=file,

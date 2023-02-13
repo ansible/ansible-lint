@@ -11,6 +11,14 @@ galaxy_info:
   license: license (GPLv2, CC-BY, etc)
 """
 
+NO_GALAXY_INFO = """
+galaxy_information:
+  author: your name
+  description: your description
+  company: your company (optional)
+  license: license (GPLv2, CC-BY, etc)
+"""
+
 
 def test_default_galaxy_info() -> None:
     """Test for meta-incorrect."""
@@ -23,3 +31,12 @@ def test_default_galaxy_info() -> None:
     assert "Should change default metadata: description" in str(results)
     assert "Should change default metadata: company" in str(results)
     assert "Should change default metadata: license" in str(results)
+
+
+def test_no_galaxy_info() -> None:
+    """Test for no galaxy info passed to meta-incorrect."""
+    collection = RulesCollection()
+    collection.register(MetaChangeFromDefaultRule())
+    runner = RunFromText(collection)
+    results = runner.run_role_meta_main(NO_GALAXY_INFO)
+    assert results == []
