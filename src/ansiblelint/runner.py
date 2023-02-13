@@ -214,6 +214,13 @@ class Runner:
 def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
     lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
+    for rule in rules:
+        if "unskippable" in rule.tags:
+            for entry in (*options.skip_list, *options.warn_list):
+                if rule.id == entry or entry.startswith(f"{rule.id}["):
+                    raise RuntimeError(
+                        f"Rule '{rule.id}' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file."
+                    )
     matches = []
     checked_files: set[Lintable] = set()
     runner = Runner(
