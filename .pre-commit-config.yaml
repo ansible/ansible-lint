@@ -154,7 +154,7 @@ repos:
       - id: pyupgrade
         args: ["--py38-plus"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.991
+    rev: v1.0.0
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -205,7 +205,7 @@ repos:
       - id: pip-compile
         name: lock
         always_run: true
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib
         language: python
         files: ^.config\/requirements.*$
         alias: lock
@@ -215,7 +215,7 @@ repos:
           - pip>=22.3.1
       - id: pip-compile
         name: deps
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib
         language: python
         files: ^.config\/requirements.*$
         alias: deps
@@ -224,7 +224,7 @@ repos:
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package ansible-core --upgrade
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --upgrade
         language: python
         always_run: true
         files: ^.config\/requirements.*$
