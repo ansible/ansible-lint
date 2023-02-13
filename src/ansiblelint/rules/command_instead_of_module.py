@@ -233,7 +233,7 @@ if "pytest" in sys.modules:  # noqa: C901
         "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
     )
     def test_systemd_kill(rule_runner: RunFromText) -> None:
-        """Set-default is not supported by the systemd module."""
+        """Kill is not supported by the systemd module."""
         results = rule_runner.run_playbook(SYSTEMD_KILL)
         assert len(results) == 0
 
