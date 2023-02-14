@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -92,3 +93,25 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 )
                 return message.format(task[loop_type], loop_type)
         return False
+
+
+if "pytest" in sys.modules:
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
+
+    def test_use_bare_positive() -> None:
+        """Positive test for deprecated-bare-vars."""
+        collection = RulesCollection()
+        collection.register(UsingBareVariablesIsDeprecatedRule())
+        success = "examples/playbooks/rule-deprecated-bare-vars-pass.yml"
+        good_runner = Runner(success, rules=collection)
+        assert [] == good_runner.run()
+
+    def test_use_bare_negative() -> None:
+        """Negative test for deprecated-bare-vars."""
+        collection = RulesCollection()
+        collection.register(UsingBareVariablesIsDeprecatedRule())
+        failure = "examples/playbooks/rule-deprecated-bare-vars-fail.yml"
+        bad_runner = Runner(failure, rules=collection)
+        errs = bad_runner.run()
+        assert len(errs) == 12
