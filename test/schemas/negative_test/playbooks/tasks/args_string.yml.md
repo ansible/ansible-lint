@@ -23,9 +23,9 @@
   {
     "instancePath": "/0/args",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
+    "message": "must match pattern \"^\\{[\\{%](.|[\r\n])*[\\}%]\\}$\"",
     "params": {
-      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -80,7 +80,7 @@ stdout:
         },
         {
           "path": "$[0].args",
-          "message": "'{{ }}123' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
+          "message": "'{{ }}123' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
         }
       ]
     }

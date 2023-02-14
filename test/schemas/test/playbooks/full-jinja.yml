@@ -6,4 +6,11 @@
     {{
       true
     }}
-  tasks: []
+  tasks:
+    - name: Test more complex jinja is also allowed
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      # that below is valid and show be allowed:
+      with_items: >-
+        {%- set ns = [1, 1, 2] -%}
+        {{- ns | unique -}}
