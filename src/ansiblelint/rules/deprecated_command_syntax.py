@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -69,3 +70,32 @@ class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
                 message = "{0} used in place of argument {1} to file module"
                 return message.format(executable, self._arguments[executable])
         return False
+
+
+DEPRECATED_COMMAND_PLAY = """---
+- name: Fixture
+  hosts: localhost
+  tasks:
+  - name: Shell with pipe
+    ansible.builtin.command:
+      err: echo hello | true  # noqa: risky-shell-pipe
+    changed_when: false
+"""
+
+
+# testing code to be loaded only with pytest or when executed the rule file
+if "pytest" in sys.modules:
+    import pytest
+
+    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        (pytest.param(DEPRECATED_COMMAND_PLAY, 0, id="no_first_cmd_arg"),),
+    )
+    def test_rule_deprecated_command_no_first_cmd_arg(
+        default_text_runner: RunFromText, text: str, expected: int
+    ) -> None:
+        """Validate that rule works as intended."""
+        results = default_text_runner.run_playbook(text)
+        assert len(results) == expected
