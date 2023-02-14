@@ -20,4 +20,4 @@ def test_use_bare_negative() -> None:
     failure = "examples/playbooks/using-bare-variables-failure.yml"
     bad_runner = Runner(failure, rules=collection)
     errs = bad_runner.run()
-    assert len(errs) == 11
+    assert len(errs) == 12
