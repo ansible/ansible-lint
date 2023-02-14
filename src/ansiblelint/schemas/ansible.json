@@ -248,7 +248,7 @@
       "title": "Environment"
     },
     "full-jinja": {
-      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$",
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$",
       "type": "string"
     },
     "ignore_errors": {

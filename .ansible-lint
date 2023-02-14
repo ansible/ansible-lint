@@ -14,7 +14,6 @@ exclude_paths:
   - .github/
   - test/fixtures/formatting-before/
   - test/fixtures/formatting-prettier/
-  - test/schemas/
 # parseable: true
 # quiet: true
 # strict: true

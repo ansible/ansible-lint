@@ -59,9 +59,9 @@
   {
     "instancePath": "/0/become",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
+    "message": "must match pattern \"^\\{[\\{%](.|[\r\n])*[\\}%]\\}$\"",
     "params": {
-      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -130,7 +130,7 @@ stdout:
         },
         {
           "path": "$[0].become",
-          "message": "'yes' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
+          "message": "'yes' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
         }
       ]
     }

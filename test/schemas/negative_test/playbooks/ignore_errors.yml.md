@@ -68,9 +68,9 @@
   {
     "instancePath": "/0/tasks/0/ignore_errors",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
+    "message": "must match pattern \"^\\{[\\{%](.|[\r\n])*[\\}%]\\}$\"",
     "params": {
-      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -95,9 +95,9 @@
   {
     "instancePath": "/0/tasks/0/ignore_errors",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
+    "message": "must match pattern \"^\\{[\\{%](.|[\r\n])*[\\}%]\\}$\"",
     "params": {
-      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -177,7 +177,7 @@ stdout:
         },
         {
           "path": "$[0].tasks[0].ignore_errors",
-          "message": "'should_ignore_errors' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
+          "message": "'should_ignore_errors' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
         },
         {
           "path": "$[0].tasks[0]",
@@ -193,7 +193,7 @@ stdout:
         },
         {
           "path": "$[0].tasks[0].ignore_errors",
-          "message": "'should_ignore_errors' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
+          "message": "'should_ignore_errors' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
         }
       ]
     }

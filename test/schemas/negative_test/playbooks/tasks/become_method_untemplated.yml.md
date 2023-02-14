@@ -33,9 +33,9 @@
   {
     "instancePath": "/0/become_method",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
+    "message": "must match pattern \"^\\{[\\{%](.|[\r\n])*[\\}%]\\}$\"",
     "params": {
-      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -70,9 +70,9 @@
   {
     "instancePath": "/0/become_method",
     "keyword": "pattern",
-    "message": "must match pattern \"^\\{\\{(.|[\r\n])*\\}\\}$\"",
+    "message": "must match pattern \"^\\{[\\{%](.|[\r\n])*[\\}%]\\}$\"",
     "params": {
-      "pattern": "^\\{\\{(.|[\r\n])*\\}\\}$"
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
   },
@@ -123,7 +123,7 @@ stdout:
         },
         {
           "path": "$[0].become_method",
-          "message": "'sudo_var' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
+          "message": "'sudo_var' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
         },
         {
           "path": "$[0]",
@@ -139,7 +139,7 @@ stdout:
         },
         {
           "path": "$[0].become_method",
-          "message": "'sudo_var' does not match '^\\\\{\\\\{(.|[\\r\\n])*\\\\}\\\\}$'"
+          "message": "'sudo_var' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
         }
       ]
     }
