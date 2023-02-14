@@ -68,7 +68,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
 
     _executable_options = {
         "git": ["branch", "log", "lfs"],
-        "systemctl": ["--version", "set-default", "show-environment", "status"],
+        "systemctl": ["--version", "kill", "set-default", "show-environment", "status"],
         "yum": ["clean"],
         "rpm": ["--nodeps"],
     }
@@ -153,6 +153,13 @@ if "pytest" in sys.modules:  # noqa: C901
       command: systemctl set-default multi-user.target
 """
 
+    SYSTEMD_KILL = """
+- hosts: all
+  tasks:
+    - name: Kill service using SIGUSR1
+      command: systemctl kill --signal=SIGUSR1 sshd
+"""
+
     YUM_UPDATE = """
 - hosts: all
   tasks:
@@ -220,6 +227,14 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_systemd_runlevel(rule_runner: RunFromText) -> None:
         """Set-default is not supported by the systemd module."""
         results = rule_runner.run_playbook(SYSTEMD_RUNLEVEL)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
+    )
+    def test_systemd_kill(rule_runner: RunFromText) -> None:
+        """Kill is not supported by the systemd module."""
+        results = rule_runner.run_playbook(SYSTEMD_KILL)
         assert len(results) == 0
 
     @pytest.mark.parametrize(

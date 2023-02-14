@@ -21,6 +21,7 @@ RULEDIRS
 RUNLEVEL
 Renderable
 Representer
+SIGUSR1
 SRCROOT
 Sbarnea
 Sorin
