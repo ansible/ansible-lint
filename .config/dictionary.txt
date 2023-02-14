@@ -223,6 +223,8 @@ norole
 nostderr
 notest
 nxos
+octal
+octals
 opensearch
 openshift
 outdir
@@ -287,6 +289,7 @@ rulebooks
 ruledirs
 rulesdir
 rulesdirs
+ruleset
 runas
 sarif
 scalarint

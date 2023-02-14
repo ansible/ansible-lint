@@ -6,4 +6,4 @@
       ansible.builtin.copy:
         content: { "foo": "bar" } # <-- avoid-implicit[copy-content]
         dest: /tmp/foo.txt
-        mode: 0600
+        mode: "0600"

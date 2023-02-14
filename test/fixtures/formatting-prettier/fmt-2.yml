@@ -14,8 +14,8 @@
 - nothing: null # null
 
 - octal:
-    - 0o123 # YAML 1.2 octal
-    - 0123 # YAML 1.1 octal
+    - "0o123" # YAML 1.2 octal
+    - "0123" # YAML 1.1 octal
 
 - integer:
     - 0 # Not an octal. See #2071
