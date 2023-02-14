@@ -397,6 +397,20 @@ class Lintable:
                         from ansiblelint.skip_utils import append_skipped_rules
 
                     self.state = append_skipped_rules(self.state, self)
+                elif self.kind == "plugin":
+                    from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
+                        parse_plugin,
+                    )
+
+                    self._data = parse_plugin(self)
+                    if self._data:
+                        # Lazy import to avoid delays and cyclic-imports
+                        if "append_skipped_rules" not in globals():
+                            # pylint: disable=import-outside-toplevel
+                            from ansiblelint.skip_utils import append_skipped_rules
+
+                        self._data = append_skipped_rules(self._data, self)
+
                 else:
                     logging.debug(
                         "data set to None for %s due to being '%s' (%s) kind.",
