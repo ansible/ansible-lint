@@ -27,16 +27,8 @@ CACHE_DIR = (
 )
 
 DEFAULT_WARN_LIST = [
-    "avoid-implicit",
     "experimental",
-    "fqcn[action]",
-    "fqcn[redirect]",
     "jinja[spacing]",  # warning until we resolve all reported false-positives
-    "name[casing]",
-    "name[play]",
-    "name[prefix]",
-    "role-name",
-    "role-name[path]",  # too new
 ]
 
 DEFAULT_KINDS = [

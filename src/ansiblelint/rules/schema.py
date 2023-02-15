@@ -50,7 +50,7 @@ class ValidateSchemaRule(AnsibleLintRule):
 
     id = "schema"
     severity = "VERY_HIGH"
-    tags = ["core", "experimental"]
+    tags = ["core"]
     version_added = "v6.1.0"
 
     def matchtask(

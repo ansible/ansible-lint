@@ -18,7 +18,7 @@ def test_strict(strict: bool, returncode: int, message: str) -> None:
         args.insert(0, "--strict")
     result = run_ansible_lint(*args)
     assert result.returncode == returncode
-    assert "key-order[task]" in result.stdout
+    assert "args[module]" in result.stdout
     for summary_line in result.stderr.splitlines():
         if summary_line.startswith(message):
             break
