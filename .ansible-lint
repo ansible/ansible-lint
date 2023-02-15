@@ -31,7 +31,7 @@ mock_roles:
   - fake_namespace.fake_collection.fake_role # role within a collection
 
 # Enable checking of loop variable prefixes in roles
-loop_var_prefix: "{role}_"
+loop_var_prefix: "^(__|{role}_)"
 
 # Enforce variable names to follow pattern below, in addition to Ansible own
 # requirements, like avoiding python identifiers. To disable add `var-naming`

@@ -91,6 +91,8 @@ BASE_KINDS = [
 
 PROFILES = yaml_from_file(Path(__file__).parent / "data" / "profiles.yml")
 
+LOOP_VAR_PREFIX = "^(__|{role}_)"
+
 options = Namespace(
     cache_dir=None,
     colored=True,
