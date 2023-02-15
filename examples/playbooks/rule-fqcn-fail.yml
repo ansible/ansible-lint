@@ -11,4 +11,4 @@
       ini_file:
         section: foo
         path: /tmp/test.ini
-        mode: 0644
+        mode: "0644"

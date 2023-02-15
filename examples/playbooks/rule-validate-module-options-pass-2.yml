@@ -7,4 +7,4 @@
         src: /mine/ntp.conf
         dest: /etc/ntp.conf
         backup: true
-        mode: 0600
+        mode: "0600"

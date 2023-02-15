@@ -6,7 +6,7 @@
       ansible.builtin.copy:
         dest: "/tmp/placeholder"
         content: "Ansible made this!"
-        mode: 0600
+        mode: "0600"
       notify:
         - Second command to run # <-- handler will run only when file is changed
   handlers:

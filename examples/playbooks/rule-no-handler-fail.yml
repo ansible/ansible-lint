@@ -6,7 +6,7 @@
       ansible.builtin.copy:
         dest: "/tmp/placeholder"
         content: "Ansible made this!"
-        mode: 0600
+        mode: "0600"
       register: result # <-- we register the result of the task
 
     - name: Second command to run

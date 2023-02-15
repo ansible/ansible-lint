@@ -20,7 +20,7 @@
       ansible.builtin.file:
         path: /opt/software/deployment
         state: "{{ item }}"
-        mode: 0755
+        mode: "0755"
       with_items:
         - absent
         - directory

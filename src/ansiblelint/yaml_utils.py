@@ -67,6 +67,9 @@ rules:
   braces:
     min-spaces-inside: 0  # yamllint defaults to 0
     max-spaces-inside: 1  # yamllint defaults to 0
+  octal-values:
+    forbid-implicit-octal: true  # yamllint defaults to false
+    forbid-explicit-octal: true  # yamllint defaults to false
 """
 
 
@@ -606,6 +609,16 @@ class FormattedEmitter(Emitter):
     def choose_scalar_style(self) -> Any:
         """Select how to quote scalars if needed."""
         style = super().choose_scalar_style()
+        if (
+            style == ""
+            and self.event.value.startswith("0")
+            and len(self.event.value) > 1
+        ):
+            if self.event.tag == "tag:yaml.org,2002:int" and self.event.implicit[0]:
+                # ensures that "0123" string does not lose its quoting
+                self.event.tag = "tag:yaml.org,2002:str"
+                self.event.implicit = (True, True, True)
+            return '"'
         if style != "'":
             # block scalar, double quoted, etc.
             return style

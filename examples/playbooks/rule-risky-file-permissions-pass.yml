@@ -6,7 +6,7 @@
     - name: Permissions not missing and numeric
       ansible.builtin.file:
         path: foo
-        mode: 0600
+        mode: "0600"
 
 - name: SUCCESS_PERMISSIONS_PRESENT_GET_URL
   hosts: all
@@ -15,7 +15,7 @@
       ansible.builtin.get_url:
         url: http://foo
         dest: foo
-        mode: 0600
+        mode: "0600"
 
 - name: SUCCESS_ABSENT_STATE
   hosts: all
@@ -67,7 +67,7 @@
     - name: Permissions not missing and numeric (fqcn)
       ansible.builtin.file:
         path: bar
-        mode: 755 # noqa: risky-octal
+        mode: "755" # noqa: risky-octal
     - name: File edit when create is false (fqcn)
       ansible.builtin.lineinfile:
         path: foo

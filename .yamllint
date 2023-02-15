@@ -8,6 +8,9 @@ rules:
   indentation:
     level: error
     indent-sequences: consistent
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
 ignore: |
   .tox
   examples/playbooks/example.yml
