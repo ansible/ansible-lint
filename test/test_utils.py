@@ -302,7 +302,10 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks
     assert "Identified: test/test/always-run-success.yml" not in err
-    assert "Executing syntax check on examples/playbooks/mocked_dependency.yml" in err
+    assert (
+        "Executing syntax check on playbook examples/playbooks/mocked_dependency.yml"
+        in err
+    )
 
 
 def test_is_playbook() -> None:
