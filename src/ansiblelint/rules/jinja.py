@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 import black
 import jinja2
-from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleParserError
+from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from jinja2.exceptions import TemplateSyntaxError
 
@@ -28,6 +28,19 @@ _logger = logging.getLogger(__package__)
 KEYWORDS_WITH_IMPLICIT_TEMPLATE = ("changed_when", "failed_when", "until", "when")
 
 Token = namedtuple("Token", "lineno token_type value")
+
+ignored_re = re.compile(
+    "|".join(
+        [
+            r"^Object of type method is not JSON serializable",
+            r"^Unexpected templating type error occurred on",
+            r"^obj must be a list of dicts or a nested dict$",
+            r"^the template file (.*) could not be found for the lookup$",
+            r"could not locate file in lookup",
+            r"unable to locate collection",
+        ]
+    )
+)
 
 
 class JinjaRule(AnsibleLintRule):
@@ -55,80 +68,82 @@ class JinjaRule(AnsibleLintRule):
     def matchtask(  # noqa: C901
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str | MatchError:
-        for key, v, _ in nested_items_path(task):
-            if isinstance(v, str):
-                try:
-                    template(
-                        basedir=file.dir if file else ".",
-                        value=v,
-                        variables=deannotate(task.get("vars", {})),
-                        fail_on_error=True,  # we later decide which ones to ignore or not
-                    )
-                # ValueError RepresenterError
-                except AnsibleError as exc:
-                    bypass = False
-                    orig_exc = exc.orig_exc if getattr(exc, "orig_exc", None) else exc
-                    match = self._ansible_error_re.match(
-                        getattr(orig_exc, "message", str(orig_exc))
-                    )
-                    if (
-                        isinstance(exc, AnsibleFilterError)
-                        or "unable to locate collection" in orig_exc.message
-                    ):
-                        bypass = True
-                    elif re.match(
-                        r"^the template file (.*) could not be found for the lookup$",
-                        orig_exc.message,
-                    ) or re.match(r"could not locate file in lookup", orig_exc.message):
-                        bypass = True
-                    elif isinstance(orig_exc, AnsibleParserError):
-                        # "An unhandled exception occurred while running the lookup plugin '...'. Error was a <class 'ansible.errors.AnsibleParserError'>, original message: Invalid filename: 'None'. Invalid filename: 'None'"
-
-                        # An unhandled exception occurred while running the lookup plugin 'template'. Error was a <class 'ansible.errors.AnsibleError'>, original message: the template file ... could not be found for the lookup. the template file ... could not be found for the lookup
-
-                        # ansible@devel (2.14) new behavior:
-                        # AnsibleError(TemplateSyntaxError): template error while templating string: Could not load "ipwrap": 'Invalid plugin FQCN (ansible.netcommon.ipwrap): unable to locate collection ansible.netcommon'. String: Foo {{ buildset_registry.host | ipwrap }}. Could not load "ipwrap": 'Invalid plugin FQCN (ansible.netcommon.ipwrap): unable to locate collection ansible.netcommon'
-                        bypass = True
-                    elif (
-                        isinstance(orig_exc, (AnsibleError, TemplateSyntaxError))
-                        and match
-                    ):
-                        error = match.group("error")
-                        detail = match.group("detail")
-                        # string = match.group("string")
-                        if error.startswith("template error while templating string"):
-                            bypass = False
-                        elif detail.startswith("unable to locate collection"):
-                            _logger.debug("Ignored AnsibleError: %s", exc)
-                            bypass = True
-                        else:
-                            bypass = False
-                    elif re.match(r"^lookup plugin (.*) not found$", exc.message):
-                        # lookup plugin 'template' not found
-                        bypass = True
-
-                    # AnsibleFilterError: 'obj must be a list of dicts or a nested dict'
-                    # AnsibleError: template error while templating string: expected token ':', got '}'. String: {{ {{ '1' }} }}
-                    # AnsibleError: template error while templating string: unable to locate collection ansible.netcommon. String: Foo {{ buildset_registry.host | ipwrap }}
-                    if not bypass:
-                        return self.create_matcherror(
-                            message=str(exc),
-                            linenumber=task[LINE_NUMBER_KEY],
-                            filename=file,
-                            tag=f"{self.id}[invalid]",
+        try:
+            for key, v, _ in nested_items_path(task):
+                if isinstance(v, str):
+                    try:
+                        template(
+                            basedir=file.dir if file else ".",
+                            value=v,
+                            variables=deannotate(task.get("vars", {})),
+                            fail_on_error=True,  # we later decide which ones to ignore or not
                         )
+                    # ValueError RepresenterError
+                    except AnsibleError as exc:
+                        bypass = False
+                        orig_exc = (
+                            exc.orig_exc if getattr(exc, "orig_exc", None) else exc
+                        )
+                        orig_exc_message = getattr(orig_exc, "message", str(orig_exc))
+                        match = self._ansible_error_re.match(
+                            getattr(orig_exc, "message", str(orig_exc))
+                        )
+                        if ignored_re.match(orig_exc_message):
+                            bypass = True
+                        elif isinstance(orig_exc, AnsibleParserError):
+                            # "An unhandled exception occurred while running the lookup plugin '...'. Error was a <class 'ansible.errors.AnsibleParserError'>, original message: Invalid filename: 'None'. Invalid filename: 'None'"
 
-                reformatted, details, tag = self.check_whitespace(
-                    v, key=key, lintable=file
-                )
-                if reformatted != v:
-                    return self.create_matcherror(
-                        message=self._msg(tag=tag, value=v, reformatted=reformatted),
-                        linenumber=task[LINE_NUMBER_KEY],
-                        details=details,
-                        filename=file,
-                        tag=f"{self.id}[{tag}]",
+                            # An unhandled exception occurred while running the lookup plugin 'template'. Error was a <class 'ansible.errors.AnsibleError'>, original message: the template file ... could not be found for the lookup. the template file ... could not be found for the lookup
+
+                            # ansible@devel (2.14) new behavior:
+                            # AnsibleError(TemplateSyntaxError): template error while templating string: Could not load "ipwrap": 'Invalid plugin FQCN (ansible.netcommon.ipwrap): unable to locate collection ansible.netcommon'. String: Foo {{ buildset_registry.host | ipwrap }}. Could not load "ipwrap": 'Invalid plugin FQCN (ansible.netcommon.ipwrap): unable to locate collection ansible.netcommon'
+                            bypass = True
+                        elif (
+                            isinstance(orig_exc, (AnsibleError, TemplateSyntaxError))
+                            and match
+                        ):
+                            error = match.group("error")
+                            detail = match.group("detail")
+                            # string = match.group("string")
+                            if error.startswith(
+                                "template error while templating string"
+                            ):
+                                bypass = False
+                            elif detail.startswith("unable to locate collection"):
+                                _logger.debug("Ignored AnsibleError: %s", exc)
+                                bypass = True
+                            else:
+                                bypass = False
+                        elif re.match(r"^lookup plugin (.*) not found$", exc.message):
+                            # lookup plugin 'template' not found
+                            bypass = True
+
+                        # AnsibleFilterError: 'obj must be a list of dicts or a nested dict'
+                        # AnsibleError: template error while templating string: expected token ':', got '}'. String: {{ {{ '1' }} }}
+                        # AnsibleError: template error while templating string: unable to locate collection ansible.netcommon. String: Foo {{ buildset_registry.host | ipwrap }}
+                        if not bypass:
+                            return self.create_matcherror(
+                                message=str(exc),
+                                linenumber=task[LINE_NUMBER_KEY],
+                                filename=file,
+                                tag=f"{self.id}[invalid]",
+                            )
+                    reformatted, details, tag = self.check_whitespace(
+                        v, key=key, lintable=file
                     )
+                    if reformatted != v:
+                        return self.create_matcherror(
+                            message=self._msg(
+                                tag=tag, value=v, reformatted=reformatted
+                            ),
+                            linenumber=task[LINE_NUMBER_KEY],
+                            details=details,
+                            filename=file,
+                            tag=f"{self.id}[{tag}]",
+                        )
+        except Exception as exc:
+            _logger.info("Exception in JinjaRule.matchtask: %s", exc)
+            raise
         return False
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:

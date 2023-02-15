@@ -90,7 +90,6 @@ class RoleNames(AnsibleLintRule):
 
         if file.kind == "playbook":
             for play in file.data:
-                # breakpoint()
                 if "roles" in play:
                     line = play["__line__"]
                     for role in play["roles"]:
@@ -100,7 +99,6 @@ class RoleNames(AnsibleLintRule):
                         elif isinstance(role, str):
                             role_name = role
                         if "/" in role_name:
-                            # breakpoint()
                             result.append(
                                 self.create_matcherror(
                                     f"Avoid using paths when importing roles. ({role_name})",
