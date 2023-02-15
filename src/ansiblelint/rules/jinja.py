@@ -64,12 +64,16 @@ class JinjaRule(AnsibleLintRule):
         """Generate error message."""
         return self._tag2msg[tag].format(value=value, reformatted=reformatted)
 
-    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches,too-many-locals
     def matchtask(  # noqa: C901
         self, task: dict[str, Any], file: Lintable | None = None
-    ) -> bool | str | MatchError:
+    ) -> list[MatchError]:
+        result = []
         try:
-            for key, v, _ in nested_items_path(task):
+            for key, v, path in nested_items_path(
+                task,
+                ignored_keys=("block", "ansible.builtin.block", "ansible.legacy.block"),
+            ):
                 if isinstance(v, str):
                     try:
                         template(
@@ -122,29 +126,34 @@ class JinjaRule(AnsibleLintRule):
                         # AnsibleError: template error while templating string: expected token ':', got '}'. String: {{ {{ '1' }} }}
                         # AnsibleError: template error while templating string: unable to locate collection ansible.netcommon. String: Foo {{ buildset_registry.host | ipwrap }}
                         if not bypass:
-                            return self.create_matcherror(
-                                message=str(exc),
-                                linenumber=task[LINE_NUMBER_KEY],
-                                filename=file,
-                                tag=f"{self.id}[invalid]",
+                            result.append(
+                                self.create_matcherror(
+                                    message=str(exc),
+                                    linenumber=_get_error_line(task, path),
+                                    filename=file,
+                                    tag=f"{self.id}[invalid]",
+                                )
                             )
+                            continue
                     reformatted, details, tag = self.check_whitespace(
                         v, key=key, lintable=file
                     )
                     if reformatted != v:
-                        return self.create_matcherror(
-                            message=self._msg(
-                                tag=tag, value=v, reformatted=reformatted
-                            ),
-                            linenumber=task[LINE_NUMBER_KEY],
-                            details=details,
-                            filename=file,
-                            tag=f"{self.id}[{tag}]",
+                        result.append(
+                            self.create_matcherror(
+                                message=self._msg(
+                                    tag=tag, value=v, reformatted=reformatted
+                                ),
+                                linenumber=_get_error_line(task, path),
+                                details=details,
+                                filename=file,
+                                tag=f"{self.id}[{tag}]",
+                            )
                         )
         except Exception as exc:
             _logger.info("Exception in JinjaRule.matchtask: %s", exc)
             raise
-        return False
+        return result
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
@@ -344,7 +353,7 @@ if "pytest" in sys.modules:  # noqa: C901
     @pytest.fixture(name="error_expected_lines")
     def fixture_error_expected_lines() -> list[int]:
         """Return list of expected error lines."""
-        return [31, 34, 37, 40, 43, 46, 72]
+        return [33, 36, 39, 42, 45, 48, 74]
 
     # 21 68
     @pytest.fixture(name="lint_error_lines")
@@ -636,9 +645,13 @@ if "pytest" in sys.modules:  # noqa: C901
         collection.register(JinjaRule())
         success = "examples/playbooks/rule-jinja-invalid.yml"
         errs = Runner(success, rules=collection).run()
-        assert len(errs) == 1
-        assert errs[0].tag == "jinja[invalid]"
+        assert len(errs) == 2
+        assert errs[0].tag == "jinja[spacing]"
         assert errs[0].rule.id == "jinja"
+        assert errs[0].linenumber == 9
+        assert errs[1].tag == "jinja[invalid]"
+        assert errs[1].rule.id == "jinja"
+        assert errs[1].linenumber == 9
 
     def test_jinja_valid() -> None:
         """Tests our ability to parse jinja, even when variables may not be defined."""
@@ -647,3 +660,16 @@ if "pytest" in sys.modules:  # noqa: C901
         success = "examples/playbooks/rule-jinja-valid.yml"
         errs = Runner(success, rules=collection).run()
         assert len(errs) == 0
+
+
+def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
+    """Return error line number."""
+    line = task[LINE_NUMBER_KEY]
+    ctx = task
+    for _ in path:
+        ctx = ctx[_]
+        if LINE_NUMBER_KEY in ctx:
+            line = ctx[LINE_NUMBER_KEY]
+    if not isinstance(line, int):
+        raise RuntimeError("Line number is not an integer")
+    return line

@@ -2,8 +2,11 @@
 - name: Fixture
   hosts: localhost
   tasks:
-    - name: Foo # <-- this is valid jinja
-      ansible.builtin.debug:
-        msg: "{{ 'a' b }}" # <-- jinja2[invalid]
+    - name: A block used to check that we do not identify error at correct level
+      block:
+        - name: Foo # <-- this is valid jinja2
+          ansible.builtin.debug:
+            foo: "{{ 1  }}" # <-- jinja2[spacing]
+            msg: "{{ 'a' b }}" # <-- jinja2[invalid]
 # It should be noted that even ansible --syntax-check fails to spot the jinja
 # error above, but ansible will throw a runtime error when running
