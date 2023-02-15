@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -70,9 +71,9 @@ class RoleNames(AnsibleLintRule):
             if "/" in name:
                 results.append(
                     self.create_matcherror(
-                        "Avoid using paths when importing roles.",
+                        f"Avoid using paths when importing roles. ({name})",
                         filename=file,
-                        linenumber=task["__line__"],
+                        linenumber=task["action"].get("__line__", task["__line__"]),
                         tag=f"{self.id}[path]",
                     )
                 )
@@ -84,8 +85,32 @@ class RoleNames(AnsibleLintRule):
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         result: list[MatchError] = []
 
-        if file.kind not in ("meta", "role"):
+        if file.kind not in ("meta", "role", "playbook"):
             return result
+
+        if file.kind == "playbook":
+            for play in file.data:
+                # breakpoint()
+                if "roles" in play:
+                    line = play["__line__"]
+                    for role in play["roles"]:
+                        if isinstance(role, dict):
+                            line = role["__line__"]
+                            role_name = role["role"]
+                        elif isinstance(role, str):
+                            role_name = role
+                        if "/" in role_name:
+                            # breakpoint()
+                            result.append(
+                                self.create_matcherror(
+                                    f"Avoid using paths when importing roles. ({role_name})",
+                                    filename=file,
+                                    linenumber=line,
+                                    tag=f"{self.id}[path]",
+                                )
+                            )
+            return result
+
         if file.kind == "role":
             role_name = self._infer_role_name(
                 meta=file.path / "meta" / "main.yml", default=file.path.name
@@ -115,3 +140,23 @@ class RoleNames(AnsibleLintRule):
                 except KeyError:
                     pass
         return default
+
+
+if "pytest" in sys.modules:
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("test_file", "failure"),
+        (pytest.param("examples/playbooks/rule-role-name-path.yml", 3, id="fail"),),
+    )
+    def test_role_name_path(
+        default_rules_collection: RulesCollection, test_file: str, failure: int
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(test_file, rules=default_rules_collection).run()
+        for result in results:
+            assert result.tag == "role-name[path]"
+        assert len(results) == failure
