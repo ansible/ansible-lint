@@ -18,3 +18,10 @@
       ansible.builtin.pause:
         # should trigger no-prompting as neither seconds/minutes are mentioned
         prompt: "Make sure org.foo.FooOverload exception is not present"
+
+- name: Fixture for testing if no vars_prompt is provided, lines 34-36
+  hosts: all
+  tasks:
+    - name: Pause for 5 minutes to build app cache
+      ansible.builtin.pause:
+        minutes: 5 # should not trigger because minutes is mentioned
