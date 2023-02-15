@@ -68,27 +68,39 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     _order = 0
 
     @staticmethod
-    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-locals,too-many-branches
     def _get_ansible_syntax_check_matches(lintable: Lintable) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
         default_rule: BaseRule = AnsibleSyntaxCheckRule()
         results = []
-        if lintable.kind != "playbook":
+        if lintable.kind not in ("playbook", "role"):
             return []
 
-        with timed_info("Executing syntax check on %s", lintable.path):
+        with timed_info(
+            "Executing syntax check on %s %s", lintable.kind, lintable.path
+        ):
             # To avoid noisy warnings we pass localhost as current inventory:
             # [WARNING]: No inventory was parsed, only implicit localhost is available
             # [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
-            args = ["-i", "localhost,"]
+            if lintable.kind == "playbook":
+                cmd = [
+                    "ansible-playbook",
+                    "-i",
+                    "localhost,",
+                    "--syntax-check",
+                    str(lintable.path.expanduser()),
+                ]
+            else:  # role
+                cmd = [
+                    "ansible",
+                    "localhost",
+                    "--syntax-check",
+                    "--module-name=include_role",
+                    "--args",
+                    f"name={str(lintable.path.expanduser())}",
+                ]
             if options.extra_vars:
-                args.extend(["--extra-vars", json.dumps(options.extra_vars)])
-            cmd = [
-                "ansible-playbook",
-                "--syntax-check",
-                *args,
-                str(lintable.path.expanduser()),
-            ]
+                cmd.extend(["--extra-vars", json.dumps(options.extra_vars)])
 
             # To reduce noisy warnings like
             # CryptographyDeprecationWarning: Blowfish has been deprecated
@@ -215,3 +227,14 @@ if "pytest" in sys.modules:
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
 
         assert not result
+
+    def test_syntax_check_role() -> None:
+        """Validate syntax check of a broken role."""
+        lintable = Lintable("examples/playbooks/roles/invalid_due_syntax", kind="role")
+        # pylint: disable=protected-access
+        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+        assert len(result) == 1, result
+        assert result[0].linenumber == 2
+        assert result[0].filename == "examples/roles/invalid_due_syntax/tasks/main.yml"
+        assert result[0].tag == "syntax-check[specific]"
+        assert result[0].message == "no module/action detected in task."
