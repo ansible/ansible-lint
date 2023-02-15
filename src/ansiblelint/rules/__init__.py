@@ -389,8 +389,9 @@ class RulesCollection:
             self.register(rule, conditional=conditional)
         self.rules = sorted(self.rules)
 
-        # when we have a profile we unload some of the rules
-        if profile_name:
+        # When we have a profile we unload some of the rules
+        # But we do include all rules when listing all rules or tags
+        if profile_name and not (self.options.list_rules or self.options.list_tags):
             filter_rules_with_profile(self.rules, profile_name)
 
     def register(self, obj: AnsibleLintRule, conditional: bool = False) -> None:
