@@ -1,0 +1,10 @@
+---
+- name: Fixture for role-name[path] rule
+  hosts: localhost
+  roles:
+    - subfolder/1st_role # 1st
+    - role: subfolder/2nd_role # 2nd
+  tasks:
+    - name: Another
+      ansible.builtin.import_role:
+        name: subfolder/3rd_role # 3rd
