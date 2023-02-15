@@ -171,13 +171,12 @@ class App:
             console_stderr.print(f"Writing ignore file to {IGNORE_TXT}")
             lines = set()
             for rule in result.matches:
-                lines.add(f"{rule.filename} {rule.tag}")
+                lines.add(f"{rule.filename} {rule.tag}\n")
             with open(IGNORE_TXT, "w", encoding="utf-8") as ignore_file:
                 ignore_file.write(
                     "# This file contains ignores rule violations for ansible-lint\n"
                 )
                 ignore_file.writelines(sorted(list(lines)))
-                ignore_file.write("\n")
         elif matched_rules and not self.options.quiet:
             console_stderr.print(
                 "Read [link=https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations."
