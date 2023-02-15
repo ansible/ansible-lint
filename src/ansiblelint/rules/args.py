@@ -76,6 +76,14 @@ class ArgsRule(AnsibleLintRule):
             for key, value in task["action"].items()
             if not key.startswith("__")
         }
+        # https://github.com/ansible/ansible-lint/issues/2824
+        if loaded_module.resolved_fqcn == "ansible.builtin.async_status":
+            module_args["_async_dir"] = "/tmp/ansible-async"
+        if loaded_module.resolved_fqcn == "ansible.builtin.service":
+            _logger.debug(
+                "Skipped service module validation as not being supported yet."
+            )
+            return []
 
         with mock.patch.object(
             mock_ansible_module, "AnsibleModule", CustomAnsibleModule
