@@ -28,10 +28,10 @@ SUCCESS_TASKS = """
   copy:
     content: '# This file was moved to /etc/other.conf'
     dest: /etc/mine.conf
-# - name: Content example with no src
-#   win_copy:
-#     content: '# This file was moved to /etc/other.conf'
-#     dest: /etc/mine.conf
+- name: Copy example
+  copy:
+    src: /home/example/files/foo.conf
+    dest: /etc/foo.conf
 """
 
 
