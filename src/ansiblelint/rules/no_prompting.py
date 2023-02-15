@@ -28,7 +28,7 @@ class NoPromptingRule(AnsibleLintRule):
         """Return matches found for a specific playbook."""
         # If the Play uses the 'vars_prompt' section to set variables
 
-        if file.kind != "playbook":
+        if file.kind != "playbook":  # pragma: no cover
             return []
 
         vars_prompt = data.get("vars_prompt", None)
@@ -67,7 +67,7 @@ if "pytest" in sys.modules:
         options.enable_list = ["no-prompting"]
         rules = RulesCollection(options=options)
         rules.register(NoPromptingRule())
-        results = Runner("examples/playbooks/no-prompting.yml", rules=rules).run()
+        results = Runner("examples/playbooks/rule-no-prompting.yml", rules=rules).run()
         assert len(results) == 2
         for result in results:
             assert result.rule.id == "no-prompting"
