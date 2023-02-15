@@ -14,6 +14,7 @@ from typing import (
     Dict,
     Iterator,
     Pattern,
+    Sequence,
     Tuple,
     Union,
     cast,
@@ -170,6 +171,7 @@ def iter_tasks_in_file(
 
 def nested_items_path(
     data_collection: dict[Any, Any] | list[Any],
+    ignored_keys: Sequence[str] = (),
 ) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate a nested data structure, yielding key/index, value, and parent_path.
 
@@ -230,12 +232,15 @@ def nested_items_path(
     # valid data, we better ignore NoneType
     if data_collection is None:
         return
-    yield from _nested_items_path(data_collection=data_collection, parent_path=[])
+    yield from _nested_items_path(
+        data_collection=data_collection, parent_path=[], ignored_keys=ignored_keys
+    )
 
 
 def _nested_items_path(
     data_collection: dict[Any, Any] | list[Any],
     parent_path: list[str | int],
+    ignored_keys: Sequence[str] = (),
 ) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate through data_collection (internal implementation of nested_items_path).
 
@@ -260,7 +265,7 @@ def _nested_items_path(
             f"of type '{type(data_collection)}'"
         )
     for key, value in convert_data_collection_to_tuples():
-        if key in (SKIPPED_RULES_KEY, "__file__", "__line__"):
+        if key in (SKIPPED_RULES_KEY, "__file__", "__line__", *ignored_keys):
             continue
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
