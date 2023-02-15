@@ -53,7 +53,7 @@ class KeyOrderRule(AnsibleLintRule):
     id = "key-order"
     shortdesc = __doc__
     severity = "LOW"
-    tags = ["formatting", "experimental"]
+    tags = ["formatting"]
     version_added = "v6.6.2"
     needs_raw_task = True
 

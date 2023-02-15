@@ -19,7 +19,7 @@ class RunOnce(AnsibleLintRule):
     link = "https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html"
     description = "When using run_once, we should avoid using strategy as free."
 
-    tags = ["idiom", "experimental"]
+    tags = ["idiom"]
     severity = "MEDIUM"
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:

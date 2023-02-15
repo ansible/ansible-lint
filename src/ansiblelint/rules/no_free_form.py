@@ -19,7 +19,7 @@ class NoFreeFormRule(AnsibleLintRule):
     id = "no-free-form"
     description = "Avoid free-form inside files as it can produce subtile bugs."
     severity = "MEDIUM"
-    tags = ["syntax", "risk", "experimental"]
+    tags = ["syntax", "risk"]
     version_added = "v6.8.0"
     needs_raw_task = True
     cmd_shell_re = re.compile(

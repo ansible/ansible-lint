@@ -21,7 +21,7 @@ class IgnoreErrorsRule(AnsibleLintRule):
         "to reduce the risk of ignoring important failures."
     )
     severity = "LOW"
-    tags = ["unpredictability", "experimental"]
+    tags = ["unpredictability"]
     version_added = "v5.0.7"
 
     def matchtask(

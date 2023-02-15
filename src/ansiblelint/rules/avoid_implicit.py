@@ -21,7 +21,7 @@ class AvoidImplicitRule(AnsibleLintRule):
         "``copy`` with ``content`` to ensure correctness."
     )
     severity = "MEDIUM"
-    tags = ["unpredictability", "experimental"]
+    tags = ["unpredictability"]
     version_added = "v6.8.0"
 
     def matchtask(

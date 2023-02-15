@@ -20,7 +20,7 @@ class NoPromptingRule(AnsibleLintRule):
         "Disallow the use of vars_prompt or ansible.builtin.pause to better"
         "accommodate unattended playbook runs and use in CI pipelines."
     )
-    tags = ["opt-in", "experimental"]
+    tags = ["opt-in"]
     severity = "VERY_LOW"
     version_added = "v6.0.3"
 
