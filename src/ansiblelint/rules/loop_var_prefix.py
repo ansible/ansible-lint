@@ -1,10 +1,11 @@
 """Optional Ansible-lint rule to enforce use of prefix on role loop vars."""
 from __future__ import annotations
 
+import re
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.config import options
+from ansiblelint.config import LOOP_VAR_PREFIX, options
 from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import toidentifier
@@ -26,7 +27,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
 """
 
     tags = ["idiom"]
-    prefix = ""
+    prefix = re.compile("")
     severity = "MEDIUM"
 
     def matchtask(
@@ -36,9 +37,9 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         if not file or not file.role or not options.loop_var_prefix:
             return []
 
-        self.prefix = options.loop_var_prefix.format(role=toidentifier(file.role))
-        # self.prefix becomes `loop_var_prefix_` because role name is loop_var_prefix
-
+        self.prefix = re.compile(
+            options.loop_var_prefix.format(role=toidentifier(file.role))
+        )
         has_loop = "loop" in task
         for key in task.keys():
             if key.startswith("with_"):
@@ -49,10 +50,10 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
             loop_var = loop_control.get("loop_var", "")
 
             if loop_var:
-                if not loop_var.startswith(self.prefix):
+                if not self.prefix.match(loop_var):
                     return [
                         self.create_matcherror(
-                            message=f"Loop variable should start with {self.prefix}",
+                            message=f"Loop variable name does not match /{options.loop_var_prefix}/ regex, where role={toidentifier(file.role)}.",
                             filename=file,
                             tag="loop-var-prefix[wrong]",
                         )
@@ -60,7 +61,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
             else:
                 return [
                     self.create_matcherror(
-                        message=f"Replace unsafe implicit `item` loop variable by adding `loop_var: {self.prefix}...`.",
+                        message=f"Replace unsafe implicit `item` loop variable by adding a `loop_var` that is matching /{options.loop_var_prefix}/ regex.",
                         filename=file,
                         tag="loop-var-prefix[missing]",
                     )
@@ -92,7 +93,7 @@ if "pytest" in sys.modules:
     ) -> None:
         """Test rule matches."""
         # Enable checking of loop variable prefixes in roles
-        options.loop_var_prefix = "{role}_"
+        options.loop_var_prefix = LOOP_VAR_PREFIX
         results = Runner(test_file, rules=default_rules_collection).run()
         for result in results:
             assert result.rule.id == RoleLoopVarPrefix().id
