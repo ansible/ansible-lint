@@ -38,8 +38,10 @@ ignored_re = re.compile(
             r"^the template file (.*) could not be found for the lookup$",
             r"could not locate file in lookup",
             r"unable to locate collection",
+            r"^Error in (.*)is undefined$",
         ]
-    )
+    ),
+    flags=re.MULTILINE | re.DOTALL,
 )
 
 

@@ -26,6 +26,9 @@
       vars:
         ns_vars: {}
         x: "{{ lookup('ansible.builtin.template', 'namespace.yaml.j2', template_vars=ns_vars) | from_yaml }}"
+    - name: Bug https://github.com/ansible/ansible-lint/issues/3048
+      ansible.builtin.set_fact:
+        x: "{{ y.json | community.general.json_query(edition.version) }}"
 
 # https://github.com/ansible/ansible-lint/issues/2697
 - name: Test linter
