@@ -29,6 +29,15 @@ from ansiblelint.yaml_utils import clean_json
 
 _logger = logging.getLogger(__name__)
 
+ignored_re = re.compile(
+    "|".join(
+        [
+            r"^parameters are mutually exclusive:",
+        ]
+    ),
+    flags=re.MULTILINE | re.DOTALL,
+)
+
 
 @lru_cache
 def load_module(module_name: str) -> loader.PluginLoadContext:
@@ -146,6 +155,8 @@ class ArgsRule(AnsibleLintRule):
         sanitized_results = []
         for result in results:
             result_msg = result.message
+            if ignored_re.match(result_msg):
+                continue
             if result_msg.startswith("Unsupported parameters"):
                 # cmd option is a special case in command module and after option validation is done.
                 if (
@@ -257,7 +268,7 @@ if "pytest" in sys.modules:
         """Test rule invalid module options."""
         collection = RulesCollection()
         collection.register(ArgsRule())
-        success = "examples/playbooks/rule-args-module-fail-1.yml"
+        success = "examples/playbooks/rule-args-module-fail.yml"
         results = Runner(success, rules=collection).run()
         assert len(results) == 5
         assert results[0].tag == "args[module]"
@@ -275,6 +286,6 @@ if "pytest" in sys.modules:
         """Test rule valid module options."""
         collection = RulesCollection()
         collection.register(ArgsRule())
-        success = "examples/playbooks/rule-args-module-pass-1.yml"
+        success = "examples/playbooks/rule-args-module-pass.yml"
         results = Runner(success, rules=collection).run()
         assert len(results) == 0, results
