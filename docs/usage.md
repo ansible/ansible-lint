@@ -5,8 +5,8 @@
 After you install Ansible-lint, run `ansible-lint --help` to display available
 commands and their options.
 
-```bash exec="1" source="console"
-ansible-lint --help
+```console exec="1" source="console"
+$ ansible-lint --help
 ```
 
 ### Command output
@@ -74,8 +74,8 @@ You can specify the list of **roles** or **playbooks** that you want to lint
 with the `-p` argument. For example, to lint `examples/playbooks/play.yml` and
 `examples/roles/bobbins`, use the following command:
 
-```bash exec="1" source="console"
-ansible-lint --offline -p examples/playbooks/play.yml examples/roles/bobbins || true
+```console exec="1" source="console" returncode="2"
+$ ansible-lint --offline -p examples/playbooks/play.yml examples/roles/bobbins
 ```
 
 ## Running example playbooks
@@ -85,24 +85,58 @@ playbooks with different rule violations and undesirable characteristics. You
 can run `ansible-lint` on the example playbooks to observe Ansible-lint in
 action, as follows:
 
-```bash exec="1" source="console"
-ansible-lint --offline -p examples/playbooks/example.yml >/dev/null || true
+```console exec="1" source="console" returncode="2"
+$ ansible-lint --offline -p examples/playbooks/example.yml
 ```
 
 Ansible-lint also handles playbooks that include other playbooks, tasks,
 handlers, or roles, as the `examples/playbooks/include.yml` example
 demonstrates.
 
-```bash exec="1" source="console"
-ansible-lint --offline -p examples/playbooks/include.yml 2>/dev/null || true
+```console exec="1" source="console" returncode="2"
+$ ansible-lint --offline -q -p examples/playbooks/include.yml
 ```
 
-You can generate `JSON` reports based on the code-climate specification as the
+## Output formats
+
+### pep8
+
+```console exec="1" source="console" returncode="2"
+$ ansible-lint --offline -q -f pep8 examples/playbooks/norole.yml
+```
+
+### SARIF JSON
+
+Using `--format sarif` or `--format json` the linter will output on stdout a
+report in [SARIF]
+
+We also have an option `--sarif-file FILE` option that can make the linter dump
+the output to a file while not altering its normal stdout output. This can be
+used in CI/CD pipelines.
+
+```bash exec="1" source="tabbed-left" result="json" returncode="2"
+ansible-lint --offline -q -f sarif examples/playbooks/norole.yml
+```
+
+### Code Climate JSON
+
+You can generate `JSON` reports based on the [Code Climate] specification as the
 `examples/playbooks/norole.yml` example demonstrates.
 
-```bash exec="1"  source="tabbed-left" result="json"
-ansible-lint --offline -f json examples/playbooks/norole.yml 2>/dev/null || true
+```bash exec="1" source="tabbed-left" result="json" returncode="2"
+ansible-lint --offline -q -f codeclimate examples/playbooks/norole.yml
 ```
+
+Historically `-f json` was used to generate Code Climate JSON reports but in
+never versions we switched its meaning point SARIF JSON format instead.
+
+!!! warning
+
+    When possible we recommend using the [SARIF](#sarif-json) format instead of the Code Climate
+    as that one is more complete and has a full specification and also a JSON
+    validation schema. Code Climate format does not expose our severity
+    levels because we use that field to map warnings
+    as `minor` and errors as `major` issues.
 
 ## Specifying rules at runtime
 
@@ -123,8 +157,8 @@ You can then use the `-t` option to specify a tag and include the associated
 rules in the lint run. For example, the following `ansible-lint` command applies
 only the rules associated with the _idempotency_ tag:
 
-```bash exec="1" source="console"
-ansible-lint -t idempotency playbook.yml
+```console exec="1" source="console" returncode="0"
+$ ansible-lint -t idempotency playbook.yml
 ```
 
 The following shows the available tags in an example set of rules and the rules
@@ -253,3 +287,8 @@ follows:
   ```bash
   ansible-lint --profile=safety
   ```
+
+[code climate]:
+  https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#data-types
+[sarif]:
+  https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
