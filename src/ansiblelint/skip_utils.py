@@ -24,9 +24,10 @@ from __future__ import annotations
 import collections.abc
 import logging
 import re
+from collections.abc import Generator, Sequence
 from functools import lru_cache
 from itertools import product
-from typing import TYPE_CHECKING, Any, Generator, Sequence
+from typing import TYPE_CHECKING, Any
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 from ruamel.yaml import YAML

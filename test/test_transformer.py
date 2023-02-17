@@ -5,7 +5,7 @@ import os
 import pathlib
 import shutil
 from argparse import Namespace
-from typing import Iterator
+from collections.abc import Iterator
 
 import pytest
 

@@ -28,10 +28,10 @@ import os
 import re
 import warnings
 from argparse import Namespace
-from collections.abc import ItemsView, Mapping
+from collections.abc import Generator, ItemsView, Mapping, Sequence
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Generator, Sequence
+from typing import Any, Callable
 
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError

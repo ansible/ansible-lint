@@ -6,19 +6,10 @@ import functools
 import logging
 import os
 import re
+from collections.abc import Iterator, Sequence
 from io import StringIO
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Iterator,
-    Pattern,
-    Sequence,
-    Tuple,
-    Union,
-    cast,
-)
+from re import Pattern
+from typing import TYPE_CHECKING, Any, Callable, Union, cast
 
 import ruamel.yaml.events
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, Format
@@ -250,7 +241,7 @@ def _nested_items_path(
     """
     # we have to cast each convert_to_tuples assignment or mypy complains
     # that both assignments (for dict and list) do not have the same type
-    convert_to_tuples_type = Callable[[], Iterator[Tuple[Union[str, int], Any]]]
+    convert_to_tuples_type = Callable[[], Iterator[tuple[Union[str, int], Any]]]
     if isinstance(data_collection, dict):
         convert_data_collection_to_tuples = cast(
             convert_to_tuples_type, functools.partial(data_collection.items)
@@ -929,7 +920,7 @@ class FormattedYAML(YAML):
                 elif quote_type == "double":
                     config["preferred_quote"] = '"'
 
-        return cast(Dict[str, Union[bool, int, str]], config)
+        return cast(dict[str, Union[bool, int, str]], config)
 
     @property  # type: ignore[override]
     def version(self) -> str | tuple[int, int]:
