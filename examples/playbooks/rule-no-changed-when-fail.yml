@@ -1,0 +1,15 @@
+---
+- name: Fixture for no-changed-when (fail with 3 occurrences)
+  hosts: all
+  tasks:
+    - name: Register command output, but cat still does not change anything
+      ansible.builtin.command: cat {{ my_file | quote }}
+      register: my_output
+    - name: Block level 1
+      block:
+        - name: Block level 2
+          block:
+            - name: Basic command task, should fail
+              ansible.builtin.command: cat my_file
+    - name: Basic shell task, should fail
+      shell: cat my_file # noqa: fqcn command-instead-of-shell

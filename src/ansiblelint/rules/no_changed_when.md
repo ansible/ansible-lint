@@ -1,12 +1,20 @@
 # no-changed-when
 
-This rule checks that tasks return changes to results or conditions.
-Unless tasks only read information, you should ensure that they return changes in the following ways:
+This rule checks that tasks return changes to results or conditions. Unless
+tasks only read information, you should ensure that they return changes in the
+following ways:
 
 - Register results or conditions and use the `changed_when` clause.
 - Use the `creates` or `removes` argument.
 
-You should use the `when` clause to run tasks only if a check returns a particular result.
+You should always use the `changed_when` clause on tasks that do not naturally
+detect if a change has occurred or not. Some of the most common examples are
+[shell] and [command] modules, which run arbitrary commands.
+
+One very common workaround is to use a boolean value like `changed_when: false`
+if the task never changes anything or `changed_when: true` if it always
+changes something, but you can also use any expressions, including ones that
+use the registered result of a task, like in our example below.
 
 ## Problematic Code
 
@@ -31,3 +39,8 @@ You should use the `when` clause to run tasks only if a check returns a particul
       register: my_output # <- Registers the command output.
       changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 ```
+
+[shell]:
+  https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+[command]:
+  https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html

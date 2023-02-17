@@ -1,0 +1,23 @@
+---
+- name: Fixture for no-changed-when (pass)
+  hosts: all
+  tasks:
+    - name: Handle command output with return code # noqa: command-instead-of-shell
+      ansible.builtin.command: cat {{ my_file | quote }}
+      register: my_output
+      changed_when: my_output.rc != 0
+
+    - name: Handle shell output with return code # noqa: command-instead-of-shell
+      ansible.builtin.shell: cat {{ my_file | quote }}
+      register: my_output
+      changed_when: my_output.rc != 0
+
+    - name: Handle shell output with false changed_when # noqa: command-instead-of-shell
+      ansible.builtin.shell: cat {{ my_file | quote }}
+      register: my_output
+      changed_when: false
+
+    - name: Command with argument
+      command: createfile.sh # noqa: fqcn
+      args:
+        creates: /tmp/????unknown_files????
