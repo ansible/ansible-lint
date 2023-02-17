@@ -57,6 +57,11 @@ def expand_to_normalized_paths(
 def load_config(config_file: str) -> dict[Any, Any]:
     """Load configuration from disk."""
     config_path = None
+
+    if config_file == "/dev/null":
+        _logger.debug("Skipping config file as it was set to /dev/null")
+        return {}
+
     if config_file:
         config_path = os.path.abspath(config_file)
         if not os.path.exists(config_path):

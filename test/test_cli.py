@@ -193,3 +193,13 @@ def test_extra_vars_loaded(base_arguments: list[str]) -> None:
     )
 
     assert config.extra_vars == {"foo": "bar", "knights_favorite_word": "NI"}
+
+
+@pytest.mark.parametrize(
+    "config_file",
+    (pytest.param("/dev/null", id="dev-null"),),
+)
+def test_config_dev_null(base_arguments: list[str], config_file: str) -> None:
+    """Ensures specific config files produce error code 3."""
+    cfg = cli.get_config(base_arguments + ["-c", config_file])
+    assert cfg.config_file == "/dev/null"
