@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import TYPE_CHECKING, Iterable
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from yamllint.linter import run as run_yamllint
 
@@ -13,7 +14,8 @@ from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.yaml_utils import load_yamllint_config
 
 if TYPE_CHECKING:
-    from typing import Any, Generator
+    from collections.abc import Generator
+    from typing import Any
 
     from ansiblelint.errors import MatchError
 

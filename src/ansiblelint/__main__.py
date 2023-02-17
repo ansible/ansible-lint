@@ -30,8 +30,9 @@ import shutil
 import site
 import subprocess
 import sys
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Iterator, TextIO
+from typing import TYPE_CHECKING, Any, Callable, TextIO
 
 from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir

@@ -1,7 +1,7 @@
 """Utils to generate rules documentation."""
 import logging
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 from rich import box
 from rich.console import RenderableType

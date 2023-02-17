@@ -39,12 +39,9 @@ def test_profile_listing(capfd: CaptureFixture[str]) -> None:
 
     # Confirmation that it runs in auto-detect mode
     assert "command-instead-of-module" in out
-    if sys.version_info < (3, 9):
-        assert "ansible-lint is no longer tested" in err
-    else:
-        # On WSL we might see this warning on stderr:
-        # [WARNING]: Ansible is being run in a world writable directory
-        # WSL2 has "WSL2" in platform name but WSL1 has "microsoft":
-        platform_name = platform.platform().lower()
-        if all(word not in platform_name for word in ["wsl", "microsoft"]):
-            assert err == "", platform_name
+    # On WSL we might see this warning on stderr:
+    # [WARNING]: Ansible is being run in a world writable directory
+    # WSL2 has "WSL2" in platform name but WSL1 has "microsoft":
+    platform_name = platform.platform().lower()
+    if all(word not in platform_name for word in ["wsl", "microsoft"]):
+        assert err == "", platform_name

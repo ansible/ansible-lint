@@ -8,7 +8,8 @@ import pytest
 from ansiblelint.rules import TransformMixin
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List, MutableMapping, MutableSequence, Type, Union
+    from collections.abc import MutableMapping, MutableSequence
+    from typing import Any, Dict, List, Type, Union
 
 
 DUMMY_MAP: dict[str, Any] = {

@@ -5,9 +5,10 @@ import logging
 import multiprocessing
 import multiprocessing.pool
 import os
+from collections.abc import Generator
 from dataclasses import dataclass
 from fnmatch import fnmatch
-from typing import TYPE_CHECKING, Any, Generator
+from typing import TYPE_CHECKING, Any
 
 import ansiblelint.skip_utils
 import ansiblelint.utils

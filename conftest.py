@@ -36,11 +36,9 @@ from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-p
     HAS_LIBYAML,
 )
 
-if not HAS_LIBYAML and sys.version_info >= (3, 9, 0):
+if not HAS_LIBYAML:
     # While presence of libyaml is not required for runtime, we keep this error
     # fatal here in order to be sure that we spot libyaml errors during testing.
-    #
-    # For 3.8.x we do not do this check, as libyaml does not have an arm64 build for py38.
     print(
         "FATAL: For testing, we require pyyaml to be installed with its native extension, missing it would make testing 3x slower and risk missing essential bugs.",
         file=sys.stderr,

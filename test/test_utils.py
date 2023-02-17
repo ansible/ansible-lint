@@ -24,8 +24,9 @@ import logging
 import subprocess
 import sys
 from argparse import Namespace
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 import pytest
 from _pytest.capture import CaptureFixture

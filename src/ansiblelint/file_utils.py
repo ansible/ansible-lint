@@ -9,10 +9,11 @@ import subprocess
 import sys
 from argparse import Namespace
 from collections import OrderedDict, defaultdict
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, Iterator, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import wcmatch.pathlib
 from wcmatch.wcmatch import RECURSIVE, WcMatch

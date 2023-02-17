@@ -8,10 +8,11 @@ import re
 import sys
 from argparse import Namespace
 from collections import defaultdict
+from collections.abc import Iterable, Iterator, MutableMapping, MutableSequence
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Iterable, Iterator, MutableMapping, MutableSequence, cast
+from typing import Any, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 

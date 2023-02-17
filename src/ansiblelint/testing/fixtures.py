@@ -10,7 +10,7 @@ from __future__ import annotations
 import copy
 import os
 from argparse import Namespace
-from typing import Iterator
+from collections.abc import Iterator
 
 import pytest
 from _pytest.fixtures import SubRequest

@@ -6,8 +6,9 @@ import logging
 import os
 import sys
 from argparse import Namespace
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any, Callable
 
 from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES
 from ansiblelint.constants import (
