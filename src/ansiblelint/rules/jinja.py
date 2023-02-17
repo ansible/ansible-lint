@@ -17,6 +17,7 @@ from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.skip_utils import get_rule_skips_from_line
+from ansiblelint.text import has_jinja
 from ansiblelint.utils import parse_yaml_from_file, template
 from ansiblelint.yaml_utils import deannotate, nested_items_path
 
@@ -202,6 +203,8 @@ class JinjaRule(AnsibleLintRule):
 
         self.env.lstrip_blocks = False
         self.env.trim_blocks = False
+        self.env.autoescape = True
+        self.env.newline_sequence = "\n"
         tokens = [
             Token(lineno=t[0], token_type=t[1], value=t[2]) for t in self.env.lex(text)
         ]
@@ -270,6 +273,10 @@ class JinjaRule(AnsibleLintRule):
         ):
             implicit = True
             text = cook(text, implicit=implicit)
+
+        # don't try to lex strings that have no jinja inside them
+        if not has_jinja(text):
+            return text, "", "spacing"
 
         expr_str = None
         expr_type = None
@@ -583,6 +590,22 @@ if "pytest" in sys.modules:  # noqa: C901
                 "{{ lookup('file', '/tmp/non-existent', errors='ignore') }}",
                 "spacing",
                 id="43",
+            ),
+            # https://github.com/ansible/ansible-lint/pull/3057
+            # since jinja 3.0.0, \r is converted to \n if the string has jinja in it
+            pytest.param(
+                "{{ 'foo' }}\r{{ 'bar' }}",
+                "{{ 'foo' }}\n{{ 'bar' }}",
+                "spacing",
+                id="44",
+            ),
+            # if we do not have any jinja constructs, we should keep original \r
+            # to match ansible behavior
+            pytest.param(
+                "foo\rbar",
+                "foo\rbar",
+                "spacing",
+                id="45",
             ),
         ),
     )
