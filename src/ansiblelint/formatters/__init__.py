@@ -178,7 +178,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             # Append issue to result list
             result.append(issue)
 
-        return json.dumps(result)
+        return json.dumps(result, sort_keys=False, indent=2)
 
     @staticmethod
     def _remap_severity(match: MatchError) -> str:
@@ -248,9 +248,7 @@ class SarifFormatter(BaseFormatter[Any]):
             "runs": runs,
         }
 
-        return json.dumps(
-            report, default=lambda o: o.__dict__, sort_keys=False, indent=2
-        )
+        return json.dumps(report, sort_keys=False, indent=2)
 
     def _extract_results(
         self, matches: list[MatchError]
