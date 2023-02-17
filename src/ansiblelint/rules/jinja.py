@@ -39,6 +39,7 @@ ignored_re = re.compile(
             r"could not locate file in lookup",
             r"unable to locate collection",
             r"^Error in (.*)is undefined$",
+            r"^Mandatory variable (.*) not defined.$",
         ]
     ),
     flags=re.MULTILINE | re.DOTALL,
