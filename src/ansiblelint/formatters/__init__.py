@@ -154,10 +154,6 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
                 # https://github.com/codeclimate/platform/issues/68
                 issue["url"] = match.rule.url
             issue["severity"] = self._remap_severity(match)
-            # level is not part of CodeClimate specification, but there is
-            # no other way to expose that info. We recommend switching to
-            # SARIF format which is better suited for interoperability.
-            issue["level"] = match.level
             issue["description"] = self.escape(str(match.message))
             issue["fingerprint"] = hashlib.sha256(
                 repr(match).encode("utf-8")
@@ -182,18 +178,15 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
 
     @staticmethod
     def _remap_severity(match: MatchError) -> str:
-        severity = match.rule.severity
-
-        if severity in ["LOW"]:
+        # level is not part of CodeClimate specification, but there is
+        # no other way to expose that info. We recommend switching to
+        # SARIF format which is better suited for interoperability.
+        #
+        # Out current implementation will return `major` for all errors and
+        # `warning` for all warnings. We may revisit this in the future.
+        if match.level == "warning":
             return "minor"
-        if severity in ["MEDIUM"]:
-            return "major"
-        if severity in ["HIGH"]:
-            return "critical"
-        if severity in ["VERY_HIGH"]:
-            return "blocker"
-        # VERY_LOW, INFO or anything else
-        return "info"
+        return "major"
 
 
 class SarifFormatter(BaseFormatter[Any]):

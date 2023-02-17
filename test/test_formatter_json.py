@@ -82,7 +82,7 @@ class TestCodeclimateJSONFormatter:
         assert "categories" in single_match
         assert isinstance(single_match["categories"], list)
         assert "severity" in single_match
-        assert single_match["severity"] == "blocker"
+        assert single_match["severity"] == "major"
         assert "description" in single_match
         assert "fingerprint" in single_match
         assert "location" in single_match
