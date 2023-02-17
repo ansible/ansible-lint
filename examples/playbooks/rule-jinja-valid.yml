@@ -49,3 +49,16 @@
         test:
           one: two
           param: no jinja
+
+- name: Bug https://github.com/ansible/ansible-lint/issues/3048
+  hosts: localhost
+  tasks:
+    - name: "Test for bug #3048"
+      ansible.builtin.debug:
+        msg: "{{ __my_var | mandatory }}"
+      loop: "{{ a_var }}"
+      loop_control:
+        loop_var: __my_var
+      vars:
+        a_var:
+          - one
