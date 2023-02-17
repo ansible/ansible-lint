@@ -24,3 +24,12 @@
       with_items:
         - absent
         - directory
+
+    - name: Bug https://github.com/ansible/ansible-lint/issues/2962
+      become: true
+      ansible.builtin.apt_key:
+        url: "{{ zj_item['url'] | default(omit) }}"
+        data: "{{ zj_item['data'] | default(omit) }}"
+      loop: "{{ repositories_keys }}"
+      loop_control:
+        loop_var: zj_item
