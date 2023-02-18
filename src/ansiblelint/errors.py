@@ -9,6 +9,16 @@ from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable, normpath
 
 
+class StrictModeError(RuntimeError):
+    """Raise when we encounter a warning in strict mode."""
+
+    def __init__(
+        self, message: str = "Warning treated as error due to --strict option."
+    ):
+        """Initialize a StrictModeError instance."""
+        super().__init__(message)
+
+
 # pylint: disable=too-many-instance-attributes
 @functools.total_ordering
 class MatchError(ValueError):

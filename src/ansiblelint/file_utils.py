@@ -21,6 +21,7 @@ from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, options
 from ansiblelint.constants import GIT_CMD, FileType, States
+from ansiblelint.logger import warn_or_fail
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3979
@@ -432,13 +433,11 @@ def discover_lintables(options: Namespace) -> dict[str, Any]:
         out = set(out_present) - set(out_absent)
     except subprocess.CalledProcessError as exc:
         if not (exc.returncode == 128 and "fatal: not a git repository" in exc.output):
-            _logger.warning(
-                "Failed to discover lintable files using git: %s",
-                exc.output.rstrip("\n"),
-            )
+            err = exc.output.rstrip("\n")
+            warn_or_fail(f"Failed to discover lintable files using git: {err}")
     except FileNotFoundError as exc:
         if options.verbosity:
-            _logger.warning("Failed to locate command: %s", exc)
+            warn_or_fail(f"Failed to locate command: {exc}")
 
     if out is None:
         exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
