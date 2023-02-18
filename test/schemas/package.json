@@ -5,7 +5,7 @@
     "js-yaml": "^4.1.0",
     "safe-stable-stringify": "^2.4.2",
     "ts-node": "^10.9.1",
-    "vscode-json-languageservice": "^5.2.0"
+    "vscode-json-languageservice": "^5.3.0"
   },
   "scripts": {
     "compile": "tsc -p ./src",
@@ -17,7 +17,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.13.0",
+    "@types/node": "^18.14.0",
     "chai": "^4.3.7",
     "minimatch": "^6.2.0",
     "mocha": "^10.2.0",

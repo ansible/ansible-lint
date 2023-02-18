@@ -57,7 +57,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.22.0
+    rev: v6.26.0
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -154,7 +154,7 @@ repos:
       - id: pyupgrade
         args: ["--py39-plus"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.0.0
+    rev: v1.0.1
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -180,7 +180,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.16.1
+    rev: v2.16.2
     hooks:
       - id: pylint
         args:
