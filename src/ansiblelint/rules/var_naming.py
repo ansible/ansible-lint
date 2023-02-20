@@ -50,7 +50,7 @@ class VariableNamingRule(AnsibleLintRule):
     def is_invalid_variable_name(self, ident: str) -> bool:
         """Check if variable name is using right pattern."""
         # Based on https://github.com/ansible/ansible/blob/devel/lib/ansible/utils/vars.py#L235
-        if not isinstance(ident, str):
+        if not isinstance(ident, str):  # pragma: no cover
             return False
 
         try:
@@ -240,3 +240,9 @@ if "pytest" in sys.modules:
         )
         assert result.returncode == SUCCESS_RC
         assert "var-naming" not in result.stdout
+
+    def test_is_invalid_variable_name() -> None:
+        """Test for invalid variable names."""
+        var_name_rule = VariableNamingRule()
+        assert var_name_rule.is_invalid_variable_name("assert") is False
+        assert var_name_rule.is_invalid_variable_name("é") is False
