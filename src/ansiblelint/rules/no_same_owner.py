@@ -30,7 +30,7 @@ should not be preserved when transferring files between them.
     ) -> bool | str:
         """Return matches for a task."""
         action = task.get("action")
-        if not isinstance(action, dict):
+        if not isinstance(action, dict):  # pragma: no cover
             return False
 
         module = action["__ansible_module__"]
