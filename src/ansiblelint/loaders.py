@@ -31,7 +31,7 @@ def yaml_from_file(filepath: str | Path) -> Any:
         return yaml_load(content)
 
 
-def load_ignore_txt(filepath: Path = None) -> dict[str, set[str]]:
+def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
     """Return a list of rules to ignore."""
     result = defaultdict(set)
 
