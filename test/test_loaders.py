@@ -29,11 +29,13 @@ def test_load_ignore_txt_default_success() -> None:
 
         with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
-                dedent("""
+                dedent(
+                    """
                     # See https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files
                     playbook2.yml package-latest # comment
                     playbook2.yml foo-bar
-                """)
+                """
+                )
             )
 
         cwd = os.getcwd()
@@ -55,11 +57,13 @@ def test_load_ignore_txt_default_success_alternative() -> None:
 
         with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
-                dedent("""
+                dedent(
+                    """
                     playbook.yml foo-bar
                     playbook.yml more-foo # what-the-foo?
                     tasks/main.yml more-bar
-                """)
+                """
+                )
             )
 
         cwd = os.getcwd()
@@ -84,12 +88,14 @@ def test_load_ignore_txt_custom_success() -> None:
 
         with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
-                dedent("""
+                dedent(
+                    """
                     playbook.yml hector
                     vars/main.yml tuco
                     roles/guzman/tasks/main.yml lalo
                     roles/eduardo/tasks/main.yml lalo
-                """)
+                """
+                )
             )
 
         cwd = os.getcwd()
