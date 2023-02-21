@@ -14,7 +14,7 @@ def test_load_ignore_txt_default_empty() -> None:
         os.chdir(temporary_directory)
         result = load_ignore_txt()
 
-    assert result == {}
+    assert not result
 
 
 def test_load_ignore_txt_default_success() -> None:
@@ -82,4 +82,4 @@ def test_load_ignore_txt_custom_fail() -> None:
     """Test load_ignore_txt with a user defined but invalid ignore-file location."""
     result = load_ignore_txt(Path(str(uuid.uuid4())))
 
-    assert result == {}
+    assert not result
