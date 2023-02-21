@@ -41,7 +41,7 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
         if os.path.isfile(filepath):
             ignore_file = str(filepath)
         else:
-            _logger.error(f"Ignore file not found '{ignore_file}'")
+            _logger.error(f"Ignore file not found '%s'", ignore_file)
     elif os.path.isfile(IGNORE_FILE.default):
         ignore_file = IGNORE_FILE.default
     elif os.path.isfile(IGNORE_FILE.alternative):
@@ -49,7 +49,7 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
 
     if ignore_file:
         with open(ignore_file, encoding="utf-8") as _ignore_file:
-            _logger.debug(f"Loading ignores from {ignore_file}")
+            _logger.debug(f"Loading ignores from '%s'", ignore_file)
             for line in _ignore_file:
                 entry = line.split("#")[0].rstrip()
                 if entry:
