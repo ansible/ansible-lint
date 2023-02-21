@@ -388,3 +388,5 @@ xfail
 xunit
 yatesr
 zuul
+tuco
+lalo
