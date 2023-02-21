@@ -10,6 +10,9 @@
     - name: Foo
       ansible.builtin.debug:
         msg: "Presence of \t should trigger no-tabs here."
+    - name: Key has a tab
+      ansible.builtin.debug:
+        "ms\tg": "The associated key has \t and should trigger no-tabs here."
     - name: Should not trigger no-tabs rules # noqa fqcn
       lineinfile:
         path: some.txt
