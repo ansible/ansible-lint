@@ -22,7 +22,7 @@ def test_load_ignore_txt_default_success() -> None:
     with tempfile.TemporaryDirectory() as temporary_directory:
         ignore_file = os.path.join(temporary_directory, IGNORE_FILE.default)
 
-        with open(ignore_file, "w") as _ignore_file:
+        with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
                 dedent(
                     """
@@ -45,7 +45,7 @@ def test_load_ignore_txt_default_success_alternative() -> None:
         ignore_file = os.path.join(temporary_directory, IGNORE_FILE.alternative)
         os.makedirs(os.path.dirname(ignore_file))
 
-        with open(ignore_file, "w") as _ignore_file:
+        with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
                 dedent(
                     """
@@ -71,7 +71,7 @@ def test_load_ignore_txt_custom_success() -> None:
         ignore_file = os.path.join(temporary_directory, "subdir", "my_ignores.txt")
         os.makedirs(os.path.dirname(ignore_file))
 
-        with open(ignore_file, "w") as _ignore_file:
+        with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
                 dedent(
                     """
