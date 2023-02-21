@@ -60,4 +60,4 @@ if "pytest" in sys.modules:
         ).run()
         assert results[0].linenumber == 10
         assert results[0].message == NoTabsRule().shortdesc
-        assert len(results) == 1
+        assert len(results) == 2
