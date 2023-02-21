@@ -11,8 +11,13 @@ from ansiblelint.loaders import IGNORE_FILE, load_ignore_txt
 def test_load_ignore_txt_default_empty() -> None:
     """Test load_ignore_txt when no ignore-file is present."""
     with tempfile.TemporaryDirectory() as temporary_directory:
-        os.chdir(temporary_directory)
-        result = load_ignore_txt()
+        cwd = os.getcwd()
+
+        try:
+            os.chdir(temporary_directory)
+            result = load_ignore_txt()
+        finally:
+            os.chdir(cwd)
 
     assert not result
 
@@ -33,8 +38,13 @@ def test_load_ignore_txt_default_success() -> None:
                 )
             )
 
-        os.chdir(temporary_directory)
-        result = load_ignore_txt()
+        cwd = os.getcwd()
+
+        try:
+            os.chdir(temporary_directory)
+            result = load_ignore_txt()
+        finally:
+            os.chdir(cwd)
 
     assert result == {"playbook2.yml": {"package-latest", "foo-bar"}}
 
@@ -56,8 +66,13 @@ def test_load_ignore_txt_default_success_alternative() -> None:
                 )
             )
 
-        os.chdir(temporary_directory)
-        result = load_ignore_txt()
+        cwd = os.getcwd()
+
+        try:
+            os.chdir(temporary_directory)
+            result = load_ignore_txt()
+        finally:
+            os.chdir(cwd)
 
     assert result == {
         "playbook.yml": {"more-foo", "foo-bar"},
@@ -83,8 +98,13 @@ def test_load_ignore_txt_custom_success() -> None:
                 )
             )
 
-        os.chdir(temporary_directory)
-        result = load_ignore_txt(Path(ignore_file))
+        cwd = os.getcwd()
+
+        try:
+            os.chdir(temporary_directory)
+            result = load_ignore_txt(Path(ignore_file))
+        finally:
+            os.chdir(cwd)
 
     assert result == {
         "playbook.yml": {"hector"},
