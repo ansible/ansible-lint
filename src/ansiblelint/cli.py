@@ -23,9 +23,9 @@ from ansiblelint.file_utils import (
     guess_project_dir,
     normpath,
 )
+from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.schemas.main import validate_file_schema
 from ansiblelint.yaml_utils import clean_json
-from ansiblelint.loaders import IGNORE_FILE
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [
