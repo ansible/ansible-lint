@@ -41,7 +41,7 @@ counterparts:
 ## Ignoring rules for entire files
 
 Ansible-lint will load skip rules from an `.ansible-lint-ignore` or
-`.config/ansible-lint-ignore.txt` file that should reside adjacent the config file.
+`.config/ansible-lint-ignore.txt` file that should reside adjacent to the config file.
 The file format is very simple, containing the filename and the rule to be ignored.
 It also supports comments starting with `#`.
 
