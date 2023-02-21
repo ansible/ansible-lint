@@ -41,6 +41,12 @@
     dest: dummy
   delegate_to: localhost
 
+- name: fail | Unarchive delegated-src-no-string
+  ansible.builtin.unarchive:
+    src: 4432
+    dest: dummy
+  delegate_to: localhost
+
 - name: fail | Unarchive-gz
   ansible.builtin.unarchive:
     src: "{{ file }}.tar.gz"
