@@ -4,4 +4,4 @@ profile: basic
 rules:
   custom-inc-rule:
     exclude_paths:
-      - 'tests/*.yml'
+      - "tests/*.yml"
