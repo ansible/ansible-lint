@@ -52,7 +52,7 @@ Modules that are checked:
     path: foo
     mode: 0600  # explicitly sets the desired permissions, to make the results predictable
 
-- name: Safe example of using copy (3nd solution)
+- name: Safe example of using copy (3rd solution)
   ansible.builtin.copy:
     src: foo
     dest: bar
