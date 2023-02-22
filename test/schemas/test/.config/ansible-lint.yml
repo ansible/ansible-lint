@@ -1,0 +1,7 @@
+---
+# .ansible-lint
+profile: basic
+rules:
+  custom-inc-rule:
+    exclude_paths:
+      - 'tests/*.yml'
