@@ -36,7 +36,6 @@ Modules that are checked:
   community.general.ini_file:
     path: foo
     create: true
-    mode: preserve
 ```
 
 ## Correct code
@@ -47,11 +46,15 @@ Modules that are checked:
   community.general.ini_file:
     path: foo
     create: false  # prevents creating a file with potentially insecure permissions
-    mode: preserve
 
 - name: Safe example of using ini_file (2nd solution)
   community.general.ini_file:
     path: foo
     mode: 0600  # explicitly sets the desired permissions, to make the results predictable
-    mode: preserve
+
+- name: Safe example of using copy (3rd solution)
+  ansible.builtin.copy:
+    src: foo
+    dest: bar
+    mode: preserve   # copy has a special mode that sets the same permissions as the source file
 ```
