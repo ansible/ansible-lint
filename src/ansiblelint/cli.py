@@ -23,6 +23,7 @@ from ansiblelint.file_utils import (
     guess_project_dir,
     normpath,
 )
+from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.schemas.main import validate_file_schema
 from ansiblelint.yaml_utils import clean_json
 
@@ -425,6 +426,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "--config-file",
         dest="config_file",
         help="Specify configuration file to use. By default it will look for '.ansible-lint' or '.config/ansible-lint.yml'",
+    )
+    parser.add_argument(
+        "-i",
+        "--ignore-file",
+        dest="ignore_file",
+        type=Path,
+        default=None,
+        help=f"Specify ignore file to use. By default it will look for '{IGNORE_FILE.default}' or '{IGNORE_FILE.alternative}'",
     )
     parser.add_argument(
         "--offline",
