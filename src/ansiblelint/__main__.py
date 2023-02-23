@@ -292,7 +292,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     # Remove skip_list items from the result
     result.matches = [m for m in result.matches if m.tag not in app.options.skip_list]
     # Mark matches as ignored inside ignore file
-    ignore_map = load_ignore_txt()
+    ignore_map = load_ignore_txt(options.ignore_file)
     for match in result.matches:
         if match.tag in ignore_map[match.filename]:
             match.ignored = True

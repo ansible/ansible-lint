@@ -18,7 +18,7 @@ from ansiblelint.config import PROFILES, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RULE_DOC_URL, SUCCESS_RC, VIOLATIONS_FOUND_RC
 from ansiblelint.errors import MatchError
-from ansiblelint.loaders import IGNORE_TXT
+from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
@@ -168,11 +168,11 @@ class App:
         matched_rules = self._get_matched_skippable_rules(result.matches)
 
         if matched_rules and self.options.generate_ignore:
-            console_stderr.print(f"Writing ignore file to {IGNORE_TXT}")
+            console_stderr.print(f"Writing ignore file to {IGNORE_FILE.default}")
             lines = set()
             for rule in result.matches:
                 lines.add(f"{rule.filename} {rule.tag}\n")
-            with open(IGNORE_TXT, "w", encoding="utf-8") as ignore_file:
+            with open(IGNORE_FILE.default, "w", encoding="utf-8") as ignore_file:
                 ignore_file.write(
                     "# This file contains ignores rule violations for ansible-lint\n"
                 )
