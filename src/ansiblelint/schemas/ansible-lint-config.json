@@ -122,7 +122,7 @@
         "$ref": "#/$defs/rule"
       },
       "propertyNames": {
-        "pattern": "^[a-z0-9-]+$"
+        "pattern": "^[a-z0-9-\\[\\]]+$"
       },
       "title": "Rules specific configuration.",
       "type": "object"
