@@ -1,0 +1,16 @@
+---
+- name: Empty string compare success
+  hosts: all
+  tasks:
+    - name: Shut down
+      ansible.builtin.shell: |
+        /sbin/shutdown -t now
+        echo $var == ""
+      changed_when: false
+      when: ansible_os_family
+    - name: Shut down
+      ansible.builtin.shell: |
+        /sbin/shutdown -t now
+        echo $var == ""
+      changed_when: false
+      when: [ansible_os_family]
