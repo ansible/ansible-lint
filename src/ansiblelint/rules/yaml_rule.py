@@ -48,8 +48,6 @@ class YamllintRule(AnsibleLintRule):
             self.severity = "VERY_LOW"
             if problem.level == "error":
                 self.severity = "MEDIUM"
-            if problem.desc.endswith("(syntax)"):
-                self.severity = "VERY_HIGH"
             matches.append(
                 self.create_matcherror(
                     # yamllint does return lower-case sentences
@@ -172,10 +170,10 @@ if "pytest" in sys.modules:
 
     def test_yamllint_has_help(default_rules_collection: RulesCollection) -> None:
         """Asserts that we loaded markdown documentation in help property."""
-        for collection in default_rules_collection:
-            if collection.id == "yaml":
-                assert collection.help is not None
-                assert len(collection.help) > 100
+        for rule in default_rules_collection:
+            if rule.id == "yaml":
+                assert rule.help is not None
+                assert len(rule.help) > 100
                 break
-        else:
-            pytest.fail("No yaml collection found")
+        else:  # pragma: no cover
+            pytest.fail("No yaml rule found")
