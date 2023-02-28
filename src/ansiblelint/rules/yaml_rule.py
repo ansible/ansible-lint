@@ -104,7 +104,7 @@ def _fetch_skips(data: Any, collector: dict[int, set[str]]) -> dict[int, set[str
             for entry in data:
                 if (
                     entry
-                    and hasattr(data, "get")
+                    and hasattr(entry, "get")
                     and LINE_NUMBER_KEY in entry
                     and SKIPPED_RULES_KEY in entry
                     and entry[SKIPPED_RULES_KEY]
@@ -145,11 +145,17 @@ if "pytest" in sys.modules:
                 "yaml",
                 [],
             ),
+            (
+                "examples/yamllint/skipped-rule.yml",
+                "yaml",
+                [],
+            ),
         ),
         ids=(
             "invalid",
             "valid",
             "multi-document",
+            "skipped-rule",
         ),
     )
     def test_yamllint(file: str, expected_kind: str, expected: list[str]) -> None:
