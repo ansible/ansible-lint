@@ -69,9 +69,8 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
                         filename=file,
                     )
                 )
-            return results
 
-        return []
+        return results
 
 
 # testing code to be loaded only with pytest or when executed the rule file
