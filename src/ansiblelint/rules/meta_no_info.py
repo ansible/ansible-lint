@@ -70,11 +70,6 @@ class MetaMainHasInfoRule(AnsibleLintRule):
         if file.kind != "meta":
             return []
 
-        # since Ansible 2.10 we can add a meta/requirements.yml but
-        # we only want to match on meta/main.yml
-        if file.path.name != "main.yml":
-            return []
-
         galaxy_info = data.get("galaxy_info", False)
         if galaxy_info:
             return [
