@@ -84,7 +84,7 @@ if "pytest" in sys.modules:
                 "examples/playbooks/roles/loop_var_prefix/tasks/pass.yml", 0, id="pass"
             ),
             pytest.param(
-                "examples/playbooks/roles/loop_var_prefix/tasks/fail.yml", 5, id="fail"
+                "examples/playbooks/roles/loop_var_prefix/tasks/fail.yml", 6, id="fail"
             ),
         ),
     )
