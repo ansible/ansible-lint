@@ -1,6 +1,7 @@
 """Utility functions related to file operations."""
 from __future__ import annotations
 
+import ast
 import copy
 import logging
 import os
@@ -207,7 +208,7 @@ class Lintable:
         name = normpath_path(name)
         # we need to be sure that we expanduser() because otherwise a simple
         # test like .path.exists() will return unexpected results.
-        self.path = name.expanduser()
+        self.path = self._original_path = name.expanduser()
         # Filename is effective file on disk, for stdin is a namedtempfile
         self.name = self.filename = str(name)
 
@@ -253,6 +254,16 @@ class Lintable:
 
         if self.kind == "yaml":
             _ = self.data  # pylint: disable=pointless-statement
+
+        if self.kind == "plugin":
+            self.file = NamedTemporaryFile(mode="w+", suffix=f"_{name.name}.yaml", dir=self.dir)
+            self.filename = self.file.name
+            self._content = self.parse_examples_from_plugin()
+            self.file.write(self._content)
+            self.file.flush()
+            self.path = Path(self.file.name)
+            self.base_kind = "text/yaml"
+
 
     def _guess_kind(self) -> None:
         if self.kind == "yaml":
@@ -371,6 +382,22 @@ class Lintable:
     def __repr__(self) -> str:
         """Return user friendly representation of a lintable."""
         return f"{self.name} ({self.kind})"
+
+    def parse_examples_from_plugin(self) -> str:
+        """Parse yaml inside plugin EXAMPLES string as ansible.utils.parse_yaml but with linenumbers.
+
+        The line numbers are stored in each node's LINE_NUMBER_KEY key.
+        """
+        parsed = ast.parse(self.content, self.path)
+
+        examples = None
+        for node in parsed.body:
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id == "EXAMPLES" and isinstance(node.value, ast.Constant):
+                        examples = node.value.value
+
+        return examples or ""
 
     @property
     def data(self) -> Any:

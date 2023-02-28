@@ -22,7 +22,6 @@
 """Generic utility helpers."""
 from __future__ import annotations
 
-import ast
 import contextlib
 import inspect
 import logging
@@ -907,78 +906,6 @@ def parse_yaml_linenumbers(
     ) as exc:
         msg = "Failed to load YAML file"
         raise RuntimeError(msg) from exc
-
-    if len(result) == 0:
-        return None  # empty documents
-    if len(result) == 1:
-        return result[0]
-    return result
-
-
-@lru_cache(maxsize=None)
-def parse_plugin(  # noqa: max-complexity: 12
-    lintable: Lintable,
-) -> AnsibleBaseYAMLObject:
-    """Parse yaml inside plugin EXAMPLES string as ansible.utils.parse_yaml but with linenumbers.
-
-    The line numbers are stored in each node's LINE_NUMBER_KEY key.
-    """
-    result = []
-
-    def compose_node(parent: yaml.nodes.Node, index: int) -> yaml.nodes.Node:
-        # the line number where the previous token has ended (plus empty lines)
-        line = loader.line
-        node = Composer.compose_node(loader, parent, index)
-        if not isinstance(node, yaml.nodes.Node):
-            raise RuntimeError("Unexpected yaml data.")
-        setattr(node, "__line__", line + 1)
-        return node
-
-    def construct_mapping(
-        node: AnsibleBaseYAMLObject, deep: bool = False
-    ) -> AnsibleMapping:
-        mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
-        if hasattr(node, "__line__"):
-            mapping[LINE_NUMBER_KEY] = node.__line__
-        else:
-            mapping[
-                LINE_NUMBER_KEY
-            ] = mapping._line_number  # pylint: disable=protected-access
-        mapping[FILENAME_KEY] = lintable.path
-        return mapping
-
-    parsed = ast.parse(lintable.content, lintable.path)
-
-    examples = None
-    for node in parsed.body:
-        if isinstance(node, ast.Assign):
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id == "EXAMPLES" and isinstance(node.value, ast.Constant):
-                    examples = node.value.value
-
-    if not examples:
-        # EXAMPLES string not found
-        return None
-    lintable.content = examples
-
-    try:
-        loader = AnsibleLoader(lintable.content)
-        loader.compose_node = compose_node
-        loader.construct_mapping = construct_mapping
-        # while Ansible only accepts single documents, we also need to load
-        # multi-documents, as we attempt to load any YAML file, not only
-        # Ansible managed ones.
-        while True:
-            data = loader.get_data()
-            if data is None:
-                break
-            result.append(data)
-    except (
-        yaml.parser.ParserError,
-        yaml.scanner.ScannerError,
-        yaml.constructor.ConstructorError,
-    ) as exc:
-        raise RuntimeError("Failed to load YAML file") from exc
 
     if len(result) == 0:
         return None  # empty documents
