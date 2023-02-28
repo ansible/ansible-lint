@@ -499,6 +499,25 @@
       "title": "License File",
       "type": "string"
     },
+    "manifest": {
+      "additionalProperties": false,
+      "markdownDescription": "A dict controlling use of manifest directives used in building the collection artifact.\nThe key directives is a list of MANIFEST.in style directives\nThe key omit_default_directives is a boolean that controls whether the default directives are used.\nMutually exclusive with build_ignore.",
+      "properties": {
+        "directives": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Directives",
+          "type": "array"
+        },
+        "omit_default_directives": {
+          "title": "Omit Default Directives",
+          "type": "boolean"
+        }
+      },
+      "title": "Manifest",
+      "type": "object"
+    },
     "name": {
       "minLength": 2,
       "pattern": "^[a-z][a-z0-9_]+$",
