@@ -51,53 +51,25 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    import pytest
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
-    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
-
-    SUCCESS_PLAY = """
-- hosts: all
-  tasks:
-    - name: Shut down
-      shell: |
-        /sbin/shutdown -t now
-        echo $var == ""
-      when: ansible_os_family
-    - name: Shut down
-      shell: |
-        /sbin/shutdown -t now
-        echo $var == ""
-      when: [ansible_os_family]
-"""
-
-    FAIL_PLAY = """
-- hosts: all
-  tasks:
-  - name: Shut down
-    command: /sbin/shutdown -t now
-    when: ansible_os_family == ""
-  - name: Shut down
-    command: /sbin/shutdown -t now
-    when: ansible_os_family !=""
-  - name: Shut down
-    command: /sbin/shutdown -t now
-    when: False
-"""
-
-    @pytest.mark.parametrize(
-        "rule_runner", (ComparisonToEmptyStringRule,), indirect=["rule_runner"]
-    )
-    def test_rule_empty_string_compare_fail(rule_runner: RunFromText) -> None:
+    def test_rule_empty_string_compare_fail() -> None:
         """Test rule matches."""
-        results = rule_runner.run_playbook(FAIL_PLAY)
-        assert len(results) == 2
+        rules = RulesCollection()
+        rules.register(ComparisonToEmptyStringRule())
+        results = Runner(
+            "examples/playbooks/rule-empty-string-compare-fail.yml", rules=rules
+        ).run()
+        assert len(results) == 3
         for result in results:
             assert result.message == ComparisonToEmptyStringRule().shortdesc
 
-    @pytest.mark.parametrize(
-        "rule_runner", (ComparisonToEmptyStringRule,), indirect=["rule_runner"]
-    )
-    def test_rule_empty_string_compare_pass(rule_runner: RunFromText) -> None:
+    def test_rule_empty_string_compare_pass() -> None:
         """Test rule matches."""
-        results = rule_runner.run_playbook(SUCCESS_PLAY)
+        rules = RulesCollection()
+        rules.register(ComparisonToEmptyStringRule())
+        results = Runner(
+            "examples/playbooks/rule-empty-string-compare-pass.yml", rules=rules
+        ).run()
         assert len(results) == 0, results
