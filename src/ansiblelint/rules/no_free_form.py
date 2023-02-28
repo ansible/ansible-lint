@@ -93,7 +93,7 @@ if "pytest" in sys.modules:  # noqa: C901
         ("file", "expected"),
         (
             pytest.param("examples/playbooks/rule-no-free-form-pass.yml", 0, id="pass"),
-            pytest.param("examples/playbooks/rule-no-free-form-fail.yml", 2, id="fail"),
+            pytest.param("examples/playbooks/rule-no-free-form-fail.yml", 3, id="fail"),
         ),
     )
     def test_rule_no_free_form(
