@@ -18,11 +18,12 @@ exclude: >
     .vscode/extensions.json|
     .vscode/settings.json|
     examples/broken/encoding.j2|
-    test/schemas/data/licenses.json|
-    test/schemas/package-lock.json|
-    test/schemas/negative_test|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
-    examples/playbooks/collections/.*
+    examples/playbooks/collections/.*|
+    src/ansiblelint/schemas/rulebook.json|
+    test/schemas/data/licenses.json|
+    test/schemas/negative_test|
+    test/schemas/package-lock.json
   )$
 repos:
   - repo: meta
@@ -48,7 +49,7 @@ repos:
             test/fixtures/formatting-before/.*|
             test/schemas/data/.*|
             test/schemas/(negative_test|test)/.*\.md|
-            src/ansiblelint/schemas/(molecule|tasks|playbook).json|
+            src/ansiblelint/schemas/(molecule|tasks|playbook|rulebook).json|
             src/ansiblelint/schemas/ansible-navigator-config.json
           )$
         always_run: true

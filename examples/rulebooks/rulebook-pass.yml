@@ -9,11 +9,7 @@
         port: 9092
         group_id: testing
   rules:
-    - name:
+    - name: Demo rule
       condition: event.i is defined
       action:
         debug:
-    - name:
-      condition: event.stop == true
-      action:
-        shutdown:

@@ -111,107 +111,123 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         ("file", "expected_kind", "expected"),
         (
-            (
+            pytest.param(
                 "examples/collection/galaxy.yml",
                 "galaxy",
                 ["'GPL' is not one of"],
+                id="galaxy",
             ),
-            (
+            pytest.param(
                 "examples/roles/invalid_requirements_schema/meta/requirements.yml",
                 "requirements",
                 ["{'foo': 'bar'} is not valid under any of the given schemas"],
+                id="requirements",
             ),
-            (
+            pytest.param(
                 "examples/roles/invalid_meta_schema/meta/main.yml",
                 "meta",
                 ["False is not of type 'string'"],
+                id="meta",
             ),
-            (
+            pytest.param(
                 "examples/playbooks/vars/invalid_vars_schema.yml",
                 "vars",
                 ["'123' does not match any of the regexes"],
+                id="vars",
             ),
-            (
+            pytest.param(
                 "examples/execution-environment.yml",
                 "execution-environment",
                 [],
+                id="execution-environment",
             ),
-            (
+            pytest.param(
                 "examples/ee_broken/execution-environment.yml",
                 "execution-environment",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
+                id="execution-environment-broken",
             ),
             ("examples/meta/runtime.yml", "meta-runtime", []),
-            (
+            pytest.param(
                 "examples/broken_collection_meta_runtime/meta/runtime.yml",
                 "meta-runtime",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
+                id="meta-runtime-broken",
             ),
-            (
+            pytest.param(
                 "examples/inventory/production.yml",
                 "inventory",
                 [],
+                id="inventory",
             ),
-            (
+            pytest.param(
                 "examples/inventory/broken_dev_inventory.yml",
                 "inventory",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
+                id="inventory-broken",
             ),
-            (
+            pytest.param(
                 ".ansible-lint",
                 "ansible-lint-config",
                 [],
+                id="ansible-lint-config",
             ),
-            (
+            pytest.param(
                 "examples/.config/ansible-lint.yml",
                 "ansible-lint-config",
                 [],
+                id="ansible-lint-config2",
             ),
-            (
+            pytest.param(
                 "examples/broken/.ansible-lint",
                 "ansible-lint-config",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
+                id="ansible-lint-config-broken",
             ),
-            (
+            pytest.param(
                 "examples/ansible-navigator.yml",
                 "ansible-navigator-config",
                 [],
+                id="ansible-navigator-config",
             ),
-            (
+            pytest.param(
                 "examples/broken/ansible-navigator.yml",
                 "ansible-navigator-config",
                 ["Additional properties are not allowed ('ansible' was unexpected)"],
+                id="ansible-navigator-config-broken",
             ),
-            (
+            pytest.param(
                 "examples/roles/hello/meta/argument_specs.yml",
                 "arg_specs",
                 [],
+                id="arg_specs",
             ),
-            (
+            pytest.param(
                 "examples/roles/broken_argument_specs/meta/argument_specs.yml",
                 "arg_specs",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
+                id="arg_specs-broken",
             ),
-        ),
-        ids=(
-            # "playbook-fail",
-            "galaxy",
-            "requirements",
-            "meta",
-            "vars",
-            "ee",
-            "ee-broken",
-            "meta-runtime",
-            "meta-runtime-broken",
-            "inventory",
-            "inventory-broken",
-            "lint-config",
-            "lint-config2",
-            "lint-config-broken",
-            "navigator",
-            "navigator-broken",
-            "argspecs",
-            "argspecs-broken",
+            pytest.param(
+                "examples/changelogs/changelog.yaml",
+                "changelog",
+                ["Additional properties are not allowed ('foo' was unexpected)"],
+                id="changelog",
+            ),
+            pytest.param(
+                "examples/rulebooks/rulebook-fail.yml",
+                "rulebook",
+                [
+                    "Additional properties are not allowed ('that_should_not_be_here' was unexpected)"
+                ],
+                id="rulebook",
+            ),
+            pytest.param(
+                "examples/rulebooks/rulebook-pass.yml",
+                "rulebook",
+                [],
+                id="rulebook2",
+            ),
         ),
     )
     def test_schema(file: str, expected_kind: str, expected: list[str]) -> None:

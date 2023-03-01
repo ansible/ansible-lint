@@ -1,0 +1,21 @@
+---
+- name: Sample rulebooks
+  hosts: all
+  that_should_not_be_here: foo
+  sources: # should be "sources"
+    - name: listen for alerts
+      ansible.eda.alertmanager:
+        host: 0.0.0.0
+        port: 8000
+  rules:
+    - name: restart web server
+      condition: event.alert.labels.job == "fastapi" and event.alert.status == "firing"
+      action:
+        run_playbook:
+          name: ansible.eda.start_app
+          copy_files: true
+          post_events: true
+    - name: debug
+      condition: event.alert.labels.job == "fastapi"
+      action:
+        debug: sss

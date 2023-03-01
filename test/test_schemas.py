@@ -13,8 +13,6 @@ import pytest
 from spdx.config import __file__ as spdx_config_path
 
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import RulesCollection
-from ansiblelint.runner import Runner
 from ansiblelint.schemas import __file__ as schema_path
 from ansiblelint.schemas import refresh_schemas, validate_file_schema
 
@@ -31,28 +29,6 @@ def test_refresh_schemas() -> None:
     sleep(1)
     # should be cached now
     assert refresh_schemas(min_age_seconds=10) == 0
-
-
-@pytest.mark.parametrize(
-    ("file", "expected_tags"),
-    (
-        pytest.param(
-            "examples/changelogs/changelog.yaml", ["schema[changelog]"], id="changelog"
-        ),
-    ),
-)
-def test_schema(
-    default_rules_collection: RulesCollection,
-    file: str,
-    expected_tags: list[str],
-) -> None:
-    """Test that runner can go through any corner cases."""
-    runner = Runner(file, rules=default_rules_collection)
-    matches = runner.run()
-
-    assert len(matches) == len(expected_tags)
-    for i, match in enumerate(matches):
-        assert match.tag == expected_tags[i]
 
 
 def urlopen_side_effect(*_args: Any, **kwargs: Any) -> DEFAULT:

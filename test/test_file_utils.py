@@ -209,7 +209,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
             "examples/playbooks/rulebook.yml", "playbook", id="29"
         ),  # playbooks folder should determine kind
         pytest.param(
-            "examples/rulebooks/rulebook.yml", "rulebook", id="30"
+            "examples/rulebooks/rulebook-pass.yml", "rulebook", id="30"
         ),  # content should determine it as a rulebook
         pytest.param(
             "examples/yamllint/valid.yml", "yaml", id="31"

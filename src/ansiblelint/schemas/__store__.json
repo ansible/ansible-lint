@@ -47,6 +47,10 @@
     "etag": "a11edf24f416043f2da8dd329f1d61338fc9708e017bd3cbe43d8c06e4b30090",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
+  "rulebook": {
+    "etag": "64b248fdbf6cede0c0e1736b51b4235f8d06ad602346ce06bf15d913708d9b30",
+    "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json"
+  },
   "tasks": {
     "etag": "9226a9fea0a3cfa1bbc6c4db57fb4b28e5cf8abd7f390fa4a93cf1cf38ac64cd",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/tasks.json"
