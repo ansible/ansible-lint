@@ -227,7 +227,14 @@
         },
         {
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string"
+              }
+            ]
           },
           "type": "array"
         }

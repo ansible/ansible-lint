@@ -1,0 +1,11 @@
+---
+- name: Test for when (passing)
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Testing for when is passed a list
+      ansible.builtin.debug:
+        msg: "this is ok"
+      when:
+        - true
+        - "foo"
