@@ -20,7 +20,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json"
   },
   "galaxy": {
-    "etag": "90d0beb8a8ec0fc9ebdc146f3d19f1566c648ed5574b381ed63e06cb15de4d37",
+    "etag": "8a7b0505c5b42a6a0fb065b1e1b6ba864f53d69b54d1cfbeaab1fa4b03b705a7",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/galaxy.json"
   },
   "inventory": {
@@ -40,7 +40,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
   },
   "playbook": {
-    "etag": "f49882815c54f8595c4e2b9cbcf8f48b1bf5dee892b4cf8938d13343c8448d7b",
+    "etag": "1813d65227c1b299b53d012ea451409acce3bdac33037fe4224bfe5df0fab76e",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/playbook.json"
   },
   "requirements": {
@@ -48,7 +48,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
   "tasks": {
-    "etag": "7725d87e98752a96967cce8a62bc8593c15a85582f1cdefef6afce61a6a9bbe5",
+    "etag": "9226a9fea0a3cfa1bbc6c4db57fb4b28e5cf8abd7f390fa4a93cf1cf38ac64cd",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/tasks.json"
   },
   "vars": {
