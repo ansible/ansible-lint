@@ -57,13 +57,13 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.26.0
+    rev: v6.27.0
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
-  - repo: https://github.com/sirosen/check-jsonschema
+  - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.21.0
     hooks:
       - id: check-github-workflows
