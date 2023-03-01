@@ -200,12 +200,12 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/jazzband/pip-tools
-    rev: 6.12.2
+    rev: 6.12.3
     hooks:
       - id: pip-compile
         name: lock
         always_run: true
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib
+        entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib
         language: python
         files: ^.config\/requirements.*$
         alias: lock
@@ -215,7 +215,7 @@ repos:
           - pip>=22.3.1
       - id: pip-compile
         name: deps
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib
+        entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib
         language: python
         files: ^.config\/requirements.*$
         alias: deps

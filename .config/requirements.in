@@ -1,7 +1,6 @@
 # Special order section for helping pip:
 will-not-work-on-windows-try-from-wsl-instead; platform_system=='Windows'
-ansible-core>=2.12.0,<2.14.0; python_version<'3.9' # GPLv3
-ansible-core>=2.12.0; python_version>='3.9' # GPLv3
+ansible-core>=2.12.0 # GPLv3
 # alphabetically sorted:
 black>=22.8.0 # MIT
 filelock>=3.3.0 # The Unlicense

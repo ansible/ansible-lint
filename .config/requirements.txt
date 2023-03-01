@@ -4,7 +4,7 @@
 #
 #    pip-compile --extra=docs --extra=test --no-annotate --output-file=.config/requirements.txt --resolver=backtracking --strip-extras --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
-ansible-core==2.14.3 ; python_version >= "3.9"
+ansible-core==2.14.3
 astroid==2.14.2
 attrs==22.2.0
 beautifulsoup4==4.11.2
