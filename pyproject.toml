@@ -162,7 +162,11 @@ addopts = "-p no:pytest_cov"
 # `--no-cov` which prevents activation from tox.ini and which also fails
 # when plugin is effectively missing.
 doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  # https://sourceforge.net/p/ruamel-yaml/tickets/452/
+  "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
+]
 junit_duration_report = "call"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
 # https://github.com/shyim/junit-report-annotations-action/issues/3#issuecomment-663241378
