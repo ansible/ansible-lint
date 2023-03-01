@@ -265,6 +265,10 @@ class Lintable:
             self.base_kind = "text/yaml"
 
 
+    def __del__(self):
+        if hasattr(self, "file"):
+            self.file.close()
+
     def _guess_kind(self) -> None:
         if self.kind == "yaml":
             if (
