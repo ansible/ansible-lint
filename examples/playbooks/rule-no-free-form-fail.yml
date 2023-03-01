@@ -8,3 +8,7 @@
     - name: Use raw to echo
       ansible.builtin.raw: executable=/bin/bash echo foo # <-- don't use executable=
       changed_when: false
+    - name: Testing anything else passed to raw except for string
+      ansible.builtin.raw:
+        args: "123"
+      changed_when: false

@@ -1,0 +1,12 @@
+name: foo
+namespace: bar
+version: 1.2.3
+authors:
+  - John
+readme: ../README.md
+description: ...
+repository: https://www.github.com/my_org/my_collection
+manifest:
+  directive: # <-- typo, should be "directives"
+    - "foo"
+  omit_default_directives: true

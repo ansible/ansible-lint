@@ -1,0 +1,3 @@
+---
+- test: skipped_rule # noqa name
+- other: aaa

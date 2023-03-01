@@ -41,8 +41,7 @@ class NoLogPasswordsRule(AnsibleLintRule):
         self, task: dict[str, Any], file: Lintable | None = None
     ) -> bool | str:
         if task["action"]["__ansible_module_original__"] == "ansible.builtin.user" and (
-            (task["action"].get("password_lock") or task["action"].get("password_lock"))
-            and not task["action"].get("password")
+            task["action"].get("password_lock") and not task["action"].get("password")
         ):
             has_password = False
         else:
@@ -187,6 +186,19 @@ if "pytest" in sys.modules:  # noqa: C901
           - lint
 """
 
+    PASSWORD_LOCK_YES_BUT_NO_PASSWORD = """
+- hosts: all
+  tasks:
+    - name: Succeed when only password locking account
+      ansible.builtin.user:
+        name: "{{ item }}"
+        password_lock: yes
+        # user_password: "this is a comment, not a password"
+        with_list:
+          - ansible
+          - lint
+"""
+
     PASSWORD_LOCK_FALSE = """
 - hosts: all
   tasks:
@@ -254,6 +266,14 @@ if "pytest" in sys.modules:  # noqa: C901
     def test_no_log_password_lock_yes(rule_runner: RunFromText) -> None:
         """The task only locks the user."""
         results = rule_runner.run_playbook(PASSWORD_LOCK_YES)
+        assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+    )
+    def test_no_log_password_lock_yes_but_no_password(rule_runner: RunFromText) -> None:
+        """The task only locks the user."""
+        results = rule_runner.run_playbook(PASSWORD_LOCK_YES_BUT_NO_PASSWORD)
         assert len(results) == 0
 
     @pytest.mark.parametrize(

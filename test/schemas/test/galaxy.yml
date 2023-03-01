@@ -11,3 +11,7 @@ dependencies:
   "anderson55.my_collection": "*" # note: "*" selects the highest version available
 # upload to galaxy will fail if a repository key is not present
 repository: https://www.github.com/my_org/my_collection
+manifest:
+  directives:
+    - "foo"
+  omit_default_directives: true

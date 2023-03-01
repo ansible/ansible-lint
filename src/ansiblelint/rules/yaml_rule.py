@@ -48,8 +48,6 @@ class YamllintRule(AnsibleLintRule):
             self.severity = "VERY_LOW"
             if problem.level == "error":
                 self.severity = "MEDIUM"
-            if problem.desc.endswith("(syntax)"):
-                self.severity = "VERY_HIGH"
             matches.append(
                 self.create_matcherror(
                     # yamllint does return lower-case sentences
@@ -106,7 +104,7 @@ def _fetch_skips(data: Any, collector: dict[int, set[str]]) -> dict[int, set[str
             for entry in data:
                 if (
                     entry
-                    and hasattr(data, "get")
+                    and hasattr(entry, "get")
                     and LINE_NUMBER_KEY in entry
                     and SKIPPED_RULES_KEY in entry
                     and entry[SKIPPED_RULES_KEY]
@@ -147,11 +145,17 @@ if "pytest" in sys.modules:
                 "yaml",
                 [],
             ),
+            (
+                "examples/yamllint/skipped-rule.yml",
+                "yaml",
+                [],
+            ),
         ),
         ids=(
             "invalid",
             "valid",
             "multi-document",
+            "skipped-rule",
         ),
     )
     def test_yamllint(file: str, expected_kind: str, expected: list[str]) -> None:
@@ -172,10 +176,10 @@ if "pytest" in sys.modules:
 
     def test_yamllint_has_help(default_rules_collection: RulesCollection) -> None:
         """Asserts that we loaded markdown documentation in help property."""
-        for collection in default_rules_collection:
-            if collection.id == "yaml":
-                assert collection.help is not None
-                assert len(collection.help) > 100
+        for rule in default_rules_collection:
+            if rule.id == "yaml":
+                assert rule.help is not None
+                assert len(rule.help) > 100
                 break
-        else:
-            pytest.fail("No yaml collection found")
+        else:  # pragma: no cover
+            pytest.fail("No yaml rule found")

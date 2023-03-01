@@ -1,0 +1,16 @@
+---
+- name: Empty String Compare Fail
+  hosts: all
+  tasks:
+    - name: Shut down # noqa no-changed-when
+      ansible.builtin.command: /sbin/shutdown -t now
+      when: ansible_os_family == ""
+    - name: Shut down # noqa no-changed-when
+      ansible.builtin.command: /sbin/shutdown -t now
+      when: ansible_os_family !=""
+    - name: Shut down # noqa no-changed-when
+      ansible.builtin.command: /sbin/shutdown -t now
+      when: false
+    - name: Shut down # noqa no-changed-when
+      ansible.builtin.command: /sbin/shutdown -t now
+      when: [ansible_os_family == ""]
