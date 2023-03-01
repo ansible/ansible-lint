@@ -17,3 +17,15 @@ def timed_info(msg: Any, *args: Any) -> Iterator[None]:
     finally:
         elapsed = time.time() - start
         _logger.info(msg + " (%.2fs)", *(*args, elapsed))
+
+
+def warn_or_fail(message: str) -> None:
+    """Warn or fail depending on the strictness level."""
+    # pylint: disable=import-outside-toplevel
+    from ansiblelint.config import options
+    from ansiblelint.errors import StrictModeError
+
+    if options.strict:
+        raise StrictModeError(message)
+
+    _logger.warning(message)
