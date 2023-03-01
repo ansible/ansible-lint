@@ -63,6 +63,7 @@ FileType = Literal[
     "role",  # that is a folder!
     "yaml",  # generic yaml file, previously reported as unknown file type
     "ansible-lint-config",
+    "sanity-ignore-file",  # tests/sanity/ignore file
     "",  # unknown file type
 ]
 

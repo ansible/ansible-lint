@@ -49,7 +49,7 @@ mkdocs==1.4.2
 mkdocs-autorefs==0.4.1
 mkdocs-gen-files==0.4.0
 mkdocs-htmlproofer-plugin==0.10.3
-mkdocs-material==9.0.15
+mkdocs-material==9.1.0
 mkdocs-material-extensions==1.1.1
 mkdocstrings==0.20.0
 mkdocstrings-python==0.8.3

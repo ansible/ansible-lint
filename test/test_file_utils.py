@@ -229,6 +229,11 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
         pytest.param(
             "examples/playbooks/vars/subfolder/settings.yaml", "vars", id="40"
         ),
+        pytest.param(
+            "examples/sanity_ignores/tests/sanity/ignore-2.14.txt",
+            "sanity-ignore-file",
+            id="41",
+        ),
     ),
 )
 def test_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:

@@ -143,6 +143,7 @@ geerlingguy
 getmatches
 globbing
 globmatch
+gplv3
 groupname
 hostkey
 hostnames
@@ -172,6 +173,7 @@ keyserver
 konstruktoid
 kubernetes
 kubevirt
+lalo
 languageservice
 letsencrypt
 levelname
@@ -347,6 +349,7 @@ toidentifier
 tomli
 toolset
 tripleo
+tuco
 typehint
 typehints
 ulimits
@@ -388,5 +391,3 @@ xfail
 xunit
 yatesr
 zuul
-tuco
-lalo

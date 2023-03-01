@@ -104,7 +104,7 @@ in
 as validated or certified content. It extends [shared](#shared) profile.
 
 - [avoid-dot-notation](https://github.com/ansible/ansible-lint/issues/2174)
-- [disallowed-ignore](https://github.com/ansible/ansible-lint/issues/2121)
+- [sanity](https://github.com/ansible/ansible-lint/issues/2121)
 - [fqcn](rules/fqcn.md)
 - [import-task-no-when](https://github.com/ansible/ansible-lint/issues/2219)
 - [meta-no-dependencies](https://github.com/ansible/ansible-lint/issues/2159)

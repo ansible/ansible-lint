@@ -45,6 +45,7 @@
 - [risky-shell-pipe][]
 - [role-name][]
 - [run-once][]
+- [sanity][]
 - [schema][]
 - [syntax-check][]
 - [var-naming][]
