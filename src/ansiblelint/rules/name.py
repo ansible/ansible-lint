@@ -212,3 +212,10 @@ if "pytest" in sys.modules:  # noqa: C901
         errs = bad_runner.run()
         assert len(errs) == 1
         assert errs[0].tag == "name[template]"
+
+    def test_when_no_lintable() -> None:
+        """Test when lintable is None."""
+        name_rule = NameRule()
+        # pylint: disable=protected-access
+        result = name_rule._prefix_check("Foo", None, 1)
+        assert len(result) == 0
