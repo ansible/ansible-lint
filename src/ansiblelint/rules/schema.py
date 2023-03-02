@@ -8,7 +8,8 @@ from typing import Any
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.schemas import JSON_SCHEMAS, validate_file_schema
+from ansiblelint.schemas.__main__ import JSON_SCHEMAS
+from ansiblelint.schemas.main import validate_file_schema
 
 _logger = logging.getLogger(__name__)
 
