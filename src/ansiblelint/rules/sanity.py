@@ -28,8 +28,15 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
     version_added = "v6.14.0"
 
     # Partner Engineering defines this list. Please contact PE for changes.
-    allowed_ignores = [
+
+    allowed_ignores_v2_9 = [
+        "validate-modules:deprecation-mismatch",  # Note: 2.9 expects a deprecated key in the METADATA. It was removed in later versions.
+        "validate-modules:invalid-documentation",  # Note: The removed_at_date key in the deprecated section is invalid for 2.9.
+    ]
+
+    allowed_ignores_all = [
         "validate-modules:missing-gplv3-license",
+        "action-plugin-docs",  # Added for Networking Collections
         "import-2.6",
         "import-2.6!skip",
         "import-2.7",
@@ -59,13 +66,19 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
         with open(file.abspath, encoding="utf-8") as ignore_file:
             entries = ignore_file.read().splitlines()
 
+            ignores = self.allowed_ignores_all
+
+            # If there is a ignore-2.9.txt file, add the v2_9 list of allowed ignores
+            if "ignore-2.9.txt" in str(file.abspath):
+                ignores = self.allowed_ignores_all + self.allowed_ignores_v2_9
+
             for line_num, entry in enumerate(entries, 1):
                 if entry and entry[0] != "#":
                     try:
                         if "#" in entry:
                             entry, _ = entry.split("#")
                         (_, test) = entry.split()
-                        if test not in self.allowed_ignores:
+                        if test not in ignores:
                             results.append(
                                 self.create_matcherror(
                                     message=f"Ignore file contains {test} at line {line_num}, which is not a permitted ignore.",
@@ -99,7 +112,7 @@ if "pytest" in sys.modules:
         ("test_file", "failures", "tags"),
         (
             pytest.param(
-                "examples/sanity_ignores/tests/sanity/ignore-2.14.txt",
+                "examples/sanity_ignores/tests/sanity/ignore-2.9.txt",
                 0,
                 "sanity[cannot-ignore]",
                 id="pass",

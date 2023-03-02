@@ -1,2 +1,0 @@
-plugins/module_utils/ansible_example_module.py compile-2.6!skip
-plugins/module_utils/ansible_example_module.py import-2.6!skip
