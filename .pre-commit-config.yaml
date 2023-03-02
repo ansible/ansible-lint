@@ -242,4 +242,3 @@ repos:
         name: update json schemas
         entry: python3 src/ansiblelint/schemas/__main__.py
         language: python
-        stages: [manual]
