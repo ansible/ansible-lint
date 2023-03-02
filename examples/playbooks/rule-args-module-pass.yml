@@ -33,3 +33,26 @@
       loop: "{{ repositories_keys }}"
       loop_control:
         loop_var: zj_item
+
+    - name: Bug 2428 daemon_reload should be allowed
+      ansible.builtin.systemd:
+        name: foo
+        state: restarted
+        daemon_reload: true
+
+    - name: Bug 2424 async_status
+      ansible.builtin.async_status:
+        jid: "{{ 999 }}"
+
+    - name: Bug https://github.com/VSChina/vscode-ansible/issues/261
+      ansible.builtin.set_fact:
+        dns_nameservers: "{{ var1 }}"
+
+    - name: Bug cmd should be allowed
+      ansible.builtin.command:
+        cmd: echo "foo"
+      changed_when: false
+
+    - name: Bag another allowed form of command
+      ansible.builtin.command: "/etc/test.sh"
+      changed_when: false
