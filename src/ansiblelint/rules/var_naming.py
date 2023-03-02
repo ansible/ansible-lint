@@ -31,12 +31,6 @@ CamelCaseButErrorIgnored: true  # noqa: var-naming
 """
 
 
-# properties/parameters are prefixed and postfixed with `__`
-def is_property(k: str) -> bool:
-    """Check if key is a property."""
-    return k.startswith("__") and k.endswith("__")
-
-
 class VariableNamingRule(AnsibleLintRule):
     """All variables should be named using only lowercase and underscores."""
 
