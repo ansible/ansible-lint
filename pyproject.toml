@@ -108,7 +108,7 @@ disallow_any_generics = true
 exclude = "(build|dist|test/local-content|site-packages|~/.pyenv)"
 
 [[tool.mypy.overrides]]
-module = ["ansible.*", "yamllint.*", "ansiblelint._version"]
+module = ["ansible.*", "yamllint.*", "ansiblelint._version", "spdx.*"]
 ignore_missing_imports = true
 ignore_errors = true
 
