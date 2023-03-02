@@ -108,7 +108,7 @@ production:
   rules:
     avoid-dot-notation:
       url: https://github.com/ansible/ansible-lint/issues/2174
-    disallowed-ignore: # [sanity]
+    sanity:
       url: https://github.com/ansible/ansible-lint/issues/2121
     fqcn:
     import-task-no-when:

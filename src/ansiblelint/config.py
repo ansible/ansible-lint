@@ -68,6 +68,7 @@ DEFAULT_KINDS = [
     {"changelog": "**/changelogs/changelog.yaml"},
     {"yaml": "**/*.{yaml,yml}"},
     {"yaml": "**/.*.{yaml,yml}"},
+    {"sanity-ignore-file": "**/tests/sanity/ignore-*.txt"},
 ]
 
 BASE_KINDS = [
