@@ -168,6 +168,7 @@ repos:
           - pytest>=7.2.0
           - rich>=13.2.0
           - ruamel.yaml
+          - spdx-tools
           - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.4.2
@@ -196,6 +197,7 @@ repos:
           - pyyaml
           - rich>=13.2.0
           - ruamel.yaml
+          - spdx-tools
           - typing_extensions
           - wcmatch
           - yamllint

@@ -1,5 +1,7 @@
 """Test schemas modules."""
+import json
 import logging
+import os
 import subprocess
 import sys
 import urllib
@@ -8,10 +10,12 @@ from typing import Any
 from unittest.mock import DEFAULT, MagicMock, patch
 
 import pytest
+from spdx.config import __file__ as spdx_config_path
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
+from ansiblelint.schemas import __file__ as schema_path
 from ansiblelint.schemas import refresh_schemas, validate_file_schema
 
 
@@ -97,3 +101,34 @@ def test_validate_file_schema() -> None:
     result = validate_file_schema(lintable)
     assert len(result) == 1, result
     assert "Unable to find JSON Schema" in result[0]
+
+
+def test_spdx() -> None:
+    """Test that SPDX license identifiers are in sync."""
+    _base_dir = os.path.dirname(spdx_config_path)
+    _licenses = os.path.join(_base_dir, "licenses.json")
+
+    license_ids = set()
+    with open(_licenses, encoding="utf-8") as license_fh:
+        licenses = json.load(license_fh)
+    for lic in licenses["licenses"]:
+        if lic.get("isDeprecatedLicenseId"):
+            continue
+        license_ids.add(lic["licenseId"])
+
+    with open(
+        os.path.join(os.path.dirname(schema_path), "galaxy.json"), encoding="utf-8"
+    ) as f:
+        schema = json.load(f)
+        spx_enum = schema["$defs"]["SPDXLicenseEnum"]["enum"]
+    if set(spx_enum) != license_ids:
+        with open(
+            os.path.join(os.path.dirname(schema_path), "galaxy.json"),
+            "w",
+            encoding="utf-8",
+        ) as f:
+            schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
+            json.dump(schema, f, indent=2)
+        pytest.fail(
+            "SPDX license list inside galaxy.json JSON Schema file was updated."
+        )
