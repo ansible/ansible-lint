@@ -105,158 +105,30 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
 if "pytest" in sys.modules:  # noqa: C901
     import pytest
 
-    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
-
-    APT_GET = """
-- hosts: all
-  tasks:
-    - name: Run apt-get update
-      command: apt-get update
-"""
-
-    GIT_COMMANDS_OK = """
-- hosts: all
-  tasks:
-    - name: Print current git branch
-      command: git branch
-    - name: Print git log
-      command: git log
-    - name: Install git lfs support
-      command: git lfs install
-"""
-
-    RESTART_SSHD = """
-- hosts: all
-  tasks:
-    - name: Restart sshd
-      command: systemctl restart sshd
-"""
-
-    SYSTEMCTL_STATUS = """
-- hosts: all
-  tasks:
-    - name: Show systemctl service status
-      command: systemctl status systemd-timesyncd
-"""
-
-    SYSTEMD_ENVIRONMENT = """
-- hosts: all
-  tasks:
-    - name: Show systemd environment
-      command: systemctl show-environment
-"""
-
-    SYSTEMD_RUNLEVEL = """
-- hosts: all
-  tasks:
-    - name: Set systemd runlevel
-      command: systemctl set-default multi-user.target
-"""
-
-    SYSTEMD_KILL = """
-- hosts: all
-  tasks:
-    - name: Kill service using SIGUSR1
-      command: systemctl kill --signal=SIGUSR1 sshd
-"""
-
-    YUM_UPDATE = """
-- hosts: all
-  tasks:
-    - name: Run yum update
-      command: yum update
-"""
-
-    YUM_CLEAN = """
-- hosts: all
-  tasks:
-    - name: Clear yum cache
-      command: yum clean all
-"""
-
-    NO_COMMAND = """
-- hosts: all
-  tasks:
-    - name: Clear yum cache
-      command: ""
-"""
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
+        ("file", "expected"),
+        (
+            pytest.param(
+                "examples/playbooks/rule-command-instead-of-module-pass.yml",
+                0,
+                id="pass",
+            ),
+            pytest.param(
+                "examples/playbooks/rule-command-instead-of-module-fail.yml",
+                3,
+                id="fail",
+            ),
+        ),
     )
-    def test_apt_get(rule_runner: RunFromText) -> None:
-        """The apt module supports update."""
-        results = rule_runner.run_playbook(APT_GET)
-        assert len(results) == 1
+    def test_command_instead_of_module(
+        default_rules_collection: RulesCollection, file: str, expected: int
+    ) -> None:
+        """Validate that rule works as intended."""
+        results = Runner(file, rules=default_rules_collection).run()
 
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_restart_sshd(rule_runner: RunFromText) -> None:
-        """Restarting services is supported by the systemd module."""
-        results = rule_runner.run_playbook(RESTART_SSHD)
-        assert len(results) == 1
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_git_commands_ok(rule_runner: RunFromText) -> None:
-        """Check the git commands not supported by the git module do not trigger rule."""
-        results = rule_runner.run_playbook(GIT_COMMANDS_OK)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_systemd_status(rule_runner: RunFromText) -> None:
-        """Set-default is not supported by the systemd module."""
-        results = rule_runner.run_playbook(SYSTEMCTL_STATUS)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_systemd_environment(rule_runner: RunFromText) -> None:
-        """Showing the environment is not supported by the systemd module."""
-        results = rule_runner.run_playbook(SYSTEMD_ENVIRONMENT)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_systemd_runlevel(rule_runner: RunFromText) -> None:
-        """Set-default is not supported by the systemd module."""
-        results = rule_runner.run_playbook(SYSTEMD_RUNLEVEL)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_systemd_kill(rule_runner: RunFromText) -> None:
-        """Kill is not supported by the systemd module."""
-        results = rule_runner.run_playbook(SYSTEMD_KILL)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_yum_update(rule_runner: RunFromText) -> None:
-        """Using yum update should fail."""
-        results = rule_runner.run_playbook(YUM_UPDATE)
-        assert len(results) == 1
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_yum_clean(rule_runner: RunFromText) -> None:
-        """The yum module does not support clearing yum cache."""
-        results = rule_runner.run_playbook(YUM_CLEAN)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (CommandsInsteadOfModulesRule,), indirect=["rule_runner"]
-    )
-    def test_no_command(rule_runner: RunFromText) -> None:
-        """If no command is passed it should return 0."""
-        results = rule_runner.run_playbook(NO_COMMAND)
-        assert len(results) == 0
+        for result in results:
+            assert result.rule.id == CommandsInsteadOfModulesRule.id, result
+        assert len(results) == expected
