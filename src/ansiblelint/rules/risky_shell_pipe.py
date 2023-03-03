@@ -6,7 +6,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import convert_to_boolean
+from ansiblelint.utils import convert_to_boolean, get_cmd_args
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -43,9 +43,7 @@ class ShellWithoutPipefail(AnsibleLintRule):
         if task.get("ignore_errors"):
             return False
 
-        jinja_stripped_cmd = self.unjinja(
-            " ".join(task["action"].get("__ansible_arguments__", []))
-        )
+        jinja_stripped_cmd = self.unjinja(get_cmd_args(task))
 
         return bool(
             self._pipe_re.search(jinja_stripped_cmd)

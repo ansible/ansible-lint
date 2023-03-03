@@ -148,11 +148,11 @@ def test_normalize_complex_command() -> None:
                 "action": {
                     "__ansible_module__": "yum",
                     "__ansible_module_original__": "yum",
-                    "__ansible_arguments__": [],
                     "name": "httpd",
                     "state": "latest",
                 },
             },
+            id="0",
         ),
         pytest.param(
             {
@@ -179,6 +179,7 @@ def test_normalize_complex_command() -> None:
                     "__ansible_module_original__": "block/always/rescue",
                 },
             },
+            id="1",
         ),
     ),
 )

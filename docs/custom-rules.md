@@ -84,15 +84,6 @@ _action_. The value of `task['action']` contains the module being used, and the
 arguments passed, both as key-value pairs and a list of other arguments (e.g.
 the command used with shell).
 
-In ansible-lint 2.0.0, `task['action']['args']` was renamed
-`task['action']['module_arguments']` to avoid a clash when a module actually
-takes args as a parameter key (e.g. ec2_tag)
-
-In ansible-lint 3.0.0 `task['action']['module']` was renamed
-`task['action']['__ansible_module__']` to avoid a clash when a module take
-module as an argument. As a precaution, `task['action']['module_arguments']` was
-renamed `task['action']['__ansible_arguments__']`.
-
 ## Packaging custom rules
 
 Ansible-lint automatically loads and enables custom rules in Python packages
