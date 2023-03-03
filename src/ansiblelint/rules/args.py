@@ -38,6 +38,19 @@ ignored_re = re.compile(
     flags=re.MULTILINE | re.DOTALL,
 )
 
+workarounds_drop_map = {
+    # https://github.com/ansible/ansible-lint/issues/3110
+    "ansible.builtin.copy": ["decrypt"],
+    # https://github.com/ansible/ansible-lint/issues/2824#issuecomment-1354337466
+    "ansible.builtin.service": ["daemon_reload"],
+    # Avoid: Unsupported parameters for (basic.py) module: cmd. Supported parameters include: _raw_params, _uses_shell, argv, chdir, creates, executable, removes, stdin, stdin_add_newline, strip_empty_ends.
+    "ansible.builtin.command": ["cmd"],
+}
+workarounds_inject_map = {
+    # https://github.com/ansible/ansible-lint/issues/2824
+    "ansible.builtin.async_status": {"_async_dir": "/tmp/ansible-async"}
+}
+
 
 @lru_cache
 def load_module(module_name: str) -> loader.PluginLoadContext:
@@ -85,14 +98,12 @@ class ArgsRule(AnsibleLintRule):
             for key, value in task["action"].items()
             if not key.startswith("__")
         }
-        # https://github.com/ansible/ansible-lint/issues/2824
-        if loaded_module.resolved_fqcn == "ansible.builtin.async_status":
-            module_args["_async_dir"] = "/tmp/ansible-async"
-        if loaded_module.resolved_fqcn == "ansible.builtin.service":
-            _logger.debug(
-                "Skipped service module validation as not being supported yet."
-            )
-            return []
+        if loaded_module.resolved_fqcn in workarounds_inject_map:
+            module_args.update(workarounds_inject_map[loaded_module.resolved_fqcn])
+        if loaded_module.resolved_fqcn in workarounds_drop_map:
+            for key in workarounds_drop_map[loaded_module.resolved_fqcn]:
+                if key in module_args:
+                    del module_args[key]
 
         with mock.patch.object(
             mock_ansible_module, "AnsibleModule", CustomAnsibleModule
@@ -148,6 +159,7 @@ class ArgsRule(AnsibleLintRule):
             except ValidationPassed:
                 return []
 
+    # pylint: disable=unused-argument
     def _sanitize_results(
         self, results: list[MatchError], module_name: str
     ) -> list[MatchError]:
@@ -156,47 +168,6 @@ class ArgsRule(AnsibleLintRule):
         for result in results:
             result_msg = result.message
             if ignored_re.match(result_msg):
-                continue
-            if result_msg.startswith("Unsupported parameters"):
-                # cmd option is a special case in command module and after option validation is done.
-                if (
-                    "Unsupported parameters for (basic.py) module" in result_msg
-                    and module_name
-                    in ["command", "ansible.builtin.command", "ansible.legacy.command"]
-                ):
-                    continue
-                result.message = result_msg.replace("(basic.py)", f"{module_name}")
-            elif result_msg.startswith("missing required arguments"):
-                if (
-                    "missing required arguments: free_form" in result_msg
-                    and module_name
-                    in [
-                        "raw",
-                        "ansible.builtin.raw",
-                        "ansible.legacy.raw",
-                        "meta",
-                        "ansible.builtin.meta",
-                        "ansible.legacy.meta",
-                    ]
-                ):
-                    # free_form option is a special case in raw module hence ignore this error.
-                    continue
-                if (
-                    "missing required arguments: key_value" in result_msg
-                    and module_name
-                    in [
-                        "set_fact",
-                        "ansible.builtin.set_fact",
-                        "ansible.legacy.set_fact",
-                    ]
-                ):
-                    # handle special case for set_fact module with key and value
-                    continue
-            if "Supported parameters include" in result_msg and module_name in [
-                "set_fact",
-                "ansible.builtin.set_fact",
-                "ansible.legacy.set_fact",
-            ]:
                 continue
             sanitized_results.append(result)
 
