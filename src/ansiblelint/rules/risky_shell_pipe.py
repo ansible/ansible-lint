@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -51,3 +52,35 @@ class ShellWithoutPipefail(AnsibleLintRule):
             and not self._pipefail_re.search(jinja_stripped_cmd)
             and not convert_to_boolean(task["action"].get("ignore_errors", False))
         )
+
+
+if "pytest" in sys.modules:  # noqa: C901
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("file", "expected"),
+        (
+            pytest.param(
+                "examples/playbooks/rule-risky-shell-pipe-pass.yml",
+                0,
+                id="pass",
+            ),
+            pytest.param(
+                "examples/playbooks/rule-risky-shell-pipe-fail.yml",
+                3,
+                id="fail",
+            ),
+        ),
+    )
+    def test_risky_shell_pipe(
+        default_rules_collection: RulesCollection, file: str, expected: int
+    ) -> None:
+        """Validate that rule works as intended."""
+        results = Runner(file, rules=default_rules_collection).run()
+
+        for result in results:
+            assert result.rule.id == ShellWithoutPipefail.id, result
+        assert len(results) == expected
