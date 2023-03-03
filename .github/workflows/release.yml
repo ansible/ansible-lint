@@ -22,15 +22,19 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
+
       - name: Install tox
         run: python3 -m pip install --user "tox>=4.0.0"
+
       - name: Check out src from Git
         uses: actions/checkout@v3
         with:
           fetch-depth: 0 # needed by setuptools-scm
           submodules: true
+
       - name: Build dists
         run: python -m tox
+
       - name: Publish to pypi.org
         if: >- # "create" workflows run separately from "push" & "pull_request"
           github.event_name == 'release'
@@ -38,8 +42,26 @@ jobs:
         with:
           password: ${{ secrets.pypi_password }}
 
+  homebrew:
+    name: Bump homebrew formula
+    environment: release
+    runs-on: ubuntu-22.04
+    needs: pypi
+
+    env:
+      FORCE_COLOR: 1
+      PY_COLORS: 1
+      TOXENV: pkg
+
+    steps:
+      - name: Check out src from Git
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # needed by setuptools-scm
+          submodules: true
+
       - name: Bump homebrew formula
-        uses: mislav/bump-homebrew-formula-action@v2
+        uses: mislav/bump-homebrew-formula-action@v2.2
         with:
           # A PR will be sent to github.com/Homebrew/homebrew-core to update this formula:
           formula-name: ansible-lint
