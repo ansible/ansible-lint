@@ -8,6 +8,9 @@
   from_url: /rules/hg-latest/
   to_url: /rules/latest/
 - type: page
+  from_url: /rules/deprecated-command-syntax/
+  to_url: /rules/no-free-form/
+- type: page
   from_url: /default_rules/index/
   to_url: /rules/
 # Keep this last or it will match all the other rules

@@ -55,7 +55,7 @@ def test_role_tasks_with_block(default_text_runner: RunFromText) -> None:
 
 @pytest.mark.parametrize(
     ("lintable", "expected"),
-    (pytest.param("examples/playbooks/test_skip_inside_yaml.yml", 10, id="yaml"),),
+    (pytest.param("examples/playbooks/test_skip_inside_yaml.yml", 2, id="yaml"),),
 )
 def test_inline_skips(
     default_rules_collection: RulesCollection, lintable: str, expected: int

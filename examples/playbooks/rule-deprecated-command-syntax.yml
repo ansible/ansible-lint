@@ -1,0 +1,7 @@
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - name: Shell with pipe
+      ansible.builtin.command: creates=/tmp/foo touch /tmp/foo
+      changed_when: false

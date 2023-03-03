@@ -12,7 +12,7 @@
       ansible.builtin.command: git log
       changed_when: false
 
-    - name: Test deprecated-command-syntax
+    - name: Test no-free-form
       ansible.builtin.command: creates=B chmod 644 A
 
     - name: Test latest[git] (skip)
@@ -30,7 +30,7 @@
       tags:
         - skip_ansible_lint
 
-    - name: Test deprecated-command-syntax (skip)
+    - name: Test no-free-form (skip)
       ansible.builtin.command: chmod 644 A
       tags:
         - skip_ansible_lint

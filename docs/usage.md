@@ -230,7 +230,7 @@ a task, which does not skip line-based rules. You can use the
 _command_ or _shell_ modules, for example:
 
 ```yaml
-- name: This would typically fire deprecated-command-syntax
+- name: This would typically fire no-free-form
   command: warn=no chmod 644 X
 
 - name: This would typically fire command-instead-of-module

@@ -102,13 +102,14 @@ RENAMED_TAGS = {
     "703": "meta-incorrect",
     "704": "meta-video-links",
     "911": "syntax-check",
-    "var-spacing": "jinja[spacing]",
-    "unnamed-task": "name[missing]",
+    "deprecated-command-syntax": "no-free-form",
+    "fqcn-builtins": "fqcn[action-core]",
     "git-latest": "latest[git]",
     "hg-latest": "latest[hg]",
     "no-jinja-nesting": "jinja[invalid]",
     "no-loop-var-prefix": "loop-var-prefix",
-    "fqcn-builtins": "fqcn[action-core]",
+    "unnamed-task": "name[missing]",
+    "var-spacing": "jinja[spacing]",
 }
 
 PLAYBOOK_TASK_KEYWORDS = [

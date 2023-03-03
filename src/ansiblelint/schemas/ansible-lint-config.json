@@ -128,7 +128,6 @@
               "command-instead-of-module",
               "command-instead-of-shell",
               "deprecated-bare-vars",
-              "deprecated-command-syntax",
               "deprecated-local-action",
               "deprecated-module",
               "empty-string-compare",
