@@ -1,0 +1,62 @@
+---
+- name: Test fixture for risky-shell-pipe
+  hosts: localhost
+  become: false
+  tasks:
+    - name: Pipeline with pipefail
+      ansible.builtin.shell: set -o pipefail && false | cat
+      changed_when: false
+
+    - name: Pipeline with pipefail, multi-line
+      ansible.builtin.shell: |
+        set -o pipefail
+        false | cat
+      changed_when: false
+
+    - name: Pipeline with pipefail, complex set
+      ansible.builtin.shell: |
+        set -e -x -o pipefail
+        false | cat
+      changed_when: false
+
+    - name: Pipeline with pipefail, complex set
+      ansible.builtin.shell: |
+        set -e -x -o pipefail
+        false | cat
+      changed_when: false
+
+    - name: Pipeline with pipefail, complex set
+      ansible.builtin.shell: |
+        set -eo pipefail
+        false | cat
+      changed_when: false
+
+    - name: Pipeline with pipefail not at first line
+      ansible.builtin.shell: |
+        echo foo
+        set -eo pipefail
+        false | cat
+      changed_when: false
+
+    - name: Pipeline without pipefail, ignoring errors # noqa: risky-shell-pipe
+      ansible.builtin.shell: false | cat
+      failed_when: false
+      changed_when: false
+
+    - name: Non-pipeline without pipefail # noqa: command-instead-of-shell
+      ansible.builtin.shell: "true"
+      changed_when: false
+
+    - name: Command without pipefail
+      ansible.builtin.command: "true"
+      changed_when: false
+
+    - name: Shell with or
+      ansible.builtin.shell: false || true
+      changed_when: false
+
+    - name: Another one
+      ansible.builtin.shell: |
+        set -o pipefail
+        df | grep '/dev'
+      changed_when: false

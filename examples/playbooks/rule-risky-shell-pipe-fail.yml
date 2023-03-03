@@ -1,0 +1,17 @@
+---
+- name: Test fixture for risky-shell-pipe
+  hosts: localhost
+  become: false
+  tasks:
+    - name: Pipeline without pipefail
+      ansible.builtin.shell: false | cat
+      changed_when: false
+
+    - name: Pipeline with or and pipe, no pipefail
+      ansible.builtin.shell: false || true | cat
+      changed_when: false
+
+    - name: Another one
+      ansible.builtin.shell: |
+        df | grep '/dev'
+      changed_when: false
