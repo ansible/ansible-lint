@@ -62,3 +62,14 @@
       vars:
         a_var:
           - one
+
+- name: Bug https://github.com/ansible/ansible-lint/issues/3082
+  hosts: localhost
+  tasks:
+    - name: Use with_items to populate a file
+      ansible.builtin.copy:
+        content: "{{ item.cfg | to_nice_yaml(indent=2, width=9999) }}"
+        dest: "/tmp/{{ item.name }}.yaml"
+        mode: "0640"
+      with_items:
+        - name: file2
