@@ -1,0 +1,37 @@
+---
+- name: Test fixture for command-instead-of-module
+  hosts: localhost
+  tasks:
+    - name: Print current git branch
+      ansible.builtin.command: git branch
+      changed_when: false
+    - name: Print git log
+      ansible.builtin.command: git log
+      changed_when: false
+    - name: Install git lfs support
+      ansible.builtin.command: git lfs install
+      changed_when: false
+
+    - name: Show systemctl service status
+      ansible.builtin.command: systemctl status systemd-timesyncd
+      changed_when: false
+
+    - name: Show systemd environment
+      ansible.builtin.command: systemctl show-environment
+      changed_when: false
+
+    - name: Set systemd runlevel
+      ansible.builtin.command: systemctl set-default multi-user.target
+      changed_when: false
+
+    - name: Kill service using SIGUSR1
+      ansible.builtin.command: systemctl kill --signal=SIGUSR1 sshd
+      changed_when: false
+
+    - name: Clear yum cache
+      ansible.builtin.command: yum clean all
+      changed_when: false
+
+    - name: Clear yum cache
+      ansible.builtin.command: ""
+      changed_when: false

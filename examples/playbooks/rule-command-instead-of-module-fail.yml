@@ -1,0 +1,15 @@
+---
+- name: Test fixture for command-instead-of-module
+  hosts: localhost
+  tasks:
+    - name: Run apt-get update # <-- 1
+      ansible.builtin.command: apt-get update
+      changed_when: false
+
+    - name: Restart sshd # <-- 2
+      ansible.builtin.command: systemctl restart sshd
+      changed_when: false
+
+    - name: Run yum update # <-- 3
+      ansible.builtin.command: yum update
+      changed_when: false
