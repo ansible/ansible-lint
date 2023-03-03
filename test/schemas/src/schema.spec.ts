@@ -48,7 +48,7 @@ describe("schemas under f/", function () {
   schema_files.forEach((schema_file) => {
     if (
       schema_file.startsWith("_") ||
-      schema_file == "ansible-navigator-config.json"
+      ["ansible-navigator-config.json", "rulebook.json"].includes(schema_file)
     ) {
       return;
     }

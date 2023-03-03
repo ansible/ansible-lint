@@ -1,0 +1,416 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json",
+    "type": "array",
+    "items": {"$ref": "#/$defs/ruleset"},
+    "minItems": 1,
+    "examples": ["rulebooks/*.yml", "rulebooks/*.yaml"],
+    "$defs": {
+        "ruleset": {
+            "type": "object",
+            "properties": {
+                "hosts": {
+                    "type": "string"
+                },
+                "gather_facts": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/source"}
+                },
+                "rules": {
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/rule"}
+                }
+            },
+            "required": [
+                "hosts",
+                "sources",
+                "rules"
+            ],
+            "additionalProperties": false
+        },
+        "source": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "filters": {
+                    "type": "array",
+                    "items": {"type": "object"}
+                }
+            },
+            "additionalProperties": {
+                "oneOf":[
+                    {"type": "object"},
+                    {"type": "null"}
+                ]
+            }
+        },
+        "throttle": {
+            "type": "object",
+	    "oneOf": [
+		    {"required": ["once_within", "group_by_attributes"]},
+		    {"required": ["once_after", "group_by_attributes"]}
+	    ],
+            "properties": {
+                "once_within" : {
+                    "type": "string",
+                    "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
+                },
+                "once_after" : {
+                    "type": "string",
+                    "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
+                },
+                "group_by_attributes": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                }
+            },
+            "additionalProperties": false
+        },
+        "rule": {
+            "type": "object",
+            "oneOf": [
+                  {"required": ["name", "condition", "actions"]},
+                  {"required": ["name", "condition", "action"]}
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                },
+                "enabled": { "type": "boolean" },
+                "throttle": {"$ref": "#/$defs/throttle"},
+                "condition": {
+                    "anyOf": [
+                        { "type": "string" },
+                        {"$ref": "#/$defs/all-condition"},
+                        {"$ref": "#/$defs/any-condition"},
+                        {"$ref": "#/$defs/not-all-condition"}
+                    ]
+                },
+                "actions": {
+                    "type": "array",
+                    "items": {
+                         "oneOf": [
+                                {"$ref": "#/$defs/run-playbook-action"},
+                                {"$ref": "#/$defs/run-module-action"},
+                                {"$ref": "#/$defs/run-job-template-action"},
+                                {"$ref": "#/$defs/post-event-action"},
+                                {"$ref": "#/$defs/set-fact-action"},
+                                {"$ref": "#/$defs/retract-fact-action"},
+                                {"$ref": "#/$defs/print-event-action"},
+                                {"$ref": "#/$defs/debug-action"},
+                                {"$ref": "#/$defs/none-action"},
+                                {"$ref": "#/$defs/shutdown-action"}
+                         ]
+                     }
+                },
+                "action": {
+                    "oneOf": [
+                        {"$ref": "#/$defs/run-playbook-action"},
+                        {"$ref": "#/$defs/run-module-action"},
+                        {"$ref": "#/$defs/run-job-template-action"},
+                        {"$ref": "#/$defs/post-event-action"},
+                        {"$ref": "#/$defs/set-fact-action"},
+                        {"$ref": "#/$defs/retract-fact-action"},
+                        {"$ref": "#/$defs/print-event-action"},
+                        {"$ref": "#/$defs/debug-action"},
+                        {"$ref": "#/$defs/none-action"},
+                        {"$ref": "#/$defs/shutdown-action"}
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "all-condition": {
+            "type": "object",
+            "properties": {
+                "all": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                },
+                "timeout" : {
+                    "type": "string",
+                    "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
+                }
+            },
+            "additionalProperties": false
+        },
+        "not-all-condition": {
+            "type": "object",
+            "properties": {
+                "not_all": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                },
+                "timeout" : {
+                    "type": "string",
+                    "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
+                }
+            },
+            "required": [
+                "timeout",
+                "not_all"
+            ],
+            "additionalProperties": false
+        },
+        "any-condition": {
+            "type": "object",
+            "properties": {
+                "any": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                }
+            },
+            "additionalProperties": false
+        },
+        "run-playbook-action": {
+            "type": "object",
+            "properties": {
+                "run_playbook": {
+                    "type": "object",
+                    "properties": {
+                        "copy_files": { "type": "boolean" },
+                        "name": {"type": "string" },
+                        "post_events": { "type": "boolean" },
+                        "set_facts": { "type": "boolean" },
+                        "ruleset": { "type": "string" },
+                        "verbosity": {"type": "integer" },
+                        "var_root": {"type": ["string","object"] },
+                        "json_mode": { "type": "boolean" },
+                        "retry": { "type": "boolean" },
+                        "retries": { "type": "integer" },
+                        "delay": { "type": "number" },
+                        "extra_vars": {"type": "object"}
+                    },
+                    "required": [
+                        "name"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                  "run_playbook"
+            ],
+            "additionalProperties": false
+        },
+        "run-module-action": {
+            "type": "object",
+            "properties": {
+                "run_module": {
+                    "type": "object",
+                    "properties": {
+                        "copy_files": { "type": "boolean" },
+                        "name": {"type": "string" },
+                        "post_events": { "type": "boolean" },
+                        "set_facts": { "type": "boolean" },
+                        "verbosity": {"type": "integer" },
+                        "var_root": {"type": ["string","object"] },
+                        "json_mode": { "type": "boolean" },
+                        "retry": { "type": "boolean" },
+                        "retries": { "type": "integer" },
+                        "delay": { "type": "number" },
+                        "module_args": {"type": "object"},
+                        "extra_vars": {"type": "object"}
+                    },
+                    "required": [
+                        "name"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                  "run_module"
+            ],
+            "additionalProperties": false
+        },
+        "run-job-template-action": {
+            "type": "object",
+            "properties": {
+                "run_job_template": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "organization": { "type": "string" },
+                        "job_args": { "type": "object" },
+                        "post_events": { "type": "boolean" },
+                        "set_facts": { "type": "boolean" },
+                        "ruleset": { "type": "string" },
+                        "var_root": { "type": "string" },
+                        "retry": { "type": "boolean" },
+                        "retries": { "type": "integer" },
+                        "delay": { "type": "integer" }
+                    },
+                    "required": [
+                        "name",
+                        "organization"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "run_job_template"
+            ],
+            "additionalProperties": false
+        },
+        "post-event-action": {
+            "type": "object",
+            "properties": {
+                "post_event": {
+                    "type": "object",
+                    "properties": {
+                        "ruleset": {"type": "string" },
+                        "event": {"type": "object" }
+                    },
+                    "required": [
+                       "event"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "post_event"
+            ],
+            "additionalProperties": false
+        },
+        "set-fact-action": {
+            "type": "object",
+            "properties": {
+                "set_fact": {
+                    "type": "object",
+                    "properties": {
+                        "ruleset": {"type": "string" },
+                        "fact": {"type": "object" }
+                    },
+                    "required": [
+                       "fact"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "set_fact"
+            ],
+            "additionalProperties": false
+        },
+        "retract-fact-action": {
+            "type": "object",
+            "properties": {
+                "retract_fact": {
+                    "type": "object",
+                    "properties": {
+                        "ruleset": {"type": "string" },
+                        "fact": {"type": "object" }
+                    },
+                    "required": [
+                       "fact"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "retract_fact"
+            ],
+            "additionalProperties": false
+        },
+        "print-event-action": {
+            "type": "object",
+            "properties": {
+                "print_event": {
+                    "type": ["object","null"],
+                    "properties": {
+                        "var_root": {"type": ["string","object"] },
+                        "pretty": {"type": "boolean" }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "print_event"
+            ],
+            "additionalProperties": false
+        },
+	"debug-msg": {
+		"type": "object",
+                "properties": {
+			    "msg": {
+				    "anyOf": [
+					    {"type": "string"},
+					    {"type": "array",
+					     "items": {"type": "string"}
+					    }
+				    ]
+			    }
+		},
+                "additionalProperties": false
+
+	},
+	"debug-var": {
+		"type": "object",
+                "properties": {
+			    "var": { "type": "string" }
+		},
+                "additionalProperties": false
+	},
+
+        "debug-action": {
+            "type": "object",
+            "properties": {
+                "debug": {
+                    "anyOf": [
+                        {"$ref": "#/$defs/debug-msg"},
+                        {"$ref": "#/$defs/debug-var"},
+			{"type": "null" }
+                    ]
+		}
+            },
+            "additionalProperties": false,
+            "required": [
+                "debug"
+            ]
+        },
+
+        "none-action": {
+            "type": "object",
+            "properties": {
+                "none": {
+                    "type": ["object","null"]
+                }
+            },
+            "required": [
+                "none"
+            ],
+            "additionalProperties": false
+        },
+        "shutdown-action": {
+            "type": "object",
+            "properties": {
+                "shutdown": {
+                    "type": ["object","null"],
+                    "properties": {
+                        "delay": {"type": "number" },
+                        "message": {"type": "string" },
+                        "kind" : {
+                           "type": "string",
+                           "enum": ["graceful", "now"]
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "shutdown"
+            ],
+            "additionalProperties": false
+        }
+    }
+}

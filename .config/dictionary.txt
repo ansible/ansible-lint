@@ -36,6 +36,7 @@ aarch64
 abspath
 addoption
 addopts
+alertmanager
 ansiblelint
 apidoc
 apport
@@ -124,6 +125,7 @@ extlinks
 facelessuser
 facter
 fakerole
+fastapi
 fileglob
 filelock
 filesspot
