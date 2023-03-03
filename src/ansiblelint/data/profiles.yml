@@ -21,13 +21,14 @@ basic:
     command-instead-of-module:
     command-instead-of-shell:
     deprecated-bare-vars:
-    deprecated-command-syntax:
     deprecated-local-action:
     deprecated-module:
     inline-env-var:
     key-order:
     literal-compare:
     jinja:
+    no-free-form: # schema-related
+      url: https://github.com/ansible/ansible-lint/issues/2117
     no-jinja-when:
     no-tabs:
     partial-become:
@@ -49,8 +50,6 @@ moderate:
     name[imperative]:
       url: https://github.com/ansible/ansible-lint/issues/2170
     name[casing]:
-    no-free-form: # schema-related
-      url: https://github.com/ansible/ansible-lint/issues/2117
     spell-var-name:
       url: https://github.com/ansible/ansible-lint/issues/2168
 safety:

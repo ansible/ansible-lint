@@ -77,7 +77,6 @@ nav:
       - rules/command-instead-of-module.md
       - rules/command-instead-of-shell.md
       - rules/deprecated-bare-vars.md
-      - rules/deprecated-command-syntax.md
       - rules/deprecated-local-action.md
       - rules/deprecated-module.md
       - rules/empty-string-compare.md

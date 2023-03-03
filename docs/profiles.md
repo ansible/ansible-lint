@@ -31,13 +31,13 @@ and formatting. It extends [min](#min) profile.
 - [command-instead-of-module](rules/command-instead-of-module.md)
 - [command-instead-of-shell](rules/command-instead-of-shell.md)
 - [deprecated-bare-vars](rules/deprecated-bare-vars.md)
-- [deprecated-command-syntax](rules/deprecated-command-syntax.md)
 - [deprecated-local-action](rules/deprecated-local-action.md)
 - [deprecated-module](rules/deprecated-module.md)
 - [inline-env-var](rules/inline-env-var.md)
 - [key-order](rules/key-order.md)
 - [literal-compare](rules/literal-compare.md)
 - [jinja](rules/jinja.md)
+- [no-free-form](https://github.com/ansible/ansible-lint/issues/2117)
 - [no-jinja-when](rules/no-jinja-when.md)
 - [no-tabs](rules/no-tabs.md)
 - [partial-become](rules/partial-become.md)
@@ -56,7 +56,6 @@ content easier to read and maintain. It extends [basic](#basic) profile.
 - [name[template]](rules/name.md)
 - [name[imperative]](https://github.com/ansible/ansible-lint/issues/2170)
 - [name[casing]](rules/name.md)
-- [no-free-form](https://github.com/ansible/ansible-lint/issues/2117)
 - [spell-var-name](https://github.com/ansible/ansible-lint/issues/2168)
 
 ## safety

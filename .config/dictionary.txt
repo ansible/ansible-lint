@@ -135,7 +135,6 @@ firewalld
 fontawesome
 formatstr
 formetting
-formsyntax
 fqcn
 fqrn
 fulltoc
