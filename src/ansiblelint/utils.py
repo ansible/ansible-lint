@@ -518,11 +518,6 @@ def _look_for_role_files(
     return results
 
 
-def _kv_to_dict(v: str) -> dict[str, Any]:
-    (command, args, kwargs) = tokenize(v)
-    return {"__ansible_module__": command, "__ansible_arguments__": args, **kwargs}
-
-
 def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
     """Return a stripped-off task structure compatible with new Ansible.
 
@@ -606,18 +601,6 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
         "__ansible_module_original__": action_unnormalized,
     }
 
-    if "_raw_params" in arguments:
-        # Doing a split here is really bad as it would break jinja2 templating
-        # parsing of the template must happen before any kind of split.
-        result["action"]["__ansible_arguments__"] = [arguments["_raw_params"]]
-        del arguments["_raw_params"]
-    else:
-        result["action"]["__ansible_arguments__"] = []
-
-    if "argv" in arguments and not result["action"]["__ansible_arguments__"]:
-        result["action"]["__ansible_arguments__"] = arguments["argv"]
-        del arguments["argv"]
-
     result["action"].update(arguments)
     return result
 
@@ -648,13 +631,14 @@ def task_to_str(task: dict[str, Any]) -> str:
         not in [
             "__ansible_module__",
             "__ansible_module_original__",
-            "__ansible_arguments__",
+            "_raw_params",
             LINE_NUMBER_KEY,
             FILENAME_KEY,
         ]
     ]
 
-    for item in action.get("__ansible_arguments__", []):
+    # breakpoint()
+    for item in action.get("_raw_params", []):
         args.append(str(item))
 
     return f"{action['__ansible_module__']} {' '.join(args)}"
@@ -769,13 +753,21 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
     return result
 
 
+def get_cmd_args(task: dict[str, Any]) -> str:
+    """Extract the args from a cmd task as a string."""
+    if "cmd" in task["action"]:
+        args = task["action"]["cmd"]
+    else:
+        args = task["action"].get("_raw_params", [])
+    if not isinstance(args, str):
+        return " ".join(args)
+    return args
+
+
 def get_first_cmd_arg(task: dict[str, Any]) -> Any:
     """Extract the first arg from a cmd task."""
     try:
-        if "cmd" in task["action"]:
-            first_cmd_arg = task["action"]["cmd"].split()[0]
-        else:
-            first_cmd_arg = task["action"]["__ansible_arguments__"][0].split()[0]
+        first_cmd_arg = get_cmd_args(task).split()[0]
     except IndexError:
         return None
     return first_cmd_arg
@@ -784,10 +776,7 @@ def get_first_cmd_arg(task: dict[str, Any]) -> Any:
 def get_second_cmd_arg(task: dict[str, Any]) -> Any:
     """Extract the second arg from a cmd task."""
     try:
-        if "cmd" in task["action"]:
-            second_cmd_arg = task["action"]["cmd"].split()[1]
-        else:
-            second_cmd_arg = task["action"]["__ansible_arguments__"][0].split()[1]
+        second_cmd_arg = get_cmd_args(task).split()[1]
     except IndexError:
         return None
     return second_cmd_arg

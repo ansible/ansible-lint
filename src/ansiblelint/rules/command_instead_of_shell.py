@@ -24,6 +24,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import get_cmd_args
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -144,12 +145,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
             if "executable" in task["action"]:
                 return False
 
-            if "cmd" in task["action"]:
-                jinja_stripped_cmd = self.unjinja(task["action"].get("cmd", []))
-            else:
-                jinja_stripped_cmd = self.unjinja(
-                    " ".join(task["action"].get("__ansible_arguments__", []))
-                )
+            jinja_stripped_cmd = self.unjinja(get_cmd_args(task))
             return not any(ch in jinja_stripped_cmd for ch in "&|<>;$\n*[]{}?`")
         return False
 
