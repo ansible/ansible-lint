@@ -207,29 +207,32 @@ repos:
     hooks:
       - id: pip-compile
         name: lock
+        alias: lock
         always_run: true
         entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib
-        language: python
         files: ^.config\/requirements.*$
-        alias: lock
-        stages: [manual]
+        language: python
         language_version: "3.9" # minimal we support officially
+        pass_filenames: false
+        stages: [manual]
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
         name: deps
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib
-        language: python
-        files: ^.config\/requirements.*$
         alias: deps
-        language_version: "3.9" # minimal we support officially
         always_run: true
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib
+        files: ^.config\/requirements.*$
+        language: python
+        language_version: "3.9" # minimal we support officially
+        pass_filenames: false
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
         entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --upgrade
         language: python
         always_run: true
+        pass_filenames: false
         files: ^.config\/requirements.*$
         alias: up
         stages: [manual]
@@ -243,3 +246,5 @@ repos:
         name: update json schemas
         entry: python3 src/ansiblelint/schemas/__main__.py
         language: python
+        pass_filenames: false
+        always_run: true

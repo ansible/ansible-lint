@@ -13,9 +13,10 @@ This rule can produce messages like:
 - `sanity[bad-ignore]` - Ignore file entry at {line_num} is formatted
   incorrectly. Please review.
 
-Currently allowed ignores are:
+Currently allowed ignores for all Ansible versions are:
 
 - `validate-modules:missing-gplv3-license`
+- `action-plugin-docs`
 - `import-2.6`
 - `import-2.6!skip`
 - `import-2.7`
@@ -28,6 +29,10 @@ Currently allowed ignores are:
 - `compile-2.7!skip`
 - `compile-3.5`
 - `compile-3.5!skip`
+
+Additionally allowed ignores for Ansible 2.9 are:
+- `validate-modules:deprecation-mismatch`
+- `validate-modules:invalid-documentation`
 
 ## Problematic code
 
