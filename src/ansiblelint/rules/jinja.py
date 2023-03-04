@@ -41,6 +41,7 @@ ignored_re = re.compile(
             r"unable to locate collection",
             r"^Error in (.*)is undefined$",
             r"^Mandatory variable (.*) not defined.$",
+            r"is undefined",
         ]
     ),
     flags=re.MULTILINE | re.DOTALL,
@@ -96,7 +97,7 @@ class JinjaRule(AnsibleLintRule):
                         match = self._ansible_error_re.match(
                             getattr(orig_exc, "message", str(orig_exc))
                         )
-                        if ignored_re.match(orig_exc_message):
+                        if ignored_re.search(orig_exc_message):
                             bypass = True
                         elif isinstance(orig_exc, AnsibleParserError):
                             # "An unhandled exception occurred while running the lookup plugin '...'. Error was a <class 'ansible.errors.AnsibleParserError'>, original message: Invalid filename: 'None'. Invalid filename: 'None'"
@@ -669,7 +670,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Tests our ability to spot spacing errors inside jinja2 templates."""
         collection = RulesCollection()
         collection.register(JinjaRule())
-        success = "examples/playbooks/rule-jinja-invalid.yml"
+        success = "examples/playbooks/rule-jinja-fail.yml"
         errs = Runner(success, rules=collection).run()
         assert len(errs) == 2
         assert errs[0].tag == "jinja[spacing]"
@@ -683,7 +684,7 @@ if "pytest" in sys.modules:  # noqa: C901
         """Tests our ability to parse jinja, even when variables may not be defined."""
         collection = RulesCollection()
         collection.register(JinjaRule())
-        success = "examples/playbooks/rule-jinja-valid.yml"
+        success = "examples/playbooks/rule-jinja-pass.yml"
         errs = Runner(success, rules=collection).run()
         assert len(errs) == 0
 
