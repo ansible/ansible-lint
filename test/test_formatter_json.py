@@ -43,6 +43,7 @@ class TestCodeclimateJSONFormatter:
                 details="hello",
                 filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
+                ignored=True,
             )
         )
         self.formatter = CodeclimateJSONFormatter(
@@ -91,6 +92,8 @@ class TestCodeclimateJSONFormatter:
         assert "lines" in single_match["location"]
         assert single_match["location"]["lines"]["begin"] == self.matches[0].linenumber
         assert "positions" not in single_match["location"]
+        # check that the 2nd match is marked as 'minor' because it was created with ignored=True
+        assert result[1]["severity"] == "minor"
 
     def test_validate_codeclimate_schema_with_positions(self) -> None:
         """Test if the returned JSON is a valid codeclimate report (containing 'positions' instead of 'lines')."""

@@ -50,6 +50,7 @@ class MatchError(ValueError):
         filename: Lintable | None = None,
         rule: BaseRule = RuntimeErrorRule(),
         tag: str | None = None,  # optional fine-graded tag
+        ignored: bool = False,
     ) -> None:
         """Initialize a MatchError instance."""
         super().__init__(message)
@@ -84,7 +85,7 @@ class MatchError(ValueError):
                 self.filename = normpath(filename)
                 self.lintable = Lintable(self.filename)
         self.rule = rule
-        self.ignored = False  # If set it will be displayed but not counted as failure
+        self.ignored = ignored  # If set it will be displayed but not counted as failure
         # This can be used by rules that can report multiple errors type, so
         # we can still filter by them.
         self.tag = tag or rule.id
@@ -101,7 +102,9 @@ class MatchError(ValueError):
     @functools.cached_property
     def level(self) -> str:
         """Return the level of the rule: error, warning or notice."""
-        if {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(options.warn_list):
+        if not self.ignored and {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(
+            options.warn_list
+        ):
             return "error"
         return "warning"
 
