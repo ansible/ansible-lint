@@ -56,3 +56,13 @@
     - name: Bag another allowed form of command
       ansible.builtin.command: "/etc/test.sh"
       changed_when: false
+
+    - name: Bug 3090
+      community.docker.docker_container_exec:
+        container: foo
+        argv:
+          - /bin/bash
+          - "-c"
+          - "ls -lah > /dev/stderr"
+        chdir: /root
+      register: result
