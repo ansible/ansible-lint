@@ -1,17 +1,9 @@
 """Utils to generate rules documentation."""
 import logging
 from collections.abc import Iterable
-from pathlib import Path
 
 from rich import box
-from rich.console import RenderableType
-
-# Remove this compatibility try-catch block once we drop support for rich < 10.7.0
-try:
-    from rich.console import group
-except ImportError:
-    from rich.console import render_group as group  # type: ignore
-
+from rich.console import RenderableType, group
 from rich.markdown import Markdown
 from rich.table import Table
 
@@ -29,46 +21,6 @@ Below you can see the list of default rules Ansible Lint use to evaluate playboo
 """
 
 _logger = logging.getLogger(__name__)
-
-
-def rules_as_docs(rules: RulesCollection) -> str:
-    """Dump documentation files for all rules, returns only confirmation message.
-
-    That is internally used for building documentation and the API can change
-    at any time.
-    """
-    result = ""
-    dump_path = Path(".") / "docs" / "rules"
-    if not dump_path.exists():
-        raise RuntimeError(f"Failed to find {dump_path} folder for dumping rules.")
-
-    with open(dump_path / ".." / "profiles.md", "w", encoding="utf-8") as f:
-        f.write(profiles_as_md(header=True, docs_url="rules/"))
-
-    for rule in rules.alphabetical():
-        result = ""
-        with open(dump_path / f"{rule.id}.md", "w", encoding="utf-8") as f:
-            # because title == rule.id we get the desired labels for free
-            # and we do not have to insert `(target_header)=`
-            title = f"{rule.id}"
-
-            if rule.help:
-                if not rule.help.startswith(f"# {rule.id}"):
-                    raise RuntimeError(
-                        f"Rule {rule.__class__} markdown help does not start with `# {rule.id}` header.\n{rule.help}"
-                    )
-                result = result[1:]
-                result += f"{rule.help}"
-            else:
-                description = rule.description
-                if rule.link:
-                    description += f" [more]({rule.link})"
-
-                result += f"# {title}\n\n**{rule.shortdesc}**\n\n{description}"
-            result = result.strip() + "\n"
-            f.write(result)
-
-    return "All markdown files for rules were dumped!"
 
 
 def rules_as_str(rules: RulesCollection) -> RenderableType:
@@ -95,7 +47,7 @@ def rules_as_md(rules: RulesCollection) -> str:
         title = f"{rule.id}"
 
         if rule.help:
-            if not rule.help.startswith(f"# {rule.id}"):
+            if not rule.help.startswith(f"# {rule.id}"):  # pragma: no cover
                 raise RuntimeError(
                     f"Rule {rule.__class__} markdown help does not start with `# {rule.id}` header.\n{rule.help}"
                 )
