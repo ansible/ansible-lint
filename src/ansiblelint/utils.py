@@ -26,9 +26,8 @@ import inspect
 import logging
 import os
 import re
-import warnings
 from argparse import Namespace
-from collections.abc import Generator, ItemsView, Mapping, Sequence
+from collections.abc import ItemsView, Mapping, Sequence
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable
@@ -878,26 +877,3 @@ def _extend_with_roles(lintables: list[Lintable]) -> None:
 def convert_to_boolean(value: Any) -> bool:
     """Use Ansible to convert something to a boolean."""
     return bool(boolean(value))
-
-
-def nested_items(
-    data: dict[Any, Any] | list[Any], parent: str = ""
-) -> Generator[tuple[Any, Any, str], None, None]:
-    """Iterate a nested data structure."""
-    warnings.warn(
-        "Call to deprecated function ansiblelint.utils.nested_items. "
-        "Use ansiblelint.yaml_utils.nested_items_path instead.",
-        category=DeprecationWarning,
-        stacklevel=2,
-    )
-    if isinstance(data, dict):
-        for k, v in data.items():
-            yield k, v, parent
-            # pylint: disable=redefined-outer-name
-            for k, v, returned_parent in nested_items(v, k):
-                yield k, v, returned_parent
-    if isinstance(data, list):
-        for item in data:
-            yield "list-item", item, parent
-            for k, v, returned_parent in nested_items(item):
-                yield k, v, returned_parent

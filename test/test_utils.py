@@ -376,24 +376,6 @@ def test_get_rules_dirs_with_custom_rules(
     assert get_rules_dirs(user_ruledirs, use_default) == expected
 
 
-def test_nested_items() -> None:
-    """Verify correct function of nested_items()."""
-    data = {"foo": "text", "bar": {"some": "text2"}, "fruits": ["apple", "orange"]}
-
-    items = [
-        ("foo", "text", ""),
-        ("bar", {"some": "text2"}, ""),
-        ("some", "text2", "bar"),
-        ("fruits", ["apple", "orange"], ""),
-        ("list-item", "apple", "fruits"),
-        ("list-item", "orange", "fruits"),
-    ]
-    with pytest.deprecated_call(
-        match=r"Call to deprecated function ansiblelint\.utils\.nested_items.*"
-    ):
-        assert list(utils.nested_items(data)) == items
-
-
 def test_find_children() -> None:
     """Verify correct function of find_children()."""
     utils.find_children(Lintable("examples/playbooks/find_children.yml"))
