@@ -179,7 +179,7 @@ class LoadingFailureRule(BaseRule):
     severity = "VERY_HIGH"
     tags = ["core", "unskippable"]
     version_added = "v4.3.0"
-    help = LOAD_FAILURE_MD
+    _help = LOAD_FAILURE_MD
     _order = 0
 
 
