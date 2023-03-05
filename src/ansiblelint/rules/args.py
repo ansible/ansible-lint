@@ -249,7 +249,7 @@ if "pytest" in sys.modules:
         assert results[2].tag == "args[module]"
         assert "Unsupported parameters for" in results[2].message
         assert results[3].tag == "args[module]"
-        assert "Unsupported parameters for" in results[2].message
+        assert "Unsupported parameters for" in results[3].message
         assert results[4].tag == "args[module]"
         assert "value of state must be one of" in results[4].message
 
