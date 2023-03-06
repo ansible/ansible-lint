@@ -110,7 +110,7 @@
       "type": "object"
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible-requirements.json",
+  "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "anyOf": [
     {
