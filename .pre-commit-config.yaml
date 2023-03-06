@@ -31,7 +31,7 @@ repos:
       - id: check-useless-excludes
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: v3.0.0-alpha.4
+    rev: v3.0.0-alpha.6
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting
@@ -58,7 +58,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.27.0
+    rev: v6.28.0
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -182,7 +182,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.16.2
+    rev: v2.16.4
     hooks:
       - id: pylint
         args:
