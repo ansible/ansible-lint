@@ -116,6 +116,7 @@ nav:
       - rules/risky-shell-pipe.md
       - rules/role-name.md
       - rules/run-once.md
+      - rules/sanity.md
       - rules/schema.md
       - rules/syntax-check.md
       - rules/var-naming.md
