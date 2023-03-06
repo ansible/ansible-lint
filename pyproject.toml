@@ -166,6 +166,8 @@ filterwarnings = [
   "error",
   # https://sourceforge.net/p/ruamel-yaml/tickets/452/
   "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
+  # https://github.com/spdx/tools-python/issues/507
+  "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
 ]
 junit_duration_report = "call"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
