@@ -238,7 +238,7 @@
       "type": ["string", "null"]
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/changelog.json",
+  "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/changelog.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
   "examples": ["changelogs/changelog.yaml"],

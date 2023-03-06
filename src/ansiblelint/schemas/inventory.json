@@ -42,7 +42,7 @@
       "type": "object"
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible-inventory.json",
+  "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": true,
   "description": "Ansible Inventory Schema",
