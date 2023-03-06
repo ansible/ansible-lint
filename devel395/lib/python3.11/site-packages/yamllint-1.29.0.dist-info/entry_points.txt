@@ -1,0 +1,2 @@
+[console_scripts]
+yamllint = yamllint.cli:run

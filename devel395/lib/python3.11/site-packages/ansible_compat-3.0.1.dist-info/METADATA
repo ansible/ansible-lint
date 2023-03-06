@@ -1,0 +1,70 @@
+Metadata-Version: 2.1
+Name: ansible-compat
+Version: 3.0.1
+Summary: Ansible compatibility goodies
+Author-email: Sorin Sbarnea <ssbarnea@redhat.com>
+Maintainer-email: Sorin Sbarnea <ssbarnea@redhat.com>
+License: MIT
+Project-URL: homepage, https://github.com/ansible/ansible-compat
+Project-URL: documentation, https://ansible-compat.readthedocs.io/
+Project-URL: repository, https://github.com/ansible/ansible-compat
+Project-URL: changelog, https://github.com/ansible/ansible-compat/releases
+Keywords: ansible
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: Software Development :: Bug Tracking
+Classifier: Topic :: Software Development :: Quality Assurance
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: ansible-core (>=2.12)
+Requires-Dist: packaging
+Requires-Dist: PyYAML
+Requires-Dist: subprocess-tee (>=0.4.1)
+Requires-Dist: jsonschema (>=4.6.0)
+Provides-Extra: docs
+Requires-Dist: argparse-manpage ; extra == 'docs'
+Requires-Dist: black ; extra == 'docs'
+Requires-Dist: cairosvg ; extra == 'docs'
+Requires-Dist: markdown-include ; extra == 'docs'
+Requires-Dist: mkdocs ; extra == 'docs'
+Requires-Dist: mkdocs-exclude ; extra == 'docs'
+Requires-Dist: mkdocs-material ; extra == 'docs'
+Requires-Dist: mkdocs-material-extensions ; extra == 'docs'
+Requires-Dist: mkdocstrings ; extra == 'docs'
+Requires-Dist: mkdocstrings-python ; extra == 'docs'
+Requires-Dist: pillow ; extra == 'docs'
+Requires-Dist: pymdown-extensions ; extra == 'docs'
+Requires-Dist: slugify ; extra == 'docs'
+Provides-Extra: test
+Requires-Dist: coverage ; extra == 'test'
+Requires-Dist: pip-tools ; extra == 'test'
+Requires-Dist: pytest (>=7.2.0) ; extra == 'test'
+Requires-Dist: pytest-mock ; extra == 'test'
+Requires-Dist: pytest-plus ; extra == 'test'
+
+# ansible-compat
+
+[![pypi](https://img.shields.io/pypi/v/ansible-compat.svg)](https://pypi.org/project/ansible-compat/)
+[![docs](https://readthedocs.org/projects/ansible-compat/badge/?version=latest)](https://ansible-compat.readthedocs.io/en/latest/)
+[![gh](https://github.com/ansible/ansible-compat/actions/workflows/tox.yml/badge.svg)](https://github.com/ansible/ansible-compat/actions/workflows/tox.yml)
+[![codecov.io](https://codecov.io/github/ansible/ansible-compat/coverage.svg?branch=main)](https://codecov.io/github/ansible/ansible-compat?branch=main)
+
+A python package contains functions that facilitate working with various
+versions of Ansible 2.12 and newer.
+
+Documentation is available at [ansible-compat.readthedocs.io](https://ansible-compat.readthedocs.io/en/latest/).

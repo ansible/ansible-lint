@@ -1,0 +1,68 @@
+Metadata-Version: 2.1
+Name: subprocess-tee
+Version: 0.4.1
+Summary: subprocess-tee
+Author-email: Sorin Sbarnea <sorin.sbarnea@gmail.com>
+Maintainer-email: Sorin Sbarnea <sorin.sbarnea@gmail.com>
+License: MIT
+Project-URL: homepage, https://github.com/pycontribs/subprocess-tee
+Project-URL: documentation, https://subprocess-tee.readthedocs.io
+Project-URL: repository, https://github.com/pycontribs/subprocess-tee
+Project-URL: changelog, https://github.com/pycontribs/subprocess-tee/releases
+Keywords: subprocess,asyncio
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: test
+Requires-Dist: enrich (>=1.2.6) ; extra == 'test'
+Requires-Dist: molecule (>=3.4.0) ; extra == 'test'
+Requires-Dist: pytest-cov (>=2.12.1) ; extra == 'test'
+Requires-Dist: pytest-plus (>=0.2) ; extra == 'test'
+Requires-Dist: pytest-xdist (>=2.3.0) ; extra == 'test'
+Requires-Dist: pytest (>=6.2.5) ; extra == 'test'
+
+# subprocess-tee
+
+This package provides a drop-in alternative to `subprocess.run` that
+captures the output while still printing it in **real-time**, just the way
+`tee` does.
+
+Printing output in real-time while still capturing is valuable for
+any tool that executes long-running child processes. For those, you do want
+to provide instant feedback (progress) related to what is happening.
+
+```python
+# from subprocess import run
+from subprocess_tee import run
+
+result = run("echo 123")
+result.stdout == "123\n"
+```
+
+You can add `tee=False` to disable the tee functionality if you want, this
+being a much shorter alternative than adding the well known
+`stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL`.
+
+Keep in mind that `universal_newlines=True` is implied as we expect text
+processing, this being a divergence from the original `subprocess.run`.
+
+You can still use `check=True` in order to make it raise CompletedProcess
+exception when the result code is not zero.

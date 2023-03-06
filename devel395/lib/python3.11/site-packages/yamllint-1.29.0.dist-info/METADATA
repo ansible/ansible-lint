@@ -1,0 +1,37 @@
+Metadata-Version: 2.1
+Name: yamllint
+Version: 1.29.0
+Summary: A linter for YAML files.
+Home-page: https://github.com/adrienverge/yamllint
+Author: Adrien Vergé
+License: GPLv3
+Project-URL: Documentation, https://yamllint.readthedocs.io
+Project-URL: Download, https://pypi.org/project/yamllint/#files
+Project-URL: Bug Tracker, https://github.com/adrienverge/yamllint/issues
+Project-URL: Source Code, https://github.com/adrienverge/yamllint
+Keywords: yaml,lint,linter,syntax,checker
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Debuggers
+Classifier: Topic :: Software Development :: Quality Assurance
+Classifier: Topic :: Software Development :: Testing
+Requires-Python: >=3.7
+License-File: LICENSE
+Requires-Dist: pathspec (>=0.5.3)
+Requires-Dist: pyyaml
+Requires-Dist: setuptools
+
+A linter for YAML files.
+
+yamllint does not only check for syntax validity, but for weirdnesses like key
+repetition and cosmetic problems such as lines length, trailing spaces,
+indentation, etc.
