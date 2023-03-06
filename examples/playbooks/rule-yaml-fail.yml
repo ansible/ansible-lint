@@ -1,0 +1,18 @@
+---
+- name: Fixture for yaml rule that should generate 3 errors
+  # https://github.com/ansible/ansible-lint/issues/3139
+  hosts: localhost
+  tasks:
+    - name: "1"
+      ansible.builtin.debug:
+        msg: yes
+
+    - name: "2"
+      ansible.builtin.debug:
+        msg: yes
+      tags:
+        - skip_ansible_lint # this has no effect for yamllint rule
+
+    - name: "3"
+      ansible.builtin.debug:
+        msg: yes

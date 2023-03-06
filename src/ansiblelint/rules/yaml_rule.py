@@ -38,7 +38,6 @@ class YamllintRule(AnsibleLintRule):
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""
         matches: list[MatchError] = []
-        filtered_matches: list[MatchError] = []
         if str(file.base_kind) != "text/yaml":
             return matches
 
@@ -58,23 +57,7 @@ class YamllintRule(AnsibleLintRule):
                     tag=f"yaml[{problem.rule}]",
                 )
             )
-
-        # Now we save inside the file the skips, so they can be removed later,
-        # especially as these skips can be about other rules than yaml one.
-        _fetch_skips(file.data, file.line_skips)
-
-        for match in matches:
-            last_skips = set()
-
-            for line, skips in file.line_skips.items():
-                if line > match.linenumber:
-                    break
-                last_skips = skips
-            if last_skips.intersection({"skip_ansible_lint", match.rule.id, match.tag}):
-                continue
-            filtered_matches.append(match)
-
-        return filtered_matches
+        return matches
 
 
 def _combine_skip_rules(data: Any) -> set[str]:
@@ -126,7 +109,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         ("file", "expected_kind", "expected"),
         (
-            (
+            pytest.param(
                 "examples/yamllint/invalid.yml",
                 "yaml",
                 [
@@ -134,28 +117,31 @@ if "pytest" in sys.modules:
                     'Duplication of key "foo" in mapping',
                     "Trailing spaces",
                 ],
+                id="invalid",
             ),
-            (
-                "examples/yamllint/valid.yml",
-                "yaml",
+            pytest.param("examples/yamllint/valid.yml", "yaml", [], id="valid"),
+            pytest.param(
+                "examples/yamllint/multi-document.yaml", "yaml", [], id="multi-document"
+            ),
+            pytest.param(
+                "examples/yamllint/skipped-rule.yml", "yaml", [], id="skipped-rule"
+            ),
+            pytest.param(
+                "examples/playbooks/rule-yaml-fail.yml",
+                "playbook",
+                [
+                    "Truthy value should be one of [false, true]",
+                    "Truthy value should be one of [false, true]",
+                    "Truthy value should be one of [false, true]",
+                ],
+                id="rule-yaml-fail",
+            ),
+            pytest.param(
+                "examples/playbooks/rule-yaml-pass.yml",
+                "playbook",
                 [],
+                id="rule-yaml-pass",
             ),
-            (
-                "examples/yamllint/multi-document.yaml",
-                "yaml",
-                [],
-            ),
-            (
-                "examples/yamllint/skipped-rule.yml",
-                "yaml",
-                [],
-            ),
-        ),
-        ids=(
-            "invalid",
-            "valid",
-            "multi-document",
-            "skipped-rule",
         ),
     )
     def test_yamllint(file: str, expected_kind: str, expected: list[str]) -> None:
