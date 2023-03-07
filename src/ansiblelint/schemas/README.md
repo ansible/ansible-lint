@@ -46,8 +46,8 @@ which subschema to use. You can also look at our
 [vscode-yaml](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 extension.
 
-- [playbook subschema url](https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook)
-- [tasks subschema uri](https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/tasks)
+- [playbook subschema url](https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook)
+- [tasks subschema uri](https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/tasks)
 
 ## Jinja2 implicit vs explicit templating
 
