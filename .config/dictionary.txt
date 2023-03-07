@@ -159,6 +159,7 @@ importlib
 iniconfig
 inlinehilite
 insertafter
+ipaddr
 ipwrap
 isclass
 iscsi
