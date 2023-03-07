@@ -66,3 +66,12 @@
           - "ls -lah > /dev/stderr"
         chdir: /root
       register: result
+
+    - name: "Bug 3138"
+      become: true
+      ansible.builtin.service:
+        name: "jenkins"
+        state: started
+        # 'use' is dropped by preprocessing ...
+        use: "{{ ansible_service_mgr }}"
+      changed_when: false

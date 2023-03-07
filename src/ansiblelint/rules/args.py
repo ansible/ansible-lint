@@ -42,7 +42,8 @@ workarounds_drop_map = {
     # https://github.com/ansible/ansible-lint/issues/3110
     "ansible.builtin.copy": ["decrypt"],
     # https://github.com/ansible/ansible-lint/issues/2824#issuecomment-1354337466
-    "ansible.builtin.service": ["daemon_reload"],
+    # https://github.com/ansible/ansible-lint/issues/3138
+    "ansible.builtin.service": ["daemon_reload", "use"],
     # Avoid: Unsupported parameters for (basic.py) module: cmd. Supported parameters include: _raw_params, _uses_shell, argv, chdir, creates, executable, removes, stdin, stdin_add_newline, strip_empty_ends.
     "ansible.builtin.command": ["cmd"],
 }
