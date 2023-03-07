@@ -33,6 +33,13 @@ ignored_re = re.compile(
     "|".join(
         [
             r"^parameters are mutually exclusive:",
+            # https://github.com/ansible/ansible-lint/issues/3128 as strings can be jinja
+            # Do not remove unless you manually test if the original example
+            # from the bug does not trigger the rule anymore. We were not able
+            # to add a regression test because it would involve installing this
+            # collection. Attempts to reproduce same bug with other collections
+            # failed, even if the message originates from Ansible core.
+            r"^unable to evaluate string as dictionary$",
         ]
     ),
     flags=re.MULTILINE | re.DOTALL,
