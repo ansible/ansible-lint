@@ -122,7 +122,7 @@ if __name__ == "__main__":
         sub_json["$comment"] = "Generated from ansible.json, do not edit."
         sub_json[
             "$id"
-        ] = f"https://raw.githubusercontent.com/ansible-lint/main/src/ansiblelint/schemas/{subschema}.json"
+        ] = f"https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/{subschema}.json"
 
         # Remove all unreferenced ($ref) definitions ($defs) recursively
         while True:
