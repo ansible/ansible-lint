@@ -1,0 +1,7 @@
+---
+# yamllint disable rule:truthy
+- name: Fixture for yaml rule testing ability to use disable comments
+  hosts: localhost
+  tasks: []
+  become: yes # <-- allowed only due to comment above
+# yamllint enable rule:truthy

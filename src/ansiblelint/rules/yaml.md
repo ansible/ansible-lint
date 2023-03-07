@@ -28,6 +28,11 @@ warn_list:
   - yaml[document-start]
 ```
 
+!!! warning
+
+    You cannot use `tags: [skip_ansible_lint]` to disable this rule but you can
+    use [yamllint magic comments](https://yamllint.readthedocs.io/en/stable/disable_with_comments.html#disabling-checks-for-all-or-part-of-the-file) for tuning it.
+
 See the
 [list of yamllint rules](https://yamllint.readthedocs.io/en/stable/rules.html)
 for more information.
