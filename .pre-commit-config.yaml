@@ -248,4 +248,4 @@ repos:
         language: python
         pass_filenames: false
         always_run: true
-        stages: [manual]
+        # stages: [manual]
