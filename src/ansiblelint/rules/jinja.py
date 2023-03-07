@@ -42,6 +42,7 @@ ignored_re = re.compile(
             r"^Error in (.*)is undefined$",
             r"^Mandatory variable (.*) not defined.$",
             r"is undefined",
+            r"Unrecognized type <<class 'ansible.template.AnsibleUndefined'>> for (.*) filter <value>$",
         ]
     ),
     flags=re.MULTILINE | re.DOTALL,
