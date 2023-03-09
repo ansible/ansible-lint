@@ -53,6 +53,8 @@ workarounds_drop_map = {
     "ansible.builtin.service": ["daemon_reload", "use"],
     # Avoid: Unsupported parameters for (basic.py) module: cmd. Supported parameters include: _raw_params, _uses_shell, argv, chdir, creates, executable, removes, stdin, stdin_add_newline, strip_empty_ends.
     "ansible.builtin.command": ["cmd"],
+    # https://github.com/ansible/ansible-lint/issues/3152
+    "ansible.posix.synchronize": ["use_ssh_args"],
 }
 workarounds_inject_map = {
     # https://github.com/ansible/ansible-lint/issues/2824
