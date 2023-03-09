@@ -77,3 +77,7 @@
     - name: Bug https://github.com/ansible/ansible-lint/issues/3136
       ansible.builtin.debug:
         msg: "IP is {{ foo | ansible.utils.ipaddr('address') }}"
+
+    - name: "Bug https://github.com/ansible/ansible-lint/issues/3155"
+      ansible.builtin.debug:
+        msg: "Is changed:{{ date_cmd is changed }}"
