@@ -43,6 +43,8 @@ ignored_re = re.compile(
             r"^Mandatory variable (.*) not defined.$",
             r"is undefined",
             r"Unrecognized type <<class 'ansible.template.AnsibleUndefined'>> for (.*) filter <value>$",
+            # https://github.com/ansible/ansible-lint/issues/3155
+            r"^The '(.*)' test expects a dictionary$",
         ]
     ),
     flags=re.MULTILINE | re.DOTALL,
