@@ -57,6 +57,7 @@ nav:
       - index: rules/index.md
       - rules/args.md
       - rules/avoid-implicit.md
+      - rules/complexity.md
       - rules/command-instead-of-module.md
       - rules/command-instead-of-shell.md
       - rules/deprecated-bare-vars.md

@@ -2,6 +2,7 @@
 
 - [args][]
 - [avoid-implicit][]
+- [complexity][]
 - [command-instead-of-module][]
 - [command-instead-of-shell][]
 - [deprecated-bare-vars][]

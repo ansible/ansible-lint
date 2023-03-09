@@ -131,6 +131,7 @@ options = Namespace(
     profile=None,
     task_name_prefix="{stem} | ",
     sarif_file=None,
+    max_tasks=100,
 )
 
 # Used to store detected tag deprecations
