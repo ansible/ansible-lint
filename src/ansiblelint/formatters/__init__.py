@@ -278,7 +278,7 @@ class SarifFormatter(BaseFormatter[Any]):
         result: dict[str, Any] = {
             "ruleId": match.tag,
             "message": {
-                "text": str(match.message),
+                "text": str(match.details),
             },
             "locations": [
                 {

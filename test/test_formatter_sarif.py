@@ -99,7 +99,7 @@ class TestSarifFormatter:
         assert len(results) == 2
         for i, result in enumerate(results):
             assert result["ruleId"] == self.matches[i].tag
-            assert result["message"]["text"] == self.matches[0].message
+            assert result["message"]["text"] == self.matches[0].details
             assert (
                 result["locations"][0]["physicalLocation"]["artifactLocation"]["uri"]
                 == self.matches[i].filename
