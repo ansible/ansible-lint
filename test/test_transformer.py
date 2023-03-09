@@ -63,7 +63,7 @@ def fixture_runner_result(
         pytest.param("examples/playbooks/unicode.yml", 1, False, id="unicode"),
         pytest.param(
             "examples/playbooks/lots_of_warnings.yml",
-            992,
+            993,
             False,
             id="lots_of_warnings",
         ),

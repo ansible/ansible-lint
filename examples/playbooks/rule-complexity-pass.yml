@@ -1,0 +1,23 @@
+---
+- name: Test fixture complexity rule
+  hosts: all
+  tasks:
+    - name: Task 1
+      ansible.builtin.debug:
+        msg: "This is task 1"
+
+    - name: Task 2
+      ansible.builtin.debug:
+        msg: "This is task 2"
+
+    - name: Task 3
+      ansible.builtin.debug:
+        msg: "This is task 3"
+
+    - name: Task 4
+      ansible.builtin.debug:
+        msg: "This is task 4"
+
+    - name: Task 5
+      ansible.builtin.debug:
+        msg: "This is task 5"
