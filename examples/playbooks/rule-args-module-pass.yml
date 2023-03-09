@@ -75,3 +75,11 @@
         # 'use' is dropped by preprocessing ...
         use: "{{ ansible_service_mgr }}"
       changed_when: false
+
+    - name: "Bug 3152"
+      ansible.posix.synchronize:
+        src: .
+        dest: .
+        owner: false
+        group: false
+        use_ssh_args: true
