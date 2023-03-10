@@ -35,15 +35,15 @@ The following values are supported, and function identically to their CLI
 counterparts:
 
 ```yaml
---8<-- ".ansible-lint"
+{!../.ansible-lint!}
 ```
 
 ## Ignoring rules for entire files
 
 Ansible-lint will load skip rules from an `.ansible-lint-ignore` or
-`.config/ansible-lint-ignore.txt` file that should reside adjacent to the config file.
-The file format is very simple, containing the filename and the rule to be ignored.
-It also supports comments starting with `#`.
+`.config/ansible-lint-ignore.txt` file that should reside adjacent to the config
+file. The file format is very simple, containing the filename and the rule to be
+ignored. It also supports comments starting with `#`.
 
 ```yaml title=".ansible-lint-ignore"
 # this is just a comment
