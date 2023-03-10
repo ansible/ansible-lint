@@ -270,8 +270,6 @@ class SarifFormatter(BaseFormatter[Any]):
             "helpUri": match.rule.url,
             "properties": {"tags": match.rule.tags},
         }
-        if match.rule.link:
-            rule["helpUri"] = match.rule.link
         return rule
 
     def _to_sarif_result(self, match: MatchError) -> dict[str, Any]:
