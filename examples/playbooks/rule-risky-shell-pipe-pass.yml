@@ -60,3 +60,11 @@
         set -o pipefail
         df | grep '/dev'
       changed_when: false
+
+    - name: "PowerShell with pipefail should be ok, bug #3161"
+      # https://github.com/ansible/ansible-lint/issues/3161
+      ansible.builtin.shell:
+        executable: /bin/pwsh
+        cmd: |
+          $ProgressPreference = 'this | that'
+      changed_when: false

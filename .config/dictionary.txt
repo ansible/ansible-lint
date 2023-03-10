@@ -255,6 +255,7 @@ prerun
 prettierignore
 programoutput
 psutil
+pwsh
 pyargs
 pycache
 pycharm
