@@ -94,7 +94,7 @@ class TestSarifFormatter:
         assert rules[0]["defaultConfiguration"]["level"] == "error"
         assert rules[0]["help"]["text"] == self.matches[0].rule.description
         assert rules[0]["properties"]["tags"] == self.matches[0].rule.tags
-        assert rules[0]["helpUri"] == self.rule.link
+        assert rules[0]["helpUri"] == self.matches[0].rule.url
         results = sarif["runs"][0]["results"]
         assert len(results) == 2
         for i, result in enumerate(results):
