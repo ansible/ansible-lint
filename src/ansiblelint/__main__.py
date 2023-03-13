@@ -375,7 +375,7 @@ def path_inject() -> None:
     # Expand ~ in PATH as it known to break many tools
     expanded = False
     for idx, path in enumerate(paths):
-        if "~" in path:  # pragma: no cover
+        if path.startswith("~"):  # pragma: no cover
             paths[idx] = os.path.expanduser(path)
             expanded = True
     if expanded:  # pragma: no cover
