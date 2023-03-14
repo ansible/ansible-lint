@@ -1,10 +1,15 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/rulebook.json",
+    "$id": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json",
     "type": "array",
-    "items": {"$ref": "#/$defs/ruleset"},
+    "items": {
+        "$ref": "#/$defs/ruleset"
+    },
     "minItems": 1,
-    "examples": ["rulebooks/*.yml", "rulebooks/*.yaml"],
+    "examples": [
+        "rulebooks/*.yml",
+        "rulebooks/*.yaml"
+    ],
     "$defs": {
         "ruleset": {
             "type": "object",
@@ -21,11 +26,15 @@
                 },
                 "sources": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/source"}
+                    "items": {
+                        "$ref": "#/$defs/source"
+                    }
                 },
                 "rules": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/rule"}
+                    "items": {
+                        "$ref": "#/$defs/rule"
+                    }
                 }
             },
             "required": [
@@ -43,34 +52,52 @@
                 },
                 "filters": {
                     "type": "array",
-                    "items": {"type": "object"}
+                    "items": {
+                        "type": "object"
+                    }
                 }
             },
             "additionalProperties": {
-                "oneOf":[
-                    {"type": "object"},
-                    {"type": "null"}
+                "oneOf": [
+                    {
+                        "type": "object"
+                    },
+                    {
+                        "type": "null"
+                    }
                 ]
             }
         },
         "throttle": {
             "type": "object",
-	    "oneOf": [
-		    {"required": ["once_within", "group_by_attributes"]},
-		    {"required": ["once_after", "group_by_attributes"]}
-	    ],
+            "oneOf": [
+                {
+                    "required": [
+                        "once_within",
+                        "group_by_attributes"
+                    ]
+                },
+                {
+                    "required": [
+                        "once_after",
+                        "group_by_attributes"
+                    ]
+                }
+            ],
             "properties": {
-                "once_within" : {
+                "once_within": {
                     "type": "string",
                     "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
                 },
-                "once_after" : {
+                "once_after": {
                     "type": "string",
                     "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
                 },
                 "group_by_attributes": {
                     "type": "array",
-                    "items": { "type": "string" }
+                    "items": {
+                        "type": "string"
+                    }
                 }
             },
             "additionalProperties": false
@@ -78,8 +105,20 @@
         "rule": {
             "type": "object",
             "oneOf": [
-                  {"required": ["name", "condition", "actions"]},
-                  {"required": ["name", "condition", "action"]}
+                {
+                    "required": [
+                        "name",
+                        "condition",
+                        "actions"
+                    ]
+                },
+                {
+                    "required": [
+                        "name",
+                        "condition",
+                        "action"
+                    ]
+                }
             ],
             "properties": {
                 "name": {
@@ -87,45 +126,97 @@
                     "minLength": 1,
                     "pattern": "\\S"
                 },
-                "enabled": { "type": "boolean" },
-                "throttle": {"$ref": "#/$defs/throttle"},
+                "enabled": {
+                    "type": "boolean"
+                },
+                "throttle": {
+                    "$ref": "#/$defs/throttle"
+                },
                 "condition": {
                     "anyOf": [
-                        { "type": "string" },
-                        {"$ref": "#/$defs/all-condition"},
-                        {"$ref": "#/$defs/any-condition"},
-                        {"$ref": "#/$defs/not-all-condition"}
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/all-condition"
+                        },
+                        {
+                            "$ref": "#/$defs/any-condition"
+                        },
+                        {
+                            "$ref": "#/$defs/not-all-condition"
+                        }
                     ]
                 },
                 "actions": {
                     "type": "array",
                     "items": {
-                         "oneOf": [
-                                {"$ref": "#/$defs/run-playbook-action"},
-                                {"$ref": "#/$defs/run-module-action"},
-                                {"$ref": "#/$defs/run-job-template-action"},
-                                {"$ref": "#/$defs/post-event-action"},
-                                {"$ref": "#/$defs/set-fact-action"},
-                                {"$ref": "#/$defs/retract-fact-action"},
-                                {"$ref": "#/$defs/print-event-action"},
-                                {"$ref": "#/$defs/debug-action"},
-                                {"$ref": "#/$defs/none-action"},
-                                {"$ref": "#/$defs/shutdown-action"}
-                         ]
-                     }
+                        "oneOf": [
+                            {
+                                "$ref": "#/$defs/run-playbook-action"
+                            },
+                            {
+                                "$ref": "#/$defs/run-module-action"
+                            },
+                            {
+                                "$ref": "#/$defs/run-job-template-action"
+                            },
+                            {
+                                "$ref": "#/$defs/post-event-action"
+                            },
+                            {
+                                "$ref": "#/$defs/set-fact-action"
+                            },
+                            {
+                                "$ref": "#/$defs/retract-fact-action"
+                            },
+                            {
+                                "$ref": "#/$defs/print-event-action"
+                            },
+                            {
+                                "$ref": "#/$defs/debug-action"
+                            },
+                            {
+                                "$ref": "#/$defs/none-action"
+                            },
+                            {
+                                "$ref": "#/$defs/shutdown-action"
+                            }
+                        ]
+                    }
                 },
                 "action": {
                     "oneOf": [
-                        {"$ref": "#/$defs/run-playbook-action"},
-                        {"$ref": "#/$defs/run-module-action"},
-                        {"$ref": "#/$defs/run-job-template-action"},
-                        {"$ref": "#/$defs/post-event-action"},
-                        {"$ref": "#/$defs/set-fact-action"},
-                        {"$ref": "#/$defs/retract-fact-action"},
-                        {"$ref": "#/$defs/print-event-action"},
-                        {"$ref": "#/$defs/debug-action"},
-                        {"$ref": "#/$defs/none-action"},
-                        {"$ref": "#/$defs/shutdown-action"}
+                        {
+                            "$ref": "#/$defs/run-playbook-action"
+                        },
+                        {
+                            "$ref": "#/$defs/run-module-action"
+                        },
+                        {
+                            "$ref": "#/$defs/run-job-template-action"
+                        },
+                        {
+                            "$ref": "#/$defs/post-event-action"
+                        },
+                        {
+                            "$ref": "#/$defs/set-fact-action"
+                        },
+                        {
+                            "$ref": "#/$defs/retract-fact-action"
+                        },
+                        {
+                            "$ref": "#/$defs/print-event-action"
+                        },
+                        {
+                            "$ref": "#/$defs/debug-action"
+                        },
+                        {
+                            "$ref": "#/$defs/none-action"
+                        },
+                        {
+                            "$ref": "#/$defs/shutdown-action"
+                        }
                     ]
                 }
             },
@@ -136,9 +227,11 @@
             "properties": {
                 "all": {
                     "type": "array",
-                    "items": { "type": "string" }
+                    "items": {
+                        "type": "string"
+                    }
                 },
-                "timeout" : {
+                "timeout": {
                     "type": "string",
                     "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
                 }
@@ -150,9 +243,11 @@
             "properties": {
                 "not_all": {
                     "type": "array",
-                    "items": { "type": "string" }
+                    "items": {
+                        "type": "string"
+                    }
                 },
-                "timeout" : {
+                "timeout": {
                     "type": "string",
                     "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
                 }
@@ -168,7 +263,9 @@
             "properties": {
                 "any": {
                     "type": "array",
-                    "items": { "type": "string" }
+                    "items": {
+                        "type": "string"
+                    }
                 }
             },
             "additionalProperties": false
@@ -179,18 +276,45 @@
                 "run_playbook": {
                     "type": "object",
                     "properties": {
-                        "copy_files": { "type": "boolean" },
-                        "name": {"type": "string" },
-                        "post_events": { "type": "boolean" },
-                        "set_facts": { "type": "boolean" },
-                        "ruleset": { "type": "string" },
-                        "verbosity": {"type": "integer" },
-                        "var_root": {"type": ["string","object"] },
-                        "json_mode": { "type": "boolean" },
-                        "retry": { "type": "boolean" },
-                        "retries": { "type": "integer" },
-                        "delay": { "type": "number" },
-                        "extra_vars": {"type": "object"}
+                        "copy_files": {
+                            "type": "boolean"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "post_events": {
+                            "type": "boolean"
+                        },
+                        "set_facts": {
+                            "type": "boolean"
+                        },
+                        "ruleset": {
+                            "type": "string"
+                        },
+                        "verbosity": {
+                            "type": "integer"
+                        },
+                        "var_root": {
+                            "type": [
+                                "string",
+                                "object"
+                            ]
+                        },
+                        "json_mode": {
+                            "type": "boolean"
+                        },
+                        "retry": {
+                            "type": "boolean"
+                        },
+                        "retries": {
+                            "type": "integer"
+                        },
+                        "delay": {
+                            "type": "number"
+                        },
+                        "extra_vars": {
+                            "type": "object"
+                        }
                     },
                     "required": [
                         "name"
@@ -199,7 +323,7 @@
                 }
             },
             "required": [
-                  "run_playbook"
+                "run_playbook"
             ],
             "additionalProperties": false
         },
@@ -209,18 +333,45 @@
                 "run_module": {
                     "type": "object",
                     "properties": {
-                        "copy_files": { "type": "boolean" },
-                        "name": {"type": "string" },
-                        "post_events": { "type": "boolean" },
-                        "set_facts": { "type": "boolean" },
-                        "verbosity": {"type": "integer" },
-                        "var_root": {"type": ["string","object"] },
-                        "json_mode": { "type": "boolean" },
-                        "retry": { "type": "boolean" },
-                        "retries": { "type": "integer" },
-                        "delay": { "type": "number" },
-                        "module_args": {"type": "object"},
-                        "extra_vars": {"type": "object"}
+                        "copy_files": {
+                            "type": "boolean"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "post_events": {
+                            "type": "boolean"
+                        },
+                        "set_facts": {
+                            "type": "boolean"
+                        },
+                        "verbosity": {
+                            "type": "integer"
+                        },
+                        "var_root": {
+                            "type": [
+                                "string",
+                                "object"
+                            ]
+                        },
+                        "json_mode": {
+                            "type": "boolean"
+                        },
+                        "retry": {
+                            "type": "boolean"
+                        },
+                        "retries": {
+                            "type": "integer"
+                        },
+                        "delay": {
+                            "type": "number"
+                        },
+                        "module_args": {
+                            "type": "object"
+                        },
+                        "extra_vars": {
+                            "type": "object"
+                        }
                     },
                     "required": [
                         "name"
@@ -229,7 +380,7 @@
                 }
             },
             "required": [
-                  "run_module"
+                "run_module"
             ],
             "additionalProperties": false
         },
@@ -239,16 +390,36 @@
                 "run_job_template": {
                     "type": "object",
                     "properties": {
-                        "name": { "type": "string" },
-                        "organization": { "type": "string" },
-                        "job_args": { "type": "object" },
-                        "post_events": { "type": "boolean" },
-                        "set_facts": { "type": "boolean" },
-                        "ruleset": { "type": "string" },
-                        "var_root": { "type": "string" },
-                        "retry": { "type": "boolean" },
-                        "retries": { "type": "integer" },
-                        "delay": { "type": "integer" }
+                        "name": {
+                            "type": "string"
+                        },
+                        "organization": {
+                            "type": "string"
+                        },
+                        "job_args": {
+                            "type": "object"
+                        },
+                        "post_events": {
+                            "type": "boolean"
+                        },
+                        "set_facts": {
+                            "type": "boolean"
+                        },
+                        "ruleset": {
+                            "type": "string"
+                        },
+                        "var_root": {
+                            "type": "string"
+                        },
+                        "retry": {
+                            "type": "boolean"
+                        },
+                        "retries": {
+                            "type": "integer"
+                        },
+                        "delay": {
+                            "type": "integer"
+                        }
                     },
                     "required": [
                         "name",
@@ -268,11 +439,15 @@
                 "post_event": {
                     "type": "object",
                     "properties": {
-                        "ruleset": {"type": "string" },
-                        "event": {"type": "object" }
+                        "ruleset": {
+                            "type": "string"
+                        },
+                        "event": {
+                            "type": "object"
+                        }
                     },
                     "required": [
-                       "event"
+                        "event"
                     ],
                     "additionalProperties": false
                 }
@@ -288,11 +463,15 @@
                 "set_fact": {
                     "type": "object",
                     "properties": {
-                        "ruleset": {"type": "string" },
-                        "fact": {"type": "object" }
+                        "ruleset": {
+                            "type": "string"
+                        },
+                        "fact": {
+                            "type": "object"
+                        }
                     },
                     "required": [
-                       "fact"
+                        "fact"
                     ],
                     "additionalProperties": false
                 }
@@ -308,11 +487,15 @@
                 "retract_fact": {
                     "type": "object",
                     "properties": {
-                        "ruleset": {"type": "string" },
-                        "fact": {"type": "object" }
+                        "ruleset": {
+                            "type": "string"
+                        },
+                        "fact": {
+                            "type": "object"
+                        }
                     },
                     "required": [
-                       "fact"
+                        "fact"
                     ],
                     "additionalProperties": false
                 }
@@ -326,10 +509,20 @@
             "type": "object",
             "properties": {
                 "print_event": {
-                    "type": ["object","null"],
+                    "type": [
+                        "object",
+                        "null"
+                    ],
                     "properties": {
-                        "var_root": {"type": ["string","object"] },
-                        "pretty": {"type": "boolean" }
+                        "var_root": {
+                            "type": [
+                                "string",
+                                "object"
+                            ]
+                        },
+                        "pretty": {
+                            "type": "boolean"
+                        }
                     },
                     "additionalProperties": false
                 }
@@ -339,51 +532,64 @@
             ],
             "additionalProperties": false
         },
-	"debug-msg": {
-		"type": "object",
-                "properties": {
-			    "msg": {
-				    "anyOf": [
-					    {"type": "string"},
-					    {"type": "array",
-					     "items": {"type": "string"}
-					    }
-				    ]
-			    }
-		},
-                "additionalProperties": false
-
-	},
-	"debug-var": {
-		"type": "object",
-                "properties": {
-			    "var": { "type": "string" }
-		},
-                "additionalProperties": false
-	},
-
+        "debug-msg": {
+            "type": "object",
+            "properties": {
+                "msg": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "debug-var": {
+            "type": "object",
+            "properties": {
+                "var": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
         "debug-action": {
             "type": "object",
             "properties": {
                 "debug": {
                     "anyOf": [
-                        {"$ref": "#/$defs/debug-msg"},
-                        {"$ref": "#/$defs/debug-var"},
-			{"type": "null" }
+                        {
+                            "$ref": "#/$defs/debug-msg"
+                        },
+                        {
+                            "$ref": "#/$defs/debug-var"
+                        },
+                        {
+                            "type": "null"
+                        }
                     ]
-		}
+                }
             },
             "additionalProperties": false,
             "required": [
                 "debug"
             ]
         },
-
         "none-action": {
             "type": "object",
             "properties": {
                 "none": {
-                    "type": ["object","null"]
+                    "type": [
+                        "object",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -395,13 +601,23 @@
             "type": "object",
             "properties": {
                 "shutdown": {
-                    "type": ["object","null"],
+                    "type": [
+                        "object",
+                        "null"
+                    ],
                     "properties": {
-                        "delay": {"type": "number" },
-                        "message": {"type": "string" },
-                        "kind" : {
-                           "type": "string",
-                           "enum": ["graceful", "now"]
+                        "delay": {
+                            "type": "number"
+                        },
+                        "message": {
+                            "type": "string"
+                        },
+                        "kind": {
+                            "type": "string",
+                            "enum": [
+                                "graceful",
+                                "now"
+                            ]
                         }
                     },
                     "additionalProperties": false

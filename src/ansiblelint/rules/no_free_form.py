@@ -17,7 +17,7 @@ class NoFreeFormRule(AnsibleLintRule):
     """Rule for detecting discouraged free-form syntax for action modules."""
 
     id = "no-free-form"
-    description = "Avoid free-form inside files as it can produce subtile bugs."
+    description = "Avoid free-form inside files as it can produce subtle bugs."
     severity = "MEDIUM"
     tags = ["syntax", "risk"]
     version_added = "v6.8.0"
