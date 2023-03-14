@@ -17,6 +17,8 @@ For more information see the following topics in Ansible documentation:
 
 !!! warning
 
+    The reason for the existence of this rule is for reminding users that `run_once`
+    is not providing any warranty that the task will run only once.
     This rule will always trigger regardless of the value configured inside the 'strategy' field. That is because the effective value used at runtime can be different than the value inside the file. For example, ansible command line arguments can alter it.
 
 It is perfectly fine to add `# noqa: run-once[task]` to mark the warning as
