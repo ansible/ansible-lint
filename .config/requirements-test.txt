@@ -6,7 +6,7 @@ flake8-future-annotations # IDE support
 mypy # IDE support
 psutil # soft-dep of pytest-xdist
 pylint # IDE support
-pytest >= 7.2.0
+pytest >= 7.2.2
 pytest-mock
 pytest-plus >= 0.2 # for PYTEST_REQPASS
 pytest-xdist >= 2.1.0

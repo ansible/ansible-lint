@@ -58,14 +58,14 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.28.0
+    rev: v6.29.0
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.21.0
+    rev: 0.22.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -96,7 +96,7 @@ repos:
       - id: debug-statements
         language_version: python3
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.2
+    rev: v2.2.4
     hooks:
       - id: codespell
         exclude: >
@@ -155,7 +155,7 @@ repos:
       - id: pyupgrade
         args: ["--py39-plus"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.0.1
+    rev: v1.1.1
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -166,7 +166,7 @@ repos:
           - cryptography>=39.0.1
           - filelock
           - jinja2
-          - pytest>=7.2.0
+          - pytest>=7.2.2
           - rich>=13.2.0
           - ruamel.yaml
           - spdx-tools
@@ -182,7 +182,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.16.4
+    rev: v2.17.0
     hooks:
       - id: pylint
         args:
@@ -194,7 +194,7 @@ repos:
           - docutils
           - filelock
           - jsonschema>=4.9.0
-          - pytest>=7.2.0
+          - pytest>=7.2.2
           - pyyaml
           - rich>=13.2.0
           - ruamel.yaml

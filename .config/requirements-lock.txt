@@ -20,7 +20,7 @@ mdurl==0.1.2
 mypy-extensions==1.0.0
 packaging==23.0
 pathspec==0.11.0
-platformdirs==3.1.0
+platformdirs==3.1.1
 pycparser==2.21
 pygments==2.14.0
 pyrsistent==0.19.3
@@ -28,7 +28,7 @@ pyyaml==6.0
 resolvelib==0.8.1
 rich==13.3.2
 ruamel-yaml==0.17.21
-setuptools==67.5.1
+setuptools==67.6.0
 subprocess-tee==0.4.1
 tomli==2.0.1
 typing-extensions==4.5.0
