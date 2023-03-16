@@ -155,23 +155,22 @@ class AnsibleLintRule(BaseRule):
         ):
             return matches
 
-        tasks_iterator = ansiblelint.yaml_utils.iter_tasks_in_file(file)
-        for raw_task, task, skipped_tags, error in tasks_iterator:
-            if error is not None:
+        for task in ansiblelint.yaml_utils.iter_tasks_in_file(file):
+            if task.error is not None:
                 # normalize_task converts AnsibleParserError to MatchError
-                return [error]
+                return [task.error]
 
             if (
-                self.id in skipped_tags
-                or ("action" not in task)
-                or "skip_ansible_lint" in task.get("tags", [])
+                self.id in task.skip_tags
+                or ("action" not in task.normalized_task)
+                or "skip_ansible_lint" in task.normalized_task.get("tags", [])
             ):
                 continue
 
             if self.needs_raw_task:
-                task["__raw_task__"] = raw_task
+                task.normalized_task["__raw_task__"] = task.raw_task
 
-            result = self.matchtask(task, file=file)
+            result = self.matchtask(task.normalized_task, file=file)
             if not result:
                 continue
 
@@ -181,13 +180,15 @@ class AnsibleLintRule(BaseRule):
                 # https://github.com/PyCQA/pylint/issues/6044
                 # pylint: disable=not-an-iterable
                 for match in result:
-                    if match.tag in skipped_tags:
+                    if match.tag in task.skip_tags:
                         continue
-                    self._enrich_matcherror_with_task_details(match, task)
+                    self._enrich_matcherror_with_task_details(
+                        match, task.normalized_task
+                    )
                     matches.append(match)
                 continue
             if isinstance(result, MatchError):
-                if result.tag in skipped_tags:
+                if result.tag in task.skip_tags:
                     continue
                 match = result
             else:  # bool or string
@@ -196,11 +197,11 @@ class AnsibleLintRule(BaseRule):
                     message = result
                 match = self.create_matcherror(
                     message=message,
-                    linenumber=task[LINE_NUMBER_KEY],
+                    linenumber=task.normalized_task[LINE_NUMBER_KEY],
                     filename=file,
                 )
 
-            self._enrich_matcherror_with_task_details(match, task)
+            self._enrich_matcherror_with_task_details(match, task.normalized_task)
             matches.append(match)
         return matches
 
