@@ -37,7 +37,7 @@ class TestSarifFormatter:
                 message="message",
                 linenumber=1,
                 column=10,
-                details="hello",
+                details="details",
                 filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
                 tag="yaml[test]",
@@ -47,7 +47,7 @@ class TestSarifFormatter:
             MatchError(
                 message="message",
                 linenumber=2,
-                details="hello",
+                details="",
                 filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
                 tag="yaml[test]",
@@ -99,7 +99,6 @@ class TestSarifFormatter:
         assert len(results) == 2
         for i, result in enumerate(results):
             assert result["ruleId"] == self.matches[i].tag
-            assert result["message"]["text"] == self.matches[0].details
             assert (
                 result["locations"][0]["physicalLocation"]["artifactLocation"]["uri"]
                 == self.matches[i].filename
@@ -125,6 +124,8 @@ class TestSarifFormatter:
                     not in result["locations"][0]["physicalLocation"]["region"]
                 )
         assert sarif["runs"][0]["originalUriBaseIds"][SarifFormatter.BASE_URI_ID]["uri"]
+        assert results[0]["message"]["text"] == self.matches[0].details
+        assert results[1]["message"]["text"] == self.matches[1].message
 
 
 def test_sarif_parsable_ignored() -> None:
