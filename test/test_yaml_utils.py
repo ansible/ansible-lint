@@ -13,6 +13,7 @@ from yamllint.linter import run as run_yamllint
 
 import ansiblelint.yaml_utils
 from ansiblelint.file_utils import Lintable
+from ansiblelint.utils import task_in_list
 
 fixtures_dir = Path(__file__).parent / "fixtures"
 formatting_before_fixtures_dir = fixtures_dir / "formatting-before"
@@ -27,9 +28,17 @@ def fixture_empty_lintable() -> Lintable:
     return lintable
 
 
-def test_iter_tasks_in_file_with_empty_file(empty_lintable: Lintable) -> None:
-    """Make sure that iter_tasks_in_file returns early when files are empty."""
-    res = list(ansiblelint.yaml_utils.iter_tasks_in_file(empty_lintable))
+def test_tasks_in_list_empty_file(empty_lintable: Lintable) -> None:
+    """Make sure that task_in_list returns early when files are empty."""
+    assert empty_lintable.kind
+    assert empty_lintable.path
+    res = list(
+        task_in_list(
+            data=empty_lintable,
+            filename=str(empty_lintable.path),
+            kind=empty_lintable.kind,
+        )
+    )
     assert not res
 
 

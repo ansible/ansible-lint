@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Fixture for no-changed-when
+  hosts: localhost
   tasks:
     - name: Command with creates check
       ansible.builtin.command: echo blah
@@ -15,46 +16,48 @@
       ansible.builtin.command: echo blah
       changed_when: false
 
-    - name: Command with inline creates
+    - name: Command with inline creates # noqa: no-free-form
       ansible.builtin.command: creates=Z echo blah
 
-    - name: Command with inline removes
+    - name: Command with inline removes # noqa: no-free-form
       ansible.builtin.command: removes=Z echo blah
 
-    - name: Command with cmd
+    - name: Command with cmd # noqa: fqcn[action-core]
       command:
         cmd: echo blah
       args:
         creates: Z
 
-    - name: Use shell with creates check
+    - name: Use shell with creates check # noqa: fqcn[action-core] command-instead-of-shell
       shell: echo blah
       args:
         creates: Z
 
-    - name: Use shell with removes check
+    - name: Use shell with removes check # noqa: fqcn[action-core] command-instead-of-shell
       shell: echo blah
       args:
         removes: Z
 
-    - name: Use shell with changed_when
+    - name: Use shell with changed_when # noqa: fqcn[action-core] command-instead-of-shell
       shell: echo blah
       changed_when: false
 
-    - name: Use shell with inline creates
+    - name: Use shell with inline creates # noqa: fqcn[action-core] no-free-form command-instead-of-shell
       shell: creates=Z echo blah
 
-    - name: Use shell with inline removes
+    - name: Use shell with inline removes # noqa: fqcn[action-core] no-free-form command-instead-of-shell
       shell: removes=Z echo blah
 
-    - name: Use shell with cmd
+    - name: Use shell with cmd # noqa: fqcn[action-core] command-instead-of-shell
       shell:
         cmd: echo blah
       args:
         creates: Z
 
-- hosts: localhost
+- name: Fixture
+  hosts: localhost
   handlers:
-    - name: Restart something
+    - name: Restart something # noqa: fqcn[action-core] no-changed-when
       command: do something
-    - include: handlers/included-handlers.yml
+    - name: Foo # noqa: fqcn[action-core] deprecated-module
+      include: handlers/included-handlers.yml

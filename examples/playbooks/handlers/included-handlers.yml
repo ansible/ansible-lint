@@ -1,6 +1,6 @@
 ---
-- name: Restart xyz
+- name: Restart xyz # noqa: no-free-form fqcn[action-core]
   service: name=xyz state=restarted
 # see Issue #165
-- name: Command handler issue 165
+- name: Command handler issue 165 # noqa: fqcn[action-core] no-changed-when
   command: do something

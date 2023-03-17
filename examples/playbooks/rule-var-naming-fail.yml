@@ -2,11 +2,11 @@
 - name: Fixture
   hosts: localhost
   vars:
-    CamelCaseIsBad: false # invalid
+    CamelCaseIsBad: false # invalid 1
     this_is_valid: # valid because content is a dict, not a variable
       CamelCase: ...
       ALL_CAPS: ...
-    ALL_CAPS_ARE_BAD_TOO: ... # invalid
+    ALL_CAPS_ARE_BAD_TOO: ... # invalid 2
     CamelCaseButErrorIgnored: true # noqa: var-naming
 
   tasks:
@@ -18,15 +18,15 @@
         CamelCaseButErrorIgnored: true # noqa: var-naming
     - name: Test in a block
       vars:
-        BAD: false # invalid
-        MoreBad: ... # invalid
+        BAD: false # invalid 3
+        MoreBad: ... # invalid 4
       block:
         - name: Foo
           vars:
-            ALL_CAPS_ARE_BAD_TOO: "{{ MoreBad }}" # invalid
+            ALL_CAPS_ARE_BAD_TOO: "{{ MoreBad }}" # invalid 5
           ansible.builtin.set_fact:
-            CamelCaseIsBad: "{{ BAD }}" # invalid
+            CamelCaseIsBad: "{{ BAD }}" # invalid 6
     - name: Test on register
       ansible.builtin.debug:
         var: test_var
-      register: CamelCaseIsBad # invalid
+      register: CamelCaseIsBad # invalid 7

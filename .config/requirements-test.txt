@@ -12,3 +12,4 @@ pytest-plus >= 0.2 # for PYTEST_REQPASS
 pytest-xdist >= 2.1.0
 spdx-tools >= 0.7.1 # Apache
 types-pyyaml # IDE support
+types-jsonschema # IDE support
