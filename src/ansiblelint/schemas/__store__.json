@@ -20,7 +20,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json"
   },
   "galaxy": {
-    "etag": "f9cae8231aa310ef1d26d46142097d1439b0d38f03029cfcdcf0c2830b24ca37",
+    "etag": "61f38feb51dc7eaff43ab22f3759b3a5202776ee75ee4204f07135282817f724",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/galaxy.json"
   },
   "inventory": {
@@ -48,7 +48,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
   "rulebook": {
-    "etag": "64b248fdbf6cede0c0e1736b51b4235f8d06ad602346ce06bf15d913708d9b30",
+    "etag": "61ccd5e187ba837b5cea6ad1f696a29fb1e2a8f14278dddda6269c43c5594c7f",
     "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json"
   },
   "tasks": {

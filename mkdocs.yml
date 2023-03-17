@@ -11,9 +11,7 @@ extra_css:
   - stylesheets/extra.css
 
 theme:
-  name: "material"
-  logo: images/logo.svg
-  favicon: images/favicon.ico
+  name: ansible
   features:
     - content.code.copy
     - content.action.edit
@@ -23,21 +21,6 @@ theme:
     - navigation.indexes
     - navigation.tracking
     - toc.integrate
-  palette:
-    - media: "(prefers-color-scheme: light)"
-      primary: teal
-      accent: blue
-      scheme: default
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: teal
-      accent: blue
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
 extra:
   social:
     - icon: fontawesome/brands/python
@@ -145,8 +128,8 @@ plugins:
       scripts:
         - src/ansiblelint/generate_docs.py
   - search
-  - social
-  - tags
+  - material/social
+  - material/tags
   # https://github.com/manuzhang/mkdocs-htmlproofer-plugin
   # - htmlproofer
   - mkdocstrings:
@@ -164,14 +147,14 @@ plugins:
               domains: [py, std]
 
 markdown_extensions:
+  - markdown_include.include:
+      base_path: docs
   - admonition
   - def_list
   - footnotes
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets:
-      check_paths: true
   - pymdownx.superfences
   - pymdownx.magiclink:
       repo_url_shortener: true

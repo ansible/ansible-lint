@@ -12,3 +12,5 @@ ruamel.yaml>=0.17.21,<0.18 # MIT, next version is planned to have breaking chang
 subprocess-tee>=0.4.1 # MIT, used by ansible-compat
 yamllint >= 1.26.3 # GPLv3
 wcmatch>=8.1.2 # MIT
+# Temporary workarounds:
+pathspec!=0.11.1 # https://github.com/adrienverge/yamllint/pull/548

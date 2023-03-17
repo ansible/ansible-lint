@@ -135,6 +135,8 @@ disable = [
   # unable to disable it inside tests
   # https://github.com/PyCQA/pylint/issues/850
   "cyclic-import",
+  # https://github.com/PyCQA/pylint/issues/8453
+  "preferred-module",
 ]
 
 [tool.pylint.TYPECHECK]

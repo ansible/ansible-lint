@@ -45,6 +45,10 @@ class ShellWithoutPipefail(AnsibleLintRule):
 
         jinja_stripped_cmd = self.unjinja(get_cmd_args(task))
 
+        # https://github.com/ansible/ansible-lint/issues/3161
+        if "pwsh" in task["action"].get("executable", ""):
+            return False
+
         return bool(
             self._pipe_re.search(jinja_stripped_cmd)
             and not self._pipefail_re.search(jinja_stripped_cmd)

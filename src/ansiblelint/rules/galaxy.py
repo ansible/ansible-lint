@@ -109,6 +109,15 @@ class GalaxyRule(AnsibleLintRule):
                 )
             )
 
+        if not os.path.isfile(os.path.join(base_path, "meta/runtime.yml")):
+            results.append(
+                self.create_matcherror(
+                    message="meta/runtime.yml file not found.",
+                    tag="galaxy[no-runtime]",
+                    filename=file,
+                )
+            )
+
         return results
 
 
@@ -178,23 +187,6 @@ if "pytest" in sys.modules:  # noqa: C901
         errs = bad_runner.run()
         assert len(errs) == 1
 
-    def test_changelog_present() -> None:
-        """Positive test for finding a changelog."""
-        collection = RulesCollection()
-        collection.register(GalaxyRule())
-        good_runner = Runner("examples/collection/galaxy.yml", rules=collection)
-        assert [] == good_runner.run()
-
-    def test_changelog_missing() -> None:
-        """Negative test for finding a changelog."""
-        collection = RulesCollection()
-        collection.register(GalaxyRule())
-        bad_runner = Runner("examples/no_changelog/galaxy.yml", rules=collection)
-        result = bad_runner.run()
-        assert len(result) == 1
-        for item in result:
-            assert item.tag == "galaxy[no-changelog]"
-
     def test_version_class() -> None:
         """Test for version class."""
         v = Version("1.0.0")
@@ -209,24 +201,42 @@ if "pytest" in sys.modules:  # noqa: C901
         with pytest.raises(NotImplementedError, match=expected):
             _coerce(type(Version))
 
-    def test_galaxy_tags_pass() -> None:
-        """Test for required tags."""
-        collection = RulesCollection()
-        collection.register(GalaxyRule())
-        bad_runner = Runner(
-            "examples/galaxy_no_required_tags/pass/galaxy.yml", rules=collection
-        )
-        result = bad_runner.run()
-        assert len(result) == 0
+    @pytest.mark.parametrize(
+        ("file", "expected"),
+        (
+            pytest.param(
+                "examples/galaxy_no_required_tags/fail/galaxy.yml",
+                ["galaxy[tags]"],
+                id="tags",
+            ),
+            pytest.param(
+                "examples/galaxy_no_required_tags/pass/galaxy.yml",
+                [],
+                id="pass",
+            ),
+            pytest.param(
+                "examples/collection/galaxy.yml",
+                ["schema[galaxy]"],
+                id="schema",
+            ),
+            pytest.param(
+                "examples/no_changelog/galaxy.yml",
+                ["galaxy[no-changelog]"],
+                id="no-changelog",
+            ),
+            pytest.param(
+                "examples/no_collection_version/galaxy.yml",
+                ["schema[galaxy]", "galaxy[version-missing]"],
+                id="no-collection-version",
+            ),
+        ),
+    )
+    def test_galaxy_rule(
+        default_rules_collection: RulesCollection, file: str, expected: list[str]
+    ) -> None:
+        """Validate that rule works as intended."""
+        results = Runner(file, rules=default_rules_collection).run()
 
-    def test_galaxy_tags_fail() -> None:
-        """Test for required tags."""
-        collection = RulesCollection()
-        collection.register(GalaxyRule())
-        bad_runner = Runner(
-            "examples/galaxy_no_required_tags/fail/galaxy.yml", rules=collection
-        )
-        result = bad_runner.run()
-        assert len(result) == 1
-        for item in result:
-            assert item.tag == "galaxy[tags]"
+        assert len(results) == len(expected)
+        for index, result in enumerate(results):
+            assert result.tag == expected[index]
