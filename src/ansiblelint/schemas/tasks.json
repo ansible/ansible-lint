@@ -41,8 +41,8 @@
           "type": "array"
         },
         "any_errors_fatal": {
-          "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Any Errors Fatal"
         },
         "become": {
           "$ref": "#/$defs/templated-boolean",
@@ -283,8 +283,8 @@
           "type": "string"
         },
         "any_errors_fatal": {
-          "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Any Errors Fatal"
         },
         "args": {
           "$ref": "#/$defs/templated-object",
