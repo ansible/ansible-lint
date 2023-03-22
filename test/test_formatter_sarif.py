@@ -66,7 +66,7 @@ class TestSarifFormatter:
         json.loads(self.formatter.format_result(self.matches))
 
     def test_single_match(self) -> None:
-        """Test negative case. Only lists are allowed. Otherwise a RuntimeError will be raised."""
+        """Test negative case. Only lists are allowed. Otherwise, a RuntimeError will be raised."""
         assert isinstance(self.formatter, SarifFormatter)
         with pytest.raises(RuntimeError):
             self.formatter.format_result(self.matches[0])  # type: ignore
