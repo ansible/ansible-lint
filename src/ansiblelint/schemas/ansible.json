@@ -80,8 +80,8 @@
           "type": "array"
         },
         "any_errors_fatal": {
-          "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Any Errors Fatal"
         },
         "become": {
           "$ref": "#/$defs/templated-boolean",
@@ -284,8 +284,8 @@
       ],
       "properties": {
         "any_errors_fatal": {
-          "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Any Errors Fatal"
         },
         "become": {
           "$ref": "#/$defs/templated-boolean",
@@ -646,8 +646,8 @@
       "markdownDescription": "See [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)",
       "properties": {
         "any_errors_fatal": {
-          "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Any Errors Fatal"
         },
         "become": {
           "$ref": "#/$defs/templated-boolean",
@@ -815,8 +815,8 @@
           "type": "string"
         },
         "any_errors_fatal": {
-          "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Any Errors Fatal"
         },
         "args": {
           "$ref": "#/$defs/templated-object",
