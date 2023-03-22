@@ -58,7 +58,8 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
         # tasks in a block are "meta" type
         if task["__ansible_action_type__"] in ["task", "meta"]:
             if task["action"]["__ansible_module__"] in self._commands and (
-                "changed_when" not in task
+                "when" not in task
+                and "changed_when" not in task
                 and "creates" not in task["action"]
                 and "removes" not in task["action"]
             ):
