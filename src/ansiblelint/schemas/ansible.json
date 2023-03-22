@@ -81,7 +81,7 @@
         },
         "any_errors_fatal": {
           "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean"
         },
         "become": {
           "$ref": "#/$defs/templated-boolean",
@@ -285,7 +285,7 @@
       "properties": {
         "any_errors_fatal": {
           "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean"
         },
         "become": {
           "$ref": "#/$defs/templated-boolean",
@@ -647,7 +647,7 @@
       "properties": {
         "any_errors_fatal": {
           "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean"
         },
         "become": {
           "$ref": "#/$defs/templated-boolean",
@@ -816,7 +816,7 @@
         },
         "any_errors_fatal": {
           "title": "Any Errors Fatal",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean"
         },
         "args": {
           "$ref": "#/$defs/templated-object",
