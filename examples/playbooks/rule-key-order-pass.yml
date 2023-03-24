@@ -1,0 +1,16 @@
+---
+- name: Fixture for key-order rule
+  hosts: localhost
+  tasks:
+    - name: Test
+      ansible.builtin.command: echo "test"
+      changed_when: false
+    - name: Test2
+      ansible.builtin.debug:
+        msg: "Debug without a name"
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+    - no_log: true # noqa: key-order[task] command-instead-of-shell
+      ansible.builtin.shell: echo hello
+      name: Task with no_log on top
+      changed_when: false
