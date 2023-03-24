@@ -1,0 +1,60 @@
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - name: Shell with pipe
+      ansible.builtin.shell:
+        cmd: echo hello | true # noqa: risky-shell-pipe
+      changed_when: false
+
+    - name: Shell with redirect
+      ansible.builtin.shell:
+        cmd: echo hello >  /tmp/hello
+      changed_when: false
+
+    - name: Chain two shell commands
+      ansible.builtin.shell:
+        cmd: echo hello && echo goodbye
+      changed_when: false
+
+    - name: Run commands in succession
+      ansible.builtin.shell:
+        cmd: echo hello ; echo goodbye
+      changed_when: false
+
+    - name: Use variables
+      ansible.builtin.shell:
+        cmd: echo $HOME $USER
+      changed_when: false
+
+    - name: Use * for globbing
+      ansible.builtin.shell:
+        cmd: ls foo*
+      changed_when: false
+
+    - name: Use ? for globbing
+      ansible.builtin.shell:
+        cmd: ls foo?
+      changed_when: false
+
+    - name: Use [] for globbing
+      ansible.builtin.shell:
+        cmd: ls foo[1,2,3]
+      changed_when: false
+
+    - name: Use shell generator
+      ansible.builtin.shell:
+        cmd: ls foo{.txt,.xml}
+      changed_when: false
+
+    - name: Use backticks
+      ansible.builtin.shell:
+        cmd: ls `ls foo*`
+      changed_when: false
+
+    - name: Use shell with cmd
+      ansible.builtin.shell:
+        cmd: |
+          set -x
+          ls foo?
+      changed_when: false
