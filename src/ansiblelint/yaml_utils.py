@@ -7,7 +7,6 @@ import logging
 import os
 import re
 from collections.abc import Iterator, Sequence
-from dataclasses import dataclass
 from io import StringIO
 from re import Pattern
 from typing import TYPE_CHECKING, Any, Callable, Union, cast
@@ -32,9 +31,7 @@ from ansiblelint.constants import (
     PLAYBOOK_TASK_KEYWORDS,
     SKIPPED_RULES_KEY,
 )
-from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.utils import get_action_tasks, normalize_task
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -107,42 +104,6 @@ def load_yamllint_config() -> YamlLintConfig:
             break
     _logger.debug("Effective yamllint rules used: %s", config.rules)
     return config
-
-
-def iter_tasks_in_file(
-    lintable: Lintable,
-) -> Iterator[Task]:
-    """Iterate over tasks in file.
-
-    :param lintable: The playbook or tasks/handlers yaml file to get tasks from
-
-    Yields a Task object
-    """
-    data = lintable.data
-    if not data:
-        return
-
-    raw_tasks = get_action_tasks(data, lintable)
-
-    for raw_task in raw_tasks:
-        err: MatchError | None = None
-
-        skip_tags: list[str] = raw_task.get(SKIPPED_RULES_KEY, [])
-
-        try:
-            normalized_task = normalize_task(raw_task, str(lintable.path))
-        except MatchError as err:
-            # normalize_task converts AnsibleParserError to MatchError
-            yield Task(raw_task, raw_task, skip_tags, err)
-            return
-
-        if "skip_ansible_lint" in raw_task.get("tags", []):
-            skip_tags.append("skip_ansible_lint")
-        if skip_tags:
-            yield Task(raw_task, normalized_task, skip_tags, None)
-            continue
-
-        yield Task(raw_task, normalized_task, skip_tags, None)
 
 
 def nested_items_path(
@@ -1120,28 +1081,3 @@ def clean_json(
         # neither a dict nor a list, do nothing
         pass
     return obj
-
-
-@dataclass
-class Task:
-    """Class that represents a task from linter point of view.
-
-    raw_task:
-        When looping through the tasks in the file, each "raw_task" is minimally
-        processed to include these special keys: __line__, __file__, skipped_rules.
-    normalized_task:
-        When each raw_task is "normalized", action shorthand (strings) get parsed
-        by ansible into python objects and the action key gets normalized. If the task
-        should be skipped (skipped is True) or normalizing it fails (error is not None)
-        then this is just the raw_task instead of a normalized copy.
-    skip_tags:
-        List of tags found to be skipped, from tags block or noqa comments
-    error:
-        This is normally None. It will be a MatchError when the raw_task cannot be
-        normalized due to an AnsibleParserError.
-    """
-
-    raw_task: tuple[dict[str, Any]]
-    normalized_task: dict[str, Any]
-    skip_tags: list[str]
-    error: MatchError | None = None

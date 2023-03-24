@@ -1,0 +1,28 @@
+---
+- name: Fixture for task_in_list
+  hosts: localhost
+  tasks:
+    - name: A
+      ansible.builtin.debug:
+        msg: "A"
+    - name: B
+      ansible.builtin.debug:
+        msg: "C"
+  pre_tasks:
+    - name: C
+      ansible.builtin.debug:
+        msg: "C"
+  post_tasks:
+    - name: D
+      block:
+        - name: E
+          ansible.builtin.debug:
+            msg: "E"
+      rescue:
+        - name: F
+          ansible.builtin.debug:
+            msg: "F"
+      always:
+        - name: G
+          ansible.builtin.debug:
+            msg: "G"

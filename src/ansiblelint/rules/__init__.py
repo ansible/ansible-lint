@@ -155,7 +155,9 @@ class AnsibleLintRule(BaseRule):
         ):
             return matches
 
-        for task in ansiblelint.yaml_utils.iter_tasks_in_file(file):
+        for task in ansiblelint.utils.task_in_list(
+            data=file.data, kind=file.kind, filename=str(file.path)
+        ):
             if task.error is not None:
                 # normalize_task converts AnsibleParserError to MatchError
                 return [task.error]

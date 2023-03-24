@@ -95,6 +95,7 @@ line_length = 88
 
 [tool.mypy]
 python_version = 3.9
+strict = true
 color_output = true
 error_summary = true
 disallow_untyped_calls = true
@@ -105,10 +106,16 @@ disallow_any_generics = true
 # warn_return_any = True
 # warn_unused_configs = True
 # site-packages is here to help vscode mypy integration getting confused
-exclude = "(build|dist|test/local-content|site-packages|~/.pyenv)"
+exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
 
 [[tool.mypy.overrides]]
-module = ["ansible.*", "yamllint.*", "ansiblelint._version", "spdx.*"]
+module = [
+  "ansible.*",
+  "yamllint.*",
+  "ansiblelint._version",
+  "ruamel.yaml",
+  "spdx.*"
+]
 ignore_missing_imports = true
 ignore_errors = true
 

@@ -27,7 +27,8 @@ import logging
 import os
 import re
 from argparse import Namespace
-from collections.abc import ItemsView, Mapping, Sequence
+from collections.abc import ItemsView, Iterator, Mapping, Sequence
+from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable
@@ -663,6 +664,115 @@ def extract_from_list(
                         f"Key '{candidate}' defined, but bad value: '{str(block[candidate])}'"
                     )
     return results
+
+
+@dataclass
+class Task:
+    """Class that represents a task from linter point of view.
+
+    raw_task:
+        When looping through the tasks in the file, each "raw_task" is minimally
+        processed to include these special keys: __line__, __file__, skipped_rules.
+    normalized_task:
+        When each raw_task is "normalized", action shorthand (strings) get parsed
+        by ansible into python objects and the action key gets normalized. If the task
+        should be skipped (skipped is True) or normalizing it fails (error is not None)
+        then this is just the raw_task instead of a normalized copy.
+    skip_tags:
+        List of tags found to be skipped, from tags block or noqa comments
+    error:
+        This is normally None. It will be a MatchError when the raw_task cannot be
+        normalized due to an AnsibleParserError.
+    position: Any
+    """
+
+    raw_task: dict[str, Any]
+    filename: str = ""
+    _normalized_task: dict[str, Any] | _MISSING_TYPE = field(init=False, repr=False)
+    error: MatchError | None = None
+    position: Any = None
+
+    @property
+    def name(self) -> str | None:
+        """Return the name of the task."""
+        return self.raw_task.get("name", None)
+
+    @property
+    def normalized_task(self) -> dict[str, Any]:
+        """Return the name of the task."""
+        if not hasattr(self, "_normalized_task"):
+            try:
+                self._normalized_task = normalize_task(
+                    self.raw_task, filename=self.filename
+                )
+            except MatchError as err:
+                self.error = err
+                # When we cannot normalize it, we just use the raw task instead
+                # to avoid adding extra complexity to the rules.
+                self._normalized_task = self.raw_task
+        if isinstance(self._normalized_task, _MISSING_TYPE):
+            raise RuntimeError("Task was not normalized")
+        return self._normalized_task
+
+    @property
+    def skip_tags(self) -> list[str]:
+        """Return the list of tags to skip."""
+        skip_tags: list[str] = self.raw_task.get(SKIPPED_RULES_KEY, [])
+        return skip_tags
+
+    def __repr__(self) -> str:
+        """Return a string representation of the task."""
+        return f"Task('{self.name}' [{self.position}])"
+
+
+def task_in_list(
+    data: AnsibleBaseYAMLObject,
+    filename: str,
+    kind: str,
+    position: str = ".",
+) -> Iterator[Task]:
+    """Get action tasks from block structures."""
+
+    def each_entry(data: AnsibleBaseYAMLObject, position: str) -> Iterator[Task]:
+        if not data:
+            return
+        for entry_index, entry in enumerate(data):
+            if not entry:
+                continue
+            _pos = f"{position}[{entry_index}]"
+            if isinstance(entry, dict):
+                yield Task(
+                    entry,
+                    position=_pos,
+                )
+            for block in [k for k in entry if k in NESTED_TASK_KEYS]:
+                yield from task_in_list(
+                    data=entry[block],
+                    filename=filename,
+                    kind="tasks",
+                    position=f"{_pos}.{block}",
+                )
+
+    if not isinstance(data, list):
+        return
+    if kind == "playbook":
+        attributes = ["tasks", "pre_tasks", "post_tasks", "handlers"]
+        for item_index, item in enumerate(data):
+            for attribute in attributes:
+                if not isinstance(item, dict):
+                    continue
+                if attribute in item:
+                    if isinstance(item[attribute], list):
+                        yield from each_entry(
+                            item[attribute],
+                            f"{position }[{item_index}].{attribute}",
+                        )
+                    elif item[attribute] is not None:
+                        raise RuntimeError(
+                            f"Key '{attribute}' defined, but bad value: '{str(item[attribute])}'"
+                        )
+    else:
+        yield from each_entry(data, position)
 
 
 def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> list[Any]:

@@ -101,6 +101,7 @@ text-unidecode==1.3
 tinycss2==1.2.1
 tomli==2.0.1
 tomlkit==0.11.6
+types-jsonschema==4.17.0.6
 types-pyyaml==6.0.12.8
 typing-extensions==4.5.0
 uritools==4.0.1

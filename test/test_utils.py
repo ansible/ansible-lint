@@ -387,3 +387,35 @@ def test_find_children_in_task(default_rules_collection: RulesCollection) -> Non
         Lintable("examples/playbooks/tasks/bug-2875.yml"),
         rules=default_rules_collection,
     ).run()
+
+
+@pytest.mark.parametrize(
+    ("file", "names", "positions"),
+    (
+        pytest.param(
+            "examples/playbooks/task_in_list-0.yml",
+            ["A", "B", "C", "D", "E", "F", "G"],
+            [
+                ".[0].tasks[0]",
+                ".[0].tasks[1]",
+                ".[0].pre_tasks[0]",
+                ".[0].post_tasks[0]",
+                ".[0].post_tasks[0].block[0]",
+                ".[0].post_tasks[0].rescue[0]",
+                ".[0].post_tasks[0].always[0]",
+            ],
+            id="0",
+        ),
+    ),
+)
+def test_task_in_list(file: str, names: list[str], positions: list[str]) -> None:
+    """Check that tasks get extracted from blocks if present."""
+    lintable = Lintable(file)
+    assert lintable.kind
+    tasks = list(
+        utils.task_in_list(data=lintable.data, filename=file, kind=lintable.kind)
+    )
+    assert len(tasks) == len(names)
+    for index, task in enumerate(tasks):
+        assert task.name == names[index]
+        assert task.position == positions[index]
