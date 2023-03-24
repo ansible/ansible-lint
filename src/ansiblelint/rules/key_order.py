@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.testing import RunFromText
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
@@ -79,36 +78,24 @@ class KeyOrderRule(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
-    PLAY_SUCCESS = """---
-- hosts: localhost
-  tasks:
-    - name: Test
-      command: echo "test"
-    - name: Test2
-      debug:
-        msg: "Debug without a name"
-    - name: Flush handlers
-      meta: flush_handlers
-    - no_log: true  # noqa: key-order
-      shell: echo hello
-      name: Task with no_log on top
-"""
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
-    @pytest.mark.parametrize("rule_runner", (KeyOrderRule,), indirect=["rule_runner"])
-    def test_key_order_task_name_has_name_first_rule_pass(
-        rule_runner: RunFromText,
+    @pytest.mark.parametrize(
+        ("test_file", "failures"),
+        (
+            pytest.param("examples/playbooks/rule-key-order-pass.yml", 0, id="pass"),
+            pytest.param("examples/playbooks/rule-key-order-fail.yml", 6, id="fail"),
+        ),
+    )
+    def test_key_order_rule(
+        default_rules_collection: RulesCollection, test_file: str, failures: int
     ) -> None:
         """Test rule matches."""
-        results = rule_runner.run_playbook(PLAY_SUCCESS)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize("rule_runner", (KeyOrderRule,), indirect=["rule_runner"])
-    def test_key_order_task_name_has_name_first_rule_fail(
-        rule_runner: RunFromText,
-    ) -> None:
-        """Test rule matches."""
-        results = rule_runner.run("examples/playbooks/rule-key-order-fail.yml")
-        assert len(results) == 6
+        results = Runner(test_file, rules=default_rules_collection).run()
+        assert len(results) == failures
+        for result in results:
+            assert result.rule.id == "key-order"
 
     @pytest.mark.parametrize(
         ("properties", "expected"),
