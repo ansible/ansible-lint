@@ -182,7 +182,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.17.0
+    rev: v2.17.1
     hooks:
       - id: pylint
         args:
