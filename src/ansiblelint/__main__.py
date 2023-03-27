@@ -397,14 +397,15 @@ def path_inject() -> None:
     if py_path not in paths and os.path.exists(f"{py_path}/ansible"):
         inject_paths.append(py_path)
 
-    if inject_paths:
-        # flake8: noqa: T201
-        print(
-            f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
-            file=sys.stderr,
-        )
-    if inject_paths or expanded:
-        os.environ["PATH"] = os.pathsep.join([*inject_paths, *paths])
+    if not os.environ.get("PYENV_VIRTUAL_ENV", None):
+        if inject_paths:
+            # flake8: noqa: T201
+            print(
+                f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
+                file=sys.stderr,
+            )
+        if inject_paths or expanded:
+            os.environ["PATH"] = os.pathsep.join([*inject_paths, *paths])
 
     # We do know that finding ansible in PATH does not guarantee that it is
     # functioning or that is in fact the same version that was installed as
