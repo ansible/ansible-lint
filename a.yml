@@ -1,0 +1,10 @@
+---
+- name: Debug
+  hosts: localhost
+  gather_facts: false
+  vars:
+    qq: ["qq", "ww", "qq"]
+  tasks:
+    - name: Print it
+      ansible.builtin.debug:
+        msg: "{{ qq | unique }}"

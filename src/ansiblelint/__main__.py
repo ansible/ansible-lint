@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 import errno
+import io
 import logging
 import os
 import pathlib
@@ -31,7 +32,7 @@ import site
 import subprocess
 import sys
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stderr
 from typing import TYPE_CHECKING, Any, Callable, TextIO
 
 from ansible_compat.config import ansible_version
@@ -66,7 +67,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-def initialize_logger(level: int = 0) -> None:
+def initialize_logger(level: int = 0, stream: TextIO | None = None) -> None:
     """Set up the global logging level based on the verbosity number."""
     # We are about to act on the root logger, which defaults to logging.WARNING.
     # That is where our 0 (default) value comes from.
@@ -78,7 +79,7 @@ def initialize_logger(level: int = 0) -> None:
         2: logging.DEBUG,
     }
 
-    handler = logging.StreamHandler()
+    handler = logging.StreamHandler(stream=stream)
     formatter = logging.Formatter("%(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
     logger = logging.getLogger()
@@ -186,124 +187,129 @@ def support_banner() -> None:
 # pylint: disable=too-many-branches,too-many-statements
 def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
-    # alter PATH if needed (venv support)
-    path_inject()
 
-    if argv is None:  # pragma: no cover
-        argv = sys.argv
-    initialize_options(argv[1:])
+    original_stderr = sys.stderr
+    with redirect_stderr(io.StringIO()) as captured_stderr:
+        # alter PATH if needed (venv support)
+        path_inject()
 
-    console_options["force_terminal"] = options.colored
-    reconfigure(console_options)
+        if argv is None:  # pragma: no cover
+            argv = sys.argv
+        initialize_options(argv[1:])
 
-    if options.version:
-        console.print(
-            f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]"
-        )
-        msg = get_version_warning()
-        if msg:
-            console.print(msg)
-        support_banner()
-        sys.exit(0)
-    else:
-        support_banner()
+        console_options["force_terminal"] = options.colored
+        reconfigure(console_options)
 
-    initialize_logger(options.verbosity)
-    _logger.debug("Options: %s", options)
-    _logger.debug(os.getcwd())
+        if options.version:
+            console.print(
+                f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]"
+            )
+            msg = get_version_warning()
+            if msg:
+                console.print(msg)
+            support_banner()
+            sys.exit(0)
+        else:
+            support_banner()
 
-    if options.progressive:
-        _logger.warning(
-            "Progressive mode is deprecated and will be removed in next major version, use ignore files instead: https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files"
-        )
+        initialize_logger(options.verbosity, original_stderr)
+        _logger.debug("Options: %s", options)
+        _logger.debug(os.getcwd())
 
-    if not options.offline:
+        if options.progressive:
+            _logger.warning(
+                "Progressive mode is deprecated and will be removed in next major version, use ignore files instead: https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files"
+            )
+
+        if not options.offline:
+            # pylint: disable=import-outside-toplevel
+            from ansiblelint.schemas import refresh_schemas
+
+            refresh_schemas()
+
         # pylint: disable=import-outside-toplevel
-        from ansiblelint.schemas import refresh_schemas
+        from ansiblelint.rules import RulesCollection
+        from ansiblelint.runner import _get_matches
 
-        refresh_schemas()
+        rules = RulesCollection(options.rulesdirs, profile_name=options.profile)
 
-    # pylint: disable=import-outside-toplevel
-    from ansiblelint.rules import RulesCollection
-    from ansiblelint.runner import _get_matches
+        if options.list_profiles:
+            from ansiblelint.generate_docs import profiles_as_rich
 
-    rules = RulesCollection(options.rulesdirs, profile_name=options.profile)
+            console.print(profiles_as_rich())
+            return 0
 
-    if options.list_profiles:
-        from ansiblelint.generate_docs import profiles_as_rich
+        if options.list_rules or options.list_tags:
+            return _do_list(rules)
 
-        console.print(profiles_as_rich())
-        return 0
+        app = get_app()
+        if isinstance(options.tags, str):
+            options.tags = options.tags.split(",")  # pragma: no cover
+        result = _get_matches(rules, options)
 
-    if options.list_rules or options.list_tags:
-        return _do_list(rules)
+        if options.write_list:
+            _do_transform(result, options)
 
-    app = get_app()
-    if isinstance(options.tags, str):
-        options.tags = options.tags.split(",")  # pragma: no cover
-    result = _get_matches(rules, options)
+        mark_as_success = True
+        if result.matches and options.progressive:
+            mark_as_success = False
+            _logger.info(
+                "Matches found, running again on previous revision in order to detect regressions"
+            )
+            with _previous_revision():
+                _logger.debug("Options: %s", options)
+                _logger.debug(os.getcwd())
+                old_result = _get_matches(rules, options)
+                # remove old matches from current list
+                matches_delta = list(set(result.matches) - set(old_result.matches))
+                if len(matches_delta) == 0:
+                    _logger.warning(
+                        "Total violations not increased since previous "
+                        "commit, will mark result as success. (%s -> %s)",
+                        len(old_result.matches),
+                        len(matches_delta),
+                    )
+                    mark_as_success = True
 
-    if options.write_list:
-        _do_transform(result, options)
+                ignored = 0
+                for match in result.matches:
+                    # if match is not new, mark is as ignored
+                    if match not in matches_delta:
+                        match.ignored = True
+                        ignored += 1
+                if ignored:
+                    _logger.warning(
+                        "Marked %s previously known violation(s) as ignored due to"
+                        " progressive mode.",
+                        ignored,
+                    )
 
-    mark_as_success = True
-    if result.matches and options.progressive:
-        mark_as_success = False
-        _logger.info(
-            "Matches found, running again on previous revision in order to detect regressions"
-        )
-        with _previous_revision():
-            _logger.debug("Options: %s", options)
-            _logger.debug(os.getcwd())
-            old_result = _get_matches(rules, options)
-            # remove old matches from current list
-            matches_delta = list(set(result.matches) - set(old_result.matches))
-            if len(matches_delta) == 0:
-                _logger.warning(
-                    "Total violations not increased since previous "
-                    "commit, will mark result as success. (%s -> %s)",
-                    len(old_result.matches),
-                    len(matches_delta),
-                )
-                mark_as_success = True
+        if options.strict and result.matches:
+            mark_as_success = False
 
-            ignored = 0
-            for match in result.matches:
-                # if match is not new, mark is as ignored
-                if match not in matches_delta:
-                    match.ignored = True
-                    ignored += 1
-            if ignored:
-                _logger.warning(
-                    "Marked %s previously known violation(s) as ignored due to"
-                    " progressive mode.",
-                    ignored,
-                )
+        # Remove skip_list items from the result
+        result.matches = [
+            m for m in result.matches if m.tag not in app.options.skip_list
+        ]
+        # Mark matches as ignored inside ignore file
+        ignore_map = load_ignore_txt(options.ignore_file)
+        for match in result.matches:
+            if match.tag in ignore_map[match.filename]:
+                match.ignored = True
 
-    if options.strict and result.matches:
-        mark_as_success = False
+        app.render_matches(result.matches)
 
-    # Remove skip_list items from the result
-    result.matches = [m for m in result.matches if m.tag not in app.options.skip_list]
-    # Mark matches as ignored inside ignore file
-    ignore_map = load_ignore_txt(options.ignore_file)
-    for match in result.matches:
-        if match.tag in ignore_map[match.filename]:
-            match.ignored = True
+        _perform_mockings_cleanup()
+        if options.cache_dir_lock:
+            options.cache_dir_lock.release()
+            pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
+        if options.mock_filters:
+            _logger.warning(
+                "The following filters were mocked during the run: %s",
+                ",".join(options.mock_filters),
+            )
 
-    app.render_matches(result.matches)
-
-    _perform_mockings_cleanup()
-    if options.cache_dir_lock:
-        options.cache_dir_lock.release()
-        pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
-    if options.mock_filters:
-        _logger.warning(
-            "The following filters were mocked during the run: %s",
-            ",".join(options.mock_filters),
-        )
-
-    return app.report_outcome(result, mark_as_success=mark_as_success)
+        return app.report_outcome(result, mark_as_success=mark_as_success)
 
 
 @contextmanager
