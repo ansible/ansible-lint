@@ -45,11 +45,11 @@ class VariableNamingRule(AnsibleLintRule):
         if not ident.startswith('__'):
             re_pattern = re.compile(options.var_naming_pattern.format(role=role_ident) or "^[a-z_][a-z0-9_]*$")
         else:
-            re_pattern = "^[a-z_][a-z0-9_]*$"
+            re_pattern = re.compile("^[a-z_][a-z0-9_]*$")
 
         """Check if variable name is using right pattern."""
         # Based on https://github.com/ansible/ansible/blob/devel/lib/ansible/utils/vars.py#L235
-        
+
         if not isinstance(ident, str):  # pragma: no cover
             return False
 
@@ -111,8 +111,15 @@ class VariableNamingRule(AnsibleLintRule):
         role_name = ""
         # If the task uses the 'vars' section to set variables
         if file.data:
-            split_filepath = str(file.data.__getitem__(0).get("__file__").absolute()).split("roles/")
-            if len(split_filepath) > 1 and not task['action']['__ansible_module__'] in ["import_tasks", "include_tasks", "import_role", "include_role"]:
+            split_filepath = str(
+                file.data.__getitem__(0).get("__file__").absolute()
+            ).split("roles/")
+            if len(split_filepath) > 1 and not task["action"]["__ansible_module__"] in [
+                "import_tasks",
+                "include_tasks",
+                "import_role",
+                "include_role",
+            ]:
                 role_name = split_filepath[1].split("/")[0]
         our_vars = task.get("vars", {})
         for key in our_vars.keys():
@@ -145,7 +152,9 @@ class VariableNamingRule(AnsibleLintRule):
 
         # If the task registers a variable
         registered_var = task.get("register", None)
-        if registered_var and self.is_invalid_variable_name(registered_var, role_ident=role_name):
+        if registered_var and self.is_invalid_variable_name(
+            registered_var, role_ident=role_name
+        ):
             results.append(
                 self.create_matcherror(
                     filename=file,
