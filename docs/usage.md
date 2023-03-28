@@ -61,9 +61,8 @@ commit.
 
 ## Linting playbooks and roles
 
-Ansible-lint recommends following the
-{ref}`collection structure layout <collection_structure>` whether you plan to
-build a collection or not.
+Ansible-lint recommends following the [collection structure layout] whether you
+plan to build a collection or not.
 
 Following that layout assures the best integration with all ecosystem tools
 because it helps those tools better distinguish between random YAML files and
@@ -77,6 +76,9 @@ with the `-p` argument. For example, to lint `examples/playbooks/play.yml` and
 ```console exec="1" source="console" returncode="2"
 $ ansible-lint --offline -p examples/playbooks/play.yml examples/roles/bobbins
 ```
+
+[collection structure layout]:
+  https://docs.ansible.com/ansible-core/devel/dev_guide/developing_collections_structure.html#collection-structure
 
 ## Running example playbooks
 
