@@ -39,11 +39,17 @@ class VariableNamingRule(AnsibleLintRule):
     tags = ["idiom"]
     version_added = "v5.0.10"
     needs_raw_task = True
-    re_pattern = re.compile(options.var_naming_pattern or "^[a-z_][a-z0-9_]*$")
 
-    def is_invalid_variable_name(self, ident: str) -> bool:
+    def is_invalid_variable_name(self, ident: str, role_ident: str = None) -> bool:
+
+        if role_ident and not ident.startswith('__'):
+            re_pattern = re.compile(options.var_naming_pattern.format(role=role_ident) or "^[a-z_][a-z0-9_]*$")
+        else:
+            re_pattern = re.compile(options.var_naming_pattern.replace(f"{{role}}", "") or "^[a-z_][a-z0-9_]*$")
+
         """Check if variable name is using right pattern."""
         # Based on https://github.com/ansible/ansible/blob/devel/lib/ansible/utils/vars.py#L235
+        
         if not isinstance(ident, str):  # pragma: no cover
             return False
 
@@ -62,7 +68,7 @@ class VariableNamingRule(AnsibleLintRule):
         # previous tests should not be triggered as they would have raised a
         # syntax-error when we loaded the files but we keep them here as a
         # safety measure.
-        return not bool(self.re_pattern.match(ident))
+        return not bool(re_pattern.match(str(ident)))
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
@@ -103,9 +109,15 @@ class VariableNamingRule(AnsibleLintRule):
         """Return matches for task based variables."""
         results = []
         # If the task uses the 'vars' section to set variables
+        if file.data:
+            split_filepath = str(file.data.__getitem__(0).get("__file__").absolute()).split("roles/")
+            if len(split_filepath) > 1 and not task['action']['__ansible_module__'] in ["import_tasks", "include_tasks", "import_role", "include_role"]:
+                role_name = split_filepath[1].split("/")[0]
+            else:
+                role_name = None
         our_vars = task.get("vars", {})
         for key in our_vars.keys():
-            if self.is_invalid_variable_name(key):
+            if self.is_invalid_variable_name(key, role_ident=role_name):
                 results.append(
                     self.create_matcherror(
                         filename=file,
@@ -122,7 +134,7 @@ class VariableNamingRule(AnsibleLintRule):
                 lambda x: isinstance(x, str) and not x.startswith("__"),
                 task["action"].keys(),
             ):
-                if self.is_invalid_variable_name(key):
+                if self.is_invalid_variable_name(key, role_ident=role_name):
                     results.append(
                         self.create_matcherror(
                             filename=file,
@@ -134,7 +146,7 @@ class VariableNamingRule(AnsibleLintRule):
 
         # If the task registers a variable
         registered_var = task.get("register", None)
-        if registered_var and self.is_invalid_variable_name(registered_var):
+        if registered_var and self.is_invalid_variable_name(registered_var, role_ident=role_name):
             results.append(
                 self.create_matcherror(
                     filename=file,
@@ -153,9 +165,14 @@ class VariableNamingRule(AnsibleLintRule):
         meta_data: dict[AnsibleUnicode, Any] = {}
 
         if str(file.kind) == "vars" and file.data:
+            split_filepath = str(file.data.get("__file__").absolute()).split("roles/")
+            if len(split_filepath) > 1:
+                role_name = split_filepath[1].split("/")[0]
+            else:
+                role_name = None
             meta_data = parse_yaml_from_file(str(file.path))
             for key in meta_data.keys():
-                if self.is_invalid_variable_name(key):
+                if self.is_invalid_variable_name(key, role_ident=role_name):
                     raw_results.append(
                         self.create_matcherror(
                             filename=file,
