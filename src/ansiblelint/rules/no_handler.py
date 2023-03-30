@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 def _changed_in_when(item: str) -> bool:
     item_list = item.split()
 
-    if not isinstance(item, str) or "and" in item_list:
+    if not isinstance(item, str) or {"and", "not"} & set(item_list):
         return False
     return any(
         changed in item
@@ -89,7 +89,7 @@ if "pytest" in sys.modules:
       changed_when: true
 """
 
-    SUCCEED_WHEN_AND = """
+    SUCCEED_WHEN = """
 - hosts: all
   tasks:
     - name: Registering task 1
@@ -105,6 +105,15 @@ if "pytest" in sys.modules:
     - name: Use when task
       command: echo Hello
       when: r1.changed and r2.changed
+
+    - name: Registering task
+      command: echo Hello
+      register: r
+      changed_when: true
+
+    - name: When task not changed
+      command: echo Not changed
+      when: not r.changed
 """
 
     FAIL_RESULT_IS_CHANGED = """
@@ -137,7 +146,7 @@ if "pytest" in sys.modules:
     )
     def test_succeed_when_and(rule_runner: Any) -> None:
         """See https://github.com/ansible/ansible-lint/issues/1526."""
-        results = rule_runner.run_playbook(SUCCEED_WHEN_AND)
+        results = rule_runner.run_playbook(SUCCEED_WHEN)
         assert len(results) == 0
 
     @pytest.mark.parametrize(
