@@ -5,6 +5,7 @@ import keyword
 import re
 import sys
 from typing import TYPE_CHECKING, Any
+from pathlib import Path
 
 from ansible.parsing.yaml.objects import AnsibleUnicode
 
@@ -42,13 +43,15 @@ class VariableNamingRule(AnsibleLintRule):
 
     def is_invalid_variable_name(self, ident: str, role_ident: str = "") -> bool:
 
-        if not ident.startswith('__'):
-            re_pattern = re.compile(options.var_naming_pattern.format(role=role_ident) or "^[a-z_][a-z0-9_]*$")
-        else:
-            re_pattern = re.compile("^[a-z_][a-z0-9_]*$")
-
         """Check if variable name is using right pattern."""
         # Based on https://github.com/ansible/ansible/blob/devel/lib/ansible/utils/vars.py#L235
+        if not ident.startswith("__"):
+            re_pattern = re.compile(
+                options.var_naming_pattern.format(role=role_ident)
+                or "^[a-z_][a-z0-9_]*$"
+            )
+        else:
+            re_pattern = re.compile("^[a-z_][a-z0-9_]*$")    
 
         if not isinstance(ident, str):  # pragma: no cover
             return False
@@ -110,17 +113,16 @@ class VariableNamingRule(AnsibleLintRule):
         results = []
         role_name = ""
         # If the task uses the 'vars' section to set variables
-        if file.data:
-            split_filepath = str(
-                file.data.__getitem__(0).get("__file__").absolute()
-            ).split("roles/")
-            if len(split_filepath) > 1 and not task["action"]["__ansible_module__"] in [
-                "import_tasks",
-                "include_tasks",
-                "import_role",
-                "include_role",
-            ]:
-                role_name = split_filepath[1].split("/")[0]
+        split_filepath = str(
+            Path(task.get("__file__")).resolve()
+        ).split("roles/")
+        if len(split_filepath) > 1 and not task["action"]["__ansible_module__"] in [
+            "import_tasks",
+            "include_tasks",
+            "import_role",
+            "include_role",
+        ]:
+            role_name = split_filepath[1].split("/")[0]
         our_vars = task.get("vars", {})
         for key in our_vars.keys():
             if self.is_invalid_variable_name(key, role_ident=role_name):
