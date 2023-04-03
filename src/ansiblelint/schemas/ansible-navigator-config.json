@@ -520,7 +520,7 @@
     "required": [
         "ansible-navigator"
     ],
-    "title": "ansible-navigator settings v2.2",
+    "title": "ansible-navigator settings v3.0",
     "type": "object",
-    "version": "2.2"
+    "version": "3.0"
 }
