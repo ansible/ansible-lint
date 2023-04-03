@@ -230,9 +230,14 @@ if "pytest" in sys.modules:
 
     def test_syntax_check_role() -> None:
         """Validate syntax check of a broken role."""
+        # pylint: disable=import-outside-toplevel
+        from ansiblelint.rules import RulesCollection
+        from ansiblelint.runner import Runner
+
         lintable = Lintable("examples/playbooks/roles/invalid_due_syntax", kind="role")
         # pylint: disable=protected-access
-        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+        rules = RulesCollection()
+        result = Runner(lintable, rules=rules).run()
         assert len(result) == 1, result
         assert result[0].linenumber == 2
         assert result[0].filename == "examples/roles/invalid_due_syntax/tasks/main.yml"

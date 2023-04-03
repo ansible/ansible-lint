@@ -106,7 +106,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
     )
-    def test_no_galaxy_info(rule_runner: Any) -> None:
+    def test_meta_not_tags(rule_runner: Any) -> None:
         """Test rule matches."""
         results = rule_runner.run(
             "examples/roles/meta_no_tags_galaxy_info/meta/main.yml"

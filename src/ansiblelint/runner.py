@@ -139,7 +139,7 @@ class Runner:
 
         # playbooks: List[Lintable] = []
         for lintable in self.lintables:
-            if lintable.kind != "playbook" or lintable.stop_processing:
+            if lintable.kind not in ("playbook", "role") or lintable.stop_processing:
                 continue
             files.append(lintable)
 

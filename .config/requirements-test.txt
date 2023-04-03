@@ -5,6 +5,7 @@ flake8 # IDE support
 flake8-future-annotations # IDE support
 jmespath
 mypy # IDE support
+netaddr # needed by ipwrap filter
 psutil # soft-dep of pytest-xdist
 pylint # IDE support
 pytest >= 7.2.2
