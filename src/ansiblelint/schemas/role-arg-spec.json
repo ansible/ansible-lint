@@ -233,7 +233,7 @@
       "title": "Option"
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/arg_specs.json",
+  "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
   "examples": ["meta/argument_specs.yml"],
@@ -246,5 +246,5 @@
       "markdownDescription": "Add entry point, usually `main`.\nSee [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)"
     }
   },
-  "title": "Ansible Argument Specs Schema"
+  "title": "Ansible Role Argument Specs Schema"
 }
