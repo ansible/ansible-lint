@@ -171,7 +171,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
             "roles/foo/molecule/scenario3/collections.yml", "requirements", id="10"
         ),  # requirements
         pytest.param(
-            "roles/foo/meta/argument_specs.yml", "arg_specs", id="11"
+            "roles/foo/meta/argument_specs.yml", "role-arg-spec", id="11"
         ),  # role argument specs
         # tasks files:
         pytest.param("tasks/directory with spaces/main.yml", "tasks", id="12"),  # tasks

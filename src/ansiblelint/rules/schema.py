@@ -198,15 +198,15 @@ if "pytest" in sys.modules:
             ),
             pytest.param(
                 "examples/roles/hello/meta/argument_specs.yml",
-                "arg_specs",
+                "role-arg-spec",
                 [],
-                id="arg_specs",
+                id="role-arg-spec",
             ),
             pytest.param(
                 "examples/roles/broken_argument_specs/meta/argument_specs.yml",
-                "arg_specs",
+                "role-arg-spec",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
-                id="arg_specs-broken",
+                id="role-arg-spec-broken",
             ),
             pytest.param(
                 "examples/changelogs/changelog.yaml",
