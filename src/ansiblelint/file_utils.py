@@ -388,7 +388,7 @@ class Lintable:
                     logging.debug(
                         "data set to None for %s due to being of %s kind.",
                         self.path,
-                        self.base_kind,
+                        self.base_kind or "unknown",
                     )
                     self._data = States.UNKNOWN_DATA
 
