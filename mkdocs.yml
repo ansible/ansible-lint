@@ -109,25 +109,14 @@ nav:
       - Contributing: contributing.md
       - custom-rules.md
 
-#   - installation.md
-#   - using:
-#       - getting-started.md
-#       - usage.md
-#       - configuration.md
-#   - examples.md
-#   - faq.md
-#   - contributing.md
-#   - tags.md
-#   # - subprocess-tee: '!import https://github.com/pycontribs/subprocess-tee?branch=main&multi_docs=False'
-#   # - xxx: '!import https://github.com/eclipse-opensmartclide/smartclide-docs'
-
 plugins:
   - autorefs
   - markdown-exec
   - gen-files:
       scripts:
         - src/ansiblelint/generate_docs.py
-  - search
+  - material/search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - material/social
   - material/tags
   # https://github.com/manuzhang/mkdocs-htmlproofer-plugin
