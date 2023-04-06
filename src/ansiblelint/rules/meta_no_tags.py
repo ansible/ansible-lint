@@ -6,6 +6,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.testing import RunFromText
 
 # Copyright (c) 2018, Ansible Project
 
@@ -87,33 +88,6 @@ class MetaTagValidRule(AnsibleLintRule):
         return results
 
 
-META_TAG_VALID = """
-galaxy_info:
-    galaxy_tags: ['database', 'my s q l', 'MYTAG']
-    categories: 'my_category_not_in_a_list'
-"""
-
-META_TAG_NO_GALAXY_INFO = """
-galaxy_tags: ['database', 'my s q l', 'MYTAG']
-"""
-
-META_TAG_NO_LIST = """
-galaxy_info:
-    galaxy_tags: 'database'
-"""
-
-META_CATEGORIES_AS_LIST = """
-galaxy_info:
-    galaxy_tags: ['database', 'my s q l', 'MYTAG']
-    categories: ['networking', 'posix']
-"""
-
-META_TAGS_NOT_A_STRING = """
-galaxy_info:
-    galaxy_tags: [False, 'database', 'my s q l', 'MYTAG']
-    categories: 'networking'
-"""
-
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
     import pytest
@@ -121,9 +95,9 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
     )
-    def test_valid_tag_rule(rule_runner: Any) -> None:
+    def test_valid_tag_rule(rule_runner: RunFromText) -> None:
         """Test rule matches."""
-        results = rule_runner.run_role_meta_main(META_TAG_VALID)
+        results = rule_runner.run("examples/roles/meta_no_tags_valid/meta/main.yml")
         assert "Use 'galaxy_tags' rather than 'categories'" in str(results), results
         assert "Expected 'categories' to be a list" in str(results)
         assert "invalid: 'my s q l'" in str(results)
@@ -134,7 +108,9 @@ if "pytest" in sys.modules:
     )
     def test_no_galaxy_info(rule_runner: Any) -> None:
         """Test rule matches."""
-        results = rule_runner.run_role_meta_main(META_TAG_NO_GALAXY_INFO)
+        results = rule_runner.run(
+            "examples/roles/meta_no_tags_galaxy_info/meta/main.yml"
+        )
         assert results == []
 
     @pytest.mark.parametrize(
@@ -142,7 +118,7 @@ if "pytest" in sys.modules:
     )
     def test_no_galaxy_tags_list(rule_runner: Any) -> None:
         """Test rule matches."""
-        results = rule_runner.run_role_meta_main(META_TAG_NO_LIST)
+        results = rule_runner.run("examples/roles/meta_tags_no_list/meta/main.yml")
         assert "Expected 'galaxy_tags' to be a list" in str(results)
 
     @pytest.mark.parametrize(
@@ -150,7 +126,9 @@ if "pytest" in sys.modules:
     )
     def test_galaxy_categories_as_list(rule_runner: Any) -> None:
         """Test rule matches."""
-        results = rule_runner.run_role_meta_main(META_CATEGORIES_AS_LIST)
+        results = rule_runner.run(
+            "examples/roles/meta_categories_as_list/meta/main.yml"
+        )
         assert "Use 'galaxy_tags' rather than 'categories'" in str(results), results
         assert "Expected 'categories' to be a list" not in str(results)
 
@@ -159,5 +137,5 @@ if "pytest" in sys.modules:
     )
     def test_tags_not_a_string(rule_runner: Any) -> None:
         """Test rule matches."""
-        results = rule_runner.run_role_meta_main(META_TAGS_NOT_A_STRING)
+        results = rule_runner.run("examples/roles/meta_tags_not_a_string/meta/main.yml")
         assert "Tags must be strings" in str(results)
