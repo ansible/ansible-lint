@@ -3,6 +3,7 @@ coverage-enable-subprocess # see https://github.com/nedbat/coveragepy/issues/134
 coverage[toml] >= 6.4.4
 flake8 # IDE support
 flake8-future-annotations # IDE support
+jmespath
 mypy # IDE support
 psutil # soft-dep of pytest-xdist
 pylint # IDE support
@@ -11,5 +12,5 @@ pytest-mock
 pytest-plus >= 0.2 # for PYTEST_REQPASS
 pytest-xdist >= 2.1.0
 spdx-tools >= 0.7.1 # Apache
-types-pyyaml # IDE support
 types-jsonschema # IDE support
+types-pyyaml # IDE support

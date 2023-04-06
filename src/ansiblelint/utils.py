@@ -196,7 +196,9 @@ def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignor
 
 def _set_collections_basedir(basedir: str) -> None:
     # Sets the playbook directory as playbook_paths for the collection loader
-    AnsibleCollectionConfig.playbook_paths = basedir
+    # Ansible expects only absolute paths inside `playbook_paths` and will
+    # produce weird errors if we use a relative one.
+    AnsibleCollectionConfig.playbook_paths = os.path.abspath(basedir)
 
 
 def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
