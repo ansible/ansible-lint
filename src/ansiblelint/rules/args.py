@@ -243,6 +243,8 @@ class ArgsRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
+    import pytest
+
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     def test_args_module_fail() -> None:
@@ -263,10 +265,12 @@ if "pytest" in sys.modules:
         assert results[4].tag == "args[module]"
         assert "value of state must be one of" in results[4].message
 
-    def test_args_module_pass() -> None:
+    def test_args_module_pass(caplog: pytest.LogCaptureFixture) -> None:
         """Test rule valid module options."""
         collection = RulesCollection()
         collection.register(ArgsRule())
         success = "examples/playbooks/rule-args-module-pass.yml"
-        results = Runner(success, rules=collection).run()
+        with caplog.at_level(logging.WARNING):
+            results = Runner(success, rules=collection).run()
         assert len(results) == 0, results
+        assert len(caplog.records) == 0, caplog.records
