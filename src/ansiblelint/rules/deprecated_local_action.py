@@ -35,28 +35,15 @@ class TaskNoLocalAction(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    import pytest
-
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.testing import RunFromText
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
-    FAIL_TASK = """
-    - name: Task example
-      local_action:
-        module: boto3_facts
-    """
-
-    SUCCESS_TASK = """
-    - name: Task example
-      boto3_facts:
-      delegate_to: localhost # local_action
-    """
-
-    @pytest.mark.parametrize(("text", "expected"), ((SUCCESS_TASK, 0), (FAIL_TASK, 1)))
-    def test_local_action(text: str, expected: int) -> None:
+    def test_local_action(default_rules_collection: RulesCollection) -> None:
         """Positive test deprecated_local_action."""
-        collection = RulesCollection()
-        collection.register(TaskNoLocalAction())
-        runner = RunFromText(collection)
-        results = runner.run_role_tasks_main(text)
-        assert len(results) == expected
+        results = Runner(
+            "examples/playbooks/rule-deprecated-local-action-fail.yml",
+            rules=default_rules_collection,
+        ).run()
+
+        assert len(results) == 1
+        assert results[0].tag == "deprecated-local-action"
