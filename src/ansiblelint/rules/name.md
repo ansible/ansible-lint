@@ -9,6 +9,7 @@ This rule can produce messages as:
 - `name[casing]` - All names should start with an uppercase letter for languages
   that support it.
 - `name[missing]` - All tasks should be named.
+- `name[import_playbook]` - All import_playbooks should be named.
 - `name[play]` - All plays should be named.
 - `name[prefix]` - Prefix task names in sub-tasks files. (opt-in)
 - `name[template]` - Jinja templates should only be at the end of 'name'. This

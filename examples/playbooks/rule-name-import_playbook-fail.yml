@@ -1,0 +1,2 @@
+---
+- ansible.builtin.import_playbook: "./rule-name-play-fail.yml" # <-- name[import_playbook]

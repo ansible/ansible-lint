@@ -32,6 +32,15 @@ class NameRule(AnsibleLintRule):
         results = []
         if file.kind != "playbook":
             return []
+        if "import_playbook" in data or "ansible.builtin.import_playbook" in data:
+            return [
+                self.create_matcherror(
+                    message="All import_playbooks should be named.",
+                    linenumber=data[LINE_NUMBER_KEY],
+                    tag="name[import_playbook]",
+                    filename=file,
+                )
+            ]
         if "name" not in data:
             return [
                 self.create_matcherror(
@@ -201,6 +210,16 @@ if "pytest" in sys.modules:  # noqa: C901
         errs = Runner(success, rules=collection).run()
         assert len(errs) == 1
         assert errs[0].tag == "name[play]"
+        assert errs[0].rule.id == "name"
+
+    def test_name_import_playbook() -> None:
+        """Positive test for name[import_playbook]."""
+        collection = RulesCollection()
+        collection.register(NameRule())
+        success = "examples/playbooks/rule-name-import_playbook-fail.yml"
+        errs = Runner(success, rules=collection).run()
+        assert len(errs) == 1
+        assert errs[0].tag == "name[import_playbook]"
         assert errs[0].rule.id == "name"
 
     def test_name_template() -> None:
