@@ -2,8 +2,8 @@
 # Copyright (c) 2018, Ansible Project
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 import sys
+from typing import TYPE_CHECKING
 
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
@@ -59,6 +59,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
 
 if "pytest" in sys.modules:
     import pytest
+
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
