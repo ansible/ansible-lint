@@ -85,12 +85,6 @@ class MetaVideoLinksRule(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
-    META_NO_GALAXY_INFO = """
-    galaxy_information:
-    video_links:
-    - url: https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be
-    """
-
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
