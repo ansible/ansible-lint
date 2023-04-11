@@ -8,7 +8,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json"
   },
   "changelog": {
-    "etag": "2b862fe2be05a6d3ed4fbed9a31752deb3b1cc63d4f98bded6a4f90e9166a6bd",
+    "etag": "9d65bd02c484c8fdfb98527401b49ff74d05edc8092abfb2767a2d06a7eb2063",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/changelog.json"
   },
   "execution-environment": {
