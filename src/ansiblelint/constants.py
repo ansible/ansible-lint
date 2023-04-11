@@ -97,7 +97,6 @@ RENAMED_TAGS = {
     "505": "missing-import",
     "601": "literal-compare",
     "602": "empty-string-compare",
-    "701": "meta-no-info",
     "702": "meta-no-tags",
     "703": "meta-incorrect",
     "704": "meta-video-links",
