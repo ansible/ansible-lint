@@ -1,0 +1,27 @@
+# Test fixture for mete-video-links test
+---
+galaxy_info:
+  standalone: true
+  author: foo
+  description: bar
+  license: MIT
+  min_ansible_version: "2.12"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+  # https://github.com/ansible/galaxy/blob/devel/galaxy/importer/loaders/role.py
+  video_links:
+    - url: https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be
+      title: Proper format
+    - url: https://drive.google.com/file/d/1spYR51l8SqQqvAhSdZE7/view
+      title: Check for VIDEO_REGEXP validity and break
+    - https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be
+    - my_bad_key: https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be
+      title: This has a bad key
+    - url: www.acme.com/vid
+      title: Bad format of url
+  # https://github.com/ansible/galaxy/blob/devel/galaxy/importer/loaders/role.py#L303
+  cloud_platforms:
+    - amazon
+    - azure

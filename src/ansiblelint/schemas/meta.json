@@ -442,7 +442,8 @@
                 "min_ansible_version",
                 "namespace",
                 "platforms",
-                "role_name"
+                "role_name",
+                "video_links"
               ]
             },
             "required": ["description"]
@@ -457,6 +458,9 @@
         "author": {
           "title": "Author",
           "type": "string"
+        },
+        "cloud_platforms": {
+          "markdownDescription": "Only valid for old standalone roles."
         },
         "company": {
           "title": "Company",
@@ -515,6 +519,10 @@
           "description": "Set to true for old standalone roles, or false for new collection roles.",
           "title": "Standalone",
           "type": "boolean"
+        },
+        "video_links": {
+          "markdownDescription": "Only valid for old standalone roles.",
+          "type": "array"
         }
       },
       "title": "GalaxyInfoModel",
