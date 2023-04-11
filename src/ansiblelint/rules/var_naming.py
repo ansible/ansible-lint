@@ -4,8 +4,8 @@ from __future__ import annotations
 import keyword
 import re
 import sys
-from typing import TYPE_CHECKING, Any
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 from ansible.parsing.yaml.objects import AnsibleUnicode
 
@@ -42,7 +42,6 @@ class VariableNamingRule(AnsibleLintRule):
     needs_raw_task = True
 
     def is_invalid_variable_name(self, ident: str, role_ident: str = "") -> bool:
-
         """Check if variable name is using right pattern."""
         # Based on https://github.com/ansible/ansible/blob/devel/lib/ansible/utils/vars.py#L235
         if not ident.startswith("__"):
@@ -51,7 +50,7 @@ class VariableNamingRule(AnsibleLintRule):
                 or "^[a-z_][a-z0-9_]*$"
             )
         else:
-            re_pattern = re.compile("^[a-z_][a-z0-9_]*$")    
+            re_pattern = re.compile("^[a-z_][a-z0-9_]*$")
 
         if not isinstance(ident, str):  # pragma: no cover
             return False
@@ -113,9 +112,9 @@ class VariableNamingRule(AnsibleLintRule):
         results = []
         role_name = ""
         # If the task uses the 'vars' section to set variables
-        split_filepath = str(
-            Path(task.get("__file__")).resolve()
-        ).split("roles/")
+        split_filepath = (
+            Path(str(task.get("__file__"))).resolve().as_posix().split("roles/")
+        )
         if len(split_filepath) > 1 and not task["action"]["__ansible_module__"] in [
             "import_tasks",
             "include_tasks",
