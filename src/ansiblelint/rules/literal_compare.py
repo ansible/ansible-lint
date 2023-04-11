@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -46,3 +47,35 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
                             return True
 
         return False
+
+
+if "pytest" in sys.modules:
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("test_file", "failures"),
+        (
+            pytest.param(
+                "examples/playbooks/rule_literal_compare_fail.yml",
+                3,
+                id="fail",
+            ),
+            pytest.param(
+                "examples/playbooks/rule_literal_compare_pass.yml",
+                0,
+                id="pass",
+            ),
+        ),
+    )
+    def test_literal_compare(
+        default_rules_collection: RulesCollection, test_file: str, failures: int
+    ) -> None:
+        """Test rule matches."""
+        # Enable checking of loop variable prefixes in roles
+        results = Runner(test_file, rules=default_rules_collection).run()
+        for result in results:
+            assert result.rule.id == "literal-compare"
+        assert len(results) == failures
