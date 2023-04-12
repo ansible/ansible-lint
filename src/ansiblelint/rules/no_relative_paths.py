@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -43,3 +44,27 @@ class RoleRelativePath(AnsibleLintRule):
             return True
 
         return False
+
+
+# testing code to be loaded only with pytest or when executed the rule file
+if "pytest" in sys.modules:
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("test_file", "failures"),
+        (
+            pytest.param("examples/playbooks/no_relative_paths_fail.yml", 2, id="fail"),
+            pytest.param("examples/playbooks/no_relative_paths_pass.yml", 0, id="pass"),
+        ),
+    )
+    def test_no_relative_paths(
+        default_rules_collection: RulesCollection, test_file: str, failures: int
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(test_file, rules=default_rules_collection).run()
+        assert len(results) == failures
+        for result in results:
+            assert result.tag == "no-relative-paths"
