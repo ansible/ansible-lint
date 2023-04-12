@@ -145,7 +145,7 @@ class Runner:
 
         # avoid resource leak warning, https://github.com/python/cpython/issues/90549
         # pylint: disable=unused-variable
-        global_resource = multiprocessing.Semaphore()
+        global_resource = multiprocessing.Semaphore()  # noqa: F841
 
         pool = multiprocessing.pool.ThreadPool(processes=multiprocessing.cpu_count())
         return_list = pool.map(worker, files, chunksize=1)

@@ -23,7 +23,6 @@ from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
     from argparse import Namespace
-    from typing import Dict, Set  # pylint: disable=ungrouped-imports
 
     from ansiblelint._internal.rules import BaseRule
     from ansiblelint.file_utils import Lintable

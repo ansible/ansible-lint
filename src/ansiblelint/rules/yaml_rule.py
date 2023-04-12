@@ -14,7 +14,6 @@ from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.yaml_utils import load_yamllint_config
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
     from typing import Any
 
     from ansiblelint.errors import MatchError

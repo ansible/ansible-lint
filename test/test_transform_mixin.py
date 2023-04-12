@@ -9,7 +9,7 @@ from ansiblelint.rules import TransformMixin
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
-    from typing import Any, Dict, List, Type, Union
+    from typing import Any
 
 
 DUMMY_MAP: dict[str, Any] = {
