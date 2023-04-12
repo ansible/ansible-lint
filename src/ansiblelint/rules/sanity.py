@@ -10,8 +10,6 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 

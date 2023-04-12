@@ -16,8 +16,6 @@ from ansiblelint.testing.fixtures import *  # noqa: F403
 from ansiblelint.yaml_utils import FormattedYAML
 
 if TYPE_CHECKING:
-    from typing import List  # pylint: disable=ungrouped-imports
-
     from _pytest import nodes
     from _pytest.config import Config
     from _pytest.config.argparsing import Parser
