@@ -109,7 +109,13 @@ disallow_any_generics = true
 exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
 
 [[tool.mypy.overrides]]
-module = ["ansible.*", "yamllint.*", "ansiblelint._version", "ruamel.yaml", "spdx.*"]
+module = [
+  "ansible.*",
+  "yamllint.*",
+  "ansiblelint._version",
+  "ruamel.yaml",
+  "spdx.*"
+]
 ignore_missing_imports = true
 ignore_errors = true
 
