@@ -1,0 +1,34 @@
+---
+- name: Fixture for no-handler rule
+  hosts: all
+  tasks:
+    - name: This should trigger no-handler rule # noqa: no-changed-when
+      ansible.builtin.command: echo could be done better
+      when: result is changed
+
+    - name: Do anything # noqa: no-changed-when
+      ansible.builtin.command: echo 123
+      when:
+        - something.changed
+
+    - name: This should be a handler
+      ansible.builtin.debug:
+        msg: why isn't this a handler
+      when: result.changed
+
+    - name: This should be a handler 3 # noqa: literal-compare
+      ansible.builtin.debug:
+        msg: why isn't this a handler
+      when: result.changed == true
+
+    - name: This should be a handler 4 # noqa: literal-compare
+      ansible.builtin.debug:
+        msg: why isn't this a handler
+      when: result['changed'] == true
+
+    - name: This should be a handler 5 # noqa: literal-compare
+      ansible.builtin.debug:
+        msg: why isn't this a handler
+      when:
+        - result['changed'] == true
+        - another_condition

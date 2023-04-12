@@ -31,9 +31,11 @@ if TYPE_CHECKING:
 
 
 def _changed_in_when(item: str) -> bool:
+    if not isinstance(item, str):
+        return False
     item_list = item.split()
 
-    if not isinstance(item, str) or {"and", "not"} & set(item_list):
+    if {"and", "not"} & set(item_list):
         return False
     return any(
         changed in item
@@ -80,87 +82,21 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
-    SUCCEED_CHANGED_WHEN = """
-- hosts: all
-  tasks:
-    - name: Execute something
-      command: echo 123
-      register: result
-      changed_when: true
-"""
-
-    SUCCEED_WHEN = """
-- hosts: all
-  tasks:
-    - name: Registering task 1
-      command: echo Hello
-      register: r1
-      changed_when: true
-
-    - name: Registering task 2
-      command: echo Hello
-      register: r2
-      changed_when: true
-
-    - name: Use when task
-      command: echo Hello
-      when: r1.changed and r2.changed
-
-    - name: Registering task
-      command: echo Hello
-      register: r
-      changed_when: true
-
-    - name: When task not changed
-      command: echo Not changed
-      when: not r.changed
-"""
-
-    FAIL_RESULT_IS_CHANGED = """
-- hosts: all
-  tasks:
-    - name: This should trigger no-handler rule
-      command: echo could be done better
-      when: result is changed
-"""
-
-    FAILED_SOMETHING_CHANGED = """
-- hosts: all
-  tasks:
-    - name: Do anything
-      command: echo 123
-      when:
-        - something.changed
-"""
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     @pytest.mark.parametrize(
-        "rule_runner", (UseHandlerRatherThanWhenChangedRule,), indirect=["rule_runner"]
+        ("test_file", "failures"),
+        (
+            pytest.param("examples/playbooks/no_handler_fail.yml", 6, id="fail"),
+            pytest.param("examples/playbooks/no_handler_pass.yml", 0, id="pass"),
+        ),
     )
-    def test_succeed_changed_when(rule_runner: Any) -> None:
-        """Using changed_when is acceptable."""
-        results = rule_runner.run_playbook(SUCCEED_CHANGED_WHEN)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (UseHandlerRatherThanWhenChangedRule,), indirect=["rule_runner"]
-    )
-    def test_succeed_when_and(rule_runner: Any) -> None:
-        """See https://github.com/ansible/ansible-lint/issues/1526."""
-        results = rule_runner.run_playbook(SUCCEED_WHEN)
-        assert len(results) == 0
-
-    @pytest.mark.parametrize(
-        "rule_runner", (UseHandlerRatherThanWhenChangedRule,), indirect=["rule_runner"]
-    )
-    def test_fail_result_is_changed(rule_runner: Any) -> None:
-        """This task uses 'is changed'."""
-        results = rule_runner.run_playbook(FAIL_RESULT_IS_CHANGED)
-        assert len(results) == 1
-
-    @pytest.mark.parametrize(
-        "rule_runner", (UseHandlerRatherThanWhenChangedRule,), indirect=["rule_runner"]
-    )
-    def test_failed_something_changed(rule_runner: Any) -> None:
-        """This task uses '.changed'."""
-        results = rule_runner.run_playbook(FAILED_SOMETHING_CHANGED)
-        assert len(results) == 1
+    def test_no_handler(
+        default_rules_collection: RulesCollection, test_file: str, failures: int
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(test_file, rules=default_rules_collection).run()
+        assert len(results) == failures
+        for result in results:
+            assert result.tag == "no-handler"
