@@ -1,0 +1,14 @@
+---
+- name: Fixture for no-relative-paths
+  hosts: localhost
+  tasks:
+    - name: Content example with no src
+      ansible.builtin.copy:
+        content: "# This file was moved to /etc/other.conf"
+        dest: /etc/mine.conf
+        mode: "0644"
+    - name: Copy example
+      ansible.builtin.copy:
+        src: /home/example/files/foo.conf
+        dest: /etc/foo.conf
+        mode: "0644"
