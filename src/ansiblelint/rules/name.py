@@ -8,13 +8,15 @@ from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.file_utils import Lintable  # noqa: F811
 
 
-class NameRule(AnsibleLintRule):
+class NameRule(AnsibleLintRule, TransformMixin):
     """Rule for checking task and play names."""
 
     id = "name"
@@ -140,6 +142,20 @@ class NameRule(AnsibleLintRule):
                 )
             )
         return results
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == "name[casing]":
+            target_task = self.seek(match.yaml_path, data)
+            # Not using capitalize(), since that rewrites the rest of the name to lower case
+            target_task[
+                "name"
+            ] = f"{target_task['name'][:1].upper()}{target_task['name'][1:]}"
+            match.fixed = True
 
 
 if "pytest" in sys.modules:  # noqa: C901
