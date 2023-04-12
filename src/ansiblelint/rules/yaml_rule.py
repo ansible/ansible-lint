@@ -121,6 +121,12 @@ if "pytest" in sys.modules:
             ),
             pytest.param("examples/yamllint/valid.yml", "yaml", [], id="valid"),
             pytest.param(
+                "examples/yamllint/line-length.yml",
+                "yaml",
+                ["Line too long (166 > 160 characters)"],
+                id="line-length",
+            ),
+            pytest.param(
                 "examples/yamllint/multi-document.yaml", "yaml", [], id="multi-document"
             ),
             pytest.param(
