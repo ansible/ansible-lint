@@ -75,7 +75,6 @@ nav:
       - rules/load-failure.md
       - rules/loop-var-prefix.md
       - rules/meta-incorrect.md
-      - rules/meta-no-info.md
       - rules/meta-no-tags.md
       - rules/meta-runtime.md
       - rules/meta-video-links.md

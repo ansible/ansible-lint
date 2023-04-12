@@ -149,7 +149,6 @@
               "literal-compare",
               "load-failure",
               "meta-incorrect",
-              "meta-no-info",
               "meta-no-tags",
               "meta-runtime",
               "meta-video-links",
