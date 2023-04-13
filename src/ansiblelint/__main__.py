@@ -37,6 +37,7 @@ from typing import TYPE_CHECKING, Any, Callable, TextIO
 from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir
 from filelock import FileLock, Timeout
+from rich.highlighter import NullHighlighter
 
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
@@ -52,6 +53,7 @@ from ansiblelint.config import get_version_warning, options
 from ansiblelint.constants import EXIT_CONTROL_C_RC, GIT_CMD, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.loaders import load_ignore_txt
+from ansiblelint.logger import RichHandlerEx
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
@@ -78,9 +80,12 @@ def initialize_logger(level: int = 0) -> None:
         2: logging.DEBUG,
     }
 
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(levelname)-8s %(message)s")
-    handler.setFormatter(formatter)
+    handler = RichHandlerEx(
+        show_time=False,
+        console=console_stderr,
+        markup=False,
+        highlighter=NullHighlighter(),
+    )
     logger = logging.getLogger()
     logger.addHandler(handler)
     # Unknown logging level is treated as DEBUG

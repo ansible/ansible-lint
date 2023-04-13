@@ -495,11 +495,6 @@ def guess_project_dir(config_file: str | None) -> str:
     if path is None:
         path = os.getcwd()
 
-    _logger.info(
-        "Guessed %s as project root directory",
-        path,
-    )
-
     return path
 
 

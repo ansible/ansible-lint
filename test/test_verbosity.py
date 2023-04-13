@@ -17,41 +17,41 @@ from ansiblelint.testing import run_ansible_lint
         (
             "",
             [
-                ("WARNING  Listing 1 violation(s) that are fatal", False),
-                ("DEBUG ", True),
-                ("INFO ", True),
+                ("W: Listing 1 violation(s) that are fatal", False),
+                ("D: ", True),
+                ("I: ", True),
             ],
         ),
         (
             "-q",
             [
-                ("WARNING ", True),
-                ("DEBUG ", True),
-                ("INFO ", True),
+                ("W: ", True),
+                ("D: ", True),
+                ("I: ", True),
             ],
         ),
         (
             "-qq",
             [
-                ("WARNING ", True),
-                ("DEBUG ", True),
-                ("INFO ", True),
+                ("W: ", True),
+                ("D: ", True),
+                ("I: ", True),
             ],
         ),
         (
             "-v",
             [
-                ("WARNING  Listing 1 violation(s) that are fatal", False),
-                ("INFO     Set ANSIBLE_LIBRARY=", False),
-                ("DEBUG ", True),
+                ("W: Listing 1 violation(s) that are fatal", False),
+                ("ANSIBLE_LIBRARY=", False),
+                ("D: ", True),
             ],
         ),
         (
             "-vv",
             [
                 # ("DEBUG    Loading custom .yamllint config file,", False),
-                ("WARNING  Listing 1 violation(s) that are fatal", False),
-                ("INFO     Set ANSIBLE_LIBRARY=", False),
+                ("W: Listing 1 violation(s) that are fatal", False),
+                ("ANSIBLE_LIBRARY=", False),
                 # ("DEBUG    Effective yamllint rules used", False),
             ],
         ),
@@ -59,19 +59,19 @@ from ansiblelint.testing import run_ansible_lint
             "-vvvvvvvvvvvvvvvvvvvvvvvvv",
             [
                 # ("DEBUG    Loading custom .yamllint config file,", False),
-                ("WARNING  Listing 1 violation(s) that are fatal", False),
-                ("INFO     Set ANSIBLE_LIBRARY=", False),
+                ("W: Listing 1 violation(s) that are fatal", False),
+                ("ANSIBLE_LIBRARY=", False),
                 # ("DEBUG    Effective yamllint rules used", False),
             ],
         ),
     ),
     ids=(
-        "default-verbosity",
-        "quiet",
-        "really-quiet",
-        "loquacious",
-        "really-loquacious",
-        'really-loquacious but with more "v"s -- same as -vv',
+        "0",  # "default-verbosity",
+        "1",  # "quiet",
+        "2",  # "really-quiet",
+        "3",  # "loquacious",
+        "4",  # "really-loquacious",
+        "5",  # 'really-loquacious but with more "v"s -- same as -vv',
     ),
 )
 def test_default_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> None:

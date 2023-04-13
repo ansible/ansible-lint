@@ -97,7 +97,7 @@ def test_discover_lintables_git_verbose(
 @pytest.mark.parametrize(
     "is_in_git",
     (True, False),
-    ids=("in Git", "outside Git"),
+    ids=("in-git", "out-git"),
 )
 def test_discover_lintables_silent(
     is_in_git: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture[str]

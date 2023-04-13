@@ -59,6 +59,12 @@ _theme = Theme(
         "title": "yellow",
         "error": "bright_red",
         "filename": "blue",
+        "log.message": "dim",
+        "logging.level.notset": "dim",
+        "logging.level.info": "dim",
+        "logging.level.debug": "dim",
+        "logging.level.warning": "yellow",
+        "logging.level.error": "red",
     }
 )
 console_options: dict[str, Any] = {"emoji": False, "theme": _theme, "soft_wrap": True}

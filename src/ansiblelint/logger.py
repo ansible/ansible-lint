@@ -5,7 +5,29 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Any
 
+from rich.logging import RichHandler
+from rich.text import Text
+
 _logger = logging.getLogger(__name__)
+
+
+class RichHandlerEx(RichHandler):
+    """Rich logging handler."""
+
+    def get_level_text(self, record: logging.LogRecord) -> Text:
+        """Get the level name from the record.
+
+        Args:
+            record (LogRecord): LogRecord instance.
+
+        Returns:
+            Text: A tuple of the style and level name.
+        """
+        level_name = record.levelname
+        level_text = Text.styled(
+            f"{level_name[0]}:", f"logging.level.{level_name.lower()}"
+        )
+        return level_text
 
 
 @contextmanager
