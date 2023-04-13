@@ -167,6 +167,7 @@ isdir
 isdisjoint
 iskeyword
 isort
+isorted
 jsonfile
 jsonschema
 junitxml
