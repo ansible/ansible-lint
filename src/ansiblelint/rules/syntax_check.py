@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from typing import Any
 
@@ -72,6 +73,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     def _get_ansible_syntax_check_matches(lintable: Lintable) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
         default_rule: BaseRule = AnsibleSyntaxCheckRule()
+        fh = None
         results = []
         if lintable.kind not in ("playbook", "role"):
             return []
@@ -79,26 +81,32 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
         with timed_info(
             "Executing syntax check on %s %s", lintable.kind, lintable.path
         ):
+            if lintable.kind == "role":
+                playbook_text = f"""
+---
+- name: Temporary playbook for role syntax check
+  hosts: localhost
+  tasks:
+    - ansible.builtin.import_role:
+        name: {str(lintable.path.expanduser())}
+"""
+                # pylint: disable=consider-using-with
+                fh = tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix="play")
+                fh.write(playbook_text)
+                fh.flush()
+                playbook_path = fh.name
+            else:
+                playbook_path = str(lintable.path.expanduser())
             # To avoid noisy warnings we pass localhost as current inventory:
             # [WARNING]: No inventory was parsed, only implicit localhost is available
             # [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
-            if lintable.kind == "playbook":
-                cmd = [
-                    "ansible-playbook",
-                    "-i",
-                    "localhost,",
-                    "--syntax-check",
-                    str(lintable.path.expanduser()),
-                ]
-            else:  # role
-                cmd = [
-                    "ansible",
-                    "localhost",
-                    "--syntax-check",
-                    "--module-name=include_role",
-                    "--args",
-                    f"name={str(lintable.path.expanduser())}",
-                ]
+            cmd = [
+                "ansible-playbook",
+                "-i",
+                "localhost,",
+                "--syntax-check",
+                playbook_path,
+            ]
             if options.extra_vars:
                 cmd.extend(["--extra-vars", json.dumps(options.extra_vars)])
 
@@ -178,6 +186,8 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                     )
                 )
 
+        if fh:
+            fh.close()
         return results
 
 
