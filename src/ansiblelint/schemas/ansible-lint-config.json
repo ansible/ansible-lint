@@ -17,7 +17,10 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
-  "examples": [".ansible-lint", ".config/ansible-lint.yml"],
+  "examples": [
+    ".ansible-lint",
+    ".config/ansible-lint.yml"
+  ],
   "properties": {
     "display_relative_path": {
       "default": true,
@@ -105,7 +108,10 @@
         null
       ],
       "title": "Profile",
-      "type": ["null", "string"]
+      "type": [
+        "null",
+        "string"
+      ]
     },
     "progressive": {
       "default": false,
@@ -161,7 +167,6 @@
               "meta-video-links",
               "name",
               "name[casing]",
-              "name[missing]",
               "name[play]",
               "name[prefix]",
               "name[template]",
@@ -214,7 +219,10 @@
     "sarif_file": {
       "default": null,
       "title": "SARIF Output filename",
-      "type": ["null", "string"]
+      "type": [
+        "null",
+        "string"
+      ]
     },
     "skip_action_validation": {
       "default": false,
