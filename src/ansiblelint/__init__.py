@@ -20,7 +20,7 @@
 """Main ansible-lint package."""
 from __future__ import annotations
 
-import ansiblelint._vendor
+import ansiblelint._vendor  # noqa: F401
 from ansiblelint.version import __version__
 
 # make vendored top-level modules accessible EARLY

@@ -213,6 +213,14 @@ python_files = [
 xfail_strict = true
 markers = ["eco: Tests effects on a set of 3rd party ansible repositories"]
 
+[tool.ruff]
+# select = ["ALL"]
+ignore = [
+  "E501", # we use black
+
+]
+target-version = "py39"
+
 [tool.setuptools.dynamic]
 optional-dependencies.docs = { file = [".config/requirements-docs.txt"] }
 optional-dependencies.test = { file = [".config/requirements-test.txt"] }
