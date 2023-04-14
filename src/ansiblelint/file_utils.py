@@ -4,12 +4,11 @@ from __future__ import annotations
 import copy
 import logging
 import os
-import pathlib
 import subprocess
 import sys
 from argparse import Namespace
 from collections import OrderedDict, defaultdict
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -20,7 +19,7 @@ from wcmatch.wcmatch import RECURSIVE, WcMatch
 from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, options
-from ansiblelint.constants import GIT_CMD, FileType, States
+from ansiblelint.constants import CONFIG_FILENAMES, GIT_CMD, FileType, States
 from ansiblelint.logger import warn_or_fail
 
 if TYPE_CHECKING:
@@ -467,49 +466,58 @@ def strip_dotslash_prefix(fname: str) -> str:
     return fname[2:] if fname.startswith("./") else fname
 
 
-def guess_project_dir(config_file: str | None) -> str:
-    """Return detected project dir or current working directory."""
-    path = None
-    if config_file is not None and config_file != "/dev/null":
-        target = pathlib.Path(config_file)
-        if target.exists():
-            # for config inside .config, we return the parent dir as project dir
-            cfg_path = target.parent
-            if cfg_path.parts[-1] == ".config":
-                path = str(cfg_path.parent.absolute())
-            else:
-                path = str(cfg_path.absolute())
+def find_project_root(
+    srcs: Sequence[str],
+    config_file: str | None = None,
+) -> tuple[Path, str]:
+    """Return a directory containing .git or ansible-lint config files.
 
-    if path is None:
-        try:
-            result = subprocess.run(
-                [*GIT_CMD, "rev-parse", "--show-toplevel"],
-                capture_output=True,
-                text=True,
-                check=True,
-            )
+    That directory will be a common parent of all files and directories
+    passed in `srcs`.
 
-            path = result.stdout.splitlines()[0]
-        except subprocess.CalledProcessError as exc:
-            if not (
-                exc.returncode == 128 and "fatal: not a git repository" in exc.stderr
-            ):
-                _logger.warning(
-                    "Failed to guess project directory using git: %s",
-                    exc.stderr.rstrip("\n"),
-                )
-        except FileNotFoundError as exc:
-            _logger.warning("Failed to locate command: %s", exc)
+    If no directory in the tree contains a marker that would specify it's the
+    project root, the root of the file system is returned.
 
-    if path is None:
-        path = os.getcwd()
+    Returns a two-tuple with the first element as the project root path and
+    the second element as a string describing the method by which the
+    project root was discovered.
+    """
+    directory = None
+    if not srcs:
+        srcs = [str(Path.cwd().resolve().absolute())]
+    path_srcs = [Path(Path.cwd(), src).resolve() for src in srcs]
 
-    _logger.info(
-        "Guessed %s as project root directory",
-        path,
+    if config_file:
+        cfg_files = [config_file]
+    else:
+        cfg_files = CONFIG_FILENAMES
+
+    # A list of lists of parents for each 'src'. 'src' is included as a
+    # "parent" of itself if it is a directory
+    src_parents = [
+        list(path.parents) + ([path] if path.is_dir() else []) for path in path_srcs
+    ]
+
+    common_base = max(
+        set.intersection(*(set(parents) for parents in src_parents)),
+        key=lambda path: path.parts,
     )
 
-    return path
+    for directory in (common_base, *common_base.parents):
+        if (directory / ".git").exists():
+            return directory, ".git directory"
+
+        if (directory / ".hg").is_dir():
+            return directory, ".hg directory"
+
+        for cfg_file in cfg_files:
+            if not os.path.isabs(cfg_file):
+                if (directory / cfg_file).is_file():
+                    return directory, str(cfg_file)
+
+    if not directory:
+        return Path.cwd(), "current working directory"
+    return directory, "file system root"
 
 
 def expand_dirs_in_lintables(lintables: set[Lintable]) -> None:
