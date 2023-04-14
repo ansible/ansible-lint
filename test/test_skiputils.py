@@ -75,11 +75,11 @@ def test_playbook_noqa2(default_text_runner: RunFromText) -> None:
                             "git": "src=/path/to/git/repo dest=checkout",
                             "__line__": 4,
                             "__file__": Path("examples/playbooks/noqa.yml"),
-                        }
+                        },
                     ],
                     "__line__": 2,
                     "__file__": Path("examples/playbooks/noqa.yml"),
-                }
+                },
             ],
             [
                 {
@@ -92,11 +92,11 @@ def test_playbook_noqa2(default_text_runner: RunFromText) -> None:
                             "__line__": 4,
                             "__file__": Path("examples/playbooks/noqa.yml"),
                             SKIPPED_RULES_KEY: ["latest[git]", "partial-become"],
-                        }
+                        },
                     ],
                     "__line__": 2,
                     "__file__": Path("examples/playbooks/noqa.yml"),
-                }
+                },
             ],
         ),
         pytest.param(
@@ -116,28 +116,28 @@ def test_playbook_noqa2(default_text_runner: RunFromText) -> None:
                                                 "msg": "Test unnamed task in block",
                                                 "__line__": 9,
                                                 "__file__": Path(
-                                                    "examples/playbooks/noqa-nested.yml"
+                                                    "examples/playbooks/noqa-nested.yml",
                                                 ),
                                             },
                                             "__line__": 8,
                                             "__file__": Path(
-                                                "examples/playbooks/noqa-nested.yml"
+                                                "examples/playbooks/noqa-nested.yml",
                                             ),
-                                        }
+                                        },
                                     ],
                                     "__line__": 6,
                                     "__file__": Path(
-                                        "examples/playbooks/noqa-nested.yml"
+                                        "examples/playbooks/noqa-nested.yml",
                                     ),
-                                }
+                                },
                             ],
                             "__line__": 4,
                             "__file__": Path("examples/playbooks/noqa-nested.yml"),
-                        }
+                        },
                     ],
                     "__line__": 2,
                     "__file__": Path("examples/playbooks/noqa-nested.yml"),
-                }
+                },
             ],
             [
                 {
@@ -154,31 +154,31 @@ def test_playbook_noqa2(default_text_runner: RunFromText) -> None:
                                                 "msg": "Test unnamed task in block",
                                                 "__line__": 9,
                                                 "__file__": Path(
-                                                    "examples/playbooks/noqa-nested.yml"
+                                                    "examples/playbooks/noqa-nested.yml",
                                                 ),
                                             },
                                             "__line__": 8,
                                             "__file__": Path(
-                                                "examples/playbooks/noqa-nested.yml"
+                                                "examples/playbooks/noqa-nested.yml",
                                             ),
                                             SKIPPED_RULES_KEY: ["name[missing]"],
-                                        }
+                                        },
                                     ],
                                     "__line__": 6,
                                     "__file__": Path(
-                                        "examples/playbooks/noqa-nested.yml"
+                                        "examples/playbooks/noqa-nested.yml",
                                     ),
                                     SKIPPED_RULES_KEY: ["name[missing]"],
-                                }
+                                },
                             ],
                             "__line__": 4,
                             "__file__": Path("examples/playbooks/noqa-nested.yml"),
                             SKIPPED_RULES_KEY: ["name[missing]"],
-                        }
+                        },
                     ],
                     "__line__": 2,
                     "__file__": Path("examples/playbooks/noqa-nested.yml"),
-                }
+                },
             ],
         ),
     ),
@@ -206,19 +206,22 @@ def test_append_skipped_rules(
             {
                 "name": "Attempt and graceful roll back",
                 "block": [
-                    {"name": "Force a failure", "ansible.builtin.command": "/bin/false"}
+                    {
+                        "name": "Force a failure",
+                        "ansible.builtin.command": "/bin/false",
+                    },
                 ],
                 "rescue": [
                     {
                         "name": "Force a failure in middle of recovery!",
                         "ansible.builtin.command": "/bin/false",
-                    }
+                    },
                 ],
                 "always": [
                     {
                         "name": "Always do this",
                         "ansible.builtin.debug": {"msg": "This always executes"},
-                    }
+                    },
                 ],
             },
             True,

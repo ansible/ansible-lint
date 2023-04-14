@@ -41,7 +41,6 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     version_added = "historic"
 
     _package_managers = [
-        # spell-checker: disable
         "apk",
         "apt",
         "bower",
@@ -68,11 +67,12 @@ class PackageIsNotLatestRule(AnsibleLintRule):
         "yarn",
         "yum",
         "zypper",
-        # spell-checker: enable
     ]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         return (
             task["action"]["__ansible_module__"] in self._package_managers

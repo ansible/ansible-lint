@@ -19,7 +19,6 @@ SORTER_TASKS = (
     # "args",
     None,  # <-- None include all modules that not using action and *
     # "when",
-    # "(loop|loop_|with_).*",
     # "notify",
     # "tags",
     "block",
@@ -57,11 +56,13 @@ class KeyOrderRule(AnsibleLintRule):
     needs_raw_task = True
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
         raw_task = task["__raw_task__"]
-        keys = [key for key in raw_task.keys() if not key.startswith("_")]
+        keys = [key for key in raw_task if not key.startswith("_")]
         sorted_keys = sorted(keys, key=functools.cmp_to_key(task_property_sorter))
         if keys != sorted_keys:
             result.append(
@@ -69,7 +70,7 @@ class KeyOrderRule(AnsibleLintRule):
                     f"You can improve the task key order to: {', '.join(sorted_keys)}",
                     filename=file,
                     tag="key-order[task]",
-                )
+                ),
             )
         return result
 
@@ -89,7 +90,9 @@ if "pytest" in sys.modules:
         ),
     )
     def test_key_order_rule(
-        default_rules_collection: RulesCollection, test_file: str, failures: int
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: int,
     ) -> None:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()
@@ -103,12 +106,14 @@ if "pytest" in sys.modules:
             pytest.param([], []),
             pytest.param(["block", "name"], ["name", "block"]),
             pytest.param(
-                ["block", "name", "action", "..."], ["name", "action", "...", "block"]
+                ["block", "name", "action", "..."],
+                ["name", "action", "...", "block"],
             ),
         ),
     )
     def test_key_order_property_sorter(
-        properties: list[str], expected: list[str]
+        properties: list[str],
+        expected: list[str],
     ) -> None:
         """Test the task property sorter."""
         result = sorted(properties, key=functools.cmp_to_key(task_property_sorter))

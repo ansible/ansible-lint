@@ -30,7 +30,9 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
     literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         for k, v, _ in nested_items_path(task):
             if k == "when":
@@ -42,7 +44,7 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
                 else:
                     for item in v:
                         if isinstance(item, str) and self.literal_bool_compare.search(
-                            item
+                            item,
                         ):
                             return True
 
@@ -71,7 +73,9 @@ if "pytest" in sys.modules:
         ),
     )
     def test_literal_compare(
-        default_rules_collection: RulesCollection, test_file: str, failures: int
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: int,
     ) -> None:
         """Test rule matches."""
         # Enable checking of loop variable prefixes in roles

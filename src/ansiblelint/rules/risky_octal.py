@@ -76,7 +76,7 @@ class OctalPermissionsRule(AnsibleLintRule):
             and not ((mode >> 3) % 8 == 1 and (mode >> 6) % 2 == 1)
         )
         user_write_without_read = (
-            (mode >> 6) % 8 and (mode >> 6) % 8 < 4 and not (mode >> 6) % 8 == 1
+            (mode >> 6) % 8 and (mode >> 6) % 8 < 4 and (mode >> 6) % 8 != 1
         )
         other_more_generous_than_group = mode % 8 > (mode >> 3) % 8
         other_more_generous_than_user = mode % 8 > (mode >> 6) % 8
@@ -88,11 +88,13 @@ class OctalPermissionsRule(AnsibleLintRule):
             or user_write_without_read
             or other_more_generous_than_group
             or other_more_generous_than_user
-            or group_more_generous_than_user
+            or group_more_generous_than_user,
         )
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         if task["action"]["__ansible_module__"] in self._modules:
             mode = task["action"].get("mode", None)
@@ -181,7 +183,7 @@ if "pytest" in sys.modules:
         rule = OctalPermissionsRule()
         for mode in VALID_MODES:
             assert not rule.is_invalid_permission(
-                mode
+                mode,
             ), f"0o{mode:o} should be a valid mode"
 
     def test_octal_invalid_modes() -> None:
@@ -189,5 +191,5 @@ if "pytest" in sys.modules:
         rule = OctalPermissionsRule()
         for mode in INVALID_MODES:
             assert rule.is_invalid_permission(
-                mode
+                mode,
             ), f"{mode:d} should be an invalid mode"

@@ -25,7 +25,9 @@ class IgnoreErrorsRule(AnsibleLintRule):
     version_added = "v5.0.7"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         if (
             task.get("ignore_errors")
@@ -90,7 +92,9 @@ if "pytest" in sys.modules:
 """
 
     @pytest.mark.parametrize(
-        "rule_runner", (IgnoreErrorsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (IgnoreErrorsRule,),
+        indirect=["rule_runner"],
     )
     def test_ignore_errors_true(rule_runner: RunFromText) -> None:
         """The task uses ignore_errors."""
@@ -98,7 +102,9 @@ if "pytest" in sys.modules:
         assert len(results) == 1
 
     @pytest.mark.parametrize(
-        "rule_runner", (IgnoreErrorsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (IgnoreErrorsRule,),
+        indirect=["rule_runner"],
     )
     def test_ignore_errors_false(rule_runner: RunFromText) -> None:
         """The task uses ignore_errors: false, oddly enough."""
@@ -106,7 +112,9 @@ if "pytest" in sys.modules:
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (IgnoreErrorsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (IgnoreErrorsRule,),
+        indirect=["rule_runner"],
     )
     def test_ignore_errors_check_mode(rule_runner: RunFromText) -> None:
         """The task uses ignore_errors: "{{ ansible_check_mode }}"."""
@@ -114,7 +122,9 @@ if "pytest" in sys.modules:
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (IgnoreErrorsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (IgnoreErrorsRule,),
+        indirect=["rule_runner"],
     )
     def test_ignore_errors_register(rule_runner: RunFromText) -> None:
         """The task uses ignore_errors: but output is registered and managed."""
@@ -122,7 +132,9 @@ if "pytest" in sys.modules:
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (IgnoreErrorsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (IgnoreErrorsRule,),
+        indirect=["rule_runner"],
     )
     def test_failed_when(rule_runner: RunFromText) -> None:
         """Instead of ignore_errors, this task uses failed_when."""

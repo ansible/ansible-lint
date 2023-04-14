@@ -104,7 +104,9 @@ class BaseRule:
         return []
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str | MatchError | list[MatchError]:
         """Confirm if current rule is matching a specific task.
 

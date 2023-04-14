@@ -59,7 +59,9 @@ class App:
             # If formatter CodeclimateJSONFormatter or SarifFormatter is chosen,
             # then print only the matches in JSON
             console.print(
-                self.formatter.format_result(matches), markup=False, highlight=False
+                self.formatter.format_result(matches),
+                markup=False,
+                highlight=False,
             )
             return
 
@@ -77,7 +79,8 @@ class App:
                     console.print(self.formatter.format(match), highlight=False)
         if fatal_matches:
             _logger.warning(
-                "Listing %s violation(s) that are fatal", len(fatal_matches)
+                "Listing %s violation(s) that are fatal",
+                len(fatal_matches),
             )
             for match in fatal_matches:
                 if not match.ignored:
@@ -86,12 +89,14 @@ class App:
         # If run under GitHub Actions we also want to emit output recognized by it.
         if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("GITHUB_WORKFLOW"):
             _logger.info(
-                "GitHub Actions environment detected, adding annotations output..."
+                "GitHub Actions environment detected, adding annotations output...",
             )
             formatter = formatters.AnnotationsFormatter(self.options.cwd, True)
             for match in itertools.chain(fatal_matches, ignored_matches):
                 console_stderr.print(
-                    formatter.format(match), markup=False, highlight=False
+                    formatter.format(match),
+                    markup=False,
+                    highlight=False,
                 )
 
         # If sarif_file is set, we also dump the results to a sarif file.
@@ -115,13 +120,15 @@ class App:
             # *rule.tags is the list of the rule's tags (categories): `style`
             if match.tag not in result.tag_stats:
                 result.tag_stats[match.tag] = TagStats(
-                    tag=match.tag, count=1, associated_tags=match.rule.tags
+                    tag=match.tag,
+                    count=1,
+                    associated_tags=match.rule.tags,
                 )
             else:
                 result.tag_stats[match.tag].count += 1
 
             if {match.tag, match.rule.id, *match.rule.tags}.isdisjoint(
-                self.options.warn_list
+                self.options.warn_list,
             ):
                 # not in warn_list
                 if match.fixed:
@@ -178,12 +185,12 @@ class App:
                 lines.add(f"{rule.filename} {rule.tag}\n")
             with open(IGNORE_FILE.default, "w", encoding="utf-8") as ignore_file:
                 ignore_file.write(
-                    "# This file contains ignores rule violations for ansible-lint\n"
+                    "# This file contains ignores rule violations for ansible-lint\n",
                 )
                 ignore_file.writelines(sorted(list(lines)))
         elif matched_rules and not self.options.quiet:
             console_stderr.print(
-                "Read [link=https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations."
+                "Read [link=https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations.",
             )
 
         # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
@@ -195,16 +202,14 @@ class App:
         # We can do the deprecation once the ecosystem caught up at least a bit.
         # for k, v in used_old_tags.items():
         #     _logger.warning(
-        #         "Replaced deprecated tag '%s' with '%s' but it will become an "
         #         "error in the future.",
         #         k,
         #         v,
-        #     )
 
         if self.options.write_list and "yaml" in self.options.skip_list:
             _logger.warning(
                 "You specified '--write', but no files can be modified "
-                "because 'yaml' is in 'skip_list'."
+                "because 'yaml' is in 'skip_list'.",
             )
 
         if mark_as_success and summary.failures and not self.options.progressive:
@@ -213,7 +218,10 @@ class App:
         if not self.options.quiet:
             console_stderr.print(render_yaml(msg))
             self.report_summary(
-                summary, changed_files_count, files_count, is_success=mark_as_success
+                summary,
+                changed_files_count,
+                files_count,
+                is_success=mark_as_success,
             )
 
         return SUCCESS_RC if mark_as_success else VIOLATIONS_FOUND_RC
@@ -232,7 +240,6 @@ class App:
 
         for profile, profile_config in PROFILES.items():
             for rule in profile_config["rules"]:
-                # print(profile, rule)
                 rule_order[rule] = (idx, profile)
                 idx += 1
         _logger.debug("Determined rule-profile order: %s", rule_order)
@@ -242,7 +249,8 @@ class App:
                 tag_stats.order, tag_stats.profile = rule_order.get(tag, (idx, ""))
             elif "[" in tag:
                 tag_stats.order, tag_stats.profile = rule_order.get(
-                    tag.split("[")[0], (idx, "")
+                    tag.split("[")[0],
+                    (idx, ""),
                 )
             if tag_stats.profile:
                 failed_profiles.add(tag_stats.profile)
@@ -254,7 +262,7 @@ class App:
         # determine which profile passed
         summary.passed_profile = ""
         passed_profile_count = 0
-        for profile in PROFILES.keys():
+        for profile in PROFILES:
             if profile in failed_profiles:
                 break
             if profile != summary.passed_profile:
@@ -358,7 +366,9 @@ def get_app() -> App:
     # fail.
     _perform_mockings()
     app.runtime.prepare_environment(
-        install_local=(not offline), offline=offline, role_name_check=role_name_check
+        install_local=(not offline),
+        offline=offline,
+        role_name_check=role_name_check,
     )
 
     return app

@@ -18,7 +18,8 @@ from ansiblelint.transformer import Transformer
 
 @pytest.fixture(name="copy_examples_dir")
 def fixture_copy_examples_dir(
-    tmp_path: pathlib.Path, config_options: Namespace
+    tmp_path: pathlib.Path,
+    config_options: Namespace,
 ) -> Iterator[tuple[pathlib.Path, pathlib.Path]]:
     """Fixture that copies the examples/ dir into a tmpdir."""
     examples_dir = pathlib.Path("examples")
@@ -50,18 +51,30 @@ def fixture_runner_result(
     (
         # reuse TestRunner::test_runner test cases to ensure transformer does not mangle matches
         pytest.param(
-            "examples/playbooks/nomatchestest.yml", 0, False, id="nomatchestest"
+            "examples/playbooks/nomatchestest.yml",
+            0,
+            False,
+            id="nomatchestest",
         ),
         pytest.param("examples/playbooks/unicode.yml", 1, False, id="unicode"),
         pytest.param(
-            "examples/playbooks/lots_of_warnings.yml", 992, False, id="lots_of_warnings"
+            "examples/playbooks/lots_of_warnings.yml",
+            992,
+            False,
+            id="lots_of_warnings",
         ),
         pytest.param("examples/playbooks/become.yml", 0, False, id="become"),
         pytest.param(
-            "examples/playbooks/contains_secrets.yml", 0, False, id="contains_secrets"
+            "examples/playbooks/contains_secrets.yml",
+            0,
+            False,
+            id="contains_secrets",
         ),
         pytest.param(
-            "examples/playbooks/vars/empty_vars.yml", 0, False, id="empty_vars"
+            "examples/playbooks/vars/empty_vars.yml",
+            0,
+            False,
+            id="empty_vars",
         ),
         pytest.param("examples/playbooks/vars/strings.yml", 0, True, id="strings"),
         pytest.param("examples/playbooks/name-case.yml", 1, True, id="name_case"),

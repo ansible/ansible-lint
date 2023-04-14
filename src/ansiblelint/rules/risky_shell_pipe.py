@@ -32,7 +32,9 @@ class ShellWithoutPipefail(AnsibleLintRule):
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         if task["__ansible_action_type__"] != "task":
             return False
@@ -52,7 +54,7 @@ class ShellWithoutPipefail(AnsibleLintRule):
         return bool(
             self._pipe_re.search(jinja_stripped_cmd)
             and not self._pipefail_re.search(jinja_stripped_cmd)
-            and not convert_to_boolean(task["action"].get("ignore_errors", False))
+            and not convert_to_boolean(task["action"].get("ignore_errors", False)),
         )
 
 
@@ -78,7 +80,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ),
     )
     def test_risky_shell_pipe(
-        default_rules_collection: RulesCollection, file: str, expected: int
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: int,
     ) -> None:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()

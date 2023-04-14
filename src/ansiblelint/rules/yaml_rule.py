@@ -41,7 +41,9 @@ class YamllintRule(AnsibleLintRule):
             return matches
 
         for problem in run_yamllint(
-            file.content, YamllintRule.config, filepath=file.path
+            file.content,
+            YamllintRule.config,
+            filepath=file.path,
         ):
             self.severity = "VERY_LOW"
             if problem.level == "error":
@@ -54,7 +56,7 @@ class YamllintRule(AnsibleLintRule):
                     details="",
                     filename=file,
                     tag=f"yaml[{problem.rule}]",
-                )
+                ),
             )
         return matches
 
@@ -126,10 +128,16 @@ if "pytest" in sys.modules:
                 id="line-length",
             ),
             pytest.param(
-                "examples/yamllint/multi-document.yaml", "yaml", [], id="multi-document"
+                "examples/yamllint/multi-document.yaml",
+                "yaml",
+                [],
+                id="multi-document",
             ),
             pytest.param(
-                "examples/yamllint/skipped-rule.yml", "yaml", [], id="skipped-rule"
+                "examples/yamllint/skipped-rule.yml",
+                "yaml",
+                [],
+                id="skipped-rule",
             ),
             pytest.param(
                 "examples/playbooks/rule-yaml-fail.yml",

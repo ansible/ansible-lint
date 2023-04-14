@@ -267,7 +267,7 @@ class Lintable:
             return str(self.path)
         if key == "type":
             return str(self.kind)
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def get(self, key: Any, default: Any = None) -> Any:
         """Provide compatibility subscriptable support."""
@@ -342,7 +342,8 @@ class Lintable:
             # No changes to write.
             return
         self.path.expanduser().resolve().write_text(
-            self._content or "", encoding="utf-8"
+            self._content or "",
+            encoding="utf-8",
         )
 
     def __hash__(self) -> int:
@@ -419,14 +420,19 @@ def discover_lintables(options: Namespace) -> dict[str, Any]:
 
     try:
         out_present = subprocess.check_output(
-            git_command_present, stderr=subprocess.STDOUT, text=True
+            git_command_present,
+            stderr=subprocess.STDOUT,
+            text=True,
         ).split("\x00")[:-1]
         _logger.info(
-            "Discovered files to lint using: %s", " ".join(git_command_present)
+            "Discovered files to lint using: %s",
+            " ".join(git_command_present),
         )
 
         out_absent = subprocess.check_output(
-            git_command_absent, stderr=subprocess.STDOUT, text=True
+            git_command_absent,
+            stderr=subprocess.STDOUT,
+            text=True,
         ).split("\x00")[:-1]
         _logger.info("Excluded removed files using: %s", " ".join(git_command_absent))
 
@@ -446,7 +452,10 @@ def discover_lintables(options: Namespace) -> dict[str, Any]:
         out = {
             strip_dotslash_prefix(fname)
             for fname in WcMatch(
-                ".", exclude_pattern=exclude_pattern, flags=RECURSIVE, limit=256
+                ".",
+                exclude_pattern=exclude_pattern,
+                flags=RECURSIVE,
+                limit=256,
             ).match()
         }
 

@@ -31,7 +31,8 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 LOTS_OF_WARNINGS_PLAYBOOK = abspath(
-    "examples/playbooks/lots_of_warnings.yml", os.getcwd()
+    "examples/playbooks/lots_of_warnings.yml",
+    os.getcwd(),
 )
 
 
@@ -48,7 +49,10 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath(
         ),
         pytest.param("examples/playbooks/become.yml", [], 0, id="become"),
         pytest.param(
-            "examples/playbooks/contains_secrets.yml", [], 0, id="contains_secrets"
+            "examples/playbooks/contains_secrets.yml",
+            [],
+            0,
+            id="contains_secrets",
         ),
     ),
 )
@@ -80,7 +84,8 @@ def test_runner_exclude_paths(default_rules_collection: RulesCollection) -> None
 
 @pytest.mark.parametrize(("exclude_path"), ("**/playbooks/*.yml",))
 def test_runner_exclude_globs(
-    default_rules_collection: RulesCollection, exclude_path: str
+    default_rules_collection: RulesCollection,
+    exclude_path: str,
 ) -> None:
     """Test that globs work."""
     runner = Runner(
@@ -121,7 +126,8 @@ def test_runner_unicode_format(
 
 @pytest.mark.parametrize("directory_name", ("test/", os.path.abspath("test")))
 def test_runner_with_directory(
-    default_rules_collection: RulesCollection, directory_name: str
+    default_rules_collection: RulesCollection,
+    directory_name: str,
 ) -> None:
     """Check that runner detects a directory as role."""
     runner = Runner(directory_name, rules=default_rules_collection)

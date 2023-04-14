@@ -47,7 +47,9 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     version_added = "historic"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         loop_type = next((key for key in task if key.startswith("with_")), None)
         if loop_type:
@@ -76,15 +78,18 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
         return False
 
     def _matchvar(
-        self, varstring: str, task: dict[str, Any], loop_type: str
+        self,
+        varstring: str,
+        task: dict[str, Any],
+        loop_type: str,
     ) -> bool | str:
         if isinstance(varstring, str) and not has_jinja(varstring):
             valid = loop_type == "with_fileglob" and bool(
-                has_jinja(varstring) or has_glob(varstring)
+                has_jinja(varstring) or has_glob(varstring),
             )
 
             valid |= loop_type == "with_filetree" and bool(
-                has_jinja(varstring) or varstring.endswith(os.sep)
+                has_jinja(varstring) or varstring.endswith(os.sep),
             )
             if not valid:
                 message = (

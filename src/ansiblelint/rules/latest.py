@@ -23,7 +23,9 @@ class LatestRule(AnsibleLintRule):
     version_added = "v6.5.2"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str | MatchError:
         """Check if module args are safe."""
         if (

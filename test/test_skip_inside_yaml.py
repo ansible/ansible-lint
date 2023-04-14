@@ -22,7 +22,9 @@ def test_role_tasks_with_block(default_rules_collection: RulesCollection) -> Non
     (pytest.param("examples/playbooks/test_skip_inside_yaml.yml", 4, id="yaml"),),
 )
 def test_inline_skips(
-    default_rules_collection: RulesCollection, lintable: str, expected: int
+    default_rules_collection: RulesCollection,
+    lintable: str,
+    expected: int,
 ) -> None:
     """Check that playbooks can contain skips."""
     results = Runner(lintable, rules=default_rules_collection).run()

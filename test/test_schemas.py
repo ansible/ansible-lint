@@ -48,7 +48,8 @@ def test_requests_uses_timeout(mock_request: MagicMock) -> None:
 
 @patch("urllib.request")
 def test_request_timeouterror_handling(
-    mock_request: MagicMock, caplog: pytest.LogCaptureFixture
+    mock_request: MagicMock,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that schema refresh can handle time out errors."""
     error_msg = "Simulating handshake operation time out."
@@ -93,7 +94,8 @@ def test_spdx() -> None:
         license_ids.add(lic["licenseId"])
 
     with open(
-        os.path.join(os.path.dirname(schema_path), "galaxy.json"), encoding="utf-8"
+        os.path.join(os.path.dirname(schema_path), "galaxy.json"),
+        encoding="utf-8",
     ) as f:
         schema = json.load(f)
         spx_enum = schema["$defs"]["SPDXLicenseEnum"]["enum"]
@@ -106,5 +108,5 @@ def test_spdx() -> None:
             schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
             json.dump(schema, f, indent=2)
         pytest.fail(
-            "SPDX license list inside galaxy.json JSON Schema file was updated."
+            "SPDX license list inside galaxy.json JSON Schema file was updated.",
         )

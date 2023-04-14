@@ -25,7 +25,7 @@ import collections.abc
 import logging
 import re
 from collections.abc import Generator, Sequence
-from functools import lru_cache
+from functools import cache
 from itertools import product
 from typing import TYPE_CHECKING, Any
 
@@ -78,7 +78,8 @@ def get_rule_skips_from_line(line: str) -> list[str]:
 
 
 def append_skipped_rules(
-    pyyaml_data: AnsibleBaseYAMLObject, lintable: Lintable
+    pyyaml_data: AnsibleBaseYAMLObject,
+    lintable: Lintable,
 ) -> AnsibleBaseYAMLObject:
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
@@ -105,7 +106,7 @@ def append_skipped_rules(
     return yaml_skip
 
 
-@lru_cache(maxsize=None)
+@cache
 def load_data(file_text: str) -> Any:
     """Parse ``file_text`` as yaml and return parsed structure.
 
@@ -125,14 +126,17 @@ def load_data(file_text: str) -> Any:
 
 
 def _append_skipped_rules(  # noqa: max-complexity: 12
-    pyyaml_data: AnsibleBaseYAMLObject, lintable: Lintable
+    pyyaml_data: AnsibleBaseYAMLObject,
+    lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
     # parse file text using 2nd parser library
     try:
         ruamel_data = load_data(lintable.content)
     except ScannerError as exc:
         _logger.debug(
-            "Ignored loading skipped rules from file %s due to: %s", lintable, exc
+            "Ignored loading skipped rules from file %s due to: %s",
+            lintable,
+            exc,
         )
         # For unparsable file types, we return empty skip lists
         return None
@@ -191,7 +195,8 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
         if pyyaml_task.get("name") != ruamel_task.get("name"):
             raise RuntimeError("Error in matching skip comment to a task")
         pyyaml_task[SKIPPED_RULES_KEY] = _get_rule_skips_from_yaml(
-            ruamel_task, lintable
+            ruamel_task,
+            lintable,
         )
 
     return pyyaml_data
@@ -231,7 +236,8 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
 
 
 def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
-    yaml_input: Sequence[Any], lintable: Lintable
+    yaml_input: Sequence[Any],
+    lintable: Lintable,
 ) -> Sequence[Any]:
     """Traverse yaml for comments with rule skips and return list of rules."""
     yaml_comment_obj_strings = []
@@ -246,9 +252,8 @@ def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
                     comment_str = v.value
                     if _noqa_comment_re.match(comment_str):
                         line = v.start_mark.line + 1  # ruamel line numbers start at 0
-                        # column = v.start_mark.column + 1  # ruamel column numbers start at 0
                         lintable.line_skips[line].update(
-                            get_rule_skips_from_line(comment_str.strip())
+                            get_rule_skips_from_line(comment_str.strip()),
                         )
         yaml_comment_obj_strings.append(str(obj.ca.items))
         if isinstance(obj, dict):
@@ -287,8 +292,4 @@ def is_nested_task(task: dict[str, Any]) -> bool:
     if isinstance(task, str):
         return False
 
-    for key in NESTED_TASK_KEYS:
-        if task.get(key):
-            return True
-
-    return False
+    return any(task.get(key) for key in NESTED_TASK_KEYS)

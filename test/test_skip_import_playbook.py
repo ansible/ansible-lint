@@ -40,7 +40,8 @@ def fixture_playbook(tmp_path: Path) -> str:
 
 
 def test_skip_import_playbook(
-    default_rules_collection: RulesCollection, playbook: str
+    default_rules_collection: RulesCollection,
+    playbook: str,
 ) -> None:
     """Verify that a playbook import is skipped after a failure."""
     runner = Runner(playbook, rules=default_rules_collection)

@@ -25,7 +25,6 @@ class DeprecatedModuleRule(AnsibleLintRule):
     version_added = "v4.0.0"
 
     _modules = [
-        # spell-checker:disable
         "accelerate",
         "aos_asn_pool",
         "aos_blueprint",
@@ -65,11 +64,12 @@ class DeprecatedModuleRule(AnsibleLintRule):
         "vsphere_guest",
         "win_msi",
         "include",
-        # spell-checker:enable
     ]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         module = task["action"]["__ansible_module__"]
         if module in self._modules:

@@ -14,7 +14,7 @@ from ansiblelint.text import strip_ansi_escape
 def fixture_local_test_dir() -> str:
     """Fixture to return local test directory."""
     return os.path.realpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "examples")
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "examples"),
     )
 
 
@@ -98,13 +98,17 @@ def test_run_playbook(local_test_dir: str) -> None:
     ("args", "expected_msg"),
     (
         pytest.param(
-            [], "role-name: Role name invalid-name does not match", id="normal"
+            [],
+            "role-name: Role name invalid-name does not match",
+            id="normal",
         ),
         pytest.param(["--skip-list", "role-name"], "", id="skipped"),
     ),
 )
 def test_run_role_name_invalid(
-    local_test_dir: str, args: list[str], expected_msg: str
+    local_test_dir: str,
+    args: list[str],
+    expected_msg: str,
 ) -> None:
     """Test run with a role with invalid name."""
     cwd = local_test_dir

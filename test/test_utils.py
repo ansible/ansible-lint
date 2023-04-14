@@ -105,7 +105,8 @@ def test_tokenize(
     ),
 )
 def test_normalize(
-    reference_form: dict[str, Any], alternate_forms: tuple[dict[str, Any]]
+    reference_form: dict[str, Any],
+    alternate_forms: tuple[dict[str, Any]],
 ) -> None:
     """Test that tasks specified differently are normalized same way."""
     normal_form = utils.normalize_task(reference_form, "tasks.yml")
@@ -124,13 +125,16 @@ def test_normalize_complex_command() -> None:
     task3 = {"name": "hello", "pip": "name=df editable=false"}
     task4 = {"name": "hello", "action": "pip name=df editable=false"}
     assert utils.normalize_task(task1, "tasks.yml") == utils.normalize_task(
-        task2, "tasks.yml"
+        task2,
+        "tasks.yml",
     )
     assert utils.normalize_task(task2, "tasks.yml") == utils.normalize_task(
-        task3, "tasks.yml"
+        task3,
+        "tasks.yml",
     )
     assert utils.normalize_task(task3, "tasks.yml") == utils.normalize_task(
-        task4, "tasks.yml"
+        task4,
+        "tasks.yml",
     )
 
 
@@ -162,7 +166,7 @@ def test_normalize_complex_command() -> None:
                         "name": "Install httpd and memcached",
                         "ansible.builtin.yum": ["httpd", "memcached"],
                         "state": "present",
-                    }
+                    },
                 ],
             },
             {
@@ -172,7 +176,7 @@ def test_normalize_complex_command() -> None:
                         "name": "Install httpd and memcached",
                         "ansible.builtin.yum": ["httpd", "memcached"],
                         "state": "present",
-                    }
+                    },
                 ],
                 "action": {
                     "__ansible_module__": "block/always/rescue",
@@ -346,7 +350,9 @@ _CUSTOM_RULEDIRS = [
     ),
 )
 def test_get_rules_dirs(
-    user_ruledirs: list[str], use_default: bool, expected: list[str]
+    user_ruledirs: list[str],
+    use_default: bool,
+    expected: list[str],
 ) -> None:
     """Test it returns expected dir lists."""
     assert get_rules_dirs(user_ruledirs, use_default) == expected
@@ -413,7 +419,7 @@ def test_task_in_list(file: str, names: list[str], positions: list[str]) -> None
     lintable = Lintable(file)
     assert lintable.kind
     tasks = list(
-        utils.task_in_list(data=lintable.data, filename=file, kind=lintable.kind)
+        utils.task_in_list(data=lintable.data, filename=file, kind=lintable.kind),
     )
     assert len(tasks) == len(names)
     for index, task in enumerate(tasks):

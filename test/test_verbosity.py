@@ -49,19 +49,15 @@ from ansiblelint.testing import run_ansible_lint
         (
             "-vv",
             [
-                # ("DEBUG    Loading custom .yamllint config file,", False),
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
-                # ("DEBUG    Effective yamllint rules used", False),
             ],
         ),
         (
             "-vvvvvvvvvvvvvvvvvvvvvvvvv",
             [
-                # ("DEBUG    Loading custom .yamllint config file,", False),
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
-                # ("DEBUG    Effective yamllint rules used", False),
             ],
         ),
     ),
@@ -79,7 +75,7 @@ def test_default_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> N
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture, to produce a warning.
     cwd = os.path.realpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."),
     )
 
     fakerole = os.path.join("test", "fixtures", "verbosity-tests")

@@ -34,7 +34,7 @@ class TestCodeclimateJSONFormatter:
                 details="hello",
                 filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
-            )
+            ),
         )
         self.matches.append(
             MatchError(
@@ -44,10 +44,11 @@ class TestCodeclimateJSONFormatter:
                 filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
                 ignored=True,
-            )
+            ),
         )
         self.formatter = CodeclimateJSONFormatter(
-            pathlib.Path.cwd(), display_relative_path=True
+            pathlib.Path.cwd(),
+            display_relative_path=True,
         )
 
     def test_format_list(self) -> None:
@@ -108,9 +109,9 @@ class TestCodeclimateJSONFormatter:
                         details="hello",
                         filename=Lintable("filename.yml", content=""),
                         rule=self.rule,
-                    )
-                ]
-            )
+                    ),
+                ],
+            ),
         )
         assert result[0]["location"]["positions"]["begin"]["line"] == 1
         assert result[0]["location"]["positions"]["begin"]["column"] == 42

@@ -61,7 +61,9 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
     ),
 )
 def test_expand_paths_vars(
-    test_path: str | Path, expected: str, monkeypatch: MonkeyPatch
+    test_path: str | Path,
+    expected: str,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Ensure that tilde and env vars are expanded in paths lists."""
     monkeypatch.setenv("TEST_PATH", "/test/path")
@@ -100,7 +102,9 @@ def test_discover_lintables_git_verbose(
     ids=("in Git", "outside Git"),
 )
 def test_discover_lintables_silent(
-    is_in_git: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture[str]
+    is_in_git: bool,
+    monkeypatch: MonkeyPatch,
+    capsys: CaptureFixture[str],
 ) -> None:
     """Verify that no stderr output is displayed while discovering yaml files.
 
@@ -115,7 +119,7 @@ def test_discover_lintables_silent(
         monkeypatch.setenv("GIT_DIR", "")
 
     yaml_count = len(list(lint_path.glob("**/*.yml"))) + len(
-        list(lint_path.glob("**/*.yaml"))
+        list(lint_path.glob("**/*.yaml")),
     )
 
     monkeypatch.chdir(str(lint_path))
@@ -150,55 +154,83 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
         pytest.param("examples/roles/foo.yml", "yaml", id="3"),
         # the only yml file that is not a playbook inside molecule/ folders
         pytest.param(
-            "examples/.config/molecule/config.yml", "yaml", id="4"
+            "examples/.config/molecule/config.yml",
+            "yaml",
+            id="4",
         ),  # molecule shared config
         pytest.param(
-            "test/schemas/test/molecule/cluster/base.yml", "yaml", id="5"
+            "test/schemas/test/molecule/cluster/base.yml",
+            "yaml",
+            id="5",
         ),  # molecule scenario base config
         pytest.param(
-            "test/schemas/test/molecule/cluster/molecule.yml", "yaml", id="6"
+            "test/schemas/test/molecule/cluster/molecule.yml",
+            "yaml",
+            id="6",
         ),  # molecule scenario config
         pytest.param(
-            "test/schemas/test/molecule/cluster/foobar.yml", "playbook", id="7"
+            "test/schemas/test/molecule/cluster/foobar.yml",
+            "playbook",
+            id="7",
         ),  # custom playbook name
         pytest.param(
-            "test/schemas/test/molecule/cluster/converge.yml", "playbook", id="8"
+            "test/schemas/test/molecule/cluster/converge.yml",
+            "playbook",
+            id="8",
         ),  # common playbook name
         pytest.param(
-            "roles/foo/molecule/scenario3/requirements.yml", "requirements", id="9"
+            "roles/foo/molecule/scenario3/requirements.yml",
+            "requirements",
+            id="9",
         ),  # requirements
         pytest.param(
-            "roles/foo/molecule/scenario3/collections.yml", "requirements", id="10"
+            "roles/foo/molecule/scenario3/collections.yml",
+            "requirements",
+            id="10",
         ),  # requirements
         pytest.param(
-            "roles/foo/meta/argument_specs.yml", "role-arg-spec", id="11"
+            "roles/foo/meta/argument_specs.yml",
+            "role-arg-spec",
+            id="11",
         ),  # role argument specs
         # tasks files:
         pytest.param("tasks/directory with spaces/main.yml", "tasks", id="12"),  # tasks
         pytest.param("tasks/requirements.yml", "tasks", id="13"),  # tasks
         # requirements (we do not support includes yet)
         pytest.param(
-            "requirements.yml", "requirements", id="14"
+            "requirements.yml",
+            "requirements",
+            id="14",
         ),  # collection requirements
         pytest.param(
-            "roles/foo/meta/requirements.yml", "requirements", id="15"
+            "roles/foo/meta/requirements.yml",
+            "requirements",
+            id="15",
         ),  # inside role requirements
         # Undeterminable files:
         pytest.param("test/fixtures/unknown-type.yml", "yaml", id="16"),
         pytest.param(
-            "releasenotes/notes/run-playbooks-refactor.yaml", "reno", id="17"
+            "releasenotes/notes/run-playbooks-refactor.yaml",
+            "reno",
+            id="17",
         ),  # reno
         pytest.param("examples/host_vars/localhost.yml", "vars", id="18"),
         pytest.param("examples/group_vars/all.yml", "vars", id="19"),
         pytest.param("examples/playbooks/vars/other.yml", "vars", id="20"),
         pytest.param(
-            "examples/playbooks/vars/subfolder/settings.yml", "vars", id="21"
+            "examples/playbooks/vars/subfolder/settings.yml",
+            "vars",
+            id="21",
         ),  # deep vars
         pytest.param(
-            "molecule/scenario/collections.yml", "requirements", id="22"
+            "molecule/scenario/collections.yml",
+            "requirements",
+            id="22",
         ),  # deprecated 2.8 format
         pytest.param(
-            "../roles/geerlingguy.mysql/tasks/configure.yml", "tasks", id="23"
+            "../roles/geerlingguy.mysql/tasks/configure.yml",
+            "tasks",
+            id="23",
         ),  # relative path involved
         pytest.param("galaxy.yml", "galaxy", id="24"),
         pytest.param("foo.j2.yml", "jinja2", id="25"),
@@ -206,19 +238,29 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
         pytest.param("foo.j2.yaml", "jinja2", id="27"),
         pytest.param("foo.yaml.j2", "jinja2", id="28"),
         pytest.param(
-            "examples/playbooks/rulebook.yml", "playbook", id="29"
+            "examples/playbooks/rulebook.yml",
+            "playbook",
+            id="29",
         ),  # playbooks folder should determine kind
         pytest.param(
-            "examples/rulebooks/rulebook-pass.yml", "rulebook", id="30"
+            "examples/rulebooks/rulebook-pass.yml",
+            "rulebook",
+            id="30",
         ),  # content should determine it as a rulebook
         pytest.param(
-            "examples/yamllint/valid.yml", "yaml", id="31"
+            "examples/yamllint/valid.yml",
+            "yaml",
+            id="31",
         ),  # empty yaml is valid yaml, not assuming anything else
         pytest.param(
-            "examples/other/guess-1.yml", "playbook", id="32"
+            "examples/other/guess-1.yml",
+            "playbook",
+            id="32",
         ),  # content should determine is as a play
         pytest.param(
-            "examples/playbooks/tasks/passing_task.yml", "tasks", id="33"
+            "examples/playbooks/tasks/passing_task.yml",
+            "tasks",
+            id="33",
         ),  # content should determine is tasks
         pytest.param("examples/collection/galaxy.yml", "galaxy", id="34"),
         pytest.param("examples/meta/runtime.yml", "meta-runtime", id="35"),
@@ -227,7 +269,9 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
         pytest.param("examples/inventory/production.yml", "inventory", id="38"),
         pytest.param("examples/playbooks/vars/empty_vars.yml", "vars", id="39"),
         pytest.param(
-            "examples/playbooks/vars/subfolder/settings.yaml", "vars", id="40"
+            "examples/playbooks/vars/subfolder/settings.yaml",
+            "vars",
+            id="40",
         ),
         pytest.param(
             "examples/sanity_ignores/tests/sanity/ignore-2.14.txt",
@@ -266,7 +310,7 @@ def test_guess_project_dir_dotconfig() -> None:
     """Verify guess_project_dir()."""
     with cwd("examples"):
         assert os.path.exists(
-            ".config/ansible-lint.yml"
+            ".config/ansible-lint.yml",
         ), "Test requires config file inside .config folder."
         result = guess_project_dir(".config/ansible-lint.yml")
         assert result == str(os.getcwd())
@@ -283,7 +327,10 @@ BASIC_PLAYBOOK = """
 
 @pytest.fixture(name="tmp_updated_lintable")
 def fixture_tmp_updated_lintable(
-    tmp_path: Path, path: str, content: str, updated_content: str
+    tmp_path: Path,
+    path: str,
+    content: str,
+    updated_content: str,
 ) -> Lintable:
     """Create a temp file Lintable with a content update that is not on disk."""
     lintable = Lintable(tmp_path / path, content)
@@ -300,7 +347,11 @@ def fixture_tmp_updated_lintable(
     ("path", "content", "updated_content", "updated"),
     (
         pytest.param(
-            "no_change.yaml", BASIC_PLAYBOOK, BASIC_PLAYBOOK, False, id="no_change"
+            "no_change.yaml",
+            BASIC_PLAYBOOK,
+            BASIC_PLAYBOOK,
+            False,
+            id="no_change",
         ),
         pytest.param(
             "quotes.yaml",
@@ -310,12 +361,19 @@ def fixture_tmp_updated_lintable(
             id="updated_quotes",
         ),
         pytest.param(
-            "shorten.yaml", BASIC_PLAYBOOK, "# short file\n", True, id="shorten_file"
+            "shorten.yaml",
+            BASIC_PLAYBOOK,
+            "# short file\n",
+            True,
+            id="shorten_file",
         ),
     ),
 )
 def test_lintable_updated(
-    path: str, content: str, updated_content: str, updated: bool
+    path: str,
+    content: str,
+    updated_content: str,
+    updated: bool,
 ) -> None:
     """Validate ``Lintable.updated`` when setting ``Lintable.content``."""
     lintable = Lintable(path, content)
@@ -330,7 +388,9 @@ def test_lintable_updated(
 
 
 @pytest.mark.parametrize(
-    "updated_content", ((None,), (b"bytes",)), ids=("none", "bytes")
+    "updated_content",
+    ((None,), (b"bytes",)),
+    ids=("none", "bytes"),
 )
 def test_lintable_content_setter_with_bad_types(updated_content: Any) -> None:
     """Validate ``Lintable.updated`` when setting ``Lintable.content``."""
@@ -468,7 +528,9 @@ def test_lintable_content_deleter(
         pytest.param(os.path.expanduser("~/xxx"), "~/xxx", id="rel-to-home"),
         pytest.param("/a/b/c", "/a/b/c", id="absolute"),
         pytest.param(
-            "examples/playbooks/roles", "examples/roles", id="resolve-symlink"
+            "examples/playbooks/roles",
+            "examples/roles",
+            id="resolve-symlink",
         ),
     ),
 )

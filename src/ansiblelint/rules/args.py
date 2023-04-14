@@ -40,7 +40,7 @@ ignored_re = re.compile(
             # collection. Attempts to reproduce same bug with other collections
             # failed, even if the message originates from Ansible core.
             r"^unable to evaluate string as dictionary$",
-        ]
+        ],
     ),
     flags=re.MULTILINE | re.DOTALL,
 )
@@ -58,7 +58,7 @@ workarounds_drop_map = {
 }
 workarounds_inject_map = {
     # https://github.com/ansible/ansible-lint/issues/2824
-    "ansible.builtin.async_status": {"_async_dir": "/tmp/ansible-async"}
+    "ansible.builtin.async_status": {"_async_dir": "/tmp/ansible-async"},
 }
 
 
@@ -92,7 +92,9 @@ class ArgsRule(AnsibleLintRule):
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         # pylint: disable=too-many-branches,too-many-locals
         results: list[MatchError] = []
@@ -116,7 +118,9 @@ class ArgsRule(AnsibleLintRule):
                     del module_args[key]
 
         with mock.patch.object(
-            mock_ansible_module, "AnsibleModule", CustomAnsibleModule
+            mock_ansible_module,
+            "AnsibleModule",
+            CustomAnsibleModule,
         ):
             spec = importlib.util.spec_from_file_location(
                 name=loaded_module.resolved_fqcn,
@@ -161,7 +165,7 @@ class ArgsRule(AnsibleLintRule):
                             failed_msg = fio.getvalue()
                     if failed_msg:
                         results.extend(
-                            self._parse_failed_msg(failed_msg, task, module_name, file)
+                            self._parse_failed_msg(failed_msg, task, module_name, file),
                         )
 
                 sanitized_results = self._sanitize_results(results, module_name)
@@ -171,7 +175,9 @@ class ArgsRule(AnsibleLintRule):
 
     # pylint: disable=unused-argument
     def _sanitize_results(
-        self, results: list[MatchError], module_name: str
+        self,
+        results: list[MatchError],
+        module_name: str,
     ) -> list[MatchError]:
         """Remove results that are false positive."""
         sanitized_results = []
@@ -199,7 +205,8 @@ class ArgsRule(AnsibleLintRule):
             error_message = failed_msg
 
         option_type_check_error = re.search(
-            r"argument '(?P<name>.*)' is of type", error_message
+            r"argument '(?P<name>.*)' is of type",
+            error_message,
         )
         if option_type_check_error:
             # ignore options with templated variable value with type check errors
@@ -215,7 +222,8 @@ class ArgsRule(AnsibleLintRule):
                 return results
 
         value_not_in_choices_error = re.search(
-            r"value of (?P<name>.*) must be one of:", error_message
+            r"value of (?P<name>.*) must be one of:",
+            error_message,
         )
         if value_not_in_choices_error:
             # ignore templated value not in allowed choices
@@ -236,7 +244,7 @@ class ArgsRule(AnsibleLintRule):
                 linenumber=task[LINE_NUMBER_KEY],
                 tag="args[module]",
                 filename=file,
-            )
+            ),
         )
         return results
 

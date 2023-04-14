@@ -46,7 +46,8 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="empty-playbook",
         regex=re.compile(
-            "Empty playbook, nothing to do", re.MULTILINE | re.S | re.DOTALL
+            "Empty playbook, nothing to do",
+            re.MULTILINE | re.S | re.DOTALL,
         ),
     ),
     KnownError(
@@ -79,7 +80,9 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             return []
 
         with timed_info(
-            "Executing syntax check on %s %s", lintable.kind, lintable.path
+            "Executing syntax check on %s %s",
+            lintable.kind,
+            lintable.path,
         ):
             if lintable.kind == "role":
                 playbook_text = f"""
@@ -165,7 +168,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                             rule=rule,
                             details=details,
                             tag=f"{rule.id}[{pattern.tag}]",
-                        )
+                        ),
                     )
 
             if not results:
@@ -183,7 +186,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                         rule=rule,
                         details=details,
                         tag=tag,
-                    )
+                    ),
                 )
 
         if fh:
@@ -197,7 +200,8 @@ if "pytest" in sys.modules:
     def test_get_ansible_syntax_check_matches() -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(
-            "examples/playbooks/conflicting_action.yml", kind="playbook"
+            "examples/playbooks/conflicting_action.yml",
+            kind="playbook",
         )
         # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)

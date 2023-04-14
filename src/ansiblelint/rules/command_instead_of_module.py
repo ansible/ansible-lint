@@ -74,7 +74,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     }
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         if task["action"]["__ansible_module__"] not in self._commands:
             return False
@@ -95,7 +97,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             return False
 
         if executable in self._modules and convert_to_boolean(
-            task["action"].get("warn", True)
+            task["action"].get("warn", True),
         ):
             message = "{0} used in place of {1} module"
             return message.format(executable, self._modules[executable])
@@ -124,7 +126,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ),
     )
     def test_command_instead_of_module(
-        default_rules_collection: RulesCollection, file: str, expected: int
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: int,
     ) -> None:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()

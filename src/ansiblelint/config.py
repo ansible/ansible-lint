@@ -59,7 +59,7 @@ DEFAULT_KINDS = [
     {"role-arg-spec": "**/meta/argument_specs.{yaml,yml}"},  # role argument specs
     {"yaml": ".config/molecule/config.{yaml,yml}"},  # molecule global config
     {
-        "requirements": "**/molecule/*/{collections,requirements}.{yaml,yml}"
+        "requirements": "**/molecule/*/{collections,requirements}.{yaml,yml}",
     },  # molecule old collection requirements (v1), ansible 2.8 only
     {"yaml": "**/molecule/*/{base,molecule}.{yaml,yml}"},  # molecule config
     {"requirements": "**/requirements.{yaml,yml}"},  # v2 and v1
@@ -76,7 +76,7 @@ BASE_KINDS = [
     # MIME/IANA model. Their purpose is to be able to process a file based on
     # it type, including generic processing of text files using the prefix.
     {
-        "text/jinja2": "**/*.j2"
+        "text/jinja2": "**/*.j2",
     },  # jinja2 templates are not always parsable as something else
     {"text/jinja2": "**/*.j2.*"},
     {"text": "**/templates/**/*.*"},  # templates are likely not validable
@@ -179,7 +179,7 @@ def guess_install_method() -> str:
         pip = f"pip install --upgrade {package_name}"
     elif __file__.startswith(os.path.expanduser("~/.local/lib")):
         _logger.debug(
-            "Found --user installation, assuming `pip3 install --user` will work."
+            "Found --user installation, assuming `pip3 install --user` will work.",
         )
         pip = f"pip3 install --user --upgrade {package_name}"
 
@@ -248,7 +248,9 @@ def get_version_warning() -> str:
                     json.dump(data, f)
         except (URLError, HTTPError) as exc:  # pragma: no cover
             _logger.debug(
-                "Unable to fetch latest version from %s due to: %s", release_url, exc
+                "Unable to fetch latest version from %s due to: %s",
+                release_url,
+                exc,
             )
             return ""
 

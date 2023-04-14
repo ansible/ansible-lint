@@ -15,7 +15,6 @@ from ansiblelint.rules import AnsibleLintRule, RulesCollection
 _logger = logging.getLogger(__name__)
 
 builtins = [
-    # spell-checker:disable
     "add_host",
     "apt",
     "apt_key",
@@ -84,7 +83,6 @@ builtins = [
     "wait_for_connection",
     "yum",
     "yum_repository",
-    # spell-checker:enable
 ]
 
 
@@ -101,7 +99,9 @@ class FQCNBuiltinsRule(AnsibleLintRule):
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
         module = task["action"]["__ansible_module_original__"]
@@ -121,7 +121,9 @@ class FQCNBuiltinsRule(AnsibleLintRule):
             module_alias = self.module_aliases[module]
             if module_alias.startswith("ansible.builtin"):
                 legacy_module = module_alias.replace(
-                    "ansible.builtin.", "ansible.legacy.", 1
+                    "ansible.builtin.",
+                    "ansible.legacy.",
+                    1,
                 )
                 if module != legacy_module:
                     result.append(
@@ -131,7 +133,7 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                             filename=file,
                             linenumber=task["__line__"],
                             tag="fqcn[action-core]",
-                        )
+                        ),
                     )
             else:
                 if module.count(".") < 2:
@@ -142,13 +144,13 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                             filename=file,
                             linenumber=task["__line__"],
                             tag="fqcn[action]",
-                        )
+                        ),
                     )
                 # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once
                 # community team is flattening these.
                 # See: https://github.com/ansible-community/community-topics/issues/147
                 elif not module.startswith("community.general.") or module.startswith(
-                    "community.network."
+                    "community.network.",
                 ):
                     result.append(
                         self.create_matcherror(
@@ -156,7 +158,7 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                             filename=file,
                             linenumber=task["__line__"],
                             tag="fqcn[canonical]",
-                        )
+                        ),
                     )
         return result
 
@@ -170,7 +172,7 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                     linenumber=data[LINE_NUMBER_KEY],
                     tag="fqcn[keyword]",
                     filename=file,
-                )
+                ),
             ]
         return []
 

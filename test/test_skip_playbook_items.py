@@ -109,7 +109,9 @@ PLAYBOOK_WITH_BLOCK = """\
     ),
 )
 def test_pre_tasks(
-    default_text_runner: RunFromText, playbook: str, length: int
+    default_text_runner: RunFromText,
+    playbook: str,
+    length: int,
 ) -> None:
     """Check that skipping is possible in different playbook parts."""
     # When

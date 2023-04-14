@@ -54,7 +54,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                     self.create_matcherror(
                         "Expected item in 'video_links' to be a dictionary",
                         filename=file,
-                    )
+                    ),
                 )
                 continue
 
@@ -64,7 +64,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                         "Expected item in 'video_links' to contain "
                         "only keys 'url' and 'title'",
                         filename=file,
-                    )
+                    ),
                 )
                 continue
 
@@ -102,7 +102,9 @@ if "pytest" in sys.modules:
                 id="1",
             ),
             pytest.param(
-                "examples/roles/meta_video_links_pass/meta/main.yml", (), id="2"
+                "examples/roles/meta_video_links_pass/meta/main.yml",
+                (),
+                id="2",
             ),
         ),
     )

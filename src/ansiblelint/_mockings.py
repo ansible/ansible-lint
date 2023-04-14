@@ -46,7 +46,9 @@ def _write_module_stub(
 ) -> None:
     """Write module stub to disk."""
     body = ANSIBLE_MOCKED_MODULE.format(
-        name=name, collection=collection, namespace=namespace
+        name=name,
+        collection=collection,
+        namespace=namespace,
     )
     with open(filename, "w", encoding="utf-8") as f:
         f.write(body)

@@ -83,7 +83,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
                                     tag="sanity[cannot-ignore]",
                                     linenumber=line_num,
                                     filename=file,
-                                )
+                                ),
                             )
 
                     except ValueError:
@@ -93,7 +93,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
                                 tag="sanity[bad-ignore]",
                                 linenumber=line_num,
                                 filename=file,
-                            )
+                            ),
                         )
 
         return results

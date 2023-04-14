@@ -37,7 +37,7 @@ def test_tasks_in_list_empty_file(empty_lintable: Lintable) -> None:
             data=empty_lintable,
             filename=str(empty_lintable.path),
             kind=empty_lintable.kind,
-        )
+        ),
     )
     assert not res
 
@@ -96,9 +96,9 @@ _input_playbook = [
                     # our Emitter defaults to double-quotes
                     "msg": "{{ msg }}",
                 },
-            }
+            },
         ],
-    }
+    },
 ]
 _SINGLE_QUOTE_WITHOUT_INDENTS = """\
 ---
@@ -252,7 +252,6 @@ def test_formatted_yaml_loader_dumper(
     assert dump_from_after == after_content
 
     # We can't do this because FormattedYAML is stricter in some cases:
-    # assert prettier_content == after_content
     #
     # Instead, `pytest --regenerate-formatting-fixtures` will fail if prettier would
     # change any files in test/fixtures/formatting-after
@@ -282,7 +281,10 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
     (
         # ignored lintables
         pytest.param(
-            "examples/playbooks/tasks/passing_task.yml", 2, [], id="ignore_tasks_file"
+            "examples/playbooks/tasks/passing_task.yml",
+            2,
+            [],
+            id="ignore_tasks_file",
         ),
         pytest.param(
             "examples/roles/more_complex/handlers/main.yml",
@@ -292,11 +294,17 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
         ),
         pytest.param("examples/playbooks/vars/other.yml", 2, [], id="ignore_vars_file"),
         pytest.param(
-            "examples/host_vars/localhost.yml", 2, [], id="ignore_host_vars_file"
+            "examples/host_vars/localhost.yml",
+            2,
+            [],
+            id="ignore_host_vars_file",
         ),
         pytest.param("examples/group_vars/all.yml", 2, [], id="ignore_group_vars_file"),
         pytest.param(
-            "examples/inventory/inventory.yml", 2, [], id="ignore_inventory_file"
+            "examples/inventory/inventory.yml",
+            2,
+            [],
+            id="ignore_inventory_file",
         ),
         pytest.param(
             "examples/roles/dependency_in_meta/meta/main.yml",
@@ -305,15 +313,23 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
             id="ignore_meta_file",
         ),
         pytest.param(
-            "examples/reqs_v1/requirements.yml", 2, [], id="ignore_requirements_v1_file"
+            "examples/reqs_v1/requirements.yml",
+            2,
+            [],
+            id="ignore_requirements_v1_file",
         ),
         pytest.param(
-            "examples/reqs_v2/requirements.yml", 2, [], id="ignore_requirements_v2_file"
+            "examples/reqs_v2/requirements.yml",
+            2,
+            [],
+            id="ignore_requirements_v2_file",
         ),
         # we don't have any release notes examples. Oh well.
-        # pytest.param("examples/", 2, [], id="ignore_release_notes_file"),
         pytest.param(
-            ".pre-commit-config.yaml", 2, [], id="ignore_unrecognized_yaml_file"
+            ".pre-commit-config.yaml",
+            2,
+            [],
+            id="ignore_unrecognized_yaml_file",
         ),
         # playbook lintables
         pytest.param(
@@ -494,7 +510,9 @@ def test_get_path_to_play(
 ) -> None:
     """Ensure ``get_path_to_play`` returns the expected path given a file + line."""
     path_to_play = ansiblelint.yaml_utils.get_path_to_play(
-        lintable, line_number, ruamel_data
+        lintable,
+        line_number,
+        ruamel_data,
     )
     assert path_to_play == expected_path
 
@@ -505,11 +523,17 @@ def test_get_path_to_play(
         # ignored lintables
         pytest.param("examples/playbooks/vars/other.yml", 2, [], id="ignore_vars_file"),
         pytest.param(
-            "examples/host_vars/localhost.yml", 2, [], id="ignore_host_vars_file"
+            "examples/host_vars/localhost.yml",
+            2,
+            [],
+            id="ignore_host_vars_file",
         ),
         pytest.param("examples/group_vars/all.yml", 2, [], id="ignore_group_vars_file"),
         pytest.param(
-            "examples/inventory/inventory.yml", 2, [], id="ignore_inventory_file"
+            "examples/inventory/inventory.yml",
+            2,
+            [],
+            id="ignore_inventory_file",
         ),
         pytest.param(
             "examples/roles/dependency_in_meta/meta/main.yml",
@@ -518,15 +542,23 @@ def test_get_path_to_play(
             id="ignore_meta_file",
         ),
         pytest.param(
-            "examples/reqs_v1/requirements.yml", 2, [], id="ignore_requirements_v1_file"
+            "examples/reqs_v1/requirements.yml",
+            2,
+            [],
+            id="ignore_requirements_v1_file",
         ),
         pytest.param(
-            "examples/reqs_v2/requirements.yml", 2, [], id="ignore_requirements_v2_file"
+            "examples/reqs_v2/requirements.yml",
+            2,
+            [],
+            id="ignore_requirements_v2_file",
         ),
         # we don't have any release notes examples. Oh well.
-        # pytest.param("examples/", 2, [], id="ignore_release_notes_file"),
         pytest.param(
-            ".pre-commit-config.yaml", 2, [], id="ignore_unrecognized_yaml_file"
+            ".pre-commit-config.yaml",
+            2,
+            [],
+            id="ignore_unrecognized_yaml_file",
         ),
         # tasks-containing lintables
         pytest.param(
@@ -733,7 +765,10 @@ def test_get_path_to_play(
         # tasks files
         pytest.param("examples/playbooks/tasks/x.yml", 2, [0], id="tasks-null_task"),
         pytest.param(
-            "examples/playbooks/tasks/x.yml", 6, [1], id="tasks-null_task_next"
+            "examples/playbooks/tasks/x.yml",
+            6,
+            [1],
+            id="tasks-null_task_next",
         ),
         pytest.param(
             "examples/playbooks/tasks/empty_blocks.yml",
@@ -848,7 +883,9 @@ def test_get_path_to_task(
 ) -> None:
     """Ensure ``get_task_to_play`` returns the expected path given a file + line."""
     path_to_task = ansiblelint.yaml_utils.get_path_to_task(
-        lintable, line_number, ruamel_data
+        lintable,
+        line_number,
+        ruamel_data,
     )
     assert path_to_task == expected_path
 
@@ -873,7 +910,8 @@ def test_get_path_to_play_raises_value_error_for_bad_line_number(
 ) -> None:
     """Ensure ``get_path_to_play`` raises ValueError for line_number < 1."""
     with pytest.raises(
-        ValueError, match=f"expected line_number >= 1, got {line_number}"
+        ValueError,
+        match=f"expected line_number >= 1, got {line_number}",
     ):
         ansiblelint.yaml_utils.get_path_to_play(lintable, line_number, ruamel_data)
 
@@ -889,7 +927,8 @@ def test_get_path_to_task_raises_value_error_for_bad_line_number(
 ) -> None:
     """Ensure ``get_task_to_play`` raises ValueError for line_number < 1."""
     with pytest.raises(
-        ValueError, match=f"expected line_number >= 1, got {line_number}"
+        ValueError,
+        match=f"expected line_number >= 1, got {line_number}",
     ):
         ansiblelint.yaml_utils.get_path_to_task(lintable, line_number, ruamel_data)
 

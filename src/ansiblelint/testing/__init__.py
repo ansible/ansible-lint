@@ -46,7 +46,9 @@ class RunFromText:
         return self._call_runner(filename)
 
     def run_playbook(
-        self, playbook_text: str, prefix: str = "playbook"
+        self,
+        playbook_text: str,
+        prefix: str = "playbook",
     ) -> list[MatchError]:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix=prefix) as fh:
@@ -128,10 +130,7 @@ def run_ansible_lint(
         "VIRTUAL_ENV",
     ]
 
-    if env is None:
-        _env = {}
-    else:
-        _env = env
+    _env = {} if env is None else env
     for v in safe_list:
         if v in os.environ and v not in _env:
             _env[v] = os.environ[v]

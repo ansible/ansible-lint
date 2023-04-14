@@ -67,7 +67,7 @@ class GalaxyRule(AnsibleLintRule):
                     message="No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",
                     tag="galaxy[no-changelog]",
                     filename=file,
-                )
+                ),
             )
 
         # Checking if galaxy.yml contains one or more required tags for certification
@@ -81,7 +81,7 @@ class GalaxyRule(AnsibleLintRule):
                     ),
                     tag="galaxy[tags]",
                     filename=file,
-                )
+                ),
             )
 
         if "version" not in data:
@@ -91,7 +91,7 @@ class GalaxyRule(AnsibleLintRule):
                     linenumber=data[LINE_NUMBER_KEY],
                     tag="galaxy[version-missing]",
                     filename=file,
-                )
+                ),
             )
             return results
             # returning here as it does not make sense
@@ -106,7 +106,7 @@ class GalaxyRule(AnsibleLintRule):
                     linenumber=version._line_number,
                     tag="galaxy[version-incorrect]",
                     filename=file,
-                )
+                ),
             )
 
         if not os.path.isfile(os.path.join(base_path, "meta/runtime.yml")):
@@ -115,7 +115,7 @@ class GalaxyRule(AnsibleLintRule):
                     message="meta/runtime.yml file not found.",
                     tag="galaxy[no-runtime]",
                     filename=file,
-                )
+                ),
             )
 
         return results
@@ -232,7 +232,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ),
     )
     def test_galaxy_rule(
-        default_rules_collection: RulesCollection, file: str, expected: list[str]
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: list[str],
     ) -> None:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()
