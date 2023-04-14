@@ -50,23 +50,26 @@ class MetaTagValidRule(AnsibleLintRule):
             else:
                 results.append(
                     self.create_matcherror(
-                        "Expected 'galaxy_tags' to be a list", filename=file
-                    )
+                        "Expected 'galaxy_tags' to be a list",
+                        filename=file,
+                    ),
                 )
 
         if "categories" in galaxy_info:
             results.append(
                 self.create_matcherror(
-                    "Use 'galaxy_tags' rather than 'categories'", filename=file
-                )
+                    "Use 'galaxy_tags' rather than 'categories'",
+                    filename=file,
+                ),
             )
             if isinstance(galaxy_info["categories"], list):
                 tags += galaxy_info["categories"]
             else:
                 results.append(
                     self.create_matcherror(
-                        "Expected 'categories' to be a list", filename=file
-                    )
+                        "Expected 'categories' to be a list",
+                        filename=file,
+                    ),
                 )
 
         for tag in tags:
@@ -74,15 +77,17 @@ class MetaTagValidRule(AnsibleLintRule):
             if not isinstance(tag, str):
                 results.append(
                     self.create_matcherror(
-                        f"Tags must be strings: '{tag}'", filename=file
-                    )
+                        f"Tags must be strings: '{tag}'",
+                        filename=file,
+                    ),
                 )
                 continue
             if not re.match(self.TAG_REGEXP, tag):
                 results.append(
                     self.create_matcherror(
-                        message=f"{msg}, invalid: '{tag}'", filename=file
-                    )
+                        message=f"{msg}, invalid: '{tag}'",
+                        filename=file,
+                    ),
                 )
 
         return results
@@ -93,7 +98,9 @@ if "pytest" in sys.modules:
     import pytest
 
     @pytest.mark.parametrize(
-        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (MetaTagValidRule,),
+        indirect=["rule_runner"],
     )
     def test_valid_tag_rule(rule_runner: RunFromText) -> None:
         """Test rule matches."""
@@ -104,17 +111,21 @@ if "pytest" in sys.modules:
         assert "invalid: 'MYTAG'" in str(results)
 
     @pytest.mark.parametrize(
-        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (MetaTagValidRule,),
+        indirect=["rule_runner"],
     )
     def test_meta_not_tags(rule_runner: Any) -> None:
         """Test rule matches."""
         results = rule_runner.run(
-            "examples/roles/meta_no_tags_galaxy_info/meta/main.yml"
+            "examples/roles/meta_no_tags_galaxy_info/meta/main.yml",
         )
         assert results == []
 
     @pytest.mark.parametrize(
-        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (MetaTagValidRule,),
+        indirect=["rule_runner"],
     )
     def test_no_galaxy_tags_list(rule_runner: Any) -> None:
         """Test rule matches."""
@@ -122,18 +133,22 @@ if "pytest" in sys.modules:
         assert "Expected 'galaxy_tags' to be a list" in str(results)
 
     @pytest.mark.parametrize(
-        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (MetaTagValidRule,),
+        indirect=["rule_runner"],
     )
     def test_galaxy_categories_as_list(rule_runner: Any) -> None:
         """Test rule matches."""
         results = rule_runner.run(
-            "examples/roles/meta_categories_as_list/meta/main.yml"
+            "examples/roles/meta_categories_as_list/meta/main.yml",
         )
         assert "Use 'galaxy_tags' rather than 'categories'" in str(results), results
         assert "Expected 'categories' to be a list" not in str(results)
 
     @pytest.mark.parametrize(
-        "rule_runner", (MetaTagValidRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (MetaTagValidRule,),
+        indirect=["rule_runner"],
     )
     def test_tags_not_a_string(rule_runner: Any) -> None:
         """Test rule matches."""

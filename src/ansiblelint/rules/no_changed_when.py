@@ -52,7 +52,9 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
         # tasks in a block are "meta" type
@@ -76,15 +78,21 @@ if "pytest" in sys.modules:
         ("file", "expected"),
         (
             pytest.param(
-                "examples/playbooks/rule-no-changed-when-pass.yml", 0, id="pass"
+                "examples/playbooks/rule-no-changed-when-pass.yml",
+                0,
+                id="pass",
             ),
             pytest.param(
-                "examples/playbooks/rule-no-changed-when-fail.yml", 3, id="fail"
+                "examples/playbooks/rule-no-changed-when-fail.yml",
+                3,
+                id="fail",
             ),
         ),
     )
     def test_rule_no_changed_when(
-        default_rules_collection: RulesCollection, file: str, expected: int
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: int,
     ) -> None:
         """Validate no-changed-when rule."""
         results = Runner(file, rules=default_rules_collection).run()

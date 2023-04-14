@@ -12,5 +12,5 @@ def main() -> None:
             "data": {"default": None},
             "path": {"default": None},
             "file": {"default": None},
-        }
+        },
     )

@@ -119,10 +119,7 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
         line_num = match.linenumber
         severity = match.rule.severity
         violation_details = self.escape(match.message)
-        if match.column:
-            col = f",col={match.column}"
-        else:
-            col = ""
+        col = f",col={match.column}" if match.column else ""
         return (
             f"::{match.level} file={file_path},line={line_num}{col},severity={severity},title={match.tag}"
             f"::{violation_details}"
@@ -141,7 +138,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             raise RuntimeError(
-                f"The {self.__class__} was expecting a list of MatchError."
+                f"The {self.__class__} was expecting a list of MatchError.",
             )
 
         result = []
@@ -156,7 +153,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             issue["severity"] = self._remap_severity(match)
             issue["description"] = self.escape(str(match.message))
             issue["fingerprint"] = hashlib.sha256(
-                repr(match).encode("utf-8")
+                repr(match).encode("utf-8"),
             ).hexdigest()
             issue["location"] = {}
             issue["location"]["path"] = self._format_path(match.filename or "")
@@ -208,7 +205,7 @@ class SarifFormatter(BaseFormatter[Any]):
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             raise RuntimeError(
-                f"The {self.__class__} was expecting a list of MatchError."
+                f"The {self.__class__} was expecting a list of MatchError.",
             )
 
         root_path = Path(str(self._base_dir)).as_uri()
@@ -221,7 +218,7 @@ class SarifFormatter(BaseFormatter[Any]):
                 "version": __version__,
                 "informationUri": self.TOOL_URL,
                 "rules": rules,
-            }
+            },
         }
 
         runs = [
@@ -232,7 +229,7 @@ class SarifFormatter(BaseFormatter[Any]):
                 "originalUriBaseIds": {
                     self.BASE_URI_ID: {"uri": root_path},
                 },
-            }
+            },
         ]
 
         report = {
@@ -244,7 +241,8 @@ class SarifFormatter(BaseFormatter[Any]):
         return json.dumps(report, sort_keys=False, indent=2)
 
     def _extract_results(
-        self, matches: list[MatchError]
+        self,
+        matches: list[MatchError],
     ) -> tuple[list[Any], list[Any]]:
         rules = {}
         results = []

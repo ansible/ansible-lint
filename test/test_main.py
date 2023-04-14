@@ -56,7 +56,11 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
     ),
 )
 def test_get_version_warning(
-    mocker: Any, ver_diff: str, found: bool, check: str, outlen: int
+    mocker: Any,
+    ver_diff: str,
+    found: bool,
+    check: str,
+    outlen: int,
 ) -> None:
     """Assert get_version_warning working as expected."""
     data = '{"html_url": "https://127.0.0.1", "tag_name": "' + f"{ver_diff}" + '"}'

@@ -38,14 +38,16 @@ class NoLogPasswordsRule(AnsibleLintRule):
     version_added = "v5.0.9"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         if task["action"]["__ansible_module_original__"] == "ansible.builtin.user" and (
             task["action"].get("password_lock") and not task["action"].get("password")
         ):
             has_password = False
         else:
-            for param in task["action"].keys():
+            for param in task["action"]:
                 if "password" in param:
                     has_password = True
                     break
@@ -67,7 +69,7 @@ class NoLogPasswordsRule(AnsibleLintRule):
             return False
 
         return bool(
-            has_password and not convert_to_boolean(no_log) and len(has_loop) > 0
+            has_password and not convert_to_boolean(no_log) and len(has_loop) > 0,
         )
 
 
@@ -209,7 +211,9 @@ if "pytest" in sys.modules:  # noqa: C901
 """
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_no_log_unused(rule_runner: RunFromText) -> None:
         """The task does not use no_log but also no loop."""
@@ -217,7 +221,9 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_no_log_false(rule_runner: RunFromText) -> None:
         """The task sets no_log to false."""
@@ -227,7 +233,9 @@ if "pytest" in sys.modules:  # noqa: C901
             assert result.rule.id == "no-log-password"
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_no_log_no(rule_runner: RunFromText) -> None:
         """The task sets no_log to no."""
@@ -236,7 +244,9 @@ if "pytest" in sys.modules:  # noqa: C901
         assert results[0].rule.id == "no-log-password"
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_password_with_lock(rule_runner: RunFromText) -> None:
         """The task sets a password but also lock the user."""
@@ -245,7 +255,9 @@ if "pytest" in sys.modules:  # noqa: C901
         assert results[0].rule.id == "no-log-password"
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_no_log_yes(rule_runner: RunFromText) -> None:
         """The task sets no_log to yes."""
@@ -253,7 +265,9 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_no_log_true(rule_runner: RunFromText) -> None:
         """The task sets no_log to true."""
@@ -261,7 +275,9 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_no_log_password_lock_yes(rule_runner: RunFromText) -> None:
         """The task only locks the user."""
@@ -269,7 +285,9 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_no_log_password_lock_yes_but_no_password(rule_runner: RunFromText) -> None:
         """The task only locks the user."""
@@ -277,7 +295,9 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(results) == 0
 
     @pytest.mark.parametrize(
-        "rule_runner", (NoLogPasswordsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (NoLogPasswordsRule,),
+        indirect=["rule_runner"],
     )
     def test_password_lock_false(rule_runner: RunFromText) -> None:
         """The task does not actually lock the user."""

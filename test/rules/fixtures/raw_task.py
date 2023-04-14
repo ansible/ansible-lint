@@ -16,7 +16,9 @@ class RawTaskRule(AnsibleLintRule):
     needs_raw_task = True
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         """Match a task using __raw_task__ to inspect the module params type."""
         raw_task = task["__raw_task__"]

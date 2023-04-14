@@ -10,7 +10,8 @@ from ansiblelint.testing import run_ansible_lint
 def test_example(default_rules_collection: RulesCollection) -> None:
     """example.yml is expected to have exact number of errors inside."""
     result = Runner(
-        "examples/playbooks/example.yml", rules=default_rules_collection
+        "examples/playbooks/example.yml",
+        rules=default_rules_collection,
     ).run()
     assert len(result) == 22
 
@@ -19,13 +20,19 @@ def test_example(default_rules_collection: RulesCollection) -> None:
     ("filename", "line", "column"),
     (
         pytest.param(
-            "examples/playbooks/syntax-error-string.yml", 6, 7, id="syntax-error"
+            "examples/playbooks/syntax-error-string.yml",
+            6,
+            7,
+            id="syntax-error",
         ),
         pytest.param("examples/playbooks/syntax-error.yml", 2, 3, id="syntax-error"),
     ),
 )
 def test_example_syntax_error(
-    default_rules_collection: RulesCollection, filename: str, line: int, column: int
+    default_rules_collection: RulesCollection,
+    filename: str,
+    line: int,
+    column: int,
 ) -> None:
     """Validates that loading valid YAML string produce error."""
     result = Runner(filename, rules=default_rules_collection).run()
@@ -41,7 +48,8 @@ def test_example_custom_module(default_rules_collection: RulesCollection) -> Non
     """custom_module.yml is expected to pass."""
     app = get_app()
     result = Runner(
-        "examples/playbooks/custom_module.yml", rules=default_rules_collection
+        "examples/playbooks/custom_module.yml",
+        rules=default_rules_collection,
     ).run()
     assert len(result) == 0, f"{app.runtime.cache_dir}"
 
@@ -49,7 +57,8 @@ def test_example_custom_module(default_rules_collection: RulesCollection) -> Non
 def test_full_vault(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
     result = Runner(
-        "examples/playbooks/vars/not_decryptable.yml", rules=default_rules_collection
+        "examples/playbooks/vars/not_decryptable.yml",
+        rules=default_rules_collection,
     ).run()
     assert len(result) == 0
 

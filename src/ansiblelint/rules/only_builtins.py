@@ -20,7 +20,9 @@ class OnlyBuiltinsRule(AnsibleLintRule):
     tags = ["opt-in", "experimental"]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         module = task["action"]["__ansible_module_original__"]
 
@@ -86,7 +88,9 @@ if "pytest" in sys.modules:
         assert result.returncode == SUCCESS_RC
 
     @pytest.mark.parametrize(
-        "rule_runner", (OnlyBuiltinsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (OnlyBuiltinsRule,),
+        indirect=["rule_runner"],
     )
     def test_only_builtin_pass(rule_runner: RunFromText) -> None:
         """Test rule does not match."""

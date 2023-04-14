@@ -214,15 +214,48 @@ xfail_strict = true
 markers = ["eco: Tests effects on a set of 3rd party ansible repositories"]
 
 [tool.ruff]
-select = ["PT"]
 ignore = [
   "E501", # we use black
-
+  # temporary disabled until we fix them:
+  "ANN",
+  "ARG",
+  "A",
+  "B",
+  "C",
+  "SIM",
+  "BLE",
+  "D",
+  "G",
+  "RET",
+  "N",
+  "EM",
+  "EXE",
+  "FBT",
+  "INP",
+  "ISC",
+  "PGH",
+  "PIE",
+  "PLC",
+  "PTH",
+  "PLR",
+  "PLW",
+  "RUF",
+  "S",
+  "SLF",
+  "T",
+  "TCH",
+  "TRY",
 ]
+select = ["ALL"]
 target-version = "py39"
+# Same as Black.
+line-length = 88
 
 [tool.ruff.flake8-pytest-style]
 parametrize-values-type = "tuple"
+
+[tool.ruff.isort]
+known-first-party = ["ansiblelint"]
 
 [tool.setuptools.dynamic]
 optional-dependencies.docs = { file = [".config/requirements-docs.txt"] }

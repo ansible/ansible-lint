@@ -13,7 +13,8 @@ class StrictModeError(RuntimeError):
     """Raise when we encounter a warning in strict mode."""
 
     def __init__(
-        self, message: str = "Warning treated as error due to --strict option."
+        self,
+        message: str = "Warning treated as error due to --strict option.",
     ):
         """Initialize a StrictModeError instance."""
         super().__init__(message)
@@ -66,11 +67,11 @@ class MatchError(ValueError):
         # Safety measure to ensure we do not end-up with incorrect indexes
         if linenumber == 0:  # pragma: no cover
             raise RuntimeError(
-                "MatchError called incorrectly as line numbers start with 1"
+                "MatchError called incorrectly as line numbers start with 1",
             )
         if column == 0:  # pragma: no cover
             raise RuntimeError(
-                "MatchError called incorrectly as column numbers start with 1"
+                "MatchError called incorrectly as column numbers start with 1",
             )
 
         self.linenumber = linenumber
@@ -103,7 +104,7 @@ class MatchError(ValueError):
     def level(self) -> str:
         """Return the level of the rule: error, warning or notice."""
         if not self.ignored and {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(
-            options.warn_list
+            options.warn_list,
         ):
             return "error"
         return "warning"
@@ -116,7 +117,11 @@ class MatchError(ValueError):
         _id = getattr(self.rule, "id", "000")
 
         return formatstr.format(
-            _id, self.message, self.filename, self.linenumber, self.details
+            _id,
+            self.message,
+            self.filename,
+            self.linenumber,
+            self.details,
         )
 
     @property

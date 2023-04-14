@@ -49,7 +49,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
                         filename=file,
                         linenumber=file.data[LINE_NUMBER_KEY],
                         message=f"Should change default metadata: {field}",
-                    )
+                    ),
                 )
 
         return results
@@ -64,7 +64,8 @@ if "pytest" in sys.modules:
     ) -> None:
         """Test for meta-incorrect."""
         results = Runner(
-            "examples/roles/meta_incorrect_fail", rules=default_rules_collection
+            "examples/roles/meta_incorrect_fail",
+            rules=default_rules_collection,
         ).run()
         for result in results:
             assert result.rule.id == "meta-incorrect"

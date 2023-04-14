@@ -60,7 +60,9 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         if task["action"]["__ansible_module__"] in ["command"]:
             first_cmd_arg = get_first_cmd_arg(task)
@@ -69,6 +71,6 @@ class EnvVarsInCommandRule(AnsibleLintRule):
 
             return any(
                 [arg not in self.expected_args for arg in task["action"]]
-                + ["=" in first_cmd_arg]
+                + ["=" in first_cmd_arg],
             )
         return False

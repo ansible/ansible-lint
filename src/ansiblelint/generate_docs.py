@@ -27,12 +27,10 @@ def rules_as_str(rules: RulesCollection) -> RenderableType:
     """Return rules as string."""
     table = Table(show_header=False, header_style="title", box=box.SIMPLE)
     for rule in rules.alphabetical():
-        if rule.tags:
-            tag = f"[dim] ({', '.join(rule.tags)})[/dim]"
-        else:
-            tag = ""
+        tag = f"[dim] ({', '.join(rule.tags)})[/dim]" if rule.tags else ""
         table.add_row(
-            f"[link={RULE_DOC_URL}{rule.id}/]{rule.id}[/link]", rule.shortdesc + tag
+            f"[link={RULE_DOC_URL}{rule.id}/]{rule.id}[/link]",
+            rule.shortdesc + tag,
         )
     return table
 
@@ -49,7 +47,7 @@ def rules_as_md(rules: RulesCollection) -> str:
         if rule.help:
             if not rule.help.startswith(f"# {rule.id}"):  # pragma: no cover
                 raise RuntimeError(
-                    f"Rule {rule.__class__} markdown help does not start with `# {rule.id}` header.\n{rule.help}"
+                    f"Rule {rule.__class__} markdown help does not start with `# {rule.id}` header.\n{rule.help}",
                 )
             result += f"\n\n{rule.help}"
         else:

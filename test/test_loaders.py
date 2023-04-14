@@ -34,8 +34,8 @@ def test_load_ignore_txt_default_success() -> None:
                     # See https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files
                     playbook2.yml package-latest # comment
                     playbook2.yml foo-bar
-                """
-                )
+                """,
+                ),
             )
 
         cwd = os.getcwd()
@@ -62,8 +62,8 @@ def test_load_ignore_txt_default_success_alternative() -> None:
                     playbook.yml foo-bar
                     playbook.yml more-foo # what-the-foo?
                     tasks/main.yml more-bar
-                """
-                )
+                """,
+                ),
             )
 
         cwd = os.getcwd()
@@ -94,8 +94,8 @@ def test_load_ignore_txt_custom_success() -> None:
                     vars/main.yml tuco
                     roles/guzman/tasks/main.yml lalo
                     roles/eduardo/tasks/main.yml lalo
-                """
-                )
+                """,
+                ),
             )
 
         cwd = os.getcwd()

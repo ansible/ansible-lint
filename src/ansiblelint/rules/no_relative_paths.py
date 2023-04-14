@@ -30,7 +30,9 @@ class RoleRelativePath(AnsibleLintRule):
     }
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         module = task["action"]["__ansible_module__"]
         if module not in self._module_to_path_folder:
@@ -61,7 +63,9 @@ if "pytest" in sys.modules:
         ),
     )
     def test_no_relative_paths(
-        default_rules_collection: RulesCollection, test_file: str, failures: int
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: int,
     ) -> None:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()

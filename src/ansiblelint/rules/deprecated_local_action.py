@@ -23,11 +23,13 @@ class TaskNoLocalAction(AnsibleLintRule):
     version_added = "v4.0.0"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         """Return matches for a task."""
         raw_task = task["__raw_task__"]
-        if "local_action" in raw_task.keys():
+        if "local_action" in raw_task:
             return True
 
         return False

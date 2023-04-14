@@ -25,7 +25,9 @@ class AvoidImplicitRule(AnsibleLintRule):
     version_added = "v6.8.0"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         """Confirm if current rule is matching a specific task."""
         if task["action"]["__ansible_module__"] == "copy":

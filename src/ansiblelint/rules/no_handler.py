@@ -64,7 +64,9 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     version_added = "historic"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         if task["__ansible_action_type__"] != "task":
             return False
@@ -93,7 +95,9 @@ if "pytest" in sys.modules:
         ),
     )
     def test_no_handler(
-        default_rules_collection: RulesCollection, test_file: str, failures: int
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: int,
     ) -> None:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()

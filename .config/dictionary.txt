@@ -97,6 +97,7 @@ darglint
 dataclasses
 dbservers
 deannotate
+debconf
 debops
 decryptable
 delenv
@@ -141,6 +142,7 @@ fulltoc
 fullwidth
 gecos
 geerlingguy
+getent
 getmatches
 globbing
 globmatch
@@ -216,6 +218,7 @@ myrole
 namedtempfile
 nestedincludes
 netcommon
+netscaler
 nilashishc
 nitpicky
 nocolor
@@ -234,7 +237,9 @@ opensearch
 openshift
 outdir
 outlen
+pacman
 pageview
+panos
 parseable
 pathex
 pathlib
@@ -252,6 +257,7 @@ placefolder
 pluggy
 pluginmanager
 podman
+portchannel
 prerun
 prettierignore
 programoutput
@@ -314,6 +320,7 @@ simpletask
 skippable
 skiptasks
 skiputils
+slackpkg
 slaveinput
 sortfunc
 sourcegraph
@@ -329,6 +336,8 @@ substrs
 subtest
 superfences
 supervisorctl
+swdepot
+switchport
 synchronize
 sysvinit
 taskfile
