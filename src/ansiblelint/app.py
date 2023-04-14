@@ -85,9 +85,14 @@ class App:
 
         # If run under GitHub Actions we also want to emit output recognized by it.
         if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("GITHUB_WORKFLOW"):
+            _logger.info(
+                "GitHub Actions environment detected, adding annotations output..."
+            )
             formatter = formatters.AnnotationsFormatter(self.options.cwd, True)
             for match in itertools.chain(fatal_matches, ignored_matches):
-                console.print(formatter.format(match), markup=False, highlight=False)
+                console_stderr.print(
+                    formatter.format(match), markup=False, highlight=False
+                )
 
         # If sarif_file is set, we also dump the results to a sarif file.
         if self.options.sarif_file:
