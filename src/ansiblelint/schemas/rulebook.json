@@ -7,8 +7,8 @@
     },
     "minItems": 1,
     "examples": [
-        "rulebooks/*.yml",
-        "rulebooks/*.yaml"
+        "extensions/eda/rulebooks/*.yml",
+        "extensions/eda/rulebooks/*.yaml"
     ],
     "$defs": {
         "ruleset": {
