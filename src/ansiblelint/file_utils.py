@@ -1,7 +1,6 @@
 """Utility functions related to file operations."""
 from __future__ import annotations
 
-import ast
 import copy
 import logging
 import os
@@ -13,6 +12,7 @@ from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
 
 import pathspec
+from ansible.parsing.plugin_docs import read_docstring
 import wcmatch.pathlib
 import wcmatch.wcmatch
 from yaml.error import YAMLError
@@ -392,15 +392,8 @@ class Lintable:
 
         The line numbers are stored in each node's LINE_NUMBER_KEY key.
         """
-        parsed = ast.parse(self.content, self.path)
-
-        examples = None
-        for node in parsed.body:
-            if isinstance(node, ast.Assign):
-                for target in node.targets:
-                    if isinstance(target, ast.Name) and target.id == "EXAMPLES" and isinstance(node.value, ast.Constant):
-                        examples = node.value.value
-
+        docs = read_docstring(str(self.path))
+        examples = docs["plainexamples"]
         return examples or ""
 
     @property
