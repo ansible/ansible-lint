@@ -10,7 +10,7 @@ if os.getcwd() != os.path.dirname(__file__):
 
 # checking if user is running pytest without installing test dependencies:
 missing = []
-for module in ["ansible", "black", "flake8", "mypy", "pylint"]:
+for module in ["ansible", "black", "mypy", "pylint"]:
     if not importlib.util.find_spec(module):
         missing.append(module)
 if missing:
@@ -31,7 +31,7 @@ except subprocess.CalledProcessError as exc:
     print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)
     sys.exit(1)
 
-# flake8: noqa: E402
+# ruff: noqa: E402
 from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-position
     HAS_LIBYAML,
 )

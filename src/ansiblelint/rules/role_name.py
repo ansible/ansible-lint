@@ -49,7 +49,6 @@ def _match_role_name_regex(role_name: str) -> bool:
 
 
 class RoleNames(AnsibleLintRule):
-    # Unable to use f-strings due to flake8 bug with AST parsing
     """Role name {0} does not match ``^[a-z][a-z0-9_]*$`` pattern."""
 
     id = "role-name"

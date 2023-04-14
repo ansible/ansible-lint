@@ -27,8 +27,6 @@ dill==0.3.6
 exceptiongroup==1.1.1
 execnet==1.9.0
 filelock==3.11.0
-flake8==6.0.0
-flake8-future-annotations==1.1.0
 ghp-import==2.1.0
 griffe==0.26.0
 htmlmin2==0.1.13
@@ -72,9 +70,7 @@ platformdirs==3.2.0
 pluggy==1.0.0
 ply==3.11
 psutil==5.9.4
-pycodestyle==2.10.0
 pycparser==2.21
-pyflakes==3.0.1
 pygments==2.14.0
 pylint==2.17.2
 pymdown-extensions==9.10

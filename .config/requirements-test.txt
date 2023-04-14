@@ -1,8 +1,6 @@
 black # IDE support
 coverage-enable-subprocess # see https://github.com/nedbat/coveragepy/issues/1341#issuecomment-1228942657
 coverage[toml] >= 6.4.4
-flake8 # IDE support
-flake8-future-annotations # IDE support
 jmespath
 mypy # IDE support
 netaddr # needed by ipwrap filter

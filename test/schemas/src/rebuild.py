@@ -51,7 +51,7 @@ vars
 vars_files
 vars_prompt
 """.split(),
-    )
+    ),
 )
 
 
@@ -77,20 +77,18 @@ if __name__ == "__main__":
     invalid_var_names = sorted(list(keyword.kwlist) + play_keywords)
     if "__peg_parser__" in invalid_var_names:
         invalid_var_names.remove("__peg_parser__")
-    # flake8: noqa: T201
     print("Updating invalid var names")
 
     with open("f/vars.json", "r+", encoding="utf-8") as f:
         vars_schema = json.load(f)
         vars_schema["anyOf"][0]["patternProperties"] = {
-            f"^(?!({'|'.join(invalid_var_names)})$)[a-zA-Z_][\\w]*$": {}
+            f"^(?!({'|'.join(invalid_var_names)})$)[a-zA-Z_][\\w]*$": {},
         }
         f.seek(0)
         json.dump(vars_schema, f, indent=2)
         f.write("\n")
         f.truncate()
 
-    # flake8: noqa: T201
     print("Compiling subschemas...")
     with open("f/ansible.json", encoding="utf-8") as f:
         combined_json = json.load(f)
