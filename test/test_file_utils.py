@@ -1,6 +1,7 @@
 """Tests for file utility functions."""
 from __future__ import annotations
 
+import logging
 import os
 import time
 from argparse import Namespace
@@ -105,6 +106,7 @@ def test_discover_lintables_silent(
     is_in_git: bool,
     monkeypatch: MonkeyPatch,
     capsys: CaptureFixture[str],
+    caplog: LogCaptureFixture,
 ) -> None:
     """Verify that no stderr output is displayed while discovering yaml files.
 
@@ -112,6 +114,7 @@ def test_discover_lintables_silent(
 
     Also checks expected number of files are detected.
     """
+    caplog.set_level(logging.FATAL)
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
     lint_path = test_dir / ".." / "examples" / "roles" / "test-role"
@@ -125,7 +128,9 @@ def test_discover_lintables_silent(
     monkeypatch.chdir(str(lint_path))
     files = file_utils.discover_lintables(options)
     stderr = capsys.readouterr().err
-    assert not stderr, "No stderr output is expected when the verbosity is off"
+    assert (
+        not stderr
+    ), f"No stderr output is expected when the verbosity is off, got: {stderr}"
     assert (
         len(files) == yaml_count
     ), "Expected to find {yaml_count} yaml files in {lint_path}".format_map(
