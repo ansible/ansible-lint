@@ -1,0 +1,68 @@
+---
+- name: Fixture for no-handler-pass
+  hosts: all
+  tasks:
+    - name: Execute something
+      ansible.builtin.command: echo 123
+      register: result
+      changed_when: true
+
+    - name: Print helpful error message
+      ansible.builtin.debug:
+        var: result
+      when: result.failed
+
+    - name: Do something when hello is output
+      ansible.builtin.debug:
+        msg: why isn't this a handler
+      when: result.stdout == "hello"
+
+    - name: Never actually debug
+      ansible.builtin.debug:
+        var: result
+      when: false
+
+    - name: "Don't execute this step"
+      ansible.builtin.debug:
+        msg: "debug message"
+      when:
+        - false
+
+    - name: Check when with a list
+      ansible.builtin.debug:
+        var: result
+      when:
+        - conditionA
+        - conditionB
+
+    - name: Registering task 1
+      ansible.builtin.command: echo Hello
+      register: r1
+      changed_when: true
+
+    - name: Registering task 2
+      ansible.builtin.command: echo Hello
+      register: r2
+      changed_when: true
+
+    - name: Use when task # noqa: no-changed-when
+      ansible.builtin.command: echo Hello
+      when: r1.changed and r2.changed
+
+    - name: Registering task
+      ansible.builtin.command: echo Hello
+      register: r
+      changed_when: true
+
+    - name: When task not changed # noqa: no-changed-when
+      ansible.builtin.command: echo Not changed
+      when: not r.changed
+
+    - name: Execute command # noqa: no-changed-when
+      ansible.builtin.command: echo hello
+      register: result
+
+    - name: This should be a handler 2
+      ansible.builtin.debug:
+        msg: why isn't this a handler
+      when: result | changed

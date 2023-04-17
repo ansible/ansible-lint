@@ -30,13 +30,13 @@ def fixture_default_rules_collection() -> RulesCollection:
     return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=options)
 
 
-@pytest.fixture
+@pytest.fixture()
 def default_text_runner(default_rules_collection: RulesCollection) -> RunFromText:
     """Return RunFromText instance for the default set of collections."""
     return RunFromText(default_rules_collection)
 
 
-@pytest.fixture
+@pytest.fixture()
 def rule_runner(request: SubRequest, config_options: Namespace) -> RunFromText:
     """Return runner for a specific rule class."""
     rule_class = request.param

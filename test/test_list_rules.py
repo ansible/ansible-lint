@@ -12,7 +12,7 @@ def test_list_rules_includes_opt_in_rules() -> None:
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture.
     cwd = os.path.realpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."),
     )
     fakerole = os.path.join("test", "fixtures", "list-rules-tests")
 
@@ -45,13 +45,15 @@ def test_list_rules_includes_opt_in_rules() -> None:
     ),
 )
 def test_list_rules_with_format_option(
-    result: bool, returncode: int, format_string: str
+    result: bool,
+    returncode: int,
+    format_string: str,
 ) -> None:
     """Checks that listing rules with format options works."""
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture.
     cwd = os.path.realpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."),
     )
     fakerole = os.path.join("test", "fixtures", "list-rules-tests")
 
@@ -67,7 +69,7 @@ def test_list_tags_includes_opt_in_rules() -> None:
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture.
     cwd = os.path.realpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."),
     )
     fakerole = os.path.join("test", "fixtures", "list-rules-tests")
 

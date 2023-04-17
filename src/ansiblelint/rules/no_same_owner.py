@@ -26,7 +26,9 @@ should not be preserved when transferring files between them.
     tags = ["opt-in"]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         """Return matches for a task."""
         action = task.get("action")
@@ -67,9 +69,8 @@ should not be preserved when transferring files between them.
             if not isinstance(src, str):
                 return False
 
-            if src.endswith("zip"):
-                if "-X" in action.get("extra_opts", []):
-                    return True
+            if src.endswith("zip") and "-X" in action.get("extra_opts", []):
+                return True
             if re.search(r".*\.tar(\.(gz|bz2|xz))?$", src):
                 if "--no-same-owner" not in action.get("extra_opts", []):
                     return True
@@ -87,15 +88,21 @@ if "pytest" in sys.modules:
         ("test_file", "failures"),
         (
             pytest.param(
-                "examples/roles/role_for_no_same_owner/tasks/fail.yml", 12, id="fail"
+                "examples/roles/role_for_no_same_owner/tasks/fail.yml",
+                12,
+                id="fail",
             ),
             pytest.param(
-                "examples/roles/role_for_no_same_owner/tasks/pass.yml", 0, id="pass"
+                "examples/roles/role_for_no_same_owner/tasks/pass.yml",
+                0,
+                id="pass",
             ),
         ),
     )
     def test_no_same_owner_rule(
-        default_rules_collection: RulesCollection, test_file: str, failures: int
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: int,
     ) -> None:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()

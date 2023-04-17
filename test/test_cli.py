@@ -33,7 +33,9 @@ def fixture_base_arguments() -> list[str]:
     ),
 )
 def test_ensure_config_are_equal(
-    base_arguments: list[str], args: list[str], config: str
+    base_arguments: list[str],
+    args: list[str],
+    config: str,
 ) -> None:
     """Check equality of the CLI options to config files."""
     command = base_arguments + args
@@ -88,7 +90,10 @@ def test_ensure_config_are_equal(
     ),
 )
 def test_ensure_write_cli_does_not_consume_lintables(
-    base_arguments: list[str], with_base: bool, args: list[str], config: str
+    base_arguments: list[str],
+    with_base: bool,
+    args: list[str],
+    config: str,
 ) -> None:
     """Check equality of the CLI --write options to config files."""
     cli_parser = cli.get_cli_parser()
@@ -100,7 +105,8 @@ def test_ensure_write_cli_does_not_consume_lintables(
     file_value = file_config.get("write_list")
     orig_cli_value = getattr(options, "write_list")
     cli_value = cli.WriteArgAction.merge_write_list_config(
-        from_file=[], from_cli=orig_cli_value
+        from_file=[],
+        from_cli=orig_cli_value,
     )
     assert file_value == cli_value
 
@@ -110,7 +116,7 @@ def test_config_can_be_overridden(base_arguments: list[str]) -> None:
     no_override = cli.get_config(base_arguments + ["-t", "bad_tag"])
 
     overridden = cli.get_config(
-        base_arguments + ["-t", "bad_tag", "-c", "test/fixtures/tags.yml"]
+        base_arguments + ["-t", "bad_tag", "-c", "test/fixtures/tags.yml"],
     )
 
     assert no_override.tags + ["skip_ansible_lint"] == overridden.tags
@@ -119,7 +125,7 @@ def test_config_can_be_overridden(base_arguments: list[str]) -> None:
 def test_different_config_file(base_arguments: list[str]) -> None:
     """Ensures an alternate config_file can be used."""
     diff_config = cli.get_config(
-        base_arguments + ["-c", "test/fixtures/ansible-config.yml"]
+        base_arguments + ["-c", "test/fixtures/ansible-config.yml"],
     )
     no_config = cli.get_config(base_arguments + ["-v"])
 
@@ -129,11 +135,11 @@ def test_different_config_file(base_arguments: list[str]) -> None:
 def test_expand_path_user_and_vars_config_file(base_arguments: list[str]) -> None:
     """Ensure user and vars are expanded when specified as exclude_paths."""
     config1 = cli.get_config(
-        base_arguments + ["-c", "test/fixtures/exclude-paths-with-expands.yml"]
+        base_arguments + ["-c", "test/fixtures/exclude-paths-with-expands.yml"],
     )
     config2 = cli.get_config(
         base_arguments
-        + ["--exclude", "~/.ansible/roles", "--exclude", "$HOME/.ansible/roles"]
+        + ["--exclude", "~/.ansible/roles", "--exclude", "$HOME/.ansible/roles"],
     )
 
     assert str(config1.exclude_paths[0]) == os.path.expanduser("~/.ansible/roles")
@@ -141,10 +147,10 @@ def test_expand_path_user_and_vars_config_file(base_arguments: list[str]) -> Non
 
     # exclude-paths coming in via cli are PosixPath objects; which hold the (canonical) real path (without symlinks)
     assert str(config2.exclude_paths[0]) == os.path.realpath(
-        os.path.expanduser("~/.ansible/roles")
+        os.path.expanduser("~/.ansible/roles"),
     )
     assert str(config2.exclude_paths[1]) == os.path.realpath(
-        os.path.expandvars("$HOME/.ansible/roles")
+        os.path.expandvars("$HOME/.ansible/roles"),
     )
 
 
@@ -160,7 +166,8 @@ def test_path_from_config_do_not_depend_on_cwd(
 
 
 def test_path_from_cli_depend_on_cwd(
-    base_arguments: list[str], monkeypatch: MonkeyPatch
+    base_arguments: list[str],
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Check that CLI-provided paths are relative to CWD."""
     # Issue 572
@@ -195,7 +202,7 @@ def test_config_failure(base_arguments: list[str], config_file: str) -> None:
 def test_extra_vars_loaded(base_arguments: list[str]) -> None:
     """Ensure ``extra_vars`` option is loaded from file config."""
     config = cli.get_config(
-        base_arguments + ["-c", "test/fixtures/config-with-extra-vars.yml"]
+        base_arguments + ["-c", "test/fixtures/config-with-extra-vars.yml"],
     )
 
     assert config.extra_vars == {"foo": "bar", "knights_favorite_word": "NI"}

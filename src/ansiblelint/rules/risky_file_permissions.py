@@ -86,7 +86,9 @@ class MissingFilePermissionsRule(AnsibleLintRule):
 
     # pylint: disable=too-many-return-statements
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         module = task["action"]["__ansible_module__"]
         mode = task["action"].get("mode", None)
@@ -136,7 +138,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ("file", "expected"),
         (
             pytest.param(
-                "examples/playbooks/rule-risky-file-permissions-pass.yml", 0, id="pass"
+                "examples/playbooks/rule-risky-file-permissions-pass.yml",
+                0,
+                id="pass",
             ),
             pytest.param(
                 "examples/playbooks/rule-risky-file-permissions-fail.yml",

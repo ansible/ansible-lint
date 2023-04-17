@@ -33,15 +33,15 @@ def _ensure_vendored_path_entry() -> None:
         sys.path.insert(0, vendored_path_entry)
 
         already_loaded_vendored_modules = set(sys.modules.keys()).intersection(
-            vendored_module_names
+            vendored_module_names,
         )
 
         if already_loaded_vendored_modules:
             warnings.warn(
                 "One or more Python packages bundled by this ansible-lint distribution were already "
                 "loaded ({}). This may result in undefined behavior.".format(
-                    ", ".join(sorted(already_loaded_vendored_modules))
-                )
+                    ", ".join(sorted(already_loaded_vendored_modules)),
+                ),
             )
 
 

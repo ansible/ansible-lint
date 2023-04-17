@@ -44,10 +44,9 @@ from rich.theme import Theme
 # string: #dd1144 (light-red)
 DEFAULT_STYLES.update(
     {
-        # "code": Style(color="bright_black", bgcolor="red"),
         "markdown.code": Style(color="bright_black"),
         "markdown.code_block": Style(dim=True, color="cyan"),
-    }
+    },
 )
 
 
@@ -59,7 +58,7 @@ _theme = Theme(
         "title": "yellow",
         "error": "bright_red",
         "filename": "blue",
-    }
+    },
 )
 console_options: dict[str, Any] = {"emoji": False, "theme": _theme, "soft_wrap": True}
 console_options_stderr = console_options.copy()

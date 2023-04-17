@@ -26,7 +26,10 @@ def sanitize_output(text: str) -> str:
     result = text.replace(os.path.expanduser("~"), "~")
     # removes warning related to PATH alteration
     result = re.sub(
-        r"^WARNING: PATH altered to include.+\n", "", result, flags=re.MULTILINE
+        r"^WARNING: PATH altered to include.+\n",
+        "",
+        result,
+        flags=re.MULTILINE,
     )
     # replace venv path
     result = result.replace(".tox/venv", ".tox/eco")

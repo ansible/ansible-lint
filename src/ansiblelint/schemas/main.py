@@ -23,7 +23,6 @@ def validate_file_schema(file: Lintable) -> list[str]:
         # convert yaml to json (keys are converted to strings)
         yaml_data = yaml_load_safe(file.content)
         json_data = json.loads(json.dumps(yaml_data))
-        # file.data = json_data
         jsonschema.validate(
             instance=json_data,
             schema=_schema_cache[file.kind],

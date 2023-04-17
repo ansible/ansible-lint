@@ -31,17 +31,19 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     severity = "MEDIUM"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         """Return matches for a task."""
         if not file or not file.role or not options.loop_var_prefix:
             return []
 
         self.prefix = re.compile(
-            options.loop_var_prefix.format(role=toidentifier(file.role))
+            options.loop_var_prefix.format(role=toidentifier(file.role)),
         )
         has_loop = "loop" in task
-        for key in task.keys():
+        for key in task:
             if key.startswith("with_"):
                 has_loop = True
 
@@ -56,7 +58,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
                             message=f"Loop variable name does not match /{options.loop_var_prefix}/ regex, where role={toidentifier(file.role)}.",
                             filename=file,
                             tag="loop-var-prefix[wrong]",
-                        )
+                        ),
                     ]
             else:
                 return [
@@ -64,7 +66,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
                         message=f"Replace unsafe implicit `item` loop variable by adding a `loop_var` that is matching /{options.loop_var_prefix}/ regex.",
                         filename=file,
                         tag="loop-var-prefix[missing]",
-                    )
+                    ),
                 ]
 
         return []
@@ -81,15 +83,21 @@ if "pytest" in sys.modules:
         ("test_file", "failures"),
         (
             pytest.param(
-                "examples/playbooks/roles/loop_var_prefix/tasks/pass.yml", 0, id="pass"
+                "examples/playbooks/roles/loop_var_prefix/tasks/pass.yml",
+                0,
+                id="pass",
             ),
             pytest.param(
-                "examples/playbooks/roles/loop_var_prefix/tasks/fail.yml", 6, id="fail"
+                "examples/playbooks/roles/loop_var_prefix/tasks/fail.yml",
+                6,
+                id="fail",
             ),
         ),
     )
     def test_loop_var_prefix(
-        default_rules_collection: RulesCollection, test_file: str, failures: int
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: int,
     ) -> None:
         """Test rule matches."""
         # Enable checking of loop variable prefixes in roles

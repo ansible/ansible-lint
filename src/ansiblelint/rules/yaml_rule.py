@@ -14,7 +14,6 @@ from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.yaml_utils import load_yamllint_config
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
     from typing import Any
 
     from ansiblelint.errors import MatchError
@@ -42,7 +41,9 @@ class YamllintRule(AnsibleLintRule):
             return matches
 
         for problem in run_yamllint(
-            file.content, YamllintRule.config, filepath=file.path
+            file.content,
+            YamllintRule.config,
+            filepath=file.path,
         ):
             self.severity = "VERY_LOW"
             if problem.level == "error":
@@ -55,7 +56,7 @@ class YamllintRule(AnsibleLintRule):
                     details="",
                     filename=file,
                     tag=f"yaml[{problem.rule}]",
-                )
+                ),
             )
         return matches
 
@@ -121,10 +122,22 @@ if "pytest" in sys.modules:
             ),
             pytest.param("examples/yamllint/valid.yml", "yaml", [], id="valid"),
             pytest.param(
-                "examples/yamllint/multi-document.yaml", "yaml", [], id="multi-document"
+                "examples/yamllint/line-length.yml",
+                "yaml",
+                ["Line too long (166 > 160 characters)"],
+                id="line-length",
             ),
             pytest.param(
-                "examples/yamllint/skipped-rule.yml", "yaml", [], id="skipped-rule"
+                "examples/yamllint/multi-document.yaml",
+                "yaml",
+                [],
+                id="multi-document",
+            ),
+            pytest.param(
+                "examples/yamllint/skipped-rule.yml",
+                "yaml",
+                [],
+                id="skipped-rule",
             ),
             pytest.param(
                 "examples/playbooks/rule-yaml-fail.yml",

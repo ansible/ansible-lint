@@ -45,7 +45,7 @@ ignored_re = re.compile(
             r"Unrecognized type <<class 'ansible.template.AnsibleUndefined'>> for (.*) filter <value>$",
             # https://github.com/ansible/ansible-lint/issues/3155
             r"^The '(.*)' test expects a dictionary$",
-        ]
+        ],
     ),
     flags=re.MULTILINE | re.DOTALL,
 )
@@ -59,7 +59,8 @@ class JinjaRule(AnsibleLintRule):
     tags = ["formatting"]
     version_added = "v6.5.0"
     _ansible_error_re = re.compile(
-        r"^(?P<error>.*): (?P<detail>.*)\. String: (?P<string>.*)$", flags=re.MULTILINE
+        r"^(?P<error>.*): (?P<detail>.*)\. String: (?P<string>.*)$",
+        flags=re.MULTILINE,
     )
 
     env = jinja2.Environment(trim_blocks=False)
@@ -74,7 +75,9 @@ class JinjaRule(AnsibleLintRule):
 
     # pylint: disable=too-many-branches,too-many-locals
     def matchtask(  # noqa: C901
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
         try:
@@ -98,13 +101,11 @@ class JinjaRule(AnsibleLintRule):
                         )
                         orig_exc_message = getattr(orig_exc, "message", str(orig_exc))
                         match = self._ansible_error_re.match(
-                            getattr(orig_exc, "message", str(orig_exc))
+                            getattr(orig_exc, "message", str(orig_exc)),
                         )
                         if ignored_re.search(orig_exc_message):
                             bypass = True
                         elif isinstance(orig_exc, AnsibleParserError):
-                            # "An unhandled exception occurred while running the lookup plugin '...'. Error was a <class 'ansible.errors.AnsibleParserError'>, original message: Invalid filename: 'None'. Invalid filename: 'None'"
-
                             # An unhandled exception occurred while running the lookup plugin 'template'. Error was a <class 'ansible.errors.AnsibleError'>, original message: the template file ... could not be found for the lookup. the template file ... could not be found for the lookup
 
                             # ansible@devel (2.14) new behavior:
@@ -116,9 +117,8 @@ class JinjaRule(AnsibleLintRule):
                         ):
                             error = match.group("error")
                             detail = match.group("detail")
-                            # string = match.group("string")
                             if error.startswith(
-                                "template error while templating string"
+                                "template error while templating string",
                             ):
                                 bypass = False
                             elif detail.startswith("unable to locate collection"):
@@ -130,7 +130,6 @@ class JinjaRule(AnsibleLintRule):
                             # lookup plugin 'template' not found
                             bypass = True
 
-                        # AnsibleFilterError: 'obj must be a list of dicts or a nested dict'
                         # AnsibleError: template error while templating string: expected token ':', got '}'. String: {{ {{ '1' }} }}
                         # AnsibleError: template error while templating string: unable to locate collection ansible.netcommon. String: Foo {{ buildset_registry.host | ipwrap }}
                         if not bypass:
@@ -140,23 +139,27 @@ class JinjaRule(AnsibleLintRule):
                                     linenumber=_get_error_line(task, path),
                                     filename=file,
                                     tag=f"{self.id}[invalid]",
-                                )
+                                ),
                             )
                             continue
                     reformatted, details, tag = self.check_whitespace(
-                        v, key=key, lintable=file
+                        v,
+                        key=key,
+                        lintable=file,
                     )
                     if reformatted != v:
                         result.append(
                             self.create_matcherror(
                                 message=self._msg(
-                                    tag=tag, value=v, reformatted=reformatted
+                                    tag=tag,
+                                    value=v,
+                                    reformatted=reformatted,
                                 ),
                                 linenumber=_get_error_line(task, path),
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
-                            )
+                            ),
                         )
         except Exception as exc:
             _logger.info("Exception in JinjaRule.matchtask: %s", exc)
@@ -175,19 +178,23 @@ class JinjaRule(AnsibleLintRule):
             for key, v, path in nested_items_path(data):
                 if isinstance(v, AnsibleUnicode):
                     reformatted, details, tag = self.check_whitespace(
-                        v, key=key, lintable=file
+                        v,
+                        key=key,
+                        lintable=file,
                     )
                     if reformatted != v:
                         results.append(
                             self.create_matcherror(
                                 message=self._msg(
-                                    tag=tag, value=v, reformatted=reformatted
+                                    tag=tag,
+                                    value=v,
+                                    reformatted=reformatted,
                                 ),
                                 linenumber=v.ansible_pos[1],
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
-                            )
+                            ),
                         )
             if raw_results:
                 lines = file.content.splitlines()
@@ -215,7 +222,7 @@ class JinjaRule(AnsibleLintRule):
         new_text = self.unlex(tokens)
         if text != new_text:
             _logger.debug(
-                "Unable to perform full roundtrip lex-unlex on jinja template (expected when '-' modifier is used): {text} -> {new_text}"
+                "Unable to perform full roundtrip lex-unlex on jinja template (expected when '-' modifier is used): {text} -> {new_text}",
             )
         return tokens
 
@@ -234,7 +241,10 @@ class JinjaRule(AnsibleLintRule):
 
     # pylint: disable=too-many-branches,too-many-statements,too-many-locals
     def check_whitespace(  # noqa: max-complexity: 13
-        self, text: str, key: str, lintable: Lintable | None = None
+        self,
+        text: str,
+        key: str,
+        lintable: Lintable | None = None,
     ) -> tuple[str, str, str]:
         """Check spacing inside given jinja2 template string.
 
@@ -307,7 +317,7 @@ class JinjaRule(AnsibleLintRule):
                     # process expression
                     # pylint: disable=unsupported-membership-test
                     if isinstance(expr_str, str) and "\n" in expr_str:
-                        raise NotImplementedError()
+                        raise NotImplementedError
                     leading_spaces = " " * (len(expr_str) - len(expr_str.lstrip()))
                     expr_str = leading_spaces + blacken(expr_str.lstrip())
                     if tokens[
@@ -354,7 +364,8 @@ class JinjaRule(AnsibleLintRule):
 def blacken(text: str) -> str:
     """Format Jinja2 template using black."""
     return black.format_str(
-        text, mode=black.FileMode(line_length=sys.maxsize, string_normalization=False)
+        text,
+        mode=black.FileMode(line_length=sys.maxsize, string_normalization=False),
     ).rstrip("\n")
 
 
@@ -380,12 +391,13 @@ if "pytest" in sys.modules:  # noqa: C901
         return list(map(lambda item: item.linenumber, results))
 
     def test_jinja_spacing_playbook(
-        error_expected_lines: list[int], lint_error_lines: list[int]
+        error_expected_lines: list[int],
+        lint_error_lines: list[int],
     ) -> None:
         """Ensure that expected error lines are matching found linting error lines."""
         # list unexpected error lines or non-matching error lines
         error_lines_difference = list(
-            set(error_expected_lines).symmetric_difference(set(lint_error_lines))
+            set(error_expected_lines).symmetric_difference(set(lint_error_lines)),
         )
         assert len(error_lines_difference) == 0
 
@@ -422,7 +434,10 @@ if "pytest" in sys.modules:  # noqa: C901
                 id="5",
             ),
             pytest.param(
-                "Shell with jinja filter", "Shell with jinja filter", "spacing", id="6"
+                "Shell with jinja filter",
+                "Shell with jinja filter",
+                "spacing",
+                id="6",
             ),
             pytest.param(
                 "{{{'dummy_2':1}|true}}",
@@ -446,10 +461,7 @@ if "pytest" in sys.modules:  # noqa: C901
             pytest.param("{{foo(123)}}", "{{ foo(123) }}", "spacing", id="11"),
             pytest.param("{{ foo(a.b.c) }}", "{{ foo(a.b.c) }}", "spacing", id="12"),
             # pytest.param(
-            #     "{{ foo | bool else [ ] }}",
-            #     "{{ foo | bool else [] }}",
             #     "spacing",
-            #     id="13",
             # ),
             pytest.param(
                 "{{foo(x =['server_options'])}}",
@@ -458,7 +470,10 @@ if "pytest" in sys.modules:  # noqa: C901
                 id="14",
             ),
             pytest.param(
-                '{{ [ "host", "NA"] }}', '{{ ["host", "NA"] }}', "spacing", id="15"
+                '{{ [ "host", "NA"] }}',
+                '{{ ["host", "NA"] }}',
+                "spacing",
+                id="15",
             ),
             pytest.param(
                 "{{ {'dummy_2': {'nested_dummy_1': value_1,\n    'nested_dummy_2': value_2}} |\ncombine(dummy_1) }}",
@@ -511,7 +526,10 @@ if "pytest" in sys.modules:  # noqa: C901
             ),
             pytest.param("{{ r(1,[]) }}", "{{ r(1, []) }}", "spacing", id="26"),
             pytest.param(
-                "{{ lookup([ddd ]) }}", "{{ lookup([ddd]) }}", "spacing", id="27"
+                "{{ lookup([ddd ]) }}",
+                "{{ lookup([ddd]) }}",
+                "spacing",
+                id="27",
             ),
             pytest.param(
                 "{{ [ x ] if x is string else x }}",
@@ -520,7 +538,6 @@ if "pytest" in sys.modules:  # noqa: C901
                 id="28",
             ),
             pytest.param(
-                # "{% if a|int <= 8 -%} iptables {%- else -%} iptables-nft {%- endif %}",
                 "{% if a|int <= 8 -%} iptables {%- else -%} iptables-nft {%- endif %}",
                 "{% if a | int <= 8 -%} iptables{%- else -%} iptables-nft{%- endif %}",
                 "spacing",
@@ -570,7 +587,10 @@ if "pytest" in sys.modules:  # noqa: C901
             ),
             pytest.param("{{ a +~'b' }}", "{{ a + ~'b' }}", "spacing", id="36"),
             pytest.param(
-                "{{ (a[: -4] *~ b) }}", "{{ (a[:-4] * ~b) }}", "spacing", id="37"
+                "{{ (a[: -4] *~ b) }}",
+                "{{ (a[:-4] * ~b) }}",
+                "spacing",
+                id="37",
             ),
             pytest.param("{{ [a,~ b] }}", "{{ [a, ~b] }}", "spacing", id="38"),
             # Not supported yet due to being accepted by black:
@@ -618,7 +638,9 @@ if "pytest" in sys.modules:  # noqa: C901
         rule = JinjaRule()
 
         reformatted, details, returned_tag = rule.check_whitespace(
-            text, key="name", lintable=Lintable("playbook.yml")
+            text,
+            key="name",
+            lintable=Lintable("playbook.yml"),
         )
         assert tag == returned_tag, details
         assert expected == reformatted
@@ -649,7 +671,9 @@ if "pytest" in sys.modules:  # noqa: C901
         # implicit jinja2 are working only inside playbooks and tasks
         lintable = Lintable(name="playbook.yml", kind="playbook")
         reformatted, details, returned_tag = rule.check_whitespace(
-            text, key="when", lintable=lintable
+            text,
+            key="when",
+            lintable=lintable,
         )
         assert tag == returned_tag, details
         assert expected == reformatted

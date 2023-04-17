@@ -53,7 +53,9 @@ def _nested_search(term: str, data: dict[str, Any]) -> Any:
     if data and term in data:
         return True
     return reduce(
-        (lambda x, y: x or _nested_search(term, y)), _get_subtasks(data), False
+        (lambda x, y: x or _nested_search(term, y)),
+        _get_subtasks(data),
+        False,
     )
 
 
@@ -67,7 +69,9 @@ def _become_user_without_become(becomeuserabove: bool, data: dict[str, Any]) -> 
         # 'become' in its lineage
         subtasks = _get_subtasks(data)
         return reduce(
-            (lambda x, y: x or _become_user_without_become(False, y)), subtasks, False
+            (lambda x, y: x or _become_user_without_become(False, y)),
+            subtasks,
+            False,
         )
     if _nested_search("become_user", data):
         # Keep searching down if 'become_user' exists in the tree below current task
@@ -76,7 +80,8 @@ def _become_user_without_become(becomeuserabove: bool, data: dict[str, Any]) -> 
             (
                 lambda x, y: x
                 or _become_user_without_become(
-                    becomeuserabove or "become_user" in data, y
+                    becomeuserabove or "become_user" in data,
+                    y,
                 )
             ),
             subtasks,
@@ -105,7 +110,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
                         message=self.shortdesc,
                         filename=file,
                         linenumber=data[LINE_NUMBER_KEY],
-                    )
+                    ),
                 ]
         return []
 

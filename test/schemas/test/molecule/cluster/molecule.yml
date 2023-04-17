@@ -9,7 +9,6 @@ lint: |
   set -e
   yamllint -c molecule/yaml-lint.yml .
   ansible-lint
-  flake8
 
 platforms:
   - name: instance-1

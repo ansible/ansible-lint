@@ -50,12 +50,14 @@ class NoFormattingInWhenRule(AnsibleLintRule):
                             details=str({"when": role}),
                             filename=file,
                             linenumber=role[LINE_NUMBER_KEY],
-                        )
+                        ),
                     )
         return errors
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         return "when" in task and not self._is_valid(task["when"])
 

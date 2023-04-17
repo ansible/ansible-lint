@@ -1,0 +1,25 @@
+---
+- name: Fixture for literal-compare
+  hosts: localhost
+  tasks:
+    - name: Example task
+      ansible.builtin.debug:
+        msg: test
+      when: my_var
+
+    - name: Another example task
+      ansible.builtin.debug:
+        msg: test
+      when:
+        - 1 + 1 == 2
+        - true
+
+    - name: Example task
+      ansible.builtin.debug:
+        msg: test
+      when: not my_var
+
+    - name: Example task
+      ansible.builtin.debug:
+        msg: test
+      when: my_var not None

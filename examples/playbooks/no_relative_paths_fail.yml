@@ -1,0 +1,23 @@
+---
+- name: Fixture for no-relative-paths
+  hosts: localhost
+  tasks:
+    - name: Template example # <-- 1st
+      ansible.builtin.template:
+        src: ../templates/foo.j2
+        dest: /etc/file.conf
+        mode: "0644"
+    - name: Copy example # <-- 2nd
+      ansible.builtin.copy:
+        src: ../files/foo.conf
+        dest: /etc/foo.conf
+        mode: "0644"
+    # Removed from test suite as module is no longer part of core
+    # - name: Some win_template example
+    #   win_template:
+    #     src: ../win_templates/file.conf.j2
+    #     dest: file.conf
+    # - name: Some win_copy example
+    #   win_copy:
+    #     src: ../files/foo.conf
+    #     dest: renamed-foo.conf

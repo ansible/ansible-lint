@@ -9,13 +9,13 @@ This rule recommends using `delegate_to: localhost` instead of the
 ---
 - name: Task example
   local_action: # <-- this is deprecated
-    module: boto3_facts
+    module: ansible.builtin.debug
 ```
 
 ## Correct Code
 
 ```yaml
 - name: Task example
-    boto3_facts:
+    ansible.builtin.debug:
   delegate_to: localhost # <-- recommended way to run on localhost
 ```

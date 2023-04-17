@@ -23,11 +23,13 @@ class NoFreeFormRule(AnsibleLintRule):
     version_added = "v6.8.0"
     needs_raw_task = True
     cmd_shell_re = re.compile(
-        r"(chdir|creates|executable|removes|stdin|stdin_add_newline|warn)="
+        r"(chdir|creates|executable|removes|stdin|stdin_add_newline|warn)=",
     )
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         results: list[MatchError] = []
         action = task["action"]["__ansible_module_original__"]
@@ -45,7 +47,7 @@ class NoFreeFormRule(AnsibleLintRule):
                             linenumber=task[LINE_NUMBER_KEY],
                             filename=file,
                             tag=f"{self.id}[raw]",
-                        )
+                        ),
                     )
             else:
                 results.append(
@@ -54,7 +56,7 @@ class NoFreeFormRule(AnsibleLintRule):
                         linenumber=task[LINE_NUMBER_KEY],
                         filename=file,
                         tag=f"{self.id}[raw-non-string]",
-                    )
+                    ),
                 )
         elif isinstance(action_value, str) and "=" in action_value:
             fail = False
@@ -78,7 +80,7 @@ class NoFreeFormRule(AnsibleLintRule):
                         message=f"Avoid using free-form when calling module actions. ({action})",
                         linenumber=task[LINE_NUMBER_KEY],
                         filename=file,
-                    )
+                    ),
                 )
         return results
 
@@ -97,7 +99,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ),
     )
     def test_rule_no_free_form(
-        default_rules_collection: RulesCollection, file: str, expected: int
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: int,
     ) -> None:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()

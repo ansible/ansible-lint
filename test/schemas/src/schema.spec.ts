@@ -1,7 +1,7 @@
 import * as path from "path";
 import Ajv from "ajv";
 import fs from "fs";
-import minimatch from "minimatch";
+import { minimatch } from "minimatch";
 import yaml from "js-yaml";
 import { assert } from "chai";
 import stringify from "safe-stable-stringify";

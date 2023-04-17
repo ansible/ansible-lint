@@ -98,7 +98,8 @@ class Runner:
         abs_path = str(lintable.abspath)
         if self.project_dir and not abs_path.startswith(self.project_dir):
             _logger.debug(
-                "Skipping %s as it is outside of the project directory.", abs_path
+                "Skipping %s as it is outside of the project directory.",
+                abs_path,
             )
             return True
 
@@ -128,7 +129,7 @@ class Runner:
                         message=str(lintable.exc),
                         details=str(lintable.exc.__cause__),
                         rule=LoadingFailureRule(),
-                    )
+                    ),
                 )
                 lintable.stop_processing = True
 
@@ -137,15 +138,14 @@ class Runner:
             # pylint: disable=protected-access
             return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
 
-        # playbooks: List[Lintable] = []
         for lintable in self.lintables:
-            if lintable.kind != "playbook" or lintable.stop_processing:
+            if lintable.kind not in ("playbook", "role") or lintable.stop_processing:
                 continue
             files.append(lintable)
 
         # avoid resource leak warning, https://github.com/python/cpython/issues/90549
         # pylint: disable=unused-variable
-        global_resource = multiprocessing.Semaphore()
+        global_resource = multiprocessing.Semaphore()  # noqa: F841
 
         pool = multiprocessing.pool.ThreadPool(processes=multiprocessing.cpu_count())
         return_list = pool.map(worker, files, chunksize=1)
@@ -174,7 +174,7 @@ class Runner:
                 )
 
                 matches.extend(
-                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list)
+                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list),
                 )
 
         # update list of checked files
@@ -187,7 +187,7 @@ class Runner:
                 and hasattr(match, "lintable")
                 and match.tag not in match.lintable.line_skips[match.linenumber],
                 matches,
-            )
+            ),
         )
 
         return sorted(set(matches))
@@ -220,7 +220,7 @@ def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
             for entry in (*options.skip_list, *options.warn_list):
                 if rule.id == entry or entry.startswith(f"{rule.id}["):
                     raise RuntimeError(
-                        f"Rule '{rule.id}' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file."
+                        f"Rule '{rule.id}' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file.",
                     )
     matches = []
     checked_files: set[Lintable] = set()

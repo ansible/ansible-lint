@@ -6,7 +6,7 @@ import sys
 import time
 import urllib.request
 from collections import defaultdict
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any
 from urllib.request import Request
@@ -30,7 +30,7 @@ class SchemaCacheDict(defaultdict):  # type: ignore
         return value
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_schema(kind: str) -> Any:
     """Return the schema for the given kind."""
     schema_file = os.path.dirname(__file__) + "/" + kind + ".json"
@@ -54,7 +54,8 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         return 0
     if not os.access(store_file, os.W_OK):  # pragma: no cover
         _logger.debug(
-            "Skipping schema update due to lack of writing rights on %s", store_file
+            "Skipping schema update due to lack of writing rights on %s",
+            store_file,
         )
         return -1
     _logger.debug("Checking for updated schemas...")
@@ -64,7 +65,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         url = data["url"]
         if "#" in url:
             raise RuntimeError(
-                f"Schema URLs cannot contain # due to python-jsonschema limitation: {url}"
+                f"Schema URLs cannot contain # due to python-jsonschema limitation: {url}",
             )
         path = Path(f"{os.path.relpath(os.path.dirname(__file__))}/{kind}.json")
         _logger.debug("Refreshing %s schema ...", kind)
@@ -114,9 +115,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
 
 if __name__ == "__main__":
     if refresh_schemas(60 * 10):  # pragma: no cover
-        # flake8: noqa: T201
         print("Schemas were updated.")
         sys.exit(1)
     else:  # pragma: no cover
-        # flake8: noqa: T201
         print("Schemas not updated", 0)

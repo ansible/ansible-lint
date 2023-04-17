@@ -16,8 +16,6 @@ from ansiblelint.testing.fixtures import *  # noqa: F403
 from ansiblelint.yaml_utils import FormattedYAML
 
 if TYPE_CHECKING:
-    from typing import List  # pylint: disable=ungrouped-imports
-
     from _pytest import nodes
     from _pytest.config import Config
     from _pytest.config.argparsing import Parser
@@ -49,11 +47,11 @@ def pytest_collection_modifyitems(items: list[nodes.Item], config: Config) -> No
     do_regenerate = config.getoption("--regenerate-formatting-fixtures")
     skip_other = pytest.mark.skip(
         reason="not a formatting_fixture test and "
-        "--regenerate-formatting-fixtures was specified"
+        "--regenerate-formatting-fixtures was specified",
     )
     skip_formatting_fixture = pytest.mark.skip(
         reason="specify --regenerate-formatting-fixtures to "
-        "only run formatting_fixtures test"
+        "only run formatting_fixtures test",
     )
     for item in items:
         if do_regenerate and "formatting_fixtures" not in item.keywords:

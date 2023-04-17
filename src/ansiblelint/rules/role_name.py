@@ -49,7 +49,6 @@ def _match_role_name_regex(role_name: str) -> bool:
 
 
 class RoleNames(AnsibleLintRule):
-    # Unable to use f-strings due to flake8 bug with AST parsing
     """Role name {0} does not match ``^[a-z][a-z0-9_]*$`` pattern."""
 
     id = "role-name"
@@ -63,7 +62,9 @@ class RoleNames(AnsibleLintRule):
     version_added = "v6.8.5"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         results = []
         if task["action"]["__ansible_module__"] in ROLE_IMPORT_ACTION_NAMES:
@@ -75,7 +76,7 @@ class RoleNames(AnsibleLintRule):
                         filename=file,
                         linenumber=task["action"].get("__line__", task["__line__"]),
                         tag=f"{self.id}[path]",
-                    )
+                    ),
                 )
         return results
 
@@ -105,17 +106,19 @@ class RoleNames(AnsibleLintRule):
                                     filename=file,
                                     linenumber=line,
                                     tag=f"{self.id}[path]",
-                                )
+                                ),
                             )
             return result
 
         if file.kind == "role":
             role_name = self._infer_role_name(
-                meta=file.path / "meta" / "main.yml", default=file.path.name
+                meta=file.path / "meta" / "main.yml",
+                default=file.path.name,
             )
         else:
             role_name = self._infer_role_name(
-                meta=file.path, default=file.path.resolve().parents[1].name
+                meta=file.path,
+                default=file.path.resolve().parents[1].name,
             )
 
         role_name = _remove_prefix(role_name, "ansible-role-")
@@ -124,7 +127,7 @@ class RoleNames(AnsibleLintRule):
                 self.create_matcherror(
                     filename=file,
                     message=self.shortdesc.format(role_name),
-                )
+                ),
             )
         return result
 
@@ -151,7 +154,9 @@ if "pytest" in sys.modules:
         (pytest.param("examples/playbooks/rule-role-name-path.yml", 3, id="fail"),),
     )
     def test_role_name_path(
-        default_rules_collection: RulesCollection, test_file: str, failure: int
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failure: int,
     ) -> None:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()

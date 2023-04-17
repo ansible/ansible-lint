@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import re
+import sys
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from ansiblelint.constants import FILENAME_KEY, LINE_NUMBER_KEY
@@ -52,7 +54,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                     self.create_matcherror(
                         "Expected item in 'video_links' to be a dictionary",
                         filename=file,
-                    )
+                    ),
                 )
                 continue
 
@@ -62,7 +64,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                         "Expected item in 'video_links' to contain "
                         "only keys 'url' and 'title'",
                         filename=file,
-                    )
+                    ),
                 )
                 continue
 
@@ -78,3 +80,42 @@ class MetaVideoLinksRule(AnsibleLintRule):
                 results.append(self.create_matcherror(msg, filename=file))
 
         return results
+
+
+if "pytest" in sys.modules:
+    import pytest
+
+    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+
+    @pytest.mark.parametrize(
+        ("test_file", "failures"),
+        (
+            pytest.param(
+                "examples/roles/meta_video_links_fail/meta/main.yml",
+                (
+                    "Expected item in 'video_links' to be a dictionary",
+                    "Expected item in 'video_links' to contain only keys 'url' and 'title'",
+                    "URL format 'https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be' is not recognized. Expected it be a shared link from Vimeo, YouTube, or Google Drive.",
+                    "URL format 'www.acme.com/vid' is not recognized",
+                ),
+                id="1",
+            ),
+            pytest.param(
+                "examples/roles/meta_video_links_pass/meta/main.yml",
+                (),
+                id="2",
+            ),
+        ),
+    )
+    def test_video_links(
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: Sequence[str],
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(test_file, rules=default_rules_collection).run()
+        assert len(results) == len(failures)
+        for index, result in enumerate(results):
+            assert result.tag == "meta-video-links"
+            assert failures[index] in result.message

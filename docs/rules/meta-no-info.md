@@ -1,1 +1,0 @@
-../../src/ansiblelint/rules/meta_no_info.md

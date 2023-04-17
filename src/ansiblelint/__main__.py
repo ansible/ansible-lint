@@ -121,7 +121,7 @@ def initialize_options(arguments: list[str] | None = None) -> None:
             options.cache_dir_lock.acquire(timeout=180)
         except Timeout:  # pragma: no cover
             _logger.error(
-                "Timeout waiting for another instance of ansible-lint to release the lock."
+                "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
             sys.exit(LOCK_TIMEOUT_RC)
 
@@ -143,7 +143,8 @@ def _do_list(rules: RulesCollection) -> int:
         }
 
         console.print(
-            _rule_format_map.get(options.format, rules_as_str)(rules), highlight=False
+            _rule_format_map.get(options.format, rules_as_str)(rules),
+            highlight=False,
         )
         return 0
 
@@ -198,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     if options.version:
         console.print(
-            f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]"
+            f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]",
         )
         msg = get_version_warning()
         if msg:
@@ -214,7 +215,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     if options.progressive:
         _logger.warning(
-            "Progressive mode is deprecated and will be removed in next major version, use ignore files instead: https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files"
+            "Progressive mode is deprecated and will be removed in next major version, use ignore files instead: https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files",
         )
 
     if not options.offline:
@@ -250,7 +251,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     if result.matches and options.progressive:
         mark_as_success = False
         _logger.info(
-            "Matches found, running again on previous revision in order to detect regressions"
+            "Matches found, running again on previous revision in order to detect regressions",
         )
         with _previous_revision():
             _logger.debug("Options: %s", options)
@@ -379,7 +380,6 @@ def path_inject() -> None:
             paths[idx] = os.path.expanduser(path)
             expanded = True
     if expanded:  # pragma: no cover
-        # flake8: noqa: T201
         print(
             "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
             file=sys.stderr,
@@ -389,7 +389,7 @@ def path_inject() -> None:
 
     userbase_bin_path = f"{site.getuserbase()}/bin"
     if userbase_bin_path not in paths and os.path.exists(
-        f"{userbase_bin_path}/bin/ansible"
+        f"{userbase_bin_path}/bin/ansible",
     ):
         inject_paths.append(userbase_bin_path)
 
@@ -399,7 +399,6 @@ def path_inject() -> None:
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
         if inject_paths:
-            # flake8: noqa: T201
             print(
                 f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
                 file=sys.stderr,

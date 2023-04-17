@@ -57,7 +57,7 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
                         path, rule = entry.split()
                     except ValueError as exc:
                         raise RuntimeError(
-                            f"Unable to parse line '{line}' from {ignore_file} file."
+                            f"Unable to parse line '{line}' from {ignore_file} file.",
                         ) from exc
                     result[path].add(rule)
 

@@ -170,7 +170,9 @@ def nested_items_path(
     if data_collection is None:
         return
     yield from _nested_items_path(
-        data_collection=data_collection, parent_path=[], ignored_keys=ignored_keys
+        data_collection=data_collection,
+        parent_path=[],
+        ignored_keys=ignored_keys,
     )
 
 
@@ -190,16 +192,18 @@ def _nested_items_path(
     convert_to_tuples_type = Callable[[], Iterator[tuple[Union[str, int], Any]]]
     if isinstance(data_collection, dict):
         convert_data_collection_to_tuples = cast(
-            convert_to_tuples_type, functools.partial(data_collection.items)
+            convert_to_tuples_type,
+            functools.partial(data_collection.items),
         )
     elif isinstance(data_collection, list):
         convert_data_collection_to_tuples = cast(
-            convert_to_tuples_type, functools.partial(enumerate, data_collection)
+            convert_to_tuples_type,
+            functools.partial(enumerate, data_collection),
         )
     else:
         raise TypeError(
             f"Expected a dict or a list but got {data_collection!r} "
-            f"of type '{type(data_collection)}'"
+            f"of type '{type(data_collection)}'",
         )
     for key, value in convert_data_collection_to_tuples():
         if key in (SKIPPED_RULES_KEY, "__file__", "__line__", *ignored_keys):
@@ -207,7 +211,8 @@ def _nested_items_path(
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
             yield from _nested_items_path(
-                data_collection=value, parent_path=parent_path + [key]
+                data_collection=value,
+                parent_path=parent_path + [key],
             )
 
 
@@ -299,7 +304,6 @@ def _get_path_to_task_in_playbook(
             # last_line_number_in_block is 1-based; next_*_line_index is 0-based
             # next_*_line_index - 1 to get line before next_*_line_index.
             # Then + 1 to make it a 1-based number.
-            # So, last_line_number_in_block = next_*_line_index - 1 + 1
             if next_block_line_index is not None:
                 last_line_number_in_block = next_block_line_index
             elif next_play_line_index is not None:
@@ -308,7 +312,9 @@ def _get_path_to_task_in_playbook(
                 last_line_number_in_block = None
 
             task_path = _get_path_to_task_in_tasks_block(
-                line_number, play[tasks_keyword], last_line_number_in_block
+                line_number,
+                play[tasks_keyword],
+                last_line_number_in_block,
             )
             if task_path:
                 # mypy gets confused without this typehint
@@ -353,7 +359,10 @@ def _get_path_to_task_in_tasks_block(
         nested_task_keys = set(task.keys()).intersection(set(NESTED_TASK_KEYS))
         if nested_task_keys:
             subtask_path = _get_path_to_task_in_nested_tasks_block(
-                line_number, task, nested_task_keys, next_task_line_index
+                line_number,
+                task,
+                nested_task_keys,
+                next_task_line_index,
             )
             if subtask_path:
                 # mypy gets confused without this typehint
@@ -403,7 +412,6 @@ def _get_path_to_task_in_nested_tasks_block(
         # last_line_number_in_block is 1-based; next_*_line_index is 0-based
         # next_*_line_index - 1 to get line before next_*_line_index.
         # Then + 1 to make it a 1-based number.
-        # So, last_line_number_in_block = next_*_line_index - 1 + 1
         last_line_number_in_block = (
             next_task_key_line_index
             if next_task_key_line_index is not None
@@ -476,13 +484,17 @@ class CustomConstructor(RoundTripConstructor):
             if value_s[0] == "0":
                 # got an octal in YAML 1.1
                 ret = OctalIntYAML11(
-                    ret, width=None, underscore=underscore, anchor=node.anchor
+                    ret,
+                    width=None,
+                    underscore=underscore,
+                    anchor=node.anchor,
                 )
         return ret
 
 
 CustomConstructor.add_constructor(
-    "tag:yaml.org,2002:int", CustomConstructor.construct_yaml_int
+    "tag:yaml.org,2002:int",
+    CustomConstructor.construct_yaml_int,
 )
 
 
@@ -520,7 +532,8 @@ class FormattedEmitter(Emitter):
     def expect_document_root(self) -> None:
         """Expect doc root (extend to record if the root doc is a sequence)."""
         self._root_is_sequence = isinstance(
-            self.event, ruamel.yaml.events.SequenceStartEvent
+            self.event,
+            ruamel.yaml.events.SequenceStartEvent,
         )
         return super().expect_document_root()
 
@@ -699,7 +712,6 @@ class FormattedYAML(YAML):
         typ: str | None = None,
         pure: bool = False,
         output: Any = None,
-        # input: Any = None,
         plug_ins: list[str] | None = None,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
@@ -813,14 +825,10 @@ class FormattedYAML(YAML):
         # This will only preserve quotes for strings read from the file.
         # anything modified by the transform will use no quotes, preferred_quote,
         # or the quote that results in the least amount of escaping.
-        # self.preserve_quotes = True
 
         # If needed, we can use this to change null representation to be explicit
         # (see https://stackoverflow.com/a/44314840/1134951)
         # self.Representer.add_representer(
-        #     type(None),
-        #     lambda self, data: self.represent_scalar("tag:yaml.org,2002:null", "null"),
-        # )
 
     @staticmethod
     def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:
@@ -972,14 +980,11 @@ class FormattedYAML(YAML):
         #     DocumentStartToken.comment -> DocumentStartEvent.comment
         #   Then, in the composer:
         #     once in composer.current_event
-        #       composer.compose_document()
         #         discards DocumentStartEvent
         #           move DocumentStartEvent to composer.last_event
-        #           node = composer.compose_node(None, None)
         #             all document nodes get composed (events get used)
         #         discard DocumentEndEvent
         #           move DocumentEndEvent to composer.last_event
-        #         return node
         # So, there's no convenient way to extend the composer
         # to somehow capture the comments and pass them on.
 

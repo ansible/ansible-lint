@@ -10,8 +10,6 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -85,7 +83,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
                                     tag="sanity[cannot-ignore]",
                                     linenumber=line_num,
                                     filename=file,
-                                )
+                                ),
                             )
 
                     except ValueError:
@@ -95,7 +93,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
                                 tag="sanity[bad-ignore]",
                                 linenumber=line_num,
                                 filename=file,
-                            )
+                            ),
                         )
 
         return results

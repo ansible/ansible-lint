@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from typing import Any
 
@@ -45,7 +46,8 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="empty-playbook",
         regex=re.compile(
-            "Empty playbook, nothing to do", re.MULTILINE | re.S | re.DOTALL
+            "Empty playbook, nothing to do",
+            re.MULTILINE | re.S | re.DOTALL,
         ),
     ),
     KnownError(
@@ -72,33 +74,42 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     def _get_ansible_syntax_check_matches(lintable: Lintable) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
         default_rule: BaseRule = AnsibleSyntaxCheckRule()
+        fh = None
         results = []
         if lintable.kind not in ("playbook", "role"):
             return []
 
         with timed_info(
-            "Executing syntax check on %s %s", lintable.kind, lintable.path
+            "Executing syntax check on %s %s",
+            lintable.kind,
+            lintable.path,
         ):
+            if lintable.kind == "role":
+                playbook_text = f"""
+---
+- name: Temporary playbook for role syntax check
+  hosts: localhost
+  tasks:
+    - ansible.builtin.import_role:
+        name: {str(lintable.path.expanduser())}
+"""
+                # pylint: disable=consider-using-with
+                fh = tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix="play")
+                fh.write(playbook_text)
+                fh.flush()
+                playbook_path = fh.name
+            else:
+                playbook_path = str(lintable.path.expanduser())
             # To avoid noisy warnings we pass localhost as current inventory:
             # [WARNING]: No inventory was parsed, only implicit localhost is available
             # [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
-            if lintable.kind == "playbook":
-                cmd = [
-                    "ansible-playbook",
-                    "-i",
-                    "localhost,",
-                    "--syntax-check",
-                    str(lintable.path.expanduser()),
-                ]
-            else:  # role
-                cmd = [
-                    "ansible",
-                    "localhost",
-                    "--syntax-check",
-                    "--module-name=include_role",
-                    "--args",
-                    f"name={str(lintable.path.expanduser())}",
-                ]
+            cmd = [
+                "ansible-playbook",
+                "-i",
+                "localhost,",
+                "--syntax-check",
+                playbook_path,
+            ]
             if options.extra_vars:
                 cmd.extend(["--extra-vars", json.dumps(options.extra_vars)])
 
@@ -157,7 +168,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                             rule=rule,
                             details=details,
                             tag=f"{rule.id}[{pattern.tag}]",
-                        )
+                        ),
                     )
 
             if not results:
@@ -175,9 +186,11 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                         rule=rule,
                         details=details,
                         tag=tag,
-                    )
+                    ),
                 )
 
+        if fh:
+            fh.close()
         return results
 
 
@@ -187,7 +200,8 @@ if "pytest" in sys.modules:
     def test_get_ansible_syntax_check_matches() -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(
-            "examples/playbooks/conflicting_action.yml", kind="playbook"
+            "examples/playbooks/conflicting_action.yml",
+            kind="playbook",
         )
         # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
@@ -230,9 +244,14 @@ if "pytest" in sys.modules:
 
     def test_syntax_check_role() -> None:
         """Validate syntax check of a broken role."""
+        # pylint: disable=import-outside-toplevel
+        from ansiblelint.rules import RulesCollection
+        from ansiblelint.runner import Runner
+
         lintable = Lintable("examples/playbooks/roles/invalid_due_syntax", kind="role")
         # pylint: disable=protected-access
-        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+        rules = RulesCollection()
+        result = Runner(lintable, rules=rules).run()
         assert len(result) == 1, result
         assert result[0].linenumber == 2
         assert result[0].filename == "examples/roles/invalid_due_syntax/tasks/main.yml"

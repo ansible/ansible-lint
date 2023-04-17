@@ -105,7 +105,8 @@ class AnsibleLintRule(BaseRule):
 
     @staticmethod
     def _enrich_matcherror_with_task_details(
-        match: MatchError, task: dict[str, Any]
+        match: MatchError,
+        task: dict[str, Any],
     ) -> None:
         match.task = task
         if not match.details:
@@ -156,7 +157,9 @@ class AnsibleLintRule(BaseRule):
             return matches
 
         for task in ansiblelint.utils.task_in_list(
-            data=file.data, kind=file.kind, filename=str(file.path)
+            data=file.data,
+            kind=file.kind,
+            filename=str(file.path),
         ):
             if task.error is not None:
                 # normalize_task converts AnsibleParserError to MatchError
@@ -177,7 +180,8 @@ class AnsibleLintRule(BaseRule):
                 continue
 
             if isinstance(result, Iterable) and not isinstance(
-                result, str
+                result,
+                str,
             ):  # list[MatchError]
                 # https://github.com/PyCQA/pylint/issues/6044
                 # pylint: disable=not-an-iterable
@@ -185,7 +189,8 @@ class AnsibleLintRule(BaseRule):
                     if match.tag in task.skip_tags:
                         continue
                     self._enrich_matcherror_with_task_details(
-                        match, task.normalized_task
+                        match,
+                        task.normalized_task,
                     )
                     matches.append(match)
                 continue
@@ -312,7 +317,6 @@ class TransformMixin:
         for segment in yaml_path:
             # The cast() calls tell mypy what types we expect.
             # Essentially this does:
-            #   target = target[segment]
             if isinstance(segment, str):
                 target = cast(MutableMapping[str, Any], target)[segment]
             elif isinstance(segment, int):
@@ -328,7 +332,7 @@ def load_plugins(  # noqa: max-complexity: 11
 
     def all_subclasses(cls: type) -> set[type]:
         return set(cls.__subclasses__()).union(
-            [s for c in cls.__subclasses__() for s in all_subclasses(c)]
+            [s for c in cls.__subclasses__() for s in all_subclasses(c)],
         )
 
     orig_sys_path = sys.path.copy()
@@ -350,11 +354,14 @@ def load_plugins(  # noqa: max-complexity: 11
         # or rules that do not have a valid id. For example, during testing
         # python may load other rule classes, some outside the tested rule
         # directories.
-        if getattr(rule, "id") and Path(inspect.getfile(rule)).parent.absolute() in [
-            Path(x).absolute() for x in dirs
-        ]:
-            if issubclass(rule, BaseRule) and rule.id not in rules:
-                rules[rule.id] = rule()
+        if (
+            getattr(rule, "id")
+            and Path(inspect.getfile(rule)).parent.absolute()
+            in [Path(x).absolute() for x in dirs]
+            and issubclass(rule, BaseRule)
+            and rule.id not in rules
+        ):
+            rules[rule.id] = rule()
     for rule in rules.values():  # type: ignore
         if isinstance(rule, AnsibleLintRule) and bool(rule.id):
             yield rule
@@ -387,7 +394,7 @@ class RulesCollection:
                 AnsibleParserErrorRule(),
                 LoadingFailureRule(),
                 WarningRule(),
-            ]
+            ],
         )
         for rule in load_plugins(rulesdirs):
             self.register(rule, conditional=conditional)
@@ -410,7 +417,7 @@ class RulesCollection:
                 obj.id in self.options.enable_list,
                 self.options.list_rules,
                 self.options.list_tags,
-            ]
+            ],
         ):
             obj._collection = self  # pylint: disable=protected-access
             self.rules.append(obj)
@@ -455,7 +462,7 @@ class RulesCollection:
                         filename=file,
                         rule=LoadingFailureRule(),
                         tag=f"{LoadingFailureRule.id}[{exc.__class__.__name__.lower()}]",
-                    )
+                    ),
                 ]
 
         for rule in self.rules:
@@ -480,7 +487,7 @@ class RulesCollection:
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
         return "\n".join(
-            [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)]
+            [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)],
         )
 
     def list_tags(self) -> str:
@@ -512,7 +519,6 @@ class RulesCollection:
                 result += f"{tag}:  # {desc}\n"
             else:
                 result += f"{tag}:\n"
-            # result += f"  rules:\n"
             for name in tags[tag]:
                 result += f"  - {name}\n"
         return result
@@ -546,8 +552,6 @@ def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:
                         profile,
                     )
                     rule.tags.remove(tag)
-                    # rule_col.rules.remove(rule)
-                    # break
             if "opt-in" in rule.tags:
                 rule.tags.remove("opt-in")
     _logger.debug("%s/%s rules included in the profile", len(rule_col), total_rules)

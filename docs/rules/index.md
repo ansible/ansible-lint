@@ -20,7 +20,6 @@
 - [load-failure][]
 - [loop-var-prefix][]
 - [meta-incorrect][]
-- [meta-no-info][]
 - [meta-no-tags][]
 - [meta-runtime][]
 - [meta-video-links][]

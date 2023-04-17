@@ -35,7 +35,8 @@ _PATH_VARS = [
 
 
 def expand_to_normalized_paths(
-    config: dict[str, Any], base_dir: str | None = None
+    config: dict[str, Any],
+    base_dir: str | None = None,
 ) -> None:
     """Mutate given config normalizing any path values in it."""
     # config can be None (-c /dev/null)
@@ -74,7 +75,9 @@ def load_config(config_file: str) -> dict[Any, Any]:
         return {}
 
     config_lintable = Lintable(
-        config_path, kind="ansible-lint-config", base_kind="text/yaml"
+        config_path,
+        kind="ansible-lint-config",
+        base_kind="text/yaml",
     )
 
     for error in validate_file_schema(config_lintable):
@@ -197,7 +200,9 @@ class WriteArgAction(argparse.Action):
 
     @classmethod
     def merge_write_list_config(
-        cls, from_file: list[str], from_cli: list[str]
+        cls,
+        from_file: list[str],
+        from_cli: list[str],
     ) -> list[str]:
         """Combine the write_list from file config with --write CLI arg.
 
@@ -328,7 +333,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "--write",
         dest="write_list",
         # this is a tri-state argument that takes an optional comma separated list:
-        #   not provided, --write, --write=a,b,c
         action=WriteArgAction,
         help="Allow ansible-lint to reformat YAML files and run rule transforms "
         "(Reformatting YAML files standardizes spacing, quotes, etc. "
@@ -509,7 +513,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
     # if either commandline parameter or config file option is set merge
     # with the other, if neither is set use the default
     for entry, default in lists_map.items():
-        if getattr(cli_config, entry, None) or entry in file_config.keys():
+        if getattr(cli_config, entry, None) or entry in file_config:
             value = getattr(cli_config, entry, [])
             value.extend(file_config.pop(entry, []))
         else:
@@ -557,7 +561,7 @@ def get_config(arguments: list[str]) -> Namespace:
         parser.error(
             f"argument -f: invalid choice: '{options.format}'. "
             f"In combination with argument -L only 'brief', "
-            f"'rich' or 'md' are supported with -f."
+            f"'rich' or 'md' are supported with -f.",
         )
 
     # save info about custom config file, as options.config_file may be modified by merge_config
@@ -575,7 +579,7 @@ def get_config(arguments: list[str]) -> Namespace:
 
     if not options.project_dir or not os.path.exists(options.project_dir):
         raise RuntimeError(
-            f"Failed to determine a valid project_dir: {options.project_dir}"
+            f"Failed to determine a valid project_dir: {options.project_dir}",
         )
 
     # Compute final verbosity level by subtracting -q counter.
@@ -592,7 +596,8 @@ def get_rules_dirs(rulesdir: list[str], use_default: bool = True) -> list[str]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
     default_custom_rulesdir = os.environ.get(
-        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, "custom")
+        CUSTOM_RULESDIR_ENVVAR,
+        os.path.join(DEFAULT_RULESDIR, "custom"),
     )
     custom_ruledirs = sorted(
         str(x.resolve())

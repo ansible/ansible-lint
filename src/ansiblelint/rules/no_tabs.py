@@ -37,7 +37,9 @@ class NoTabsRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         action = task["action"]["__ansible_module__"]
         for k, v, _ in nested_items_path(task):
@@ -56,7 +58,8 @@ if "pytest" in sys.modules:
     def test_no_tabs_rule(default_rules_collection: RulesCollection) -> None:
         """Test rule matches."""
         results = Runner(
-            "examples/playbooks/rule-no-tabs.yml", rules=default_rules_collection
+            "examples/playbooks/rule-no-tabs.yml",
+            rules=default_rules_collection,
         ).run()
         assert results[0].linenumber == 10
         assert results[0].message == NoTabsRule().shortdesc

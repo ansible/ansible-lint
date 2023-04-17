@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "Tyriar.sort-lines",
+        "charliermarsh.ruff",
         "esbenp.prettier-vscode",
         "hbenl.vscode-test-explorer",
         "ms-python.isort",
