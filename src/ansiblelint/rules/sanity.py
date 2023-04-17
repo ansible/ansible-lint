@@ -22,7 +22,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
         "Identifies non-allowed entries in the `tests/sanity/ignore*.txt files."
     )
     severity = "MEDIUM"
-    tags = ["experimental"]
+    tags = []
     version_added = "v6.14.0"
 
     # Partner Engineering defines this list. Please contact PE for changes.
