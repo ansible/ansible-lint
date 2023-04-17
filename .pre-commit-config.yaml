@@ -134,24 +134,6 @@ repos:
     hooks:
       - id: black
         language_version: python3
-  - repo: https://github.com/pycqa/flake8.git
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        language_version: python3
-        additional_dependencies:
-          - flake8-2020>=1.6.0
-          # - flake8-black>=0.1.1
-          - flake8-docstrings>=1.5.0
-          - flake8-print>=5.0
-          - flake8-pytest-style>=1.2.2
-          - flake8-future-annotations>=0.0.3
-  - repo: https://github.com/asottile/pyupgrade
-    # keep it after flake8
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
-        args: ["--py39-plus"]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.2.0
     hooks:
