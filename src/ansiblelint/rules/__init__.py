@@ -542,16 +542,4 @@ def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:
                 profile,
             )
             rule_col.remove(rule)
-        else:
-            for tag in ("opt-in", "experimental"):
-                if tag in rule.tags:
-                    _logger.debug(
-                        "Removing tag `%s` from `%s` rule because `%s` profile makes it mandatory.",
-                        tag,
-                        rule.id,
-                        profile,
-                    )
-                    rule.tags.remove(tag)
-            if "opt-in" in rule.tags:
-                rule.tags.remove("opt-in")
     _logger.debug("%s/%s rules included in the profile", len(rule_col), total_rules)
