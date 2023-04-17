@@ -7,7 +7,7 @@ import re
 import sys
 
 from ansiblelint.config import options
-from ansiblelint.constants import ANSIBLE_MOCKED_MODULE, INVALID_CONFIG_RC
+from ansiblelint.constants import ANSIBLE_MOCKED_MODULE, RC
 
 _logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ def _make_module_stub(module_name: str) -> None:
         )
     else:
         _logger.error("Config error: %s is not a valid module name.", module_name)
-        sys.exit(INVALID_CONFIG_RC)
+        sys.exit(RC.INVALID_CONFIG)
 
 
 def _write_module_stub(

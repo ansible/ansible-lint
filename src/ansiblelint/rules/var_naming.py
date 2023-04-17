@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 from ansible.parsing.yaml.objects import AnsibleUnicode
 
 from ansiblelint.config import options
-from ansiblelint.constants import LINE_NUMBER_KEY, SUCCESS_RC
+from ansiblelint.constants import LINE_NUMBER_KEY, RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.runner import Runner
@@ -235,7 +235,7 @@ if "pytest" in sys.modules:
             f"--config-file={conf_path}",
             role_path,
         )
-        assert result.returncode == SUCCESS_RC
+        assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout
 
     def test_is_invalid_variable_name() -> None:

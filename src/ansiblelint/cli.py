@@ -14,7 +14,7 @@ from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES, log_e
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
     DEFAULT_RULESDIR,
-    INVALID_CONFIG_RC,
+    RC,
 )
 from ansiblelint.file_utils import (
     Lintable,
@@ -68,7 +68,7 @@ def load_config(config_file: str) -> dict[Any, Any]:
         config_path = os.path.abspath(config_file)
         if not os.path.exists(config_path):
             _logger.error("Config file not found '%s'", config_path)
-            sys.exit(INVALID_CONFIG_RC)
+            sys.exit(RC.INVALID_CONFIG)
     config_path = config_path or get_config_path()
     if not config_path or not os.path.exists(config_path):
         # a missing default config file should not trigger an error
@@ -82,7 +82,7 @@ def load_config(config_file: str) -> dict[Any, Any]:
 
     for error in validate_file_schema(config_lintable):
         _logger.error("Invalid configuration file %s. %s", config_path, error)
-        sys.exit(INVALID_CONFIG_RC)
+        sys.exit(RC.INVALID_CONFIG)
 
     config = clean_json(config_lintable.data)
     if not isinstance(config, dict):

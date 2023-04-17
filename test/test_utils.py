@@ -38,7 +38,7 @@ from ansible_compat.runtime import Runtime
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
-from ansiblelint.constants import VIOLATIONS_FOUND_RC
+from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
@@ -292,7 +292,7 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     result = subprocess.run(cmd, check=False).returncode
 
     # We de expect to fail on our own repo due to test examples we have
-    assert result == VIOLATIONS_FOUND_RC
+    assert result == RC.VIOLATIONS_FOUND
 
     out, err = capfd.readouterr()
 

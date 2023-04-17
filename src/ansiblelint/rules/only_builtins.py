@@ -45,7 +45,7 @@ if "pytest" in sys.modules:
     # pylint: disable=ungrouped-imports
     import pytest
 
-    from ansiblelint.constants import SUCCESS_RC, VIOLATIONS_FOUND_RC
+    from ansiblelint.constants import RC
     from ansiblelint.testing import RunFromText, run_ansible_lint
 
     SUCCESS_PLAY = """
@@ -68,7 +68,7 @@ if "pytest" in sys.modules:
             "only-builtins",
             "examples/playbooks/rule-only-builtins.yml",
         )
-        assert result.returncode == VIOLATIONS_FOUND_RC
+        assert result.returncode == RC.VIOLATIONS_FOUND
         assert "Failed" in result.stderr
         assert "warning(s)" in result.stderr
         assert "only-builtins: Use only builtin actions" in result.stdout
@@ -85,7 +85,7 @@ if "pytest" in sys.modules:
             "examples/playbooks/rule-only-builtins.yml",
         )
         assert "only-builtins" not in result.stdout
-        assert result.returncode == SUCCESS_RC
+        assert result.returncode == RC.SUCCESS
 
     @pytest.mark.parametrize(
         "rule_runner",
