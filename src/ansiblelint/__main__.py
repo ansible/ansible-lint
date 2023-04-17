@@ -66,6 +66,19 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
+class LintLogHandler(logging.Handler):
+    """Custom handler that uses our rich stderr console."""
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            msg = self.format(record)
+            console_stderr.print(f"[dim]{msg}[/dim]", highlight=False)
+        except RecursionError:  # See issue 36272
+            raise
+        except Exception:  # pylint: disable=broad-exception-caught
+            self.handleError(record)
+
+
 def initialize_logger(level: int = 0) -> None:
     """Set up the global logging level based on the verbosity number."""
     # We are about to act on the root logger, which defaults to logging.WARNING.
@@ -78,7 +91,7 @@ def initialize_logger(level: int = 0) -> None:
         2: logging.DEBUG,
     }
 
-    handler = logging.StreamHandler()
+    handler = LintLogHandler()
     formatter = logging.Formatter("%(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
     logger = logging.getLogger()
