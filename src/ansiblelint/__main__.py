@@ -48,7 +48,7 @@ from ansiblelint.color import (
     reconfigure,
     render_yaml,
 )
-from ansiblelint.config import get_version_warning, options
+from ansiblelint.config import get_version_warning, log_entries, options
 from ansiblelint.constants import EXIT_CONTROL_C_RC, GIT_CMD, LOCK_TIMEOUT_RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.loaders import load_ignore_txt
@@ -184,7 +184,7 @@ def support_banner() -> None:
         )
 
 
-# pylint: disable=too-many-branches,too-many-statements
+# pylint: disable=too-many-branches,too-many-statements,too-many-locals
 def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
@@ -210,6 +210,8 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         support_banner()
 
     initialize_logger(options.verbosity)
+    for level, message in log_entries:
+        _logger.log(level, message)
     _logger.debug("Options: %s", options)
     _logger.debug(os.getcwd())
 

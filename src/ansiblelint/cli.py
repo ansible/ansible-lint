@@ -10,7 +10,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, Callable
 
-from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES
+from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES, log_entries
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
     DEFAULT_RULESDIR,
@@ -20,7 +20,7 @@ from ansiblelint.file_utils import (
     Lintable,
     abspath,
     expand_path_vars,
-    guess_project_dir,
+    find_project_root,
     normpath,
 )
 from ansiblelint.loaders import IGNORE_FILE
@@ -300,7 +300,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--project-dir",
         dest="project_dir",
-        default=".",
+        default=None,
         help="Location of project/repository, autodetected based on location "
         "of configuration file.",
     )
@@ -487,7 +487,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
 
     scalar_map = {
         "loop_var_prefix": None,
-        "project_dir": ".",
+        "project_dir": None,
         "profile": None,
         "sarif_file": None,
     }
@@ -565,7 +565,6 @@ def get_config(arguments: list[str]) -> Namespace:
         )
 
     # save info about custom config file, as options.config_file may be modified by merge_config
-    has_custom_config = not options.config_file
 
     file_config = load_config(options.config_file)
 
@@ -573,9 +572,18 @@ def get_config(arguments: list[str]) -> Namespace:
 
     options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
 
-    if has_custom_config and options.project_dir == ".":
-        project_dir = guess_project_dir(options.config_file)
+    if not options.project_dir:
+        project_dir, method = find_project_root(
+            srcs=options.lintables,
+            config_file=options.config_file,
+        )
         options.project_dir = os.path.expanduser(normpath(project_dir))
+        log_entries.append(
+            (
+                logging.INFO,
+                f"Identified `{project_dir}` as project root as project root containing {method}.",
+            ),
+        )
 
     if not options.project_dir or not os.path.exists(options.project_dir):
         raise RuntimeError(

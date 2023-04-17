@@ -139,6 +139,9 @@ used_old_tags: dict[str, str] = {}
 # Used to store collection list paths (with mock paths if needed)
 collection_list: list[str] = []
 
+# Used to store log messages before logging is initialized (level, message)
+log_entries: list[tuple[int, str]] = []
+
 
 def get_rule_config(rule_id: str) -> dict[str, Any]:
     """Get configurations for the rule ``rule_id``."""

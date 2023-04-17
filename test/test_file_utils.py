@@ -19,7 +19,7 @@ from ansiblelint.file_utils import (
     Lintable,
     expand_path_vars,
     expand_paths_vars,
-    guess_project_dir,
+    find_project_root,
     normpath,
     normpath_path,
 )
@@ -299,21 +299,27 @@ def test_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:
     assert lintable_detected.kind == result[lintable_expected.name]
 
 
-def test_guess_project_dir_tmp_path(tmp_path: Path) -> None:
-    """Verify guess_project_dir()."""
+def test_find_project_root_1(tmp_path: Path) -> None:
+    """Verify find_project_root()."""
+    # this matches black behavior in absence of any config files or .git/.hg  folders.
     with cwd(str(tmp_path)):
-        result = guess_project_dir(None)
-        assert result == str(tmp_path)
+        path, method = find_project_root([])
+        assert str(path) == "/"
+        assert method == "file system root"
 
 
-def test_guess_project_dir_dotconfig() -> None:
-    """Verify guess_project_dir()."""
+def test_find_project_root_dotconfig() -> None:
+    """Verify find_project_root()."""
+    # this expects to return examples folder as project root because this
+    # folder already has an .config/ansible-lint.yml file inside, which should
+    # be enough.
     with cwd("examples"):
         assert os.path.exists(
             ".config/ansible-lint.yml",
         ), "Test requires config file inside .config folder."
-        result = guess_project_dir(".config/ansible-lint.yml")
-        assert result == str(os.getcwd())
+        path, method = find_project_root([])
+        assert str(path) == str(os.getcwd())
+        assert method == ".config/ansible-lint.yml"
 
 
 BASIC_PLAYBOOK = """

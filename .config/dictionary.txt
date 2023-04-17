@@ -324,6 +324,7 @@ slackpkg
 slaveinput
 sortfunc
 sourcegraph
+srcs
 srpm
 ssbarnea
 stylesheet
