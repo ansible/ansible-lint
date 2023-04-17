@@ -11,12 +11,13 @@ RULE_DOC_URL = "https://ansible-lint.readthedocs.io/rules/"
 # Not using an IntEnum because only starting with py3.11 it will evaluate it
 # as int.
 class RC:  # pylint: disable=too-few-public-methods
-    """All exist codes used by ansible-lint."""
+    """All exit codes used by ansible-lint."""
 
     SUCCESS = 0
     VIOLATIONS_FOUND = 2
     INVALID_CONFIG = 3
     LOCK_TIMEOUT = 4
+    NO_FILES_MATCHED = 5
     EXIT_CONTROL_C = 130
 
 

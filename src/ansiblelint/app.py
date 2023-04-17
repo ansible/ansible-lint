@@ -223,8 +223,17 @@ class App:
                 files_count,
                 is_success=mark_as_success,
             )
-
-        return RC.SUCCESS if mark_as_success else RC.VIOLATIONS_FOUND
+        if mark_as_success:
+            if not files_count:
+                # success without any file being analyzed is reported as failure
+                # to match match, preventing accidents where linter was running
+                # not doing anything due to misconfiguration.
+                _logger.critical(
+                    "Linter finished without analyzing any file, check configuration and arguments given.",
+                )
+                return RC.NO_FILES_MATCHED
+            return RC.SUCCESS
+        return RC.VIOLATIONS_FOUND
 
     def report_summary(  # pylint: disable=too-many-branches,too-many-locals
         self,
