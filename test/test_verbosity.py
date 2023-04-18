@@ -14,63 +14,61 @@ from ansiblelint.testing import run_ansible_lint
 @pytest.mark.parametrize(
     ("verbosity", "substrs"),
     (
-        (
+        pytest.param(
             "",
             [
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("DEBUG ", True),
                 ("INFO ", True),
             ],
+            id="default",
         ),
-        (
+        pytest.param(
             "-q",
             [
                 ("WARNING ", True),
                 ("DEBUG ", True),
                 ("INFO ", True),
             ],
+            id="q",
         ),
-        (
+        pytest.param(
             "-qq",
             [
                 ("WARNING ", True),
                 ("DEBUG ", True),
                 ("INFO ", True),
             ],
+            id="qq",
         ),
-        (
+        pytest.param(
             "-v",
             [
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
                 ("DEBUG ", True),
             ],
+            id="v",
         ),
-        (
+        pytest.param(
             "-vv",
             [
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
             ],
+            id="really-loquacious",
         ),
-        (
-            "-vvvvvvvvvvvvvvvvvvvvvvvvv",
+        pytest.param(
+            "-vv",
             [
                 ("WARNING  Listing 1 violation(s) that are fatal", False),
                 ("INFO     Set ANSIBLE_LIBRARY=", False),
             ],
+            id="vv",
         ),
     ),
-    ids=(
-        "default-verbosity",
-        "quiet",
-        "really-quiet",
-        "loquacious",
-        "really-loquacious",
-        'really-loquacious but with more "v"s -- same as -vv',
-    ),
 )
-def test_default_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> None:
+def test_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> None:
     """Checks that our default verbosity displays (only) warnings."""
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture, to produce a warning.

@@ -160,7 +160,15 @@ def kind_from_path(path: Path, base: bool = False) -> FileType:
         return ""
 
     if path.is_dir():
-        return "role"
+        known_role_subfolders = ("tasks", "meta", "vars", "defaults", "handlers")
+        for filename in known_role_subfolders:
+            if (path / filename).is_dir():
+                return "role"
+        _logger.debug(
+            "Folder `%s` does not look like a role due to missing any of the common subfolders such: %s.",
+            path,
+            ", ".join(known_role_subfolders),
+        )
 
     if str(path) == "/dev/stdin":
         return "playbook"
