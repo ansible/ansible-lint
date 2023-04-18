@@ -49,7 +49,7 @@ from ansiblelint.color import (
     render_yaml,
 )
 from ansiblelint.config import get_version_warning, log_entries, options
-from ansiblelint.constants import EXIT_CONTROL_C_RC, GIT_CMD, LOCK_TIMEOUT_RC
+from ansiblelint.constants import GIT_CMD, RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.skip_utils import normalize_tag
@@ -136,7 +136,7 @@ def initialize_options(arguments: list[str] | None = None) -> None:
             _logger.error(
                 "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
-            sys.exit(LOCK_TIMEOUT_RC)
+            sys.exit(RC.LOCK_TIMEOUT)
 
     # Avoid extra output noise from Ansible about using devel versions
     if "ANSIBLE_DEVEL_WARNING" not in os.environ:  # pragma: no branch
@@ -373,7 +373,7 @@ def _run_cli_entrypoint() -> None:
         if exc.errno != errno.EPIPE:  # pragma: no cover
             raise
     except KeyboardInterrupt:  # pragma: no cover
-        sys.exit(EXIT_CONTROL_C_RC)
+        sys.exit(RC.EXIT_CONTROL_C)
     except RuntimeError as exc:  # pragma: no cover
         raise SystemExit(exc) from exc
 

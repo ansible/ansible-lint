@@ -16,7 +16,7 @@ from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
 from ansiblelint.config import PROFILES, get_version_warning
 from ansiblelint.config import options as default_options
-from ansiblelint.constants import RULE_DOC_URL, SUCCESS_RC, VIOLATIONS_FOUND_RC
+from ansiblelint.constants import RC, RULE_DOC_URL
 from ansiblelint.errors import MatchError
 from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.stats import SummarizedResults, TagStats
@@ -224,7 +224,7 @@ class App:
                 is_success=mark_as_success,
             )
 
-        return SUCCESS_RC if mark_as_success else VIOLATIONS_FOUND_RC
+        return RC.SUCCESS if mark_as_success else RC.VIOLATIONS_FOUND
 
     def report_summary(  # pylint: disable=too-many-branches,too-many-locals
         self,
