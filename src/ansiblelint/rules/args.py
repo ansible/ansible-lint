@@ -18,7 +18,7 @@ from unittest.mock import patch
 # pylint: disable=reimported
 import ansible.module_utils.basic as mock_ansible_module
 from ansible.module_utils import basic
-from ansible.plugins import loader
+from ansible.plugins.loader import PluginLoadContext, module_loader
 
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import MatchError
@@ -63,9 +63,9 @@ workarounds_inject_map = {
 
 
 @lru_cache
-def load_module(module_name: str) -> loader.PluginLoadContext:
+def load_module(module_name: str) -> PluginLoadContext:
     """Load plugin from module name and cache it."""
-    return loader.module_loader.find_plugin_with_context(module_name)
+    return module_loader.find_plugin_with_context(module_name)
 
 
 class ValidationPassed(Exception):
@@ -105,6 +105,16 @@ class ArgsRule(AnsibleLintRule):
             return []
 
         loaded_module = load_module(module_name)
+
+        # https://github.com/ansible/ansible-lint/issues/3200
+        # since "ps1" modules cannot be executed on POSIX platforms, we will
+        # avoid running this rule for such modules
+        if isinstance(
+            loaded_module.plugin_resolved_path,
+            str,
+        ) and loaded_module.plugin_resolved_path.endswith(".ps1"):
+            return []
+
         module_args = {
             key: value
             for key, value in task["action"].items()

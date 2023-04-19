@@ -83,3 +83,8 @@
         owner: false
         group: false
         use_ssh_args: true
+
+    - name: Create software directory (Windows module - Bug 3200)
+      ansible.windows.win_file:
+        path: "c:\\test_dir"
+        state: directory
