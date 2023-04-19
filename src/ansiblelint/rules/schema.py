@@ -86,6 +86,7 @@ class ValidateSchemaRule(AnsibleLintRule):
             if errors[0].startswith("Failed to load YAML file"):
                 _logger.debug(
                     "Ignored failure to load %s for schema validation, as !vault may cause it.",
+                    file,
                 )
                 return []
 

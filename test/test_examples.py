@@ -54,13 +54,28 @@ def test_example_custom_module(default_rules_collection: RulesCollection) -> Non
     assert len(result) == 0, f"{app.runtime.cache_dir}"
 
 
-def test_full_vault(default_rules_collection: RulesCollection) -> None:
-    """custom_module.yml is expected to pass."""
+def test_vault_full(default_rules_collection: RulesCollection) -> None:
+    """Check ability to process fully vaulted files."""
     result = Runner(
-        "examples/playbooks/vars/not_decryptable.yml",
+        "examples/playbooks/vars/vault_full.yml",
         rules=default_rules_collection,
     ).run()
     assert len(result) == 0
+
+
+def test_vault_partial(
+    default_rules_collection: RulesCollection,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Check ability to precess files that container !vault inside."""
+    result = Runner(
+        "examples/playbooks/vars/vault_partial.yml",
+        rules=default_rules_collection,
+    ).run()
+    assert len(result) == 0
+    # Ensure that we do not have side-effect extra logging even if the vault
+    # content cannot be decrypted.
+    assert caplog.record_tuples == []
 
 
 def test_custom_kinds() -> None:
