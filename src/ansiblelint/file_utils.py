@@ -256,7 +256,9 @@ class Lintable:
             _ = self.data  # pylint: disable=pointless-statement
 
         if self.kind == "plugin":
-            self.file = NamedTemporaryFile(mode="w+", suffix=f"_{name.name}.yaml", dir=self.dir)
+            self.file = NamedTemporaryFile(
+                mode="w+", suffix=f"_{name.name}.yaml", dir=self.dir
+            )
             self.filename = self.file.name
             self._content = self.parse_examples_from_plugin()
             self.file.write(self._content)
