@@ -259,6 +259,7 @@ pipx
 pkgcache  # linux
 pkgs
 placefolder
+plainexamples
 pluggy
 pluginmanager
 pmrun

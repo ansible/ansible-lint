@@ -256,8 +256,11 @@ class Lintable:
             _ = self.data  # pylint: disable=pointless-statement
 
         if self.kind == "plugin":
+            # pylint: disable=consider-using-with
             self.file = NamedTemporaryFile(
-                mode="w+", suffix=f"_{name.name}.yaml", dir=self.dir
+                mode="w+",
+                suffix=f"_{name.name}.yaml",
+                dir=self.dir,
             )
             self.filename = self.file.name
             self._content = self.parse_examples_from_plugin()
@@ -267,7 +270,7 @@ class Lintable:
             self.base_kind = "text/yaml"
 
 
-    def __del__(self):
+    def __del__(self) -> None:
         if hasattr(self, "file"):
             self.file.close()
 
