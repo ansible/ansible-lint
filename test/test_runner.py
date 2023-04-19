@@ -124,7 +124,13 @@ def test_runner_unicode_format(
     formatter.format(matches[0])
 
 
-@pytest.mark.parametrize("directory_name", ("test/", os.path.abspath("test")))
+@pytest.mark.parametrize(
+    "directory_name",
+    (
+        pytest.param("test/fixtures/verbosity-tests", id="rel"),
+        pytest.param(os.path.abspath("test/fixtures/verbosity-tests"), id="abs"),
+    ),
+)
 def test_runner_with_directory(
     default_rules_collection: RulesCollection,
     directory_name: str,
