@@ -64,7 +64,8 @@ def test_vault_full(default_rules_collection: RulesCollection) -> None:
 
 
 def test_vault_partial(
-    default_rules_collection: RulesCollection, caplog: pytest.LogCaptureFixture
+    default_rules_collection: RulesCollection,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Check ability to precess files that container !vault inside."""
     result = Runner(
