@@ -5,9 +5,10 @@
     - name: Rewrite shell to ansible.builtin.shell via the fqcn[action-core] transform # noqa: command-instead-of-shell
       shell: echo This rule should get matched by the fqcn[action-core] rule
       changed_when: false
-    - name: Rewrite openssh_keypair to community.crypto.openssh_keypair via the fqcn[action] transform
-      openssh_keypair:
-        path: /tmp/supersecret
+    - name: Rewrite docker_image_info to community.docker.docker_image_info via the fqcn[action] transform
+      docker_image_info:
+        name:
+          - busybox
     - name: Rewrite ansible.builtin.synchronize to ansible.posix.synchronize via the fqcn[canonical] transform
       ansible.builtin.synchronize:
         src: dummy
