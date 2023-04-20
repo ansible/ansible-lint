@@ -3,7 +3,7 @@ set -euo pipefail
 pushd examples/playbooks/collections >/dev/null
 MISSING=()
 export ANSIBLE_COLLECTIONS_PATH=.
-for COLLECTION in ansible.posix community.docker community.general community.molecule ansible.windows;
+for COLLECTION in ansible.posix community.docker community.general community.molecule ansible.windows community.crypto;
 do
     COL_NAME=${COLLECTION//\./-}
     FILENAME=$(find . -maxdepth 1 -name "$COL_NAME*" -print -quit)
