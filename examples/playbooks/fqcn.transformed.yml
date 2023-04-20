@@ -13,3 +13,10 @@
       ansible.posix.synchronize:
         src: dummy
         dest: dummy2
+
+    - name: Empty lines are respected # noqa: command-instead-of-shell
+      ansible.builtin.shell: echo empty line after this
+
+    - name: Comment lines are respected # noqa: command-instead-of-shell
+      ansible.builtin.shell: echo comment line after this
+      # This is just a comment for some reason
