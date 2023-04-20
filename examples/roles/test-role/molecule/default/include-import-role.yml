@@ -1,5 +1,5 @@
 ---
-- name: test
+- name: Fixture for test_run_playbook test
   gather_facts: false
   hosts: all
   roles:

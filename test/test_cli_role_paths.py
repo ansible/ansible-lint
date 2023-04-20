@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from ansiblelint.constants import RC
 from ansiblelint.testing import run_ansible_lint
 from ansiblelint.text import strip_ansi_escape
 
@@ -90,8 +91,12 @@ def test_run_playbook(local_test_dir: str) -> None:
     env = os.environ.copy()
     env["ANSIBLE_ROLES_PATH"] = role_path
 
-    result = run_ansible_lint(lintable, cwd=cwd, env=env)
-    assert "Use shell only when shell functionality is required" in result.stdout
+    result = run_ansible_lint("-f", "pep8", lintable, cwd=cwd, env=env)
+    # All 4 failures are expected to be found inside the included role and not
+    # from the playbook given as argument.
+    assert result.returncode == RC.VIOLATIONS_FOUND
+    assert "tasks/main.yml:2: command-instead-of-shell" in result.stdout
+    assert "tasks/world.yml:2: name[missing]" in result.stdout
 
 
 @pytest.mark.parametrize(

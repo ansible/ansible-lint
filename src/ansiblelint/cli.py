@@ -581,7 +581,7 @@ def get_config(arguments: list[str]) -> Namespace:
         log_entries.append(
             (
                 logging.INFO,
-                f"Identified `{project_dir}` as project root as project root containing {method}.",
+                f"Identified [filename]{project_dir}[/] as project root due [bold]{method}[/].",
             ),
         )
 
