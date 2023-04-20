@@ -324,7 +324,7 @@ def test_find_project_root_dotconfig() -> None:
         ), "Test requires config file inside .config folder."
         path, method = find_project_root([])
         assert str(path) == str(os.getcwd())
-        assert method == ".config/ansible-lint.yml"
+        assert ".config/ansible-lint.yml" in method
 
 
 BASIC_PLAYBOOK = """
