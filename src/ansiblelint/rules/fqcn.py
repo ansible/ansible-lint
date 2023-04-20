@@ -191,7 +191,8 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             # Unfortunately, a lot of data about Ansible content gets lost here, you only get a simple dict.
             # For now, just parse the error messages for the data about action names etc. and fix this later.
             if match.tag == "fqcn[action-core]":
-                current_action = match.message.split("(")[1][:-2]  # split at the first bracket, cut off the last bracket and dot
+                # split at the first bracket, cut off the last bracket and dot
+                current_action = match.message.split("(")[1][:-2]
                 # This will always replace builtin modules with "ansible.builtin" versions, not "ansible.legacy".
                 # The latter is technically more correct in what ansible has executed so far, the former is most likely better understood and more robust.
                 new_action = match.details.split("`")[1]
