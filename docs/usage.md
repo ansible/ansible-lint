@@ -290,7 +290,37 @@ follows:
   ansible-lint --profile=safety
   ```
 
+## Vaults
+
+As ansible-lint executes ansible, it also needs access to encrypted secrets. If
+you do not give access to them or you are concerned about security implications,
+you should consider refactoring your code to allow it to be linted without
+access to real secrets:
+
+- Configure dummy fallback values that are used during linting, so Ansible will
+  not complain about undefined variables.
+- Exclude the problematic files from the linting process.
+
+```yaml
+---
+# Example of avoiding undefined variable error
+foo: "{{ undefined_variable_name | default('dummy') }}"
+```
+
+Keep in mind that a well-written playbook or role should allow Ansible's syntax
+check from passing on it, even if you do not have access to the vault.
+
+Internally ansible-lint runs `ansible-playbook --syntax-check` on each playbook
+and also on roles. As ansible-code does not support running syntax-check
+directly on roles, the linter will create temporary playbooks that only include
+each role from your project. You will need to change the code of the role in a
+way that it does not produce syntax errors when called without any variables or
+arguments. This usually involves making use of `defaults/` but be sure that you
+fully understand [variable precedence].
+
 [code climate]:
   https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#data-types
 [sarif]:
   https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
+[variable precedence]:
+  https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
