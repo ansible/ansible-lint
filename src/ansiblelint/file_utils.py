@@ -519,9 +519,14 @@ def find_project_root(
             return directory, ".hg directory"
 
         for cfg_file in cfg_files:
-            if not os.path.isabs(cfg_file):
-                if (directory / cfg_file).is_file():
-                    return directory, str(cfg_file)
+            # note that if cfg_file is already absolute, 'directory' is ignored
+            resolved_cfg_path = directory / cfg_file
+            if resolved_cfg_path.is_file():
+                if os.path.isabs(cfg_file):
+                    directory = Path(cfg_file).parent
+                    if directory.name == ".config":
+                        directory = directory.parent
+                return directory, f"config file {resolved_cfg_path}"
 
     if not directory:
         return Path.cwd(), "current working directory"
