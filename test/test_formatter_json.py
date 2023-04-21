@@ -65,9 +65,9 @@ class TestCodeclimateJSONFormatter:
         assert "\n" not in output
 
     def test_single_match(self) -> None:
-        """Test negative case. Only lists are allowed. Otherwise a RuntimeError will be raised."""
+        """Test negative case. Only lists are allowed. Otherwise a TypeError will be raised."""
         assert isinstance(self.formatter, CodeclimateJSONFormatter)
-        with pytest.raises(RuntimeError):
+        with pytest.raises(TypeError):
             self.formatter.format_result(self.matches[0])  # type: ignore
 
     def test_result_is_list(self) -> None:

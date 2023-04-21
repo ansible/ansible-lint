@@ -24,7 +24,7 @@ def toidentifier(text: str) -> str:
     """Convert unsafe chars to ones allowed in variables."""
     result = re.sub(r"[\s-]+", "_", text)
     if not result.isidentifier():
-        raise RuntimeError(
+        raise RuntimeError(  # noqa: TRY003
             f"Unable to convert role name '{text}' to valid variable name.",
         )
     return result

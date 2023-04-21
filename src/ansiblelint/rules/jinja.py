@@ -317,7 +317,7 @@ class JinjaRule(AnsibleLintRule):
                     # process expression
                     # pylint: disable=unsupported-membership-test
                     if isinstance(expr_str, str) and "\n" in expr_str:
-                        raise NotImplementedError
+                        raise NotImplementedError  # noqa: TRY301
                     leading_spaces = " " * (len(expr_str) - len(expr_str.lstrip()))
                     expr_str = leading_spaces + blacken(expr_str.lstrip())
                     if tokens[
@@ -725,5 +725,5 @@ def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
         if LINE_NUMBER_KEY in ctx:
             line = ctx[LINE_NUMBER_KEY]
     if not isinstance(line, int):
-        raise RuntimeError("Line number is not an integer")
+        raise TypeError("Line number is not an integer")  # noqa: TRY003
     return line

@@ -46,7 +46,7 @@ def rules_as_md(rules: RulesCollection) -> str:
 
         if rule.help:
             if not rule.help.startswith(f"# {rule.id}"):  # pragma: no cover
-                raise RuntimeError(
+                raise RuntimeError(  # noqa: TRY003
                     f"Rule {rule.__class__} markdown help does not start with `# {rule.id}` header.\n{rule.help}",
                 )
             result += f"\n\n{rule.help}"

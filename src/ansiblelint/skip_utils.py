@@ -97,7 +97,7 @@ def append_skipped_rules(
         yaml_skip = _append_skipped_rules(pyyaml_data, lintable)
     except RuntimeError:
         # Notify user of skip error, do not stop, do not change exit code
-        _logger.error("Error trying to append skipped rules", exc_info=True)
+        _logger.exception("Error trying to append skipped rules", exc_info=True)
         return pyyaml_data
 
     if not yaml_skip:
@@ -193,7 +193,9 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
             continue
 
         if pyyaml_task.get("name") != ruamel_task.get("name"):
-            raise RuntimeError("Error in matching skip comment to a task")
+            raise RuntimeError(  # noqa: TRY003
+                "Error in matching skip comment to a task",
+            )  # noqa: TRY003
         pyyaml_task[SKIPPED_RULES_KEY] = _get_rule_skips_from_yaml(
             ruamel_task,
             lintable,

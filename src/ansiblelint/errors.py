@@ -57,7 +57,7 @@ class MatchError(ValueError):
         super().__init__(message)
 
         if rule.__class__ is RuntimeErrorRule and not message:
-            raise TypeError(
+            raise TypeError(  # noqa: TRY003
                 f"{self.__class__.__name__}() missing a "
                 "required argument: one of 'message' or 'rule'",
             )
@@ -66,11 +66,11 @@ class MatchError(ValueError):
 
         # Safety measure to ensure we do not end-up with incorrect indexes
         if linenumber == 0:  # pragma: no cover
-            raise RuntimeError(
+            raise RuntimeError(  # noqa: TRY003
                 "MatchError called incorrectly as line numbers start with 1",
             )
         if column == 0:  # pragma: no cover
-            raise RuntimeError(
+            raise RuntimeError(  # noqa: TRY003
                 "MatchError called incorrectly as column numbers start with 1",
             )
 

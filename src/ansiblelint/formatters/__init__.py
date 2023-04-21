@@ -137,7 +137,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
     def format_result(self, matches: list[MatchError]) -> str:
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
-            raise RuntimeError(
+            raise TypeError(  # noqa: TRY003
                 f"The {self.__class__} was expecting a list of MatchError.",
             )
 
@@ -205,7 +205,7 @@ class SarifFormatter(BaseFormatter[Any]):
     def format_result(self, matches: list[MatchError]) -> str:
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
-            raise RuntimeError(
+            raise TypeError(  # noqa: TRY003
                 f"The {self.__class__} was expecting a list of MatchError.",
             )
 

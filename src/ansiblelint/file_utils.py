@@ -77,9 +77,10 @@ def is_relative_to(path: Path, *other: Any) -> bool:
     """Return True if the path is relative to another path or False."""
     try:
         path.resolve().absolute().relative_to(*other)
-        return True
     except ValueError:
         return False
+
+    return True
 
 
 def normpath_path(path: str | BasePathLike) -> Path:
@@ -287,11 +288,11 @@ class Lintable:
         # Can raise UnicodeDecodeError
         try:
             self._content = self.path.expanduser().resolve().read_text(encoding="utf-8")
-        except FileNotFoundError as ex:
+        except FileNotFoundError:
             if vars(options).get("progressive"):
                 self._content = ""
             else:
-                raise ex
+                raise
         if self._original_content is None:
             self._original_content = self._content
 
@@ -310,7 +311,7 @@ class Lintable:
         has not already been populated.
         """
         if not isinstance(value, str):
-            raise TypeError(f"Expected str but got {type(value)}")
+            raise TypeError(f"Expected str but got {type(value)}")  # noqa: TRY003
         if self._original_content is None:
             if self._content is not None:
                 self._original_content = self._content

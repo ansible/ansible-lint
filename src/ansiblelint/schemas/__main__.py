@@ -64,7 +64,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
     for kind, data in JSON_SCHEMAS.items():
         url = data["url"]
         if "#" in url:
-            raise RuntimeError(
+            raise RuntimeError(  # noqa: TRY003
                 f"Schema URLs cannot contain # due to python-jsonschema limitation: {url}",
             )
         path = Path(f"{os.path.relpath(os.path.dirname(__file__))}/{kind}.json")

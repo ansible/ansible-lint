@@ -133,7 +133,7 @@ def initialize_options(arguments: list[str] | None = None) -> None:
         try:
             options.cache_dir_lock.acquire(timeout=180)
         except Timeout:  # pragma: no cover
-            _logger.error(
+            _logger.exception(
                 "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
             sys.exit(RC.LOCK_TIMEOUT)
@@ -426,7 +426,9 @@ def path_inject() -> None:
     # our dependency, but addressing this would be done by ansible-compat.
     for cmd in ("ansible", "git"):
         if not shutil.which(cmd):
-            raise RuntimeError(f"Failed to find runtime dependency '{cmd}' in PATH")
+            raise RuntimeError(  # noqa: TRY003
+                f"Failed to find runtime dependency '{cmd}' in PATH",
+            )
 
 
 # Based on Ansible implementation
