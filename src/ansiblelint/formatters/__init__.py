@@ -171,7 +171,8 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             # Append issue to result list
             result.append(issue)
 
-        return json.dumps(result, sort_keys=False, indent=2)
+        # Keep it single line due to https://github.com/ansible/ansible-navigator/issues/1490
+        return json.dumps(result, sort_keys=False)
 
     @staticmethod
     def _remap_severity(match: MatchError) -> str:
@@ -237,8 +238,8 @@ class SarifFormatter(BaseFormatter[Any]):
             "version": self.SARIF_SCHEMA_VERSION,
             "runs": runs,
         }
-
-        return json.dumps(report, sort_keys=False, indent=2)
+        # Keep it single line due to https://github.com/ansible/ansible-navigator/issues/1490
+        return json.dumps(report, sort_keys=False)
 
     def _extract_results(
         self,
