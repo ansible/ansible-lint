@@ -565,7 +565,7 @@ class FormattedEmitter(Emitter):
         """Select how to quote scalars if needed."""
         style = super().choose_scalar_style()
         if (
-            style == ""
+            style == ""  # noqa: PLC1901
             and self.event.value.startswith("0")
             and len(self.event.value) > 1
         ):

@@ -44,4 +44,4 @@ def test_profile_listing(capfd: CaptureFixture[str]) -> None:
     # WSL2 has "WSL2" in platform name but WSL1 has "microsoft":
     platform_name = platform.platform().lower()
     if all(word not in platform_name for word in ["wsl", "microsoft"]):
-        assert err == "", platform_name
+        assert not err, platform_name

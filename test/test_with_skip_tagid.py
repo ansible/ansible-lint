@@ -55,4 +55,4 @@ def test_run_skip_rule() -> None:
         executable="ansible-lint",
     )
     assert result.returncode == 0
-    assert result.stdout == ""
+    assert not result.stdout

@@ -234,8 +234,6 @@ ignore = [
   "INP",
   "ISC",
   "PGH",
-  "PIE",
-  "PLC",
   "PTH",
   "PLR",
   "PLW",
