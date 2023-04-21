@@ -59,7 +59,10 @@ class TestCodeclimateJSONFormatter:
     def test_result_is_json(self) -> None:
         """Test if returned string value is a JSON."""
         assert isinstance(self.formatter, CodeclimateJSONFormatter)
-        json.loads(self.formatter.format_result(self.matches))
+        output = self.formatter.format_result(self.matches)
+        json.loads(output)
+        # https://github.com/ansible/ansible-navigator/issues/1490
+        assert "\n" not in output
 
     def test_single_match(self) -> None:
         """Test negative case. Only lists are allowed. Otherwise a RuntimeError will be raised."""
