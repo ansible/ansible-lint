@@ -670,8 +670,12 @@ def task_to_str(task: dict[str, Any]) -> str:
         ]
     ]
 
-    for item in action.get("_raw_params", []):
-        args.append(str(item))
+    _raw_params = action.get("_raw_params", [])
+    if isinstance(_raw_params, list):
+        for item in _raw_params:
+            args.append(str(item))
+    else:
+        args.append(_raw_params)
 
     return f"{action['__ansible_module__']} {' '.join(args)}"
 
