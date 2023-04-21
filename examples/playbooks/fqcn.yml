@@ -1,0 +1,16 @@
+---
+- name: FQCN transform test file
+  hosts: localhost
+  tasks:
+    - name: Rewrite shell to ansible.builtin.shell via the fqcn[action-core] transform # noqa: command-instead-of-shell
+      shell: echo This rule should get matched by the fqcn[action-core] rule
+      changed_when: false
+    - name: Rewrite openssh_keypair to community.crypto.openssh_keypair via the fqcn[action] transform
+      openssh_keypair:
+        path: /tmp/supersecret
+    - name: Rewrite ansible.builtin.synchronize to ansible.posix.synchronize via the fqcn[canonical] transform
+      ansible.builtin.synchronize:
+        src: dummy
+        dest: dummy2
+        owner: false
+        group: false

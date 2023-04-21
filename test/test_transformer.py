@@ -78,6 +78,7 @@ def fixture_runner_result(
         ),
         pytest.param("examples/playbooks/vars/strings.yml", 0, True, id="strings"),
         pytest.param("examples/playbooks/name-case.yml", 1, True, id="name_case"),
+        pytest.param("examples/playbooks/fqcn.yml", 3, True, id="fqcn"),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
