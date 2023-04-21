@@ -568,3 +568,11 @@ def test_bug_2513(
         results = Runner(filename, rules=default_rules_collection).run()
         assert len(results) == 1
         assert results[0].rule.id == "name"
+
+
+def test_lintable_singleton() -> None:
+    """Validate that Lintables are singletons."""
+
+    lintable1 = Lintable("/dev/null")
+    lintable2 = Lintable("/dev/null")
+    assert id(lintable1) == id(lintable2)

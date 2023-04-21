@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+import inspect
 import logging
 import os
 import subprocess
@@ -177,8 +178,35 @@ def kind_from_path(path: Path, base: bool = False) -> FileType:
     return ""
 
 
+class SingletonArgs(type):
+    """Singleton that keep single instance for single set of arguments."""
+
+    _instances: dict[Any, Any] = {}
+    _init: dict[Any, Any] = {}
+
+    # pylint: disable=unused-argument
+    def __init__(cls, name: str, bases: list[Any], dct: dict[Any, Any]):
+        cls._init[cls] = dct.get("__init__", None)
+
+    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
+        init = cls._init[cls]
+        key: frozenset[Any] | type
+        if init is not None:
+            sig = inspect.signature(init)
+            # Passing through the arguments made to the function
+            bound_args = sig.bind(*args, **kwargs)
+            bound_args.apply_defaults()
+            key = frozenset([init, None, *bound_args.arguments.items()])
+        else:
+            key = cls
+
+        if key not in cls._instances:
+            cls._instances[key] = super().__call__(*args, **kwargs)
+        return cls._instances[key]
+
+
 # pylint: disable=too-many-instance-attributes
-class Lintable:
+class Lintable(metaclass=SingletonArgs):
     """Defines a file/folder that can be linted.
 
     Providing file content when creating the object allow creation of in-memory
