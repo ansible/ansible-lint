@@ -99,7 +99,7 @@ RENAMED_TAGS = {
     "403": "package-latest",
     "404": "no-relative-paths",
     "501": "partial-become",
-    "502": "unnamed-task",
+    "502": "name[missing]",
     "503": "no-handler",
     "504": "deprecated-local-action",
     "505": "missing-import",

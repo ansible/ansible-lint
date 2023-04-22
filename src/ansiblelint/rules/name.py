@@ -179,7 +179,7 @@ if "pytest" in sys.modules:  # noqa: C901
     from ansiblelint.runner import Runner
 
     def test_file_positive() -> None:
-        """Positive test for unnamed-task."""
+        """Positive test for name[missing]."""
         collection = RulesCollection()
         collection.register(NameRule())
         success = "examples/playbooks/rule-name-missing-pass.yml"
@@ -187,7 +187,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert [] == good_runner.run()
 
     def test_file_negative() -> None:
-        """Negative test for unnamed-task."""
+        """Negative test for name[missing]."""
         collection = RulesCollection()
         collection.register(NameRule())
         failure = "examples/playbooks/rule-name-missing-fail.yml"
@@ -196,7 +196,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(errs) == 5
 
     def test_name_prefix_negative() -> None:
-        """Negative test for unnamed-task."""
+        """Negative test for name[missing]."""
         custom_options = deepcopy(options)
         custom_options.enable_list = ["name[prefix]"]
         collection = RulesCollection(options=custom_options)
