@@ -68,7 +68,7 @@ def load_module(module_name: str) -> PluginLoadContext:
     return module_loader.find_plugin_with_context(module_name)
 
 
-class ValidationPassed(Exception):
+class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
 
 
@@ -78,7 +78,7 @@ class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore
     def __init__(self, *args: str, **kwargs: str) -> None:
         """Initialize AnsibleModule mock."""
         super().__init__(*args, **kwargs)
-        raise ValidationPassed
+        raise ValidationPassedError
 
 
 class ArgsRule(AnsibleLintRule):
@@ -180,7 +180,7 @@ class ArgsRule(AnsibleLintRule):
 
                 sanitized_results = self._sanitize_results(results, module_name)
                 return sanitized_results
-            except ValidationPassed:
+            except ValidationPassedError:
                 return []
 
     # pylint: disable=unused-argument
