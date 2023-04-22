@@ -203,7 +203,10 @@ class JinjaRule(AnsibleLintRule):
                 lines = file.content.splitlines()
                 for match in raw_results:
                     # lineno starts with 1, not zero
-                    skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
+                    skip_list = get_rule_skips_from_line(
+                        line=lines[match.lineno - 1],
+                        lintable=file,
+                    )
                     if match.rule.id not in skip_list and match.tag not in skip_list:
                         results.append(match)
         else:

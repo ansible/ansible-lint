@@ -5,15 +5,16 @@ import logging
 import multiprocessing
 import multiprocessing.pool
 import os
+import warnings
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from typing import TYPE_CHECKING, Any
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
-from ansiblelint._internal.rules import LoadingFailureRule
+from ansiblelint._internal.rules import LoadingFailureRule, WarningRule
 from ansiblelint.constants import States
-from ansiblelint.errors import MatchError
+from ansiblelint.errors import LintWarning, MatchError, WarnSource
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
@@ -112,8 +113,51 @@ class Runner:
             for path in self.exclude_paths
         )
 
-    def run(self) -> list[MatchError]:  # noqa: C901
+    def run(self) -> list[MatchError]:
         """Execute the linting process."""
+        matches: list[MatchError] = []
+        with warnings.catch_warnings(record=True) as captured_warnings:
+            warnings.simplefilter("always")
+            matches = self._run()
+            for warn in captured_warnings:
+                # For the moment we are ignoring deprecation warnings as Ansible
+                # modules outside current content can generate them and user
+                # might not be able to do anything about them.
+                if warn.category is DeprecationWarning:
+                    continue
+                if warn.category is LintWarning:
+                    filename: None | Lintable = None
+                    if isinstance(warn.source, WarnSource):
+                        match = MatchError(
+                            message=warn.source.message or warn.category.__name__,
+                            rule=WarningRule(),
+                            filename=warn.source.filename.filename,
+                            tag=warn.source.tag,
+                            lineno=warn.source.lineno,
+                        )
+                    else:
+                        filename = warn.source
+                        # breakpoint()
+                        match = MatchError(
+                            message=warn.message
+                            if isinstance(warn.message, str)
+                            else "?",
+                            rule=WarningRule(),
+                            filename=str(filename),
+                        )
+                    matches.append(match)
+                    continue
+                _logger.warning(
+                    "%s:%s %s %s",
+                    warn.filename,
+                    warn.lineno or 1,
+                    warn.category.__name__,
+                    warn.message,
+                )
+        return matches
+
+    def _run(self) -> list[MatchError]:  # noqa: C901
+        """Run the linting (inner loop)."""
         files: list[Lintable] = []
         matches: list[MatchError] = []
 

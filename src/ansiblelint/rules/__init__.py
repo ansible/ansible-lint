@@ -119,7 +119,10 @@ class AnsibleLintRule(BaseRule):
             if line.lstrip().startswith("#"):
                 continue
 
-            rule_id_list = ansiblelint.skip_utils.get_rule_skips_from_line(line)
+            rule_id_list = ansiblelint.skip_utils.get_rule_skips_from_line(
+                line,
+                lintable=file,
+            )
             if self.id in rule_id_list:
                 continue
 

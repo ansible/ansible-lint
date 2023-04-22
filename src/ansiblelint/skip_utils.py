@@ -24,6 +24,7 @@ from __future__ import annotations
 import collections.abc
 import logging
 import re
+import warnings
 from functools import cache
 from itertools import product
 from typing import TYPE_CHECKING, Any
@@ -41,6 +42,7 @@ from ansiblelint.constants import (
     RENAMED_TAGS,
     SKIPPED_RULES_KEY,
 )
+from ansiblelint.errors import LintWarning, WarnSource
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
@@ -60,7 +62,11 @@ _noqa_comment_re = re.compile(r"^# noqa(\s|:)")
 # ansible.parsing.yaml.objects.AnsibleSequence
 
 
-def get_rule_skips_from_line(line: str) -> list[str]:
+def get_rule_skips_from_line(
+    line: str,
+    lintable: Lintable,
+    lineno: int = 1,
+) -> list[str]:
     """Return list of rule ids skipped via comment on the line of yaml."""
     _before_noqa, _noqa_marker, noqa_text = line.partition("# noqa")
 
@@ -69,10 +75,17 @@ def get_rule_skips_from_line(line: str) -> list[str]:
         if v in RENAMED_TAGS:
             tag = RENAMED_TAGS[v]
             if v not in _found_deprecated_tags:
-                _logger.warning(
-                    "Replaced outdated tag '%s' with '%s', replace it to avoid future regressions",
-                    v,
-                    tag,
+                msg = f"Replaced outdated tag '{v}' with '{tag}', replace it to avoid future errors"
+                warnings.warn(
+                    message=msg,
+                    category=LintWarning,
+                    source=WarnSource(
+                        filename=lintable,
+                        lineno=lineno,
+                        tag="warning[outdated-tag]",
+                        message=msg,
+                    ),
+                    stacklevel=0,
                 )
                 _found_deprecated_tags.add(v)
             v = tag
@@ -257,7 +270,11 @@ def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
                     if _noqa_comment_re.match(comment_str):
                         line = v.start_mark.line + 1  # ruamel line numbers start at 0
                         lintable.line_skips[line].update(
-                            get_rule_skips_from_line(comment_str.strip()),
+                            get_rule_skips_from_line(
+                                comment_str.strip(),
+                                lintable=lintable,
+                                lineno=line,
+                            ),
                         )
         yaml_comment_obj_strings.append(str(obj.ca.items))
         if isinstance(obj, dict):
@@ -277,7 +294,7 @@ def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
     rule_id_list = []
     for comment_obj_str in yaml_comment_obj_strings:
         for line in comment_obj_str.split(r"\n"):
-            rule_id_list.extend(get_rule_skips_from_line(line))
+            rule_id_list.extend(get_rule_skips_from_line(line, lintable=lintable))
 
     return [normalize_tag(tag) for tag in rule_id_list]
 
