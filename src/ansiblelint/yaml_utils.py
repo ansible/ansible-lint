@@ -218,17 +218,17 @@ def _nested_items_path(
 
 def get_path_to_play(
     lintable: Lintable,
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     ruamel_data: CommentedMap | CommentedSeq,
 ) -> list[str | int]:
     """Get the path to the play in the given file at the given line number."""
-    if line_number < 1:
-        raise ValueError(f"expected line_number >= 1, got {line_number}")
+    if lineno < 1:
+        raise ValueError(f"expected lineno >= 1, got {lineno}")
     if lintable.kind != "playbook" or not isinstance(ruamel_data, CommentedSeq):
         return []
     lc: LineCol  # lc uses 0-based counts # pylint: disable=invalid-name
-    # line_number is 1-based. Convert to 0-based.
-    line_index = line_number - 1
+    # lineno is 1-based. Convert to 0-based.
+    line_index = lineno - 1
 
     prev_play_line_index = ruamel_data.lc.line
     last_play_index = len(ruamel_data)
@@ -260,25 +260,25 @@ def get_path_to_play(
 
 def get_path_to_task(
     lintable: Lintable,
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     ruamel_data: CommentedMap | CommentedSeq,
 ) -> list[str | int]:
     """Get the path to the task in the given file at the given line number."""
-    if line_number < 1:
-        raise ValueError(f"expected line_number >= 1, got {line_number}")
+    if lineno < 1:
+        raise ValueError(f"expected lineno >= 1, got {lineno}")
     if lintable.kind in ("tasks", "handlers"):
         assert isinstance(ruamel_data, CommentedSeq)
-        return _get_path_to_task_in_tasks_block(line_number, ruamel_data)
+        return _get_path_to_task_in_tasks_block(lineno, ruamel_data)
     if lintable.kind == "playbook":
         assert isinstance(ruamel_data, CommentedSeq)
-        return _get_path_to_task_in_playbook(line_number, ruamel_data)
+        return _get_path_to_task_in_playbook(lineno, ruamel_data)
     # if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
 
     return []
 
 
 def _get_path_to_task_in_playbook(
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     ruamel_data: CommentedSeq,
 ) -> list[str | int]:
     """Get the path to the task in the given playbook data at the given line number."""
@@ -301,20 +301,20 @@ def _get_path_to_task_in_playbook(
                 next_block_line_index = None
             else:
                 next_block_line_index = play.lc.data[next_keyword][0]
-            # last_line_number_in_block is 1-based; next_*_line_index is 0-based
+            # last_lineno_in_block is 1-based; next_*_line_index is 0-based
             # next_*_line_index - 1 to get line before next_*_line_index.
             # Then + 1 to make it a 1-based number.
             if next_block_line_index is not None:
-                last_line_number_in_block = next_block_line_index
+                last_lineno_in_block = next_block_line_index
             elif next_play_line_index is not None:
-                last_line_number_in_block = next_play_line_index
+                last_lineno_in_block = next_play_line_index
             else:
-                last_line_number_in_block = None
+                last_lineno_in_block = None
 
             task_path = _get_path_to_task_in_tasks_block(
-                line_number,
+                lineno,
                 play[tasks_keyword],
-                last_line_number_in_block,
+                last_lineno_in_block,
             )
             if task_path:
                 # mypy gets confused without this typehint
@@ -323,20 +323,20 @@ def _get_path_to_task_in_playbook(
                     tasks_keyword,
                 ]
                 return tasks_keyword_path + list(task_path)
-    # line_number is before first play or no tasks keywords in any of the plays
+    # lineno is before first play or no tasks keywords in any of the plays
     return []
 
 
 def _get_path_to_task_in_tasks_block(
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     tasks_block: CommentedSeq,
-    last_line_number: int | None = None,  # 1-based
+    last_lineno: int | None = None,  # 1-based
 ) -> list[str | int]:
     """Get the path to the task in the given tasks block at the given line number."""
     task: CommentedMap | None
-    # line_number and last_line_number are 1-based. Convert to 0-based.
-    line_index = line_number - 1
-    last_line_index = None if last_line_number is None else last_line_number - 1
+    # lineno and last_lineno are 1-based. Convert to 0-based.
+    line_index = lineno - 1
+    last_line_index = None if last_lineno is None else last_lineno - 1
 
     # lc (LineCol) uses 0-based counts
     prev_task_line_index = tasks_block.lc.line
@@ -359,7 +359,7 @@ def _get_path_to_task_in_tasks_block(
         nested_task_keys = set(task.keys()).intersection(set(NESTED_TASK_KEYS))
         if nested_task_keys:
             subtask_path = _get_path_to_task_in_nested_tasks_block(
-                line_number,
+                lineno,
                 task,
                 nested_task_keys,
                 next_task_line_index,
@@ -391,7 +391,7 @@ def _get_path_to_task_in_tasks_block(
 
 
 def _get_path_to_task_in_nested_tasks_block(
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     task: CommentedMap,
     nested_task_keys: set[str],
     next_task_line_index: int | None = None,  # 0-based
@@ -409,18 +409,18 @@ def _get_path_to_task_in_nested_tasks_block(
             next_task_key_line_index = task.lc.data[next_task_key][0]
         else:
             next_task_key_line_index = None
-        # last_line_number_in_block is 1-based; next_*_line_index is 0-based
+        # last_lineno_in_block is 1-based; next_*_line_index is 0-based
         # next_*_line_index - 1 to get line before next_*_line_index.
         # Then + 1 to make it a 1-based number.
-        last_line_number_in_block = (
+        last_lineno_in_block = (
             next_task_key_line_index
             if next_task_key_line_index is not None
             else next_task_line_index
         )
         subtask_path = _get_path_to_task_in_tasks_block(
-            line_number,
+            lineno,
             nested_task_block,
-            last_line_number_in_block,  # 1-based
+            last_lineno_in_block,  # 1-based
         )
         if subtask_path:
             return [task_key] + list(subtask_path)

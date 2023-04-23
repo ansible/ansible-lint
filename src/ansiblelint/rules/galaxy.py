@@ -88,7 +88,7 @@ class GalaxyRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     message="galaxy.yaml should have version tag.",
-                    linenumber=data[LINE_NUMBER_KEY],
+                    lineno=data[LINE_NUMBER_KEY],
                     tag="galaxy[version-missing]",
                     filename=file,
                 ),
@@ -103,7 +103,7 @@ class GalaxyRule(AnsibleLintRule):
                 self.create_matcherror(
                     message="collection version should be greater than or equal to 1.0.0",
                     # pylint: disable=protected-access
-                    linenumber=version._line_number,
+                    lineno=version._line_number,
                     tag="galaxy[version-incorrect]",
                     filename=file,
                 ),

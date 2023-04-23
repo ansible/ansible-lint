@@ -277,7 +277,7 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
 
 
 @pytest.mark.parametrize(
-    ("file_path", "line_number", "expected_path"),
+    ("file_path", "lineno", "expected_path"),
     (
         # ignored lintables
         pytest.param(
@@ -504,21 +504,21 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
 )
 def test_get_path_to_play(
     lintable: Lintable,
-    line_number: int,
+    lineno: int,
     ruamel_data: CommentedMap | CommentedSeq,
     expected_path: list[int | str],
 ) -> None:
     """Ensure ``get_path_to_play`` returns the expected path given a file + line."""
     path_to_play = ansiblelint.yaml_utils.get_path_to_play(
         lintable,
-        line_number,
+        lineno,
         ruamel_data,
     )
     assert path_to_play == expected_path
 
 
 @pytest.mark.parametrize(
-    ("file_path", "line_number", "expected_path"),
+    ("file_path", "lineno", "expected_path"),
     (
         # ignored lintables
         pytest.param("examples/playbooks/vars/other.yml", 2, [], id="ignore_vars_file"),
@@ -877,21 +877,21 @@ def test_get_path_to_play(
 )
 def test_get_path_to_task(
     lintable: Lintable,
-    line_number: int,
+    lineno: int,
     ruamel_data: CommentedMap | CommentedSeq,
     expected_path: list[int | str],
 ) -> None:
     """Ensure ``get_task_to_play`` returns the expected path given a file + line."""
     path_to_task = ansiblelint.yaml_utils.get_path_to_task(
         lintable,
-        line_number,
+        lineno,
         ruamel_data,
     )
     assert path_to_task == expected_path
 
 
 @pytest.mark.parametrize(
-    ("file_path", "line_number"),
+    ("file_path", "lineno"),
     (
         pytest.param("examples/playbooks/become.yml", 0, id="1_play_playbook"),
         pytest.param(
@@ -903,34 +903,34 @@ def test_get_path_to_task(
         pytest.param("examples/playbooks/become.yml", 0, id="1_task_playbook"),
     ),
 )
-def test_get_path_to_play_raises_value_error_for_bad_line_number(
+def test_get_path_to_play_raises_value_error_for_bad_lineno(
     lintable: Lintable,
-    line_number: int,
+    lineno: int,
     ruamel_data: CommentedMap | CommentedSeq,
 ) -> None:
-    """Ensure ``get_path_to_play`` raises ValueError for line_number < 1."""
+    """Ensure ``get_path_to_play`` raises ValueError for lineno < 1."""
     with pytest.raises(
         ValueError,
-        match=f"expected line_number >= 1, got {line_number}",
+        match=f"expected lineno >= 1, got {lineno}",
     ):
-        ansiblelint.yaml_utils.get_path_to_play(lintable, line_number, ruamel_data)
+        ansiblelint.yaml_utils.get_path_to_play(lintable, lineno, ruamel_data)
 
 
 @pytest.mark.parametrize(
-    ("file_path", "line_number"),
+    ("file_path", "lineno"),
     (pytest.param("examples/roles/more_complex/tasks/main.yml", 0, id="tasks"),),
 )
-def test_get_path_to_task_raises_value_error_for_bad_line_number(
+def test_get_path_to_task_raises_value_error_for_bad_lineno(
     lintable: Lintable,
-    line_number: int,
+    lineno: int,
     ruamel_data: CommentedMap | CommentedSeq,
 ) -> None:
-    """Ensure ``get_task_to_play`` raises ValueError for line_number < 1."""
+    """Ensure ``get_task_to_play`` raises ValueError for lineno < 1."""
     with pytest.raises(
         ValueError,
-        match=f"expected line_number >= 1, got {line_number}",
+        match=f"expected lineno >= 1, got {lineno}",
     ):
-        ansiblelint.yaml_utils.get_path_to_task(lintable, line_number, ruamel_data)
+        ansiblelint.yaml_utils.get_path_to_task(lintable, lineno, ruamel_data)
 
 
 @pytest.mark.parametrize(

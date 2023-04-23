@@ -30,7 +30,7 @@ class TestCodeclimateJSONFormatter:
         self.matches.append(
             MatchError(
                 message="message",
-                linenumber=1,
+                lineno=1,
                 details="hello",
                 filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
@@ -39,7 +39,7 @@ class TestCodeclimateJSONFormatter:
         self.matches.append(
             MatchError(
                 message="message",
-                linenumber=2,
+                lineno=2,
                 details="hello",
                 filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
@@ -94,7 +94,7 @@ class TestCodeclimateJSONFormatter:
         assert "path" in single_match["location"]
         assert single_match["location"]["path"] == self.matches[0].filename
         assert "lines" in single_match["location"]
-        assert single_match["location"]["lines"]["begin"] == self.matches[0].linenumber
+        assert single_match["location"]["lines"]["begin"] == self.matches[0].lineno
         assert "positions" not in single_match["location"]
         # check that the 2nd match is marked as 'minor' because it was created with ignored=True
         assert result[1]["severity"] == "minor"
@@ -107,7 +107,7 @@ class TestCodeclimateJSONFormatter:
                 [
                     MatchError(
                         message="message",
-                        linenumber=1,
+                        lineno=1,
                         column=42,
                         details="hello",
                         filename=Lintable("filename.yml", content=""),

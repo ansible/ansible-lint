@@ -109,13 +109,7 @@ disallow_any_generics = true
 exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
 
 [[tool.mypy.overrides]]
-module = [
-  "ansible.*",
-  "yamllint.*",
-  "ansiblelint._version",
-  "ruamel.yaml",
-  "spdx.*"
-]
+module = ["ansible.*", "yamllint.*", "ansiblelint._version", "ruamel.yaml", "spdx.*"]
 ignore_missing_imports = true
 ignore_errors = true
 
@@ -126,6 +120,12 @@ extension-pkg-allow-list = ["black.parsing"]
 preferred-modules = ["py:pathlib", "unittest:pytest"]
 
 [tool.pylint.MASTER]
+bad-names = [
+  # spell-checker:ignore linenumber
+  "linenumber", # use lineno instead
+  "line_number", # use lineno instead
+
+]
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "ex", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:

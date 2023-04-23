@@ -38,7 +38,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             return [
                 self.create_matcherror(
                     message="All plays should be named.",
-                    linenumber=data[LINE_NUMBER_KEY],
+                    lineno=data[LINE_NUMBER_KEY],
                     tag="name[play]",
                     filename=file,
                 ),
@@ -47,7 +47,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             self._check_name(
                 data["name"],
                 lintable=file,
-                linenumber=data[LINE_NUMBER_KEY],
+                lineno=data[LINE_NUMBER_KEY],
             ),
         )
         return results
@@ -63,7 +63,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             results.append(
                 self.create_matcherror(
                     message="All tasks should be named.",
-                    linenumber=task[LINE_NUMBER_KEY],
+                    lineno=task[LINE_NUMBER_KEY],
                     tag="name[missing]",
                     filename=file,
                 ),
@@ -73,7 +73,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 self._prefix_check(
                     name,
                     lintable=file,
-                    linenumber=task[LINE_NUMBER_KEY],
+                    lineno=task[LINE_NUMBER_KEY],
                 ),
             )
         return results
@@ -82,7 +82,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         self,
         name: str,
         lintable: Lintable | None,
-        linenumber: int,
+        lineno: int,
     ) -> list[MatchError]:
         results: list[MatchError] = []
         effective_name = name
@@ -94,7 +94,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 self._check_name(
                     effective_name,
                     lintable=lintable,
-                    linenumber=linenumber,
+                    lineno=lineno,
                 ),
             )
         return results
@@ -103,7 +103,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         self,
         name: str,
         lintable: Lintable | None,
-        linenumber: int,
+        lineno: int,
     ) -> list[MatchError]:
         # This rules applies only to languages that do have uppercase and
         # lowercase letter, so we ignore anything else. On Unicode isupper()
@@ -124,7 +124,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
                         results.append(
                             self.create_matcherror(
                                 message=f"Task name should start with '{prefix}'.",
-                                linenumber=linenumber,
+                                lineno=lineno,
                                 tag="name[prefix]",
                                 filename=lintable,
                             ),
@@ -141,7 +141,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             results.append(
                 self.create_matcherror(
                     message="All names should start with an uppercase letter.",
-                    linenumber=linenumber,
+                    lineno=lineno,
                     tag="name[casing]",
                     filename=lintable,
                 ),
@@ -150,7 +150,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             results.append(
                 self.create_matcherror(
                     message="Jinja templates should only be at the end of 'name'",
-                    linenumber=linenumber,
+                    lineno=lineno,
                     tag="name[template]",
                     filename=lintable,
                 ),

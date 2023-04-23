@@ -109,7 +109,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
                     self.create_matcherror(
                         message=self.shortdesc,
                         filename=file,
-                        linenumber=data[LINE_NUMBER_KEY],
+                        lineno=data[LINE_NUMBER_KEY],
                     ),
                 ]
         return []
