@@ -112,9 +112,9 @@ exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbo
 module = [
   "ansible.*",
   "yamllint.*",
-  "ansiblelint._version",
+  "ansiblelint._version", # generated
   "ruamel.yaml",
-  "spdx.*"
+  "spdx.*",
 ]
 ignore_missing_imports = true
 ignore_errors = true
