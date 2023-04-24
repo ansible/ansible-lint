@@ -124,7 +124,7 @@ class Runner:
             if isinstance(lintable.data, States) and lintable.exc:
                 matches.append(
                     MatchError(
-                        filename=lintable,
+                        lintable=lintable,
                         message=str(lintable.exc),
                         details=str(lintable.exc.__cause__),
                         rule=LoadingFailureRule(),
@@ -208,7 +208,7 @@ class Runner:
                     exc.rule = LoadingFailureRule()
                     yield exc
                 except AttributeError:
-                    yield MatchError(filename=lintable, rule=LoadingFailureRule())
+                    yield MatchError(lintable=lintable, rule=LoadingFailureRule())
                 visited.add(lintable)
 
 

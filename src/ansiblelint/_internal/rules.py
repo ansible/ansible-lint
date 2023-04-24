@@ -156,6 +156,7 @@ class RuntimeErrorRule(BaseRule):
     """Unexpected internal error."""
 
     id = "internal-error"
+    shortdesc = "Unexpected internal error"
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v5.0.0"

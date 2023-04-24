@@ -64,11 +64,8 @@ def test_matcherror_compare(
 
 def test_matcherror_invalid() -> None:
     """Ensure that MatchError requires message or rule."""
-    expected_err = (
-        r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
-    )
-    with pytest.raises(TypeError, match=expected_err):
-        raise MatchError
+    with pytest.raises(TypeError):
+        MatchError()  # pylint: disable=pointless-exception-statement
 
 
 @pytest.mark.parametrize(
@@ -78,8 +75,8 @@ def test_matcherror_invalid() -> None:
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
         (
-            MatchError("a", filename=Lintable("b", content="")),
-            MatchError("a", filename=Lintable("a", content="")),
+            MatchError("a", lintable=Lintable("b", content="")),
+            MatchError("a", lintable=Lintable("a", content="")),
         ),
         # rule id partial-become > rule id no-changed-when
         (
@@ -182,7 +179,7 @@ def test_matcherror_compare_with_other_fallback(
     expected_value: bool,
 ) -> None:
     """Check that MatchError comparison runs other types fallbacks."""
-    assert operation(MatchError("foo"), other) is expected_value
+    assert operation(MatchError(message="foo"), other) is expected_value
 
 
 @pytest.mark.parametrize(

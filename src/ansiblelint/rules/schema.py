@@ -67,7 +67,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                 result.append(
                     MatchError(
                         message=msg,
-                        filename=file,
+                        lintable=file or Lintable(""),
                         rule=ValidateSchemaRule(),
                         details=ValidateSchemaRule.description,
                         tag=f"schema[{tag}]",
@@ -93,7 +93,7 @@ class ValidateSchemaRule(AnsibleLintRule):
             result.append(
                 MatchError(
                     message=errors[0],
-                    filename=file,
+                    lintable=file,
                     rule=ValidateSchemaRule(),
                     details=ValidateSchemaRule.description,
                     tag=f"schema[{file.kind}]",
