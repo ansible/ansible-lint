@@ -133,7 +133,7 @@ bad-names = [
 
 ]
 # pylint defaults + f,fh,v,id
-good-names = ["i", "j", "k", "ex", "Run", "_", "f", "fh", "v", "id", "T"]
+good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:
 ignore-paths = "^src/ansiblelint/(_version|_vendor).*$"
 

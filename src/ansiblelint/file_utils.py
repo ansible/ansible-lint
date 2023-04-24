@@ -286,11 +286,11 @@ class Lintable:
         # Can raise UnicodeDecodeError
         try:
             self._content = self.path.expanduser().resolve().read_text(encoding="utf-8")
-        except FileNotFoundError as ex:
+        except FileNotFoundError as exc:
             if vars(options).get("progressive"):
                 self._content = ""
             else:
-                raise ex
+                raise exc
         if self._original_content is None:
             self._original_content = self._content
 
