@@ -15,7 +15,7 @@ from collections.abc import Iterator
 import pytest
 from _pytest.fixtures import SubRequest
 
-from ansiblelint.config import options  # noqa: F401
+from ansiblelint.config import options
 from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import RunFromText

@@ -198,7 +198,7 @@ def support_banner() -> None:
 
 
 # pylint: disable=too-many-branches,too-many-statements,too-many-locals
-def main(argv: list[str] | None = None) -> int:  # noqa: C901
+def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
     path_inject()

@@ -111,7 +111,7 @@ class Runner:
             for path in self.exclude_paths
         )
 
-    def run(self) -> list[MatchError]:  # noqa: C901
+    def run(self) -> list[MatchError]:
         """Execute the linting process."""
         files: list[Lintable] = []
         matches: list[MatchError] = []

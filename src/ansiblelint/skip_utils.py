@@ -1,4 +1,4 @@
-# (c) 2019–2020, Ansible by Red Hat
+# (c) 2019-2020, Ansible by Red Hat
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -125,7 +125,7 @@ def load_data(file_text: str) -> Any:
         return yaml.load_all(file_text)
 
 
-def _append_skipped_rules(  # noqa: max-complexity: 12
+def _append_skipped_rules(  # : max-complexity: 12
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
@@ -235,7 +235,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
         yield task
 
 
-def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
+def _get_rule_skips_from_yaml(  # : max-complexity: 12
     yaml_input: Sequence[Any],
     lintable: Lintable,
 ) -> Sequence[Any]:

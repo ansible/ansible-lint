@@ -104,7 +104,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         return False
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports

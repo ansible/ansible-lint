@@ -206,7 +206,7 @@ def _set_collections_basedir(basedir: str) -> None:
     AnsibleCollectionConfig.playbook_paths = os.path.abspath(basedir)
 
 
-def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
+def find_children(lintable: Lintable) -> list[Lintable]:
     """Traverse children of a single file or folder."""
     if not lintable.path.exists():
         return []
@@ -618,7 +618,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
     _extract_ansible_parsed_keys_from_task(
         result,
         task,
-        ansible_parsed_keys + (action,),
+        (*ansible_parsed_keys, action),
     )
 
     if not isinstance(action, str):
@@ -841,7 +841,7 @@ def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
 
 
 @cache
-def parse_yaml_linenumbers(  # noqa: max-complexity: 12
+def parse_yaml_linenumbers(  # : max-complexity: 12
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.

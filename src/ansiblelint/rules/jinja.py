@@ -74,7 +74,7 @@ class JinjaRule(AnsibleLintRule):
         return self._tag2msg[tag].format(value=value, reformatted=reformatted)
 
     # pylint: disable=too-many-branches,too-many-locals
-    def matchtask(  # noqa: C901
+    def matchtask(
         self,
         task: dict[str, Any],
         file: Lintable | None = None,
@@ -240,7 +240,7 @@ class JinjaRule(AnsibleLintRule):
         return result
 
     # pylint: disable=too-many-branches,too-many-statements,too-many-locals
-    def check_whitespace(  # noqa: max-complexity: 13
+    def check_whitespace(  # : max-complexity: 13
         self,
         text: str,
         key: str,
@@ -369,7 +369,7 @@ def blacken(text: str) -> str:
     ).rstrip("\n")
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports

@@ -114,7 +114,7 @@ module = [
   "yamllint.*",
   "ansiblelint._version",
   "ruamel.yaml",
-  "spdx.*"
+  "spdx.*",
 ]
 ignore_missing_imports = true
 ignore_errors = true
@@ -242,7 +242,6 @@ ignore = [
   "PTH",
   "PLR",
   "PLW",
-  "RUF",
   "S",
   "SLF",
   "T",

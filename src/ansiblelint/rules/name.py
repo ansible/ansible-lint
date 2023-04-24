@@ -13,7 +13,7 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-    from ansiblelint.file_utils import Lintable  # noqa: F811
+    from ansiblelint.file_utils import Lintable
 
 
 class NameRule(AnsibleLintRule, TransformMixin):
@@ -172,7 +172,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             match.fixed = True
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     from ansiblelint.config import options
     from ansiblelint.file_utils import Lintable  # noqa: F811
     from ansiblelint.rules import RulesCollection
