@@ -11,7 +11,6 @@ profile: null # min, basic, moderate,safety, shared, production
 # option are parsed relative to the CWD of execution.
 exclude_paths:
   - .cache/ # implicit unless exclude_paths is defined in config
-  - .github/
   - test/fixtures/formatting-before/
   - test/fixtures/formatting-prettier/
 # parseable: true
