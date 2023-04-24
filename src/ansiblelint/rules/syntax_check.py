@@ -132,7 +132,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
         if run.returncode != 0:
             message = None
             filename = lintable
-            linenumber = 1
+            lineno = 1
             column = None
             tag = None
 
@@ -152,7 +152,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                     groups = match.groupdict()
                     title = groups.get("title", match.group(0))
                     details = groups.get("details", "")
-                    linenumber = int(groups.get("line", 1))
+                    lineno = int(groups.get("line", 1))
 
                     if "filename" in groups:
                         filename = Lintable(groups["filename"])
@@ -163,7 +163,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                         MatchError(
                             message=title,
                             filename=filename,
-                            linenumber=linenumber,
+                            lineno=lineno,
                             column=column,
                             rule=rule,
                             details=details,
@@ -181,7 +181,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                     MatchError(
                         message=message,
                         filename=filename,
-                        linenumber=linenumber,
+                        lineno=lineno,
                         column=column,
                         rule=rule,
                         details=details,
@@ -205,7 +205,7 @@ if "pytest" in sys.modules:
         )
         # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
-        assert result[0].linenumber == 4
+        assert result[0].lineno == 4
         assert result[0].column == 7
         assert (
             result[0].message
@@ -221,7 +221,7 @@ if "pytest" in sys.modules:
         lintable = Lintable("examples/playbooks/empty_playbook.yml", kind="playbook")
         # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
-        assert result[0].linenumber == 1
+        assert result[0].lineno == 1
         # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
         assert result[0].filename.endswith("/empty_playbook.yml")
@@ -253,7 +253,7 @@ if "pytest" in sys.modules:
         rules = RulesCollection()
         result = Runner(lintable, rules=rules).run()
         assert len(result) == 1, result
-        assert result[0].linenumber == 2
+        assert result[0].lineno == 2
         assert result[0].filename == "examples/roles/invalid_due_syntax/tasks/main.yml"
         assert result[0].tag == "syntax-check[specific]"
         assert result[0].message == "no module/action detected in task."

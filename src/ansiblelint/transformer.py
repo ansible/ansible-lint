@@ -131,11 +131,11 @@ class Transformer:
             if file_is_yaml and not match.yaml_path:
                 data = cast(Union[CommentedMap, CommentedSeq], data)
                 if match.match_type == "play":
-                    match.yaml_path = get_path_to_play(file, match.linenumber, data)
+                    match.yaml_path = get_path_to_play(file, match.lineno, data)
                 elif match.task or file.kind in (
                     "tasks",
                     "handlers",
                     "playbook",
                 ):
-                    match.yaml_path = get_path_to_task(file, match.linenumber, data)
+                    match.yaml_path = get_path_to_task(file, match.lineno, data)
             match.rule.transform(match, file, data)

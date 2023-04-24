@@ -2,7 +2,7 @@
 # Sync RTD redirects
 name: redirects
 
-on:
+"on":
   push:
     branches:
       - main

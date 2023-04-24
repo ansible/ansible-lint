@@ -74,7 +74,7 @@ class RoleNames(AnsibleLintRule):
                     self.create_matcherror(
                         f"Avoid using paths when importing roles. ({name})",
                         filename=file,
-                        linenumber=task["action"].get("__line__", task["__line__"]),
+                        lineno=task["action"].get("__line__", task["__line__"]),
                         tag=f"{self.id}[path]",
                     ),
                 )
@@ -104,7 +104,7 @@ class RoleNames(AnsibleLintRule):
                                 self.create_matcherror(
                                     f"Avoid using paths when importing roles. ({role_name})",
                                     filename=file,
-                                    linenumber=line,
+                                    lineno=line,
                                     tag=f"{self.id}[path]",
                                 ),
                             )

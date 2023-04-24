@@ -135,7 +135,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                             message=f"Use FQCN for builtin module actions ({module}).",
                             details=f"Use `{module_alias}` or `{legacy_module}` instead.",
                             filename=file,
-                            linenumber=task["__line__"],
+                            lineno=task["__line__"],
                             tag="fqcn[action-core]",
                         ),
                     )
@@ -146,7 +146,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                             message=f"Use FQCN for module actions, such `{self.module_aliases[module]}`.",
                             details=f"Action `{module}` is not FQCN.",
                             filename=file,
-                            linenumber=task["__line__"],
+                            lineno=task["__line__"],
                             tag="fqcn[action]",
                         ),
                     )
@@ -160,7 +160,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                         self.create_matcherror(
                             message=f"You should use canonical module name `{self.module_aliases[module]}` instead of `{module}`.",
                             filename=file,
-                            linenumber=task["__line__"],
+                            lineno=task["__line__"],
                             tag="fqcn[canonical]",
                         ),
                     )
@@ -173,7 +173,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             return [
                 self.create_matcherror(
                     message="Avoid `collections` keyword by using FQCN for all plugins, modules, roles and playbooks.",
-                    linenumber=data[LINE_NUMBER_KEY],
+                    lineno=data[LINE_NUMBER_KEY],
                     tag="fqcn[keyword]",
                     filename=file,
                 ),

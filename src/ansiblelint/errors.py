@@ -45,7 +45,7 @@ class MatchError(ValueError):
         message: str | None = None,
         # most linters report use (1,1) base, including yamllint and flake8
         # we should never report line 0 or column 0 in output.
-        linenumber: int = 1,
+        lineno: int = 1,
         column: int | None = None,
         details: str = "",
         filename: Lintable | None = None,
@@ -65,7 +65,7 @@ class MatchError(ValueError):
         self.message = str(message or getattr(rule, "shortdesc", ""))
 
         # Safety measure to ensure we do not end-up with incorrect indexes
-        if linenumber == 0:  # pragma: no cover
+        if lineno == 0:  # pragma: no cover
             raise RuntimeError(
                 "MatchError called incorrectly as line numbers start with 1",
             )
@@ -74,7 +74,7 @@ class MatchError(ValueError):
                 "MatchError called incorrectly as column numbers start with 1",
             )
 
-        self.linenumber = linenumber
+        self.lineno = lineno
         self.column = column
         self.details = details
         self.filename = ""
@@ -120,7 +120,7 @@ class MatchError(ValueError):
             _id,
             self.message,
             self.filename,
-            self.linenumber,
+            self.lineno,
             self.details,
         )
 
@@ -128,15 +128,15 @@ class MatchError(ValueError):
     def position(self) -> str:
         """Return error positioning, with column number if available."""
         if self.column:
-            return f"{self.linenumber}:{self.column}"
-        return str(self.linenumber)
+            return f"{self.lineno}:{self.column}"
+        return str(self.lineno)
 
     @property
     def _hash_key(self) -> Any:
         # line attr is knowingly excluded, as dict is not hashable
         return (
             self.filename,
-            self.linenumber,
+            self.lineno,
             str(getattr(self.rule, "id", 0)),
             self.message,
             self.details,
