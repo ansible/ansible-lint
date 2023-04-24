@@ -9,6 +9,7 @@ from collections.abc import Iterator
 
 import pytest
 
+from ansiblelint.config import Options
 from ansiblelint.rules import RulesCollection
 
 # noinspection PyProtectedMember
@@ -36,7 +37,7 @@ def fixture_copy_examples_dir(
 
 @pytest.fixture(name="runner_result")
 def fixture_runner_result(
-    config_options: Namespace,
+    config_options: Options,
     default_rules_collection: RulesCollection,
     playbook: str,
 ) -> LintResult:
@@ -82,7 +83,7 @@ def fixture_runner_result(
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
-    config_options: Namespace,
+    config_options: Options,
     copy_examples_dir: tuple[pathlib.Path, pathlib.Path],
     playbook: str,
     runner_result: LintResult,

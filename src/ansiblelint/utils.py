@@ -27,7 +27,6 @@ import inspect
 import logging
 import os
 import re
-from argparse import Namespace
 from collections.abc import ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache
@@ -55,7 +54,7 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
 )
 from ansiblelint.app import get_app
-from ansiblelint.config import options
+from ansiblelint.config import Options, options
 from ansiblelint.constants import (
     FILENAME_KEY,
     INCLUSION_ACTION_NAMES,
@@ -974,7 +973,7 @@ def is_playbook(filename: str) -> bool:
 
 # pylint: disable=too-many-statements
 def get_lintables(
-    opts: Namespace = Namespace(),
+    opts: Options = Options(),
     args: list[str] | None = None,
 ) -> list[Lintable]:
     """Detect files and directories that are lintable."""

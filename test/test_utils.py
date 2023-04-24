@@ -23,7 +23,6 @@ from __future__ import annotations
 import logging
 import subprocess
 import sys
-from argparse import Namespace
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -38,6 +37,7 @@ from ansible_compat.runtime import Runtime
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
+from ansiblelint.config import Options
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
@@ -324,7 +324,7 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
     options = cli.get_config(["--exclude", "foo"])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Namespace) -> list[str]:
+    def mockreturn(options: Options) -> list[str]:
         return ["foo/playbook.yml", "bar/playbook.yml"]
 
     monkeypatch.setattr(utils, "discover_lintables", mockreturn)
