@@ -14,7 +14,7 @@ from rich.table import Table
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
-from ansiblelint.config import PROFILES, get_version_warning
+from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RC, RULE_DOC_URL
 from ansiblelint.errors import MatchError
@@ -22,8 +22,6 @@ from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
-    from argparse import Namespace
-
     from ansiblelint._internal.rules import BaseRule
     from ansiblelint.file_utils import Lintable
     from ansiblelint.runner import LintResult
@@ -35,7 +33,7 @@ _logger = logging.getLogger(__package__)
 class App:
     """App class represents an execution of the linter."""
 
-    def __init__(self, options: Namespace):
+    def __init__(self, options: Options):
         """Construct app run based on already loaded configuration."""
         options.skip_list = _sanitize_list_options(options.skip_list)
         options.warn_list = _sanitize_list_options(options.warn_list)
@@ -332,7 +330,7 @@ class App:
 
 
 def choose_formatter_factory(
-    options_list: Namespace,
+    options_list: Options,
 ) -> type[formatters.BaseFormatter[Any]]:
     """Select an output formatter based on the incoming command line arguments."""
     r: type[formatters.BaseFormatter[Any]] = formatters.Formatter

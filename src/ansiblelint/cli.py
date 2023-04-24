@@ -10,7 +10,13 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, Callable
 
-from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES, log_entries
+from ansiblelint.config import (
+    DEFAULT_KINDS,
+    DEFAULT_WARN_LIST,
+    PROFILES,
+    Options,
+    log_entries,
+)
 from ansiblelint.constants import (
     CUSTOM_RULESDIR_ENVVAR,
     DEFAULT_RULESDIR,
@@ -56,13 +62,13 @@ def expand_to_normalized_paths(
         config[paths_var] = normalized_paths
 
 
-def load_config(config_file: str) -> dict[Any, Any]:
+def load_config(config_file: str | None) -> tuple[dict[Any, Any], str | None]:
     """Load configuration from disk."""
     config_path = None
 
     if config_file == "/dev/null":
         _logger.debug("Skipping config file as it was set to /dev/null")
-        return {}
+        return {}, config_file
 
     if config_file:
         config_path = os.path.abspath(config_file)
@@ -72,7 +78,7 @@ def load_config(config_file: str) -> dict[Any, Any]:
     config_path = config_path or get_config_path()
     if not config_path or not os.path.exists(config_path):
         # a missing default config file should not trigger an error
-        return {}
+        return {}, None
 
     config_lintable = Lintable(
         config_path,
@@ -91,7 +97,7 @@ def load_config(config_file: str) -> dict[Any, Any]:
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
 
-    return config
+    return config, config_path
 
 
 def get_config_path(config_file: str | None = None) -> str | None:
@@ -459,7 +465,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespace:
+def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
     """Combine the file config with the CLI args."""
     bools = (
         "display_relative_path",
@@ -546,10 +552,10 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
     return cli_config
 
 
-def get_config(arguments: list[str]) -> Namespace:
+def get_config(arguments: list[str]) -> Options:
     """Extract the config based on given args."""
     parser = get_cli_parser()
-    options = parser.parse_args(arguments)
+    options = Options(**vars(parser.parse_args(arguments)))
 
     # docs is not document, being used for internal documentation building
     if options.list_rules and options.format not in [
@@ -565,12 +571,13 @@ def get_config(arguments: list[str]) -> Namespace:
         )
 
     # save info about custom config file, as options.config_file may be modified by merge_config
-
-    file_config = load_config(options.config_file)
-
+    file_config, options.config_file = load_config(options.config_file)
     config = merge_config(file_config, options)
 
-    options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
+    options.rulesdirs = get_rules_dirs(
+        [str(r) for r in options.rulesdir],
+        options.use_default_rules,
+    )
 
     if not options.project_dir:
         project_dir, method = find_project_root(

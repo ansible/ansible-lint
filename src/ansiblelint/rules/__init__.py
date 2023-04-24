@@ -6,7 +6,6 @@ import inspect
 import logging
 import re
 import sys
-from argparse import Namespace
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, MutableMapping, MutableSequence
 from functools import lru_cache
@@ -26,7 +25,7 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
     WarningRule,
 )
-from ansiblelint.config import PROFILES, get_rule_config
+from ansiblelint.config import PROFILES, Options, get_rule_config
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
 from ansiblelint.errors import MatchError
@@ -373,7 +372,7 @@ class RulesCollection:
     def __init__(
         self,
         rulesdirs: list[str] | None = None,
-        options: Namespace = default_options,
+        options: Options = default_options,
         profile_name: str | None = None,
         conditional: bool = True,
     ) -> None:
