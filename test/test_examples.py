@@ -40,7 +40,7 @@ def test_example_syntax_error(
     assert result[0].rule.id == "syntax-check"
     # This also ensures that line and column numbers start at 1, so they
     # match what editors will show (or output from other linters)
-    assert result[0].linenumber == line
+    assert result[0].lineno == line
     assert result[0].column == column
 
 

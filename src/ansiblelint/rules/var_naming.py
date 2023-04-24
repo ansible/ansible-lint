@@ -78,7 +78,7 @@ class VariableNamingRule(AnsibleLintRule):
                 raw_results.append(
                     self.create_matcherror(
                         filename=file,
-                        linenumber=key.ansible_pos[1]
+                        lineno=key.ansible_pos[1]
                         if isinstance(key, AnsibleUnicode)
                         else our_vars[LINE_NUMBER_KEY],
                         message="Play defines variable '"
@@ -90,8 +90,8 @@ class VariableNamingRule(AnsibleLintRule):
         if raw_results:
             lines = file.content.splitlines()
             for match in raw_results:
-                # linenumber starts with 1, not zero
-                skip_list = get_rule_skips_from_line(lines[match.linenumber - 1])
+                # lineno starts with 1, not zero
+                skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
                 if match.rule.id not in skip_list and match.tag not in skip_list:
                     results.append(match)
 
@@ -111,7 +111,7 @@ class VariableNamingRule(AnsibleLintRule):
                 results.append(
                     self.create_matcherror(
                         filename=file,
-                        linenumber=our_vars[LINE_NUMBER_KEY],
+                        lineno=our_vars[LINE_NUMBER_KEY],
                         message=f"Task defines variable within 'vars' section that violates variable naming standards: {key}",
                         tag=f"var-naming[{key}]",
                     ),
@@ -128,7 +128,7 @@ class VariableNamingRule(AnsibleLintRule):
                     results.append(
                         self.create_matcherror(
                             filename=file,
-                            linenumber=task["action"][LINE_NUMBER_KEY],
+                            lineno=task["action"][LINE_NUMBER_KEY],
                             message=f"Task uses 'set_fact' to define variables that violates variable naming standards: {key}",
                             tag=f"var-naming[{key}]",
                         ),
@@ -140,7 +140,7 @@ class VariableNamingRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     filename=file,
-                    linenumber=task[LINE_NUMBER_KEY],
+                    lineno=task[LINE_NUMBER_KEY],
                     message=f"Task registers a variable that violates variable naming standards: {registered_var}",
                     tag=f"var-naming[{registered_var}]",
                 ),
@@ -161,7 +161,7 @@ class VariableNamingRule(AnsibleLintRule):
                     raw_results.append(
                         self.create_matcherror(
                             filename=file,
-                            linenumber=key.ansible_pos[1],
+                            lineno=key.ansible_pos[1],
                             message="File defines variable '"
                             + key
                             + "' that violates variable naming standards",
@@ -170,8 +170,8 @@ class VariableNamingRule(AnsibleLintRule):
             if raw_results:
                 lines = file.content.splitlines()
                 for match in raw_results:
-                    # linenumber starts with 1, not zero
-                    skip_list = get_rule_skips_from_line(lines[match.linenumber - 1])
+                    # lineno starts with 1, not zero
+                    skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
                     if match.rule.id not in skip_list and match.tag not in skip_list:
                         results.append(match)
         else:
@@ -221,7 +221,7 @@ if "pytest" in sys.modules:
 
         # list unexpected error lines or non-matching error lines
         expected_error_lines = [2, 6]
-        lines = [i.linenumber for i in results]
+        lines = [i.lineno for i in results]
         error_lines_difference = list(
             set(expected_error_lines).symmetric_difference(set(lines)),
         )

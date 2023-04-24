@@ -61,6 +61,6 @@ if "pytest" in sys.modules:
             "examples/playbooks/rule-no-tabs.yml",
             rules=default_rules_collection,
         ).run()
-        assert results[0].linenumber == 10
+        assert results[0].lineno == 10
         assert results[0].message == NoTabsRule().shortdesc
         assert len(results) == 2

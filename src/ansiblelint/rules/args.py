@@ -251,7 +251,7 @@ class ArgsRule(AnsibleLintRule):
         results.append(
             self.create_matcherror(
                 message=error_message,
-                linenumber=task[LINE_NUMBER_KEY],
+                lineno=task[LINE_NUMBER_KEY],
                 tag="args[module]",
                 filename=file,
             ),

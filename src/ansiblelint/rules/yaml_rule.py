@@ -52,7 +52,7 @@ class YamllintRule(AnsibleLintRule):
                 self.create_matcherror(
                     # yamllint does return lower-case sentences
                     message=problem.desc.capitalize(),
-                    linenumber=problem.line,
+                    lineno=problem.line,
                     details="",
                     filename=file,
                     tag=f"yaml[{problem.rule}]",

@@ -36,7 +36,7 @@ def test_format_coloured_string() -> None:
     """Test formetting colored."""
     match = MatchError(
         message="message",
-        linenumber=1,
+        lineno=1,
         details=DETAILS,
         filename=Lintable("filename.yml", content=""),
         rule=rule,
@@ -48,7 +48,7 @@ def test_unicode_format_string() -> None:
     """Test formatting unicode."""
     match = MatchError(
         message="\U0001f427",
-        linenumber=1,
+        lineno=1,
         details=DETAILS,
         filename=Lintable("filename.yml", content=""),
         rule=rule,
@@ -60,7 +60,7 @@ def test_dict_format_line() -> None:
     """Test formatting dictionary details."""
     match = MatchError(
         message="xyz",
-        linenumber=1,
+        lineno=1,
         details={"hello": "world"},  # type: ignore
         filename=Lintable("filename.yml", content=""),
         rule=rule,

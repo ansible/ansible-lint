@@ -49,7 +49,7 @@ class NoFormattingInWhenRule(AnsibleLintRule):
                         self.create_matcherror(
                             details=str({"when": role}),
                             filename=file,
-                            linenumber=role[LINE_NUMBER_KEY],
+                            lineno=role[LINE_NUMBER_KEY],
                         ),
                     )
         return errors
