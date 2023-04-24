@@ -5,5 +5,5 @@
       block:
         - name: 2nd level
           block:
-            - ansible.builtin.debug: # noqa: unnamed-task
+            - ansible.builtin.debug: # noqa: name[missing]
                 msg: "test unnamed task in block"
