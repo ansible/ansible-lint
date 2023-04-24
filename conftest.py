@@ -1,8 +1,12 @@
 """PyTest Fixtures."""
 import importlib
 import os
+import platform
 import subprocess
 import sys
+import warnings
+
+import pytest
 
 # Ensure we always run from the root of the repository
 if os.getcwd() != os.path.dirname(__file__):
@@ -39,11 +43,16 @@ from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-p
 if not HAS_LIBYAML:
     # While presence of libyaml is not required for runtime, we keep this error
     # fatal here in order to be sure that we spot libyaml errors during testing.
-    print(
-        "FATAL: For testing, we require pyyaml to be installed with its native extension, missing it would make testing 3x slower and risk missing essential bugs.",
-        file=sys.stderr,
-    )
-    sys.exit(1)
+    arch = platform.machine()
+    if arch not in ("arm64", "x86_64"):
+        warnings.warn(
+            f"This architecture ({arch}) is not supported by libyaml, performance will be degraded.",
+            category=RuntimeWarning,
+        )
+    else:
+        pytest.fail(
+            "FATAL: For testing, we require pyyaml to be installed with its native extension, missing it would make testing 3x slower and risk missing essential bugs.",
+        )
 
 
 os.environ["NO_COLOR"] = "1"
