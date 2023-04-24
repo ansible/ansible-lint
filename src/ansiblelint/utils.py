@@ -607,7 +607,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
             rule=AnsibleParserErrorRule(),
             message=exc.message,
             filename=task.get(FILENAME_KEY, "Unknown"),
-            linenumber=task.get(LINE_NUMBER_KEY, 0),
+            lineno=task.get(LINE_NUMBER_KEY, 0),
         )
 
     # denormalize shell -> command conversion

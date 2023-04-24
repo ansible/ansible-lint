@@ -39,7 +39,7 @@ class RunOnce(AnsibleLintRule):
                 filename=file,
                 tag=f"{self.id}[play]",
                 # pylint: disable=protected-access
-                linenumber=strategy._line_number,
+                lineno=strategy._line_number,
             ),
         ]
 
@@ -60,7 +60,7 @@ class RunOnce(AnsibleLintRule):
                 message="Using run_once may behave differently if strategy is set to free.",
                 filename=file,
                 tag=f"{self.id}[task]",
-                linenumber=task[LINE_NUMBER_KEY],
+                lineno=task[LINE_NUMBER_KEY],
             ),
         ]
 

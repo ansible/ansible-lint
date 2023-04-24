@@ -126,6 +126,12 @@ extension-pkg-allow-list = ["black.parsing"]
 preferred-modules = ["py:pathlib", "unittest:pytest"]
 
 [tool.pylint.MASTER]
+bad-names = [
+  # spell-checker:ignore linenumber
+  "linenumber", # use lineno instead
+  "line_number", # use lineno instead
+
+]
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "ex", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:

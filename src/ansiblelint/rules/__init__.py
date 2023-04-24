@@ -75,7 +75,7 @@ class AnsibleLintRule(BaseRule):
     def create_matcherror(
         self,
         message: str | None = None,
-        linenumber: int = 1,
+        lineno: int = 1,
         details: str = "",
         filename: Lintable | None = None,
         tag: str = "",
@@ -83,7 +83,7 @@ class AnsibleLintRule(BaseRule):
         """Instantiate a new MatchError."""
         match = MatchError(
             message=message,
-            linenumber=linenumber,
+            lineno=lineno,
             details=details,
             filename=filename,
             rule=copy.copy(self),
@@ -111,8 +111,8 @@ class AnsibleLintRule(BaseRule):
         match.task = task
         if not match.details:
             match.details = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-        if match.linenumber < task[LINE_NUMBER_KEY]:
-            match.linenumber = task[LINE_NUMBER_KEY]
+        if match.lineno < task[LINE_NUMBER_KEY]:
+            match.lineno = task[LINE_NUMBER_KEY]
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
@@ -134,7 +134,7 @@ class AnsibleLintRule(BaseRule):
                 message = result
             matcherror = self.create_matcherror(
                 message=message,
-                linenumber=prev_line_no + 1,
+                lineno=prev_line_no + 1,
                 details=line,
                 filename=file,
             )
@@ -204,7 +204,7 @@ class AnsibleLintRule(BaseRule):
                     message = result
                 match = self.create_matcherror(
                     message=message,
-                    linenumber=task.normalized_task[LINE_NUMBER_KEY],
+                    lineno=task.normalized_task[LINE_NUMBER_KEY],
                     filename=file,
                 )
 

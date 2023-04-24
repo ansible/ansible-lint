@@ -136,7 +136,7 @@ class JinjaRule(AnsibleLintRule):
                             result.append(
                                 self.create_matcherror(
                                     message=str(exc),
-                                    linenumber=_get_error_line(task, path),
+                                    lineno=_get_error_line(task, path),
                                     filename=file,
                                     tag=f"{self.id}[invalid]",
                                 ),
@@ -155,7 +155,7 @@ class JinjaRule(AnsibleLintRule):
                                     value=v,
                                     reformatted=reformatted,
                                 ),
-                                linenumber=_get_error_line(task, path),
+                                lineno=_get_error_line(task, path),
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
@@ -190,7 +190,7 @@ class JinjaRule(AnsibleLintRule):
                                     value=v,
                                     reformatted=reformatted,
                                 ),
-                                linenumber=v.ansible_pos[1],
+                                lineno=v.ansible_pos[1],
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
@@ -199,8 +199,8 @@ class JinjaRule(AnsibleLintRule):
             if raw_results:
                 lines = file.content.splitlines()
                 for match in raw_results:
-                    # linenumber starts with 1, not zero
-                    skip_list = get_rule_skips_from_line(lines[match.linenumber - 1])
+                    # lineno starts with 1, not zero
+                    skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
                     if match.rule.id not in skip_list and match.tag not in skip_list:
                         results.append(match)
         else:
@@ -388,7 +388,7 @@ if "pytest" in sys.modules:  # noqa: C901
         collection.register(JinjaRule())
         lintable = Lintable("examples/playbooks/jinja-spacing.yml")
         results = Runner(lintable, rules=collection).run()
-        return list(map(lambda item: item.linenumber, results))
+        return list(map(lambda item: item.lineno, results))
 
     def test_jinja_spacing_playbook(
         error_expected_lines: list[int],
@@ -411,7 +411,7 @@ if "pytest" in sys.modules:  # noqa: C901
         error_expected_lineno = [14, 15, 16, 17, 18, 19, 32]
         assert len(results) == len(error_expected_lineno)
         for idx, err in enumerate(results):
-            assert err.linenumber == error_expected_lineno[idx]
+            assert err.lineno == error_expected_lineno[idx]
 
     @pytest.mark.parametrize(
         ("text", "expected", "tag"),
@@ -702,10 +702,10 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(errs) == 2
         assert errs[0].tag == "jinja[spacing]"
         assert errs[0].rule.id == "jinja"
-        assert errs[0].linenumber == 9
+        assert errs[0].lineno == 9
         assert errs[1].tag == "jinja[invalid]"
         assert errs[1].rule.id == "jinja"
-        assert errs[1].linenumber == 9
+        assert errs[1].lineno == 9
 
     def test_jinja_valid() -> None:
         """Tests our ability to parse jinja, even when variables may not be defined."""

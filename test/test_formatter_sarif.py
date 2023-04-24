@@ -35,7 +35,7 @@ class TestSarifFormatter:
         self.matches.append(
             MatchError(
                 message="message",
-                linenumber=1,
+                lineno=1,
                 column=10,
                 details="details",
                 filename=Lintable("filename.yml", content=""),
@@ -46,7 +46,7 @@ class TestSarifFormatter:
         self.matches.append(
             MatchError(
                 message="message",
-                linenumber=2,
+                lineno=2,
                 details="",
                 filename=Lintable("filename.yml", content=""),
                 rule=self.rule,
@@ -114,7 +114,7 @@ class TestSarifFormatter:
             )
             assert (
                 result["locations"][0]["physicalLocation"]["region"]["startLine"]
-                == self.matches[i].linenumber
+                == self.matches[i].lineno
             )
             if self.matches[i].column:
                 assert (

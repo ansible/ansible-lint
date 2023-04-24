@@ -44,7 +44,7 @@ class NoFreeFormRule(AnsibleLintRule):
                     results.append(
                         self.create_matcherror(
                             message="Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
-                            linenumber=task[LINE_NUMBER_KEY],
+                            lineno=task[LINE_NUMBER_KEY],
                             filename=file,
                             tag=f"{self.id}[raw]",
                         ),
@@ -53,7 +53,7 @@ class NoFreeFormRule(AnsibleLintRule):
                 results.append(
                     self.create_matcherror(
                         message="Passing a non string value to `raw` module is neither documented or supported.",
-                        linenumber=task[LINE_NUMBER_KEY],
+                        lineno=task[LINE_NUMBER_KEY],
                         filename=file,
                         tag=f"{self.id}[raw-non-string]",
                     ),
@@ -78,7 +78,7 @@ class NoFreeFormRule(AnsibleLintRule):
                 results.append(
                     self.create_matcherror(
                         message=f"Avoid using free-form when calling module actions. ({action})",
-                        linenumber=task[LINE_NUMBER_KEY],
+                        lineno=task[LINE_NUMBER_KEY],
                         filename=file,
                     ),
                 )
