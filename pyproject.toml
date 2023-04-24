@@ -233,7 +233,6 @@ ignore = [
   "D",
   "G",
   "RET",
-  "N",
   "EM",
   "EXE",
   "FBT",
