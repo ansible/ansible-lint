@@ -376,7 +376,7 @@ def _run_cli_entrypoint() -> None:
         raise SystemExit(exc) from exc
 
 
-def path_inject() -> None:
+def path_inject() -> None:  # noqa: C901
     """Add python interpreter path to top of PATH to fix outside venv calling."""
     # This make it possible to call ansible-lint that was installed inside a
     # virtualenv without having to pre-activate it. Otherwise subprocess will

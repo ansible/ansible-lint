@@ -388,7 +388,7 @@ if "pytest" in sys.modules:  # noqa: C901
         collection.register(JinjaRule())
         lintable = Lintable("examples/playbooks/jinja-spacing.yml")
         results = Runner(lintable, rules=collection).run()
-        return list(map(lambda item: item.lineno, results))
+        return [item.lineno for item in results]
 
     def test_jinja_spacing_playbook(
         error_expected_lines: list[int],

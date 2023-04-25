@@ -91,7 +91,7 @@ class ArgsRule(AnsibleLintRule):
     version_added = "v6.10.0"
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
 
-    def matchtask(
+    def matchtask(  # noqa: C901
         self,
         task: dict[str, Any],
         file: Lintable | None = None,

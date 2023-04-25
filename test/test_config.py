@@ -5,7 +5,7 @@ from ansiblelint.rules import RulesCollection
 
 def test_profiles(default_rules_collection: RulesCollection) -> None:
     """Test the rules included in profiles are valid."""
-    profile_banned_tags = set(["opt-in", "experimental"])
+    profile_banned_tags = {"opt-in", "experimental"}
     for name, data in PROFILES.items():
         for profile_rule_id in data["rules"]:
             for rule in default_rules_collection.rules:
