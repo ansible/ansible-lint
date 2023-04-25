@@ -294,15 +294,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="parseable output, same as '-f pep8'",
     )
     parser.add_argument(
-        "--progressive",
-        dest="progressive",
-        default=False,
-        action="store_true",
-        help="Return success if number of violations compared with "
-        "previous git commit has not increased. This feature works "
-        "only in git repositories.",
-    )
-    parser.add_argument(
         "--project-dir",
         dest="project_dir",
         default=None,
@@ -472,7 +463,6 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         "quiet",
         "strict",
         "use_default_rules",
-        "progressive",
         "offline",
     )
     # maps lists to their default config values

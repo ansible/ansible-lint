@@ -210,7 +210,7 @@ class App:
                 "because 'yaml' is in 'skip_list'.",
             )
 
-        if mark_as_success and summary.failures and not self.options.progressive:
+        if mark_as_success and summary.failures:
             mark_as_success = False
 
         if not self.options.quiet:
