@@ -222,6 +222,7 @@ markers = ["eco: Tests effects on a set of 3rd party ansible repositories"]
 [tool.ruff]
 ignore = [
   "E501", # we use black
+  "ERA001", # auto-removal of commented out code affects development and vscode integration
   # temporary disabled until we fix them:
   "ANN",
   "ARG",
