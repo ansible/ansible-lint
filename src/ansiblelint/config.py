@@ -103,7 +103,7 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     cache_dir: str | None = None
     colored: bool = True
     configured: bool = False
-    cwd: Path = Path(".")
+    cwd: Path = Path(".")  # noqa: RUF009
     display_relative_path: bool = True
     exclude_paths: list[str] = field(default_factory=list)
     format: str = "brief"

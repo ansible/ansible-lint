@@ -155,7 +155,7 @@ def _coerce(other: object) -> Version:
     raise NotImplementedError(f"Unable to coerce object type {type(other)} to Version")
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports

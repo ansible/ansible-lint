@@ -617,7 +617,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
     _extract_ansible_parsed_keys_from_task(
         result,
         task,
-        ansible_parsed_keys + (action,),
+        (*ansible_parsed_keys, action),
     )
 
     if not isinstance(action, str):

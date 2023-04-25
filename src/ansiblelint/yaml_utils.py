@@ -212,7 +212,7 @@ def _nested_items_path(
         if isinstance(value, (dict, list)):
             yield from _nested_items_path(
                 data_collection=value,
-                parent_path=parent_path + [key],
+                parent_path=[*parent_path, key],
             )
 
 
@@ -423,7 +423,7 @@ def _get_path_to_task_in_nested_tasks_block(
             last_lineno_in_block,  # 1-based
         )
         if subtask_path:
-            return [task_key] + list(subtask_path)
+            return [task_key, *list(subtask_path)]
     # line is not part of this nested tasks block
     return []
 
@@ -623,7 +623,7 @@ class FormattedEmitter(Emitter):
         """Modify strings to protect "#" from full-line-comment post-processing."""
         try:
             if "#" in string:
-                # ＃ is \uFF03 (fullwidth number sign)
+                # # is \uFF03 (fullwidth number sign)
                 # ﹟ is \uFE5F (small number sign)
                 string = string.replace("#", "\uFF03#\uFE5F")
                 # this is safe even if this sequence is present
@@ -638,7 +638,7 @@ class FormattedEmitter(Emitter):
         """Remove string protection of "#" after full-line-comment post-processing."""
         try:
             if "\uFF03#\uFE5F" in string:
-                # ＃ is \uFF03 (fullwidth number sign)
+                # # is \uFF03 (fullwidth number sign)
                 # ﹟ is \uFE5F (small number sign)
                 string = string.replace("\uFF03#\uFE5F", "#")
         except (ValueError, TypeError):

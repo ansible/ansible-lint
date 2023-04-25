@@ -29,7 +29,8 @@ class OnlyBuiltinsRule(AnsibleLintRule):
         allowed_collections = [
             "ansible.builtin",
             "ansible.legacy",
-        ] + options.only_builtins_allow_collections
+            *options.only_builtins_allow_collections,
+        ]
         allowed_modules = builtins + options.only_builtins_allow_modules
 
         is_allowed = (
