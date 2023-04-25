@@ -73,7 +73,7 @@ class NoLogPasswordsRule(AnsibleLintRule):
         )
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports

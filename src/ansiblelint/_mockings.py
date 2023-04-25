@@ -55,7 +55,7 @@ def _write_module_stub(
 
 
 # pylint: disable=too-many-branches
-def _perform_mockings() -> None:  # noqa: C901
+def _perform_mockings() -> None:
     """Mock modules and roles."""
     for role_name in options.mock_roles:
         if re.match(r"\w+\.\w+\.\w+$", role_name):
@@ -74,7 +74,7 @@ def _perform_mockings() -> None:  # noqa: C901
             _make_module_stub(module_name)
 
 
-def _perform_mockings_cleanup() -> None:  # noqa: C901
+def _perform_mockings_cleanup() -> None:
     """Clean up mocked modules and roles."""
     for role_name in options.mock_roles:
         if re.match(r"\w+\.\w+\.\w+$", role_name):

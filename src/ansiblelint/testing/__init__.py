@@ -15,12 +15,12 @@ if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
     # pylint: disable=unsubscriptable-object
     CompletedProcess = subprocess.CompletedProcess[Any]
-    from ansiblelint.errors import MatchError  # noqa: E402
+    from ansiblelint.errors import MatchError
 else:
     CompletedProcess = subprocess.CompletedProcess
 
 # pylint: disable=wrong-import-position
-from ansiblelint.runner import Runner  # noqa: E402
+from ansiblelint.runner import Runner
 
 
 class RunFromText:

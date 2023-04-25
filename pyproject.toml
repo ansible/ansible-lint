@@ -239,7 +239,6 @@ ignore = [
   "PTH",
   "PLR",
   "PLW",
-  "RUF",
   "S",
   "SLF",
   "T",

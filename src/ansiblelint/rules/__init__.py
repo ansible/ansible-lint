@@ -324,7 +324,7 @@ class TransformMixin:
 
 
 # pylint: disable=too-many-nested-blocks
-def load_plugins(  # noqa: max-complexity: 11
+def load_plugins(  # : max-complexity: 11
     dirs: list[str],
 ) -> Iterator[AnsibleLintRule]:
     """Yield a rule class."""
@@ -437,7 +437,7 @@ class RulesCollection:
         """Combine rules."""
         self.rules.extend(more)
 
-    def run(  # noqa: max-complexity: 12
+    def run(  # : max-complexity: 12
         self,
         file: Lintable,
         tags: set[str] | None = None,

@@ -14,7 +14,7 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-    from ansiblelint.file_utils import Lintable  # noqa: F811
+    from ansiblelint.file_utils import Lintable
 
 _logger = logging.getLogger(__name__)
 
