@@ -92,10 +92,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 has_jinja(varstring) or varstring.endswith(os.sep),
             )
             if not valid:
-                message = (
-                    "Possible bare variable '{0}' used in a '{1}' loop."
-                    + " You should use the full variable syntax ('{{{{ {0} }}}}') or convert it to a list if that is not really a variable."
-                )
+                message = "Possible bare variable '{0}' used in a '{1}' loop. You should use the full variable syntax ('{{{{ {0} }}}}') or convert it to a list if that is not really a variable."
                 return message.format(task[loop_type], loop_type)
         return False
 

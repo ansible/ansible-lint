@@ -63,7 +63,7 @@ def test_get_version_warning(
     outlen: int,
 ) -> None:
     """Assert get_version_warning working as expected."""
-    data = '{"html_url": "https://127.0.0.1", "tag_name": "' + f"{ver_diff}" + '"}'
+    data = f'{{"html_url": "https://127.0.0.1", "tag_name": "{ver_diff}"}}'
     # simulate cache file
     mocker.patch("os.path.exists", return_value=True)
     mocker.patch("os.path.getmtime", return_value=time.time())

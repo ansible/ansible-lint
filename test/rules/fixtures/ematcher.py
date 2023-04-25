@@ -7,7 +7,7 @@ class EMatcherRule(AnsibleLintRule):
 
     id = "TEST0001"
     description = (
-        "This is a test custom rule that looks for lines " + "containing BANNED string"
+        "This is a test custom rule that looks for lines containing BANNED string"
     )
     tags = ["fake", "dummy", "test1"]
 
