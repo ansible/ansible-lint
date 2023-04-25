@@ -763,7 +763,7 @@ class Task:
         return f"Task('{self.name}' [{self.position}])"
 
 
-def task_in_list(
+def task_in_list(  # noqa: C901
     data: AnsibleBaseYAMLObject,
     filename: str,
     kind: str,
