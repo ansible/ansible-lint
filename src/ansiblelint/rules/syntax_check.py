@@ -71,7 +71,9 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
 
     @staticmethod
     # pylint: disable=too-many-locals,too-many-branches
-    def _get_ansible_syntax_check_matches(lintable: Lintable) -> list[MatchError]:
+    def _get_ansible_syntax_check_matches(  # noqa: C901
+        lintable: Lintable,
+    ) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
         default_rule: BaseRule = AnsibleSyntaxCheckRule()
         fh = None

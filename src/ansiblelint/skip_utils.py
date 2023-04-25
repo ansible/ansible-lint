@@ -245,7 +245,7 @@ def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
     if isinstance(yaml_input, str):
         return []
 
-    def traverse_yaml(obj: Any) -> None:
+    def traverse_yaml(obj: Any) -> None:  # noqa: C901
         for _, entry in obj.ca.items.items():
             for v in entry:
                 if isinstance(v, CommentToken):

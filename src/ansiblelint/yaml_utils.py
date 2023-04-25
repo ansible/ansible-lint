@@ -831,7 +831,7 @@ class FormattedYAML(YAML):
         # self.Representer.add_representer(
 
     @staticmethod
-    def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:
+    def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:  # noqa: C901
         """Extract FormattedYAML-relevant settings from yamllint config if possible."""
         config = {
             "explicit_start": True,

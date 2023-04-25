@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 import os
 import time
-from argparse import Namespace
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +14,7 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from ansiblelint import cli, file_utils
 from ansiblelint.__main__ import initialize_logger
+from ansiblelint.config import Options
 from ansiblelint.constants import FileType
 from ansiblelint.file_utils import (
     Lintable,
@@ -291,7 +291,7 @@ def test_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:
     options = cli.get_config([])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Namespace) -> dict[str, Any]:
+    def mockreturn(options: Options) -> dict[str, Any]:
         return {normpath(path): kind}
 
     # assert Lintable is able to determine file type

@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import logging
-from argparse import Namespace
 from typing import Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+from ansiblelint.config import Options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
@@ -31,7 +31,7 @@ class Transformer:
     pre-requisite for the planned rule-specific transforms.
     """
 
-    def __init__(self, result: LintResult, options: Namespace):
+    def __init__(self, result: LintResult, options: Options):
         """Initialize a Transformer instance."""
         self.write_set = self.effective_write_set(options.write_list)
 

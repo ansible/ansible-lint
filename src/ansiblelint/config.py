@@ -8,12 +8,13 @@ import sys
 import time
 import urllib.request
 import warnings
-from argparse import Namespace
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
 
+from filelock import FileLock
 from packaging.version import Version
 
 from ansiblelint import __version__
@@ -94,44 +95,64 @@ PROFILES = yaml_from_file(Path(__file__).parent / "data" / "profiles.yml")
 
 LOOP_VAR_PREFIX = "^(__|{role}_)"
 
-options = Namespace(
-    cache_dir=None,
-    colored=True,
-    configured=False,
-    cwd=".",
-    display_relative_path=True,
-    exclude_paths=[],
-    format="brief",
-    lintables=[],
-    list_rules=False,
-    list_tags=False,
-    write_list=[],
-    parseable=False,
-    quiet=False,
-    rulesdirs=[],
-    skip_list=[],
-    tags=[],
-    verbosity=False,
-    warn_list=[],
-    kinds=DEFAULT_KINDS,
-    mock_filters=[],
-    mock_modules=[],
-    mock_roles=[],
-    loop_var_prefix=None,
-    only_builtins_allow_collections=[],
-    only_builtins_allow_modules=[],
-    var_naming_pattern=None,
-    offline=False,
-    project_dir=".",  # default should be valid folder (do not use None here)
-    extra_vars=None,
-    enable_list=[],
-    skip_action_validation=True,
-    strict=False,
-    rules={},  # Placeholder to set and keep configurations for each rule.
-    profile=None,
-    task_name_prefix="{stem} | ",
-    sarif_file=None,
-)
+
+@dataclass
+class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-methods
+    """Store ansible-lint effective configuration options."""
+
+    cache_dir: str | None = None
+    colored: bool = True
+    configured: bool = False
+    cwd: Path = Path(".")
+    display_relative_path: bool = True
+    exclude_paths: list[str] = field(default_factory=list)
+    format: str = "brief"
+    lintables: list[str] = field(default_factory=list)
+    list_rules: bool = False
+    list_tags: bool = False
+    write_list: list[str] = field(default_factory=list)
+    parseable: bool = False
+    quiet: bool = False
+    rulesdirs: list[str] = field(default_factory=list)
+    skip_list: list[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    verbosity: int = 0
+    warn_list: list[str] = field(default_factory=list)
+    kinds = DEFAULT_KINDS
+    mock_filters: list[str] = field(default_factory=list)
+    mock_modules: list[str] = field(default_factory=list)
+    mock_roles: list[str] = field(default_factory=list)
+    loop_var_prefix: str | None = None
+    only_builtins_allow_collections: list[str] = field(default_factory=list)
+    only_builtins_allow_modules: list[str] = field(default_factory=list)
+    var_naming_pattern: str | None = None
+    offline: bool = False
+    project_dir: str = "."  # default should be valid folder (do not use None here)
+    extra_vars: dict[str, Any] | None = None
+    enable_list: list[str] = field(default_factory=list)
+    skip_action_validation: bool = True
+    strict: bool = False
+    rules: dict[
+        str,
+        Any,
+    ] = field(
+        default_factory=dict,
+    )  # Placeholder to set and keep configurations for each rule.
+    profile: str | None = None
+    task_name_prefix: str = "{stem} | "
+    sarif_file: Path | None = None
+    config_file: str | None = None
+    generate_ignore: bool = False
+    rulesdir: list[Path] = field(default_factory=list)
+    progressive: bool = False
+    cache_dir_lock: FileLock | None = None
+    use_default_rules: bool = False
+    version: bool = False  # display version command
+    list_profiles: bool = False  # display profiles command
+    ignore_file: Path | None = None
+
+
+options = Options()
 
 # Used to store detected tag deprecations
 used_old_tags: dict[str, str] = {}

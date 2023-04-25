@@ -42,7 +42,7 @@ def test_ensure_config_are_equal(
     cli_parser = cli.get_cli_parser()
 
     options = cli_parser.parse_args(command)
-    file_config = cli.load_config(config)
+    file_config = cli.load_config(config)[0]
 
     for key, val in file_config.items():
         # config_file does not make sense in file_config
@@ -100,7 +100,7 @@ def test_ensure_write_cli_does_not_consume_lintables(
 
     command = base_arguments + args if with_base else args
     options = cli_parser.parse_args(command)
-    file_config = cli.load_config(config)
+    file_config = cli.load_config(config)[0]
 
     file_value = file_config.get("write_list")
     orig_cli_value = getattr(options, "write_list")
@@ -158,9 +158,9 @@ def test_path_from_config_do_not_depend_on_cwd(
     monkeypatch: MonkeyPatch,
 ) -> None:  # Issue 572
     """Check that config-provided paths are decoupled from CWD."""
-    config1 = cli.load_config("test/fixtures/config-with-relative-path.yml")
+    config1 = cli.load_config("test/fixtures/config-with-relative-path.yml")[0]
     monkeypatch.chdir("test")
-    config2 = cli.load_config("fixtures/config-with-relative-path.yml")
+    config2 = cli.load_config("fixtures/config-with-relative-path.yml")[0]
 
     assert config1["exclude_paths"].sort() == config2["exclude_paths"].sort()
 

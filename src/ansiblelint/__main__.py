@@ -48,7 +48,7 @@ from ansiblelint.color import (
     reconfigure,
     render_yaml,
 )
-from ansiblelint.config import get_version_warning, log_entries, options
+from ansiblelint.config import Options, get_version_warning, log_entries, options
 from ansiblelint.constants import GIT_CMD, RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.loaders import load_ignore_txt
@@ -56,8 +56,6 @@ from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
-    from argparse import Namespace
-
     # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
@@ -170,7 +168,7 @@ def _do_list(rules: RulesCollection) -> int:
 
 
 # noinspection PyShadowingNames
-def _do_transform(result: LintResult, opts: Namespace) -> None:
+def _do_transform(result: LintResult, opts: Options) -> None:
     """Create and run Transformer."""
     if "yaml" in opts.skip_list:
         # The transformer rewrites yaml files, but the user requested to skip
@@ -378,7 +376,7 @@ def _run_cli_entrypoint() -> None:
         raise SystemExit(exc) from exc
 
 
-def path_inject() -> None:
+def path_inject() -> None:  # noqa: C901
     """Add python interpreter path to top of PATH to fix outside venv calling."""
     # This make it possible to call ansible-lint that was installed inside a
     # virtualenv without having to pre-activate it. Otherwise subprocess will

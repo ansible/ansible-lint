@@ -9,13 +9,12 @@ from __future__ import annotations
 
 import copy
 import os
-from argparse import Namespace
 from collections.abc import Iterator
 
 import pytest
 from _pytest.fixtures import SubRequest
 
-from ansiblelint.config import options  # noqa: F401
+from ansiblelint.config import Options, options  # noqa: F401
 from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import RunFromText
@@ -37,7 +36,7 @@ def default_text_runner(default_rules_collection: RulesCollection) -> RunFromTex
 
 
 @pytest.fixture()
-def rule_runner(request: SubRequest, config_options: Namespace) -> RunFromText:
+def rule_runner(request: SubRequest, config_options: Options) -> RunFromText:
     """Return runner for a specific rule class."""
     rule_class = request.param
     config_options.enable_list.append(rule_class().id)
@@ -47,7 +46,7 @@ def rule_runner(request: SubRequest, config_options: Namespace) -> RunFromText:
 
 
 @pytest.fixture(name="config_options")
-def fixture_config_options() -> Iterator[Namespace]:
+def fixture_config_options() -> Iterator[Options]:
     """Return configuration options that will be restored after testrun."""
     global options  # pylint: disable=global-statement,invalid-name
     original_options = copy.deepcopy(options)
