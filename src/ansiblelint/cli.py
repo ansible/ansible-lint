@@ -17,11 +17,7 @@ from ansiblelint.config import (
     Options,
     log_entries,
 )
-from ansiblelint.constants import (
-    CUSTOM_RULESDIR_ENVVAR,
-    DEFAULT_RULESDIR,
-    RC,
-)
+from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, RC
 from ansiblelint.file_utils import (
     Lintable,
     abspath,
@@ -428,7 +424,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         action=AbspathArgAction,
         type=Path,
         default=[],
-        help="path to directories or files to skip. " "This option is repeatable.",
+        help="path to directories or files to skip. This option is repeatable.",
     )
     parser.add_argument(
         "-c",
