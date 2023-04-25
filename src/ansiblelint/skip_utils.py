@@ -97,7 +97,7 @@ def append_skipped_rules(
         yaml_skip = _append_skipped_rules(pyyaml_data, lintable)
     except RuntimeError:
         # Notify user of skip error, do not stop, do not change exit code
-        _logger.error("Error trying to append skipped rules", exc_info=True)
+        _logger.exception("Error trying to append skipped rules")
         return pyyaml_data
 
     if not yaml_skip:
