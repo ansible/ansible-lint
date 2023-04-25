@@ -7,8 +7,7 @@ class UnsetVariableMatcherRule(AnsibleLintRule):
 
     id = "TEST0002"
     description = (
-        "This is a test rule that looks for lines "
-        + "post templating that still contain {{"
+        "This is a test rule that looks for lines post templating that still contain {{"
     )
     tags = ["fake", "dummy", "test2"]
 

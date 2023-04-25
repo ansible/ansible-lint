@@ -236,7 +236,6 @@ ignore = [
   "EXE",
   "FBT",
   "INP",
-  "ISC",
   "PGH",
   "PTH",
   "PLR",
