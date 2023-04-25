@@ -6,7 +6,6 @@ import logging
 import os
 import subprocess
 import sys
-from argparse import Namespace
 from collections import OrderedDict, defaultdict
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
@@ -18,7 +17,7 @@ import wcmatch.pathlib
 from wcmatch.wcmatch import RECURSIVE, WcMatch
 from yaml.error import YAMLError
 
-from ansiblelint.config import BASE_KINDS, options
+from ansiblelint.config import BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, GIT_CMD, FileType, States
 from ansiblelint.logger import warn_or_fail
 
@@ -287,11 +286,11 @@ class Lintable:
         # Can raise UnicodeDecodeError
         try:
             self._content = self.path.expanduser().resolve().read_text(encoding="utf-8")
-        except FileNotFoundError as ex:
+        except FileNotFoundError as exc:
             if vars(options).get("progressive"):
                 self._content = ""
             else:
-                raise ex
+                raise exc
         if self._original_content is None:
             self._original_content = self._content
 
@@ -407,7 +406,7 @@ class Lintable:
 
 
 # pylint: disable=redefined-outer-name
-def discover_lintables(options: Namespace) -> dict[str, Any]:
+def discover_lintables(options: Options) -> dict[str, Any]:
     """Find all files that we know how to lint.
 
     Return format is normalized, relative for stuff below cwd, ~/ for content

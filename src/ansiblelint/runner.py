@@ -13,14 +13,13 @@ from typing import TYPE_CHECKING, Any
 import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule
+from ansiblelint.config import Options
 from ansiblelint.constants import States
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
-    from argparse import Namespace
-
     from ansiblelint.rules import RulesCollection
 
 _logger = logging.getLogger(__name__)
@@ -212,7 +211,7 @@ class Runner:
                 visited.add(lintable)
 
 
-def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
+def _get_matches(rules: RulesCollection, options: Options) -> LintResult:
     lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
     for rule in rules:
@@ -227,7 +226,7 @@ def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
     runner = Runner(
         *lintables,
         rules=rules,
-        tags=options.tags,
+        tags=frozenset(options.tags),
         skip_list=options.skip_list,
         exclude_paths=options.exclude_paths,
         verbosity=options.verbosity,
