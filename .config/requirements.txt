@@ -4,8 +4,8 @@
 #
 #    pip-compile --extra=docs --extra=test --no-annotate --output-file=.config/requirements.txt --resolver=backtracking --strip-extras --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
-ansible-core==2.14.4
-astroid==2.15.3
+ansible-core==2.14.5
+astroid==2.15.4
 attrs==23.1.0
 beautifulsoup4==4.12.1
 black==23.3.0
@@ -66,13 +66,13 @@ packaging==23.0
 pathspec==0.11.1
 pillow==9.5.0
 pipdeptree==2.7.0
-platformdirs==3.2.0
+platformdirs==3.3.0
 pluggy==1.0.0
 ply==3.11
 psutil==5.9.5
 pycparser==2.21
 pygments==2.14.0
-pylint==2.17.2
+pylint==2.17.3
 pymdown-extensions==9.10
 pyparsing==3.0.9
 pyrsistent==0.19.3
