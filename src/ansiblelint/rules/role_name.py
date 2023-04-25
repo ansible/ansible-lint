@@ -83,7 +83,7 @@ class RoleNames(AnsibleLintRule):
     def matchdir(self, lintable: Lintable) -> list[MatchError]:
         return self.matchyaml(lintable)
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def matchyaml(self, file: Lintable) -> list[MatchError]:  # noqa: C901
         result: list[MatchError] = []
 
         if file.kind not in ("meta", "role", "playbook"):

@@ -473,7 +473,7 @@ def strip_dotslash_prefix(fname: str) -> str:
     return fname[2:] if fname.startswith("./") else fname
 
 
-def find_project_root(
+def find_project_root(  # noqa: C901
     srcs: Sequence[str],
     config_file: str | None = None,
 ) -> tuple[Path, str]:

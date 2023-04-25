@@ -42,7 +42,7 @@ _schema_cache = SchemaCacheDict()
 
 
 # pylint: disable=too-many-branches
-def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
+def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:  # noqa: C901
     """Refresh JSON schemas by downloading latest versions.
 
     Returns number of changed schemas.

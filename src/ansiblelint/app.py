@@ -46,7 +46,7 @@ class App:
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(isolated=True, require_module=True)
 
-    def render_matches(self, matches: list[MatchError]) -> None:
+    def render_matches(self, matches: list[MatchError]) -> None:  # noqa: C901
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
 
@@ -185,7 +185,7 @@ class App:
                 ignore_file.write(
                     "# This file contains ignores rule violations for ansible-lint\n",
                 )
-                ignore_file.writelines(sorted(list(lines)))
+                ignore_file.writelines(sorted(lines))
         elif matched_rules and not self.options.quiet:
             console_stderr.print(
                 "Read [link=https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations.",
@@ -233,7 +233,7 @@ class App:
             return RC.SUCCESS
         return RC.VIOLATIONS_FOUND
 
-    def report_summary(  # pylint: disable=too-many-branches,too-many-locals
+    def report_summary(  # pylint: disable=too-many-branches,too-many-locals # noqa: C901
         self,
         summary: SummarizedResults,
         changed_files_count: int,
