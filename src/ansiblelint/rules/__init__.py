@@ -73,7 +73,7 @@ class AnsibleLintRule(BaseRule):
     # pylint: disable=too-many-arguments
     def create_matcherror(
         self,
-        message: str | None = None,
+        message: str = "",
         lineno: int = 1,
         details: str = "",
         filename: Lintable | None = None,
@@ -84,11 +84,10 @@ class AnsibleLintRule(BaseRule):
             message=message,
             lineno=lineno,
             details=details,
-            filename=filename,
+            lintable=filename or Lintable(""),
             rule=copy.copy(self),
+            tag=tag,
         )
-        if tag:
-            match.tag = tag
         # search through callers to find one of the match* methods
         frame = inspect.currentframe()
         match_type: str | None = None
@@ -128,7 +127,7 @@ class AnsibleLintRule(BaseRule):
             result = self.match(line)
             if not result:
                 continue
-            message = None
+            message = ""
             if isinstance(result, str):
                 message = result
             matcherror = self.create_matcherror(
@@ -198,7 +197,7 @@ class AnsibleLintRule(BaseRule):
                     continue
                 match = result
             else:  # bool or string
-                message = None
+                message = ""
                 if isinstance(result, str):
                     message = result
                 match = self.create_matcherror(
@@ -223,7 +222,7 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, str):
             if yaml.startswith("$ANSIBLE_VAULT"):
                 return []
-            return [MatchError(filename=file, rule=LoadingFailureRule())]
+            return [MatchError(lintable=file, rule=LoadingFailureRule())]
         if not yaml:
             return matches
 
@@ -458,7 +457,7 @@ class RulesCollection:
                 return [
                     MatchError(
                         message=str(exc),
-                        filename=file,
+                        lintable=file,
                         rule=LoadingFailureRule(),
                         tag=f"{LoadingFailureRule.id}[{exc.__class__.__name__.lower()}]",
                     ),
