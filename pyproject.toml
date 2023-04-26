@@ -223,6 +223,8 @@ markers = ["eco: Tests effects on a set of 3rd party ansible repositories"]
 ignore = [
   "E501", # we use black
   "ERA001", # auto-removal of commented out code affects development and vscode integration
+  "INP001", # "is part of an implicit namespace package", all false positives
+  "PLW2901", # PLW2901: Redefined loop variable
   "RET504", # Unnecessary variable assignment before `return` statement
   # temporary disabled until we fix them:
   "ANN",
@@ -234,11 +236,9 @@ ignore = [
   "D",
   "EXE",
   "FBT",
-  "INP",
   "PGH",
   "PTH",
   "PLR",
-  "PLW",
   "SLF",
   "TCH",
   "TRY",

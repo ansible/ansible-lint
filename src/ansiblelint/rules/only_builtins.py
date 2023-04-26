@@ -1,6 +1,7 @@
 """Rule definition for usage of builtin actions only."""
 from __future__ import annotations
 
+import os
 import sys
 from typing import Any
 
@@ -62,12 +63,15 @@ if "pytest" in sys.modules:
 
     def test_only_builtins_fail() -> None:
         """Test rule matches."""
+        env = os.environ.copy()
+        env["NO_COLOR"] = "1"
         result = run_ansible_lint(
             "--strict",
             "--warn-list=",
             "--enable-list",
             "only-builtins",
             "examples/playbooks/rule-only-builtins.yml",
+            env=env,
         )
         assert result.returncode == RC.VIOLATIONS_FOUND
         assert "Failed" in result.stderr
