@@ -43,8 +43,7 @@ def fixture_runner_result(
 ) -> LintResult:
     """Fixture that runs the Runner to populate a LintResult for a given file."""
     config_options.lintables = [playbook]
-    result = _get_matches(rules=default_rules_collection, options=config_options)
-    return result
+    return _get_matches(rules=default_rules_collection, options=config_options)
 
 
 @pytest.mark.parametrize(

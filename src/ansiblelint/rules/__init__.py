@@ -479,9 +479,7 @@ class RulesCollection:
 
         # some rules can produce matches with tags that are inside our
         # skip_list, so we need to cleanse the matches
-        matches = [m for m in matches if m.tag not in skip_list]
-
-        return matches
+        return [m for m in matches if m.tag not in skip_list]
 
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""

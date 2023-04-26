@@ -24,8 +24,7 @@ formatting_after_fixtures_dir = fixtures_dir / "formatting-after"
 @pytest.fixture(name="empty_lintable")
 def fixture_empty_lintable() -> Lintable:
     """Return a Lintable with no contents."""
-    lintable = Lintable("__empty_file__.yaml", content="")
-    return lintable
+    return Lintable("__empty_file__.yaml", content="")
 
 
 def test_tasks_in_list_empty_file(empty_lintable: Lintable) -> None:

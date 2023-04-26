@@ -128,8 +128,7 @@ def expand_path_vars(path: str) -> str:
 
 def expand_paths_vars(paths: list[str]) -> list[str]:
     """Expand the environment or ~ variables in a list."""
-    paths = [expand_path_vars(p) for p in paths]
-    return paths
+    return [expand_path_vars(p) for p in paths]
 
 
 def kind_from_path(path: Path, base: bool = False) -> FileType:

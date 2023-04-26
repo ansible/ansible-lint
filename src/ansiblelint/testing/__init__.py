@@ -54,8 +54,7 @@ class RunFromText:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix=prefix) as fh:
             fh.write(playbook_text)
             fh.flush()
-            results = self._call_runner(fh.name)
-        return results
+            return self._call_runner(fh.name)
 
     def run_role_tasks_main(self, tasks_main_text: str) -> list[MatchError]:
         """Lints received text as tasks."""

@@ -109,8 +109,7 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
 
     dataloader = DataLoader()
     dataloader.set_basedir(basedir)
-    templar = Templar(dataloader, variables=templatevars)
-    return templar
+    return Templar(dataloader, variables=templatevars)
 
 
 def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:

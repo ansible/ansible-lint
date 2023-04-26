@@ -231,7 +231,6 @@ ignore = [
   "SIM",
   "BLE",
   "D",
-  "RET",
   "EXE",
   "FBT",
   "INP",
