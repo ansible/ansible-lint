@@ -109,7 +109,7 @@
     },
     "progressive": {
       "default": false,
-      "title": "Progressive",
+      "title": "Progressive (removed feature)",
       "type": "boolean"
     },
     "quiet": {

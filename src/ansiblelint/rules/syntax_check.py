@@ -136,7 +136,6 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             filename = lintable
             lineno = 1
             column = None
-            tag = None
 
             stderr = strip_ansi_escape(run.stderr)
             stdout = strip_ansi_escape(run.stdout)
@@ -164,7 +163,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                     results.append(
                         MatchError(
                             message=title,
-                            filename=filename,
+                            lintable=filename,
                             lineno=lineno,
                             column=column,
                             rule=rule,
@@ -182,12 +181,12 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
                 results.append(
                     MatchError(
                         message=message,
-                        filename=filename,
+                        lintable=filename,
                         lineno=lineno,
                         column=column,
                         rule=rule,
                         details=details,
-                        tag=tag,
+                        tag="",
                     ),
                 )
 

@@ -40,24 +40,18 @@ Ansible-lint creates a new cache on the next invocation.
 You should add the `.cache` folder to the `.gitignore` file in your git
 repositories.
 
-## Using progressive mode (deprecated)
+# Gradual adoption
 
-!!! warning
+For an easier gradual adoption, adopters should consider [ignore
+file][configuring.md#ignoring-rules-for-entire-files] feature. This allows the
+quick introduction of a linter pipeline for preventing addition of new
+violations, while known violations are ignored. Some people can work on
+addressing these historical violations while others may continue to work on
+other maintenance tasks.
 
-    This feature is deprecated and will be removed in the next major release.
-    We encourage you to use [ignore file](configuring.md#ignoring-rules-for-entire-files)
-    instead.
-
-For easier adoption, Ansible-lint can alert for rule violations that occur since
-the last commit. This allows new code to be merged without any rule violations
-while allowing content developers to address historical violations at a
-different pace.
-
-The `--progressive` option runs Ansible-lint twice if rule violations exist in
-your content. The second run is performed against a temporary git working copy
-that contains the last commit. Rule violations that exist in the last commit are
-ignored and Ansible-lint displays only the violations that exist in the new
-commit.
+The deprecated `--progressive` mode was removed in v6.16.0 as it added code
+complexity and performance overhead. It also presented several corner cases
+where it failed to work as expected and caused false negatives.
 
 ## Linting playbooks and roles
 
