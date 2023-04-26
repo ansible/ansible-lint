@@ -157,6 +157,7 @@ if "pytest" in sys.modules:
             ),
         ),
     )
+    @pytest.mark.filterwarnings("ignore::ansible_compat.runtime.AnsibleWarning")
     def test_yamllint(file: str, expected_kind: str, expected: list[str]) -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(file)

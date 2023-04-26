@@ -98,9 +98,13 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
 
 
 if "pytest" in sys.modules:
+    import pytest
+
+    # pylint: disable=ungrouped-imports
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
+    @pytest.mark.filterwarnings("ignore::ansible_compat.runtime.AnsibleWarning")
     def test_use_bare_positive() -> None:
         """Positive test for deprecated-bare-vars."""
         collection = RulesCollection()
