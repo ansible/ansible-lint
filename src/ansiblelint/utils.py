@@ -27,11 +27,14 @@ import inspect
 import logging
 import os
 import re
+import sys
 from collections.abc import ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache
 from pathlib import Path
+from types import TracebackType
 from typing import Any, Callable
+from unittest.mock import MagicMock
 
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
@@ -128,6 +131,56 @@ def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:
     return left
 
 
+class NoDisplay:
+    """Context manager to disable display."""
+
+    def __init__(self) -> None:
+        """Initialize a NoDisplay context manager."""
+        self.prev = sys.modules.pop("ansible.utils.display", None)
+        self.mock_display = MagicMock()
+        sys.modules["ansible.utils.display"] = self.mock_display
+
+    def displayed(self) -> dict[str, dict[str, Any]]:
+        """Return a dict of all displayed messages.
+
+        :return: A dict of all displayed messages (calls to display)
+        """
+        displayed = {}
+        for call in self.mock_display.mock_calls:
+            full_method, args, kwargs = call
+            if "." not in full_method:
+                continue
+            method = full_method.split(".")[-1]
+            if method.startswith("_"):
+                continue
+            displayed[method] = {"args": args, "kwargs": kwargs}
+        return displayed
+
+    def __enter__(self) -> NoDisplay:
+        """Enter the context manager.
+
+        :return: The context manager
+        """
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        """Exit the context manager.
+
+        :param type: The type of exception
+        :param value: The exception
+        :param traceback: The traceback
+        """
+        # pylint: disable=unused-argument
+        # pylint: disable=redefined-builtin
+        if self.prev:
+            sys.modules["ansible.utils.display"] = self.prev
+
+
 def ansible_template(
     basedir: str,
     varname: Any,
@@ -163,38 +216,43 @@ def ansible_template(
 
     kwargs["disable_lookups"] = True
     for _i in range(10):
-        try:
-            templated = templar.template(varname, **kwargs)
-            return templated
-        except AnsibleError as exc:
-            if lookup_error in exc.message:
-                return varname
-            if exc.message.startswith(filter_error):
-                while True:
-                    match = re_filter_in_err.search(exc.message)
-                    if match:
-                        missing_filter = match.group(1)
-                        break
-                    match = re_filter_fqcn.search(exc.message)
-                    if match:
-                        missing_filter = match.group(0)
-                        break
-                    missing_filter = exc.message.split("'")[1]
-                    break
+        with NoDisplay() as display_consumer:
+            try:
+                templated = templar.template(varname, **kwargs)
+                _displayed = display_consumer.displayed()
+                return templated
 
-                if not re_valid_filter.match(missing_filter):
-                    err = f"Could not parse missing filter name from error message: {exc.message}"
-                    _logger.warning(err)
-                    raise
+            except AnsibleError as exc:
+                _displayed = display_consumer.displayed()
 
-                # pylint: disable=protected-access
-                templar.environment.filters._delegatee[missing_filter] = mock_filter
-                # Record the mocked filter so we can warn the user
-                if missing_filter not in options.mock_filters:
-                    _logger.debug("Mocking missing filter %s", missing_filter)
-                    options.mock_filters.append(missing_filter)
-                continue
-            raise
+                if lookup_error in exc.message:
+                    return varname
+                if exc.message.startswith(filter_error):
+                    while True:
+                        match = re_filter_in_err.search(exc.message)
+                        if match:
+                            missing_filter = match.group(1)
+                            break
+                        match = re_filter_fqcn.search(exc.message)
+                        if match:
+                            missing_filter = match.group(0)
+                            break
+                        missing_filter = exc.message.split("'")[1]
+                        break
+
+                    if not re_valid_filter.match(missing_filter):
+                        err = f"Could not parse missing filter name from error message: {exc.message}"
+                        _logger.warning(err)
+                        raise
+
+                    # pylint: disable=protected-access
+                    templar.environment.filters._delegatee[missing_filter] = mock_filter
+                    # Record the mocked filter so we can warn the user
+                    if missing_filter not in options.mock_filters:
+                        _logger.debug("Mocking missing filter %s", missing_filter)
+                        options.mock_filters.append(missing_filter)
+                    continue
+                raise
     return None
 
 
