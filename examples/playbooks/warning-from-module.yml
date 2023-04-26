@@ -1,0 +1,11 @@
+---
+# https://github.com/ansible/ansible-lint/issues/3216
+- name: "Reproduce for bug #3216 warning from core module using Display.warning()"
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Some task
+      ansible.builtin.debug:
+        msg: "{{ qq | unique }}"
+      vars:
+        qq: ["qq", "ww"]

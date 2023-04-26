@@ -263,7 +263,7 @@ def get_version_warning() -> str:
             "https://api.github.com/repos/ansible/ansible-lint/releases/latest"
         )
         try:
-            with urllib.request.urlopen(release_url) as url:
+            with urllib.request.urlopen(release_url) as url:  # noqa: S310
                 data = json.load(url)
                 with open(cache_file, "w", encoding="utf-8") as f:
                     json.dump(data, f)
