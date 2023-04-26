@@ -8,6 +8,8 @@ After [creating your fork on GitHub], you can do:
 ```shell-session
 $ git clone git@github.com:your-name/ansible-lint
 $ cd ansible-lint
+$ git submodule init
+$ git submodule update
 $ git checkout -b your-branch-name
 # DO SOME CODING HERE
 $ git add your new files
