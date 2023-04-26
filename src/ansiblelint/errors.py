@@ -57,22 +57,18 @@ class MatchError(ValueError):
         super().__init__(message)
 
         if rule.__class__ is RuntimeErrorRule and not message:
-            raise TypeError(
-                f"{self.__class__.__name__}() missing a "
-                "required argument: one of 'message' or 'rule'",
-            )
+            msg = f"{self.__class__.__name__}() missing a required argument: one of 'message' or 'rule'"
+            raise TypeError(msg)
 
         self.message = str(message or getattr(rule, "shortdesc", ""))
 
         # Safety measure to ensure we do not end-up with incorrect indexes
         if lineno == 0:  # pragma: no cover
-            raise RuntimeError(
-                "MatchError called incorrectly as line numbers start with 1",
-            )
+            msg = "MatchError called incorrectly as line numbers start with 1"
+            raise RuntimeError(msg)
         if column == 0:  # pragma: no cover
-            raise RuntimeError(
-                "MatchError called incorrectly as column numbers start with 1",
-            )
+            msg = "MatchError called incorrectly as column numbers start with 1"
+            raise RuntimeError(msg)
 
         self.lineno = lineno
         self.column = column

@@ -488,10 +488,8 @@ def _get_task_handler_children_for_tasks_or_playbooks(
                 basedir = os.path.dirname(basedir)
                 f = path_dwim(basedir, file_name)
             return Lintable(f, kind=child_type)
-
-    raise LookupError(
-        f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}',
-    )
+    msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
+    raise LookupError(msg)
 
 
 def _validate_task_handler_action_for_role(th_action: dict[str, Any]) -> None:
@@ -531,9 +529,8 @@ def _roles_children(
                         ),
                     )
             elif k != "dependencies":
-                raise SystemExit(
-                    f'role dict {role} does not contain a "role" or "name" key',
-                )
+                msg = f'role dict {role} does not contain a "role" or "name" key'
+                raise SystemExit(msg)
         else:
             results.extend(_look_for_role_files(basedir, role, main=main))
     return results
@@ -666,7 +663,8 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
     )
 
     if not isinstance(action, str):
-        raise RuntimeError(f"Task actions can only be strings, got {action}")
+        msg = f"Task actions can only be strings, got {action}"
+        raise RuntimeError(msg)
     action_unnormalized = action
     # convert builtin fqn calls to short forms because most rules know only
     # about short calls but in the future we may switch the normalization to do
@@ -742,9 +740,8 @@ def extract_from_list(
                         )
                     results.extend(subresults)
                 elif block[candidate] is not None:
-                    raise RuntimeError(
-                        f"Key '{candidate}' defined, but bad value: '{str(block[candidate])}'",
-                    )
+                    msg = f"Key '{candidate}' defined, but bad value: '{str(block[candidate])}'"
+                    raise RuntimeError(msg)
     return results
 
 
@@ -794,7 +791,8 @@ class Task:
                 # to avoid adding extra complexity to the rules.
                 self._normalized_task = self.raw_task
         if isinstance(self._normalized_task, _MISSING_TYPE):
-            raise RuntimeError("Task was not normalized")
+            msg = "Task was not normalized"
+            raise RuntimeError(msg)
         return self._normalized_task
 
     @property
@@ -851,9 +849,8 @@ def task_in_list(  # noqa: C901
                             f"{position }[{item_index}].{attribute}",
                         )
                     elif item[attribute] is not None:
-                        raise RuntimeError(
-                            f"Key '{attribute}' defined, but bad value: '{str(item[attribute])}'",
-                        )
+                        msg = f"Key '{attribute}' defined, but bad value: '{str(item[attribute])}'"
+                        raise RuntimeError(msg)
     else:
         yield from each_entry(data, position)
 
@@ -899,7 +896,8 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
         line = loader.line
         node = Composer.compose_node(loader, parent, index)
         if not isinstance(node, yaml.nodes.Node):
-            raise RuntimeError("Unexpected yaml data.")
+            msg = "Unexpected yaml data."
+            raise RuntimeError(msg)
         setattr(node, "__line__", line + 1)
         return node
 
@@ -937,7 +935,8 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
         yaml.scanner.ScannerError,
         yaml.constructor.ConstructorError,
     ) as exc:
-        raise RuntimeError("Failed to load YAML file") from exc
+        msg = "Failed to load YAML file"
+        raise RuntimeError(msg) from exc
 
     if len(result) == 0:
         return None  # empty documents
@@ -1036,9 +1035,8 @@ def get_lintables(
             try:
                 for file_path in opts.exclude_paths:
                     if str(path.resolve()).startswith(str(file_path)):
-                        raise FileNotFoundError(
-                            f"File {file_path} matched exclusion entry: {path}",
-                        )
+                        msg = f"File {file_path} matched exclusion entry: {path}"
+                        raise FileNotFoundError(msg)
             except FileNotFoundError as exc:
                 _logger.debug("Ignored %s due to: %s", path, exc)
                 continue

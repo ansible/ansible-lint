@@ -152,7 +152,8 @@ def _coerce(other: object) -> Version:
         other = Version(str(other))
     if isinstance(other, Version):
         return other
-    raise NotImplementedError(f"Unable to coerce object type {type(other)} to Version")
+    msg = f"Unable to coerce object type {type(other)} to Version"
+    raise NotImplementedError(msg)
 
 
 if "pytest" in sys.modules:

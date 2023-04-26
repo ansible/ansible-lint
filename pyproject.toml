@@ -232,7 +232,6 @@ ignore = [
   "BLE",
   "D",
   "RET",
-  "EM",
   "EXE",
   "FBT",
   "INP",
