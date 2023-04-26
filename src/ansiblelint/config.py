@@ -132,10 +132,7 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     enable_list: list[str] = field(default_factory=list)
     skip_action_validation: bool = True
     strict: bool = False
-    rules: dict[
-        str,
-        Any,
-    ] = field(
+    rules: dict[str, Any] = field(
         default_factory=dict,
     )  # Placeholder to set and keep configurations for each rule.
     profile: str | None = None
@@ -144,7 +141,6 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     config_file: str | None = None
     generate_ignore: bool = False
     rulesdir: list[Path] = field(default_factory=list)
-    progressive: bool = False
     cache_dir_lock: FileLock | None = None
     use_default_rules: bool = False
     version: bool = False  # display version command
