@@ -14,6 +14,10 @@
         "ruleset": {
             "type": "object",
             "properties": {
+                "default_events_ttl": {
+                    "type": "string",
+                    "pattern": "^\\d+\\s(seconds?|minutes?|hours?|days?)$"
+                },
                 "hosts": {
                     "type": "string"
                 },
