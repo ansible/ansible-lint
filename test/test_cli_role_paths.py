@@ -90,6 +90,7 @@ def test_run_playbook(local_test_dir: str) -> None:
 
     env = os.environ.copy()
     env["ANSIBLE_ROLES_PATH"] = role_path
+    env["NO_COLOR"] = "1"
 
     result = run_ansible_lint("-f", "pep8", lintable, cwd=cwd, env=env)
     # All 4 failures are expected to be found inside the included role and not
