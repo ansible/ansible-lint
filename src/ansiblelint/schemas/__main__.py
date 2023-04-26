@@ -73,7 +73,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:  # noqa: C901
         if etag:
             request.add_header("If-None-Match", f'"{data.get("etag")}"')
         try:
-            with urllib.request.urlopen(request, timeout=10) as response:
+            with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
                 if response.status == 200:
                     content = response.read().decode("utf-8").rstrip()
                     etag = response.headers["etag"].strip('"')

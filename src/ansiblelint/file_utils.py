@@ -422,7 +422,7 @@ def discover_lintables(options: Options) -> dict[str, Any]:
 
     try:
         out_present = subprocess.check_output(
-            git_command_present,
+            git_command_present,  # noqa: S603
             stderr=subprocess.STDOUT,
             text=True,
         ).split("\x00")[:-1]
@@ -432,7 +432,7 @@ def discover_lintables(options: Options) -> dict[str, Any]:
         )
 
         out_absent = subprocess.check_output(
-            git_command_absent,
+            git_command_absent,  # noqa: S603
             stderr=subprocess.STDOUT,
             text=True,
         ).split("\x00")[:-1]

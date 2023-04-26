@@ -73,7 +73,7 @@ from ansiblelint.text import removeprefix
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
-DEFAULT_VAULT_PASSWORD = "x"
+DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
 COLLECTION_PLAY_RE = re.compile(r"^[\w\d_]+\.[\w\d_]+\.[\w\d_]+$")
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
