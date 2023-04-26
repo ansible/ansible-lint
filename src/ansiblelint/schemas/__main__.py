@@ -114,7 +114,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:  # noqa: C901
 
 if __name__ == "__main__":
     if refresh_schemas(60 * 10):  # pragma: no cover
-        print("Schemas were updated.")
+        print("Schemas were updated.")  # noqa: T201
         sys.exit(1)
     else:  # pragma: no cover
-        print("Schemas not updated", 0)
+        print("Schemas not updated", 0)  # noqa: T201
