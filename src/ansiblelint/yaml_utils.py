@@ -201,10 +201,8 @@ def _nested_items_path(
             functools.partial(enumerate, data_collection),
         )
     else:
-        raise TypeError(
-            f"Expected a dict or a list but got {data_collection!r} "
-            f"of type '{type(data_collection)}'",
-        )
+        msg = f"Expected a dict or a list but got {data_collection!r} of type '{type(data_collection)}'"
+        raise TypeError(msg)
     for key, value in convert_data_collection_to_tuples():
         if key in (SKIPPED_RULES_KEY, "__file__", "__line__", *ignored_keys):
             continue
@@ -223,7 +221,8 @@ def get_path_to_play(
 ) -> list[str | int]:
     """Get the path to the play in the given file at the given line number."""
     if lineno < 1:
-        raise ValueError(f"expected lineno >= 1, got {lineno}")
+        msg = f"expected lineno >= 1, got {lineno}"
+        raise ValueError(msg)
     if lintable.kind != "playbook" or not isinstance(ruamel_data, CommentedSeq):
         return []
     lc: LineCol  # lc uses 0-based counts # pylint: disable=invalid-name
@@ -265,7 +264,8 @@ def get_path_to_task(
 ) -> list[str | int]:
     """Get the path to the task in the given file at the given line number."""
     if lineno < 1:
-        raise ValueError(f"expected lineno >= 1, got {lineno}")
+        msg = f"expected lineno >= 1, got {lineno}"
+        raise ValueError(msg)
     if lintable.kind in ("tasks", "handlers"):
         assert isinstance(ruamel_data, CommentedSeq)
         return _get_path_to_task_in_tasks_block(lineno, ruamel_data)
@@ -900,7 +900,8 @@ class FormattedYAML(YAML):
     def loads(self, stream: str) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
         if not isinstance(stream, str):
-            raise NotImplementedError(f"expected a str but got {type(stream)}")
+            msg = f"expected a str but got {type(stream)}"
+            raise NotImplementedError(msg)
         text, preamble_comment = self._pre_process_yaml(stream)
         data = self.load(stream=text)
         if preamble_comment is not None:

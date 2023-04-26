@@ -424,7 +424,8 @@ def path_inject() -> None:  # noqa: C901
     # our dependency, but addressing this would be done by ansible-compat.
     for cmd in ("ansible", "git"):
         if not shutil.which(cmd):
-            raise RuntimeError(f"Failed to find runtime dependency '{cmd}' in PATH")
+            msg = f"Failed to find runtime dependency '{cmd}' in PATH"
+            raise RuntimeError(msg)
 
 
 # Based on Ansible implementation

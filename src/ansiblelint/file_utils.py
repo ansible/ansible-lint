@@ -309,7 +309,8 @@ class Lintable:
         has not already been populated.
         """
         if not isinstance(value, str):
-            raise TypeError(f"Expected str but got {type(value)}")
+            msg = f"Expected str but got {type(value)}"
+            raise TypeError(msg)
         if self._original_content is None:
             if self._content is not None:
                 self._original_content = self._content

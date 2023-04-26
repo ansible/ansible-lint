@@ -725,5 +725,6 @@ def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
         if LINE_NUMBER_KEY in ctx:
             line = ctx[LINE_NUMBER_KEY]
     if not isinstance(line, int):
-        raise RuntimeError("Line number is not an integer")
+        msg = "Line number is not an integer"
+        raise RuntimeError(msg)
     return line

@@ -193,7 +193,8 @@ def _append_skipped_rules(  # noqa: max-complexity: 12
             continue
 
         if pyyaml_task.get("name") != ruamel_task.get("name"):
-            raise RuntimeError("Error in matching skip comment to a task")
+            msg = "Error in matching skip comment to a task"
+            raise RuntimeError(msg)
         pyyaml_task[SKIPPED_RULES_KEY] = _get_rule_skips_from_yaml(
             ruamel_task,
             lintable,

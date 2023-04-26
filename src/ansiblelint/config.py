@@ -168,7 +168,8 @@ def get_rule_config(rule_id: str) -> dict[str, Any]:
     """Get configurations for the rule ``rule_id``."""
     rule_config = options.rules.get(rule_id, {})
     if not isinstance(rule_config, dict):  # pragma: no branch
-        raise RuntimeError(f"Invalid rule config for {rule_id}: {rule_config}")
+        msg = f"Invalid rule config for {rule_id}: {rule_config}"
+        raise RuntimeError(msg)
     return rule_config
 
 
