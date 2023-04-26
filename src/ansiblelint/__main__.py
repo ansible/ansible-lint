@@ -356,7 +356,7 @@ def path_inject() -> None:  # noqa: C901
             paths[idx] = os.path.expanduser(path)
             expanded = True
     if expanded:  # pragma: no cover
-        print(
+        print(  # noqa: T201
             "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
             file=sys.stderr,
         )
@@ -375,7 +375,7 @@ def path_inject() -> None:  # noqa: C901
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
         if inject_paths:
-            print(
+            print(  # noqa: T201
                 f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
                 file=sys.stderr,
             )
