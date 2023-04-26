@@ -113,37 +113,82 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
     return templar
 
 
+def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:
+    """Mock a filter that can take any combination of args and kwargs.
+
+    This will return x when x | filter(y,z) is called
+    e.g. {{ foo | ansible.utils.ipaddr('address') }}
+
+    :param left: The left hand side of the filter
+    :param args: The args passed to the filter
+    :param kwargs: The kwargs passed to the filter
+    :return: The left hand side of the filter
+    """
+    # pylint: disable=unused-argument
+    return left
+
+
 def ansible_template(
     basedir: str,
     varname: Any,
     templatevars: Any,
     **kwargs: Any,
 ) -> Any:
-    """Render a templated string by mocking missing filters."""
+    """Render a templated string by mocking missing filters.
+
+    In the case of a missing lookup, ansible core does an early exit
+    when disable_lookup=True but this happens after the jinja2 syntax already passed
+    return the original string as if it had been templated.
+
+    In the case of a missing filter, extract the missing filter plugin name
+    from the ansible error, 'Could not load "filter"'. Then mock the filter
+    and template the string again. The range allows for up to 10 unknown filters
+    in succession
+
+    :param basedir: The directory containing the lintable file
+    :param varname: The string to be templated
+    :param templatevars: The variables to be used in the template
+    :param kwargs: Additional arguments to be passed to the templating engine
+    :return: The templated string or None
+    :raises: AnsibleError if the filter plugin cannot be extracted or the
+             string could not be templated in 10 attempts
+    """
+    # pylint: disable=too-many-locals
+    filter_error = "template error while templating string:"
+    lookup_error = "was found, however lookups were disabled from templating"
+    re_filter_fqcn = re.compile(r"\w+\.\w+\.\w+")
+    re_filter_in_err = re.compile(r"Could not load \"(\w+)\"")
+    re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
-    # pylint: disable=unused-variable
-    for i in range(3):
+
+    kwargs["disable_lookups"] = True
+    for _i in range(10):
         try:
-            kwargs["disable_lookups"] = True
-            return templar.template(varname, **kwargs)
+            templated = templar.template(varname, **kwargs)
+            return templated
         except AnsibleError as exc:
-            if (
-                "was found, however lookups were disabled from templating"
-                in exc.message
-            ):
-                # ansible core does an early exit when disable_lookup=True but
-                # this happens after the jinja2 syntax already passed.
-                break
-            if (
-                exc.message.startswith("template error while templating string:")
-                and "'" in exc.message
-            ):
-                missing_filter = exc.message.split("'")[1]
-                if missing_filter == "end of print statement":
+            if lookup_error in exc.message:
+                return varname
+            if exc.message.startswith(filter_error):
+                while True:
+                    match = re_filter_in_err.search(exc.message)
+                    if match:
+                        missing_filter = match.group(1)
+                        break
+                    match = re_filter_fqcn.search(exc.message)
+                    if match:
+                        missing_filter = match.group(0)
+                        break
+                    missing_filter = exc.message.split("'")[1]
+                    break
+
+                if not re_valid_filter.match(missing_filter):
+                    err = f"Could not parse missing filter name from error message: {exc.message}"
+                    _logger.warning(err)
                     raise
-                # Mock the filter to avoid and error from Ansible templating
+
                 # pylint: disable=protected-access
-                templar.environment.filters._delegatee[missing_filter] = lambda x: x
+                templar.environment.filters._delegatee[missing_filter] = mock_filter
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)

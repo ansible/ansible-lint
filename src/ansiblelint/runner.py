@@ -196,7 +196,8 @@ class Runner:
         while visited != self.lintables:
             for lintable in self.lintables - visited:
                 try:
-                    for child in ansiblelint.utils.find_children(lintable):
+                    children = ansiblelint.utils.find_children(lintable)
+                    for child in children:
                         if self.is_excluded(child):
                             continue
                         self.lintables.add(child)
