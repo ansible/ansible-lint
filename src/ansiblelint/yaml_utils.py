@@ -239,7 +239,9 @@ def get_path_to_play(
             next_play_line_index = None
 
         lc = play.lc  # pylint: disable=invalid-name
-        assert isinstance(lc.line, int)
+        if not isinstance(lc.line, int):
+            msg = f"expected lc.line to be an int, got {lc.line!r}"
+            raise RuntimeError(msg)
         if lc.line == line_index:
             return [play_index]
         if play_index > 0 and prev_play_line_index < line_index < lc.line:
@@ -266,13 +268,14 @@ def get_path_to_task(
     if lineno < 1:
         msg = f"expected lineno >= 1, got {lineno}"
         raise ValueError(msg)
-    if lintable.kind in ("tasks", "handlers"):
-        assert isinstance(ruamel_data, CommentedSeq)
-        return _get_path_to_task_in_tasks_block(lineno, ruamel_data)
-    if lintable.kind == "playbook":
-        assert isinstance(ruamel_data, CommentedSeq)
-        return _get_path_to_task_in_playbook(lineno, ruamel_data)
-    # if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
+    if lintable.kind in ("tasks", "handlers", "playbook"):
+        if not isinstance(ruamel_data, CommentedSeq):
+            msg = f"expected ruamel_data to be a CommentedSeq, got {ruamel_data!r}"
+            raise ValueError(msg)
+        if lintable.kind in ("tasks", "handlers"):
+            return _get_path_to_task_in_tasks_block(lineno, ruamel_data)
+        if lintable.kind == "playbook":
+            return _get_path_to_task_in_playbook(lineno, ruamel_data)
 
     return []
 
@@ -327,7 +330,7 @@ def _get_path_to_task_in_playbook(
     return []
 
 
-def _get_path_to_task_in_tasks_block(
+def _get_path_to_task_in_tasks_block(  # noqa: C901
     lineno: int,  # 1-based
     tasks_block: CommentedSeq,
     last_lineno: int | None = None,  # 1-based
@@ -369,7 +372,9 @@ def _get_path_to_task_in_tasks_block(
                 task_path: list[str | int] = [task_index]
                 return task_path + list(subtask_path)
 
-        assert isinstance(task.lc.line, int)
+        if not isinstance(task.lc.line, int):
+            msg = f"expected task.lc.line to be an int, got {task.lc.line!r}"
+            raise RuntimeError(msg)
         if task.lc.line == line_index:
             return [task_index]
         if task_index > 0 and prev_task_line_index < line_index < task.lc.line:

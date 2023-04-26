@@ -27,7 +27,7 @@ if missing:
 # might depend on these. This approach is compatible with GHA caching.
 try:
     subprocess.check_output(
-        ["./tools/install-reqs.sh"],
+        ["./tools/install-reqs.sh"],  # noqa: S603
         stderr=subprocess.PIPE,
         text=True,
     )

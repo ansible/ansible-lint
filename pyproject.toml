@@ -239,7 +239,6 @@ ignore = [
   "PTH",
   "PLR",
   "PLW",
-  "S",
   "SLF",
   "T",
   "TCH",
@@ -255,6 +254,11 @@ parametrize-values-type = "tuple"
 
 [tool.ruff.isort]
 known-first-party = ["ansiblelint"]
+
+[tool.ruff.per-file-ignores]
+"test/**/*.py" = ["S"]
+"src/ansiblelint/rules/*.py" = ["S"]
+"src/ansiblelint/testing/*.py" = ["S"]
 
 [tool.setuptools.dynamic]
 optional-dependencies.docs = { file = [".config/requirements-docs.txt"] }
