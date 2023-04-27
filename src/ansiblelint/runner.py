@@ -135,7 +135,9 @@ class Runner:
         # -- phase 1 : syntax check in parallel --
         def worker(lintable: Lintable) -> list[MatchError]:
             # pylint: disable=protected-access
-            return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+            return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(  # noqa: SLF001
+                lintable,
+            )
 
         for lintable in self.lintables:
             if lintable.kind not in ("playbook", "role") or lintable.stop_processing:

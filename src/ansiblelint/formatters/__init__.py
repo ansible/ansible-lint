@@ -35,13 +35,13 @@ class BaseFormatter(Generic[T]):
         if base_dir:  # can be None
             base_dir = base_dir.absolute()
 
-        self._base_dir = base_dir if display_relative_path else None
+        self.base_dir = base_dir if display_relative_path else None
 
     def _format_path(self, path: str | Path) -> str | Path:
-        if not self._base_dir or not path:
+        if not self.base_dir or not path:
             return path
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
-        return os.path.relpath(path, start=self._base_dir)
+        return os.path.relpath(path, start=self.base_dir)
 
     def format(self, match: MatchError) -> str:
         """Format a match error."""
@@ -207,7 +207,7 @@ class SarifFormatter(BaseFormatter[Any]):
             msg = f"The {self.__class__} was expecting a list of MatchError."
             raise RuntimeError(msg)
 
-        root_path = Path(str(self._base_dir)).as_uri()
+        root_path = Path(str(self.base_dir)).as_uri()
         root_path = root_path + "/" if not root_path.endswith("/") else root_path
         rules, results = self._extract_results(matches)
 

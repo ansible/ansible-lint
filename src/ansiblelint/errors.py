@@ -138,7 +138,7 @@ class MatchError(ValueError):
         """Return whether the current object is less than the other."""
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return bool(self._hash_key < other._hash_key)
+        return bool(self._hash_key < other._hash_key)  # noqa: SLF001
 
     def __eq__(self, other: object) -> bool:
         """Identify whether the other object represents the same rule match."""

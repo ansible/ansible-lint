@@ -39,7 +39,7 @@ class RunOnce(AnsibleLintRule):
                 filename=file,
                 tag=f"{self.id}[play]",
                 # pylint: disable=protected-access
-                lineno=strategy._line_number,
+                lineno=strategy._line_number,  # noqa: SLF001
             ),
         ]
 
