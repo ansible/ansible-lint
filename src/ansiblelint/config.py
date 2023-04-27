@@ -228,7 +228,7 @@ def guess_install_method() -> str:
                 logging.debug("Skipping %s as it is not installed.", package_name)
                 use_pip = False
     # pylint: disable=broad-except
-    except Exception as exc:
+    except Exception as exc:  # noqa:BLE001
         # On Fedora 36, we got a AttributeError exception from pip that we want to avoid
         logging.debug(exc)
         use_pip = False
