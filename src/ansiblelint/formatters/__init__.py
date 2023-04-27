@@ -43,7 +43,7 @@ class BaseFormatter(Generic[T]):
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
         return os.path.relpath(path, start=self.base_dir)
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         """Format a match error."""
         return str(match)
 
@@ -56,7 +56,7 @@ class BaseFormatter(Generic[T]):
 class Formatter(BaseFormatter):  # type: ignore
     """Default output formatter of ansible-lint."""
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         _id = getattr(match.rule, "id", "000")
         result = f"[{match.level}][bold][link={match.rule.url}]{self.escape(match.tag)}[/link][/][/][dim]:[/] [{match.level}]{self.escape(match.message)}[/]"
         if match.level != "error":
@@ -76,7 +76,7 @@ class Formatter(BaseFormatter):  # type: ignore
 class QuietFormatter(BaseFormatter[Any]):
     """Brief output formatter for ansible-lint."""
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         return (
             f"[{match.level}]{match.rule.id}[/] "
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
@@ -86,7 +86,7 @@ class QuietFormatter(BaseFormatter[Any]):
 class ParseableFormatter(BaseFormatter[Any]):
     """Parseable uses PEP8 compatible format."""
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         result = (
             f"[filename]{self._format_path(match.filename or '')}[/][dim]:{match.position}:[/] "
             f"[{match.level}][bold]{self.escape(match.tag)}[/bold]"
@@ -113,7 +113,7 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
     Supported levels: debug, warning, error
     """
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         """Prepare a match instance for reporting as a GitHub Actions annotation."""
         file_path = self._format_path(match.filename or "")
         line_num = match.lineno

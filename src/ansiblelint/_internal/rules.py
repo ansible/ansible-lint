@@ -53,7 +53,7 @@ class BaseRule:
     _collection: RulesCollection | None = None
 
     @property
-    def help(self) -> str:
+    def help(self) -> str:  # noqa: A003
         """Return a help markdown string for the rule."""
         if self._help is None:
             self._help = ""

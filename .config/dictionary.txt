@@ -157,6 +157,7 @@ htpasswd
 hwchksum
 hwcksum
 idempotency
+ignorelist
 importlib
 iniconfig
 inlinehilite

@@ -123,7 +123,7 @@ def test_runner_unicode_format(
 
     matches = runner.run()
 
-    formatter.format(matches[0])
+    formatter.apply(matches[0])
 
 
 @pytest.mark.parametrize(

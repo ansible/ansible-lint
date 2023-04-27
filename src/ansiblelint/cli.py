@@ -154,10 +154,10 @@ class WriteArgAction(argparse.Action):
         nargs: int | str | None = None,
         const: Any = None,
         default: Any = None,
-        type: Callable[[str], Any] | None = None,
+        type: Callable[[str], Any] | None = None,  # noqa: A002
         choices: list[Any] | None = None,
         required: bool = False,
-        help: str | None = None,
+        help: str | None = None,  # noqa: A002
         metavar: str | None = None,
     ) -> None:
         """Create the argparse action with WriteArg-specific defaults."""

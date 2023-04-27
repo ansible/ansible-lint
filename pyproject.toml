@@ -227,7 +227,6 @@ ignore = [
   "PLW2901", # PLW2901: Redefined loop variable
   "RET504", # Unnecessary variable assignment before `return` statement
   # temporary disabled until we fix them:
-  "A",
   "ANN",
   "ARG002", # Unused method argument (currently in too many places)
   "D",
@@ -241,6 +240,9 @@ select = ["ALL"]
 target-version = "py39"
 # Same as Black.
 line-length = 88
+
+[tool.ruff.flake8-builtins]
+builtins-ignorelist = ["id"]
 
 [tool.ruff.flake8-pytest-style]
 parametrize-values-type = "tuple"
