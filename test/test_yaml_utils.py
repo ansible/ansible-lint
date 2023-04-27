@@ -227,7 +227,7 @@ def fixture_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, s
 )
 def test_formatted_yaml_loader_dumper(
     yaml_formatting_fixtures: tuple[str, str, str],
-    fixture_filename: str,
+    fixture_filename: str,  # noqa: ARG001
 ) -> None:
     """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
     # pylint: disable=unused-argument

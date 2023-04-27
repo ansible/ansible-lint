@@ -227,15 +227,15 @@ ignore = [
   "PLW2901", # PLW2901: Redefined loop variable
   "RET504", # Unnecessary variable assignment before `return` statement
   # temporary disabled until we fix them:
-  "ANN",
-  "ARG",
   "A",
+  "ANN",
+  "ARG002", # Unused method argument (currently in too many places)
   "B",
   "D",
   "FBT",
   "PGH",
-  "PTH",
   "PLR",
+  "PTH",
   "TCH",
   "TRY",
 ]
