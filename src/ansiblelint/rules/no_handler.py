@@ -75,7 +75,8 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
 
         if isinstance(when, list):
             for item in when:
-                return _changed_in_when(item)
+                if _changed_in_when(item):
+                    return True
         if isinstance(when, str):
             return _changed_in_when(when)
         return False
@@ -90,7 +91,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         ("test_file", "failures"),
         (
-            pytest.param("examples/playbooks/no_handler_fail.yml", 6, id="fail"),
+            pytest.param("examples/playbooks/no_handler_fail.yml", 7, id="fail"),
             pytest.param("examples/playbooks/no_handler_pass.yml", 0, id="pass"),
         ),
     )
