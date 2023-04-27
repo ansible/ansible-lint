@@ -113,7 +113,7 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
     return templar
 
 
-def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:
+def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG001
     """Mock a filter that can take any combination of args and kwargs.
 
     This will return x when x | filter(y,z) is called
@@ -326,7 +326,7 @@ def play_children(
     basedir: str,
     item: tuple[str, Any],
     parent_type: FileType,
-    playbook_dir: str,
+    playbook_dir: str,  # noqa: ARG001
 ) -> list[Lintable]:
     """Flatten the traversed play tasks."""
     # pylint: disable=unused-argument
@@ -511,7 +511,7 @@ def _roles_children(
     basedir: str,
     k: str,
     v: Sequence[Any],
-    parent_type: FileType,
+    parent_type: FileType,  # noqa: ARG001
     main: str = "main",
 ) -> list[Lintable]:
     # pylint: disable=unused-argument # parent_type)
@@ -572,7 +572,7 @@ def _rolepath(basedir: str, role: str) -> str | None:
 def _look_for_role_files(
     basedir: str,
     role: str,
-    main: str | None = "main",
+    main: str | None = "main",  # noqa: ARG001
 ) -> list[Lintable]:
     # pylint: disable=unused-argument # main
     role_path = _rolepath(basedir, role)

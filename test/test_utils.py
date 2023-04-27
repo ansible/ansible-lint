@@ -324,7 +324,7 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
     options = cli.get_config(["--exclude", "foo"])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Options) -> list[str]:
+    def mockreturn(options: Options) -> list[str]:  # noqa: ARG001
         return ["foo/playbook.yml", "bar/playbook.yml"]
 
     monkeypatch.setattr(utils, "discover_lintables", mockreturn)

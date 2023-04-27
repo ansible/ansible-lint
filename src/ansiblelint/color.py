@@ -87,8 +87,8 @@ def render_yaml(text: str) -> Syntax:
 # pylint: disable=redefined-outer-name,unused-argument
 def _rich_codeblock_custom_rich_console(
     self: rich.markdown.CodeBlock,
-    console: Console,
-    options: rich.console.ConsoleOptions,
+    console: Console,  # noqa: ARG001
+    options: rich.console.ConsoleOptions,  # noqa: ARG001
 ) -> rich.console.RenderResult:  # pragma: no cover
     code = str(self.text).rstrip()
     syntax = Syntax(

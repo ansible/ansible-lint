@@ -291,7 +291,7 @@ def test_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:
     options = cli.get_config([])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Options) -> dict[str, Any]:
+    def mockreturn(options: Options) -> dict[str, Any]:  # noqa: ARG001
         return {normpath(path): kind}
 
     # assert Lintable is able to determine file type
