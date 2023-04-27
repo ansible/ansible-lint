@@ -9,15 +9,19 @@ from __future__ import annotations
 
 import copy
 import os
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 import pytest
-from _pytest.fixtures import SubRequest
 
 from ansiblelint.config import Options, options
 from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import RunFromText
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from _pytest.fixtures import SubRequest
 
 
 @pytest.fixture(name="default_rules_collection")

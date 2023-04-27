@@ -30,7 +30,6 @@ import shutil
 import site
 import subprocess
 import sys
-from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Callable, TextIO
 
@@ -57,6 +56,8 @@ from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
+    from collections.abc import Iterator
+
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
 

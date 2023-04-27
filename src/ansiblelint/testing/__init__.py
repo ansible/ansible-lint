@@ -9,13 +9,13 @@ import tempfile
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.app import get_app
-from ansiblelint.rules import RulesCollection
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
     # pylint: disable=unsubscriptable-object
     CompletedProcess = subprocess.CompletedProcess[Any]
     from ansiblelint.errors import MatchError
+    from ansiblelint.rules import RulesCollection
 else:
     CompletedProcess = subprocess.CompletedProcess
 

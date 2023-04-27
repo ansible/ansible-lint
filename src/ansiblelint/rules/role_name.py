@@ -24,16 +24,17 @@ from __future__ import annotations
 import re
 import sys
 from functools import cache
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import ROLE_IMPORT_ACTION_NAMES
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 
 ROLE_NAME_REGEX = re.compile(r"^[a-z][a-z0-9_]*$")

@@ -8,12 +8,12 @@ from typing import TYPE_CHECKING, Any
 from ansible.plugins.loader import module_loader
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 _logger = logging.getLogger(__name__)

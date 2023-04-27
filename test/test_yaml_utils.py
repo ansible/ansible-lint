@@ -3,17 +3,19 @@ from __future__ import annotations
 
 from io import StringIO
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from ruamel.yaml.comments import CommentedMap, CommentedSeq
-from ruamel.yaml.emitter import Emitter
 from ruamel.yaml.main import YAML
 from yamllint.linter import run as run_yamllint
 
 import ansiblelint.yaml_utils
 from ansiblelint.file_utils import Lintable
 from ansiblelint.utils import task_in_list
+
+if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+    from ruamel.yaml.emitter import Emitter
 
 fixtures_dir = Path(__file__).parent / "fixtures"
 formatting_before_fixtures_dir = fixtures_dir / "formatting-before"

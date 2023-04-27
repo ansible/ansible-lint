@@ -1,10 +1,12 @@
 """Test Rule that needs_raw_task."""
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from ansiblelint.file_utils import Lintable
 
 
 class RawTaskRule(AnsibleLintRule):

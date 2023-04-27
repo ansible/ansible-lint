@@ -9,7 +9,7 @@ import logging
 import re
 import sys
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 # pylint: disable=preferred-module
 from unittest import mock
@@ -21,11 +21,14 @@ from ansible.module_utils import basic
 from ansible.plugins.loader import PluginLoadContext, module_loader
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.text import has_jinja
 from ansiblelint.yaml_utils import clean_json
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
+
 
 _logger = logging.getLogger(__name__)
 
@@ -261,7 +264,7 @@ class ArgsRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    import pytest
+    import pytest  # noqa: TCH002
 
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 

@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import os
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.config import options
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.rules.fqcn import builtins
 from ansiblelint.skip_utils import is_nested_task
+
+if TYPE_CHECKING:
+    from ansiblelint.file_utils import Lintable
 
 
 class OnlyBuiltinsRule(AnsibleLintRule):

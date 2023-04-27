@@ -7,11 +7,10 @@ import os
 import subprocess
 import sys
 from collections import OrderedDict, defaultdict
-from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import wcmatch.pathlib
 from wcmatch.wcmatch import RECURSIVE, WcMatch
@@ -20,6 +19,10 @@ from yaml.error import YAMLError
 from ansiblelint.config import BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, GIT_CMD, FileType, States
 from ansiblelint.logger import warn_or_fail
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+
 
 _logger = logging.getLogger(__package__)
 

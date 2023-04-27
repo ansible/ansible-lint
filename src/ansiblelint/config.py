@@ -11,14 +11,17 @@ import warnings
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.error import HTTPError, URLError
 
-from filelock import FileLock
 from packaging.version import Version
 
 from ansiblelint import __version__
 from ansiblelint.loaders import yaml_from_file
+
+if TYPE_CHECKING:
+    from filelock import FileLock
+
 
 _logger = logging.getLogger(__name__)
 

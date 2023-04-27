@@ -5,11 +5,14 @@ from __future__ import annotations
 
 import os
 import sys
+from typing import TYPE_CHECKING
 
-from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
 
 
 class PlaybookExtensionRule(AnsibleLintRule):

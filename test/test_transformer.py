@@ -4,17 +4,20 @@ from __future__ import annotations
 import os
 import pathlib
 import shutil
-from argparse import Namespace
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 import pytest
-
-from ansiblelint.config import Options
-from ansiblelint.rules import RulesCollection
 
 # noinspection PyProtectedMember
 from ansiblelint.runner import LintResult, _get_matches
 from ansiblelint.transformer import Transformer
+
+if TYPE_CHECKING:
+    from argparse import Namespace
+    from collections.abc import Iterator
+
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
 
 
 @pytest.fixture(name="copy_examples_dir")

@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import re
 import sys
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from ansiblelint.constants import FILENAME_KEY, LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 

@@ -2,16 +2,18 @@
 from __future__ import annotations
 
 import logging
-from typing import Union, cast
+from typing import TYPE_CHECKING, Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-from ansiblelint.config import Options
-from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.runner import LintResult
 from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
+
+if TYPE_CHECKING:
+    from ansiblelint.config import Options
+    from ansiblelint.errors import MatchError
+    from ansiblelint.runner import LintResult
 
 __all__ = ["Transformer"]
 

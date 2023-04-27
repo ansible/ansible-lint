@@ -235,7 +235,6 @@ ignore = [
   "PGH",
   "PLR",
   "PTH",
-  "TCH",
   "TRY",
 ]
 select = ["ALL"]

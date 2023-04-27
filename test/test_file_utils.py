@@ -5,17 +5,12 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from _pytest.capture import CaptureFixture
-from _pytest.logging import LogCaptureFixture
-from _pytest.monkeypatch import MonkeyPatch
 
 from ansiblelint import cli, file_utils
 from ansiblelint.__main__ import initialize_logger
-from ansiblelint.config import Options
-from ansiblelint.constants import FileType
 from ansiblelint.file_utils import (
     Lintable,
     expand_path_vars,
@@ -24,10 +19,18 @@ from ansiblelint.file_utils import (
     normpath,
     normpath_path,
 )
-from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 from .conftest import cwd
+
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
+    from _pytest.logging import LogCaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
+
+    from ansiblelint.config import Options
+    from ansiblelint.constants import FileType
+    from ansiblelint.rules import RulesCollection
 
 
 @pytest.mark.parametrize(

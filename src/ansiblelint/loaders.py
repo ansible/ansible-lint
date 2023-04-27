@@ -5,8 +5,7 @@ import logging
 import os
 from collections import defaultdict, namedtuple
 from functools import partial
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 from yaml import YAMLError
@@ -16,6 +15,9 @@ try:
     from yaml import CSafeLoader as SafeLoader
 except (ImportError, AttributeError):
     from yaml import FullLoader, SafeLoader  # type: ignore
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 IgnoreFile = namedtuple("IgnoreFile", "default alternative")
 IGNORE_FILE = IgnoreFile(".ansible-lint-ignore", ".config/ansible-lint-ignore.txt")

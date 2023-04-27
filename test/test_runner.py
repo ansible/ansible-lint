@@ -21,14 +21,16 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
 from ansiblelint import formatters
 from ansiblelint.file_utils import Lintable, abspath
-from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from ansiblelint.rules import RulesCollection
 
 LOTS_OF_WARNINGS_PLAYBOOK = abspath(
     "examples/playbooks/lots_of_warnings.yml",
