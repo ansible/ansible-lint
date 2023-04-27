@@ -42,7 +42,8 @@ class IgnoreErrorsRule(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
-    from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
+    if TYPE_CHECKING:
+        from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
 
     IGNORE_ERRORS_TRUE = """
 - hosts: all

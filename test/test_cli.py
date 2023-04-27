@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
 
 from ansiblelint import cli
+
+if TYPE_CHECKING:
+    from _pytest.monkeypatch import MonkeyPatch
 
 
 @pytest.fixture(name="base_arguments")

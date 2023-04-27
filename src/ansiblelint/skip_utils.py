@@ -24,7 +24,6 @@ from __future__ import annotations
 import collections.abc
 import logging
 import re
-from collections.abc import Generator, Sequence
 from functools import cache
 from itertools import product
 from typing import TYPE_CHECKING, Any
@@ -42,10 +41,14 @@ from ansiblelint.constants import (
     RENAMED_TAGS,
     SKIPPED_RULES_KEY,
 )
-from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
+    from collections.abc import Generator, Sequence
+
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
+
+    from ansiblelint.file_utils import Lintable
+
 
 _logger = logging.getLogger(__name__)
 _found_deprecated_tags: set[str] = set()

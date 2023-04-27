@@ -13,10 +13,11 @@ from ansiblelint.skip_utils import (
     get_rule_skips_from_line,
     is_nested_task,
 )
-from ansiblelint.testing import RunFromText
 
 if TYPE_CHECKING:
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
+
+    from ansiblelint.testing import RunFromText
 
 PLAYBOOK_WITH_NOQA = """\
 ---

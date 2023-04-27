@@ -1,13 +1,18 @@
 """Tests related to role imports."""
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from _pytest.fixtures import SubRequest
 
-from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from _pytest.fixtures import SubRequest
+
+    from ansiblelint.rules import RulesCollection
 
 ROLE_TASKS_MAIN = """\
 ---

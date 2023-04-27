@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import textwrap
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
-from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from ansiblelint.rules import RulesCollection
 
 LAYOUT_IMPORTS: dict[str, str] = {
     "main.yml": textwrap.dedent(

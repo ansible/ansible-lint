@@ -23,25 +23,30 @@ from __future__ import annotations
 import logging
 import subprocess
 import sys
-from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from _pytest.capture import CaptureFixture
-from _pytest.logging import LogCaptureFixture
-from _pytest.monkeypatch import MonkeyPatch
 from ansible.utils.sentinel import Sentinel
 from ansible_compat.runtime import Runtime
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
-from ansiblelint.config import Options
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from _pytest.capture import CaptureFixture
+    from _pytest.logging import LogCaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
+
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
 
 runtime = Runtime(require_module=True)
 

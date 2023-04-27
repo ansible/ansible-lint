@@ -5,7 +5,6 @@ import logging
 import multiprocessing
 import multiprocessing.pool
 import os
-from collections.abc import Generator
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from typing import TYPE_CHECKING, Any
@@ -13,13 +12,15 @@ from typing import TYPE_CHECKING, Any
 import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule
-from ansiblelint.config import Options
 from ansiblelint.constants import States
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
 
 _logger = logging.getLogger(__name__)

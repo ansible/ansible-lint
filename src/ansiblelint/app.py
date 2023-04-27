@@ -17,12 +17,12 @@ from ansiblelint.color import console, console_stderr, render_yaml
 from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RC, RULE_DOC_URL
-from ansiblelint.errors import MatchError
 from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
     from ansiblelint._internal.rules import BaseRule
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.runner import LintResult
 

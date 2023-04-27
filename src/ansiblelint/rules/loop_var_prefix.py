@@ -6,11 +6,11 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.config import LOOP_VAR_PREFIX, options
-from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import toidentifier
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 

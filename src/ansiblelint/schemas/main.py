@@ -3,16 +3,19 @@ from __future__ import annotations
 
 import json
 import logging
+from typing import TYPE_CHECKING
 
 import jsonschema
 import yaml
 from jsonschema.exceptions import ValidationError
 
-from ansiblelint.file_utils import Lintable
 from ansiblelint.loaders import yaml_load_safe
 from ansiblelint.schemas.__main__ import JSON_SCHEMAS, _schema_cache
 
 _logger = logging.getLogger(__package__)
+
+if TYPE_CHECKING:
+    from ansiblelint.file_utils import Lintable
 
 
 def validate_file_schema(file: Lintable) -> list[str]:

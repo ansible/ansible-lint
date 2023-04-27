@@ -6,7 +6,6 @@ import sys
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.testing import RunFromText
 
 # Copyright (c) 2018, Ansible Project
 
@@ -16,6 +15,7 @@ if TYPE_CHECKING:
 
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.testing import RunFromText
 
 
 class MetaTagValidRule(AnsibleLintRule):

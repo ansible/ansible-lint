@@ -10,9 +10,7 @@ from collections import defaultdict
 from collections.abc import Iterable, Iterator, MutableMapping, MutableSequence
 from importlib import import_module
 from pathlib import Path
-from typing import Any, cast
-
-from ruamel.yaml.comments import CommentedMap, CommentedSeq
+from typing import TYPE_CHECKING, Any, cast
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
@@ -29,6 +27,9 @@ from ansiblelint.config import options as default_options
 from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
+
+if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 _logger = logging.getLogger(__name__)
 

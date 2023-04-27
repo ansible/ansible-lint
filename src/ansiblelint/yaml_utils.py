@@ -19,10 +19,7 @@ from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
 from ruamel.yaml.main import YAML
-from ruamel.yaml.nodes import ScalarNode
-from ruamel.yaml.representer import RoundTripRepresenter
 from ruamel.yaml.scalarint import ScalarInt
-from ruamel.yaml.tokens import CommentToken
 from yamllint.config import YamlLintConfig
 
 from ansiblelint.constants import (
@@ -31,11 +28,15 @@ from ansiblelint.constants import (
     PLAYBOOK_TASK_KEYWORDS,
     SKIPPED_RULES_KEY,
 )
-from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
     from ruamel.yaml.comments import LineCol  # pylint: disable=ungrouped-imports
+    from ruamel.yaml.nodes import ScalarNode
+    from ruamel.yaml.representer import RoundTripRepresenter
+    from ruamel.yaml.tokens import CommentToken
+
+    from ansiblelint.file_utils import Lintable
 
 _logger = logging.getLogger(__name__)
 

@@ -6,9 +6,8 @@ import logging
 import os
 import sys
 from argparse import Namespace
-from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
 from ansiblelint.config import (
     DEFAULT_KINDS,
@@ -28,6 +27,10 @@ from ansiblelint.file_utils import (
 from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.schemas.main import validate_file_schema
 from ansiblelint.yaml_utils import clean_json
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [

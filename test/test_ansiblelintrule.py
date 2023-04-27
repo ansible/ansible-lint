@@ -1,13 +1,15 @@
 """Generic tests for AnsibleLintRule class."""
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
 
 from ansiblelint.config import options
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from _pytest.monkeypatch import MonkeyPatch
 
 
 def test_unjinja() -> None:
