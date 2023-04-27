@@ -82,7 +82,7 @@ def _fetch_skips(data: Any, collector: dict[int, set[str]]) -> dict[int, set[str
             collector[data.get(LINE_NUMBER_KEY)].update(rules)
     if isinstance(data, Iterable) and not isinstance(data, str):
         if isinstance(data, dict):
-            for entry, value in data.items():
+            for _entry, value in data.items():
                 _fetch_skips(value, collector)
         else:  # must be some kind of list
             for entry in data:

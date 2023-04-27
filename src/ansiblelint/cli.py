@@ -191,7 +191,7 @@ class WriteArgAction(argparse.Action):
             # But if --write comes first, then it might actually be a lintable.
             maybe_lintable = Path(values)
             if maybe_lintable.exists():
-                setattr(namespace, "lintables", [values])
+                namespace.lintables = [values]
                 values = []
         if isinstance(values, str):
             values = values.split(",")
@@ -536,7 +536,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
     # append default kinds to the custom list
     kinds = file_config.get("kinds", [])
     kinds.extend(DEFAULT_KINDS)
-    setattr(cli_config, "kinds", kinds)
+    cli_config.kinds = kinds
 
     return cli_config
 

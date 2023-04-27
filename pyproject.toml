@@ -230,7 +230,6 @@ ignore = [
   "A",
   "ANN",
   "ARG002", # Unused method argument (currently in too many places)
-  "B",
   "D",
   "FBT",
   "PGH",

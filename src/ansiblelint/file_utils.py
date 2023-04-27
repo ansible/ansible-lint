@@ -244,7 +244,7 @@ class Lintable:
         self.abspath = self.path.expanduser().absolute()
 
         if self.kind == "yaml":
-            self.data  # pylint: disable=pointless-statement
+            _ = self.data  # pylint: disable=pointless-statement
 
     def _guess_kind(self) -> None:
         if self.kind == "yaml":

@@ -176,7 +176,7 @@ class JinjaRule(AnsibleLintRule):
         if str(file.kind) == "vars":
             data = parse_yaml_from_file(str(file.path))
             # pylint: disable=unused-variable
-            for key, v, path in nested_items_path(data):
+            for key, v, _path in nested_items_path(data):
                 if isinstance(v, AnsibleUnicode):
                     reformatted, details, tag = self.check_whitespace(
                         v,
