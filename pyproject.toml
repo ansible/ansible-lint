@@ -231,7 +231,6 @@ ignore = [
   "ARG",
   "A",
   "B",
-  "SIM",
   "BLE",
   "D",
   "EXE",
@@ -239,6 +238,7 @@ ignore = [
   "PGH",
   "PTH",
   "PLR",
+  "S603", # subprocess-without-shell-equals-true => subprocess call: check for execution of untrusted input
   "SLF",
   "TCH",
   "TRY",
