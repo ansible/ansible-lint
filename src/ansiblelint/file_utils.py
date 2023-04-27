@@ -21,11 +21,7 @@ from ansiblelint.config import BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, GIT_CMD, FileType, States
 from ansiblelint.logger import warn_or_fail
 
-if TYPE_CHECKING:
-    # https://github.com/PyCQA/pylint/issues/3979
-    BasePathLike = os.PathLike[Any]  # pylint: disable=unsubscriptable-object
-else:
-    BasePathLike = os.PathLike
+BasePathLike = os.PathLike[Any] if TYPE_CHECKING else os.PathLike
 
 _logger = logging.getLogger(__package__)
 
@@ -46,7 +42,7 @@ def abspath(path: str, base_dir: str) -> str:
     return os.path.normpath(path)
 
 
-def normpath(path: str | BasePathLike) -> str:
+def normpath(path: str | BasePathLike) -> str:  # type: ignore[valid-type]
     """
     Normalize a path in order to provide a more consistent output.
 
@@ -81,7 +77,7 @@ def is_relative_to(path: Path, *other: Any) -> bool:
         return False
 
 
-def normpath_path(path: str | BasePathLike) -> Path:
+def normpath_path(path: str | BasePathLike) -> Path:  # type: ignore[valid-type]
     """Normalize a path in order to provide a more consistent output.
 
     - Any symlinks are resolved.
@@ -107,7 +103,7 @@ def normpath_path(path: str | BasePathLike) -> Path:
 
 
 @contextmanager
-def cwd(path: str | BasePathLike) -> Iterator[None]:
+def cwd(path: str | BasePathLike) -> Iterator[None]:  # type: ignore[valid-type]
     """Context manager for temporary changing current working directory."""
     old_pwd = os.getcwd()
     os.chdir(path)
@@ -469,7 +465,7 @@ def strip_dotslash_prefix(fname: str) -> str:
     return fname[2:] if fname.startswith("./") else fname
 
 
-def find_project_root(  # noqa: C901
+def find_project_root(
     srcs: Sequence[str],
     config_file: str | None = None,
 ) -> tuple[Path, str]:
@@ -490,10 +486,7 @@ def find_project_root(  # noqa: C901
         srcs = [str(Path.cwd().resolve().absolute())]
     path_srcs = [Path(Path.cwd(), src).resolve() for src in srcs]
 
-    if config_file:
-        cfg_files = [config_file]
-    else:
-        cfg_files = CONFIG_FILENAMES
+    cfg_files = [config_file] if config_file else CONFIG_FILENAMES
 
     # A list of lists of parents for each 'src'. 'src' is included as a
     # "parent" of itself if it is a directory

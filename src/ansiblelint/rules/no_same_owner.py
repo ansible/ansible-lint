@@ -71,9 +71,11 @@ should not be preserved when transferring files between them.
 
             if src.endswith("zip") and "-X" in action.get("extra_opts", []):
                 return True
-            if re.search(r".*\.tar(\.(gz|bz2|xz))?$", src):
-                if "--no-same-owner" not in action.get("extra_opts", []):
-                    return True
+            if re.search(
+                r".*\.tar(\.(gz|bz2|xz))?$",
+                src,
+            ) and "--no-same-owner" not in action.get("extra_opts", []):
+                return True
         return False
 
 

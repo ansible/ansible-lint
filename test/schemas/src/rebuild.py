@@ -62,14 +62,12 @@ def is_ref_used(obj: Any, ref: str) -> bool:
         if obj.get("$ref", None) == ref_use:
             return True
         for _ in obj.values():
-            if isinstance(_, (dict, list)):
-                if is_ref_used(_, ref):
-                    return True
+            if isinstance(_, (dict, list)) and is_ref_used(_, ref):
+                return True
     elif isinstance(obj, list):
         for _ in obj:
-            if isinstance(_, (dict, list)):
-                if is_ref_used(_, ref):
-                    return True
+            if isinstance(_, (dict, list)) and is_ref_used(_, ref):
+                return True
     return False
 
 
@@ -127,7 +125,7 @@ if __name__ == "__main__":
         # Remove all unreferenced ($ref) definitions ($defs) recursively
         while True:
             spare = []
-            for k in sub_json["$defs"].keys():
+            for k in sub_json["$defs"]:
                 if not is_ref_used(sub_json, k):
                     spare.append(k)
             for k in spare:
