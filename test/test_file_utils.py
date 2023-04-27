@@ -71,7 +71,7 @@ def test_expand_paths_vars(
 ) -> None:
     """Ensure that tilde and env vars are expanded in paths lists."""
     monkeypatch.setenv("TEST_PATH", "/test/path")
-    assert expand_paths_vars([test_path]) == [expected]  # type: ignore
+    assert expand_paths_vars([test_path]) == [expected]  # type: ignore[list-item]
 
 
 @pytest.mark.parametrize(

@@ -359,7 +359,7 @@ def load_plugins(  # : max-complexity: 11
             and rule.id not in rules
         ):
             rules[rule.id] = rule()
-    for rule in rules.values():  # type: ignore
+    for rule in rules.values():  # type: ignore[assignment]
         if isinstance(rule, AnsibleLintRule) and bool(rule.id):
             yield rule
 

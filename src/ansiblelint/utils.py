@@ -233,16 +233,16 @@ def tokenize(line: str) -> tuple[str, list[str], dict[str, str]]:
     return (command, args, kwargs)
 
 
-def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore
+def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore[type-arg]
     if isinstance(pb_data, dict):
         return pb_data.items()
     if not pb_data:
-        return []  # type: ignore
+        return []  # type: ignore[return-value]
 
     # "if play" prevents failure if the play sequence contains None,
     # which is weird but currently allowed by Ansible
     # https://github.com/ansible/ansible-lint/issues/849
-    return [item for play in pb_data if play for item in play.items()]  # type: ignore
+    return [item for play in pb_data if play for item in play.items()]  # type: ignore[return-value]
 
 
 def _set_collections_basedir(basedir: str) -> None:
@@ -1001,7 +1001,7 @@ def is_playbook(filename: str) -> bool:
 
     try:
         f = parse_yaml_from_file(filename)
-    except Exception as exc:  # pylint: disable=broad-except # noqa:BLE001
+    except Exception as exc:  # pylint: disable=broad-except # noqa: BLE001
         _logger.warning(
             "Failed to load %s with %s, assuming is not a playbook.",
             filename,

@@ -149,7 +149,7 @@ def kind_from_path(path: Path, base: bool = False) -> FileType:
                     | wcmatch.pathlib.DOTGLOB
                 ),
             ):
-                return str(k)  # type: ignore
+                return str(k)  # type: ignore[return-value]
 
     if base:
         # Unknown base file type is default

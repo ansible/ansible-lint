@@ -231,7 +231,6 @@ ignore = [
   "ARG002", # Unused method argument (currently in too many places)
   "D",
   "FBT",
-  "PGH",
   "PLR",
   "PTH",
   "TRY",

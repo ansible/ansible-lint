@@ -101,4 +101,4 @@ def _rich_codeblock_custom_rich_console(
     yield syntax
 
 
-rich.markdown.CodeBlock.__rich_console__ = _rich_codeblock_custom_rich_console  # type: ignore
+rich.markdown.CodeBlock.__rich_console__ = _rich_codeblock_custom_rich_console  # type: ignore[method-assign]

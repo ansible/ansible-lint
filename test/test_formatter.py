@@ -61,7 +61,7 @@ def test_dict_format_line() -> None:
     match = MatchError(
         message="xyz",
         lineno=1,
-        details={"hello": "world"},  # type: ignore
+        details={"hello": "world"},  # type: ignore[arg-type]
         lintable=Lintable("filename.yml", content=""),
         rule=rule,
     )

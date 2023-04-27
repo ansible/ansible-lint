@@ -68,7 +68,7 @@ class TestCodeclimateJSONFormatter:
         """Test negative case. Only lists are allowed. Otherwise a RuntimeError will be raised."""
         assert isinstance(self.formatter, CodeclimateJSONFormatter)
         with pytest.raises(RuntimeError):
-            self.formatter.format_result(self.matches[0])  # type: ignore
+            self.formatter.format_result(self.matches[0])  # type: ignore[arg-type]
 
     def test_result_is_list(self) -> None:
         """Test if the return JSON contains a list with a length of 2."""

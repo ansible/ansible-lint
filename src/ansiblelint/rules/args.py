@@ -75,7 +75,7 @@ class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
 
 
-class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore
+class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc]
     """Mock AnsibleModule class."""
 
     def __init__(self, *args: str, **kwargs: str) -> None:

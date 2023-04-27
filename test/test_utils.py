@@ -209,7 +209,7 @@ def test_extract_from_list() -> None:
     test_list = utils.extract_from_list(blocks, ["block"])
     test_none = utils.extract_from_list(blocks, ["test_none"])
 
-    assert list(block["block"]) == test_list  # type: ignore
+    assert list(block["block"]) == test_list  # type: ignore[arg-type]
     assert not test_none
     with pytest.raises(RuntimeError):
         utils.extract_from_list(blocks, ["test_string"])
