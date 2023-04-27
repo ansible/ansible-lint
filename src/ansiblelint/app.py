@@ -74,7 +74,7 @@ class App:
             for match in ignored_matches:
                 if match.ignored:
                     # highlight must be off or apostrophes may produce unexpected results
-                    console.print(self.formatter.format(match), highlight=False)
+                    console.print(self.formatter.apply(match), highlight=False)
         if fatal_matches:
             _logger.warning(
                 "Listing %s violation(s) that are fatal",
@@ -82,7 +82,7 @@ class App:
             )
             for match in fatal_matches:
                 if not match.ignored:
-                    console.print(self.formatter.format(match), highlight=False)
+                    console.print(self.formatter.apply(match), highlight=False)
 
         # If run under GitHub Actions we also want to emit output recognized by it.
         if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("GITHUB_WORKFLOW"):
@@ -92,7 +92,7 @@ class App:
             formatter = formatters.AnnotationsFormatter(self.options.cwd, True)
             for match in itertools.chain(fatal_matches, ignored_matches):
                 console_stderr.print(
-                    formatter.format(match),
+                    formatter.apply(match),
                     markup=False,
                     highlight=False,
                 )

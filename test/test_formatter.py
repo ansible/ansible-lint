@@ -41,7 +41,7 @@ def test_format_coloured_string() -> None:
         lintable=Lintable("filename.yml", content=""),
         rule=rule,
     )
-    formatter.format(match)
+    formatter.apply(match)
 
 
 def test_unicode_format_string() -> None:
@@ -53,7 +53,7 @@ def test_unicode_format_string() -> None:
         lintable=Lintable("filename.yml", content=""),
         rule=rule,
     )
-    formatter.format(match)
+    formatter.apply(match)
 
 
 def test_dict_format_line() -> None:
@@ -65,4 +65,4 @@ def test_dict_format_line() -> None:
         lintable=Lintable("filename.yml", content=""),
         rule=rule,
     )
-    formatter.format(match)
+    formatter.apply(match)
