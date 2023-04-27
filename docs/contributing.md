@@ -6,7 +6,7 @@ fork.
 After [creating your fork on GitHub], you can do:
 
 ```shell-session
-$ git clone git@github.com:your-name/ansible-lint
+$ git clone --recursive git@github.com:your-name/ansible-lint
 $ cd ansible-lint
 $ git checkout -b your-branch-name
 # DO SOME CODING HERE
