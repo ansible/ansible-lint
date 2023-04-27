@@ -11,7 +11,7 @@ from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 
 import wcmatch.pathlib
 from wcmatch.wcmatch import RECURSIVE, WcMatch
@@ -20,12 +20,6 @@ from yaml.error import YAMLError
 from ansiblelint.config import BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, GIT_CMD, FileType, States
 from ansiblelint.logger import warn_or_fail
-
-if TYPE_CHECKING:
-    # https://github.com/PyCQA/pylint/issues/3979
-    BasePathLike = os.PathLike[Any]  # pylint: disable=unsubscriptable-object
-else:
-    BasePathLike = os.PathLike
 
 _logger = logging.getLogger(__package__)
 
@@ -46,7 +40,7 @@ def abspath(path: str, base_dir: str) -> str:
     return os.path.normpath(path)
 
 
-def normpath(path: str | BasePathLike) -> str:
+def normpath(path: str | Path) -> str:
     """
     Normalize a path in order to provide a more consistent output.
 
@@ -81,7 +75,7 @@ def is_relative_to(path: Path, *other: Any) -> bool:
         return False
 
 
-def normpath_path(path: str | BasePathLike) -> Path:
+def normpath_path(path: str | Path) -> Path:
     """Normalize a path in order to provide a more consistent output.
 
     - Any symlinks are resolved.
@@ -107,7 +101,7 @@ def normpath_path(path: str | BasePathLike) -> Path:
 
 
 @contextmanager
-def cwd(path: str | BasePathLike) -> Iterator[None]:
+def cwd(path: str | Path) -> Iterator[None]:
     """Context manager for temporary changing current working directory."""
     old_pwd = os.getcwd()
     os.chdir(path)
