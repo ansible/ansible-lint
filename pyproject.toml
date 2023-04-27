@@ -233,7 +233,6 @@ ignore = [
   "B",
   "SIM",
   "D",
-  "EXE",
   "FBT",
   "PGH",
   "PTH",
