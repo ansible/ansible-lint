@@ -6,7 +6,7 @@ except ImportError:  # pragma: no cover
         import pkg_resources
 
         __version__ = pkg_resources.get_distribution("ansible-lint").version
-    except Exception:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except # noqa:BLE001
         # this is the fallback SemVer version picked by setuptools_scm when tag
         # information is not available.
         __version__ = "0.1.dev1"
