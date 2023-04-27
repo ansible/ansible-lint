@@ -103,9 +103,10 @@ class JinjaRule(AnsibleLintRule):
                         match = self._ansible_error_re.match(
                             getattr(orig_exc, "message", str(orig_exc)),
                         )
-                        if ignored_re.search(orig_exc_message):
-                            bypass = True
-                        elif isinstance(orig_exc, AnsibleParserError):
+                        if ignored_re.search(orig_exc_message) or isinstance(
+                            orig_exc,
+                            AnsibleParserError,
+                        ):
                             # An unhandled exception occurred while running the lookup plugin 'template'. Error was a <class 'ansible.errors.AnsibleError'>, original message: the template file ... could not be found for the lookup. the template file ... could not be found for the lookup
 
                             # ansible@devel (2.14) new behavior:

@@ -463,7 +463,7 @@ def strip_dotslash_prefix(fname: str) -> str:
     return fname[2:] if fname.startswith("./") else fname
 
 
-def find_project_root(  # noqa: C901
+def find_project_root(
     srcs: Sequence[str],
     config_file: str | None = None,
 ) -> tuple[Path, str]:
@@ -484,10 +484,7 @@ def find_project_root(  # noqa: C901
         srcs = [str(Path.cwd().resolve().absolute())]
     path_srcs = [Path(Path.cwd(), src).resolve() for src in srcs]
 
-    if config_file:
-        cfg_files = [config_file]
-    else:
-        cfg_files = CONFIG_FILENAMES
+    cfg_files = [config_file] if config_file else CONFIG_FILENAMES
 
     # A list of lists of parents for each 'src'. 'src' is included as a
     # "parent" of itself if it is a directory

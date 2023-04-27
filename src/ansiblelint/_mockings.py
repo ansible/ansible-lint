@@ -1,6 +1,7 @@
 """Utilities for mocking ansible modules and roles."""
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import re
@@ -82,7 +83,5 @@ def _perform_mockings_cleanup() -> None:
             path = f"{options.cache_dir}/collections/ansible_collections/{ namespace }/{ collection }/roles/{ role_dir }/"
         else:
             path = f"{options.cache_dir}/roles/{role_name}"
-        try:
+        with contextlib.suppress(OSError):
             os.rmdir(path)
-        except OSError:
-            pass
