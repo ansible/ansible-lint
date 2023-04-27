@@ -8,7 +8,6 @@ import re
 import sys
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, MutableMapping, MutableSequence
-from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
 from typing import Any, cast
@@ -57,7 +56,6 @@ class AnsibleLintRule(BaseRule):
         """Retrieve rule specific configuration."""
         return get_rule_config(self.id)
 
-    @lru_cache(maxsize=256)
     def get_config(self, key: str) -> Any:
         """Return a configured value for given key string."""
         return self.rule_config.get(key, None)
@@ -353,7 +351,7 @@ def load_plugins(  # : max-complexity: 11
         # python may load other rule classes, some outside the tested rule
         # directories.
         if (
-            getattr(rule, "id")
+            rule.id  # type: ignore[attr-defined]
             and Path(inspect.getfile(rule)).parent.absolute()
             in [Path(x).absolute() for x in dirs]
             and issubclass(rule, BaseRule)

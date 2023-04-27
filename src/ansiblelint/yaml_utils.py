@@ -915,7 +915,7 @@ class FormattedYAML(YAML):
         text, preamble_comment = self._pre_process_yaml(stream)
         data = self.load(stream=text)
         if preamble_comment is not None:
-            setattr(data, "preamble_comment", preamble_comment)
+            data.preamble_comment = preamble_comment
         return data
 
     def dumps(self, data: Any) -> str:

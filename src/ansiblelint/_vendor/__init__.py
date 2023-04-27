@@ -42,6 +42,7 @@ def _ensure_vendored_path_entry() -> None:
                 "loaded ({}). This may result in undefined behavior.".format(
                     ", ".join(sorted(already_loaded_vendored_modules)),
                 ),
+                stacklevel=1,
             )
 
 

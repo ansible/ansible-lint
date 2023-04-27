@@ -47,6 +47,7 @@ if not HAS_LIBYAML:
         warnings.warn(
             f"This architecture ({arch}) is not supported by libyaml, performance will be degraded.",
             category=RuntimeWarning,
+            stacklevel=1,
         )
     else:
         pytest.fail(

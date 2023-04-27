@@ -651,7 +651,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
             message=exc.message,
             filename=task.get(FILENAME_KEY, "Unknown"),
             lineno=task.get(LINE_NUMBER_KEY, 0),
-        )
+        ) from exc
 
     # denormalize shell -> command conversion
     if "_uses_shell" in arguments:
@@ -900,7 +900,7 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
         if not isinstance(node, yaml.nodes.Node):
             msg = "Unexpected yaml data."
             raise RuntimeError(msg)
-        setattr(node, "__line__", line + 1)
+        node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
     def construct_mapping(
@@ -1019,7 +1019,7 @@ def is_playbook(filename: str) -> bool:
 
 # pylint: disable=too-many-statements
 def get_lintables(
-    opts: Options = Options(),
+    opts: Options = options,
     args: list[str] | None = None,
 ) -> list[Lintable]:
     """Detect files and directories that are lintable."""

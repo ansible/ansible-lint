@@ -103,7 +103,7 @@ def test_ensure_write_cli_does_not_consume_lintables(
     file_config = cli.load_config(config)[0]
 
     file_value = file_config.get("write_list")
-    orig_cli_value = getattr(options, "write_list")
+    orig_cli_value = options.write_list
     cli_value = cli.WriteArgAction.merge_write_list_config(
         from_file=[],
         from_cli=orig_cli_value,

@@ -95,7 +95,7 @@ def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
 
     Based on TestRunner::test_runner
     """
-    setattr(config_options, "write_list", ["all"])
+    config_options.write_list = ["all"]
     transformer = Transformer(result=runner_result, options=config_options)
     transformer.run()
 
