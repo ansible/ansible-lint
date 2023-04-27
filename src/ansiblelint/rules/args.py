@@ -168,7 +168,7 @@ class ArgsRule(AnsibleLintRule):
                     # as what happens may be very hard to debug.
                     with contextlib.redirect_stdout(fio):
                         # pylint: disable=protected-access
-                        basic._ANSIBLE_ARGS = None
+                        basic._ANSIBLE_ARGS = None  # noqa: SLF001
                         try:
                             module.main()
                         except SystemExit:

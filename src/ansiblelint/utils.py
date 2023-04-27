@@ -188,7 +188,9 @@ def ansible_template(
                     raise
 
                 # pylint: disable=protected-access
-                templar.environment.filters._delegatee[missing_filter] = mock_filter
+                templar.environment.filters._delegatee[  # noqa: SLF001
+                    missing_filter
+                ] = mock_filter
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
@@ -911,7 +913,7 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
         else:
             mapping[
                 LINE_NUMBER_KEY
-            ] = mapping._line_number  # pylint: disable=protected-access
+            ] = mapping._line_number  # pylint: disable=protected-access  # noqa: SLF001
         mapping[FILENAME_KEY] = lintable.path
         return mapping
 

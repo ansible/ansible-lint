@@ -248,5 +248,5 @@ if "pytest" in sys.modules:
         """Test when lintable is None."""
         name_rule = NameRule()
         # pylint: disable=protected-access
-        result = name_rule._prefix_check("Foo", None, 1)
+        result = name_rule._prefix_check("Foo", None, 1)  # noqa: SLF001
         assert len(result) == 0

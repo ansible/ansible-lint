@@ -455,7 +455,12 @@ class OctalIntYAML11(ScalarInt):
         anchor = data.yaml_anchor(any=True)
         # noinspection PyProtectedMember
         # pylint: disable=protected-access
-        return representer.insert_underscore("0", v, data._underscore, anchor=anchor)
+        return representer.insert_underscore(
+            "0",
+            v,
+            data._underscore,  # noqa: SLF001
+            anchor=anchor,
+        )
 
 
 class CustomConstructor(RoundTripConstructor):

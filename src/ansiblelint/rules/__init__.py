@@ -417,7 +417,7 @@ class RulesCollection:
                 self.options.list_tags,
             ],
         ):
-            obj._collection = self  # pylint: disable=protected-access
+            obj._collection = self  # pylint: disable=protected-access # noqa: SLF001
             self.rules.append(obj)
 
     def __iter__(self) -> Iterator[BaseRule]:
