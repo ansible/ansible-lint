@@ -14,7 +14,7 @@ try:
     from yaml import CFullLoader as FullLoader
     from yaml import CSafeLoader as SafeLoader
 except (ImportError, AttributeError):
-    from yaml import FullLoader, SafeLoader  # type: ignore
+    from yaml import FullLoader, SafeLoader  # type: ignore[assignment]
 
 if TYPE_CHECKING:
     from pathlib import Path

@@ -15,7 +15,7 @@ from ansiblelint.version import __version__
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
-T = TypeVar("T", bound="BaseFormatter")  # type: ignore
+T = TypeVar("T", bound="BaseFormatter")  # type: ignore[type-arg]
 
 
 class BaseFormatter(Generic[T]):
@@ -53,7 +53,7 @@ class BaseFormatter(Generic[T]):
         return rich.markup.escape(text)
 
 
-class Formatter(BaseFormatter):  # type: ignore
+class Formatter(BaseFormatter):  # type: ignore[type-arg]
     """Default output formatter of ansible-lint."""
 
     def apply(self, match: MatchError) -> str:
@@ -98,7 +98,7 @@ class ParseableFormatter(BaseFormatter[Any]):
         return result
 
 
-class AnnotationsFormatter(BaseFormatter):  # type: ignore
+class AnnotationsFormatter(BaseFormatter):  # type: ignore[type-arg]
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-a-warning-message
     """Formatter for emitting violations as GitHub Workflow Commands.
 

@@ -74,7 +74,7 @@ class LintLogHandler(logging.Handler):
             console_stderr.print(f"[dim]{msg}[/dim]", highlight=False)
         except RecursionError:  # See issue 36272
             raise
-        except Exception:  # pylint: disable=broad-exception-caught # noqa:BLE001
+        except Exception:  # pylint: disable=broad-exception-caught # noqa: BLE001
             self.handleError(record)
 
 

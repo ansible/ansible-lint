@@ -87,7 +87,7 @@ class BaseRule:
             for method in [self.matchlines, self.matchtasks, self.matchyaml]:
                 try:
                     matches.extend(method(file))
-                except Exception as exc:  # pylint: disable=broad-except # noqa:BLE001
+                except Exception as exc:  # pylint: disable=broad-except # noqa: BLE001
                     _logger.warning(
                         "Ignored exception from %s.%s while processing %s: %s",
                         self.__class__.__name__,

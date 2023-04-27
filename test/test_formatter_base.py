@@ -25,7 +25,7 @@ def test_base_formatter_when_base_dir(
 ) -> None:
     """Check that base formatter accepts relative pathlib and str."""
     # Given
-    base_formatter = BaseFormatter(base_dir, relative_path)  # type: ignore
+    base_formatter = BaseFormatter(base_dir, relative_path)  # type: ignore[var-annotated]
 
     # When
     output_path = (
@@ -58,7 +58,7 @@ def test_base_formatter_when_base_dir_is_given_and_relative_is_true(
 ) -> None:
     """Check that the base formatter equally accepts pathlib and str."""
     # Given
-    base_formatter = BaseFormatter(base_dir, True)  # type: ignore
+    base_formatter = BaseFormatter(base_dir, True)  # type: ignore[var-annotated]
 
     # When
     # pylint: disable=protected-access

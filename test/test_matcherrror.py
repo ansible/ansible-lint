@@ -32,19 +32,19 @@ class DummySentinelTestObject:
 
     def __eq__(self, other: object) -> bool:
         """Return sentinel as result of equality check w/ anything."""
-        return "EQ_SENTINEL"  # type: ignore
+        return "EQ_SENTINEL"  # type: ignore[return-value]
 
     def __ne__(self, other: object) -> bool:
         """Return sentinel as result of inequality check w/ anything."""
-        return "NE_SENTINEL"  # type: ignore
+        return "NE_SENTINEL"  # type: ignore[return-value]
 
     def __lt__(self, other: object) -> bool:
         """Return sentinel as result of less than check w/ anything."""
-        return "LT_SENTINEL"  # type: ignore
+        return "LT_SENTINEL"  # type: ignore[return-value]
 
     def __gt__(self, other: object) -> bool:
         """Return sentinel as result of greater than chk w/ anything."""
-        return "GT_SENTINEL"  # type: ignore
+        return "GT_SENTINEL"  # type: ignore[return-value]
 
 
 @pytest.mark.parametrize(
@@ -205,4 +205,4 @@ def test_matcherror_compare_with_dummy_sentinel(
     # NOTE: This assertion abuses the CPython property to cache short string
     # NOTE: objects because the identity check is more precise and we don't
     # NOTE: want extra operator protocol methods to influence the test.
-    assert operation(MatchError("foo"), dummy_obj) is expected_value  # type: ignore
+    assert operation(MatchError("foo"), dummy_obj) is expected_value  # type: ignore[comparison-overlap]

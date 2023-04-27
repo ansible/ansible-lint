@@ -20,7 +20,7 @@ with open(store_file, encoding="utf-8") as json_file:
     JSON_SCHEMAS = json.load(json_file)
 
 
-class SchemaCacheDict(defaultdict):  # type: ignore
+class SchemaCacheDict(defaultdict):  # type: ignore[type-arg]
     """Caching schema store."""
 
     def __missing__(self, key: str) -> Any:

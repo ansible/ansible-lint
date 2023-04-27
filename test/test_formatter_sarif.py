@@ -72,7 +72,7 @@ class TestSarifFormatter:
         """Test negative case. Only lists are allowed. Otherwise, a RuntimeError will be raised."""
         assert isinstance(self.formatter, SarifFormatter)
         with pytest.raises(RuntimeError):
-            self.formatter.format_result(self.matches[0])  # type: ignore
+            self.formatter.format_result(self.matches[0])  # type: ignore[arg-type]
 
     def test_result_is_list(self) -> None:
         """Test if the return SARIF object contains the results with length of 2."""
