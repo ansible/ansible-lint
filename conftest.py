@@ -5,12 +5,13 @@ import platform
 import subprocess
 import sys
 import warnings
+from pathlib import Path
 
 import pytest
 
 # Ensure we always run from the root of the repository
-if os.getcwd() != os.path.dirname(__file__):
-    os.chdir(os.path.dirname(__file__))
+if Path.cwd() != Path(__file__).parent:
+    os.chdir(Path(__file__).parent)
 
 # checking if user is running pytest without installing test dependencies:
 missing = []

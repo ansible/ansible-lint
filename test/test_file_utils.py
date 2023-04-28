@@ -13,6 +13,7 @@ from ansiblelint import cli, file_utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.file_utils import (
     Lintable,
+    cwd,
     expand_path_vars,
     expand_paths_vars,
     find_project_root,
@@ -20,8 +21,6 @@ from ansiblelint.file_utils import (
     normpath_path,
 )
 from ansiblelint.runner import Runner
-
-from .conftest import cwd
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -310,7 +309,7 @@ def test_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:
 def test_find_project_root_1(tmp_path: Path) -> None:
     """Verify find_project_root()."""
     # this matches black behavior in absence of any config files or .git/.hg  folders.
-    with cwd(str(tmp_path)):
+    with cwd(tmp_path):
         path, method = find_project_root([])
         assert str(path) == "/"
         assert method == "file system root"
@@ -321,7 +320,7 @@ def test_find_project_root_dotconfig() -> None:
     # this expects to return examples folder as project root because this
     # folder already has an .config/ansible-lint.yml file inside, which should
     # be enough.
-    with cwd("examples"):
+    with cwd(Path("examples")):
         assert os.path.exists(
             ".config/ansible-lint.yml",
         ), "Test requires config file inside .config folder."
@@ -567,7 +566,7 @@ def test_bug_2513(
     os.makedirs(os.path.dirname(os.path.expanduser(filename)), exist_ok=True)
     lintable = Lintable(filename, content="---\n- hosts: all\n")
     lintable.write(force=True)
-    with cwd(str(tmp_path)):
+    with cwd(tmp_path):
         results = Runner(filename, rules=default_rules_collection).run()
         assert len(results) == 1
         assert results[0].rule.id == "name"
