@@ -1076,8 +1076,7 @@ def clean_json(
     if isinstance(key, str)
     else False,
 ) -> Any:
-    """
-    Remove all keys matching the condition from a nested JSON-like object.
+    """Remove all keys matching the condition from a nested JSON-like object.
 
     :param obj: a JSON like object to clean, also returned for chaining.
     :param func: a callable that takes a key in argument and return True for each key to delete

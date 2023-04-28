@@ -977,8 +977,7 @@ def get_second_cmd_arg(task: dict[str, Any]) -> Any:
 
 
 def is_playbook(filename: str) -> bool:
-    """
-    Check if the file is a playbook.
+    """Check if the file is a playbook.
 
     Given a filename, it should return true if it looks like a playbook. The
     function is not supposed to raise exceptions.

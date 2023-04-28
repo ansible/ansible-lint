@@ -16,9 +16,7 @@ __path__ = []
 
 
 def _ensure_vendored_path_entry() -> None:
-    """
-    Ensure that any downstream-bundled content beneath this package is available at the top of sys.path
-    """
+    """Ensure that any downstream-bundled content beneath this package is available at the top of sys.path."""
     # patch our vendored dir onto sys.path
     vendored_path_entry = os.path.dirname(__file__)
     vendored_module_names = {

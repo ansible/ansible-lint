@@ -24,6 +24,7 @@ class BaseFormatter(Generic[T]):
     Base class for output formatters.
 
     Args:
+    ----
         base_dir (str|Path): reference directory against which display relative path.
         display_relative_path (bool): whether to show path as relative or absolute
     """

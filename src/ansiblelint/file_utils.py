@@ -30,10 +30,8 @@ _logger = logging.getLogger(__package__)
 def abspath(path: str, base_dir: str) -> str:
     """Make relative path absolute relative to given directory.
 
-    Args:
-       path (str): the path to make absolute
-       base_dir (str): the directory from which make \
-                       relative paths absolute
+    path (str): the path to make absolute
+    base_dir (str): the directory from which make relative paths absolute.
     """
     if not os.path.isabs(path):
         # Don't use abspath as it assumes path is relative to cwd.
@@ -44,8 +42,7 @@ def abspath(path: str, base_dir: str) -> str:
 
 
 def normpath(path: str | Path) -> str:
-    """
-    Normalize a path in order to provide a more consistent output.
+    """Normalize a path in order to provide a more consistent output.
 
     Currently it generates a relative path but in the future we may want to
     make this user configurable.
