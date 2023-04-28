@@ -229,7 +229,7 @@ ignore = [
   # temporary disabled until we fix them:
   "ANN",
   "ARG002", # Unused method argument (currently in too many places)
-  "D",
+  "D102", # Missing docstring in public method (currently in too many places)
   "FBT",
   "PLR",
   "PTH",

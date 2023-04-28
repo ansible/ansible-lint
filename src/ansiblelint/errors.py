@@ -50,9 +50,7 @@ class MatchError(ValueError):
     fixed: bool = False  # True when a transform has resolved this MatchError
 
     def __post_init__(self) -> None:
-        # This can be used by rules that can report multiple errors type, so
-        # we can still filter by them.
-
+        """Can be use by rules that can report multiple errors type, so we can still filter by them."""
         if not self.lintable and self.filename:
             self.lintable = Lintable(self.filename)
         elif self.lintable and not self.filename:

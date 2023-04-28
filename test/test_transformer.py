@@ -93,8 +93,7 @@ def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
     transformed: bool,
     matches_count: int,
 ) -> None:
-    """
-    Test that transformer can go through any corner cases.
+    """Test that transformer can go through any corner cases.
 
     Based on TestRunner::test_runner
     """
