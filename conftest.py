@@ -46,7 +46,7 @@ if not HAS_LIBYAML:
     if arch not in ("arm64", "x86_64"):
         warnings.warn(
             f"This architecture ({arch}) is not supported by libyaml, performance will be degraded.",
-            category=RuntimeWarning,
+            category=pytest.PytestWarning,
             stacklevel=1,
         )
     else:

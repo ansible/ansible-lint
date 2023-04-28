@@ -183,6 +183,8 @@ filterwarnings = [
   "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
   # https://github.com/spdx/tools-python/issues/507
   "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
+  # We raise one non critical warning from our own conftest.py:
+  "always::pytest.PytestWarning",
 ]
 junit_duration_report = "call"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
