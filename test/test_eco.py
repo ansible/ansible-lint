@@ -42,7 +42,7 @@ def sanitize_output(text: str) -> str:
 def test_eco(repo: str) -> None:
     """Test a set of 3rd party Ansible repositories for possible regressions."""
     url = eco_repos[repo]
-    cache_dir = os.path.expanduser("~/.cache/ansible-lint-eco")
+    cache_dir = pathlib.Path("~/.cache/ansible-lint-eco").expanduser()
     my_dir = (pathlib.Path(__file__).parent / "eco").resolve()
     os.makedirs(cache_dir, exist_ok=True)
     # clone repo
@@ -66,7 +66,7 @@ def test_eco(repo: str) -> None:
         result = run_ansible_lint(
             *args,
             executable=executable,
-            cwd=f"{cache_dir}/{repo}",
+            cwd=cache_dir / repo,
         )
 
         # Ensure that cmd looks the same for later diff, even if the path was different

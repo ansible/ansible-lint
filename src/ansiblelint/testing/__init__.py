@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.app import get_app
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     # https://github.com/PyCQA/pylint/issues/3240
     # pylint: disable=unsubscriptable-object
     CompletedProcess = subprocess.CompletedProcess[Any]
@@ -96,7 +98,7 @@ class RunFromText:
 
 def run_ansible_lint(
     *argv: str,
-    cwd: str | None = None,
+    cwd: Path | None = None,
     executable: str | None = None,
     env: dict[str, str] | None = None,
     offline: bool = True,

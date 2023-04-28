@@ -103,7 +103,7 @@ LOOP_VAR_PREFIX = "^(__|{role}_)"
 class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-methods
     """Store ansible-lint effective configuration options."""
 
-    cache_dir: str | None = None
+    cache_dir: Path | None = None
     colored: bool = True
     configured: bool = False
     cwd: Path = Path(".")  # noqa: RUF009
