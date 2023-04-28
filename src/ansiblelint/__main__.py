@@ -311,7 +311,7 @@ def _previous_revision() -> Iterator[None]:
         stderr=subprocess.DEVNULL,
     )
     try:
-        with cwd(worktree_dir):
+        with cwd(pathlib.Path(worktree_dir)):
             subprocess.run(
                 [*GIT_CMD, "checkout", revision],  # noqa: S603
                 stdout=subprocess.DEVNULL,

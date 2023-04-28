@@ -1,10 +1,8 @@
 """PyTest fixtures for testing the project."""
 from __future__ import annotations
 
-import os
 import shutil
 import subprocess
-from contextlib import contextmanager
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -15,22 +13,9 @@ from ansiblelint.testing.fixtures import *  # noqa: F403
 from ansiblelint.yaml_utils import FormattedYAML
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
-
     from _pytest import nodes
     from _pytest.config import Config
     from _pytest.config.argparsing import Parser
-
-
-@contextmanager
-def cwd(path: str) -> Iterator[None]:
-    """Context manager for chdir."""
-    old_pwd = os.getcwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(old_pwd)
 
 
 def pytest_addoption(parser: Parser) -> None:

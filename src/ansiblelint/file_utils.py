@@ -101,9 +101,9 @@ def normpath_path(path: str | Path) -> Path:
 
 
 @contextmanager
-def cwd(path: str | Path) -> Iterator[None]:
+def cwd(path: Path) -> Iterator[None]:
     """Context manager for temporary changing current working directory."""
-    old_pwd = os.getcwd()
+    old_pwd = Path.cwd()
     os.chdir(path)
     try:
         yield
