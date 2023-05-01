@@ -292,6 +292,7 @@ relpath
 reportversion
 representer
 reqs
+resolvelib
 returncode
 rmtree
 robertdebock
