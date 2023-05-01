@@ -189,7 +189,7 @@
             "cliconf": {
               "$ref": "#/$defs/plugin-descriptions"
             },
-            "connections": {
+            "connection": {
               "$ref": "#/$defs/plugin-descriptions"
             },
             "filter": {
