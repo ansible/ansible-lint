@@ -808,9 +808,9 @@ class FormattedYAML(YAML):
         self.compact_seq_map = True  # type: ignore[assignment] # key after dash
 
         # Do not use yaml.indent() as it obscures the purpose of these vars:
-        self.map_indent = 2  # type: ignore[assignment]
-        self.sequence_indent = 4 if indent_sequences else 2  # type: ignore[assignment]
-        self.sequence_dash_offset = self.sequence_indent - 2  # type: ignore[operator]
+        self.map_indent = 2
+        self.sequence_indent = 4 if indent_sequences else 2
+        self.sequence_dash_offset = self.sequence_indent - 2
 
         # If someone doesn't want our FormattedEmitter, they can change it.
         self.Emitter = FormattedEmitter

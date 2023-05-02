@@ -125,7 +125,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.263"
+    rev: "v0.0.264"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -148,7 +148,8 @@ repos:
           - jinja2
           - pytest>=7.2.2
           - rich>=13.2.0
-          - ruamel.yaml
+          - ruamel-yaml>=0.17.22
+          - ruamel-yaml-clib>=0.2.7
           - spdx-tools
           - subprocess-tee
           - types-PyYAML
@@ -177,7 +178,8 @@ repos:
           - pytest>=7.2.2
           - pyyaml
           - rich>=13.2.0
-          - ruamel.yaml
+          - ruamel-yaml>=0.17.22
+          - ruamel-yaml-clib>=0.2.7
           - spdx-tools
           - typing_extensions
           - wcmatch
