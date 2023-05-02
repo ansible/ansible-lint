@@ -189,9 +189,9 @@ def test_custom_ruamel_yaml_emitter(
     """Test ``ruamel.yaml.YAML.dump()`` sequence formatting and quotes."""
     yaml = YAML(typ="rt")
     # NB: ruamel.yaml does not have typehints, so mypy complains about everything here.
-    yaml.explicit_start = True  # type: ignore[assignment]
-    yaml.map_indent = map_indent  # type: ignore[assignment]
-    yaml.sequence_indent = sequence_indent  # type: ignore[assignment]
+    yaml.explicit_start = True
+    yaml.map_indent = map_indent
+    yaml.sequence_indent = sequence_indent
     yaml.sequence_dash_offset = sequence_dash_offset
     if alternate_emitter is not None:
         yaml.Emitter = alternate_emitter
