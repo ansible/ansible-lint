@@ -121,10 +121,11 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     options.warn_list = [normalize_tag(tag) for tag in options.warn_list]
 
     options.configured = True
-    options.cache_dir = get_cache_dir(options.project_dir)
+    options.cache_dir = get_cache_dir(pathlib.Path(options.project_dir))
 
     # add a lock file so we do not have two instances running inside at the same time
-    os.makedirs(options.cache_dir, exist_ok=True)
+    if options.cache_dir:
+        options.cache_dir.mkdir(parents=True, exist_ok=True)
 
     options.cache_dir_lock = None
     if not options.offline:  # pragma: no cover

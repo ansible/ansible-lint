@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import pytest
 
@@ -79,9 +80,9 @@ def test_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> None:
     fakerole = os.path.join("test", "fixtures", "verbosity-tests")
 
     if verbosity:
-        result = run_ansible_lint(verbosity, fakerole, cwd=cwd)
+        result = run_ansible_lint(verbosity, fakerole, cwd=Path(cwd))
     else:
-        result = run_ansible_lint(fakerole, cwd=cwd)
+        result = run_ansible_lint(fakerole, cwd=Path(cwd))
 
     for substr, invert in substrs:
         if invert:

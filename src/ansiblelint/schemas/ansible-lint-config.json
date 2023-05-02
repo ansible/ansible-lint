@@ -112,6 +112,11 @@
       "title": "Progressive (removed feature)",
       "type": "boolean"
     },
+    "project_dir": {
+      "default": null,
+      "title": "Project Directory",
+      "type": ["string", "null"]
+    },
     "quiet": {
       "default": true,
       "title": "Quiet",

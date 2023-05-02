@@ -54,3 +54,9 @@ if not HAS_LIBYAML:
         pytest.fail(
             "FATAL: For testing, we require pyyaml to be installed with its native extension, missing it would make testing 3x slower and risk missing essential bugs.",
         )
+
+
+@pytest.fixture(name="project_path")
+def fixture_project_path() -> Path:
+    """Fixture to linter root folder."""
+    return Path(__file__).resolve().parent
