@@ -301,6 +301,7 @@ def template(
     basedir: str,
     value: Any,
     variables: Any,
+    *,
     fail_on_error: bool = False,
     fail_on_undefined: bool = False,
     **kwargs: str,
@@ -727,6 +728,7 @@ def task_to_str(task: dict[str, Any]) -> str:
 def extract_from_list(
     blocks: AnsibleBaseYAMLObject,
     candidates: list[str],
+    *,
     recursive: bool = False,
 ) -> list[Any]:
     """Get action tasks from block structures."""
@@ -738,7 +740,11 @@ def extract_from_list(
                     subresults = add_action_type(block[candidate], candidate)
                     if recursive:
                         subresults.extend(
-                            extract_from_list(subresults, candidates, recursive),
+                            extract_from_list(
+                                subresults,
+                                candidates,
+                                recursive=recursive,
+                            ),
                         )
                     results.extend(subresults)
                 elif block[candidate] is not None:
@@ -905,6 +911,7 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
 
     def construct_mapping(
         node: AnsibleBaseYAMLObject,
+        *,
         deep: bool = False,
     ) -> AnsibleMapping:
         mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)

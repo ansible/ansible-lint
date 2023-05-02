@@ -360,7 +360,7 @@ def test_get_rules_dirs(
     expected: list[str],
 ) -> None:
     """Test it returns expected dir lists."""
-    assert get_rules_dirs(user_ruledirs, use_default) == expected
+    assert get_rules_dirs(user_ruledirs, use_default=use_default) == expected
 
 
 @pytest.mark.parametrize(
@@ -384,7 +384,7 @@ def test_get_rules_dirs_with_custom_rules(
 ) -> None:
     """Test it returns expected dir lists when custom rules exist."""
     monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, str(_CUSTOM_RULESDIR))
-    assert get_rules_dirs(user_ruledirs, use_default) == expected
+    assert get_rules_dirs(user_ruledirs, use_default=use_default) == expected
 
 
 def test_find_children() -> None:

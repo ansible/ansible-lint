@@ -156,6 +156,7 @@ class WriteArgAction(argparse.Action):
         default: Any = None,
         type: Callable[[str], Any] | None = None,  # noqa: A002
         choices: list[Any] | None = None,
+        *,
         required: bool = False,
         help: str | None = None,  # noqa: A002
         metavar: str | None = None,
@@ -568,7 +569,7 @@ def get_config(arguments: list[str]) -> Options:
 
     options.rulesdirs = get_rules_dirs(
         [str(r) for r in options.rulesdir],
-        options.use_default_rules,
+        use_default=options.use_default_rules,
     )
 
     if not options.project_dir:
@@ -598,7 +599,7 @@ def print_help(file: Any = sys.stdout) -> None:
     get_cli_parser().print_help(file=file)
 
 
-def get_rules_dirs(rulesdir: list[str], use_default: bool = True) -> list[str]:
+def get_rules_dirs(rulesdir: list[str], *, use_default: bool = True) -> list[str]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
     default_custom_rulesdir = os.environ.get(
