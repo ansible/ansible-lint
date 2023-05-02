@@ -1,6 +1,5 @@
 """Tests related to our logging/verbosity setup."""
 
-import os
 from pathlib import Path
 
 import pytest
@@ -12,7 +11,7 @@ def test_list_rules_includes_opt_in_rules(project_path: Path) -> None:
     """Checks that listing rules also includes the opt-in rules."""
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture.
-    fakerole = os.path.join("test", "fixtures", "list-rules-tests")
+    fakerole = Path("test") / "fixtures" / "list-rules-tests"
 
     result_list_rules = run_ansible_lint("-L", fakerole, cwd=project_path)
 
@@ -51,7 +50,7 @@ def test_list_rules_with_format_option(
     """Checks that listing rules with format options works."""
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture.
-    fakerole = os.path.join("test", "fixtures", "list-rules-tests")
+    fakerole = Path("test") / "fixtures" / "list-rules-tests"
 
     result_list_rules = run_ansible_lint(
         "-f",
@@ -70,8 +69,8 @@ def test_list_tags_includes_opt_in_rules(project_path: Path) -> None:
     """Checks that listing tags also includes the opt-in rules."""
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture.
-    fakerole = os.path.join("test", "fixtures", "list-rules-tests")
+    fakerole = Path("test") / "fixtures" / "list-rules-tests"
 
-    result_list_tags = run_ansible_lint("-L", fakerole, cwd=project_path)
+    result_list_tags = run_ansible_lint("-L", str(fakerole), cwd=project_path)
 
     assert ("opt-in" in result_list_tags.stdout) is True

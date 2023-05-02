@@ -31,6 +31,7 @@ import site
 import subprocess
 import sys
 from contextlib import contextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, TextIO
 
 from ansible_compat.config import ansible_version
@@ -226,11 +227,11 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     for level, message in log_entries:
         _logger.log(level, message)
     _logger.debug("Options: %s", options)
-    _logger.debug(os.getcwd())
+    _logger.debug("CWD: %s", Path.cwd())
 
     if not options.offline:
         # pylint: disable=import-outside-toplevel
-        from ansiblelint.schemas import refresh_schemas
+        from ansiblelint.schemas.__main__ import refresh_schemas
 
         refresh_schemas()
 

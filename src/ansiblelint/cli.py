@@ -272,7 +272,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
         ],
         help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
-    parser.add_argument("--sarif-file", default=None, help="SARIF output file")
+    parser.add_argument(
+        "--sarif-file",
+        default=None,
+        type=Path,
+        help="SARIF output file",
+    )
     parser.add_argument(
         "-q",
         dest="quiet",

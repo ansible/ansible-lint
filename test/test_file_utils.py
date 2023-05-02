@@ -50,7 +50,7 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
     """Ensure that tilde and env vars are expanded in paths."""
     test_path = "/test/path"
     monkeypatch.setenv("TEST_PATH", test_path)
-    assert expand_path_vars("~") == os.path.expanduser("~")
+    assert expand_path_vars("~") == os.path.expanduser("~")  # noqa: PTH111
     assert expand_path_vars("$TEST_PATH") == test_path
 
 
@@ -60,7 +60,7 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
         pytest.param(Path("$TEST_PATH"), "/test/path", id="pathlib.Path"),
         pytest.param("$TEST_PATH", "/test/path", id="str"),
         pytest.param("  $TEST_PATH  ", "/test/path", id="stripped-str"),
-        pytest.param("~", os.path.expanduser("~"), id="home"),
+        pytest.param("~", os.path.expanduser("~"), id="home"),  # noqa: PTH:111
     ),
 )
 def test_expand_paths_vars(
@@ -321,11 +321,11 @@ def test_find_project_root_dotconfig() -> None:
     # folder already has an .config/ansible-lint.yml file inside, which should
     # be enough.
     with cwd(Path("examples")):
-        assert os.path.exists(
+        assert Path(
             ".config/ansible-lint.yml",
-        ), "Test requires config file inside .config folder."
+        ).exists(), "Test requires config file inside .config folder."
         path, method = find_project_root([])
-        assert str(path) == str(os.getcwd())
+        assert str(path) == str(Path.cwd())
         assert ".config/ansible-lint.yml" in method
 
 
@@ -538,7 +538,11 @@ def test_lintable_content_deleter(
     ("path", "result"),
     (
         pytest.param("foo", "foo", id="rel"),
-        pytest.param(os.path.expanduser("~/xxx"), "~/xxx", id="rel-to-home"),
+        pytest.param(
+            os.path.expanduser("~/xxx"),  # noqa: PTH111
+            "~/xxx",
+            id="rel-to-home",
+        ),
         pytest.param("/a/b/c", "/a/b/c", id="absolute"),
         pytest.param(
             "examples/playbooks/roles",
@@ -562,8 +566,8 @@ def test_bug_2513(
     we will still be able to process the files.
     See: https://github.com/ansible/ansible-lint/issues/2513
     """
-    filename = "~/.cache/ansible-lint/playbook.yml"
-    os.makedirs(os.path.dirname(os.path.expanduser(filename)), exist_ok=True)
+    filename = Path("~/.cache/ansible-lint/playbook.yml").expanduser()
+    filename.parent.mkdir(parents=True, exist_ok=True)
     lintable = Lintable(filename, content="---\n- hosts: all\n")
     lintable.write(force=True)
     with cwd(tmp_path):

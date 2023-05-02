@@ -150,12 +150,14 @@ def test_expand_path_user_and_vars_config_file(base_arguments: list[str]) -> Non
         ],
     )
 
-    assert str(config1.exclude_paths[0]) == os.path.expanduser("~/.ansible/roles")
+    assert str(config1.exclude_paths[0]) == os.path.expanduser(  # noqa: PTH111
+        "~/.ansible/roles",
+    )
     assert str(config1.exclude_paths[1]) == os.path.expandvars("$HOME/.ansible/roles")
 
     # exclude-paths coming in via cli are PosixPath objects; which hold the (canonical) real path (without symlinks)
     assert str(config2.exclude_paths[0]) == os.path.realpath(
-        os.path.expanduser("~/.ansible/roles"),
+        os.path.expanduser("~/.ansible/roles"),  # noqa: PTH111
     )
     assert str(config2.exclude_paths[1]) == os.path.realpath(
         os.path.expandvars("$HOME/.ansible/roles"),

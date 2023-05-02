@@ -20,10 +20,12 @@ from ansiblelint.config import get_version_warning
 def test_call_from_outside_venv(expected_warning: bool) -> None:
     """Asserts ability to be called w/ or w/o venv activation."""
     git_location = shutil.which("git")
-    assert git_location
+    if not git_location:
+        pytest.fail("git not found")
+    git_path = Path(git_location).parent
 
     if expected_warning:
-        env = {"HOME": str(Path.home()), "PATH": str(os.path.dirname(git_location))}
+        env = {"HOME": str(Path.home()), "PATH": str(git_path)}
     else:
         env = os.environ.copy()
 
@@ -31,12 +33,12 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
         if v in os.environ:
             env[v] = os.environ[v]
 
-    py_path = os.path.dirname(sys.executable)
+    py_path = Path(sys.executable).parent
     # Passing custom env prevents the process from inheriting PATH or other
     # environment variables from the current process, so we emulate being
     # called from outside the venv.
     proc = subprocess.run(
-        [f"{py_path}/ansible-lint", "--version"],
+        [py_path / "ansible-lint", "--version"],
         check=False,
         capture_output=True,
         text=True,

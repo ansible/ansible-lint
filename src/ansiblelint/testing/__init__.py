@@ -97,14 +97,14 @@ class RunFromText:
 
 
 def run_ansible_lint(
-    *argv: str,
+    *argv: str | Path,
     cwd: Path | None = None,
     executable: str | None = None,
     env: dict[str, str] | None = None,
     offline: bool = True,
 ) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
-    args = [*argv]
+    args = [str(item) for item in argv]
     if offline:  # pragma: no cover
         args.insert(0, "--offline")
 

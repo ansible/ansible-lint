@@ -1,6 +1,7 @@
 """Constants used by AnsibleLint."""
 import os.path
 from enum import Enum
+from pathlib import Path
 from typing import Literal
 
 DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
@@ -162,7 +163,7 @@ ROLE_IMPORT_ACTION_NAMES = {
 # reusable actions, where the mounted volume might have different owner.
 #
 # https://github.com/ansible/ansible-lint-action/issues/138
-GIT_CMD = ["git", "-c", f"safe.directory={os.getcwd()}"]
+GIT_CMD = ["git", "-c", f"safe.directory={Path.cwd()}"]
 
 CONFIG_FILENAMES = [".ansible-lint", ".config/ansible-lint.yml"]
 

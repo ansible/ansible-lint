@@ -8,6 +8,7 @@ import os
 import re
 from collections.abc import Iterator, Sequence
 from io import StringIO
+from pathlib import Path
 from re import Pattern
 from typing import TYPE_CHECKING, Any, Callable, Union, cast
 
@@ -85,21 +86,21 @@ def load_yamllint_config() -> YamlLintConfig:
     config = YamlLintConfig(content=YAMLLINT_CONFIG)
     # if we detect local yamllint config we use it but raise a warning
     # as this is likely to get out of sync with our internal config.
-    for file in [
+    for path in [
         ".yamllint",
         ".yamllint.yaml",
         ".yamllint.yml",
         os.getenv("YAMLLINT_CONFIG_FILE", ""),
-        os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
-        + "/yamllint/config",
+        os.getenv("XDG_CONFIG_HOME", "~/.config") + "/yamllint/config",
     ]:
-        if os.path.isfile(file):
+        file = Path(path).expanduser()
+        if file.is_file():
             _logger.debug(
                 "Loading custom %s config file, this extends our "
                 "internal yamllint config.",
                 file,
             )
-            config_override = YamlLintConfig(file=file)
+            config_override = YamlLintConfig(file=str(file))
             config_override.extend(config)
             config = config_override
             break

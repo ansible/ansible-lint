@@ -236,7 +236,6 @@ ignore = [
   "D102", # Missing docstring in public method (currently in too many places)
   "FBT",
   "PLR",
-  "PTH",
   "TRY",
 ]
 select = ["ALL"]
@@ -257,6 +256,11 @@ known-first-party = ["ansiblelint"]
 "test/**/*.py" = ["S"]
 "src/ansiblelint/rules/*.py" = ["S"]
 "src/ansiblelint/testing/*.py" = ["S"]
+# Temporary disabled until we fix them:
+"src/ansiblelint/{testing,schemas,rules}/*.py" = ["PTH"]
+"src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings,__main__}.py" = [
+  "PTH",
+]
 
 [tool.setuptools.dynamic]
 optional-dependencies.docs = { file = [".config/requirements-docs.txt"] }

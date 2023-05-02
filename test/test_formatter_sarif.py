@@ -167,5 +167,5 @@ def test_sarif_file(file: str, return_code: int) -> None:
         ]
         result = subprocess.run([*cmd, file], check=False, capture_output=True)
         assert result.returncode == return_code
-        assert os.path.exists(output_file.name)
+        assert os.path.exists(output_file.name)  # noqa: PTH110
         assert os.path.getsize(output_file.name) > 0

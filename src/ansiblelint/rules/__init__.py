@@ -369,7 +369,7 @@ class RulesCollection:
 
     def __init__(
         self,
-        rulesdirs: list[str] | None = None,
+        rulesdirs: list[str] | list[Path] | None = None,
         options: Options = default_options,
         profile_name: str | None = None,
         conditional: bool = True,
@@ -379,9 +379,8 @@ class RulesCollection:
         self.profile = []
         if profile_name:
             self.profile = PROFILES[profile_name]
-        if rulesdirs is None:
-            rulesdirs = []
-        self.rulesdirs = expand_paths_vars(rulesdirs)
+        rulesdirs_str = [] if rulesdirs is None else [str(r) for r in rulesdirs]
+        self.rulesdirs = expand_paths_vars(rulesdirs_str)
         self.rules: list[BaseRule] = []
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
@@ -393,7 +392,7 @@ class RulesCollection:
                 WarningRule(),
             ],
         )
-        for rule in load_plugins(rulesdirs):
+        for rule in load_plugins(rulesdirs_str):
             self.register(rule, conditional=conditional)
         self.rules = sorted(self.rules)
 
