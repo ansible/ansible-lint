@@ -322,7 +322,9 @@ def _previous_revision() -> Iterator[None]:
             )
             yield
     finally:
-        options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
+        options.exclude_paths = [
+            str(Path.cwd().resolve() / p) for p in rel_exclude_paths
+        ]
 
 
 def _run_cli_entrypoint() -> None:
@@ -356,7 +358,7 @@ def path_inject() -> None:  # noqa: C901
     expanded = False
     for idx, path in enumerate(paths):
         if path.startswith("~"):  # pragma: no cover
-            paths[idx] = os.path.expanduser(path)
+            paths[idx] = str(Path(path).expanduser())
             expanded = True
     if expanded:  # pragma: no cover
         print(  # noqa: T201
@@ -366,15 +368,16 @@ def path_inject() -> None:  # noqa: C901
 
     inject_paths = []
 
-    userbase_bin_path = f"{site.getuserbase()}/bin"
-    if userbase_bin_path not in paths and os.path.exists(
-        f"{userbase_bin_path}/bin/ansible",
+    userbase_bin_path = Path(site.getuserbase()) / "bin"
+    if (
+        str(userbase_bin_path) not in paths
+        and (userbase_bin_path / "bin" / "ansible").exists()
     ):
-        inject_paths.append(userbase_bin_path)
+        inject_paths.append(str(userbase_bin_path))
 
-    py_path = os.path.dirname(sys.executable)
-    if py_path not in paths and os.path.exists(f"{py_path}/ansible"):
-        inject_paths.append(py_path)
+    py_path = Path(sys.executable).parent
+    if str(py_path) not in paths and (py_path / "ansible").exists():
+        inject_paths.append(str(py_path))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
         if inject_paths:

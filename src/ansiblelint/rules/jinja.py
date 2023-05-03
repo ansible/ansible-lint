@@ -5,6 +5,7 @@ import logging
 import re
 import sys
 from collections import namedtuple
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import black
@@ -88,7 +89,7 @@ class JinjaRule(AnsibleLintRule):
                 if isinstance(v, str):
                     try:
                         template(
-                            basedir=file.dir if file else ".",
+                            basedir=file.path.parent if file else Path("."),
                             value=v,
                             variables=deannotate(task.get("vars", {})),
                             fail_on_error=True,  # we later decide which ones to ignore or not

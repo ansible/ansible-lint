@@ -38,7 +38,7 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
     # environment variables from the current process, so we emulate being
     # called from outside the venv.
     proc = subprocess.run(
-        [py_path / "ansible-lint", "--version"],
+        [str(py_path / "ansible-lint"), "--version"],
         check=False,
         capture_output=True,
         text=True,
