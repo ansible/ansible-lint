@@ -1,7 +1,6 @@
 """Tests related to our logging/verbosity setup."""
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
@@ -69,20 +68,20 @@ from ansiblelint.testing import run_ansible_lint
         ),
     ),
 )
-def test_verbosity(verbosity: str, substrs: list[tuple[str, bool]]) -> None:
+def test_verbosity(
+    verbosity: str,
+    substrs: list[tuple[str, bool]],
+    project_path: Path,
+) -> None:
     """Checks that our default verbosity displays (only) warnings."""
     # Piggyback off the .yamllint in the root of the repo, just for testing.
     # We'll "override" it with the one in the fixture, to produce a warning.
-    cwd = os.path.realpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."),
-    )
-
-    fakerole = os.path.join("test", "fixtures", "verbosity-tests")
+    fakerole = Path() / "test" / "fixtures" / "verbosity-tests"
 
     if verbosity:
-        result = run_ansible_lint(verbosity, fakerole, cwd=Path(cwd))
+        result = run_ansible_lint(verbosity, str(fakerole), cwd=project_path)
     else:
-        result = run_ansible_lint(fakerole, cwd=Path(cwd))
+        result = run_ansible_lint(str(fakerole), cwd=project_path)
 
     for substr, invert in substrs:
         if invert:

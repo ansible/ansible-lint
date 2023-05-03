@@ -5,6 +5,7 @@ import itertools
 import logging
 import os
 from functools import lru_cache
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansible_compat.runtime import Runtime
@@ -101,7 +102,7 @@ class App:
         if self.options.sarif_file:
             sarif = formatters.SarifFormatter(self.options.cwd, True)
             json = sarif.format_result(matches)
-            with open(self.options.sarif_file, "w", encoding="utf-8") as sarif_file:
+            with self.options.sarif_file.open("w", encoding="utf-8") as sarif_file:
                 sarif_file.write(json)
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
@@ -177,11 +178,12 @@ class App:
         matched_rules = self._get_matched_skippable_rules(result.matches)
 
         if matched_rules and self.options.generate_ignore:
-            console_stderr.print(f"Writing ignore file to {IGNORE_FILE.default}")
+            ignore_file_path = Path(IGNORE_FILE.default)
+            console_stderr.print(f"Writing ignore file to {ignore_file_path}")
             lines = set()
             for rule in result.matches:
                 lines.add(f"{rule.filename} {rule.tag}\n")
-            with open(IGNORE_FILE.default, "w", encoding="utf-8") as ignore_file:
+            with ignore_file_path.open("w", encoding="utf-8") as ignore_file:
                 ignore_file.write(
                     "# This file contains ignores rule violations for ansible-lint\n",
                 )

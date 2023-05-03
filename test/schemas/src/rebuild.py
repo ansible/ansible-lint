@@ -3,6 +3,7 @@ import copy
 import json
 import keyword
 import sys
+from pathlib import Path
 from typing import Any
 
 play_keywords = list(
@@ -77,7 +78,7 @@ if __name__ == "__main__":
         invalid_var_names.remove("__peg_parser__")
     print("Updating invalid var names")  # noqa: T201
 
-    with open("f/vars.json", "r+", encoding="utf-8") as f:
+    with Path("f/vars.json").open("r+", encoding="utf-8") as f:
         vars_schema = json.load(f)
         vars_schema["anyOf"][0]["patternProperties"] = {
             f"^(?!({'|'.join(invalid_var_names)})$)[a-zA-Z_][\\w]*$": {},
@@ -88,7 +89,7 @@ if __name__ == "__main__":
         f.truncate()
 
     print("Compiling subschemas...")  # noqa: T201
-    with open("f/ansible.json", encoding="utf-8") as f:
+    with Path("f/ansible.json").open(encoding="utf-8") as f:
         combined_json = json.load(f)
 
     for subschema in ["tasks", "playbook"]:
@@ -134,6 +135,6 @@ if __name__ == "__main__":
             if not spare:
                 break
 
-        with open(f"f/{subschema}.json", "w", encoding="utf-8") as f:
+        with Path(f"f/{subschema}.json").open("w", encoding="utf-8") as f:
             json.dump(sub_json, f, indent=2, sort_keys=True)
             f.write("\n")

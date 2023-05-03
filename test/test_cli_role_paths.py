@@ -166,7 +166,7 @@ def test_run_single_role_path_with_roles_path_env(local_test_dir: Path) -> None:
     role_path = "roles/test-role"
 
     env = os.environ.copy()
-    env["ANSIBLE_ROLES_PATH"] = os.path.realpath(os.path.join(cwd, "../examples/roles"))
+    env["ANSIBLE_ROLES_PATH"] = os.path.realpath((cwd / "../examples/roles").resolve())
 
     result = run_ansible_lint(role_path, cwd=cwd, env=env)
     assert "Use shell only when shell functionality is required" in result.stdout
