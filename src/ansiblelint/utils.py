@@ -275,7 +275,10 @@ def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
     for item in _playbook_items(playbook_ds):
         # if lintable.kind not in ["playbook"]:
         for child in play_children(
-            lintable.path.parent, item, lintable.kind, playbook_dir
+            lintable.path.parent,
+            item,
+            lintable.kind,
+            playbook_dir,
         ):
             # We avoid processing parametrized children
             path_str = str(child.path)
