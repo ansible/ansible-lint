@@ -22,13 +22,6 @@ project:
 
 - `schema[ansible-lint-config]` validates
   [ansible-lint configuration](https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/schemas/ansible-lint-config.json)
-
-Maintained in the
-[ansible-navigator](https://github.com/ansible/ansible-navigator) project:
-
-- `schema[ansible-navigator]` validates
-  [ansible-navigator configuration](https://github.com/ansible/ansible-navigator/blob/main/src/ansible_navigator/data/ansible-navigator.json)
-
 - `schema[role-arg-spec]` validates
   [role argument specs](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#specification-format)
   which is a little bit different than the module argument spec.
@@ -55,6 +48,12 @@ Maintained in the
 - `schema[vars]` validates Ansible
   [variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html)
   that match `vars/*.yml` and `defaults/*.yml`.
+
+Maintained in the
+[ansible-navigator](https://github.com/ansible/ansible-navigator) project:
+
+- `schema[ansible-navigator]` validates
+  [ansible-navigator configuration](https://github.com/ansible/ansible-navigator/blob/main/src/ansible_navigator/data/ansible-navigator.json)
 
 ## schema[meta]
 
