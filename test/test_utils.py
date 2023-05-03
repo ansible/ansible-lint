@@ -340,8 +340,8 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
 _DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]
 _CUSTOM_RULESDIR = Path(__file__).parent / "custom_rules"
 _CUSTOM_RULEDIRS = [
-    str(_CUSTOM_RULESDIR / "example_inc"),
-    str(_CUSTOM_RULESDIR / "example_com"),
+    _CUSTOM_RULESDIR / "example_inc",
+    _CUSTOM_RULESDIR / "example_com",
 ]
 
 
@@ -355,12 +355,12 @@ _CUSTOM_RULEDIRS = [
     ),
 )
 def test_get_rules_dirs(
-    user_ruledirs: list[str],
+    user_ruledirs: list[Path],
     use_default: bool,
-    expected: list[str],
+    expected: list[Path],
 ) -> None:
     """Test it returns expected dir lists."""
-    assert get_rules_dirs(user_ruledirs, use_default) == expected
+    assert get_rules_dirs(user_ruledirs, use_default=use_default) == expected
 
 
 @pytest.mark.parametrize(
@@ -377,14 +377,14 @@ def test_get_rules_dirs(
     ),
 )
 def test_get_rules_dirs_with_custom_rules(
-    user_ruledirs: list[str],
+    user_ruledirs: list[Path],
     use_default: bool,
-    expected: list[str],
+    expected: list[Path],
     monkeypatch: MonkeyPatch,
 ) -> None:
     """Test it returns expected dir lists when custom rules exist."""
     monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, str(_CUSTOM_RULESDIR))
-    assert get_rules_dirs(user_ruledirs, use_default) == expected
+    assert get_rules_dirs(user_ruledirs, use_default=use_default) == expected
 
 
 def test_find_children() -> None:

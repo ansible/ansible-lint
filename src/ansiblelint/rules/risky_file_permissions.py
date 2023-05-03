@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -154,7 +155,7 @@ if "pytest" in sys.modules:
         collection = RulesCollection()
         collection.register(MissingFilePermissionsRule())
         runner = RunFromText(collection)
-        results = runner.run(file)
+        results = runner.run(Path(file))
         assert len(results) == expected
         for result in results:
             assert result.tag == "risky-file-permissions"

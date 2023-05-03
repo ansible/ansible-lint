@@ -257,7 +257,6 @@ known-first-party = ["ansiblelint"]
 "src/ansiblelint/rules/*.py" = ["S"]
 "src/ansiblelint/testing/*.py" = ["S"]
 # Temporary disabled until we fix them:
-"src/ansiblelint/{testing,schemas,rules}/*.py" = ["PTH"]
 "src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings,__main__}.py" = [
   "PTH",
 ]

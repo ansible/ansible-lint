@@ -8,7 +8,6 @@ pytest_plugins = ['ansiblelint.testing']
 from __future__ import annotations
 
 import copy
-import os
 from typing import TYPE_CHECKING
 
 import pytest
@@ -27,7 +26,7 @@ if TYPE_CHECKING:
 @pytest.fixture(name="default_rules_collection")
 def fixture_default_rules_collection() -> RulesCollection:
     """Return default rule collection."""
-    assert os.path.isdir(DEFAULT_RULESDIR)
+    assert DEFAULT_RULESDIR.is_dir()
     # For testing we want to manually enable opt-in rules
     options.enable_list = ["no-same-owner"]
     return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=options)

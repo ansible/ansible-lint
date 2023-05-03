@@ -61,7 +61,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
         if file.kind != "sanity-ignore-file":
             return []
 
-        with open(file.abspath, encoding="utf-8") as ignore_file:
+        with file.path.open(encoding="utf-8") as ignore_file:
             entries = ignore_file.read().splitlines()
 
             ignores = self.allowed_ignores_all

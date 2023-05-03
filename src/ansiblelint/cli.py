@@ -572,8 +572,8 @@ def get_config(arguments: list[str]) -> Options:
     config = merge_config(file_config, options)
 
     options.rulesdirs = get_rules_dirs(
-        [str(r) for r in options.rulesdir],
-        options.use_default_rules,
+        options.rulesdir,
+        use_default=options.use_default_rules,
     )
 
     if not options.project_dir:
@@ -603,7 +603,7 @@ def print_help(file: Any = sys.stdout) -> None:
     get_cli_parser().print_help(file=file)
 
 
-def get_rules_dirs(rulesdir: list[str], use_default: bool = True) -> list[str]:
+def get_rules_dirs(rulesdir: list[Path], *, use_default: bool = True) -> list[Path]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
     default_custom_rulesdir = os.environ.get(
@@ -616,7 +616,11 @@ def get_rules_dirs(rulesdir: list[str], use_default: bool = True) -> list[str]:
         if x.is_dir() and (x / "__init__.py").exists()
     )
 
+    result: list[Any] = []
     if use_default:
-        return rulesdir + custom_ruledirs + default_ruledirs
-
-    return rulesdir or custom_ruledirs + default_ruledirs
+        result = rulesdir + custom_ruledirs + default_ruledirs
+    elif rulesdir:
+        result = rulesdir
+    else:
+        result = custom_ruledirs + default_ruledirs
+    return [Path(p) for p in result]
