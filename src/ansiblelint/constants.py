@@ -1,10 +1,9 @@
 """Constants used by AnsibleLint."""
-import os.path
 from enum import Enum
 from pathlib import Path
 from typing import Literal
 
-DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
+DEFAULT_RULESDIR = Path(__file__).parent / "rules"
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
 RULE_DOC_URL = "https://ansible-lint.readthedocs.io/rules/"
 

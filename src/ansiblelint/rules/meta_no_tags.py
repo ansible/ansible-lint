@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
@@ -104,7 +105,9 @@ if "pytest" in sys.modules:
     )
     def test_valid_tag_rule(rule_runner: RunFromText) -> None:
         """Test rule matches."""
-        results = rule_runner.run("examples/roles/meta_no_tags_valid/meta/main.yml")
+        results = rule_runner.run(
+            Path("examples/roles/meta_no_tags_valid/meta/main.yml"),
+        )
         assert "Use 'galaxy_tags' rather than 'categories'" in str(results), results
         assert "Expected 'categories' to be a list" in str(results)
         assert "invalid: 'my s q l'" in str(results)

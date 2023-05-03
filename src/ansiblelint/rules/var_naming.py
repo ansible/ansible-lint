@@ -17,6 +17,8 @@ from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from ansiblelint.errors import MatchError
 
 # Should raise var-naming at line [2, 6].
@@ -212,9 +214,12 @@ if "pytest" in sys.modules:
         (VariableNamingRule,),
         indirect=["rule_runner"],
     )
-    def test_invalid_var_name_varsfile(rule_runner: RunFromText) -> None:
+    def test_invalid_var_name_varsfile(
+        rule_runner: RunFromText,
+        tmp_path: Path,
+    ) -> None:
         """Test rule matches."""
-        results = rule_runner.run_role_defaults_main(FAIL_VARS)
+        results = rule_runner.run_role_defaults_main(FAIL_VARS, tmp_path=tmp_path)
         assert len(results) == 2
         for result in results:
             assert result.rule.id == VariableNamingRule.id
