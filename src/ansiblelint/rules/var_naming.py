@@ -18,8 +18,6 @@ from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from ansiblelint.errors import MatchError
 
 # Should raise var-naming at line [2, 6].
