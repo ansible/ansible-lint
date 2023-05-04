@@ -51,20 +51,24 @@
                                         },
                                         "type": {
                                             "default": "module",
-                                            "description": "Specify the plugin type, 'become', 'cache', 'callback', 'cliconf', 'connection', 'httpapi', 'inventory', 'lookup', 'module', 'netconf', 'shell', 'strategy' or 'vars'",
+                                            "description": "Specify the plugin type, 'become', 'cache', 'callback', 'cliconf', 'connection', 'filter', 'httpapi', 'inventory', 'keyword', 'lookup', 'module', 'netconf', 'role', 'shell', 'strategy', 'test' or 'vars'",
                                             "enum": [
                                                 "become",
                                                 "cache",
                                                 "callback",
                                                 "cliconf",
                                                 "connection",
+                                                "filter",
                                                 "httpapi",
                                                 "inventory",
+                                                "keyword",
                                                 "lookup",
                                                 "module",
                                                 "netconf",
+                                                "role",
                                                 "shell",
                                                 "strategy",
+                                                "test",
                                                 "vars"
                                             ],
                                             "type": "string"
