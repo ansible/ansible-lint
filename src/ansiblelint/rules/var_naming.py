@@ -45,9 +45,9 @@ class VariableNamingRule(AnsibleLintRule):
         """Check if variable name is using right pattern."""
         # Based on https://github.com/ansible/ansible/blob/devel/lib/ansible/utils/vars.py#L235
         if not ident.startswith("__"):
+            var_naming_pattern = options.var_naming_pattern or "^[a-z_][a-z0-9_]*$"
             re_pattern = re.compile(
-                options.var_naming_pattern.format(role=role_ident)
-                or "^[a-z_][a-z0-9_]*$"
+                var_naming_pattern.format(role=role_ident)
             )
         else:
             re_pattern = re.compile("^[a-z_][a-z0-9_]*$")
