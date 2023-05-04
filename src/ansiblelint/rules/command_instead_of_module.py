@@ -20,8 +20,8 @@
 # THE SOFTWARE.
 from __future__ import annotations
 
-import os
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -87,7 +87,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         if not first_cmd_arg:
             return False
 
-        executable = os.path.basename(first_cmd_arg)
+        executable = Path(first_cmd_arg).name
 
         if (
             second_cmd_arg

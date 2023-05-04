@@ -3,7 +3,6 @@
 # Copyright (c) 2018, Ansible Project
 from __future__ import annotations
 
-import os
 import sys
 from typing import TYPE_CHECKING
 
@@ -30,8 +29,8 @@ class PlaybookExtensionRule(AnsibleLintRule):
         if file.kind != "playbook":
             return result
         path = str(file.path)
-        ext = os.path.splitext(path)
-        if ext[1] not in [".yml", ".yaml"] and path not in self.done:
+        ext = file.path.suffix
+        if ext not in [".yml", ".yaml"] and path not in self.done:
             self.done.append(path)
             result.append(self.create_matcherror(filename=file))
         return result

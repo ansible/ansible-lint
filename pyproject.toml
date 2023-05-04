@@ -107,6 +107,8 @@ disallow_any_generics = true
 # warn_unused_configs = True
 # site-packages is here to help vscode mypy integration getting confused
 exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
+# https://github.com/python/mypy/issues/12664
+no_incremental = true
 
 [[tool.mypy.overrides]]
 module = [
@@ -235,7 +237,6 @@ ignore = [
   "FBT001",
   "FBT003",
   "PLR",
-  "PTH",
   "TRY",
 ]
 select = ["ALL"]
@@ -256,6 +257,10 @@ known-first-party = ["ansiblelint"]
 "test/**/*.py" = ["S"]
 "src/ansiblelint/rules/*.py" = ["S"]
 "src/ansiblelint/testing/*.py" = ["S"]
+# Temporary disabled until we fix them:
+"src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings,__main__}.py" = [
+  "PTH",
+]
 
 [tool.setuptools.dynamic]
 optional-dependencies.docs = { file = [".config/requirements-docs.txt"] }

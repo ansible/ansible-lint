@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import os
-import pathlib
 import shutil
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -22,18 +22,18 @@ if TYPE_CHECKING:
 
 @pytest.fixture(name="copy_examples_dir")
 def fixture_copy_examples_dir(
-    tmp_path: pathlib.Path,
+    tmp_path: Path,
     config_options: Namespace,
-) -> Iterator[tuple[pathlib.Path, pathlib.Path]]:
+) -> Iterator[tuple[Path, Path]]:
     """Fixture that copies the examples/ dir into a tmpdir."""
-    examples_dir = pathlib.Path("examples")
+    examples_dir = Path("examples")
 
     shutil.copytree(examples_dir, tmp_path / "examples")
-    old_cwd = os.getcwd()
+    old_cwd = Path.cwd()
     try:
         os.chdir(tmp_path)
         config_options.cwd = tmp_path
-        yield pathlib.Path(old_cwd), tmp_path
+        yield old_cwd, tmp_path
     finally:
         os.chdir(old_cwd)
 
@@ -87,7 +87,7 @@ def fixture_runner_result(
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
     config_options: Options,
-    copy_examples_dir: tuple[pathlib.Path, pathlib.Path],
+    copy_examples_dir: tuple[Path, Path],
     playbook: str,
     runner_result: LintResult,
     transformed: bool,

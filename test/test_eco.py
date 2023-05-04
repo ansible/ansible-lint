@@ -23,7 +23,7 @@ eco_repos = {
 def sanitize_output(text: str) -> str:
     """Make the output less likely to vary between runs or minor changes."""
     # replace full path to home directory with ~.
-    result = text.replace(os.path.expanduser("~"), "~")
+    result = text.replace(os.path.expanduser("~"), "~")  # noqa: PTH111
     # removes warning related to PATH alteration
     result = re.sub(
         r"^WARNING: PATH altered to include.+\n",
@@ -44,9 +44,9 @@ def test_eco(repo: str) -> None:
     url = eco_repos[repo]
     cache_dir = pathlib.Path("~/.cache/ansible-lint-eco").expanduser()
     my_dir = (pathlib.Path(__file__).parent / "eco").resolve()
-    os.makedirs(cache_dir, exist_ok=True)
+    my_dir.mkdir(exist_ok=True, parents=True)
     # clone repo
-    if os.path.exists(f"{cache_dir}/{repo}/.git"):
+    if (cache_dir / repo / ".git").exists():
         subprocess.run("git pull", cwd=f"{cache_dir}/{repo}", shell=True, check=True)
     else:
         subprocess.run(
@@ -76,8 +76,8 @@ def test_eco(repo: str) -> None:
 
         result_txt = f"CMD: {shlex.join(result.args)}\n\nRC: {result.returncode}\n\nSTDERR:\n{result.stderr}\n\nSTDOUT:\n{result.stdout}"
 
-        os.makedirs(f"{my_dir}/{step}", exist_ok=True)
-        with open(f"{my_dir}/{step}/{repo}.result", "w", encoding="utf-8") as f:
+        (my_dir / step).mkdir(exist_ok=True)
+        with (my_dir / step / "{repo}.result").open("w", encoding="utf-8") as f:
             f.write(sanitize_output(result_txt))
 
     # fail if result is different than our expected one

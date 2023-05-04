@@ -10,6 +10,7 @@ pytest >= 7.2.2
 pytest-mock
 pytest-plus >= 0.2 # for PYTEST_REQPASS
 pytest-xdist >= 2.1.0
+ruamel-yaml-clib  # needed for mypy
 spdx-tools >= 0.7.1 # Apache
 types-jsonschema # IDE support
 types-pyyaml # IDE support

@@ -19,6 +19,7 @@ from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from pathlib import Path
 
     from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
@@ -40,7 +41,7 @@ class Runner:
     # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self,
-        *lintables: Lintable | str,
+        *lintables: Lintable | str | Path,
         rules: RulesCollection,
         tags: frozenset[Any] = frozenset(),
         skip_list: list[str] | None = None,

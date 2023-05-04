@@ -16,7 +16,7 @@ _logger = logging.getLogger(__package__)
 # Maps kinds to JSON schemas
 # See https://www.schemastore.org/json/
 store_file = Path(f"{__file__}/../__store__.json").resolve()
-with open(store_file, encoding="utf-8") as json_file:
+with store_file.open(encoding="utf-8") as json_file:
     JSON_SCHEMAS = json.load(json_file)
 
 
@@ -33,8 +33,8 @@ class SchemaCacheDict(defaultdict):  # type: ignore[type-arg]
 @cache
 def get_schema(kind: str) -> Any:
     """Return the schema for the given kind."""
-    schema_file = os.path.dirname(__file__) + "/" + kind + ".json"
-    with open(schema_file, encoding="utf-8") as f:
+    schema_file = Path(__file__).parent / f"{kind}.json"
+    with schema_file.open(encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -66,7 +66,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:  # noqa: C901
         if "#" in url:
             msg = f"Schema URLs cannot contain # due to python-jsonschema limitation: {url}"
             raise RuntimeError(msg)
-        path = Path(f"{os.path.relpath(os.path.dirname(__file__))}/{kind}.json")
+        path = Path(__file__).parent.resolve() / f"{kind}.json"
         _logger.debug("Refreshing %s schema ...", kind)
         request = Request(url)
         etag = data.get("etag", "")
@@ -80,7 +80,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:  # noqa: C901
                     if etag != data.get("etag", ""):
                         JSON_SCHEMAS[kind]["etag"] = etag
                         changed += 1
-                    with open(f"{path}", "w", encoding="utf-8") as f_out:
+                    with path.open("w", encoding="utf-8") as f_out:
                         _logger.info("Schema %s was updated", kind)
                         f_out.write(content)
                         f_out.write("\n")  # prettier/editors
@@ -100,7 +100,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:  # noqa: C901
             _logger.debug("Skipped schema refresh due to unexpected exception: %s", exc)
             break
     if changed:  # pragma: no cover
-        with open(store_file, "w", encoding="utf-8") as f_out:
+        with store_file.open("w", encoding="utf-8") as f_out:
             # formatting should match our .prettierrc.yaml
             json.dump(JSON_SCHEMAS, f_out, indent=2, sort_keys=True)
             f_out.write("\n")  # prettier and editors in general

@@ -1,7 +1,6 @@
 """Implementation of GalaxyRule."""
 from __future__ import annotations
 
-import os
 import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
@@ -45,16 +44,16 @@ class GalaxyRule(AnsibleLintRule):
 
         results = []
 
-        base_path = os.path.split(str(file.abspath))[0]
+        base_path = file.path.parent.resolve()
         changelog_found = 0
         changelog_paths = [
-            os.path.join(base_path, "changelogs", "changelog.yaml"),
-            os.path.join(base_path, "CHANGELOG.rst"),
-            os.path.join(base_path, "CHANGELOG.md"),
+            base_path / "changelogs" / "changelog.yaml",
+            base_path / "CHANGELOG.rst",
+            base_path / "CHANGELOG.md",
         ]
 
         for path in changelog_paths:
-            if os.path.isfile(path):
+            if path.is_file():
                 changelog_found = 1
 
         galaxy_tag_list = data.get("tags", None)
@@ -109,7 +108,7 @@ class GalaxyRule(AnsibleLintRule):
                 ),
             )
 
-        if not os.path.isfile(os.path.join(base_path, "meta/runtime.yml")):
+        if not (base_path / "meta" / "runtime.yml").is_file():
             results.append(
                 self.create_matcherror(
                     message="meta/runtime.yml file not found.",

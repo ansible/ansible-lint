@@ -20,38 +20,40 @@
 # THE SOFTWARE.
 from __future__ import annotations
 
-import os
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
 
 from ansiblelint import formatters
-from ansiblelint.file_utils import Lintable, abspath
+from ansiblelint.file_utils import Lintable
 from ansiblelint.runner import Runner
 
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection
 
-LOTS_OF_WARNINGS_PLAYBOOK = abspath(
-    "examples/playbooks/lots_of_warnings.yml",
-    os.getcwd(),
-)
+LOTS_OF_WARNINGS_PLAYBOOK = Path("examples/playbooks/lots_of_warnings.yml").resolve()
 
 
 @pytest.mark.parametrize(
     ("playbook", "exclude", "length"),
     (
-        pytest.param("examples/playbooks/nomatchestest.yml", [], 0, id="nomatchestest"),
-        pytest.param("examples/playbooks/unicode.yml", [], 1, id="unicode"),
+        pytest.param(
+            Path("examples/playbooks/nomatchestest.yml"),
+            [],
+            0,
+            id="nomatchestest",
+        ),
+        pytest.param(Path("examples/playbooks/unicode.yml"), [], 1, id="unicode"),
         pytest.param(
             LOTS_OF_WARNINGS_PLAYBOOK,
             [LOTS_OF_WARNINGS_PLAYBOOK],
             0,
             id="lots_of_warnings",
         ),
-        pytest.param("examples/playbooks/become.yml", [], 0, id="become"),
+        pytest.param(Path("examples/playbooks/become.yml"), [], 0, id="become"),
         pytest.param(
-            "examples/playbooks/contains_secrets.yml",
+            Path("examples/playbooks/contains_secrets.yml"),
             [],
             0,
             id="contains_secrets",
@@ -60,7 +62,7 @@ LOTS_OF_WARNINGS_PLAYBOOK = abspath(
 )
 def test_runner(
     default_rules_collection: RulesCollection,
-    playbook: str,
+    playbook: Path,
     exclude: list[str],
     length: int,
 ) -> None:
@@ -115,7 +117,7 @@ def test_runner_unicode_format(
     formatter_cls: type[formatters.BaseFormatter[Any]],
 ) -> None:
     """Check that all formatters are unicode-friendly."""
-    formatter = formatter_cls(os.getcwd(), display_relative_path=True)
+    formatter = formatter_cls(Path.cwd(), display_relative_path=True)
     runner = Runner(
         Lintable("examples/playbooks/unicode.yml", kind="playbook"),
         rules=default_rules_collection,
@@ -129,13 +131,13 @@ def test_runner_unicode_format(
 @pytest.mark.parametrize(
     "directory_name",
     (
-        pytest.param("test/fixtures/verbosity-tests", id="rel"),
-        pytest.param(os.path.abspath("test/fixtures/verbosity-tests"), id="abs"),
+        pytest.param(Path("test/fixtures/verbosity-tests"), id="rel"),
+        pytest.param(Path("test/fixtures/verbosity-tests").resolve(), id="abs"),
     ),
 )
 def test_runner_with_directory(
     default_rules_collection: RulesCollection,
-    directory_name: str,
+    directory_name: Path,
 ) -> None:
     """Check that runner detects a directory as role."""
     runner = Runner(directory_name, rules=default_rules_collection)
@@ -148,7 +150,7 @@ def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> N
     """Ensure that lintables aren't double-checked."""
     checked_files: set[Lintable] = set()
 
-    filename = os.path.abspath("examples/playbooks/common-include-1.yml")
+    filename = Path("examples/playbooks/common-include-1.yml").resolve()
     runner = Runner(
         filename,
         rules=default_rules_collection,
@@ -159,9 +161,9 @@ def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> N
     assert len(runner.checked_files) == 2
     assert len(run1) == 1
 
-    filename = os.path.abspath("examples/playbooks/common-include-2.yml")
+    filename = Path("examples/playbooks/common-include-2.yml").resolve()
     runner = Runner(
-        filename,
+        str(filename),
         rules=default_rules_collection,
         verbosity=0,
         checked_files=checked_files,

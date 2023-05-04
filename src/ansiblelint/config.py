@@ -106,7 +106,7 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     cache_dir: Path | None = None
     colored: bool = True
     configured: bool = False
-    cwd: Path = Path(".")  # noqa: RUF009
+    cwd: Path = Path(".")
     display_relative_path: bool = True
     exclude_paths: list[str] = field(default_factory=list)
     format: str = "brief"  # noqa: A003
@@ -116,7 +116,7 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     write_list: list[str] = field(default_factory=list)
     parseable: bool = False
     quiet: bool = False
-    rulesdirs: list[str] = field(default_factory=list)
+    rulesdirs: list[Path] = field(default_factory=list)
     skip_list: list[str] = field(default_factory=list)
     tags: list[str] = field(default_factory=list)
     verbosity: int = 0

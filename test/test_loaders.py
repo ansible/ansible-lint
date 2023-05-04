@@ -11,7 +11,7 @@ from ansiblelint.loaders import IGNORE_FILE, load_ignore_txt
 def test_load_ignore_txt_default_empty() -> None:
     """Test load_ignore_txt when no ignore-file is present."""
     with tempfile.TemporaryDirectory() as temporary_directory:
-        cwd = os.getcwd()
+        cwd = Path.cwd()
 
         try:
             os.chdir(temporary_directory)
@@ -25,9 +25,9 @@ def test_load_ignore_txt_default_empty() -> None:
 def test_load_ignore_txt_default_success() -> None:
     """Test load_ignore_txt with an existing ignore-file in the default location."""
     with tempfile.TemporaryDirectory() as temporary_directory:
-        ignore_file = os.path.join(temporary_directory, IGNORE_FILE.default)
+        ignore_file = Path(temporary_directory) / IGNORE_FILE.default
 
-        with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
+        with ignore_file.open("w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
                 dedent(
                     """
@@ -38,7 +38,7 @@ def test_load_ignore_txt_default_success() -> None:
                 ),
             )
 
-        cwd = os.getcwd()
+        cwd = Path.cwd()
 
         try:
             os.chdir(temporary_directory)
@@ -52,10 +52,10 @@ def test_load_ignore_txt_default_success() -> None:
 def test_load_ignore_txt_default_success_alternative() -> None:
     """Test load_ignore_txt with an ignore-file in the alternative location ('.config' subdirectory)."""
     with tempfile.TemporaryDirectory() as temporary_directory:
-        ignore_file = os.path.join(temporary_directory, IGNORE_FILE.alternative)
-        os.makedirs(os.path.dirname(ignore_file))
+        ignore_file = Path(temporary_directory) / IGNORE_FILE.alternative
+        ignore_file.parent.mkdir(parents=True)
 
-        with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
+        with ignore_file.open("w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
                 dedent(
                     """
@@ -66,7 +66,7 @@ def test_load_ignore_txt_default_success_alternative() -> None:
                 ),
             )
 
-        cwd = os.getcwd()
+        cwd = Path.cwd()
 
         try:
             os.chdir(temporary_directory)
@@ -83,10 +83,10 @@ def test_load_ignore_txt_default_success_alternative() -> None:
 def test_load_ignore_txt_custom_success() -> None:
     """Test load_ignore_txt with an ignore-file in a user defined location."""
     with tempfile.TemporaryDirectory() as temporary_directory:
-        ignore_file = os.path.join(temporary_directory, "subdir", "my_ignores.txt")
-        os.makedirs(os.path.dirname(ignore_file))
+        ignore_file = Path(temporary_directory) / "subdir" / "my_ignores.txt"
+        ignore_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(ignore_file, "w", encoding="utf-8") as _ignore_file:
+        with ignore_file.open("w", encoding="utf-8") as _ignore_file:
             _ignore_file.write(
                 dedent(
                     """
@@ -98,7 +98,7 @@ def test_load_ignore_txt_custom_success() -> None:
                 ),
             )
 
-        cwd = os.getcwd()
+        cwd = Path.cwd()
 
         try:
             os.chdir(temporary_directory)
