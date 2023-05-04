@@ -17,6 +17,7 @@ exclude: >
     .config/requirements.*|
     .vscode/extensions.json|
     .vscode/settings.json|
+    examples/broken/encoding.yml|
     examples/broken/encoding.j2|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
     examples/playbooks/collections/.*|
