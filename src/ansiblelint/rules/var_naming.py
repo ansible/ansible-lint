@@ -49,7 +49,7 @@ class VariableNamingRule(AnsibleLintRule):
         if not ident.startswith("__"):
             var_naming_pattern = options.var_naming_pattern or "^[a-z_][a-z0-9_]*$"
             re_pattern = re.compile(
-                var_naming_pattern.format(role=role_ident)
+                var_naming_pattern.format(role=role_ident),
             )
         else:
             re_pattern = re.compile("^[a-z_][a-z0-9_]*$")
@@ -119,7 +119,7 @@ class VariableNamingRule(AnsibleLintRule):
         split_filepath = (
             Path(str(task.get("__file__"))).resolve().as_posix().split("roles/")
         )
-        if len(split_filepath) > 1 and not task["action"]["__ansible_module__"] in [
+        if len(split_filepath) > 1 and task["action"]["__ansible_module__"] not in [
             "import_tasks",
             "include_tasks",
             "import_role",
@@ -158,7 +158,8 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task registers a variable
         registered_var = task.get("register", None)
         if registered_var and self.is_invalid_variable_name(
-            registered_var, role_ident=role_name
+            registered_var,
+            role_ident=role_name,
         ):
             results.append(
                 self.create_matcherror(
