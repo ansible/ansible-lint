@@ -123,7 +123,7 @@ class VariableNamingRule(AnsibleLintRule):
         ]:
             role_name = split_filepath[1].split("/")[0]
         our_vars = task.get("vars", {})
-        for key in our_vars.keys():
+        for key in our_vars:
             if self.is_invalid_variable_name(key, role_ident=role_name):
                 results.append(
                     self.create_matcherror(
@@ -179,7 +179,7 @@ class VariableNamingRule(AnsibleLintRule):
             if len(split_filepath) > 1:
                 role_name = split_filepath[1].split("/")[0]
             meta_data = parse_yaml_from_file(str(file.path))
-            for key in meta_data.keys():
+            for key in meta_data:
                 if self.is_invalid_variable_name(key, role_ident=role_name):
                     raw_results.append(
                         self.create_matcherror(
