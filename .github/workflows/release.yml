@@ -2,7 +2,7 @@
 # cspell:ignore mislav
 name: release
 
-on:
+"on":
   release:
     types: [published]
 

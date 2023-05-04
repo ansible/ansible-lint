@@ -8,6 +8,10 @@
   from_url: /rules/hg-latest/
   to_url: /rules/latest/
 - type: page
+  from_url: /rules/meta-no-info/
+  # cspell:disable-next-line
+  to_url: /rules/schemas/#schemameta
+- type: page
   from_url: /rules/deprecated-command-syntax/
   to_url: /rules/no-free-form/
 - type: page

@@ -78,7 +78,6 @@ shared:
     layout:
       url: https://github.com/ansible/ansible-lint/issues/1900
     meta-incorrect:
-    meta-no-info:
     meta-no-tags:
     meta-video-links:
     meta-version:

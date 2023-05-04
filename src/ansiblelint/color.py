@@ -44,10 +44,9 @@ from rich.theme import Theme
 # string: #dd1144 (light-red)
 DEFAULT_STYLES.update(
     {
-        # "code": Style(color="bright_black", bgcolor="red"),
         "markdown.code": Style(color="bright_black"),
         "markdown.code_block": Style(dim=True, color="cyan"),
-    }
+    },
 )
 
 
@@ -59,7 +58,7 @@ _theme = Theme(
         "title": "yellow",
         "error": "bright_red",
         "filename": "blue",
-    }
+    },
 )
 console_options: dict[str, Any] = {"emoji": False, "theme": _theme, "soft_wrap": True}
 console_options_stderr = console_options.copy()
@@ -71,10 +70,7 @@ console_stderr = Console(**console_options_stderr)
 
 def reconfigure(new_options: dict[str, Any]) -> None:
     """Reconfigure console options."""
-    global console_options  # pylint: disable=global-statement,invalid-name
-    global console_stderr  # pylint: disable=global-statement,invalid-name,global-variable-not-assigned
-
-    console_options = new_options
+    console_options = new_options  # pylint: disable=redefined-outer-name
     rich.reconfigure(**new_options)
     # see https://github.com/willmcgugan/rich/discussions/484#discussioncomment-200182
     new_console_options_stderr = console_options.copy()
@@ -91,8 +87,8 @@ def render_yaml(text: str) -> Syntax:
 # pylint: disable=redefined-outer-name,unused-argument
 def _rich_codeblock_custom_rich_console(
     self: rich.markdown.CodeBlock,
-    console: Console,
-    options: rich.console.ConsoleOptions,
+    console: Console,  # noqa: ARG001
+    options: rich.console.ConsoleOptions,  # noqa: ARG001
 ) -> rich.console.RenderResult:  # pragma: no cover
     code = str(self.text).rstrip()
     syntax = Syntax(
@@ -105,4 +101,4 @@ def _rich_codeblock_custom_rich_console(
     yield syntax
 
 
-rich.markdown.CodeBlock.__rich_console__ = _rich_codeblock_custom_rich_console  # type: ignore
+rich.markdown.CodeBlock.__rich_console__ = _rich_codeblock_custom_rich_console  # type: ignore[method-assign]

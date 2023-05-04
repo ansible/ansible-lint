@@ -1,20 +1,24 @@
 """Test schemas modules."""
 import json
 import logging
-import os
 import subprocess
 import sys
 import urllib
+from pathlib import Path
 from time import sleep
 from typing import Any
 from unittest.mock import DEFAULT, MagicMock, patch
 
 import pytest
-from spdx.config import __file__ as spdx_config_path
+import spdx.config
 
 from ansiblelint.file_utils import Lintable
-from ansiblelint.schemas import __file__ as schema_path
-from ansiblelint.schemas import refresh_schemas, validate_file_schema
+from ansiblelint.schemas import __file__ as schema_module
+from ansiblelint.schemas.__main__ import refresh_schemas
+from ansiblelint.schemas.main import validate_file_schema
+
+schema_path = Path(schema_module).parent
+spdx_config_path = Path(spdx.config.__file__).parent
 
 
 def test_refresh_schemas() -> None:
@@ -48,7 +52,8 @@ def test_requests_uses_timeout(mock_request: MagicMock) -> None:
 
 @patch("urllib.request")
 def test_request_timeouterror_handling(
-    mock_request: MagicMock, caplog: pytest.LogCaptureFixture
+    mock_request: MagicMock,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that schema refresh can handle time out errors."""
     error_msg = "Simulating handshake operation time out."
@@ -81,30 +86,24 @@ def test_validate_file_schema() -> None:
 
 def test_spdx() -> None:
     """Test that SPDX license identifiers are in sync."""
-    _base_dir = os.path.dirname(spdx_config_path)
-    _licenses = os.path.join(_base_dir, "licenses.json")
+    _licenses = spdx_config_path / "licenses.json"
 
     license_ids = set()
-    with open(_licenses, encoding="utf-8") as license_fh:
+    with _licenses.open(encoding="utf-8") as license_fh:
         licenses = json.load(license_fh)
     for lic in licenses["licenses"]:
         if lic.get("isDeprecatedLicenseId"):
             continue
         license_ids.add(lic["licenseId"])
 
-    with open(
-        os.path.join(os.path.dirname(schema_path), "galaxy.json"), encoding="utf-8"
-    ) as f:
+    galaxy_json = schema_path / "galaxy.json"
+    with galaxy_json.open(encoding="utf-8") as f:
         schema = json.load(f)
         spx_enum = schema["$defs"]["SPDXLicenseEnum"]["enum"]
     if set(spx_enum) != license_ids:
-        with open(
-            os.path.join(os.path.dirname(schema_path), "galaxy.json"),
-            "w",
-            encoding="utf-8",
-        ) as f:
+        with galaxy_json.open("w", encoding="utf-8") as f:
             schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
             json.dump(schema, f, indent=2)
         pytest.fail(
-            "SPDX license list inside galaxy.json JSON Schema file was updated."
+            "SPDX license list inside galaxy.json JSON Schema file was updated.",
         )

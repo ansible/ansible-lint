@@ -6,21 +6,22 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.app import get_app
-from ansiblelint.rules import RulesCollection
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
     # pylint: disable=unsubscriptable-object
     CompletedProcess = subprocess.CompletedProcess[Any]
-    from ansiblelint.errors import MatchError  # noqa: E402
+    from ansiblelint.errors import MatchError
+    from ansiblelint.rules import RulesCollection
 else:
     CompletedProcess = subprocess.CompletedProcess
 
 # pylint: disable=wrong-import-position
-from ansiblelint.runner import Runner  # noqa: E402
+from ansiblelint.runner import Runner
 
 
 class RunFromText:
@@ -37,54 +38,68 @@ class RunFromText:
 
         self.collection = collection
 
-    def _call_runner(self, path: str) -> list[MatchError]:
+    def _call_runner(self, path: Path) -> list[MatchError]:
         runner = Runner(path, rules=self.collection)
         return runner.run()
 
-    def run(self, filename: str) -> list[MatchError]:
+    def run(self, filename: Path) -> list[MatchError]:
         """Lints received filename."""
         return self._call_runner(filename)
 
     def run_playbook(
-        self, playbook_text: str, prefix: str = "playbook"
+        self,
+        playbook_text: str,
+        prefix: str = "playbook",
     ) -> list[MatchError]:
         """Lints received text as a playbook."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix=prefix) as fh:
             fh.write(playbook_text)
             fh.flush()
-            results = self._call_runner(fh.name)
+            results = self._call_runner(Path(fh.name))
         return results
 
-    def run_role_tasks_main(self, tasks_main_text: str) -> list[MatchError]:
+    def run_role_tasks_main(
+        self,
+        tasks_main_text: str,
+        tmp_path: Path,
+    ) -> list[MatchError]:
         """Lints received text as tasks."""
-        role_path = tempfile.mkdtemp(prefix="role_")
-        tasks_path = os.path.join(role_path, "tasks")
-        os.makedirs(tasks_path)
-        with open(os.path.join(tasks_path, "main.yml"), "w", encoding="utf-8") as fh:
+        role_path = tmp_path
+        tasks_path = role_path / "tasks"
+        tasks_path.mkdir(parents=True, exist_ok=True)
+        with (tasks_path / "main.yml").open("w", encoding="utf-8") as fh:
             fh.write(tasks_main_text)
             fh.flush()
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results
 
-    def run_role_meta_main(self, meta_main_text: str) -> list[MatchError]:
+    def run_role_meta_main(
+        self,
+        meta_main_text: str,
+        temp_path: Path,
+    ) -> list[MatchError]:
         """Lints received text as meta."""
-        role_path = tempfile.mkdtemp(prefix="role_")
-        meta_path = os.path.join(role_path, "meta")
-        os.makedirs(meta_path)
-        with open(os.path.join(meta_path, "main.yml"), "w", encoding="utf-8") as fh:
+        role_path = temp_path
+        meta_path = role_path / "meta"
+        meta_path.mkdir(parents=True, exist_ok=True)
+        with (meta_path / "main.yml").open("w", encoding="utf-8") as fh:
             fh.write(meta_main_text)
             fh.flush()
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)
         return results
 
-    def run_role_defaults_main(self, defaults_main_text: str) -> list[MatchError]:
+    def run_role_defaults_main(
+        self,
+        defaults_main_text: str,
+        tmp_path: Path,
+    ) -> list[MatchError]:
         """Lints received text as vars file in defaults."""
-        role_path = tempfile.mkdtemp(prefix="role_")
-        defaults_path = os.path.join(role_path, "defaults")
-        os.makedirs(defaults_path)
-        with open(os.path.join(defaults_path, "main.yml"), "w", encoding="utf-8") as fh:
+        role_path = tmp_path
+        defaults_path = role_path / "defaults"
+        defaults_path.mkdir(parents=True, exist_ok=True)
+        with (defaults_path / "main.yml").open("w", encoding="utf-8") as fh:
             fh.write(defaults_main_text)
             fh.flush()
         results = self._call_runner(role_path)
@@ -93,14 +108,14 @@ class RunFromText:
 
 
 def run_ansible_lint(
-    *argv: str,
-    cwd: str | None = None,
+    *argv: str | Path,
+    cwd: Path | None = None,
     executable: str | None = None,
     env: dict[str, str] | None = None,
     offline: bool = True,
 ) -> CompletedProcess:
     """Run ansible-lint on a given path and returns its output."""
-    args = [*argv]
+    args = [str(item) for item in argv]
     if offline:  # pragma: no cover
         args.insert(0, "--offline")
 
@@ -128,10 +143,7 @@ def run_ansible_lint(
         "VIRTUAL_ENV",
     ]
 
-    if env is None:
-        _env = {}
-    else:
-        _env = env
+    _env = {} if env is None else env
     for v in safe_list:
         if v in os.environ and v not in _env:
             _env[v] = os.environ[v]

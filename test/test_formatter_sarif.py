@@ -35,23 +35,23 @@ class TestSarifFormatter:
         self.matches.append(
             MatchError(
                 message="message",
-                linenumber=1,
+                lineno=1,
                 column=10,
                 details="details",
-                filename=Lintable("filename.yml", content=""),
+                lintable=Lintable("filename.yml", content=""),
                 rule=self.rule,
                 tag="yaml[test]",
-            )
+            ),
         )
         self.matches.append(
             MatchError(
                 message="message",
-                linenumber=2,
+                lineno=2,
                 details="",
-                filename=Lintable("filename.yml", content=""),
+                lintable=Lintable("filename.yml", content=""),
                 rule=self.rule,
                 tag="yaml[test]",
-            )
+            ),
         )
         self.formatter = SarifFormatter(pathlib.Path.cwd(), display_relative_path=True)
 
@@ -63,13 +63,16 @@ class TestSarifFormatter:
     def test_result_is_json(self) -> None:
         """Test if returned string value is a JSON."""
         assert isinstance(self.formatter, SarifFormatter)
-        json.loads(self.formatter.format_result(self.matches))
+        output = self.formatter.format_result(self.matches)
+        json.loads(output)
+        # https://github.com/ansible/ansible-navigator/issues/1490
+        assert "\n" not in output
 
     def test_single_match(self) -> None:
         """Test negative case. Only lists are allowed. Otherwise, a RuntimeError will be raised."""
         assert isinstance(self.formatter, SarifFormatter)
         with pytest.raises(RuntimeError):
-            self.formatter.format_result(self.matches[0])  # type: ignore
+            self.formatter.format_result(self.matches[0])  # type: ignore[arg-type]
 
     def test_result_is_list(self) -> None:
         """Test if the return SARIF object contains the results with length of 2."""
@@ -111,7 +114,7 @@ class TestSarifFormatter:
             )
             assert (
                 result["locations"][0]["physicalLocation"]["region"]["startLine"]
-                == self.matches[i].linenumber
+                == self.matches[i].lineno
             )
             if self.matches[i].column:
                 assert (
@@ -164,5 +167,5 @@ def test_sarif_file(file: str, return_code: int) -> None:
         ]
         result = subprocess.run([*cmd, file], check=False, capture_output=True)
         assert result.returncode == return_code
-        assert os.path.exists(output_file.name)
+        assert os.path.exists(output_file.name)  # noqa: PTH110
         assert os.path.getsize(output_file.name) > 0

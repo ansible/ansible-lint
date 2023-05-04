@@ -44,7 +44,9 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
     version_added = "historic"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         # Use unjinja so that we don't match on jinja filters
         # rather than pipes
@@ -76,12 +78,16 @@ if "pytest" in sys.modules:
                 id="good",
             ),
             pytest.param(
-                "examples/playbooks/rule-command-instead-of-shell-fail.yml", 3, id="bad"
+                "examples/playbooks/rule-command-instead-of-shell-fail.yml",
+                3,
+                id="bad",
             ),
         ),
     )
     def test_rule_command_instead_of_shell(
-        default_rules_collection: RulesCollection, file: str, expected: int
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: int,
     ) -> None:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()

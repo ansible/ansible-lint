@@ -21,15 +21,15 @@ double_multiline_with_octothorpe: # this EOL comment gets lost
   # this is not a comment"
 
 # this is a comment
-folded_block_scalar_with_octothorpe: > # > EOL comment gets lost
+folded_block_scalar_with_octothorpe: > # comment 1
   # this is not a comment
 
 # this is a comment
-folded_chomp_strip_block_scalar_with_octothorpe: >- # > EOL comment gets lost
+folded_chomp_strip_block_scalar_with_octothorpe: >- # comment 2
   # this is not a comment
 
 # this is a comment
-folded_chomp_keep_block_scalar_with_octothorpe: >+ # > EOL comment gets lost
+folded_chomp_keep_block_scalar_with_octothorpe: >+ # comment 3
   # this is not a comment
 
 # this is a comment

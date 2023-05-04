@@ -32,6 +32,8 @@ releases:
         - something that is not included in release notes
       known_issues:
         - som other
+      xxx:
+        - we should ignore unknown keys because user can define custom section in changelogs/config.yaml file
     modules:
       - name: head
         description: Make a HEAD request

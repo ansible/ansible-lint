@@ -1,0 +1,12 @@
+# Fixture for meta-incorrect
+---
+galaxy_info: # <-- 4x meta-incorrect
+  author: your name
+  description: your description
+  company: your company (optional)
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: "2.12"
+  platforms:
+    - name: EL
+      versions:
+        - "7"

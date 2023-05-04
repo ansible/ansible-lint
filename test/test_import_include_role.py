@@ -1,13 +1,18 @@
 """Tests related to role imports."""
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from _pytest.fixtures import SubRequest
 
-from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from _pytest.fixtures import SubRequest
+
+    from ansiblelint.rules import RulesCollection
 
 ROLE_TASKS_MAIN = """\
 ---
@@ -135,7 +140,9 @@ def fixture_playbook_path(request: SubRequest, tmp_path: Path) -> str:
     indirect=("playbook_path",),
 )
 def test_import_role2(
-    default_rules_collection: RulesCollection, playbook_path: str, messages: list[str]
+    default_rules_collection: RulesCollection,
+    playbook_path: str,
+    messages: list[str],
 ) -> None:
     """Test that include_role digs deeper than import_role."""
     runner = Runner(

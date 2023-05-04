@@ -5,6 +5,7 @@ import itertools
 import logging
 import os
 from functools import lru_cache
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansible_compat.runtime import Runtime
@@ -14,18 +15,15 @@ from rich.table import Table
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
-from ansiblelint.config import PROFILES, get_version_warning
+from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
-from ansiblelint.constants import RULE_DOC_URL, SUCCESS_RC, VIOLATIONS_FOUND_RC
-from ansiblelint.errors import MatchError
+from ansiblelint.constants import RC, RULE_DOC_URL
 from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
-    from argparse import Namespace
-    from typing import Dict, Set  # pylint: disable=ungrouped-imports
-
     from ansiblelint._internal.rules import BaseRule
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.runner import LintResult
 
@@ -36,7 +34,7 @@ _logger = logging.getLogger(__package__)
 class App:
     """App class represents an execution of the linter."""
 
-    def __init__(self, options: Namespace):
+    def __init__(self, options: Options):
         """Construct app run based on already loaded configuration."""
         options.skip_list = _sanitize_list_options(options.skip_list)
         options.warn_list = _sanitize_list_options(options.warn_list)
@@ -49,7 +47,7 @@ class App:
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(isolated=True, require_module=True)
 
-    def render_matches(self, matches: list[MatchError]) -> None:
+    def render_matches(self, matches: list[MatchError]) -> None:  # noqa: C901
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
 
@@ -60,7 +58,9 @@ class App:
             # If formatter CodeclimateJSONFormatter or SarifFormatter is chosen,
             # then print only the matches in JSON
             console.print(
-                self.formatter.format_result(matches), markup=False, highlight=False
+                self.formatter.format_result(matches),
+                markup=False,
+                highlight=False,
             )
             return
 
@@ -75,26 +75,34 @@ class App:
             for match in ignored_matches:
                 if match.ignored:
                     # highlight must be off or apostrophes may produce unexpected results
-                    console.print(self.formatter.format(match), highlight=False)
+                    console.print(self.formatter.apply(match), highlight=False)
         if fatal_matches:
             _logger.warning(
-                "Listing %s violation(s) that are fatal", len(fatal_matches)
+                "Listing %s violation(s) that are fatal",
+                len(fatal_matches),
             )
             for match in fatal_matches:
                 if not match.ignored:
-                    console.print(self.formatter.format(match), highlight=False)
+                    console.print(self.formatter.apply(match), highlight=False)
 
         # If run under GitHub Actions we also want to emit output recognized by it.
         if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("GITHUB_WORKFLOW"):
+            _logger.info(
+                "GitHub Actions environment detected, adding annotations output...",
+            )
             formatter = formatters.AnnotationsFormatter(self.options.cwd, True)
             for match in itertools.chain(fatal_matches, ignored_matches):
-                console.print(formatter.format(match), markup=False, highlight=False)
+                console_stderr.print(
+                    formatter.apply(match),
+                    markup=False,
+                    highlight=False,
+                )
 
         # If sarif_file is set, we also dump the results to a sarif file.
         if self.options.sarif_file:
             sarif = formatters.SarifFormatter(self.options.cwd, True)
             json = sarif.format_result(matches)
-            with open(self.options.sarif_file, "w", encoding="utf-8") as sarif_file:
+            with self.options.sarif_file.open("w", encoding="utf-8") as sarif_file:
                 sarif_file.write(json)
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
@@ -111,13 +119,15 @@ class App:
             # *rule.tags is the list of the rule's tags (categories): `style`
             if match.tag not in result.tag_stats:
                 result.tag_stats[match.tag] = TagStats(
-                    tag=match.tag, count=1, associated_tags=match.rule.tags
+                    tag=match.tag,
+                    count=1,
+                    associated_tags=match.rule.tags,
                 )
             else:
                 result.tag_stats[match.tag].count += 1
 
             if {match.tag, match.rule.id, *match.rule.tags}.isdisjoint(
-                self.options.warn_list
+                self.options.warn_list,
             ):
                 # not in warn_list
                 if match.fixed:
@@ -155,7 +165,12 @@ class App:
                 matched_rules.pop(rule_id)
         return matched_rules
 
-    def report_outcome(self, result: LintResult, mark_as_success: bool = False) -> int:
+    def report_outcome(
+        self,
+        result: LintResult,
+        *,
+        mark_as_success: bool = False,
+    ) -> int:
         """Display information about how to skip found rules.
 
         Returns exit code, 2 if errors were found, 0 when only warnings were found.
@@ -168,18 +183,19 @@ class App:
         matched_rules = self._get_matched_skippable_rules(result.matches)
 
         if matched_rules and self.options.generate_ignore:
-            console_stderr.print(f"Writing ignore file to {IGNORE_FILE.default}")
+            ignore_file_path = Path(IGNORE_FILE.default)
+            console_stderr.print(f"Writing ignore file to {ignore_file_path}")
             lines = set()
             for rule in result.matches:
                 lines.add(f"{rule.filename} {rule.tag}\n")
-            with open(IGNORE_FILE.default, "w", encoding="utf-8") as ignore_file:
+            with ignore_file_path.open("w", encoding="utf-8") as ignore_file:
                 ignore_file.write(
-                    "# This file contains ignores rule violations for ansible-lint\n"
+                    "# This file contains ignores rule violations for ansible-lint\n",
                 )
-                ignore_file.writelines(sorted(list(lines)))
+                ignore_file.writelines(sorted(lines))
         elif matched_rules and not self.options.quiet:
             console_stderr.print(
-                "Read [link=https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations."
+                "Read [link=https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations.",
             )
 
         # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
@@ -191,30 +207,40 @@ class App:
         # We can do the deprecation once the ecosystem caught up at least a bit.
         # for k, v in used_old_tags.items():
         #     _logger.warning(
-        #         "Replaced deprecated tag '%s' with '%s' but it will become an "
         #         "error in the future.",
         #         k,
         #         v,
-        #     )
 
         if self.options.write_list and "yaml" in self.options.skip_list:
             _logger.warning(
                 "You specified '--write', but no files can be modified "
-                "because 'yaml' is in 'skip_list'."
+                "because 'yaml' is in 'skip_list'.",
             )
 
-        if mark_as_success and summary.failures and not self.options.progressive:
+        if mark_as_success and summary.failures:
             mark_as_success = False
 
         if not self.options.quiet:
             console_stderr.print(render_yaml(msg))
             self.report_summary(
-                summary, changed_files_count, files_count, is_success=mark_as_success
+                summary,
+                changed_files_count,
+                files_count,
+                is_success=mark_as_success,
             )
+        if mark_as_success:
+            if not files_count:
+                # success without any file being analyzed is reported as failure
+                # to match match, preventing accidents where linter was running
+                # not doing anything due to misconfiguration.
+                _logger.critical(
+                    "Linter finished without analyzing any file, check configuration and arguments given.",
+                )
+                return RC.NO_FILES_MATCHED
+            return RC.SUCCESS
+        return RC.VIOLATIONS_FOUND
 
-        return SUCCESS_RC if mark_as_success else VIOLATIONS_FOUND_RC
-
-    def report_summary(  # pylint: disable=too-many-branches,too-many-locals
+    def report_summary(  # pylint: disable=too-many-branches,too-many-locals # noqa: C901
         self,
         summary: SummarizedResults,
         changed_files_count: int,
@@ -228,7 +254,6 @@ class App:
 
         for profile, profile_config in PROFILES.items():
             for rule in profile_config["rules"]:
-                # print(profile, rule)
                 rule_order[rule] = (idx, profile)
                 idx += 1
         _logger.debug("Determined rule-profile order: %s", rule_order)
@@ -238,7 +263,8 @@ class App:
                 tag_stats.order, tag_stats.profile = rule_order.get(tag, (idx, ""))
             elif "[" in tag:
                 tag_stats.order, tag_stats.profile = rule_order.get(
-                    tag.split("[")[0], (idx, "")
+                    tag.split("[")[0],
+                    (idx, ""),
                 )
             if tag_stats.profile:
                 failed_profiles.add(tag_stats.profile)
@@ -250,7 +276,7 @@ class App:
         # determine which profile passed
         summary.passed_profile = ""
         passed_profile_count = 0
-        for profile in PROFILES.keys():
+        for profile in PROFILES:
             if profile in failed_profiles:
                 break
             if profile != summary.passed_profile:
@@ -311,7 +337,7 @@ class App:
 
 
 def choose_formatter_factory(
-    options_list: Namespace,
+    options_list: Options,
 ) -> type[formatters.BaseFormatter[Any]]:
     """Select an output formatter based on the incoming command line arguments."""
     r: type[formatters.BaseFormatter[Any]] = formatters.Formatter
@@ -354,7 +380,9 @@ def get_app() -> App:
     # fail.
     _perform_mockings()
     app.runtime.prepare_environment(
-        install_local=(not offline), offline=offline, role_name_check=role_name_check
+        install_local=(not offline),
+        offline=offline,
+        role_name_check=role_name_check,
     )
 
     return app

@@ -40,30 +40,23 @@ Ansible-lint creates a new cache on the next invocation.
 You should add the `.cache` folder to the `.gitignore` file in your git
 repositories.
 
-## Using progressive mode (deprecated)
+# Gradual adoption
 
-!!! warning
+For an easier gradual adoption, adopters should consider [ignore
+file][configuring.md#ignoring-rules-for-entire-files] feature. This allows the
+quick introduction of a linter pipeline for preventing addition of new
+violations, while known violations are ignored. Some people can work on
+addressing these historical violations while others may continue to work on
+other maintenance tasks.
 
-    This feature is deprecated and will be removed in the next major release.
-    We encourage you to use [ignore file](configuring.md#ignoring-rules-for-entire-files)
-    instead.
-
-For easier adoption, Ansible-lint can alert for rule violations that occur since
-the last commit. This allows new code to be merged without any rule violations
-while allowing content developers to address historical violations at a
-different pace.
-
-The `--progressive` option runs Ansible-lint twice if rule violations exist in
-your content. The second run is performed against a temporary git working copy
-that contains the last commit. Rule violations that exist in the last commit are
-ignored and Ansible-lint displays only the violations that exist in the new
-commit.
+The deprecated `--progressive` mode was removed in v6.16.0 as it added code
+complexity and performance overhead. It also presented several corner cases
+where it failed to work as expected and caused false negatives.
 
 ## Linting playbooks and roles
 
-Ansible-lint recommends following the
-{ref}`collection structure layout <collection_structure>` whether you plan to
-build a collection or not.
+Ansible-lint recommends following the [collection structure layout] whether you
+plan to build a collection or not.
 
 Following that layout assures the best integration with all ecosystem tools
 because it helps those tools better distinguish between random YAML files and
@@ -77,6 +70,9 @@ with the `-p` argument. For example, to lint `examples/playbooks/play.yml` and
 ```console exec="1" source="console" returncode="2"
 $ ansible-lint --offline -p examples/playbooks/play.yml examples/roles/bobbins
 ```
+
+[collection structure layout]:
+  https://docs.ansible.com/ansible-core/devel/dev_guide/developing_collections_structure.html#collection-structure
 
 ## Running example playbooks
 
@@ -288,7 +284,37 @@ follows:
   ansible-lint --profile=safety
   ```
 
+## Vaults
+
+As ansible-lint executes ansible, it also needs access to encrypted secrets. If
+you do not give access to them or you are concerned about security implications,
+you should consider refactoring your code to allow it to be linted without
+access to real secrets:
+
+- Configure dummy fallback values that are used during linting, so Ansible will
+  not complain about undefined variables.
+- Exclude the problematic files from the linting process.
+
+```yaml
+---
+# Example of avoiding undefined variable error
+foo: "{{ undefined_variable_name | default('dummy') }}"
+```
+
+Keep in mind that a well-written playbook or role should allow Ansible's syntax
+check from passing on it, even if you do not have access to the vault.
+
+Internally ansible-lint runs `ansible-playbook --syntax-check` on each playbook
+and also on roles. As ansible-code does not support running syntax-check
+directly on roles, the linter will create temporary playbooks that only include
+each role from your project. You will need to change the code of the role in a
+way that it does not produce syntax errors when called without any variables or
+arguments. This usually involves making use of `defaults/` but be sure that you
+fully understand [variable precedence].
+
 [code climate]:
   https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md#data-types
 [sarif]:
   https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
+[variable precedence]:
+  https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence

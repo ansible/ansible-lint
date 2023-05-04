@@ -5,8 +5,7 @@ import logging
 import os
 from collections import defaultdict, namedtuple
 from functools import partial
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 from yaml import YAMLError
@@ -15,7 +14,10 @@ try:
     from yaml import CFullLoader as FullLoader
     from yaml import CSafeLoader as SafeLoader
 except (ImportError, AttributeError):
-    from yaml import FullLoader, SafeLoader  # type: ignore
+    from yaml import FullLoader, SafeLoader  # type: ignore[assignment]
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 IgnoreFile = namedtuple("IgnoreFile", "default alternative")
 IGNORE_FILE = IgnoreFile(".ansible-lint-ignore", ".config/ansible-lint-ignore.txt")
@@ -56,9 +58,8 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
                     try:
                         path, rule = entry.split()
                     except ValueError as exc:
-                        raise RuntimeError(
-                            f"Unable to parse line '{line}' from {ignore_file} file."
-                        ) from exc
+                        msg = f"Unable to parse line '{line}' from {ignore_file} file."
+                        raise RuntimeError(msg) from exc
                     result[path].add(rule)
 
     return result

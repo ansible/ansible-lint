@@ -2,16 +2,18 @@
 from __future__ import annotations
 
 import logging
-from argparse import Namespace
-from typing import Union, cast
+from typing import TYPE_CHECKING, Union, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.runner import LintResult
 from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
+
+if TYPE_CHECKING:
+    from ansiblelint.config import Options
+    from ansiblelint.errors import MatchError
+    from ansiblelint.runner import LintResult
 
 __all__ = ["Transformer"]
 
@@ -31,7 +33,7 @@ class Transformer:
     pre-requisite for the planned rule-specific transforms.
     """
 
-    def __init__(self, result: LintResult, options: Namespace):
+    def __init__(self, result: LintResult, options: Options):
         """Initialize a Transformer instance."""
         self.write_set = self.effective_write_set(options.write_list)
 
@@ -131,11 +133,11 @@ class Transformer:
             if file_is_yaml and not match.yaml_path:
                 data = cast(Union[CommentedMap, CommentedSeq], data)
                 if match.match_type == "play":
-                    match.yaml_path = get_path_to_play(file, match.linenumber, data)
+                    match.yaml_path = get_path_to_play(file, match.lineno, data)
                 elif match.task or file.kind in (
                     "tasks",
                     "handlers",
                     "playbook",
                 ):
-                    match.yaml_path = get_path_to_task(file, match.linenumber, data)
+                    match.yaml_path = get_path_to_task(file, match.lineno, data)
             match.rule.transform(match, file, data)

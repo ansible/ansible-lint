@@ -30,7 +30,9 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
     empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         for k, v, _ in nested_items_path(task):
             if k == "when":
@@ -42,7 +44,7 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
                 else:
                     for item in v:
                         if isinstance(item, str) and self.empty_string_compare.search(
-                            item
+                            item,
                         ):
                             return True
 
@@ -59,7 +61,8 @@ if "pytest" in sys.modules:
         rules = RulesCollection()
         rules.register(ComparisonToEmptyStringRule())
         results = Runner(
-            "examples/playbooks/rule-empty-string-compare-fail.yml", rules=rules
+            "examples/playbooks/rule-empty-string-compare-fail.yml",
+            rules=rules,
         ).run()
         assert len(results) == 3
         for result in results:
@@ -70,6 +73,7 @@ if "pytest" in sys.modules:
         rules = RulesCollection()
         rules.register(ComparisonToEmptyStringRule())
         results = Runner(
-            "examples/playbooks/rule-empty-string-compare-pass.yml", rules=rules
+            "examples/playbooks/rule-empty-string-compare-pass.yml",
+            rules=rules,
         ).run()
         assert len(results) == 0, results

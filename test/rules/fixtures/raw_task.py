@@ -1,10 +1,12 @@
 """Test Rule that needs_raw_task."""
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
+
+if TYPE_CHECKING:
+    from ansiblelint.file_utils import Lintable
 
 
 class RawTaskRule(AnsibleLintRule):
@@ -16,7 +18,9 @@ class RawTaskRule(AnsibleLintRule):
     needs_raw_task = True
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         """Match a task using __raw_task__ to inspect the module params type."""
         raw_task = task["__raw_task__"]

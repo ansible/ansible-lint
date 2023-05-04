@@ -6,10 +6,10 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import INCLUSION_ACTION_NAMES, LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
@@ -23,11 +23,13 @@ class NoFreeFormRule(AnsibleLintRule):
     version_added = "v6.8.0"
     needs_raw_task = True
     cmd_shell_re = re.compile(
-        r"(chdir|creates|executable|removes|stdin|stdin_add_newline|warn)="
+        r"(chdir|creates|executable|removes|stdin|stdin_add_newline|warn)=",
     )
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         results: list[MatchError] = []
         action = task["action"]["__ansible_module_original__"]
@@ -42,19 +44,19 @@ class NoFreeFormRule(AnsibleLintRule):
                     results.append(
                         self.create_matcherror(
                             message="Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
-                            linenumber=task[LINE_NUMBER_KEY],
+                            lineno=task[LINE_NUMBER_KEY],
                             filename=file,
                             tag=f"{self.id}[raw]",
-                        )
+                        ),
                     )
             else:
                 results.append(
                     self.create_matcherror(
                         message="Passing a non string value to `raw` module is neither documented or supported.",
-                        linenumber=task[LINE_NUMBER_KEY],
+                        lineno=task[LINE_NUMBER_KEY],
                         filename=file,
                         tag=f"{self.id}[raw-non-string]",
-                    )
+                    ),
                 )
         elif isinstance(action_value, str) and "=" in action_value:
             fail = False
@@ -76,14 +78,14 @@ class NoFreeFormRule(AnsibleLintRule):
                 results.append(
                     self.create_matcherror(
                         message=f"Avoid using free-form when calling module actions. ({action})",
-                        linenumber=task[LINE_NUMBER_KEY],
+                        lineno=task[LINE_NUMBER_KEY],
                         filename=file,
-                    )
+                    ),
                 )
         return results
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
@@ -97,7 +99,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ),
     )
     def test_rule_no_free_form(
-        default_rules_collection: RulesCollection, file: str, expected: int
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: int,
     ) -> None:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()

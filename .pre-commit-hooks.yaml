@@ -16,5 +16,4 @@
     # If you want to use specific version of ansible-core or ansible, feel
     # free to override `additional_dependencies` in your own hook config
     # file.
-    - .
     - ansible-core>=2.13.3

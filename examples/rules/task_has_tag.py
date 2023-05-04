@@ -17,7 +17,9 @@ class TaskHasTag(AnsibleLintRule):
     tags = ["productivity", "tags"]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         """Task matching method."""
         if isinstance(task, str):

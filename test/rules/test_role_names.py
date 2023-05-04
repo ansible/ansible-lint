@@ -1,15 +1,18 @@
 """Test the RoleNames rule."""
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from _pytest.fixtures import SubRequest
 
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.role_name import RoleNames
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from _pytest.fixtures import SubRequest
 
 ROLE_NAME_VALID = "test_role"
 
@@ -75,7 +78,9 @@ def fixture_playbook_path(request: SubRequest, tmp_path: Path) -> str:
     indirect=("playbook_path",),
 )
 def test_role_name(
-    test_rules_collection: RulesCollection, playbook_path: str, messages: list[str]
+    test_rules_collection: RulesCollection,
+    playbook_path: str,
+    messages: list[str],
 ) -> None:
     """Lint a playbook and compare the expected messages with the actual messages."""
     runner = Runner(playbook_path, rules=test_rules_collection)

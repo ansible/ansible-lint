@@ -7,14 +7,16 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
-    from ansiblelint.file_utils import Lintable  # noqa: F811
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 
-class NameRule(AnsibleLintRule):
+class NameRule(AnsibleLintRule, TransformMixin):
     """Rule for checking task and play names."""
 
     id = "name"
@@ -36,20 +38,24 @@ class NameRule(AnsibleLintRule):
             return [
                 self.create_matcherror(
                     message="All plays should be named.",
-                    linenumber=data[LINE_NUMBER_KEY],
+                    lineno=data[LINE_NUMBER_KEY],
                     tag="name[play]",
                     filename=file,
-                )
+                ),
             ]
         results.extend(
             self._check_name(
-                data["name"], lintable=file, linenumber=data[LINE_NUMBER_KEY]
-            )
+                data["name"],
+                lintable=file,
+                lineno=data[LINE_NUMBER_KEY],
+            ),
         )
         return results
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         results = []
         name = task.get("name")
@@ -57,21 +63,26 @@ class NameRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     message="All tasks should be named.",
-                    linenumber=task[LINE_NUMBER_KEY],
+                    lineno=task[LINE_NUMBER_KEY],
                     tag="name[missing]",
                     filename=file,
-                )
+                ),
             )
         else:
             results.extend(
                 self._prefix_check(
-                    name, lintable=file, linenumber=task[LINE_NUMBER_KEY]
-                )
+                    name,
+                    lintable=file,
+                    lineno=task[LINE_NUMBER_KEY],
+                ),
             )
         return results
 
     def _prefix_check(
-        self, name: str, lintable: Lintable | None, linenumber: int
+        self,
+        name: str,
+        lintable: Lintable | None,
+        lineno: int,
     ) -> list[MatchError]:
         results: list[MatchError] = []
         effective_name = name
@@ -81,13 +92,18 @@ class NameRule(AnsibleLintRule):
         if not results:
             results.extend(
                 self._check_name(
-                    effective_name, lintable=lintable, linenumber=linenumber
-                )
+                    effective_name,
+                    lintable=lintable,
+                    lineno=lineno,
+                ),
             )
         return results
 
     def _check_name(
-        self, name: str, lintable: Lintable | None, linenumber: int
+        self,
+        name: str,
+        lintable: Lintable | None,
+        lineno: int,
     ) -> list[MatchError]:
         # This rules applies only to languages that do have uppercase and
         # lowercase letter, so we ignore anything else. On Unicode isupper()
@@ -97,7 +113,7 @@ class NameRule(AnsibleLintRule):
         effective_name = name
         if self._collection and lintable:
             prefix = self._collection.options.task_name_prefix.format(
-                stem=lintable.path.stem
+                stem=lintable.path.stem,
             )
             if lintable.kind == "tasks" and lintable.path.stem != "main":
                 if not name.startswith(prefix):
@@ -108,10 +124,10 @@ class NameRule(AnsibleLintRule):
                         results.append(
                             self.create_matcherror(
                                 message=f"Task name should start with '{prefix}'.",
-                                linenumber=linenumber,
+                                lineno=lineno,
                                 tag="name[prefix]",
                                 filename=lintable,
-                            )
+                            ),
                         )
                         return results
                 else:
@@ -125,31 +141,45 @@ class NameRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     message="All names should start with an uppercase letter.",
-                    linenumber=linenumber,
+                    lineno=lineno,
                     tag="name[casing]",
                     filename=lintable,
-                )
+                ),
             )
         if self._re_templated_inside.match(name):
             results.append(
                 self.create_matcherror(
                     message="Jinja templates should only be at the end of 'name'",
-                    linenumber=linenumber,
+                    lineno=lineno,
                     tag="name[template]",
                     filename=lintable,
-                )
+                ),
             )
         return results
 
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == "name[casing]":
+            target_task = self.seek(match.yaml_path, data)
+            # Not using capitalize(), since that rewrites the rest of the name to lower case
+            target_task[
+                "name"
+            ] = f"{target_task['name'][:1].upper()}{target_task['name'][1:]}"
+            match.fixed = True
 
-if "pytest" in sys.modules:  # noqa: C901
+
+if "pytest" in sys.modules:
     from ansiblelint.config import options
     from ansiblelint.file_utils import Lintable  # noqa: F811
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
     def test_file_positive() -> None:
-        """Positive test for unnamed-task."""
+        """Positive test for name[missing]."""
         collection = RulesCollection()
         collection.register(NameRule())
         success = "examples/playbooks/rule-name-missing-pass.yml"
@@ -157,7 +187,7 @@ if "pytest" in sys.modules:  # noqa: C901
         assert [] == good_runner.run()
 
     def test_file_negative() -> None:
-        """Negative test for unnamed-task."""
+        """Negative test for name[missing]."""
         collection = RulesCollection()
         collection.register(NameRule())
         failure = "examples/playbooks/rule-name-missing-fail.yml"
@@ -166,13 +196,14 @@ if "pytest" in sys.modules:  # noqa: C901
         assert len(errs) == 5
 
     def test_name_prefix_negative() -> None:
-        """Negative test for unnamed-task."""
+        """Negative test for name[missing]."""
         custom_options = deepcopy(options)
         custom_options.enable_list = ["name[prefix]"]
         collection = RulesCollection(options=custom_options)
         collection.register(NameRule())
         failure = Lintable(
-            "examples/playbooks/tasks/rule-name-prefix-fail.yml", kind="tasks"
+            "examples/playbooks/tasks/rule-name-prefix-fail.yml",
+            kind="tasks",
         )
         bad_runner = Runner(failure, rules=collection)
         results = bad_runner.run()
@@ -217,5 +248,5 @@ if "pytest" in sys.modules:  # noqa: C901
         """Test when lintable is None."""
         name_rule = NameRule()
         # pylint: disable=protected-access
-        result = name_rule._prefix_check("Foo", None, 1)
+        result = name_rule._prefix_check("Foo", None, 1)  # noqa: SLF001
         assert len(result) == 0

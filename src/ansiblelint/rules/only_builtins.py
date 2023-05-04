@@ -1,14 +1,17 @@
 """Rule definition for usage of builtin actions only."""
 from __future__ import annotations
 
+import os
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.config import options
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.rules.fqcn import builtins
 from ansiblelint.skip_utils import is_nested_task
+
+if TYPE_CHECKING:
+    from ansiblelint.file_utils import Lintable
 
 
 class OnlyBuiltinsRule(AnsibleLintRule):
@@ -20,14 +23,17 @@ class OnlyBuiltinsRule(AnsibleLintRule):
     tags = ["opt-in", "experimental"]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         module = task["action"]["__ansible_module_original__"]
 
         allowed_collections = [
             "ansible.builtin",
             "ansible.legacy",
-        ] + options.only_builtins_allow_collections
+            *options.only_builtins_allow_collections,
+        ]
         allowed_modules = builtins + options.only_builtins_allow_modules
 
         is_allowed = (
@@ -43,7 +49,7 @@ if "pytest" in sys.modules:
     # pylint: disable=ungrouped-imports
     import pytest
 
-    from ansiblelint.constants import SUCCESS_RC, VIOLATIONS_FOUND_RC
+    from ansiblelint.constants import RC
     from ansiblelint.testing import RunFromText, run_ansible_lint
 
     SUCCESS_PLAY = """
@@ -59,14 +65,17 @@ if "pytest" in sys.modules:
 
     def test_only_builtins_fail() -> None:
         """Test rule matches."""
+        env = os.environ.copy()
+        env["NO_COLOR"] = "1"
         result = run_ansible_lint(
             "--strict",
             "--warn-list=",
             "--enable-list",
             "only-builtins",
             "examples/playbooks/rule-only-builtins.yml",
+            env=env,
         )
-        assert result.returncode == VIOLATIONS_FOUND_RC
+        assert result.returncode == RC.VIOLATIONS_FOUND
         assert "Failed" in result.stderr
         assert "warning(s)" in result.stderr
         assert "only-builtins: Use only builtin actions" in result.stdout
@@ -83,10 +92,12 @@ if "pytest" in sys.modules:
             "examples/playbooks/rule-only-builtins.yml",
         )
         assert "only-builtins" not in result.stdout
-        assert result.returncode == SUCCESS_RC
+        assert result.returncode == RC.SUCCESS
 
     @pytest.mark.parametrize(
-        "rule_runner", (OnlyBuiltinsRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (OnlyBuiltinsRule,),
+        indirect=["rule_runner"],
     )
     def test_only_builtin_pass(rule_runner: RunFromText) -> None:
         """Test rule does not match."""

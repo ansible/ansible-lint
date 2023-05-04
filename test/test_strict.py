@@ -1,4 +1,6 @@
 """Test strict mode."""
+import os
+
 import pytest
 
 from ansiblelint.testing import run_ansible_lint
@@ -14,9 +16,11 @@ from ansiblelint.testing import run_ansible_lint
 def test_strict(strict: bool, returncode: int, message: str) -> None:
     """Test running from inside meta folder."""
     args = ["examples/playbooks/strict-mode.yml"]
+    env = os.environ.copy()
+    env["NO_COLOR"] = "1"
     if strict:
         args.insert(0, "--strict")
-    result = run_ansible_lint(*args)
+    result = run_ansible_lint(*args, env=env)
     assert result.returncode == returncode
     assert "args[module]" in result.stdout
     for summary_line in result.stderr.splitlines():

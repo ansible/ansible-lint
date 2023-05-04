@@ -1,7 +1,7 @@
-import os
 import pkgutil
 import sys
 import warnings
+from pathlib import Path
 
 # This package exists to host vendored top-level Python packages for downstream packaging. Any Python packages
 # installed beneath this one will be masked from the Ansible loader, and available from the front of sys.path.
@@ -16,11 +16,9 @@ __path__ = []
 
 
 def _ensure_vendored_path_entry() -> None:
-    """
-    Ensure that any downstream-bundled content beneath this package is available at the top of sys.path
-    """
+    """Ensure that any downstream-bundled content beneath this package is available at the top of sys.path."""
     # patch our vendored dir onto sys.path
-    vendored_path_entry = os.path.dirname(__file__)
+    vendored_path_entry = str(Path(__file__).parent)
     vendored_module_names = {
         m[1] for m in pkgutil.iter_modules([vendored_path_entry], "")
     }  # m[1] == m.name
@@ -33,15 +31,16 @@ def _ensure_vendored_path_entry() -> None:
         sys.path.insert(0, vendored_path_entry)
 
         already_loaded_vendored_modules = set(sys.modules.keys()).intersection(
-            vendored_module_names
+            vendored_module_names,
         )
 
         if already_loaded_vendored_modules:
             warnings.warn(
                 "One or more Python packages bundled by this ansible-lint distribution were already "
                 "loaded ({}). This may result in undefined behavior.".format(
-                    ", ".join(sorted(already_loaded_vendored_modules))
-                )
+                    ", ".join(sorted(already_loaded_vendored_modules)),
+                ),
+                stacklevel=1,
             )
 
 

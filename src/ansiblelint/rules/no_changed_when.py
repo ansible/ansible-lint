@@ -24,10 +24,10 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
@@ -52,17 +52,22 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
     ]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
         # tasks in a block are "meta" type
-        if task["__ansible_action_type__"] in ["task", "meta"]:
-            if task["action"]["__ansible_module__"] in self._commands and (
+        if (
+            task["__ansible_action_type__"] in ["task", "meta"]
+            and task["action"]["__ansible_module__"] in self._commands
+            and (
                 "changed_when" not in task
                 and "creates" not in task["action"]
                 and "removes" not in task["action"]
-            ):
-                result.append(self.create_matcherror(filename=file))
+            )
+        ):
+            result.append(self.create_matcherror(filename=file))
         return result
 
 
@@ -76,15 +81,21 @@ if "pytest" in sys.modules:
         ("file", "expected"),
         (
             pytest.param(
-                "examples/playbooks/rule-no-changed-when-pass.yml", 0, id="pass"
+                "examples/playbooks/rule-no-changed-when-pass.yml",
+                0,
+                id="pass",
             ),
             pytest.param(
-                "examples/playbooks/rule-no-changed-when-fail.yml", 3, id="fail"
+                "examples/playbooks/rule-no-changed-when-fail.yml",
+                3,
+                id="fail",
             ),
         ),
     )
     def test_rule_no_changed_when(
-        default_rules_collection: RulesCollection, file: str, expected: int
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: int,
     ) -> None:
         """Validate no-changed-when rule."""
         results = Runner(file, rules=default_rules_collection).run()

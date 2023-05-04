@@ -1,18 +1,14 @@
 {
   "ansible-lint-config": {
-    "etag": "4753f3c433fc6c05c62c7c36adf8cc9379a51f0554b2c7eee67685a2a7061a4d",
+    "etag": "0c180fc60da7bfbbf70d0ffa6dd4871aefce5e6f987f9c8073cb203dacd991b2",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json"
   },
   "ansible-navigator-config": {
-    "etag": "ddcaa4cc87f2fe9ea0dde101954c674222662b91c159d3e3b28bb18095af676b",
+    "etag": "9095eec00b504fee85c5c7f445839e9823d25a15cde28270007dfd6cda575e81",
     "url": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json"
   },
-  "arg_specs": {
-    "etag": "f74d4de954104f4908a9aa3b7834cca6c9fd98f8dce59ebe245c14bae9942fa5",
-    "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/arg_specs.json"
-  },
   "changelog": {
-    "etag": "2b862fe2be05a6d3ed4fbed9a31752deb3b1cc63d4f98bded6a4f90e9166a6bd",
+    "etag": "593ed5eef7c1e670f3667de70d43a41a5138513bd9640a85cbe8cb6faaa59793",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/changelog.json"
   },
   "execution-environment": {
@@ -28,7 +24,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json"
   },
   "meta": {
-    "etag": "9b1f825eff8182e6128a105ddb4003b90cf3ae6ea275f439a73d1e84046d854d",
+    "etag": "449550c81ab905d3ac30b2672bf23a43cf1a71eef168ab08e8caee8c4a32bce6",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json"
   },
   "meta-runtime": {
@@ -47,8 +43,12 @@
     "etag": "93c6ccd1f79f58134795b85f9b1193d6e18417dd01a9d1f37d9f247562a1e6fe",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
+  "role-arg-spec": {
+    "etag": "498a6f716c7e99bd474ae9e7d34b3f43fbf2aad750f769392fc8e29fa590be6c",
+    "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json"
+  },
   "rulebook": {
-    "etag": "61ccd5e187ba837b5cea6ad1f696a29fb1e2a8f14278dddda6269c43c5594c7f",
+    "etag": "1d0929e47a132677f77971d97d208d98bd7e38c7028b04a79c55eebcc23e9e32",
     "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json"
   },
   "tasks": {

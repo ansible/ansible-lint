@@ -26,7 +26,7 @@
     "python.linting.flake8Args": [
         "--ignore=E501,W503"
     ],
-    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Enabled": false,
     "python.linting.mypyCategorySeverity.error": "Warning",
     "python.linting.mypyEnabled": true,
     "python.linting.pylintEnabled": true,
@@ -41,5 +41,11 @@
     ],
     "yaml.format.enable": false,
     "yaml.validate": true,
-    "evenBetterToml.formatter.alignComments": false
+    "evenBetterToml.formatter.alignComments": false,
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true,
+            "source.fixAll": true
+          }
+    }
 }

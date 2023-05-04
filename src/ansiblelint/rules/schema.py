@@ -40,7 +40,7 @@ pre_checks = {
             "msg": "with_cartesian was moved to with_community.general.flattened in 2.10",
             "tag": "moves",
         },
-    }
+    },
 }
 
 
@@ -55,7 +55,9 @@ class ValidateSchemaRule(AnsibleLintRule):
     version_added = "v6.1.0"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str | MatchError | list[MatchError]:
         result = []
         for key in pre_checks["task"]:
@@ -65,11 +67,11 @@ class ValidateSchemaRule(AnsibleLintRule):
                 result.append(
                     MatchError(
                         message=msg,
-                        filename=file,
+                        lintable=file or Lintable(""),
                         rule=ValidateSchemaRule(),
                         details=ValidateSchemaRule.description,
                         tag=f"schema[{tag}]",
-                    )
+                    ),
                 )
         return result
 
@@ -83,18 +85,19 @@ class ValidateSchemaRule(AnsibleLintRule):
         if errors:
             if errors[0].startswith("Failed to load YAML file"):
                 _logger.debug(
-                    "Ignored failure to load %s for schema validation, as !vault may cause it."
+                    "Ignored failure to load %s for schema validation, as !vault may cause it.",
+                    file,
                 )
                 return []
 
             result.append(
                 MatchError(
                     message=errors[0],
-                    filename=file,
+                    lintable=file,
                     rule=ValidateSchemaRule(),
                     details=ValidateSchemaRule.description,
                     tag=f"schema[{file.kind}]",
-                )
+                ),
             )
         return result
 
@@ -198,15 +201,15 @@ if "pytest" in sys.modules:
             ),
             pytest.param(
                 "examples/roles/hello/meta/argument_specs.yml",
-                "arg_specs",
+                "role-arg-spec",
                 [],
-                id="arg_specs",
+                id="role-arg-spec",
             ),
             pytest.param(
                 "examples/roles/broken_argument_specs/meta/argument_specs.yml",
-                "arg_specs",
+                "role-arg-spec",
                 ["Additional properties are not allowed ('foo' was unexpected)"],
-                id="arg_specs-broken",
+                id="role-arg-spec-broken",
             ),
             pytest.param(
                 "examples/changelogs/changelog.yaml",
@@ -218,7 +221,7 @@ if "pytest" in sys.modules:
                 "examples/rulebooks/rulebook-fail.yml",
                 "rulebook",
                 [
-                    "Additional properties are not allowed ('that_should_not_be_here' was unexpected)"
+                    "Additional properties are not allowed ('that_should_not_be_here' was unexpected)",
                 ],
                 id="rulebook",
             ),
@@ -258,7 +261,10 @@ if "pytest" in sys.modules:
         ),
     )
     def test_schema_moves(
-        file: str, expected_kind: str, expected_tag: str, count: int
+        file: str,
+        expected_kind: str,
+        expected_tag: str,
+        count: int,
     ) -> None:
         """Validate ability to detect schema[moves]."""
         lintable = Lintable(file)

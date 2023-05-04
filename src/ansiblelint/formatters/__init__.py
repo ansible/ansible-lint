@@ -5,7 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Generic, List, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 import rich
 
@@ -15,7 +15,7 @@ from ansiblelint.version import __version__
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
 
-T = TypeVar("T", bound="BaseFormatter")  # type: ignore
+T = TypeVar("T", bound="BaseFormatter")  # type: ignore[type-arg]
 
 
 class BaseFormatter(Generic[T]):
@@ -24,6 +24,7 @@ class BaseFormatter(Generic[T]):
     Base class for output formatters.
 
     Args:
+    ----
         base_dir (str|Path): reference directory against which display relative path.
         display_relative_path (bool): whether to show path as relative or absolute
     """
@@ -35,15 +36,15 @@ class BaseFormatter(Generic[T]):
         if base_dir:  # can be None
             base_dir = base_dir.absolute()
 
-        self._base_dir = base_dir if display_relative_path else None
+        self.base_dir = base_dir if display_relative_path else None
 
     def _format_path(self, path: str | Path) -> str | Path:
-        if not self._base_dir or not path:
+        if not self.base_dir or not path:
             return path
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
-        return os.path.relpath(path, start=self._base_dir)
+        return os.path.relpath(path, start=self.base_dir)
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         """Format a match error."""
         return str(match)
 
@@ -53,10 +54,10 @@ class BaseFormatter(Generic[T]):
         return rich.markup.escape(text)
 
 
-class Formatter(BaseFormatter):  # type: ignore
+class Formatter(BaseFormatter):  # type: ignore[type-arg]
     """Default output formatter of ansible-lint."""
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         _id = getattr(match.rule, "id", "000")
         result = f"[{match.level}][bold][link={match.rule.url}]{self.escape(match.tag)}[/link][/][/][dim]:[/] [{match.level}]{self.escape(match.message)}[/]"
         if match.level != "error":
@@ -76,7 +77,7 @@ class Formatter(BaseFormatter):  # type: ignore
 class QuietFormatter(BaseFormatter[Any]):
     """Brief output formatter for ansible-lint."""
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         return (
             f"[{match.level}]{match.rule.id}[/] "
             f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
@@ -86,7 +87,7 @@ class QuietFormatter(BaseFormatter[Any]):
 class ParseableFormatter(BaseFormatter[Any]):
     """Parseable uses PEP8 compatible format."""
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         result = (
             f"[filename]{self._format_path(match.filename or '')}[/][dim]:{match.position}:[/] "
             f"[{match.level}][bold]{self.escape(match.tag)}[/bold]"
@@ -98,7 +99,7 @@ class ParseableFormatter(BaseFormatter[Any]):
         return result
 
 
-class AnnotationsFormatter(BaseFormatter):  # type: ignore
+class AnnotationsFormatter(BaseFormatter):  # type: ignore[type-arg]
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-a-warning-message
     """Formatter for emitting violations as GitHub Workflow Commands.
 
@@ -113,16 +114,13 @@ class AnnotationsFormatter(BaseFormatter):  # type: ignore
     Supported levels: debug, warning, error
     """
 
-    def format(self, match: MatchError) -> str:
+    def apply(self, match: MatchError) -> str:
         """Prepare a match instance for reporting as a GitHub Actions annotation."""
         file_path = self._format_path(match.filename or "")
-        line_num = match.linenumber
+        line_num = match.lineno
         severity = match.rule.severity
         violation_details = self.escape(match.message)
-        if match.column:
-            col = f",col={match.column}"
-        else:
-            col = ""
+        col = f",col={match.column}" if match.column else ""
         return (
             f"::{match.level} file={file_path},line={line_num}{col},severity={severity},title={match.tag}"
             f"::{violation_details}"
@@ -140,9 +138,8 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
     def format_result(self, matches: list[MatchError]) -> str:
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
-            raise RuntimeError(
-                f"The {self.__class__} was expecting a list of MatchError."
-            )
+            msg = f"The {self.__class__} was expecting a list of MatchError."
+            raise RuntimeError(msg)
 
         result = []
         for match in matches:
@@ -156,25 +153,26 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
             issue["severity"] = self._remap_severity(match)
             issue["description"] = self.escape(str(match.message))
             issue["fingerprint"] = hashlib.sha256(
-                repr(match).encode("utf-8")
+                repr(match).encode("utf-8"),
             ).hexdigest()
             issue["location"] = {}
             issue["location"]["path"] = self._format_path(match.filename or "")
             if match.column:
                 issue["location"]["positions"] = {}
                 issue["location"]["positions"]["begin"] = {}
-                issue["location"]["positions"]["begin"]["line"] = match.linenumber
+                issue["location"]["positions"]["begin"]["line"] = match.lineno
                 issue["location"]["positions"]["begin"]["column"] = match.column
             else:
                 issue["location"]["lines"] = {}
-                issue["location"]["lines"]["begin"] = match.linenumber
+                issue["location"]["lines"]["begin"] = match.lineno
             if match.details:
                 issue["content"] = {}
                 issue["content"]["body"] = match.details
             # Append issue to result list
             result.append(issue)
 
-        return json.dumps(result, sort_keys=False, indent=2)
+        # Keep it single line due to https://github.com/ansible/ansible-navigator/issues/1490
+        return json.dumps(result, sort_keys=False)
 
     @staticmethod
     def _remap_severity(match: MatchError) -> str:
@@ -207,11 +205,10 @@ class SarifFormatter(BaseFormatter[Any]):
     def format_result(self, matches: list[MatchError]) -> str:
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
-            raise RuntimeError(
-                f"The {self.__class__} was expecting a list of MatchError."
-            )
+            msg = f"The {self.__class__} was expecting a list of MatchError."
+            raise RuntimeError(msg)
 
-        root_path = Path(str(self._base_dir)).as_uri()
+        root_path = Path(str(self.base_dir)).as_uri()
         root_path = root_path + "/" if not root_path.endswith("/") else root_path
         rules, results = self._extract_results(matches)
 
@@ -221,7 +218,7 @@ class SarifFormatter(BaseFormatter[Any]):
                 "version": __version__,
                 "informationUri": self.TOOL_URL,
                 "rules": rules,
-            }
+            },
         }
 
         runs = [
@@ -232,7 +229,7 @@ class SarifFormatter(BaseFormatter[Any]):
                 "originalUriBaseIds": {
                     self.BASE_URI_ID: {"uri": root_path},
                 },
-            }
+            },
         ]
 
         report = {
@@ -240,11 +237,12 @@ class SarifFormatter(BaseFormatter[Any]):
             "version": self.SARIF_SCHEMA_VERSION,
             "runs": runs,
         }
-
-        return json.dumps(report, sort_keys=False, indent=2)
+        # Keep it single line due to https://github.com/ansible/ansible-navigator/issues/1490
+        return json.dumps(report, sort_keys=False)
 
     def _extract_results(
-        self, matches: list[MatchError]
+        self,
+        matches: list[MatchError],
     ) -> tuple[list[Any], list[Any]]:
         rules = {}
         results = []
@@ -288,7 +286,7 @@ class SarifFormatter(BaseFormatter[Any]):
                             "uriBaseId": self.BASE_URI_ID,
                         },
                         "region": {
-                            "startLine": match.linenumber,
+                            "startLine": match.lineno,
                         },
                     },
                 },

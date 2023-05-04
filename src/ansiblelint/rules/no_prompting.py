@@ -37,13 +37,15 @@ class NoPromptingRule(AnsibleLintRule):
         return [
             self.create_matcherror(
                 message="Play uses vars_prompt",
-                linenumber=vars_prompt[0][LINE_NUMBER_KEY],
+                lineno=vars_prompt[0][LINE_NUMBER_KEY],
                 filename=file,
-            )
+            ),
         ]
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         """Return matches for ansible.builtin.pause tasks."""
         # We do not want to trigger this rule if pause has either seconds or

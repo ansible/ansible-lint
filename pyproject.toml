@@ -107,14 +107,16 @@ disallow_any_generics = true
 # warn_unused_configs = True
 # site-packages is here to help vscode mypy integration getting confused
 exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
+# https://github.com/python/mypy/issues/12664
+no_incremental = true
 
 [[tool.mypy.overrides]]
 module = [
   "ansible.*",
   "yamllint.*",
-  "ansiblelint._version",
+  "ansiblelint._version", # generated
   "ruamel.yaml",
-  "spdx.*"
+  "spdx.*",
 ]
 ignore_missing_imports = true
 ignore_errors = true
@@ -126,8 +128,14 @@ extension-pkg-allow-list = ["black.parsing"]
 preferred-modules = ["py:pathlib", "unittest:pytest"]
 
 [tool.pylint.MASTER]
+bad-names = [
+  # spell-checker:ignore linenumber
+  "linenumber", # use lineno instead
+  "line_number", # use lineno instead
+
+]
 # pylint defaults + f,fh,v,id
-good-names = ["i", "j", "k", "ex", "Run", "_", "f", "fh", "v", "id", "T"]
+good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:
 ignore-paths = "^src/ansiblelint/(_version|_vendor).*$"
 
@@ -177,6 +185,8 @@ filterwarnings = [
   "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
   # https://github.com/spdx/tools-python/issues/507
   "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
+  # We raise one non critical warning from our own conftest.py:
+  "always::pytest.PytestWarning",
 ]
 junit_duration_report = "call"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
@@ -212,6 +222,45 @@ python_files = [
 # testpaths =
 xfail_strict = true
 markers = ["eco: Tests effects on a set of 3rd party ansible repositories"]
+
+[tool.ruff]
+ignore = [
+  "E501", # we use black
+  "ERA001", # auto-removal of commented out code affects development and vscode integration
+  "INP001", # "is part of an implicit namespace package", all false positives
+  "PLW2901", # PLW2901: Redefined loop variable
+  "RET504", # Unnecessary variable assignment before `return` statement
+  # temporary disabled until we fix them:
+  "ANN",
+  "ARG002", # Unused method argument (currently in too many places)
+  "D102", # Missing docstring in public method (currently in too many places)
+  "FBT001",
+  "FBT003",
+  "PLR",
+  "TRY",
+]
+select = ["ALL"]
+target-version = "py39"
+# Same as Black.
+line-length = 88
+
+[tool.ruff.flake8-builtins]
+builtins-ignorelist = ["id"]
+
+[tool.ruff.flake8-pytest-style]
+parametrize-values-type = "tuple"
+
+[tool.ruff.isort]
+known-first-party = ["ansiblelint"]
+
+[tool.ruff.per-file-ignores]
+"test/**/*.py" = ["S"]
+"src/ansiblelint/rules/*.py" = ["S"]
+"src/ansiblelint/testing/*.py" = ["S"]
+# Temporary disabled until we fix them:
+"src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings}.py" = [
+  "PTH",
+]
 
 [tool.setuptools.dynamic]
 optional-dependencies.docs = { file = [".config/requirements-docs.txt"] }

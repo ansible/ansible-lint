@@ -347,6 +347,7 @@
               "35",
               "36",
               "37",
+              "38",
               "all"
             ],
             "type": "string"
@@ -382,6 +383,9 @@
               "12.1",
               "12.2",
               "13.0",
+              "13.1",
+              "13.2",
+              "14.0",
               "8.0",
               "8.1",
               "8.2",
@@ -439,7 +443,8 @@
                 "min_ansible_version",
                 "namespace",
                 "platforms",
-                "role_name"
+                "role_name",
+                "video_links"
               ]
             },
             "required": ["description"]
@@ -454,6 +459,9 @@
         "author": {
           "title": "Author",
           "type": "string"
+        },
+        "cloud_platforms": {
+          "markdownDescription": "Only valid for old standalone roles."
         },
         "company": {
           "title": "Company",
@@ -512,6 +520,10 @@
           "description": "Set to true for old standalone roles, or false for new collection roles.",
           "title": "Standalone",
           "type": "boolean"
+        },
+        "video_links": {
+          "markdownDescription": "Only valid for old standalone roles.",
+          "type": "array"
         }
       },
       "title": "GalaxyInfoModel",
@@ -744,6 +756,9 @@
               "6.8",
               "6.9",
               "7.0",
+              "7.1",
+              "7.2",
+              "7.3",
               "all"
             ],
             "type": "string"

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 from ansible.parsing.yaml.objects import AnsibleUnicode
 
 from ansiblelint.config import options
-from ansiblelint.constants import LINE_NUMBER_KEY, SUCCESS_RC
+from ansiblelint.constants import LINE_NUMBER_KEY, RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.runner import Runner
@@ -18,6 +18,8 @@ from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from ansiblelint.errors import MatchError
 
 # Should raise var-naming at line [2, 6].
@@ -81,32 +83,34 @@ class VariableNamingRule(AnsibleLintRule):
             return results
         # If the Play uses the 'vars' section to set variables
         our_vars = data.get("vars", {})
-        for key in our_vars.keys():
+        for key in our_vars:
             if self.is_invalid_variable_name(key):
                 raw_results.append(
                     self.create_matcherror(
                         filename=file,
-                        linenumber=key.ansible_pos[1]
+                        lineno=key.ansible_pos[1]
                         if isinstance(key, AnsibleUnicode)
                         else our_vars[LINE_NUMBER_KEY],
                         message="Play defines variable '"
                         + key
                         + "' within 'vars' section that violates variable naming standards",
                         tag=f"var-naming[{key}]",
-                    )
+                    ),
                 )
         if raw_results:
             lines = file.content.splitlines()
             for match in raw_results:
-                # linenumber starts with 1, not zero
-                skip_list = get_rule_skips_from_line(lines[match.linenumber - 1])
+                # lineno starts with 1, not zero
+                skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
                 if match.rule.id not in skip_list and match.tag not in skip_list:
                     results.append(match)
 
         return results
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         """Return matches for task based variables."""
         results = []
@@ -128,10 +132,10 @@ class VariableNamingRule(AnsibleLintRule):
                 results.append(
                     self.create_matcherror(
                         filename=file,
-                        linenumber=our_vars[LINE_NUMBER_KEY],
+                        lineno=our_vars[LINE_NUMBER_KEY],
                         message=f"Task defines variable within 'vars' section that violates variable naming standards: {key}",
                         tag=f"var-naming[{key}]",
-                    )
+                    ),
                 )
 
         # If the task uses the 'set_fact' module
@@ -145,10 +149,10 @@ class VariableNamingRule(AnsibleLintRule):
                     results.append(
                         self.create_matcherror(
                             filename=file,
-                            linenumber=task["action"][LINE_NUMBER_KEY],
+                            lineno=task["action"][LINE_NUMBER_KEY],
                             message=f"Task uses 'set_fact' to define variables that violates variable naming standards: {key}",
                             tag=f"var-naming[{key}]",
-                        )
+                        ),
                     )
 
         # If the task registers a variable
@@ -159,10 +163,10 @@ class VariableNamingRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     filename=file,
-                    linenumber=task[LINE_NUMBER_KEY],
+                    lineno=task[LINE_NUMBER_KEY],
                     message=f"Task registers a variable that violates variable naming standards: {registered_var}",
                     tag=f"var-naming[{registered_var}]",
-                )
+                ),
             )
 
         return results
@@ -184,17 +188,17 @@ class VariableNamingRule(AnsibleLintRule):
                     raw_results.append(
                         self.create_matcherror(
                             filename=file,
-                            linenumber=key.ansible_pos[1],
+                            lineno=key.ansible_pos[1],
                             message="File defines variable '"
                             + key
                             + "' that violates variable naming standards",
-                        )
+                        ),
                     )
             if raw_results:
                 lines = file.content.splitlines()
                 for match in raw_results:
-                    # linenumber starts with 1, not zero
-                    skip_list = get_rule_skips_from_line(lines[match.linenumber - 1])
+                    # lineno starts with 1, not zero
+                    skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
                     if match.rule.id not in skip_list and match.tag not in skip_list:
                         results.append(match)
         else:
@@ -223,7 +227,6 @@ if "pytest" in sys.modules:
         rules = RulesCollection(options=options)
         rules.register(VariableNamingRule())
         results = Runner(Lintable(file), rules=rules).run()
-        # results = rule_runner.run()
         assert len(results) == expected
         for result in results:
             assert result.rule.id == VariableNamingRule.id
@@ -232,20 +235,25 @@ if "pytest" in sys.modules:
         # of its c-extension)
 
     @pytest.mark.parametrize(
-        "rule_runner", (VariableNamingRule,), indirect=["rule_runner"]
+        "rule_runner",
+        (VariableNamingRule,),
+        indirect=["rule_runner"],
     )
-    def test_invalid_var_name_varsfile(rule_runner: RunFromText) -> None:
+    def test_invalid_var_name_varsfile(
+        rule_runner: RunFromText,
+        tmp_path: Path,
+    ) -> None:
         """Test rule matches."""
-        results = rule_runner.run_role_defaults_main(FAIL_VARS)
+        results = rule_runner.run_role_defaults_main(FAIL_VARS, tmp_path=tmp_path)
         assert len(results) == 2
         for result in results:
             assert result.rule.id == VariableNamingRule.id
 
         # list unexpected error lines or non-matching error lines
         expected_error_lines = [2, 6]
-        lines = [i.linenumber for i in results]
+        lines = [i.lineno for i in results]
         error_lines_difference = list(
-            set(expected_error_lines).symmetric_difference(set(lines))
+            set(expected_error_lines).symmetric_difference(set(lines)),
         )
         assert len(error_lines_difference) == 0
 
@@ -257,7 +265,7 @@ if "pytest" in sys.modules:
             f"--config-file={conf_path}",
             role_path,
         )
-        assert result.returncode == SUCCESS_RC
+        assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout
 
     def test_is_invalid_variable_name() -> None:

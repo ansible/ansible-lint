@@ -9,7 +9,7 @@ import logging
 import re
 import sys
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 # pylint: disable=preferred-module
 from unittest import mock
@@ -18,14 +18,17 @@ from unittest.mock import patch
 # pylint: disable=reimported
 import ansible.module_utils.basic as mock_ansible_module
 from ansible.module_utils import basic
-from ansible.plugins import loader
+from ansible.plugins.loader import PluginLoadContext, module_loader
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.text import has_jinja
 from ansiblelint.yaml_utils import clean_json
+
+if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
+
 
 _logger = logging.getLogger(__name__)
 
@@ -40,7 +43,7 @@ ignored_re = re.compile(
             # collection. Attempts to reproduce same bug with other collections
             # failed, even if the message originates from Ansible core.
             r"^unable to evaluate string as dictionary$",
-        ]
+        ],
     ),
     flags=re.MULTILINE | re.DOTALL,
 )
@@ -58,27 +61,27 @@ workarounds_drop_map = {
 }
 workarounds_inject_map = {
     # https://github.com/ansible/ansible-lint/issues/2824
-    "ansible.builtin.async_status": {"_async_dir": "/tmp/ansible-async"}
+    "ansible.builtin.async_status": {"_async_dir": "/tmp/ansible-async"},
 }
 
 
 @lru_cache
-def load_module(module_name: str) -> loader.PluginLoadContext:
+def load_module(module_name: str) -> PluginLoadContext:
     """Load plugin from module name and cache it."""
-    return loader.module_loader.find_plugin_with_context(module_name)
+    return module_loader.find_plugin_with_context(module_name)
 
 
-class ValidationPassed(Exception):
+class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
 
 
-class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore
+class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc]
     """Mock AnsibleModule class."""
 
     def __init__(self, *args: str, **kwargs: str) -> None:
         """Initialize AnsibleModule mock."""
         super().__init__(*args, **kwargs)
-        raise ValidationPassed
+        raise ValidationPassedError
 
 
 class ArgsRule(AnsibleLintRule):
@@ -91,8 +94,10 @@ class ArgsRule(AnsibleLintRule):
     version_added = "v6.10.0"
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
 
-    def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+    def matchtask(  # noqa: C901
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         # pylint: disable=too-many-branches,too-many-locals
         results: list[MatchError] = []
@@ -103,6 +108,16 @@ class ArgsRule(AnsibleLintRule):
             return []
 
         loaded_module = load_module(module_name)
+
+        # https://github.com/ansible/ansible-lint/issues/3200
+        # since "ps1" modules cannot be executed on POSIX platforms, we will
+        # avoid running this rule for such modules
+        if isinstance(
+            loaded_module.plugin_resolved_path,
+            str,
+        ) and loaded_module.plugin_resolved_path.endswith(".ps1"):
+            return []
+
         module_args = {
             key: value
             for key, value in task["action"].items()
@@ -116,7 +131,9 @@ class ArgsRule(AnsibleLintRule):
                     del module_args[key]
 
         with mock.patch.object(
-            mock_ansible_module, "AnsibleModule", CustomAnsibleModule
+            mock_ansible_module,
+            "AnsibleModule",
+            CustomAnsibleModule,
         ):
             spec = importlib.util.spec_from_file_location(
                 name=loaded_module.resolved_fqcn,
@@ -154,24 +171,26 @@ class ArgsRule(AnsibleLintRule):
                     # as what happens may be very hard to debug.
                     with contextlib.redirect_stdout(fio):
                         # pylint: disable=protected-access
-                        basic._ANSIBLE_ARGS = None
+                        basic._ANSIBLE_ARGS = None  # noqa: SLF001
                         try:
                             module.main()
                         except SystemExit:
                             failed_msg = fio.getvalue()
                     if failed_msg:
                         results.extend(
-                            self._parse_failed_msg(failed_msg, task, module_name, file)
+                            self._parse_failed_msg(failed_msg, task, module_name, file),
                         )
 
                 sanitized_results = self._sanitize_results(results, module_name)
                 return sanitized_results
-            except ValidationPassed:
+            except ValidationPassedError:
                 return []
 
     # pylint: disable=unused-argument
     def _sanitize_results(
-        self, results: list[MatchError], module_name: str
+        self,
+        results: list[MatchError],
+        module_name: str,
     ) -> list[MatchError]:
         """Remove results that are false positive."""
         sanitized_results = []
@@ -199,7 +218,8 @@ class ArgsRule(AnsibleLintRule):
             error_message = failed_msg
 
         option_type_check_error = re.search(
-            r"argument '(?P<name>.*)' is of type", error_message
+            r"argument '(?P<name>.*)' is of type",
+            error_message,
         )
         if option_type_check_error:
             # ignore options with templated variable value with type check errors
@@ -215,7 +235,8 @@ class ArgsRule(AnsibleLintRule):
                 return results
 
         value_not_in_choices_error = re.search(
-            r"value of (?P<name>.*) must be one of:", error_message
+            r"value of (?P<name>.*) must be one of:",
+            error_message,
         )
         if value_not_in_choices_error:
             # ignore templated value not in allowed choices
@@ -233,16 +254,18 @@ class ArgsRule(AnsibleLintRule):
         results.append(
             self.create_matcherror(
                 message=error_message,
-                linenumber=task[LINE_NUMBER_KEY],
+                lineno=task[LINE_NUMBER_KEY],
                 tag="args[module]",
                 filename=file,
-            )
+            ),
         )
         return results
 
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
+    import pytest  # noqa: TCH002
+
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     def test_args_module_fail() -> None:
@@ -263,10 +286,12 @@ if "pytest" in sys.modules:
         assert results[4].tag == "args[module]"
         assert "value of state must be one of" in results[4].message
 
-    def test_args_module_pass() -> None:
+    def test_args_module_pass(caplog: pytest.LogCaptureFixture) -> None:
         """Test rule valid module options."""
         collection = RulesCollection()
         collection.register(ArgsRule())
         success = "examples/playbooks/rule-args-module-pass.yml"
-        results = Runner(success, rules=collection).run()
+        with caplog.at_level(logging.WARNING):
+            results = Runner(success, rules=collection).run()
         assert len(results) == 0, results
+        assert len(caplog.records) == 0, caplog.records

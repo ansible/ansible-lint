@@ -1,37 +1,41 @@
 """PyTest Fixtures."""
 import importlib
 import os
+import platform
 import subprocess
 import sys
+import warnings
+from pathlib import Path
+
+import pytest
 
 # Ensure we always run from the root of the repository
-if os.getcwd() != os.path.dirname(__file__):
-    os.chdir(os.path.dirname(__file__))
+if Path.cwd() != Path(__file__).parent:
+    os.chdir(Path(__file__).parent)
 
 # checking if user is running pytest without installing test dependencies:
 missing = []
-for module in ["ansible", "black", "flake8", "mypy", "pylint"]:
+for module in ["ansible", "black", "mypy", "pylint"]:
     if not importlib.util.find_spec(module):
         missing.append(module)
 if missing:
-    print(
-        f"FATAL: Missing modules: {', '.join(missing)} -- probably you missed installing test requirements with: pip install -e '.[test]'",
-        file=sys.stderr,
+    pytest.exit(
+        reason=f"FATAL: Missing modules: {', '.join(missing)} -- probably you missed installing test requirements with: pip install -e '.[test]'",
+        returncode=1,
     )
-    sys.exit(1)
 # we need to be sure that we have the requirements installed as some tests
 # might depend on these. This approach is compatible with GHA caching.
 try:
     subprocess.check_output(
-        ["./tools/install-reqs.sh"],
+        ["./tools/install-reqs.sh"],  # noqa: S603
         stderr=subprocess.PIPE,
         text=True,
     )
 except subprocess.CalledProcessError as exc:
-    print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)
+    print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)  # noqa: T201
     sys.exit(1)
 
-# flake8: noqa: E402
+# ruff: noqa: E402
 from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-position
     HAS_LIBYAML,
 )
@@ -39,11 +43,20 @@ from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-p
 if not HAS_LIBYAML:
     # While presence of libyaml is not required for runtime, we keep this error
     # fatal here in order to be sure that we spot libyaml errors during testing.
-    print(
-        "FATAL: For testing, we require pyyaml to be installed with its native extension, missing it would make testing 3x slower and risk missing essential bugs.",
-        file=sys.stderr,
-    )
-    sys.exit(1)
+    arch = platform.machine()
+    if arch not in ("arm64", "x86_64"):
+        warnings.warn(
+            f"This architecture ({arch}) is not supported by libyaml, performance will be degraded.",
+            category=pytest.PytestWarning,
+            stacklevel=1,
+        )
+    else:
+        pytest.fail(
+            "FATAL: For testing, we require pyyaml to be installed with its native extension, missing it would make testing 3x slower and risk missing essential bugs.",
+        )
 
 
-os.environ["NO_COLOR"] = "1"
+@pytest.fixture(name="project_path")
+def fixture_project_path() -> Path:
+    """Fixture to linter root folder."""
+    return Path(__file__).resolve().parent

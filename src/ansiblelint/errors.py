@@ -2,24 +2,27 @@
 from __future__ import annotations
 
 import functools
+from dataclasses import dataclass, field
 from typing import Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.config import options
-from ansiblelint.file_utils import Lintable, normpath
+from ansiblelint.file_utils import Lintable
 
 
 class StrictModeError(RuntimeError):
     """Raise when we encounter a warning in strict mode."""
 
     def __init__(
-        self, message: str = "Warning treated as error due to --strict option."
+        self,
+        message: str = "Warning treated as error due to --strict option.",
     ):
         """Initialize a StrictModeError instance."""
         super().__init__(message)
 
 
 # pylint: disable=too-many-instance-attributes
+@dataclass(unsafe_hash=True)
 @functools.total_ordering
 class MatchError(ValueError):
     """Rule violation detected during linting.
@@ -31,79 +34,64 @@ class MatchError(ValueError):
     instance.
     """
 
-    tag = ""
+    # order matters for these:
+    message: str = field(init=True, repr=False, default="")
+    lintable: Lintable = field(init=True, repr=False, default=Lintable(name=""))
+    filename: str = field(init=True, repr=False, default="")
 
-    # IMPORTANT: any additional comparison protocol methods must return
-    # IMPORTANT: `NotImplemented` singleton to allow the check to use the
-    # IMPORTANT: other object's fallbacks.
-    # Ref: https://docs.python.org/3/reference/datamodel.html#object.__lt__
+    tag: str = field(init=True, repr=False, default="")
+    lineno: int = 1
+    details: str = ""
+    column: int | None = None
+    # rule is not included in hash because we might have different instances
+    # of the same rule, but we use the 'tag' to identify the rule.
+    rule: BaseRule = field(hash=False, default=RuntimeErrorRule())
+    ignored: bool = False
+    fixed: bool = False  # True when a transform has resolved this MatchError
 
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        message: str | None = None,
-        # most linters report use (1,1) base, including yamllint and flake8
-        # we should never report line 0 or column 0 in output.
-        linenumber: int = 1,
-        column: int | None = None,
-        details: str = "",
-        filename: Lintable | None = None,
-        rule: BaseRule = RuntimeErrorRule(),
-        tag: str | None = None,  # optional fine-graded tag
-        ignored: bool = False,
-    ) -> None:
-        """Initialize a MatchError instance."""
-        super().__init__(message)
+    def __post_init__(self) -> None:
+        """Can be use by rules that can report multiple errors type, so we can still filter by them."""
+        if not self.lintable and self.filename:
+            self.lintable = Lintable(self.filename)
+        elif self.lintable and not self.filename:
+            self.filename = self.lintable.name
 
-        if rule.__class__ is RuntimeErrorRule and not message:
-            raise TypeError(
-                f"{self.__class__.__name__}() missing a "
-                "required argument: one of 'message' or 'rule'",
-            )
+        # We want to catch accidental MatchError() which contains no useful
+        # information. When no arguments are passed, the '_message' field is
+        # set to 'property', only if passed it becomes a string.
+        if self.rule.__class__ is RuntimeErrorRule:
+            # so instance was created without a rule
+            if not self.message:
+                msg = f"{self.__class__.__name__}() missing a required argument: one of 'message' or 'rule'"
+                raise TypeError(msg)
+            if not isinstance(self.tag, str):
+                msg = "MatchErrors must be created with either rule or tag specified."
+                raise TypeError(msg)
+        if not self.message:
+            self.message = self.rule.shortdesc
 
-        self.message = str(message or getattr(rule, "shortdesc", ""))
-
-        # Safety measure to ensure we do not end-up with incorrect indexes
-        if linenumber == 0:  # pragma: no cover
-            raise RuntimeError(
-                "MatchError called incorrectly as line numbers start with 1"
-            )
-        if column == 0:  # pragma: no cover
-            raise RuntimeError(
-                "MatchError called incorrectly as column numbers start with 1"
-            )
-
-        self.linenumber = linenumber
-        self.column = column
-        self.details = details
-        self.filename = ""
-        if filename:
-            if isinstance(filename, Lintable):
-                self.lintable = filename
-                self.filename = normpath(str(filename.path))
-            else:
-                self.filename = normpath(filename)
-                self.lintable = Lintable(self.filename)
-        self.rule = rule
-        self.ignored = ignored  # If set it will be displayed but not counted as failure
-        # This can be used by rules that can report multiple errors type, so
-        # we can still filter by them.
-        self.tag = tag or rule.id
-
-        # optional indicator on how this error was found
         self.match_type: str | None = None
         # for task matches, save the normalized task object (useful for transforms)
         self.task: dict[str, Any] | None = None
         # path to the problem area, like: [0,"pre_tasks",3] for [0].pre_tasks[3]
         self.yaml_path: list[int | str] = []
-        # True when a transform has resolved this MatchError
-        self.fixed = False
+
+        if not self.tag:
+            self.tag = self.rule.id
+
+        # Safety measure to ensure we do not end-up with incorrect indexes
+        if self.lineno == 0:  # pragma: no cover
+            msg = "MatchError called incorrectly as line numbers start with 1"
+            raise RuntimeError(msg)
+        if self.column == 0:  # pragma: no cover
+            msg = "MatchError called incorrectly as column numbers start with 1"
+            raise RuntimeError(msg)
 
     @functools.cached_property
     def level(self) -> str:
         """Return the level of the rule: error, warning or notice."""
         if not self.ignored and {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(
-            options.warn_list
+            options.warn_list,
         ):
             return "error"
         return "warning"
@@ -116,22 +104,26 @@ class MatchError(ValueError):
         _id = getattr(self.rule, "id", "000")
 
         return formatstr.format(
-            _id, self.message, self.filename, self.linenumber, self.details
+            _id,
+            self.message,
+            self.filename,
+            self.lineno,
+            self.details,
         )
 
     @property
     def position(self) -> str:
         """Return error positioning, with column number if available."""
         if self.column:
-            return f"{self.linenumber}:{self.column}"
-        return str(self.linenumber)
+            return f"{self.lineno}:{self.column}"
+        return str(self.lineno)
 
     @property
     def _hash_key(self) -> Any:
         # line attr is knowingly excluded, as dict is not hashable
         return (
             self.filename,
-            self.linenumber,
+            self.lineno,
             str(getattr(self.rule, "id", 0)),
             self.message,
             self.details,
@@ -144,11 +136,7 @@ class MatchError(ValueError):
         """Return whether the current object is less than the other."""
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return bool(self._hash_key < other._hash_key)
-
-    def __hash__(self) -> int:
-        """Return a hash value of the MatchError instance."""
-        return hash(self._hash_key)
+        return bool(self._hash_key < other._hash_key)  # noqa: SLF001
 
     def __eq__(self, other: object) -> bool:
         """Identify whether the other object represents the same rule match."""

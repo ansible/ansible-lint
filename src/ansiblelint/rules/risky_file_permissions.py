@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -86,7 +87,9 @@ class MissingFilePermissionsRule(AnsibleLintRule):
 
     # pylint: disable=too-many-return-statements
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         module = task["action"]["__ansible_module__"]
         mode = task["action"].get("mode", None)
@@ -126,7 +129,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         return mode is None
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
@@ -136,7 +139,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ("file", "expected"),
         (
             pytest.param(
-                "examples/playbooks/rule-risky-file-permissions-pass.yml", 0, id="pass"
+                "examples/playbooks/rule-risky-file-permissions-pass.yml",
+                0,
+                id="pass",
             ),
             pytest.param(
                 "examples/playbooks/rule-risky-file-permissions-fail.yml",
@@ -150,7 +155,7 @@ if "pytest" in sys.modules:  # noqa: C901
         collection = RulesCollection()
         collection.register(MissingFilePermissionsRule())
         runner = RunFromText(collection)
-        results = runner.run(file)
+        results = runner.run(Path(file))
         assert len(results) == expected
         for result in results:
             assert result.tag == "risky-file-permissions"

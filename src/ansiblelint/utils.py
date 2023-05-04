@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # spell-checker:ignore dwim
+# pylint: disable=too-many-lines
 """Generic utility helpers."""
 from __future__ import annotations
 
@@ -26,10 +27,9 @@ import inspect
 import logging
 import os
 import re
-from argparse import Namespace
 from collections.abc import ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any, Callable
 
@@ -54,7 +54,7 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
 )
 from ansiblelint.app import get_app
-from ansiblelint.config import options
+from ansiblelint.config import Options, options
 from ansiblelint.constants import (
     FILENAME_KEY,
     INCLUSION_ACTION_NAMES,
@@ -73,7 +73,7 @@ from ansiblelint.text import removeprefix
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
-DEFAULT_VAULT_PASSWORD = "x"
+DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
 COLLECTION_PLAY_RE = re.compile(r"^[\w\d_]+\.[\w\d_]+\.[\w\d_]+$")
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
@@ -97,15 +97,15 @@ def path_dwim(basedir: str, given: str) -> str:
     return str(dataloader.path_dwim(given))
 
 
-def ansible_templar(basedir: str, templatevars: Any) -> Templar:
+def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     """Create an Ansible Templar using templatevars."""
     # `basedir` is the directory containing the lintable file.
     # Therefore, for tasks in a role, `basedir` has the form
     # `roles/some_role/tasks`. On the other hand, the search path
     # is `roles/some_role/{files,templates}`. As a result, the
     # `tasks` part in the basedir should be stripped stripped.
-    if os.path.basename(basedir) == "tasks":
-        basedir = os.path.dirname(basedir)
+    if basedir.name == "tasks":
+        basedir = basedir.parent
 
     dataloader = DataLoader()
     dataloader.set_basedir(basedir)
@@ -113,40 +113,91 @@ def ansible_templar(basedir: str, templatevars: Any) -> Templar:
     return templar
 
 
+def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG001
+    """Mock a filter that can take any combination of args and kwargs.
+
+    This will return x when x | filter(y,z) is called
+    e.g. {{ foo | ansible.utils.ipaddr('address') }}
+
+    :param left: The left hand side of the filter
+    :param args: The args passed to the filter
+    :param kwargs: The kwargs passed to the filter
+    :return: The left hand side of the filter
+    """
+    # pylint: disable=unused-argument
+    return left
+
+
 def ansible_template(
-    basedir: str, varname: Any, templatevars: Any, **kwargs: Any
+    basedir: Path,
+    varname: Any,
+    templatevars: Any,
+    **kwargs: Any,
 ) -> Any:
-    """Render a templated string by mocking missing filters."""
+    """Render a templated string by mocking missing filters.
+
+    In the case of a missing lookup, ansible core does an early exit
+    when disable_lookup=True but this happens after the jinja2 syntax already passed
+    return the original string as if it had been templated.
+
+    In the case of a missing filter, extract the missing filter plugin name
+    from the ansible error, 'Could not load "filter"'. Then mock the filter
+    and template the string again. The range allows for up to 10 unknown filters
+    in succession
+
+    :param basedir: The directory containing the lintable file
+    :param varname: The string to be templated
+    :param templatevars: The variables to be used in the template
+    :param kwargs: Additional arguments to be passed to the templating engine
+    :return: The templated string or None
+    :raises: AnsibleError if the filter plugin cannot be extracted or the
+             string could not be templated in 10 attempts
+    """
+    # pylint: disable=too-many-locals
+    filter_error = "template error while templating string:"
+    lookup_error = "was found, however lookups were disabled from templating"
+    re_filter_fqcn = re.compile(r"\w+\.\w+\.\w+")
+    re_filter_in_err = re.compile(r"Could not load \"(\w+)\"")
+    re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
-    # pylint: disable=unused-variable
-    for i in range(3):
+
+    kwargs["disable_lookups"] = True
+    for _i in range(10):
         try:
-            kwargs["disable_lookups"] = True
-            return templar.template(varname, **kwargs)
+            templated = templar.template(varname, **kwargs)
+            return templated
         except AnsibleError as exc:
-            if (
-                "was found, however lookups were disabled from templating"
-                in exc.message
-            ):
-                # ansible core does an early exit when disable_lookup=True but
-                # this happens after the jinja2 syntax already passed.
-                break
-            if (
-                exc.message.startswith("template error while templating string:")
-                and "'" in exc.message
-            ):
-                missing_filter = exc.message.split("'")[1]
-                if missing_filter == "end of print statement":
+            if lookup_error in exc.message:
+                return varname
+            if exc.message.startswith(filter_error):
+                while True:
+                    match = re_filter_in_err.search(exc.message)
+                    if match:
+                        missing_filter = match.group(1)
+                        break
+                    match = re_filter_fqcn.search(exc.message)
+                    if match:
+                        missing_filter = match.group(0)
+                        break
+                    missing_filter = exc.message.split("'")[1]
+                    break
+
+                if not re_valid_filter.match(missing_filter):
+                    err = f"Could not parse missing filter name from error message: {exc.message}"
+                    _logger.warning(err)
                     raise
-                # Mock the filter to avoid and error from Ansible templating
+
                 # pylint: disable=protected-access
-                templar.environment.filters._delegatee[missing_filter] = lambda x: x
+                templar.environment.filters._delegatee[  # noqa: SLF001
+                    missing_filter
+                ] = mock_filter
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
                     options.mock_filters.append(missing_filter)
                 continue
             raise
+    return None
 
 
 BLOCK_NAME_TO_ACTION_TYPE_MAP = {
@@ -182,21 +233,23 @@ def tokenize(line: str) -> tuple[str, list[str], dict[str, str]]:
     return (command, args, kwargs)
 
 
-def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore
+def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore[type-arg]
     if isinstance(pb_data, dict):
         return pb_data.items()
     if not pb_data:
-        return []  # type: ignore
+        return []  # type: ignore[return-value]
 
     # "if play" prevents failure if the play sequence contains None,
     # which is weird but currently allowed by Ansible
     # https://github.com/ansible/ansible-lint/issues/849
-    return [item for play in pb_data if play for item in play.items()]  # type: ignore
+    return [item for play in pb_data if play for item in play.items()]  # type: ignore[return-value]
 
 
-def _set_collections_basedir(basedir: str) -> None:
+def _set_collections_basedir(basedir: Path) -> None:
     # Sets the playbook directory as playbook_paths for the collection loader
-    AnsibleCollectionConfig.playbook_paths = basedir
+    # Ansible expects only absolute paths inside `playbook_paths` and will
+    # produce weird errors if we use a relative one.
+    AnsibleCollectionConfig.playbook_paths = str(basedir.resolve())
 
 
 def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
@@ -204,7 +257,7 @@ def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
     if not lintable.path.exists():
         return []
     playbook_dir = str(lintable.path.parent)
-    _set_collections_basedir(playbook_dir or os.path.abspath("."))
+    _set_collections_basedir(lintable.path.parent)
     add_all_plugin_dirs(playbook_dir or ".")
     if lintable.kind == "role":
         playbook_ds = AnsibleMapping({"roles": [{"role": str(lintable.path)}]})
@@ -216,14 +269,17 @@ def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
         except AnsibleError as exc:
             raise SystemExit(exc) from exc
     results = []
-    basedir = os.path.dirname(str(lintable.path))
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
     if isinstance(playbook_ds, str):
-        raise MatchError(filename=lintable, rule=LoadingFailureRule())
+        raise MatchError(lintable=lintable, rule=LoadingFailureRule())
     for item in _playbook_items(playbook_ds):
         # if lintable.kind not in ["playbook"]:
-        #     continue
-        for child in play_children(basedir, item, lintable.kind, playbook_dir):
+        for child in play_children(
+            lintable.path.parent,
+            item,
+            lintable.kind,
+            playbook_dir,
+        ):
             # We avoid processing parametrized children
             path_str = str(child.path)
             if "$" in path_str or "{{" in path_str:
@@ -246,9 +302,10 @@ def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
 
 
 def template(
-    basedir: str,
+    basedir: Path,
     value: Any,
     variables: Any,
+    *,
     fail_on_error: bool = False,
     fail_on_undefined: bool = False,
     **kwargs: str,
@@ -256,7 +313,7 @@ def template(
     """Attempt rendering a value with known vars."""
     try:
         value = ansible_template(
-            os.path.abspath(basedir),
+            basedir.resolve(),
             value,
             variables,
             **dict(kwargs, fail_on_undefined=fail_on_undefined),
@@ -271,7 +328,10 @@ def template(
 
 
 def play_children(
-    basedir: str, item: tuple[str, Any], parent_type: FileType, playbook_dir: str
+    basedir: Path,
+    item: tuple[str, Any],
+    parent_type: FileType,
+    playbook_dir: str,  # noqa: ARG001
 ) -> list[Lintable]:
     """Flatten the traversed play tasks."""
     # pylint: disable=unused-argument
@@ -293,22 +353,24 @@ def play_children(
         "ansible.builtin.import_tasks": _include_children,
     }
     (k, v) = item
-    add_all_plugin_dirs(os.path.abspath(basedir))
+    add_all_plugin_dirs(str(basedir.resolve()))
 
-    if k in delegate_map:
-        if v:
-            v = template(
-                os.path.abspath(basedir),
-                v,
-                {"playbook_dir": PLAYBOOK_DIR or os.path.abspath(basedir)},
-                fail_on_undefined=False,
-            )
-            return delegate_map[k](basedir, k, v, parent_type)
+    if k in delegate_map and v:
+        v = template(
+            basedir,
+            v,
+            {"playbook_dir": PLAYBOOK_DIR or str(basedir.resolve())},
+            fail_on_undefined=False,
+        )
+        return delegate_map[k](str(basedir), k, v, parent_type)
     return []
 
 
 def _include_children(
-    basedir: str, k: str, v: Any, parent_type: FileType
+    basedir: str,
+    k: str,
+    v: Any,
+    parent_type: FileType,
 ) -> list[Lintable]:
     # handle special case include_tasks: name=filename.yml
     if k in INCLUSION_ACTION_NAMES and isinstance(v, dict) and "file" in v:
@@ -338,7 +400,10 @@ def _include_children(
 
 
 def _taskshandlers_children(
-    basedir: str, k: str, v: None | Any, parent_type: FileType
+    basedir: str,
+    k: str,
+    v: None | Any,
+    parent_type: FileType,
 ) -> list[Lintable]:
     results: list[Lintable] = []
     if v is None:
@@ -362,7 +427,6 @@ def _taskshandlers_children(
             continue
 
         if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
-            # lgtm [py/unreachable-statement]
             task_handler = normalize_task_v2(task_handler)
             _validate_task_handler_action_for_role(task_handler["action"])
             results.extend(
@@ -372,7 +436,7 @@ def _taskshandlers_children(
                     [task_handler["action"].get("name")],
                     parent_type,
                     main=task_handler["action"].get("tasks_from", "main"),
-                )
+                ),
             )
             continue
 
@@ -380,15 +444,25 @@ def _taskshandlers_children(
             continue
 
         results.extend(
-            _taskshandlers_children(basedir, k, task_handler["block"], parent_type)
+            _taskshandlers_children(basedir, k, task_handler["block"], parent_type),
         )
         if "rescue" in task_handler:
             results.extend(
-                _taskshandlers_children(basedir, k, task_handler["rescue"], parent_type)
+                _taskshandlers_children(
+                    basedir,
+                    k,
+                    task_handler["rescue"],
+                    parent_type,
+                ),
             )
         if "always" in task_handler:
             results.extend(
-                _taskshandlers_children(basedir, k, task_handler["always"], parent_type)
+                _taskshandlers_children(
+                    basedir,
+                    k,
+                    task_handler["always"],
+                    parent_type,
+                ),
             )
 
     return results
@@ -421,10 +495,8 @@ def _get_task_handler_children_for_tasks_or_playbooks(
                 basedir = os.path.dirname(basedir)
                 f = path_dwim(basedir, file_name)
             return Lintable(f, kind=child_type)
-
-    raise LookupError(
-        f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}',
-    )
+    msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
+    raise LookupError(msg)
 
 
 def _validate_task_handler_action_for_role(th_action: dict[str, Any]) -> None:
@@ -441,7 +513,11 @@ def _validate_task_handler_action_for_role(th_action: dict[str, Any]) -> None:
 
 
 def _roles_children(
-    basedir: str, k: str, v: Sequence[Any], parent_type: FileType, main: str = "main"
+    basedir: str,
+    k: str,
+    v: Sequence[Any],
+    parent_type: FileType,  # noqa: ARG001
+    main: str = "main",
 ) -> list[Lintable]:
     # pylint: disable=unused-argument # parent_type)
     results: list[Lintable] = []
@@ -454,13 +530,14 @@ def _roles_children(
                 if "tags" not in role or "skip_ansible_lint" not in role["tags"]:
                     results.extend(
                         _look_for_role_files(
-                            basedir, role.get("role", role.get("name")), main=main
-                        )
+                            basedir,
+                            role.get("role", role.get("name")),
+                            main=main,
+                        ),
                     )
             elif k != "dependencies":
-                raise SystemExit(
-                    f'role dict {role} does not contain a "role" or "name" key'
-                )
+                msg = f'role dict {role} does not contain a "role" or "name" key'
+                raise SystemExit(msg)
         else:
             results.extend(_look_for_role_files(basedir, role, main=main))
     return results
@@ -498,7 +575,9 @@ def _rolepath(basedir: str, role: str) -> str | None:
 
 
 def _look_for_role_files(
-    basedir: str, role: str, main: str | None = "main"
+    basedir: str,
+    role: str,
+    main: str | None = "main",  # noqa: ARG001
 ) -> list[Lintable]:
     # pylint: disable=unused-argument # main
     role_path = _rolepath(basedir, role)
@@ -568,7 +647,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
 
     try:
         action, arguments, result["delegate_to"] = mod_arg_parser.parse(
-            skip_action_validation=options.skip_action_validation
+            skip_action_validation=options.skip_action_validation,
         )
     except AnsibleParserError as exc:
         # pylint: disable=raise-missing-from
@@ -576,8 +655,8 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
             rule=AnsibleParserErrorRule(),
             message=exc.message,
             filename=task.get(FILENAME_KEY, "Unknown"),
-            linenumber=task.get(LINE_NUMBER_KEY, 0),
-        )
+            lineno=task.get(LINE_NUMBER_KEY, 0),
+        ) from exc
 
     # denormalize shell -> command conversion
     if "_uses_shell" in arguments:
@@ -585,11 +664,14 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
         del arguments["_uses_shell"]
 
     _extract_ansible_parsed_keys_from_task(
-        result, task, ansible_parsed_keys + (action,)
+        result,
+        task,
+        (*ansible_parsed_keys, action),
     )
 
     if not isinstance(action, str):
-        raise RuntimeError(f"Task actions can only be strings, got {action}")
+        msg = f"Task actions can only be strings, got {action}"
+        raise RuntimeError(msg)
     action_unnormalized = action
     # convert builtin fqn calls to short forms because most rules know only
     # about short calls but in the future we may switch the normalization to do
@@ -637,15 +719,21 @@ def task_to_str(task: dict[str, Any]) -> str:
         ]
     ]
 
-    # breakpoint()
-    for item in action.get("_raw_params", []):
-        args.append(str(item))
+    _raw_params = action.get("_raw_params", [])
+    if isinstance(_raw_params, list):
+        for item in _raw_params:
+            args.append(str(item))
+    else:
+        args.append(_raw_params)
 
     return f"{action['__ansible_module__']} {' '.join(args)}"
 
 
 def extract_from_list(
-    blocks: AnsibleBaseYAMLObject, candidates: list[str], recursive: bool = False
+    blocks: AnsibleBaseYAMLObject,
+    candidates: list[str],
+    *,
+    recursive: bool = False,
 ) -> list[Any]:
     """Get action tasks from block structures."""
     results = []
@@ -656,13 +744,16 @@ def extract_from_list(
                     subresults = add_action_type(block[candidate], candidate)
                     if recursive:
                         subresults.extend(
-                            extract_from_list(subresults, candidates, recursive)
+                            extract_from_list(
+                                subresults,
+                                candidates,
+                                recursive=recursive,
+                            ),
                         )
                     results.extend(subresults)
                 elif block[candidate] is not None:
-                    raise RuntimeError(
-                        f"Key '{candidate}' defined, but bad value: '{str(block[candidate])}'"
-                    )
+                    msg = f"Key '{candidate}' defined, but bad value: '{str(block[candidate])}'"
+                    raise RuntimeError(msg)
     return results
 
 
@@ -703,7 +794,8 @@ class Task:
         if not hasattr(self, "_normalized_task"):
             try:
                 self._normalized_task = normalize_task(
-                    self.raw_task, filename=self.filename
+                    self.raw_task,
+                    filename=self.filename,
                 )
             except MatchError as err:
                 self.error = err
@@ -711,7 +803,8 @@ class Task:
                 # to avoid adding extra complexity to the rules.
                 self._normalized_task = self.raw_task
         if isinstance(self._normalized_task, _MISSING_TYPE):
-            raise RuntimeError("Task was not normalized")
+            msg = "Task was not normalized"
+            raise RuntimeError(msg)
         return self._normalized_task
 
     @property
@@ -725,7 +818,7 @@ class Task:
         return f"Task('{self.name}' [{self.position}])"
 
 
-def task_in_list(
+def task_in_list(  # noqa: C901
     data: AnsibleBaseYAMLObject,
     filename: str,
     kind: str,
@@ -768,9 +861,8 @@ def task_in_list(
                             f"{position }[{item_index}].{attribute}",
                         )
                     elif item[attribute] is not None:
-                        raise RuntimeError(
-                            f"Key '{attribute}' defined, but bad value: '{str(item[attribute])}'"
-                        )
+                        msg = f"Key '{attribute}' defined, but bad value: '{str(item[attribute])}'"
+                        raise RuntimeError(msg)
     else:
         yield from each_entry(data, position)
 
@@ -801,7 +893,7 @@ def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
     return tasks
 
 
-@lru_cache(maxsize=None)
+@cache
 def parse_yaml_linenumbers(  # noqa: max-complexity: 12
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject:
@@ -816,12 +908,15 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
         line = loader.line
         node = Composer.compose_node(loader, parent, index)
         if not isinstance(node, yaml.nodes.Node):
-            raise RuntimeError("Unexpected yaml data.")
-        setattr(node, "__line__", line + 1)
+            msg = "Unexpected yaml data."
+            raise RuntimeError(msg)
+        node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
     def construct_mapping(
-        node: AnsibleBaseYAMLObject, deep: bool = False
+        node: AnsibleBaseYAMLObject,
+        *,
+        deep: bool = False,
     ) -> AnsibleMapping:
         mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
         if hasattr(node, "__line__"):
@@ -829,7 +924,7 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
         else:
             mapping[
                 LINE_NUMBER_KEY
-            ] = mapping._line_number  # pylint: disable=protected-access
+            ] = mapping._line_number  # pylint: disable=protected-access  # noqa: SLF001
         mapping[FILENAME_KEY] = lintable.path
         return mapping
 
@@ -853,7 +948,8 @@ def parse_yaml_linenumbers(  # noqa: max-complexity: 12
         yaml.scanner.ScannerError,
         yaml.constructor.ConstructorError,
     ) as exc:
-        raise RuntimeError("Failed to load YAML file") from exc
+        msg = "Failed to load YAML file"
+        raise RuntimeError(msg) from exc
 
     if len(result) == 0:
         return None  # empty documents
@@ -892,8 +988,7 @@ def get_second_cmd_arg(task: dict[str, Any]) -> Any:
 
 
 def is_playbook(filename: str) -> bool:
-    """
-    Check if the file is a playbook.
+    """Check if the file is a playbook.
 
     Given a filename, it should return true if it looks like a playbook. The
     function is not supposed to raise exceptions.
@@ -916,9 +1011,11 @@ def is_playbook(filename: str) -> bool:
 
     try:
         f = parse_yaml_from_file(filename)
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc:  # pylint: disable=broad-except # noqa: BLE001
         _logger.warning(
-            "Failed to load %s with %s, assuming is not a playbook.", filename, exc
+            "Failed to load %s with %s, assuming is not a playbook.",
+            filename,
+            exc,
         )
     else:
         if (
@@ -932,7 +1029,8 @@ def is_playbook(filename: str) -> bool:
 
 # pylint: disable=too-many-statements
 def get_lintables(
-    opts: Namespace = Namespace(), args: list[str] | None = None
+    opts: Options = options,
+    args: list[str] | None = None,
 ) -> list[Lintable]:
     """Detect files and directories that are lintable."""
     lintables: list[Lintable] = []
@@ -949,9 +1047,8 @@ def get_lintables(
             try:
                 for file_path in opts.exclude_paths:
                     if str(path.resolve()).startswith(str(file_path)):
-                        raise FileNotFoundError(
-                            f"File {file_path} matched exclusion entry: {path}"
-                        )
+                        msg = f"File {file_path} matched exclusion entry: {path}"
+                        raise FileNotFoundError(msg)
             except FileNotFoundError as exc:
                 _logger.debug("Ignored %s due to: %s", path, exc)
                 continue
@@ -978,8 +1075,8 @@ def _extend_with_roles(lintables: list[Lintable]) -> None:
             while role.parent.name != "roles" and role.name:
                 role = role.parent
             if role.exists() and not role.is_file():
-                lintable = Lintable(role, kind="role")
-                if lintable not in lintables:
+                lintable = Lintable(role)
+                if lintable.kind == "role" and lintable not in lintables:
                     _logger.debug("Added role: %s", lintable)
                     lintables.append(lintable)
 

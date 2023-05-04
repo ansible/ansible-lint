@@ -3,6 +3,7 @@ import copy
 import json
 import keyword
 import sys
+from pathlib import Path
 from typing import Any
 
 play_keywords = list(
@@ -51,7 +52,7 @@ vars
 vars_files
 vars_prompt
 """.split(),
-    )
+    ),
 )
 
 
@@ -62,14 +63,12 @@ def is_ref_used(obj: Any, ref: str) -> bool:
         if obj.get("$ref", None) == ref_use:
             return True
         for _ in obj.values():
-            if isinstance(_, (dict, list)):
-                if is_ref_used(_, ref):
-                    return True
+            if isinstance(_, (dict, list)) and is_ref_used(_, ref):
+                return True
     elif isinstance(obj, list):
         for _ in obj:
-            if isinstance(_, (dict, list)):
-                if is_ref_used(_, ref):
-                    return True
+            if isinstance(_, (dict, list)) and is_ref_used(_, ref):
+                return True
     return False
 
 
@@ -77,22 +76,20 @@ if __name__ == "__main__":
     invalid_var_names = sorted(list(keyword.kwlist) + play_keywords)
     if "__peg_parser__" in invalid_var_names:
         invalid_var_names.remove("__peg_parser__")
-    # flake8: noqa: T201
-    print("Updating invalid var names")
+    print("Updating invalid var names")  # noqa: T201
 
-    with open("f/vars.json", "r+", encoding="utf-8") as f:
+    with Path("f/vars.json").open("r+", encoding="utf-8") as f:
         vars_schema = json.load(f)
         vars_schema["anyOf"][0]["patternProperties"] = {
-            f"^(?!({'|'.join(invalid_var_names)})$)[a-zA-Z_][\\w]*$": {}
+            f"^(?!({'|'.join(invalid_var_names)})$)[a-zA-Z_][\\w]*$": {},
         }
         f.seek(0)
         json.dump(vars_schema, f, indent=2)
         f.write("\n")
         f.truncate()
 
-    # flake8: noqa: T201
-    print("Compiling subschemas...")
-    with open("f/ansible.json", encoding="utf-8") as f:
+    print("Compiling subschemas...")  # noqa: T201
+    with Path("f/ansible.json").open(encoding="utf-8") as f:
         combined_json = json.load(f)
 
     for subschema in ["tasks", "playbook"]:
@@ -114,7 +111,9 @@ if __name__ == "__main__":
                 del sub_json[key]
         for key in sub_json:
             if key not in ["$schema", "$defs"]:
-                print(f"Unexpected key found at combined schema root: ${key}")
+                print(  # noqa: T201
+                    f"Unexpected key found at combined schema root: ${key}",
+                )
                 sys.exit(2)
         # Copy keys from subschema to root
         for key, value in combined_json["$defs"][subschema].items():
@@ -127,15 +126,15 @@ if __name__ == "__main__":
         # Remove all unreferenced ($ref) definitions ($defs) recursively
         while True:
             spare = []
-            for k in sub_json["$defs"].keys():
+            for k in sub_json["$defs"]:
                 if not is_ref_used(sub_json, k):
                     spare.append(k)
             for k in spare:
-                print(f"{subschema}: deleting unused '{k}' definition")
+                print(f"{subschema}: deleting unused '{k}' definition")  # noqa: T201
                 del sub_json["$defs"][k]
             if not spare:
                 break
 
-        with open(f"f/{subschema}.json", "w", encoding="utf-8") as f:
+        with Path(f"f/{subschema}.json").open("w", encoding="utf-8") as f:
             json.dump(sub_json, f, indent=2, sort_keys=True)
             f.write("\n")

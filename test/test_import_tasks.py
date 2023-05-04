@@ -16,7 +16,8 @@ from ansiblelint.runner import Runner
     ),
 )
 def test_import_tasks(
-    default_rules_collection: RulesCollection, playbook_path: str
+    default_rules_collection: RulesCollection,
+    playbook_path: str,
 ) -> None:
     """Assures import_playbook includes are recognized."""
     runner = Runner(playbook_path, rules=default_rules_collection)

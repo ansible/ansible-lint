@@ -20,8 +20,8 @@
 # THE SOFTWARE.
 from __future__ import annotations
 
-import os
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -74,7 +74,9 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     }
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str:
         if task["action"]["__ansible_module__"] not in self._commands:
             return False
@@ -85,7 +87,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         if not first_cmd_arg:
             return False
 
-        executable = os.path.basename(first_cmd_arg)
+        executable = Path(first_cmd_arg).name
 
         if (
             second_cmd_arg
@@ -95,14 +97,14 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             return False
 
         if executable in self._modules and convert_to_boolean(
-            task["action"].get("warn", True)
+            task["action"].get("warn", True),
         ):
             message = "{0} used in place of {1} module"
             return message.format(executable, self._modules[executable])
         return False
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
@@ -124,7 +126,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ),
     )
     def test_command_instead_of_module(
-        default_rules_collection: RulesCollection, file: str, expected: int
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: int,
     ) -> None:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()

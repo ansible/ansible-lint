@@ -1,0 +1,4 @@
+---
+- name: this lacks a capitalization
+  hosts: localhost
+  tasks: []

@@ -12,9 +12,12 @@ detect if a change has occurred or not. Some of the most common examples are
 [shell] and [command] modules, which run arbitrary commands.
 
 One very common workaround is to use a boolean value like `changed_when: false`
-if the task never changes anything or `changed_when: true` if it always
-changes something, but you can also use any expressions, including ones that
-use the registered result of a task, like in our example below.
+if the task never changes anything or `changed_when: true` if it always changes
+something, but you can also use any expressions, including ones that use the
+registered result of a task, like in our example below.
+
+This rule also applies to handlers, not only to tasks because they are also
+tasks.
 
 ## Problematic Code
 

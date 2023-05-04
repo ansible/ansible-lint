@@ -8,6 +8,7 @@ import os
 import re
 from collections.abc import Iterator, Sequence
 from io import StringIO
+from pathlib import Path
 from re import Pattern
 from typing import TYPE_CHECKING, Any, Callable, Union, cast
 
@@ -19,10 +20,7 @@ from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
 from ruamel.yaml.main import YAML
-from ruamel.yaml.nodes import ScalarNode
-from ruamel.yaml.representer import RoundTripRepresenter
 from ruamel.yaml.scalarint import ScalarInt
-from ruamel.yaml.tokens import CommentToken
 from yamllint.config import YamlLintConfig
 
 from ansiblelint.constants import (
@@ -31,11 +29,15 @@ from ansiblelint.constants import (
     PLAYBOOK_TASK_KEYWORDS,
     SKIPPED_RULES_KEY,
 )
-from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
     from ruamel.yaml.comments import LineCol  # pylint: disable=ungrouped-imports
+    from ruamel.yaml.nodes import ScalarNode
+    from ruamel.yaml.representer import RoundTripRepresenter
+    from ruamel.yaml.tokens import CommentToken
+
+    from ansiblelint.file_utils import Lintable
 
 _logger = logging.getLogger(__name__)
 
@@ -84,21 +86,21 @@ def load_yamllint_config() -> YamlLintConfig:
     config = YamlLintConfig(content=YAMLLINT_CONFIG)
     # if we detect local yamllint config we use it but raise a warning
     # as this is likely to get out of sync with our internal config.
-    for file in [
+    for path in [
         ".yamllint",
         ".yamllint.yaml",
         ".yamllint.yml",
         os.getenv("YAMLLINT_CONFIG_FILE", ""),
-        os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
-        + "/yamllint/config",
+        os.getenv("XDG_CONFIG_HOME", "~/.config") + "/yamllint/config",
     ]:
-        if os.path.isfile(file):
+        file = Path(path).expanduser()
+        if file.is_file():
             _logger.debug(
                 "Loading custom %s config file, this extends our "
                 "internal yamllint config.",
                 file,
             )
-            config_override = YamlLintConfig(file=file)
+            config_override = YamlLintConfig(file=str(file))
             config_override.extend(config)
             config = config_override
             break
@@ -170,7 +172,9 @@ def nested_items_path(
     if data_collection is None:
         return
     yield from _nested_items_path(
-        data_collection=data_collection, parent_path=[], ignored_keys=ignored_keys
+        data_collection=data_collection,
+        parent_path=[],
+        ignored_keys=ignored_keys,
     )
 
 
@@ -190,40 +194,42 @@ def _nested_items_path(
     convert_to_tuples_type = Callable[[], Iterator[tuple[Union[str, int], Any]]]
     if isinstance(data_collection, dict):
         convert_data_collection_to_tuples = cast(
-            convert_to_tuples_type, functools.partial(data_collection.items)
+            convert_to_tuples_type,
+            functools.partial(data_collection.items),
         )
     elif isinstance(data_collection, list):
         convert_data_collection_to_tuples = cast(
-            convert_to_tuples_type, functools.partial(enumerate, data_collection)
+            convert_to_tuples_type,
+            functools.partial(enumerate, data_collection),
         )
     else:
-        raise TypeError(
-            f"Expected a dict or a list but got {data_collection!r} "
-            f"of type '{type(data_collection)}'"
-        )
+        msg = f"Expected a dict or a list but got {data_collection!r} of type '{type(data_collection)}'"
+        raise TypeError(msg)
     for key, value in convert_data_collection_to_tuples():
         if key in (SKIPPED_RULES_KEY, "__file__", "__line__", *ignored_keys):
             continue
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
             yield from _nested_items_path(
-                data_collection=value, parent_path=parent_path + [key]
+                data_collection=value,
+                parent_path=[*parent_path, key],
             )
 
 
 def get_path_to_play(
     lintable: Lintable,
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     ruamel_data: CommentedMap | CommentedSeq,
 ) -> list[str | int]:
     """Get the path to the play in the given file at the given line number."""
-    if line_number < 1:
-        raise ValueError(f"expected line_number >= 1, got {line_number}")
+    if lineno < 1:
+        msg = f"expected lineno >= 1, got {lineno}"
+        raise ValueError(msg)
     if lintable.kind != "playbook" or not isinstance(ruamel_data, CommentedSeq):
         return []
     lc: LineCol  # lc uses 0-based counts # pylint: disable=invalid-name
-    # line_number is 1-based. Convert to 0-based.
-    line_index = line_number - 1
+    # lineno is 1-based. Convert to 0-based.
+    line_index = lineno - 1
 
     prev_play_line_index = ruamel_data.lc.line
     last_play_index = len(ruamel_data)
@@ -235,7 +241,9 @@ def get_path_to_play(
             next_play_line_index = None
 
         lc = play.lc  # pylint: disable=invalid-name
-        assert isinstance(lc.line, int)
+        if not isinstance(lc.line, int):
+            msg = f"expected lc.line to be an int, got {lc.line!r}"
+            raise RuntimeError(msg)
         if lc.line == line_index:
             return [play_index]
         if play_index > 0 and prev_play_line_index < line_index < lc.line:
@@ -255,25 +263,27 @@ def get_path_to_play(
 
 def get_path_to_task(
     lintable: Lintable,
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     ruamel_data: CommentedMap | CommentedSeq,
 ) -> list[str | int]:
     """Get the path to the task in the given file at the given line number."""
-    if line_number < 1:
-        raise ValueError(f"expected line_number >= 1, got {line_number}")
-    if lintable.kind in ("tasks", "handlers"):
-        assert isinstance(ruamel_data, CommentedSeq)
-        return _get_path_to_task_in_tasks_block(line_number, ruamel_data)
-    if lintable.kind == "playbook":
-        assert isinstance(ruamel_data, CommentedSeq)
-        return _get_path_to_task_in_playbook(line_number, ruamel_data)
-    # if lintable.kind in ["yaml", "requirements", "vars", "meta", "reno", "test-meta"]:
+    if lineno < 1:
+        msg = f"expected lineno >= 1, got {lineno}"
+        raise ValueError(msg)
+    if lintable.kind in ("tasks", "handlers", "playbook"):
+        if not isinstance(ruamel_data, CommentedSeq):
+            msg = f"expected ruamel_data to be a CommentedSeq, got {ruamel_data!r}"
+            raise ValueError(msg)
+        if lintable.kind in ("tasks", "handlers"):
+            return _get_path_to_task_in_tasks_block(lineno, ruamel_data)
+        if lintable.kind == "playbook":
+            return _get_path_to_task_in_playbook(lineno, ruamel_data)
 
     return []
 
 
 def _get_path_to_task_in_playbook(
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     ruamel_data: CommentedSeq,
 ) -> list[str | int]:
     """Get the path to the task in the given playbook data at the given line number."""
@@ -296,19 +306,20 @@ def _get_path_to_task_in_playbook(
                 next_block_line_index = None
             else:
                 next_block_line_index = play.lc.data[next_keyword][0]
-            # last_line_number_in_block is 1-based; next_*_line_index is 0-based
+            # last_lineno_in_block is 1-based; next_*_line_index is 0-based
             # next_*_line_index - 1 to get line before next_*_line_index.
             # Then + 1 to make it a 1-based number.
-            # So, last_line_number_in_block = next_*_line_index - 1 + 1
             if next_block_line_index is not None:
-                last_line_number_in_block = next_block_line_index
+                last_lineno_in_block = next_block_line_index
             elif next_play_line_index is not None:
-                last_line_number_in_block = next_play_line_index
+                last_lineno_in_block = next_play_line_index
             else:
-                last_line_number_in_block = None
+                last_lineno_in_block = None
 
             task_path = _get_path_to_task_in_tasks_block(
-                line_number, play[tasks_keyword], last_line_number_in_block
+                lineno,
+                play[tasks_keyword],
+                last_lineno_in_block,
             )
             if task_path:
                 # mypy gets confused without this typehint
@@ -317,20 +328,20 @@ def _get_path_to_task_in_playbook(
                     tasks_keyword,
                 ]
                 return tasks_keyword_path + list(task_path)
-    # line_number is before first play or no tasks keywords in any of the plays
+    # lineno is before first play or no tasks keywords in any of the plays
     return []
 
 
-def _get_path_to_task_in_tasks_block(
-    line_number: int,  # 1-based
+def _get_path_to_task_in_tasks_block(  # noqa: C901
+    lineno: int,  # 1-based
     tasks_block: CommentedSeq,
-    last_line_number: int | None = None,  # 1-based
+    last_lineno: int | None = None,  # 1-based
 ) -> list[str | int]:
     """Get the path to the task in the given tasks block at the given line number."""
     task: CommentedMap | None
-    # line_number and last_line_number are 1-based. Convert to 0-based.
-    line_index = line_number - 1
-    last_line_index = None if last_line_number is None else last_line_number - 1
+    # lineno and last_lineno are 1-based. Convert to 0-based.
+    line_index = lineno - 1
+    last_line_index = None if last_lineno is None else last_lineno - 1
 
     # lc (LineCol) uses 0-based counts
     prev_task_line_index = tasks_block.lc.line
@@ -353,14 +364,19 @@ def _get_path_to_task_in_tasks_block(
         nested_task_keys = set(task.keys()).intersection(set(NESTED_TASK_KEYS))
         if nested_task_keys:
             subtask_path = _get_path_to_task_in_nested_tasks_block(
-                line_number, task, nested_task_keys, next_task_line_index
+                lineno,
+                task,
+                nested_task_keys,
+                next_task_line_index,
             )
             if subtask_path:
                 # mypy gets confused without this typehint
                 task_path: list[str | int] = [task_index]
                 return task_path + list(subtask_path)
 
-        assert isinstance(task.lc.line, int)
+        if not isinstance(task.lc.line, int):
+            msg = f"expected task.lc.line to be an int, got {task.lc.line!r}"
+            raise RuntimeError(msg)
         if task.lc.line == line_index:
             return [task_index]
         if task_index > 0 and prev_task_line_index < line_index < task.lc.line:
@@ -382,7 +398,7 @@ def _get_path_to_task_in_tasks_block(
 
 
 def _get_path_to_task_in_nested_tasks_block(
-    line_number: int,  # 1-based
+    lineno: int,  # 1-based
     task: CommentedMap,
     nested_task_keys: set[str],
     next_task_line_index: int | None = None,  # 0-based
@@ -400,22 +416,21 @@ def _get_path_to_task_in_nested_tasks_block(
             next_task_key_line_index = task.lc.data[next_task_key][0]
         else:
             next_task_key_line_index = None
-        # last_line_number_in_block is 1-based; next_*_line_index is 0-based
+        # last_lineno_in_block is 1-based; next_*_line_index is 0-based
         # next_*_line_index - 1 to get line before next_*_line_index.
         # Then + 1 to make it a 1-based number.
-        # So, last_line_number_in_block = next_*_line_index - 1 + 1
-        last_line_number_in_block = (
+        last_lineno_in_block = (
             next_task_key_line_index
             if next_task_key_line_index is not None
             else next_task_line_index
         )
         subtask_path = _get_path_to_task_in_tasks_block(
-            line_number,
+            lineno,
             nested_task_block,
-            last_line_number_in_block,  # 1-based
+            last_lineno_in_block,  # 1-based
         )
         if subtask_path:
-            return [task_key] + list(subtask_path)
+            return [task_key, *list(subtask_path)]
     # line is not part of this nested tasks block
     return []
 
@@ -442,7 +457,12 @@ class OctalIntYAML11(ScalarInt):
         anchor = data.yaml_anchor(any=True)
         # noinspection PyProtectedMember
         # pylint: disable=protected-access
-        return representer.insert_underscore("0", v, data._underscore, anchor=anchor)
+        return representer.insert_underscore(
+            "0",
+            v,
+            data._underscore,  # noqa: SLF001
+            anchor=anchor,
+        )
 
 
 class CustomConstructor(RoundTripConstructor):
@@ -476,13 +496,17 @@ class CustomConstructor(RoundTripConstructor):
             if value_s[0] == "0":
                 # got an octal in YAML 1.1
                 ret = OctalIntYAML11(
-                    ret, width=None, underscore=underscore, anchor=node.anchor
+                    ret,
+                    width=None,
+                    underscore=underscore,
+                    anchor=node.anchor,
                 )
         return ret
 
 
 CustomConstructor.add_constructor(
-    "tag:yaml.org,2002:int", CustomConstructor.construct_yaml_int
+    "tag:yaml.org,2002:int",
+    CustomConstructor.construct_yaml_int,
 )
 
 
@@ -520,7 +544,8 @@ class FormattedEmitter(Emitter):
     def expect_document_root(self) -> None:
         """Expect doc root (extend to record if the root doc is a sequence)."""
         self._root_is_sequence = isinstance(
-            self.event, ruamel.yaml.events.SequenceStartEvent
+            self.event,
+            ruamel.yaml.events.SequenceStartEvent,
         )
         return super().expect_document_root()
 
@@ -552,7 +577,7 @@ class FormattedEmitter(Emitter):
         """Select how to quote scalars if needed."""
         style = super().choose_scalar_style()
         if (
-            style == ""
+            style == ""  # noqa: PLC1901
             and self.event.value.startswith("0")
             and len(self.event.value) > 1
         ):
@@ -572,8 +597,8 @@ class FormattedEmitter(Emitter):
         self,
         indicator: str,  # ruamel.yaml typehint is wrong. This is a string.
         need_whitespace: bool,
-        whitespace: bool = False,
-        indention: bool = False,  # (sic) ruamel.yaml has this typo in their API
+        whitespace: bool = False,  # noqa: FBT002
+        indention: bool = False,  # (sic) ruamel.yaml has this typo in their API # noqa: FBT002
     ) -> None:
         """Make sure that flow maps get whitespace by the curly braces."""
         # We try to go with one whitespace by the curly braces and adjust accordingly
@@ -610,7 +635,7 @@ class FormattedEmitter(Emitter):
         """Modify strings to protect "#" from full-line-comment post-processing."""
         try:
             if "#" in string:
-                # ＃ is \uFF03 (fullwidth number sign)
+                # # is \uFF03 (fullwidth number sign)
                 # ﹟ is \uFE5F (small number sign)
                 string = string.replace("#", "\uFF03#\uFE5F")
                 # this is safe even if this sequence is present
@@ -625,7 +650,7 @@ class FormattedEmitter(Emitter):
         """Remove string protection of "#" after full-line-comment post-processing."""
         try:
             if "\uFF03#\uFE5F" in string:
-                # ＃ is \uFF03 (fullwidth number sign)
+                # # is \uFF03 (fullwidth number sign)
                 # ﹟ is \uFE5F (small number sign)
                 string = string.replace("\uFF03#\uFE5F", "#")
         except (ValueError, TypeError):
@@ -645,7 +670,11 @@ class FormattedEmitter(Emitter):
         return analysis
 
     # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
-    def write_comment(self, comment: CommentToken, pre: bool = False) -> None:
+    def write_comment(
+        self,
+        comment: CommentToken,
+        pre: bool = False,  # noqa: FBT002
+    ) -> None:
         """Clean up extra new lines and spaces in comments.
 
         ruamel.yaml treats new or empty lines as comments.
@@ -699,7 +728,6 @@ class FormattedYAML(YAML):
         typ: str | None = None,
         pure: bool = False,
         output: Any = None,
-        # input: Any = None,
         plug_ins: list[str] | None = None,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
@@ -785,9 +813,9 @@ class FormattedYAML(YAML):
         self.compact_seq_map = True  # type: ignore[assignment] # key after dash
 
         # Do not use yaml.indent() as it obscures the purpose of these vars:
-        self.map_indent = 2  # type: ignore[assignment]
-        self.sequence_indent = 4 if indent_sequences else 2  # type: ignore[assignment]
-        self.sequence_dash_offset = self.sequence_indent - 2  # type: ignore[operator]
+        self.map_indent = 2
+        self.sequence_indent = 4 if indent_sequences else 2
+        self.sequence_dash_offset = self.sequence_indent - 2
 
         # If someone doesn't want our FormattedEmitter, they can change it.
         self.Emitter = FormattedEmitter
@@ -813,17 +841,13 @@ class FormattedYAML(YAML):
         # This will only preserve quotes for strings read from the file.
         # anything modified by the transform will use no quotes, preferred_quote,
         # or the quote that results in the least amount of escaping.
-        # self.preserve_quotes = True
 
         # If needed, we can use this to change null representation to be explicit
         # (see https://stackoverflow.com/a/44314840/1134951)
         # self.Representer.add_representer(
-        #     type(None),
-        #     lambda self, data: self.represent_scalar("tag:yaml.org,2002:null", "null"),
-        # )
 
     @staticmethod
-    def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:
+    def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:  # noqa: C901
         """Extract FormattedYAML-relevant settings from yamllint config if possible."""
         config = {
             "explicit_start": True,
@@ -892,11 +916,12 @@ class FormattedYAML(YAML):
     def loads(self, stream: str) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
         if not isinstance(stream, str):
-            raise NotImplementedError(f"expected a str but got {type(stream)}")
+            msg = f"expected a str but got {type(stream)}"
+            raise NotImplementedError(msg)
         text, preamble_comment = self._pre_process_yaml(stream)
         data = self.load(stream=text)
         if preamble_comment is not None:
-            setattr(data, "preamble_comment", preamble_comment)
+            data.preamble_comment = preamble_comment
         return data
 
     def dumps(self, data: Any) -> str:
@@ -972,14 +997,11 @@ class FormattedYAML(YAML):
         #     DocumentStartToken.comment -> DocumentStartEvent.comment
         #   Then, in the composer:
         #     once in composer.current_event
-        #       composer.compose_document()
         #         discards DocumentStartEvent
         #           move DocumentStartEvent to composer.last_event
-        #           node = composer.compose_node(None, None)
         #             all document nodes get composed (events get used)
         #         discard DocumentEndEvent
         #           move DocumentEndEvent to composer.last_event
-        #         return node
         # So, there's no convenient way to extend the composer
         # to somehow capture the comments and pass them on.
 
@@ -1059,8 +1081,7 @@ def clean_json(
     if isinstance(key, str)
     else False,
 ) -> Any:
-    """
-    Remove all keys matching the condition from a nested JSON-like object.
+    """Remove all keys matching the condition from a nested JSON-like object.
 
     :param obj: a JSON like object to clean, also returned for chaining.
     :param func: a callable that takes a key in argument and return True for each key to delete

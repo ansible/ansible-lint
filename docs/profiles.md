@@ -83,7 +83,6 @@ private instance. It extends [safety](#safety) profile.
 - [ignore-errors](rules/ignore-errors.md)
 - [layout](https://github.com/ansible/ansible-lint/issues/1900)
 - [meta-incorrect](rules/meta-incorrect.md)
-- [meta-no-info](rules/meta-no-info.md)
 - [meta-no-tags](rules/meta-no-tags.md)
 - [meta-video-links](rules/meta-video-links.md)
 - [meta-version](https://github.com/ansible/ansible-lint/issues/2103)

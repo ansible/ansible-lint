@@ -53,7 +53,7 @@ class BaseRule:
     _collection: RulesCollection | None = None
 
     @property
-    def help(self) -> str:
+    def help(self) -> str:  # noqa: A003
         """Return a help markdown string for the rule."""
         if self._help is None:
             self._help = ""
@@ -87,7 +87,7 @@ class BaseRule:
             for method in [self.matchlines, self.matchtasks, self.matchyaml]:
                 try:
                     matches.extend(method(file))
-                except Exception as exc:  # pylint: disable=broad-except
+                except Exception as exc:  # pylint: disable=broad-except # noqa: BLE001
                     _logger.warning(
                         "Ignored exception from %s.%s while processing %s: %s",
                         self.__class__.__name__,
@@ -104,7 +104,9 @@ class BaseRule:
         return []
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str | MatchError | list[MatchError]:
         """Confirm if current rule is matching a specific task.
 
@@ -140,7 +142,7 @@ class BaseRule:
 
     def __lt__(self, other: BaseRule) -> bool:
         """Enable us to sort rules by their id."""
-        return (self._order, self.id) < (other._order, other.id)
+        return (self._order, self.id) < (other._order, other.id)  # noqa: SLF001
 
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
@@ -154,6 +156,7 @@ class RuntimeErrorRule(BaseRule):
     """Unexpected internal error."""
 
     id = "internal-error"
+    shortdesc = "Unexpected internal error"
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v5.0.0"

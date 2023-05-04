@@ -30,24 +30,25 @@ class TestCodeclimateJSONFormatter:
         self.matches.append(
             MatchError(
                 message="message",
-                linenumber=1,
+                lineno=1,
                 details="hello",
-                filename=Lintable("filename.yml", content=""),
+                lintable=Lintable("filename.yml", content=""),
                 rule=self.rule,
-            )
+            ),
         )
         self.matches.append(
             MatchError(
                 message="message",
-                linenumber=2,
+                lineno=2,
                 details="hello",
-                filename=Lintable("filename.yml", content=""),
+                lintable=Lintable("filename.yml", content=""),
                 rule=self.rule,
                 ignored=True,
-            )
+            ),
         )
         self.formatter = CodeclimateJSONFormatter(
-            pathlib.Path.cwd(), display_relative_path=True
+            pathlib.Path.cwd(),
+            display_relative_path=True,
         )
 
     def test_format_list(self) -> None:
@@ -58,13 +59,16 @@ class TestCodeclimateJSONFormatter:
     def test_result_is_json(self) -> None:
         """Test if returned string value is a JSON."""
         assert isinstance(self.formatter, CodeclimateJSONFormatter)
-        json.loads(self.formatter.format_result(self.matches))
+        output = self.formatter.format_result(self.matches)
+        json.loads(output)
+        # https://github.com/ansible/ansible-navigator/issues/1490
+        assert "\n" not in output
 
     def test_single_match(self) -> None:
         """Test negative case. Only lists are allowed. Otherwise a RuntimeError will be raised."""
         assert isinstance(self.formatter, CodeclimateJSONFormatter)
         with pytest.raises(RuntimeError):
-            self.formatter.format_result(self.matches[0])  # type: ignore
+            self.formatter.format_result(self.matches[0])  # type: ignore[arg-type]
 
     def test_result_is_list(self) -> None:
         """Test if the return JSON contains a list with a length of 2."""
@@ -90,7 +94,7 @@ class TestCodeclimateJSONFormatter:
         assert "path" in single_match["location"]
         assert single_match["location"]["path"] == self.matches[0].filename
         assert "lines" in single_match["location"]
-        assert single_match["location"]["lines"]["begin"] == self.matches[0].linenumber
+        assert single_match["location"]["lines"]["begin"] == self.matches[0].lineno
         assert "positions" not in single_match["location"]
         # check that the 2nd match is marked as 'minor' because it was created with ignored=True
         assert result[1]["severity"] == "minor"
@@ -103,14 +107,14 @@ class TestCodeclimateJSONFormatter:
                 [
                     MatchError(
                         message="message",
-                        linenumber=1,
+                        lineno=1,
                         column=42,
                         details="hello",
-                        filename=Lintable("filename.yml", content=""),
+                        lintable=Lintable("filename.yml", content=""),
                         rule=self.rule,
-                    )
-                ]
-            )
+                    ),
+                ],
+            ),
         )
         assert result[0]["location"]["positions"]["begin"]["line"] == 1
         assert result[0]["location"]["positions"]["begin"]["column"] == 42

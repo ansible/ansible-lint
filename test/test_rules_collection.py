@@ -21,8 +21,8 @@
 from __future__ import annotations
 
 import collections
-import os
 import re
+from pathlib import Path
 
 import pytest
 
@@ -35,7 +35,7 @@ from ansiblelint.testing import run_ansible_lint
 @pytest.fixture(name="test_rules_collection")
 def fixture_test_rules_collection() -> RulesCollection:
     """Create a shared rules collection test instance."""
-    return RulesCollection([os.path.abspath("./test/rules/fixtures")])
+    return RulesCollection([Path("./test/rules/fixtures").resolve()])
 
 
 @pytest.fixture(name="ematchtestfile")
@@ -57,12 +57,13 @@ def test_load_collection_from_directory(test_rules_collection: RulesCollection) 
 
 
 def test_run_collection(
-    test_rules_collection: RulesCollection, ematchtestfile: Lintable
+    test_rules_collection: RulesCollection,
+    ematchtestfile: Lintable,
 ) -> None:
     """Test that default rules match pre-meditated violations."""
     matches = test_rules_collection.run(ematchtestfile)
     assert len(matches) == 4  # 3 occurrences of BANNED using TEST0001 + 1 for raw-task
-    assert matches[0].linenumber == 3
+    assert matches[0].lineno == 3
 
 
 def test_tags(
@@ -104,11 +105,13 @@ def test_skip_id(
 ) -> None:
     """Check that skipping valid IDs excludes their violations."""
     matches = test_rules_collection.run(
-        ematchtestfile, skip_list=["TEST0001", "raw-task"]
+        ematchtestfile,
+        skip_list=["TEST0001", "raw-task"],
     )
     assert len(matches) == 0
     matches = test_rules_collection.run(
-        ematchtestfile, skip_list=["TEST0002", "raw-task"]
+        ematchtestfile,
+        skip_list=["TEST0002", "raw-task"],
     )
     assert len(matches) == 3
     matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=["TEST0001"])
@@ -118,7 +121,8 @@ def test_skip_id(
 
 
 def test_skip_non_existent_id(
-    test_rules_collection: RulesCollection, ematchtestfile: Lintable
+    test_rules_collection: RulesCollection,
+    ematchtestfile: Lintable,
 ) -> None:
     """Check that skipping invalid IDs changes nothing."""
     matches = test_rules_collection.run(ematchtestfile, skip_list=["DOESNOTEXIST"])
@@ -127,7 +131,7 @@ def test_skip_non_existent_id(
 
 def test_no_duplicate_rule_ids() -> None:
     """Check that rules of the collection don't have duplicate IDs."""
-    real_rules = RulesCollection([os.path.abspath("./src/ansiblelint/rules")])
+    real_rules = RulesCollection([Path("./src/ansiblelint/rules").resolve()])
     rule_ids = [rule.id for rule in real_rules]
     assert not any(y > 1 for y in collections.Counter(rule_ids).values())
 
@@ -138,8 +142,8 @@ def test_rich_rule_listing() -> None:
     This check also offers the contract of having rule id, short and long
     descriptions in the console output.
     """
-    rules_path = os.path.abspath("./test/rules/fixtures")
-    result = run_ansible_lint("-r", rules_path, "-f", "full", "-L")
+    rules_path = Path("./test/rules/fixtures").resolve()
+    result = run_ansible_lint("-r", str(rules_path), "-f", "full", "-L")
     assert result.returncode == 0
 
     for rule in RulesCollection([rules_path]):
@@ -152,19 +156,20 @@ def test_rich_rule_listing() -> None:
 def test_rules_id_format() -> None:
     """Assure all our rules have consistent format."""
     rule_id_re = re.compile("^[a-z-]{4,30}$")
-    # options.enable_list = ["no-same-owner", "no-log-password", "no-same-owner"]
     rules = RulesCollection(
-        [os.path.abspath("./src/ansiblelint/rules")], options=options, conditional=False
+        [Path("./src/ansiblelint/rules").resolve()],
+        options=options,
+        conditional=False,
     )
     keys: set[str] = set()
     for rule in rules:
         assert rule_id_re.match(
-            rule.id
+            rule.id,
         ), f"Rule id {rule.id} did not match our required format."
         keys.add(rule.id)
         assert (
-            rule.help != "" or rule.description or rule.__doc__
+            rule.help or rule.description or rule.__doc__
         ), f"Rule {rule.id} must have at least one of:  .help, .description, .__doc__"
     assert "yaml" in keys, "yaml rule is missing"
-    assert len(rules) == 50  # update this number when adding new rules!
+    assert len(rules) == 49  # update this number when adding new rules!
     assert len(keys) == len(rules), "Duplicate rule ids?"

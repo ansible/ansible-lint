@@ -31,7 +31,7 @@ repos:
       - id: check-useless-excludes
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: v3.0.0-alpha.6
+    rev: v3.0.0-alpha.9-for-vscode
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting
@@ -58,7 +58,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.30.1
+    rev: v6.31.0
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -110,7 +110,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.30.0
+    rev: v1.31.0
     hooks:
       - id: yamllint
         exclude: >
@@ -124,51 +124,32 @@ repos:
         files: \.(yaml|yml)$
         types: [file, yaml]
         entry: yamllint --strict
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: "v0.0.264"
     hooks:
-      - id: isort
-        args:
-          # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
-          - --filter-files
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
         language_version: python3
-  - repo: https://github.com/pycqa/flake8.git
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        language_version: python3
-        additional_dependencies:
-          - flake8-2020>=1.6.0
-          # - flake8-black>=0.1.1
-          - flake8-docstrings>=1.5.0
-          - flake8-print>=5.0
-          - flake8-pytest-style>=1.2.2
-          - flake8-future-annotations>=0.0.3
-  - repo: https://github.com/asottile/pyupgrade
-    # keep it after flake8
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
-        args: ["--py39-plus"]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.1.1
+    rev: v1.2.0
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat
+          - ansible-compat>=4.0.1
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock
           - jinja2
           - pytest>=7.2.2
           - rich>=13.2.0
-          - ruamel.yaml
+          - ruamel-yaml>=0.17.22
+          - ruamel-yaml-clib>=0.2.7
           - spdx-tools
           - subprocess-tee
           - types-PyYAML
@@ -182,13 +163,13 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v2.17.1
+    rev: v3.0.0a6
     hooks:
       - id: pylint
         args:
           - --output-format=colorized
         additional_dependencies:
-          - ansible-compat
+          - ansible-compat>=4.0.1
           - ansible-core>=2.14.0
           - black>=22.10.0
           - docutils
@@ -197,19 +178,20 @@ repos:
           - pytest>=7.2.2
           - pyyaml
           - rich>=13.2.0
-          - ruamel.yaml
+          - ruamel-yaml>=0.17.22
+          - ruamel-yaml-clib>=0.2.7
           - spdx-tools
           - typing_extensions
           - wcmatch
           - yamllint
   - repo: https://github.com/jazzband/pip-tools
-    rev: 6.12.3
+    rev: 6.13.0
     hooks:
       - id: pip-compile
         name: lock
         alias: lock
         always_run: true
-        entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib
+        entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
         files: ^.config\/requirements.*$
         language: python
         language_version: "3.9" # minimal we support officially
@@ -221,7 +203,7 @@ repos:
         name: deps
         alias: deps
         always_run: true
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
         files: ^.config\/requirements.*$
         language: python
         language_version: "3.9" # minimal we support officially
@@ -229,7 +211,7 @@ repos:
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --upgrade
+        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib  --unsafe-package resolvelib --upgrade
         language: python
         always_run: true
         pass_filenames: false

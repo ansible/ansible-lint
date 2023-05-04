@@ -23,25 +23,30 @@ from __future__ import annotations
 import logging
 import subprocess
 import sys
-from argparse import Namespace
-from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from _pytest.capture import CaptureFixture
-from _pytest.logging import LogCaptureFixture
-from _pytest.monkeypatch import MonkeyPatch
 from ansible.utils.sentinel import Sentinel
 from ansible_compat.runtime import Runtime
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
-from ansiblelint.constants import VIOLATIONS_FOUND_RC
+from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from _pytest.capture import CaptureFixture
+    from _pytest.logging import LogCaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
+
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
 
 runtime = Runtime(require_module=True)
 
@@ -105,7 +110,8 @@ def test_tokenize(
     ),
 )
 def test_normalize(
-    reference_form: dict[str, Any], alternate_forms: tuple[dict[str, Any]]
+    reference_form: dict[str, Any],
+    alternate_forms: tuple[dict[str, Any]],
 ) -> None:
     """Test that tasks specified differently are normalized same way."""
     normal_form = utils.normalize_task(reference_form, "tasks.yml")
@@ -124,13 +130,16 @@ def test_normalize_complex_command() -> None:
     task3 = {"name": "hello", "pip": "name=df editable=false"}
     task4 = {"name": "hello", "action": "pip name=df editable=false"}
     assert utils.normalize_task(task1, "tasks.yml") == utils.normalize_task(
-        task2, "tasks.yml"
+        task2,
+        "tasks.yml",
     )
     assert utils.normalize_task(task2, "tasks.yml") == utils.normalize_task(
-        task3, "tasks.yml"
+        task3,
+        "tasks.yml",
     )
     assert utils.normalize_task(task3, "tasks.yml") == utils.normalize_task(
-        task4, "tasks.yml"
+        task4,
+        "tasks.yml",
     )
 
 
@@ -162,7 +171,7 @@ def test_normalize_complex_command() -> None:
                         "name": "Install httpd and memcached",
                         "ansible.builtin.yum": ["httpd", "memcached"],
                         "state": "present",
-                    }
+                    },
                 ],
             },
             {
@@ -172,7 +181,7 @@ def test_normalize_complex_command() -> None:
                         "name": "Install httpd and memcached",
                         "ansible.builtin.yum": ["httpd", "memcached"],
                         "state": "present",
-                    }
+                    },
                 ],
                 "action": {
                     "__ansible_module__": "block/always/rescue",
@@ -200,7 +209,7 @@ def test_extract_from_list() -> None:
     test_list = utils.extract_from_list(blocks, ["block"])
     test_none = utils.extract_from_list(blocks, ["test_none"])
 
-    assert list(block["block"]) == test_list  # type: ignore
+    assert list(block["block"]) == test_list  # type: ignore[arg-type]
     assert not test_none
     with pytest.raises(RuntimeError):
         utils.extract_from_list(blocks, ["test_string"])
@@ -244,7 +253,7 @@ def test_extract_from_list_recursive() -> None:
 def test_template(template: str, output: str) -> None:
     """Verify that resolvable template vars and filters get rendered."""
     result = utils.template(
-        basedir="/base/dir",
+        basedir=Path("/base/dir"),
         value=template,
         variables={"playbook_dir": "/a/b/c"},
         fail_on_error=False,
@@ -288,7 +297,7 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     result = subprocess.run(cmd, check=False).returncode
 
     # We de expect to fail on our own repo due to test examples we have
-    assert result == VIOLATIONS_FOUND_RC
+    assert result == RC.VIOLATIONS_FOUND
 
     out, err = capfd.readouterr()
 
@@ -320,7 +329,7 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
     options = cli.get_config(["--exclude", "foo"])
 
     # pylint: disable=unused-argument
-    def mockreturn(options: Namespace) -> list[str]:
+    def mockreturn(options: Options) -> list[str]:  # noqa: ARG001
         return ["foo/playbook.yml", "bar/playbook.yml"]
 
     monkeypatch.setattr(utils, "discover_lintables", mockreturn)
@@ -331,8 +340,8 @@ def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
 _DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]
 _CUSTOM_RULESDIR = Path(__file__).parent / "custom_rules"
 _CUSTOM_RULEDIRS = [
-    str(_CUSTOM_RULESDIR / "example_inc"),
-    str(_CUSTOM_RULESDIR / "example_com"),
+    _CUSTOM_RULESDIR / "example_inc",
+    _CUSTOM_RULESDIR / "example_com",
 ]
 
 
@@ -346,10 +355,12 @@ _CUSTOM_RULEDIRS = [
     ),
 )
 def test_get_rules_dirs(
-    user_ruledirs: list[str], use_default: bool, expected: list[str]
+    user_ruledirs: list[Path],
+    use_default: bool,
+    expected: list[Path],
 ) -> None:
     """Test it returns expected dir lists."""
-    assert get_rules_dirs(user_ruledirs, use_default) == expected
+    assert get_rules_dirs(user_ruledirs, use_default=use_default) == expected
 
 
 @pytest.mark.parametrize(
@@ -366,14 +377,14 @@ def test_get_rules_dirs(
     ),
 )
 def test_get_rules_dirs_with_custom_rules(
-    user_ruledirs: list[str],
+    user_ruledirs: list[Path],
     use_default: bool,
-    expected: list[str],
+    expected: list[Path],
     monkeypatch: MonkeyPatch,
 ) -> None:
     """Test it returns expected dir lists when custom rules exist."""
     monkeypatch.setenv(constants.CUSTOM_RULESDIR_ENVVAR, str(_CUSTOM_RULESDIR))
-    assert get_rules_dirs(user_ruledirs, use_default) == expected
+    assert get_rules_dirs(user_ruledirs, use_default=use_default) == expected
 
 
 def test_find_children() -> None:
@@ -413,7 +424,7 @@ def test_task_in_list(file: str, names: list[str], positions: list[str]) -> None
     lintable = Lintable(file)
     assert lintable.kind
     tasks = list(
-        utils.task_in_list(data=lintable.data, filename=file, kind=lintable.kind)
+        utils.task_in_list(data=lintable.data, filename=file, kind=lintable.kind),
     )
     assert len(tasks) == len(names)
     for index, task in enumerate(tasks):

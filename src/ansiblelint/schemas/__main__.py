@@ -6,7 +6,7 @@ import sys
 import time
 import urllib.request
 from collections import defaultdict
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any
 from urllib.request import Request
@@ -16,11 +16,11 @@ _logger = logging.getLogger(__package__)
 # Maps kinds to JSON schemas
 # See https://www.schemastore.org/json/
 store_file = Path(f"{__file__}/../__store__.json").resolve()
-with open(store_file, encoding="utf-8") as json_file:
+with store_file.open(encoding="utf-8") as json_file:
     JSON_SCHEMAS = json.load(json_file)
 
 
-class SchemaCacheDict(defaultdict):  # type: ignore
+class SchemaCacheDict(defaultdict):  # type: ignore[type-arg]
     """Caching schema store."""
 
     def __missing__(self, key: str) -> Any:
@@ -30,11 +30,11 @@ class SchemaCacheDict(defaultdict):  # type: ignore
         return value
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_schema(kind: str) -> Any:
     """Return the schema for the given kind."""
-    schema_file = os.path.dirname(__file__) + "/" + kind + ".json"
-    with open(schema_file, encoding="utf-8") as f:
+    schema_file = Path(__file__).parent / f"{kind}.json"
+    with schema_file.open(encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -42,7 +42,7 @@ _schema_cache = SchemaCacheDict()
 
 
 # pylint: disable=too-many-branches
-def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
+def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:  # noqa: C901
     """Refresh JSON schemas by downloading latest versions.
 
     Returns number of changed schemas.
@@ -54,7 +54,8 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         return 0
     if not os.access(store_file, os.W_OK):  # pragma: no cover
         _logger.debug(
-            "Skipping schema update due to lack of writing rights on %s", store_file
+            "Skipping schema update due to lack of writing rights on %s",
+            store_file,
         )
         return -1
     _logger.debug("Checking for updated schemas...")
@@ -63,24 +64,23 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
     for kind, data in JSON_SCHEMAS.items():
         url = data["url"]
         if "#" in url:
-            raise RuntimeError(
-                f"Schema URLs cannot contain # due to python-jsonschema limitation: {url}"
-            )
-        path = Path(f"{os.path.relpath(os.path.dirname(__file__))}/{kind}.json")
+            msg = f"Schema URLs cannot contain # due to python-jsonschema limitation: {url}"
+            raise RuntimeError(msg)
+        path = Path(__file__).parent.resolve() / f"{kind}.json"
         _logger.debug("Refreshing %s schema ...", kind)
         request = Request(url)
         etag = data.get("etag", "")
         if etag:
             request.add_header("If-None-Match", f'"{data.get("etag")}"')
         try:
-            with urllib.request.urlopen(request, timeout=10) as response:
+            with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
                 if response.status == 200:
                     content = response.read().decode("utf-8").rstrip()
                     etag = response.headers["etag"].strip('"')
                     if etag != data.get("etag", ""):
                         JSON_SCHEMAS[kind]["etag"] = etag
                         changed += 1
-                    with open(f"{path}", "w", encoding="utf-8") as f_out:
+                    with path.open("w", encoding="utf-8") as f_out:
                         _logger.info("Schema %s was updated", kind)
                         f_out.write(content)
                         f_out.write("\n")  # prettier/editors
@@ -100,7 +100,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
             _logger.debug("Skipped schema refresh due to unexpected exception: %s", exc)
             break
     if changed:  # pragma: no cover
-        with open(store_file, "w", encoding="utf-8") as f_out:
+        with store_file.open("w", encoding="utf-8") as f_out:
             # formatting should match our .prettierrc.yaml
             json.dump(JSON_SCHEMAS, f_out, indent=2, sort_keys=True)
             f_out.write("\n")  # prettier and editors in general
@@ -114,9 +114,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
 
 if __name__ == "__main__":
     if refresh_schemas(60 * 10):  # pragma: no cover
-        # flake8: noqa: T201
-        print("Schemas were updated.")
+        print("Schemas were updated.")  # noqa: T201
         sys.exit(1)
     else:  # pragma: no cover
-        # flake8: noqa: T201
-        print("Schemas not updated", 0)
+        print("Schemas not updated", 0)  # noqa: T201

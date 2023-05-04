@@ -3,19 +3,22 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ansible.plugins.loader import module_loader
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import AnsibleLintRule, RulesCollection
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
+
+if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
 
 _logger = logging.getLogger(__name__)
 
 builtins = [
-    # spell-checker:disable
     "add_host",
     "apt",
     "apt_key",
@@ -84,11 +87,10 @@ builtins = [
     "wait_for_connection",
     "yum",
     "yum_repository",
-    # spell-checker:enable
 ]
 
 
-class FQCNBuiltinsRule(AnsibleLintRule):
+class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
     """Use FQCN for builtin actions."""
 
     id = "fqcn"
@@ -101,7 +103,9 @@ class FQCNBuiltinsRule(AnsibleLintRule):
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
         module = task["action"]["__ansible_module_original__"]
@@ -121,7 +125,9 @@ class FQCNBuiltinsRule(AnsibleLintRule):
             module_alias = self.module_aliases[module]
             if module_alias.startswith("ansible.builtin"):
                 legacy_module = module_alias.replace(
-                    "ansible.builtin.", "ansible.legacy.", 1
+                    "ansible.builtin.",
+                    "ansible.legacy.",
+                    1,
                 )
                 if module != legacy_module:
                     result.append(
@@ -129,9 +135,9 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                             message=f"Use FQCN for builtin module actions ({module}).",
                             details=f"Use `{module_alias}` or `{legacy_module}` instead.",
                             filename=file,
-                            linenumber=task["__line__"],
+                            lineno=task["__line__"],
                             tag="fqcn[action-core]",
-                        )
+                        ),
                     )
             else:
                 if module.count(".") < 2:
@@ -140,23 +146,23 @@ class FQCNBuiltinsRule(AnsibleLintRule):
                             message=f"Use FQCN for module actions, such `{self.module_aliases[module]}`.",
                             details=f"Action `{module}` is not FQCN.",
                             filename=file,
-                            linenumber=task["__line__"],
+                            lineno=task["__line__"],
                             tag="fqcn[action]",
-                        )
+                        ),
                     )
                 # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once
                 # community team is flattening these.
                 # See: https://github.com/ansible-community/community-topics/issues/147
                 elif not module.startswith("community.general.") or module.startswith(
-                    "community.network."
+                    "community.network.",
                 ):
                     result.append(
                         self.create_matcherror(
                             message=f"You should use canonical module name `{self.module_aliases[module]}` instead of `{module}`.",
                             filename=file,
-                            linenumber=task["__line__"],
+                            lineno=task["__line__"],
                             tag="fqcn[canonical]",
-                        )
+                        ),
                     )
         return result
 
@@ -167,16 +173,44 @@ class FQCNBuiltinsRule(AnsibleLintRule):
             return [
                 self.create_matcherror(
                     message="Avoid `collections` keyword by using FQCN for all plugins, modules, roles and playbooks.",
-                    linenumber=data[LINE_NUMBER_KEY],
+                    lineno=data[LINE_NUMBER_KEY],
                     tag="fqcn[keyword]",
                     filename=file,
-                )
+                ),
             ]
         return []
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag in {"fqcn[action-core]", "fqcn[action]", "fqcn[canonical]"}:
+            target_task = self.seek(match.yaml_path, data)
+            # Unfortunately, a lot of data about Ansible content gets lost here, you only get a simple dict.
+            # For now, just parse the error messages for the data about action names etc. and fix this later.
+            if match.tag == "fqcn[action-core]":
+                # split at the first bracket, cut off the last bracket and dot
+                current_action = match.message.split("(")[1][:-2]
+                # This will always replace builtin modules with "ansible.builtin" versions, not "ansible.legacy".
+                # The latter is technically more correct in what ansible has executed so far, the former is most likely better understood and more robust.
+                new_action = match.details.split("`")[1]
+            elif match.tag == "fqcn[action]":
+                current_action = match.details.split("`")[1]
+                new_action = match.message.split("`")[1]
+            elif match.tag == "fqcn[canonical]":
+                current_action = match.message.split("`")[3]
+                new_action = match.message.split("`")[1]
+            for _ in range(len(target_task)):
+                k, v = target_task.popitem(False)
+                target_task[new_action if k == current_action else k] = v
+            match.fixed = True
 
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
+    from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
     def test_fqcn_builtin_fail() -> None:

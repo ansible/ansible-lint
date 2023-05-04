@@ -6,15 +6,11 @@ import inspect
 import logging
 import re
 import sys
-from argparse import Namespace
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, MutableMapping, MutableSequence
-from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import Any, cast
-
-from ruamel.yaml.comments import CommentedMap, CommentedSeq
+from typing import TYPE_CHECKING, Any, cast
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
@@ -26,11 +22,14 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
     WarningRule,
 )
-from ansiblelint.config import PROFILES, get_rule_config
+from ansiblelint.config import PROFILES, Options, get_rule_config
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
+
+if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 _logger = logging.getLogger(__name__)
 
@@ -58,7 +57,6 @@ class AnsibleLintRule(BaseRule):
         """Retrieve rule specific configuration."""
         return get_rule_config(self.id)
 
-    @lru_cache(maxsize=256)
     def get_config(self, key: str) -> Any:
         """Return a configured value for given key string."""
         return self.rule_config.get(key, None)
@@ -74,8 +72,8 @@ class AnsibleLintRule(BaseRule):
     # pylint: disable=too-many-arguments
     def create_matcherror(
         self,
-        message: str | None = None,
-        linenumber: int = 1,
+        message: str = "",
+        lineno: int = 1,
         details: str = "",
         filename: Lintable | None = None,
         tag: str = "",
@@ -83,13 +81,12 @@ class AnsibleLintRule(BaseRule):
         """Instantiate a new MatchError."""
         match = MatchError(
             message=message,
-            linenumber=linenumber,
+            lineno=lineno,
             details=details,
-            filename=filename,
+            lintable=filename or Lintable(""),
             rule=copy.copy(self),
+            tag=tag,
         )
-        if tag:
-            match.tag = tag
         # search through callers to find one of the match* methods
         frame = inspect.currentframe()
         match_type: str | None = None
@@ -105,13 +102,14 @@ class AnsibleLintRule(BaseRule):
 
     @staticmethod
     def _enrich_matcherror_with_task_details(
-        match: MatchError, task: dict[str, Any]
+        match: MatchError,
+        task: dict[str, Any],
     ) -> None:
         match.task = task
         if not match.details:
             match.details = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-        if match.linenumber < task[LINE_NUMBER_KEY]:
-            match.linenumber = task[LINE_NUMBER_KEY]
+        if match.lineno < task[LINE_NUMBER_KEY]:
+            match.lineno = task[LINE_NUMBER_KEY]
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
@@ -128,12 +126,12 @@ class AnsibleLintRule(BaseRule):
             result = self.match(line)
             if not result:
                 continue
-            message = None
+            message = ""
             if isinstance(result, str):
                 message = result
             matcherror = self.create_matcherror(
                 message=message,
-                linenumber=prev_line_no + 1,
+                lineno=prev_line_no + 1,
                 details=line,
                 filename=file,
             )
@@ -156,7 +154,9 @@ class AnsibleLintRule(BaseRule):
             return matches
 
         for task in ansiblelint.utils.task_in_list(
-            data=file.data, kind=file.kind, filename=str(file.path)
+            data=file.data,
+            kind=file.kind,
+            filename=str(file.path),
         ):
             if task.error is not None:
                 # normalize_task converts AnsibleParserError to MatchError
@@ -177,7 +177,8 @@ class AnsibleLintRule(BaseRule):
                 continue
 
             if isinstance(result, Iterable) and not isinstance(
-                result, str
+                result,
+                str,
             ):  # list[MatchError]
                 # https://github.com/PyCQA/pylint/issues/6044
                 # pylint: disable=not-an-iterable
@@ -185,7 +186,8 @@ class AnsibleLintRule(BaseRule):
                     if match.tag in task.skip_tags:
                         continue
                     self._enrich_matcherror_with_task_details(
-                        match, task.normalized_task
+                        match,
+                        task.normalized_task,
                     )
                     matches.append(match)
                 continue
@@ -194,12 +196,12 @@ class AnsibleLintRule(BaseRule):
                     continue
                 match = result
             else:  # bool or string
-                message = None
+                message = ""
                 if isinstance(result, str):
                     message = result
                 match = self.create_matcherror(
                     message=message,
-                    linenumber=task.normalized_task[LINE_NUMBER_KEY],
+                    lineno=task.normalized_task[LINE_NUMBER_KEY],
                     filename=file,
                 )
 
@@ -219,7 +221,7 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, str):
             if yaml.startswith("$ANSIBLE_VAULT"):
                 return []
-            return [MatchError(filename=file, rule=LoadingFailureRule())]
+            return [MatchError(lintable=file, rule=LoadingFailureRule())]
         if not yaml:
             return matches
 
@@ -312,7 +314,6 @@ class TransformMixin:
         for segment in yaml_path:
             # The cast() calls tell mypy what types we expect.
             # Essentially this does:
-            #   target = target[segment]
             if isinstance(segment, str):
                 target = cast(MutableMapping[str, Any], target)[segment]
             elif isinstance(segment, int):
@@ -321,14 +322,14 @@ class TransformMixin:
 
 
 # pylint: disable=too-many-nested-blocks
-def load_plugins(  # noqa: max-complexity: 11
+def load_plugins(  # : max-complexity: 11
     dirs: list[str],
 ) -> Iterator[AnsibleLintRule]:
     """Yield a rule class."""
 
     def all_subclasses(cls: type) -> set[type]:
         return set(cls.__subclasses__()).union(
-            [s for c in cls.__subclasses__() for s in all_subclasses(c)]
+            [s for c in cls.__subclasses__() for s in all_subclasses(c)],
         )
 
     orig_sys_path = sys.path.copy()
@@ -350,12 +351,15 @@ def load_plugins(  # noqa: max-complexity: 11
         # or rules that do not have a valid id. For example, during testing
         # python may load other rule classes, some outside the tested rule
         # directories.
-        if getattr(rule, "id") and Path(inspect.getfile(rule)).parent.absolute() in [
-            Path(x).absolute() for x in dirs
-        ]:
-            if issubclass(rule, BaseRule) and rule.id not in rules:
-                rules[rule.id] = rule()
-    for rule in rules.values():  # type: ignore
+        if (
+            rule.id  # type: ignore[attr-defined]
+            and Path(inspect.getfile(rule)).parent.absolute()
+            in [Path(x).absolute() for x in dirs]
+            and issubclass(rule, BaseRule)
+            and rule.id not in rules
+        ):
+            rules[rule.id] = rule()
+    for rule in rules.values():  # type: ignore[assignment]
         if isinstance(rule, AnsibleLintRule) and bool(rule.id):
             yield rule
 
@@ -365,9 +369,10 @@ class RulesCollection:
 
     def __init__(
         self,
-        rulesdirs: list[str] | None = None,
-        options: Namespace = default_options,
+        rulesdirs: list[str] | list[Path] | None = None,
+        options: Options = default_options,
         profile_name: str | None = None,
+        *,
         conditional: bool = True,
     ) -> None:
         """Initialize a RulesCollection instance."""
@@ -375,9 +380,8 @@ class RulesCollection:
         self.profile = []
         if profile_name:
             self.profile = PROFILES[profile_name]
-        if rulesdirs is None:
-            rulesdirs = []
-        self.rulesdirs = expand_paths_vars(rulesdirs)
+        rulesdirs_str = [] if rulesdirs is None else [str(r) for r in rulesdirs]
+        self.rulesdirs = expand_paths_vars(rulesdirs_str)
         self.rules: list[BaseRule] = []
         # internal rules included in order to expose them for docs as they are
         # not directly loaded by our rule loader.
@@ -387,9 +391,9 @@ class RulesCollection:
                 AnsibleParserErrorRule(),
                 LoadingFailureRule(),
                 WarningRule(),
-            ]
+            ],
         )
-        for rule in load_plugins(rulesdirs):
+        for rule in load_plugins(rulesdirs_str):
             self.register(rule, conditional=conditional)
         self.rules = sorted(self.rules)
 
@@ -398,7 +402,7 @@ class RulesCollection:
         if profile_name and not (self.options.list_rules or self.options.list_tags):
             filter_rules_with_profile(self.rules, profile_name)
 
-    def register(self, obj: AnsibleLintRule, conditional: bool = False) -> None:
+    def register(self, obj: AnsibleLintRule, *, conditional: bool = False) -> None:
         """Register a rule."""
         # We skip opt-in rules which were not manually enabled.
         # But we do include opt-in rules when listing all rules or tags
@@ -410,9 +414,9 @@ class RulesCollection:
                 obj.id in self.options.enable_list,
                 self.options.list_rules,
                 self.options.list_tags,
-            ]
+            ],
         ):
-            obj._collection = self  # pylint: disable=protected-access
+            obj._collection = self  # pylint: disable=protected-access # noqa: SLF001
             self.rules.append(obj)
 
     def __iter__(self) -> Iterator[BaseRule]:
@@ -431,7 +435,7 @@ class RulesCollection:
         """Combine rules."""
         self.rules.extend(more)
 
-    def run(  # noqa: max-complexity: 12
+    def run(  # : max-complexity: 12
         self,
         file: Lintable,
         tags: set[str] | None = None,
@@ -452,10 +456,10 @@ class RulesCollection:
                 return [
                     MatchError(
                         message=str(exc),
-                        filename=file,
+                        lintable=file,
                         rule=LoadingFailureRule(),
                         tag=f"{LoadingFailureRule.id}[{exc.__class__.__name__.lower()}]",
-                    )
+                    ),
                 ]
 
         for rule in self.rules:
@@ -480,7 +484,7 @@ class RulesCollection:
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
         return "\n".join(
-            [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)]
+            [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)],
         )
 
     def list_tags(self) -> str:
@@ -512,7 +516,6 @@ class RulesCollection:
                 result += f"{tag}:  # {desc}\n"
             else:
                 result += f"{tag}:\n"
-            # result += f"  rules:\n"
             for name in tags[tag]:
                 result += f"  - {name}\n"
         return result
@@ -536,18 +539,4 @@ def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:
                 profile,
             )
             rule_col.remove(rule)
-        else:
-            for tag in ("opt-in", "experimental"):
-                if tag in rule.tags:
-                    _logger.debug(
-                        "Removing tag `%s` from `%s` rule because `%s` profile makes it mandatory.",
-                        tag,
-                        rule.id,
-                        profile,
-                    )
-                    rule.tags.remove(tag)
-                    # rule_col.rules.remove(rule)
-                    # break
-            if "opt-in" in rule.tags:
-                rule.tags.remove("opt-in")
     _logger.debug("%s/%s rules included in the profile", len(rule_col), total_rules)

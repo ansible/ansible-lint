@@ -32,19 +32,19 @@ class DummySentinelTestObject:
 
     def __eq__(self, other: object) -> bool:
         """Return sentinel as result of equality check w/ anything."""
-        return "EQ_SENTINEL"  # type: ignore
+        return "EQ_SENTINEL"  # type: ignore[return-value]
 
     def __ne__(self, other: object) -> bool:
         """Return sentinel as result of inequality check w/ anything."""
-        return "NE_SENTINEL"  # type: ignore
+        return "NE_SENTINEL"  # type: ignore[return-value]
 
     def __lt__(self, other: object) -> bool:
         """Return sentinel as result of less than check w/ anything."""
-        return "LT_SENTINEL"  # type: ignore
+        return "LT_SENTINEL"  # type: ignore[return-value]
 
     def __gt__(self, other: object) -> bool:
         """Return sentinel as result of greater than chk w/ anything."""
-        return "GT_SENTINEL"  # type: ignore
+        return "GT_SENTINEL"  # type: ignore[return-value]
 
 
 @pytest.mark.parametrize(
@@ -55,7 +55,8 @@ class DummySentinelTestObject:
     ),
 )
 def test_matcherror_compare(
-    left_match_error: MatchError, right_match_error: MatchError
+    left_match_error: MatchError,
+    right_match_error: MatchError,
 ) -> None:
     """Check that MatchError instances with similar attrs are equivalent."""
     assert left_match_error == right_match_error
@@ -63,11 +64,8 @@ def test_matcherror_compare(
 
 def test_matcherror_invalid() -> None:
     """Ensure that MatchError requires message or rule."""
-    expected_err = (
-        r"^MatchError\(\) missing a required argument: one of 'message' or 'rule'$"
-    )
-    with pytest.raises(TypeError, match=expected_err):
-        raise MatchError()
+    with pytest.raises(TypeError):
+        MatchError()  # pylint: disable=pointless-exception-statement
 
 
 @pytest.mark.parametrize(
@@ -77,8 +75,8 @@ def test_matcherror_invalid() -> None:
         (MatchError("z"), MatchError("a")),
         # filenames takes priority in sorting
         (
-            MatchError("a", filename=Lintable("b", content="")),
-            MatchError("a", filename=Lintable("a", content="")),
+            MatchError("a", lintable=Lintable("b", content="")),
+            MatchError("a", lintable=Lintable("a", content="")),
         ),
         # rule id partial-become > rule id no-changed-when
         (
@@ -97,21 +95,24 @@ class TestMatchErrorCompare:
 
     @staticmethod
     def test_match_error_less_than(
-        left_match_error: MatchError, right_match_error: MatchError
+        left_match_error: MatchError,
+        right_match_error: MatchError,
     ) -> None:
         """Check 'less than' protocol implementation in MatchError."""
         assert right_match_error < left_match_error
 
     @staticmethod
     def test_match_error_greater_than(
-        left_match_error: MatchError, right_match_error: MatchError
+        left_match_error: MatchError,
+        right_match_error: MatchError,
     ) -> None:
         """Check 'greater than' protocol implementation in MatchError."""
         assert left_match_error > right_match_error
 
     @staticmethod
     def test_match_error_not_equal(
-        left_match_error: MatchError, right_match_error: MatchError
+        left_match_error: MatchError,
+        right_match_error: MatchError,
     ) -> None:
         """Check 'not equals' protocol implementation in MatchError."""
         assert left_match_error != right_match_error
@@ -135,7 +136,9 @@ class TestMatchErrorCompare:
     ),
 )
 def test_matcherror_compare_no_other_fallback(
-    other: Any, operation: Callable[..., bool], operator_char: str
+    other: Any,
+    operation: Callable[..., bool],
+    operator_char: str,
 ) -> None:
     """Check that MatchError comparison with other types causes TypeError."""
     expected_error = (
@@ -143,7 +146,8 @@ def test_matcherror_compare_no_other_fallback(
         r"unsupported operand type\(s\) for {operator!s}:|"
         r"'{operator!s}' not supported between instances of"
         r") 'MatchError' and '{other_type!s}'$".format(
-            other_type=type(other).__name__, operator=operator_char
+            other_type=type(other).__name__,
+            operator=operator_char,
         )
     )
     with pytest.raises(TypeError, match=expected_error):
@@ -175,7 +179,7 @@ def test_matcherror_compare_with_other_fallback(
     expected_value: bool,
 ) -> None:
     """Check that MatchError comparison runs other types fallbacks."""
-    assert operation(MatchError("foo"), other) is expected_value
+    assert operation(MatchError(message="foo"), other) is expected_value
 
 
 @pytest.mark.parametrize(
@@ -193,11 +197,12 @@ def test_matcherror_compare_with_other_fallback(
     ids=("==", "!=", "<", ">"),
 )
 def test_matcherror_compare_with_dummy_sentinel(
-    operation: Callable[..., bool], expected_value: str
+    operation: Callable[..., bool],
+    expected_value: str,
 ) -> None:
     """Check that MatchError comparison runs other types fallbacks."""
     dummy_obj = DummySentinelTestObject()
     # NOTE: This assertion abuses the CPython property to cache short string
     # NOTE: objects because the identity check is more precise and we don't
     # NOTE: want extra operator protocol methods to influence the test.
-    assert operation(MatchError("foo"), dummy_obj) is expected_value  # type: ignore
+    assert operation(MatchError("foo"), dummy_obj) is expected_value  # type: ignore[comparison-overlap]

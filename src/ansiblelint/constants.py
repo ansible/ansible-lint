@@ -1,17 +1,25 @@
 """Constants used by AnsibleLint."""
-import os.path
 from enum import Enum
+from pathlib import Path
 from typing import Literal
 
-DEFAULT_RULESDIR = os.path.join(os.path.dirname(__file__), "rules")
+DEFAULT_RULESDIR = Path(__file__).parent / "rules"
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
 RULE_DOC_URL = "https://ansible-lint.readthedocs.io/rules/"
 
-SUCCESS_RC = 0
-VIOLATIONS_FOUND_RC = 2
-INVALID_CONFIG_RC = 3
-LOCK_TIMEOUT_RC = 4
-EXIT_CONTROL_C_RC = 130
+
+# Not using an IntEnum because only starting with py3.11 it will evaluate it
+# as int.
+class RC:  # pylint: disable=too-few-public-methods
+    """All exit codes used by ansible-lint."""
+
+    SUCCESS = 0
+    VIOLATIONS_FOUND = 2
+    INVALID_CONFIG = 3
+    LOCK_TIMEOUT = 4
+    NO_FILES_MATCHED = 5
+    EXIT_CONTROL_C = 130
+
 
 # Minimal version of Ansible we support for runtime
 ANSIBLE_MIN_VERSION = "2.12"
@@ -91,13 +99,12 @@ RENAMED_TAGS = {
     "403": "package-latest",
     "404": "no-relative-paths",
     "501": "partial-become",
-    "502": "unnamed-task",
+    "502": "name[missing]",
     "503": "no-handler",
     "504": "deprecated-local-action",
     "505": "missing-import",
     "601": "literal-compare",
     "602": "empty-string-compare",
-    "701": "meta-no-info",
     "702": "meta-no-tags",
     "703": "meta-incorrect",
     "704": "meta-video-links",
@@ -155,7 +162,9 @@ ROLE_IMPORT_ACTION_NAMES = {
 # reusable actions, where the mounted volume might have different owner.
 #
 # https://github.com/ansible/ansible-lint-action/issues/138
-GIT_CMD = ["git", "-c", f"safe.directory={os.getcwd()}"]
+GIT_CMD = ["git", "-c", f"safe.directory={Path.cwd()}"]
+
+CONFIG_FILENAMES = [".ansible-lint", ".config/ansible-lint.yml"]
 
 
 class States(Enum):

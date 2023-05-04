@@ -5,7 +5,6 @@ import logging
 import multiprocessing
 import multiprocessing.pool
 import os
-from collections.abc import Generator
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from typing import TYPE_CHECKING, Any
@@ -19,8 +18,10 @@ from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
-    from argparse import Namespace
+    from collections.abc import Generator
+    from pathlib import Path
 
+    from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
 
 _logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ class Runner:
     # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(
         self,
-        *lintables: Lintable | str,
+        *lintables: Lintable | str | Path,
         rules: RulesCollection,
         tags: frozenset[Any] = frozenset(),
         skip_list: list[str] | None = None,
@@ -98,7 +99,8 @@ class Runner:
         abs_path = str(lintable.abspath)
         if self.project_dir and not abs_path.startswith(self.project_dir):
             _logger.debug(
-                "Skipping %s as it is outside of the project directory.", abs_path
+                "Skipping %s as it is outside of the project directory.",
+                abs_path,
             )
             return True
 
@@ -124,28 +126,29 @@ class Runner:
             if isinstance(lintable.data, States) and lintable.exc:
                 matches.append(
                     MatchError(
-                        filename=lintable,
+                        lintable=lintable,
                         message=str(lintable.exc),
                         details=str(lintable.exc.__cause__),
                         rule=LoadingFailureRule(),
-                    )
+                    ),
                 )
                 lintable.stop_processing = True
 
         # -- phase 1 : syntax check in parallel --
         def worker(lintable: Lintable) -> list[MatchError]:
             # pylint: disable=protected-access
-            return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+            return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(  # noqa: SLF001
+                lintable,
+            )
 
-        # playbooks: List[Lintable] = []
         for lintable in self.lintables:
-            if lintable.kind != "playbook" or lintable.stop_processing:
+            if lintable.kind not in ("playbook", "role") or lintable.stop_processing:
                 continue
             files.append(lintable)
 
         # avoid resource leak warning, https://github.com/python/cpython/issues/90549
         # pylint: disable=unused-variable
-        global_resource = multiprocessing.Semaphore()
+        global_resource = multiprocessing.Semaphore()  # noqa: F841
 
         pool = multiprocessing.pool.ThreadPool(processes=multiprocessing.cpu_count())
         return_list = pool.map(worker, files, chunksize=1)
@@ -174,7 +177,7 @@ class Runner:
                 )
 
                 matches.extend(
-                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list)
+                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list),
                 )
 
         # update list of checked files
@@ -185,9 +188,9 @@ class Runner:
             filter(
                 lambda match: not self.is_excluded(Lintable(match.filename))
                 and hasattr(match, "lintable")
-                and match.tag not in match.lintable.line_skips[match.linenumber],
+                and match.tag not in match.lintable.line_skips[match.lineno],
                 matches,
-            )
+            ),
         )
 
         return sorted(set(matches))
@@ -197,7 +200,8 @@ class Runner:
         while visited != self.lintables:
             for lintable in self.lintables - visited:
                 try:
-                    for child in ansiblelint.utils.find_children(lintable):
+                    children = ansiblelint.utils.find_children(lintable)
+                    for child in children:
                         if self.is_excluded(child):
                             continue
                         self.lintables.add(child)
@@ -208,26 +212,25 @@ class Runner:
                     exc.rule = LoadingFailureRule()
                     yield exc
                 except AttributeError:
-                    yield MatchError(filename=lintable, rule=LoadingFailureRule())
+                    yield MatchError(lintable=lintable, rule=LoadingFailureRule())
                 visited.add(lintable)
 
 
-def _get_matches(rules: RulesCollection, options: Namespace) -> LintResult:
+def _get_matches(rules: RulesCollection, options: Options) -> LintResult:
     lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
     for rule in rules:
         if "unskippable" in rule.tags:
             for entry in (*options.skip_list, *options.warn_list):
                 if rule.id == entry or entry.startswith(f"{rule.id}["):
-                    raise RuntimeError(
-                        f"Rule '{rule.id}' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file."
-                    )
+                    msg = f"Rule '{rule.id}' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file."
+                    raise RuntimeError(msg)
     matches = []
     checked_files: set[Lintable] = set()
     runner = Runner(
         *lintables,
         rules=rules,
-        tags=options.tags,
+        tags=frozenset(options.tags),
         skip_list=options.skip_list,
         exclude_paths=options.exclude_paths,
         verbosity=options.verbosity,

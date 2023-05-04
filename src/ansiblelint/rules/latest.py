@@ -3,10 +3,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
@@ -23,7 +23,9 @@ class LatestRule(AnsibleLintRule):
     version_added = "v6.5.2"
 
     def matchtask(
-        self, task: dict[str, Any], file: Lintable | None = None
+        self,
+        task: dict[str, Any],
+        file: Lintable | None = None,
     ) -> bool | str | MatchError:
         """Check if module args are safe."""
         if (

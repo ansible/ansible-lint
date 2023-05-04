@@ -30,8 +30,8 @@ import shutil
 import site
 import subprocess
 import sys
-from collections.abc import Iterator
 from contextlib import contextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, TextIO
 
 from ansible_compat.config import ansible_version
@@ -48,22 +48,35 @@ from ansiblelint.color import (
     reconfigure,
     render_yaml,
 )
-from ansiblelint.config import get_version_warning, options
-from ansiblelint.constants import EXIT_CONTROL_C_RC, GIT_CMD, LOCK_TIMEOUT_RC
+from ansiblelint.config import Options, get_version_warning, log_entries, options
+from ansiblelint.constants import GIT_CMD, RC
 from ansiblelint.file_utils import abspath, cwd, normpath
 from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
-    from argparse import Namespace
-
     # RulesCollection must be imported lazily or ansible gets imported too early.
+    from collections.abc import Iterator
+
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
 
 
 _logger = logging.getLogger(__name__)
+
+
+class LintLogHandler(logging.Handler):
+    """Custom handler that uses our rich stderr console."""
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            msg = self.format(record)
+            console_stderr.print(f"[dim]{msg}[/dim]", highlight=False)
+        except RecursionError:  # See issue 36272
+            raise
+        except Exception:  # pylint: disable=broad-exception-caught # noqa: BLE001
+            self.handleError(record)
 
 
 def initialize_logger(level: int = 0) -> None:
@@ -78,7 +91,7 @@ def initialize_logger(level: int = 0) -> None:
         2: logging.DEBUG,
     }
 
-    handler = logging.StreamHandler()
+    handler = LintLogHandler()
     formatter = logging.Formatter("%(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
     logger = logging.getLogger()
@@ -109,10 +122,11 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     options.warn_list = [normalize_tag(tag) for tag in options.warn_list]
 
     options.configured = True
-    options.cache_dir = get_cache_dir(options.project_dir)
+    options.cache_dir = get_cache_dir(pathlib.Path(options.project_dir))
 
     # add a lock file so we do not have two instances running inside at the same time
-    os.makedirs(options.cache_dir, exist_ok=True)
+    if options.cache_dir:
+        options.cache_dir.mkdir(parents=True, exist_ok=True)
 
     options.cache_dir_lock = None
     if not options.offline:  # pragma: no cover
@@ -121,9 +135,9 @@ def initialize_options(arguments: list[str] | None = None) -> None:
             options.cache_dir_lock.acquire(timeout=180)
         except Timeout:  # pragma: no cover
             _logger.error(
-                "Timeout waiting for another instance of ansible-lint to release the lock."
+                "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
-            sys.exit(LOCK_TIMEOUT_RC)
+            sys.exit(RC.LOCK_TIMEOUT)
 
     # Avoid extra output noise from Ansible about using devel versions
     if "ANSIBLE_DEVEL_WARNING" not in os.environ:  # pragma: no branch
@@ -143,7 +157,8 @@ def _do_list(rules: RulesCollection) -> int:
         }
 
         console.print(
-            _rule_format_map.get(options.format, rules_as_str)(rules), highlight=False
+            _rule_format_map.get(options.format, rules_as_str)(rules),
+            highlight=False,
         )
         return 0
 
@@ -156,7 +171,7 @@ def _do_list(rules: RulesCollection) -> int:
 
 
 # noinspection PyShadowingNames
-def _do_transform(result: LintResult, opts: Namespace) -> None:
+def _do_transform(result: LintResult, opts: Options) -> None:
     """Create and run Transformer."""
     if "yaml" in opts.skip_list:
         # The transformer rewrites yaml files, but the user requested to skip
@@ -183,7 +198,7 @@ def support_banner() -> None:
         )
 
 
-# pylint: disable=too-many-branches,too-many-statements
+# pylint: disable=too-many-branches,too-many-statements,too-many-locals
 def main(argv: list[str] | None = None) -> int:  # noqa: C901
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
@@ -198,7 +213,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     if options.version:
         console.print(
-            f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]"
+            f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]",
         )
         msg = get_version_warning()
         if msg:
@@ -209,17 +224,14 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         support_banner()
 
     initialize_logger(options.verbosity)
+    for level, message in log_entries:
+        _logger.log(level, message)
     _logger.debug("Options: %s", options)
-    _logger.debug(os.getcwd())
-
-    if options.progressive:
-        _logger.warning(
-            "Progressive mode is deprecated and will be removed in next major version, use ignore files instead: https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files"
-        )
+    _logger.debug("CWD: %s", Path.cwd())
 
     if not options.offline:
         # pylint: disable=import-outside-toplevel
-        from ansiblelint.schemas import refresh_schemas
+        from ansiblelint.schemas.__main__ import refresh_schemas
 
         refresh_schemas()
 
@@ -247,38 +259,6 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         _do_transform(result, options)
 
     mark_as_success = True
-    if result.matches and options.progressive:
-        mark_as_success = False
-        _logger.info(
-            "Matches found, running again on previous revision in order to detect regressions"
-        )
-        with _previous_revision():
-            _logger.debug("Options: %s", options)
-            _logger.debug(os.getcwd())
-            old_result = _get_matches(rules, options)
-            # remove old matches from current list
-            matches_delta = list(set(result.matches) - set(old_result.matches))
-            if len(matches_delta) == 0:
-                _logger.warning(
-                    "Total violations not increased since previous "
-                    "commit, will mark result as success. (%s -> %s)",
-                    len(old_result.matches),
-                    len(matches_delta),
-                )
-                mark_as_success = True
-
-            ignored = 0
-            for match in result.matches:
-                # if match is not new, mark is as ignored
-                if match not in matches_delta:
-                    match.ignored = True
-                    ignored += 1
-            if ignored:
-                _logger.warning(
-                    "Marked %s previously known violation(s) as ignored due to"
-                    " progressive mode.",
-                    ignored,
-                )
 
     if options.strict and result.matches:
         mark_as_success = False
@@ -314,7 +294,7 @@ def _previous_revision() -> Iterator[None]:
     rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
     options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
     revision = subprocess.run(
-        [*GIT_CMD, "rev-parse", "HEAD^1"],
+        [*GIT_CMD, "rev-parse", "HEAD^1"],  # noqa: S603
         check=True,
         text=True,
         stdout=subprocess.PIPE,
@@ -328,21 +308,23 @@ def _previous_revision() -> Iterator[None]:
     # Run check will fail if worktree_dir already exists
     # pylint: disable=subprocess-run-check
     subprocess.run(
-        [*GIT_CMD, "worktree", "add", "-f", worktree_dir],
+        [*GIT_CMD, "worktree", "add", "-f", worktree_dir],  # noqa: S603
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     try:
-        with cwd(worktree_dir):
+        with cwd(pathlib.Path(worktree_dir)):
             subprocess.run(
-                [*GIT_CMD, "checkout", revision],
+                [*GIT_CMD, "checkout", revision],  # noqa: S603
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 check=True,
             )
             yield
     finally:
-        options.exclude_paths = [abspath(p, os.getcwd()) for p in rel_exclude_paths]
+        options.exclude_paths = [
+            str(Path.cwd().resolve() / p) for p in rel_exclude_paths
+        ]
 
 
 def _run_cli_entrypoint() -> None:
@@ -357,12 +339,12 @@ def _run_cli_entrypoint() -> None:
         if exc.errno != errno.EPIPE:  # pragma: no cover
             raise
     except KeyboardInterrupt:  # pragma: no cover
-        sys.exit(EXIT_CONTROL_C_RC)
+        sys.exit(RC.EXIT_CONTROL_C)
     except RuntimeError as exc:  # pragma: no cover
         raise SystemExit(exc) from exc
 
 
-def path_inject() -> None:
+def path_inject() -> None:  # noqa: C901
     """Add python interpreter path to top of PATH to fix outside venv calling."""
     # This make it possible to call ansible-lint that was installed inside a
     # virtualenv without having to pre-activate it. Otherwise subprocess will
@@ -376,42 +358,43 @@ def path_inject() -> None:
     expanded = False
     for idx, path in enumerate(paths):
         if path.startswith("~"):  # pragma: no cover
-            paths[idx] = os.path.expanduser(path)
+            paths[idx] = str(Path(path).expanduser())
             expanded = True
     if expanded:  # pragma: no cover
-        # flake8: noqa: T201
-        print(
+        print(  # noqa: T201
             "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
             file=sys.stderr,
         )
 
     inject_paths = []
 
-    userbase_bin_path = f"{site.getuserbase()}/bin"
-    if userbase_bin_path not in paths and os.path.exists(
-        f"{userbase_bin_path}/bin/ansible"
+    userbase_bin_path = Path(site.getuserbase()) / "bin"
+    if (
+        str(userbase_bin_path) not in paths
+        and (userbase_bin_path / "bin" / "ansible").exists()
     ):
-        inject_paths.append(userbase_bin_path)
+        inject_paths.append(str(userbase_bin_path))
 
-    py_path = os.path.dirname(sys.executable)
-    if py_path not in paths and os.path.exists(f"{py_path}/ansible"):
-        inject_paths.append(py_path)
+    py_path = Path(sys.executable).parent
+    if str(py_path) not in paths and (py_path / "ansible").exists():
+        inject_paths.append(str(py_path))
 
-    if inject_paths:
-        # flake8: noqa: T201
-        print(
-            f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
-            file=sys.stderr,
-        )
-    if inject_paths or expanded:
-        os.environ["PATH"] = os.pathsep.join([*inject_paths, *paths])
+    if not os.environ.get("PYENV_VIRTUAL_ENV", None):
+        if inject_paths:
+            print(  # noqa: T201
+                f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
+                file=sys.stderr,
+            )
+        if inject_paths or expanded:
+            os.environ["PATH"] = os.pathsep.join([*inject_paths, *paths])
 
     # We do know that finding ansible in PATH does not guarantee that it is
     # functioning or that is in fact the same version that was installed as
     # our dependency, but addressing this would be done by ansible-compat.
     for cmd in ("ansible", "git"):
         if not shutil.which(cmd):
-            raise RuntimeError(f"Failed to find runtime dependency '{cmd}' in PATH")
+            msg = f"Failed to find runtime dependency '{cmd}' in PATH"
+            raise RuntimeError(msg)
 
 
 # Based on Ansible implementation

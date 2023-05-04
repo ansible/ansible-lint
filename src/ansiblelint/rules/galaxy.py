@@ -1,16 +1,15 @@
 """Implementation of GalaxyRule."""
 from __future__ import annotations
 
-import os
 import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
@@ -25,7 +24,7 @@ class GalaxyRule(AnsibleLintRule):
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
-        if file.kind != "galaxy":  # type: ignore
+        if file.kind != "galaxy":  # type: ignore[comparison-overlap]
             return []
 
         # Defined by Automation Hub Team and Partner Engineering
@@ -45,16 +44,16 @@ class GalaxyRule(AnsibleLintRule):
 
         results = []
 
-        base_path = os.path.split(str(file.abspath))[0]
+        base_path = file.path.parent.resolve()
         changelog_found = 0
         changelog_paths = [
-            os.path.join(base_path, "changelogs", "changelog.yaml"),
-            os.path.join(base_path, "CHANGELOG.rst"),
-            os.path.join(base_path, "CHANGELOG.md"),
+            base_path / "changelogs" / "changelog.yaml",
+            base_path / "CHANGELOG.rst",
+            base_path / "CHANGELOG.md",
         ]
 
         for path in changelog_paths:
-            if os.path.isfile(path):
+            if path.is_file():
                 changelog_found = 1
 
         galaxy_tag_list = data.get("tags", None)
@@ -67,7 +66,7 @@ class GalaxyRule(AnsibleLintRule):
                     message="No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",
                     tag="galaxy[no-changelog]",
                     filename=file,
-                )
+                ),
             )
 
         # Checking if galaxy.yml contains one or more required tags for certification
@@ -81,17 +80,17 @@ class GalaxyRule(AnsibleLintRule):
                     ),
                     tag="galaxy[tags]",
                     filename=file,
-                )
+                ),
             )
 
         if "version" not in data:
             results.append(
                 self.create_matcherror(
                     message="galaxy.yaml should have version tag.",
-                    linenumber=data[LINE_NUMBER_KEY],
+                    lineno=data[LINE_NUMBER_KEY],
                     tag="galaxy[version-missing]",
                     filename=file,
-                )
+                ),
             )
             return results
             # returning here as it does not make sense
@@ -103,19 +102,19 @@ class GalaxyRule(AnsibleLintRule):
                 self.create_matcherror(
                     message="collection version should be greater than or equal to 1.0.0",
                     # pylint: disable=protected-access
-                    linenumber=version._line_number,
+                    lineno=version._line_number,  # noqa: SLF001
                     tag="galaxy[version-incorrect]",
                     filename=file,
-                )
+                ),
             )
 
-        if not os.path.isfile(os.path.join(base_path, "meta/runtime.yml")):
+        if not (base_path / "meta" / "runtime.yml").is_file():
             results.append(
                 self.create_matcherror(
                     message="meta/runtime.yml file not found.",
                     tag="galaxy[no-runtime]",
                     filename=file,
-                )
+                ),
             )
 
         return results
@@ -152,10 +151,11 @@ def _coerce(other: object) -> Version:
         other = Version(str(other))
     if isinstance(other, Version):
         return other
-    raise NotImplementedError(f"Unable to coerce object type {type(other)} to Version")
+    msg = f"Unable to coerce object type {type(other)} to Version"
+    raise NotImplementedError(msg)
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
@@ -232,7 +232,9 @@ if "pytest" in sys.modules:  # noqa: C901
         ),
     )
     def test_galaxy_rule(
-        default_rules_collection: RulesCollection, file: str, expected: list[str]
+        default_rules_collection: RulesCollection,
+        file: str,
+        expected: list[str],
     ) -> None:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()

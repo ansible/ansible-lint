@@ -2,40 +2,45 @@
 from __future__ import annotations
 
 import os
-import pathlib
 import shutil
-from argparse import Namespace
-from collections.abc import Iterator
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-
-from ansiblelint.rules import RulesCollection
 
 # noinspection PyProtectedMember
 from ansiblelint.runner import LintResult, _get_matches
 from ansiblelint.transformer import Transformer
 
+if TYPE_CHECKING:
+    from argparse import Namespace
+    from collections.abc import Iterator
+
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
 
 @pytest.fixture(name="copy_examples_dir")
 def fixture_copy_examples_dir(
-    tmp_path: pathlib.Path, config_options: Namespace
-) -> Iterator[tuple[pathlib.Path, pathlib.Path]]:
+    tmp_path: Path,
+    config_options: Namespace,
+) -> Iterator[tuple[Path, Path]]:
     """Fixture that copies the examples/ dir into a tmpdir."""
-    examples_dir = pathlib.Path("examples")
+    examples_dir = Path("examples")
 
     shutil.copytree(examples_dir, tmp_path / "examples")
-    old_cwd = os.getcwd()
+    old_cwd = Path.cwd()
     try:
         os.chdir(tmp_path)
         config_options.cwd = tmp_path
-        yield pathlib.Path(old_cwd), tmp_path
+        yield old_cwd, tmp_path
     finally:
         os.chdir(old_cwd)
 
 
 @pytest.fixture(name="runner_result")
 def fixture_runner_result(
-    config_options: Namespace,
+    config_options: Options,
     default_rules_collection: RulesCollection,
     playbook: str,
 ) -> LintResult:
@@ -50,36 +55,49 @@ def fixture_runner_result(
     (
         # reuse TestRunner::test_runner test cases to ensure transformer does not mangle matches
         pytest.param(
-            "examples/playbooks/nomatchestest.yml", 0, False, id="nomatchestest"
+            "examples/playbooks/nomatchestest.yml",
+            0,
+            False,
+            id="nomatchestest",
         ),
         pytest.param("examples/playbooks/unicode.yml", 1, False, id="unicode"),
         pytest.param(
-            "examples/playbooks/lots_of_warnings.yml", 992, False, id="lots_of_warnings"
+            "examples/playbooks/lots_of_warnings.yml",
+            992,
+            False,
+            id="lots_of_warnings",
         ),
         pytest.param("examples/playbooks/become.yml", 0, False, id="become"),
         pytest.param(
-            "examples/playbooks/contains_secrets.yml", 0, False, id="contains_secrets"
+            "examples/playbooks/contains_secrets.yml",
+            0,
+            False,
+            id="contains_secrets",
         ),
         pytest.param(
-            "examples/playbooks/vars/empty_vars.yml", 0, False, id="empty_vars"
+            "examples/playbooks/vars/empty_vars.yml",
+            0,
+            False,
+            id="empty_vars",
         ),
         pytest.param("examples/playbooks/vars/strings.yml", 0, True, id="strings"),
+        pytest.param("examples/playbooks/name-case.yml", 1, True, id="name_case"),
+        pytest.param("examples/playbooks/fqcn.yml", 3, True, id="fqcn"),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
-    config_options: Namespace,
-    copy_examples_dir: tuple[pathlib.Path, pathlib.Path],
+    config_options: Options,
+    copy_examples_dir: tuple[Path, Path],
     playbook: str,
     runner_result: LintResult,
     transformed: bool,
     matches_count: int,
 ) -> None:
-    """
-    Test that transformer can go through any corner cases.
+    """Test that transformer can go through any corner cases.
 
     Based on TestRunner::test_runner
     """
-    setattr(config_options, "write_list", ["all"])
+    config_options.write_list = ["all"]
     transformer = Transformer(result=runner_result, options=config_options)
     transformer.run()
 

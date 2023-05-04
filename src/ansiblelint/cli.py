@@ -6,26 +6,31 @@ import logging
 import os
 import sys
 from argparse import Namespace
-from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
-from ansiblelint.config import DEFAULT_KINDS, DEFAULT_WARN_LIST, PROFILES
-from ansiblelint.constants import (
-    CUSTOM_RULESDIR_ENVVAR,
-    DEFAULT_RULESDIR,
-    INVALID_CONFIG_RC,
+from ansiblelint.config import (
+    DEFAULT_KINDS,
+    DEFAULT_WARN_LIST,
+    PROFILES,
+    Options,
+    log_entries,
 )
+from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, RC
 from ansiblelint.file_utils import (
     Lintable,
     abspath,
     expand_path_vars,
-    guess_project_dir,
+    find_project_root,
     normpath,
 )
 from ansiblelint.loaders import IGNORE_FILE
 from ansiblelint.schemas.main import validate_file_schema
 from ansiblelint.yaml_utils import clean_json
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [
@@ -35,7 +40,8 @@ _PATH_VARS = [
 
 
 def expand_to_normalized_paths(
-    config: dict[str, Any], base_dir: str | None = None
+    config: dict[str, Any],
+    base_dir: str | None = None,
 ) -> None:
     """Mutate given config normalizing any path values in it."""
     # config can be None (-c /dev/null)
@@ -55,40 +61,43 @@ def expand_to_normalized_paths(
         config[paths_var] = normalized_paths
 
 
-def load_config(config_file: str) -> dict[Any, Any]:
+def load_config(config_file: str | None) -> tuple[dict[Any, Any], str | None]:
     """Load configuration from disk."""
     config_path = None
 
     if config_file == "/dev/null":
         _logger.debug("Skipping config file as it was set to /dev/null")
-        return {}
+        return {}, config_file
 
     if config_file:
         config_path = os.path.abspath(config_file)
         if not os.path.exists(config_path):
             _logger.error("Config file not found '%s'", config_path)
-            sys.exit(INVALID_CONFIG_RC)
+            sys.exit(RC.INVALID_CONFIG)
     config_path = config_path or get_config_path()
     if not config_path or not os.path.exists(config_path):
         # a missing default config file should not trigger an error
-        return {}
+        return {}, None
 
     config_lintable = Lintable(
-        config_path, kind="ansible-lint-config", base_kind="text/yaml"
+        config_path,
+        kind="ansible-lint-config",
+        base_kind="text/yaml",
     )
 
     for error in validate_file_schema(config_lintable):
         _logger.error("Invalid configuration file %s. %s", config_path, error)
-        sys.exit(INVALID_CONFIG_RC)
+        sys.exit(RC.INVALID_CONFIG)
 
     config = clean_json(config_lintable.data)
     if not isinstance(config, dict):
-        raise RuntimeError("Schema failed to properly validate the config file.")
+        msg = "Schema failed to properly validate the config file."
+        raise RuntimeError(msg)
     config["config_file"] = config_path
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
 
-    return config
+    return config, config_path
 
 
 def get_config_path(config_file: str | None = None) -> str | None:
@@ -145,17 +154,20 @@ class WriteArgAction(argparse.Action):
         nargs: int | str | None = None,
         const: Any = None,
         default: Any = None,
-        type: Callable[[str], Any] | None = None,
+        type: Callable[[str], Any] | None = None,  # noqa: A002
         choices: list[Any] | None = None,
+        *,
         required: bool = False,
-        help: str | None = None,
+        help: str | None = None,  # noqa: A002
         metavar: str | None = None,
     ) -> None:
         """Create the argparse action with WriteArg-specific defaults."""
         if nargs is not None:
-            raise ValueError("nargs for WriteArgAction must not be set.")
+            msg = "nargs for WriteArgAction must not be set."
+            raise ValueError(msg)
         if const is not None:
-            raise ValueError("const for WriteArgAction must not be set.")
+            msg = "const for WriteArgAction must not be set."
+            raise ValueError(msg)
         super().__init__(
             option_strings=option_strings,
             dest=dest,
@@ -183,7 +195,7 @@ class WriteArgAction(argparse.Action):
             # But if --write comes first, then it might actually be a lintable.
             maybe_lintable = Path(values)
             if maybe_lintable.exists():
-                setattr(namespace, "lintables", [values])
+                namespace.lintables = [values]
                 values = []
         if isinstance(values, str):
             values = values.split(",")
@@ -197,7 +209,9 @@ class WriteArgAction(argparse.Action):
 
     @classmethod
     def merge_write_list_config(
-        cls, from_file: list[str], from_cli: list[str]
+        cls,
+        from_file: list[str],
+        from_cli: list[str],
     ) -> list[str]:
         """Combine the write_list from file config with --write CLI arg.
 
@@ -259,7 +273,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
         ],
         help="stdout formatting, json being an alias for codeclimate. (default: %(default)s)",
     )
-    parser.add_argument("--sarif-file", default=None, help="SARIF output file")
+    parser.add_argument(
+        "--sarif-file",
+        default=None,
+        type=Path,
+        help="SARIF output file",
+    )
     parser.add_argument(
         "-q",
         dest="quiet",
@@ -284,18 +303,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="parseable output, same as '-f pep8'",
     )
     parser.add_argument(
-        "--progressive",
-        dest="progressive",
-        default=False,
-        action="store_true",
-        help="Return success if number of violations compared with "
-        "previous git commit has not increased. This feature works "
-        "only in git repositories.",
-    )
-    parser.add_argument(
         "--project-dir",
         dest="project_dir",
-        default=".",
+        default=None,
         help="Location of project/repository, autodetected based on location "
         "of configuration file.",
     )
@@ -328,7 +338,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "--write",
         dest="write_list",
         # this is a tri-state argument that takes an optional comma separated list:
-        #   not provided, --write, --write=a,b,c
         action=WriteArgAction,
         help="Allow ansible-lint to reformat YAML files and run rule transforms "
         "(Reformatting YAML files standardizes spacing, quotes, etc. "
@@ -418,7 +427,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         action=AbspathArgAction,
         type=Path,
         default=[],
-        help="path to directories or files to skip. " "This option is repeatable.",
+        help="path to directories or files to skip. This option is repeatable.",
     )
     parser.add_argument(
         "-c",
@@ -455,7 +464,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespace:
+def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
     """Combine the file config with the CLI args."""
     bools = (
         "display_relative_path",
@@ -463,7 +472,6 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
         "quiet",
         "strict",
         "use_default_rules",
-        "progressive",
         "offline",
     )
     # maps lists to their default config values
@@ -483,7 +491,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
 
     scalar_map = {
         "loop_var_prefix": None,
-        "project_dir": ".",
+        "project_dir": None,
         "profile": None,
         "sarif_file": None,
     }
@@ -509,7 +517,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
     # if either commandline parameter or config file option is set merge
     # with the other, if neither is set use the default
     for entry, default in lists_map.items():
-        if getattr(cli_config, entry, None) or entry in file_config.keys():
+        if getattr(cli_config, entry, None) or entry in file_config:
             value = getattr(cli_config, entry, [])
             value.extend(file_config.pop(entry, []))
         else:
@@ -537,15 +545,15 @@ def merge_config(file_config: dict[Any, Any], cli_config: Namespace) -> Namespac
     # append default kinds to the custom list
     kinds = file_config.get("kinds", [])
     kinds.extend(DEFAULT_KINDS)
-    setattr(cli_config, "kinds", kinds)
+    cli_config.kinds = kinds
 
     return cli_config
 
 
-def get_config(arguments: list[str]) -> Namespace:
+def get_config(arguments: list[str]) -> Options:
     """Extract the config based on given args."""
     parser = get_cli_parser()
-    options = parser.parse_args(arguments)
+    options = Options(**vars(parser.parse_args(arguments)))
 
     # docs is not document, being used for internal documentation building
     if options.list_rules and options.format not in [
@@ -557,26 +565,34 @@ def get_config(arguments: list[str]) -> Namespace:
         parser.error(
             f"argument -f: invalid choice: '{options.format}'. "
             f"In combination with argument -L only 'brief', "
-            f"'rich' or 'md' are supported with -f."
+            f"'rich' or 'md' are supported with -f.",
         )
 
     # save info about custom config file, as options.config_file may be modified by merge_config
-    has_custom_config = not options.config_file
-
-    file_config = load_config(options.config_file)
-
+    file_config, options.config_file = load_config(options.config_file)
     config = merge_config(file_config, options)
 
-    options.rulesdirs = get_rules_dirs(options.rulesdir, options.use_default_rules)
+    options.rulesdirs = get_rules_dirs(
+        options.rulesdir,
+        use_default=options.use_default_rules,
+    )
 
-    if has_custom_config and options.project_dir == ".":
-        project_dir = guess_project_dir(options.config_file)
+    if not options.project_dir:
+        project_dir, method = find_project_root(
+            srcs=options.lintables,
+            config_file=options.config_file,
+        )
         options.project_dir = os.path.expanduser(normpath(project_dir))
+        log_entries.append(
+            (
+                logging.INFO,
+                f"Identified [filename]{project_dir}[/] as project root due [bold]{method}[/].",
+            ),
+        )
 
     if not options.project_dir or not os.path.exists(options.project_dir):
-        raise RuntimeError(
-            f"Failed to determine a valid project_dir: {options.project_dir}"
-        )
+        msg = f"Failed to determine a valid project_dir: {options.project_dir}"
+        raise RuntimeError(msg)
 
     # Compute final verbosity level by subtracting -q counter.
     options.verbosity -= options.quiet
@@ -588,11 +604,12 @@ def print_help(file: Any = sys.stdout) -> None:
     get_cli_parser().print_help(file=file)
 
 
-def get_rules_dirs(rulesdir: list[str], use_default: bool = True) -> list[str]:
+def get_rules_dirs(rulesdir: list[Path], *, use_default: bool = True) -> list[Path]:
     """Return a list of rules dirs."""
     default_ruledirs = [DEFAULT_RULESDIR]
     default_custom_rulesdir = os.environ.get(
-        CUSTOM_RULESDIR_ENVVAR, os.path.join(DEFAULT_RULESDIR, "custom")
+        CUSTOM_RULESDIR_ENVVAR,
+        os.path.join(DEFAULT_RULESDIR, "custom"),
     )
     custom_ruledirs = sorted(
         str(x.resolve())
@@ -600,7 +617,11 @@ def get_rules_dirs(rulesdir: list[str], use_default: bool = True) -> list[str]:
         if x.is_dir() and (x / "__init__.py").exists()
     )
 
+    result: list[Any] = []
     if use_default:
-        return rulesdir + custom_ruledirs + default_ruledirs
-
-    return rulesdir or custom_ruledirs + default_ruledirs
+        result = rulesdir + custom_ruledirs + default_ruledirs
+    elif rulesdir:
+        result = rulesdir
+    else:
+        result = custom_ruledirs + default_ruledirs
+    return [Path(p) for p in result]

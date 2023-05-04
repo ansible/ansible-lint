@@ -1,0 +1,21 @@
+---
+- name: Bad git 1 # noqa: latest[git]
+  action: ansible.builtin.git repo=. clone=no
+- name: Bad git 2 <-- 1st
+  action: ansible.builtin.git repo=. clone=no
+- name: Block with rescue and always section
+  block:
+    - name: Bad git 3 # noqa: latest[git]
+      action: ansible.builtin.git repo=. clone=no
+    - name: Bad git 4 <-- 2nd
+      action: ansible.builtin.git repo=. clone=no
+  rescue:
+    - name: Bad git 5 # noqa: latest[git]
+      action: ansible.builtin.git repo=. clone=no
+    - name: Bad git 6 <-- 3rd
+      action: ansible.builtin.git repo=. clone=no
+  always:
+    - name: Bad git 7 # noqa: latest[git]
+      action: ansible.builtin.git repo=. clone=no
+    - name: Bad git 8 <-- 4th
+      action: ansible.builtin.git repo=. clone=no

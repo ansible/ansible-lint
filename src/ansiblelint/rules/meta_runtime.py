@@ -12,8 +12,6 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -56,7 +54,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
                         message="requires_ansible key must be set to a supported version.",
                         tag="meta-runtime[unsupported-version]",
                         filename=file,
-                    )
+                    ),
                 )
 
             try:
@@ -67,7 +65,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
                         message="'requires_ansible' is not a valid requirement specification",
                         tag="meta-runtime[invalid-version]",
                         filename=file,
-                    )
+                    ),
                 )
 
         return results
