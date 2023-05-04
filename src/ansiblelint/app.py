@@ -183,7 +183,12 @@ class App:
         matched_rules = self._get_matched_skippable_rules(result.matches)
 
         if matched_rules and self.options.generate_ignore:
-            ignore_file_path = Path(IGNORE_FILE.default)
+            # ANSIBLE_LINT_IGNORE_FILE environment variable overrides default
+            # dumping location in linter and is not documented or supported. We
+            # use this only for testing purposes.
+            ignore_file_path = Path(
+                os.environ.get("ANSIBLE_LINT_IGNORE_FILE", IGNORE_FILE.default),
+            )
             console_stderr.print(f"Writing ignore file to {ignore_file_path}")
             lines = set()
             for rule in result.matches:
