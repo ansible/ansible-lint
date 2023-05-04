@@ -372,6 +372,7 @@ class RulesCollection:
         rulesdirs: list[str] | list[Path] | None = None,
         options: Options = default_options,
         profile_name: str | None = None,
+        *,
         conditional: bool = True,
     ) -> None:
         """Initialize a RulesCollection instance."""
@@ -401,7 +402,7 @@ class RulesCollection:
         if profile_name and not (self.options.list_rules or self.options.list_tags):
             filter_rules_with_profile(self.rules, profile_name)
 
-    def register(self, obj: AnsibleLintRule, conditional: bool = False) -> None:
+    def register(self, obj: AnsibleLintRule, *, conditional: bool = False) -> None:
         """Register a rule."""
         # We skip opt-in rules which were not manually enabled.
         # But we do include opt-in rules when listing all rules or tags

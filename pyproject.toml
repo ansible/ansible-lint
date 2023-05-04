@@ -234,7 +234,8 @@ ignore = [
   "ANN",
   "ARG002", # Unused method argument (currently in too many places)
   "D102", # Missing docstring in public method (currently in too many places)
-  "FBT",
+  "FBT001",
+  "FBT003",
   "PLR",
   "TRY",
 ]

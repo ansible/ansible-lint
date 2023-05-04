@@ -126,7 +126,7 @@ def expand_paths_vars(paths: list[str]) -> list[str]:
     return paths
 
 
-def kind_from_path(path: Path, base: bool = False) -> FileType:
+def kind_from_path(path: Path, *, base: bool = False) -> FileType:
     """Determine the file kind based on its name.
 
     When called with base=True, it will return the base file type instead
@@ -316,7 +316,7 @@ class Lintable:
         """Reset the internal content cache."""
         self._content = None
 
-    def write(self, force: bool = False) -> None:
+    def write(self, *, force: bool = False) -> None:
         """Write the value of ``Lintable.content`` to disk.
 
         This only writes to disk if the content has been updated (``Lintable.updated``).

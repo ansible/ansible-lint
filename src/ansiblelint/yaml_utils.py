@@ -597,8 +597,8 @@ class FormattedEmitter(Emitter):
         self,
         indicator: str,  # ruamel.yaml typehint is wrong. This is a string.
         need_whitespace: bool,
-        whitespace: bool = False,
-        indention: bool = False,  # (sic) ruamel.yaml has this typo in their API
+        whitespace: bool = False,  # noqa: FBT002
+        indention: bool = False,  # (sic) ruamel.yaml has this typo in their API # noqa: FBT002
     ) -> None:
         """Make sure that flow maps get whitespace by the curly braces."""
         # We try to go with one whitespace by the curly braces and adjust accordingly
@@ -670,7 +670,11 @@ class FormattedEmitter(Emitter):
         return analysis
 
     # comment is a CommentToken, not Any (Any is ruamel.yaml's lazy type hint).
-    def write_comment(self, comment: CommentToken, pre: bool = False) -> None:
+    def write_comment(
+        self,
+        comment: CommentToken,
+        pre: bool = False,  # noqa: FBT002
+    ) -> None:
         """Clean up extra new lines and spaces in comments.
 
         ruamel.yaml treats new or empty lines as comments.

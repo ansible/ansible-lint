@@ -81,7 +81,7 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
         yield table
 
 
-def profiles_as_md(header: bool = False, docs_url: str = RULE_DOC_URL) -> str:
+def profiles_as_md(*, header: bool = False, docs_url: str = RULE_DOC_URL) -> str:
     """Return markdown representation of supported profiles."""
     result = ""
 

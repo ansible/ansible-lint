@@ -165,7 +165,12 @@ class App:
                 matched_rules.pop(rule_id)
         return matched_rules
 
-    def report_outcome(self, result: LintResult, mark_as_success: bool = False) -> int:
+    def report_outcome(
+        self,
+        result: LintResult,
+        *,
+        mark_as_success: bool = False,
+    ) -> int:
         """Display information about how to skip found rules.
 
         Returns exit code, 2 if errors were found, 0 when only warnings were found.

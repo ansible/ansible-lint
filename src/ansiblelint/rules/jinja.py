@@ -256,7 +256,7 @@ class JinjaRule(AnsibleLintRule):
         :returns: (string, string, string)  reformatted text, detailed error, error tag
         """
 
-        def cook(value: str, implicit: bool = False) -> str:
+        def cook(value: str, *, implicit: bool = False) -> str:
             """Prepare an implicit string for jinja parsing when needed."""
             if not implicit:
                 return value
@@ -265,7 +265,7 @@ class JinjaRule(AnsibleLintRule):
                 return value
             return f"{{{{ {value} }}}}"
 
-        def uncook(value: str, implicit: bool = False) -> str:
+        def uncook(value: str, *, implicit: bool = False) -> str:
             """Restore an string to original form when it was an implicit one."""
             if not implicit:
                 return value
@@ -349,12 +349,12 @@ class JinjaRule(AnsibleLintRule):
             # newlines, as we decided to not touch them yet.
             # These both are documented as known limitations.
             _logger.debug("Ignored jinja internal error %s", exc)
-            return uncook(text, implicit), "", "spacing"
+            return uncook(text, implicit=implicit), "", "spacing"
 
         # finalize
         reformatted = self.unlex(tokens)
         failed = reformatted != text
-        reformatted = uncook(reformatted, implicit)
+        reformatted = uncook(reformatted, implicit=implicit)
         details = (
             f"Jinja2 template rewrite recommendation: `{reformatted}`."
             if failed

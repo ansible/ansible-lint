@@ -156,6 +156,7 @@ class WriteArgAction(argparse.Action):
         default: Any = None,
         type: Callable[[str], Any] | None = None,  # noqa: A002
         choices: list[Any] | None = None,
+        *,
         required: bool = False,
         help: str | None = None,  # noqa: A002
         metavar: str | None = None,
