@@ -124,12 +124,14 @@ class Runner:
                 self.lintables.remove(lintable)
                 continue
             if isinstance(lintable.data, States) and lintable.exc:
+                lintable.exc.__class__.__name__.lower()
                 matches.append(
                     MatchError(
                         lintable=lintable,
                         message=str(lintable.exc),
                         details=str(lintable.exc.__cause__),
                         rule=LoadingFailureRule(),
+                        tag=f"load-failure[{lintable.exc.__class__.__name__.lower()}]",
                     ),
                 )
                 lintable.stop_processing = True
