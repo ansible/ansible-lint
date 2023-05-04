@@ -97,15 +97,15 @@ def path_dwim(basedir: str, given: str) -> str:
     return str(dataloader.path_dwim(given))
 
 
-def ansible_templar(basedir: str, templatevars: Any) -> Templar:
+def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     """Create an Ansible Templar using templatevars."""
     # `basedir` is the directory containing the lintable file.
     # Therefore, for tasks in a role, `basedir` has the form
     # `roles/some_role/tasks`. On the other hand, the search path
     # is `roles/some_role/{files,templates}`. As a result, the
     # `tasks` part in the basedir should be stripped stripped.
-    if os.path.basename(basedir) == "tasks":
-        basedir = os.path.dirname(basedir)
+    if basedir.name == "tasks":
+        basedir = basedir.parent
 
     dataloader = DataLoader()
     dataloader.set_basedir(basedir)
@@ -129,7 +129,7 @@ def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG001
 
 
 def ansible_template(
-    basedir: str,
+    basedir: Path,
     varname: Any,
     templatevars: Any,
     **kwargs: Any,
@@ -245,11 +245,11 @@ def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignor
     return [item for play in pb_data if play for item in play.items()]  # type: ignore[return-value]
 
 
-def _set_collections_basedir(basedir: str) -> None:
+def _set_collections_basedir(basedir: Path) -> None:
     # Sets the playbook directory as playbook_paths for the collection loader
     # Ansible expects only absolute paths inside `playbook_paths` and will
     # produce weird errors if we use a relative one.
-    AnsibleCollectionConfig.playbook_paths = os.path.abspath(basedir)
+    AnsibleCollectionConfig.playbook_paths = str(basedir.resolve())
 
 
 def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
@@ -257,7 +257,7 @@ def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
     if not lintable.path.exists():
         return []
     playbook_dir = str(lintable.path.parent)
-    _set_collections_basedir(playbook_dir or os.path.abspath("."))
+    _set_collections_basedir(lintable.path.parent)
     add_all_plugin_dirs(playbook_dir or ".")
     if lintable.kind == "role":
         playbook_ds = AnsibleMapping({"roles": [{"role": str(lintable.path)}]})
@@ -269,13 +269,17 @@ def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
         except AnsibleError as exc:
             raise SystemExit(exc) from exc
     results = []
-    basedir = os.path.dirname(str(lintable.path))
     # playbook_ds can be an AnsibleUnicode string, which we consider invalid
     if isinstance(playbook_ds, str):
         raise MatchError(lintable=lintable, rule=LoadingFailureRule())
     for item in _playbook_items(playbook_ds):
         # if lintable.kind not in ["playbook"]:
-        for child in play_children(basedir, item, lintable.kind, playbook_dir):
+        for child in play_children(
+            lintable.path.parent,
+            item,
+            lintable.kind,
+            playbook_dir,
+        ):
             # We avoid processing parametrized children
             path_str = str(child.path)
             if "$" in path_str or "{{" in path_str:
@@ -298,7 +302,7 @@ def find_children(lintable: Lintable) -> list[Lintable]:  # noqa: C901
 
 
 def template(
-    basedir: str,
+    basedir: Path,
     value: Any,
     variables: Any,
     fail_on_error: bool = False,
@@ -308,7 +312,7 @@ def template(
     """Attempt rendering a value with known vars."""
     try:
         value = ansible_template(
-            os.path.abspath(basedir),
+            basedir.resolve(),
             value,
             variables,
             **dict(kwargs, fail_on_undefined=fail_on_undefined),
@@ -323,7 +327,7 @@ def template(
 
 
 def play_children(
-    basedir: str,
+    basedir: Path,
     item: tuple[str, Any],
     parent_type: FileType,
     playbook_dir: str,  # noqa: ARG001
@@ -348,16 +352,16 @@ def play_children(
         "ansible.builtin.import_tasks": _include_children,
     }
     (k, v) = item
-    add_all_plugin_dirs(os.path.abspath(basedir))
+    add_all_plugin_dirs(str(basedir.resolve()))
 
     if k in delegate_map and v:
         v = template(
-            os.path.abspath(basedir),
+            basedir,
             v,
-            {"playbook_dir": PLAYBOOK_DIR or os.path.abspath(basedir)},
+            {"playbook_dir": PLAYBOOK_DIR or str(basedir.resolve())},
             fail_on_undefined=False,
         )
-        return delegate_map[k](basedir, k, v, parent_type)
+        return delegate_map[k](str(basedir), k, v, parent_type)
     return []
 
 

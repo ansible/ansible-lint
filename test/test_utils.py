@@ -253,7 +253,7 @@ def test_extract_from_list_recursive() -> None:
 def test_template(template: str, output: str) -> None:
     """Verify that resolvable template vars and filters get rendered."""
     result = utils.template(
-        basedir="/base/dir",
+        basedir=Path("/base/dir"),
         value=template,
         variables={"playbook_dir": "/a/b/c"},
         fail_on_error=False,
