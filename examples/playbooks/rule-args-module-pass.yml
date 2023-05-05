@@ -88,3 +88,10 @@
       ansible.windows.win_file:
         path: "c:\\test_dir"
         state: directory
+
+    - name: Ansible-lint for args rule should succeed (Bug - 3199)
+      vars:
+        copy_vars:
+          src: "args.json"
+      action: ansible.builtin.copy
+      args: "{{ copy_vars }}" # since, we're unable to analyze jinja, we skip this kind of checks
