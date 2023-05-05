@@ -28,9 +28,7 @@ import os
 import pathlib
 import shutil
 import site
-import subprocess
 import sys
-from contextlib import contextmanager
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, TextIO
 
@@ -49,15 +47,13 @@ from ansiblelint.color import (
     render_yaml,
 )
 from ansiblelint.config import Options, get_version_warning, log_entries, options
-from ansiblelint.constants import GIT_CMD, RC
-from ansiblelint.file_utils import abspath, cwd, normpath
+from ansiblelint.constants import RC
 from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
-    from collections.abc import Iterator
 
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
@@ -284,47 +280,6 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         )
 
     return app.report_outcome(result, mark_as_success=mark_as_success)
-
-
-@contextmanager
-def _previous_revision() -> Iterator[None]:
-    """Create or update a temporary workdir containing the previous revision."""
-    worktree_dir = f"{options.cache_dir}/old-rev"
-    # Update options.exclude_paths to include use the temporary workdir.
-    rel_exclude_paths = [normpath(p) for p in options.exclude_paths]
-    options.exclude_paths = [abspath(p, worktree_dir) for p in rel_exclude_paths]
-    revision = subprocess.run(
-        [*GIT_CMD, "rev-parse", "HEAD^1"],  # noqa: S603
-        check=True,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-    ).stdout.strip()
-    _logger.info("Previous revision SHA: %s", revision)
-    path = pathlib.Path(worktree_dir)
-    if path.exists():
-        shutil.rmtree(worktree_dir)
-    path.mkdir(parents=True, exist_ok=True)
-    # Run check will fail if worktree_dir already exists
-    # pylint: disable=subprocess-run-check
-    subprocess.run(
-        [*GIT_CMD, "worktree", "add", "-f", worktree_dir],  # noqa: S603
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    try:
-        with cwd(pathlib.Path(worktree_dir)):
-            subprocess.run(
-                [*GIT_CMD, "checkout", revision],  # noqa: S603
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=True,
-            )
-            yield
-    finally:
-        options.exclude_paths = [
-            str(Path.cwd().resolve() / p) for p in rel_exclude_paths
-        ]
 
 
 def _run_cli_entrypoint() -> None:

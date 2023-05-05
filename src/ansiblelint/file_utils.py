@@ -13,7 +13,7 @@ from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
 
 import wcmatch.pathlib
-from wcmatch.wcmatch import RECURSIVE, WcMatch
+import wcmatch.wcmatch
 from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, Options, options
@@ -446,19 +446,22 @@ def discover_lintables(options: Options) -> dict[str, Any]:
         if options.verbosity:
             warn_or_fail(f"Failed to locate command: {exc}")
 
-    if out is None:
-        exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
-        _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
-        # remove './' prefix from output of WcMatch
-        out = {
-            strip_dotslash_prefix(fname)
-            for fname in WcMatch(
-                ".",
-                exclude_pattern=exclude_pattern,
-                flags=RECURSIVE,
-                limit=256,
-            ).match()
-        }
+    # Applying exclude patterns
+    if not out:
+        out = set(".")
+
+    exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
+    _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
+    # remove './' prefix from output of WcMatch
+    out = {
+        strip_dotslash_prefix(fname)
+        for fname in wcmatch.wcmatch.WcMatch(
+            ".",
+            exclude_pattern=exclude_pattern,
+            flags=wcmatch.wcmatch.RECURSIVE,
+            limit=256,
+        ).match()
+    }
 
     return OrderedDict.fromkeys(sorted(out))
 
