@@ -28,6 +28,7 @@ from ansiblelint.yaml_utils import clean_json
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 _logger = logging.getLogger(__name__)
@@ -96,7 +97,7 @@ class ArgsRule(AnsibleLintRule):
 
     def matchtask(  # noqa: C901
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         # pylint: disable=too-many-branches,too-many-locals

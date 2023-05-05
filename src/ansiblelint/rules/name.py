@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class NameRule(AnsibleLintRule, TransformMixin):
@@ -54,7 +55,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         results = []

@@ -16,10 +16,10 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import convert_to_boolean
+from ansiblelint.utils import Task, convert_to_boolean
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -39,7 +39,7 @@ class NoLogPasswordsRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
         if task["action"]["__ansible_module_original__"] == "ansible.builtin.user" and (

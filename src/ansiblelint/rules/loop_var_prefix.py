@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.config import LOOP_VAR_PREFIX, options
 from ansiblelint.rules import AnsibleLintRule
@@ -12,6 +12,7 @@ from ansiblelint.text import toidentifier
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class RoleLoopVarPrefix(AnsibleLintRule):
@@ -32,7 +33,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         """Return matches for a task."""
@@ -42,13 +43,13 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         self.prefix = re.compile(
             options.loop_var_prefix.format(role=toidentifier(file.role)),
         )
-        has_loop = "loop" in task
-        for key in task:
+        has_loop = "loop" in task.raw_task
+        for key in task.raw_task:
             if key.startswith("with_"):
                 has_loop = True
 
         if has_loop:
-            loop_control = task.get("loop_control", {})
+            loop_control = task.raw_task.get("loop_control", {})
             loop_var = loop_control.get("loop_var", "")
 
             if loop_var:

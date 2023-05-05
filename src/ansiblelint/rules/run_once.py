@@ -10,6 +10,7 @@ from ansiblelint.rules import AnsibleLintRule
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class RunOnce(AnsibleLintRule):
@@ -45,7 +46,7 @@ class RunOnce(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         """Return matches for a task."""

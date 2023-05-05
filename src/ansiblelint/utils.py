@@ -27,7 +27,7 @@ import inspect
 import logging
 import os
 import re
-from collections.abc import ItemsView, Iterator, Mapping, Sequence
+from collections.abc import Generator, ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache
 from pathlib import Path
@@ -758,7 +758,7 @@ def extract_from_list(
 
 
 @dataclass
-class Task:
+class Task(dict[str, Any]):
     """Class that represents a task from linter point of view.
 
     raw_task:
@@ -816,6 +816,18 @@ class Task:
     def __repr__(self) -> str:
         """Return a string representation of the task."""
         return f"Task('{self.name}' [{self.position}])"
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """Get a value from the task."""
+        return self.normalized_task.get(key, default)
+
+    def __getitem__(self, index: str) -> Any:
+        """Allow access as task[...]."""
+        return self.normalized_task[index]
+
+    def __iter__(self) -> Generator[str, None, None]:
+        """Provide support for 'key in task'."""
+        yield from (f for f in self.normalized_task)
 
 
 def task_in_list(  # noqa: C901

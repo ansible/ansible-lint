@@ -22,13 +22,14 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class CommandHasChangesCheckRule(AnsibleLintRule):
@@ -53,7 +54,7 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
@@ -62,7 +63,7 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
             task["__ansible_action_type__"] in ["task", "meta"]
             and task["action"]["__ansible_module__"] in self._commands
             and (
-                "changed_when" not in task
+                "changed_when" not in task.raw_task
                 and "creates" not in task["action"]
                 and "removes" not in task["action"]
             )

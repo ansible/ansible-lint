@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.rules import RulesCollection
+    from ansiblelint.utils import Task
 
 _logger = logging.getLogger(__name__)
 LOAD_FAILURE_MD = """\
@@ -105,7 +106,7 @@ class BaseRule:
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str | MatchError | list[MatchError]:
         """Confirm if current rule is matching a specific task.

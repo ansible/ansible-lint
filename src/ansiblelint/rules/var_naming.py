@@ -20,6 +20,8 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from ansiblelint.errors import MatchError
+    from ansiblelint.utils import Task
+
 
 # Should raise var-naming at line [2, 6].
 FAIL_VARS = """---
@@ -101,7 +103,7 @@ class VariableNamingRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         """Return matches for task based variables."""

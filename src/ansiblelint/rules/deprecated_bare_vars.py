@@ -31,6 +31,7 @@ from ansiblelint.text import has_glob, has_jinja
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
@@ -48,7 +49,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
         loop_type = next((key for key in task if key.startswith("with_")), None)
