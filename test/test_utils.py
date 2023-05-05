@@ -34,7 +34,7 @@ from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
 from ansiblelint.constants import RC
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, cwd
 from ansiblelint.runner import Runner
 
 if TYPE_CHECKING:
@@ -44,7 +44,6 @@ if TYPE_CHECKING:
     from _pytest.logging import LogCaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
 
-    from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
 
 
@@ -324,17 +323,25 @@ def test_is_playbook() -> None:
     assert utils.is_playbook("examples/playbooks/always-run-success.yml")
 
 
-def test_auto_detect_exclude(monkeypatch: MonkeyPatch) -> None:
+def test_auto_detect_exclude(tmp_path: Path) -> None:
     """Verify that exclude option can be used to narrow down detection."""
-    options = cli.get_config(["--exclude", "foo"])
+    with cwd(tmp_path):
+        subprocess.check_output(
+            "git init",
+            stderr=subprocess.STDOUT,
+            text=True,
+            shell=True,
+            cwd=tmp_path,
+        )
+        (tmp_path / "foo").mkdir()
+        (tmp_path / "bar").mkdir()
+        (tmp_path / "foo" / "playbook.yml").touch()
+        (tmp_path / "bar" / "playbook.yml").touch()
+        options = cli.get_config(["--exclude", "foo"])
+        options.cwd = tmp_path
 
-    # pylint: disable=unused-argument
-    def mockreturn(options: Options) -> list[str]:  # noqa: ARG001
-        return ["foo/playbook.yml", "bar/playbook.yml"]
-
-    monkeypatch.setattr(utils, "discover_lintables", mockreturn)
-    result = utils.get_lintables(options)
-    assert result == [Lintable("bar/playbook.yml", kind="playbook")]
+        result = utils.get_lintables(options)
+        assert result == [Lintable("bar/playbook.yml", kind="playbook")]
 
 
 _DEFAULT_RULEDIRS = [constants.DEFAULT_RULESDIR]

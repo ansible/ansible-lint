@@ -1043,20 +1043,6 @@ def get_lintables(
     else:
         for filename in discover_lintables(opts):
             path = Path(filename)
-            # skip exclusions
-            try:
-                for file_path in opts.exclude_paths:
-                    if str(path.resolve()).startswith(str(file_path)):
-                        msg = f"File {file_path} matched exclusion entry: {path}"
-                        raise FileNotFoundError(msg)
-            except FileNotFoundError as exc:
-                _logger.debug("Ignored %s due to: %s", path, exc)
-                continue
-
-            if path.is_symlink() and not path.exists():
-                _logger.warning("Ignored broken symlink %s -> %s", path, path.resolve())
-                continue
-
             lintables.append(Lintable(path))
 
         # stage 2: guess roles from current lintables, as there is no unique
