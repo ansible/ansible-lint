@@ -91,6 +91,25 @@
       "title": "Amazon Linux 2PlatformModel",
       "type": "object"
     },
+    "Amazon_Linux_2023PlatformModel": {
+      "properties": {
+        "name": {
+          "const": "Amazon Linux 2023",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "Amazon Linux 2023PlatformModel",
+      "type": "object"
+    },
     "ArchLinuxPlatformModel": {
       "properties": {
         "name": {
