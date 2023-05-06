@@ -5,13 +5,13 @@
 single: single # this is a comment
 single_with_double: '"single" quoted' # this is a comment
 
-single_multiline_with_octothorpe: "single over 160 char line to force wrapping. over 160 char line to force wrapping. over 160 char line to force wrapping. over 160\n\
+single_multiline_with_octothorpe: "single over 160 char line to force wrapping. over 160 char line to force wrapping. over 160 char line to force wrapping. over 160\n
   # this is not a comment"
 
 double: double # this is a comment
 double_with_single: "'double' quoted" # this is a comment
 
-double_multiline_with_octothorpe: "double over 160 char line to force wrapping. over 160 char line to force wrapping. over 160 char line to force wrapping. over 160\n\
+double_multiline_with_octothorpe: "double over 160 char line to force wrapping. over 160 char line to force wrapping. over 160 char line to force wrapping. over 160\n
   # this is not a comment"
 
 # this is a comment
