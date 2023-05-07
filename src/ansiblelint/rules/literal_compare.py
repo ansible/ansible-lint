@@ -6,13 +6,14 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.yaml_utils import nested_items_path
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class ComparisonToLiteralBoolRule(AnsibleLintRule):
@@ -31,7 +32,7 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
         for k, v, _ in nested_items_path(task):

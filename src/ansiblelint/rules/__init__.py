@@ -103,7 +103,7 @@ class AnsibleLintRule(BaseRule):
     @staticmethod
     def _enrich_matcherror_with_task_details(
         match: MatchError,
-        task: dict[str, Any],
+        task: ansiblelint.utils.Task,
     ) -> None:
         match.task = task
         if not match.details:
@@ -172,7 +172,7 @@ class AnsibleLintRule(BaseRule):
             if self.needs_raw_task:
                 task.normalized_task["__raw_task__"] = task.raw_task
 
-            result = self.matchtask(task.normalized_task, file=file)
+            result = self.matchtask(task, file=file)
             if not result:
                 continue
 
@@ -187,7 +187,7 @@ class AnsibleLintRule(BaseRule):
                         continue
                     self._enrich_matcherror_with_task_details(
                         match,
-                        task.normalized_task,
+                        task,
                     )
                     matches.append(match)
                 continue
@@ -205,7 +205,7 @@ class AnsibleLintRule(BaseRule):
                     filename=file,
                 )
 
-            self._enrich_matcherror_with_task_details(match, task.normalized_task)
+            self._enrich_matcherror_with_task_details(match, task)
             matches.append(match)
         return matches
 

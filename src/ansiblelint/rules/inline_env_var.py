@@ -20,11 +20,11 @@
 # THE SOFTWARE.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.constants import FILENAME_KEY, LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import get_first_cmd_arg
+from ansiblelint.utils import Task, get_first_cmd_arg
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -61,7 +61,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
         if task["action"]["__ansible_module__"] in ["command"]:

@@ -22,13 +22,14 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg, get_second_cmd_arg
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
@@ -75,7 +76,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
         if task["action"]["__ansible_module__"] not in self._commands:

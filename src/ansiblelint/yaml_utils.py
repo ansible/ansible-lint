@@ -29,6 +29,7 @@ from ansiblelint.constants import (
     PLAYBOOK_TASK_KEYWORDS,
     SKIPPED_RULES_KEY,
 )
+from ansiblelint.utils import Task
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -171,8 +172,13 @@ def nested_items_path(
     # valid data, we better ignore NoneType
     if data_collection is None:
         return
+    data: dict[Any, Any] | list[Any]
+    if isinstance(data_collection, Task):
+        data = data_collection.normalized_task
+    else:
+        data = data_collection
     yield from _nested_items_path(
-        data_collection=data_collection,
+        data_collection=data,
         parent_path=[],
         ignored_keys=ignored_keys,
     )

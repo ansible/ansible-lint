@@ -11,6 +11,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class NoSameOwnerRule(AnsibleLintRule):
@@ -27,7 +28,7 @@ should not be preserved when transferring files between them.
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
         """Return matches for a task."""
