@@ -100,7 +100,7 @@ class ArgsRule(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
-        # pylint: disable=too-many-branches,too-many-locals
+        # pylint: disable=too-many-branches,too-many-locals,too-many-return-statements
         results: list[MatchError] = []
         module_name = task["action"]["__ansible_module_original__"]
         failed_msg = None
@@ -124,6 +124,16 @@ class ArgsRule(AnsibleLintRule):
             for key, value in task["action"].items()
             if not key.startswith("__")
         }
+
+        # Return if 'args' is jinja string
+        # https://github.com/ansible/ansible-lint/issues/3199
+        if (
+            "args" in task.raw_task
+            and isinstance(task.raw_task["args"], str)
+            and has_jinja(task.raw_task["args"])
+        ):
+            return []
+
         if loaded_module.resolved_fqcn in workarounds_inject_map:
             module_args.update(workarounds_inject_map[loaded_module.resolved_fqcn])
         if loaded_module.resolved_fqcn in workarounds_drop_map:
