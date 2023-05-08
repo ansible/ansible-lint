@@ -38,6 +38,25 @@
       "title": "AlpinePlatformModel",
       "type": "object"
     },
+    "AmazonLinuxPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "Amazon Linux",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["all", "1", "2", "2023"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "Amazon Linux 2PlatformModel",
+      "type": "object"
+    },
     "AmazonPlatformModel": {
       "properties": {
         "name": {
@@ -70,25 +89,6 @@
         }
       },
       "title": "AmazonPlatformModel",
-      "type": "object"
-    },
-    "AmazonLinuxPlatformModel": {
-      "properties": {
-        "name": {
-          "const": "Amazon Linux",
-          "title": "Name",
-          "type": "string"
-        },
-        "versions": {
-          "default": "all",
-          "items": {
-            "enum": ["all", "1", "2", "2013"],
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "title": "Amazon Linux 2PlatformModel",
       "type": "object"
     },
     "ArchLinuxPlatformModel": {
