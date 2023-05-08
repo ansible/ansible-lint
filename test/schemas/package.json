@@ -16,7 +16,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.16.3",
+    "@types/node": "^20.1.0",
     "chai": "^4.3.7",
     "minimatch": "^9.0.0",
     "mocha": "^10.2.0",
