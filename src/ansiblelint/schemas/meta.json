@@ -72,36 +72,17 @@
       "title": "AmazonPlatformModel",
       "type": "object"
     },
-    "Amazon_Linux_2023PlatformModel": {
+    "AmazonLinuxPlatformModel": {
       "properties": {
         "name": {
-          "const": "Amazon Linux 2023",
+          "const": "Amazon Linux",
           "title": "Name",
           "type": "string"
         },
         "versions": {
           "default": "all",
           "items": {
-            "enum": ["all"],
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "title": "Amazon Linux 2023PlatformModel",
-      "type": "object"
-    },
-    "Amazon_Linux_2PlatformModel": {
-      "properties": {
-        "name": {
-          "const": "Amazon Linux 2",
-          "title": "Name",
-          "type": "string"
-        },
-        "versions": {
-          "default": "all",
-          "items": {
-            "enum": ["all"],
+            "enum": ["all", "1", "2", "2013"],
             "type": "string"
           },
           "type": "array"
@@ -1225,7 +1206,7 @@
             "$ref": "#/$defs/AmazonPlatformModel"
           },
           {
-            "$ref": "#/$defs/Amazon_Linux_2PlatformModel"
+            "$ref": "#/$defs/AmazonLinuxPlatformModel"
           },
           {
             "$ref": "#/$defs/aosPlatformModel"
