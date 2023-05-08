@@ -72,7 +72,7 @@ ply==3.11
 psutil==5.9.5
 pycparser==2.21
 pygments==2.14.0
-pylint==2.17.3
+pylint==2.17.4
 pymdown-extensions==9.10
 pyparsing==3.0.9
 pyrsistent==0.19.3
