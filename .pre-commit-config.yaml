@@ -21,6 +21,8 @@ exclude: >
     examples/broken/encoding.j2|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
     examples/playbooks/collections/.*|
+    examples/playbooks/vars/empty.transformed.yml|
+    examples/playbooks/vars/empty.yml|
     src/ansiblelint/schemas/rulebook.json|
     test/schemas/data/licenses.json|
     test/schemas/negative_test|
@@ -40,17 +42,19 @@ repos:
           (?x)^(
             .*\.md$|
             examples/other/some.j2.yaml|
+            examples/playbooks/collections/.*|
             examples/playbooks/example.yml|
             examples/playbooks/multiline-brackets.*|
             examples/playbooks/templates/not-valid.yaml|
-            examples/playbooks/with-umlaut-.*|
+            examples/playbooks/vars/empty.transformed.yml|
+            examples/playbooks/vars/empty.yml|
             examples/playbooks/with-skip-tag-id.yml|
+            examples/playbooks/with-umlaut-.*|
             examples/yamllint/.*|
-            examples/playbooks/collections/.*|
-            test/fixtures/formatting-before/.*|
-            test/schemas/data/.*|
-            test/schemas/(negative_test|test)/.*\.md|
             src/ansiblelint/schemas/(molecule|tasks|playbook|rulebook).json|
+            test/fixtures/formatting-before/.*|
+            test/schemas/(negative_test|test)/.*\.md|
+            test/schemas/data/.*|
             src/ansiblelint/schemas/ansible-navigator-config.json
           )$
         always_run: true

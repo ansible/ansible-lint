@@ -81,6 +81,7 @@ def fixture_runner_result(
             id="empty_vars",
         ),
         pytest.param("examples/playbooks/vars/strings.yml", 0, True, id="strings"),
+        pytest.param("examples/playbooks/vars/empty.yml", 1, False, id="empty"),
         pytest.param("examples/playbooks/name-case.yml", 1, True, id="name_case"),
         pytest.param("examples/playbooks/fqcn.yml", 3, True, id="fqcn"),
     ),
