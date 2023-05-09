@@ -8,6 +8,7 @@ import pytest
 
 from ansiblelint.constants import SKIPPED_RULES_KEY
 from ansiblelint.file_utils import Lintable
+from ansiblelint.runner import Runner
 from ansiblelint.skip_utils import (
     append_skipped_rules,
     get_rule_skips_from_line,
@@ -17,6 +18,7 @@ from ansiblelint.skip_utils import (
 if TYPE_CHECKING:
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
 
+    from ansiblelint.rules import RulesCollection
     from ansiblelint.testing import RunFromText
 
 PLAYBOOK_WITH_NOQA = """\
@@ -43,7 +45,7 @@ PLAYBOOK_WITH_NOQA = """\
 )
 def test_get_rule_skips_from_line(line: str, expected: str) -> None:
     """Validate get_rule_skips_from_line."""
-    v = get_rule_skips_from_line(line)
+    v = get_rule_skips_from_line(line, lintable=Lintable(""))
     assert v == [expected]
 
 
@@ -232,3 +234,19 @@ def test_append_skipped_rules(
 def test_is_nested_task(task: dict[str, Any], expected: bool) -> None:
     """Test is_nested_task() returns expected bool."""
     assert is_nested_task(task) == expected
+
+
+def test_capture_warning_outdated_tag(
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Test that exclude paths do work."""
+    runner = Runner(
+        "examples/playbooks/capture-warning.yml",
+        rules=default_rules_collection,
+    )
+
+    matches = runner.run()
+    assert len(matches) == 1
+    assert matches[0].rule.id == "warning"
+    assert matches[0].tag == "warning[outdated-tag]"
+    assert matches[0].lineno == 8

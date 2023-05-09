@@ -13,6 +13,20 @@ if TYPE_CHECKING:
     from ansiblelint.utils import Task
 
 
+class LintWarning(Warning):
+    """Used by linter."""
+
+
+@dataclass
+class WarnSource:
+    """Container for warning information, so we can later create a MatchError from it."""
+
+    filename: Lintable
+    lineno: int
+    tag: str
+    message: str | None = None
+
+
 class StrictModeError(RuntimeError):
     """Raise when we encounter a warning in strict mode."""
 
