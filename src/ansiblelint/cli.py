@@ -34,7 +34,6 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 _PATH_VARS = [
-    "exclude_paths",
     "rulesdir",
 ]
 
@@ -424,8 +423,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--exclude",
         dest="exclude_paths",
-        action=AbspathArgAction,
-        type=Path,
+        action="extend",
+        nargs="+",
+        type=str,
         default=[],
         help="path to directories or files to skip. This option is repeatable.",
     )
@@ -593,6 +593,11 @@ def get_config(arguments: list[str]) -> Options:
     if not options.project_dir or not os.path.exists(options.project_dir):
         msg = f"Failed to determine a valid project_dir: {options.project_dir}"
         raise RuntimeError(msg)
+
+    # expand user home dir in exclude_paths
+    options.exclude_paths = [
+        os.path.expandvars(os.path.expanduser(p)) for p in options.exclude_paths
+    ]
 
     # Compute final verbosity level by subtracting -q counter.
     options.verbosity -= options.quiet

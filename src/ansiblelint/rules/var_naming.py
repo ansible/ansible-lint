@@ -19,6 +19,8 @@ from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
+    from ansiblelint.utils import Task
+
 
 # Should raise var-naming at line [2, 6].
 FAIL_VARS = """---
@@ -99,7 +101,10 @@ class VariableNamingRule(AnsibleLintRule):
             lines = file.content.splitlines()
             for match in raw_results:
                 # lineno starts with 1, not zero
-                skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
+                skip_list = get_rule_skips_from_line(
+                    line=lines[match.lineno - 1],
+                    lintable=file,
+                )
                 if match.rule.id not in skip_list and match.tag not in skip_list:
                     results.append(match)
 
@@ -107,7 +112,7 @@ class VariableNamingRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         """Return matches for task based variables."""
@@ -197,7 +202,10 @@ class VariableNamingRule(AnsibleLintRule):
                 lines = file.content.splitlines()
                 for match in raw_results:
                     # lineno starts with 1, not zero
-                    skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
+                    skip_list = get_rule_skips_from_line(
+                        line=lines[match.lineno - 1],
+                        lintable=file,
+                    )
                     if match.rule.id not in skip_list and match.tag not in skip_list:
                         results.append(match)
         else:

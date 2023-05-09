@@ -1,0 +1,8 @@
+---
+- name: Fixture to generate a warning
+  hosts: localhost
+  tasks:
+    - name: Generate a warning
+      ansible.builtin.debug:
+        msg: "This is a warning"
+      when: "{{ false }}" # noqa: 102 jinja[spacing]

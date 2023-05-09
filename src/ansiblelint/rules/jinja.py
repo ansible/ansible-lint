@@ -24,6 +24,7 @@ from ansiblelint.yaml_utils import deannotate, nested_items_path
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
+    from ansiblelint.utils import Task
 
 
 _logger = logging.getLogger(__package__)
@@ -77,7 +78,7 @@ class JinjaRule(AnsibleLintRule):
     # pylint: disable=too-many-branches,too-many-locals
     def matchtask(  # noqa: C901
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
@@ -202,7 +203,10 @@ class JinjaRule(AnsibleLintRule):
                 lines = file.content.splitlines()
                 for match in raw_results:
                     # lineno starts with 1, not zero
-                    skip_list = get_rule_skips_from_line(lines[match.lineno - 1])
+                    skip_list = get_rule_skips_from_line(
+                        line=lines[match.lineno - 1],
+                        lintable=file,
+                    )
                     if match.rule.id not in skip_list and match.tag not in skip_list:
                         results.append(match)
         else:

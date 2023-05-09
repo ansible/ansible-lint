@@ -17,6 +17,7 @@ exclude: >
     .config/requirements.*|
     .vscode/extensions.json|
     .vscode/settings.json|
+    examples/broken/encoding.yml|
     examples/broken/encoding.j2|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
     examples/playbooks/collections/.*|
@@ -65,7 +66,7 @@ repos:
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.22.0
+    rev: 0.23.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -125,7 +126,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.264"
+    rev: "v0.0.265"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -148,7 +149,7 @@ repos:
           - jinja2
           - pytest>=7.2.2
           - rich>=13.2.0
-          - ruamel-yaml>=0.17.22
+          - ruamel-yaml>=0.17.24
           - ruamel-yaml-clib>=0.2.7
           - spdx-tools
           - subprocess-tee
@@ -178,7 +179,7 @@ repos:
           - pytest>=7.2.2
           - pyyaml
           - rich>=13.2.0
-          - ruamel-yaml>=0.17.22
+          - ruamel-yaml>=0.17.24
           - ruamel-yaml-clib>=0.2.7
           - spdx-tools
           - typing_extensions

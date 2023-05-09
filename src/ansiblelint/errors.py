@@ -3,11 +3,28 @@ from __future__ import annotations
 
 import functools
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
 from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
+
+if TYPE_CHECKING:
+    from ansiblelint.utils import Task
+
+
+class LintWarning(Warning):
+    """Used by linter."""
+
+
+@dataclass
+class WarnSource:
+    """Container for warning information, so we can later create a MatchError from it."""
+
+    filename: Lintable
+    lineno: int
+    tag: str
+    message: str | None = None
 
 
 class StrictModeError(RuntimeError):
@@ -72,7 +89,7 @@ class MatchError(ValueError):
 
         self.match_type: str | None = None
         # for task matches, save the normalized task object (useful for transforms)
-        self.task: dict[str, Any] | None = None
+        self.task: Task | None = None
         # path to the problem area, like: [0,"pre_tasks",3] for [0].pre_tasks[3]
         self.yaml_path: list[int | str] = []
 

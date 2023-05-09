@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.constants import INCLUSION_ACTION_NAMES, LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
@@ -11,6 +11,7 @@ from ansiblelint.rules import AnsibleLintRule
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class NoFreeFormRule(AnsibleLintRule):
@@ -28,7 +29,7 @@ class NoFreeFormRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
         results: list[MatchError] = []

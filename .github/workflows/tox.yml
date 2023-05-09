@@ -59,7 +59,7 @@ jobs:
       WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:GITHUB_STEP_SUMMARY
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 794
+      PYTEST_REQPASS: 795
     steps:
       - name: Activate WSL1
         if: "contains(matrix.shell, 'wsl')"
@@ -83,6 +83,15 @@ jobs:
           path: |
             ~/.cache/pre-commit
           key: pre-commit-${{ matrix.name || matrix.passed_name }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Set eco cache
+        uses: actions/cache@v3
+        if: ${{ matrix.passed_name == 'eco' }}
+        with:
+          path: |
+            .cache/eco
+            ~/.cache/ansible-compat
+          key: eco-${{ matrix.name || matrix.passed_name }}-${{ hashFiles('tools/test-eco.sh') }}
 
       - name: Set galaxy cache
         uses: actions/cache@v3

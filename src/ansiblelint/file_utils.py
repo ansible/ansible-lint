@@ -13,7 +13,7 @@ from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
 
 import wcmatch.pathlib
-from wcmatch.wcmatch import RECURSIVE, WcMatch
+import wcmatch.wcmatch
 from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, Options, options
@@ -191,7 +191,7 @@ class Lintable:
         self.dir: str = ""
         self.kind: FileType | None = None
         self.stop_processing = False  # Set to stop other rules from running
-        self._data: Any = States.NOT_LOADED
+        self.state: Any = States.NOT_LOADED
         self.line_skips: dict[int, set[str]] = defaultdict(set)
         self.exc: Exception | None = None  # Stores data loading exceptions
 
@@ -359,17 +359,17 @@ class Lintable:
     @property
     def data(self) -> Any:
         """Return loaded data representation for current file, if possible."""
-        if self._data == States.NOT_LOADED:
+        if self.state == States.NOT_LOADED:
             if self.path.is_dir():
-                self._data = None
-                return self._data
+                self.state = None
+                return self.state
             try:
                 if str(self.base_kind) == "text/yaml":
                     from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
                         parse_yaml_linenumbers,
                     )
 
-                    self._data = parse_yaml_linenumbers(self)
+                    self.state = parse_yaml_linenumbers(self)
                     # now that _data is not empty, we can try guessing if playbook or rulebook
                     # it has to be done before append_skipped_rules() call as it's relying
                     # on self.kind.
@@ -380,19 +380,24 @@ class Lintable:
                         # pylint: disable=import-outside-toplevel
                         from ansiblelint.skip_utils import append_skipped_rules
 
-                    self._data = append_skipped_rules(self._data, self)
+                    self.state = append_skipped_rules(self.state, self)
                 else:
                     logging.debug(
                         "data set to None for %s due to being of %s kind.",
                         self.path,
                         self.base_kind or "unknown",
                     )
-                    self._data = States.UNKNOWN_DATA
+                    self.state = States.UNKNOWN_DATA
 
-            except (RuntimeError, FileNotFoundError, YAMLError) as exc:
-                self._data = States.LOAD_FAILED
+            except (
+                RuntimeError,
+                FileNotFoundError,
+                YAMLError,
+                UnicodeDecodeError,
+            ) as exc:
+                self.state = States.LOAD_FAILED
                 self.exc = exc
-        return self._data
+        return self.state
 
 
 # pylint: disable=redefined-outer-name
@@ -441,19 +446,22 @@ def discover_lintables(options: Options) -> dict[str, Any]:
         if options.verbosity:
             warn_or_fail(f"Failed to locate command: {exc}")
 
-    if out is None:
-        exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
-        _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
-        # remove './' prefix from output of WcMatch
-        out = {
-            strip_dotslash_prefix(fname)
-            for fname in WcMatch(
-                ".",
-                exclude_pattern=exclude_pattern,
-                flags=RECURSIVE,
-                limit=256,
-            ).match()
-        }
+    # Applying exclude patterns
+    if not out:
+        out = set(".")
+
+    exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
+    _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
+    # remove './' prefix from output of WcMatch
+    out = {
+        strip_dotslash_prefix(fname)
+        for fname in wcmatch.wcmatch.WcMatch(
+            ".",
+            exclude_pattern=exclude_pattern,
+            flags=wcmatch.wcmatch.RECURSIVE,
+            limit=256,
+        ).match()
+    }
 
     return OrderedDict.fromkeys(sorted(out))
 

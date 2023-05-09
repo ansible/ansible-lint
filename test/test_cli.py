@@ -20,41 +20,49 @@ def fixture_base_arguments() -> list[str]:
 
 
 @pytest.mark.parametrize(
-    ("args", "config"),
+    ("args", "config_path"),
     (
-        (["-p"], "test/fixtures/parseable.yml"),
-        (["-q"], "test/fixtures/quiet.yml"),
-        (["-r", "test/fixtures/rules/"], "test/fixtures/rulesdir.yml"),
-        (["-R", "-r", "test/fixtures/rules/"], "test/fixtures/rulesdir-defaults.yml"),
-        (["-s"], "test/fixtures/strict.yml"),
-        (["-t", "skip_ansible_lint"], "test/fixtures/tags.yml"),
-        (["-v"], "test/fixtures/verbosity.yml"),
-        (["-x", "bad_tag"], "test/fixtures/skip-tags.yml"),
-        (["--exclude", "test/"], "test/fixtures/exclude-paths.yml"),
-        (["--show-relpath"], "test/fixtures/show-abspath.yml"),
-        ([], "test/fixtures/show-relpath.yml"),
+        pytest.param(["-p"], "test/fixtures/parseable.yml", id="1"),
+        pytest.param(["-q"], "test/fixtures/quiet.yml", id="2"),
+        pytest.param(
+            ["-r", "test/fixtures/rules/"],
+            "test/fixtures/rulesdir.yml",
+            id="3",
+        ),
+        pytest.param(
+            ["-R", "-r", "test/fixtures/rules/"],
+            "test/fixtures/rulesdir-defaults.yml",
+            id="4",
+        ),
+        pytest.param(["-s"], "test/fixtures/strict.yml", id="5"),
+        pytest.param(["-t", "skip_ansible_lint"], "test/fixtures/tags.yml", id="6"),
+        pytest.param(["-v"], "test/fixtures/verbosity.yml", id="7"),
+        pytest.param(["-x", "bad_tag"], "test/fixtures/skip-tags.yml", id="8"),
+        pytest.param(["--exclude", "../"], "test/fixtures/exclude-paths.yml", id="9"),
+        pytest.param(["--show-relpath"], "test/fixtures/show-abspath.yml", id="10"),
+        pytest.param([], "test/fixtures/show-relpath.yml", id="11"),
     ),
 )
 def test_ensure_config_are_equal(
     base_arguments: list[str],
     args: list[str],
-    config: str,
+    config_path: str,
 ) -> None:
     """Check equality of the CLI options to config files."""
     command = base_arguments + args
     cli_parser = cli.get_cli_parser()
 
     options = cli_parser.parse_args(command)
-    file_config = cli.load_config(config)[0]
-
+    file_config = cli.load_config(config_path)[0]
     for key, val in file_config.items():
         # config_file does not make sense in file_config
         if key == "config_file":
             continue
 
-        if key in {"exclude_paths", "rulesdir"}:
+        if key == "rulesdir":
+            # this is list of Paths
             val = [Path(p) for p in val]
-        assert val == getattr(options, key)
+        assert val == getattr(options, key), f"Mismatch for {key}"
 
 
 @pytest.mark.parametrize(
@@ -173,28 +181,6 @@ def test_path_from_config_do_not_depend_on_cwd(
     config2 = cli.load_config("fixtures/config-with-relative-path.yml")[0]
 
     assert config1["exclude_paths"].sort() == config2["exclude_paths"].sort()
-
-
-def test_path_from_cli_depend_on_cwd(
-    base_arguments: list[str],
-    monkeypatch: MonkeyPatch,
-) -> None:
-    """Check that CLI-provided paths are relative to CWD."""
-    # Issue 572
-    arguments = [
-        *base_arguments,
-        "--exclude",
-        "test/fixtures/config-with-relative-path.yml",
-    ]
-
-    options1 = cli.get_cli_parser().parse_args(arguments)
-    assert "test/test" not in str(options1.exclude_paths[0])
-
-    test_dir = "test"
-    monkeypatch.chdir(test_dir)
-    options2 = cli.get_cli_parser().parse_args(arguments)
-
-    assert "test/test" in str(options2.exclude_paths[0])
 
 
 @pytest.mark.parametrize(

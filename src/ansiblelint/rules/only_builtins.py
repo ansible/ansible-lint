@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.config import options
 from ansiblelint.rules import AnsibleLintRule
@@ -12,6 +12,7 @@ from ansiblelint.skip_utils import is_nested_task
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class OnlyBuiltinsRule(AnsibleLintRule):
@@ -24,7 +25,7 @@ class OnlyBuiltinsRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
         module = task["action"]["__ansible_module_original__"]

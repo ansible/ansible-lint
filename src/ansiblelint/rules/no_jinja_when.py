@@ -10,6 +10,7 @@ from ansiblelint.rules import AnsibleLintRule
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class NoFormattingInWhenRule(AnsibleLintRule):
@@ -44,7 +45,11 @@ class NoFormattingInWhenRule(AnsibleLintRule):
             if "roles" not in data or data["roles"] is None:
                 return errors
             for role in data["roles"]:
-                if self.matchtask(role, file=file):
+                if (
+                    isinstance(role, dict)
+                    and "when" in role
+                    and not self._is_valid(role["when"])
+                ):
                     errors.append(
                         self.create_matcherror(
                             details=str({"when": role}),
@@ -56,10 +61,10 @@ class NoFormattingInWhenRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
-        return "when" in task and not self._is_valid(task["when"])
+        return "when" in task.raw_task and not self._is_valid(task.raw_task["when"])
 
 
 if "pytest" in sys.modules:
@@ -67,7 +72,7 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_file_positive() -> None:
+    def test_jinja_file_positive() -> None:
         """Positive test for no-jinja-when."""
         collection = RulesCollection()
         collection.register(NoFormattingInWhenRule())
@@ -75,7 +80,7 @@ if "pytest" in sys.modules:
         good_runner = Runner(success, rules=collection)
         assert [] == good_runner.run()
 
-    def test_file_negative() -> None:
+    def test_jinja_file_negative() -> None:
         """Negative test for no-jinja-when."""
         collection = RulesCollection()
         collection.register(NoFormattingInWhenRule())
