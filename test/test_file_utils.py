@@ -286,6 +286,11 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
             id="41",
         ),
         pytest.param("examples/playbooks/tasks/vars/bug-3289.yml", "vars", id="42"),
+        pytest.param(
+            "examples/site.yml",
+            "playbook",
+            id="43",
+        ),  # content should determine it as a play
     ),
 )
 def test_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:

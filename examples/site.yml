@@ -1,0 +1,4 @@
+---
+# site.yml
+- ansible.builtin.import_playbook: playbooks/play.yml
+- ansible.builtin.import_playbook: playbooks/playbook-parent.yml
