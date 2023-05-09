@@ -832,7 +832,7 @@ class Task(dict[str, Any]):
 
 def task_in_list(  # noqa: C901
     data: AnsibleBaseYAMLObject,
-    filename: str,
+    file: Lintable,
     kind: str,
     position: str = ".",
 ) -> Iterator[Task]:
@@ -853,7 +853,7 @@ def task_in_list(  # noqa: C901
             for block in [k for k in entry if k in NESTED_TASK_KEYS]:
                 yield from task_in_list(
                     data=entry[block],
-                    filename=filename,
+                    file=file,
                     kind="tasks",
                     position=f"{_pos}.{block}",
                 )

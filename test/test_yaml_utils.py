@@ -37,7 +37,7 @@ def test_tasks_in_list_empty_file(empty_lintable: Lintable) -> None:
     res = list(
         task_in_list(
             data=empty_lintable,
-            filename=str(empty_lintable.path),
+            file=empty_lintable,
             kind=empty_lintable.kind,
         ),
     )

@@ -431,7 +431,7 @@ def test_task_in_list(file: str, names: list[str], positions: list[str]) -> None
     lintable = Lintable(file)
     assert lintable.kind
     tasks = list(
-        utils.task_in_list(data=lintable.data, filename=file, kind=lintable.kind),
+        utils.task_in_list(data=lintable.data, file=lintable, kind=lintable.kind),
     )
     assert len(tasks) == len(names)
     for index, task in enumerate(tasks):

@@ -159,7 +159,7 @@ class AnsibleLintRule(BaseRule):
         for task in ansiblelint.utils.task_in_list(
             data=file.data,
             kind=file.kind,
-            filename=str(file.path),
+            file=file,
         ):
             if task.error is not None:
                 # normalize_task converts AnsibleParserError to MatchError
