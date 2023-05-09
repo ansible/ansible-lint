@@ -1,4 +1,4 @@
 ---
 - name: Foobar
   ansible.builtin.set_fact:
-    k8s_grafana_users__namespace: "foo"
+    var_naming_pattern__namespace: "foo"
