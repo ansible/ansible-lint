@@ -180,12 +180,14 @@ class Lintable:
     When symlinks are given, they will always be resolved to their target.
     """
 
-    def __init__(
+    # pylint: disable=too-many-arguments
+    def __init__(  # noqa: C901
         self,
         name: str | Path,
         content: str | None = None,
         kind: FileType | None = None,
         base_kind: str = "",
+        parent: Lintable | None = None,
     ):
         """Create a Lintable instance."""
         self.dir: str = ""
@@ -194,6 +196,7 @@ class Lintable:
         self.state: Any = States.NOT_LOADED
         self.line_skips: dict[int, set[str]] = defaultdict(set)
         self.exc: Exception | None = None  # Stores data loading exceptions
+        self.parent = parent
 
         if isinstance(name, str):
             name = Path(name)
@@ -242,6 +245,9 @@ class Lintable:
         # determine base file kind (yaml, xml, ini, ...)
         self.base_kind = base_kind or kind_from_path(self.path, base=True)
         self.abspath = self.path.expanduser().absolute()
+
+        if self.kind == "tasks":
+            self.parent = _guess_parent(self)
 
         if self.kind == "yaml":
             _ = self.data  # pylint: disable=pointless-statement
@@ -553,3 +559,14 @@ def expand_dirs_in_lintables(lintables: set[Lintable]) -> None:
                 for filename in all_files:
                     if filename.startswith(str(item.path)):
                         lintables.add(Lintable(filename))
+
+
+def _guess_parent(lintable: Lintable) -> Lintable | None:
+    """Return a parent directory for a lintable."""
+    try:
+        if lintable.path.parents[2].name == "roles":
+            # role_name = lintable.parents[1].name
+            return Lintable(lintable.path.parents[1], kind="role")
+    except IndexError:
+        pass
+    return None

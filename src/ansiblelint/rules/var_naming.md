@@ -9,6 +9,16 @@ alphabetic or underscore `_` character.
 For more information see the [creating valid variable names][var-names] topic in
 Ansible documentation and [Naming things (Good Practices for Ansible)][cop].
 
+Possible errors messages:
+
+- `var-naming[non-string]`: Variables names must be strings.
+- `var-naming[non-ascii]`: Variables names must be ASCII.
+- `var-naming[no-keyword]`: Variables names must not be Python keywords.
+- `var-naming[no-jinja]`: Variables names must not contain jinja2 templating.
+- `var-naming[pattern]`: Variables names should match ... regex.
+- `var-naming[no-role-prefix]`: Variables names from within roles should use
+  `role_name_` as a prefix.
+
 ## Settings
 
 This rule behavior can be changed by altering the below settings:

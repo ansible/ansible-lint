@@ -12,7 +12,7 @@
   tasks:
     - name: Foo
       ansible.builtin.set_fact:
-        "{{ 'test_' }}var": "value" # valid
+        "{{ 'test_' }}var": "value" # noqa: var-naming[no-jinja]
     - name: Bar
       ansible.builtin.set_fact:
         CamelCaseButErrorIgnored: true # noqa: var-naming
