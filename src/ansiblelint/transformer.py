@@ -100,6 +100,10 @@ class Transformer:
                     # This is an empty vars file or similar which loads as None.
                     # It is not safe to write this file or data-loss is likely.
                     # Only maps and sequences can preserve comments. Skip it.
+                    _logger.debug(
+                        "Ignored reformatting %s because current implementation in ruamel.yaml would drop comments. See https://sourceforge.net/p/ruamel-yaml/tickets/460/",
+                        file,
+                    )
                     continue
 
             if self.write_set != {"none"}:

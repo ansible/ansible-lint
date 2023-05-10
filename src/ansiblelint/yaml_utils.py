@@ -924,10 +924,20 @@ class FormattedYAML(YAML):
         if not isinstance(stream, str):
             msg = f"expected a str but got {type(stream)}"
             raise NotImplementedError(msg)
+        # As ruamel drops comments for any document that is not a mapping or sequence,
+        # we need to avoid using it to reformat those documents.
+        # https://sourceforge.net/p/ruamel-yaml/tickets/460/
+
         text, preamble_comment = self._pre_process_yaml(stream)
         data = self.load(stream=text)
-        if preamble_comment is not None:
-            data.preamble_comment = preamble_comment
+        if preamble_comment is not None and isinstance(
+            data,
+            (CommentedMap, CommentedSeq),
+        ):
+            data.preamble_comment = preamble_comment  # type: ignore[union-attr]
+        # Because data can validly also be None for empty documents, we cannot
+        # really annotate the return type here, so we need to remember to
+        # never save None or scalar data types when reformatting.
         return data
 
     def dumps(self, data: Any) -> str:

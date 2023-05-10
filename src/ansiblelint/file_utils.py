@@ -248,10 +248,14 @@ class Lintable:
 
     def _guess_kind(self) -> None:
         if self.kind == "yaml":
-            if isinstance(self.data, list) and (
-                "hosts" in self.data[0]
-                or "import_playbook" in self.data[0]
-                or "ansible.builtin.import_playbook" in self.data[0]
+            if (
+                isinstance(self.data, list)
+                and len(self.data) > 0
+                and (
+                    "hosts" in self.data[0]
+                    or "import_playbook" in self.data[0]
+                    or "ansible.builtin.import_playbook" in self.data[0]
+                )
             ):
                 if "rules" not in self.data[0]:
                     self.kind = "playbook"
