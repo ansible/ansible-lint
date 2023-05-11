@@ -37,7 +37,7 @@ pre_checks = {
             "tag": "moves",
         },
         "with_filetree": {
-            "msg": "with_filetree was moved to with_community.general.flattened in 2.10",
+            "msg": "with_filetree was moved to with_community.general.filetree in 2.10",
             "tag": "moves",
         },
         "with_cartesian": {
