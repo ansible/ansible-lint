@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from fnmatch import fnmatch
 from typing import TYPE_CHECKING, Any
 
+from ansible_compat.runtime import AnsibleWarning
+
 import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule, WarningRule
@@ -120,6 +122,14 @@ class Runner:
             warnings.simplefilter("always")
             matches = self._run()
             for warn in captured_warnings:
+                # Silence Ansible runtime warnings that are unactionable
+                # https://github.com/ansible/ansible-lint/issues/3216
+                if warn.category is AnsibleWarning and isinstance(warn.source, dict):
+                    msg = warn.source["msg"]
+                    if msg.startswith(
+                        "Falling back to Ansible unique filter as Jinja2 one failed",
+                    ):
+                        continue
                 # For the moment we are ignoring deprecation warnings as Ansible
                 # modules outside current content can generate them and user
                 # might not be able to do anything about them.
