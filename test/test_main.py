@@ -5,9 +5,9 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any
 
 import pytest
+from pytest_mock import MockerFixture
 
 from ansiblelint.config import get_version_warning
 
@@ -58,7 +58,7 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
     ),
 )
 def test_get_version_warning(
-    mocker: Any,
+    mocker: MockerFixture,
     ver_diff: str,
     found: bool,
     check: str,

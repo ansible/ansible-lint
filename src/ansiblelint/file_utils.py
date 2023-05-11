@@ -422,36 +422,60 @@ def discover_lintables(options: Options) -> dict[str, Any]:
     under current user and absolute for everything else.
     """
     # git is preferred as it also considers .gitignore
-    git_command_present = [
-        *GIT_CMD,
-        "ls-files",
-        "--cached",
-        "--others",
-        "--exclude-standard",
-        "-z",
-    ]
-    git_command_absent = [*GIT_CMD, "ls-files", "--deleted", "-z"]
-    out = None
+    # As --recurse-submodules is incompatible with --others we need to run
+    # twice to get combined results.
+    commands = {
+        "tracked": {
+            "cmd": [
+                *GIT_CMD,
+                "ls-files",
+                "--cached",
+                "--exclude-standard",
+                "--recurse-submodules",
+                "-z",
+            ],
+            "remove": False,
+        },
+        "others": {
+            "cmd": [
+                *GIT_CMD,
+                "ls-files",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "-z",
+            ],
+            "remove": False,
+        },
+        "absent": {
+            "cmd": [
+                *GIT_CMD,
+                "ls-files",
+                "--deleted",
+                "-z",
+            ],
+            "remove": True,
+        },
+    }
 
+    out: set[str] = set()
     try:
-        out_present = subprocess.check_output(
-            git_command_present,  # noqa: S603
-            stderr=subprocess.STDOUT,
-            text=True,
-        ).split("\x00")[:-1]
-        _logger.info(
-            "Discovered files to lint using: %s",
-            " ".join(git_command_present),
-        )
+        for k, value in commands.items():
+            if not isinstance(value["cmd"], list):
+                msg = f"Expected list but got {type(value['cmd'])}"
+                raise TypeError(msg)
+            result = subprocess.check_output(
+                value["cmd"],  # noqa: S603
+                stderr=subprocess.STDOUT,
+                text=True,
+            ).split("\x00")[:-1]
+            _logger.info(
+                "Discovered files to lint using git (%s): %s",
+                k,
+                " ".join(value["cmd"]),
+            )
+            out = out.union(result) if not value["remove"] else out - set(result)
 
-        out_absent = subprocess.check_output(
-            git_command_absent,  # noqa: S603
-            stderr=subprocess.STDOUT,
-            text=True,
-        ).split("\x00")[:-1]
-        _logger.info("Excluded removed files using: %s", " ".join(git_command_absent))
-
-        out = set(out_present) - set(out_absent)
     except subprocess.CalledProcessError as exc:
         if not (exc.returncode == 128 and "fatal: not a git repository" in exc.output):
             err = exc.output.rstrip("\n")

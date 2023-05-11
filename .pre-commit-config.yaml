@@ -151,6 +151,7 @@ repos:
           - cryptography>=39.0.1
           - filelock
           - jinja2
+          - pytest-mock
           - pytest>=7.2.2
           - rich>=13.2.0
           - ruamel-yaml>=0.17.26
@@ -180,6 +181,7 @@ repos:
           - docutils
           - filelock
           - jsonschema>=4.9.0
+          - pytest-mock
           - pytest>=7.2.2
           - pyyaml
           - rich>=13.2.0
