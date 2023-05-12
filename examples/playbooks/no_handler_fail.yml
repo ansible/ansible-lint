@@ -25,17 +25,3 @@
       ansible.builtin.debug:
         msg: why isn't this a handler
       when: result['changed'] == true
-
-    - name: This should be a handler 5 # noqa: literal-compare
-      ansible.builtin.debug:
-        msg: why isn't this a handler
-      when:
-        - result['changed'] == true
-        - another_condition
-
-    - name: This should be a handler 6
-      ansible.builtin.debug:
-        msg: why isn't this a handler
-      when:
-        - first_condition
-        - result.changed
