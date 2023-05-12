@@ -86,3 +86,17 @@ def test_custom_kinds() -> None:
     # in our ansible-lint config, the test would not identify it as yaml file.
     assert "Examining examples/other/some.yaml-too of type yaml" in result.stderr
     assert "Examining examples/other/some.j2.yaml of type jinja2" in result.stderr
+
+
+def test_bug_3216(capsys: pytest.CaptureFixture[str]) -> None:
+    """Check that we hide ansible-core originating warning about fallback on unique filter."""
+    result = run_ansible_lint(
+        "-vv",
+        "--offline",
+        "examples/playbooks/bug-core-warning-unique-filter-fallback.yml",
+    )
+    captured = capsys.readouterr()
+    assert result.returncode == 0
+    warn_msg = "Falling back to Ansible unique filter"
+    assert warn_msg not in captured.err
+    assert warn_msg not in captured.out
