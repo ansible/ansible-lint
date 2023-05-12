@@ -32,9 +32,9 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, TextIO
 
-from ansible_compat.config import ansible_version
 from ansible_compat.prerun import get_cache_dir
 from filelock import FileLock, Timeout
+from rich.markup import escape
 
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
@@ -46,7 +46,13 @@ from ansiblelint.color import (
     reconfigure,
     render_yaml,
 )
-from ansiblelint.config import Options, get_version_warning, log_entries, options
+from ansiblelint.config import (
+    Options,
+    get_deps_versions,
+    get_version_warning,
+    log_entries,
+    options,
+)
 from ansiblelint.constants import RC
 from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.skip_utils import normalize_tag
@@ -208,9 +214,12 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     reconfigure(console_options)
 
     if options.version:
-        console.print(
-            f"ansible-lint [repr.number]{__version__}[/] using ansible [repr.number]{ansible_version()}[/]",
-        )
+        deps = get_deps_versions()
+        msg = f"ansible-lint [repr.number]{__version__}[/] using[dim]"
+        for k, v in deps.items():
+            msg += f" {escape(k)}:[repr.number]{v}[/]"
+        msg += "[/]"
+        console.print(msg, markup=True, highlight=False)
         msg = get_version_warning()
         if msg:
             console.print(msg)
@@ -252,6 +261,16 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     result = _get_matches(rules, options)
 
     if options.write_list:
+        ruamel_safe_version = "0.17.26"
+        from packaging.version import Version
+        from ruamel.yaml import __version__ as ruamel_yaml_version_str
+
+        if Version(ruamel_safe_version) > Version(ruamel_yaml_version_str):
+            _logger.warning(
+                "We detected use of `--write` feature with a buggy ruamel-yaml %s library instead of >=%s, upgrade it before reporting any bugs like dropped comments.",
+                ruamel_yaml_version_str,
+                ruamel_safe_version,
+            )
         _do_transform(result, options)
 
     mark_as_success = True

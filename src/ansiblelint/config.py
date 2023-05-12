@@ -10,6 +10,7 @@ import urllib.request
 import warnings
 from dataclasses import dataclass, field
 from functools import lru_cache
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from urllib.error import HTTPError, URLError
@@ -238,6 +239,18 @@ def guess_install_method() -> str:
 
     # We only want to recommend pip for upgrade if it looks safe to do so.
     return pip if use_pip else ""
+
+
+def get_deps_versions() -> dict[str, Version | None]:
+    """Return versions of most important dependencies."""
+    result: dict[str, Version | None] = {}
+
+    for name in ["ansible-core", "ruamel-yaml", "ruamel-yaml-clib"]:
+        try:
+            result[name] = Version(version(name))
+        except PackageNotFoundError:
+            result[name] = None
+    return result
 
 
 def get_version_warning() -> str:
