@@ -20,7 +20,7 @@ mdurl==0.1.2
 mypy-extensions==1.0.0
 packaging==23.1
 pathspec==0.11.1
-platformdirs==3.5.0
+platformdirs==3.5.1
 pycparser==2.21
 pygments==2.15.1
 pyrsistent==0.19.3

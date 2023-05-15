@@ -33,7 +33,7 @@ KEYWORDS_WITH_IMPLICIT_TEMPLATE = ("changed_when", "failed_when", "until", "when
 Token = namedtuple("Token", "lineno token_type value")
 
 ignored_re = re.compile(
-    "|".join(
+    "|".join(  # noqa: FLY002
         [
             r"^Object of type method is not JSON serializable",
             r"^Unexpected templating type error occurred on",

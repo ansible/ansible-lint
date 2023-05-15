@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 ignored_re = re.compile(
-    "|".join(
+    "|".join(  # noqa: FLY002
         [
             r"^parameters are mutually exclusive:",
             # https://github.com/ansible/ansible-lint/issues/3128 as strings can be jinja
