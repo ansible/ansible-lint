@@ -752,7 +752,7 @@ def extract_from_list(
                         )
                     results.extend(subresults)
                 elif block[candidate] is not None:
-                    msg = f"Key '{candidate}' defined, but bad value: '{str(block[candidate])}'"
+                    msg = f"Key '{candidate}' defined, but bad value: '{block[candidate]!s}'"
                     raise RuntimeError(msg)
     return results
 
@@ -873,7 +873,7 @@ def task_in_list(  # noqa: C901
                             f"{position }[{item_index}].{attribute}",
                         )
                     elif item[attribute] is not None:
-                        msg = f"Key '{attribute}' defined, but bad value: '{str(item[attribute])}'"
+                        msg = f"Key '{attribute}' defined, but bad value: '{item[attribute]!s}'"
                         raise RuntimeError(msg)
     else:
         yield from each_entry(data, position)

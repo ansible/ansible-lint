@@ -93,7 +93,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
   hosts: localhost
   tasks:
     - ansible.builtin.import_role:
-        name: {str(lintable.path.expanduser())}
+        name: {lintable.path.expanduser()!s}
 """
                 # pylint: disable=consider-using-with
                 fh = tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix="play")
