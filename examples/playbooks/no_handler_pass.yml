@@ -35,6 +35,12 @@
         - conditionA
         - conditionB
 
+    - name: Check when with a list of size 1
+      ansible.builtin.debug:
+        var: result
+      when:
+        - conditionA
+
     - name: Registering task 1
       ansible.builtin.command: echo Hello
       register: r1
@@ -48,6 +54,16 @@
     - name: Use when task # noqa: no-changed-when
       ansible.builtin.command: echo Hello
       when: r1.changed and r2.changed
+
+    - name: Use when with or # noqa: no-changed-when
+      ansible.builtin.command: echo Hello
+      when: r1.changed or conditionA
+
+    - name: Use when with list of conditions # noqa: no-changed-when
+      ansible.builtin.command: echo Hello
+      when:
+        - r1.changed
+        - conditionA
 
     - name: Registering task
       ansible.builtin.command: echo Hello

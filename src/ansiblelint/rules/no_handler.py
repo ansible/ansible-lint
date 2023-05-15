@@ -36,7 +36,7 @@ def _changed_in_when(item: str) -> bool:
         return False
     item_list = item.split()
 
-    if {"and", "not"} & set(item_list):
+    if {"and", "or", "not"} & set(item_list):
         return False
     return any(
         changed in item
@@ -75,9 +75,9 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         when = task.get("when")
 
         if isinstance(when, list):
-            for item in when:
-                if _changed_in_when(item):
-                    return True
+            if len(when) > 1:
+                return False
+            return _changed_in_when(when[0])
         if isinstance(when, str):
             return _changed_in_when(when)
         return False
@@ -92,7 +92,7 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         ("test_file", "failures"),
         (
-            pytest.param("examples/playbooks/no_handler_fail.yml", 7, id="fail"),
+            pytest.param("examples/playbooks/no_handler_fail.yml", 5, id="fail"),
             pytest.param("examples/playbooks/no_handler_pass.yml", 0, id="pass"),
         ),
     )
