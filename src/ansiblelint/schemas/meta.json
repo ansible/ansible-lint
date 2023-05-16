@@ -662,6 +662,36 @@
       "title": "JunosPlatformModel",
       "type": "object"
     },
+    "KaliPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "Kali",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": [
+              "2.0",
+              "2016",
+              "2017",
+              "2018",
+              "2019",
+              "2020",
+              "2021",
+              "2022",
+              "2023",
+              "all"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "KaliPlatformModel",
+      "type": "object"
+    },
     "MacOSXPlatformModel": {
       "properties": {
         "name": {
@@ -1264,6 +1294,9 @@
           },
           {
             "$ref": "#/$defs/JunosPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/KaliPlatformModel"
           },
           {
             "$ref": "#/$defs/macOSPlatformModel"
