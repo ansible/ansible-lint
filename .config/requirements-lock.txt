@@ -4,7 +4,7 @@
 #
 #    pip-compile --no-annotate --output-file=.config/requirements-lock.txt --resolver=backtracking --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
-ansible-core==2.14.5
+ansible-core==2.15.0
 attrs==23.1.0
 black==23.3.0
 bracex==2.3.post1
@@ -12,6 +12,7 @@ cffi==1.15.1
 click==8.1.3
 cryptography==40.0.2
 filelock==3.12.0
+importlib-resources==5.0.7
 jinja2==3.1.2
 jsonschema==4.17.3
 markdown-it-py==2.2.0
