@@ -14,6 +14,7 @@ Currently supported versions of ansible-core are:
 - `2.13.x`
 - `2.14.x`
 - `2.15.x`
+- `2.16.x` (in development)
 
 This rule can produce messages such as:
 
