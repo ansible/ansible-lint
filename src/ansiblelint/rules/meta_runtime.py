@@ -30,7 +30,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
 
     # Refer to https://access.redhat.com/support/policy/updates/ansible-automation-platform
     # Also add devel to this list
-    supported_ansible = ["2.9.10", "2.11.", "2.12.", "2.13.", "2.14.", "2.15."]
+    supported_ansible = ["2.9.10", "2.11.", "2.12.", "2.13.", "2.14.", "2.15.", "2.16."]
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Find violations inside meta files.
