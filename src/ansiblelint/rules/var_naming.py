@@ -10,7 +10,7 @@ from ansible.parsing.yaml.objects import AnsibleUnicode
 from ansible.vars.reserved import get_reserved_names
 
 from ansiblelint.config import options
-from ansiblelint.constants import LINE_NUMBER_KEY, RC
+from ansiblelint.constants import ANNOTATION_KEYS, LINE_NUMBER_KEY, RC
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
@@ -48,6 +48,9 @@ class VariableNamingRule(AnsibleLintRule):
                 message="Variables names must be strings.",
                 rule=self,
             )
+
+        if ident in ANNOTATION_KEYS:
+            return None
 
         try:
             ident.encode("ascii")
@@ -262,5 +265,12 @@ if "pytest" in sys.modules:
             f"--config-file={conf_path}",
             role_path,
         )
+        assert result.returncode == RC.SUCCESS
+        assert "var-naming" not in result.stdout
+
+    def test_var_naming_with_include_tasks_and_vars() -> None:
+        """Test with include tasks and vars."""
+        role_path = "examples/roles/var_naming_pattern/tasks/include_task_with_vars.yml"
+        result = run_ansible_lint(role_path)
         assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout

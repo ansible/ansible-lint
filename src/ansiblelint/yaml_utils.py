@@ -27,7 +27,6 @@ from ansiblelint.constants import (
     ANNOTATION_KEYS,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
-    SKIPPED_RULES_KEY,
 )
 from ansiblelint.utils import Task
 
@@ -212,7 +211,7 @@ def _nested_items_path(
         msg = f"Expected a dict or a list but got {data_collection!r} of type '{type(data_collection)}'"
         raise TypeError(msg)
     for key, value in convert_data_collection_to_tuples():
-        if key in (SKIPPED_RULES_KEY, "__file__", "__line__", *ignored_keys):
+        if key in (*ANNOTATION_KEYS, *ignored_keys):
             continue
         yield key, value, parent_path
         if isinstance(value, (dict, list)):
