@@ -33,6 +33,31 @@ class YamllintRule(AnsibleLintRule):
     link = "https://yamllint.readthedocs.io/en/stable/rules.html"
     # ensure this rule runs before most of other common rules
     _order = 1
+    _ids = {
+        "yaml[anchors]": "",
+        "yaml[braces]": "",
+        "yaml[brackets]": "",
+        "yaml[colons]": "",
+        "yaml[commas]": "",
+        "yaml[comments-indentation]": "",
+        "yaml[comments]": "",
+        "yaml[document-end]": "",
+        "yaml[document-start]": "",
+        "yaml[empty-lines]": "",
+        "yaml[empty-values]": "",
+        "yaml[float-values]": "",
+        "yaml[hyphens]": "",
+        "yaml[indentation]": "",
+        "yaml[key-duplicates]": "",
+        "yaml[key-ordering]": "",
+        "yaml[line-length]": "",
+        "yaml[new-line-at-end-of-file]": "",
+        "yaml[new-lines]": "",
+        "yaml[octal-values]": "",
+        "yaml[quoted-strings]": "",
+        "yaml[trailing-spaces]": "",
+        "yaml[truthy]": "",
+    }
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""

@@ -70,6 +70,10 @@ class JinjaRule(AnsibleLintRule):
         "invalid": "Syntax error in jinja2 template: {value}",
         "spacing": "Jinja2 spacing could be improved: {value} -> {reformatted}",
     }
+    _ids = {
+        "jinja[invalid]": "Invalid jinja2 syntax",
+        "jinja[spacing]": "Jinja2 spacing could be improved",
+    }
 
     def _msg(self, tag: str, value: str, reformatted: str) -> str:
         """Generate error message."""
@@ -246,7 +250,7 @@ class JinjaRule(AnsibleLintRule):
         return result
 
     # pylint: disable=too-many-branches,too-many-statements,too-many-locals
-    def check_whitespace(  # noqa: max-complexity: 13
+    def check_whitespace(  # noqa: C901
         self,
         text: str,
         key: str,

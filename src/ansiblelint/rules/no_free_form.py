@@ -26,6 +26,10 @@ class NoFreeFormRule(AnsibleLintRule):
     cmd_shell_re = re.compile(
         r"(chdir|creates|executable|removes|stdin|stdin_add_newline|warn)=",
     )
+    _ids = {
+        "no-free-form[raw]": "Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
+        "no-free-form[raw-non-string]": "Passing a non string value to `raw` module is neither documented or supported.",
+    }
 
     def matchtask(
         self,

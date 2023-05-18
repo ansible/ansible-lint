@@ -31,6 +31,10 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
     # Refer to https://access.redhat.com/support/policy/updates/ansible-automation-platform
     # Also add devel to this list
     supported_ansible = ["2.9.10", "2.11.", "2.12.", "2.13.", "2.14.", "2.15.", "2.16."]
+    _ids = {
+        "meta-runtime[unsupported-version]": "requires_ansible key must be set to a supported version.",
+        "meta-runtime[invalid-version]": "'requires_ansible' is not a valid requirement specification",
+    }
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Find violations inside meta files.

@@ -149,6 +149,14 @@ class BaseRule:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
 
+    @classmethod
+    def ids(cls) -> dict[str, str]:
+        """Return a dictionary ids and their messages.
+
+        This is used by the ``--list-tags`` option to ansible-lint.
+        """
+        return getattr(cls, "_ids", {cls.id: cls.shortdesc})
+
 
 # pylint: enable=unused-argument
 

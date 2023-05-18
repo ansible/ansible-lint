@@ -21,6 +21,13 @@ class GalaxyRule(AnsibleLintRule):
     severity = "MEDIUM"
     tags = ["metadata"]
     version_added = "v6.11.0 (last update)"
+    _ids = {
+        "galaxy[tags]": "galaxy.yaml must have one of the required tags",
+        "galaxy[no-changelog]": "No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",
+        "galaxy[version-missing]": "galaxy.yaml should have version tag.",
+        "galaxy[version-incorrect]": "collection version should be greater than or equal to 1.0.0",
+        "galaxy[no-runtime]": "meta/runtime.yml file not found.",
+    }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""

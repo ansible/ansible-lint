@@ -91,6 +91,11 @@ class VariableNamingRule(AnsibleLintRule):
         "ansible_user",
         "ansible_remote_tmp",  # no included in docs
     }
+    _ids = {
+        "var-naming[no-reserved]": "Variables names must not be Ansible reserved names.",
+        "var-naming[no-jinja]": "Variables names must not contain jinja2 templating.",
+        "var-naming[pattern]": f"Variables names should match {re_pattern_str} regex.",
+    }
 
     # pylint: disable=too-many-return-statements
     def get_var_naming_matcherror(
