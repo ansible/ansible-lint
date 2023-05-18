@@ -7,6 +7,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from ansible.parsing.yaml.objects import AnsibleUnicode
+from ansible.vars.reserved import get_reserved_names
 
 from ansiblelint.config import options
 from ansiblelint.constants import LINE_NUMBER_KEY, RC
@@ -31,8 +32,9 @@ class VariableNamingRule(AnsibleLintRule):
     needs_raw_task = True
     re_pattern_str = options.var_naming_pattern or "^[a-z_][a-z0-9_]*$"
     re_pattern = re.compile(re_pattern_str)
+    reserved_names = get_reserved_names()
 
-    # pylint: disable=too-many-return-statements)
+    # pylint: disable=too-many-return-statements
     def get_var_naming_matcherror(
         self,
         ident: str,
@@ -52,14 +54,21 @@ class VariableNamingRule(AnsibleLintRule):
         except UnicodeEncodeError:
             return MatchError(
                 tag="var-naming[non-ascii]",
-                message="Variables names must be ASCII.",
+                message=f"Variables names must be ASCII. ({ident})",
                 rule=self,
             )
 
         if keyword.iskeyword(ident):
             return MatchError(
                 tag="var-naming[no-keyword]",
-                message="Variables names must not be Python keywords.",
+                message=f"Variables names must not be Python keywords. ({ident})",
+                rule=self,
+            )
+
+        if ident in self.reserved_names:
+            return MatchError(
+                tag="var-naming[no-reserved]",
+                message=f"Variables names must not be Ansible reserved names. ({ident})",
                 rule=self,
             )
 
@@ -74,7 +83,7 @@ class VariableNamingRule(AnsibleLintRule):
         if not bool(self.re_pattern.match(ident)):
             return MatchError(
                 tag="var-naming[pattern]",
-                message=f"Variables names should match {self.re_pattern_str} regex.",
+                message=f"Variables names should match {self.re_pattern_str} regex. ({ident})",
                 rule=self,
             )
 
@@ -140,7 +149,6 @@ class VariableNamingRule(AnsibleLintRule):
                 results.append(match_error)
 
         # If the task uses the 'set_fact' module
-        # breakpoint()
         ansible_module = task["action"]["__ansible_module__"]
         if ansible_module == "set_fact":
             for key in filter(
@@ -239,6 +247,7 @@ if "pytest" in sys.modules:
             ("var-naming[no-jinja]", 7),
             ("var-naming[no-keyword]", 9),
             ("var-naming[non-ascii]", 10),
+            ("var-naming[no-reserved]", 11),
         )
         assert len(results) == len(expected_errors)
         for idx, result in enumerate(results):

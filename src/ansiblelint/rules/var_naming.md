@@ -18,6 +18,7 @@ Possible errors messages:
 - `var-naming[pattern]`: Variables names should match ... regex.
 - `var-naming[no-role-prefix]`: Variables names from within roles should use
   `role_name_` as a prefix.
+- `var-naming[no-reserved]`: Variables names must not be Ansible reserved names.
 
 ## Settings
 
@@ -38,6 +39,7 @@ var_naming_pattern: "^[a-z_][a-z0-9_]*$"
     CamelCase: true # <- Contains a mix of lowercase and uppercase characters.
     ALL_CAPS: bar # <- Contains only uppercase characters.
     v@r!able: baz # <- Contains special characters.
+    hosts: [] # <- hosts is an Ansible reserved name
 ```
 
 ## Correct Code
@@ -50,6 +52,7 @@ var_naming_pattern: "^[a-z_][a-z0-9_]*$"
     lowercase: true # <- Contains only lowercase characters.
     no_caps: bar # <- Does not contains uppercase characters.
     variable: baz # <- Does not contain special characters.
+    my_hosts: [] # <- Does not use a reserved names.
 ```
 
 [cop]: https://redhat-cop.github.io/automation-good-practices/#_naming_things
