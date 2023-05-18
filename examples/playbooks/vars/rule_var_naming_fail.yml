@@ -9,3 +9,6 @@ CamelCaseButErrorIgnored: true # noqa: var-naming
 assert: true # invalid due to being Python reserved keyword
 é: true # invalid due to non-ascii character
 hosts: true # invalid as being Ansible reserved name
+role_name: boo # invalid as being Ansible special magic variable
+ansible_facts: {} # special variable that we allow to be written
+ansible_python_interpreter: python3 # special variable that we allow to be written

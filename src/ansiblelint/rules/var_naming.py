@@ -33,6 +33,64 @@ class VariableNamingRule(AnsibleLintRule):
     re_pattern_str = options.var_naming_pattern or "^[a-z_][a-z0-9_]*$"
     re_pattern = re.compile(re_pattern_str)
     reserved_names = get_reserved_names()
+    # List of special variables that should be treated as read-only. This list
+    # does not include connection variables, which we expect users to tune in
+    # specific cases.
+    # https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+    read_only_names = {
+        "ansible_check_mode",
+        "ansible_collection_name",
+        "ansible_config_file",
+        "ansible_dependent_role_names",
+        "ansible_diff_mode",
+        "ansible_forks",
+        "ansible_index_var",
+        "ansible_inventory_sources",
+        "ansible_limit",
+        "ansible_local",  # special fact
+        "ansible_loop",
+        "ansible_loop_var",
+        "ansible_parent_role_names",
+        "ansible_parent_role_paths",
+        "ansible_play_batch",
+        "ansible_play_hosts",
+        "ansible_play_hosts_all",
+        "ansible_play_name",
+        "ansible_play_role_names",
+        "ansible_playbook_python",
+        "ansible_role_name",
+        "ansible_role_names",
+        "ansible_run_tags",
+        "ansible_search_path",
+        "ansible_skip_tags",
+        "ansible_verbosity",
+        "ansible_version",
+        "group_names",
+        "groups",
+        "hostvars",
+        "inventory_dir",
+        "inventory_file",
+        "inventory_hostname",
+        "inventory_hostname_short",
+        "omit",
+        "play_hosts",
+        "playbook_dir",
+        "role_name",
+        "role_names",
+        "role_path",
+    }
+
+    # These special variables are used by Ansible but we allow users to set
+    # them as they might need it in certain cases.
+    allowed_special_names = {
+        "ansible_facts",
+        "ansible_become_user",
+        "ansible_connection",
+        "ansible_host",
+        "ansible_python_interpreter",
+        "ansible_user",
+        "ansible_remote_tmp",  # no included in docs
+    }
 
     # pylint: disable=too-many-return-statements
     def get_var_naming_matcherror(
@@ -49,7 +107,7 @@ class VariableNamingRule(AnsibleLintRule):
                 rule=self,
             )
 
-        if ident in ANNOTATION_KEYS:
+        if ident in ANNOTATION_KEYS or ident in self.allowed_special_names:
             return None
 
         try:
@@ -72,6 +130,13 @@ class VariableNamingRule(AnsibleLintRule):
             return MatchError(
                 tag="var-naming[no-reserved]",
                 message=f"Variables names must not be Ansible reserved names. ({ident})",
+                rule=self,
+            )
+
+        if ident in self.read_only_names:
+            return MatchError(
+                tag="var-naming[read-only]",
+                message=f"This special variable is read-only. ({ident})",
                 rule=self,
             )
 
@@ -251,6 +316,7 @@ if "pytest" in sys.modules:
             ("var-naming[no-keyword]", 9),
             ("var-naming[non-ascii]", 10),
             ("var-naming[no-reserved]", 11),
+            ("var-naming[read-only]", 12),
         )
         assert len(results) == len(expected_errors)
         for idx, result in enumerate(results):
