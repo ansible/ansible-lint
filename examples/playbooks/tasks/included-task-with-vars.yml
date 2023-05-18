@@ -1,0 +1,4 @@
+---
+- name: included-task-with-vars | Test
+  ansible.builtin.debug:
+    msg: "{{ foo }}"
