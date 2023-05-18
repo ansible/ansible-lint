@@ -6,5 +6,6 @@ this_is_valid: # valid because content is a dict, not a variable
 ALL_CAPS_ARE_BAD_TOO: ... # invalid
 "{{ 'test_' }}var": "value" # noqa: schema
 CamelCaseButErrorIgnored: true # noqa: var-naming
-assert: true # invalid due to reserved keyword
+assert: true # invalid due to being Python reserved keyword
 é: true # invalid due to non-ascii character
+hosts: true # invalid as being Ansible reserved name
