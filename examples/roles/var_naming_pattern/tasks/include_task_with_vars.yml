@@ -1,0 +1,5 @@
+---
+- name: include_task_with_vars | Foo
+  ansible.builtin.include_tasks: ../tasks/included-task-with-vars.yml
+  vars:
+    var_naming_pattern_foo: bar
