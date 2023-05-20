@@ -62,6 +62,9 @@ class RoleNames(AnsibleLintRule):
     severity = "HIGH"
     tags = ["deprecations", "metadata"]
     version_added = "v6.8.5"
+    _ids = {
+        "role-name[path]": "Avoid using paths when importing roles.",
+    }
 
     def matchtask(
         self,

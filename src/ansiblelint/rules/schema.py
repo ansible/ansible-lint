@@ -57,6 +57,23 @@ class ValidateSchemaRule(AnsibleLintRule):
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v6.1.0"
+    _ids = {
+        "schema[ansible-lint-config]": "",
+        "schema[ansible-navigator-config]": "",
+        "schema[changelog]": "",
+        "schema[execution-environment]": "",
+        "schema[galaxy]": "",
+        "schema[inventory]": "",
+        "schema[meta]": "",
+        "schema[meta-runtime]": "",
+        "schema[molecule]": "",
+        "schema[playbook]": "",
+        "schema[requirements]": "",
+        "schema[role-arg-spec]": "",
+        "schema[rulebook]": "",
+        "schema[tasks]": "",
+        "schema[vars]": "",
+    }
 
     def matchtask(
         self,

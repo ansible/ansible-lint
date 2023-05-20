@@ -22,6 +22,10 @@ class RunOnce(AnsibleLintRule):
 
     tags = ["idiom"]
     severity = "MEDIUM"
+    _ids = {
+        "run-once[task]": "Using run_once may behave differently if strategy is set to free.",
+        "run-once[play]": "Play uses strategy: free",
+    }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""

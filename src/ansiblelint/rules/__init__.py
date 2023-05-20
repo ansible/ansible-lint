@@ -503,6 +503,7 @@ class RulesCollection:
             "metadata": "Invalid metadata, likely related to galaxy, collections or roles",
             "opt-in": "Rules that are not used unless manually added to `enable_list`",
             "security": "Rules related o potentially security issues, like exposing credentials",
+            "syntax": "Related to wrong or deprecated syntax",
             "unpredictability": "Warn about code that might not work in a predictable way",
             "unskippable": "Indicate a fatal error that cannot be ignored or disabled",
             "yaml": "External linter which will also produce its own rule codes",
@@ -510,8 +511,13 @@ class RulesCollection:
 
         tags = defaultdict(list)
         for rule in self.rules:
+            # Fail early if a rule does not have any of our required tags
+            if not set(rule.tags).intersection(tag_desc.keys()):
+                msg = f"Rule {rule} does not have any of the required tags: {', '.join(tag_desc.keys())}"
+                raise RuntimeError(msg)
             for tag in rule.tags:
-                tags[tag].append(rule.id)
+                for id_ in rule.ids():
+                    tags[tag].append(id_)
         result = "# List of tags and rules they cover\n"
         for tag in sorted(tags):
             desc = tag_desc.get(tag, None)
@@ -519,7 +525,7 @@ class RulesCollection:
                 result += f"{tag}:  # {desc}\n"
             else:
                 result += f"{tag}:\n"
-            for name in tags[tag]:
+            for name in sorted(tags[tag]):
                 result += f"  - {name}\n"
         return result
 

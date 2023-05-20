@@ -29,6 +29,13 @@ class NameRule(AnsibleLintRule, TransformMixin):
     tags = ["idiom"]
     version_added = "v6.9.1 (last update)"
     _re_templated_inside = re.compile(r".*\{\{.*\}\}.*\w.*$")
+    _ids = {
+        "name[play]": "All plays should be named.",
+        "name[missing]": "All tasks should be named.",
+        "name[prefix]": "Task name should start with a prefix.",
+        "name[casing]": "All names should start with an uppercase letter.",
+        "name[template]": "Jinja templates should only be at the end of 'name'",
+    }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""

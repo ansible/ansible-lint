@@ -103,6 +103,11 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
     tags = ["formatting"]
     version_added = "v6.8.0"
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
+    _ids = {
+        "fqcn[action-core]": "Use FQCN for builtin module actions",
+        "fqcn[action]": "Use FQCN for module actions",
+        "fqcn[canonical]": "You should use canonical module name",
+    }
 
     def matchtask(
         self,
@@ -188,7 +193,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
-        if match.tag in {"fqcn[action-core]", "fqcn[action]", "fqcn[canonical]"}:
+        if match.tag in self.ids():
             target_task = self.seek(match.yaml_path, data)
             # Unfortunately, a lot of data about Ansible content gets lost here, you only get a simple dict.
             # For now, just parse the error messages for the data about action names etc. and fix this later.

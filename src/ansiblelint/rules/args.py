@@ -94,6 +94,9 @@ class ArgsRule(AnsibleLintRule):
     tags = ["syntax", "experimental"]
     version_added = "v6.10.0"
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
+    _ids = {
+        "args[module]": description,
+    }
 
     def matchtask(  # noqa: C901
         self,

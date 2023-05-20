@@ -22,7 +22,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
         "Identifies non-allowed entries in the `tests/sanity/ignore*.txt files."
     )
     severity = "MEDIUM"
-    tags = []
+    tags = ["idiom"]
     version_added = "v6.14.0"
 
     # Partner Engineering defines this list. Please contact PE for changes.
@@ -48,6 +48,10 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
         "compile-3.5",
         "compile-3.5!skip",
     ]
+    _ids = {
+        "sanity[cannot-ignore]": "Ignore file contains ... at line ..., which is not a permitted ignore.",
+        "sanity[bad-ignore]": "Ignore file entry at ... is formatted incorrectly. Please review.",
+    }
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Evaluate sanity ignore lists for disallowed ignores.
