@@ -157,6 +157,7 @@
               "latest",
               "literal-compare",
               "load-failure",
+              "load-failure[not-found]",
               "loop-var-prefix",
               "loop-var-prefix[missing]",
               "loop-var-prefix[wrong]",

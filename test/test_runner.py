@@ -173,3 +173,20 @@ def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> N
     # this second run should return 0 because the included filed was already
     # processed and added to checked_files, which acts like a bypass list.
     assert len(run2) == 0
+
+
+def test_runner_not_found(default_rules_collection: RulesCollection) -> None:
+    """Ensure that lintables aren't double-checked."""
+    checked_files: set[Lintable] = set()
+
+    filename = Path("this/folder/does/not/exist").resolve()
+    runner = Runner(
+        filename,
+        rules=default_rules_collection,
+        verbosity=0,
+        checked_files=checked_files,
+    )
+    result = runner.run()
+    assert len(runner.checked_files) == 1
+    assert len(result) == 1
+    assert result[0].tag == "load-failure[not-found]"

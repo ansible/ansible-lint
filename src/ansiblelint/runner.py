@@ -188,6 +188,16 @@ class Runner:
                     ),
                 )
                 lintable.stop_processing = True
+            # identify missing files/folders
+            if not lintable.path.exists():
+                matches.append(
+                    MatchError(
+                        lintable=lintable,
+                        message="File or found not found.",
+                        rule=LoadingFailureRule(),
+                        tag="load-failure[not-found]",
+                    ),
+                )
 
         # -- phase 1 : syntax check in parallel --
         def worker(lintable: Lintable) -> list[MatchError]:

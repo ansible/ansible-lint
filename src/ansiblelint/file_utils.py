@@ -205,7 +205,9 @@ class Lintable:
         if is_relative:
             name = name.relative_to(name.cwd())
         name = normpath_path(name)
-        self.path = name
+        # we need to be sure that we expanduser() because otherwise a simple
+        # test like .path.exists() will return unexpected results.
+        self.path = name.expanduser()
         # Filename is effective file on disk, for stdin is a namedtempfile
         self.name = self.filename = str(name)
 
