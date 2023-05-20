@@ -193,6 +193,9 @@ class LoadingFailureRule(BaseRule):
     version_added = "v4.3.0"
     _help = LOAD_FAILURE_MD
     _order = 0
+    _ids = {
+        "load-failure[not-found]": "File not found",
+    }
 
 
 class WarningRule(BaseRule):
