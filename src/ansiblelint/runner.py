@@ -63,10 +63,12 @@ class Runner:
         if exclude_paths is None:
             exclude_paths = []
 
-        # Assure consistent type
+        # Assure consistent type and configure given lintables as explicit (so
+        # excludes paths would not apply on them).
         for item in lintables:
             if not isinstance(item, Lintable):
                 item = Lintable(item)
+            item.explicit = True
             self.lintables.add(item)
 
         # Expand folders (roles) to their components
@@ -99,6 +101,11 @@ class Runner:
 
         # Exclusions should be evaluated only using absolute paths in order
         # to work correctly.
+
+        # Explicit lintables are never excluded
+        if lintable.explicit:
+            return False
+
         abs_path = str(lintable.abspath)
         if self.project_dir and not abs_path.startswith(self.project_dir):
             _logger.debug(
@@ -193,7 +200,7 @@ class Runner:
                 matches.append(
                     MatchError(
                         lintable=lintable,
-                        message="File or found not found.",
+                        message="File or directory found not found.",
                         rule=LoadingFailureRule(),
                         tag="load-failure[not-found]",
                     ),
@@ -251,7 +258,7 @@ class Runner:
         # remove any matches made inside excluded files
         matches = list(
             filter(
-                lambda match: not self.is_excluded(Lintable(match.filename))
+                lambda match: not self.is_excluded(match.lintable)
                 and hasattr(match, "lintable")
                 and match.tag not in match.lintable.line_skips[match.lineno],
                 matches,
