@@ -40,7 +40,7 @@ Ansible-lint creates a new cache on the next invocation.
 You should add the `.cache` folder to the `.gitignore` file in your git
 repositories.
 
-# Gradual adoption
+## Gradual adoption
 
 For an easier gradual adoption, adopters should consider [ignore
 file][configuring.md#ignoring-rules-for-entire-files] feature. This allows the
@@ -318,3 +318,17 @@ fully understand [variable precedence].
   https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
 [variable precedence]:
   https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
+
+## Dependencies and requirements
+
+Ansible-lint will recognize `requirements.yml` files used for runtime and
+testing purposes and install them automatically. Valid locations for these files
+are:
+
+- [`requirements.yml`](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file)
+- `roles/requirements.yml`
+- `collections/requirements.yml`
+- `tests/requirements.yml`
+- `tests/integration/requirements.yml`
+- `tests/unit/requirements.yml`
+- [`galaxy.yml`](https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html)
