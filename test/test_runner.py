@@ -48,7 +48,7 @@ LOTS_OF_WARNINGS_PLAYBOOK = Path("examples/playbooks/lots_of_warnings.yml").reso
         pytest.param(
             LOTS_OF_WARNINGS_PLAYBOOK,
             [LOTS_OF_WARNINGS_PLAYBOOK],
-            0,
+            992,
             id="lots_of_warnings",
         ),
         pytest.param(Path("examples/playbooks/become.yml"), [], 0, id="become"),
@@ -77,9 +77,9 @@ def test_runner(
 def test_runner_exclude_paths(default_rules_collection: RulesCollection) -> None:
     """Test that exclude paths do work."""
     runner = Runner(
-        "examples/playbooks/example.yml",
+        "examples/playbooks/deep/",
         rules=default_rules_collection,
-        exclude_paths=["examples/"],
+        exclude_paths=["examples/playbooks/deep/empty.yml"],
     )
 
     matches = runner.run()
@@ -190,3 +190,21 @@ def test_runner_not_found(default_rules_collection: RulesCollection) -> None:
     assert len(runner.checked_files) == 1
     assert len(result) == 1
     assert result[0].tag == "load-failure[not-found]"
+
+
+def test_runner_tmp_file(
+    tmp_path: Path,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Ensure we do not ignore an explicit temporary file from linting."""
+    # https://github.com/ansible/ansible-lint/issues/2628
+    filename = tmp_path / "playbook.yml"
+    filename.write_text("---\n")
+    runner = Runner(
+        filename,
+        rules=default_rules_collection,
+        verbosity=0,
+    )
+    result = runner.run()
+    assert len(result) == 1
+    assert result[0].tag == "syntax-check[empty-playbook]"

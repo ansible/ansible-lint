@@ -197,6 +197,7 @@ class Lintable:
         self.line_skips: dict[int, set[str]] = defaultdict(set)
         self.exc: Exception | None = None  # Stores data loading exceptions
         self.parent = parent
+        self.explicit = False  # Indicates if the file was explicitly provided or was indirectly included.
 
         if isinstance(name, str):
             name = Path(name)
