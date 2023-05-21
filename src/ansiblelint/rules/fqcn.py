@@ -159,7 +159,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                     )
                 # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once
                 # community team is flattening these.
-                # See: https://github.com/ansible-community/community-topics/issues/147
+                # https://github.com/ansible-community/community-topics/issues/147
                 elif not module.startswith("community.general.") or module.startswith(
                     "community.network.",
                 ):
