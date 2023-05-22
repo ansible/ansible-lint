@@ -168,7 +168,7 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/ee_broken/execution-environment.yml",
                 "execution-environment",
-                ["Additional properties are not allowed ('foo' was unexpected)"],
+                ["{'foo': 'bar'} is not valid under any of the given schemas"],
                 id="execution-environment-broken",
             ),
             ("examples/meta/runtime.yml", "meta-runtime", []),

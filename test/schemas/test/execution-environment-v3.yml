@@ -1,0 +1,19 @@
+---
+version: 3
+
+images:
+  base_image:
+    name: "quay.io/ansible/ansible-runner:stable-2.10-devel"
+
+dependencies:
+  galaxy: requirements.yml
+  python: requirements.txt
+  system: bindep.txt
+
+additional_build_steps:
+  prepend_base: |
+    RUN whoami
+    RUN cat /etc/os-release
+  append_base:
+    - RUN echo This is a post-install command!
+    - RUN ls -la /etc
