@@ -200,7 +200,7 @@ class Runner:
                 matches.append(
                     MatchError(
                         lintable=lintable,
-                        message="File or directory found not found.",
+                        message="File or directory not found.",
                         rule=LoadingFailureRule(),
                         tag="load-failure[not-found]",
                     ),
