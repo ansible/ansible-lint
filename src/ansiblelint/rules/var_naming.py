@@ -200,7 +200,7 @@ class VariableNamingRule(AnsibleLintRule):
 
         return results
 
-    def matchtask(
+    def matchtask(  # noqa: C901
         self,
         task: Task,
         file: Lintable | None = None,
@@ -211,8 +211,13 @@ class VariableNamingRule(AnsibleLintRule):
         filename = "" if file is None else str(file.path)
         if file and file.parent and file.parent.kind == "role":
             prefix = file.parent.path.name
+        ansible_module = task["action"]["__ansible_module__"]
         # If the task uses the 'vars' section to set variables
         our_vars = task.get("vars", {})
+        if ansible_module in ("include_role", "import_role"):
+            action = task["action"]
+            if isinstance(action, dict):
+                prefix = action.get("name", "").split("/")[-1]
         for key in our_vars:
             match_error = self.get_var_naming_matcherror(key, prefix=prefix)
             if match_error:
@@ -222,7 +227,6 @@ class VariableNamingRule(AnsibleLintRule):
                 results.append(match_error)
 
         # If the task uses the 'set_fact' module
-        ansible_module = task["action"]["__ansible_module__"]
         if ansible_module == "set_fact":
             for key in filter(
                 lambda x: isinstance(x, str) and not x.startswith("__"),

@@ -3,3 +3,11 @@
   ansible.builtin.include_tasks: ../tasks/included-task-with-vars.yml
   vars:
     var_naming_pattern_foo: bar
+
+- name: include_task_with_vars | Foo
+  ansible.builtin.include_role:
+    name: bobbins
+  vars:
+    bobbins_foo: bar
+    # ^ this is valid because for include/import, the prefix should be of the
+    # included role and from of the current role.
