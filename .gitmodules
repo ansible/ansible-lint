@@ -1,3 +1,0 @@
-[submodule ".projects/ansible-compat"]
-	path = .projects/ansible-compat
-	url = https://github.com/ansible/ansible-compat

@@ -71,7 +71,7 @@ source = ["src", ".tox/*/site-packages"]
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
-omit = ["*/src/*/_vendor/*", "test/*"]
+omit = ["test/*"]
 # Increase it just so it would pass on any single-python run
 fail_under = 93
 skip_covered = true
@@ -137,7 +137,7 @@ bad-names = [
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:
-ignore-paths = "^src/ansiblelint/(_version|_vendor).*$"
+ignore-paths = "^src/ansiblelint/_version.*$"
 
 [tool.pylint."MESSAGES CONTROL"]
 # increase from default is 50 which is too aggressive
@@ -199,7 +199,6 @@ norecursedirs = [
   "collections",
   "dist",
   "docs",
-  "src/ansiblelint/_vendor",
   "src/ansible_lint.egg-info",
   ".cache",
   ".eggs",
