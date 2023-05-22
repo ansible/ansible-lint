@@ -26,6 +26,13 @@ Possible errors messages:
 - `var-naming[no-reserved]`: Variables names must not be Ansible reserved names.
 - `var-naming[read-only]`: This special variable is read-only.
 
+!!! note
+
+    When using `include_role` or `import_role` with `vars`, vars should start
+    with included role name prefix. As this role might not be compliant
+    with this rule yet, you might need to temporarily disable this rule using
+    a `# noqa: var-naming[no-role-prefix]` comment.
+
 ## Settings
 
 This rule behavior can be changed by altering the below settings:
