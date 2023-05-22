@@ -1,0 +1,43 @@
+---
+name: Ansible Lint
+description: Run Ansible Lint
+author: Ansible by Red Hat <info@ansible.com>
+branding:
+  icon: shield
+  color: red
+inputs:
+  path:
+    description: >
+      Specific path to lint instead of the default `.`. Multiple arguments are
+      not supported and you will need to alter linter configuration to
+      accommodate other use cases.
+    required: false
+    # That default is just a placeholder workaround for no arguments use-case
+    # Feeding "." or empty string to ansible-lint makes it believe it is a role
+    default: --show-relpath
+  args:
+    description: deprecated
+    deprecationMessage: >
+      Arbitrary args are no longer accepted, please use path instead and
+      linter own configuration file to change its behavior.
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # needed by setuptools-scm
+        submodules: true
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        cache: pip
+        python-version: "3.11"
+
+    - name: Install ansible-lint
+      run: pipx install -e ".[lock]"
+
+    - name: Run ansible-lint
+      run: ansible-lint ${{ inputs.path }}
