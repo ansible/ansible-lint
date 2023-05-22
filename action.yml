@@ -1,0 +1,51 @@
+---
+name: ansible-lint
+description: Run Ansible Lint
+author: Ansible by Red Hat <info@ansible.com>
+branding:
+  icon: shield
+  color: red
+inputs:
+  path:
+    description: >
+      Specific path to lint instead of the default `.`. Multiple arguments are
+      not supported and you will need to alter linter configuration to
+      accommodate other use cases.
+    required: false
+    # That default is just a placeholder workaround for no arguments use-case
+    # Feeding "." or empty string to ansible-lint makes it believe it is a role
+    default: --show-relpath
+  args:
+    description: deprecated
+    deprecationMessage: >
+      Arbitrary args are no longer accepted, please use path instead and
+      linter own configuration file to change its behavior.
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # needed by setuptools-scm
+        submodules: true
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        cache: pip
+        python-version: "3.11"
+
+    - name: Install ansible-lint
+      shell: bash
+      # We need to set the version manually because $GITHUB_ACTION_PATH is not
+      # a git clone and setuptools-scm would not be able to determine the version.
+      # git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}
+      run: |
+        cd $GITHUB_ACTION_PATH
+        SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }} pip install ".[lock]"
+        ansible-lint --version
+
+    - name: Run ansible-lint
+      shell: bash
+      run: ansible-lint ${{ inputs.path }}
