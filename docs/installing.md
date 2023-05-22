@@ -78,3 +78,36 @@ pip3 install git+https://github.com/ansible/ansible-lint
 [pipx]: https://pypa.github.io/pipx/
 [pypa user guide]:
   https://packaging.python.org/en/latest/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date
+
+## Installing Ansible Lint as a GitHub Action
+
+To use the action simply create a file `.github/workflows/ansible-lint.yml` with
+content similar to the example below:
+
+```yaml
+# .github/workflows/ansible-lint.yml
+name: ansible-lint
+on:
+  pull_request:
+    branches: ["stable", "release/v*"]
+jobs:
+  build:
+    name: Ansible Lint # Naming the build is important to use it as a status check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v6
+```
+
+Due to limitations on how GitHub Actions are processing arguments, we do not
+plan to provide extra options. You will have to make use of
+[ansible-lint own configuration file](https://ansible-lint.readthedocs.io/configuring/)
+for altering its behavior.
+
+To also enable [dependabot][dependabot] automatic updates the newer versions of
+ansible-lint action you should create a file similar to
+[.github/dependabot.yml][.github/dependabot.yml]
+
+[dependabot]: https://docs.github.com/en/code-security/dependabot
+[.github/dependabot.yml]:
+  https://github.com/ansible/ansible-lint/blob/main/.github/dependabot.yml#L13-L19
