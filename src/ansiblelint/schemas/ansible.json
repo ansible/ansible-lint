@@ -41,7 +41,6 @@
       "type": "object"
     },
     "become_method": {
-      "markdownDescription": "See [become](https://docs.ansible.com/ansible/latest/user_guide/become.html)",
       "anyOf": [
         {
           "enum": [
@@ -68,6 +67,7 @@
           "type": "string"
         }
       ],
+      "markdownDescription": "See [become](https://docs.ansible.com/ansible/latest/user_guide/become.html)",
       "title": "Become Method"
     },
     "block": {
