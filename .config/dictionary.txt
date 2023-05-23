@@ -258,6 +258,7 @@ pkgs
 placefolder
 pluggy
 pluginmanager
+pmrun
 podman
 portchannel
 prerun
@@ -313,6 +314,7 @@ sdist
 sdists
 sectionauthor
 seealso
+sesu
 setenv
 setuptools
 shortdesc
@@ -339,6 +341,7 @@ subschema
 subschemas
 substrs
 subtest
+sudosu
 superfences
 supervisorctl
 swdepot

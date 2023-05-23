@@ -25,7 +25,10 @@
         "dzdo",
         "ksu",
         "doas",
-        "machinectl"
+        "machinectl",
+        "pmrun",
+        "sesu",
+        "sudosu"
       ]
     },
     "schemaPath": "#/oneOf/0/enum"
@@ -38,6 +41,15 @@
       "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
+  },
+  {
+    "instancePath": "/0/become_method",
+    "keyword": "pattern",
+    "message": "must match pattern \"^[A-Z][a-z][0-9]._$\"",
+    "params": {
+      "pattern": "^[A-Z][a-z][0-9]._$"
+    },
+    "schemaPath": "#/oneOf/2/pattern"
   },
   {
     "instancePath": "/0/become_method",
@@ -62,7 +74,10 @@
         "dzdo",
         "ksu",
         "doas",
-        "machinectl"
+        "machinectl",
+        "pmrun",
+        "sesu",
+        "sudosu"
       ]
     },
     "schemaPath": "#/oneOf/0/enum"
@@ -75,6 +90,15 @@
       "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
     },
     "schemaPath": "#/$defs/full-jinja/pattern"
+  },
+  {
+    "instancePath": "/0/become_method",
+    "keyword": "pattern",
+    "message": "must match pattern \"^[A-Z][a-z][0-9]._$\"",
+    "params": {
+      "pattern": "^[A-Z][a-z][0-9]._$"
+    },
+    "schemaPath": "#/oneOf/2/pattern"
   },
   {
     "instancePath": "/0/become_method",
@@ -119,11 +143,15 @@ stdout:
         },
         {
           "path": "$[0].become_method",
-          "message": "'sudo_var' is not one of ['sudo', 'su', 'pbrun', 'pfexec', 'runas', 'dzdo', 'ksu', 'doas', 'machinectl']"
+          "message": "'sudo_var' is not one of ['sudo', 'su', 'pbrun', 'pfexec', 'runas', 'dzdo', 'ksu', 'doas', 'machinectl', 'pmrun', 'sesu', 'sudosu']"
         },
         {
           "path": "$[0].become_method",
           "message": "'sudo_var' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
+        },
+        {
+          "path": "$[0].become_method",
+          "message": "'sudo_var' does not match '^[A-Z][a-z][0-9]._$'"
         },
         {
           "path": "$[0]",
@@ -135,11 +163,15 @@ stdout:
         },
         {
           "path": "$[0].become_method",
-          "message": "'sudo_var' is not one of ['sudo', 'su', 'pbrun', 'pfexec', 'runas', 'dzdo', 'ksu', 'doas', 'machinectl']"
+          "message": "'sudo_var' is not one of ['sudo', 'su', 'pbrun', 'pfexec', 'runas', 'dzdo', 'ksu', 'doas', 'machinectl', 'pmrun', 'sesu', 'sudosu']"
         },
         {
           "path": "$[0].become_method",
           "message": "'sudo_var' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
+        },
+        {
+          "path": "$[0].become_method",
+          "message": "'sudo_var' does not match '^[A-Z][a-z][0-9]._$'"
         }
       ]
     }
