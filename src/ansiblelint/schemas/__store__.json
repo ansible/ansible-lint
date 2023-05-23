@@ -12,7 +12,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/changelog.json"
   },
   "execution-environment": {
-    "etag": "fb343322c706fe2a571adf4f33e01a4bc86dc1d4ec548c22911eb116ccb355de",
+    "etag": "f3abb1716134227ccd667607840dd7bdebfd02a8980603df031282126dc78264",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json"
   },
   "galaxy": {

@@ -1,0 +1,4 @@
+- command: echo 123
+  vars:
+    sudo_var: doo
+  become_method: true

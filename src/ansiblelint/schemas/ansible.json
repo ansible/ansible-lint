@@ -41,26 +41,33 @@
       "type": "object"
     },
     "become_method": {
-      "markdownDescription": "See [become](https://docs.ansible.com/ansible/latest/user_guide/become.html)",
-      "oneOf": [
+      "anyOf": [
         {
           "enum": [
-            "sudo",
-            "su",
-            "pbrun",
-            "pfexec",
-            "runas",
-            "dzdo",
-            "ksu",
-            "doas",
-            "machinectl"
+            "ansible.builtin.sudo",
+            "ansible.builtin.su",
+            "community.general.pbrun",
+            "community.general.pfexec",
+            "ansible.builtin.runas",
+            "community.general.dzdo",
+            "community.general.ksu",
+            "community.general.doas",
+            "community.general.machinectl",
+            "community.general.pmrun",
+            "community.general.sesu",
+            "community.general.sudosu"
           ],
           "type": "string"
         },
         {
           "$ref": "#/$defs/full-jinja"
+        },
+        {
+          "pattern": "[A-Za-z0-9_\\.]+",
+          "type": "string"
         }
       ],
+      "markdownDescription": "See [become](https://docs.ansible.com/ansible/latest/user_guide/become.html)",
       "title": "Become Method"
     },
     "block": {
