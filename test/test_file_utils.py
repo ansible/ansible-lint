@@ -7,16 +7,19 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+# pylint: disable=preferred-module
 import pytest
 
 from ansiblelint import cli, file_utils
 from ansiblelint.__main__ import initialize_logger
+from ansiblelint.config import Options
 from ansiblelint.file_utils import (
     Lintable,
     cwd,
     expand_path_vars,
     expand_paths_vars,
     find_project_root,
+    is_excluded,
     normpath,
     normpath_path,
 )
@@ -27,7 +30,6 @@ if TYPE_CHECKING:
     from _pytest.logging import LogCaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
 
-    from ansiblelint.config import Options
     from ansiblelint.constants import FileType
     from ansiblelint.rules import RulesCollection
 
@@ -119,7 +121,7 @@ def test_discover_lintables_silent(
     caplog.set_level(logging.FATAL)
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
-    lint_path = test_dir / ".." / "examples" / "roles" / "test-role"
+    lint_path = (test_dir / ".." / "examples" / "roles" / "test-role").resolve()
     if not is_in_git:
         monkeypatch.setenv("GIT_DIR", "")
 
@@ -579,3 +581,18 @@ def test_bug_2513(
         results = Runner(filename, rules=default_rules_collection).run()
         assert len(results) == 1
         assert results[0].rule.id == "name"
+
+
+@pytest.mark.parametrize(
+    ("path", "exclude_paths", "result"),
+    (
+        pytest.param("foo/some.yml", ["foo"], True, id="0"),
+        pytest.param("foo/bar/some.yml", ["foo"], True, id="1"),
+        pytest.param("foo/bar/some.yml", ["foo/"], True, id="2"),
+        pytest.param("foo/bar/some.yml", ["foo/**"], True, id="3"),
+    ),
+)
+def test_is_excluded(path: str, exclude_paths: list[str], result: bool) -> None:
+    """Test logic for excluding files."""
+    custom_options = Options(exclude_paths=exclude_paths)
+    assert is_excluded(Path(path), opts=custom_options) == result

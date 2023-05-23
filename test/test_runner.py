@@ -58,6 +58,12 @@ LOTS_OF_WARNINGS_PLAYBOOK = Path("examples/playbooks/lots_of_warnings.yml").reso
             0,
             id="contains_secrets",
         ),
+        pytest.param(
+            Path("examples/playbooks/deep"),
+            ["examples/playbooks/deep/empty.yml"],
+            0,
+            id="excludes",
+        ),
     ),
 )
 def test_runner(
@@ -99,8 +105,8 @@ def test_runner_exclude_globs(
     )
 
     matches = runner.run()
-    # we expect to find one 2 matches from the very few .yaml file we have there (most of them have .yml extension)
-    assert len(matches) == 2
+    # we expect to find one match from a  .yaml (most of them have .yml extension)
+    assert len(matches) == 1
 
 
 @pytest.mark.parametrize(

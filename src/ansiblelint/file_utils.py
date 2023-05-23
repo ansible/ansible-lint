@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+import fnmatch
 import logging
 import os
 import subprocess
@@ -489,22 +490,53 @@ def discover_lintables(options: Options) -> dict[str, Any]:
 
     # Applying exclude patterns
     if not out:
-        out = set(".")
+        _logger.info("Looking up for files using glob ...")
+        out = {str(file) for file in Path(".").glob("**/*.*")}
 
-    exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
-    _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
-    # remove './' prefix from output of WcMatch
-    out = {
-        strip_dotslash_prefix(fname)
-        for fname in wcmatch.wcmatch.WcMatch(
-            ".",
-            exclude_pattern=exclude_pattern,
-            flags=wcmatch.wcmatch.RECURSIVE,
-            limit=256,
-        ).match()
-    }
-
+    before_count = len(out)
+    out = {file for file in out if not is_excluded(Path(file), opts=options)}
+    after_count = len(out)
+    if before_count != after_count:
+        exclude_pattern = ", ".join(str(x) for x in options.exclude_paths)
+        _logger.info(
+            "Filtered out %d/%d files due to exclude patterns: %s ...",
+            before_count - after_count,
+            before_count,
+            exclude_pattern,
+        )
     return OrderedDict.fromkeys(sorted(out))
+
+
+def is_excluded(path: Path, opts: Options = options) -> bool:
+    """Verify if a file path should be excluded."""
+    abs_path = str(path.resolve())
+    if opts.project_dir and not abs_path.startswith(
+        os.path.abspath(opts.project_dir),
+    ):
+        _logger.debug(
+            "Skipping %s as it is outside of the project directory.",
+            abs_path,
+        )
+        return True
+
+    # fnmatch does not work as excepted so we need to ensure the following
+    # logic:
+    # - a perfect match -> excluded
+    # - a match with `/**` appended to the pattern -> excluded
+    for pattern in opts.exclude_paths:
+        pattern2 = pattern + "**" if pattern.endswith("/") else pattern + "/**"
+        if (
+            abs_path.startswith(pattern)
+            or fnmatch.fnmatch(str(path), pattern)
+            or fnmatch.fnmatch(str(path), pattern2)
+        ):
+            _logger.debug(
+                "Skipped %s as it matches exclude pattern '%s'",
+                path,
+                pattern,
+            )
+            return True
+    return False
 
 
 def strip_dotslash_prefix(fname: str) -> str:

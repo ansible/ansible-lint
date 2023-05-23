@@ -7,7 +7,6 @@ import multiprocessing.pool
 import os
 import warnings
 from dataclasses import dataclass
-from fnmatch import fnmatch
 from typing import TYPE_CHECKING, Any
 
 from ansible_compat.runtime import AnsibleWarning
@@ -17,7 +16,7 @@ import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule, WarningRule
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
-from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
+from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables, is_excluded
 from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 
 if TYPE_CHECKING:
@@ -68,7 +67,7 @@ class Runner:
         for item in lintables:
             if not isinstance(item, Lintable):
                 item = Lintable(item)
-            item.explicit = True
+                item.explicit = True
             self.lintables.add(item)
 
         # Expand folders (roles) to their components
@@ -95,32 +94,11 @@ class Runner:
 
     def is_excluded(self, lintable: Lintable) -> bool:
         """Verify if a file path should be excluded."""
-        # Any will short-circuit as soon as something returns True, but will
-        # be poor performance for the case where the path under question is
-        # not excluded.
-
-        # Exclusions should be evaluated only using absolute paths in order
-        # to work correctly.
-
         # Explicit lintables are never excluded
         if lintable.explicit:
             return False
 
-        abs_path = str(lintable.abspath)
-        if self.project_dir and not abs_path.startswith(self.project_dir):
-            _logger.debug(
-                "Skipping %s as it is outside of the project directory.",
-                abs_path,
-            )
-            return True
-
-        return any(
-            abs_path.startswith(path)
-            or lintable.path.match(path)
-            or fnmatch(str(abs_path), path)
-            or fnmatch(str(lintable), path)
-            for path in self.exclude_paths
-        )
+        return is_excluded(lintable.path)
 
     def run(self) -> list[MatchError]:
         """Execute the linting process."""

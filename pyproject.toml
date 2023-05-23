@@ -222,6 +222,7 @@ python_files = [
 xfail_strict = true
 
 [tool.ruff]
+required-version = "0.0.270"
 ignore = [
   "E501", # we use black
   "ERA001", # auto-removal of commented out code affects development and vscode integration
