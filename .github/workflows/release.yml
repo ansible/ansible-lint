@@ -5,8 +5,14 @@ name: release
 "on":
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
+  # https://github.com/marketplace/actions/actions-tagger
+  actions-tagger:
+    runs-on: windows-latest
+    steps:
+      - uses: Actions-R-Us/actions-tagger@latest
   pypi:
     name: Publish to PyPI registry
     environment: release
