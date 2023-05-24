@@ -229,7 +229,9 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task uses the 'set_fact' module
         if ansible_module == "set_fact":
             for key in filter(
-                lambda x: isinstance(x, str) and not x.startswith("__"),
+                lambda x: isinstance(x, str)
+                and not x.startswith("__")
+                and x != "cacheable",
                 task["action"].keys(),
             ):
                 match_error = self.get_var_naming_matcherror(key, prefix=prefix)
@@ -346,6 +348,13 @@ if "pytest" in sys.modules:
     def test_var_naming_with_include_tasks_and_vars() -> None:
         """Test with include tasks and vars."""
         role_path = "examples/roles/var_naming_pattern/tasks/include_task_with_vars.yml"
+        result = run_ansible_lint(role_path)
+        assert result.returncode == RC.SUCCESS
+        assert "var-naming" not in result.stdout
+
+    def test_var_naming_with_set_fact_and_cacheable() -> None:
+        """Test with include tasks and vars."""
+        role_path = "examples/roles/var_naming_pattern/tasks/cacheable_set_fact.yml"
         result = run_ansible_lint(role_path)
         assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout

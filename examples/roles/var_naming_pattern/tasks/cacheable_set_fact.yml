@@ -1,0 +1,5 @@
+---
+- name: cacheable_set_fact | Using set_fact with cacheable
+  ansible.builtin.set_fact:
+    var_naming_pattern_fact: bar
+    cacheable: true
