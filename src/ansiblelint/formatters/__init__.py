@@ -42,7 +42,11 @@ class BaseFormatter(Generic[T]):
         if not self.base_dir or not path:
             return path
         # Use os.path.relpath 'cause Path.relative_to() misbehaves
-        return os.path.relpath(path, start=self.base_dir)
+        rel_path = os.path.relpath(path, start=self.base_dir)
+        # Avoid returning relative paths that go outside of base_dir
+        if rel_path.startswith(".."):
+            return path
+        return rel_path
 
     def apply(self, match: MatchError) -> str:
         """Format a match error."""
