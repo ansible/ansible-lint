@@ -1,0 +1,4 @@
+---
+- name: Task
+  ansible.builtin.debug:
+    msg: "{{ my_role2_foo }}"

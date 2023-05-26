@@ -217,7 +217,8 @@ class VariableNamingRule(AnsibleLintRule):
         if ansible_module in ("include_role", "import_role"):
             action = task["action"]
             if isinstance(action, dict):
-                prefix = action.get("name", "").split("/")[-1]
+                role_fqcn = action.get("name", "")
+                prefix = role_fqcn.split("/" if "/" in role_fqcn else ".")[-1]
         for key in our_vars:
             match_error = self.get_var_naming_matcherror(key, prefix=prefix)
             if match_error:
@@ -355,6 +356,13 @@ if "pytest" in sys.modules:
     def test_var_naming_with_set_fact_and_cacheable() -> None:
         """Test with include tasks and vars."""
         role_path = "examples/roles/var_naming_pattern/tasks/cacheable_set_fact.yml"
+        result = run_ansible_lint(role_path)
+        assert result.returncode == RC.SUCCESS
+        assert "var-naming" not in result.stdout
+
+    def test_var_naming_with_include_role_import_role() -> None:
+        """Test with include role and import role."""
+        role_path = "examples/test_collection/roles/my_role/tasks/main.yml"
         result = run_ansible_lint(role_path)
         assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout
