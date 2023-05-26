@@ -173,6 +173,29 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                     )
         return result
 
+    def matchyaml(self, file: Lintable) -> list[MatchError]:
+        """Return matches found for a specific YAML text."""
+        result = []
+        if file.kind == "plugin":
+            i = file.path.resolve().parts.index("plugins")
+            plugin_type = file.path.resolve().parts[i : i + 2]
+            short_path = file.path.resolve().parts[i + 2 :]
+            if len(short_path) > 1:
+                result.append(
+                    self.create_matcherror(
+                        message=f"Deep plugins directory is discouraged. Move '{file.path}' directly under '{'/'.join(plugin_type)}' folder.",
+                        tag="fqcn[deep]",
+                        filename=file,
+                    ),
+                )
+        elif file.kind == "playbook":
+            for play in file.data:
+                if play is None:
+                    continue
+
+                result.extend(self.matchplay(file, play))
+        return result
+
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         if file.kind != "playbook":
             return []
@@ -241,3 +264,21 @@ if "pytest" in sys.modules:
         success = "examples/playbooks/rule-fqcn-pass.yml"
         results = Runner(success, rules=collection).run()
         assert len(results) == 0, results
+
+    def test_fqcn_deep_fail() -> None:
+        """Test rule matches."""
+        collection = RulesCollection()
+        collection.register(FQCNBuiltinsRule())
+        failure = "examples/collection/plugins/modules/deep/beta.py"
+        results = Runner(failure, rules=collection).run()
+        assert len(results) == 1
+        assert results[0].tag == "fqcn[deep]"
+        assert "Deep plugins directory is discouraged" in results[0].message
+
+    def test_fqcn_deep_pass() -> None:
+        """Test rule does not match."""
+        collection = RulesCollection()
+        collection.register(FQCNBuiltinsRule())
+        success = "examples/collection/plugins/modules/alpha.py"
+        results = Runner(success, rules=collection).run()
+        assert len(results) == 0

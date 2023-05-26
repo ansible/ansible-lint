@@ -400,8 +400,9 @@ class Lintable:
                     self.state = append_skipped_rules(self.state, self)
                 else:
                     logging.debug(
-                        "data set to None for %s due to being of %s kind.",
+                        "data set to None for %s due to being '%s' (%s) kind.",
                         self.path,
+                        self.kind,
                         self.base_kind or "unknown",
                     )
                     self.state = States.UNKNOWN_DATA
