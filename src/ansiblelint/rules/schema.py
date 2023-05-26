@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
+from ansiblelint.app import get_app
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.schemas.__main__ import JSON_SCHEMAS
 from ansiblelint.schemas.main import validate_file_schema
+from ansiblelint.text import has_jinja
 
 if TYPE_CHECKING:
     from ansiblelint.utils import Task
@@ -75,6 +77,49 @@ class ValidateSchemaRule(AnsibleLintRule):
         "schema[vars]": "",
     }
 
+    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
+        """Return matches found for a specific playbook."""
+        results = []
+
+        if not data or file.kind not in ("tasks", "handlers", "playbook"):
+            return results
+        # check at play level
+        become_method = data.get("become_method", None)
+        available_become_plugins = get_app().runtime.plugins.become
+        available_become_plugins_keys = available_become_plugins.keys()
+        if (
+            become_method
+            and not has_jinja(become_method)
+            and not available_become_plugins.get(become_method)
+        ):
+            results.append(
+                MatchError(
+                    message=f"'become_method' must be one of the currently installed plugins: {', '.join(available_become_plugins_keys)}",
+                    lintable=file or Lintable(""),
+                    rule=ValidateSchemaRule(),
+                    details=ValidateSchemaRule.description,
+                    tag=f"schema[{file.kind}]",
+                ),
+            )
+
+        # check at task level
+        tasks = data.get("tasks", [])
+        if tasks:
+            for task in tasks:
+                become_method = task.get("become_method", None)
+                if become_method and not has_jinja(become_method):
+                    results.append(
+                        MatchError(
+                            message=f"'become_method' must be one of the currently installed plugins: {', '.join(available_become_plugins_keys)}",
+                            lintable=file or Lintable(""),
+                            rule=ValidateSchemaRule(),
+                            details=ValidateSchemaRule.description,
+                            tag=f"schema[{file.kind}]",
+                        ),
+                    )
+
+        return results
+
     def matchtask(
         self,
         task: Task,
@@ -98,9 +143,9 @@ class ValidateSchemaRule(AnsibleLintRule):
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return JSON validation errors found as a list of MatchError(s)."""
-        result = []
+        result: list[MatchError] = []
         if file.kind not in JSON_SCHEMAS:
-            return []
+            return result
 
         errors = validate_file_schema(file)
         if errors:
@@ -120,6 +165,9 @@ class ValidateSchemaRule(AnsibleLintRule):
                     tag=f"schema[{file.kind}]",
                 ),
             )
+
+        if not result:
+            result = super().matchyaml(file)
         return result
 
 
