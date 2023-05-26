@@ -4,7 +4,7 @@
 #
 #    pip-compile --no-annotate --output-file=.config/requirements-lock.txt --resolver=backtracking --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
-ansible-compat==4.0.5
+ansible-compat==4.1.0
 ansible-core==2.15.0
 attrs==23.1.0
 black==23.3.0
@@ -28,12 +28,12 @@ pygments==2.15.1
 pyrsistent==0.19.3
 pyyaml==6.0
 rich==13.3.5
-ruamel-yaml==0.17.26
+ruamel-yaml==0.17.27
 subprocess-tee==0.4.1
 tomli==2.0.1
-typing-extensions==4.5.0
+typing-extensions==4.6.2
 wcmatch==8.4.1
-yamllint==1.31.0
+yamllint==1.32.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # resolvelib
