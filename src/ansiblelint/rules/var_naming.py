@@ -200,7 +200,7 @@ class VariableNamingRule(AnsibleLintRule):
 
         return results
 
-    def matchtask(  # noqa: C901
+    def matchtask(
         self,
         task: Task,
         file: Lintable | None = None,

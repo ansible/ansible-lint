@@ -98,12 +98,12 @@ class ArgsRule(AnsibleLintRule):
         "args[module]": description,
     }
 
-    def matchtask(  # noqa: C901
+    def matchtask(
         self,
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
-        # pylint: disable=too-many-branches,too-many-locals,too-many-return-statements
+        # pylint: disable=too-many-locals,too-many-return-statements
         results: list[MatchError] = []
         module_name = task["action"]["__ansible_module_original__"]
         failed_msg = None

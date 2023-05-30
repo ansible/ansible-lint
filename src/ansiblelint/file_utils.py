@@ -181,7 +181,7 @@ class Lintable:
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(  # noqa: C901
+    def __init__(
         self,
         name: str | Path,
         content: str | None = None,

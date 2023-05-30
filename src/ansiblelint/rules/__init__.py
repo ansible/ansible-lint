@@ -141,8 +141,7 @@ class AnsibleLintRule(BaseRule):
             matches.append(matcherror)
         return matches
 
-    # pylint: disable=too-many-branches
-    def matchtasks(self, file: Lintable) -> list[MatchError]:  # noqa: C901
+    def matchtasks(self, file: Lintable) -> list[MatchError]:
         """Call matchtask for each task inside file and return aggregate results.
 
         Most rules will never need to override matchtasks because its main
@@ -325,7 +324,7 @@ class TransformMixin:
 
 
 # pylint: disable=too-many-nested-blocks
-def load_plugins(  # : max-complexity: 11
+def load_plugins(
     dirs: list[str],
 ) -> Iterator[AnsibleLintRule]:
     """Yield a rule class."""
@@ -438,7 +437,7 @@ class RulesCollection:
         """Combine rules."""
         self.rules.extend(more)
 
-    def run(  # : max-complexity: 12
+    def run(
         self,
         file: Lintable,
         tags: set[str] | None = None,

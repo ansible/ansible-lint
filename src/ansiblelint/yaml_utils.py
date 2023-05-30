@@ -337,7 +337,7 @@ def _get_path_to_task_in_playbook(
     return []
 
 
-def _get_path_to_task_in_tasks_block(  # noqa: C901
+def _get_path_to_task_in_tasks_block(
     lineno: int,  # 1-based
     tasks_block: CommentedSeq,
     last_lineno: int | None = None,  # 1-based
@@ -852,7 +852,7 @@ class FormattedYAML(YAML):
         # self.Representer.add_representer(
 
     @staticmethod
-    def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:  # noqa: C901
+    def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:
         """Extract FormattedYAML-relevant settings from yamllint config if possible."""
         config = {
             "explicit_start": True,
