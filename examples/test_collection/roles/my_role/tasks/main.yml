@@ -1,0 +1,6 @@
+---
+- name: Task
+  ansible.builtin.include_role:
+    name: example.test_collection.my_role2
+  vars:
+    my_role2_foo: something
