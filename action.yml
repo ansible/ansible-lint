@@ -6,20 +6,8 @@ branding:
   icon: shield
   color: red
 inputs:
-  path:
-    description: >
-      Specific path to lint instead of the default `.`. Multiple arguments are
-      not supported and you will need to alter linter configuration to
-      accommodate other use cases.
-    required: false
-    # That default is just a placeholder workaround for no arguments use-case
-    # Feeding "." or empty string to ansible-lint makes it believe it is a role
-    default: --show-relpath
   args:
-    description: deprecated
-    deprecationMessage: >
-      Arbitrary args are no longer accepted, please use path instead and
-      linter own configuration file to change its behavior.
+    description: Arguments to be passed to ansible-lint command
     required: false
     default: ""
 runs:
@@ -30,15 +18,16 @@ runs:
         fetch-depth: 0 # needed by setuptools-scm
         submodules: true
 
+    - name: Generate ansible-lint-requirements.txt
+      shell: bash
+      run: |
+        wget --output-file=$HOME/requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ github.action_ref || 'main' }}/.config/requirements-lock.txt
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         cache: pip
-        # As setting cache to pip fails if there is no requirements.txt, we
-        # trick it to also load /dev/null to avoid failure for no requirements.
-        cache-dependency-path: |
-          **/requirements*.txt
-          /dev/null
+        cache-dependency-path: ~/requirements.txt
         python-version: "3.11"
 
     - name: Install ansible-lint
@@ -46,11 +35,12 @@ runs:
       # We need to set the version manually because $GITHUB_ACTION_PATH is not
       # a git clone and setuptools-scm would not be able to determine the version.
       # git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}
+      # SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }}
       run: |
         cd $GITHUB_ACTION_PATH
-        SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }} pip install ".[lock]"
+        pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}"
         ansible-lint --version
 
     - name: Run ansible-lint
       shell: bash
-      run: ansible-lint ${{ inputs.path }}
+      run: ansible-lint ${{ inputs.args }}
