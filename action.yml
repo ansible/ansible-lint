@@ -34,6 +34,11 @@ runs:
       uses: actions/setup-python@v4
       with:
         cache: pip
+        # As setting cache to pip fails if there is no requirements.txt, we
+        # trick it to also load /dev/null to avoid failure for no requirements.
+        cache-dependency-path: |
+          **/requirements*.txt
+          /dev/null
         python-version: "3.11"
 
     - name: Install ansible-lint

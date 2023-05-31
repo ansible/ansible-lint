@@ -28,6 +28,11 @@
                 "name": {
                     "type": "string"
                 },
+                "execution_strategy": {
+                    "type": "string",
+                    "enum": ["sequential", "parallel"],
+                    "default": "sequential"
+                },
                 "sources": {
                     "type": "array",
                     "items": {
