@@ -1,0 +1,10 @@
+---
+- name: Test 'become_method' plugin validity
+  hosts: localhost
+  become: true
+  become_method: this_is_not_an_installed_plugin
+  tasks:
+    - name: Another example
+      ansible.builtin.debug:
+        msg: "This should not be reached"
+      become_method: this_is_not_an_installed_plugin
