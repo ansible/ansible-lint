@@ -13,6 +13,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: Actions-R-Us/actions-tagger@latest
+        env:
+          GITHUB_TOKEN: "${{ github.token }}"
   pypi:
     name: Publish to PyPI registry
     environment: release
