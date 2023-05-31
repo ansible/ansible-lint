@@ -299,10 +299,19 @@ if "pytest" in sys.modules:
                 id="rulebook2",
             ),
             pytest.param(
-                "examples/playbooks/rule-schema-become-method.yml",
+                "examples/playbooks/rule-schema-become-method-pass.yml",
                 "playbook",
                 [],
                 id="playbook",
+            ),
+            pytest.param(
+                "examples/playbooks/rule-schema-become-method-fail.yml",
+                "playbook",
+                [
+                    "'become_method' must be one of the currently installed plugins",
+                    "'become_method' must be one of the currently installed plugins",
+                ],
+                id="playbook2",
             ),
         ),
     )
