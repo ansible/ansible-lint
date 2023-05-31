@@ -34,6 +34,7 @@ CACHE_DIR = (
 DEFAULT_WARN_LIST = [
     "experimental",
     "jinja[spacing]",  # warning until we resolve all reported false-positives
+    "fqcn[deep]",  # 2023-05-31 added
 ]
 
 DEFAULT_KINDS = [
@@ -74,6 +75,11 @@ DEFAULT_KINDS = [
     {"yaml": "**/*.{yaml,yml}"},
     {"yaml": "**/.*.{yaml,yml}"},
     {"sanity-ignore-file": "**/tests/sanity/ignore-*.txt"},
+    # what are these doc_fragments? We also ignore module_utils for now
+    {
+        "plugin": "**/plugins/{action,become,cache,callback,connection,filter,inventory,lookup,modules,test}/**/*.py",
+    },
+    {"python": "**/*.py"},
 ]
 
 BASE_KINDS = [
@@ -93,6 +99,7 @@ BASE_KINDS = [
     {"text/yaml": "**/{.ansible-lint,.yamllint}"},
     {"text/yaml": "**/*.{yaml,yml}"},
     {"text/yaml": "**/.*.{yaml,yml}"},
+    {"text/python": "**/*.py"},
 ]
 
 PROFILES = yaml_from_file(Path(__file__).parent / "data" / "profiles.yml")

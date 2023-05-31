@@ -12,6 +12,8 @@ The `fqcn` rule has the following checks:
 - `fqcn[action-core]` - Checks for FQCNs from the `ansible.legacy` or
   `ansible.builtin` collection.
 - `fqcn[canonical]` - You should use canonical module name ... instead of ...
+- [`fqcn[deep]`](#deep-modules) - Checks for deep/nested plugins directory
+  inside collections.
 - `fqcn[keyword]` - Avoid `collections` keyword by using FQCN for all plugins,
   modules, roles and playbooks.
 
@@ -40,6 +42,17 @@ The only exception for using a canonical name is if your code still needs to be
 compatible with a very old version of Ansible, one that does not know how to
 resolve that name. If you find yourself in such a situation, feel free to add
 this rule to the ignored list.
+
+## Deep modules
+
+When writing modules, you should avoid nesting them in deep directories, even if
+Ansible allows you to do so. Since early 2023, the official guidance, backed by
+the core team, is to use a flat directory structure for modules. This ensures
+optimal performance.
+
+Existing collections that still use deep directories can migrate to the flat
+structure in a backward-compatible way by adding redirects like in
+[this example](https://github.com/ansible-collections/community.general/blob/main/meta/runtime.yml#L227-L233).
 
 ## Problematic Code
 
