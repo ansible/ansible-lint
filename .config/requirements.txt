@@ -90,7 +90,7 @@ rdflib==6.3.2
 regex==2023.5.5
 requests==2.30.0
 rich==13.3.5
-ruamel-yaml==0.17.27
+ruamel-yaml==0.17.31
 six==1.16.0
 soupsieve==2.4.1
 spdx-tools==0.7.1

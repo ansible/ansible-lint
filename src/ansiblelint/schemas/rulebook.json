@@ -496,6 +496,10 @@
                         },
                         "fact": {
                             "type": "object"
+                        },
+                        "partial": {
+                            "type": "boolean",
+                            "default": true
                         }
                     },
                     "required": [

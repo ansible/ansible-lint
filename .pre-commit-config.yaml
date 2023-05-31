@@ -154,7 +154,7 @@ repos:
           - pytest-mock
           - pytest>=7.2.2
           - rich>=13.2.0
-          - ruamel-yaml>=0.17.26
+          - ruamel-yaml>=0.17.31
           - ruamel-yaml-clib>=0.2.7
           - spdx-tools
           - subprocess-tee
@@ -185,7 +185,7 @@ repos:
           - pytest>=7.2.2
           - pyyaml
           - rich>=13.2.0
-          - ruamel-yaml>=0.17.26
+          - ruamel-yaml>=0.17.31
           - ruamel-yaml-clib>=0.2.7
           - spdx-tools
           - typing_extensions
