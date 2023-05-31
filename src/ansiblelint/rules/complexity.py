@@ -11,7 +11,7 @@ from ansiblelint.errors import MatchError
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
-    from ansiblelint.file_utils import Lintable  # noqa: F811
+    from ansiblelint.file_utils import Lintable
 
 
 class ComplexityRule(AnsibleLintRule):
@@ -42,7 +42,7 @@ class ComplexityRule(AnsibleLintRule):
         return results
 
 
-if "pytest" in sys.modules:  # noqa: C901
+if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
