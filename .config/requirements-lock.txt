@@ -31,7 +31,7 @@ pygments==2.15.1
 pyrsistent==0.19.3
 pyyaml==6.0
 requests==2.31.0
-rich==13.4.0
+rich==13.4.1
 ruamel-yaml==0.17.31
 subprocess-tee==0.4.1
 tomli==2.0.1
