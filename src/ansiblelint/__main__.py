@@ -200,8 +200,8 @@ def support_banner() -> None:
         )
 
 
-# pylint: disable=too-many-branches,too-many-statements,too-many-locals
-def main(argv: list[str] | None = None) -> int:  # noqa: C901
+# pylint: disable=too-many-statements,too-many-locals
+def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
     path_inject()
@@ -318,7 +318,7 @@ def _run_cli_entrypoint() -> None:
         raise SystemExit(exc) from exc
 
 
-def path_inject() -> None:  # noqa: C901
+def path_inject() -> None:
     """Add python interpreter path to top of PATH to fix outside venv calling."""
     # This make it possible to call ansible-lint that was installed inside a
     # virtualenv without having to pre-activate it. Otherwise subprocess will

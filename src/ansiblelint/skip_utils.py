@@ -141,7 +141,7 @@ def load_data(file_text: str) -> Any:
         return yaml.load_all(file_text)
 
 
-def _append_skipped_rules(  # noqa: max-complexity: 12
+def _append_skipped_rules(
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
@@ -252,7 +252,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
         yield task
 
 
-def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
+def _get_rule_skips_from_yaml(
     yaml_input: Sequence[Any],
     lintable: Lintable,
 ) -> Sequence[Any]:
@@ -262,7 +262,7 @@ def _get_rule_skips_from_yaml(  # noqa: max-complexity: 12
     if isinstance(yaml_input, str):
         return []
 
-    def traverse_yaml(obj: Any) -> None:  # noqa: C901
+    def traverse_yaml(obj: Any) -> None:
         for _, entry in obj.ca.items.items():
             for v in entry:
                 if isinstance(v, CommentToken):

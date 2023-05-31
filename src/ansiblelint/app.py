@@ -47,7 +47,7 @@ class App:
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(isolated=True, require_module=True)
 
-    def render_matches(self, matches: list[MatchError]) -> None:  # noqa: C901
+    def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
 
@@ -245,7 +245,7 @@ class App:
             return RC.SUCCESS
         return RC.VIOLATIONS_FOUND
 
-    def report_summary(  # pylint: disable=too-many-branches,too-many-locals # noqa: C901
+    def report_summary(  # pylint: disable=too-many-locals
         self,
         summary: SummarizedResults,
         changed_files_count: int,

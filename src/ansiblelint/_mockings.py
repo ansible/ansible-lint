@@ -70,7 +70,6 @@ def _write_module_stub(
         f.write(body)
 
 
-# pylint: disable=too-many-branches
 def _perform_mockings() -> None:
     """Mock modules and roles."""
     path: Path

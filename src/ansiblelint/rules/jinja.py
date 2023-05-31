@@ -79,8 +79,8 @@ class JinjaRule(AnsibleLintRule):
         """Generate error message."""
         return self._tag2msg[tag].format(value=value, reformatted=reformatted)
 
-    # pylint: disable=too-many-branches,too-many-locals
-    def matchtask(  # noqa: C901
+    # pylint: disable=too-many-locals
+    def matchtask(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -249,8 +249,8 @@ class JinjaRule(AnsibleLintRule):
             last_value = value
         return result
 
-    # pylint: disable=too-many-branches,too-many-statements,too-many-locals
-    def check_whitespace(  # noqa: C901
+    # pylint: disable=too-many-statements,too-many-locals
+    def check_whitespace(
         self,
         text: str,
         key: str,

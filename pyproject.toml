@@ -143,8 +143,9 @@ ignore-paths = "^src/ansiblelint/_version.*$"
 # increase from default is 50 which is too aggressive
 max-statements = 60
 disable = [
-  # On purpose disabled as we rely on black
-  "line-too-long",
+  # Disabled on purpose:
+  "line-too-long", # covered by black
+  "too-many-branches", # covered by ruff C901
   # TODO(ssbarnea): remove temporary skips adding during initial adoption:
   "duplicate-code",
   # unable to disable it inside tests
@@ -242,6 +243,10 @@ select = ["ALL"]
 target-version = "py39"
 # Same as Black.
 line-length = 88
+
+[tool.ruff.mccabe]
+# Implicit 10 is too low for our codebase, even black uses 18 as default.
+max-complexity = 20
 
 [tool.ruff.flake8-builtins]
 builtins-ignorelist = ["id"]
