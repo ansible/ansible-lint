@@ -4,21 +4,20 @@ from __future__ import annotations
 import copy
 import logging
 import os
-import subprocess
 import sys
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
 
+import pathspec
 import wcmatch.pathlib
 import wcmatch.wcmatch
 from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, Options, options
-from ansiblelint.constants import CONFIG_FILENAMES, GIT_CMD, FileType, States
-from ansiblelint.logger import warn_or_fail
+from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
@@ -419,93 +418,22 @@ class Lintable:
 
 
 # pylint: disable=redefined-outer-name
-def discover_lintables(options: Options) -> dict[str, Any]:
+def discover_lintables(options: Options) -> list[str]:
     """Find all files that we know how to lint.
 
     Return format is normalized, relative for stuff below cwd, ~/ for content
     under current user and absolute for everything else.
     """
-    # git is preferred as it also considers .gitignore
-    # As --recurse-submodules is incompatible with --others we need to run
-    # twice to get combined results.
-    commands = {
-        "tracked": {
-            "cmd": [
-                *GIT_CMD,
-                "ls-files",
-                "--cached",
-                "--exclude-standard",
-                "--recurse-submodules",
-                "-z",
-            ],
-            "remove": False,
-        },
-        "others": {
-            "cmd": [
-                *GIT_CMD,
-                "ls-files",
-                "--cached",
-                "--others",
-                "--exclude-standard",
-                "-z",
-            ],
-            "remove": False,
-        },
-        "absent": {
-            "cmd": [
-                *GIT_CMD,
-                "ls-files",
-                "--deleted",
-                "-z",
-            ],
-            "remove": True,
-        },
-    }
+    if not options.lintables:
+        options.lintables = ["."]
 
-    out: set[str] = set()
-    try:
-        for k, value in commands.items():
-            if not isinstance(value["cmd"], list):
-                msg = f"Expected list but got {type(value['cmd'])}"
-                raise TypeError(msg)
-            result = subprocess.check_output(
-                value["cmd"],  # noqa: S603
-                stderr=subprocess.STDOUT,
-                text=True,
-            ).split("\x00")[:-1]
-            _logger.info(
-                "Discovered files to lint using git (%s): %s",
-                k,
-                " ".join(value["cmd"]),
-            )
-            out = out.union(result) if not value["remove"] else out - set(result)
-
-    except subprocess.CalledProcessError as exc:
-        if not (exc.returncode == 128 and "fatal: not a git repository" in exc.output):
-            err = exc.output.rstrip("\n")
-            warn_or_fail(f"Failed to discover lintable files using git: {err}")
-    except FileNotFoundError as exc:
-        if options.verbosity:
-            warn_or_fail(f"Failed to locate command: {exc}")
-
-    # Applying exclude patterns
-    if not out:
-        out = set(".")
-
-    exclude_pattern = "|".join(str(x) for x in options.exclude_paths)
-    _logger.info("Looking up for files, excluding %s ...", exclude_pattern)
-    # remove './' prefix from output of WcMatch
-    out = {
-        strip_dotslash_prefix(fname)
-        for fname in wcmatch.wcmatch.WcMatch(
-            ".",
-            exclude_pattern=exclude_pattern,
-            flags=wcmatch.wcmatch.RECURSIVE,
-            limit=256,
-        ).match()
-    }
-
-    return OrderedDict.fromkeys(sorted(out))
+    return [
+        str(filename)
+        for filename in get_all_files(
+            *[Path(s) for s in options.lintables],
+            exclude_paths=options.exclude_paths,
+        )
+    ]
 
 
 def strip_dotslash_prefix(fname: str) -> str:
@@ -598,3 +526,56 @@ def _guess_parent(lintable: Lintable) -> Lintable | None:
     except IndexError:
         pass
     return None
+
+
+def get_all_files(
+    *paths: Path,
+    exclude_paths: list[str] | None = None,
+) -> list[Path]:
+    """Recursively retrieve all files from given folders."""
+    all_files: list[Path] = []
+    exclude_paths = [] if exclude_paths is None else exclude_paths
+
+    def is_excluded(path_to_check: Path) -> bool:
+        """Check if a file is exclude by current specs."""
+        return any(spec.match_file(str(path_to_check)) for spec in pathspecs)
+
+    for path in paths:
+        pathspecs = [
+            pathspec.GitIgnoreSpec.from_lines(
+                [
+                    ".git",
+                    ".tox",
+                    ".mypy_cache",
+                    "__pycache__",
+                    ".DS_Store",
+                    ".coverage",
+                    ".pytest_cache",
+                    ".ruff_cache",
+                    *exclude_paths,
+                ],
+            ),
+        ]
+        gitignore = path / ".gitignore"
+        if gitignore.exists():
+            with gitignore.open(encoding="UTF-8") as f:
+                _logger.info("Loading ignores from %s", gitignore)
+                pathspecs.append(
+                    pathspec.GitIgnoreSpec.from_lines(f.read().splitlines()),
+                )
+
+        # Iterate over all items in the directory
+        if path.is_file():
+            all_files.append(path)
+        else:
+            for item in sorted(path.iterdir()):
+                if is_excluded(item):
+                    _logger.info("Excluded: %s", item)
+                    continue
+                if item.is_file():
+                    all_files.append(item)
+                # If it's a directory, recursively call the function
+                elif item.is_dir():
+                    all_files.extend(get_all_files(item, exclude_paths=exclude_paths))
+
+    return all_files

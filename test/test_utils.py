@@ -300,8 +300,6 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
 
     out, err = capfd.readouterr()
 
-    # Confirmation that it runs in auto-detect mode
-    assert "Discovered files to lint using git" in err
     # An expected rule match from our examples
     assert (
         "examples/playbooks/empty_playbook.yml:1:1: "

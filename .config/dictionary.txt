@@ -247,6 +247,7 @@ parseable
 pathex
 pathlib
 pathspec
+pathspecs
 pbrun
 pfexec
 pickleable

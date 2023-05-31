@@ -1,6 +1,7 @@
 """Tests for file utility functions."""
 from __future__ import annotations
 
+import copy
 import logging
 import os
 import time
@@ -10,7 +11,6 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from ansiblelint import cli, file_utils
-from ansiblelint.__main__ import initialize_logger
 from ansiblelint.file_utils import (
     Lintable,
     cwd,
@@ -27,7 +27,6 @@ if TYPE_CHECKING:
     from _pytest.logging import LogCaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
 
-    from ansiblelint.config import Options
     from ansiblelint.constants import FileType
     from ansiblelint.rules import RulesCollection
 
@@ -73,39 +72,7 @@ def test_expand_paths_vars(
     assert expand_paths_vars([test_path]) == [expected]  # type: ignore[list-item]
 
 
-@pytest.mark.parametrize(
-    ("reset_env_var", "message_prefix"),
-    (
-        # simulate absence of git command
-        ("PATH", "Failed to locate command: "),
-        # simulate a missing git repo
-        ("GIT_DIR", "Looking up for files"),
-    ),
-    ids=("no-git-cli", "outside-git-repo"),
-)
-def test_discover_lintables_git_verbose(
-    reset_env_var: str,
-    message_prefix: str,
-    monkeypatch: MonkeyPatch,
-    caplog: LogCaptureFixture,
-) -> None:
-    """Ensure that autodiscovery lookup failures are logged."""
-    options = cli.get_config(["-v"])
-    initialize_logger(options.verbosity)
-    monkeypatch.setenv(reset_env_var, "")
-    file_utils.discover_lintables(options)
-
-    assert any(m[2].startswith("Looking up for files") for m in caplog.record_tuples)
-    assert any(m.startswith(message_prefix) for m in caplog.messages)
-
-
-@pytest.mark.parametrize(
-    "is_in_git",
-    (True, False),
-    ids=("in Git", "outside Git"),
-)
 def test_discover_lintables_silent(
-    is_in_git: bool,
     monkeypatch: MonkeyPatch,
     capsys: CaptureFixture[str],
     caplog: LogCaptureFixture,
@@ -119,16 +86,16 @@ def test_discover_lintables_silent(
     caplog.set_level(logging.FATAL)
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
-    lint_path = test_dir / ".." / "examples" / "roles" / "test-role"
-    if not is_in_git:
-        monkeypatch.setenv("GIT_DIR", "")
+    lint_path = (test_dir / ".." / "examples" / "roles" / "test-role").resolve()
 
     yaml_count = len(list(lint_path.glob("**/*.yml"))) + len(
         list(lint_path.glob("**/*.yaml")),
     )
 
     monkeypatch.chdir(str(lint_path))
-    files = file_utils.discover_lintables(options)
+    my_options = copy.deepcopy(options)
+    my_options.lintables = [str(lint_path)]
+    files = file_utils.discover_lintables(my_options)
     stderr = capsys.readouterr().err
     assert (
         not stderr
@@ -144,7 +111,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
     """Verify that filenames containing German umlauts are not garbled by the discover_lintables."""
     options = cli.get_config([])
     test_dir = Path(__file__).resolve().parent
-    lint_path = test_dir / ".." / "examples" / "playbooks"
+    lint_path = (test_dir / ".." / "examples" / "playbooks").resolve()
 
     monkeypatch.chdir(str(lint_path))
     files = file_utils.discover_lintables(options)
@@ -293,22 +260,12 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
         ),  # content should determine it as a play
     ),
 )
-def test_kinds(monkeypatch: MonkeyPatch, path: str, kind: FileType) -> None:
+def test_kinds(path: str, kind: FileType) -> None:
     """Verify auto-detection logic based on DEFAULT_KINDS."""
-    options = cli.get_config([])
-
-    # pylint: disable=unused-argument
-    def mockreturn(options: Options) -> dict[str, Any]:  # noqa: ARG001
-        return {normpath(path): kind}
-
     # assert Lintable is able to determine file type
     lintable_detected = Lintable(path)
     lintable_expected = Lintable(path, kind=kind)
     assert lintable_detected == lintable_expected
-
-    monkeypatch.setattr(file_utils, "discover_lintables", mockreturn)
-    result = file_utils.discover_lintables(options)
-    assert lintable_detected.kind == result[lintable_expected.name]
 
 
 def test_find_project_root_1(tmp_path: Path) -> None:
