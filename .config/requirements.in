@@ -11,6 +11,7 @@ pathspec>=0.9.0 # Mozilla Public License 2.0 (MPL 2.0)
 pyyaml>=5.4.1 # MIT (centos 9 has 5.3.1)
 rich>=12.0.0 # MIT
 ruamel.yaml>=0.17.0,<0.18,!=0.17.29,!=0.17.30 # MIT, next version is planned to have breaking changes
+requests>=2.31.0 # Apache-2.0 (indirect, but we want newer version for security reasons)
 subprocess-tee>=0.4.1 # MIT, used by ansible-compat
 yamllint >= 1.30.0 # GPLv3
 wcmatch>=8.1.2 # MIT
