@@ -89,7 +89,7 @@ pyyaml-env-tag==0.1
 rdflib==6.3.2
 regex==2023.5.5
 requests==2.31.0
-rich==13.4.0
+rich==13.4.1
 ruamel-yaml==0.17.31
 six==1.16.0
 soupsieve==2.4.1
