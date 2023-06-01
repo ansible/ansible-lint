@@ -538,7 +538,10 @@ def get_all_files(
 
     def is_excluded(path_to_check: Path) -> bool:
         """Check if a file is exclude by current specs."""
-        return any(spec.match_file(str(path_to_check)) for spec in pathspecs)
+        return any(
+            spec.match_file(pathspec.util.append_dir_sep(path_to_check))
+            for spec in pathspecs
+        )
 
     for path in paths:
         pathspecs = [
