@@ -368,9 +368,10 @@ def _sanitize_list_options(tag_list: list[str]) -> list[str]:
 
 
 @lru_cache
-def get_app() -> App:
+def get_app(*, offline: bool | None = None) -> App:
     """Return the application instance, caching the return value."""
-    offline = default_options.offline
+    if offline is None:
+        offline = default_options.offline
     app = App(options=default_options)
     # Make linter use the cache dir from compat
     default_options.cache_dir = app.runtime.cache_dir
