@@ -16,10 +16,10 @@ srpm_build_deps:
   - python3-build
   - python3-setuptools_scm
 jobs:
-  - job: copr_build
-    targets:
-      - fedora-rawhide-aarch64 # one on PR should be enough
-    trigger: pull_request
+  # - job: copr_build
+  #   targets:
+  #     - fedora-rawhide-aarch64 # one on PR should be enough
+  #   trigger: pull_request
   - job: copr_build
     trigger: commit
     branch: main
