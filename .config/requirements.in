@@ -7,7 +7,7 @@ black>=22.8.0 # MIT
 filelock>=3.3.0 # The Unlicense
 jsonschema>=4.10.0 # MIT, version needed for improved errors
 packaging>=21.3 # Apache-2.0,BSD-2-Clause
-pathspec>=0.9.0 # Mozilla Public License 2.0 (MPL 2.0)
+pathspec>=0.10.3 # Mozilla Public License 2.0 (MPL 2.0)
 pyyaml>=5.4.1 # MIT (centos 9 has 5.3.1)
 rich>=12.0.0 # MIT
 ruamel.yaml>=0.17.0,<0.18,!=0.17.29,!=0.17.30 # MIT, next version is planned to have breaking changes
