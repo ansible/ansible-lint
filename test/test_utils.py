@@ -320,7 +320,11 @@ def test_is_playbook() -> None:
     assert utils.is_playbook("examples/playbooks/always-run-success.yml")
 
 
-def test_auto_detect_exclude(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "exclude",
+    (pytest.param("foo", id="1"), pytest.param("foo/", id="2")),
+)
+def test_auto_detect_exclude(tmp_path: Path, exclude: str) -> None:
     """Verify that exclude option can be used to narrow down detection."""
     with cwd(tmp_path):
         subprocess.check_output(
@@ -334,9 +338,16 @@ def test_auto_detect_exclude(tmp_path: Path) -> None:
         (tmp_path / "bar").mkdir()
         (tmp_path / "foo" / "playbook.yml").touch()
         (tmp_path / "bar" / "playbook.yml").touch()
-        options = cli.get_config(["--exclude", "foo"])
-        options.cwd = tmp_path
 
+        options = cli.get_config(["--exclude", exclude])
+        options.cwd = tmp_path
+        result = utils.get_lintables(options)
+        assert result == [Lintable("bar/playbook.yml", kind="playbook")]
+
+        # now we also test with .gitignore exclude approach
+        (tmp_path / ".gitignore").write_text(f".gitignore\n{exclude}\n")
+        options = cli.get_config([])
+        options.cwd = tmp_path
         result = utils.get_lintables(options)
         assert result == [Lintable("bar/playbook.yml", kind="playbook")]
 
