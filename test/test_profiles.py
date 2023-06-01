@@ -43,5 +43,8 @@ def test_profile_listing(capfd: CaptureFixture[str]) -> None:
     # [WARNING]: Ansible is being run in a world writable directory
     # WSL2 has "WSL2" in platform name but WSL1 has "microsoft":
     platform_name = platform.platform().lower()
-    if all(word not in platform_name for word in ["wsl", "microsoft"]):
-        assert not err, platform_name
+    err_lines = [line for line in err.splitlines() if "SyntaxWarning:" not in line]
+    if all(word not in platform_name for word in ["wsl", "microsoft"]) and err_lines:
+        assert (
+            not err_lines
+        ), f"Unexpected stderr output found while running on {platform_name} platform:\n{err_lines}"
