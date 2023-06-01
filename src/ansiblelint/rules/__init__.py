@@ -382,7 +382,7 @@ class RulesCollection:
         """Initialize a RulesCollection instance."""
         self.options = options
         self.profile = []
-        self.app = app or get_app()
+        self.app = app or get_app(offline=True)
 
         if profile_name:
             self.profile = PROFILES[profile_name]

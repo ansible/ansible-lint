@@ -252,10 +252,12 @@ def main(argv: list[str] | None = None) -> int:
         console.print(profiles_as_rich())
         return 0
 
+    app = get_app(offline=None)  # to be sure we use the offline value from settings
+    rules = RulesCollection(options.rulesdirs, profile_name=options.profile, app=app)
+
     if options.list_rules or options.list_tags:
         return _do_list(rules)
 
-    app = get_app()
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")  # pragma: no cover
     result = _get_matches(rules, options)
