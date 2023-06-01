@@ -5,7 +5,6 @@ import logging
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.app import get_app
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
@@ -49,10 +48,6 @@ pre_checks = {
     },
 }
 
-FIELD_CHECKS = {
-    "become_method": get_app().runtime.plugins.become.keys(),  # pylint: disable=no-member
-}
-
 
 class ValidateSchemaRule(AnsibleLintRule):
     """Perform JSON Schema Validation for known lintable kinds."""
@@ -80,8 +75,21 @@ class ValidateSchemaRule(AnsibleLintRule):
         "schema[tasks]": "",
         "schema[vars]": "",
     }
+    _field_checks: dict[str, list[str]] = {}
 
-    become_method_msg = f"'become_method' must be one of the currently installed plugins: {', '.join(FIELD_CHECKS['become_method'])}"
+    @property
+    def field_checks(self) -> dict[str, list[str]]:
+        """Lazy property for returning field checks."""
+        if not self._collection:
+            msg = "Rule was not registered to a RuleCollection."
+            raise RuntimeError(msg)
+        if not self._field_checks:
+            self._field_checks = {
+                "become_method": sorted(
+                    self._collection.app.runtime.plugins.become.keys(),
+                ),
+            }
+        return self._field_checks
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
@@ -89,20 +97,31 @@ class ValidateSchemaRule(AnsibleLintRule):
         if not data or file.kind not in ("tasks", "handlers", "playbook"):
             return results
         # check at play level
-        for key, value in FIELD_CHECKS.items():
+        results.extend(self._get_field_matches(file=file, data=data))
+        return results
+
+    def _get_field_matches(
+        self,
+        file: Lintable,
+        data: dict[str, Any],
+    ) -> list[MatchError]:
+        """Retrieve all matches related to fields for the given data block."""
+        results = []
+        for key, values in self.field_checks.items():
             if key in data:
-                plugin_value = data.get(key, None)
-                if not has_jinja(plugin_value) and plugin_value not in value:
+                plugin_value = data[key]
+                if not has_jinja(plugin_value) and plugin_value not in values:
+                    msg = f"'{key}' must be one of the currently available values: {', '.join(values)}"
                     results.append(
                         MatchError(
-                            message=self.become_method_msg,
-                            lintable=file or Lintable(""),
+                            message=msg,
+                            lineno=data.get("__line__", 1),
+                            lintable=file,
                             rule=ValidateSchemaRule(),
                             details=ValidateSchemaRule.description,
                             tag=f"schema[{file.kind}]",
                         ),
                     )
-
         return results
 
     def matchtask(
@@ -110,34 +129,24 @@ class ValidateSchemaRule(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str | MatchError | list[MatchError]:
-        result = []
-        for key, value in FIELD_CHECKS.items():
-            if key in task.raw_task:
-                plugin_value = task.raw_task.get(key, None)
-                if not has_jinja(plugin_value) and plugin_value not in value:
-                    result.append(
-                        MatchError(
-                            message=self.become_method_msg,
-                            lintable=file or Lintable(""),
-                            rule=ValidateSchemaRule(),
-                            details=ValidateSchemaRule.description,
-                            tag=f"schema[{file.kind}]",  # type: ignore[union-attr]
-                        ),
-                    )
+        results = []
+        if not file:
+            file = Lintable("", kind="tasks")
+        results.extend(self._get_field_matches(file=file, data=task.raw_task))
         for key in pre_checks["task"]:
             if key in task.raw_task:
                 msg = pre_checks["task"][key]["msg"]
                 tag = pre_checks["task"][key]["tag"]
-                result.append(
+                results.append(
                     MatchError(
                         message=msg,
-                        lintable=file or Lintable(""),
+                        lintable=file,
                         rule=ValidateSchemaRule(),
                         details=ValidateSchemaRule.description,
                         tag=f"schema[{tag}]",
                     ),
                 )
-        return result
+        return results
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return JSON validation errors found as a list of MatchError(s)."""
@@ -308,8 +317,8 @@ if "pytest" in sys.modules:
                 "examples/playbooks/rule-schema-become-method-fail.yml",
                 "playbook",
                 [
-                    "'become_method' must be one of the currently installed plugins",
-                    "'become_method' must be one of the currently installed plugins",
+                    "'become_method' must be one of the currently available values",
+                    "'become_method' must be one of the currently available values",
                 ],
                 id="playbook2",
             ),

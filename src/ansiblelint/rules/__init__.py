@@ -22,6 +22,7 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
     WarningRule,
 )
+from ansiblelint.app import App, get_app
 from ansiblelint.config import PROFILES, Options, get_rule_config
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
@@ -376,10 +377,13 @@ class RulesCollection:
         profile_name: str | None = None,
         *,
         conditional: bool = True,
+        app: App | None = None,
     ) -> None:
         """Initialize a RulesCollection instance."""
         self.options = options
         self.profile = []
+        self.app = app or get_app()
+
         if profile_name:
             self.profile = PROFILES[profile_name]
         rulesdirs_str = [] if rulesdirs is None else [str(r) for r in rulesdirs]
@@ -408,6 +412,7 @@ class RulesCollection:
         """Register a rule."""
         # We skip opt-in rules which were not manually enabled.
         # But we do include opt-in rules when listing all rules or tags
+        obj._collection = self  # pylint: disable=protected-access # noqa: SLF001
         if any(
             [
                 not conditional,
@@ -418,7 +423,6 @@ class RulesCollection:
                 self.options.list_tags,
             ],
         ):
-            obj._collection = self  # pylint: disable=protected-access # noqa: SLF001
             self.rules.append(obj)
 
     def __iter__(self) -> Iterator[BaseRule]:
