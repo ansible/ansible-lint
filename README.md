@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v6
+        uses: ansible/ansible-lint-action@v6
 ```
 
 For more details, see [ansible-lint-action].
