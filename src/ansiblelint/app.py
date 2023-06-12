@@ -245,7 +245,7 @@ class App:
             return RC.SUCCESS
         return RC.VIOLATIONS_FOUND
 
-    def report_summary(  # pylint: disable=too-many-locals
+    def report_summary(  # pylint: disable=too-many-locals # noqa: C901
         self,
         summary: SummarizedResults,
         changed_files_count: int,
@@ -311,25 +311,30 @@ class App:
             # rate stars for the top 5 profiles (min would not get
             rating = 5 - (len(PROFILES.keys()) - passed_profile_count)
             if 0 < rating < 6:
-                stars = f", {rating}/5 star rating"
+                stars = f" Rating: {rating}/5 star"
 
             console_stderr.print(table)
             console_stderr.print()
 
-        if is_success:
-            msg = "[green]Passed[/] with "
-        else:
-            msg = "[red][bold]Failed[/][/] after "
-
-        if summary.passed_profile:
-            msg += f"[bold]{summary.passed_profile}[/] profile"
-        if stars:
-            msg += stars
+        msg = "[green]Passed[/]" if is_success else "[red][bold]Failed[/][/]"
 
         msg += f": {summary.failures} failure(s), {summary.warnings} warning(s)"
         if summary.fixed:
             msg += f", and fixed {summary.fixed} issue(s)"
         msg += f" on {files_count} files."
+
+        # Now we add some information about required and passed profile
+        if self.options.profile:
+            msg += f" Profile '{self.options.profile}' was required"
+            if summary.passed_profile:
+                msg += f", but only '{summary.passed_profile}' profile passed."
+            else:
+                msg += "."
+        elif summary.passed_profile:
+            msg += f" Last profile that met the validation criteria was '{summary.passed_profile}'."
+
+        if stars:
+            msg += stars
 
         # on offline mode and when run under pre-commit we do not want to
         # check for updates.
