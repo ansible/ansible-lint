@@ -219,6 +219,8 @@ class VariableNamingRule(AnsibleLintRule):
             if isinstance(action, dict):
                 role_fqcn = action.get("name", "")
                 prefix = role_fqcn.split("/" if "/" in role_fqcn else ".")[-1]
+        else:
+            prefix = ""
         for key in our_vars:
             match_error = self.get_var_naming_matcherror(key, prefix=prefix)
             if match_error:
