@@ -476,7 +476,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
     )
     # maps lists to their default config values
     lists_map = {
-        "exclude_paths": [".cache", ".git", ".github", ".hg", ".svn", ".tox"],
+        "exclude_paths": [".cache", ".git", ".hg", ".svn", ".tox"],
         "rulesdir": [],
         "skip_list": [],
         "tags": [],
