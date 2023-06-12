@@ -4,3 +4,10 @@
     name: example.test_collection.my_role2
   vars:
     my_role2_foo: something
+
+- name: Task 2
+  # this task should NOT trigger var-naming[no-role-prefix]
+  vars:
+    foo: bar
+  ansible.builtin.debug:
+    msg: "{{ foo }}"

@@ -1,5 +1,5 @@
 ---
-name: ansible-lint
+name: ansible-lint-action
 description: Run Ansible Lint
 author: Ansible by Red Hat <info@ansible.com>
 branding:

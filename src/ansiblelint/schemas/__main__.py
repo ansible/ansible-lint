@@ -7,6 +7,7 @@ import time
 import urllib.request
 from collections import defaultdict
 from functools import cache
+from http.client import HTTPException
 from pathlib import Path
 from typing import Any
 from urllib.request import Request
@@ -88,7 +89,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
                         # unload possibly loaded schema
                         if kind in _schema_cache:  # pragma: no cover
                             del _schema_cache[kind]
-        except (ConnectionError, OSError) as exc:
+        except (ConnectionError, OSError, HTTPException) as exc:
             if (
                 isinstance(exc, urllib.error.HTTPError)
                 and getattr(exc, "code", None) == 304
