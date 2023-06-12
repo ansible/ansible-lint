@@ -10,7 +10,7 @@ import urllib.request
 import warnings
 from dataclasses import dataclass, field
 from functools import lru_cache
-from importlib.metadata import PackageNotFoundError, version
+from importlib.metadata import PackageNotFoundError, distribution, version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from urllib.error import HTTPError, URLError
@@ -152,7 +152,7 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     config_file: str | None = None
     generate_ignore: bool = False
     rulesdir: list[Path] = field(default_factory=list)
-    cache_dir_lock: FileLock | None = None
+    cache_dir_lock: FileLock | None = None  # type: ignore[valid-type]
     use_default_rules: bool = False
     version: bool = False  # display version command
     list_profiles: bool = False  # display profiles command
@@ -205,6 +205,14 @@ def in_venv() -> bool:
 def guess_install_method() -> str:
     """Guess if pip upgrade command should be used."""
     package_name = "ansible-lint"
+
+    try:
+        if distribution(package_name).read_text("INSTALLER").strip() != "pip":  # type: ignore[union-attr]
+            return ""
+    except PackageNotFoundError as exc:
+        logging.debug(exc)
+        return ""
+
     pip = ""
     if in_venv():
         _logger.debug("Found virtualenv, assuming `pip3 install` will work.")
