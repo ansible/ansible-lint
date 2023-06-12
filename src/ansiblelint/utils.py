@@ -318,7 +318,7 @@ def template(
             variables,
             **dict(kwargs, fail_on_undefined=fail_on_undefined),
         )
-        # Hack to skip the following exception when using to_json filter on a variable.
+        # Hack to skip the following exception when using to_json filter on a variable. # noqa: FIX004
         # I guess the filter doesn't like empty vars...
     except (AnsibleError, ValueError, RepresenterError):
         # templating failed, so just keep value as is.
