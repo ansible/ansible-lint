@@ -130,7 +130,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.270"
+    rev: "v0.0.272"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -146,7 +146,7 @@ repos:
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=4.1.0
+          - ansible-compat>=4.1.2
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock
@@ -175,7 +175,7 @@ repos:
         args:
           - --output-format=colorized
         additional_dependencies:
-          - ansible-compat>=4.0.1
+          - ansible-compat>=4.1.2
           - ansible-core>=2.14.0
           - black>=22.10.0
           - docutils
