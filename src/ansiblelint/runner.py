@@ -229,6 +229,7 @@ class Runner:
         for data in return_list:
             matches.extend(data)
 
+        matches = self._filter_excluded_matches(matches)
         # -- phase 2 ---
         if not matches:
             # do our processing only when ansible syntax check passed in order
@@ -256,16 +257,17 @@ class Runner:
         self.checked_files.update(self.lintables)
 
         # remove any matches made inside excluded files
-        matches = list(
-            filter(
-                lambda match: not self.is_excluded(match.lintable)
-                and hasattr(match, "lintable")
-                and match.tag not in match.lintable.line_skips[match.lineno],
-                matches,
-            ),
-        )
+        matches = self._filter_excluded_matches(matches)
 
         return sorted(set(matches))
+
+    def _filter_excluded_matches(self, matches: list[MatchError]) -> list[MatchError]:
+        return [
+            match
+            for match in matches
+            if not self.is_excluded(match.lintable)
+            and match.tag not in match.lintable.line_skips[match.lineno]
+        ]
 
     def _emit_matches(self, files: list[Lintable]) -> Generator[MatchError, None, None]:
         visited: set[Lintable] = set()
