@@ -1,0 +1,9 @@
+---
+# This is used during the ansible-lint own testing.
+collections:
+  - ansible.posix
+  - ansible.windows
+  - community.crypto
+  - community.docker
+  - community.general
+  - community.molecule
