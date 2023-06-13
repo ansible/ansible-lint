@@ -207,7 +207,7 @@ def guess_install_method() -> str:
     package_name = "ansible-lint"
 
     try:
-        if distribution(package_name).read_text("INSTALLER").strip() != "pip":  # type: ignore[union-attr]
+        if (distribution(package_name).read_text("INSTALLER") or "").strip() != "pip":
             return ""
     except PackageNotFoundError as exc:
         logging.debug(exc)
