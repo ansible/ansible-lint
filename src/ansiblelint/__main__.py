@@ -244,7 +244,11 @@ def main(argv: list[str] | None = None) -> int:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import _get_matches
 
-    rules = RulesCollection(options.rulesdirs, profile_name=options.profile)
+    rules = RulesCollection(
+        options.rulesdirs,
+        profile_name=options.profile,
+        options=options,
+    )
 
     if options.list_profiles:
         from ansiblelint.generate_docs import profiles_as_rich
@@ -253,7 +257,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     app = get_app(offline=None)  # to be sure we use the offline value from settings
-    rules = RulesCollection(options.rulesdirs, profile_name=options.profile, app=app)
+    rules = RulesCollection(
+        options.rulesdirs,
+        profile_name=options.profile,
+        app=app,
+        options=options,
+    )
 
     if options.list_rules or options.list_tags:
         return _do_list(rules)
