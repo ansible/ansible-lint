@@ -23,17 +23,29 @@ if missing:
         reason=f"FATAL: Missing modules: {', '.join(missing)} -- probably you missed installing test requirements with: pip install -e '.[test]'",
         returncode=1,
     )
-# we need to be sure that we have the requirements installed as some tests
-# might depend on these. This approach is compatible with GHA caching.
-try:
-    subprocess.check_output(
-        ["./tools/install-reqs.sh"],  # noqa: S603
-        stderr=subprocess.PIPE,
-        text=True,
-    )
-except subprocess.CalledProcessError as exc:
-    print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)  # noqa: T201
-    sys.exit(1)
+
+
+# See: https://github.com/pytest-dev/pytest/issues/1402#issuecomment-186299177
+def pytest_configure(config: pytest.Config) -> None:
+    """Ensure we run preparation only on master thread when running in parallel."""
+    if is_master(config):
+        # we need to be sure that we have the requirements installed as some tests
+        # might depend on these. This approach is compatible with GHA caching.
+        try:
+            subprocess.check_output(
+                ["./tools/install-reqs.sh"],  # noqa: S603
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+        except subprocess.CalledProcessError as exc:
+            print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)  # noqa: T201
+            sys.exit(1)
+
+
+def is_master(config: pytest.Config) -> bool:
+    """Return true if is run on master thread."""
+    return not hasattr(config, "workerinput")
+
 
 # ruff: noqa: E402
 from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-position

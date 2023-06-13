@@ -408,6 +408,7 @@ webserver
 webservers
 willthames
 workdir
+workerinput
 worktree
 xdist
 xfail
