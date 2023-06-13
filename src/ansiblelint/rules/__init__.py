@@ -373,14 +373,20 @@ class RulesCollection:
     def __init__(
         self,
         rulesdirs: list[str] | list[Path] | None = None,
-        options: Options = default_options,
+        options: Options | None = None,
         profile_name: str | None = None,
         *,
         conditional: bool = True,
         app: App | None = None,
     ) -> None:
         """Initialize a RulesCollection instance."""
-        self.options = options
+        if options is None:
+            self.options = copy.deepcopy(default_options)
+            # When initialized without options argument we want it to always
+            # be offline as this is done only during testing.
+            self.options.offline = True
+        else:
+            self.options = options
         self.profile = []
         self.app = app or get_app(offline=True)
 
