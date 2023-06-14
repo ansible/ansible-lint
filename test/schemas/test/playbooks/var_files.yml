@@ -11,3 +11,8 @@
   hosts: localhost
   vars_files:
     - /dev/null
+
+- name: var_files should accept array of array[string]
+  hosts: localhost
+  vars_files:
+    - ["/dev/null"]

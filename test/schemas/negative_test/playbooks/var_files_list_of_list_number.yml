@@ -1,0 +1,5 @@
+---
+- name: var_files should not accept array[number]
+  hosts: localhost
+  vars_files:
+    - [0, 1]
