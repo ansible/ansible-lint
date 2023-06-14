@@ -57,13 +57,22 @@
     "schemaPath": "#/properties/vars_files/items/oneOf/0/type"
   },
   {
-    "instancePath": "/0/vars_files/0",
+    "instancePath": "/0/vars_files/0/0",
     "keyword": "type",
-    "message": "must be array",
+    "message": "must be string",
     "params": {
-      "type": "array"
+      "type": "string"
     },
-    "schemaPath": "#/properties/vars_files/items/oneOf/1/type"
+    "schemaPath": "#/properties/vars_files/items/oneOf/1/items/type"
+  },
+  {
+    "instancePath": "/0/vars_files/0/1",
+    "keyword": "type",
+    "message": "must be string",
+    "params": {
+      "type": "string"
+    },
+    "schemaPath": "#/properties/vars_files/items/oneOf/1/items/type"
   },
   {
     "instancePath": "/0/vars_files/0",
@@ -95,9 +104,9 @@ stdout:
   "status": "fail",
   "errors": [
     {
-      "filename": "negative_test/playbooks/var_files_list_number.yml",
+      "filename": "negative_test/playbooks/var_files_list_of_list_number.yml",
       "path": "$[0]",
-      "message": "{'name': 'var_files should not accept array[number]', 'hosts': 'localhost', 'vars_files': [0]} is not valid under any of the given schemas",
+      "message": "{'name': 'var_files should not accept array[number]', 'hosts': 'localhost', 'vars_files': [[0, 1]]} is not valid under any of the given schemas",
       "has_sub_errors": true,
       "best_match": {
         "path": "$[0]",
@@ -110,7 +119,7 @@ stdout:
         },
         {
           "path": "$[0]",
-          "message": "{'name': 'var_files should not accept array[number]', 'hosts': 'localhost', 'vars_files': [0]} is not valid under any of the given schemas"
+          "message": "{'name': 'var_files should not accept array[number]', 'hosts': 'localhost', 'vars_files': [[0, 1]]} is not valid under any of the given schemas"
         },
         {
           "path": "$[0]",
@@ -122,19 +131,23 @@ stdout:
         },
         {
           "path": "$[0].vars_files",
-          "message": "[0] is not of type 'object'"
+          "message": "[[0, 1]] is not of type 'object'"
         },
         {
           "path": "$[0].vars_files[0]",
-          "message": "0 is not valid under any of the given schemas"
+          "message": "[0, 1] is not valid under any of the given schemas"
         },
         {
           "path": "$[0].vars_files[0]",
+          "message": "[0, 1] is not of type 'string'"
+        },
+        {
+          "path": "$[0].vars_files[0][0]",
           "message": "0 is not of type 'string'"
         },
         {
-          "path": "$[0].vars_files[0]",
-          "message": "0 is not of type 'array'"
+          "path": "$[0].vars_files[0][1]",
+          "message": "1 is not of type 'string'"
         }
       ]
     }

@@ -627,7 +627,17 @@
         },
         "vars_files": {
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ]
           },
           "title": "Vars Files",
           "type": ["array", "string", "null"]
