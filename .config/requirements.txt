@@ -27,7 +27,7 @@ defusedxml==0.7.1
 dill==0.3.6
 exceptiongroup==1.1.1
 execnet==1.9.0
-filelock==3.12.1
+filelock==3.12.2
 ghp-import==2.1.0
 griffe==0.29.0
 htmlmin2==0.1.13
