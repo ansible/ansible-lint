@@ -21,7 +21,7 @@ from ansiblelint import __version__
 from ansiblelint.loaders import yaml_from_file
 
 if TYPE_CHECKING:
-    from filelock import FileLock
+    from filelock import BaseFileLock
 
 
 _logger = logging.getLogger(__name__)
@@ -152,7 +152,7 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     config_file: str | None = None
     generate_ignore: bool = False
     rulesdir: list[Path] = field(default_factory=list)
-    cache_dir_lock: FileLock | None = None  # type: ignore[valid-type]
+    cache_dir_lock: BaseFileLock | None = None
     use_default_rules: bool = False
     version: bool = False  # display version command
     list_profiles: bool = False  # display profiles command
