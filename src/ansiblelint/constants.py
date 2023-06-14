@@ -165,7 +165,11 @@ ROLE_IMPORT_ACTION_NAMES = {
 # https://github.com/ansible/ansible-lint-action/issues/138
 GIT_CMD = ["git", "-c", f"safe.directory={Path.cwd()}"]
 
-CONFIG_FILENAMES = [".ansible-lint", ".config/ansible-lint.yml"]
+CONFIG_FILENAMES = [
+    ".ansible-lint",
+    ".config/ansible-lint.yml",
+    ".config/ansible-lint.yaml",
+]
 
 
 class States(Enum):

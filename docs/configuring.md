@@ -12,8 +12,9 @@ example `exclude_paths`) and **True** is preferred for boolean values like
 
 ## Using local configuration files
 
-Specify Ansible-lint configuration in either `.ansible-lint` or
-`.config/ansible-lint.yml` in your current working directory.
+Specify Ansible-lint configuration in either `.ansible-lint`,
+`.config/ansible-lint.yml`, or `.config/ansible-lint.yaml` in your current
+working directory.
 
 !!! note
 
