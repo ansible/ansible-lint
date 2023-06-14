@@ -15,6 +15,7 @@ from ansible_compat.runtime import AnsibleWarning
 import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint._internal.rules import LoadingFailureRule, WarningRule
+from ansiblelint.app import get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
@@ -207,10 +208,13 @@ class Runner:
                 )
 
         # -- phase 1 : syntax check in parallel --
+        app = get_app(offline=None)
+
         def worker(lintable: Lintable) -> list[MatchError]:
             # pylint: disable=protected-access
             return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(  # noqa: SLF001
-                lintable,
+                lintable=lintable,
+                app=app,
             )
 
         for lintable in self.lintables:
