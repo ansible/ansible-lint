@@ -12,6 +12,7 @@ from ansible_compat.runtime import Runtime
 from rich.markup import escape
 from rich.table import Table
 
+import ansiblelint.utils
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
 from ansiblelint.color import console, console_stderr, render_yaml
@@ -19,13 +20,14 @@ from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RC, RULE_DOC_URL
 from ansiblelint.loaders import IGNORE_FILE
+from ansiblelint.rules import RulesCollection
+from ansiblelint.runner import LintResult, Runner
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
     from ansiblelint._internal.rules import BaseRule
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
-    from ansiblelint.runner import LintResult
 
 
 _logger = logging.getLogger(__package__)
@@ -46,6 +48,13 @@ class App:
 
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(isolated=True, require_module=True)
+        # Load rules collection
+        self.rules = RulesCollection(
+            options.rulesdirs,
+            profile_name=options.profile,
+            app=self,
+            options=options,
+        )
 
     def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""
@@ -344,6 +353,46 @@ class App:
                 msg += f"\n{version_warning}"
 
         console_stderr.print(msg)
+
+    def get_matches(self, rules: RulesCollection, options: Options) -> LintResult:
+        """Retrieve matches by using the Runner."""
+        lintables = ansiblelint.utils.get_lintables(
+            opts=options,
+            args=options.lintables,
+        )
+
+        for rule in rules:
+            if "unskippable" in rule.tags:
+                for entry in (*options.skip_list, *options.warn_list):
+                    if rule.id == entry or entry.startswith(f"{rule.id}["):
+                        msg = f"Rule '{rule.id}' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file."
+                        raise RuntimeError(msg)
+        matches = []
+        checked_files: set[Lintable] = set()
+        runner = Runner(
+            *lintables,
+            rules=rules,
+            tags=frozenset(options.tags),
+            skip_list=options.skip_list,
+            exclude_paths=options.exclude_paths,
+            verbosity=options.verbosity,
+            checked_files=checked_files,
+            project_dir=options.project_dir,
+        )
+        matches.extend(runner.run())
+
+        # Assure we do not print duplicates and the order is consistent
+        matches = sorted(set(matches))
+
+        # Convert reported filenames into human readable ones, so we hide the
+        # fact we used temporary files when processing input from stdin.
+        for match in matches:
+            for lintable in lintables:
+                if match.filename == lintable.filename:
+                    match.filename = lintable.name
+                    break
+
+        return LintResult(matches=matches, files=checked_files)
 
 
 def choose_formatter_factory(

@@ -242,7 +242,6 @@ def main(argv: list[str] | None = None) -> int:
 
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
-    from ansiblelint.runner import _get_matches
 
     if options.list_profiles:
         from ansiblelint.generate_docs import profiles_as_rich
@@ -263,7 +262,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")  # pragma: no cover
-    result = _get_matches(rules, options)
+    result = app.get_matches(rules, options)
 
     if options.write_list:
         ruamel_safe_version = "0.17.26"

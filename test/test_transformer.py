@@ -8,8 +8,9 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from ansiblelint.app import get_app
+
 # noinspection PyProtectedMember
-from ansiblelint.runner import LintResult, _get_matches
 from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
 
     from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import LintResult
 
 
 @pytest.fixture(name="copy_examples_dir")
@@ -46,7 +48,8 @@ def fixture_runner_result(
 ) -> LintResult:
     """Fixture that runs the Runner to populate a LintResult for a given file."""
     config_options.lintables = [playbook]
-    result = _get_matches(rules=default_rules_collection, options=config_options)
+    app = get_app()
+    result = app.get_matches(rules=default_rules_collection, options=config_options)
     return result
 
 

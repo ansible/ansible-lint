@@ -22,7 +22,6 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
     WarningRule,
 )
-from ansiblelint.app import App, get_app
 from ansiblelint.config import PROFILES, Options, get_rule_config
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
@@ -31,6 +30,8 @@ from ansiblelint.file_utils import Lintable, expand_paths_vars
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+    from ansiblelint.app import App
 
 _logger = logging.getLogger(__name__)
 
@@ -388,7 +389,14 @@ class RulesCollection:
         else:
             self.options = options
         self.profile = []
-        self.app = app or get_app(offline=True)
+        if not app:
+            from ansiblelint.app import (  # pylint: disable=import-outside-toplevel
+                get_app,
+            )
+
+            self.app = get_app(offline=True)
+        else:
+            self.app = app
 
         if profile_name:
             self.profile = PROFILES[profile_name]

@@ -8,6 +8,7 @@ import multiprocessing.pool
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import warnings
 from dataclasses import dataclass
@@ -24,7 +25,6 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
     WarningRule,
 )
-from ansiblelint.app import App, get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from pathlib import Path
 
-    from ansiblelint.config import Options
+    from ansiblelint.app import App
     from ansiblelint.rules import RulesCollection
 
 _logger = logging.getLogger(__name__)
@@ -219,6 +219,9 @@ class Runner:
                 )
 
         # -- phase 1 : syntax check in parallel --
+        if "get_app" not in globals():
+            # pylint: disable=import-outside-toplevel
+            from ansiblelint.app import get_app
         app = get_app(offline=None)
 
         def worker(lintable: Lintable) -> list[MatchError]:
@@ -429,40 +432,3 @@ class Runner:
                 except AttributeError:
                     yield MatchError(lintable=lintable, rule=LoadingFailureRule())
                 visited.add(lintable)
-
-
-def _get_matches(rules: RulesCollection, options: Options) -> LintResult:
-    lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
-
-    for rule in rules:
-        if "unskippable" in rule.tags:
-            for entry in (*options.skip_list, *options.warn_list):
-                if rule.id == entry or entry.startswith(f"{rule.id}["):
-                    msg = f"Rule '{rule.id}' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file."
-                    raise RuntimeError(msg)
-    matches = []
-    checked_files: set[Lintable] = set()
-    runner = Runner(
-        *lintables,
-        rules=rules,
-        tags=frozenset(options.tags),
-        skip_list=options.skip_list,
-        exclude_paths=options.exclude_paths,
-        verbosity=options.verbosity,
-        checked_files=checked_files,
-        project_dir=options.project_dir,
-    )
-    matches.extend(runner.run())
-
-    # Assure we do not print duplicates and the order is consistent
-    matches = sorted(set(matches))
-
-    # Convert reported filenames into human readable ones, so we hide the
-    # fact we used temporary files when processing input from stdin.
-    for match in matches:
-        for lintable in lintables:
-            if match.filename == lintable.filename:
-                match.filename = lintable.name
-                break
-
-    return LintResult(matches=matches, files=checked_files)

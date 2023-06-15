@@ -27,6 +27,7 @@ import inspect
 import logging
 import os
 import re
+import sys
 from collections.abc import Generator, ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache
@@ -53,7 +54,6 @@ from ansiblelint._internal.rules import (
     LoadingFailureRule,
     RuntimeErrorRule,
 )
-from ansiblelint.app import get_app
 from ansiblelint.config import Options, options
 from ansiblelint.constants import (
     FILENAME_KEY,
@@ -556,6 +556,9 @@ def _rolepath(basedir: str, role: str) -> str | None:
         # if checking a role in the current directory
         path_dwim(basedir, os.path.join("..", role)),
     ]
+
+    if "get_app" not in globals():
+        from ansiblelint.app import get_app  # pylint: disable=import-outside-toplevel
 
     for loc in get_app().runtime.config.default_roles_path:
         loc = os.path.expanduser(loc)
