@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Fixture for test_extra_vars_passed_to_command test
+  hosts: all
   tags:
     - baz
     - "{{ foo }}"
