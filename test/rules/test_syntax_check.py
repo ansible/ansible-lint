@@ -60,7 +60,6 @@ def test_extra_vars_passed_to_command(
 
 def test_syntax_check_role() -> None:
     """Validate syntax check of a broken role."""
-
     lintable = Lintable("examples/playbooks/roles/invalid_due_syntax", kind="role")
     rules = RulesCollection()
     result = Runner(lintable, rules=rules).run()
