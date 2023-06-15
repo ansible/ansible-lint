@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
-from ansiblelint.app import get_app
+from ansiblelint.app import App, get_app
 from ansiblelint.config import options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
@@ -73,6 +73,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     # pylint: disable=too-many-locals
     def _get_ansible_syntax_check_matches(
         lintable: Lintable,
+        app: App,
     ) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
         default_rule: BaseRule = AnsibleSyntaxCheckRule()
@@ -118,7 +119,7 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
             # To reduce noisy warnings like
             # CryptographyDeprecationWarning: Blowfish has been deprecated
             # https://github.com/paramiko/paramiko/issues/2038
-            env = get_app().runtime.environ.copy()
+            env = app.runtime.environ.copy()
             env["PYTHONWARNINGS"] = "ignore"
 
             run = subprocess.run(
@@ -205,7 +206,10 @@ if "pytest" in sys.modules:
             kind="playbook",
         )
         # pylint: disable=protected-access
-        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(
+            lintable,
+            app=get_app(),
+        )
         assert result[0].lineno == 4
         assert result[0].column == 7
         assert (
@@ -221,7 +225,10 @@ if "pytest" in sys.modules:
         """Validate detection of empty-playbook."""
         lintable = Lintable("examples/playbooks/empty_playbook.yml", kind="playbook")
         # pylint: disable=protected-access
-        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(
+            lintable,
+            app=get_app(),
+        )
         assert result[0].lineno == 1
         # We internally convert absolute paths returned by ansible into paths
         # relative to current directory.
@@ -239,7 +246,10 @@ if "pytest" in sys.modules:
         lintable = Lintable("examples/playbooks/extra_vars.yml", kind="playbook")
 
         # pylint: disable=protected-access
-        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(lintable)
+        result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(
+            lintable,
+            app=get_app(),
+        )
 
         assert not result
 

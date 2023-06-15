@@ -1,6 +1,6 @@
 {
   "ansible-lint-config": {
-    "etag": "b5caa5405047dad89bb9fb419a17d8a67750f3a7ecdbabe16e0eb1897d316c5a",
+    "etag": "0ec39ba1ca9c20aea463f7f536c6903c88288f47c1b2b2b3d53b527c293f8cc3",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json"
   },
   "ansible-navigator-config": {
@@ -36,7 +36,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
   },
   "playbook": {
-    "etag": "9f6baaa61cc2bfaf32d00af12ef6dd0e8ca3dd3bb94581cabb66a92795d8f4e6",
+    "etag": "acbd5edfc66279f8c3f6f8a99d0874669a254983ace5e4a2cce6105489ab3e21",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/playbook.json"
   },
   "requirements": {
