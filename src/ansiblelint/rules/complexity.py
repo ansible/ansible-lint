@@ -30,12 +30,13 @@ class ComplexityRule(AnsibleLintRule):
 
         if file.kind != "playbook":
             return []
-        if len(data["tasks"]) > options.max_tasks:
+        tasks = data.get("tasks", [])
+        if len(tasks) > options.max_tasks:
             results.append(
                 self.create_matcherror(
                     message=f"Maximum tasks allowed in a play is {options.max_tasks}.",
-                    linenumber=data[LINE_NUMBER_KEY],
-                    tag="complexity[play]",
+                    lineno=data[LINE_NUMBER_KEY],
+                    tag=f"{self.id}[play]",
                     filename=file,
                 ),
             )

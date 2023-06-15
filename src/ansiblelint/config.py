@@ -152,6 +152,7 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     version: bool = False  # display version command
     list_profiles: bool = False  # display profiles command
     ignore_file: Path | None = None
+    max_tasks: int = 100
 
 
 options = Options()
