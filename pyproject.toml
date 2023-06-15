@@ -174,7 +174,7 @@ include = ["src"]
 [tool.pytest.ini_options]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
-addopts = "-p no:pytest_cov"
+addopts = "-p no:pytest_cov -n auto -ra --showlocals --doctest-modules --durations=10"
 # https://code.visualstudio.com/docs/python/testing
 # coverage is re-enabled in `tox.ini`. That approach is safer than
 # `--no-cov` which prevents activation from tox.ini and which also fails

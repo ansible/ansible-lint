@@ -62,6 +62,9 @@ jobs:
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
       PYTEST_REQPASS: 804
+      # Temporary disable parallelism under GHA until we sort concurrency issues
+      # related to collection installations.
+      PYTEST_ADDOPS: "-n1 --dist=loadscope --maxfail=1"
     steps:
       - name: Activate WSL1
         if: "contains(matrix.shell, 'wsl')"
@@ -86,25 +89,18 @@ jobs:
             ~/.cache/pre-commit
           key: pre-commit-${{ matrix.name || matrix.passed_name }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: Set ansible cache(s)
-        uses: actions/cache@v3
-        with:
-          path: |
-            .cache/eco
-            examples/playbooks/collections/ansible_collections
-            ~/.cache/ansible-compat
-            ~/.ansible/collections
-            ~/.ansible/roles
-          key: ${{ matrix.name || matrix.passed_name }}-${{ hashFiles('tools/test-eco.sh', 'requirements.yml') }}
-
-      - name: Set galaxy cache
-        uses: actions/cache@v3
-        if: ${{ startsWith(matrix.passed_name, 'py') }}
-        with:
-          path: |
-            examples/playbooks/collections/*.tar.gz
-            examples/playbooks/collections/ansible_collections
-          key: galaxy-${{ hashFiles('examples/playbooks/collections/requirements.yml') }}
+      # - name: Set galaxy cache
+      #   uses: actions/cache@v3
+      #   if: ${{ startsWith(matrix.passed_name, 'py') }}
+      #   with:
+      #     path: |
+      #       .cache/eco
+      #       ~/.cache/ansible-compat
+      #       ~/.ansible/collections
+      #       ~/.ansible/roles
+      #       examples/playbooks/collections/*.tar.gz
+      #       examples/playbooks/collections/ansible_collections
+      #     key: galaxy-${{ hashFiles('examples/playbooks/collections/requirements.yml') }}
 
       - name: Set up Python ${{ matrix.python_version || '3.9' }}
         if: "!contains(matrix.shell, 'wsl')"
