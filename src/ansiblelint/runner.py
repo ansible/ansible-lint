@@ -1,10 +1,14 @@
 """Runner implementation."""
 from __future__ import annotations
 
+import json
 import logging
 import multiprocessing
 import multiprocessing.pool
 import os
+import re
+import subprocess
+import tempfile
 import warnings
 from dataclasses import dataclass
 from fnmatch import fnmatch
@@ -14,12 +18,19 @@ from ansible_compat.runtime import AnsibleWarning
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
-from ansiblelint._internal.rules import LoadingFailureRule, WarningRule
-from ansiblelint.app import get_app
+from ansiblelint._internal.rules import (
+    BaseRule,
+    LoadingFailureRule,
+    RuntimeErrorRule,
+    WarningRule,
+)
+from ansiblelint.app import App, get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
-from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
+from ansiblelint.logger import timed_info
+from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS, AnsibleSyntaxCheckRule
+from ansiblelint.text import strip_ansi_escape
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -212,7 +223,7 @@ class Runner:
 
         def worker(lintable: Lintable) -> list[MatchError]:
             # pylint: disable=protected-access
-            return AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(  # noqa: SLF001
+            return self._get_ansible_syntax_check_matches(
                 lintable=lintable,
                 app=app,
             )
@@ -264,6 +275,132 @@ class Runner:
         matches = self._filter_excluded_matches(matches)
 
         return sorted(set(matches))
+
+    # pylint: disable=too-many-locals
+    def _get_ansible_syntax_check_matches(
+        self,
+        lintable: Lintable,
+        app: App,
+    ) -> list[MatchError]:
+        """Run ansible syntax check and return a list of MatchError(s)."""
+        default_rule: BaseRule = AnsibleSyntaxCheckRule()
+        fh = None
+        results = []
+        if lintable.kind not in ("playbook", "role"):
+            return []
+
+        with timed_info(
+            "Executing syntax check on %s %s",
+            lintable.kind,
+            lintable.path,
+        ):
+            if lintable.kind == "role":
+                playbook_text = f"""
+---
+- name: Temporary playbook for role syntax check
+  hosts: localhost
+  tasks:
+    - ansible.builtin.import_role:
+        name: {lintable.path.expanduser()!s}
+"""
+                # pylint: disable=consider-using-with
+                fh = tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix="play")
+                fh.write(playbook_text)
+                fh.flush()
+                playbook_path = fh.name
+            else:
+                playbook_path = str(lintable.path.expanduser())
+            # To avoid noisy warnings we pass localhost as current inventory:
+            # [WARNING]: No inventory was parsed, only implicit localhost is available
+            # [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+            cmd = [
+                "ansible-playbook",
+                "-i",
+                "localhost,",
+                "--syntax-check",
+                playbook_path,
+            ]
+            if app.options.extra_vars:
+                cmd.extend(["--extra-vars", json.dumps(app.options.extra_vars)])
+
+            # To reduce noisy warnings like
+            # CryptographyDeprecationWarning: Blowfish has been deprecated
+            # https://github.com/paramiko/paramiko/issues/2038
+            env = app.runtime.environ.copy()
+            env["PYTHONWARNINGS"] = "ignore"
+
+            run = subprocess.run(
+                cmd,
+                stdin=subprocess.PIPE,
+                capture_output=True,
+                shell=False,  # needed when command is a list # noqa: S603
+                text=True,
+                check=False,
+                env=env,
+            )
+
+        if run.returncode != 0:
+            message = None
+            filename = lintable
+            lineno = 1
+            column = None
+
+            stderr = strip_ansi_escape(run.stderr)
+            stdout = strip_ansi_escape(run.stdout)
+            if stderr:
+                details = stderr
+                if stdout:
+                    details += "\n" + stdout
+            else:
+                details = stdout
+
+            for pattern in OUTPUT_PATTERNS:
+                rule = default_rule
+                match = re.search(pattern.regex, stderr)
+                if match:
+                    groups = match.groupdict()
+                    title = groups.get("title", match.group(0))
+                    details = groups.get("details", "")
+                    lineno = int(groups.get("line", 1))
+
+                    if "filename" in groups:
+                        filename = Lintable(groups["filename"])
+                    else:
+                        filename = lintable
+                    column = int(groups.get("column", 1))
+                    results.append(
+                        MatchError(
+                            message=title,
+                            lintable=filename,
+                            lineno=lineno,
+                            column=column,
+                            rule=rule,
+                            details=details,
+                            tag=f"{rule.id}[{pattern.tag}]",
+                        ),
+                    )
+
+            if not results:
+                rule = RuntimeErrorRule()
+                message = (
+                    f"Unexpected error code {run.returncode} from "
+                    f"execution of: {' '.join(cmd)}"
+                )
+                results.append(
+                    MatchError(
+                        message=message,
+                        lintable=filename,
+                        lineno=lineno,
+                        column=column,
+                        rule=rule,
+                        details=details,
+                        tag="",
+                    ),
+                )
+
+        if fh:
+            fh.close()
+        return results
 
     def _filter_excluded_matches(self, matches: list[MatchError]) -> list[MatchError]:
         return [
