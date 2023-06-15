@@ -28,8 +28,12 @@ def fixture_default_rules_collection() -> RulesCollection:
     """Return default rule collection."""
     assert DEFAULT_RULESDIR.is_dir()
     # For testing we want to manually enable opt-in rules
-    options.enable_list = ["no-same-owner"]
-    return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=options)
+    test_options = copy.deepcopy(options)
+    test_options.enable_list = ["no-same-owner"]
+    # That is instantiated very often and do want to avoid ansible-galaxy
+    # install errors due to concurrency.
+    test_options.offline = True
+    return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=test_options)
 
 
 @pytest.fixture()

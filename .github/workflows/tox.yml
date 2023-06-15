@@ -32,7 +32,9 @@ jobs:
           max_python: "3.11"
           other_names: |
             lint
-            pkg,hook,docs
+            pkg
+            hook
+            docs
             schemas
             eco
             py-devel
@@ -84,14 +86,16 @@ jobs:
             ~/.cache/pre-commit
           key: pre-commit-${{ matrix.name || matrix.passed_name }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: Set eco cache
+      - name: Set ansible cache(s)
         uses: actions/cache@v3
-        if: ${{ matrix.passed_name == 'eco' }}
         with:
           path: |
             .cache/eco
+            examples/playbooks/collections/ansible_collections
             ~/.cache/ansible-compat
-          key: eco-${{ matrix.name || matrix.passed_name }}-${{ hashFiles('tools/test-eco.sh') }}
+            ~/.ansible/collections
+            ~/.ansible/roles
+          key: ${{ matrix.name || matrix.passed_name }}-${{ hashFiles('tools/test-eco.sh', 'requirements.yml') }}
 
       - name: Set galaxy cache
         uses: actions/cache@v3
