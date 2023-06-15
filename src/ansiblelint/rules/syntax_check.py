@@ -10,14 +10,13 @@ from dataclasses import dataclass
 from typing import Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
+from ansiblelint.app import App, get_app
 from ansiblelint.config import options
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.logger import timed_info
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import strip_ansi_escape
-
-from ansiblelint.app import App, get_app
 
 
 @dataclass
@@ -208,7 +207,8 @@ if "pytest" in sys.modules:
         )
         # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(
-            lintable, app=get_app()
+            lintable,
+            app=get_app(),
         )
         assert result[0].lineno == 4
         assert result[0].column == 7
@@ -226,7 +226,8 @@ if "pytest" in sys.modules:
         lintable = Lintable("examples/playbooks/empty_playbook.yml", kind="playbook")
         # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(
-            lintable, app=get_app()
+            lintable,
+            app=get_app(),
         )
         assert result[0].lineno == 1
         # We internally convert absolute paths returned by ansible into paths
@@ -246,7 +247,8 @@ if "pytest" in sys.modules:
 
         # pylint: disable=protected-access
         result = AnsibleSyntaxCheckRule._get_ansible_syntax_check_matches(
-            lintable, app=get_app()
+            lintable,
+            app=get_app(),
         )
 
         assert not result
