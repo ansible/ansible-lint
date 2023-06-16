@@ -8,7 +8,6 @@ import multiprocessing.pool
 import os
 import re
 import subprocess
-import sys
 import tempfile
 import warnings
 from dataclasses import dataclass

@@ -27,7 +27,6 @@ import inspect
 import logging
 import os
 import re
-import sys
 from collections.abc import Generator, ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache
