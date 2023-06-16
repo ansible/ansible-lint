@@ -12,8 +12,13 @@ import tempfile
 import warnings
 from dataclasses import dataclass
 from fnmatch import fnmatch
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from ansible.errors import AnsibleError
+from ansible.parsing.splitter import split_args
+from ansible.parsing.yaml.constructor import AnsibleMapping
+from ansible.plugins.loader import add_all_plugin_dirs
 from ansible_compat.runtime import AnsibleWarning
 
 import ansiblelint.skip_utils
@@ -31,12 +36,20 @@ from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.logger import timed_info
 from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS, AnsibleSyntaxCheckRule
 from ansiblelint.text import strip_ansi_escape
+from ansiblelint.utils import (
+    PLAYBOOK_DIR,
+    _include_children,
+    _roles_children,
+    _taskshandlers_children,
+    template,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Generator
-    from pathlib import Path
+    from typing import Callable
 
     from ansiblelint.config import Options
+    from ansiblelint.constants import FileType
     from ansiblelint.rules import RulesCollection
 
 _logger = logging.getLogger(__name__)
@@ -415,7 +428,7 @@ class Runner:
         while visited != self.lintables:
             for lintable in self.lintables - visited:
                 try:
-                    children = ansiblelint.utils.find_children(lintable)
+                    children = self.find_children(lintable)
                     for child in children:
                         if self.is_excluded(child):
                             continue
@@ -429,6 +442,93 @@ class Runner:
                 except AttributeError:
                     yield MatchError(lintable=lintable, rule=LoadingFailureRule())
                 visited.add(lintable)
+
+    def find_children(self, lintable: Lintable) -> list[Lintable]:
+        """Traverse children of a single file or folder."""
+        if not lintable.path.exists():
+            return []
+        playbook_dir = str(lintable.path.parent)
+        ansiblelint.utils.set_collections_basedir(lintable.path.parent)
+        add_all_plugin_dirs(playbook_dir or ".")
+        if lintable.kind == "role":
+            playbook_ds = AnsibleMapping({"roles": [{"role": str(lintable.path)}]})
+        elif lintable.kind not in ("playbook", "tasks"):
+            return []
+        else:
+            try:
+                playbook_ds = ansiblelint.utils.parse_yaml_from_file(str(lintable.path))
+            except AnsibleError as exc:
+                raise SystemExit(exc) from exc
+        results = []
+        # playbook_ds can be an AnsibleUnicode string, which we consider invalid
+        if isinstance(playbook_ds, str):
+            raise MatchError(lintable=lintable, rule=LoadingFailureRule())
+        for item in ansiblelint.utils.playbook_items(playbook_ds):
+            # if lintable.kind not in ["playbook"]:
+            for child in self.play_children(
+                lintable.path.parent,
+                item,
+                lintable.kind,
+                playbook_dir,
+            ):
+                # We avoid processing parametrized children
+                path_str = str(child.path)
+                if "$" in path_str or "{{" in path_str:
+                    continue
+
+                # Repair incorrect paths obtained when old syntax was used, like:
+                # - include: simpletask.yml tags=nginx
+                valid_tokens = []
+                for token in split_args(path_str):
+                    if "=" in token:
+                        break
+                    valid_tokens.append(token)
+                path = " ".join(valid_tokens)
+                if path != path_str:
+                    child.path = Path(path)
+                    child.name = child.path.name
+
+                results.append(child)
+        return results
+
+    def play_children(
+        self,
+        basedir: Path,
+        item: tuple[str, Any],
+        parent_type: FileType,
+        playbook_dir: str,
+    ) -> list[Lintable]:
+        """Flatten the traversed play tasks."""
+        # pylint: disable=unused-argument
+        delegate_map: dict[str, Callable[[str, Any, Any, FileType], list[Lintable]]] = {
+            "tasks": _taskshandlers_children,
+            "pre_tasks": _taskshandlers_children,
+            "post_tasks": _taskshandlers_children,
+            "block": _taskshandlers_children,
+            "include": _include_children,
+            "ansible.builtin.include": _include_children,
+            "import_playbook": _include_children,
+            "ansible.builtin.import_playbook": _include_children,
+            "roles": _roles_children,
+            "dependencies": _roles_children,
+            "handlers": _taskshandlers_children,
+            "include_tasks": _include_children,
+            "ansible.builtin.include_tasks": _include_children,
+            "import_tasks": _include_children,
+            "ansible.builtin.import_tasks": _include_children,
+        }
+        (k, v) = item
+        add_all_plugin_dirs(str(basedir.resolve()))
+
+        if k in delegate_map and v:
+            v = template(
+                basedir,
+                v,
+                {"playbook_dir": PLAYBOOK_DIR or str(basedir.resolve())},
+                fail_on_undefined=False,
+            )
+            return delegate_map[k](str(basedir), k, v, parent_type)
+        return []
 
 
 def _get_matches(rules: RulesCollection, options: Options) -> LintResult:
