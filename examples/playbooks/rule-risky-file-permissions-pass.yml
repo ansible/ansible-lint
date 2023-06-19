@@ -56,6 +56,7 @@
     - name: Replace should not require mode
       ansible.builtin.replace:
         path: foo
+        regexp: foo
 
 - name: SUCCESS_RECURSE
   hosts: all
@@ -64,6 +65,7 @@
       ansible.builtin.file:
         state: directory
         recurse: true
+        path: foo
     - name: Permissions not missing and numeric (fqcn)
       ansible.builtin.file:
         path: bar

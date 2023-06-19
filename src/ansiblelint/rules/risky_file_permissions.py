@@ -95,6 +95,10 @@ class MissingFilePermissionsRule(AnsibleLintRule):
         module = task["action"]["__ansible_module__"]
         mode = task["action"].get("mode", None)
 
+        if not isinstance(task.args, dict):
+            # We are unable to check args when using jinja templating
+            return False
+
         if module not in self._modules and module not in self._modules_with_create:
             return False
 
@@ -151,11 +155,13 @@ if "pytest" in sys.modules:
             ),
         ),
     )
-    def test_risky_file_permissions(file: str, expected: int) -> None:
+    def test_risky_file_permissions(
+        file: str,
+        expected: int,
+        default_rules_collection: RulesCollection,
+    ) -> None:
         """The ini_file module does not accept preserve mode."""
-        collection = RulesCollection()
-        collection.register(MissingFilePermissionsRule())
-        runner = RunFromText(collection)
+        runner = RunFromText(default_rules_collection)
         results = runner.run(Path(file))
         assert len(results) == expected
         for result in results:

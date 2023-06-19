@@ -8,6 +8,7 @@
         path: foo
         create: true
         mode: preserve
+        section: bar
 
 - name: FAIL_INI_PERMISSION
   hosts: all
@@ -16,6 +17,7 @@
       community.general.ini_file:
         path: foo
         create: true
+        section: bar
 
 - name: FAIL_PRESERVE_MODE
   hosts: all
@@ -28,7 +30,7 @@
 - name: FAIL_MISSING_PERMISSIONS_TOUCH
   hosts: all
   tasks:
-    - name: Permissions missing and might create file
+    - name: Permissions missing and might create file # noqa: fqcn[action-core]
       file:
         path: foo
         state: touch
@@ -40,7 +42,7 @@
 - name: FAIL_MISSING_PERMISSIONS_DIRECTORY
   hosts: all
   tasks:
-    - name: Permissions missing and might create directory
+    - name: Permissions missing and might create directory # noqa: fqcn[action-core]
       file:
         path: foo
         state: directory
@@ -71,15 +73,16 @@
 - name: FAIL_REPLACE_PRESERVE
   hosts: all
   tasks:
-    - name: Replace does not allow preserve mode
+    - name: Replace does not allow preserve mode # noqa: fqcn[action-core]
       replace:
         path: foo
         mode: preserve
+        regexp: foo
 
 - name: FAIL_PERMISSION_COMMENT
   hosts: all
   tasks:
-    - name: Permissions is only a comment
+    - name: Permissions is only a comment # noqa: fqcn[action-core]
       file:
         path: foo
         owner: root

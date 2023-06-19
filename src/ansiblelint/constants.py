@@ -136,8 +136,13 @@ NESTED_TASK_KEYS = [
 SKIPPED_RULES_KEY = "__skipped_rules__"
 LINE_NUMBER_KEY = "__line__"
 FILENAME_KEY = "__file__"
-ANNOTATION_KEYS = [FILENAME_KEY, LINE_NUMBER_KEY, SKIPPED_RULES_KEY]
-
+ANNOTATION_KEYS = [
+    FILENAME_KEY,
+    LINE_NUMBER_KEY,
+    SKIPPED_RULES_KEY,
+    "__ansible_module__",
+    "__ansible_module_original__",
+]
 INCLUSION_ACTION_NAMES = {
     "include",
     "include_tasks",

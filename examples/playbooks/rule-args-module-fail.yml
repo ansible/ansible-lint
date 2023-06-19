@@ -17,7 +17,7 @@
         masked: false
 
     - name: Enable service httpd and ensure it is not masked
-      # module should produce: 'Unsupported parameters for ansible.builtin.systemd module: foo. Supported parameters include: no_block, state, daemon_reload (daemon-reload), name (service, unit), force, masked, daemon_reexec (daemon-reexec), scope, enabled.'
+      # module should produce: 'Unsupported parameters for ansible.builtin.systemd module"
       ansible.builtin.systemd:
         foo: true
 
@@ -34,3 +34,4 @@
       ansible.builtin.file:
         path: /opt/software/deployment
         state: away
+        mode: "0600"
