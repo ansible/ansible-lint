@@ -293,7 +293,7 @@ def main(argv: list[str] | None = None) -> int:
 
     app.render_matches(result.matches)
 
-    _perform_mockings_cleanup()
+    _perform_mockings_cleanup(app.options)
     if options.cache_dir_lock:
         options.cache_dir_lock.release()
         pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)

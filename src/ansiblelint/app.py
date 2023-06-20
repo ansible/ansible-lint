@@ -1,6 +1,7 @@
 """Application."""
 from __future__ import annotations
 
+import copy
 import itertools
 import logging
 import os
@@ -377,9 +378,16 @@ def get_app(*, offline: bool | None = None) -> App:
     """Return the application instance, caching the return value."""
     if offline is None:
         offline = default_options.offline
-    app = App(options=default_options)
+
+    if default_options.offline != offline:
+        options = copy.deepcopy(default_options)
+        options.offline = offline
+    else:
+        options = default_options
+
+    app = App(options=options)
     # Make linter use the cache dir from compat
-    default_options.cache_dir = app.runtime.cache_dir
+    options.cache_dir = app.runtime.cache_dir
 
     role_name_check = 0
     if "role-name" in app.options.warn_list:
@@ -389,7 +397,7 @@ def get_app(*, offline: bool | None = None) -> App:
 
     # mocking must happen before prepare_environment or galaxy install might
     # fail.
-    _perform_mockings()
+    _perform_mockings(options=app.options)
     app.runtime.prepare_environment(
         install_local=(not offline),
         offline=offline,
