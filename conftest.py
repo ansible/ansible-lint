@@ -28,6 +28,8 @@ if missing:
 # See: https://github.com/pytest-dev/pytest/issues/1402#issuecomment-186299177
 def pytest_configure(config: pytest.Config) -> None:
     """Ensure we run preparation only on master thread when running in parallel."""
+    if is_help_option_present(config):
+        return
     if is_master(config):
         # we need to be sure that we have the requirements installed as some tests
         # might depend on these. This approach is compatible with GHA caching.
@@ -40,6 +42,11 @@ def pytest_configure(config: pytest.Config) -> None:
         except subprocess.CalledProcessError as exc:
             print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)  # noqa: T201
             sys.exit(1)
+
+
+def is_help_option_present(config: pytest.Config) -> bool:
+    """Return true if pytest invocation was not about running tests."""
+    return any(config.getoption(x) for x in ["--fixtures", "--help", "--collect-only"])
 
 
 def is_master(config: pytest.Config) -> bool:

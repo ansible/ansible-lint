@@ -23,7 +23,9 @@ if TYPE_CHECKING:
     from _pytest.fixtures import SubRequest
 
 
-@pytest.fixture(name="default_rules_collection")
+# The sessions scope does not apply to xdist, so we will still have one
+# session for each worker, but at least it will a limited number.
+@pytest.fixture(name="default_rules_collection", scope="session")
 def fixture_default_rules_collection() -> RulesCollection:
     """Return default rule collection."""
     assert DEFAULT_RULESDIR.is_dir()
