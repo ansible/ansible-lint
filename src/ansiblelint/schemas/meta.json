@@ -148,35 +148,6 @@
       "title": "CumulusPlatformModel",
       "type": "object"
     },
-    "NetBSDPlatformModel": {
-      "properties": {
-        "name": {
-          "const": "NetBSD",
-          "title": "Name",
-          "type": "string"
-        },
-        "versions": {
-          "default": "all",
-          "items": {
-            "enum": [
-              "8.0",
-              "8.1",
-              "8.2",
-              "9.0",
-              "9.1",
-              "9.2",
-              "9.3",
-              "10.0",
-              "all"
-            ],
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "title": "NetBSDPlatformModel",
-      "type": "object"
-    },
     "DebianPlatformModel": {
       "properties": {
         "name": {
@@ -787,6 +758,35 @@
         }
       },
       "title": "NXOSPlatformModel",
+      "type": "object"
+    },
+    "NetBSDPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "NetBSD",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": [
+              "8.0",
+              "8.1",
+              "8.2",
+              "9.0",
+              "9.1",
+              "9.2",
+              "9.3",
+              "10.0",
+              "all"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "NetBSDPlatformModel",
       "type": "object"
     },
     "OpenBSDPlatformModel": {
