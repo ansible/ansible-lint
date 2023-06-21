@@ -12,17 +12,13 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, distribution, version
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from urllib.error import HTTPError, URLError
 
 from packaging.version import Version
 
 from ansiblelint import __version__
 from ansiblelint.loaders import yaml_from_file
-
-if TYPE_CHECKING:
-    from filelock import BaseFileLock
-
 
 _logger = logging.getLogger(__name__)
 
@@ -152,7 +148,6 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     config_file: str | None = None
     generate_ignore: bool = False
     rulesdir: list[Path] = field(default_factory=list)
-    cache_dir_lock: BaseFileLock | None = None
     use_default_rules: bool = False
     version: bool = False  # display version command
     list_profiles: bool = False  # display profiles command

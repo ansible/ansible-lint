@@ -66,6 +66,7 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__name__)
+cache_dir_lock: None | FileLock = None
 
 
 class LintLogHandler(logging.Handler):
@@ -130,11 +131,12 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     if options.cache_dir:
         options.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    options.cache_dir_lock = None
     if not options.offline:  # pragma: no cover
-        options.cache_dir_lock = FileLock(f"{options.cache_dir}/.lock")
+        cache_dir_lock = FileLock(  # pylint: disable=redefined-outer-name
+            f"{options.cache_dir}/.lock",
+        )
         try:
-            options.cache_dir_lock.acquire(timeout=180)
+            cache_dir_lock.acquire(timeout=180)
         except Timeout:  # pragma: no cover
             _logger.error(
                 "Timeout waiting for another instance of ansible-lint to release the lock.",
@@ -294,9 +296,9 @@ def main(argv: list[str] | None = None) -> int:
     app.render_matches(result.matches)
 
     _perform_mockings_cleanup(app.options)
-    if options.cache_dir_lock:
-        options.cache_dir_lock.release()
-        pathlib.Path(options.cache_dir_lock.lock_file).unlink(missing_ok=True)
+    if cache_dir_lock:
+        cache_dir_lock.release()
+        pathlib.Path(cache_dir_lock.lock_file).unlink(missing_ok=True)
     if options.mock_filters:
         _logger.warning(
             "The following filters were mocked during the run: %s",
