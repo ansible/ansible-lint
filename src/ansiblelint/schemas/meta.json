@@ -170,7 +170,7 @@
               "all"
             ],
             "type": "string"
-          }
+          },
           "type": "array"
         }
       },
