@@ -46,7 +46,7 @@ def test_example_syntax_error(
 
 def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
     """custom_module.yml is expected to pass."""
-    app = get_app()
+    app = get_app(offline=True)
     result = Runner(
         "examples/playbooks/custom_module.yml",
         rules=default_rules_collection,
