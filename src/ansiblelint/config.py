@@ -261,7 +261,7 @@ def get_deps_versions() -> dict[str, Version | None]:
     """Return versions of most important dependencies."""
     result: dict[str, Version | None] = {}
 
-    for name in ["ansible-core", "ruamel-yaml", "ruamel-yaml-clib"]:
+    for name in ["ansible-core", "ansible-compat", "ruamel-yaml", "ruamel-yaml-clib"]:
         try:
             result[name] = Version(version(name))
         except PackageNotFoundError:
