@@ -7,16 +7,17 @@ import re
 import sys
 from typing import TYPE_CHECKING
 
-from ansiblelint.config import options
 from ansiblelint.constants import ANSIBLE_MOCKED_MODULE, RC
 
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from ansiblelint.config import Options
+
 _logger = logging.getLogger(__name__)
 
 
-def _make_module_stub(module_name: str) -> None:
+def _make_module_stub(module_name: str, options: Options) -> None:
     if not options.cache_dir:
         msg = "Cache directory not set"
         raise RuntimeError(msg)
@@ -70,7 +71,7 @@ def _write_module_stub(
         f.write(body)
 
 
-def _perform_mockings() -> None:
+def _perform_mockings(options: Options) -> None:
     """Mock modules and roles."""
     path: Path
     if not options.cache_dir:
@@ -98,10 +99,10 @@ def _perform_mockings() -> None:
 
     if options.mock_modules:
         for module_name in options.mock_modules:
-            _make_module_stub(module_name)
+            _make_module_stub(module_name=module_name, options=options)
 
 
-def _perform_mockings_cleanup() -> None:
+def _perform_mockings_cleanup(options: Options) -> None:
     """Clean up mocked modules and roles."""
     if not options.cache_dir:
         msg = "Cache directory not set"

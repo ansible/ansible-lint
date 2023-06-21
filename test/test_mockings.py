@@ -13,6 +13,6 @@ def test_make_module_stub(mocker: Any) -> None:
     mocker.patch("ansiblelint.config.options.cache_dir", return_value=".")
     assert options.cache_dir is not None
     with pytest.raises(SystemExit) as exc:
-        _make_module_stub("")
+        _make_module_stub(module_name="", options=options)
     assert exc.type == SystemExit
     assert exc.value.code == RC.INVALID_CONFIG
