@@ -263,7 +263,7 @@ def _get_rule_skips_from_yaml(
         return []
 
     def traverse_yaml(obj: Any) -> None:
-        for _, entry in obj.ca.items.items():
+        for entry in obj.ca.items.values():
             for v in entry:
                 if isinstance(v, CommentToken):
                     comment_str = v.value
@@ -278,7 +278,7 @@ def _get_rule_skips_from_yaml(
                         )
         yaml_comment_obj_strings.append(str(obj.ca.items))
         if isinstance(obj, dict):
-            for _, val in obj.items():
+            for val in obj.values():
                 if isinstance(val, (dict, list)):
                     traverse_yaml(val)
         elif isinstance(obj, list):

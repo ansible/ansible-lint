@@ -223,7 +223,7 @@ python_files = [
 xfail_strict = true
 
 [tool.ruff]
-required-version = "0.0.272"
+required-version = "0.0.274"
 ignore = [
   "E501", # we use black
   "ERA001", # auto-removal of commented out code affects development and vscode integration
@@ -237,6 +237,7 @@ ignore = [
   "FBT001",
   "FBT003",
   "PLR",
+  "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "TRY",
 ]
 select = ["ALL"]
