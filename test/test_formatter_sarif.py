@@ -189,4 +189,4 @@ def test_sarif_file_creates_it_if_none_exists(file: str, return_code: int) -> No
     assert result.returncode == return_code
     assert os.path.exists(sarif_file_name)  # noqa: PTH110
     assert os.path.getsize(sarif_file_name) > 0
-    os.remove(sarif_file_name)
+    pathlib.Path.unlink(pathlib.Path(sarif_file_name))
