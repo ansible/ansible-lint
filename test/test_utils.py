@@ -402,9 +402,11 @@ def test_get_rules_dirs_with_custom_rules(
     assert get_rules_dirs(user_ruledirs, use_default=use_default) == expected
 
 
-def test_find_children() -> None:
+def test_find_children(default_rules_collection: RulesCollection) -> None:
     """Verify correct function of find_children()."""
-    utils.find_children(Lintable("examples/playbooks/find_children.yml"))
+    Runner(
+        rules=default_rules_collection,
+    ).find_children(Lintable("examples/playbooks/find_children.yml"))
 
 
 def test_find_children_in_task(default_rules_collection: RulesCollection) -> None:

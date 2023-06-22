@@ -156,7 +156,7 @@ repos:
           - rich>=13.2.0
           - ruamel-yaml>=0.17.31
           - ruamel-yaml-clib>=0.2.7
-          - spdx-tools
+          - spdx-tools>=0.7.1
           - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.4.2
@@ -187,7 +187,7 @@ repos:
           - rich>=13.2.0
           - ruamel-yaml>=0.17.31
           - ruamel-yaml-clib>=0.2.7
-          - spdx-tools
+          - spdx-tools>=0.7.1
           - typing_extensions
           - wcmatch
           - yamllint

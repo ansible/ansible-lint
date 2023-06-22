@@ -31,14 +31,13 @@ from collections.abc import Generator, ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
-from ansible.parsing.splitter import split_args
 from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
@@ -50,7 +49,6 @@ from yaml.representer import RepresenterError
 
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
-    LoadingFailureRule,
     RuntimeErrorRule,
 )
 from ansiblelint.app import get_app
@@ -234,7 +232,8 @@ def tokenize(line: str) -> tuple[str, list[str], dict[str, str]]:
     return (command, args, kwargs)
 
 
-def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore[type-arg]
+def playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore[type-arg]
+    """Return a list of items from within the playbook."""
     if isinstance(pb_data, dict):
         return pb_data.items()
     if not pb_data:
@@ -246,60 +245,11 @@ def _playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignor
     return [item for play in pb_data if play for item in play.items()]  # type: ignore[return-value]
 
 
-def _set_collections_basedir(basedir: Path) -> None:
-    # Sets the playbook directory as playbook_paths for the collection loader
+def set_collections_basedir(basedir: Path) -> None:
+    """Set the playbook directory as playbook_paths for the collection loader."""
     # Ansible expects only absolute paths inside `playbook_paths` and will
     # produce weird errors if we use a relative one.
     AnsibleCollectionConfig.playbook_paths = str(basedir.resolve())
-
-
-def find_children(lintable: Lintable) -> list[Lintable]:
-    """Traverse children of a single file or folder."""
-    if not lintable.path.exists():
-        return []
-    playbook_dir = str(lintable.path.parent)
-    _set_collections_basedir(lintable.path.parent)
-    add_all_plugin_dirs(playbook_dir or ".")
-    if lintable.kind == "role":
-        playbook_ds = AnsibleMapping({"roles": [{"role": str(lintable.path)}]})
-    elif lintable.kind not in ("playbook", "tasks"):
-        return []
-    else:
-        try:
-            playbook_ds = parse_yaml_from_file(str(lintable.path))
-        except AnsibleError as exc:
-            raise SystemExit(exc) from exc
-    results = []
-    # playbook_ds can be an AnsibleUnicode string, which we consider invalid
-    if isinstance(playbook_ds, str):
-        raise MatchError(lintable=lintable, rule=LoadingFailureRule())
-    for item in _playbook_items(playbook_ds):
-        # if lintable.kind not in ["playbook"]:
-        for child in play_children(
-            lintable.path.parent,
-            item,
-            lintable.kind,
-            playbook_dir,
-        ):
-            # We avoid processing parametrized children
-            path_str = str(child.path)
-            if "$" in path_str or "{{" in path_str:
-                continue
-
-            # Repair incorrect paths obtained when old syntax was used, like:
-            # - include: simpletask.yml tags=nginx
-            valid_tokens = []
-            for token in split_args(path_str):
-                if "=" in token:
-                    break
-                valid_tokens.append(token)
-            path = " ".join(valid_tokens)
-            if path != path_str:
-                child.path = Path(path)
-                child.name = child.path.name
-
-            results.append(child)
-    return results
 
 
 def template(
@@ -326,45 +276,6 @@ def template(
         if fail_on_error:
             raise
     return value
-
-
-def play_children(
-    basedir: Path,
-    item: tuple[str, Any],
-    parent_type: FileType,
-    playbook_dir: str,  # noqa: ARG001
-) -> list[Lintable]:
-    """Flatten the traversed play tasks."""
-    # pylint: disable=unused-argument
-    delegate_map: dict[str, Callable[[str, Any, Any, FileType], list[Lintable]]] = {
-        "tasks": _taskshandlers_children,
-        "pre_tasks": _taskshandlers_children,
-        "post_tasks": _taskshandlers_children,
-        "block": _taskshandlers_children,
-        "include": _include_children,
-        "ansible.builtin.include": _include_children,
-        "import_playbook": _include_children,
-        "ansible.builtin.import_playbook": _include_children,
-        "roles": _roles_children,
-        "dependencies": _roles_children,
-        "handlers": _taskshandlers_children,
-        "include_tasks": _include_children,
-        "ansible.builtin.include_tasks": _include_children,
-        "import_tasks": _include_children,
-        "ansible.builtin.import_tasks": _include_children,
-    }
-    (k, v) = item
-    add_all_plugin_dirs(str(basedir.resolve()))
-
-    if k in delegate_map and v:
-        v = template(
-            basedir,
-            v,
-            {"playbook_dir": PLAYBOOK_DIR or str(basedir.resolve())},
-            fail_on_undefined=False,
-        )
-        return delegate_map[k](str(basedir), k, v, parent_type)
-    return []
 
 
 def _include_children(
