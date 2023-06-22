@@ -18,16 +18,21 @@ runs:
         fetch-depth: 0 # needed by setuptools-scm
         submodules: true
 
-    - name: Generate ansible-lint-requirements.txt
+    # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
+    # folder, so we are forced to stick this temporary file inside .git, so it
+    # will not affect the linted repository.
+    # https://github.com/actions/toolkit/issues/1035
+    # https://github.com/actions/setup-python/issues/361
+    - name: Generate .git/ansible-lint-requirements.txt
       shell: bash
       run: |
-        wget --output-file=$HOME/requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ github.action_ref || 'main' }}/.config/requirements-lock.txt
+        wget --output-file=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ github.action_ref || 'main' }}/.config/requirements-lock.txt
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         cache: pip
-        cache-dependency-path: ~/requirements.txt
+        cache-dependency-path: .git/ansible-lint-requirements.txt
         python-version: "3.11"
 
     - name: Install ansible-lint
