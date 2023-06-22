@@ -169,3 +169,24 @@ def test_sarif_file(file: str, return_code: int) -> None:
         assert result.returncode == return_code
         assert os.path.exists(output_file.name)  # noqa: PTH110
         assert os.path.getsize(output_file.name) > 0
+
+
+@pytest.mark.parametrize(
+    ("file", "return_code"),
+    (pytest.param("examples/playbooks/valid.yml", 0),),
+)
+def test_sarif_file_creates_it_if_none_exists(file: str, return_code: int) -> None:
+    """Test ability to create sarif file if none exists and dump output to it (--sarif-file)."""
+    sarif_file_name = "test_output.sarif"
+    cmd = [
+        sys.executable,
+        "-m",
+        "ansiblelint",
+        "--sarif-file",
+        sarif_file_name,
+    ]
+    result = subprocess.run([*cmd, file], check=False, capture_output=True)
+    assert result.returncode == return_code
+    assert os.path.exists(sarif_file_name)  # noqa: PTH110
+    assert os.path.getsize(sarif_file_name) > 0
+    os.remove(sarif_file_name)
