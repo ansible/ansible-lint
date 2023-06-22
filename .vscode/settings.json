@@ -2,14 +2,7 @@
     "[markdown]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "[python]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll": true
-        },
-        "editor.formatOnSave": true
-    },
     "editor.formatOnSave": true,
-    "evenBetterToml.formatter.alignComments": false,
     "evenBetterToml.formatter.allowedBlankLines": 2,
     "files.exclude": {
         "*.egg-info": true,
@@ -26,7 +19,6 @@
     ],
     "grammarly.hideUnavailablePremiumAlerts": true,
     "grammarly.showExamples": true,
-    "prettier.enable": true,
     "python.analysis.exclude": [
         "build"
     ],
@@ -48,5 +40,12 @@
         "!vault scalar"
     ],
     "yaml.format.enable": false,
-    "yaml.validate": true
+    "yaml.validate": true,
+    "evenBetterToml.formatter.alignComments": false,
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true,
+            "source.fixAll": true
+          }
+    }
 }
