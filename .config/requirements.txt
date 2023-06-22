@@ -45,7 +45,7 @@ lazy-object-proxy==1.9.0
 markdown==3.3.7
 markdown-exec==1.6.0
 markdown-include==0.8.1
-markdown-it-py==2.2.0
+markdown-it-py==3.0.0
 markupsafe==2.1.2
 mccabe==0.7.0
 mdurl==0.1.2
@@ -68,7 +68,7 @@ packaging==23.1
 pathspec==0.11.1
 pillow==9.5.0
 pipdeptree==2.7.1
-platformdirs==3.5.3
+platformdirs==3.6.0
 pluggy==1.0.0
 ply==3.11
 psutil==5.9.5
@@ -76,10 +76,10 @@ pycparser==2.21
 pygments==2.15.1
 pylint==2.17.4
 pymdown-extensions==10.0.1
-pyparsing==3.0.9
+pyparsing==3.1.0
 pyrsistent==0.19.3
 pytest==7.3.2
-pytest-mock==3.10.0
+pytest-mock==3.11.1
 pytest-plus==0.4.0
 pytest-xdist==3.3.1
 python-dateutil==2.8.2
@@ -89,8 +89,8 @@ pyyaml-env-tag==0.1
 rdflib==6.3.2
 regex==2023.5.5
 requests==2.31.0
-rich==13.4.1
-ruamel-yaml==0.17.31
+rich==13.4.2
+ruamel-yaml==0.17.32
 six==1.16.0
 soupsieve==2.4.1
 spdx-tools==0.7.1
