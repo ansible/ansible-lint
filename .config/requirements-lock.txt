@@ -5,7 +5,7 @@
 #    pip-compile --no-annotate --output-file=.config/requirements-lock.txt --resolver=backtracking --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
 ansible-compat==4.1.2
-ansible-core==2.15.0
+ansible-core==2.15.1
 attrs==23.1.0
 black==23.3.0
 bracex==2.3.post1
@@ -25,7 +25,7 @@ mdurl==0.1.2
 mypy-extensions==1.0.0
 packaging==23.1
 pathspec==0.11.1
-platformdirs==3.6.0
+platformdirs==3.7.0
 pycparser==2.21
 pygments==2.15.1
 pyrsistent==0.19.3

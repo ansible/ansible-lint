@@ -143,7 +143,7 @@ class BaseRule:
 
     def __lt__(self, other: BaseRule) -> bool:
         """Enable us to sort rules by their id."""
-        return (self._order, self.id) < (other._order, other.id)  # noqa: SLF001
+        return (self._order, self.id) < (other._order, other.id)
 
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
