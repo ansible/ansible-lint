@@ -282,12 +282,10 @@ if "pytest" in sys.modules:
 
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 
-    def test_args_module_fail() -> None:
+    def test_args_module_fail(default_rules_collection: RulesCollection) -> None:
         """Test rule invalid module options."""
-        collection = RulesCollection()
-        collection.register(ArgsRule())
         success = "examples/playbooks/rule-args-module-fail.yml"
-        results = Runner(success, rules=collection).run()
+        results = Runner(success, rules=default_rules_collection).run()
         assert len(results) == 5
         assert results[0].tag == "args[module]"
         assert "missing required arguments" in results[0].message
@@ -300,12 +298,13 @@ if "pytest" in sys.modules:
         assert results[4].tag == "args[module]"
         assert "value of state must be one of" in results[4].message
 
-    def test_args_module_pass(caplog: pytest.LogCaptureFixture) -> None:
+    def test_args_module_pass(
+        default_rules_collection: RulesCollection,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
         """Test rule valid module options."""
-        collection = RulesCollection()
-        collection.register(ArgsRule())
         success = "examples/playbooks/rule-args-module-pass.yml"
         with caplog.at_level(logging.WARNING):
-            results = Runner(success, rules=collection).run()
+            results = Runner(success, rules=default_rules_collection).run()
         assert len(results) == 0, results
         assert len(caplog.records) == 0, caplog.records

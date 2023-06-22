@@ -56,6 +56,7 @@ from ansiblelint._internal.rules import (
 from ansiblelint.app import get_app
 from ansiblelint.config import Options, options
 from ansiblelint.constants import (
+    ANNOTATION_KEYS,
     FILENAME_KEY,
     INCLUSION_ACTION_NAMES,
     LINE_NUMBER_KEY,
@@ -787,6 +788,30 @@ class Task(dict[str, Any]):
     def name(self) -> str | None:
         """Return the name of the task."""
         return self.raw_task.get("name", None)
+
+    @property
+    def action(self) -> str:
+        """Return the resolved action name."""
+        action_name = self.normalized_task["action"]["__ansible_module_original__"]
+        if not isinstance(action_name, str):
+            msg = "Task actions can only be strings."
+            raise RuntimeError(msg)
+        return action_name
+
+    @property
+    def args(self) -> Any:
+        """Return the arguments passed to the task action.
+
+        While we usually expect to return a dictionary, it can also
+        return a templated string when jinja is used.
+        """
+        if "args" in self.raw_task:
+            return self.raw_task["args"]
+        result = {}
+        for k, v in self.normalized_task["action"].items():
+            if k not in ANNOTATION_KEYS:
+                result[k] = v
+        return result
 
     @property
     def normalized_task(self) -> dict[str, Any]:
