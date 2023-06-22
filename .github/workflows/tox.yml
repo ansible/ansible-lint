@@ -39,11 +39,21 @@ jobs:
             eco
             py-devel
           platforms: linux,macos
-
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Self test for ansible-lint@${{ github.action_ref || 'main' }}
+        uses: ./
+        with:
+          # basically we only lint linter own configuration, which should be passing.
+          args: .ansible-lint
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
-    needs: pre
+    needs:
+      - pre
+      - test-action
     defaults:
       run:
         shell: ${{ matrix.shell || 'bash'}}
@@ -205,6 +215,7 @@ jobs:
 
     needs:
       - build
+      - test-action
 
     runs-on: ubuntu-latest
 
