@@ -22,14 +22,14 @@ install it yourself.
 name: ansible-lint
 on:
   pull_request:
-    branches: ["stable", "release/v*"]
+    branches: ["main", "stable", "release/v*"]
 jobs:
   build:
     name: Ansible Lint # Naming the build is important to use it as a status check
     runs-on: ubuntu-latest
     steps:
       - name: Run ansible-lint
-        uses: ansible/ansible-lint-action@v6
+        uses: ansible/ansible-lint@main # or version tag instead of 'main'
 ```
 
 For more details, see [ansible-lint-action].
