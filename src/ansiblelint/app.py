@@ -103,7 +103,11 @@ class App:
         if self.options.sarif_file:
             sarif = formatters.SarifFormatter(self.options.cwd, True)
             json = sarif.format_result(matches)
-            with self.options.sarif_file.open("w", encoding="utf-8") as sarif_file:
+            with Path.open(
+                self.options.sarif_file,
+                "w",
+                encoding="utf-8",
+            ) as sarif_file:
                 sarif_file.write(json)
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
