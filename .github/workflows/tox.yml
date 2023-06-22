@@ -95,16 +95,7 @@ jobs:
             ~/.cache/ansible-compat
             ~/.ansible/collections
             ~/.ansible/roles
-          key: ${{ matrix.name || matrix.passed_name }}-${{ hashFiles('tools/test-eco.sh', 'requirements.yml') }}
-
-      - name: Set galaxy cache
-        uses: actions/cache@v3
-        if: ${{ startsWith(matrix.passed_name, 'py') }}
-        with:
-          path: |
-            examples/playbooks/collections/*.tar.gz
-            examples/playbooks/collections/ansible_collections
-          key: galaxy-${{ hashFiles('examples/playbooks/collections/requirements.yml') }}
+          key: ${{ matrix.name || matrix.passed_name }}-${{ hashFiles('tools/test-eco.sh', 'requirements.yml', 'examples/playbooks/collections/requirements.yml') }}
 
       - name: Set up Python ${{ matrix.python_version || '3.9' }}
         if: "!contains(matrix.shell, 'wsl')"

@@ -219,7 +219,7 @@ class Runner:
                 )
 
         # -- phase 1 : syntax check in parallel --
-        app = get_app(offline=None)
+        app = get_app(offline=True)
 
         def worker(lintable: Lintable) -> list[MatchError]:
             # pylint: disable=protected-access
