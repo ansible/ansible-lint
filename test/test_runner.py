@@ -48,7 +48,7 @@ LOTS_OF_WARNINGS_PLAYBOOK = Path("examples/playbooks/lots_of_warnings.yml").reso
         pytest.param(
             LOTS_OF_WARNINGS_PLAYBOOK,
             [LOTS_OF_WARNINGS_PLAYBOOK],
-            992,
+            993,
             id="lots_of_warnings",
         ),
         pytest.param(Path("examples/playbooks/become.yml"), [], 0, id="become"),
