@@ -30,7 +30,10 @@
                 },
                 "execution_strategy": {
                     "type": "string",
-                    "enum": ["sequential", "parallel"],
+                    "enum": [
+                        "parallel",
+                        "sequential"
+                    ],
                     "default": "sequential"
                 },
                 "sources": {
