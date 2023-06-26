@@ -61,14 +61,14 @@ mkdocs-minify-plugin==0.6.4
 mkdocs-monorepo-plugin==1.0.5
 mkdocstrings==0.22.0
 mkdocstrings-python==1.1.0
-mypy==1.4.0
+mypy==1.4.1
 mypy-extensions==1.0.0
 netaddr==0.8.0
 packaging==23.1
 pathspec==0.11.1
 pillow==9.5.0
 pipdeptree==2.7.1
-platformdirs==3.7.0
+platformdirs==3.8.0
 pluggy==1.2.0
 ply==3.11
 psutil==5.9.5
@@ -78,7 +78,7 @@ pylint==2.17.4
 pymdown-extensions==10.0.1
 pyparsing==3.1.0
 pyrsistent==0.19.3
-pytest==7.3.2
+pytest==7.4.0
 pytest-mock==3.11.1
 pytest-plus==0.4.0
 pytest-xdist==3.3.1

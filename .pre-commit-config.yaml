@@ -130,7 +130,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.274"
+    rev: "v0.0.275"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -140,7 +140,7 @@ repos:
       - id: black
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.4.0
+    rev: v1.4.1
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
