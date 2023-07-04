@@ -12,6 +12,7 @@ from ansiblelint.rules import AnsibleLintRule
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
 class ComplexityRule(AnsibleLintRule):
@@ -23,6 +24,8 @@ class ComplexityRule(AnsibleLintRule):
     tags = ["experimental", "idiom"]
     version_added = "v6.17.2 (last update)"
     _re_templated_inside = re.compile(r".*\{\{.*\}\}.*\w.*$")
+    max_tasks = options.max_tasks
+    max_block_depth = options.max_block_depth
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Call matchplay for up to no_of_max_tasks inside file and return aggregate results."""
@@ -41,6 +44,32 @@ class ComplexityRule(AnsibleLintRule):
                 ),
             )
         return results
+
+    def matchtask(self, task: Task, file: Lintable | None = None) -> list[MatchError]:
+        """Check if the task is a block and count the number of items inside it."""
+        results: list[MatchError] = []
+
+        if task.get("action") == "block":
+            block_depth = self.calculate_block_depth(task.get("block"))
+            if block_depth > self.max_block_depth:
+                results.append(
+                    self.create_matcherror(
+                        message=f"Replace long block with an include_tasks to make code easier to maintain. Block depth: {self.max_block_depth}",
+                        lineno=task[LINE_NUMBER_KEY],
+                        tag=f"{self.id}[task]",
+                        filename=file,
+                    ),
+                )
+        return results
+
+    def calculate_block_depth(self, tasks: list[Task], depth: int = 0) -> int:
+        """Recursively calculate the block depth of tasks."""
+        max_depth = depth
+        for task in tasks:
+            if task.get("action") == "block":
+                block_depth = self.calculate_block_depth(task.get("block"), depth + 1)
+                max_depth = max(max_depth, block_depth)
+        return max_depth
 
 
 if "pytest" in sys.modules:
