@@ -192,7 +192,7 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/jazzband/pip-tools
-    rev: 6.13.0
+    rev: 6.14.0
     hooks:
       - id: pip-compile
         name: lock
