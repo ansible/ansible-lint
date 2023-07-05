@@ -1,0 +1,18 @@
+---
+name: foo
+namespace: bar
+version: 0.0.0 # noqa: galaxy[version-incorrect]
+authors:
+  - John
+readme: ../README.md
+description: "..."
+dependencies:
+  other_namespace.collection1: ">=1.0.0"
+  other_namespace.collection2: ">=2.0.0,<3.0.0"
+  anderson55.my_collection: "*" # note: "*" selects the highest version available
+  foo.my_collection1: " " # note: this should error out because of invalid dependency version
+  foo.my_collection2: "" # note: this should error out because of invalid dependency version
+license:
+  - Apache-2.0
+repository: some-url
+tags: [networking, test_tag]
