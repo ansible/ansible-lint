@@ -63,7 +63,25 @@
     "params": {
       "type": "boolean"
     },
-    "schemaPath": "#/properties/gather_facts/type"
+    "schemaPath": "#/oneOf/0/type"
+  },
+  {
+    "instancePath": "/0/gather_facts",
+    "keyword": "pattern",
+    "message": "must match pattern \"^\\{[\\{%](.|[\r\n])*[\\}%]\\}$\"",
+    "params": {
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$"
+    },
+    "schemaPath": "#/$defs/full-jinja/pattern"
+  },
+  {
+    "instancePath": "/0/gather_facts",
+    "keyword": "oneOf",
+    "message": "must match exactly one schema in oneOf",
+    "params": {
+      "passingSchemas": null
+    },
+    "schemaPath": "#/oneOf"
   },
   {
     "instancePath": "/0",
@@ -113,7 +131,15 @@ stdout:
         },
         {
           "path": "$[0].gather_facts",
+          "message": "'non' is not valid under any of the given schemas"
+        },
+        {
+          "path": "$[0].gather_facts",
           "message": "'non' is not of type 'boolean'"
+        },
+        {
+          "path": "$[0].gather_facts",
+          "message": "'non' does not match '^\\\\{[\\\\{%](.|[\\r\\n])*[\\\\}%]\\\\}$'"
         }
       ]
     }
