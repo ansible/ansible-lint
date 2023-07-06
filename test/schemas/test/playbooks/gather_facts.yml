@@ -4,3 +4,9 @@
   tasks:
     - ansible.builtin.debug:
         msg: foo
+
+- hosts: localhost
+  gather_facts: "{{ facts_var_bool | default(false) }}"
+  tasks:
+    - ansible.builtin.debug:
+        msg: bar
