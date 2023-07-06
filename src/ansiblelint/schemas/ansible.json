@@ -349,7 +349,7 @@
         },
         "gather_facts": {
           "$ref": "#/$defs/templated-boolean",
-          "title": "Gather Facts",
+          "title": "Gather Facts"
         },
         "gather_subset": {
           "items": {
