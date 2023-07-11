@@ -68,7 +68,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     }
 
     _executable_options = {
-        "git": ["branch", "log", "lfs"],
+        "git": ["branch", "log", "lfs", "rev-parse"],
         "systemctl": ["--version", "kill", "set-default", "show-environment", "status"],
         "yum": ["clean"],
         "rpm": ["--nodeps"],
