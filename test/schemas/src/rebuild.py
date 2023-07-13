@@ -125,10 +125,7 @@ if __name__ == "__main__":
 
         # Remove all unreferenced ($ref) definitions ($defs) recursively
         while True:
-            spare = []
-            for k in sub_json["$defs"]:
-                if not is_ref_used(sub_json, k):
-                    spare.append(k)
+            spare = [k for k in sub_json["$defs"] if not is_ref_used(sub_json, k)]
             for k in spare:
                 print(f"{subschema}: deleting unused '{k}' definition")  # noqa: T201
                 del sub_json["$defs"][k]

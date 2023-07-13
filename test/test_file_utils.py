@@ -59,7 +59,7 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
         pytest.param(Path("$TEST_PATH"), "/test/path", id="pathlib.Path"),
         pytest.param("$TEST_PATH", "/test/path", id="str"),
         pytest.param("  $TEST_PATH  ", "/test/path", id="stripped-str"),
-        pytest.param("~", os.path.expanduser("~"), id="home"),  # noqa: PTH:111
+        pytest.param("~", os.path.expanduser("~"), id="home"),  # noqa: PTH111
     ),
 )
 def test_expand_paths_vars(
