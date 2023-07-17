@@ -525,8 +525,7 @@ class RulesCollection:
                 msg = f"Rule {rule} does not have any of the required tags: {', '.join(tag_desc.keys())}"
                 raise RuntimeError(msg)
             for tag in rule.tags:
-                for id_ in rule.ids():
-                    tags[tag].append(id_)
+                tags[tag] = list(rule.ids())
         result = "# List of tags and rules they cover\n"
         for tag in sorted(tags):
             desc = tag_desc.get(tag, None)

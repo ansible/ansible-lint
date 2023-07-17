@@ -634,7 +634,7 @@ def task_to_str(task: dict[str, Any]) -> str:
     _raw_params = action.get("_raw_params", [])
     if isinstance(_raw_params, list):
         for item in _raw_params:
-            args.append(str(item))
+            args.extend(str(item))
     else:
         args.append(_raw_params)
 
