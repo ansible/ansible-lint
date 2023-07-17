@@ -122,4 +122,4 @@ def _perform_mockings_cleanup(options: Options) -> None:
         else:
             path = options.cache_dir / "roles" / role_name
         with contextlib.suppress(OSError):
-            path.unlink()
+            path.rmdir()
