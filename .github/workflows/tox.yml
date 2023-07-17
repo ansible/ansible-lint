@@ -37,7 +37,7 @@ jobs:
             docs
             schemas
             eco
-            py-devel
+            py310-devel
           platforms: linux,macos
   test-action:
     runs-on: ubuntu-latest
