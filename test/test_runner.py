@@ -208,3 +208,16 @@ def test_runner_tmp_file(
     result = runner.run()
     assert len(result) == 1
     assert result[0].tag == "syntax-check[empty-playbook]"
+
+
+def test_with_full_path(default_rules_collection: RulesCollection) -> None:
+    """Ensure that lintables include file path starting from home directory."""
+    filename = Path("examples/playbooks/deep").absolute()
+    runner = Runner(
+        filename,
+        rules=default_rules_collection,
+        verbosity=0,
+    )
+    result = runner.run()
+    assert len(result) == 1
+    assert result[0].tag == "name[casing]"

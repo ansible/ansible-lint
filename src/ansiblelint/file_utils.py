@@ -513,7 +513,7 @@ def expand_dirs_in_lintables(lintables: set[Lintable]) -> None:
         for item in copy.copy(lintables):
             if item.path.is_dir():
                 for filename in all_files:
-                    if filename.startswith(str(item.path)):
+                    if filename.startswith((str(item.path), str(item.path.absolute()))):
                         lintables.add(Lintable(filename))
 
 
