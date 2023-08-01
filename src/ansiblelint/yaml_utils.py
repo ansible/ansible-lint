@@ -695,6 +695,7 @@ class FormattedEmitter(Emitter):
                     ruamel.yaml.events.CollectionEndEvent,
                     ruamel.yaml.events.DocumentEndEvent,
                     ruamel.yaml.events.StreamEndEvent,
+                    ruamel.yaml.events.MappingStartEvent,
                 ),
             )
         ):
