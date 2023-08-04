@@ -265,42 +265,20 @@ def test_formatted_yaml_loader_dumper(
     assert not list(run_yamllint(after_content, config))
 
 
-@pytest.fixture(name="task_file_formatting_fixtures")
-def fixture_tasks_formatting_fixtures() -> tuple[str, str]:
-    """Get the contents for the formatting fixture files."""
-    before_path = formatting_tasks_dir / "task-before-formatting.yml"
-    after_path = formatting_tasks_dir / "task-after-formatting.yml"
-    before_content = before_path.read_text()
-    formatted_content = after_path.read_text()
-    return before_content, formatted_content
-
-
-@pytest.mark.parametrize(
-    "fixture_filename",
-    ("task-before-formatting.yml",),
-)
-def test_formatted_task(
-    task_file_formatting_fixtures: tuple[str, str],
-    fixture_filename: str,  # noqa: ARG001
-) -> None:
+def test_formatted_task() -> None:
     """Ensure that FormattedYAML loads/dumps formatting fixtures consistently.
 
-    Compares two identical task files and tests that the single space
-    between block of tasks is preserved.
+    Compares the data of task file before and after formatting,
+    to ensure that the single space between blocks is preserved.
     """
-    # pylint: disable=unused-argument
-    before_content, after_content = task_file_formatting_fixtures
-    assert before_content == after_content
+    task_file_path = formatting_tasks_dir / "task-fmt.yml"
+    task_file_content = task_file_path.read_text()
 
     yaml = ansiblelint.yaml_utils.FormattedYAML()
 
-    data_before = yaml.loads(before_content)
-    dump_from_before = yaml.dumps(data_before)
-    data_after = yaml.loads(after_content)
-    dump_from_after = yaml.dumps(data_after)
-
-    assert dump_from_before == after_content
-    assert dump_from_after == after_content
+    before_formatting = yaml.loads(task_file_content)
+    dump_from_formatting = yaml.dumps(before_formatting)
+    assert task_file_content == dump_from_formatting
 
 
 @pytest.fixture(name="lintable")
