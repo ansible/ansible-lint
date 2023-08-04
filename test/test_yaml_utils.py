@@ -283,10 +283,14 @@ def test_formatted_task(
     task_file_formatting_fixtures: tuple[str, str],
     fixture_filename: str,  # noqa: ARG001
 ) -> None:
-    """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
+    """Ensure that FormattedYAML loads/dumps formatting fixtures consistently.
+
+    Compares two identical task files and tests that the single space
+    between block of tasks is preserved.
+    """
     # pylint: disable=unused-argument
     before_content, after_content = task_file_formatting_fixtures
-    assert before_content != after_content
+    assert before_content == after_content
 
     yaml = ansiblelint.yaml_utils.FormattedYAML()
 
