@@ -22,6 +22,7 @@ formatting_before_fixtures_dir = fixtures_dir / "formatting-before"
 formatting_prettier_fixtures_dir = fixtures_dir / "formatting-prettier"
 formatting_after_fixtures_dir = fixtures_dir / "formatting-after"
 formatting_tasks_dir = fixtures_dir / "formatting-tasks"
+formatting_playbook_dir = fixtures_dir / "formatting-playbook"
 
 
 @pytest.fixture(name="empty_lintable")
@@ -279,6 +280,22 @@ def test_formatted_task() -> None:
     before_formatting = yaml.loads(task_file_content)
     dump_from_formatting = yaml.dumps(before_formatting)
     assert task_file_content == dump_from_formatting
+
+
+def test_formatted_playbook() -> None:
+    """Ensure that FormattedYAML loads/dumps formatting fixtures consistently.
+
+    Compares the data of playbook file before and after formatting,
+    to ensure that the single space between blocks is preserved.
+    """
+    playbook_file_path = formatting_playbook_dir / "playbook-fmt.yml"
+    playbook_file_content = playbook_file_path.read_text()
+
+    yaml = ansiblelint.yaml_utils.FormattedYAML()
+
+    before_formatting = yaml.loads(playbook_file_content)
+    dump_from_formatting = yaml.dumps(before_formatting)
+    assert playbook_file_content == dump_from_formatting
 
 
 @pytest.fixture(name="lintable")
