@@ -21,6 +21,7 @@ fixtures_dir = Path(__file__).parent / "fixtures"
 formatting_before_fixtures_dir = fixtures_dir / "formatting-before"
 formatting_prettier_fixtures_dir = fixtures_dir / "formatting-prettier"
 formatting_after_fixtures_dir = fixtures_dir / "formatting-after"
+formatting_tasks_dir = fixtures_dir / "formatting-tasks"
 
 
 @pytest.fixture(name="empty_lintable")
@@ -262,6 +263,40 @@ def test_formatted_yaml_loader_dumper(
     # should not yield any problems.
     config = ansiblelint.yaml_utils.load_yamllint_config()
     assert not list(run_yamllint(after_content, config))
+
+
+@pytest.fixture(name="task_file_formatting_fixtures")
+def fixture_tasks_formatting_fixtures() -> tuple[str, str]:
+    """Get the contents for the formatting fixture files."""
+    before_path = formatting_tasks_dir / "task-before-formatting.yml"
+    after_path = formatting_tasks_dir / "task-after-formatting.yml"
+    before_content = before_path.read_text()
+    formatted_content = after_path.read_text()
+    return before_content, formatted_content
+
+
+@pytest.mark.parametrize(
+    "fixture_filename",
+    ("task-before-formatting.yml",),
+)
+def test_formatted_task(
+    task_file_formatting_fixtures: tuple[str, str],
+    fixture_filename: str,  # noqa: ARG001
+) -> None:
+    """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
+    # pylint: disable=unused-argument
+    before_content, after_content = task_file_formatting_fixtures
+    assert before_content != after_content
+
+    yaml = ansiblelint.yaml_utils.FormattedYAML()
+
+    data_before = yaml.loads(before_content)
+    dump_from_before = yaml.dumps(data_before)
+    data_after = yaml.loads(after_content)
+    dump_from_after = yaml.dumps(data_after)
+
+    assert dump_from_before == after_content
+    assert dump_from_after == after_content
 
 
 @pytest.fixture(name="lintable")
