@@ -13,7 +13,6 @@
     state: stopped
   when: '"ufw" in services'
 
-
 - name: Remove file (delete file)
   ansible.builtin.file:
     path: /etc/foo.txt
