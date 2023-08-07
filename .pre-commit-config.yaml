@@ -34,7 +34,7 @@ repos:
       - id: check-useless-excludes
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: v3.0.0
+    rev: v3.0.1
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting
@@ -63,7 +63,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.31.0
+    rev: v6.31.1
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -129,8 +129,8 @@ repos:
         files: \.(yaml|yml)$
         types: [file, yaml]
         entry: yamllint --strict
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.278"
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.0.282"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -192,7 +192,7 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/jazzband/pip-tools
-    rev: 7.0.0
+    rev: 7.2.0
     hooks:
       - id: pip-compile
         name: lock
