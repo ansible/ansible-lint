@@ -2,6 +2,9 @@
 - name: Test this playbook
   hosts: all
   tasks:
+    - name: Gather all legacy facts
+      cisco.ios.ios_facts:
+
     - name: Update modification and access time of given file
       ansible.builtin.file:
         path: /etc/some_file
