@@ -34,7 +34,7 @@ repos:
       - id: check-useless-excludes
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: v3.0.1
+    rev: v3.0.2
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting
@@ -63,14 +63,14 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.31.1
+    rev: v7.0.0
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.23.3
+    rev: 0.24.1
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -130,7 +130,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.0.282"
+    rev: "v0.0.284"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -140,7 +140,7 @@ repos:
       - id: black
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.4.1
+    rev: v1.5.0
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -169,7 +169,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v3.0.0a6
+    rev: v3.0.0a7
     hooks:
       - id: pylint
         args:
@@ -192,7 +192,7 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/jazzband/pip-tools
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
       - id: pip-compile
         name: lock

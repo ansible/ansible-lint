@@ -143,12 +143,9 @@ def test_matcherror_compare_no_other_fallback(
     """Check that MatchError comparison with other types causes TypeError."""
     expected_error = (
         r"^("
-        r"unsupported operand type\(s\) for {operator!s}:|"
-        r"'{operator!s}' not supported between instances of"
-        r") 'MatchError' and '{other_type!s}'$".format(
-            other_type=type(other).__name__,
-            operator=operator_char,
-        )
+        rf"unsupported operand type\(s\) for {operator_char!s}:|"
+        rf"'{operator_char!s}' not supported between instances of"
+        rf") 'MatchError' and '{type(other).__name__!s}'$"
     )
     with pytest.raises(TypeError, match=expected_error):
         operation(MatchError("foo"), other)
