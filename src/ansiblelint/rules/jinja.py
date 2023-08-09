@@ -94,7 +94,7 @@ class JinjaRule(AnsibleLintRule):
                 if isinstance(v, str):
                     try:
                         template(
-                            basedir=file.path.parent if file else Path("."),
+                            basedir=file.path.parent if file else Path(),
                             value=v,
                             variables=deannotate(task.get("vars", {})),
                             fail_on_error=True,  # we later decide which ones to ignore or not
