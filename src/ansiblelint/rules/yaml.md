@@ -73,7 +73,7 @@ for it does check these. If for some reason, you do not want to follow our
 defaults, you can create a `.yamllint` file in your project and this will take
 precedence over our defaults.
 
-## Additional Information
+## Additional Information for Multiline Strings
 
 Adhering to yaml[line-length] rule, for writing multiline strings we recommend using Block Style Indicator: literal style indicated by a pipe (|) or folded style indicated by a right angle bracket (>), instead of escaping the newlines with backslashes.
 Reference [guide] for writing multiple line strings in yaml.
