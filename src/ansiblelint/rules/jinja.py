@@ -4,9 +4,8 @@ from __future__ import annotations
 import logging
 import re
 import sys
-from collections import namedtuple
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import black
 import jinja2
@@ -30,7 +29,14 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__package__)
 KEYWORDS_WITH_IMPLICIT_TEMPLATE = ("changed_when", "failed_when", "until", "when")
 
-Token = namedtuple("Token", "lineno token_type value")
+
+class Token(NamedTuple):
+    """Token."""
+
+    lineno: int
+    token_type: str
+    value: str
+
 
 ignored_re = re.compile(
     "|".join(  # noqa: FLY002
