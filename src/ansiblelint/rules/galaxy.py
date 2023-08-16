@@ -186,7 +186,7 @@ if "pytest" in sys.modules:
         """Positive test for collection version in galaxy."""
         collection = RulesCollection()
         collection.register(GalaxyRule())
-        success = "examples/collection/galaxy.yml"
+        success = "examples/.collection/galaxy.yml"
         good_runner = Runner(success, rules=collection)
         assert [] == good_runner.run()
 
@@ -203,7 +203,7 @@ if "pytest" in sys.modules:
         """Test for no collection version in galaxy."""
         collection = RulesCollection()
         collection.register(GalaxyRule())
-        failure = "examples/no_collection_version/galaxy.yml"
+        failure = "examples/.no_collection_version/galaxy.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 1
@@ -236,12 +236,12 @@ if "pytest" in sys.modules:
                 id="pass",
             ),
             pytest.param(
-                "examples/collection/galaxy.yml",
+                "examples/.collection/galaxy.yml",
                 ["schema[galaxy]"],
                 id="schema",
             ),
             pytest.param(
-                "examples/invalid_dependencies/galaxy.yml",
+                "examples/.invalid_dependencies/galaxy.yml",
                 [
                     "galaxy[invalid-dependency-version]",
                     "galaxy[invalid-dependency-version]",
@@ -249,12 +249,12 @@ if "pytest" in sys.modules:
                 id="invalid-dependency-version",
             ),
             pytest.param(
-                "examples/no_changelog/galaxy.yml",
+                "examples/.no_changelog/galaxy.yml",
                 ["galaxy[no-changelog]"],
                 id="no-changelog",
             ),
             pytest.param(
-                "examples/no_collection_version/galaxy.yml",
+                "examples/.no_collection_version/galaxy.yml",
                 ["schema[galaxy]", "galaxy[version-missing]"],
                 id="no-collection-version",
             ),
