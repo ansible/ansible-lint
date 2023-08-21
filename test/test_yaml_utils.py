@@ -222,9 +222,11 @@ def fixture_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, s
 @pytest.mark.parametrize(
     "fixture_filename",
     (
-        "fmt-1.yml",
-        "fmt-2.yml",
-        "fmt-3.yml",
+        pytest.param("fmt-1.yml", id="1"),
+        pytest.param("fmt-2.yml", id="2"),
+        pytest.param("fmt-3.yml", id="3"),
+        pytest.param("fmt-4.yml", id="4"),
+        pytest.param("fmt-5.yml", id="5"),
     ),
 )
 def test_formatted_yaml_loader_dumper(

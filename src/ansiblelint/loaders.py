@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import logging
 import os
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import yaml
 from yaml import YAMLError
@@ -19,7 +19,14 @@ except (ImportError, AttributeError):
 if TYPE_CHECKING:
     from pathlib import Path
 
-IgnoreFile = namedtuple("IgnoreFile", "default alternative")
+
+class IgnoreFile(NamedTuple):
+    """IgnoreFile n."""
+
+    default: str
+    alternative: str
+
+
 IGNORE_FILE = IgnoreFile(".ansible-lint-ignore", ".config/ansible-lint-ignore.txt")
 
 yaml_load = partial(yaml.load, Loader=FullLoader)

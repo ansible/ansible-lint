@@ -364,7 +364,7 @@ if "pytest" in sys.modules:
 
     def test_var_naming_with_include_role_import_role() -> None:
         """Test with include role and import role."""
-        role_path = "examples/test_collection/roles/my_role/tasks/main.yml"
+        role_path = "examples/.test_collection/roles/my_role/tasks/main.yml"
         result = run_ansible_lint(role_path)
         assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout

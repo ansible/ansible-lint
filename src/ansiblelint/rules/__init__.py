@@ -370,7 +370,7 @@ def load_plugins(
 class RulesCollection:
     """Container for a collection of rules."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         rulesdirs: list[str] | list[Path] | None = None,
         options: Options | None = None,
