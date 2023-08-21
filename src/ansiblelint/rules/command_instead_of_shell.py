@@ -23,15 +23,18 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.utils import get_cmd_args
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
 
-class UseCommandInsteadOfShellRule(AnsibleLintRule):
+class UseCommandInsteadOfShellRule(AnsibleLintRule, TransformMixin):
     """Use shell only when shell functionality is required."""
 
     id = "command-instead-of-shell"
@@ -61,6 +64,19 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
             jinja_stripped_cmd = self.unjinja(get_cmd_args(task))
             return not any(ch in jinja_stripped_cmd for ch in "&|<>;$\n*[]{}?`")
         return False
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == "command-instead-of-shell":
+            target_task = self.seek(match.yaml_path, data)
+            for _ in range(len(target_task)):
+                k, v = target_task.popitem(False)
+                target_task["ansible.builtin.command" if "shell" in k else k] = v
+            match.fixed = True
 
 
 # testing code to be loaded only with pytest or when executed the rule file
