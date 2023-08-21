@@ -4,7 +4,7 @@
 #
 #    pip-compile --extra=docs --extra=test --no-annotate --output-file=.config/requirements.txt --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
-ansible-compat==4.1.6
+ansible-compat==4.1.7
 ansible-core==2.15.3
 astroid==2.15.6
 attrs==23.1.0
@@ -62,7 +62,7 @@ mkdocs-minify-plugin==0.6.4
 mkdocs-monorepo-plugin==1.0.5
 mkdocstrings==0.22.0
 mkdocstrings-python==1.1.0
-mypy==1.5.0
+mypy==1.5.1
 mypy-extensions==1.0.0
 netaddr==0.8.0
 packaging==23.1
