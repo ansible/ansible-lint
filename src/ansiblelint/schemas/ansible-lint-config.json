@@ -60,6 +60,11 @@
       "title": "Loop Var Prefix",
       "type": "string"
     },
+    "max_block_depth": {
+      "title": "Maximum Block Depth",
+      "type": "integer",
+      "default": 20
+    },
     "mock_modules": {
       "items": {
         "type": "string"
