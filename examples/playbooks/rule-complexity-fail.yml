@@ -108,3 +108,7 @@
         - name: Nested Task 20
           ansible.builtin.debug:
             msg: "This is nested task 20"
+
+        - name: Nested Task 21
+          ansible.builtin.debug:
+            msg: "This is nested task 21"

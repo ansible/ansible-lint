@@ -49,12 +49,12 @@ class ComplexityRule(AnsibleLintRule):
         """Check if the task is a block and count the number of items inside it."""
         results: list[MatchError] = []
 
-        if task.get("action") == "block":
-            block_depth = self.calculate_block_depth(task.get("block"))
+        if task.__class__.__name__ == "block":
+            block_depth = self.calculate_block_depth(task)
             if block_depth > self.max_block_depth:
                 results.append(
                     self.create_matcherror(
-                        message=f"Replace long block with an include_tasks to make code easier to maintain. Block depth: {self.max_block_depth}",
+                        message=f"Replace long block with an include_tasks to make code easier to maintain. Maximum block depth allowed in a play is {self.max_block_depth}.",
                         lineno=task[LINE_NUMBER_KEY],
                         tag=f"{self.id}[task]",
                         filename=file,
@@ -62,14 +62,17 @@ class ComplexityRule(AnsibleLintRule):
                 )
         return results
 
-    def calculate_block_depth(self, tasks: list[Task], depth: int = 0) -> int:
-        """Recursively calculate the block depth of tasks."""
-        max_depth = depth
-        for task in tasks:
-            if task.get("action") == "block":
-                block_depth = self.calculate_block_depth(task.get("block"), depth + 1)
-                max_depth = max(max_depth, block_depth)
-        return max_depth
+    def calculate_block_depth(self, task: Task, depth: int = 0) -> int:
+        """Recursively calculate the block depth of a task."""
+        block_depth = depth
+        block_items = task.get("tasks", [])
+        for block_task in block_items:
+            if block_task.__class__.__name__ == "block":
+                block_depth = max(
+                    block_depth,
+                    self.calculate_block_depth(block_task, depth + 1),
+                )
+        return block_depth
 
 
 if "pytest" in sys.modules:
@@ -88,7 +91,7 @@ if "pytest" in sys.modules:
             ),
             pytest.param(
                 "examples/playbooks/rule-complexity-fail.yml",
-                1,
+                2,
                 id="fail",
             ),
         ),
@@ -101,6 +104,7 @@ if "pytest" in sys.modules:
     ) -> None:
         """Test rule."""
         monkeypatch.setattr(options, "max_tasks", 5)
+        monkeypatch.setattr(options, "max_block_depth", 20)
         collection = RulesCollection()
         collection.register(ComplexityRule())
         results = Runner(file, rules=default_rules_collection).run()
