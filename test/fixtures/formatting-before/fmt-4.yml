@@ -1,0 +1,25 @@
+---
+- name: Gather all legacy facts
+  cisco.ios.ios_facts:
+
+- name: Update modification and access time of given file
+  ansible.builtin.file:
+    path: /etc/some_file
+    state: file
+    modification_time: now
+    access_time: now
+
+
+- name: Disable ufw service
+  ansible.builtin.service:
+    name: ufw
+    enabled: false
+    state: stopped
+  when: '"ufw" in services'
+
+
+
+- name: Remove file (delete file)
+  ansible.builtin.file:
+    path: /etc/foo.txt
+    state: absent
