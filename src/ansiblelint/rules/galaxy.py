@@ -5,7 +5,7 @@ import sys
 from functools import total_ordering
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.constants import LINE_NUMBER_KEY
+from ansiblelint.constants import FILENAME_KEY, LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
@@ -27,6 +27,7 @@ class GalaxyRule(AnsibleLintRule):
         "galaxy[version-missing]": "galaxy.yaml should have version tag.",
         "galaxy[version-incorrect]": "collection version should be greater than or equal to 1.0.0",
         "galaxy[no-runtime]": "meta/runtime.yml file not found.",
+        "galaxy[invalid-dependency-version]": "Invalid collection metadata. Dependency version spec range is invalid",
     }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
@@ -62,8 +63,21 @@ class GalaxyRule(AnsibleLintRule):
         for path in changelog_paths:
             if path.is_file():
                 changelog_found = 1
-
         galaxy_tag_list = data.get("tags", None)
+        collection_deps = data.get("dependencies", None)
+        if collection_deps:
+            for dep, ver in collection_deps.items():
+                if (
+                    dep not in [LINE_NUMBER_KEY, FILENAME_KEY]
+                    and len(str(ver).strip()) == 0
+                ):
+                    results.append(
+                        self.create_matcherror(
+                            message=f"Invalid collection metadata. Dependency version spec range is invalid for '{dep}'.",
+                            tag="galaxy[invalid-dependency-version]",
+                            filename=file,
+                        ),
+                    )
 
         # Changelog Check - building off Galaxy rule as there is no current way to check
         # for a nonexistent file
@@ -172,7 +186,7 @@ if "pytest" in sys.modules:
         """Positive test for collection version in galaxy."""
         collection = RulesCollection()
         collection.register(GalaxyRule())
-        success = "examples/collection/galaxy.yml"
+        success = "examples/.collection/galaxy.yml"
         good_runner = Runner(success, rules=collection)
         assert [] == good_runner.run()
 
@@ -189,7 +203,7 @@ if "pytest" in sys.modules:
         """Test for no collection version in galaxy."""
         collection = RulesCollection()
         collection.register(GalaxyRule())
-        failure = "examples/no_collection_version/galaxy.yml"
+        failure = "examples/.no_collection_version/galaxy.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 1
@@ -222,17 +236,25 @@ if "pytest" in sys.modules:
                 id="pass",
             ),
             pytest.param(
-                "examples/collection/galaxy.yml",
+                "examples/.collection/galaxy.yml",
                 ["schema[galaxy]"],
                 id="schema",
             ),
             pytest.param(
-                "examples/no_changelog/galaxy.yml",
+                "examples/.invalid_dependencies/galaxy.yml",
+                [
+                    "galaxy[invalid-dependency-version]",
+                    "galaxy[invalid-dependency-version]",
+                ],
+                id="invalid-dependency-version",
+            ),
+            pytest.param(
+                "examples/.no_changelog/galaxy.yml",
                 ["galaxy[no-changelog]"],
                 id="no-changelog",
             ),
             pytest.param(
-                "examples/no_collection_version/galaxy.yml",
+                "examples/.no_collection_version/galaxy.yml",
                 ["schema[galaxy]", "galaxy[version-missing]"],
                 id="no-collection-version",
             ),

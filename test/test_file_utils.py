@@ -59,7 +59,7 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
         pytest.param(Path("$TEST_PATH"), "/test/path", id="pathlib.Path"),
         pytest.param("$TEST_PATH", "/test/path", id="str"),
         pytest.param("  $TEST_PATH  ", "/test/path", id="stripped-str"),
-        pytest.param("~", os.path.expanduser("~"), id="home"),  # noqa: PTH:111
+        pytest.param("~", os.path.expanduser("~"), id="home"),  # noqa: PTH111
     ),
 )
 def test_expand_paths_vars(
@@ -236,7 +236,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
             "tasks",
             id="33",
         ),  # content should determine is tasks
-        pytest.param("examples/collection/galaxy.yml", "galaxy", id="34"),
+        pytest.param("examples/.collection/galaxy.yml", "galaxy", id="34"),
         pytest.param("examples/meta/runtime.yml", "meta-runtime", id="35"),
         pytest.param("examples/meta/changelogs/changelog.yaml", "changelog", id="36"),
         pytest.param("examples/inventory/inventory.yml", "inventory", id="37"),

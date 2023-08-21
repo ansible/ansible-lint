@@ -22,7 +22,7 @@ class ComplexityRule(AnsibleLintRule):
     description = "There should be limited tasks executed inside any file"
     severity = "MEDIUM"
     tags = ["experimental", "idiom"]
-    version_added = "v6.17.2 (last update)"
+    version_added = "v6.18.0 (last update)"
     _re_templated_inside = re.compile(r".*\{\{.*\}\}.*\w.*$")
     max_tasks = options.max_tasks
     max_block_depth = options.max_block_depth

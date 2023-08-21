@@ -14,10 +14,11 @@ if Path.cwd() != Path(__file__).parent:
     os.chdir(Path(__file__).parent)
 
 # checking if user is running pytest without installing test dependencies:
-missing = []
-for module in ["ansible", "black", "mypy", "pylint"]:
-    if not importlib.util.find_spec(module):
-        missing.append(module)
+missing = [
+    module
+    for module in ["ansible", "black", "mypy", "pylint"]
+    if not importlib.util.find_spec(module)
+]
 if missing:
     pytest.exit(
         reason=f"FATAL: Missing modules: {', '.join(missing)} -- probably you missed installing test requirements with: pip install -e '.[test]'",

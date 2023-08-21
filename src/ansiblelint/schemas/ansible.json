@@ -348,8 +348,8 @@
           "type": "boolean"
         },
         "gather_facts": {
-          "title": "Gather Facts",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Gather Facts"
         },
         "gather_subset": {
           "items": {

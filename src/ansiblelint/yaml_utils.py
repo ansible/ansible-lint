@@ -582,7 +582,7 @@ class FormattedEmitter(Emitter):
         """Select how to quote scalars if needed."""
         style = super().choose_scalar_style()
         if (
-            style == ""  # noqa: PLC1901
+            style == ""
             and self.event.value.startswith("0")
             and len(self.event.value) > 1
         ):
@@ -695,12 +695,19 @@ class FormattedEmitter(Emitter):
                     ruamel.yaml.events.CollectionEndEvent,
                     ruamel.yaml.events.DocumentEndEvent,
                     ruamel.yaml.events.StreamEndEvent,
+                    ruamel.yaml.events.MappingStartEvent,
                 ),
             )
         ):
             # drop pure whitespace pre comments
             # does not apply to End events since they consume one of the newlines.
             value = ""
+        elif (
+            pre
+            and not value.strip()
+            and isinstance(self.event, ruamel.yaml.events.MappingStartEvent)
+        ):
+            value = self._re_repeat_blank_lines.sub("", value)
         elif pre:
             # preserve content in pre comment with at least one newline,
             # but no extra blank lines.

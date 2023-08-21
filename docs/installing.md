@@ -36,7 +36,7 @@ satisfy, please contact the team through the
 [discussions](https://github.com/ansible/ansible-lint/discussions) forum.
 
 You can also run Ansible-lint on your source code with the
-[Ansible-lint GitHub action](https://github.com/marketplace/actions/ansible-lint)
+[Ansible-lint GitHub action](https://github.com/marketplace/actions/run-ansible-lint)
 instead of installing it directly.
 
 ## Installing the latest version

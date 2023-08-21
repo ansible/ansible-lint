@@ -44,19 +44,19 @@ class NoFormattingInWhenRule(AnsibleLintRule):
         if isinstance(data, dict):
             if "roles" not in data or data["roles"] is None:
                 return errors
-            for role in data["roles"]:
+            errors = [
+                self.create_matcherror(
+                    details=str({"when": role}),
+                    filename=file,
+                    lineno=role[LINE_NUMBER_KEY],
+                )
+                for role in data["roles"]
                 if (
                     isinstance(role, dict)
                     and "when" in role
                     and not self._is_valid(role["when"])
-                ):
-                    errors.append(
-                        self.create_matcherror(
-                            details=str({"when": role}),
-                            filename=file,
-                            lineno=role[LINE_NUMBER_KEY],
-                        ),
-                    )
+                )
+            ]
         return errors
 
     def matchtask(

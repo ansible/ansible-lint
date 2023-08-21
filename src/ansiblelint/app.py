@@ -332,7 +332,10 @@ class App:
         if self.options.profile:
             msg += f" Profile '{self.options.profile}' was required"
             if summary.passed_profile:
-                msg += f", but only '{summary.passed_profile}' profile passed."
+                if summary.passed_profile == self.options.profile:
+                    msg += ", and it passed."
+                else:
+                    msg += f", but '{summary.passed_profile}' profile passed."
             else:
                 msg += "."
         elif summary.passed_profile:
