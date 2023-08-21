@@ -29,86 +29,14 @@
 
     - name: Block Task 7
       block:
-        - name: Nested Task 1
-          ansible.builtin.debug:
-            msg: "This is nested task 1"
-
-        - name: Nested Task 2
-          ansible.builtin.debug:
-            msg: "This is nested task 2"
-
-        - name: Nested Task 3
-          ansible.builtin.debug:
-            msg: "This is nested task 3"
-
-        - name: Nested Task 4
-          ansible.builtin.debug:
-            msg: "This is nested task 4"
-
-        - name: Nested Task 5
-          ansible.builtin.debug:
-            msg: "This is nested task 5"
-
-        - name: Nested Task 6
-          ansible.builtin.debug:
-            msg: "This is nested task 6"
-
-        - name: Nested Task 7
-          ansible.builtin.debug:
-            msg: "This is nested task 7"
-
-        - name: Nested Task 8
-          ansible.builtin.debug:
-            msg: "This is nested task 8"
-
-        - name: Nested Task 9
-          ansible.builtin.debug:
-            msg: "This is nested task 9"
-
-        - name: Nested Task 10
-          ansible.builtin.debug:
-            msg: "This is nested task 10"
-
-        - name: Nested Task 11
-          ansible.builtin.debug:
-            msg: "This is nested task 11"
-
-        - name: Nested Task 12
-          ansible.builtin.debug:
-            msg: "This is nested task 12"
-
-        - name: Nested Task 13
-          ansible.builtin.debug:
-            msg: "This is nested task 13"
-
-        - name: Nested Task 14
-          ansible.builtin.debug:
-            msg: "This is nested task 14"
-
-        - name: Nested Task 15
-          ansible.builtin.debug:
-            msg: "This is nested task 15"
-
-        - name: Nested Task 16
-          ansible.builtin.debug:
-            msg: "This is nested task 16"
-
-        - name: Nested Task 17
-          ansible.builtin.debug:
-            msg: "This is nested task 17"
-
-        - name: Nested Task 18
-          ansible.builtin.debug:
-            msg: "This is nested task 18"
-
-        - name: Nested Task 19
-          ansible.builtin.debug:
-            msg: "This is nested task 19"
-
-        - name: Nested Task 20
-          ansible.builtin.debug:
-            msg: "This is nested task 20"
-
-        - name: Nested Task 21
-          ansible.builtin.debug:
-            msg: "This is nested task 21"
+        - name: 2nd level block
+          block:
+            - name: 3rd level block
+              block:
+                - name: 4th level block
+                  block:
+                    - name: 5th level block
+                      block:
+                        - name: Nested Task 1
+                          ansible.builtin.debug:
+                            msg: "This is nested task 1"
