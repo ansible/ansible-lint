@@ -53,6 +53,7 @@ Some of the detailed error codes that you might see are:
 - `yaml[empty-lines]` - _too many blank lines (...> ...)_
 - `yaml[indentation]` - _Wrong indentation: expected ... but found ..._
 - `yaml[key-duplicates]` - _Duplication of key "..." in mapping_
+- `yaml[line-length]` - _Line too long (... > ... characters)_
 - `yaml[new-line-at-end-of-file]` - _No new line character at the end of file_
 - `yaml[octal-values]`: forbidden implicit or explicit [octal](#octals) value
 - `yaml[syntax]` - YAML syntax is broken
@@ -71,6 +72,11 @@ By default, yamllint does not check for octals but our custom default ruleset
 for it does check these. If for some reason, you do not want to follow our
 defaults, you can create a `.yamllint` file in your project and this will take
 precedence over our defaults.
+
+## Additional Information for Multiline Strings
+
+Adhering to yaml[line-length] rule, for writing multiline strings we recommend using Block Style Indicator: literal style indicated by a pipe (|) or folded style indicated by a right angle bracket (>), instead of escaping the newlines with backslashes.
+Reference [guide] for writing multiple line strings in yaml.
 
 ## Problematic code
 
@@ -95,3 +101,4 @@ bar: ... # Correct comment indentation.
 [1.2.0]: https://yaml.org/spec/1.2.0/
 [1.2.2]: https://yaml.org/spec/1.2.2/
 [yaml specification]: https://yaml.org/
+[guide]: https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html#yaml-basics

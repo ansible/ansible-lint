@@ -269,7 +269,7 @@ if "pytest" in sys.modules:
         """Test rule matches."""
         collection = RulesCollection()
         collection.register(FQCNBuiltinsRule())
-        failure = "examples/collection/plugins/modules/deep/beta.py"
+        failure = "examples/.collection/plugins/modules/deep/beta.py"
         results = Runner(failure, rules=collection).run()
         assert len(results) == 1
         assert results[0].tag == "fqcn[deep]"
@@ -279,6 +279,6 @@ if "pytest" in sys.modules:
         """Test rule does not match."""
         collection = RulesCollection()
         collection.register(FQCNBuiltinsRule())
-        success = "examples/collection/plugins/modules/alpha.py"
+        success = "examples/.collection/plugins/modules/alpha.py"
         results = Runner(success, rules=collection).run()
         assert len(results) == 0

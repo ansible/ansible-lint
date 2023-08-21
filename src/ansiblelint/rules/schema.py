@@ -191,7 +191,7 @@ if "pytest" in sys.modules:
         ("file", "expected_kind", "expected"),
         (
             pytest.param(
-                "examples/collection/galaxy.yml",
+                "examples/.collection/galaxy.yml",
                 "galaxy",
                 ["'GPL' is not one of"],
                 id="galaxy",
