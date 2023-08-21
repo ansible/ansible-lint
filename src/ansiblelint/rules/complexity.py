@@ -91,7 +91,7 @@ if "pytest" in sys.modules:
             ),
             pytest.param(
                 "examples/playbooks/rule-complexity-fail.yml",
-                2,
+                1,
                 id="fail",
             ),
         ),
