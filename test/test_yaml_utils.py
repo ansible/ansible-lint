@@ -222,9 +222,11 @@ def fixture_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, s
 @pytest.mark.parametrize(
     "fixture_filename",
     (
-        "fmt-1.yml",
-        "fmt-2.yml",
-        "fmt-3.yml",
+        pytest.param("fmt-1.yml", id="1"),
+        pytest.param("fmt-2.yml", id="2"),
+        pytest.param("fmt-3.yml", id="3"),
+        pytest.param("fmt-4.yml", id="4"),
+        pytest.param("fmt-5.yml", id="5"),
     ),
 )
 def test_formatted_yaml_loader_dumper(
@@ -262,46 +264,6 @@ def test_formatted_yaml_loader_dumper(
     # should not yield any problems.
     config = ansiblelint.yaml_utils.load_yamllint_config()
     assert not list(run_yamllint(after_content, config))
-
-
-@pytest.fixture(name="task_and_playbook_formatting_fixtures")
-def fixture_task_and_playbook_formatting_fixtures(
-    fixture_filename: str,
-) -> tuple[str, str]:
-    """Get the contents for the formatting fixture files."""
-    before_path = formatting_before_fixtures_dir / fixture_filename
-    after_path = formatting_after_fixtures_dir / fixture_filename
-    before_content = before_path.read_text()
-    formatted_content = after_path.read_text()
-    return before_content, formatted_content
-
-
-@pytest.mark.parametrize(
-    "fixture_filename",
-    ("fmt-4.yml", "fmt-5.yml"),
-)
-def test_spaces_between_block_of_tasks(
-    task_and_playbook_formatting_fixtures: tuple[str, str],
-    fixture_filename: str,  # noqa: ARG001
-) -> None:
-    """Ensure that FormattedYAML loads/dumps formatting fixtures consistently.
-
-    Compare files to check that the single space between block of tasks is
-    preserved and spaces are formatted correctly.
-    """
-    # pylint: disable=unused-argument
-    before_content, after_content = task_and_playbook_formatting_fixtures
-    assert before_content != after_content
-
-    yaml = ansiblelint.yaml_utils.FormattedYAML()
-
-    data_before = yaml.loads(before_content)
-    dump_from_before = yaml.dumps(data_before)
-    data_after = yaml.loads(after_content)
-    dump_from_after = yaml.dumps(data_after)
-
-    assert dump_from_before == after_content
-    assert dump_from_after == after_content
 
 
 @pytest.fixture(name="lintable")
