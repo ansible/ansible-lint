@@ -1,15 +1,15 @@
 # loop-var-prefix
 
-This rule avoids conflicts with nested looping tasks by configuring a variable
-prefix with `loop_var`. Ansible sets `item` as the loop variable. You can use
-`loop_var` to specify a prefix for loop variables and ensure they are unique to
-each task.
+This rule avoids conflicts with nested looping tasks by enforcing an individual
+variable name in loops. Ansible defaults to `item` as the loop variable. You can
+use `loop_var` to rename it. Optionally require a prefix on the variable name.
+The prefix can be configured via the `<loop_var_prefix>` setting.
 
 This rule can produce the following messages:
 
 - `loop-var-prefix[missing]` - Replace any unsafe implicit `item` loop variable
-  by adding `loop_var: <loop_var_prefix>...`.
-- `loop-var-prefix[wrong]` - Ensure loop variables start with
+  by adding `loop_var: <variable_name>...`.
+- `loop-var-prefix[wrong]` - Ensure the loop variable starts with
   `<loop_var_prefix>`.
 
 This rule originates from the [Naming parameters section of Ansible Best
@@ -41,20 +41,20 @@ enable_list:
 - name: Example playbook
   hosts: localhost
   tasks:
-    - name: Does not set a prefix for loop variables.
+    - name: Does not set a variable name for loop variables.
       ansible.builtin.debug:
-        var: item
+        var: item # <- When in a nested loop, "item" is ambiguous
       loop:
         - foo
-        - bar # <- These items do not have a unique prefix.
-    - name: Sets a prefix that is not unique.
+        - bar
+    - name: Sets a variable name that doesn't start with <loop_var_prefix>.
       ansible.builtin.debug:
         var: zz_item
       loop:
         - foo
         - bar
       loop_control:
-        loop_var: zz_item # <- This prefix is not unique.
+        loop_var: zz_item # <- zz is not the role name so the prefix is wrong
 ```
 
 ## Correct Code
@@ -64,14 +64,14 @@ enable_list:
 - name: Example playbook
   hosts: localhost
   tasks:
-    - name: Sets a unique prefix for loop variables.
+    - name: Sets a unique variable_name with role as prefix for loop variables.
       ansible.builtin.debug:
-        var: zz_item
+        var: myrole_item
       loop:
         - foo
         - bar
       loop_control:
-        loop_var: my_prefix # <- Specifies a unique prefix for loop variables.
+        loop_var: myrole_item # <- Unique variable name with role as prefix
 ```
 
 [cop314]:
