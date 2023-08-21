@@ -26,3 +26,17 @@
     - name: Task 6
       ansible.builtin.debug:
         msg: "This is task 6"
+
+    - name: Block Task 7
+      block:
+        - name: 2nd level block
+          block:
+            - name: 3rd level block
+              block:
+                - name: 4th level block
+                  block:
+                    - name: 5th level block
+                      block:
+                        - name: Nested Task 1
+                          ansible.builtin.debug:
+                            msg: "This is nested task 1"

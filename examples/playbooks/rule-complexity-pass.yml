@@ -19,5 +19,17 @@
         msg: "This is task 4"
 
     - name: Task 5
-      ansible.builtin.debug:
-        msg: "This is task 5"
+      block:
+        - name: Include under block level 1
+          ansible.builtin.debug:
+            msg: "This is nested block"
+        - name: Block level 2
+          block:
+            - name: Include under block level 2
+              ansible.builtin.debug:
+                msg: "This is block 2"
+            - name: Block level 3
+              block:
+                - name: INCLUDE under block level 3
+                  ansible.builtin.debug:
+                    msg: "This is block 3"
