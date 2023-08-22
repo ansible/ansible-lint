@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any, Callable, Union, cast
 
 import ruamel.yaml.events
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, Format
+from ruamel.yaml.composer import ComposerError
 from ruamel.yaml.constructor import RoundTripConstructor
 from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 
@@ -935,7 +936,10 @@ class FormattedYAML(YAML):
         # https://sourceforge.net/p/ruamel-yaml/tickets/460/
 
         text, preamble_comment = self._pre_process_yaml(stream)
-        data = self.load(stream=text)
+        try:
+            data = self.load(stream=text)
+        except ComposerError:
+            data = self.load_all(stream=text)
         if preamble_comment is not None and isinstance(
             data,
             (CommentedMap, CommentedSeq),
