@@ -1,0 +1,23 @@
+---
+- name: First problematic play
+  hosts: localhost
+  tasks:
+    - name: Echo a message
+      ansible.builtin.shell: echo hello # <-- command-instead-of-shell
+      changed_when: false
+---
+- name: second problematic play # <-- name[casing]
+  hosts: localhost
+  tasks:
+    - name: Remove file (delete file)
+      ansible.builtin.file:
+        path: /etc/foo.txt
+        state: absent
+---
+- name: Third problematic play
+  hosts: localhost
+  tasks:
+    - name: Remove file (delete file)
+      file: # <-- fqcn[action-core]
+        path: /etc/foo.txt
+        state: absent
