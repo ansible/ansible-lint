@@ -25,6 +25,10 @@
                     "type": "boolean",
                     "default": false
                 },
+                "match_multiple_rules": {
+                    "type": "boolean",
+                    "default": false
+                },
                 "name": {
                     "type": "string"
                 },
