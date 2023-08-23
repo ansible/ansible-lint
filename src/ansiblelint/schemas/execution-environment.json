@@ -302,7 +302,8 @@
   },
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json",
   "$schema": "http://json-schema.org/draft-07/schema",
-  "description": "See \nV1: https://docs.ansible.com/automation-controller/latest/html/userguide/ee_reference.html\nV3: https://ansible-builder.readthedocs.io/en/latest/definition/",
+  "description": "See https://ansible-builder.readthedocs.io/en/latest/definition/ for V3 or https://docs.ansible.com/automation-controller/latest/html/userguide/ee_reference.html for older V1 format.\n",
+  "documentation_url": "https://ansible.readthedocs.io/projects/builder/en/latest/definition/",
   "examples": ["execution-environment.yml"],
   "oneOf": [{ "$ref": "#/$defs/v3" }, { "$ref": "#/$defs/v1" }],
   "title": "Ansible Execution Environment Schema v1/v3"
