@@ -341,6 +341,9 @@ class Runner:
             # https://github.com/paramiko/paramiko/issues/2038
             env = app.runtime.environ.copy()
             env["PYTHONWARNINGS"] = "ignore"
+            # Avoid execution failure if user customized any_unparsed_is_failed setting
+            # https://github.com/ansible/ansible-lint/issues/3650
+            env["ANSIBLE_INVENTORY_ANY_UNPARSED_IS_FAILED"] = "False"
 
             run = subprocess.run(
                 cmd,
