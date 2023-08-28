@@ -46,6 +46,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/invalid.yml",
@@ -56,6 +57,11 @@ stdout:
         "path": "$[0]",
         "message": "{'name': 'foo', 'hosts': 'localhost', 'import_playbook': 'included.yml'} should not be valid under {'required': ['import_playbook']}"
       },
+      "best_deep_match": {
+        "path": "$[0]",
+        "message": "'hosts' does not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
+      },
+      "num_sub_errors": 2,
       "sub_errors": [
         {
           "path": "$[0]",

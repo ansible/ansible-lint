@@ -82,6 +82,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/tasks/no_log_string.yml",
@@ -92,6 +93,11 @@ stdout:
         "path": "$[0]",
         "message": "'block' is a required property"
       },
+      "best_deep_match": {
+        "path": "$[0].no_log",
+        "message": "'some_var' is not of type 'boolean'"
+      },
+      "num_sub_errors": 6,
       "sub_errors": [
         {
           "path": "$[0].no_log",

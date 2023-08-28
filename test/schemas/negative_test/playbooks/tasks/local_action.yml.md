@@ -40,6 +40,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/tasks/local_action.yml",
@@ -50,6 +51,11 @@ stdout:
         "path": "$[0]",
         "message": "'block' is a required property"
       },
+      "best_deep_match": {
+        "path": "$[0].local_action",
+        "message": "[] is not of type 'string', 'object'"
+      },
+      "num_sub_errors": 1,
       "sub_errors": [
         {
           "path": "$[0]",

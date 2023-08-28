@@ -84,6 +84,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/gather_subset4.yml",
@@ -94,6 +95,11 @@ stdout:
         "path": "$[0]",
         "message": "'gather_subset', 'hosts', 'tasks' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].gather_subset",
+        "message": "1 is not of type 'array'"
+      },
+      "num_sub_errors": 4,
       "sub_errors": [
         {
           "path": "$[0]",

@@ -85,6 +85,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/import_playbook_exclusive.yml",
@@ -95,6 +96,11 @@ stdout:
         "path": "$[0]",
         "message": "{'ansible.builtin.import_playbook': 'foo.yml', 'import_playbook': 'other.yml'} should not be valid under {'required': ['ansible.builtin.import_playbook']}"
       },
+      "best_deep_match": {
+        "path": "$[0]",
+        "message": "{'ansible.builtin.import_playbook': 'foo.yml', 'import_playbook': 'other.yml'} should not be valid under {'required': ['import_playbook']}"
+      },
+      "num_sub_errors": 6,
       "sub_errors": [
         {
           "path": "$[0]",

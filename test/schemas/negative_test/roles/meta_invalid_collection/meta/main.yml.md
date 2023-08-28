@@ -21,6 +21,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/roles/meta_invalid_collection/meta/main.yml",

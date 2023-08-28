@@ -21,6 +21,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/inventory/broken_dev_inventory.yml",

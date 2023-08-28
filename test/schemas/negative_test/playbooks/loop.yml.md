@@ -94,6 +94,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/loop.yml",
@@ -104,6 +105,11 @@ stdout:
         "path": "$[0]",
         "message": "'hosts', 'tasks' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].tasks[0].loop",
+        "message": "123 is not of type 'string', 'array'"
+      },
+      "num_sub_errors": 6,
       "sub_errors": [
         {
           "path": "$[0]",

@@ -21,6 +21,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/changelogs/invalid-date/changelogs/changelog.yaml",
