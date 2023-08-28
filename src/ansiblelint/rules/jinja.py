@@ -407,7 +407,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         return reformatted, details, "spacing"
 
     def transform(
-        self,
+        self: JinjaRule,
         match: MatchError,
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
@@ -419,10 +419,10 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         :param data: data to transform
         """
         if match.tag == "jinja[spacing]":
-            self.transform_spacing(match, data)
+            self._transform_spacing(match, data)
 
-    def transform_spacing(
-        self,
+    def _transform_spacing(
+        self: JinjaRule,
         match: MatchError,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
