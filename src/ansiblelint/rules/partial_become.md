@@ -5,6 +5,11 @@ This rule checks that privilege escalation is activated when changing users.
 To perform an action as a different user with the `become_user` directive, you
 must set `become: true`.
 
+This rule can produce the following messages:
+
+- `partial-become[play]`: become_user requires become to work as expected, at play level.
+- `partial-become[task]`: become_user requires become to work as expected, at task level.
+
 !!! warning
 
     While Ansible inherits have of `become` and `become_user` from upper levels,
@@ -24,7 +29,7 @@ must set `become: true`.
       ansible.builtin.service:
         name: httpd
         state: started
-        become_user: apache # <- Does not change the user because "become: true" is not set.
+      become_user: apache # <- Does not change the user because "become: true" is not set.
 ```
 
 ## Correct Code
@@ -37,6 +42,6 @@ must set `become: true`.
       ansible.builtin.service:
         name: httpd
         state: started
-        become: true # <- Activates privilege escalation.
-        become_user: apache # <- Changes the user with the desired privileges.
+      become: true # <- Activates privilege escalation.
+      become_user: apache # <- Changes the user with the desired privileges.
 ```

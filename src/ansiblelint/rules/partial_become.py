@@ -21,78 +21,20 @@
 from __future__ import annotations
 
 import sys
-from functools import reduce
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.utils import Task
 
 
-def _get_subtasks(data: dict[str, Any]) -> list[Any]:
-    result: list[Any] = []
-    block_names = [
-        "tasks",
-        "pre_tasks",
-        "post_tasks",
-        "handlers",
-        "block",
-        "always",
-        "rescue",
-    ]
-    for name in block_names:
-        if data and name in data:
-            result += data[name] or []
-    return result
-
-
-def _nested_search(term: str, data: dict[str, Any]) -> Any:
-    if data and term in data:
-        return True
-    return reduce(
-        (lambda x, y: x or _nested_search(term, y)),
-        _get_subtasks(data),
-        False,
-    )
-
-
-def _become_user_without_become(becomeuserabove: bool, data: dict[str, Any]) -> Any:
-    if "become" in data:
-        # If become is in lineage of tree then correct
-        return False
-    if "become_user" in data and _nested_search("become", data):
-        # If 'become_user' on tree and become somewhere below
-        # we must check for a case of a second 'become_user' without a
-        # 'become' in its lineage
-        subtasks = _get_subtasks(data)
-        return reduce(
-            (lambda x, y: x or _become_user_without_become(False, y)),
-            subtasks,
-            False,
-        )
-    if _nested_search("become_user", data):
-        # Keep searching down if 'become_user' exists in the tree below current task
-        subtasks = _get_subtasks(data)
-        return len(subtasks) == 0 or reduce(
-            (
-                lambda x, y: x
-                or _become_user_without_become(
-                    becomeuserabove or "become_user" in data,
-                    y,
-                )
-            ),
-            subtasks,
-            False,
-        )
-    # If at bottom of tree, flag up if 'become_user' existed in the lineage of the tree and
-    # 'become' was not. This is an error if any lineage has a 'become_user' but no become
-    return becomeuserabove
-
-
-class BecomeUserWithoutBecomeRule(AnsibleLintRule):
+class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
     """become_user requires become to work as expected."""
 
     id = "partial-become"
@@ -102,17 +44,51 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule):
     version_added = "historic"
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
-        if file.kind == "playbook":
-            result = _become_user_without_become(False, data)
-            if result:
-                return [
-                    self.create_matcherror(
-                        message=self.shortdesc,
-                        filename=file,
-                        lineno=data[LINE_NUMBER_KEY],
-                    ),
-                ]
+        if (
+            file.kind == "playbook"
+            and data.get("become_user")
+            and not data.get("become")
+        ):
+            return [
+                self.create_matcherror(
+                    message=self.shortdesc,
+                    filename=file,
+                    tag=f"{self.id}[play]",
+                    lineno=data[LINE_NUMBER_KEY],
+                ),
+            ]
         return []
+
+    def matchtask(
+        self,
+        task: Task,
+        file: Lintable | None = None,
+    ) -> list[MatchError]:
+        if task.get("become_user") and not task.get("become"):
+            return [
+                self.create_matcherror(
+                    message=self.shortdesc,
+                    filename=file,
+                    tag=f"{self.id}[task]",
+                    lineno=task[LINE_NUMBER_KEY],
+                ),
+            ]
+        return []
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag in ("partial-become[play]", "partial-become[task]"):
+            target_task = self.seek(match.yaml_path, data)
+            for _ in range(len(target_task)):
+                k, v = target_task.popitem(False)
+                if k == "become_user":
+                    target_task["become"] = True
+                target_task[k] = v
+            match.fixed = True
 
 
 # testing code to be loaded only with pytest or when executed the rule file
