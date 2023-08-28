@@ -97,6 +97,12 @@ def fixture_runner_result(
             id="cmd_instead_of_shell",
         ),
         pytest.param(
+            "examples/playbooks/transform-deprecated-local-action.yml",
+            1,
+            True,
+            id="dep_local_action",
+        ),
+        pytest.param(
             "examples/playbooks/transform-partial-become.yml",
             8,
             True,
