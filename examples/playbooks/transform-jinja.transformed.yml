@@ -1,0 +1,24 @@
+---
+- name: Fixture
+  hosts: localhost
+  vars:
+    my_list:
+      - foo
+      - bar
+  tasks:
+    - name: A block used to check that we do not identify error at correct level
+      block:
+        - name: Foo # <-- this is valid jinja2
+          ansible.builtin.debug:
+            foo: "{{ 1 }}" # <-- jinja2[spacing]
+            msg: "{{ 'a' b }}" # <-- jinja2[invalid]
+
+    - name: A block used to check that we do not identify error at correct level
+      block:
+        - name: Foo # <-- this is valid jinja2
+          ansible.builtin.debug:
+            msg: "{{ item }}" # <-- jinja2[spacing]
+          with_items:
+            - "{{ items }}"
+# It should be noted that even ansible --syntax-check fails to spot the jinja
+# error above, but ansible will throw a runtime error when running

@@ -12,16 +12,20 @@ import jinja2
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from jinja2.exceptions import TemplateSyntaxError
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.constants import LINE_NUMBER_KEY
+from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.text import has_jinja
 from ansiblelint.utils import parse_yaml_from_file, template
 from ansiblelint.yaml_utils import deannotate, nested_items_path
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
 
@@ -59,7 +63,7 @@ ignored_re = re.compile(
 )
 
 
-class JinjaRule(AnsibleLintRule):
+class JinjaRule(AnsibleLintRule, TransformMixin):
     """Rule that looks inside jinja2 templates."""
 
     id = "jinja"
@@ -375,6 +379,34 @@ class JinjaRule(AnsibleLintRule):
             else ""
         )
         return reformatted, details, "spacing"
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == "jinja[spacing]":
+            target_task = self.seek(match.yaml_path, data)
+            [orig_val, updated_val] = match.message.split(":")[1].split("->")
+            orig_val = orig_val.strip()
+            for _ in range(len(target_task)):
+                k, v = target_task.popitem(False)
+                if isinstance(v, CommentedMap):
+                    for _ in range(len(v)):
+                        module_opt_key, module_opt_value = v.popitem(False)
+                        v[module_opt_key] = (
+                            updated_val.strip()
+                            if orig_val == module_opt_value
+                            else module_opt_value
+                        )
+                elif isinstance(v, CommentedSeq):
+                    for idx, seq_val in enumerate(v):
+                        v[idx] = updated_val.strip() if orig_val == seq_val else seq_val
+                elif isinstance(v, str) and v == orig_val:
+                    v = updated_val.strip()
+                target_task[k] = v
+            match.fixed = True
 
 
 def blacken(text: str) -> str:
