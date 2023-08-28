@@ -6,14 +6,17 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
 
-class TaskNoLocalAction(AnsibleLintRule):
+class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
     """Do not use 'local_action', use 'delegate_to: localhost'."""
 
     id = "deprecated-local-action"
@@ -34,6 +37,24 @@ class TaskNoLocalAction(AnsibleLintRule):
             return True
 
         return False
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == self.id:
+            target_task = self.seek(match.yaml_path, data)
+            for _ in range(len(target_task)):
+                k, v = target_task.popitem(False)
+                if k == "local_action":
+                    module_name = v["module"]
+                    target_task[module_name] = None
+                    target_task["delegate_to"] = "localhost"
+                else:
+                    target_task[k] = v
+        match.fixed = True
 
 
 # testing code to be loaded only with pytest or when executed the rule file

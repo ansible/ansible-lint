@@ -96,6 +96,12 @@ def fixture_runner_result(
             True,
             id="cmd_instead_of_shell",
         ),
+        pytest.param(
+            "examples/playbooks/transform-deprecated-local-action.yml",
+            1,
+            True,
+            id="dep_local_action",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
