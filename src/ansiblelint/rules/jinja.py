@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple
 
@@ -12,10 +13,9 @@ import jinja2
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from jinja2.exceptions import TemplateSyntaxError
-from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
+from ansiblelint.errors import RuleMatchTransformMeta
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.skip_utils import get_rule_skips_from_line
@@ -61,6 +61,26 @@ ignored_re = re.compile(
     ),
     flags=re.MULTILINE | re.DOTALL,
 )
+
+
+@dataclass(frozen=True)
+class JinjaRuleTMetaSpacing(RuleMatchTransformMeta):
+    """JinjaRule transform metadata.
+
+    :param key: Key or index within the task
+    :param value: Value of the key
+    :param path: Path to the key
+    :param fixed: Value with spacing fixed
+    """
+
+    key: str | int
+    value: str | int
+    path: tuple[str | int, ...]
+    fixed: str
+
+    def __str__(self) -> str:
+        """Return string representation."""
+        return f"{self.key}={self.value} at {self.path} fixed to {self.fixed}"
 
 
 class JinjaRule(AnsibleLintRule, TransformMixin):
@@ -176,6 +196,12 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
+                                transform_meta=JinjaRuleTMetaSpacing(
+                                    key=key,
+                                    value=v,
+                                    path=tuple(path),
+                                    fixed=reformatted,
+                                ),
                             ),
                         )
         except Exception as exc:
@@ -386,27 +412,61 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
+        """Transform jinja2 errors.
+
+        :param match: MatchError instance
+        :param lintable: Lintable instance
+        :param data: data to transform
+        """
         if match.tag == "jinja[spacing]":
-            target_task = self.seek(match.yaml_path, data)
-            [orig_val, updated_val] = match.message.split(":")[1].split("->")
-            orig_val = orig_val.strip()
-            for _ in range(len(target_task)):
-                k, v = target_task.popitem(False)
-                if isinstance(v, CommentedMap):
-                    for _ in range(len(v)):
-                        module_opt_key, module_opt_value = v.popitem(False)
-                        v[module_opt_key] = (
-                            updated_val.strip()
-                            if orig_val == module_opt_value
-                            else module_opt_value
-                        )
-                elif isinstance(v, CommentedSeq):
-                    for idx, seq_val in enumerate(v):
-                        v[idx] = updated_val.strip() if orig_val == seq_val else seq_val
-                elif isinstance(v, str) and v == orig_val:
-                    v = updated_val.strip()
-                target_task[k] = v
-            match.fixed = True
+            self.transform_spacing(match, data)
+
+    def transform_spacing(
+        self,
+        match: MatchError,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        """Transform jinja2 spacing errors.
+
+        The match error was found on a normalized task so we cannot compare the path
+        instead we only compare the key and value, if the task has 2 identical keys with the
+        exact same jinja spacing issue, we may transform them out of order
+
+        :param match: MatchError instance
+        :param data: data to transform
+        """
+        if not isinstance(match.transform_meta, JinjaRuleTMetaSpacing):
+            return
+        if isinstance(data, str):
+            return
+
+        obj = self.seek(match.yaml_path, data)
+        if obj is None:
+            return
+
+        ignored_keys = ("block", "ansible.builtin.block", "ansible.legacy.block")
+        for key, value, path in nested_items_path(
+            data_collection=obj,
+            ignored_keys=ignored_keys,
+        ):
+            if key == match.transform_meta.key and value == match.transform_meta.value:
+                for pth in path[:-1]:
+                    try:
+                        obj = obj[pth]
+                    except (KeyError, TypeError) as exc:
+                        err = f"Unable to transform {match.transform_meta}: {exc}"
+                        _logger.error(err)
+                        match.fixed = False
+                        return
+                try:
+                    obj[path[-1]][key] = match.transform_meta.fixed
+                    match.fixed = True
+
+                except (KeyError, TypeError) as exc:
+                    err = f"Unable to transform {match.transform_meta}: {exc}"
+                    _logger.error(err)
+                    match.fixed = False
+                return
 
 
 def blacken(text: str) -> str:

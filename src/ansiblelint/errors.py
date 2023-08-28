@@ -38,6 +38,11 @@ class StrictModeError(RuntimeError):
         super().__init__(message)
 
 
+@dataclass(frozen=True)
+class RuleMatchTransformMeta:
+    """Additional metadata about a match error to be used during transformation."""
+
+
 # pylint: disable=too-many-instance-attributes
 @dataclass(unsafe_hash=True)
 @functools.total_ordering
@@ -65,6 +70,7 @@ class MatchError(ValueError):
     rule: BaseRule = field(hash=False, default=RuntimeErrorRule())
     ignored: bool = False
     fixed: bool = False  # True when a transform has resolved this MatchError
+    transform_meta: RuleMatchTransformMeta | None = None
 
     def __post_init__(self) -> None:
         """Can be use by rules that can report multiple errors type, so we can still filter by them."""
