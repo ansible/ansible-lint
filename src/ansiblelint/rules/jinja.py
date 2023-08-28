@@ -456,7 +456,6 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     except (KeyError, TypeError) as exc:
                         err = f"Unable to transform {match.transform_meta}: {exc}"
                         _logger.error(err)
-                        match.fixed = False
                         return
                 try:
                     obj[path[-1]][key] = match.transform_meta.fixed
@@ -465,7 +464,6 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                 except (KeyError, TypeError) as exc:
                     err = f"Unable to transform {match.transform_meta}: {exc}"
                     _logger.error(err)
-                    match.fixed = False
                 return
 
 
