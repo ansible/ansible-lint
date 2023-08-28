@@ -1,0 +1,97 @@
+---
+- name: Fixture for deprecated-bare-vars rule
+  hosts: localhost
+  become: false
+  vars:
+    my_list:
+      - foo
+      - bar
+
+    my_list2:
+      - 1
+      - 2
+
+    my_list_of_dicts:
+      - foo: 1
+        bar: 2
+      - foo: 3
+        bar: 4
+
+    my_list_of_lists:
+      - "{{ my_list }}"
+      - "{{ my_list2 }}"
+
+    my_filenames:
+      - foo.txt
+      - bar.txt
+
+    my_dict:
+      foo: bar
+
+  tasks:
+    - name: Use with_items loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_items: my_list
+
+    - name: Use with_dict loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_dict: my_dict
+
+    ### Testing with_dict with a default empty dictionary
+    - name: Use with_dict loop using variable and default
+      ansible.builtin.debug:
+        msg: "{{ item.key }} - {{ item.value }}"
+      with_dict: uwsgi_ini | default({})
+
+    - name: Use with_nested loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item.0 }} {{ item.1 }}"
+      with_nested:
+        - my_list
+        - "{{ my_list2 }}"
+
+    - name: Use with_nested loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item.0 }} {{ item.1 }}"
+      with_nested: "my_list2"
+
+    - name: Use with_file loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_file: my_list
+
+    - name: Use with_fileglob loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_fileglob: my_list
+
+    - name: Use with_together loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item.0 }} {{ item.1 }}"
+      with_together:
+        - my_list
+        - "{{ my_list2 }}"
+
+    - name: Use with_subelements loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item.0 }}"
+      with_subelements:
+        - my_list_of_dicts
+        - bar
+
+    - name: Use with_random_choice loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_random_choice: my_list
+
+    - name: Use with_first_found loop using bare variable
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_first_found: my_filenames
+
+    - name: Use with_indexed_items loop
+      ansible.builtin.debug:
+        msg: "{{ item.0 }} {{ item.1 }}"
+      with_indexed_items: my_list

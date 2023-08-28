@@ -71,7 +71,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
-        if match.tag == "command-instead-of-shell":
+        if match.tag == self.id:
             target_task = self.seek(match.yaml_path, data)
             for _ in range(len(target_task)):
                 k, v = target_task.popitem(False)

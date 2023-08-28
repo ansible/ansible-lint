@@ -96,6 +96,12 @@ def fixture_runner_result(
             True,
             id="cmd_instead_of_shell",
         ),
+        pytest.param(
+            "examples/playbooks/transform-deprecated-bare-vars-fail.yml",
+            12,
+            True,
+            id="deprecated_bare_vars",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals

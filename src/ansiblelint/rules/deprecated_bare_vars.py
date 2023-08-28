@@ -26,15 +26,18 @@ import os
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.text import has_glob, has_jinja
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
 
-class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
+class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule, TransformMixin):
     """Using bare variables is deprecated."""
 
     id = "deprecated-bare-vars"
@@ -96,6 +99,26 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 message = "Possible bare variable '{0}' used in a '{1}' loop. You should use the full variable syntax ('{{{{ {0} }}}}') or convert it to a list if that is not really a variable."
                 return message.format(task[loop_type], loop_type)
         return False
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == self.id:
+            target_task = self.seek(match.yaml_path, data)
+            for _ in range(len(target_task)):
+                k, v = target_task.popitem(False)
+                if k.startswith("with_"):
+                    if not isinstance(v, str):
+                        change_to_be_added = match.message.split("('")[1].split("')")[0]
+                        target_task[k] = change_to_be_added
+                    else:
+                        target_task[k] = [v]
+                else:
+                    target_task[k] = v
+            match.fixed = True
 
 
 if "pytest" in sys.modules:
