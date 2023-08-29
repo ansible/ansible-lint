@@ -62,6 +62,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/reqs3/meta/requirements.yml",
@@ -72,6 +73,11 @@ stdout:
         "path": "$",
         "message": "{'foo': 'bar'} is not of type 'array'"
       },
+      "best_deep_match": {
+        "path": "$",
+        "message": "{'foo': 'bar'} is not of type 'array'"
+      },
+      "num_sub_errors": 4,
       "sub_errors": [
         {
           "path": "$",

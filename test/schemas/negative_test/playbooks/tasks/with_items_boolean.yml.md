@@ -53,6 +53,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/tasks/with_items_boolean.yml",
@@ -63,6 +64,11 @@ stdout:
         "path": "$[0]",
         "message": "'block' is a required property"
       },
+      "best_deep_match": {
+        "path": "$[0].with_items",
+        "message": "True is not of type 'string'"
+      },
+      "num_sub_errors": 3,
       "sub_errors": [
         {
           "path": "$[0]",

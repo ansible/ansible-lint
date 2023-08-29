@@ -140,6 +140,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/tasks/become_method_invalid.yml",
@@ -150,6 +151,11 @@ stdout:
         "path": "$[0]",
         "message": "'block' is a required property"
       },
+      "best_deep_match": {
+        "path": "$[0].become_method",
+        "message": "True is not one of ['ansible.builtin.sudo', 'ansible.builtin.su', 'community.general.pbrun', 'community.general.pfexec', 'ansible.builtin.runas', 'community.general.dzdo', 'community.general.ksu', 'community.general.doas', 'community.general.machinectl', 'community.general.pmrun', 'community.general.sesu', 'community.general.sudosu']"
+      },
+      "num_sub_errors": 10,
       "sub_errors": [
         {
           "path": "$[0].become_method",

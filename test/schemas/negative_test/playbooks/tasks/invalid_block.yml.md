@@ -35,6 +35,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/tasks/invalid_block.yml",
@@ -45,6 +46,11 @@ stdout:
         "path": "$[0]",
         "message": "{'block': {}} should not be valid under {'required': ['block']}"
       },
+      "best_deep_match": {
+        "path": "$[0].block",
+        "message": "{} is not of type 'array'"
+      },
+      "num_sub_errors": 1,
       "sub_errors": [
         {
           "path": "$[0].block",

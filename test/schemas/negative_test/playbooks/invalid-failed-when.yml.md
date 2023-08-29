@@ -170,6 +170,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/invalid-failed-when.yml",
@@ -180,6 +181,11 @@ stdout:
         "path": "$[0]",
         "message": "'hosts', 'tasks' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].tasks[0].failed_when",
+        "message": "123 is not of type 'boolean'"
+      },
+      "num_sub_errors": 15,
       "sub_errors": [
         {
           "path": "$[0]",
