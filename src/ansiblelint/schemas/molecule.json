@@ -512,6 +512,7 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
+  "description": "https://ansible.readthedocs.io/projects/molecule/configuration/",
   "examples": ["molecule/*/molecule.yml"],
   "properties": {
     "dependency": {
