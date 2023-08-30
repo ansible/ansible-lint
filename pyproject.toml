@@ -240,6 +240,7 @@ ignore = [
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "TRY",
   "PERF203",
+  "PD011", # We are not using pandas, any .values attributes are unrelated
 ]
 select = ["ALL"]
 target-version = "py39"

@@ -559,10 +559,27 @@ class FormattedEmitter(Emitter):
     #     https://github.com/python/mypy/issues/4125
     #     To silence we have to ignore[override] both the @property and the method.
 
+    def last_seq(self) -> bool:
+        """Return True if previous indentation was a sequence.
+
+        This is a modification of indents.last_seq() that answers correctly before
+        increase_indent() has been called. That is to say it looks at the last indent
+        instead of the second-to-last (as the current indent has yet to be pushed onto
+        the stack.
+        """
+        try:
+            return self.indents.values[-1][1]
+        except IndexError:
+            return False
+
     @property
     def best_sequence_indent(self) -> int:
         """Return the configured sequence_indent or 2 for root level."""
-        return 2 if self._is_root_level_sequence else self._sequence_indent
+        if self._is_root_level_sequence:
+            return 2
+        if self.last_seq():
+            return 2
+        return self._sequence_indent
 
     @best_sequence_indent.setter
     def best_sequence_indent(self, value: int) -> None:
@@ -572,7 +589,11 @@ class FormattedEmitter(Emitter):
     @property
     def sequence_dash_offset(self) -> int:
         """Return the configured sequence_dash_offset or 0 for root level."""
-        return 0 if self._is_root_level_sequence else self._sequence_dash_offset
+        if self._is_root_level_sequence:
+            return 0
+        if self.last_seq():
+            return 0
+        return self._sequence_dash_offset
 
     @sequence_dash_offset.setter
     def sequence_dash_offset(self, value: int) -> None:
