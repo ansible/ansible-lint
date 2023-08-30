@@ -40,6 +40,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/tasks/loop2.yml",
@@ -50,6 +51,11 @@ stdout:
         "path": "$[0]",
         "message": "'block' is a required property"
       },
+      "best_deep_match": {
+        "path": "$[0].loop",
+        "message": "123 is not of type 'string', 'array'"
+      },
+      "num_sub_errors": 1,
       "sub_errors": [
         {
           "path": "$[0]",

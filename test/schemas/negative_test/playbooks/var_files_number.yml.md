@@ -79,6 +79,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/var_files_number.yml",
@@ -89,6 +90,11 @@ stdout:
         "path": "$[0]",
         "message": "'hosts' does not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].vars_files",
+        "message": "0 is not of type 'object'"
+      },
+      "num_sub_errors": 5,
       "sub_errors": [
         {
           "path": "$[0]",

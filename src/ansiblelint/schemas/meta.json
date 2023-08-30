@@ -1447,6 +1447,7 @@
   },
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json",
   "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies",
   "examples": ["meta/main.yml"],
   "properties": {
     "additionalProperties": false,

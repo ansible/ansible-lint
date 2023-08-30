@@ -75,6 +75,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/roles.yml",
@@ -85,6 +86,11 @@ stdout:
         "path": "$[0]",
         "message": "'hosts', 'roles' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].roles",
+        "message": "'xxx' is not of type 'array'"
+      },
+      "num_sub_errors": 4,
       "sub_errors": [
         {
           "path": "$[0]",

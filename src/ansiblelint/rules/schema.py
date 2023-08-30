@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import sys
 from typing import TYPE_CHECKING, Any
 
@@ -193,25 +194,27 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/.collection/galaxy.yml",
                 "galaxy",
-                ["'GPL' is not one of"],
+                [r"^'GPL' is not one of.*https://"],
                 id="galaxy",
             ),
             pytest.param(
                 "examples/roles/invalid_requirements_schema/meta/requirements.yml",
                 "requirements",
-                ["{'foo': 'bar'} is not valid under any of the given schemas"],
+                [
+                    r"^{'foo': 'bar'} is not valid under any of the given schemas.*https://",
+                ],
                 id="requirements",
             ),
             pytest.param(
                 "examples/roles/invalid_meta_schema/meta/main.yml",
                 "meta",
-                ["False is not of type 'string'"],
+                [r"^False is not of type 'string'.*https://"],
                 id="meta",
             ),
             pytest.param(
                 "examples/playbooks/vars/invalid_vars_schema.yml",
                 "vars",
-                ["'123' does not match any of the regexes"],
+                [r"^'123' does not match any of the regexes.*https://"],
                 id="vars",
             ),
             pytest.param(
@@ -223,14 +226,18 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/ee_broken/execution-environment.yml",
                 "execution-environment",
-                ["{'foo': 'bar'} is not valid under any of the given schemas"],
+                [
+                    r"^{'foo': 'bar'} is not valid under any of the given schemas.*https://",
+                ],
                 id="execution-environment-broken",
             ),
             ("examples/meta/runtime.yml", "meta-runtime", []),
             pytest.param(
                 "examples/broken_collection_meta_runtime/meta/runtime.yml",
                 "meta-runtime",
-                ["Additional properties are not allowed ('foo' was unexpected)"],
+                [
+                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                ],
                 id="meta-runtime-broken",
             ),
             pytest.param(
@@ -242,7 +249,9 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/inventory/broken_dev_inventory.yml",
                 "inventory",
-                ["Additional properties are not allowed ('foo' was unexpected)"],
+                [
+                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                ],
                 id="inventory-broken",
             ),
             pytest.param(
@@ -260,7 +269,9 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/broken/.ansible-lint",
                 "ansible-lint-config",
-                ["Additional properties are not allowed ('foo' was unexpected)"],
+                [
+                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                ],
                 id="ansible-lint-config-broken",
             ),
             pytest.param(
@@ -272,7 +283,9 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/broken/ansible-navigator.yml",
                 "ansible-navigator-config",
-                ["Additional properties are not allowed ('ansible' was unexpected)"],
+                [
+                    r"^Additional properties are not allowed \('ansible' was unexpected\).*https://",
+                ],
                 id="ansible-navigator-config-broken",
             ),
             pytest.param(
@@ -284,20 +297,24 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/roles/broken_argument_specs/meta/argument_specs.yml",
                 "role-arg-spec",
-                ["Additional properties are not allowed ('foo' was unexpected)"],
+                [
+                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                ],
                 id="role-arg-spec-broken",
             ),
             pytest.param(
                 "examples/changelogs/changelog.yaml",
                 "changelog",
-                ["Additional properties are not allowed ('foo' was unexpected)"],
+                [
+                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                ],
                 id="changelog",
             ),
             pytest.param(
                 "examples/rulebooks/rulebook-fail.yml",
                 "rulebook",
                 [
-                    "Additional properties are not allowed ('that_should_not_be_here' was unexpected)",
+                    r"^Additional properties are not allowed \('that_should_not_be_here' was unexpected\).*https://",
                 ],
                 id="rulebook",
             ),
@@ -336,7 +353,7 @@ if "pytest" in sys.modules:
         assert len(results) == len(expected), results
         for idx, result in enumerate(results):
             assert result.filename.endswith(file)
-            assert expected[idx] in result.message
+            assert re.match(expected[idx], result.message)
             assert result.tag == f"schema[{expected_kind}]"
 
     @pytest.mark.parametrize(

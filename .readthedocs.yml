@@ -13,7 +13,6 @@ build:
     - pip install --user tox
     - python3 -m tox -e docs -- --strict --site-dir=_readthedocs/html/
 python:
-  system_packages: false
   install:
     - method: pip
       path: tox

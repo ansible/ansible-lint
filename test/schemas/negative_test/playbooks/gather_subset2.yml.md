@@ -230,6 +230,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/gather_subset2.yml",
@@ -240,6 +241,11 @@ stdout:
         "path": "$[0]",
         "message": "'gather_subset', 'hosts', 'tasks' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].gather_subset[0]",
+        "message": "'invalid' is not one of ['all', 'min', 'all_ipv4_addresses', 'all_ipv6_addresses', 'apparmor', 'architecture', 'caps', 'chroot,cmdline', 'date_time', 'default_ipv4', 'default_ipv6', 'devices', 'distribution', 'distribution_major_version', 'distribution_release', 'distribution_version', 'dns', 'effective_group_ids', 'effective_user_id', 'env', 'facter', 'fips', 'hardware', 'interfaces', 'is_chroot', 'iscsi', 'kernel', 'local', 'lsb', 'machine', 'machine_id', 'mounts', 'network', 'ohai', 'os_family', 'pkg_mgr', 'platform', 'processor', 'processor_cores', 'processor_count', 'python', 'python_version', 'real_user_id', 'selinux', 'service_mgr', 'ssh_host_key_dsa_public', 'ssh_host_key_ecdsa_public', 'ssh_host_key_ed25519_public', 'ssh_host_key_rsa_public', 'ssh_host_pub_keys', 'ssh_pub_keys', 'system', 'system_capabilities', 'system_capabilities_enforced', 'user', 'user_dir', 'user_gecos', 'user_gid', 'user_id', 'user_shell', 'user_uid', 'virtual', 'virtualization_role', 'virtualization_type']"
+      },
+      "num_sub_errors": 6,
       "sub_errors": [
         {
           "path": "$[0]",
