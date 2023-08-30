@@ -422,7 +422,7 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            28,
+            29,
             [3],
             id="4_play_playbook-first_line_in_play_4",
         ),
@@ -675,7 +675,7 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            28,
+            29,
             [],
             id="4_play_playbook-play_4_line_before_tasks",
         ),
@@ -687,13 +687,13 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            32,
+            34,
             [3, "tasks", 0],
             id="4_play_playbook-play_4_first_line_task_1",
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            33,
+            35,
             [3, "tasks", 0],
             id="4_play_playbook-play_4_middle_line_task_1",
         ),
