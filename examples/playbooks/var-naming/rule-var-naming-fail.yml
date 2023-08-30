@@ -30,3 +30,15 @@
       ansible.builtin.debug:
         var: test_var
       register: CamelCaseIsBad # invalid 7
+
+    - name: This should not trigger due to role name being dynamic (jinja)
+      ansible.builtin.include_role:
+        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      vars:
+        nginx_logrotate_conf_enable: true
+
+    - name: This should not trigger due to containing a dot in role name
+      ansible.builtin.include_role:
+        name: "foo.bar"
+      vars:
+        bar_foo: true
