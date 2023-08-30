@@ -91,6 +91,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/environment.yml",
@@ -101,6 +102,11 @@ stdout:
         "path": "$[0]",
         "message": "'environment', 'hosts' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].environment",
+        "message": "'{{ foo }}-123' is not of type 'object'"
+      },
+      "num_sub_errors": 6,
       "sub_errors": [
         {
           "path": "$[0]",

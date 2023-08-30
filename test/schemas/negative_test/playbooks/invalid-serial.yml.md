@@ -118,6 +118,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/invalid-serial.yml",
@@ -128,6 +129,11 @@ stdout:
         "path": "$[0]",
         "message": "'hosts', 'serial' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].serial",
+        "message": "'10%BAD' is not of type 'integer'"
+      },
+      "num_sub_errors": 9,
       "sub_errors": [
         {
           "path": "$[0]",

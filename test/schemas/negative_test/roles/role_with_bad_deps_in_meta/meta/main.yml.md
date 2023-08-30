@@ -64,6 +64,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/roles/role_with_bad_deps_in_meta/meta/main.yml",
@@ -74,6 +75,11 @@ stdout:
         "path": "$.dependencies[0]",
         "message": "'role' is a required property"
       },
+      "best_deep_match": {
+        "path": "$.dependencies[0]",
+        "message": "'role' is a required property"
+      },
+      "num_sub_errors": 2,
       "sub_errors": [
         {
           "path": "$.dependencies[0]",

@@ -30,6 +30,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/molecule/platforms_networks/molecule.yml",

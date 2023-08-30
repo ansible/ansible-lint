@@ -75,6 +75,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/vas_prompt.yml",
@@ -85,6 +86,11 @@ stdout:
         "path": "$[0]",
         "message": "'hosts' does not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].vars_prompt[0]",
+        "message": "Additional properties are not allowed ('tags' was unexpected)"
+      },
+      "num_sub_errors": 5,
       "sub_errors": [
         {
           "path": "$[0]",

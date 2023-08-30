@@ -55,6 +55,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/vars/python-keyword.yml",
@@ -65,6 +66,11 @@ stdout:
         "path": "$",
         "message": "{'async': '...', 'lambda': '...'} is not of type 'string'"
       },
+      "best_deep_match": {
+        "path": "$",
+        "message": "'async', 'lambda' do not match any of the regexes: '^(?!(False|None|True|and|any_errors_fatal|as|assert|async|await|become|become_exe|become_flags|become_method|become_user|break|check_mode|class|collections|connection|continue|debugger|def|del|diff|elif|else|environment|except|fact_path|finally|for|force_handlers|from|gather_facts|gather_subset|gather_timeout|global|handlers|hosts|if|ignore_errors|ignore_unreachable|import|in|is|lambda|max_fail_percentage|module_defaults|name|no_log|nonlocal|not|or|order|pass|port|post_tasks|pre_tasks|raise|remote_user|return|roles|run_once|serial|strategy|tags|tasks|throttle|timeout|try|vars|vars_files|vars_prompt|while|with|yield)$)[a-zA-Z_][\\\\w]*$'"
+      },
+      "num_sub_errors": 2,
       "sub_errors": [
         {
           "path": "$",

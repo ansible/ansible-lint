@@ -136,6 +136,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/ignore_errors.yml",
@@ -146,6 +147,11 @@ stdout:
         "path": "$[0]",
         "message": "'hosts', 'tasks' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].tasks[0].ignore_errors",
+        "message": "'should_ignore_errors' is not of type 'boolean'"
+      },
+      "num_sub_errors": 11,
       "sub_errors": [
         {
           "path": "$[0]",
