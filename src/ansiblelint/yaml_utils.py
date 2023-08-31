@@ -547,13 +547,6 @@ class FormattedEmitter(Emitter):
         """Return True if this is a sequence at the root level of the yaml document."""
         return self.column < 2 and self._root_is_sequence
 
-    @property
-    def _is_nested_sequence(self) -> bool:
-        try:
-            return self.indents.values[-1][1] and self.indents.values[-2][1]
-        except IndexError:
-            return False
-
     def expect_document_root(self) -> None:
         """Expect doc root (extend to record if the root doc is a sequence)."""
         self._root_is_sequence = isinstance(
@@ -640,7 +633,7 @@ class FormattedEmitter(Emitter):
         ):
             indicator = (" " * spaces_inside) + "}"
         # Indicator sometimes comes with embedded spaces we need to squish
-        if indicator == "  -" and self._is_nested_sequence:
+        if indicator == "  -" and self.indents.last_seq():
             indicator = "-"
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
