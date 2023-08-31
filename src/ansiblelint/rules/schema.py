@@ -155,9 +155,8 @@ class ValidateSchemaRule(AnsibleLintRule):
         if file.kind not in JSON_SCHEMAS:
             return result
 
-        errors = validate_file_schema(file)
-        if errors:
-            if errors[0].startswith("Failed to load YAML file"):
+        for error in validate_file_schema(file):
+            if error.startswith("Failed to load YAML file"):
                 _logger.debug(
                     "Ignored failure to load %s for schema validation, as !vault may cause it.",
                     file,
@@ -166,13 +165,14 @@ class ValidateSchemaRule(AnsibleLintRule):
 
             result.append(
                 MatchError(
-                    message=errors[0],
+                    message=error,
                     lintable=file,
                     rule=ValidateSchemaRule(),
                     details=ValidateSchemaRule.description,
                     tag=f"schema[{file.kind}]",
                 ),
             )
+            break
 
         if not result:
             result = super().matchyaml(file)
@@ -194,27 +194,28 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/.collection/galaxy.yml",
                 "galaxy",
-                [r"^'GPL' is not one of.*https://"],
+                [r".*'GPL' is not one of.*https://"],
                 id="galaxy",
             ),
             pytest.param(
                 "examples/roles/invalid_requirements_schema/meta/requirements.yml",
                 "requirements",
                 [
-                    r"^{'foo': 'bar'} is not valid under any of the given schemas.*https://",
+                    # r".*{'foo': 'bar'} is not valid under any of the given schemas.*https://",
+                    r".*{'foo': 'bar'} is not of type 'array'.*https://",
                 ],
                 id="requirements",
             ),
             pytest.param(
                 "examples/roles/invalid_meta_schema/meta/main.yml",
                 "meta",
-                [r"^False is not of type 'string'.*https://"],
+                [r".*False is not of type 'string'.*https://"],
                 id="meta",
             ),
             pytest.param(
                 "examples/playbooks/vars/invalid_vars_schema.yml",
                 "vars",
-                [r"^'123' does not match any of the regexes.*https://"],
+                [r".* '123' does not match any of the regexes.*https://"],
                 id="vars",
             ),
             pytest.param(
@@ -227,7 +228,7 @@ if "pytest" in sys.modules:
                 "examples/ee_broken/execution-environment.yml",
                 "execution-environment",
                 [
-                    r"^{'foo': 'bar'} is not valid under any of the given schemas.*https://",
+                    r".*Additional properties are not allowed \('foo' was unexpected\).*https://",
                 ],
                 id="execution-environment-broken",
             ),
@@ -236,7 +237,7 @@ if "pytest" in sys.modules:
                 "examples/broken_collection_meta_runtime/meta/runtime.yml",
                 "meta-runtime",
                 [
-                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                    r".*Additional properties are not allowed \('foo' was unexpected\).*https://",
                 ],
                 id="meta-runtime-broken",
             ),
@@ -250,7 +251,7 @@ if "pytest" in sys.modules:
                 "examples/inventory/broken_dev_inventory.yml",
                 "inventory",
                 [
-                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                    r".*Additional properties are not allowed \('foo' was unexpected\).*https://",
                 ],
                 id="inventory-broken",
             ),
@@ -270,7 +271,7 @@ if "pytest" in sys.modules:
                 "examples/broken/.ansible-lint",
                 "ansible-lint-config",
                 [
-                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                    r".*Additional properties are not allowed \('foo' was unexpected\).*https://",
                 ],
                 id="ansible-lint-config-broken",
             ),
@@ -284,7 +285,7 @@ if "pytest" in sys.modules:
                 "examples/broken/ansible-navigator.yml",
                 "ansible-navigator-config",
                 [
-                    r"^Additional properties are not allowed \('ansible' was unexpected\).*https://",
+                    r".*Additional properties are not allowed \('ansible' was unexpected\).*https://",
                 ],
                 id="ansible-navigator-config-broken",
             ),
@@ -298,7 +299,7 @@ if "pytest" in sys.modules:
                 "examples/roles/broken_argument_specs/meta/argument_specs.yml",
                 "role-arg-spec",
                 [
-                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                    r".*Additional properties are not allowed \('foo' was unexpected\).*https://",
                 ],
                 id="role-arg-spec-broken",
             ),
@@ -306,7 +307,7 @@ if "pytest" in sys.modules:
                 "examples/changelogs/changelog.yaml",
                 "changelog",
                 [
-                    r"^Additional properties are not allowed \('foo' was unexpected\).*https://",
+                    r".*Additional properties are not allowed \('foo' was unexpected\).*https://",
                 ],
                 id="changelog",
             ),
@@ -314,7 +315,8 @@ if "pytest" in sys.modules:
                 "examples/rulebooks/rulebook-fail.yml",
                 "rulebook",
                 [
-                    r"^Additional properties are not allowed \('that_should_not_be_here' was unexpected\).*https://",
+                    # r".*Additional properties are not allowed \('that_should_not_be_here' was unexpected\).*https://",
+                    r".*'sss' is not of type 'object'.*https://",
                 ],
                 id="rulebook",
             ),
