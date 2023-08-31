@@ -182,7 +182,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
 
 if "pytest" in sys.modules:
     from ansiblelint.config import options
-    from ansiblelint.file_utils import Lintable  # noqa: F811
+    from ansiblelint.file_utils import Lintable
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
