@@ -104,7 +104,7 @@ def fixture_runner_result(
         ),
         pytest.param(
             "examples/playbooks/transform-partial-become.yml",
-            8,
+            4,
             True,
             id="partial_become",
         ),

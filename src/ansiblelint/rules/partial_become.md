@@ -7,8 +7,10 @@ must set `become: true`.
 
 This rule can produce the following messages:
 
-- `partial-become[play]`: become_user requires become to work as expected, at play level.
-- `partial-become[task]`: become_user requires become to work as expected, at task level.
+- `partial-become[play]`: become_user requires become to work as expected, at
+  play level.
+- `partial-become[task]`: become_user requires become to work as expected, at
+  task level.
 
 !!! warning
 
@@ -24,6 +26,7 @@ This rule can produce the following messages:
 ---
 - name: Example playbook
   hosts: localhost
+  become: true # <- Activates privilege escalation.
   tasks:
     - name: Start the httpd service as the apache user
       ansible.builtin.service:
@@ -44,4 +47,76 @@ This rule can produce the following messages:
         state: started
       become: true # <- Activates privilege escalation.
       become_user: apache # <- Changes the user with the desired privileges.
+
+# Stand alone playbook alternative, applies to all tasks
+
+- name: Example playbook
+  hosts: localhost
+  become: true # <- Activates privilege escalation.
+  become_user: apache # <- Changes the user with the desired privileges.
+  tasks:
+    - name: Start the httpd service as the apache user
+      ansible.builtin.service:
+        name: httpd
+        state: started
+```
+
+## Problematic Code
+
+```yaml
+---
+- name: Example playbook 1
+  hosts: localhost
+  become: true # <- Activates privilege escalation.
+  tasks:
+    - name: Include a task file
+      ansible.builtin.include_tasks: tasks.yml
+```
+
+```yaml
+---
+- name: Example playbook 2
+  hosts: localhost
+  tasks:
+    - name: Include a task file
+      ansible.builtin.include_tasks: tasks.yml
+```
+
+```yaml
+# task.yml
+- name: Start the httpd service as the apache user
+  ansible.builtin.service:
+    name: httpd
+    state: started
+  become_user: apache # <- Does not change the user because "become: true" is not set.
+```
+
+## Correct Code
+
+```yaml
+---
+- name: Example playbook 1
+  hosts: localhost
+  tasks:
+    - name: Include a task file
+      ansible.builtin.include_tasks: tasks.yml
+```
+
+```yaml
+---
+- name: Example playbook 2
+  hosts: localhost
+  tasks:
+    - name: Include a task file
+      ansible.builtin.include_tasks: tasks.yml
+```
+
+```yaml
+# task.yml
+- name: Start the httpd service as the apache user
+  ansible.builtin.service:
+    name: httpd
+    state: started
+  become: true # <- Activates privilege escalation.
+  become_user: apache # <- Does not change the user because "become: true" is not set.
 ```
