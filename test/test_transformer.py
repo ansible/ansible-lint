@@ -108,6 +108,12 @@ def fixture_runner_result(
             True,
             id="multiline_msg_with_indent_indicator",
         ),
+        pytest.param(
+            "examples/playbooks/transform-no-log-password.yml",
+            0,
+            True,
+            id="tr_no_log_passwd",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals

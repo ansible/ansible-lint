@@ -18,14 +18,16 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.utils import Task, convert_to_boolean
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
-class NoLogPasswordsRule(AnsibleLintRule):
+class NoLogPasswordsRule(AnsibleLintRule, TransformMixin):
     """Password should not be logged."""
 
     id = "no-log-password"
@@ -71,6 +73,18 @@ class NoLogPasswordsRule(AnsibleLintRule):
         return bool(
             has_password and not convert_to_boolean(no_log) and len(has_loop) > 0,
         )
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == self.id:
+            task = self.seek(match.yaml_path, data)
+            task["no_log"] = True
+
+            match.fixed = True
 
 
 if "pytest" in sys.modules:
