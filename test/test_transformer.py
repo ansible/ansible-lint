@@ -115,7 +115,10 @@ def fixture_runner_result(
             id="jinja_spacing",
         ),
         pytest.param(
-            "examples/playbooks/vars/transform_nested_data.yml", 3, True, id="nested"
+            "examples/playbooks/vars/transform_nested_data.yml",
+            3,
+            True,
+            id="nested",
         ),
     ),
 )
