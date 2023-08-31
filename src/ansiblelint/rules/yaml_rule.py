@@ -73,6 +73,12 @@ class YamllintRule(AnsibleLintRule):
             self.severity = "VERY_LOW"
             if problem.level == "error":
                 self.severity = "MEDIUM"
+            # Ignore truthy violation with github workflows ("on:" keys)
+            if problem.rule == "truthy" and file.path.parent.parts[-2:] == (
+                ".github",
+                "workflows",
+            ):
+                continue
             matches.append(
                 self.create_matcherror(
                     # yamllint does return lower-case sentences
@@ -179,6 +185,12 @@ if "pytest" in sys.modules:
                 "playbook",
                 [],
                 id="rule-yaml-pass",
+            ),
+            pytest.param(
+                "examples/yamllint/.github/workflows/ci.yml",
+                "yaml",
+                [],
+                id="rule-yaml-github-workflow",
             ),
         ),
     )

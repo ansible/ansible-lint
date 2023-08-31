@@ -17,6 +17,7 @@
       "type": "null"
     }
   ],
+  "description": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html",
   "examples": [
     "playbooks/vars/*.yml",
     "vars/*.yml",
