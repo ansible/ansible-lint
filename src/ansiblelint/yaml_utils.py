@@ -569,9 +569,7 @@ class FormattedEmitter(Emitter):
     @property
     def best_sequence_indent(self) -> int:
         """Return the configured sequence_indent or 2 for root level."""
-        if self._is_root_level_sequence:
-            return 2
-        return self._sequence_indent
+        return 2 if self._is_root_level_sequence else self._sequence_indent
 
     @best_sequence_indent.setter
     def best_sequence_indent(self, value: int) -> None:
@@ -581,9 +579,7 @@ class FormattedEmitter(Emitter):
     @property
     def sequence_dash_offset(self) -> int:
         """Return the configured sequence_dash_offset or 0 for root level."""
-        if self._is_root_level_sequence:
-            return 0
-        return self._sequence_dash_offset
+        return 0 if self._is_root_level_sequence else self._sequence_dash_offset
 
     @sequence_dash_offset.setter
     def sequence_dash_offset(self, value: int) -> None:
