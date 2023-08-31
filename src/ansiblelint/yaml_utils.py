@@ -547,6 +547,13 @@ class FormattedEmitter(Emitter):
         """Return True if this is a sequence at the root level of the yaml document."""
         return self.column < 2 and self._root_is_sequence
 
+    @property
+    def _is_nested_sequence(self) -> bool:
+        try:
+            return self.indents.values[-1][1] and self.indents.values[-2][1]
+        except IndexError:
+            return False
+
     def expect_document_root(self) -> None:
         """Expect doc root (extend to record if the root doc is a sequence)."""
         self._root_is_sequence = isinstance(
@@ -559,25 +566,10 @@ class FormattedEmitter(Emitter):
     #     https://github.com/python/mypy/issues/4125
     #     To silence we have to ignore[override] both the @property and the method.
 
-    def last_seq(self) -> bool:
-        """Return True if previous indentation was a sequence.
-
-        This is a modification of indents.last_seq() that answers correctly before
-        increase_indent() has been called. That is to say it looks at the last indent
-        instead of the second-to-last (as the current indent has yet to be pushed onto
-        the stack.
-        """
-        try:
-            return self.indents.values[-1][1]
-        except IndexError:
-            return False
-
     @property
     def best_sequence_indent(self) -> int:
         """Return the configured sequence_indent or 2 for root level."""
         if self._is_root_level_sequence:
-            return 2
-        if self.last_seq():
             return 2
         return self._sequence_indent
 
@@ -590,8 +582,6 @@ class FormattedEmitter(Emitter):
     def sequence_dash_offset(self) -> int:
         """Return the configured sequence_dash_offset or 0 for root level."""
         if self._is_root_level_sequence:
-            return 0
-        if self.last_seq():
             return 0
         return self._sequence_dash_offset
 
@@ -620,6 +610,17 @@ class FormattedEmitter(Emitter):
             return "'"
         return self.preferred_quote
 
+    def increase_indent(
+        self,
+        flow: bool = False,  # noqa: FBT002
+        sequence: bool | None = None,
+        indentless: bool = False,  # noqa: FBT002
+    ) -> None:
+        super().increase_indent(flow, sequence, indentless)
+        # If our previous node was a sequence and we are still trying to indent, don't
+        if self.indents.last_seq():
+            self.indent = self.column + 1
+
     def write_indicator(
         self,
         indicator: str,  # ruamel.yaml typehint is wrong. This is a string.
@@ -642,6 +643,9 @@ class FormattedEmitter(Emitter):
             and not self._in_empty_flow_map
         ):
             indicator = (" " * spaces_inside) + "}"
+        # Indicator sometimes comes with embedded spaces we need to squish
+        if indicator == "  -" and self._is_nested_sequence:
+            indicator = "-"
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.
