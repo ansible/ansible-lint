@@ -103,6 +103,18 @@ def fixture_runner_result(
             id="dep_local_action",
         ),
         pytest.param(
+            "examples/playbooks/transform-block-indentation-indicator.yml",
+            0,
+            True,
+            id="multiline_msg_with_indent_indicator",
+        ),
+        pytest.param(
+            "examples/playbooks/transform-jinja.yml",
+            7,
+            True,
+            id="jinja_spacing",
+        ),
+        pytest.param(
             "examples/playbooks/transform-partial-become.yml",
             4,
             True,

@@ -16,6 +16,7 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.skip_utils import get_rule_skips_from_line
+from ansiblelint.text import has_jinja, is_fqcn_or_name
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
@@ -160,10 +161,15 @@ class VariableNamingRule(AnsibleLintRule):
                 rule=self,
             )
 
-        if prefix and not ident.startswith(f"{prefix}_"):
+        if (
+            prefix
+            and not ident.startswith(f"{prefix}_")
+            and not has_jinja(prefix)
+            and is_fqcn_or_name(prefix)
+        ):
             return MatchError(
                 tag="var-naming[no-role-prefix]",
-                message="Variables names from within roles should use role_name_ as a prefix.",
+                message=f"Variables names from within roles should use {prefix}_ as a prefix.",
                 rule=self,
             )
         return None
@@ -298,7 +304,11 @@ if "pytest" in sys.modules:
     @pytest.mark.parametrize(
         ("file", "expected"),
         (
-            pytest.param("examples/playbooks/rule-var-naming-fail.yml", 7, id="0"),
+            pytest.param(
+                "examples/playbooks/var-naming/rule-var-naming-fail.yml",
+                7,
+                id="0",
+            ),
             pytest.param("examples/Taskfile.yml", 0, id="1"),
         ),
     )

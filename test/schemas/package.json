@@ -4,7 +4,7 @@
     "js-yaml": "^4.1.0",
     "safe-stable-stringify": "^2.4.3",
     "ts-node": "^10.9.1",
-    "vscode-json-languageservice": "^5.3.5"
+    "vscode-json-languageservice": "^5.3.6"
   },
   "scripts": {
     "compile": "tsc -p ./src",
@@ -16,11 +16,11 @@
     "@types/js-yaml": "^4.0.5",
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^20.5.1",
-    "chai": "^4.3.7",
+    "@types/node": "^20.5.7",
+    "chai": "^4.3.8",
     "minimatch": "^9.0.3",
     "mocha": "^10.2.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.2"
   },
   "directories": {
     "test": "./src"

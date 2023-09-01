@@ -67,7 +67,7 @@ from ansiblelint.constants import (
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
-from ansiblelint.text import removeprefix
+from ansiblelint.text import has_jinja, removeprefix
 
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -341,11 +341,15 @@ def _taskshandlers_children(
         if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
             task_handler = normalize_task_v2(task_handler)
             _validate_task_handler_action_for_role(task_handler["action"])
+            name = task_handler["action"].get("name")
+            if has_jinja(name):
+                # we cannot deal with dynamic imports
+                continue
             results.extend(
                 _roles_children(
                     basedir,
                     k,
-                    [task_handler["action"].get("name")],
+                    [name],
                     parent_type,
                     main=task_handler["action"].get("tasks_from", "main"),
                 ),
