@@ -120,6 +120,12 @@ def fixture_runner_result(
             True,
             id="nested",
         ),
+        pytest.param(
+            "examples/playbooks/transform-key-order.yml",
+            6,
+            True,
+            id="key_order_transform",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
