@@ -102,6 +102,18 @@ def fixture_runner_result(
             True,
             id="dep_local_action",
         ),
+        pytest.param(
+            "examples/playbooks/transform-block-indentation-indicator.yml",
+            0,
+            True,
+            id="multiline_msg_with_indent_indicator",
+        ),
+        pytest.param(
+            "examples/playbooks/transform-jinja.yml",
+            7,
+            True,
+            id="jinja_spacing",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals

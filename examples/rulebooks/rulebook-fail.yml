@@ -1,8 +1,8 @@
 ---
 - name: Sample rulebooks
   hosts: all
-  that_should_not_be_here: foo
-  sources: # should be "sources"
+  that_should_not_be_here: foo # <-- this is not supported
+  sources: # <-- should be "sources"
     - name: listen for alerts
       ansible.eda.alertmanager:
         host: 0.0.0.0
@@ -18,4 +18,4 @@
     - name: debug
       condition: event.alert.labels.job == "fastapi"
       action:
-        debug: sss
+        debug: sss # <-- this should be an object
