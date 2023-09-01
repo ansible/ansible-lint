@@ -112,7 +112,7 @@ def fixture_runner_result(
             "examples/playbooks/transform-no-log-password.yml",
             0,
             True,
-            id="tr_no_log_passwd",
+            id="no_log_password",
         ),
     ),
 )
