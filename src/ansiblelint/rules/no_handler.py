@@ -69,18 +69,18 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
-        if task["__ansible_action_type__"] != "task":
+        if task["__ansible_action_type__"] != "task" or task.is_handler():
             return False
 
         when = task.get("when")
+        result = False
 
         if isinstance(when, list):
-            if len(when) > 1:
-                return False
-            return _changed_in_when(when[0])
-        if isinstance(when, str):
-            return _changed_in_when(when)
-        return False
+            if len(when) <= 1:
+                result = _changed_in_when(when[0])
+        elif isinstance(when, str):
+            result = _changed_in_when(when)
+        return result
 
 
 if "pytest" in sys.modules:
