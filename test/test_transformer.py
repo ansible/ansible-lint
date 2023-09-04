@@ -109,6 +109,12 @@ def fixture_runner_result(
             id="multiline_msg_with_indent_indicator",
         ),
         pytest.param(
+            "examples/playbooks/transform-jinja.yml",
+            7,
+            True,
+            id="jinja_spacing",
+        ),
+        pytest.param(
             "examples/playbooks/transform-no-log-password.yml",
             0,
             True,
