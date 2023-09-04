@@ -114,6 +114,12 @@ def fixture_runner_result(
             True,
             id="jinja_spacing",
         ),
+        pytest.param(
+            "examples/playbooks/vars/transform_nested_data.yml",
+            3,
+            True,
+            id="nested",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
