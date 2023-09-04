@@ -3,11 +3,15 @@ from __future__ import annotations
 
 import functools
 import sys
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.errors import RuleMatchTransformMeta
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
@@ -46,7 +50,21 @@ def task_property_sorter(property1: str, property2: str) -> int:
     return (v_1 > v_2) - (v_1 < v_2)
 
 
-class KeyOrderRule(AnsibleLintRule):
+@dataclass(frozen=True)
+class KeyOrderTMeta(RuleMatchTransformMeta):
+    """Key Order transform metadata.
+
+    :param fixed: tuple with updated key order
+    """
+
+    fixed: tuple[str | int, ...]
+
+    def __str__(self) -> str:
+        """Return string representation."""
+        return f"Fixed to {self.fixed}"
+
+
+class KeyOrderRule(AnsibleLintRule, TransformMixin):
     """Ensure specific order of keys in mappings."""
 
     id = "key-order"
@@ -74,9 +92,24 @@ class KeyOrderRule(AnsibleLintRule):
                     f"You can improve the task key order to: {', '.join(sorted_keys)}",
                     filename=file,
                     tag="key-order[task]",
+                    transform_meta=KeyOrderTMeta(fixed=tuple(sorted_keys)),
                 ),
             )
         return result
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == "key-order[task]":
+            task = self.seek(match.yaml_path, data)
+            sorted_keys = match.message.split(":")[1].split(",")
+            for key in sorted_keys:
+                key = key.strip()
+                task[key] = task.pop(key)
+            match.fixed = True
 
 
 # testing code to be loaded only with pytest or when executed the rule file
