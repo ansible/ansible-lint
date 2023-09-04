@@ -23,6 +23,7 @@ from ansiblelint.utils import Task, convert_to_boolean
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
