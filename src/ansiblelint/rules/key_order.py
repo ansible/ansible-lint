@@ -104,11 +104,7 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
         if match.tag == "key-order[task]":
-            # if not isinstance(match.transform_meta, KeyOrderTMeta):
-            #     return
             task = self.seek(match.yaml_path, data)
-            # for key in match.transform_meta.fixed:
-            #     task[key] = task.pop(key)
             sorted_keys = match.message.split(":")[1].split(",")
             for key in sorted_keys:
                 key = key.strip()
