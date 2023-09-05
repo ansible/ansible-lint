@@ -146,7 +146,7 @@ repos:
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=4.1.6
+          - ansible-compat>=4.1.9
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock>=3.12.2
@@ -175,7 +175,7 @@ repos:
         args:
           - --output-format=colorized
         additional_dependencies:
-          - ansible-compat>=4.1.6
+          - ansible-compat>=4.1.9
           - ansible-core>=2.14.0
           - black>=22.10.0
           - docutils
