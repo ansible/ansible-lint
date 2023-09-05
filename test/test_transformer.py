@@ -1,9 +1,6 @@
 """Tests for Transformer."""
 from __future__ import annotations
 
-import os
-import shutil
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -13,29 +10,10 @@ from ansiblelint.runner import LintResult, _get_matches
 from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
-    from argparse import Namespace
-    from collections.abc import Iterator
+    from pathlib import Path
 
     from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
-
-
-@pytest.fixture(name="copy_examples_dir")
-def fixture_copy_examples_dir(
-    tmp_path: Path,
-    config_options: Namespace,
-) -> Iterator[tuple[Path, Path]]:
-    """Fixture that copies the examples/ dir into a tmpdir."""
-    examples_dir = Path("examples")
-
-    shutil.copytree(examples_dir, tmp_path / "examples")
-    old_cwd = Path.cwd()
-    try:
-        os.chdir(tmp_path)
-        config_options.cwd = tmp_path
-        yield old_cwd, tmp_path
-    finally:
-        os.chdir(old_cwd)
 
 
 @pytest.fixture(name="runner_result")
