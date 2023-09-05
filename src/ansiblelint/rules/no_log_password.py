@@ -341,7 +341,7 @@ if "pytest" in sys.modules:
         transformer.run()
 
         matches = runner_result.matches
-        assert len(matches) == 1
+        assert len(matches) == 2
 
         orig_dir, tmp_dir = copy_examples_dir
         orig_playbook = orig_dir / playbook
