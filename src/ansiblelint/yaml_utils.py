@@ -599,6 +599,17 @@ class FormattedEmitter(Emitter):
             return "'"
         return self.preferred_quote
 
+    def increase_indent(
+        self,
+        flow: bool = False,  # noqa: FBT002
+        sequence: bool | None = None,
+        indentless: bool = False,  # noqa: FBT002
+    ) -> None:
+        super().increase_indent(flow, sequence, indentless)
+        # If our previous node was a sequence and we are still trying to indent, don't
+        if self.indents.last_seq():
+            self.indent = self.column + 1
+
     def write_indicator(
         self,
         indicator: str,  # ruamel.yaml typehint is wrong. This is a string.
@@ -621,6 +632,9 @@ class FormattedEmitter(Emitter):
             and not self._in_empty_flow_map
         ):
             indicator = (" " * spaces_inside) + "}"
+        # Indicator sometimes comes with embedded spaces we need to squish
+        if indicator == "  -" and self.indents.last_seq():
+            indicator = "-"
         super().write_indicator(indicator, need_whitespace, whitespace, indention)
         # if it is the start of a flow mapping, and it's not time
         # to wrap the lines, insert a space.

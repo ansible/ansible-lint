@@ -82,3 +82,14 @@
       ansible.builtin.debug:
         msg: why isn't this a handler
       when: result | changed
+
+  handlers:
+    # If this task would have being under 'tasks:' it should have triggered
+    # the rule, but under 'handlers:' it should not.
+    - name: Reproduce bug 3646
+      loop: "{{ _something_done.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      when: item.changed
+      ansible.builtin.debug:
+        msg: "{{ item.item.name }} changed"

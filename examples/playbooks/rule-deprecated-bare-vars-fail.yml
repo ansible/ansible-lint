@@ -39,12 +39,6 @@
         msg: "{{ item }}"
       with_dict: my_dict
 
-    ### Testing with_dict with a default empty dictionary
-    - name: Use with_dict loop using variable and default
-      ansible.builtin.debug:
-        msg: "{{ item.key }} - {{ item.value }}"
-      with_dict: uwsgi_ini | default({})
-
     - name: Use with_nested loop using bare variable
       ansible.builtin.debug:
         msg: "{{ item.0 }} {{ item.1 }}"

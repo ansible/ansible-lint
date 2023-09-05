@@ -223,7 +223,7 @@ python_files = [
 xfail_strict = true
 
 [tool.ruff]
-required-version = "0.0.286"
+required-version = "0.0.287"
 ignore = [
   "E501", # we use black
   "ERA001", # auto-removal of commented out code affects development and vscode integration
@@ -240,6 +240,7 @@ ignore = [
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "TRY",
   "PERF203",
+  "PD011", # We are not using pandas, any .values attributes are unrelated
 ]
 select = ["ALL"]
 target-version = "py39"
