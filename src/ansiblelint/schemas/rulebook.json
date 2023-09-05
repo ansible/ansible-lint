@@ -157,6 +157,9 @@
                             "type": "string"
                         },
                         {
+                            "type": "boolean"
+                        },
+                        {
                             "$ref": "#/$defs/all-condition"
                         },
                         {

@@ -8,7 +8,6 @@ import json
 import logging
 import re
 import sys
-from functools import lru_cache
 from typing import TYPE_CHECKING, Any
 
 # pylint: disable=preferred-module
@@ -18,11 +17,11 @@ from unittest.mock import patch
 # pylint: disable=reimported
 import ansible.module_utils.basic as mock_ansible_module
 from ansible.module_utils import basic
-from ansible.plugins.loader import PluginLoadContext, module_loader
 
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.text import has_jinja
+from ansiblelint.utils import load_plugin
 from ansiblelint.yaml_utils import clean_json
 
 if TYPE_CHECKING:
@@ -66,12 +65,6 @@ workarounds_inject_map = {
 }
 
 
-@lru_cache
-def load_module(module_name: str) -> PluginLoadContext:
-    """Load plugin from module name and cache it."""
-    return module_loader.find_plugin_with_context(module_name)
-
-
 class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
 
@@ -111,7 +104,7 @@ class ArgsRule(AnsibleLintRule):
         if module_name in self.module_aliases:
             return []
 
-        loaded_module = load_module(module_name)
+        loaded_module = load_plugin(module_name)
 
         # https://github.com/ansible/ansible-lint/issues/3200
         # since "ps1" modules cannot be executed on POSIX platforms, we will

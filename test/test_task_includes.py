@@ -1,4 +1,6 @@
 """Tests related to task inclusions."""
+import sys
+
 import pytest
 
 from ansiblelint.file_utils import Lintable
@@ -9,7 +11,14 @@ from ansiblelint.runner import Runner
 @pytest.mark.parametrize(
     ("filename", "file_count", "match_count"),
     (
-        pytest.param("examples/playbooks/blockincludes.yml", 4, 3, id="blockincludes"),
+        pytest.param(
+            "examples/playbooks/blockincludes.yml",
+            4,
+            3
+            if sys.version_info >= (3, 10, 0)
+            else 4,  # 3 with py310/ansible2.16, or 4 with py39/ansible2.15,
+            id="blockincludes",
+        ),
         pytest.param(
             "examples/playbooks/blockincludes2.yml",
             4,

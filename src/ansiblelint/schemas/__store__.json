@@ -24,7 +24,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json"
   },
   "meta": {
-    "etag": "9eb5c611e25cc9e0a180119904f8dfe39c59409b37da972f66a6c60f040a3a08",
+    "etag": "097a20155bc7936b6eae292a556bb38202d34a0a333ff5cbaaa1b4d3a4cc7bf5",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json"
   },
   "meta-runtime": {
@@ -36,7 +36,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
   },
   "playbook": {
-    "etag": "48d584b10235804c13de78177dcfeeba433bd4d196ef3872aac7fc26a26303f5",
+    "etag": "8ae42e48318ff6da41f6d383dc19b643221258ea6521886f834e31cb8d3a7322",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/playbook.json"
   },
   "requirements": {
@@ -48,7 +48,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json"
   },
   "rulebook": {
-    "etag": "b8c4ddf5d8d276d7a27335f2042554b3528ad9a091f13f1ffe7241be08a9671b",
+    "etag": "8a421671574fa65a57fb0d08e45879bfa005f271aa8c0243982a84b49fb0fe54",
     "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json"
   },
   "tasks": {
