@@ -18,14 +18,22 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, RulesCollection, TransformMixin
+from ansiblelint.runner import _get_matches
+from ansiblelint.transformer import Transformer
 from ansiblelint.utils import Task, convert_to_boolean
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+    from ansiblelint.config import Options
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
-class NoLogPasswordsRule(AnsibleLintRule):
+class NoLogPasswordsRule(AnsibleLintRule, TransformMixin):
     """Password should not be logged."""
 
     id = "no-log-password"
@@ -71,6 +79,18 @@ class NoLogPasswordsRule(AnsibleLintRule):
         return bool(
             has_password and not convert_to_boolean(no_log) and len(has_loop) > 0,
         )
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == self.id:
+            task = self.seek(match.yaml_path, data)
+            task["no_log"] = True
+
+            match.fixed = True
 
 
 if "pytest" in sys.modules:
@@ -304,3 +324,33 @@ if "pytest" in sys.modules:
         """The task does not actually lock the user."""
         results = rule_runner.run_playbook(PASSWORD_LOCK_FALSE)
         assert len(results) == 0
+
+    def test_no_log_password_transform(
+        config_options: Options,
+        copy_examples_dir: tuple[Path, Path],
+    ) -> None:
+        """Test transform functionality for no-log-password rule."""
+        playbook: str = "examples/playbooks/transform-no-log-password.yml"
+        config_options.write_list = ["all"]
+        rules = RulesCollection(options=config_options)
+        rules.register(NoLogPasswordsRule())
+
+        config_options.lintables = [playbook]
+        runner_result = _get_matches(rules=rules, options=config_options)
+        transformer = Transformer(result=runner_result, options=config_options)
+        transformer.run()
+
+        matches = runner_result.matches
+        assert len(matches) == 2
+
+        orig_dir, tmp_dir = copy_examples_dir
+        orig_playbook = orig_dir / playbook
+        expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
+        transformed_playbook = tmp_dir / playbook
+
+        orig_playbook_content = orig_playbook.read_text()
+        expected_playbook_content = expected_playbook.read_text()
+        transformed_playbook_content = transformed_playbook.read_text()
+
+        assert orig_playbook_content != transformed_playbook_content
+        assert transformed_playbook_content == expected_playbook_content

@@ -54,6 +54,8 @@ src/ansiblelint/_version.py
 test/fixtures/formatting-before/
 # prettier should not edit this due to forcibly extra-long lines
 examples/playbooks/vars/strings.transformed.yml
+# prettier should not edit this due to intentionally spaced nesting
+examples/playbooks/vars/transform_nested_data.yml
 
 # other
 .cache

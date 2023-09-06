@@ -166,3 +166,12 @@
       with_items: >-
         {%- set ns = [1, 1, 2] -%}
         {{- ns.keys | unique -}}
+
+    - name: Reproduce bug 3646
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        mode: "{{ item.mode }}"
+      with_community.general.filetree:
+        - "../templates/SpaceVim.d/"
+      when: item.state == "directory" and ".git" not in item.path

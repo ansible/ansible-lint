@@ -2,10 +2,12 @@
 - name: Fixture
   hosts: localhost
   tasks:
-    - name: Task with no_log on top
-      no_log: true
-      ansible.builtin.command: echo hello
-      changed_when: false
+    # comment before keys
+    - name: Task with no_log on top # name comment
+      no_log: true # no_log comment
+      ansible.builtin.command: echo hello # command comment
+      changed_when: false # changed_when comment
+      # comment after keys
     - name: Task with when on top
       when: true
       ansible.builtin.command: echo hello
