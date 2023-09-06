@@ -8,6 +8,9 @@ pytest_plugins = ['ansiblelint.testing']
 from __future__ import annotations
 
 import copy
+import os
+import shutil
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -18,6 +21,7 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import RunFromText
 
 if TYPE_CHECKING:
+    from argparse import Namespace
     from collections.abc import Iterator
 
     from _pytest.fixtures import SubRequest
@@ -61,3 +65,21 @@ def fixture_config_options() -> Iterator[Options]:
     original_options = copy.deepcopy(options)
     yield options
     options = original_options
+
+
+@pytest.fixture(name="copy_examples_dir")
+def fixture_copy_examples_dir(
+    tmp_path: Path,
+    config_options: Namespace,
+) -> Iterator[tuple[Path, Path]]:
+    """Fixture that copies the examples/ dir into a tmpdir."""
+    examples_dir = Path("examples")
+
+    shutil.copytree(examples_dir, tmp_path / "examples")
+    old_cwd = Path.cwd()
+    try:
+        os.chdir(tmp_path)
+        config_options.cwd = tmp_path
+        yield old_cwd, tmp_path
+    finally:
+        os.chdir(old_cwd)

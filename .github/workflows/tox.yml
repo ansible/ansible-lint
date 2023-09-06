@@ -42,7 +42,7 @@ jobs:
   test-action:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Self test for ansible-lint@${{ github.action_ref || 'main' }}
         uses: ./
         with:
@@ -83,7 +83,7 @@ jobs:
           sudo sysctl -w net.link.generic.system.hwcksum_tx=0
           sudo sysctl -w net.link.generic.system.hwcksum_rx=0
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # needed by setuptools-scm
           submodules: true
@@ -186,7 +186,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -226,7 +226,7 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
       - name: Check out src from Git
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Notify repository owners about lint change affecting them
         uses: sourcegraph/codenotify@v0.6.4
