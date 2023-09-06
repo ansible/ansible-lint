@@ -1,0 +1,21 @@
+---
+- name: One
+  hosts: all
+  tasks:
+    - name: Test when with jinja2 # noqa: jinja[spacing]
+      ansible.builtin.debug:
+        msg: text
+      when: "{{ false }}"
+
+- name: Two
+  hosts: all
+  roles:
+    - role: test
+      when: "{{ '1' = '1' }}"
+
+- name: Three
+  hosts: all
+  roles:
+    - role: test
+      when:
+        - "{{ '1' = '1' }}"

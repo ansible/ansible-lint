@@ -114,6 +114,12 @@ def fixture_runner_result(
             True,
             id="jinja_spacing",
         ),
+        pytest.param(
+            "examples/playbooks/transform-no-jinja-when.yml",
+            3,
+            True,
+            id="no_jinja_when",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
