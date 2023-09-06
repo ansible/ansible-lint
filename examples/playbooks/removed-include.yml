@@ -1,0 +1,6 @@
+---
+- name: Invalid playbook
+  hosts: localhost
+  tasks:
+    - name: Foo
+      include: tasks/simple_task.yml # <-- include was removed in 2.16
