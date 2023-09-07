@@ -10,12 +10,12 @@
 - name: Two
   hosts: all
   roles:
-    - role: test
+    - role: hello
       when: "{{ '1' = '1' }}"
 
 - name: Three
   hosts: all
   roles:
-    - role: test
+    - role: hello
       when:
         - "{{ '1' = '1' }}"
