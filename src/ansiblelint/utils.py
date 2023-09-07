@@ -753,6 +753,10 @@ class Task(dict[str, Any]):
         skip_tags: list[str] = self.raw_task.get(SKIPPED_RULES_KEY, [])
         return skip_tags
 
+    def is_handler(self) -> bool:
+        """Return true for tasks that are handlers."""
+        return ".handlers[" in self.position
+
     def __repr__(self) -> str:
         """Return a string representation of the task."""
         return f"Task('{self.name}' [{self.position}])"

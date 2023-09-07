@@ -353,6 +353,7 @@ def path_inject() -> None:
     if (
         str(userbase_bin_path) not in paths
         and (userbase_bin_path / "bin" / "ansible").exists()
+        and "pipx" not in str(userbase_bin_path)
     ):
         inject_paths.append(str(userbase_bin_path))
 
