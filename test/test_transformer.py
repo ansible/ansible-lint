@@ -110,6 +110,12 @@ def fixture_runner_result(
             True,
             id="key_order_transform",
         ),
+        pytest.param(
+            "examples/playbooks/transform-no-free-form.yml",
+            2,
+            True,
+            id="no_free_form_transform",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
