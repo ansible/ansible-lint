@@ -39,7 +39,7 @@
           become_user: root
 
 # The play has become_user but has an include
-# this is unfixable, the include could be called from multiple playbooks
+# this is not fixable, the include could be called from multiple playbooks
 - name: Play 4
   hosts: localhost
   become_user: root

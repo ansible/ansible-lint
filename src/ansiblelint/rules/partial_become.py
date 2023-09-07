@@ -29,7 +29,7 @@ from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
-
+    from collections.abc import Iterator
 
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
@@ -37,15 +37,19 @@ if TYPE_CHECKING:
 
 
 class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
-    """``become_user`` should have a cooresponding ``become`` at the play or task level."""
+    """``become_user`` should have a corresponding ``become`` at the play or task level."""
 
     id = "partial-become"
-    description = "``become_user`` should have a cooresponding ``become`` at the play or task level."
+    description = "``become_user`` should have a corresponding ``become`` at the play or task level."
     severity = "VERY_HIGH"
     tags = ["unpredictability"]
     version_added = "historic"
 
-    def matchplay(self: BecomeUserWithoutBecomeRule, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
+    def matchplay(
+        self: BecomeUserWithoutBecomeRule,
+        file: Lintable,
+        data: dict[str, Any],
+    ) -> list[MatchError]:
         """Match become_user without become in play.
 
         :param file: The file to lint.
@@ -58,14 +62,13 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         partial = "become_user" in data and "become" not in data
         if partial:
             error = self.create_matcherror(
-                    message=self.shortdesc,
-                    filename=file,
-                    tag=f"{self.id}[play]",
-                    lineno=data[LINE_NUMBER_KEY],
-                )
+                message=self.shortdesc,
+                filename=file,
+                tag=f"{self.id}[play]",
+                lineno=data[LINE_NUMBER_KEY],
+            )
             errors.append(error)
         return errors
-
 
     def matchtask(
         self: BecomeUserWithoutBecomeRule,
@@ -83,15 +86,15 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         partial = "become_user" in data and "become" not in data
         if partial:
             error = self.create_matcherror(
-                    message=self.shortdesc,
-                    filename=file,
-                    tag=f"{self.id}[task]",
-                    lineno=task[LINE_NUMBER_KEY],
-                )
+                message=self.shortdesc,
+                filename=file,
+                tag=f"{self.id}[task]",
+                lineno=task[LINE_NUMBER_KEY],
+            )
             errors.append(error)
         return errors
 
-    def _dive(self: BecomeUserWithoutBecomeRule, data: CommentedSeq):
+    def _dive(self: BecomeUserWithoutBecomeRule, data: CommentedSeq) -> Iterator[Any]:
         """Dive into the data and yield each item.
 
         :param data: The data to dive into.
@@ -135,8 +138,10 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
             match.fixed = True
             return
 
-
-    def is_ineligible_for_transform(self: BecomeUserWithoutBecomeRule, data: CommentedMap) -> bool:
+    def is_ineligible_for_transform(
+        self: BecomeUserWithoutBecomeRule,
+        data: CommentedMap,
+    ) -> bool:
         """Check if the data is eligible for transformation.
 
         :param data: The data to check.
@@ -172,11 +177,11 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         for task_group in task_groups:
             tasks = self._dive(play.get(task_group, []))
             for task in tasks:
-                bit = "become" in task
-                buit = "become_user" in task
-                bip = "become" in play
-                buip = "become_user" in play
-                if bit and not buit and buip:
+                b_in_t = "become" in task
+                bu_in_t = "become_user" in task
+                b_in_p = "become" in play
+                bu_in_p = "become_user" in play
+                if b_in_t and not bu_in_t and bu_in_p:
                     # Preserve the end comment if become is the last key
                     comment = None
                     if list(task.keys())[-1] == "become" and "become" in task.ca.items:
@@ -186,13 +191,16 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
                     if comment:
                         self._attach_comment_end(task, comment)
                     remove_play_become_user = True
-                if buit and not bit and bip:
+                if bu_in_t and not b_in_t and b_in_p:
                     become_user_index = list(task.keys()).index("become_user")
                     task.insert(become_user_index, "become", play["become"])
-                if buit and not bit and not bip:
+                if bu_in_t and not b_in_t and not b_in_p:
                     # Preserve the end comment if become_user is the last key
                     comment = None
-                    if list(task.keys())[-1] == "become_user" and "become_user" in task.ca.items:
+                    if (
+                        list(task.keys())[-1] == "become_user"
+                        and "become_user" in task.ca.items
+                    ):
                         comment = task.ca.items.pop("become_user")
                     task.pop("become_user")
                     if comment:
@@ -200,7 +208,11 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         if remove_play_become_user:
             del play["become_user"]
 
-    def _attach_comment_end(self, obj: CommentedMap | CommentedSeq, comment: Any) -> None:
+    def _attach_comment_end(
+        self,
+        obj: CommentedMap | CommentedSeq,
+        comment: Any,
+    ) -> None:
         """Attach a comment to the end of the object.
 
         :param obj: The object to attach the comment to.
@@ -217,6 +229,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
                 obj.ca.items[len(obj)] = comment
                 return
             self._attach_comment_end(obj[-1], comment)
+
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
