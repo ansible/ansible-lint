@@ -5,7 +5,7 @@
   become: true
 
   tasks:
-    - name: debug
+    - name: Debug
       ansible.builtin.debug:
         msg: hello
 
