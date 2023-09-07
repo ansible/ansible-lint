@@ -93,6 +93,12 @@ def fixture_runner_result(
             id="jinja_spacing",
         ),
         pytest.param(
+            "examples/playbooks/transform-no-jinja-when.yml",
+            3,
+            True,
+            id="no_jinja_when",
+        ),
+        pytest.param(
             "examples/playbooks/vars/transform_nested_data.yml",
             3,
             True,
