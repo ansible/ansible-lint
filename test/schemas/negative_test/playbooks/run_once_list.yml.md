@@ -154,6 +154,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/run_once_list.yml",
@@ -164,6 +165,11 @@ stdout:
         "path": "$[0]",
         "message": "'hosts', 'tasks' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].tasks[0].run_once",
+        "message": "['{{ true }}', 'xxx'] is not of type 'boolean'"
+      },
+      "num_sub_errors": 11,
       "sub_errors": [
         {
           "path": "$[0]",

@@ -1,0 +1,10 @@
+---
+- name: Demo
+  hosts: all
+  tasks:
+    - name: Demo
+      ansible.builtin.debug:
+        msg: |3
+               multi
+             line
+             message

@@ -102,6 +102,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/gather_facts.yml",
@@ -112,6 +113,11 @@ stdout:
         "path": "$[0]",
         "message": "'gather_facts', 'hosts', 'tasks' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].gather_facts",
+        "message": "'non' is not of type 'boolean'"
+      },
+      "num_sub_errors": 6,
       "sub_errors": [
         {
           "path": "$[0]",

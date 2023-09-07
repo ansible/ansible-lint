@@ -1,19 +1,22 @@
 """Implementation of no-jinja-when rule."""
 from __future__ import annotations
 
+import re
 import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
 
-class NoFormattingInWhenRule(AnsibleLintRule):
+class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
     """No Jinja2 in when."""
 
     id = "no-jinja-when"
@@ -65,6 +68,37 @@ class NoFormattingInWhenRule(AnsibleLintRule):
         file: Lintable | None = None,
     ) -> bool | str:
         return "when" in task.raw_task and not self._is_valid(task.raw_task["when"])
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == self.id:
+            task = self.seek(match.yaml_path, data)
+            key_to_check = ("when", "changed_when", "failed_when")
+            for _ in range(len(task)):
+                k, v = task.popitem(False)
+                if k == "roles" and isinstance(v, list):
+                    transform_for_roles(v, key_to_check=key_to_check)
+                elif k in key_to_check:
+                    v = re.sub(r"{{ (.*?) }}", r"\1", v)
+                task[k] = v
+            match.fixed = True
+
+
+def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> None:
+    """Additional transform logic in case of roles."""
+    for idx, new_dict in enumerate(v):
+        for new_key, new_value in new_dict.items():
+            if new_key in key_to_check:
+                if isinstance(new_value, list):
+                    for index, nested_value in enumerate(new_value):
+                        new_value[index] = re.sub(r"{{ (.*?) }}", r"\1", nested_value)
+                    v[idx][new_key] = new_value
+                if isinstance(new_value, str):
+                    v[idx][new_key] = re.sub(r"{{ (.*?) }}", r"\1", new_value)
 
 
 if "pytest" in sys.modules:

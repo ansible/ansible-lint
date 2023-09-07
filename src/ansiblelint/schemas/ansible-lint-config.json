@@ -17,6 +17,7 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
+  "description": "https://ansible.readthedocs.io/projects/lint/configuring/",
   "examples": [
     ".ansible-lint",
     ".config/ansible-lint.yml",

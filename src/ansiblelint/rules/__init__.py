@@ -32,6 +32,8 @@ from ansiblelint.file_utils import Lintable, expand_paths_vars
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.errors import RuleMatchTransformMeta
+
 _logger = logging.getLogger(__name__)
 
 match_types = {
@@ -78,6 +80,7 @@ class AnsibleLintRule(BaseRule):
         details: str = "",
         filename: Lintable | None = None,
         tag: str = "",
+        transform_meta: RuleMatchTransformMeta | None = None,
     ) -> MatchError:
         """Instantiate a new MatchError."""
         match = MatchError(
@@ -87,6 +90,7 @@ class AnsibleLintRule(BaseRule):
             lintable=filename or Lintable(""),
             rule=copy.copy(self),
             tag=tag,
+            transform_meta=transform_meta,
         )
         # search through callers to find one of the match* methods
         frame = inspect.currentframe()

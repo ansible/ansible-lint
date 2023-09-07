@@ -46,6 +46,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/vars/list.yml",
@@ -56,6 +57,11 @@ stdout:
         "path": "$",
         "message": "['foo', 'bar'] is not of type 'object'"
       },
+      "best_deep_match": {
+        "path": "$",
+        "message": "['foo', 'bar'] is not of type 'object'"
+      },
+      "num_sub_errors": 2,
       "sub_errors": [
         {
           "path": "$",

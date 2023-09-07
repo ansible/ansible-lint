@@ -27,7 +27,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.text import has_glob, has_jinja
+from ansiblelint.text import has_glob, has_jinja, is_fqcn_or_name
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -87,7 +87,11 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule, TransformMixin):
         task: dict[str, Any],
         loop_type: str,
     ) -> bool | str:
-        if isinstance(varstring, str) and not has_jinja(varstring):
+        if (
+            isinstance(varstring, str)
+            and not has_jinja(varstring)
+            and is_fqcn_or_name(varstring)
+        ):
             valid = loop_type == "with_fileglob" and bool(
                 has_jinja(varstring) or has_glob(varstring),
             )
@@ -144,4 +148,4 @@ if "pytest" in sys.modules:
         failure = "examples/playbooks/rule-deprecated-bare-vars-fail.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
-        assert len(errs) == 12
+        assert len(errs) == 11

@@ -29,6 +29,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/.config/ansible-lint.yml",

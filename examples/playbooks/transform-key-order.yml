@@ -1,0 +1,32 @@
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - # comment before keys
+      no_log: true # no_log comment
+      ansible.builtin.command: echo hello # command comment
+      name: Task with no_log on top # name comment
+      changed_when: false # changed_when comment
+      # comment after keys
+    - when: true
+      name: Task with when on top
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - delegate_to: localhost
+      name: Delegate_to on top
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - loop:
+        - 1
+        - 2
+      name: Loopy
+      ansible.builtin.command: echo {{ item }}
+      changed_when: false
+    - become: true
+      name: Become first
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - register: test
+      ansible.builtin.command: echo hello
+      name: Register first
+      changed_when: false

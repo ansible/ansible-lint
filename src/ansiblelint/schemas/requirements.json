@@ -130,6 +130,7 @@
       "$ref": "#/$defs/RequirementsV2Model"
     }
   ],
+  "description": "https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file",
   "examples": ["requirements.yml"],
   "title": "Ansible Requirements Schema"
 }

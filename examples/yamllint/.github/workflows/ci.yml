@@ -1,0 +1,9 @@
+---
+name: ack
+on: # <-- this is invalid by YAML 1.2 spec as it loads as true boolean.
+  pull_request_target:
+    types: [opened, labeled, unlabeled, synchronize]
+
+jobs:
+  ack:
+    uses: ansible/devtools/.github/workflows/ack.yml@main

@@ -141,6 +141,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/tasks.yml",
@@ -151,6 +152,11 @@ stdout:
         "path": "$[0]",
         "message": "'handlers', 'hosts', 'post_tasks', 'pre_tasks', 'tasks' do not match any of the regexes: '^(ansible\\\\.builtin\\\\.)?import_playbook$', 'name', 'tags', 'vars', 'when'"
       },
+      "best_deep_match": {
+        "path": "$[0].handlers",
+        "message": "1.0 is not of type 'array', 'null'"
+      },
+      "num_sub_errors": 7,
       "sub_errors": [
         {
           "path": "$[0]",

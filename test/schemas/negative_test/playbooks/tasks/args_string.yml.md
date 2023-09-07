@@ -55,6 +55,7 @@ stdout:
 ```json
 {
   "status": "fail",
+  "successes": [],
   "errors": [
     {
       "filename": "negative_test/playbooks/tasks/args_string.yml",
@@ -65,6 +66,11 @@ stdout:
         "path": "$[0]",
         "message": "'block' is a required property"
       },
+      "best_deep_match": {
+        "path": "$[0].args",
+        "message": "'{{ }}123' is not of type 'object'"
+      },
+      "num_sub_errors": 3,
       "sub_errors": [
         {
           "path": "$[0]",

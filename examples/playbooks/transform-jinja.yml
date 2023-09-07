@@ -1,0 +1,40 @@
+---
+- name: Fixture
+  hosts: localhost
+  vars:
+    my_list:
+      - foo
+      - bar
+  tasks:
+    - name: A block used to check that we do not identify error at correct level
+      block:
+        - name: Foo # <-- this is valid jinja2
+          ansible.builtin.debug:
+            foo: "{{ 1  }}" # <-- jinja2[spacing]
+            msg: "{{ 'a' b }}" # <-- jinja2[invalid]
+
+    - name: A block used to check that we do not identify error at correct level
+      block:
+        - name: Foo # <-- this is valid jinja2
+          ansible.builtin.debug:
+            msg: "{{ item  }}" # <-- jinja2[spacing]
+          with_items:
+            - "{{ items  }}"
+
+    - name: Confirm a deeply nested duplicate error is corrected
+      ansible.builtin.set_fact:
+        fact:
+          dict:
+            dict:
+              list:
+                - one
+                - two
+                - dict:
+                    fix: "{{'VALUE_1'|lower}}" # <-- jinja2[spacing]
+                - dict:
+                    fix: "{{'VALUE_1'|lower}}" # <-- jinja2[spacing]
+                - dict:
+                    fix: "{{'VALUE_2'|lower}}" # <-- jinja2[spacing]
+
+# It should be noted that even ansible --syntax-check fails to spot the jinja
+# error above, but ansible will throw a runtime error when running
