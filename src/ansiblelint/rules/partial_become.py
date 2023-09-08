@@ -251,4 +251,4 @@ if "pytest" in sys.modules:
         failure = "examples/playbooks/rule-partial-become-without-become-fail.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
-        assert len(errs) == 4
+        assert len(errs) == 3

@@ -83,7 +83,7 @@ This rule can produce the following messages:
 ```
 
 ```yaml
-# task.yml
+# tasks.yml
 - name: Start the httpd service as the apache user
   ansible.builtin.service:
     name: httpd
@@ -112,7 +112,7 @@ This rule can produce the following messages:
 ```
 
 ```yaml
-# task.yml
+# tasks.yml
 - name: Start the httpd service as the apache user
   ansible.builtin.service:
     name: httpd
