@@ -1,0 +1,56 @@
+---
+# The play has become_user and the task has become
+# this is fixable, copy the become_user to the task
+# and remove from the play
+- name: Play 1
+  hosts: localhost
+  become_user: root
+  tasks:
+    - name: A block
+      block:
+        - name: Debug
+          ansible.builtin.debug:
+            msg: hello
+          become: true
+
+# The task has become_user but the play does not
+# this is fixable, remove the become_user from the task
+- name: Play 2
+  hosts: localhost
+  tasks:
+    - name: A block
+      block:
+        - name: Debug
+          ansible.builtin.debug:
+            msg: hello
+          become_user: root
+
+# The task has become_user and the play has become
+# this is fixable, add become to the task
+- name: Play 3
+  hosts: localhost
+  become: true
+  tasks:
+    - name: A block
+      block:
+        - name: Debug
+          ansible.builtin.debug:
+            msg: hello
+          become_user: root
+
+# The play has become_user but has an include
+# this is not fixable, the include could be called from multiple playbooks
+- name: Play 4
+  hosts: localhost
+  become_user: root
+  tasks:
+    - name: A block
+      block:
+        - name: Debug
+          ansible.builtin.debug:
+            msg: hello
+          become: true
+
+        - name: Include
+          ansible.builtin.include_tasks:
+            file: ../tasks/partial_become/main.yml

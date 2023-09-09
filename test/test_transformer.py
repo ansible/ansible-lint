@@ -116,6 +116,12 @@ def fixture_runner_result(
             True,
             id="no_free_form_transform",
         ),
+        pytest.param(
+            "examples/playbooks/transform-partial-become.yml",
+            4,
+            True,
+            id="partial_become",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
