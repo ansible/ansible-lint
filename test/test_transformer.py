@@ -116,6 +116,12 @@ def fixture_runner_result(
             True,
             id="partial_become",
         ),
+        pytest.param(
+            "examples/playbooks/transform-no-handler.yml",
+            1,
+            True,
+            id="transform_no_handler",
+        ),
     ),
 )
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals

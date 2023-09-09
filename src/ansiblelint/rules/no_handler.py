@@ -24,11 +24,14 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from ansiblelint.rules import AnsibleLintRule
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.utils import Task
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
-    from ansiblelint.utils import Task
 
 
 def _changed_in_when(item: str) -> bool:
@@ -50,7 +53,7 @@ def _changed_in_when(item: str) -> bool:
     )
 
 
-class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
+class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule, TransformMixin):
     """Tasks that run when changed should likely be handlers."""
 
     id = "no-handler"
@@ -81,6 +84,31 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         elif isinstance(when, str):
             result = _changed_in_when(when)
         return result
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if match.tag == self.id and isinstance(data, CommentedSeq):
+            is_fixed = False
+            task_name = None
+            if isinstance(match.task, Task):
+                task_name = match.task.get("name")
+
+            for item in data:
+                # Item is a play
+                # Look for handlers at the play level
+                if "handlers" not in item:
+                    item["handlers"] = CommentedSeq()
+                for k, v in enumerate(item.get("tasks")):
+                    if v["name"] == task_name:
+                        item["handlers"].append(item.get("tasks").pop(k))
+                        is_fixed = True
+
+            if is_fixed:
+                match.fixed = True
 
 
 if "pytest" in sys.modules:
