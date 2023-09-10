@@ -20,7 +20,7 @@
         name: sudo
         state: latest
         update_only: true
-    
+
     - name: Upgrade ansible
       ansible.builtin.apt:
         name: sudo
