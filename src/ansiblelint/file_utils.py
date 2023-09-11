@@ -1,6 +1,7 @@
 """Utility functions related to file operations."""
 from __future__ import annotations
 
+import ast
 import copy
 import logging
 import os
@@ -12,9 +13,9 @@ from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
 
 import pathspec
-from ansible.parsing.plugin_docs import read_docstring
 import wcmatch.pathlib
 import wcmatch.wcmatch
+from ansible.parsing.plugin_docs import read_docstring
 from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, Options, options
@@ -208,7 +209,7 @@ class Lintable:
         name = normpath_path(name)
         # we need to be sure that we expanduser() because otherwise a simple
         # test like .path.exists() will return unexpected results.
-        self.path = self._original_path = name.expanduser()
+        self.path = name.expanduser()
         # Filename is effective file on disk, for stdin is a namedtempfile
         self.name = self.filename = str(name)
 
@@ -269,8 +270,8 @@ class Lintable:
             self.path = Path(self.file.name)
             self.base_kind = "text/yaml"
 
-
     def __del__(self) -> None:
+        """Clean up temporary files when the instance is cleaned up."""
         if hasattr(self, "file"):
             self.file.close()
 
@@ -393,10 +394,18 @@ class Lintable:
         return f"{self.name} ({self.kind})"
 
     def parse_examples_from_plugin(self) -> str:
-        """Parse yaml inside plugin EXAMPLES string as ansible.utils.parse_yaml but with linenumbers.
+        """Parse yaml inside plugin EXAMPLES string.
 
-        The line numbers are stored in each node's LINE_NUMBER_KEY key.
+        Store a line number offset to realign returned line numbers later
         """
+        parsed = ast.parse(self.content)
+        for child in parsed.body:
+            if isinstance(child, ast.Assign):
+                label = child.targets[0]
+                if isinstance(label, ast.Name) and label.id == "EXAMPLES":
+                    self._line_offset = child.lineno
+                    break
+
         docs = read_docstring(str(self.path))
         examples = docs["plainexamples"]
         return examples or ""
@@ -414,7 +423,8 @@ class Lintable:
                         parse_yaml_linenumbers,
                     )
 
-                    self.state = parse_yaml_linenumbers(self)
+                    offset = getattr(self, "_line_offset", 0)
+                    self.state = parse_yaml_linenumbers(self, line_number_offset=offset)
                     # now that _data is not empty, we can try guessing if playbook or rulebook
                     # it has to be done before append_skipped_rules() call as it's relying
                     # on self.kind.
@@ -426,19 +436,6 @@ class Lintable:
                         from ansiblelint.skip_utils import append_skipped_rules
 
                     self.state = append_skipped_rules(self.state, self)
-                elif self.kind == "plugin":
-                    from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
-                        parse_plugin,
-                    )
-
-                    self._data = parse_plugin(self)
-                    if self._data:
-                        # Lazy import to avoid delays and cyclic-imports
-                        if "append_skipped_rules" not in globals():
-                            # pylint: disable=import-outside-toplevel
-                            from ansiblelint.skip_utils import append_skipped_rules
-
-                        self._data = append_skipped_rules(self._data, self)
 
                 else:
                     logging.debug(
