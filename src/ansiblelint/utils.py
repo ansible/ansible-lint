@@ -852,7 +852,6 @@ def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
 @cache
 def parse_yaml_linenumbers(
     lintable: Lintable,
-    line_number_offset: int = 0,
 ) -> AnsibleBaseYAMLObject:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
@@ -867,7 +866,7 @@ def parse_yaml_linenumbers(
         if not isinstance(node, yaml.nodes.Node):
             msg = "Unexpected yaml data."
             raise RuntimeError(msg)
-        node.__line__ = line + (line_number_offset or 1)  # type: ignore[attr-defined]
+        node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
     def construct_mapping(

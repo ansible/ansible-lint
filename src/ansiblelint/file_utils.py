@@ -425,8 +425,7 @@ class Lintable:
                         parse_yaml_linenumbers,
                     )
 
-                    offset = getattr(self, "_line_offset", 0)
-                    self.state = parse_yaml_linenumbers(self, line_number_offset=offset)
+                    self.state = parse_yaml_linenumbers(self)
                     # now that _data is not empty, we can try guessing if playbook or rulebook
                     # it has to be done before append_skipped_rules() call as it's relying
                     # on self.kind.
@@ -438,7 +437,6 @@ class Lintable:
                         from ansiblelint.skip_utils import append_skipped_rules
 
                     self.state = append_skipped_rules(self.state, self)
-
                 else:
                     logging.debug(
                         "data set to None for %s due to being '%s' (%s) kind.",
