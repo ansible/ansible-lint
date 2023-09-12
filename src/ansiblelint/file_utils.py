@@ -408,7 +408,9 @@ class Lintable:
 
         docs = read_docstring(str(self.path))
         examples = docs["plainexamples"]
-        return examples or ""
+        # Ignore the leading newline and lack of document start
+        # as including those in EXAMPLES would be weird.
+        return f"---{examples}" if examples else ""
 
     @property
     def data(self) -> Any:
