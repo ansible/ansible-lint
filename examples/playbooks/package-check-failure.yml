@@ -26,4 +26,3 @@
         state: latest
         upgrade: true
         only_upgrade: false
-
