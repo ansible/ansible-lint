@@ -24,6 +24,7 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
     needs_raw_task = True
     severity = "MEDIUM"
     tags = ["deprecations"]
+    is_transformed = True
     version_added = "v4.0.0"
 
     def matchtask(

@@ -415,7 +415,11 @@ class RulesCollection:
 
         # When we have a profile we unload some of the rules
         # But we do include all rules when listing all rules or tags
-        if profile_name and not (self.options.list_rules or self.options.list_tags):
+        if profile_name and not (
+            self.options.list_rules
+            or self.options.list_tags
+            or self.options.list_write_rules
+        ):
             filter_rules_with_profile(self.rules, profile_name)
 
     def register(self, obj: AnsibleLintRule, *, conditional: bool = False) -> None:
@@ -539,6 +543,20 @@ class RulesCollection:
                 result += f"{tag}:\n"
             for name in sorted(tags[tag]):
                 result += f"  - {name}\n"
+        return result
+
+    def list_write_rules(self) -> str:
+        """Return all the rules covered under transform functionality."""
+        transformed_rules = []
+        rule_description = []
+        for rule in self.rules:
+            if rule.is_transformed:
+                transformed_rules.append(rule.id)
+                rule_description.append(rule.shortdesc)
+        result = "# List of rules covered under write mode\n\n"
+        rule_dict = dict(zip(transformed_rules, rule_description))
+        for key, value in rule_dict.items():
+            result += f"{key}: # {value}\n\n"
         return result
 
 

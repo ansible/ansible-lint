@@ -170,6 +170,10 @@ def _do_list(rules: RulesCollection) -> int:
         console.print(render_yaml(rules.list_tags()))
         return 0
 
+    if options.list_write_rules:
+        console.print(render_yaml(rules.list_write_rules()))
+        return 0
+
     # we should not get here!
     return 1
 
@@ -260,7 +264,7 @@ def main(argv: list[str] | None = None) -> int:
         options=options,
     )
 
-    if options.list_rules or options.list_tags:
+    if options.list_rules or options.list_tags or options.list_write_rules:
         return _do_list(rules)
 
     if isinstance(options.tags, str):

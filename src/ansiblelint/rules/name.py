@@ -27,6 +27,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
     )
     severity = "MEDIUM"
     tags = ["idiom"]
+    is_transformed = True
     version_added = "v6.9.1 (last update)"
     _re_templated_inside = re.compile(r".*\{\{.*\}\}.*\w.*$")
     _ids = {

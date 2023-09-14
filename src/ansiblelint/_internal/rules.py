@@ -38,6 +38,7 @@ class BaseRule:
 
     id: str = ""
     tags: list[str] = []
+    is_transformed: bool = False
     description: str = ""
     version_added: str = ""
     severity: str = ""

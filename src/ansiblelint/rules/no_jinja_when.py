@@ -25,6 +25,7 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
     )
     severity = "HIGH"
     tags = ["deprecations"]
+    is_transformed = True
     version_added = "historic"
 
     @staticmethod
