@@ -20,6 +20,8 @@
   "description": "https://ansible.readthedocs.io/projects/lint/configuring/",
   "examples": [
     ".ansible-lint",
+    ".ansible-lint.yml",
+    ".ansible-lint.yaml",
     ".config/ansible-lint.yml",
     ".config/ansible-lint.yaml"
   ],
@@ -115,7 +117,10 @@
         null
       ],
       "title": "Profile",
-      "type": ["null", "string"]
+      "type": [
+        "null",
+        "string"
+      ]
     },
     "progressive": {
       "default": false,
@@ -125,7 +130,10 @@
     "project_dir": {
       "default": null,
       "title": "Project Directory",
-      "type": ["string", "null"]
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "quiet": {
       "default": true,
@@ -229,7 +237,10 @@
     "sarif_file": {
       "default": null,
       "title": "SARIF Output filename",
-      "type": ["null", "string"]
+      "type": [
+        "null",
+        "string"
+      ]
     },
     "skip_action_validation": {
       "default": false,

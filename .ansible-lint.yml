@@ -1,5 +1,5 @@
 ---
-# .ansible-lint
+# .ansible-lint.yml
 
 profile: null # min, basic, moderate,safety, shared, production
 

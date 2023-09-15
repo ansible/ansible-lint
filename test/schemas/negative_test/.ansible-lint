@@ -1,4 +1,4 @@
 ---
-# .ansible-lint
+# .ansible-lint.yml
 rules:
   Wrong_Rule_name:

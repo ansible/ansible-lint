@@ -47,7 +47,7 @@ jobs:
         uses: ./
         with:
           # basically we only lint linter own configuration, which should be passing.
-          args: .ansible-lint
+          args: .ansible-lint.yml
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}

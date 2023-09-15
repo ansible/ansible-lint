@@ -38,7 +38,7 @@ Possible errors messages:
 This rule behavior can be changed by altering the below settings:
 
 ```yaml
-# .ansible-lint
+# .ansible-lint.yml
 var_naming_pattern: "^[a-z_][a-z0-9_]*$"
 ```
 

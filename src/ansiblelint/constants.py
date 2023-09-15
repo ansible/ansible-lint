@@ -172,6 +172,8 @@ GIT_CMD = ["git", "-c", f"safe.directory={Path.cwd()}"]
 
 CONFIG_FILENAMES = [
     ".ansible-lint",
+    ".ansible-lint.yml",
+    ".ansible-lint.yaml",
     ".config/ansible-lint.yml",
     ".config/ansible-lint.yaml",
 ]

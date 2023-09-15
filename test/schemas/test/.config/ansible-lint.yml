@@ -1,5 +1,5 @@
 ---
-# .ansible-lint
+# .ansible-lint.yml
 profile: basic
 rules:
   name[missing]:

@@ -22,7 +22,7 @@ expression used to check loop variable naming. Keep in mind that the `{role}`
 part is replaced with the inferred role name when applicable.
 
 ```yaml
-# .ansible-lint
+# .ansible-lint.yml
 loop_var_prefix: "^(__|{role}_)"
 ```
 

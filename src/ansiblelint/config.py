@@ -18,6 +18,7 @@ from urllib.error import HTTPError, URLError
 from packaging.version import Version
 
 from ansiblelint import __version__
+from ansiblelint.constants import CONFIG_FILENAMES
 from ansiblelint.loaders import yaml_from_file
 
 _logger = logging.getLogger(__name__)
@@ -40,8 +41,10 @@ DEFAULT_KINDS = [
     {"yaml": ".github/**/*.{yaml,yml}"},  # github workflows
     {"text": "**/templates/**/*.*"},  # templates are likely not validable
     {"execution-environment": "**/execution-environment.yml"},
-    {"ansible-lint-config": "**/.ansible-lint"},
-    {"ansible-lint-config": "**/.config/ansible-lint.yml"},
+    *[
+        {"ansible-lint-config": "**/" + config_filename}
+        for config_filename in CONFIG_FILENAMES
+    ],
     {"ansible-navigator-config": "**/ansible-navigator.{yaml,yml}"},
     {"inventory": "**/inventory/**.{yaml,yml}"},
     {"requirements": "**/meta/requirements.{yaml,yml}"},  # v1 only

@@ -16,7 +16,12 @@ from ansiblelint.config import (
     Options,
     log_entries,
 )
-from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, RC
+from ansiblelint.constants import (
+    CONFIG_FILENAMES,
+    CUSTOM_RULESDIR_ENVVAR,
+    DEFAULT_RULESDIR,
+    RC,
+)
 from ansiblelint.file_utils import (
     Lintable,
     abspath,
@@ -104,11 +109,7 @@ def get_config_path(config_file: str | None = None) -> str | None:
     if config_file:
         project_filenames = [config_file]
     else:
-        project_filenames = [
-            ".ansible-lint",
-            ".config/ansible-lint.yml",
-            ".config/ansible-lint.yaml",
-        ]
+        project_filenames = CONFIG_FILENAMES
     parent = tail = os.getcwd()
     while tail:
         for project_filename in project_filenames:
@@ -437,7 +438,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-c",
         "--config-file",
         dest="config_file",
-        help="Specify configuration file to use. By default it will look for '.ansible-lint', '.config/ansible-lint.yml', or '.config/ansible-lint.yaml'",
+        help="Specify configuration file to use. By default it will look for " + ", ".join(CONFIG_FILENAMES) + ".",
     )
     parser.add_argument(
         "-i",

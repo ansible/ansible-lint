@@ -12,9 +12,15 @@ example `exclude_paths`) and **True** is preferred for boolean values like
 
 ## Using local configuration files
 
-Specify Ansible-lint configuration in either `.ansible-lint`,
-`.config/ansible-lint.yml`, or `.config/ansible-lint.yaml` in your current
-working directory.
+Specify Ansible-lint configuration in:
+
+- `.ansible-lint`
+- `.ansible-lint.yml`
+- `.ansible-lint.yaml`
+- `.config/ansible-lint.yml`
+- `.config/ansible-lint.yaml`
+
+... in your current working directory.
 
 !!! note
 
@@ -36,7 +42,7 @@ The following values are supported, and function identically to their CLI
 counterparts:
 
 ```yaml
-{!../.ansible-lint!}
+{!../.ansible-lint.yml!}
 ```
 
 ## Ignoring rules for entire files
