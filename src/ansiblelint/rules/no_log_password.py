@@ -43,7 +43,6 @@ class NoLogPasswordsRule(AnsibleLintRule, TransformMixin):
     )
     severity = "LOW"
     tags = ["opt-in", "security", "experimental"]
-    is_transformed = True
     version_added = "v5.0.9"
 
     def matchtask(

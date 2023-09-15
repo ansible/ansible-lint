@@ -89,7 +89,6 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
     id = "jinja"
     severity = "LOW"
     tags = ["formatting"]
-    is_transformed = True
     version_added = "v6.5.0"
     _ansible_error_re = re.compile(
         r"^(?P<error>.*): (?P<detail>.*)\. String: (?P<string>.*)$",

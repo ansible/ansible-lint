@@ -71,7 +71,6 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
     shortdesc = __doc__
     severity = "LOW"
     tags = ["formatting"]
-    is_transformed = True
     version_added = "v6.6.2"
     needs_raw_task = True
     _ids = {

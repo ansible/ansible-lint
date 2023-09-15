@@ -43,7 +43,6 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
     description = "``become_user`` should have a corresponding ``become`` at the play or task level."
     severity = "VERY_HIGH"
     tags = ["unpredictability"]
-    is_transformed = True
     version_added = "historic"
 
     def matchplay(
