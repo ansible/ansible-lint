@@ -106,10 +106,7 @@ def load_config(config_file: str | None) -> tuple[dict[Any, Any], str | None]:
 
 def get_config_path(config_file: str | None = None) -> str | None:
     """Return local config file."""
-    if config_file:
-        project_filenames = [config_file]
-    else:
-        project_filenames = CONFIG_FILENAMES
+    project_filenames = [config_file] if config_file else CONFIG_FILENAMES
     parent = tail = os.getcwd()
     while tail:
         for project_filename in project_filenames:
@@ -438,7 +435,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-c",
         "--config-file",
         dest="config_file",
-        help="Specify configuration file to use. By default it will look for " + ", ".join(CONFIG_FILENAMES) + ".",
+        help="Specify configuration file to use. By default it will look for "
+        + ", ".join(CONFIG_FILENAMES)
+        + ".",
     )
     parser.add_argument(
         "-i",
