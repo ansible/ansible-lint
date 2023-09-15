@@ -403,7 +403,7 @@ class Lintable:
             if isinstance(child, ast.Assign):
                 label = child.targets[0]
                 if isinstance(label, ast.Name) and label.id == "EXAMPLES":
-                    self._line_offset = child.lineno
+                    self._line_offset = child.lineno - 1
                     break
 
         docs = read_docstring(str(self.path))
