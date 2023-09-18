@@ -7,7 +7,7 @@ In production environments, you should set `state` to `present` and specify a ta
 
 Setting `state` to `latest` not only installs software, it performs an update and installs additional packages.
 This can result in performance degradation or loss of service.
-If you do want to update packages to the latest version, you should also set the `update_only` parameter to `true` to avoid installing additional packages.
+If you do want to update packages to the latest version, you should also set the `update_only` or `only_upgrade` parameter to `true` based on package manager to avoid installing additional packages.
 
 ## Problematic Code
 
@@ -37,6 +37,12 @@ If you do want to update packages to the latest version, you should also set the
         name: sudo
         state: latest
         update_only: false # <- Updates and installs packages.
+
+    - name: Install Ansible with only_upgrade to false
+      ansible.builtin.apt:
+        name: sudo
+        state: latest
+        only_upgrade: false # <- Upgrades and installs packages
 ```
 
 ## Correct Code
@@ -68,4 +74,10 @@ If you do want to update packages to the latest version, you should also set the
         name: sudo
         state: latest
         update_only: true # <- Updates but does not install additional packages.
+
+    - name: Install Ansible with only_upgrade to false
+      ansible.builtin.apt:
+        name: sudo
+        state: latest
+        only_upgrade: true # <- Upgrades but does not install additional packages.
 ```
