@@ -274,7 +274,7 @@ def main(argv: list[str] | None = None) -> int:
 
         if Version(ruamel_safe_version) > Version(ruamel_yaml_version_str):
             _logger.warning(
-                "We detected use of `--write` feature with a buggy ruamel-yaml %s library instead of >=%s, upgrade it before reporting any bugs like dropped comments.",
+                "We detected use of `--fix` feature with a buggy ruamel-yaml %s library instead of >=%s, upgrade it before reporting any bugs like dropped comments.",
                 ruamel_yaml_version_str,
                 ruamel_safe_version,
             )

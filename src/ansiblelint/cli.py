@@ -145,7 +145,7 @@ class AbspathArgAction(argparse.Action):
 
 
 class WriteArgAction(argparse.Action):
-    """Argparse action to handle the --write flag with optional args."""
+    """Argparse action to handle the --fix flag with optional args."""
 
     _default = "__default__"
 
@@ -174,8 +174,8 @@ class WriteArgAction(argparse.Action):
         super().__init__(
             option_strings=option_strings,
             dest=dest,
-            nargs="?",  # either 0 (--write) or 1 (--write=a,b,c) argument
-            const=self._default,  # --write (no option) implicitly stores this
+            nargs="?",  # either 0 (--fix) or 1 (--fix=a,b,c) argument
+            const=self._default,  # --fix (no option) implicitly stores this
             default=default,
             type=type,
             choices=choices,
@@ -194,8 +194,8 @@ class WriteArgAction(argparse.Action):
         lintables = getattr(namespace, "lintables", None)
         if not lintables and isinstance(values, str):
             # args are processed in order.
-            # If --write is after lintables, then that is not ambiguous.
-            # But if --write comes first, then it might actually be a lintable.
+            # If --fix is after lintables, then that is not ambiguous.
+            # But if --fix comes first, then it might actually be a lintable.
             maybe_lintable = Path(values)
             if maybe_lintable.exists():
                 namespace.lintables = [values]
@@ -211,19 +211,19 @@ class WriteArgAction(argparse.Action):
         setattr(namespace, self.dest, values)
 
     @classmethod
-    def merge_write_list_config(
+    def merge_fix_list_config(
         cls,
         from_file: list[str],
         from_cli: list[str],
     ) -> list[str]:
-        """Combine the write_list from file config with --write CLI arg.
+        """Combine the write_list from file config with --fix CLI arg.
 
         Handles the implicit "all" when "__default__" is present and file config is empty.
         """
         if not from_file or "none" in from_cli:
-            # --write is the same as --write=all
+            # --fix is the same as --fix=all
             return ["all" if value == cls._default else value for value in from_cli]
-        # --write means use the config from the config file
+        # --fix means use the config from the config file
         from_cli = [value for value in from_cli if value != cls._default]
         return from_file + from_cli
 
@@ -338,7 +338,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Return non-zero exit code on warnings as well as errors",
     )
     parser.add_argument(
-        "--write",
+        "--fix",
         dest="write_list",
         # this is a tri-state argument that takes an optional comma separated list:
         action=WriteArgAction,
@@ -347,12 +347,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "A rule transform can fix or simplify fixing issues identified by that rule). "
         "You can limit the effective rule transforms (the 'write_list') by passing a "
         "keywords 'all' or 'none' or a comma separated list of rule ids or rule tags. "
-        "YAML reformatting happens whenever '--write' or '--write=' is used. "
-        "'--write' and '--write=all' are equivalent: they allow all transforms to run. "
+        "YAML reformatting happens whenever '--fix' or '--fix=' is used. "
+        "'--fix' and '--fix=all' are equivalent: they allow all transforms to run. "
         "The effective list of transforms comes from 'write_list' in the config file, "
-        "followed whatever '--write' args are provided on the commandline. "
-        "'--write=none' resets the list of transforms to allow reformatting YAML "
-        "without running any of the transforms (ie '--write=none,rule-id' will "
+        "followed whatever '--fix' args are provided on the commandline. "
+        "'--fix=none' resets the list of transforms to allow reformatting YAML "
+        "without running any of the transforms (ie '--fix=none,rule-id' will "
         "ignore write_list in the config file and only run the rule-id transform).",
     )
     parser.add_argument(
@@ -533,7 +533,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
     setattr(
         cli_config,
         entry,
-        WriteArgAction.merge_write_list_config(
+        WriteArgAction.merge_fix_list_config(
             from_file=file_config.pop(entry, []),
             from_cli=getattr(cli_config, entry, []) or [],
         ),
@@ -557,6 +557,13 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
 def get_config(arguments: list[str]) -> Options:
     """Extract the config based on given args."""
     parser = get_cli_parser()
+    # translate deprecated options
+    for i, value in enumerate(arguments):
+        if arguments[i].startswith("--write"):
+            arguments[i] = value.replace("--write", "--fix")
+            _logger.warning(
+                "Replaced deprecated '--write' option with '--fix', change you call to avoid future regressions when we remove old option.",
+            )
     options = Options(**vars(parser.parse_args(arguments)))
 
     # docs is not document, being used for internal documentation building
