@@ -68,34 +68,34 @@ def test_ensure_config_are_equal(
 @pytest.mark.parametrize(
     ("with_base", "args", "config"),
     (
-        (True, ["--write"], "test/fixtures/config-with-write-all.yml"),
-        (True, ["--write=all"], "test/fixtures/config-with-write-all.yml"),
-        (True, ["--write", "all"], "test/fixtures/config-with-write-all.yml"),
-        (True, ["--write=none"], "test/fixtures/config-with-write-none.yml"),
-        (True, ["--write", "none"], "test/fixtures/config-with-write-none.yml"),
+        (True, ["--fix"], "test/fixtures/config-with-write-all.yml"),
+        (True, ["--fix=all"], "test/fixtures/config-with-write-all.yml"),
+        (True, ["--fix", "all"], "test/fixtures/config-with-write-all.yml"),
+        (True, ["--fix=none"], "test/fixtures/config-with-write-none.yml"),
+        (True, ["--fix", "none"], "test/fixtures/config-with-write-none.yml"),
         (
             True,
-            ["--write=rule-tag,rule-id"],
+            ["--fix=rule-tag,rule-id"],
             "test/fixtures/config-with-write-subset.yml",
         ),
         (
             True,
-            ["--write", "rule-tag,rule-id"],
+            ["--fix", "rule-tag,rule-id"],
             "test/fixtures/config-with-write-subset.yml",
         ),
         (
             True,
-            ["--write", "rule-tag", "--write", "rule-id"],
+            ["--fix", "rule-tag", "--fix", "rule-id"],
             "test/fixtures/config-with-write-subset.yml",
         ),
         (
             False,
-            ["--write", "examples/playbooks/example.yml"],
+            ["--fix", "examples/playbooks/example.yml"],
             "test/fixtures/config-with-write-all.yml",
         ),
         (
             False,
-            ["--write", "examples/playbooks/example.yml", "non-existent.yml"],
+            ["--fix", "examples/playbooks/example.yml", "non-existent.yml"],
             "test/fixtures/config-with-write-all.yml",
         ),
     ),
@@ -106,7 +106,7 @@ def test_ensure_write_cli_does_not_consume_lintables(
     args: list[str],
     config: str,
 ) -> None:
-    """Check equality of the CLI --write options to config files."""
+    """Check equality of the CLI --fix options to config files."""
     cli_parser = cli.get_cli_parser()
 
     command = base_arguments + args if with_base else args
@@ -115,7 +115,7 @@ def test_ensure_write_cli_does_not_consume_lintables(
 
     file_value = file_config.get("write_list")
     orig_cli_value = options.write_list
-    cli_value = cli.WriteArgAction.merge_write_list_config(
+    cli_value = cli.WriteArgAction.merge_fix_list_config(
         from_file=[],
         from_cli=orig_cli_value,
     )
