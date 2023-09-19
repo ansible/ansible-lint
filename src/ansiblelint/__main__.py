@@ -350,15 +350,20 @@ def path_inject() -> None:
     inject_paths = []
 
     userbase_bin_path = Path(site.getuserbase()) / "bin"
+
     if (
         str(userbase_bin_path) not in paths
         and (userbase_bin_path / "bin" / "ansible").exists()
-        and "pipx" not in str(userbase_bin_path)
     ):
         inject_paths.append(str(userbase_bin_path))
 
     py_path = Path(sys.executable).parent
-    if str(py_path) not in paths and (py_path / "ansible").exists():
+    pipx_path = os.environ.get("PIPX_HOME", "pipx")
+    if (
+        str(py_path) not in paths
+        and (py_path / "ansible").exists()
+        and pipx_path not in str(py_path)
+    ):
         inject_paths.append(str(py_path))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
