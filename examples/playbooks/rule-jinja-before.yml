@@ -1,0 +1,9 @@
+---
+# https://github.com/ansible/ansible-lint/issues/3739
+- name: Reproducer bug 3739
+  hosts: all
+  tasks:
+    - name: Generate keypair
+      community.crypto.openssh_keypair:
+        path: "{{env.path}}"
+      when: ( env.path is not none )

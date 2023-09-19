@@ -19,3 +19,10 @@
         name: sudo
         state: latest
         update_only: false
+
+    - name: Install ansible with only_upgrade to false
+      ansible.builtin.apt:
+        name: sudo
+        state: latest
+        upgrade: true
+        only_upgrade: false

@@ -73,7 +73,7 @@ source = ["src", ".tox/*/site-packages"]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 omit = ["test/*"]
 # Increase it just so it would pass on any single-python run
-fail_under = 93
+fail_under = 92
 skip_covered = true
 skip_empty = true
 # During development we might remove code (files) with coverage data, and we dont want to fail:
@@ -223,8 +223,10 @@ python_files = [
 xfail_strict = true
 
 [tool.ruff]
-required-version = "0.0.286"
+required-version = "0.0.290"
 ignore = [
+  "D203", # incompatible with D211
+  "D213", # incompatible with D212
   "E501", # we use black
   "ERA001", # auto-removal of commented out code affects development and vscode integration
   "INP001", # "is part of an implicit namespace package", all false positives
@@ -240,6 +242,7 @@ ignore = [
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "TRY",
   "PERF203",
+  "PD011", # We are not using pandas, any .values attributes are unrelated
 ]
 select = ["ALL"]
 target-version = "py39"

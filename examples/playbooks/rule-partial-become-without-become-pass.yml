@@ -1,14 +1,16 @@
 ---
-- hosts: localhost
+- name: Test play
+  hosts: localhost
   become_user: root
   become: true
 
   tasks:
-    - ansible.builtin.debug:
+    - name: Debug
+      ansible.builtin.debug:
         msg: hello
 
-- hosts: localhost
-
+- name: Test play
+  hosts: localhost
   tasks:
     - name: Foo
       ansible.builtin.command: whoami
@@ -16,20 +18,22 @@
       become: true
       changed_when: false
 
-- hosts: localhost
-  become: true
+- name: Test play
+  hosts: localhost
 
   tasks:
     - name: Accepts a become from higher scope
       ansible.builtin.command: whoami
-      become_user: postgres
       changed_when: false
 
-- hosts: localhost
+- name: Test play
+  hosts: localhost
   become_user: postgres
+  become: true
 
   tasks:
     - name: Accepts a become from a lower scope
       ansible.builtin.command: whoami
       become: true
+      become_user: root
       changed_when: false

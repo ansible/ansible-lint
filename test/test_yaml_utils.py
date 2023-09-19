@@ -386,7 +386,7 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            10,
+            12,
             [1],
             id="4_play_playbook-first_line_in_play_2",
         ),
@@ -404,7 +404,7 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            19,
+            21,
             [2],
             id="4_play_playbook-first_line_in_play_3",
         ),
@@ -422,7 +422,7 @@ def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            28,
+            31,
             [3],
             id="4_play_playbook-first_line_in_play_4",
         ),
@@ -603,7 +603,7 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            7,
+            8,
             [0, "tasks", 0],
             id="4_play_playbook-play_1_first_line_task_1",
         ),
@@ -615,7 +615,7 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            10,
+            13,
             [],
             id="4_play_playbook-play_2_line_before_tasks",
         ),
@@ -627,7 +627,7 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            13,
+            15,
             [1, "tasks", 0],
             id="4_play_playbook-play_2_first_line_task_1",
         ),
@@ -645,7 +645,7 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            19,
+            23,
             [],
             id="4_play_playbook-play_3_line_before_tasks",
         ),
@@ -657,7 +657,7 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            23,
+            25,
             [2, "tasks", 0],
             id="4_play_playbook-play_3_first_line_task_1",
         ),
@@ -675,7 +675,7 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            28,
+            33,
             [],
             id="4_play_playbook-play_4_line_before_tasks",
         ),
@@ -687,13 +687,13 @@ def test_get_path_to_play(
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            32,
+            35,
             [3, "tasks", 0],
             id="4_play_playbook-play_4_first_line_task_1",
         ),
         pytest.param(
             "examples/playbooks/rule-partial-become-without-become-pass.yml",
-            33,
+            39,
             [3, "tasks", 0],
             id="4_play_playbook-play_4_middle_line_task_1",
         ),
