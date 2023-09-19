@@ -272,7 +272,8 @@ class VariableNamingRule(AnsibleLintRule):
         if str(file.kind) == "vars" and file.data:
             meta_data = parse_yaml_from_file(str(file.path))
             for key in meta_data:
-                match_error = self.get_var_naming_matcherror(key)
+                prefix = file.role if file.role else ""
+                match_error = self.get_var_naming_matcherror(key, prefix=prefix)
                 if match_error:
                     match_error.filename = filename
                     match_error.lineno = key.ansible_pos[1]
@@ -346,6 +347,18 @@ if "pytest" in sys.modules:
         for idx, result in enumerate(results):
             assert result.tag == expected_errors[idx][0]
             assert result.lineno == expected_errors[idx][1]
+
+    def test_var_naming_with_role_prefix(
+        default_rules_collection: RulesCollection,
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(
+            Lintable("examples/roles/role_vars_prefix_detection"),
+            rules=default_rules_collection,
+        ).run()
+        assert len(results) == 2
+        for result in results:
+            assert result.tag == "var-naming[no-role-prefix]"
 
     def test_var_naming_with_pattern() -> None:
         """Test rule matches."""

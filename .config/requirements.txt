@@ -5,12 +5,12 @@
 #    pip-compile --extra=docs --extra=test --no-annotate --output-file=.config/requirements.txt --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
 ansible-compat==4.1.10
-ansible-core==2.15.3
+ansible-core==2.15.4
 astroid==2.15.6
 attrs==23.1.0
 beautifulsoup4==4.12.2
-black==23.7.0
-bracex==2.3.post1
+black==23.9.1
+bracex==2.4
 cairocffi==1.5.1
 cairosvg==2.7.0
 certifi==2023.5.7
@@ -18,7 +18,7 @@ cffi==1.15.1
 charset-normalizer==3.1.0
 click==8.1.3
 colorama==0.4.6
-coverage==7.3.0
+coverage==7.3.1
 coverage-enable-subprocess==1.0
 cryptography==41.0.3
 csscompressor==0.9.5
@@ -27,7 +27,7 @@ defusedxml==0.7.1
 dill==0.3.7
 exceptiongroup==1.1.3
 execnet==2.0.2
-filelock==3.12.2
+filelock==3.12.4
 ghp-import==2.1.0
 griffe==0.29.0
 htmlmin2==0.1.13
@@ -64,7 +64,7 @@ mkdocstrings==0.22.0
 mkdocstrings-python==1.1.0
 mypy==1.5.1
 mypy-extensions==1.0.0
-netaddr==0.8.0
+netaddr==0.9.0
 packaging==23.1
 pathspec==0.11.2
 pillow==9.5.0
@@ -78,7 +78,7 @@ pygments==2.15.1
 pylint==2.17.5
 pymdown-extensions==10.0.1
 pyparsing==3.1.1
-pytest==7.4.0
+pytest==7.4.2
 pytest-mock==3.11.1
 pytest-plus==0.4.0
 pytest-xdist==3.3.1
@@ -90,8 +90,8 @@ rdflib==7.0.0
 referencing==0.30.2
 regex==2023.5.5
 requests==2.31.0
-rich==13.5.2
-rpds-py==0.10.0
+rich==13.5.3
+rpds-py==0.10.3
 ruamel-yaml==0.17.32
 six==1.16.0
 soupsieve==2.4.1
@@ -104,10 +104,10 @@ tomlkit==0.12.1
 types-jsonschema==4.17.0.10
 types-pyyaml==6.0.12.11
 typing-extensions==4.6.2
-uritools==4.0.1
+uritools==4.0.2
 urllib3==2.0.2
 watchdog==3.0.0
-wcmatch==8.4.1
+wcmatch==8.5
 webencodings==0.5.1
 wrapt==1.15.0
 xmltodict==0.13.0

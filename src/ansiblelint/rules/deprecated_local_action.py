@@ -3,17 +3,27 @@
 # Copyright (c) 2018, Ansible Project
 from __future__ import annotations
 
+import copy
+import logging
 import sys
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.runner import _get_matches
+from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
+
+
+_logger = logging.getLogger(__name__)
 
 
 class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
@@ -45,16 +55,31 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
         if match.tag == self.id:
-            target_task = self.seek(match.yaml_path, data)
+            # we do not want perform a partial modification accidentally
+            original_target_task = self.seek(match.yaml_path, data)
+            target_task = copy.deepcopy(original_target_task)
             for _ in range(len(target_task)):
                 k, v = target_task.popitem(False)
                 if k == "local_action":
-                    module_name = v["module"]
-                    target_task[module_name] = None
-                    target_task["delegate_to"] = "localhost"
+                    if isinstance(v, dict):
+                        module_name = v["module"]
+                        target_task[module_name] = None
+                        target_task["delegate_to"] = "localhost"
+                    elif isinstance(v, str):
+                        module_name, module_value = v.split(" ", 1)
+                        target_task[module_name] = module_value
+                        target_task["delegate_to"] = "localhost"
+                    else:
+                        _logger.debug(
+                            "Ignored unexpected data inside %s transform.",
+                            self.id,
+                        )
+                        return
                 else:
                     target_task[k] = v
         match.fixed = True
+        original_target_task.clear()
+        original_target_task.update(target_task)
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -71,3 +96,35 @@ if "pytest" in sys.modules:
 
         assert len(results) == 1
         assert results[0].tag == "deprecated-local-action"
+
+    def test_local_action_transform(
+        config_options: Options,
+        copy_examples_dir: tuple[Path, Path],
+        default_rules_collection: RulesCollection,
+    ) -> None:
+        """Test transform functionality for no-log-password rule."""
+        playbook: str = "examples/playbooks/tasks/local_action.yml"
+        config_options.write_list = ["all"]
+
+        config_options.lintables = [playbook]
+        runner_result = _get_matches(
+            rules=default_rules_collection,
+            options=config_options,
+        )
+        transformer = Transformer(result=runner_result, options=config_options)
+        transformer.run()
+
+        matches = runner_result.matches
+        assert len(matches) == 3
+
+        orig_dir, tmp_dir = copy_examples_dir
+        orig_playbook = orig_dir / playbook
+        expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
+        transformed_playbook = tmp_dir / playbook
+
+        orig_playbook_content = orig_playbook.read_text()
+        expected_playbook_content = expected_playbook.read_text()
+        transformed_playbook_content = transformed_playbook.read_text()
+
+        assert orig_playbook_content != transformed_playbook_content
+        assert transformed_playbook_content == expected_playbook_content

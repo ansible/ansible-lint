@@ -223,7 +223,7 @@ class App:
 
         if self.options.write_list and "yaml" in self.options.skip_list:
             _logger.warning(
-                "You specified '--write', but no files can be modified "
+                "You specified '--fix', but no files can be modified "
                 "because 'yaml' is in 'skip_list'.",
             )
 

@@ -26,6 +26,7 @@ from ansiblelint.yaml_utils import deannotate, nested_items_path
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
 
@@ -450,6 +451,8 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             ignored_keys=ignored_keys,
         ):
             if key == match.transform_meta.key and value == match.transform_meta.value:
+                if not path:
+                    continue
                 for pth in path[:-1]:
                     try:
                         obj = obj[pth]
@@ -479,7 +482,13 @@ if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+    from ansiblelint.runner import (
+        Runner,
+        _get_matches,
+    )
+
+    # pylint: disable=ungrouped-imports
+    from ansiblelint.transformer import Transformer  # pylint: disable=ungrouped-imports
 
     @pytest.fixture(name="error_expected_lines")
     def fixture_error_expected_lines() -> list[int]:
@@ -820,6 +829,38 @@ if "pytest" in sys.modules:
         success = "examples/playbooks/rule-jinja-pass.yml"
         errs = Runner(success, rules=collection).run()
         assert len(errs) == 0
+
+    def test_jinja_transform(
+        config_options: Options,
+        copy_examples_dir: tuple[Path, Path],
+        default_rules_collection: RulesCollection,
+    ) -> None:
+        """Test transform functionality for jinja rule."""
+        playbook: str = "examples/playbooks/rule-jinja-before.yml"
+        config_options.write_list = ["all"]
+
+        config_options.lintables = [playbook]
+        runner_result = _get_matches(
+            rules=default_rules_collection,
+            options=config_options,
+        )
+        transformer = Transformer(result=runner_result, options=config_options)
+        transformer.run()
+
+        matches = runner_result.matches
+        assert len(matches) == 2
+
+        orig_dir, tmp_dir = copy_examples_dir
+        orig_playbook = orig_dir / playbook
+        expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
+        transformed_playbook = tmp_dir / playbook
+
+        orig_playbook_content = orig_playbook.read_text()
+        expected_playbook_content = expected_playbook.read_text()
+        transformed_playbook_content = transformed_playbook.read_text()
+
+        assert orig_playbook_content != transformed_playbook_content
+        assert transformed_playbook_content == expected_playbook_content
 
 
 def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
