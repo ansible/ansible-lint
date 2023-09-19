@@ -216,16 +216,23 @@ class WriteArgAction(argparse.Action):
         from_file: list[str],
         from_cli: list[str],
     ) -> list[str]:
-        """Combine the write_list from file config with --fix CLI arg.
+        """Determine the write_list value based on cli vs config.
 
-        Handles the implicit "all" when "__default__" is present and file config is empty.
+        When --fix is not passed from command line the from_cli is an empty list,
+        so we use the file.
+
+        When from_cli is not an empty list, we ignore the from_file value.
         """
-        if not from_file or "none" in from_cli:
-            # --fix is the same as --fix=all
-            return ["all" if value == cls._default else value for value in from_cli]
-        # --fix means use the config from the config file
-        from_cli = [value for value in from_cli if value != cls._default]
-        return from_file + from_cli
+        arguments = from_file if from_cli == [cls._default] else from_cli
+        for magic_value in ("none", "all"):
+            if magic_value in arguments and len(arguments) > 1:
+                msg = f"When passing '{magic_value}' to '--fix', you cannot pass other values."
+                raise RuntimeError(
+                    msg,
+                )
+        if len(arguments) == 1 and arguments[0] == "none":
+            arguments = []
+        return arguments
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
@@ -342,18 +349,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="write_list",
         # this is a tri-state argument that takes an optional comma separated list:
         action=WriteArgAction,
-        help="Allow ansible-lint to reformat YAML files and run rule transforms "
-        "(Reformatting YAML files standardizes spacing, quotes, etc. "
-        "A rule transform can fix or simplify fixing issues identified by that rule). "
+        help="Allow ansible-lint to perform auto-fixes, including YAML reformatting. "
         "You can limit the effective rule transforms (the 'write_list') by passing a "
         "keywords 'all' or 'none' or a comma separated list of rule ids or rule tags. "
         "YAML reformatting happens whenever '--fix' or '--fix=' is used. "
         "'--fix' and '--fix=all' are equivalent: they allow all transforms to run. "
-        "The effective list of transforms comes from 'write_list' in the config file, "
-        "followed whatever '--fix' args are provided on the commandline. "
-        "'--fix=none' resets the list of transforms to allow reformatting YAML "
-        "without running any of the transforms (ie '--fix=none,rule-id' will "
-        "ignore write_list in the config file and only run the rule-id transform).",
+        "Presence of --fix in command overrides config file value.",
     )
     parser.add_argument(
         "--show-relpath",

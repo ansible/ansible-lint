@@ -503,6 +503,15 @@ class RulesCollection:
             [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)],
         )
 
+    def known_tags(self) -> list[str]:
+        """Return a list of known tags, without returning no sub-tags."""
+        tags = set()
+        for rule in self.rules:
+            tags.add(rule.id)
+            for tag in rule.tags:
+                tags.add(tag)
+        return sorted(tags)
+
     def list_tags(self) -> str:
         """Return a string with all the tags in the RulesCollection."""
         tag_desc = {
