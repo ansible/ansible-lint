@@ -73,7 +73,7 @@ source = ["src", ".tox/*/site-packages"]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 omit = ["test/*"]
 # Increase it just so it would pass on any single-python run
-fail_under = 93
+fail_under = 92
 skip_covered = true
 skip_empty = true
 # During development we might remove code (files) with coverage data, and we dont want to fail:

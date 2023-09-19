@@ -278,6 +278,16 @@ def main(argv: list[str] | None = None) -> int:
                 ruamel_yaml_version_str,
                 ruamel_safe_version,
             )
+        acceptable_tags = {"all", "none", *rules.known_tags()}
+        unknown_tags = set(options.write_list).difference(acceptable_tags)
+
+        if unknown_tags:
+            _logger.error(
+                "Found invalid value(s) (%s) for --fix arguments, must be one of: %s",
+                ", ".join(unknown_tags),
+                ", ".join(acceptable_tags),
+            )
+            sys.exit(RC.INVALID_CONFIG)
         _do_transform(result, options)
 
     mark_as_success = True
