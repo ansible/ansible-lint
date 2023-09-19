@@ -124,7 +124,7 @@ ansible-lint --offline -q -f codeclimate examples/playbooks/norole.yml
 ```
 
 Historically `-f json` was used to generate Code Climate JSON reports but in
-never versions we switched its meaning point SARIF JSON format instead.
+newer versions we switched its meaning point SARIF JSON format instead.
 
 !!! warning
 
