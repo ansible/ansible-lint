@@ -265,13 +265,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="List all the tags and the rules they cover. Increase the verbosity level "
         "with `-v` to include 'opt-in' tag and its rules.",
     )
-    listing_group.add_argument(
-        "-wr",
-        "--list-write-rules",
-        dest="list_write_rules",
-        action="store_true",
-        help="List all the rules that can use transform/write functionality",
-    )
     parser.add_argument(
         "-f",
         "--format",

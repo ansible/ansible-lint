@@ -6,7 +6,6 @@ import inspect
 import logging
 import re
 import sys
-from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, MutableMapping, MutableSequence
 from importlib import import_module
@@ -252,7 +251,7 @@ class AnsibleLintRule(BaseRule):
         return matches
 
 
-class TransformMixin(ABC):
+class TransformMixin:
     """A mixin for AnsibleLintRule to enable transforming files.
 
     If ansible-lint is started with the ``--fix`` option, then the ``Transformer``
@@ -261,7 +260,6 @@ class TransformMixin(ABC):
     a MatchError can do transforms to fix that match.
     """
 
-    @abstractmethod
     def transform(
         self,
         match: MatchError,
@@ -417,11 +415,7 @@ class RulesCollection:
 
         # When we have a profile we unload some of the rules
         # But we do include all rules when listing all rules or tags
-        if profile_name and not (
-            self.options.list_rules
-            or self.options.list_tags
-            or self.options.list_write_rules
-        ):
+        if profile_name and not (self.options.list_rules or self.options.list_tags):
             filter_rules_with_profile(self.rules, profile_name)
 
     def register(self, obj: AnsibleLintRule, *, conditional: bool = False) -> None:
@@ -555,29 +549,6 @@ class RulesCollection:
             for name in sorted(tags[tag]):
                 result += f"  - {name}\n"
         return result
-
-    def list_write_rules(self) -> str:
-        """Return all the rules covered under transform functionality."""
-        transformed_rules = []
-        rule_description = []
-        for rule in self.rules:
-            if issubclass(rule.__class__, TransformMixin):
-                transformed_rules.append(rule.id)
-                rule_description.append(rule.shortdesc)
-        result = "# List of rules covered under write mode\n\n"
-        rule_dict = dict(zip(transformed_rules, rule_description))
-        for key, value in rule_dict.items():
-            result += link(f"{RULE_DOC_URL}{key}/", key) + f": # {value}\n"
-        return result
-
-
-def link(uri: str, label: str) -> str:
-    """Generate the ANSI escape code for creating a hyperlinked label in a terminal."""
-    if label is None:
-        label = uri
-    parameters = ""
-    escape_mask = "\033[94m\033]8;{};{}\033\\{}\033]8;;\033\\\033[0m"
-    return escape_mask.format(parameters, uri, label)
 
 
 def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:

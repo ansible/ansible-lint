@@ -117,7 +117,6 @@ class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-me
     lintables: list[str] = field(default_factory=list)
     list_rules: bool = False
     list_tags: bool = False
-    list_write_rules: bool = False
     write_list: list[str] = field(default_factory=list)
     parseable: bool = False
     quiet: bool = False
