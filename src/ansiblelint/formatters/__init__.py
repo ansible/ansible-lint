@@ -275,8 +275,17 @@ class SarifFormatter(BaseFormatter[Any]):
         return rule
 
     def _to_sarif_result(self, match: MatchError) -> dict[str, Any]:
+        # https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/sarif-v2.1.0-errata01-os-complete.html#_Toc141790898
+        if match.level not in ("warning", "error", "note", "none"):
+            msg = "Unexpected failure to map '%s' level to SARIF."
+            raise RuntimeError(
+                msg,
+                match.level,
+            )
+
         result: dict[str, Any] = {
             "ruleId": match.tag,
+            "level": match.level,
             "message": {
                 "text": str(match.details)
                 if str(match.details)
