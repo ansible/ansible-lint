@@ -18,6 +18,13 @@ def test_list_rules_includes_opt_in_rules(project_path: Path) -> None:
     assert ("opt-in" in result_list_rules.stdout) is True
 
 
+def test_list_rules_includes_autofix() -> None:
+    """Checks that listing rules also includes the autofix label for applicable rules."""
+    result_list_rules = run_ansible_lint("--list-rules")
+
+    assert ("autofix" in result_list_rules.stdout) is True
+
+
 @pytest.mark.parametrize(
     ("result", "returncode", "format_string"),
     (
