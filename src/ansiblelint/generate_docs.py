@@ -9,7 +9,7 @@ from rich.table import Table
 
 from ansiblelint.config import PROFILES
 from ansiblelint.constants import RULE_DOC_URL
-from ansiblelint.rules import RulesCollection
+from ansiblelint.rules import RulesCollection, TransformMixin
 
 DOC_HEADER = """
 # Default Rules
@@ -27,6 +27,8 @@ def rules_as_str(rules: RulesCollection) -> RenderableType:
     """Return rules as string."""
     table = Table(show_header=False, header_style="title", box=box.SIMPLE)
     for rule in rules.alphabetical():
+        if issubclass(rule.__class__, TransformMixin):
+            rule.tags.insert(0, "autofix")
         tag = f"[dim] ({', '.join(rule.tags)})[/dim]" if rule.tags else ""
         table.add_row(
             f"[link={RULE_DOC_URL}{rule.id}/]{rule.id}[/link]",
