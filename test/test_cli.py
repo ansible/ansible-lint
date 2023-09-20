@@ -66,37 +66,77 @@ def test_ensure_config_are_equal(
 
 
 @pytest.mark.parametrize(
-    ("with_base", "args", "config"),
+    ("with_base", "args", "config", "expected"),
     (
-        (True, ["--write"], "test/fixtures/config-with-write-all.yml"),
-        (True, ["--write=all"], "test/fixtures/config-with-write-all.yml"),
-        (True, ["--write", "all"], "test/fixtures/config-with-write-all.yml"),
-        (True, ["--write=none"], "test/fixtures/config-with-write-none.yml"),
-        (True, ["--write", "none"], "test/fixtures/config-with-write-none.yml"),
-        (
+        pytest.param(
             True,
-            ["--write=rule-tag,rule-id"],
-            "test/fixtures/config-with-write-subset.yml",
-        ),
-        (
-            True,
-            ["--write", "rule-tag,rule-id"],
-            "test/fixtures/config-with-write-subset.yml",
-        ),
-        (
-            True,
-            ["--write", "rule-tag", "--write", "rule-id"],
-            "test/fixtures/config-with-write-subset.yml",
-        ),
-        (
-            False,
-            ["--write", "examples/playbooks/example.yml"],
+            ["--fix"],
             "test/fixtures/config-with-write-all.yml",
+            [],
+            id="1",
         ),
-        (
-            False,
-            ["--write", "examples/playbooks/example.yml", "non-existent.yml"],
+        pytest.param(
+            True,
+            ["--fix=all"],
             "test/fixtures/config-with-write-all.yml",
+            ["all"],
+            id="2",
+        ),
+        pytest.param(
+            True,
+            ["--fix", "all"],
+            "test/fixtures/config-with-write-all.yml",
+            ["all"],
+            id="3",
+        ),
+        pytest.param(
+            True,
+            ["--fix=none"],
+            "test/fixtures/config-with-write-none.yml",
+            [],
+            id="4",
+        ),
+        pytest.param(
+            True,
+            ["--fix", "none"],
+            "test/fixtures/config-with-write-none.yml",
+            [],
+            id="5",
+        ),
+        pytest.param(
+            True,
+            ["--fix=rule-tag,rule-id"],
+            "test/fixtures/config-with-write-subset.yml",
+            ["rule-tag", "rule-id"],
+            id="6",
+        ),
+        pytest.param(
+            True,
+            ["--fix", "rule-tag,rule-id"],
+            "test/fixtures/config-with-write-subset.yml",
+            ["rule-tag", "rule-id"],
+            id="7",
+        ),
+        pytest.param(
+            True,
+            ["--fix", "rule-tag", "--fix", "rule-id"],
+            "test/fixtures/config-with-write-subset.yml",
+            ["rule-tag", "rule-id"],
+            id="8",
+        ),
+        pytest.param(
+            False,
+            ["--fix", "examples/playbooks/example.yml"],
+            "test/fixtures/config-with-write-all.yml",
+            [],
+            id="9",
+        ),
+        pytest.param(
+            False,
+            ["--fix", "examples/playbooks/example.yml", "non-existent.yml"],
+            "test/fixtures/config-with-write-all.yml",
+            [],
+            id="10",
         ),
     ),
 )
@@ -105,21 +145,23 @@ def test_ensure_write_cli_does_not_consume_lintables(
     with_base: bool,
     args: list[str],
     config: str,
+    expected: list[str],
 ) -> None:
-    """Check equality of the CLI --write options to config files."""
+    """Check equality of the CLI --fix options to config files."""
     cli_parser = cli.get_cli_parser()
 
     command = base_arguments + args if with_base else args
     options = cli_parser.parse_args(command)
     file_config = cli.load_config(config)[0]
 
-    file_value = file_config.get("write_list")
+    file_config.get("write_list")
     orig_cli_value = options.write_list
-    cli_value = cli.WriteArgAction.merge_write_list_config(
+    cli_value = cli.WriteArgAction.merge_fix_list_config(
         from_file=[],
         from_cli=orig_cli_value,
     )
-    assert file_value == cli_value
+    # breakpoint()
+    assert cli_value == expected
 
 
 def test_config_can_be_overridden(base_arguments: list[str]) -> None:

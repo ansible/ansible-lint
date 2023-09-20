@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import multiprocessing
 import multiprocessing.pool
 import os
@@ -12,6 +13,7 @@ import tempfile
 import warnings
 from dataclasses import dataclass
 from fnmatch import fnmatch
+from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -250,7 +252,7 @@ class Runner:
         # pylint: disable=unused-variable
         global_resource = multiprocessing.Semaphore()  # noqa: F841
 
-        pool = multiprocessing.pool.ThreadPool(processes=multiprocessing.cpu_count())
+        pool = multiprocessing.pool.ThreadPool(processes=threads())
         return_list = pool.map(worker, files, chunksize=1)
         pool.close()
         pool.join()
@@ -532,6 +534,55 @@ class Runner:
             )
             return delegate_map[k](str(basedir), k, v, parent_type)
         return []
+
+
+@cache
+def threads() -> int:
+    """Determine how many threads to use.
+
+    Inside containers we want to respect limits imposed.
+
+    When present /sys/fs/cgroup/cpu.max can contain something like:
+    $ podman/docker run -it --rm --cpus 1.5 ubuntu:latest cat /sys/fs/cgroup/cpu.max
+    150000 100000
+    # "max 100000" is returned when no limits are set.
+
+    See: https://github.com/python/cpython/issues/80235
+    See: https://github.com/python/cpython/issues/70879
+    """
+    os_cpu_count = multiprocessing.cpu_count()
+    # Cgroup CPU bandwidth limit available in Linux since 2.6 kernel
+
+    cpu_max_fname = "/sys/fs/cgroup/cpu.max"
+    cfs_quota_fname = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
+    cfs_period_fname = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
+    if os.path.exists(cpu_max_fname):
+        # cgroup v2
+        # https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html
+        with open(cpu_max_fname, encoding="utf-8") as fh:
+            cpu_quota_us, cpu_period_us = fh.read().strip().split()
+    elif os.path.exists(cfs_quota_fname) and os.path.exists(cfs_period_fname):
+        # cgroup v1
+        # https://www.kernel.org/doc/html/latest/scheduler/sched-bwc.html#management
+        with open(cfs_quota_fname, encoding="utf-8") as fh:
+            cpu_quota_us = fh.read().strip()
+        with open(cfs_period_fname, encoding="utf-8") as fh:
+            cpu_period_us = fh.read().strip()
+    else:
+        # No Cgroup CPU bandwidth limit (e.g. non-Linux platform)
+        cpu_quota_us = "max"
+        cpu_period_us = "100000"  # unused, for consistency with default values
+
+    if cpu_quota_us == "max":
+        # No active Cgroup quota on a Cgroup-capable platform
+        return os_cpu_count
+    cpu_quota_us_int = int(cpu_quota_us)
+    cpu_period_us_int = int(cpu_period_us)
+    if cpu_quota_us_int > 0 and cpu_period_us_int > 0:
+        return math.ceil(cpu_quota_us_int / cpu_period_us_int)
+    # Setting a negative cpu_quota_us value is a valid way to disable
+    # cgroup CPU bandwidth limits
+    return os_cpu_count
 
 
 def _get_matches(rules: RulesCollection, options: Options) -> LintResult:

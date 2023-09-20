@@ -1,0 +1,3 @@
+---
+- name: Sample
+  local_action: command echo 123

@@ -1,0 +1,4 @@
+---
+- name: Sample
+  ansible.builtin.command: echo 123
+  delegate_to: localhost

@@ -198,7 +198,7 @@ def _do_transform(result: LintResult, opts: Options) -> None:
 
 def support_banner() -> None:
     """Display support banner when running on unsupported platform."""
-    if sys.version_info < (3, 9, 0):  # pragma: no cover
+    if sys.version_info < (3, 9, 0):  # pragma: no cover # noqa: UP036
         prefix = "::warning::" if "GITHUB_ACTION" in os.environ else "WARNING: "
         console_stderr.print(
             f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will soon require 3.9. Do not report bugs for this version.",
@@ -278,10 +278,20 @@ def main(argv: list[str] | None = None) -> int:
 
         if Version(ruamel_safe_version) > Version(ruamel_yaml_version_str):
             _logger.warning(
-                "We detected use of `--write` feature with a buggy ruamel-yaml %s library instead of >=%s, upgrade it before reporting any bugs like dropped comments.",
+                "We detected use of `--fix` feature with a buggy ruamel-yaml %s library instead of >=%s, upgrade it before reporting any bugs like dropped comments.",
                 ruamel_yaml_version_str,
                 ruamel_safe_version,
             )
+        acceptable_tags = {"all", "none", *rules.known_tags()}
+        unknown_tags = set(options.write_list).difference(acceptable_tags)
+
+        if unknown_tags:
+            _logger.error(
+                "Found invalid value(s) (%s) for --fix arguments, must be one of: %s",
+                ", ".join(unknown_tags),
+                ", ".join(acceptable_tags),
+            )
+            sys.exit(RC.INVALID_CONFIG)
         _do_transform(result, options)
 
     mark_as_success = True
@@ -354,15 +364,20 @@ def path_inject() -> None:
     inject_paths = []
 
     userbase_bin_path = Path(site.getuserbase()) / "bin"
+
     if (
         str(userbase_bin_path) not in paths
         and (userbase_bin_path / "bin" / "ansible").exists()
-        and "pipx" not in str(userbase_bin_path)
     ):
         inject_paths.append(str(userbase_bin_path))
 
     py_path = Path(sys.executable).parent
-    if str(py_path) not in paths and (py_path / "ansible").exists():
+    pipx_path = os.environ.get("PIPX_HOME", "pipx")
+    if (
+        str(py_path) not in paths
+        and (py_path / "ansible").exists()
+        and pipx_path not in str(py_path)
+    ):
         inject_paths.append(str(py_path))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
