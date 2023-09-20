@@ -74,11 +74,16 @@ class TestSarifFormatter:
         with pytest.raises(RuntimeError):
             self.formatter.format_result(self.matches[0])  # type: ignore[arg-type]
 
-    def test_result_is_list(self) -> None:
-        """Test if the return SARIF object contains the results with length of 2."""
+    def test_sarif_format(self) -> None:
+        """Test if the return SARIF object contains the expected results."""
         assert isinstance(self.formatter, SarifFormatter)
         sarif = json.loads(self.formatter.format_result(self.matches))
         assert len(sarif["runs"][0]["results"]) == 2
+        for result in sarif["runs"][0]["results"]:
+            # Ensure all reported entries have a level
+            assert "level" in result
+            # Ensure reported levels are either error or warning
+            assert result["level"] in ("error", "warning")
 
     def test_validate_sarif_schema(self) -> None:
         """Test if the returned JSON is a valid SARIF report."""
