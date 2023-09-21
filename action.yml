@@ -26,9 +26,9 @@ runs:
     - name: Generate .git/ansible-lint-requirements.txt
       shell: bash
       env:
-        GH_ACTION_REF: ${{ github.action_ref }}
+        GH_ACTION_REF: ${{ github.action_ref || 'main' }}
       run: |
-        wget --output-file=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ $GH_ACTION_REF || 'main' }}/.config/requirements-lock.txt
+        wget "--output-file=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt"
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -40,14 +40,14 @@ runs:
     - name: Install ansible-lint
       shell: bash
       env:
-        GH_ACTION_REF: ${{ github.action_ref }}
+        GH_ACTION_REF: ${{ github.action_ref || 'main' }}
       # We need to set the version manually because $GITHUB_ACTION_PATH is not
       # a git clone and setuptools-scm would not be able to determine the version.
       # git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}
       # SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }}
       run: |
         cd $GITHUB_ACTION_PATH
-        pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@${{ $GH_ACTION_REF || 'main' }}"
+        pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
         ansible-lint --version
 
     - name: Run ansible-lint
