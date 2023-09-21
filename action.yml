@@ -28,7 +28,7 @@ runs:
       env:
         GH_ACTION_REF: ${{ github.action_ref || 'main' }}
       run: |
-        wget "--output-file=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt"
+        wget --output-file=.git/ansible-lint-requirements.txt "https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt"
 
     - name: Set up Python
       uses: actions/setup-python@v4
