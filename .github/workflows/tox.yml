@@ -41,11 +41,9 @@ jobs:
           platforms: linux,macos
   test-action:
     runs-on: ubuntu-latest
-    env:
-      GH_ACTION_REF: ${{ github.action_ref }}
     steps:
       - uses: actions/checkout@v4
-      - name: Self test for ansible-lint@${{ $GH_ACTION_REF || 'main' }}
+      - name: Self test for ansible-lint@${{ github.action_ref || 'main' }}
         uses: ./
         with:
           # basically we only lint linter own configuration, which should be passing.
