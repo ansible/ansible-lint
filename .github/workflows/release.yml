@@ -69,7 +69,7 @@ jobs:
           submodules: true
 
       - name: Bump homebrew formula
-        uses: mislav/bump-homebrew-formula-action@v2.3
+        uses: mislav/bump-homebrew-formula-action@v3.0
         with:
           # A PR will be sent to github.com/Homebrew/homebrew-core to update this formula:
           formula-name: ansible-lint
