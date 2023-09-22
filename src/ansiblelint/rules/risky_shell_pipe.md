@@ -30,10 +30,14 @@ As this requirement does not apply to PowerShell, for shell commands that have
   become: false
   tasks:
     - name: Pipeline with pipefail
-      ansible.builtin.shell: set -o pipefail && false | cat
+      ansible.builtin.shell:
+        cmd: set -o pipefail && false | cat
+        executable: /bin/bash
 
     - name: Pipeline with pipefail, multi-line
-      ansible.builtin.shell: |
-        set -o pipefail # <-- adding this will prevent surprises
-        false | cat
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail # <-- adding this will prevent surprises
+          false | cat
+        executable: /bin/bash
 ```

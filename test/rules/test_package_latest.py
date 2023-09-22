@@ -20,4 +20,4 @@ def test_package_not_latest_negative() -> None:
     failure = "examples/playbooks/package-check-failure.yml"
     bad_runner = Runner(failure, rules=collection)
     errs = bad_runner.run()
-    assert len(errs) == 4
+    assert len(errs) == 5

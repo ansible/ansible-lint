@@ -22,7 +22,8 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
     id = "meta-runtime"
     description = (
         "The ``requires_ansible`` key in runtime.yml must specify "
-        "a supported platform version of ansible-core and be a valid version."
+        "a supported platform version of ansible-core and be a valid version value "
+        "in x.y.z format."
     )
     severity = "VERY_HIGH"
     tags = ["metadata"]
@@ -30,9 +31,9 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
 
     # Refer to https://access.redhat.com/support/policy/updates/ansible-automation-platform
     # Also add devel to this list
-    supported_ansible = ["2.9.10", "2.11.", "2.12.", "2.13.", "2.14.", "2.15.", "2.16."]
+    supported_ansible = ["2.13.", "2.14.", "2.15."]
     _ids = {
-        "meta-runtime[unsupported-version]": "requires_ansible key must be set to a supported version.",
+        "meta-runtime[unsupported-version]": "'requires_ansible' key must be set to a supported version - 2.13.x, 2.14.x, 2.15.x",
         "meta-runtime[invalid-version]": "'requires_ansible' is not a valid requirement specification",
     }
 
