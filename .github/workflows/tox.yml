@@ -50,6 +50,7 @@ jobs:
           args: .ansible-lint
   build:
     name: ${{ matrix.name }}
+    environment: test
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs:
       - pre
