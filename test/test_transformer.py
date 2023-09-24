@@ -111,6 +111,12 @@ def fixture_runner_result(
             id="key_order_transform",
         ),
         pytest.param(
+            "examples/playbooks/transform-no-free-form.yml",
+            2,
+            True,
+            id="no_free_form_transform",
+        ),
+        pytest.param(
             "examples/playbooks/transform-partial-become.yml",
             4,
             True,

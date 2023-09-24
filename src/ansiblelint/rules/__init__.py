@@ -254,7 +254,7 @@ class AnsibleLintRule(BaseRule):
 class TransformMixin:
     """A mixin for AnsibleLintRule to enable transforming files.
 
-    If ansible-lint is started with the ``--write`` option, then the ``Transformer``
+    If ansible-lint is started with the ``--fix`` option, then the ``Transformer``
     will call the ``transform()`` method for every MatchError identified if the rule
     that identified it subclasses this ``TransformMixin``. Only the rule that identified
     a MatchError can do transforms to fix that match.
@@ -502,6 +502,15 @@ class RulesCollection:
         return "\n".join(
             [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)],
         )
+
+    def known_tags(self) -> list[str]:
+        """Return a list of known tags, without returning no sub-tags."""
+        tags = set()
+        for rule in self.rules:
+            tags.add(rule.id)
+            for tag in rule.tags:
+                tags.add(tag)
+        return sorted(tags)
 
     def list_tags(self) -> str:
         """Return a string with all the tags in the RulesCollection."""

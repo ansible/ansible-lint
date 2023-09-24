@@ -1,20 +1,24 @@
 """Implementation of NoFreeFormRule."""
 from __future__ import annotations
 
+import functools
 import re
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import INCLUSION_ACTION_NAMES, LINE_NUMBER_KEY
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.rules.key_order import task_property_sorter
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
 
-class NoFreeFormRule(AnsibleLintRule):
+class NoFreeFormRule(AnsibleLintRule, TransformMixin):
     """Rule for detecting discouraged free-form syntax for action modules."""
 
     id = "no-free-form"
@@ -88,6 +92,73 @@ class NoFreeFormRule(AnsibleLintRule):
                     ),
                 )
         return results
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        if "no-free-form" in match.tag:
+            task = self.seek(match.yaml_path, data)
+
+            def filter_values(
+                val: str,
+                filter_key: str,
+                filter_dict: dict[str, Any],
+            ) -> bool:
+                """Return True if module option is not present in the string."""
+                if filter_key not in val:
+                    return True
+
+                [k, v] = val.split("=")
+                filter_dict[k] = v
+                return False
+
+            if match.tag == "no-free-form":
+                module_opts: dict[str, Any] = {}
+                for _ in range(len(task)):
+                    k, v = task.popitem(False)
+                    # identify module as key and process its value
+                    if len(k.split(".")) == 3 and isinstance(v, str):
+                        # Filter the module options and command
+                        module_opts["cmd"] = " ".join(
+                            [
+                                item
+                                for item in v.split(" ")
+                                if filter_values(item, "=", module_opts)
+                            ],
+                        )
+
+                        sorted_module_opts = {}
+                        for key in sorted(
+                            module_opts.keys(),
+                            key=functools.cmp_to_key(task_property_sorter),
+                        ):
+                            sorted_module_opts[key] = module_opts[key]
+
+                        task[k] = sorted_module_opts
+                    else:
+                        task[k] = v
+
+                match.fixed = True
+            elif match.tag == "no-free-form[raw]":
+                exec_key_val: dict[str, Any] = {}
+                for _ in range(len(task)):
+                    k, v = task.popitem(False)
+                    if isinstance(v, str) and "executable" in v:
+                        # Filter the executable and other parts from the string
+                        task[k] = " ".join(
+                            [
+                                item
+                                for item in v.split(" ")
+                                if filter_values(item, "executable=", exec_key_val)
+                            ],
+                        )
+                        task["args"] = exec_key_val
+                    else:
+                        task[k] = v
+                match.fixed = True
 
 
 if "pytest" in sys.modules:
