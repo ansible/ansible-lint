@@ -22,7 +22,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -91,11 +91,23 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
+        """Move the task to 'handler'.
+
+        Also, adds 'notify' to the task which
+        wants to run the handler.
+        """
         if match.tag == self.id and isinstance(data, CommentedSeq):
-            is_fixed = False
+            is_fixed: bool = False
             task_name = None
+            when_val = None
             if isinstance(match.task, Task):
-                task_name = match.task.get("name")
+                task_name = str(match.task.get("name"))
+                when = match.task.get("when")
+                # looks for the variable used as the value of when clause
+                if isinstance(when, list) and len(when) <= 1:
+                    when_val = when[0].split(".")[0]
+                elif isinstance(when, str):
+                    when_val = when.split(".")[0]
 
             for item in data:
                 # Item is a play
@@ -103,6 +115,25 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule, TransformMixin):
                 if "handlers" not in item:
                     item["handlers"] = CommentedSeq()
                 for k, v in enumerate(item.get("tasks")):
+                    # As there can be more than one tasks
+                    # Check if 'register' is in task
+                    # and if it's value is same as that of the
+                    # 'when' clause of the task (which is to be moved to the handler).
+
+                    # Need to fix scenario mentioned by Brad
+                    if "register" in v and v["register"] == when_val:
+                        # Add notify to the task
+                        if "notify" not in v:
+                            notify_seq = CommentedSeq()
+
+                        # if value of notify is a string
+                        elif not isinstance(v["notify"], CommentedSeq):
+                            old_val = v["notify"]
+                            notify_seq = CommentedSeq()
+                            notify_seq.append(old_val)
+                        notify_seq.append(task_name)
+                        v.insert(len(v), "notify", notify_seq)
+
                     if v["name"] == task_name:
                         item["handlers"].append(item.get("tasks").pop(k))
                         is_fixed = True

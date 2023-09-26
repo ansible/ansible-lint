@@ -9,6 +9,8 @@
         mode: "0600"
       register: result # <-- we register the result of the task
 
+      notify:
+        - Second command to run
   handlers:
     - name: Second command to run
       ansible.builtin.debug:
