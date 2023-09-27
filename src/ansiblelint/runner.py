@@ -617,7 +617,7 @@ def get_matches(rules: RulesCollection, options: Options) -> LintResult:
         verbosity=options.verbosity,
         checked_files=checked_files,
         project_dir=options.project_dir,
-        _skip_ansible_syntax_check=options._skip_ansible_syntax_check,  # pylint: disable=protected-access
+        _skip_ansible_syntax_check=options._skip_ansible_syntax_check,  # noqa: SLF001
     )
     matches.extend(runner.run())
 

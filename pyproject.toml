@@ -145,6 +145,7 @@ max-statements = 60
 disable = [
   # Disabled on purpose:
   "line-too-long", # covered by black
+  "protected-access", # covered by ruff SLF001
   "too-many-branches", # covered by ruff C901
   # TODO(ssbarnea): remove temporary skips adding during initial adoption:
   "duplicate-code",
@@ -153,9 +154,7 @@ disable = [
   "cyclic-import",
   # https://github.com/PyCQA/pylint/issues/8453
   "preferred-module",
-  "disable-protected-access", # covered by ruff SLF001
 ]
-enable = ["useless-suppression"]
 
 [tool.pylint.TYPECHECK]
 # pylint is unable to detect Namespace attributes and will throw a E1101

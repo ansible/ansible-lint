@@ -18,6 +18,7 @@ from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import RuleMatchTransformMeta
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.text import has_jinja
 from ansiblelint.utils import parse_yaml_from_file, template

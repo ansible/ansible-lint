@@ -257,7 +257,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
         _logger.debug("Rerunning: %s", match)
         runtime_options.tags = [match.rule.id]
         runtime_options.lintables = [match.filename]
-        runtime_options._skip_ansible_syntax_check = True # noqa: SLF001
+        runtime_options._skip_ansible_syntax_check = True  # noqa: SLF001
         new_results = get_matches(rules, runtime_options)
         if not new_results.matches:
             _logger.debug("Newly resolved: %s", match)
