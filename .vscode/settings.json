@@ -46,8 +46,6 @@
         "editor.codeActionsOnSave": {
             "source.organizeImports": true,
             "source.fixAll": true
-        }
-    },
-    "ansible.python.interpreterPath": "/home/bthornto/github/ansible-lint/venv/bin/python",
-    "ansible.validation.lint.arguments": "--fix=all"
+          }
+    }
 }
