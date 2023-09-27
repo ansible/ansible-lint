@@ -230,6 +230,7 @@ def test_pruned_err_after_fix(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
     monkeypatch.setattr("sys.argv", ["ansible-lint", str(dest), "--fix=all"])
 
     fix_called = False
+    orig_fix = main.fix
 
     def test_fix(
         runtime_options: Options,
@@ -245,7 +246,7 @@ def test_pruned_err_after_fix(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
         nonlocal fix_called
         fix_called = True
         assert len(result.matches) == 7
-        main.fix(runtime_options, result, rules)
+        orig_fix(runtime_options, result, rules)
 
     report_called = False
 
