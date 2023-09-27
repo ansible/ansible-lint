@@ -482,10 +482,7 @@ if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import (
-        Runner,
-        _get_matches,
-    )
+    from ansiblelint.runner import Runner
 
     # pylint: disable=ungrouped-imports
     from ansiblelint.transformer import Transformer  # pylint: disable=ungrouped-imports
@@ -840,7 +837,7 @@ if "pytest" in sys.modules:
         config_options.write_list = ["all"]
 
         config_options.lintables = [playbook]
-        runner_result = _get_matches(
+        runner_result = get_matches(
             rules=default_rules_collection,
             options=config_options,
         )

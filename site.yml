@@ -1,0 +1,24 @@
+---
+- name: Do this and that
+  hosts: localhost
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Create a new user
+      ansible.builtin.user:
+        name: "{{ user_name | foo | bar | this | that }}"
+        password: "{{ user_password }}"
+        shell: /bin/bash
+        groups: sudo
+        append: true
+        state: present
+
+    - name: Add SSH key to the new user
+      ansible.builtin.copy:
+        content: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        dest: /home/{{ user_name }}/.ssh/authorized_keys
+        owner: "{{ user_name }}"
+        group: "{{ user_name }}"
+        mode: "0600"
+      become: true
+      become_user: "{{ user_name }}"

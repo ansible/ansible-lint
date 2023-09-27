@@ -153,7 +153,9 @@ disable = [
   "cyclic-import",
   # https://github.com/PyCQA/pylint/issues/8453
   "preferred-module",
+  "disable-protected-access", # covered by ruff SLF001
 ]
+enable = ["useless-suppression"]
 
 [tool.pylint.TYPECHECK]
 # pylint is unable to detect Namespace attributes and will throw a E1101

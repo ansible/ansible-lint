@@ -9,7 +9,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.runner import _get_matches
+from ansiblelint.runner import get_matches
 from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
@@ -107,7 +107,7 @@ if "pytest" in sys.modules:
         config_options.write_list = ["all"]
 
         config_options.lintables = [playbook]
-        runner_result = _get_matches(
+        runner_result = get_matches(
             rules=default_rules_collection,
             options=config_options,
         )

@@ -44,8 +44,8 @@ class Transformer:
         self.matches_per_file: dict[Lintable, list[MatchError]] = {
             file: [] for file in result.files
         }
-
-        for match in self.matches:
+        not_ignored = [match for match in self.matches if not match.ignored]
+        for match in not_ignored:
             try:
                 lintable = lintables[match.filename]
             except KeyError:
