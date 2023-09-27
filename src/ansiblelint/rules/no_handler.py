@@ -85,6 +85,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule, TransformMixin):
             result = _changed_in_when(when)
         return result
 
+    # pylint: disable=too-many-nested-blocks,too-many-locals
     def transform(
         self,
         match: MatchError,
@@ -132,19 +133,20 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule, TransformMixin):
                             notify_seq = CommentedSeq()
                             notify_seq.append(old_val)
                         notify_seq.append(task_name)
+                        v.insert(len(v), "notify", notify_seq)
 
                         res = clean_comment(v.ca.items)
                         for key, value in res.items():
                             if not value.get("val", None):
                                 v.ca.items.pop(key)
                             elif value.get("move"):
+                                v.ca.items.pop(key)
                                 item.get("tasks").yaml_set_comment_before_after_key(
-                                    k + 1, value.get("val")
+                                    k + 1,
+                                    value.get("val"),
                                 )
                             else:
                                 v.ca.items[key][2].value = value.get("val", None)
-
-                        v.insert(len(v), "notify", notify_seq)
 
                     if v["name"] == task_name:
                         item["handlers"].append(item.get("tasks").pop(k))
