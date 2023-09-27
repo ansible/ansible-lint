@@ -53,6 +53,7 @@ nav:
       - usage.md
       - configuring.md
       - profiles.md
+      - autofix.md
   - Rules:
       - index: rules/index.md
       - rules/args.md
