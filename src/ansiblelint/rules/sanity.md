@@ -1,10 +1,10 @@
 # sanity
 
 This rule checks the `tests/sanity/ignore-x.x.txt` file for disallowed ignores.
-This rule is extremely opinionated and enforced by Partner Engineering. The
+This rule is extremely opinionated and enforced by Partner Engineering as a requirement for Red Hat Certification. The
 currently allowed ruleset is subject to change, but is starting at a minimal
 number of allowed ignores for maximum test enforcement. Any commented-out ignore
-entries are not evaluated.
+entries are not evaluated, and ignore files for unsupported versions of ansible-core are not evaluated.
 
 This rule can produce messages like:
 
@@ -29,10 +29,9 @@ Currently allowed ignores for all Ansible versions are:
 - `compile-2.7!skip`
 - `compile-3.5`
 - `compile-3.5!skip`
-
-Additionally allowed ignores for Ansible 2.9 are:
-- `validate-modules:deprecation-mismatch`
-- `validate-modules:invalid-documentation`
+- `shellcheck`
+- `shebang`
+- `pylint:used-before-assignment`
 
 ## Problematic code
 
