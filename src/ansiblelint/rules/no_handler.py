@@ -132,6 +132,18 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule, TransformMixin):
                             notify_seq = CommentedSeq()
                             notify_seq.append(old_val)
                         notify_seq.append(task_name)
+
+                        res = clean_comment(v.ca.items)
+                        for key, value in res.items():
+                            if not value.get("val", None):
+                                v.ca.items.pop(key)
+                            elif value.get("move"):
+                                item.get("tasks").yaml_set_comment_before_after_key(
+                                    k + 1, value.get("val")
+                                )
+                            else:
+                                v.ca.items[key][2].value = value.get("val", None)
+
                         v.insert(len(v), "notify", notify_seq)
 
                     if v["name"] == task_name:
@@ -140,6 +152,32 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule, TransformMixin):
 
             if is_fixed:
                 match.fixed = True
+
+
+def clean_comment(comments: dict[str, Any]) -> dict[str, Any]:
+    r"""Clean comments and return values without \n."""
+    res = {}
+    for key, comment in comments.items():
+        move_comment_to_next_task = False
+        # Check if comment is on a new line
+        if "\n\n" in comment[2].value[0:2]:
+            move_comment_to_next_task = True
+
+        before, _, after = comment[2].value.partition("\n")
+
+        if move_comment_to_next_task and after:
+            after = after.strip()
+            res[key] = {
+                "val": after if after else None,
+                "move": move_comment_to_next_task,
+            }
+        if before:
+            before = before.strip()
+            res[key] = {
+                "val": before if before else None,
+                "move": move_comment_to_next_task,
+            }
+    return res
 
 
 if "pytest" in sys.modules:
