@@ -10,7 +10,12 @@ from ansible.parsing.yaml.objects import AnsibleUnicode
 from ansible.vars.reserved import get_reserved_names
 
 from ansiblelint.config import options
-from ansiblelint.constants import ANNOTATION_KEYS, LINE_NUMBER_KEY, RC
+from ansiblelint.constants import (
+    ANNOTATION_KEYS,
+    LINE_NUMBER_KEY,
+    PLAYBOOK_ROLE_KEYWORDS,
+    RC,
+)
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
@@ -193,6 +198,37 @@ class VariableNamingRule(AnsibleLintRule):
                     else our_vars[LINE_NUMBER_KEY]
                 )
                 raw_results.append(match_error)
+        roles = data.get("roles", [])
+        for role in roles:
+            if isinstance(role, AnsibleUnicode):
+                continue
+            role_fqcn = role.get("role", role.get("name"))
+            prefix = role_fqcn.split("/" if "/" in role_fqcn else ".")[-1]
+            for key in list(role.keys()):
+                if key not in PLAYBOOK_ROLE_KEYWORDS:
+                    match_error = self.get_var_naming_matcherror(key, prefix=prefix)
+                    if match_error:
+                        match_error.filename = str(file.path)
+                        match_error.message += f" (vars: {key})"
+                        match_error.lineno = (
+                            key.ansible_pos[1]
+                            if isinstance(key, AnsibleUnicode)
+                            else role[LINE_NUMBER_KEY]
+                        )
+                        raw_results.append(match_error)
+
+            our_vars = role.get("vars", {})
+            for key in our_vars:
+                match_error = self.get_var_naming_matcherror(key, prefix=prefix)
+                if match_error:
+                    match_error.filename = str(file.path)
+                    match_error.message += f" (vars: {key})"
+                    match_error.lineno = (
+                        key.ansible_pos[1]
+                        if isinstance(key, AnsibleUnicode)
+                        else our_vars[LINE_NUMBER_KEY]
+                    )
+                    raw_results.append(match_error)
         if raw_results:
             lines = file.content.splitlines()
             for match in raw_results:
@@ -359,6 +395,28 @@ if "pytest" in sys.modules:
         assert len(results) == 2
         for result in results:
             assert result.tag == "var-naming[no-role-prefix]"
+
+    def test_var_naming_with_role_prefix_plays(
+        default_rules_collection: RulesCollection,
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(
+            Lintable("examples/playbooks/role_vars_prefix_detection.yml"),
+            rules=default_rules_collection,
+            exclude_paths=["examples/roles/role_vars_prefix_detection"],
+        ).run()
+        expected_errors = (
+            ("var-naming[no-role-prefix]", 9),
+            ("var-naming[no-role-prefix]", 12),
+            ("var-naming[no-role-prefix]", 15),
+            ("var-naming[no-role-prefix]", 25),
+            ("var-naming[no-role-prefix]", 32),
+            ("var-naming[no-role-prefix]", 45),
+        )
+        assert len(results) == len(expected_errors)
+        for idx, result in enumerate(results):
+            assert result.tag == expected_errors[idx][0]
+            assert result.lineno == expected_errors[idx][1]
 
     def test_var_naming_with_pattern() -> None:
         """Test rule matches."""

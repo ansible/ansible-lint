@@ -67,22 +67,10 @@ jobs:
       # proof that we failed to catch a bug by not running it. Using
       # distribution should be preferred instead of custom builds.
     env:
-      # vars safe to be passed to wsl:
-      WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:GITHUB_STEP_SUMMARY
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
       PYTEST_REQPASS: 828
     steps:
-      - name: Activate WSL1
-        if: "contains(matrix.shell, 'wsl')"
-        uses: Vampire/setup-wsl@v2
-
-      - name: MacOS workaround for https://github.com/actions/virtual-environments/issues/1187
-        if: ${{ matrix.os == 'macOS-latest' }}
-        run: |
-          sudo sysctl -w net.link.generic.system.hwcksum_tx=0
-          sudo sysctl -w net.link.generic.system.hwcksum_rx=0
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # needed by setuptools-scm
