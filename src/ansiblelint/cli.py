@@ -510,6 +510,10 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         for entry, default in lists_map.items():
             if not getattr(cli_config, entry, None):
                 setattr(cli_config, entry, default)
+        if cli_config.write_list is None:
+            cli_config.write_list = []
+        elif cli_config.write_list == [WriteArgAction._default]:  # noqa: SLF001
+            cli_config.write_list = ["all"]
         return cli_config
 
     for entry in bools:
