@@ -29,6 +29,9 @@
     - name: Bug https://github.com/ansible/ansible-lint/issues/3048
       ansible.builtin.set_fact:
         x: "{{ y.json | community.general.json_query(edition.version) }}"
+    - name: Bug https://github.com/ansible/ansible-lint/issues/3769
+      ansible.builtin.debug:
+        msg: "{{ 65534 | ansible.builtin.random(seed=inventory_hostname) }}"
 
 # https://github.com/ansible/ansible-lint/issues/2697
 - name: Test linter

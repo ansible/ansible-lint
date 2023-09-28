@@ -1,6 +1,7 @@
 """Implementation of sanity rule."""
 from __future__ import annotations
 
+import re
 import sys
 from typing import TYPE_CHECKING
 
@@ -27,12 +28,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
 
     # Partner Engineering defines this list. Please contact PE for changes.
 
-    allowed_ignores_v2_9 = [
-        "validate-modules:deprecation-mismatch",  # Note: 2.9 expects a deprecated key in the METADATA. It was removed in later versions.
-        "validate-modules:invalid-documentation",  # Note: The removed_at_date key in the deprecated section is invalid for 2.9.
-    ]
-
-    allowed_ignores_all = [
+    allowed_ignores = [
         "validate-modules:missing-gplv3-license",
         "action-plugin-docs",  # Added for Networking Collections
         "import-2.6",
@@ -47,7 +43,18 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
         "compile-2.7!skip",
         "compile-3.5",
         "compile-3.5!skip",
+        "shebang",  # Unreliable test
+        "shellcheck",  # Unreliable test
+        "pylint:used-before-assignment",  # Unreliable test
     ]
+
+    no_check_ignore_files = [
+        "ignore-2.9",
+        "ignore-2.10",
+        "ignore-2.11",
+        "ignore-2.12",
+    ]
+
     _ids = {
         "sanity[cannot-ignore]": "Ignore file contains ... at line ..., which is not a permitted ignore.",
         "sanity[bad-ignore]": "Ignore file entry at ... is formatted incorrectly. Please review.",
@@ -62,43 +69,54 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
         results: list[MatchError] = []
         test = ""
 
+        check_dirs = {
+            "plugins",
+            "roles",
+        }
+
         if file.kind != "sanity-ignore-file":
             return []
 
         with file.path.open(encoding="utf-8") as ignore_file:
             entries = ignore_file.read().splitlines()
 
-            ignores = self.allowed_ignores_all
-
-            # If there is a ignore-2.9.txt file, add the v2_9 list of allowed ignores
-            if "ignore-2.9.txt" in str(file.abspath):
-                ignores = self.allowed_ignores_all + self.allowed_ignores_v2_9
+            if any(name in str(file.abspath) for name in self.no_check_ignore_files):
+                return []
 
             for line_num, entry in enumerate(entries, 1):
-                if entry and entry[0] != "#":
-                    try:
-                        if "#" in entry:
-                            entry, _ = entry.split("#")
-                        (_, test) = entry.split()
-                        if test not in ignores:
+                base_ignore_dir = ""
+
+                if entry:
+                    # match up to the first "/"
+                    regex = re.match("[^/]*", entry)
+
+                    if regex:
+                        base_ignore_dir = regex.group(0)
+
+                    if base_ignore_dir in check_dirs:
+                        try:
+                            if "#" in entry:
+                                entry, _ = entry.split("#")
+                            (_, test) = entry.split()
+                            if test not in self.allowed_ignores:
+                                results.append(
+                                    self.create_matcherror(
+                                        message=f"Ignore file contains {test} at line {line_num}, which is not a permitted ignore.",
+                                        tag="sanity[cannot-ignore]",
+                                        lineno=line_num,
+                                        filename=file,
+                                    ),
+                                )
+
+                        except ValueError:
                             results.append(
                                 self.create_matcherror(
-                                    message=f"Ignore file contains {test} at line {line_num}, which is not a permitted ignore.",
-                                    tag="sanity[cannot-ignore]",
+                                    message=f"Ignore file entry at {line_num} is formatted incorrectly. Please review.",
+                                    tag="sanity[bad-ignore]",
                                     lineno=line_num,
                                     filename=file,
                                 ),
                             )
-
-                    except ValueError:
-                        results.append(
-                            self.create_matcherror(
-                                message=f"Ignore file entry at {line_num} is formatted incorrectly. Please review.",
-                                tag="sanity[bad-ignore]",
-                                lineno=line_num,
-                                filename=file,
-                            ),
-                        )
 
         return results
 
