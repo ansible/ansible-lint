@@ -38,7 +38,7 @@ jobs:
             schemas
             eco
             py310-devel
-          platforms: linux,macos-13
+          platforms: linux,macos
   test-action:
     runs-on: ubuntu-latest
     steps:
