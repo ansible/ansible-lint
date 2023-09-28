@@ -1,17 +1,20 @@
 """Tests for Transformer."""
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 
+import ansiblelint.__main__ as main
+from ansiblelint.app import App
+
 # noinspection PyProtectedMember
-from ansiblelint.runner import LintResult, _get_matches
+from ansiblelint.runner import LintResult, get_matches
 from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
 
@@ -24,7 +27,7 @@ def fixture_runner_result(
 ) -> LintResult:
     """Fixture that runs the Runner to populate a LintResult for a given file."""
     config_options.lintables = [playbook]
-    result = _get_matches(rules=default_rules_collection, options=config_options)
+    result = get_matches(rules=default_rules_collection, options=config_options)
     return result
 
 
@@ -211,3 +214,65 @@ def test_effective_write_set(write_list: list[str], expected: set[str]) -> None:
     """Make sure effective_write_set handles all/none keywords correctly."""
     actual = Transformer.effective_write_set(write_list)
     assert actual == expected
+
+
+def test_pruned_err_after_fix(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> None:
+    """Test that pruned errors are not reported after fixing.
+
+    :param monkeypatch: Monkeypatch
+    :param tmpdir: Temporary directory
+    """
+    file = Path("examples/playbooks/transform-jinja.yml")
+    source = Path.cwd() / file
+    dest = tmpdir / source.name
+    shutil.copyfile(source, dest)
+
+    monkeypatch.setattr("sys.argv", ["ansible-lint", str(dest), "--fix=all"])
+
+    fix_called = False
+    orig_fix = main.fix
+
+    def test_fix(
+        runtime_options: Options,
+        result: LintResult,
+        rules: RulesCollection,
+    ) -> None:
+        """Wrap main.fix to check if it was called and match count is correct.
+
+        :param runtime_options: Runtime options
+        :param result: Lint result
+        :param rules: Rules collection
+        """
+        nonlocal fix_called
+        fix_called = True
+        assert len(result.matches) == 7
+        orig_fix(runtime_options, result, rules)
+
+    report_called = False
+
+    class TestApp(App):
+        """Wrap App to check if it was called and match count is correct."""
+
+        def report_outcome(
+            self: TestApp,
+            result: LintResult,
+            *,
+            mark_as_success: bool = False,
+        ) -> int:
+            """Wrap App.report_outcome to check if it was called and match count is correct.
+
+            :param result: Lint result
+            :param mark_as_success: Mark as success
+            :returns: Exit code
+            """
+            nonlocal report_called
+            report_called = True
+            assert len(result.matches) == 1
+            return super().report_outcome(result, mark_as_success=mark_as_success)
+
+    monkeypatch.setattr("ansiblelint.__main__.fix", test_fix)
+    monkeypatch.setattr("ansiblelint.app.App", TestApp)
+
+    main.main()
+    assert fix_called
+    assert report_called

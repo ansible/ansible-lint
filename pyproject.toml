@@ -145,6 +145,7 @@ max-statements = 60
 disable = [
   # Disabled on purpose:
   "line-too-long", # covered by black
+  "protected-access", # covered by ruff SLF001
   "too-many-branches", # covered by ruff C901
   # TODO(ssbarnea): remove temporary skips adding during initial adoption:
   "duplicate-code",

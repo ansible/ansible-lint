@@ -134,6 +134,10 @@ class MatchError(ValueError):
             self.details,
         )
 
+    def __str__(self) -> str:
+        """Return a MatchError instance string representation."""
+        return self.__repr__()
+
     @property
     def position(self) -> str:
         """Return error positioning, with column number if available."""
