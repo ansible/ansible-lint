@@ -19,7 +19,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule, RulesCollection, TransformMixin
-from ansiblelint.runner import _get_matches
+from ansiblelint.runner import get_matches
 from ansiblelint.transformer import Transformer
 from ansiblelint.utils import Task, convert_to_boolean
 
@@ -336,7 +336,7 @@ if "pytest" in sys.modules:
         rules.register(NoLogPasswordsRule())
 
         config_options.lintables = [playbook]
-        runner_result = _get_matches(rules=rules, options=config_options)
+        runner_result = get_matches(rules=rules, options=config_options)
         transformer = Transformer(result=runner_result, options=config_options)
         transformer.run()
 

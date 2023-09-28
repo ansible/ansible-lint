@@ -55,6 +55,7 @@ from ansiblelint.config import (
 )
 from ansiblelint.constants import RC
 from ansiblelint.loaders import load_ignore_txt
+from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
@@ -202,6 +203,74 @@ def support_banner() -> None:
         )
 
 
+def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) -> None:
+    """Fix the linting errors.
+
+    :param options: Options object
+    :param result: LintResult object
+    """
+    match_count = len(result.matches)
+    _logger.debug("Begin fixing: %s matches", match_count)
+    ruamel_safe_version = "0.17.26"
+
+    # pylint: disable=import-outside-toplevel
+    from packaging.version import Version
+    from ruamel.yaml import __version__ as ruamel_yaml_version_str
+
+    # pylint: enable=import-outside-toplevel
+
+    if Version(ruamel_safe_version) > Version(ruamel_yaml_version_str):
+        _logger.warning(
+            "We detected use of `--fix` feature with a buggy ruamel-yaml %s library instead of >=%s, upgrade it before reporting any bugs like dropped comments.",
+            ruamel_yaml_version_str,
+            ruamel_safe_version,
+        )
+    acceptable_tags = {"all", "none", *rules.known_tags()}
+    unknown_tags = set(options.write_list).difference(acceptable_tags)
+
+    if unknown_tags:
+        _logger.error(
+            "Found invalid value(s) (%s) for --fix arguments, must be one of: %s",
+            ", ".join(unknown_tags),
+            ", ".join(acceptable_tags),
+        )
+        sys.exit(RC.INVALID_CONFIG)
+    _do_transform(result, options)
+
+    rerun = ["yaml"]
+    resolved = []
+    for idx, match in reversed(list(enumerate(result.matches))):
+        _logger.debug("Fixing: (%s of %s) %s", match_count - idx, match_count, match)
+        if match.fixed:
+            _logger.debug("Fixed, removed: %s", match)
+            result.matches.pop(idx)
+            continue
+        if match.rule.id not in rerun:
+            _logger.debug("Not rerun eligible: %s", match)
+            continue
+
+        uid = (match.rule.id, match.filename)
+        if uid in resolved:
+            _logger.debug("Previously resolved: %s", match)
+            result.matches.pop(idx)
+            continue
+        _logger.debug("Rerunning: %s", match)
+        runtime_options.tags = [match.rule.id]
+        runtime_options.lintables = [match.filename]
+        runtime_options._skip_ansible_syntax_check = True  # noqa: SLF001
+        new_results = get_matches(rules, runtime_options)
+        if not new_results.matches:
+            _logger.debug("Newly resolved: %s", match)
+            result.matches.pop(idx)
+            resolved.append(uid)
+            continue
+        if match in new_results.matches:
+            _logger.debug("Still found: %s", match)
+            continue
+        _logger.debug("Fixed, removed: %s", match)
+        result.matches.pop(idx)
+
+
 # pylint: disable=too-many-statements,too-many-locals
 def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
@@ -244,7 +313,6 @@ def main(argv: list[str] | None = None) -> int:
 
     # pylint: disable=import-outside-toplevel
     from ansiblelint.rules import RulesCollection
-    from ansiblelint.runner import _get_matches
 
     if options.list_profiles:
         from ansiblelint.generate_docs import profiles_as_rich
@@ -265,30 +333,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if isinstance(options.tags, str):
         options.tags = options.tags.split(",")  # pragma: no cover
-    result = _get_matches(rules, options)
-
-    if options.write_list:
-        ruamel_safe_version = "0.17.26"
-        from packaging.version import Version
-        from ruamel.yaml import __version__ as ruamel_yaml_version_str
-
-        if Version(ruamel_safe_version) > Version(ruamel_yaml_version_str):
-            _logger.warning(
-                "We detected use of `--fix` feature with a buggy ruamel-yaml %s library instead of >=%s, upgrade it before reporting any bugs like dropped comments.",
-                ruamel_yaml_version_str,
-                ruamel_safe_version,
-            )
-        acceptable_tags = {"all", "none", *rules.known_tags()}
-        unknown_tags = set(options.write_list).difference(acceptable_tags)
-
-        if unknown_tags:
-            _logger.error(
-                "Found invalid value(s) (%s) for --fix arguments, must be one of: %s",
-                ", ".join(unknown_tags),
-                ", ".join(acceptable_tags),
-            )
-            sys.exit(RC.INVALID_CONFIG)
-        _do_transform(result, options)
+    result = get_matches(rules, options)
 
     mark_as_success = True
 
@@ -302,6 +347,10 @@ def main(argv: list[str] | None = None) -> int:
     for match in result.matches:
         if match.tag in ignore_map[match.filename]:
             match.ignored = True
+            _logger.debug("Ignored: %s", match)
+
+    if options.write_list:
+        fix(runtime_options=options, result=result, rules=rules)
 
     app.render_matches(result.matches)
 

@@ -6,7 +6,7 @@
 #
 ansible-compat==4.1.10
 ansible-core==2.15.4
-astroid==2.15.6
+astroid==2.15.8
 attrs==23.1.0
 beautifulsoup4==4.12.2
 black==23.9.1
@@ -20,7 +20,7 @@ click==8.1.3
 colorama==0.4.6
 coverage==7.3.1
 coverage-enable-subprocess==1.0
-cryptography==41.0.3
+cryptography==41.0.4
 csscompressor==0.9.5
 cssselect2==0.7.0
 defusedxml==0.7.1
@@ -40,7 +40,7 @@ isort==5.12.0
 jinja2==3.1.2
 jmespath==1.0.1
 jsmin==3.0.1
-jsonschema==4.19.0
+jsonschema==4.19.1
 jsonschema-specifications==2023.7.1
 lazy-object-proxy==1.9.0
 markdown==3.3.7
@@ -75,7 +75,7 @@ ply==3.11
 psutil==5.9.5
 pycparser==2.21
 pygments==2.15.1
-pylint==2.17.5
+pylint==2.17.6
 pymdown-extensions==10.0.1
 pyparsing==3.1.1
 pytest==7.4.2
@@ -92,7 +92,7 @@ regex==2023.5.5
 requests==2.31.0
 rich==13.5.3
 rpds-py==0.10.3
-ruamel-yaml==0.17.32
+ruamel-yaml==0.17.33
 six==1.16.0
 soupsieve==2.4.1
 spdx-tools==0.7.1
@@ -101,8 +101,8 @@ text-unidecode==1.3
 tinycss2==1.2.1
 tomli==2.0.1
 tomlkit==0.12.1
-types-jsonschema==4.17.0.10
-types-pyyaml==6.0.12.11
+types-jsonschema==4.19.0.3
+types-pyyaml==6.0.12.12
 typing-extensions==4.6.2
 uritools==4.0.2
 urllib3==2.0.2
