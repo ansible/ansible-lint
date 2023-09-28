@@ -11,6 +11,10 @@ jobs:
   # https://github.com/marketplace/actions/actions-tagger
   actions-tagger:
     runs-on: windows-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission.
+      # https://github.blog/changelog/2023-02-02-github-actions-updating-the-default-github_token-permissions-to-read-only/
+      contents: write
     steps:
       - uses: Actions-R-Us/actions-tagger@latest
         env:
