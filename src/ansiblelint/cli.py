@@ -223,7 +223,10 @@ class WriteArgAction(argparse.Action):
 
         When from_cli is not an empty list, we ignore the from_file value.
         """
-        arguments = from_file if from_cli == [cls._default] else from_cli
+        if not from_file:
+            arguments = ["all"] if from_cli == [cls._default] else from_cli
+        else:
+            arguments = from_file
         for magic_value in ("none", "all"):
             if magic_value in arguments and len(arguments) > 1:
                 msg = f"When passing '{magic_value}' to '--fix', you cannot pass other values."

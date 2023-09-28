@@ -142,7 +142,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         )
                         if ignored_re.search(orig_exc_message) or isinstance(
                             orig_exc,
-                            AnsibleParserError,
+                            (AnsibleParserError, TypeError),
                         ):
                             # An unhandled exception occurred while running the lookup plugin 'template'. Error was a <class 'ansible.errors.AnsibleError'>, original message: the template file ... could not be found for the lookup. the template file ... could not be found for the lookup
 
