@@ -18,8 +18,8 @@ env:
   PY_COLORS: 1
 
 jobs:
-  pre:
-    name: pre
+  prepare:
+    name: prepare
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.generate_matrix.outputs.matrix }}
@@ -37,6 +37,7 @@ jobs:
             docs
             schemas
             eco
+            pre
             py310-devel
           platforms: linux,macos
   test-action:
@@ -52,14 +53,14 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs:
-      - pre
+      - prepare
       - test-action
     defaults:
       run:
         shell: ${{ matrix.shell || 'bash'}}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.pre.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
       # max-parallel: 5
       # The matrix testing goal is to cover the *most likely* environments
       # which are expected to be used by users in production. Avoid adding a
