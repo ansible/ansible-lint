@@ -5,10 +5,10 @@ You can ignore certain rules, enable `opt-in` rules, and control various other
 settings.
 
 Ansible-lint loads configuration from a file in the current working directory or
-from a file that you specify in the command line. If you provide configuration
-on both via a config file and on the command line, list values are merged (for
-example `exclude_paths`) and **True** is preferred for boolean values like
-`quiet`.
+from a file that you specify in the command line.
+
+Any configuration option that is passed from the command line will override
+the one specified inside the configuration file.
 
 ## Using local configuration files
 
