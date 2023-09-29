@@ -61,3 +61,7 @@ we concluded that the block keys must be the last ones.
 
 Another common practice was to put `tags` as the last property. Still, for the
 same reasons, we decided that they should not be put after block keys either.
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](/autofix) option.

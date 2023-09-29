@@ -115,7 +115,7 @@ plugins:
   - markdown-exec
   - gen-files:
       scripts:
-        - src/ansiblelint/generate_docs.py
+        - tools/generate_docs.py
   - material/search:
       separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - material/social
