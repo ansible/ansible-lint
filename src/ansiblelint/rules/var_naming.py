@@ -168,7 +168,7 @@ class VariableNamingRule(AnsibleLintRule):
 
         if (
             prefix
-            and not ident.startswith(f"{prefix}_")
+            and not ident.lstrip("_").startswith(f"{prefix}_")
             and not has_jinja(prefix)
             and is_fqcn_or_name(prefix)
         ):
