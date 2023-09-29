@@ -9,7 +9,7 @@ You can disable running transforms by setting `write_list: ["none"]`. Or only en
 Following is the list of supported rules covered under autofix functionality.
 
 - [command-instead-of-shell](rules/command-instead-of-shell.md#auto-fixing-capability)
-- [deprecated-local-action](rules/deprecated-local-action.md)
+- [deprecated-local-action](rules/deprecated-local-action.md#auto-fixing-capability)
 - [fqcn](rules/fqcn.md)
 - [jinja](rules/jinja.md)
 - [key-order](rules/key-order.md)
