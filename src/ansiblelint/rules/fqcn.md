@@ -87,3 +87,7 @@ structure in a backward-compatible way by adding redirects like in
       # Use the FQCN for the builtin shell module.
       ansible.builtin.shell: ssh ssh_user@{{ ansible_ssh_host }}
 ```
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](/autofix) option.

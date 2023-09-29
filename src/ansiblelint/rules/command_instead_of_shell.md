@@ -29,64 +29,6 @@ environment variable expansion or chaining multiple commands using pipes.
       changed_when: false
 ```
 
-## Auto-fixing capability
+!!! note
 
-### Before autofix
-
-```yaml
----
-- name: Fixture
-  hosts: localhost
-  tasks:
-    - name: Shell no pipe
-      ansible.builtin.shell:
-        cmd: echo hello
-      changed_when: false
-
-    - name: Shell with jinja filter
-      ansible.builtin.shell:
-        cmd: echo {{ "hello" | upper }}
-      changed_when: false
-
-    - name: Shell with jinja filter (fqcn)
-      ansible.builtin.shell:
-        cmd: echo {{ "hello" | upper }}
-      changed_when: false
-
-    - name: Command with executable parameter
-      ansible.builtin.shell:
-        cmd: clear
-      args:
-        executable: /bin/bash
-      changed_when: false
-```
-
-### After autofix
-
-```yaml
----
-- name: Fixture
-  hosts: localhost
-  tasks:
-    - name: Shell no pipe
-      ansible.builtin.command:
-        cmd: echo hello
-      changed_when: false
-
-    - name: Shell with jinja filter
-      ansible.builtin.command:
-        cmd: echo {{ "hello" | upper }}
-      changed_when: false
-
-    - name: Shell with jinja filter (fqcn)
-      ansible.builtin.command:
-        cmd: echo {{ "hello" | upper }}
-      changed_when: false
-
-    - name: Command with executable parameter
-      ansible.builtin.shell:
-        cmd: clear
-      args:
-        executable: /bin/bash
-      changed_when: false
-```
+    This rule can be automatically fixed using [`--fix`](/autofix) option.

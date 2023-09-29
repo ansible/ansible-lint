@@ -56,3 +56,7 @@ This rule can produce messages as:
         executable: /bin/bash # <-- explicit is better
       changed_when: false
 ```
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](/autofix) option.

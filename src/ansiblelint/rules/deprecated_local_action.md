@@ -19,3 +19,7 @@ This rule recommends using `delegate_to: localhost` instead of the
     ansible.builtin.debug:
   delegate_to: localhost # <-- recommended way to run on localhost
 ```
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](/autofix) option.

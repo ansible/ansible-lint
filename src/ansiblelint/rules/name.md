@@ -59,3 +59,7 @@ your `enable_list` to activate it.
     - name: Create placeholder file
       ansible.builtin.command: touch /tmp/.placeholder
 ```
+
+!!! note
+
+    `name[casing]` can be automatically fixed using [`--fix`](/autofix) option.

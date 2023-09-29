@@ -120,3 +120,7 @@ This rule can produce the following messages:
   become: true # <- Activates privilege escalation.
   become_user: apache # <- Does not change the user because "become: true" is not set.
 ```
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](/autofix) option.

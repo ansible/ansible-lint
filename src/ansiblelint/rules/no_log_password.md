@@ -43,3 +43,7 @@ Explicitly adding `no_log: true` prevents accidentally exposing secrets.
         - wow
       no_log: true # <- Sets the no_log attribute to a non-false value.
 ```
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](/autofix) option.

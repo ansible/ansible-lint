@@ -58,6 +58,12 @@ def rules_as_md(rules: RulesCollection) -> str:
 
             result += f"\n\n## {title}\n\n**{rule.shortdesc}**\n\n{description}"
 
+        # Safety net for preventing us from adding autofix to rules and
+        # forgetting to mention it inside their documentation.
+        if "autofix" in rule.tags and "autofix" not in rule.description:
+            msg = f"Rule {rule.id} is invalid because it has 'autofix' tag but this ability is not documented in its description."
+            raise RuntimeError(msg)
+
     return result
 
 

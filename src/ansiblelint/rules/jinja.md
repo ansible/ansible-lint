@@ -53,3 +53,7 @@ In its current form, this rule presents the following limitations:
   does not support tilde as a binary operator. Example: `{{ a ~ b }}`.
 - Jinja2 blocks that use dot notation with numbers are ignored because python
   and black do not allow it. Example: `{{ foo.0.bar }}`
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](/autofix) option.

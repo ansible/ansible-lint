@@ -30,3 +30,7 @@ anti-pattern and does not produce expected results.
       ansible.builtin.command: /sbin/shutdown -t now
       when: ansible_facts['os_family'] == "Debian" # <- Uses facts in a conditional statement.
 ```
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](/autofix) option.
