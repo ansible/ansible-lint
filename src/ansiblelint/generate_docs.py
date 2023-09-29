@@ -7,8 +7,7 @@ from rich.console import RenderableType, group
 from rich.markdown import Markdown
 from rich.table import Table
 
-from ansiblelint.cli import get_rules_dirs
-from ansiblelint.config import PROFILES, Options
+from ansiblelint.config import PROFILES
 from ansiblelint.constants import RULE_DOC_URL
 from ansiblelint.rules import RulesCollection, TransformMixin
 
@@ -66,26 +65,6 @@ def rules_as_md(rules: RulesCollection) -> str:
             raise RuntimeError(msg)
 
     return result
-
-
-def autofix_rule_list() -> None:
-    """To get the list of autofix rules."""
-    options = Options()
-    options.rulesdirs = get_rules_dirs([])
-    options.list_rules = True
-    rules = RulesCollection(
-        options.rulesdirs,
-        options=options,
-    )
-    result: str = "\n"
-    for rule in rules.alphabetical():
-        if issubclass(rule.__class__, TransformMixin):
-            url = f"rules/{rule.id}.md"
-            result += f"- [{rule.id}]({url})\n"
-
-    file_path = "docs/autofix.md"
-    with open(file_path, "a", encoding="utf-8") as f:
-        f.write(result)
 
 
 @group()
@@ -152,6 +131,3 @@ Ansible-lint profiles gradually increase the strictness of rules as your Ansible
 def profiles_as_rich() -> Markdown:
     """Return rich representation of supported profiles."""
     return Markdown(profiles_as_md())
-
-
-autofix_rule_list()

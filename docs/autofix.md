@@ -7,3 +7,6 @@ By default it will run all transforms (effectively `write_list: ["all"]`).
 You can disable running transforms by setting `write_list: ["none"]`. Or only enable a subset of rule transforms by listing rules/tags here.
 
 Following is the list of supported rules covered under autofix functionality.
+
+<!---start dynamic-->
+<!---end dynamic-->
