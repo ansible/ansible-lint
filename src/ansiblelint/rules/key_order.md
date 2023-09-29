@@ -61,3 +61,79 @@ we concluded that the block keys must be the last ones.
 
 Another common practice was to put `tags` as the last property. Still, for the
 same reasons, we decided that they should not be put after block keys either.
+
+## Auto-fixing capability
+
+### Before autofix
+
+```yaml
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - # comment before keys
+      no_log: true # no_log comment
+      ansible.builtin.command: echo hello # command comment
+      name: Task with no_log on top # name comment
+      changed_when: false # changed_when comment
+      # comment after keys
+    - when: true
+      name: Task with when on top
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - delegate_to: localhost
+      name: Delegate_to on top
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - loop:
+        - 1
+        - 2
+      name: Loopy
+      ansible.builtin.command: echo {{ item }}
+      changed_when: false
+    - become: true
+      name: Become first
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - register: test
+      ansible.builtin.command: echo hello
+      name: Register first
+      changed_when: false
+```
+
+### After autofix
+
+```yaml
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    # comment before keys
+    - name: Task with no_log on top # name comment
+      no_log: true # no_log comment
+      ansible.builtin.command: echo hello # command comment
+      changed_when: false # changed_when comment
+      # comment after keys
+    - name: Task with when on top
+      when: true
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - name: Delegate_to on top
+      delegate_to: localhost
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - name: Loopy
+      loop:
+        - 1
+        - 2
+      ansible.builtin.command: echo {{ item }}
+      changed_when: false
+    - name: Become first
+      become: true
+      ansible.builtin.command: echo hello
+      changed_when: false
+    - name: Register first
+      register: test
+      ansible.builtin.command: echo hello
+      changed_when: false
+```

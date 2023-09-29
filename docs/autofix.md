@@ -12,7 +12,7 @@ Following is the list of supported rules covered under autofix functionality.
 - [deprecated-local-action](rules/deprecated-local-action.md)
 - [fqcn](rules/fqcn.md)
 - [jinja](rules/jinja.md)
-- [key-order](rules/key-order.md)
+- [key-order](rules/key-order.md#auto-fixing-capability)
 - [name](rules/name.md)
 - [no-free-form](rules/no-free-form.md)
 - [no-jinja-when](rules/no-jinja-when.md)
