@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List
 
 from ansiblelint.cli import get_rules_dirs
 from ansiblelint.config import Options
@@ -13,10 +12,12 @@ def inject(original: list[str], contents: list[str]) -> list[str]:
     """Inject the contents into the original list between the delimiters.
 
     Args:
+    ----
         original: The original list of strings.
         contents: The contents to inject.
 
     Returns:
+    -------
         The original list with the contents injected.
     """
     start_delim = "<!---start dynamic-->\n"
@@ -25,12 +26,14 @@ def inject(original: list[str], contents: list[str]) -> list[str]:
     try:
         start = original.index(start_delim)
     except ValueError as exc:
-        raise ValueError(f"Could not find {start_delim} in original") from exc
+        msg = f"Could not find {start_delim} in original"
+        raise ValueError(msg) from exc
 
     try:
         end = original.index(end_delim)
     except ValueError as exc:
-        raise ValueError(f"Could not find {end_delim} in original") from exc
+        msg = f"Could not find {end_delim} in original"
+        raise ValueError(msg) from exc
 
     return original[: start + 1] + contents + original[end:]
 
@@ -39,8 +42,11 @@ def load_file(file: Path) -> list[str]:
     """Load the file into a list of strings.
 
     Args:
+    ----
         filename: The name of the file to load.
+
     Returns:
+    -------
         A list of strings, one for each line in the file.
     """
     with file.open(encoding="utf-8") as fhandle:
@@ -51,6 +57,7 @@ def write_file(file: Path, contents: list[str]) -> None:
     """Write the contents to the file.
 
     Args:
+    ----
         filename: The name of the file to write to.
         contents: The contents to write.
     """
@@ -60,7 +67,6 @@ def write_file(file: Path, contents: list[str]) -> None:
 
 def main() -> None:
     """The main function."""
-
     file = Path("docs/autofix.md")
     # Load the original file.
     original = load_file(file)
@@ -72,7 +78,7 @@ def main() -> None:
         options.rulesdirs,
         options=options,
     )
-    contents: List[str] = []
+    contents: list[str] = []
     for rule in rules.alphabetical():
         if issubclass(rule.__class__, TransformMixin):
             url = f"rules/{rule.id}.md"
