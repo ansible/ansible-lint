@@ -8,6 +8,4 @@ You can disable running transforms by setting `write_list: ["none"]`. Or only en
 
 Following is the list of supported rules covered under autofix functionality.
 
-```yaml
 {!_autofix_rules.md!}
-```
