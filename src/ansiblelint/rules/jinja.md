@@ -56,4 +56,4 @@ In its current form, this rule presents the following limitations:
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.

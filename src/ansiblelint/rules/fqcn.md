@@ -90,4 +90,4 @@ structure in a backward-compatible way by adding redirects like in
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.

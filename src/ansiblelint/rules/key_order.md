@@ -64,4 +64,4 @@ same reasons, we decided that they should not be put after block keys either.
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.

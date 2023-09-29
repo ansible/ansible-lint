@@ -46,4 +46,4 @@ Explicitly adding `no_log: true` prevents accidentally exposing secrets.
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.
