@@ -31,4 +31,4 @@ environment variable expansion or chaining multiple commands using pipes.
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.

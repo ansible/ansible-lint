@@ -62,4 +62,4 @@ your `enable_list` to activate it.
 
 !!! note
 
-    `name[casing]` can be automatically fixed using [`--fix`](/autofix) option.
+    `name[casing]` can be automatically fixed using [`--fix`](../autofix.md) option.

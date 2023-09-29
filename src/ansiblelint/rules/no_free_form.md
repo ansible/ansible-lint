@@ -59,4 +59,4 @@ This rule can produce messages as:
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.

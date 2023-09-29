@@ -33,4 +33,4 @@ anti-pattern and does not produce expected results.
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.

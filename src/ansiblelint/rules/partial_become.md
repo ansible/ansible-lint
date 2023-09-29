@@ -123,4 +123,4 @@ This rule can produce the following messages:
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.

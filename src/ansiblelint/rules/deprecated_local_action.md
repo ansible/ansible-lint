@@ -22,4 +22,4 @@ This rule recommends using `delegate_to: localhost` instead of the
 
 !!! note
 
-    This rule can be automatically fixed using [`--fix`](/autofix) option.
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.
