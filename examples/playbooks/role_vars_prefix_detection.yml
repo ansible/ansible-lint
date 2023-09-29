@@ -48,4 +48,6 @@
       ansible.builtin.include_role:
         name: role_vars_prefix_detection
       vars:
-        role_vars_prefix_detection_var2: val2
+        role_vars_prefix_detection_var1: val1
+        _role_vars_prefix_detection_var2: val2
+        __role_vars_prefix_detection_var3: val3
