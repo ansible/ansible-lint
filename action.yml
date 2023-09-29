@@ -7,17 +7,20 @@ branding:
   color: red
 inputs:
   args:
-    description: Arguments to be passed to ansible-lint command
+    description: Arguments to be passed to ansible-lint command.
+    required: false
+    default: ""
+  setup_python:
+    description: If false, this action will not setup python and will instead rely on the already installed python.
+    required: false
+    default: true
+  working_directory:
+    description: The directory where to run ansible-lint from. Default is `github.workspace`.
     required: false
     default: ""
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # needed by setuptools-scm
-        submodules: true
-
     # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
     # folder, so we are forced to stick this temporary file inside .git, so it
     # will not affect the linted repository.
@@ -29,6 +32,7 @@ runs:
         wget --output-file=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ github.action_ref || 'main' }}/.config/requirements-lock.txt
 
     - name: Set up Python
+      if: inputs.setup_python == 'true'
       uses: actions/setup-python@v4
       with:
         cache: pip
@@ -46,6 +50,17 @@ runs:
         pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}"
         ansible-lint --version
 
+    - name: Process inputs
+      id: inputs
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.working_directory }}" ]]; then
+          echo "working_directory=${{ inputs.working_directory }}" >> $GITHUB_OUTPUT
+        else
+          echo "working_directory=${{ github.workspace }}" >> $GITHUB_OUTPUT
+        fi
+
     - name: Run ansible-lint
       shell: bash
+      working-directory: ${{ steps.inputs.outputs.working_directory }}
       run: ansible-lint ${{ inputs.args }}
