@@ -110,6 +110,9 @@ nav:
       - Contributing: contributing.md
       - custom-rules.md
 
+exclude_docs: |
+  _autofix_rules.md
+
 plugins:
   - autorefs
   - markdown-exec
