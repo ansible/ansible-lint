@@ -28,6 +28,7 @@ jobs:
     name: Ansible Lint # Naming the build is important to use it as a status check
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Run ansible-lint
         uses: ansible/ansible-lint@main # or version tag instead of 'main'
 ```
