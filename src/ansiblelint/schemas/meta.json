@@ -267,7 +267,14 @@
         "versions": {
           "default": "all",
           "items": {
-            "enum": ["ascii", "beowulf", "chimaera", "daedalus", "jessie", "all"],
+            "enum": [
+              "ascii",
+              "beowulf",
+              "chimaera",
+              "daedalus",
+              "jessie",
+              "all"
+            ],
             "type": "string"
           },
           "type": "array"
