@@ -63,7 +63,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v7.3.0
+    rev: v7.3.1
     hooks:
       - id: cspell
         # entry: codespell --relative

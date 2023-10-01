@@ -155,6 +155,9 @@ disable = [
   # https://github.com/PyCQA/pylint/issues/8453
   "preferred-module",
 ]
+enable = [
+  "useless-suppression", # Identify unneeded pylint disable statements
+]
 
 [tool.pylint.TYPECHECK]
 # pylint is unable to detect Namespace attributes and will throw a E1101

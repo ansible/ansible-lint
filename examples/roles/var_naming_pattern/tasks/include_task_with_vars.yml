@@ -2,7 +2,9 @@
 - name: include_task_with_vars | Foo
   ansible.builtin.include_tasks: ../tasks/included-task-with-vars.yml
   vars:
-    var_naming_pattern_foo: bar
+    var_naming_pattern_1: bar
+    _var_naming_pattern_2: ... # we allow _ before the prefix
+    __var_naming_pattern_3: ... # we allow __ before the prefix
 
 - name: include_task_with_vars | Foo
   ansible.builtin.include_role:
