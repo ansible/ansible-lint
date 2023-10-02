@@ -169,7 +169,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v3.0.0a7
+    rev: v3.0.0b0
     hooks:
       - id: pylint
         args:
