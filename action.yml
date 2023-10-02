@@ -29,7 +29,7 @@ runs:
     - name: Generate .git/ansible-lint-requirements.txt
       shell: bash
       run: |
-        wget --output-file=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ github.action_ref || 'main' }}/.config/requirements-lock.txt
+        wget --output-document=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ github.action_ref || 'main' }}/.config/requirements-lock.txt
 
     - name: Set up Python
       if: inputs.setup_python == 'true'
