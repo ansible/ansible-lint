@@ -70,7 +70,7 @@ jobs:
     env:
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 829
+      PYTEST_REQPASS: 831
     steps:
       - uses: actions/checkout@v4
         with:

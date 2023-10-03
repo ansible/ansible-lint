@@ -1,6 +1,7 @@
 """Utility functions related to file operations."""
 from __future__ import annotations
 
+import ast
 import copy
 import logging
 import os
@@ -14,6 +15,7 @@ from typing import TYPE_CHECKING, Any, cast
 import pathspec
 import wcmatch.pathlib
 import wcmatch.wcmatch
+from ansible.parsing.plugin_docs import read_docstring
 from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, Options, options
@@ -254,6 +256,25 @@ class Lintable:
         if self.kind == "yaml":
             _ = self.data  # pylint: disable=pointless-statement
 
+        if self.kind == "plugin":
+            # pylint: disable=consider-using-with
+            self.file = NamedTemporaryFile(
+                mode="w+",
+                suffix=f"_{name.name}.yaml",
+                dir=self.dir,
+            )
+            self.filename = self.file.name
+            self._content = self.parse_examples_from_plugin()
+            self.file.write(self._content)
+            self.file.flush()
+            self.path = Path(self.file.name)
+            self.base_kind = "text/yaml"
+
+    def __del__(self) -> None:
+        """Clean up temporary files when the instance is cleaned up."""
+        if hasattr(self, "file"):
+            self.file.close()
+
     def _guess_kind(self) -> None:
         if self.kind == "yaml":
             if (
@@ -371,6 +392,25 @@ class Lintable:
     def __repr__(self) -> str:
         """Return user friendly representation of a lintable."""
         return f"{self.name} ({self.kind})"
+
+    def parse_examples_from_plugin(self) -> str:
+        """Parse yaml inside plugin EXAMPLES string.
+
+        Store a line number offset to realign returned line numbers later
+        """
+        parsed = ast.parse(self.content)
+        for child in parsed.body:
+            if isinstance(child, ast.Assign):
+                label = child.targets[0]
+                if isinstance(label, ast.Name) and label.id == "EXAMPLES":
+                    self._line_offset = child.lineno - 1
+                    break
+
+        docs = read_docstring(str(self.path))
+        examples = docs["plainexamples"]
+        # Ignore the leading newline and lack of document start
+        # as including those in EXAMPLES would be weird.
+        return f"---{examples}" if examples else ""
 
     @property
     def data(self) -> Any:
