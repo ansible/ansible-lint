@@ -17,8 +17,9 @@ jobs:
       contents: write
     steps:
       - uses: Actions-R-Us/actions-tagger@latest
-        env:
-          GITHUB_TOKEN: "${{ github.token }}"
+        with:
+          token: "${{ github.token }}"
+          publish_latest_tag: true
   pypi:
     name: Publish to PyPI registry
     environment: release
