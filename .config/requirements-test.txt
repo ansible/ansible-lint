@@ -2,6 +2,7 @@ black # IDE support
 coverage-enable-subprocess # see https://github.com/nedbat/coveragepy/issues/1341#issuecomment-1228942657
 coverage[toml] >= 6.4.4
 jmespath
+license-expression >= 30.1.1 # Apache 2.0
 mypy # IDE support
 netaddr # needed by ipwrap filter
 psutil # soft-dep of pytest-xdist
@@ -12,6 +13,5 @@ pytest-plus >= 0.2 # for PYTEST_REQPASS
 pytest-xdist >= 2.1.0
 ruamel.yaml>=0.17.31,<0.18 # only the latest is expected to pass our tests
 ruamel-yaml-clib  # needed for mypy
-spdx-tools >= 0.7.1,<0.8.0 # Apache
 types-jsonschema # IDE support
 types-pyyaml # IDE support

@@ -113,10 +113,10 @@ no_incremental = true
 [[tool.mypy.overrides]]
 module = [
   "ansible.*",
-  "yamllint.*",
   "ansiblelint._version", # generated
+  "license_expression",
   "ruamel.yaml",
-  "spdx.*",
+  "yamllint.*",
 ]
 ignore_missing_imports = true
 ignore_errors = true

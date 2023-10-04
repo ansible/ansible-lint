@@ -9,8 +9,8 @@ from time import sleep
 from typing import Any
 from unittest.mock import DEFAULT, MagicMock, patch
 
+import license_expression
 import pytest
-import spdx.config
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.schemas import __file__ as schema_module
@@ -18,7 +18,9 @@ from ansiblelint.schemas.__main__ import refresh_schemas
 from ansiblelint.schemas.main import validate_file_schema
 
 schema_path = Path(schema_module).parent
-spdx_config_path = Path(spdx.config.__file__).parent
+spdx_config_path = (
+    Path(license_expression.__file__).parent / "data" / "scancode-licensedb-index.json"
+)
 
 
 def test_refresh_schemas() -> None:
@@ -86,15 +88,18 @@ def test_validate_file_schema() -> None:
 
 def test_spdx() -> None:
     """Test that SPDX license identifiers are in sync."""
-    _licenses = spdx_config_path / "licenses.json"
-
     license_ids = set()
-    with _licenses.open(encoding="utf-8") as license_fh:
+    with spdx_config_path.open(encoding="utf-8") as license_fh:
         licenses = json.load(license_fh)
-    for lic in licenses["licenses"]:
-        if lic.get("isDeprecatedLicenseId"):
+    for lic in licenses:
+        # for lic in lic_dic:
+        #     breakpoint()
+        if lic.get("is_deprecated"):
             continue
-        license_ids.add(lic["licenseId"])
+        lic_id = lic["spdx_license_key"]
+        if lic_id.startswith("LicenseRef"):
+            continue
+        license_ids.add(lic_id)
 
     galaxy_json = schema_path / "galaxy.json"
     with galaxy_json.open(encoding="utf-8") as f:
