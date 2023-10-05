@@ -151,12 +151,12 @@ repos:
           - cryptography>=39.0.1
           - filelock>=3.12.2
           - jinja2
+          - license-expression >= 30.1.1
           - pytest-mock
           - pytest>=7.2.2
           - rich>=13.2.0
-          - ruamel-yaml>=0.17.31
           - ruamel-yaml-clib>=0.2.7
-          - spdx-tools>=0.7.1,<0.8.0
+          - ruamel-yaml>=0.17.31
           - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.4.2
@@ -181,13 +181,13 @@ repos:
           - docutils
           - filelock>=3.12.2
           - jsonschema>=4.9.0
+          - license-expression >= 30.1.1
           - pytest-mock
           - pytest>=7.2.2
           - pyyaml
           - rich>=13.2.0
-          - ruamel-yaml>=0.17.31
           - ruamel-yaml-clib>=0.2.7
-          - spdx-tools>=0.7.1,<0.8.0
+          - ruamel-yaml>=0.17.31
           - typing_extensions
           - wcmatch
           - yamllint
