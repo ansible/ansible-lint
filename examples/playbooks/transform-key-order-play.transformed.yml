@@ -1,0 +1,10 @@
+---
+- name: This is a playbook # <-- name key should be the first one
+  hosts: localhost
+  tasks:
+    - name: A block
+      when: true
+      block:
+        - name: Display a message
+          ansible.builtin.debug:
+            msg: Hello world!
