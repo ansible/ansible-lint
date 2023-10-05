@@ -1,5 +1,4 @@
 ---
-# cspell:ignore mislav
 name: release
 
 "on":
@@ -54,29 +53,3 @@ jobs:
         if: >- # "create" workflows run separately from "push" & "pull_request"
           github.event_name == 'release'
         uses: pypa/gh-action-pypi-publish@release/v1
-
-  homebrew:
-    name: Bump homebrew formula
-    environment: release
-    runs-on: ubuntu-22.04
-    needs: pypi
-
-    env:
-      FORCE_COLOR: 1
-      PY_COLORS: 1
-      TOXENV: pkg
-
-    steps:
-      - name: Check out src from Git
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # needed by setuptools-scm
-          submodules: true
-
-      - name: Bump homebrew formula
-        uses: mislav/bump-homebrew-formula-action@v3.1
-        with:
-          # A PR will be sent to github.com/Homebrew/homebrew-core to update this formula:
-          formula-name: ansible-lint
-        env:
-          COMMITTER_TOKEN: ${{ secrets.COMMITTER_TOKEN }}
