@@ -29,7 +29,7 @@ jobs:
         uses: coactions/dynamic-matrix@v1
         with:
           min_python: "3.9"
-          max_python: "3.11"
+          max_python: "3.12"
           other_names: |
             lint
             pkg
@@ -70,7 +70,7 @@ jobs:
     env:
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 829
+      PYTEST_REQPASS: 831
     steps:
       - uses: actions/checkout@v4
         with:
