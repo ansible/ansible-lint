@@ -1,9 +1,11 @@
 """Tests for Transformer."""
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest import mock
 
 import pytest
 
@@ -23,16 +25,16 @@ if TYPE_CHECKING:
 def fixture_runner_result(
     config_options: Options,
     default_rules_collection: RulesCollection,
-    playbook: str,
+    playbook_str: str,
 ) -> LintResult:
     """Fixture that runs the Runner to populate a LintResult for a given file."""
-    config_options.lintables = [playbook]
+    config_options.lintables = [playbook_str]
     result = get_matches(rules=default_rules_collection, options=config_options)
     return result
 
 
 @pytest.mark.parametrize(
-    ("playbook", "matches_count", "transformed"),
+    ("playbook_str", "matches_count", "transformed"),
     (
         # reuse TestRunner::test_runner test cases to ensure transformer does not mangle matches
         pytest.param(
@@ -127,10 +129,10 @@ def fixture_runner_result(
         ),
     ),
 )
+@mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
 def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
     config_options: Options,
-    copy_examples_dir: tuple[Path, Path],
-    playbook: str,
+    playbook_str: str,
     runner_result: LintResult,
     transformed: bool,
     matches_count: int,
@@ -139,6 +141,7 @@ def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
 
     Based on TestRunner::test_runner
     """
+    playbook = Path(playbook_str)
     config_options.write_list = ["all"]
     transformer = Transformer(result=runner_result, options=config_options)
     transformer.run()
@@ -146,21 +149,18 @@ def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
     matches = runner_result.matches
     assert len(matches) == matches_count
 
-    orig_dir, tmp_dir = copy_examples_dir
-    orig_playbook = orig_dir / playbook
-    expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
-    transformed_playbook = tmp_dir / playbook
-
-    orig_playbook_content = orig_playbook.read_text()
-    expected_playbook_content = expected_playbook.read_text()
-    transformed_playbook_content = transformed_playbook.read_text()
-
+    orig_content = playbook.read_text(encoding="utf-8")
     if transformed:
-        assert orig_playbook_content != transformed_playbook_content
-    else:
-        assert orig_playbook_content == transformed_playbook_content
+        expected_content = playbook.with_suffix(
+            f".transformed{playbook.suffix}",
+        ).read_text(encoding="utf-8")
+        transformed_content = playbook.with_suffix(f".tmp{playbook.suffix}").read_text(
+            encoding="utf-8",
+        )
 
-    assert transformed_playbook_content == expected_playbook_content
+        assert orig_content != transformed_content
+        assert expected_content == transformed_content
+        playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
 
 
 @pytest.mark.parametrize(

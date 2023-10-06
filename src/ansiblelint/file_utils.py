@@ -371,10 +371,16 @@ class Lintable:
 
             lintable.write(force=True)
         """
-        if not force and not self.updated:
+        dump_filename = self.path.expanduser().resolve()
+        if os.environ.get("ANSIBLE_LINT_WRITE_TMP", "0") == "1":
+            dump_filename = dump_filename.with_suffix(
+                f".tmp{dump_filename.suffix}",
+            )
+        elif not force and not self.updated:
             # No changes to write.
             return
-        self.path.expanduser().resolve().write_text(
+
+        dump_filename.write_text(
             self._content or "",
             encoding="utf-8",
         )
