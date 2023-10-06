@@ -261,7 +261,6 @@ class Lintable:
             self.file = NamedTemporaryFile(
                 mode="w+",
                 suffix=f"_{name.name}.yaml",
-                dir=self.dir,
             )
             self.filename = self.file.name
             self._content = self.parse_examples_from_plugin()
