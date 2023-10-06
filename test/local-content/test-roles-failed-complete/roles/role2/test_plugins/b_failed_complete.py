@@ -1,5 +1,4 @@
 """A test plugin."""
-# pylint: disable=invalid-name
 
 
 def compatibility_in_test(a, b):

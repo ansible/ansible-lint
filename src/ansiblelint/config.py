@@ -104,7 +104,7 @@ LOOP_VAR_PREFIX = "^(__|{role}_)"
 
 
 @dataclass
-class Options:  # pylint: disable=too-many-instance-attributes,too-few-public-methods
+class Options:  # pylint: disable=too-many-instance-attributes
     """Store ansible-lint effective configuration options."""
 
     # Private attributes
@@ -247,7 +247,6 @@ def guess_install_method() -> str:
             else:
                 logging.debug("Skipping %s as it is not installed.", package_name)
                 use_pip = False
-    # pylint: disable=broad-except
     except (AttributeError, ModuleNotFoundError) as exc:
         # On Fedora 36, we got a AttributeError exception from pip that we want to avoid
         # On NixOS, we got a ModuleNotFoundError exception from pip that we want to avoid

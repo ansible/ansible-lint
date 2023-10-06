@@ -84,8 +84,8 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
 
     def test_local_action(default_rules_collection: RulesCollection) -> None:
         """Positive test deprecated_local_action."""

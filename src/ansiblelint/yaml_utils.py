@@ -33,7 +33,7 @@ from ansiblelint.utils import Task
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
-    from ruamel.yaml.comments import LineCol  # pylint: disable=ungrouped-imports
+    from ruamel.yaml.comments import LineCol
     from ruamel.yaml.nodes import ScalarNode
     from ruamel.yaml.representer import RoundTripRepresenter
     from ruamel.yaml.tokens import CommentToken
@@ -233,7 +233,7 @@ def get_path_to_play(
         raise ValueError(msg)
     if lintable.kind != "playbook" or not isinstance(ruamel_data, CommentedSeq):
         return []
-    lc: LineCol  # lc uses 0-based counts # pylint: disable=invalid-name
+    lc: LineCol  # lc uses 0-based counts
     # lineno is 1-based. Convert to 0-based.
     line_index = lineno - 1
 
@@ -246,7 +246,7 @@ def get_path_to_play(
         else:
             next_play_line_index = None
 
-        lc = play.lc  # pylint: disable=invalid-name
+        lc = play.lc
         if not isinstance(lc.line, int):
             msg = f"expected lc.line to be an int, got {lc.line!r}"
             raise RuntimeError(msg)
@@ -462,7 +462,6 @@ class OctalIntYAML11(ScalarInt):
         v = format(data, "o")
         anchor = data.yaml_anchor(any=True)
         # noinspection PyProtectedMember
-        # pylint: disable=protected-access
         return representer.insert_underscore(
             "0",
             v,
@@ -981,7 +980,7 @@ class FormattedYAML(YAML):
         for key, value, parent_path in nested_items_path(data):
             if not isinstance(value, (CommentedMap, CommentedSeq)):
                 continue
-            fa: Format = value.fa  # pylint: disable=invalid-name
+            fa: Format = value.fa
             if fa.flow_style():
                 predicted_indent = self._predict_indent_length(parent_path, key)
                 predicted_width = len(str(value))
