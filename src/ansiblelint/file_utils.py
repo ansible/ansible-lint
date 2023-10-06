@@ -254,7 +254,7 @@ class Lintable:
             self.parent = _guess_parent(self)
 
         if self.kind == "yaml":
-            _ = self.data  # pylint: disable=pointless-statement
+            _ = self.data
 
         if self.kind == "plugin":
             # pylint: disable=consider-using-with

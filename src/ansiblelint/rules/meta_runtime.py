@@ -80,8 +80,9 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
-    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+    # pylint: disable=ungrouped-imports
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
 
     @pytest.mark.parametrize(
         ("test_file", "failures", "tags"),

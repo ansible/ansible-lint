@@ -68,7 +68,7 @@ FAIL_PLAY_TASKS = """
     command: HELLO=hello echo $HELLO
 
   - name: Typo some stuff
-    command: cerates=/tmp/blah warn=no touch /tmp/blah
+    command: crates=/tmp/blah warn=no touch /tmp/blah
 """
 
 
