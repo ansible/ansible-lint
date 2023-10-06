@@ -39,7 +39,8 @@ class PlaybookExtensionRule(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
-    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
+    # pylint: disable=ungrouped-imports
+    from ansiblelint.rules import RulesCollection
 
     @pytest.mark.parametrize(
         ("file", "expected"),

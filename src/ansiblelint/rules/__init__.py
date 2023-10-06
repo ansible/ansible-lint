@@ -328,7 +328,6 @@ class TransformMixin:
         return target
 
 
-# pylint: disable=too-many-nested-blocks
 def load_plugins(
     dirs: list[str],
 ) -> Iterator[AnsibleLintRule]:

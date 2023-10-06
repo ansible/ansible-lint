@@ -43,7 +43,6 @@ class RunOnce(AnsibleLintRule):
                 message="Play uses strategy: free",
                 filename=file,
                 tag=f"{self.id}[play]",
-                # pylint: disable=protected-access
                 lineno=strategy._line_number,  # noqa: SLF001
             ),
         ]
@@ -74,8 +73,9 @@ class RunOnce(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
-    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+    # pylint: disable=ungrouped-imports
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
 
     @pytest.mark.parametrize(
         ("test_file", "failure"),

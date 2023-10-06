@@ -56,8 +56,8 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
 
 
 if "pytest" in sys.modules:
-    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
 
     def test_default_galaxy_info(
         default_rules_collection: RulesCollection,

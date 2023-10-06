@@ -219,7 +219,6 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         if str(file.kind) == "vars":
             data = parse_yaml_from_file(str(file.path))
-            # pylint: disable=unused-variable
             for key, v, _path in nested_items_path(data):
                 if isinstance(v, AnsibleUnicode):
                     reformatted, details, tag = self.check_whitespace(
@@ -287,7 +286,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             last_value = value
         return result
 
-    # pylint: disable=too-many-statements,too-many-locals
+    # pylint: disable=too-many-locals
     def check_whitespace(
         self,
         text: str,
@@ -386,8 +385,6 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         except jinja2.exceptions.TemplateSyntaxError as exc:
             return "", str(exc.message), "invalid"
-        # https://github.com/PyCQA/pylint/issues/7433 - py311 only
-        # pylint: disable=c-extension-no-member
         except (NotImplementedError, black.parsing.InvalidInput) as exc:
             # black is not able to recognize all valid jinja2 templates, so we
             # just ignore InvalidInput errors.
@@ -482,11 +479,10 @@ def blacken(text: str) -> str:
 if "pytest" in sys.modules:
     import pytest
 
-    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import Runner
-
     # pylint: disable=ungrouped-imports
-    from ansiblelint.transformer import Transformer  # pylint: disable=ungrouped-imports
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
+    from ansiblelint.transformer import Transformer
 
     @pytest.fixture(name="error_expected_lines")
     def fixture_error_expected_lines() -> list[int]:

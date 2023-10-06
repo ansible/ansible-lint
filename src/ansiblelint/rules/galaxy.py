@@ -122,7 +122,6 @@ class GalaxyRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     message="collection version should be greater than or equal to 1.0.0",
-                    # pylint: disable=protected-access
                     lineno=version._line_number,  # noqa: SLF001
                     tag="galaxy[version-incorrect]",
                     filename=file,
