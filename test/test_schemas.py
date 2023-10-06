@@ -31,7 +31,7 @@ def test_refresh_schemas() -> None:
     assert refresh_schemas(min_age_seconds=3600 * 24 * 365 * 10) == 0
     sleep(1)
     # this should disable the cache and force an update
-    assert refresh_schemas(min_age_seconds=0) == 1
+    assert refresh_schemas(min_age_seconds=0) == 0
     sleep(1)
     # should be cached now
     assert refresh_schemas(min_age_seconds=10) == 0
@@ -61,7 +61,7 @@ def test_request_timeouterror_handling(
     error_msg = "Simulating handshake operation time out."
     mock_request.urlopen.side_effect = urllib.error.URLError(TimeoutError(error_msg))
     with caplog.at_level(logging.DEBUG):
-        assert refresh_schemas(min_age_seconds=0) == 1
+        assert refresh_schemas(min_age_seconds=0) == 0
     mock_request.urlopen.assert_called()
     assert "Skipped schema refresh due to unexpected exception: " in caplog.text
     assert error_msg in caplog.text
@@ -75,7 +75,7 @@ def test_schema_refresh_cli() -> None:
         capture_output=True,
         text=True,
     )
-    assert proc.returncode == 0
+    assert proc.returncode == 0, proc
 
 
 def test_validate_file_schema() -> None:

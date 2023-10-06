@@ -108,7 +108,6 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         get_schema.cache_clear()
     else:
         store_file.touch()
-        changed = 1
     return changed
 
 
