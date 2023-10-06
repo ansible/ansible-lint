@@ -1,2 +1,2 @@
-mkdocs-ansible[lock]>=0.1.6
+mkdocs-ansible[lock]>=0.2.0
 pipdeptree>=2.7.1

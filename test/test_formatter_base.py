@@ -36,7 +36,6 @@ def test_base_formatter_when_base_dir(
 
     # Then
     assert isinstance(output_path, (str, Path))
-    # pylint: disable=protected-access
     assert base_formatter.base_dir is None or isinstance(
         base_formatter.base_dir,
         (str, Path),

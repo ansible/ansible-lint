@@ -79,11 +79,13 @@ class Runner:
         verbosity: int = 0,
         checked_files: set[Lintable] | None = None,
         project_dir: str | None = None,
+        _skip_ansible_syntax_check: bool = False,
     ) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.lintables: set[Lintable] = set()
         self.project_dir = os.path.abspath(project_dir) if project_dir else None
+        self.skip_ansible_syntax_check = _skip_ansible_syntax_check
 
         if skip_list is None:
             skip_list = []
@@ -234,32 +236,36 @@ class Runner:
                 )
 
         # -- phase 1 : syntax check in parallel --
-        app = get_app(offline=True)
+        if not self.skip_ansible_syntax_check:
+            app = get_app(offline=True)
 
-        def worker(lintable: Lintable) -> list[MatchError]:
-            # pylint: disable=protected-access
-            return self._get_ansible_syntax_check_matches(
-                lintable=lintable,
-                app=app,
-            )
+            def worker(lintable: Lintable) -> list[MatchError]:
+                # pylint: disable=protected-access
+                return self._get_ansible_syntax_check_matches(
+                    lintable=lintable,
+                    app=app,
+                )
 
-        for lintable in self.lintables:
-            if lintable.kind not in ("playbook", "role") or lintable.stop_processing:
-                continue
-            files.append(lintable)
+            for lintable in self.lintables:
+                if (
+                    lintable.kind not in ("playbook", "role")
+                    or lintable.stop_processing
+                ):
+                    continue
+                files.append(lintable)
 
-        # avoid resource leak warning, https://github.com/python/cpython/issues/90549
-        # pylint: disable=unused-variable
-        global_resource = multiprocessing.Semaphore()  # noqa: F841
+            # avoid resource leak warning, https://github.com/python/cpython/issues/90549
+            # pylint: disable=unused-variable
+            global_resource = multiprocessing.Semaphore()  # noqa: F841
 
-        pool = multiprocessing.pool.ThreadPool(processes=threads())
-        return_list = pool.map(worker, files, chunksize=1)
-        pool.close()
-        pool.join()
-        for data in return_list:
-            matches.extend(data)
+            pool = multiprocessing.pool.ThreadPool(processes=threads())
+            return_list = pool.map(worker, files, chunksize=1)
+            pool.close()
+            pool.join()
+            for data in return_list:
+                matches.extend(data)
 
-        matches = self._filter_excluded_matches(matches)
+            matches = self._filter_excluded_matches(matches)
         # -- phase 2 ---
         if not matches:
             # do our processing only when ansible syntax check passed in order
@@ -585,7 +591,13 @@ def threads() -> int:
     return os_cpu_count
 
 
-def _get_matches(rules: RulesCollection, options: Options) -> LintResult:
+def get_matches(rules: RulesCollection, options: Options) -> LintResult:
+    """Get matches for given rules and options.
+
+    :param rules: Rules to use for linting.
+    :param options: Options to use for linting.
+    :returns: LintResult containing matches and checked files.
+    """
     lintables = ansiblelint.utils.get_lintables(opts=options, args=options.lintables)
 
     for rule in rules:
@@ -605,6 +617,7 @@ def _get_matches(rules: RulesCollection, options: Options) -> LintResult:
         verbosity=options.verbosity,
         checked_files=checked_files,
         project_dir=options.project_dir,
+        _skip_ansible_syntax_check=options._skip_ansible_syntax_check,  # noqa: SLF001
     )
     matches.extend(runner.run())
 

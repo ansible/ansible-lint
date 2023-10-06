@@ -223,7 +223,10 @@ class WriteArgAction(argparse.Action):
 
         When from_cli is not an empty list, we ignore the from_file value.
         """
-        arguments = from_file if from_cli == [cls._default] else from_cli
+        if not from_file:
+            arguments = ["all"] if from_cli == [cls._default] else from_cli
+        else:
+            arguments = from_file
         for magic_value in ("none", "all"):
             if magic_value in arguments and len(arguments) > 1:
                 msg = f"When passing '{magic_value}' to '--fix', you cannot pass other values."
@@ -507,6 +510,10 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         for entry, default in lists_map.items():
             if not getattr(cli_config, entry, None):
                 setattr(cli_config, entry, default)
+        if cli_config.write_list is None:
+            cli_config.write_list = []
+        elif cli_config.write_list == [WriteArgAction._default]:  # noqa: SLF001
+            cli_config.write_list = ["all"]
         return cli_config
 
     for entry in bools:

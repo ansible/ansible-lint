@@ -28,3 +28,7 @@ environment variable expansion or chaining multiple commands using pipes.
       ansible.builtin.command: echo hello
       changed_when: false
 ```
+
+!!! note
+
+    This rule can be automatically fixed using [`--fix`](../autofix.md) option.

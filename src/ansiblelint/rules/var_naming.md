@@ -22,7 +22,7 @@ Possible errors messages:
 - `var-naming[no-jinja]`: Variables names must not contain jinja2 templating.
 - `var-naming[pattern]`: Variables names should match ... regex.
 - `var-naming[no-role-prefix]`: Variables names from within roles should use
-  `role_name_` as a prefix.
+  `role_name_` as a prefix. Underlines are accepted before the prefix.
 - `var-naming[no-reserved]`: Variables names must not be Ansible reserved names.
 - `var-naming[read-only]`: This special variable is read-only.
 

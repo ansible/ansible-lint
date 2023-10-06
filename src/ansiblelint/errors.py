@@ -110,6 +110,9 @@ class MatchError(ValueError):
             msg = "MatchError called incorrectly as column numbers start with 1"
             raise RuntimeError(msg)
 
+        offset = getattr(self.lintable, "_line_offset", 0)
+        self.lineno += offset
+
     @functools.cached_property
     def level(self) -> str:
         """Return the level of the rule: error, warning or notice."""
@@ -133,6 +136,10 @@ class MatchError(ValueError):
             self.lineno,
             self.details,
         )
+
+    def __str__(self) -> str:
+        """Return a MatchError instance string representation."""
+        return self.__repr__()
 
     @property
     def position(self) -> str:

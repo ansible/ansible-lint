@@ -1,0 +1,53 @@
+---
+- name: Test role-prefix
+  hosts: localhost
+  connection: local
+  roles:
+    - role_vars_prefix_detection
+
+    - role: role_vars_prefix_detection
+      var1: val1
+
+    - role: role_vars_prefix_detection
+      var1: val1
+      become: true
+      vars:
+        var2: val2
+
+    - role: role_vars_prefix_detection
+      become: true
+      environment:
+        FOO: /bar/barr
+      role_vars_prefix_detection_var1: val1
+
+    - role: role_vars_prefix_detection
+      vars:
+        var1: val1
+
+    - role: role_vars_prefix_detection
+      become: true
+      environment:
+        BAR: /baz
+      vars:
+        var1: val1
+
+    - role: role_vars_prefix_detection
+      become: true
+      environment:
+        BAR: /baz
+      vars:
+        role_vars_prefix_detection_var1: val1
+  tasks:
+    - name: Include1
+      ansible.builtin.include_role:
+        name: role_vars_prefix_detection
+      vars:
+        var1: val1
+
+    - name: Include2
+      ansible.builtin.include_role:
+        name: role_vars_prefix_detection
+      vars:
+        role_vars_prefix_detection_var1: val1
+        _role_vars_prefix_detection_var2: val2
+        __role_vars_prefix_detection_var3: val3

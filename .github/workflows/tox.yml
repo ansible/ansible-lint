@@ -18,8 +18,8 @@ env:
   PY_COLORS: 1
 
 jobs:
-  pre:
-    name: pre
+  prepare:
+    name: prepare
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.generate_matrix.outputs.matrix }}
@@ -29,7 +29,7 @@ jobs:
         uses: coactions/dynamic-matrix@v1
         with:
           min_python: "3.9"
-          max_python: "3.11"
+          max_python: "3.12"
           other_names: |
             lint
             pkg
@@ -37,6 +37,7 @@ jobs:
             docs
             schemas
             eco
+            pre
             py310-devel
           platforms: linux,macos
   test-action:
@@ -53,14 +54,14 @@ jobs:
     environment: test
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs:
-      - pre
+      - prepare
       - test-action
     defaults:
       run:
         shell: ${{ matrix.shell || 'bash'}}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.pre.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
       # max-parallel: 5
       # The matrix testing goal is to cover the *most likely* environments
       # which are expected to be used by users in production. Avoid adding a
@@ -68,22 +69,10 @@ jobs:
       # proof that we failed to catch a bug by not running it. Using
       # distribution should be preferred instead of custom builds.
     env:
-      # vars safe to be passed to wsl:
-      WSLENV: FORCE_COLOR:PYTEST_REQPASS:TOXENV:GITHUB_STEP_SUMMARY
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 827
+      PYTEST_REQPASS: 831
     steps:
-      - name: Activate WSL1
-        if: "contains(matrix.shell, 'wsl')"
-        uses: Vampire/setup-wsl@v2
-
-      - name: MacOS workaround for https://github.com/actions/virtual-environments/issues/1187
-        if: ${{ matrix.os == 'macOS-latest' }}
-        run: |
-          sudo sysctl -w net.link.generic.system.hwcksum_tx=0
-          sudo sysctl -w net.link.generic.system.hwcksum_rx=0
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # needed by setuptools-scm

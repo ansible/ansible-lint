@@ -63,14 +63,14 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v7.3.0
+    rev: v7.3.1
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.26.3
+    rev: 0.27.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -130,7 +130,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.0.290"
+    rev: "v0.0.291"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -151,12 +151,12 @@ repos:
           - cryptography>=39.0.1
           - filelock>=3.12.2
           - jinja2
+          - license-expression >= 30.1.1
           - pytest-mock
           - pytest>=7.2.2
           - rich>=13.2.0
-          - ruamel-yaml>=0.17.31
           - ruamel-yaml-clib>=0.2.7
-          - spdx-tools>=0.7.1,<0.8.0
+          - ruamel-yaml>=0.17.31
           - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.4.2
@@ -169,7 +169,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v3.0.0a7
+    rev: v3.0.0b0
     hooks:
       - id: pylint
         args:
@@ -181,13 +181,13 @@ repos:
           - docutils
           - filelock>=3.12.2
           - jsonschema>=4.9.0
+          - license-expression >= 30.1.1
           - pytest-mock
           - pytest>=7.2.2
           - pyyaml
           - rich>=13.2.0
-          - ruamel-yaml>=0.17.31
           - ruamel-yaml-clib>=0.2.7
-          - spdx-tools>=0.7.1,<0.8.0
+          - ruamel-yaml>=0.17.31
           - typing_extensions
           - wcmatch
           - yamllint

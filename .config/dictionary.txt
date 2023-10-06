@@ -189,6 +189,7 @@ levelname
 libbzip
 libera
 libyaml
+licensedb
 lineinfile
 linenums
 linkcheck
@@ -259,6 +260,7 @@ pipx
 pkgcache  # linux
 pkgs
 placefolder
+plainexamples
 pluggy
 pluginmanager
 pmrun
@@ -312,6 +314,7 @@ ruleset
 runas
 sarif
 scalarint
+scancode
 schemafile
 sdist
 sdists
