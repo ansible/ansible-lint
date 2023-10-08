@@ -27,7 +27,6 @@ class TestSarifFormatter:
 
     def setup_class(self) -> None:
         """Set up few MatchError objects."""
-
         self.rule1.id = "TCF0001"
         self.rule1.severity = "VERY_HIGH"
         self.rule1.description = "This is the rule description."
@@ -39,37 +38,39 @@ class TestSarifFormatter:
         self.rule2.link = "https://rules/help#TCF0002"
         self.rule2.tags = ["tag3", "tag4"]
 
-        self.matches.extend([
-            MatchError(
-                message="message1",
-                lineno=1,
-                column=10,
-                details="details1",
-                lintable=Lintable("filename1.yml", content=""),
-                rule=self.rule1,
-                tag="yaml[test1]",
-                ignored=False
-            ),
-            MatchError(
-                message="message2",
-                lineno=2,
-                details="",
-                lintable=Lintable("filename2.yml", content=""),
-                rule=self.rule1,
-                tag="yaml[test2]",
-                ignored=True
-            ),
-            MatchError(
-                message="message3",
-                lineno=666,
-                column=667,
-                details="details3",
-                lintable=Lintable("filename3.yml", content=""),
-                rule=self.rule2,
-                tag="yaml[test3]",
-                ignored=False
-            ),
-        ])
+        self.matches.extend(
+            [
+                MatchError(
+                    message="message1",
+                    lineno=1,
+                    column=10,
+                    details="details1",
+                    lintable=Lintable("filename1.yml", content=""),
+                    rule=self.rule1,
+                    tag="yaml[test1]",
+                    ignored=False,
+                ),
+                MatchError(
+                    message="message2",
+                    lineno=2,
+                    details="",
+                    lintable=Lintable("filename2.yml", content=""),
+                    rule=self.rule1,
+                    tag="yaml[test2]",
+                    ignored=True,
+                ),
+                MatchError(
+                    message="message3",
+                    lineno=666,
+                    column=667,
+                    details="details3",
+                    lintable=Lintable("filename3.yml", content=""),
+                    rule=self.rule2,
+                    tag="yaml[test3]",
+                    ignored=False,
+                ),
+            ]
+        )
 
         self.formatter = SarifFormatter(pathlib.Path.cwd(), display_relative_path=True)
 
@@ -117,7 +118,9 @@ class TestSarifFormatter:
         assert rules[0]["id"] == self.matches[0].tag
         assert rules[0]["name"] == self.matches[0].tag
         assert rules[0]["shortDescription"]["text"] == self.matches[0].message
-        assert rules[0]["defaultConfiguration"]["level"] == self.formatter._get_sarif_rule_severity_level(self.matches[0].rule)
+        assert rules[0]["defaultConfiguration"][
+            "level"
+        ] == self.formatter._get_sarif_rule_severity_level(self.matches[0].rule)
         assert rules[0]["help"]["text"] == self.matches[0].rule.description
         assert rules[0]["properties"]["tags"] == self.matches[0].rule.tags
         assert rules[0]["helpUri"] == self.matches[0].rule.url
@@ -149,7 +152,9 @@ class TestSarifFormatter:
                     "startColumn"
                     not in result["locations"][0]["physicalLocation"]["region"]
                 )
-            assert result["level"] == self.formatter._get_sarif_result_severity_level(self.matches[i])
+            assert result["level"] == self.formatter._get_sarif_result_severity_level(
+                self.matches[i]
+            )
         assert sarif["runs"][0]["originalUriBaseIds"][SarifFormatter.BASE_URI_ID]["uri"]
         assert results[0]["message"]["text"] == self.matches[0].details
         assert results[1]["message"]["text"] == self.matches[1].message

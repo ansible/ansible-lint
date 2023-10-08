@@ -314,15 +314,13 @@ class SarifFormatter(BaseFormatter[Any]):
 
     @staticmethod
     def _get_sarif_rule_severity_level(rule: BaseRule) -> str:
-        """
-        General SARIF severity level for a rule.
-        (Can differ from an actual result/match severity.)
+        """General SARIF severity level for a rule.
+        (Can differ from an actual result/match severity.).
 
         Possible values: "none", "note", "warning", "error"
 
         see: https://github.com/oasis-tcs/sarif-spec/blob/123e95847b13fbdd4cbe2120fa5e33355d4a042b/Schemata/sarif-schema-2.1.0.json#L1934-L1939
         """
-
         if rule.severity in ["VERY_HIGH", "HIGH"]:
             return "error"
 
@@ -336,14 +334,12 @@ class SarifFormatter(BaseFormatter[Any]):
 
     @staticmethod
     def _get_sarif_result_severity_level(match: MatchError) -> str:
-        """
-        SARIF severity level for an actual result/match.
+        """SARIF severity level for an actual result/match.
 
         Possible values: "none", "note", "warning", "error"
 
         see: https://github.com/oasis-tcs/sarif-spec/blob/123e95847b13fbdd4cbe2120fa5e33355d4a042b/Schemata/sarif-schema-2.1.0.json#L2066-L2071
         """
-
         if not match.level:
             return "none"
 
