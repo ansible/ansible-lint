@@ -14,7 +14,7 @@ from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
-    from ansiblelint.rules import BaseRule
+    from ansiblelint.rules import BaseRule  # type: ignore[attr-defined]
 
 T = TypeVar("T", bound="BaseFormatter")  # type: ignore[type-arg]
 
