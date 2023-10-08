@@ -69,7 +69,7 @@ class TestSarifFormatter:
                     tag="yaml[test3]",
                     ignored=False,
                 ),
-            ]
+            ],
         )
 
         self.formatter = SarifFormatter(pathlib.Path.cwd(), display_relative_path=True)
@@ -153,7 +153,7 @@ class TestSarifFormatter:
                     not in result["locations"][0]["physicalLocation"]["region"]
                 )
             assert result["level"] == SarifFormatter.get_sarif_result_severity_level(
-                self.matches[i]
+                self.matches[i],
             )
         assert sarif["runs"][0]["originalUriBaseIds"][SarifFormatter.BASE_URI_ID]["uri"]
         assert results[0]["message"]["text"] == self.matches[0].details
