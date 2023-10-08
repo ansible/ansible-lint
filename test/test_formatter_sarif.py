@@ -120,7 +120,7 @@ class TestSarifFormatter:
         assert rules[0]["shortDescription"]["text"] == self.matches[0].message
         assert rules[0]["defaultConfiguration"][
             "level"
-        ] == self.formatter._get_sarif_rule_severity_level(self.matches[0].rule)
+        ] == SarifFormatter.get_sarif_rule_severity_level(self.matches[0].rule)
         assert rules[0]["help"]["text"] == self.matches[0].rule.description
         assert rules[0]["properties"]["tags"] == self.matches[0].rule.tags
         assert rules[0]["helpUri"] == self.matches[0].rule.url
@@ -152,7 +152,7 @@ class TestSarifFormatter:
                     "startColumn"
                     not in result["locations"][0]["physicalLocation"]["region"]
                 )
-            assert result["level"] == self.formatter._get_sarif_result_severity_level(
+            assert result["level"] == SarifFormatter.get_sarif_result_severity_level(
                 self.matches[i]
             )
         assert sarif["runs"][0]["originalUriBaseIds"][SarifFormatter.BASE_URI_ID]["uri"]

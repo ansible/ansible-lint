@@ -265,7 +265,7 @@ class SarifFormatter(BaseFormatter[Any]):
                 "text": str(match.message),
             },
             "defaultConfiguration": {
-                "level": self._get_sarif_rule_severity_level(match.rule),
+                "level": self.get_sarif_rule_severity_level(match.rule),
             },
             "help": {
                 "text": str(match.rule.description),
@@ -286,7 +286,7 @@ class SarifFormatter(BaseFormatter[Any]):
 
         result: dict[str, Any] = {
             "ruleId": match.tag,
-            "level": self._get_sarif_result_severity_level(match),
+            "level": self.get_sarif_result_severity_level(match),
             "message": {
                 "text": str(match.details)
                 if str(match.details)
@@ -313,10 +313,10 @@ class SarifFormatter(BaseFormatter[Any]):
         return result
 
     @staticmethod
-    def _get_sarif_rule_severity_level(rule: BaseRule) -> str:
+    def get_sarif_rule_severity_level(rule: BaseRule) -> str:
         """General SARIF severity level for a rule.
-        (Can differ from an actual result/match severity.).
 
+        Note: Can differ from an actual result/match severity.
         Possible values: "none", "note", "warning", "error"
 
         see: https://github.com/oasis-tcs/sarif-spec/blob/123e95847b13fbdd4cbe2120fa5e33355d4a042b/Schemata/sarif-schema-2.1.0.json#L1934-L1939
@@ -333,7 +333,7 @@ class SarifFormatter(BaseFormatter[Any]):
         return "none"
 
     @staticmethod
-    def _get_sarif_result_severity_level(match: MatchError) -> str:
+    def get_sarif_result_severity_level(match: MatchError) -> str:
         """SARIF severity level for an actual result/match.
 
         Possible values: "none", "note", "warning", "error"
