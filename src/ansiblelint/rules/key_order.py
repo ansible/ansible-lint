@@ -4,15 +4,15 @@ from __future__ import annotations
 import functools
 import sys
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from ansiblelint.constants import ANNOTATION_KEYS, LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError, RuleMatchTransformMeta
+from ansiblelint.errors import RuleMatchTransformMeta
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
@@ -77,25 +77,6 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
         "key-order[task]": "You can improve the task key order",
     }
 
-    def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
-        """Return matches found for a specific play (entry in playbook)."""
-        result: list[MatchError] = []
-        if file.kind != "playbook":
-            return result
-        keys = [str(key) for key, val in data.items() if key not in ANNOTATION_KEYS]
-        sorted_keys = sorted(keys, key=functools.cmp_to_key(task_property_sorter))
-        if keys != sorted_keys:
-            result.append(
-                self.create_matcherror(
-                    f"You can improve the play key order to: {', '.join(sorted_keys)}",
-                    filename=file,
-                    tag=f"{self.id}[play]",
-                    lineno=data[LINE_NUMBER_KEY],
-                    transform_meta=KeyOrderTMeta(fixed=tuple(sorted_keys)),
-                ),
-            )
-        return result
-
     def matchtask(
         self,
         task: Task,
@@ -122,15 +103,9 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
-        if not isinstance(match.transform_meta, KeyOrderTMeta):
-            return
-
-        if match.tag == f"{self.id}[play]":
-            play = self.seek(match.yaml_path, data)
-            for key in match.transform_meta.fixed:
-                play[key] = play.pop(key)
-            match.fixed = True
-        if match.tag == f"{self.id}[task]":
+        if match.tag == "key-order[task]":
+            if not isinstance(match.transform_meta, KeyOrderTMeta):
+                return
             task = self.seek(match.yaml_path, data)
             for key in match.transform_meta.fixed:
                 task[key] = task.pop(key)
