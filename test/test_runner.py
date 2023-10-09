@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
+from ansiblelint.config import options
 
 import pytest
 
@@ -92,6 +93,7 @@ def test_runner_exclude_globs(
     exclude_path: str,
 ) -> None:
     """Test that globs work."""
+    options.lintables = []
     runner = Runner(
         "examples/playbooks",
         rules=default_rules_collection,
