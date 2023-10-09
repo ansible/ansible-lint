@@ -72,3 +72,4 @@ test/schemas/node_modules
 collections
 site
 _readthedocs
+*.tmp.*
