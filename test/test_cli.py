@@ -160,7 +160,6 @@ def test_ensure_write_cli_does_not_consume_lintables(
         from_file=[],
         from_cli=orig_cli_value,
     )
-    # breakpoint()
     assert cli_value == expected
 
 

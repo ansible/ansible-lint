@@ -23,13 +23,16 @@ from __future__ import annotations
 import collections
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
-from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import run_ansible_lint
+
+if TYPE_CHECKING:
+    from ansiblelint.config import Options
 
 
 @pytest.fixture(name="test_rules_collection")
@@ -153,12 +156,12 @@ def test_rich_rule_listing() -> None:
         assert rule.description[:30] in result.stdout
 
 
-def test_rules_id_format() -> None:
+def test_rules_id_format(config_options: Options) -> None:
     """Assure all our rules have consistent format."""
     rule_id_re = re.compile("^[a-z-]{4,30}$")
     rules = RulesCollection(
         [Path("./src/ansiblelint/rules").resolve()],
-        options=options,
+        options=config_options,
         conditional=False,
     )
     keys: set[str] = set()
