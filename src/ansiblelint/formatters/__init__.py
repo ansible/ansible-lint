@@ -343,10 +343,7 @@ class SarifFormatter(BaseFormatter[Any]):
         if not match.level:
             return "none"
 
-        if match.level == "error":
-            return "error"
-
-        if match.level == "warning":
-            return "warning"
+        if match.level in ["warning", "error"]:
+            return match.level
 
         return "note"
