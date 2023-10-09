@@ -97,7 +97,7 @@ if "pytest" in sys.modules:
     import pytest
 
     if TYPE_CHECKING:
-        from ansiblelint.testing import RunFromText  # pylint: disable=ungrouped-imports
+        from ansiblelint.testing import RunFromText
 
     NO_LOG_UNUSED = """
 - name: Test

@@ -13,7 +13,6 @@ from ansiblelint.app import get_app
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
-    # pylint: disable=unsubscriptable-object
     CompletedProcess = subprocess.CompletedProcess[Any]
     from ansiblelint.errors import MatchError
     from ansiblelint.rules import RulesCollection

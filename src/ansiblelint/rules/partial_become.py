@@ -233,8 +233,8 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
-    from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+    from ansiblelint.rules import RulesCollection
+    from ansiblelint.runner import Runner
 
     def test_partial_become_pass() -> None:
         """No errors found for partial-become."""

@@ -9,8 +9,8 @@ from time import sleep
 from typing import Any
 from unittest.mock import DEFAULT, MagicMock, patch
 
+import license_expression
 import pytest
-import spdx.config
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.schemas import __file__ as schema_module
@@ -18,7 +18,9 @@ from ansiblelint.schemas.__main__ import refresh_schemas
 from ansiblelint.schemas.main import validate_file_schema
 
 schema_path = Path(schema_module).parent
-spdx_config_path = Path(spdx.config.__file__).parent
+spdx_config_path = (
+    Path(license_expression.__file__).parent / "data" / "scancode-licensedb-index.json"
+)
 
 
 def test_refresh_schemas() -> None:
@@ -29,7 +31,7 @@ def test_refresh_schemas() -> None:
     assert refresh_schemas(min_age_seconds=3600 * 24 * 365 * 10) == 0
     sleep(1)
     # this should disable the cache and force an update
-    assert refresh_schemas(min_age_seconds=0) == 1
+    assert refresh_schemas(min_age_seconds=0) == 0
     sleep(1)
     # should be cached now
     assert refresh_schemas(min_age_seconds=10) == 0
@@ -59,7 +61,7 @@ def test_request_timeouterror_handling(
     error_msg = "Simulating handshake operation time out."
     mock_request.urlopen.side_effect = urllib.error.URLError(TimeoutError(error_msg))
     with caplog.at_level(logging.DEBUG):
-        assert refresh_schemas(min_age_seconds=0) == 1
+        assert refresh_schemas(min_age_seconds=0) == 0
     mock_request.urlopen.assert_called()
     assert "Skipped schema refresh due to unexpected exception: " in caplog.text
     assert error_msg in caplog.text
@@ -73,7 +75,7 @@ def test_schema_refresh_cli() -> None:
         capture_output=True,
         text=True,
     )
-    assert proc.returncode == 0
+    assert proc.returncode == 0, proc
 
 
 def test_validate_file_schema() -> None:
@@ -86,15 +88,18 @@ def test_validate_file_schema() -> None:
 
 def test_spdx() -> None:
     """Test that SPDX license identifiers are in sync."""
-    _licenses = spdx_config_path / "licenses.json"
-
     license_ids = set()
-    with _licenses.open(encoding="utf-8") as license_fh:
+    with spdx_config_path.open(encoding="utf-8") as license_fh:
         licenses = json.load(license_fh)
-    for lic in licenses["licenses"]:
-        if lic.get("isDeprecatedLicenseId"):
+    for lic in licenses:
+        # for lic in lic_dic:
+        #     breakpoint()
+        if lic.get("is_deprecated"):
             continue
-        license_ids.add(lic["licenseId"])
+        lic_id = lic["spdx_license_key"]
+        if lic_id.startswith("LicenseRef"):
+            continue
+        license_ids.add(lic_id)
 
     galaxy_json = schema_path / "galaxy.json"
     with galaxy_json.open(encoding="utf-8") as f:

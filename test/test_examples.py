@@ -67,7 +67,7 @@ def test_vault_partial(
     default_rules_collection: RulesCollection,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Check ability to precess files that container !vault inside."""
+    """Check ability to process files that container !vault inside."""
     result = Runner(
         "examples/playbooks/vars/vault_partial.yml",
         rules=default_rules_collection,

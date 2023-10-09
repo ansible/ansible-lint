@@ -240,7 +240,6 @@ class Runner:
             app = get_app(offline=True)
 
             def worker(lintable: Lintable) -> list[MatchError]:
-                # pylint: disable=protected-access
                 return self._get_ansible_syntax_check_matches(
                     lintable=lintable,
                     app=app,

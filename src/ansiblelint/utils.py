@@ -186,7 +186,6 @@ def ansible_template(
                     _logger.warning(err)
                     raise
 
-                # pylint: disable=protected-access
                 templar.environment.filters._delegatee[  # noqa: SLF001
                     missing_filter
                 ] = mock_filter
@@ -566,7 +565,6 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
             skip_action_validation=options.skip_action_validation,
         )
     except AnsibleParserError as exc:
-        # pylint: disable=raise-missing-from
         raise MatchError(
             rule=AnsibleParserErrorRule(),
             message=exc.message,
@@ -878,9 +876,7 @@ def parse_yaml_linenumbers(
         if hasattr(node, "__line__"):
             mapping[LINE_NUMBER_KEY] = node.__line__
         else:
-            mapping[
-                LINE_NUMBER_KEY
-            ] = mapping._line_number  # pylint: disable=protected-access  # noqa: SLF001
+            mapping[LINE_NUMBER_KEY] = mapping._line_number  # noqa: SLF001
         mapping[FILENAME_KEY] = lintable.path
         return mapping
 
@@ -983,7 +979,6 @@ def is_playbook(filename: str) -> bool:
     return False
 
 
-# pylint: disable=too-many-statements
 def get_lintables(
     opts: Options = options,
     args: list[str] | None = None,

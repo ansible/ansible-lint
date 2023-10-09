@@ -271,7 +271,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
         result.matches.pop(idx)
 
 
-# pylint: disable=too-many-statements,too-many-locals
+# pylint: disable=too-many-locals
 def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
