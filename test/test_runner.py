@@ -22,11 +22,11 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
-from ansiblelint.config import options
 
 import pytest
 
 from ansiblelint import formatters
+from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
 from ansiblelint.runner import Runner
 
