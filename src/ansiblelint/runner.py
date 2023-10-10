@@ -468,29 +468,7 @@ class Runner:
         if lintable.kind == "role":
             playbook_ds = AnsibleMapping({"roles": [{"role": str(lintable.path)}]})
         elif lintable.kind == "plugin":
-            offset, content = parse_examples_from_plugin(lintable)
-            if not content:
-                # No examples, nothing to see here
-                return []
-            examples = Lintable(
-                name=lintable.name,
-                content=content,
-                kind="yaml",
-                base_kind="text/yaml",
-                parent=lintable,
-            )
-            examples.line_offset = offset
-
-            # pylint: disable=consider-using-with
-            examples.file = NamedTemporaryFile(
-                mode="w+",
-                suffix=f"_{lintable.path.name}.yaml",
-            )
-            examples.file.write(content)
-            examples.file.flush()
-            examples.filename = examples.file.name
-            examples.path = Path(examples.file.name)
-            return [examples]
+            return self.plugin_children(lintable)
         elif lintable.kind not in ("playbook", "tasks"):
             return []
         else:
@@ -568,6 +546,32 @@ class Runner:
             )
             return delegate_map[k](str(basedir), k, v, parent_type)
         return []
+
+    def plugin_children(self, lintable: Lintable) -> list[Lintable]:
+        """Collect lintable sections from plugin file."""
+        offset, content = parse_examples_from_plugin(lintable)
+        if not content:
+            # No examples, nothing to see here
+            return []
+        examples = Lintable(
+            name=lintable.name,
+            content=content,
+            kind="yaml",
+            base_kind="text/yaml",
+            parent=lintable,
+        )
+        examples.line_offset = offset
+
+        # pylint: disable=consider-using-with
+        examples.file = NamedTemporaryFile(
+            mode="w+",
+            suffix=f"_{lintable.path.name}.yaml",
+        )
+        examples.file.write(content)
+        examples.file.flush()
+        examples.filename = examples.file.name
+        examples.path = Path(examples.file.name)
+        return [examples]
 
 
 @cache
