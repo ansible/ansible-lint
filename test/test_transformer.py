@@ -127,6 +127,12 @@ def fixture_runner_result(
             True,
             id="partial_become",
         ),
+        pytest.param(
+            "examples/playbooks/transform-key-order-play.yml",
+            1,
+            True,
+            id="key_order_play_transform",
+        ),
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
