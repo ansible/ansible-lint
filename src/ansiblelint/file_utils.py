@@ -256,19 +256,6 @@ class Lintable:
         if self.kind == "yaml":
             _ = self.data
 
-        if self.kind == "plugin":
-            # pylint: disable=consider-using-with
-            self.file = NamedTemporaryFile(
-                mode="w+",
-                suffix=f"_{name.name}.yaml",
-            )
-            self.filename = self.file.name
-            self._content = self.parse_examples_from_plugin()
-            self.file.write(self._content)
-            self.file.flush()
-            self.path = Path(self.file.name)
-            self.base_kind = "text/yaml"
-
     def __del__(self) -> None:
         """Clean up temporary files when the instance is cleaned up."""
         if hasattr(self, "file"):
@@ -397,25 +384,6 @@ class Lintable:
     def __repr__(self) -> str:
         """Return user friendly representation of a lintable."""
         return f"{self.name} ({self.kind})"
-
-    def parse_examples_from_plugin(self) -> str:
-        """Parse yaml inside plugin EXAMPLES string.
-
-        Store a line number offset to realign returned line numbers later
-        """
-        parsed = ast.parse(self.content)
-        for child in parsed.body:
-            if isinstance(child, ast.Assign):
-                label = child.targets[0]
-                if isinstance(label, ast.Name) and label.id == "EXAMPLES":
-                    self._line_offset = child.lineno - 1
-                    break
-
-        docs = read_docstring(str(self.path))
-        examples = docs["plainexamples"]
-        # Ignore the leading newline and lack of document start
-        # as including those in EXAMPLES would be weird.
-        return f"---{examples}" if examples else ""
 
     @property
     def data(self) -> Any:
@@ -627,3 +595,25 @@ def get_all_files(
                     all_files.extend(get_all_files(item, exclude_paths=exclude_paths))
 
     return all_files
+
+
+def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
+    """Parse yaml inside plugin EXAMPLES string.
+
+    Store a line number offset to realign returned line numbers later
+    """
+    offset = 1
+    parsed = ast.parse(lintable.content)
+    for child in parsed.body:
+        if isinstance(child, ast.Assign):
+            label = child.targets[0]
+            if isinstance(label, ast.Name) and label.id == "EXAMPLES":
+                offset = child.lineno
+                break
+
+    docs = read_docstring(str(lintable.path))
+    examples = docs["plainexamples"]
+
+    # Ignore the leading newline and lack of document start
+    # as including those in EXAMPLES would be weird.
+    return offset, (f"---{examples}" if examples else "")

@@ -447,3 +447,20 @@ def test_task_in_list(file: str, names: list[str], positions: list[str]) -> None
     for index, task in enumerate(tasks):
         assert task.name == names[index]
         assert task.position == positions[index]
+
+
+def test_find_children_in_module(default_rules_collection: RulesCollection) -> None:
+    """Verify correct function of find_children() in tasks."""
+    lintable = Lintable("plugins/modules/fake_module.py")
+    children = Runner(
+        rules=default_rules_collection,
+    ).find_children(lintable)
+    assert len(children) == 1
+    child = children[0]
+
+    # Parent is a python file
+    assert lintable.base_kind == "text/python"
+
+    # Child correctly looks like a YAML file
+    assert child.base_kind == "text/yaml"
+    assert child.content.startswith("---")

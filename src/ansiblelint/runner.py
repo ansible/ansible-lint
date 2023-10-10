@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from fnmatch import fnmatch
 from functools import cache
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any
 
 from ansible.errors import AnsibleError
@@ -32,7 +33,11 @@ from ansiblelint._internal.rules import (
 from ansiblelint.app import App, get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
-from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
+from ansiblelint.file_utils import (
+    Lintable,
+    expand_dirs_in_lintables,
+    parse_examples_from_plugin,
+)
 from ansiblelint.logger import timed_info
 from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
@@ -465,6 +470,30 @@ class Runner:
         add_all_plugin_dirs(playbook_dir or ".")
         if lintable.kind == "role":
             playbook_ds = AnsibleMapping({"roles": [{"role": str(lintable.path)}]})
+        elif lintable.kind == "plugin":
+            offset, content = parse_examples_from_plugin(lintable)
+            if not content:
+                # No examples, nothing to see here
+                return []
+            examples = Lintable(
+                name=lintable.name,
+                content=content,
+                kind="yaml",
+                base_kind="text/yaml",
+                parent=lintable,
+            )
+            examples._line_offset = offset  # noqa: SLF001
+
+            # pylint: disable=consider-using-with
+            examples.file = NamedTemporaryFile(
+                mode="w+",
+                suffix=f"_{lintable.path.name}.yaml",
+            )
+            examples.file.write(content)
+            examples.file.flush()
+            examples.filename = examples.file.name
+            examples.path = Path(examples.file.name)
+            return [examples]
         elif lintable.kind not in ("playbook", "tasks"):
             return []
         else:
