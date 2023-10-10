@@ -5,7 +5,9 @@ from __future__ import annotations
 
 import copy
 import logging
+import os
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
@@ -13,8 +15,6 @@ from ansiblelint.runner import get_matches
 from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
     from ansiblelint.config import Options
@@ -84,6 +84,8 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
+    from unittest import mock
+
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
@@ -97,34 +99,33 @@ if "pytest" in sys.modules:
         assert len(results) == 1
         assert results[0].tag == "deprecated-local-action"
 
+    @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
     def test_local_action_transform(
         config_options: Options,
-        copy_examples_dir: tuple[Path, Path],
         default_rules_collection: RulesCollection,
     ) -> None:
         """Test transform functionality for no-log-password rule."""
-        playbook: str = "examples/playbooks/tasks/local_action.yml"
+        playbook = Path("examples/playbooks/tasks/local_action.yml")
         config_options.write_list = ["all"]
 
-        config_options.lintables = [playbook]
+        config_options.lintables = [str(playbook)]
         runner_result = get_matches(
             rules=default_rules_collection,
             options=config_options,
         )
         transformer = Transformer(result=runner_result, options=config_options)
         transformer.run()
-
         matches = runner_result.matches
         assert len(matches) == 3
 
-        orig_dir, tmp_dir = copy_examples_dir
-        orig_playbook = orig_dir / playbook
-        expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
-        transformed_playbook = tmp_dir / playbook
+        orig_content = playbook.read_text(encoding="utf-8")
+        expected_content = playbook.with_suffix(
+            f".transformed{playbook.suffix}",
+        ).read_text(encoding="utf-8")
+        transformed_content = playbook.with_suffix(f".tmp{playbook.suffix}").read_text(
+            encoding="utf-8",
+        )
 
-        orig_playbook_content = orig_playbook.read_text()
-        expected_playbook_content = expected_playbook.read_text()
-        transformed_playbook_content = transformed_playbook.read_text()
-
-        assert orig_playbook_content != transformed_playbook_content
-        assert transformed_playbook_content == expected_playbook_content
+        assert orig_content != transformed_content
+        assert expected_content == transformed_content
+        playbook.with_suffix(f".tmp{playbook.suffix}").unlink()

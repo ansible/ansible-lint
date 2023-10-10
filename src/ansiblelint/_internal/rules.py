@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.constants import RULE_DOC_URL
 
 if TYPE_CHECKING:
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.rules import RulesCollection
@@ -156,6 +157,24 @@ class BaseRule:
         This is used by the ``--list-tags`` option to ansible-lint.
         """
         return getattr(cls, "_ids", {cls.id: cls.shortdesc})
+
+    @property
+    def rule_config(self) -> dict[str, Any]:
+        """Retrieve rule specific configuration."""
+        rule_config = self.options.rules.get(self.id, {})
+        if not isinstance(rule_config, dict):  # pragma: no branch
+            msg = f"Invalid rule config for {self.id}: {rule_config}"
+            raise RuntimeError(msg)
+        return rule_config
+
+    @property
+    def options(self) -> Options:
+        """Used to access linter configuration."""
+        if self._collection is None:
+            msg = f"A rule ({self.id}) that is not part of a collection cannot access its configuration."
+            _logger.warning(msg)
+            raise RuntimeError(msg)
+        return self._collection.options
 
 
 # pylint: enable=unused-argument

@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint._internal.rules import BaseRule, RuntimeErrorRule
-from ansiblelint.config import options
 from ansiblelint.file_utils import Lintable
 
 if TYPE_CHECKING:
@@ -25,17 +24,6 @@ class WarnSource:
     lineno: int
     tag: str
     message: str | None = None
-
-
-class StrictModeError(RuntimeError):
-    """Raise when we encounter a warning in strict mode."""
-
-    def __init__(
-        self,
-        message: str = "Warning treated as error due to --strict option.",
-    ):
-        """Initialize a StrictModeError instance."""
-        super().__init__(message)
 
 
 @dataclass(frozen=True)
@@ -117,7 +105,7 @@ class MatchError(ValueError):
     def level(self) -> str:
         """Return the level of the rule: error, warning or notice."""
         if not self.ignored and {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(
-            options.warn_list,
+            self.rule.options.warn_list,
         ):
             return "error"
         return "warning"

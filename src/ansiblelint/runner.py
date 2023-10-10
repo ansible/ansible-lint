@@ -28,15 +28,13 @@ import ansiblelint.utils
 from ansiblelint._internal.rules import (
     BaseRule,
     LoadingFailureRule,
-    RuntimeErrorRule,
-    WarningRule,
 )
 from ansiblelint.app import App, get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
 from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.logger import timed_info
-from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS, AnsibleSyntaxCheckRule
+from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
 from ansiblelint.utils import (
     PLAYBOOK_DIR,
@@ -176,7 +174,7 @@ class Runner:
                     if isinstance(warn.source, WarnSource):
                         match = MatchError(
                             message=warn.source.message or warn.category.__name__,
-                            rule=WarningRule(),
+                            rule=self.rules["warning"],
                             filename=warn.source.filename.filename,
                             tag=warn.source.tag,
                             lineno=warn.source.lineno,
@@ -187,7 +185,7 @@ class Runner:
                             message=warn.message
                             if isinstance(warn.message, str)
                             else "?",
-                            rule=WarningRule(),
+                            rule=self.rules["warning"],
                             filename=str(filename),
                         )
                     matches.append(match)
@@ -219,7 +217,7 @@ class Runner:
                         lintable=lintable,
                         message=str(lintable.exc),
                         details=str(lintable.exc.__cause__),
-                        rule=LoadingFailureRule(),
+                        rule=self.rules["load-failure"],
                         tag=f"load-failure[{lintable.exc.__class__.__name__.lower()}]",
                     ),
                 )
@@ -230,7 +228,7 @@ class Runner:
                     MatchError(
                         lintable=lintable,
                         message="File or directory not found.",
-                        rule=LoadingFailureRule(),
+                        rule=self.rules["load-failure"],
                         tag="load-failure[not-found]",
                     ),
                 )
@@ -303,7 +301,12 @@ class Runner:
         app: App,
     ) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
-        default_rule: BaseRule = AnsibleSyntaxCheckRule()
+        try:
+            default_rule: BaseRule = self.rules["syntax-check"]
+        except ValueError:
+            # if syntax-check is not loaded, we do not perform any syntax check,
+            # that might happen during testing
+            return []
         fh = None
         results = []
         if lintable.kind not in ("playbook", "role"):
@@ -404,7 +407,7 @@ class Runner:
                     )
 
             if not results:
-                rule = RuntimeErrorRule()
+                rule = self.rules["internal-error"]
                 message = (
                     f"Unexpected error code {run.returncode} from "
                     f"execution of: {' '.join(cmd)}"
@@ -450,7 +453,7 @@ class Runner:
                     exc.rule = LoadingFailureRule()
                     yield exc
                 except AttributeError:
-                    yield MatchError(lintable=lintable, rule=LoadingFailureRule())
+                    yield MatchError(lintable=lintable, rule=self.rules["load-failure"])
                 visited.add(lintable)
 
     def find_children(self, lintable: Lintable) -> list[Lintable]:
@@ -472,7 +475,7 @@ class Runner:
         results = []
         # playbook_ds can be an AnsibleUnicode string, which we consider invalid
         if isinstance(playbook_ds, str):
-            raise MatchError(lintable=lintable, rule=LoadingFailureRule())
+            raise MatchError(lintable=lintable, rule=self.rules["load-failure"])
         for item in ansiblelint.utils.playbook_items(playbook_ds):
             # if lintable.kind not in ["playbook"]:
             for child in self.play_children(
