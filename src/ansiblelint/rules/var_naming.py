@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from ansible.vars.reserved import get_reserved_names
 
-from ansiblelint.config import options
+from ansiblelint.config import Options, options
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
     LINE_NUMBER_KEY,
@@ -349,9 +349,13 @@ if "pytest" in sys.modules:
             pytest.param("examples/Taskfile.yml", 0, id="1"),
         ),
     )
-    def test_invalid_var_name_playbook(file: str, expected: int) -> None:
+    def test_invalid_var_name_playbook(
+        file: str,
+        expected: int,
+        config_options: Options,
+    ) -> None:
         """Test rule matches."""
-        rules = RulesCollection(options=options)
+        rules = RulesCollection(options=config_options)
         rules.register(VariableNamingRule())
         results = Runner(Lintable(file), rules=rules).run()
         assert len(results) == expected

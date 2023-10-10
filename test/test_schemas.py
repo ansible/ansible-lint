@@ -92,8 +92,6 @@ def test_spdx() -> None:
     with spdx_config_path.open(encoding="utf-8") as license_fh:
         licenses = json.load(license_fh)
     for lic in licenses:
-        # for lic in lic_dic:
-        #     breakpoint()
         if lic.get("is_deprecated"):
             continue
         lic_id = lic["spdx_license_key"]

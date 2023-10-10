@@ -130,7 +130,7 @@ def fixture_runner_result(
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
-def test_transformer(  # pylint: disable=too-many-arguments, too-many-locals
+def test_transformer(
     config_options: Options,
     playbook_str: str,
     runner_result: LintResult,
