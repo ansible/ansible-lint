@@ -19,43 +19,61 @@ from ansiblelint.rules import AnsibleLintRule, RulesCollection
 class TestSarifFormatter:
     """Unit test for SarifFormatter."""
 
-    rule = AnsibleLintRule()
+    rule1 = AnsibleLintRule()
+    rule2 = AnsibleLintRule()
     matches: list[MatchError] = []
     formatter: SarifFormatter | None = None
     collection = RulesCollection()
+    collection.register(rule1)
+    collection.register(rule2)
 
     def setup_class(self) -> None:
         """Set up few MatchError objects."""
-        self.rule = AnsibleLintRule()
-        self.rule.id = "TCF0001"
-        self.rule.severity = "VERY_HIGH"
-        self.rule.description = "This is the rule description."
-        self.rule.link = "https://rules/help#TCF0001"
-        self.rule.tags = ["tag1", "tag2"]
-        self.collection.register(self.rule)
+        self.rule1.id = "TCF0001"
+        self.rule1.severity = "VERY_HIGH"
+        self.rule1.description = "This is the rule description."
+        self.rule1.link = "https://rules/help#TCF0001"
+        self.rule1.tags = ["tag1", "tag2"]
 
-        self.matches = []
-        self.matches.append(
-            MatchError(
-                message="message",
-                lineno=1,
-                column=10,
-                details="details",
-                lintable=Lintable("filename.yml", content=""),
-                rule=self.rule,
-                tag="yaml[test]",
-            ),
+        self.rule2.id = "TCF0002"
+        self.rule2.severity = "MEDIUM"
+        self.rule2.link = "https://rules/help#TCF0002"
+        self.rule2.tags = ["tag3", "tag4"]
+
+        self.matches.extend(
+            [
+                MatchError(
+                    message="message1",
+                    lineno=1,
+                    column=10,
+                    details="details1",
+                    lintable=Lintable("filename1.yml", content=""),
+                    rule=self.rule1,
+                    tag="yaml[test1]",
+                    ignored=False,
+                ),
+                MatchError(
+                    message="message2",
+                    lineno=2,
+                    details="",
+                    lintable=Lintable("filename2.yml", content=""),
+                    rule=self.rule1,
+                    tag="yaml[test2]",
+                    ignored=True,
+                ),
+                MatchError(
+                    message="message3",
+                    lineno=666,
+                    column=667,
+                    details="details3",
+                    lintable=Lintable("filename3.yml", content=""),
+                    rule=self.rule2,
+                    tag="yaml[test3]",
+                    ignored=False,
+                ),
+            ],
         )
-        self.matches.append(
-            MatchError(
-                message="message",
-                lineno=2,
-                details="",
-                lintable=Lintable("filename.yml", content=""),
-                rule=self.rule,
-                tag="yaml[test]",
-            ),
-        )
+
         self.formatter = SarifFormatter(pathlib.Path.cwd(), display_relative_path=True)
 
     def test_format_list(self) -> None:
@@ -81,7 +99,7 @@ class TestSarifFormatter:
         """Test if the return SARIF object contains the expected results."""
         assert isinstance(self.formatter, SarifFormatter)
         sarif = json.loads(self.formatter.format_result(self.matches))
-        assert len(sarif["runs"][0]["results"]) == 2
+        assert len(sarif["runs"][0]["results"]) == 3
         for result in sarif["runs"][0]["results"]:
             # Ensure all reported entries have a level
             assert "level" in result
@@ -98,16 +116,18 @@ class TestSarifFormatter:
         assert driver["name"] == SarifFormatter.TOOL_NAME
         assert driver["informationUri"] == SarifFormatter.TOOL_URL
         rules = driver["rules"]
-        assert len(rules) == 1
+        assert len(rules) == 3
         assert rules[0]["id"] == self.matches[0].tag
         assert rules[0]["name"] == self.matches[0].tag
         assert rules[0]["shortDescription"]["text"] == self.matches[0].message
-        assert rules[0]["defaultConfiguration"]["level"] == "error"
+        assert rules[0]["defaultConfiguration"][
+            "level"
+        ] == SarifFormatter.get_sarif_rule_severity_level(self.matches[0].rule)
         assert rules[0]["help"]["text"] == self.matches[0].rule.description
         assert rules[0]["properties"]["tags"] == self.matches[0].rule.tags
         assert rules[0]["helpUri"] == self.matches[0].rule.url
         results = sarif["runs"][0]["results"]
-        assert len(results) == 2
+        assert len(results) == 3
         for i, result in enumerate(results):
             assert result["ruleId"] == self.matches[i].tag
             assert (
@@ -134,6 +154,9 @@ class TestSarifFormatter:
                     "startColumn"
                     not in result["locations"][0]["physicalLocation"]["region"]
                 )
+            assert result["level"] == SarifFormatter.get_sarif_result_severity_level(
+                self.matches[i],
+            )
         assert sarif["runs"][0]["originalUriBaseIds"][SarifFormatter.BASE_URI_ID]["uri"]
         assert results[0]["message"]["text"] == self.matches[0].details
         assert results[1]["message"]["text"] == self.matches[1].message
