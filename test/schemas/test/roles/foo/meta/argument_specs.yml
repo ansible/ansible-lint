@@ -40,6 +40,35 @@ argument_specs:
               - 3
               - 123
 
+      complex_required_options:
+        type: dict
+        description: Contains sub-options with interacting requirements
+        options:
+          foo:
+            type: str
+          bar:
+            type: str
+          baz:
+            type: str
+
+        mutually_exclusive:
+          - ["foo", "bar"]
+
+        required_together:
+          - ["bar", "baz"]
+
+        required_one_of:
+          - ["foo", "bar", "baz"]
+
+        required_if:
+          - ["foo", "must_have_bar_and_baz_default", ["bar", "baz"]]
+          - ["foo", "must_have_bar_and_baz_explicit", ["bar", "baz"], false]
+          - ["foo", "must_have_one_of_bar_or_baz", ["bar", "baz"], true]
+
+        required_by:
+          foo: "bar"
+          bar: ["foo", "baz"]
+
     seealso:
       - module: community.foo.bar
       - module: community.foo.baz
