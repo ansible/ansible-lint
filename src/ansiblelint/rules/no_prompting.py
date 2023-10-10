@@ -8,6 +8,7 @@ from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
@@ -60,15 +61,14 @@ class NoPromptingRule(AnsibleLintRule):
 
 
 if "pytest" in sys.modules:
-    from ansiblelint.config import options
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_no_prompting_fail() -> None:
+    def test_no_prompting_fail(config_options: Options) -> None:
         """Negative test for no-prompting."""
         # For testing we want to manually enable opt-in rules
-        options.enable_list = ["no-prompting"]
-        rules = RulesCollection(options=options)
+        config_options.enable_list = ["no-prompting"]
+        rules = RulesCollection(options=config_options)
         rules.register(NoPromptingRule())
         results = Runner("examples/playbooks/rule-no-prompting.yml", rules=rules).run()
         assert len(results) == 2

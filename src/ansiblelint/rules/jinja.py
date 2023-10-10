@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -477,6 +478,8 @@ def blacken(text: str) -> str:
 
 
 if "pytest" in sys.modules:
+    from unittest import mock
+
     import pytest
 
     # pylint: disable=ungrouped-imports
@@ -824,16 +827,16 @@ if "pytest" in sys.modules:
         errs = Runner(success, rules=collection).run()
         assert len(errs) == 0
 
+    @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
     def test_jinja_transform(
         config_options: Options,
-        copy_examples_dir: tuple[Path, Path],
         default_rules_collection: RulesCollection,
     ) -> None:
         """Test transform functionality for jinja rule."""
-        playbook: str = "examples/playbooks/rule-jinja-before.yml"
+        playbook = Path("examples/playbooks/rule-jinja-before.yml")
         config_options.write_list = ["all"]
 
-        config_options.lintables = [playbook]
+        config_options.lintables = [str(playbook)]
         runner_result = get_matches(
             rules=default_rules_collection,
             options=config_options,
@@ -844,17 +847,17 @@ if "pytest" in sys.modules:
         matches = runner_result.matches
         assert len(matches) == 2
 
-        orig_dir, tmp_dir = copy_examples_dir
-        orig_playbook = orig_dir / playbook
-        expected_playbook = orig_dir / playbook.replace(".yml", ".transformed.yml")
-        transformed_playbook = tmp_dir / playbook
+        orig_content = playbook.read_text(encoding="utf-8")
+        expected_content = playbook.with_suffix(
+            f".transformed{playbook.suffix}",
+        ).read_text(encoding="utf-8")
+        transformed_content = playbook.with_suffix(f".tmp{playbook.suffix}").read_text(
+            encoding="utf-8",
+        )
 
-        orig_playbook_content = orig_playbook.read_text()
-        expected_playbook_content = expected_playbook.read_text()
-        transformed_playbook_content = transformed_playbook.read_text()
-
-        assert orig_playbook_content != transformed_playbook_content
-        assert transformed_playbook_content == expected_playbook_content
+        assert orig_content != transformed_content
+        assert expected_content == transformed_content
+        playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
 
 
 def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
