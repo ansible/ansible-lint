@@ -24,6 +24,8 @@ class TestSarifFormatter:
     matches: list[MatchError] = []
     formatter: SarifFormatter | None = None
     collection = RulesCollection()
+    collection.register(rule1)
+    collection.register(rule2)
 
     def setup_class(self) -> None:
         """Set up few MatchError objects."""
