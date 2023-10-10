@@ -13,7 +13,7 @@ import pytest
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import SarifFormatter
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
 
 class TestSarifFormatter:
@@ -22,6 +22,7 @@ class TestSarifFormatter:
     rule = AnsibleLintRule()
     matches: list[MatchError] = []
     formatter: SarifFormatter | None = None
+    collection = RulesCollection()
 
     def setup_class(self) -> None:
         """Set up few MatchError objects."""
@@ -31,6 +32,8 @@ class TestSarifFormatter:
         self.rule.description = "This is the rule description."
         self.rule.link = "https://rules/help#TCF0001"
         self.rule.tags = ["tag1", "tag2"]
+        self.collection.register(self.rule)
+
         self.matches = []
         self.matches.append(
             MatchError(

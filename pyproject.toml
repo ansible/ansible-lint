@@ -163,10 +163,6 @@ enable = [
 [tool.pylint.REPORTING]
 output-format = "colorized"
 
-[tool.pylint.TYPECHECK]
-# pylint is unable to detect Namespace attributes and will throw a E1101
-generated-members = "options.*"
-
 [tool.pylint.SUMMARY]
 # We don't need the score spamming console, as we either pass or fail
 score = "n"

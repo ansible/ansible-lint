@@ -23,7 +23,7 @@ def test_rule_config(
     rule_config: dict[str, Any],
     config_options: Options,
 ) -> None:
-    """Check that a rule config is inherited from options."""
+    """Check that a rule config can be accessed."""
     config_options.rules["load-failure"] = rule_config
     rules = RulesCollection(options=config_options)
     for rule in rules:

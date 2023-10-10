@@ -119,7 +119,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                             message=msg,
                             lineno=data.get("__line__", 1),
                             lintable=file,
-                            rule=ValidateSchemaRule(),
+                            rule=self,
                             details=ValidateSchemaRule.description,
                             tag=f"schema[{file.kind}]",
                         ),
@@ -143,7 +143,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                     MatchError(
                         message=msg,
                         lintable=file,
-                        rule=ValidateSchemaRule(),
+                        rule=self,
                         details=ValidateSchemaRule.description,
                         tag=f"schema[{tag}]",
                     ),
@@ -168,7 +168,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                 MatchError(
                     message=error,
                     lintable=file,
-                    rule=ValidateSchemaRule(),
+                    rule=self,
                     details=ValidateSchemaRule.description,
                     tag=f"schema[{file.kind}]",
                 ),
