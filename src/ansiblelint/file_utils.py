@@ -1,7 +1,6 @@
 """Utility functions related to file operations."""
 from __future__ import annotations
 
-import ast
 import copy
 import logging
 import os
@@ -15,7 +14,6 @@ from typing import TYPE_CHECKING, Any, cast
 import pathspec
 import wcmatch.pathlib
 import wcmatch.wcmatch
-from ansible.parsing.plugin_docs import read_docstring
 from yaml.error import YAMLError
 
 from ansiblelint.config import BASE_KINDS, Options, options
@@ -199,6 +197,9 @@ class Lintable:
         self.exc: Exception | None = None  # Stores data loading exceptions
         self.parent = parent
         self.explicit = False  # Indicates if the file was explicitly provided or was indirectly included.
+        self.line_offset = (
+            0  # Amount to offset line numbers by to get accurate position
+        )
 
         if isinstance(name, str):
             name = Path(name)
@@ -595,25 +596,3 @@ def get_all_files(
                     all_files.extend(get_all_files(item, exclude_paths=exclude_paths))
 
     return all_files
-
-
-def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
-    """Parse yaml inside plugin EXAMPLES string.
-
-    Store a line number offset to realign returned line numbers later
-    """
-    offset = 1
-    parsed = ast.parse(lintable.content)
-    for child in parsed.body:
-        if isinstance(child, ast.Assign):
-            label = child.targets[0]
-            if isinstance(label, ast.Name) and label.id == "EXAMPLES":
-                offset = child.lineno
-                break
-
-    docs = read_docstring(str(lintable.path))
-    examples = docs["plainexamples"]
-
-    # Ignore the leading newline and lack of document start
-    # as including those in EXAMPLES would be weird.
-    return offset, (f"---{examples}" if examples else "")

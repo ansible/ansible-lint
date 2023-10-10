@@ -33,11 +33,7 @@ from ansiblelint._internal.rules import (
 from ansiblelint.app import App, get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
-from ansiblelint.file_utils import (
-    Lintable,
-    expand_dirs_in_lintables,
-    parse_examples_from_plugin,
-)
+from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
 from ansiblelint.logger import timed_info
 from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
@@ -46,6 +42,7 @@ from ansiblelint.utils import (
     _include_children,
     _roles_children,
     _taskshandlers_children,
+    parse_examples_from_plugin,
     template,
 )
 
@@ -482,7 +479,7 @@ class Runner:
                 base_kind="text/yaml",
                 parent=lintable,
             )
-            examples._line_offset = offset  # noqa: SLF001
+            examples.line_offset = offset
 
             # pylint: disable=consider-using-with
             examples.file = NamedTemporaryFile(
