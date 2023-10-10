@@ -16,6 +16,7 @@ from ansiblelint.yaml_utils import load_yamllint_config
 if TYPE_CHECKING:
     from typing import Any
 
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
 
 _logger = logging.getLogger(__name__)
@@ -134,7 +135,6 @@ if "pytest" in sys.modules:
     import pytest
 
     # pylint: disable=ungrouped-imports
-    from ansiblelint.config import options
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
@@ -195,12 +195,17 @@ if "pytest" in sys.modules:
         ),
     )
     @pytest.mark.filterwarnings("ignore::ansible_compat.runtime.AnsibleWarning")
-    def test_yamllint(file: str, expected_kind: str, expected: list[str]) -> None:
+    def test_yamllint(
+        file: str,
+        expected_kind: str,
+        expected: list[str],
+        config_options: Options,
+    ) -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(file)
         assert lintable.kind == expected_kind
 
-        rules = RulesCollection(options=options)
+        rules = RulesCollection(options=config_options)
         rules.register(YamllintRule())
         results = Runner(lintable, rules=rules).run()
 

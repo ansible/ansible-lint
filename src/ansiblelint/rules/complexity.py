@@ -9,6 +9,7 @@ from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
 if TYPE_CHECKING:
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
@@ -77,7 +78,6 @@ if "pytest" in sys.modules:
     import pytest
 
     # pylint: disable=ungrouped-imports
-    from ansiblelint.config import options
     from ansiblelint.runner import Runner
 
     @pytest.mark.parametrize(
@@ -99,11 +99,12 @@ if "pytest" in sys.modules:
         file: str,
         expected_results: list[str],
         monkeypatch: pytest.MonkeyPatch,
+        config_options: Options,
     ) -> None:
         """Test rule."""
-        monkeypatch.setattr(options, "max_tasks", 5)
-        monkeypatch.setattr(options, "max_block_depth", 3)
-        collection = RulesCollection(options=options)
+        monkeypatch.setattr(config_options, "max_tasks", 5)
+        monkeypatch.setattr(config_options, "max_block_depth", 3)
+        collection = RulesCollection(options=config_options)
         collection.register(ComplexityRule())
         results = Runner(file, rules=collection).run()
 

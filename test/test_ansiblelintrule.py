@@ -5,11 +5,10 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from ansiblelint.config import options
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
 if TYPE_CHECKING:
-    from _pytest.monkeypatch import MonkeyPatch
+    from ansiblelint.config import Options
 
 
 def test_unjinja() -> None:
@@ -20,12 +19,14 @@ def test_unjinja() -> None:
 
 
 @pytest.mark.parametrize("rule_config", ({}, {"foo": True, "bar": 1}))
-def test_rule_config(rule_config: dict[str, Any], monkeypatch: MonkeyPatch) -> None:
+def test_rule_config(
+    rule_config: dict[str, Any],
+    config_options: Options,
+) -> None:
     """Check that a rule config is inherited from options."""
-    rule_id = "rule-0"
-    monkeypatch.setattr(AnsibleLintRule, "id", rule_id)
-    monkeypatch.setitem(options.rules, rule_id, rule_config)
-
-    rule = AnsibleLintRule()
-    assert set(rule.rule_config.items()) == set(rule_config.items())
-    assert all(rule.get_config(k) == v for k, v in rule_config.items())
+    config_options.rules["load-failure"] = rule_config
+    rules = RulesCollection(options=config_options)
+    for rule in rules:
+        if rule.id == "load-failure":
+            assert rule._collection  # noqa: SLF001
+            assert rule.rule_config == rule_config

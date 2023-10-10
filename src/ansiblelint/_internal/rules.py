@@ -157,6 +157,19 @@ class BaseRule:
         """
         return getattr(cls, "_ids", {cls.id: cls.shortdesc})
 
+    @property
+    def rule_config(self) -> dict[str, Any]:
+        """Retrieve rule specific configuration."""
+        if not self._collection:
+            msg = "A rule that is not part of a collection cannot access its configuration."
+            _logger.warning(msg)
+            raise RuntimeError(msg)
+        rule_config = self._collection.options.rules.get(self.id, {})
+        if not isinstance(rule_config, dict):  # pragma: no branch
+            msg = f"Invalid rule config for {self.id}: {rule_config}"
+            raise RuntimeError(msg)
+        return rule_config
+
 
 # pylint: enable=unused-argument
 

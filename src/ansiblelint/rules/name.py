@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import re
 import sys
-from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
@@ -12,6 +11,7 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
@@ -181,7 +181,6 @@ class NameRule(AnsibleLintRule, TransformMixin):
 
 
 if "pytest" in sys.modules:
-    from ansiblelint.config import options
     from ansiblelint.file_utils import Lintable
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
@@ -203,11 +202,10 @@ if "pytest" in sys.modules:
         errs = bad_runner.run()
         assert len(errs) == 5
 
-    def test_name_prefix_negative() -> None:
+    def test_name_prefix_negative(config_options: Options) -> None:
         """Negative test for name[missing]."""
-        custom_options = deepcopy(options)
-        custom_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=custom_options)
+        config_options.enable_list = ["name[prefix]"]
+        collection = RulesCollection(options=config_options)
         collection.register(NameRule())
         failure = Lintable(
             "examples/playbooks/tasks/rule-name-prefix-fail.yml",
