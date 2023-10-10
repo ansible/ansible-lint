@@ -58,11 +58,10 @@ def test_extra_vars_passed_to_command(
     assert not result
 
 
-def test_syntax_check_role() -> None:
+def test_syntax_check_role(default_rules_collection: RulesCollection) -> None:
     """Validate syntax check of a broken role."""
     lintable = Lintable("examples/playbooks/roles/invalid_due_syntax", kind="role")
-    rules = RulesCollection()
-    result = Runner(lintable, rules=rules).run()
+    result = Runner(lintable, rules=default_rules_collection).run()
     assert len(result) == 1, result
     assert result[0].lineno == 2
     assert result[0].filename == "examples/roles/invalid_due_syntax/tasks/main.yml"

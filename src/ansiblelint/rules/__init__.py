@@ -223,7 +223,16 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, str):
             if yaml.startswith("$ANSIBLE_VAULT"):
                 return []
-            return [MatchError(lintable=file, rule=LoadingFailureRule())]
+            if self._collection is None:
+                msg = f"Rule {self.id} was not added to a collection."
+                raise RuntimeError(msg)
+            return [
+                # pylint: disable=E1136
+                MatchError(
+                    lintable=file,
+                    rule=self._collection["load-failure"],
+                ),
+            ]
         if not yaml:
             return matches
 
@@ -443,6 +452,14 @@ class RulesCollection:
         """Return the length of the RulesCollection data."""
         return len(self.rules)
 
+    def __getitem__(self, item: Any) -> BaseRule:
+        """Return a rule from inside the collection based on its id."""
+        for rule in self.rules:
+            if rule.id == item:
+                return rule
+        msg = f"Rule {item} is not present inside this collection."
+        raise ValueError(msg)
+
     def extend(self, more: list[AnsibleLintRule]) -> None:
         """Combine rules."""
         self.rules.extend(more)
@@ -469,7 +486,7 @@ class RulesCollection:
                     MatchError(
                         message=str(exc),
                         lintable=file,
-                        rule=LoadingFailureRule(),
+                        rule=self["load-failure"],
                         tag=f"{LoadingFailureRule.id}[{exc.__class__.__name__.lower()}]",
                     ),
                 ]
