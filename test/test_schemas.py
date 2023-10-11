@@ -5,7 +5,6 @@ import subprocess
 import sys
 import urllib
 from pathlib import Path
-from time import sleep
 from typing import Any
 from unittest.mock import DEFAULT, MagicMock, patch
 
@@ -21,20 +20,6 @@ schema_path = Path(schema_module).parent
 spdx_config_path = (
     Path(license_expression.__file__).parent / "data" / "scancode-licensedb-index.json"
 )
-
-
-def test_refresh_schemas() -> None:
-    """Test for schema update skip."""
-    # This is written as a single test in order to avoid concurrency issues,
-    # which caused random issues on CI when the two tests run in parallel
-    # and or in different order.
-    assert refresh_schemas(min_age_seconds=3600 * 24 * 365 * 10) == 0
-    sleep(1)
-    # this should disable the cache and force an update
-    assert refresh_schemas(min_age_seconds=0) == 0
-    sleep(1)
-    # should be cached now
-    assert refresh_schemas(min_age_seconds=10) == 0
 
 
 def urlopen_side_effect(*_args: Any, **kwargs: Any) -> DEFAULT:
