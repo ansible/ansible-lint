@@ -23,7 +23,7 @@ from ansiblelint._internal.rules import (
     WarningRule,
 )
 from ansiblelint.app import App, get_app
-from ansiblelint.config import PROFILES, Options, get_rule_config
+from ansiblelint.config import PROFILES, Options
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
 from ansiblelint.errors import MatchError
@@ -54,11 +54,6 @@ class AnsibleLintRule(BaseRule):
     def url(self) -> str:
         """Return rule documentation url."""
         return RULE_DOC_URL + self.id + "/"
-
-    @property
-    def rule_config(self) -> dict[str, Any]:
-        """Retrieve rule specific configuration."""
-        return get_rule_config(self.id)
 
     def get_config(self, key: str) -> Any:
         """Return a configured value for given key string."""
@@ -228,7 +223,16 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, str):
             if yaml.startswith("$ANSIBLE_VAULT"):
                 return []
-            return [MatchError(lintable=file, rule=LoadingFailureRule())]
+            if self._collection is None:
+                msg = f"Rule {self.id} was not added to a collection."
+                raise RuntimeError(msg)
+            return [
+                # pylint: disable=E1136
+                MatchError(
+                    lintable=file,
+                    rule=self._collection["load-failure"],
+                ),
+            ]
         if not yaml:
             return matches
 
@@ -408,6 +412,8 @@ class RulesCollection:
                 WarningRule(),
             ],
         )
+        for rule in self.rules:
+            rule._collection = self  # noqa: SLF001
         for rule in load_plugins(rulesdirs_str):
             self.register(rule, conditional=conditional)
         self.rules = sorted(self.rules)
@@ -446,6 +452,14 @@ class RulesCollection:
         """Return the length of the RulesCollection data."""
         return len(self.rules)
 
+    def __getitem__(self, item: Any) -> BaseRule:
+        """Return a rule from inside the collection based on its id."""
+        for rule in self.rules:
+            if rule.id == item:
+                return rule
+        msg = f"Rule {item} is not present inside this collection."
+        raise ValueError(msg)
+
     def extend(self, more: list[AnsibleLintRule]) -> None:
         """Combine rules."""
         self.rules.extend(more)
@@ -472,7 +486,7 @@ class RulesCollection:
                     MatchError(
                         message=str(exc),
                         lintable=file,
-                        rule=LoadingFailureRule(),
+                        rule=self["load-failure"],
                         tag=f"{LoadingFailureRule.id}[{exc.__class__.__name__.lower()}]",
                     ),
                 ]
