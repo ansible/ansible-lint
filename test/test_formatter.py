@@ -23,10 +23,12 @@ import pathlib
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import Formatter
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
+collection = RulesCollection()
 rule = AnsibleLintRule()
 rule.id = "TCF0001"
+collection.register(rule)
 formatter = Formatter(pathlib.Path.cwd(), display_relative_path=True)
 # These details would generate a rich rendering error if not escaped:
 DETAILS = "Some [/tmp/foo] details."

@@ -174,7 +174,10 @@ def test_run_single_role_path_with_roles_path_env(local_test_dir: Path) -> None:
 
 @pytest.mark.parametrize(
     ("result", "env"),
-    ((True, {"GITHUB_ACTIONS": "true", "GITHUB_WORKFLOW": "foo"}), (False, None)),
+    (
+        (True, {"GITHUB_ACTIONS": "true", "GITHUB_WORKFLOW": "foo", "NO_COLOR": "1"}),
+        (False, None),
+    ),
     ids=("on", "off"),
 )
 def test_run_playbook_github(result: bool, env: dict[str, str]) -> None:

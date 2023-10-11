@@ -11,7 +11,7 @@ import pytest
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import CodeclimateJSONFormatter
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
 
 class TestCodeclimateJSONFormatter:
@@ -20,12 +20,14 @@ class TestCodeclimateJSONFormatter:
     rule = AnsibleLintRule()
     matches: list[MatchError] = []
     formatter: CodeclimateJSONFormatter | None = None
+    collection = RulesCollection()
 
     def setup_class(self) -> None:
         """Set up few MatchError objects."""
         self.rule = AnsibleLintRule()
         self.rule.id = "TCF0001"
         self.rule.severity = "VERY_HIGH"
+        self.collection.register(self.rule)
         self.matches = []
         self.matches.append(
             MatchError(

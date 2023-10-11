@@ -198,6 +198,70 @@
           "default": false,
           "type": "boolean"
         },
+        "mutually_exclusive": {
+          "type": "array",
+          "items": {
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required_together": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required_one_of": {
+          "type": "array",
+          "items": {
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required_if": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {},
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "boolean"
+              }
+            ],
+            "minItems": 3,
+            "maxItems": 4
+          }
+        },
+        "required_by": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          }
+        },
         "type": {
           "$ref": "#/$defs/datatype",
           "markdownDescription": "See [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec"

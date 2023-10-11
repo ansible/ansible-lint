@@ -5,7 +5,6 @@ import os
 import sys
 from typing import TYPE_CHECKING
 
-from ansiblelint.config import options
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.rules.fqcn import builtins
 from ansiblelint.skip_utils import is_nested_task
@@ -33,9 +32,9 @@ class OnlyBuiltinsRule(AnsibleLintRule):
         allowed_collections = [
             "ansible.builtin",
             "ansible.legacy",
-            *options.only_builtins_allow_collections,
+            *self.options.only_builtins_allow_collections,
         ]
-        allowed_modules = builtins + options.only_builtins_allow_modules
+        allowed_modules = builtins + self.options.only_builtins_allow_modules
 
         is_allowed = (
             any(module.startswith(f"{prefix}.") for prefix in allowed_collections)
