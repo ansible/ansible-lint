@@ -53,7 +53,7 @@ from ansiblelint.config import (
     log_entries,
     options,
 )
-from ansiblelint.constants import RC
+from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
 from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import normalize_tag
@@ -305,7 +305,22 @@ def main(argv: list[str] | None = None) -> int:
     _logger.debug("Options: %s", options)
     _logger.debug("CWD: %s", Path.cwd())
 
-    if not options.offline:
+    # checks if we have `ANSIBLE_LINT_SKIP_SCHEMA_UPDATE` set to bypass schema
+    # update. Also skip if in offline mode.
+    # env var set to skip schema refresh
+    skip_schema_update = (
+        bool(
+            int(
+                os.environ.get(
+                    SKIP_SCHEMA_UPDATE,
+                    "0",
+                ),
+            ),
+        )
+        or options.offline
+    )
+
+    if not skip_schema_update:
         # pylint: disable=import-outside-toplevel
         from ansiblelint.schemas.__main__ import refresh_schemas
 
