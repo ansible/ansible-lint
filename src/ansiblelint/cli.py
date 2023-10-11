@@ -16,7 +16,7 @@ from ansiblelint.config import (
     Options,
     log_entries,
 )
-from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, RC
+from ansiblelint.constants import CUSTOM_RULESDIR_ENVVAR, DEFAULT_RULESDIR, EPILOG, RC
 from ansiblelint.file_utils import (
     Lintable,
     abspath,
@@ -240,7 +240,11 @@ class WriteArgAction(argparse.Action):
 
 def get_cli_parser() -> argparse.ArgumentParser:
     """Initialize an argument parser."""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        epilog=EPILOG,
+        # Avoid rewrapping description and epilog
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
 
     listing_group = parser.add_mutually_exclusive_group()
     listing_group.add_argument(
