@@ -6,11 +6,13 @@ from typing import Literal
 DEFAULT_RULESDIR = Path(__file__).parent / "rules"
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
 RULE_DOC_URL = "https://ansible-lint.readthedocs.io/rules/"
+SKIP_SCHEMA_UPDATE = "ANSIBLE_LINT_SKIP_SCHEMA_UPDATE"
 
 ENV_VARS_HELP = {
     CUSTOM_RULESDIR_ENVVAR: "Used for adding another folder into the lookup path for new rules.",
     "ANSIBLE_LINT_IGNORE_FILE": "Define it to override the name of the default ignore file `.ansible-lint-ignore`",
     "ANSIBLE_LINT_WRITE_TMP": "Tells linter to dump fixes into different temp files instead of overriding original. Used internally for testing.",
+    SKIP_SCHEMA_UPDATE: "Tells ansible-lint to skip schema refresh.",
 }
 
 EPILOG = (
