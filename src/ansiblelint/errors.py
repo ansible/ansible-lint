@@ -98,8 +98,7 @@ class MatchError(ValueError):
             msg = "MatchError called incorrectly as column numbers start with 1"
             raise RuntimeError(msg)
 
-        offset = getattr(self.lintable, "_line_offset", 0)
-        self.lineno += offset
+        self.lineno += self.lintable.line_offset
 
     @functools.cached_property
     def level(self) -> str:

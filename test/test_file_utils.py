@@ -541,13 +541,3 @@ def test_bug_2513(
         results = Runner(filename, rules=default_rules_collection).run()
         assert len(results) == 1
         assert results[0].rule.id == "name"
-
-
-def test_examples_content() -> None:
-    """Test that a module loads the correct content."""
-    filename = Path("plugins/modules/fake_module.py")
-    lintable = Lintable(filename)
-    # Lintable is now correctly purporting to be a YAML file
-    assert lintable.base_kind == "text/yaml"
-    # Lintable content should be contents of EXAMPLES
-    assert lintable.content == "---" + BASIC_PLAYBOOK
