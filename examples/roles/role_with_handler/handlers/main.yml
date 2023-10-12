@@ -1,0 +1,8 @@
+---
+- name: Debug
+  loop: "{{ _something_done.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.changed
+  ansible.builtin.debug:
+    msg: "{{ item.item.name }} changed"

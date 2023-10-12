@@ -755,7 +755,10 @@ class Task(dict[str, Any]):
 
     def is_handler(self) -> bool:
         """Return true for tasks that are handlers."""
-        return ".handlers[" in self.position
+        return (
+            isinstance(self._normalized_task, dict)
+            and "handlers" in str(self._normalized_task["action"][FILENAME_KEY])
+        ) or ".handlers[" in self.position
 
     def __repr__(self) -> str:
         """Return a string representation of the task."""
