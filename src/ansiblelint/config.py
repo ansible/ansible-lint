@@ -98,6 +98,21 @@ BASE_KINDS = [
     {"text/python": "**/*.py"},
 ]
 
+# File kinds that are recognized by ansible, used internally to force use of
+# YAML 1.1 instead of 1.2 due to ansible-core dependency on pyyaml.
+ANSIBLE_OWNED_KINDS = {
+    "handlers",
+    "galaxy",
+    "meta",
+    "meta-runtime",
+    "playbook",
+    "requirements",
+    "role-arg-spec",
+    "rulebook",
+    "tasks",
+    "vars",
+}
+
 PROFILES = yaml_from_file(Path(__file__).parent / "data" / "profiles.yml")
 
 LOOP_VAR_PREFIX = "^(__|{role}_)"

@@ -16,7 +16,7 @@ import wcmatch.pathlib
 import wcmatch.wcmatch
 from yaml.error import YAMLError
 
-from ansiblelint.config import BASE_KINDS, Options, options
+from ansiblelint.config import ANSIBLE_OWNED_KINDS, BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
 
 if TYPE_CHECKING:
@@ -385,6 +385,10 @@ class Lintable:
     def __repr__(self) -> str:
         """Return user friendly representation of a lintable."""
         return f"{self.name} ({self.kind})"
+
+    def is_owned_by_ansible(self) -> bool:
+        """Return true for YAML files that are managed by Ansible."""
+        return self.kind in ANSIBLE_OWNED_KINDS
 
     @property
     def data(self) -> Any:
