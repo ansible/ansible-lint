@@ -22,6 +22,7 @@
 """Generic utility helpers."""
 from __future__ import annotations
 
+import ast
 import contextlib
 import inspect
 import logging
@@ -38,6 +39,7 @@ from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
+from ansible.parsing.plugin_docs import read_docstring
 from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
@@ -1021,3 +1023,25 @@ def _extend_with_roles(lintables: list[Lintable]) -> None:
 def convert_to_boolean(value: Any) -> bool:
     """Use Ansible to convert something to a boolean."""
     return bool(boolean(value))
+
+
+def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
+    """Parse yaml inside plugin EXAMPLES string.
+
+    Store a line number offset to realign returned line numbers later
+    """
+    offset = 1
+    parsed = ast.parse(lintable.content)
+    for child in parsed.body:
+        if isinstance(child, ast.Assign):
+            label = child.targets[0]
+            if isinstance(label, ast.Name) and label.id == "EXAMPLES":
+                offset = child.lineno - 1
+                break
+
+    docs = read_docstring(str(lintable.path))
+    examples = docs["plainexamples"]
+
+    # Ignore the leading newline and lack of document start
+    # as including those in EXAMPLES would be weird.
+    return offset, (f"---{examples}" if examples else "")
