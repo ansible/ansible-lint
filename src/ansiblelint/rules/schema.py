@@ -232,7 +232,12 @@ if "pytest" in sys.modules:
                 ],
                 id="execution-environment-broken",
             ),
-            ("examples/meta/runtime.yml", "meta-runtime", []),
+            pytest.param(
+                "examples/meta/runtime.yml",
+                "meta-runtime",
+                [],
+                id="meta-runtime",
+            ),
             pytest.param(
                 "examples/broken_collection_meta_runtime/meta/runtime.yml",
                 "meta-runtime",

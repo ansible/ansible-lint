@@ -9,7 +9,7 @@ psutil # soft-dep of pytest-xdist
 pylint # IDE support
 pytest >= 7.2.2
 pytest-mock
-pytest-plus >= 0.2 # for PYTEST_REQPASS
+pytest-plus >= 0.6 # for PYTEST_REQPASS
 pytest-xdist >= 2.1.0
 ruamel.yaml>=0.17.31,<0.18 # only the latest is expected to pass our tests
 ruamel-yaml-clib  # needed for mypy
