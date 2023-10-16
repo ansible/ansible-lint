@@ -1416,7 +1416,7 @@
           },
           {
             "$ref": "#/$defs/RockyLinuxPlatformModel"
-          }
+          },
           {
             "$ref": "#/$defs/SLESPlatformModel"
           },
