@@ -920,7 +920,7 @@
     "RockyLinuxPlatformModel": {
       "properties": {
         "name": {
-          "const": "RockyLinux",
+          "const": "Rocky",
           "title": "Name",
           "type": "string"
         },
