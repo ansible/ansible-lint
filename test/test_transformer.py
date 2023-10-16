@@ -162,6 +162,13 @@ def fixture_runner_result(
             False,
             id="github-workflow",
         ),
+        pytest.param(
+            "examples/playbooks/invalid-transform.yml",
+            1,
+            False,
+            True,
+            id="invalid_transform",
+        ),
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
