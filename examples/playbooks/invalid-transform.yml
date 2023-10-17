@@ -1,0 +1,11 @@
+# yamllint disable-file
+---
+- name: Test
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Print hello message
+      ansible.builtin.debug:
+        msg: "Hello!"
+          register: vm_output

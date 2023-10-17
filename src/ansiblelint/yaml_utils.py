@@ -21,6 +21,7 @@ from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
 from ruamel.yaml.main import YAML
+from ruamel.yaml.parser import ParserError
 from ruamel.yaml.scalarint import ScalarInt
 from yamllint.config import YamlLintConfig
 
@@ -953,6 +954,9 @@ class FormattedYAML(YAML):
             data = self.load(stream=text)
         except ComposerError:
             data = self.load_all(stream=text)
+        except ParserError:
+            data = None
+            _logger.error("Invalid yaml, verify the file contents and try again.")
         if preamble_comment is not None and isinstance(
             data,
             (CommentedMap, CommentedSeq),
