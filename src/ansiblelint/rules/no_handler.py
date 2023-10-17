@@ -89,6 +89,7 @@ if "pytest" in sys.modules:
     # pylint: disable=ungrouped-imports
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
+    from ansiblelint.testing import run_ansible_lint
 
     @pytest.mark.parametrize(
         ("test_file", "failures"),
@@ -107,3 +108,10 @@ if "pytest" in sys.modules:
         assert len(results) == failures
         for result in results:
             assert result.tag == "no-handler"
+
+    def test_role_with_handler() -> None:
+        """Test role with handler."""
+        role_path = "examples/roles/role_with_handler"
+
+        results = run_ansible_lint("-v", role_path)
+        assert "no-handler" not in results.stdout
