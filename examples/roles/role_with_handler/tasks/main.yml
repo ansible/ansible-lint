@@ -1,0 +1,17 @@
+---
+- name: Get info
+  delegate_to: localhost
+  register: collected_info
+  ansible.builtin.debug:
+    msg: test
+
+- name: Do something
+  delegate_to: localhost
+  loop: "{{ collected_info['some_list'] }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify:
+    - Debug
+  register: _something_done
+  ansible.builtin.debug:
+    msg: test2
