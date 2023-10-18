@@ -121,18 +121,18 @@ class TestMatchErrorCompare:
 @pytest.mark.parametrize(
     "other",
     (
-        None,
-        "foo",
-        42,
-        Exception("foo"),
+        pytest.param(None, id="none"),
+        pytest.param("foo", id="str"),
+        pytest.param(42, id="int"),
+        pytest.param(Exception("foo"), id="exc"),
     ),
     ids=repr,
 )
 @pytest.mark.parametrize(
     ("operation", "operator_char"),
     (
-        pytest.param(operator.le, "<=", id="<="),
-        pytest.param(operator.gt, ">", id=">"),
+        pytest.param(operator.le, "<=", id="le"),
+        pytest.param(operator.gt, ">", id="gt"),
     ),
 )
 def test_matcherror_compare_no_other_fallback(
@@ -154,21 +154,20 @@ def test_matcherror_compare_no_other_fallback(
 @pytest.mark.parametrize(
     "other",
     (
-        None,
-        "foo",
-        42,
-        Exception("foo"),
-        DummyTestObject(),
+        pytest.param(None, id="none"),
+        pytest.param("foo", id="str"),
+        pytest.param(42, id="int"),
+        pytest.param(Exception("foo"), id="exception"),
+        pytest.param(DummyTestObject(), id="obj"),
     ),
     ids=repr,
 )
 @pytest.mark.parametrize(
     ("operation", "expected_value"),
     (
-        (operator.eq, False),
-        (operator.ne, True),
+        pytest.param(operator.eq, False, id="eq"),
+        pytest.param(operator.ne, True, id="ne"),
     ),
-    ids=("==", "!="),
 )
 def test_matcherror_compare_with_other_fallback(
     other: object,
@@ -182,16 +181,15 @@ def test_matcherror_compare_with_other_fallback(
 @pytest.mark.parametrize(
     ("operation", "expected_value"),
     (
-        (operator.eq, "EQ_SENTINEL"),
-        (operator.ne, "NE_SENTINEL"),
+        pytest.param(operator.eq, "EQ_SENTINEL", id="eq"),
+        pytest.param(operator.ne, "NE_SENTINEL", id="ne"),
         # NOTE: these are swapped because when we do `x < y`, and `x.__lt__(y)`
         # NOTE: returns `NotImplemented`, Python will reverse the check into
         # NOTE: `y > x`, and so `y.__gt__(x) is called.
         # Ref: https://docs.python.org/3/reference/datamodel.html#object.__lt__
-        (operator.lt, "GT_SENTINEL"),
-        (operator.gt, "LT_SENTINEL"),
+        pytest.param(operator.lt, "GT_SENTINEL", id="gt"),
+        pytest.param(operator.gt, "LT_SENTINEL", id="lt"),
     ),
-    ids=("==", "!=", "<", ">"),
 )
 def test_matcherror_compare_with_dummy_sentinel(
     operation: Callable[..., bool],

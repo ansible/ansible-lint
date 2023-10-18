@@ -105,8 +105,8 @@ LAYOUT_INCLUDES: dict[str, str] = {
 @pytest.mark.parametrize(
     "ansible_project_layout",
     (
-        pytest.param(LAYOUT_IMPORTS, id="using only import_tasks"),
-        pytest.param(LAYOUT_INCLUDES, id="using only include_tasks"),
+        pytest.param(LAYOUT_IMPORTS, id="using-only-import_tasks"),
+        pytest.param(LAYOUT_INCLUDES, id="using-only-include_tasks"),
     ),
 )
 def test_file_path_evaluation(
