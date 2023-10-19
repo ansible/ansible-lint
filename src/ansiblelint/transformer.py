@@ -109,7 +109,9 @@ class Transformer:
                 self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if not file.is_owned_by_ansible():
-                return
+                # Do nothing until we enable support for YAML 1.2
+                # https://github.com/ansible/ansible-lint/issues/3811
+                continue
 
             if file_is_yaml:
                 # noinspection PyUnboundLocalVariable
