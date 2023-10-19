@@ -45,6 +45,8 @@ class BaseRule:
     link: str = ""
     has_dynamic_tags: bool = False
     needs_raw_task: bool = False
+    # Used to mark rules that we will never unload (internal ones)
+    unloadable: bool = False
     # We use _order to sort rules and to ensure that some run before others,
     # _order 0 for internal rules
     # _order 1 for rules that check that data can be loaded
@@ -189,6 +191,7 @@ class RuntimeErrorRule(BaseRule):
     tags = ["core"]
     version_added = "v5.0.0"
     _order = 0
+    unloadable = True
 
 
 class AnsibleParserErrorRule(BaseRule):
@@ -200,6 +203,7 @@ class AnsibleParserErrorRule(BaseRule):
     tags = ["core"]
     version_added = "v5.0.0"
     _order = 0
+    unloadable = True
 
 
 class LoadingFailureRule(BaseRule):
@@ -215,6 +219,7 @@ class LoadingFailureRule(BaseRule):
     _ids = {
         "load-failure[not-found]": "File not found",
     }
+    unloadable = True
 
 
 class WarningRule(BaseRule):
@@ -226,3 +231,4 @@ class WarningRule(BaseRule):
     tags = ["core", "experimental"]
     version_added = "v6.8.0"
     _order = 0
+    unloadable = True
