@@ -76,12 +76,12 @@ class TestSarifFormatter:
 
         self.formatter = SarifFormatter(pathlib.Path.cwd(), display_relative_path=True)
 
-    def test_format_list(self) -> None:
+    def test_sarif_format_list(self) -> None:
         """Test if the return value is a string."""
         assert isinstance(self.formatter, SarifFormatter)
         assert isinstance(self.formatter.format_result(self.matches), str)
 
-    def test_result_is_json(self) -> None:
+    def test_sarif_result_is_json(self) -> None:
         """Test if returned string value is a JSON."""
         assert isinstance(self.formatter, SarifFormatter)
         output = self.formatter.format_result(self.matches)
@@ -89,7 +89,7 @@ class TestSarifFormatter:
         # https://github.com/ansible/ansible-navigator/issues/1490
         assert "\n" not in output
 
-    def test_single_match(self) -> None:
+    def test_sarif_single_match(self) -> None:
         """Test negative case. Only lists are allowed. Otherwise, a RuntimeError will be raised."""
         assert isinstance(self.formatter, SarifFormatter)
         with pytest.raises(RuntimeError):
@@ -182,8 +182,8 @@ def test_sarif_parsable_ignored() -> None:
 @pytest.mark.parametrize(
     ("file", "return_code"),
     (
-        pytest.param("examples/playbooks/valid.yml", 0),
-        pytest.param("playbook.yml", 2),
+        pytest.param("examples/playbooks/valid.yml", 0, id="0"),
+        pytest.param("playbook.yml", 2, id="1"),
     ),
 )
 def test_sarif_file(file: str, return_code: int) -> None:
@@ -204,7 +204,7 @@ def test_sarif_file(file: str, return_code: int) -> None:
 
 @pytest.mark.parametrize(
     ("file", "return_code"),
-    (pytest.param("examples/playbooks/valid.yml", 0),),
+    (pytest.param("examples/playbooks/valid.yml", 0, id="0"),),
 )
 def test_sarif_file_creates_it_if_none_exists(file: str, return_code: int) -> None:
     """Test ability to create sarif file if none exists and dump output to it (--sarif-file)."""

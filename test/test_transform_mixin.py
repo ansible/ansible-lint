@@ -55,72 +55,91 @@ def test_seek_with_bad_path(
 @pytest.mark.parametrize(
     ("yaml_path", "data", "expected"),
     (
-        ([], DUMMY_MAP, DUMMY_MAP),
-        (["foo"], DUMMY_MAP, DUMMY_MAP["foo"]),
-        (["bar"], DUMMY_MAP, DUMMY_MAP["bar"]),
-        (["bar", "some"], DUMMY_MAP, DUMMY_MAP["bar"]["some"]),
-        (["fruits"], DUMMY_MAP, DUMMY_MAP["fruits"]),
-        (["fruits", 0], DUMMY_MAP, DUMMY_MAP["fruits"][0]),
-        (["fruits", 1], DUMMY_MAP, DUMMY_MAP["fruits"][1]),
-        (["answer"], DUMMY_MAP, DUMMY_MAP["answer"]),
-        (["answer", 0], DUMMY_MAP, DUMMY_MAP["answer"][0]),
-        (["answer", 0, "forty-two"], DUMMY_MAP, DUMMY_MAP["answer"][0]["forty-two"]),
-        (
+        pytest.param([], DUMMY_MAP, DUMMY_MAP, id="0"),
+        pytest.param(["foo"], DUMMY_MAP, DUMMY_MAP["foo"], id="1"),
+        pytest.param(["bar"], DUMMY_MAP, DUMMY_MAP["bar"], id="2"),
+        pytest.param(["bar", "some"], DUMMY_MAP, DUMMY_MAP["bar"]["some"], id="3"),
+        pytest.param(["fruits"], DUMMY_MAP, DUMMY_MAP["fruits"], id="4"),
+        pytest.param(["fruits", 0], DUMMY_MAP, DUMMY_MAP["fruits"][0], id="5"),
+        pytest.param(["fruits", 1], DUMMY_MAP, DUMMY_MAP["fruits"][1], id="6"),
+        pytest.param(["answer"], DUMMY_MAP, DUMMY_MAP["answer"], id="7"),
+        pytest.param(["answer", 0], DUMMY_MAP, DUMMY_MAP["answer"][0], id="8"),
+        pytest.param(
+            ["answer", 0, "forty-two"],
+            DUMMY_MAP,
+            DUMMY_MAP["answer"][0]["forty-two"],
+            id="9",
+        ),
+        pytest.param(
             ["answer", 0, "forty-two", 0],
             DUMMY_MAP,
             DUMMY_MAP["answer"][0]["forty-two"][0],
+            id="10",
         ),
-        (
+        pytest.param(
             ["answer", 0, "forty-two", 1],
             DUMMY_MAP,
             DUMMY_MAP["answer"][0]["forty-two"][1],
+            id="11",
         ),
-        (
+        pytest.param(
             ["answer", 0, "forty-two", 2],
             DUMMY_MAP,
             DUMMY_MAP["answer"][0]["forty-two"][2],
+            id="12",
         ),
-        ([], DUMMY_LIST, DUMMY_LIST),
-        ([0], DUMMY_LIST, DUMMY_LIST[0]),
-        ([0, "foo"], DUMMY_LIST, DUMMY_LIST[0]["foo"]),
-        ([1], DUMMY_LIST, DUMMY_LIST[1]),
-        ([1, "bar"], DUMMY_LIST, DUMMY_LIST[1]["bar"]),
-        ([1, "bar", "some"], DUMMY_LIST, DUMMY_LIST[1]["bar"]["some"]),
-        ([1, "fruits"], DUMMY_LIST, DUMMY_LIST[1]["fruits"]),
-        ([1, "fruits", 0], DUMMY_LIST, DUMMY_LIST[1]["fruits"][0]),
-        ([1, "fruits", 1], DUMMY_LIST, DUMMY_LIST[1]["fruits"][1]),
-        ([2], DUMMY_LIST, DUMMY_LIST[2]),
-        ([2, "answer"], DUMMY_LIST, DUMMY_LIST[2]["answer"]),
-        ([2, "answer", 0], DUMMY_LIST, DUMMY_LIST[2]["answer"][0]),
-        (
+        pytest.param([], DUMMY_LIST, DUMMY_LIST, id="13"),
+        pytest.param([0], DUMMY_LIST, DUMMY_LIST[0], id="14"),
+        pytest.param([0, "foo"], DUMMY_LIST, DUMMY_LIST[0]["foo"], id="15"),
+        pytest.param([1], DUMMY_LIST, DUMMY_LIST[1], id="16"),
+        pytest.param([1, "bar"], DUMMY_LIST, DUMMY_LIST[1]["bar"], id="17"),
+        pytest.param(
+            [1, "bar", "some"],
+            DUMMY_LIST,
+            DUMMY_LIST[1]["bar"]["some"],
+            id="18",
+        ),
+        pytest.param([1, "fruits"], DUMMY_LIST, DUMMY_LIST[1]["fruits"], id="19"),
+        pytest.param([1, "fruits", 0], DUMMY_LIST, DUMMY_LIST[1]["fruits"][0], id="20"),
+        pytest.param([1, "fruits", 1], DUMMY_LIST, DUMMY_LIST[1]["fruits"][1], id="21"),
+        pytest.param([2], DUMMY_LIST, DUMMY_LIST[2], id="22"),
+        pytest.param([2, "answer"], DUMMY_LIST, DUMMY_LIST[2]["answer"], id="23"),
+        pytest.param([2, "answer", 0], DUMMY_LIST, DUMMY_LIST[2]["answer"][0], id="24"),
+        pytest.param(
             [2, "answer", 0, "forty-two"],
             DUMMY_LIST,
             DUMMY_LIST[2]["answer"][0]["forty-two"],
+            id="25",
         ),
-        (
+        pytest.param(
             [2, "answer", 0, "forty-two", 0],
             DUMMY_LIST,
             DUMMY_LIST[2]["answer"][0]["forty-two"][0],
+            id="26",
         ),
-        (
+        pytest.param(
             [2, "answer", 0, "forty-two", 1],
             DUMMY_LIST,
             DUMMY_LIST[2]["answer"][0]["forty-two"][1],
+            id="27",
         ),
-        (
+        pytest.param(
             [2, "answer", 0, "forty-two", 2],
             DUMMY_LIST,
             DUMMY_LIST[2]["answer"][0]["forty-two"][2],
+            id="28",
         ),
-        (
+        pytest.param(
             [],
             "this is a string that should be returned as is, ignoring path.",
             "this is a string that should be returned as is, ignoring path.",
+            id="29",
         ),
-        (
+        pytest.param(
             [2, "answer", 0, "forty-two", 2],
             "this is a string that should be returned as is, ignoring path.",
             "this is a string that should be returned as is, ignoring path.",
+            id="30",
         ),
     ),
 )
