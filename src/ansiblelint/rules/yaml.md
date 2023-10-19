@@ -1,6 +1,24 @@
 # yaml
 
-This rule checks YAML syntax and is an implementation of `yamllint`.
+This rule checks YAML syntax by using [yamllint] but with few minor default
+configuration changes.
+
+!!! warning
+
+    [Auto-fix](../autofix.md) functionality will change **inline comment indentation to one
+    character instead of two**, which is the default of [yamllint]. The reason
+    for this decision is for keeping reformatting compatibility
+    with [prettier], which is the most popular reformatter.
+
+    ```yaml title=".yamllint"
+    rules:
+      comments:
+        min-spaces-from-content: 1 # prettier compatibility
+    ```
+
+    There is no need to create this yamllint config file, but if you also
+    run yamllint yourself, you might want to create it to make it behave
+    the same way as ansible-lint.
 
 You can disable YAML syntax violations by adding `yaml` to the `skip_list` in
 your Ansible-lint configuration as follows:
@@ -102,3 +120,5 @@ bar: ... # Correct comment indentation.
 [1.2.2]: https://yaml.org/spec/1.2.2/
 [yaml specification]: https://yaml.org/
 [guide]: https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html#yaml-basics
+[prettier]: https://prettier.io/
+[yamllint]: https://yamllint.readthedocs.io/en/stable/

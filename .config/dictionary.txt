@@ -292,6 +292,7 @@ pyupgrade
 pyyaml
 redirections
 reexec
+reformatter
 regexes
 releasenotes
 relpath
