@@ -578,6 +578,8 @@ def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:
             included.add(rule)
         extends = PROFILES[extends].get("extends", None)
     for rule in rule_col.copy():
+        if rule.unloadable:
+            continue
         if rule.id not in included:
             _logger.debug(
                 "Unloading %s rule due to not being part of %s profile.",

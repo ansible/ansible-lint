@@ -292,6 +292,7 @@ pyupgrade
 pyyaml
 redirections
 reexec
+reformatter
 regexes
 releasenotes
 relpath
@@ -388,6 +389,7 @@ unindented
 uninstallation
 unjinja
 unlex
+unloadable
 unnormalized
 unskippable
 unspaced
