@@ -157,7 +157,7 @@ repos:
           - pytest>=7.2.2
           - rich>=13.2.0
           - ruamel-yaml-clib>=0.2.7
-          - ruamel-yaml>=0.17.31
+          - ruamel-yaml>=0.18.2
           - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.4.2
@@ -188,7 +188,7 @@ repos:
           - pyyaml
           - rich>=13.2.0
           - ruamel-yaml-clib>=0.2.7
-          - ruamel-yaml>=0.17.31
+          - ruamel-yaml>=0.18.2
           - typing_extensions
           - wcmatch
           - yamllint
