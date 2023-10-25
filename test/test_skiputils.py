@@ -39,8 +39,8 @@ PLAYBOOK_WITH_NOQA = """\
 @pytest.mark.parametrize(
     ("line", "expected"),
     (
-        ("foo # noqa: bar", "bar"),
-        ("foo # noqa bar", "bar"),
+        pytest.param("foo # noqa: bar", "bar", id="0"),
+        pytest.param("foo # noqa bar", "bar", id="1"),
     ),
 )
 def test_get_rule_skips_from_line(line: str, expected: str) -> None:

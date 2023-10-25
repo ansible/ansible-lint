@@ -52,9 +52,9 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
 @pytest.mark.parametrize(
     ("ver_diff", "found", "check", "outlen"),
     (
-        ("v1.2.2", True, "pre-release", 1),
-        ("v1.2.3", False, "", 1),
-        ("v1.2.4", True, "new release", 2),
+        pytest.param("v1.2.2", True, "pre-release", 1, id="0"),
+        pytest.param("v1.2.3", False, "", 1, id="1"),
+        pytest.param("v1.2.4", True, "new release", 2, id="2"),
     ),
 )
 def test_get_version_warning(

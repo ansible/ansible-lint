@@ -917,6 +917,39 @@
       "title": "PAN-OSPlatformModel",
       "type": "object"
     },
+    "RockyLinuxPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "Rocky",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": [
+              "8.0",
+              "8.1",
+              "8.2",
+              "8.3",
+              "8.4",
+              "8.5",
+              "8.6",
+              "8.7",
+              "8.8",
+              "9.0",
+              "9.1",
+              "9.2",
+              "all"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "RockyLinuxPlatformModel",
+      "type": "object"
+    },
     "SLESPlatformModel": {
       "properties": {
         "name": {
@@ -1047,7 +1080,6 @@
               "artful",
               "bionic",
               "cosmic",
-              "cuttlefish",
               "disco",
               "eoan",
               "focal",
@@ -1055,6 +1087,7 @@
               "hirsute",
               "impish",
               "jammy",
+              "kinetic",
               "lucid",
               "lunar",
               "mantic",
@@ -1383,6 +1416,9 @@
           },
           {
             "$ref": "#/$defs/PAN-OSPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/RockyLinuxPlatformModel"
           },
           {
             "$ref": "#/$defs/SLESPlatformModel"

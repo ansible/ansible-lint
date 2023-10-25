@@ -12,12 +12,18 @@ from ansiblelint.formatters import BaseFormatter
 @pytest.mark.parametrize(
     ("base_dir", "relative_path"),
     (
-        (None, True),
-        ("/whatever", False),
-        (Path("/whatever"), False),
+        pytest.param(None, True, id="0"),
+        pytest.param("/whatever", False, id="1"),
+        pytest.param(Path("/whatever"), False, id="2"),
     ),
 )
-@pytest.mark.parametrize("path", ("/whatever/string", Path("/whatever/string")))
+@pytest.mark.parametrize(
+    "path",
+    (
+        pytest.param("/whatever/string", id="a"),
+        pytest.param(Path("/whatever/string"), id="b"),
+    ),
+)
 def test_base_formatter_when_base_dir(
     base_dir: Any,
     relative_path: bool,
@@ -44,11 +50,17 @@ def test_base_formatter_when_base_dir(
 @pytest.mark.parametrize(
     "base_dir",
     (
-        Path("/whatever"),
-        "/whatever",
+        pytest.param(Path("/whatever"), id="0"),
+        pytest.param("/whatever", id="1"),
     ),
 )
-@pytest.mark.parametrize("path", ("/whatever/string", Path("/whatever/string")))
+@pytest.mark.parametrize(
+    "path",
+    (
+        pytest.param("/whatever/string", id="a"),
+        pytest.param(Path("/whatever/string"), id="b"),
+    ),
+)
 def test_base_formatter_when_base_dir_is_given_and_relative_is_true(
     path: str | Path,
     base_dir: str | Path,

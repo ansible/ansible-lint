@@ -8,3 +8,4 @@
 - [no-jinja-when](rules/no-jinja-when.md)
 - [no-log-password](rules/no-log-password.md)
 - [partial-become](rules/partial-become.md)
+- [yaml](rules/yaml.md)
