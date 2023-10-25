@@ -68,7 +68,10 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
             raise RuntimeError(msg)
         path = Path(__file__).parent.resolve() / f"{kind}.json"
         _logger.debug("Refreshing %s schema ...", kind)
-        request = Request(url)
+        if not url.startswith(("http:", "https:")):
+            msg = f"Unexpected url schema: {url}"
+            raise ValueError(msg)
+        request = Request(url)  # noqa: S310
         etag = data.get("etag", "")
         if etag:
             request.add_header("If-None-Match", f'"{data.get("etag")}"')
