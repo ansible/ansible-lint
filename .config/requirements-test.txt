@@ -11,7 +11,7 @@ pytest >= 7.2.2
 pytest-mock
 pytest-plus >= 0.6 # for PYTEST_REQPASS
 pytest-xdist >= 2.1.0
-ruamel.yaml>=0.17.31,<0.18 # only the latest is expected to pass our tests
+ruamel.yaml>=0.17.31
 ruamel-yaml-clib  # needed for mypy
 types-jsonschema # IDE support
 types-pyyaml # IDE support
