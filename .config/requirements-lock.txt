@@ -34,7 +34,7 @@ referencing==0.30.2
 requests==2.31.0
 rich==13.5.3
 rpds-py==0.10.3
-ruamel-yaml==0.17.33
+ruamel-yaml==0.18.2
 subprocess-tee==0.4.1
 tomli==2.0.1
 typing-extensions==4.8.0

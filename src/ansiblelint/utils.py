@@ -702,7 +702,11 @@ class Task(dict[str, Any]):
     @property
     def name(self) -> str | None:
         """Return the name of the task."""
-        return self.raw_task.get("name", None)
+        name = self.raw_task.get("name", None)
+        if name is not None and not isinstance(name, str):
+            msg = "Task name can only be a string."
+            raise RuntimeError(msg)
+        return name
 
     @property
     def action(self) -> str:

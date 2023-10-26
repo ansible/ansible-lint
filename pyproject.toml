@@ -232,7 +232,7 @@ python_files = [
 xfail_strict = true
 
 [tool.ruff]
-required-version = "0.0.292"
+required-version = "0.1.2"
 ignore = [
   "D203", # incompatible with D211
   "D213", # incompatible with D212
