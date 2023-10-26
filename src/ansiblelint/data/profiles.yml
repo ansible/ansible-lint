@@ -58,6 +58,7 @@ safety:
   extends: moderate
   rules:
     avoid-implicit:
+    changelog-galaxy-version:
     latest:
     package-latest:
     risky-file-permissions:

@@ -2,6 +2,7 @@
 
 - [args][]
 - [avoid-implicit][]
+- [changelog-galaxy-version][]
 - [complexity][]
 - [command-instead-of-module][]
 - [command-instead-of-shell][]
