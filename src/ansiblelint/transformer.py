@@ -114,6 +114,7 @@ class Transformer:
                 continue
 
             if file_is_yaml:
+                _logger.debug("Dumping %s using YAML (%s)", file, yaml.version)
                 # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
 
