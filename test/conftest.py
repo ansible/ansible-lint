@@ -83,7 +83,7 @@ def regenerate_formatting_fixtures() -> None:
 
     # Writing fixtures with ansiblelint.yaml_utils.FormattedYAML()
     for fixture in fixtures_dir_after.glob("fmt-[0-9].yml"):
-        data = yaml.loads(fixture.read_text())
+        data = yaml.load(fixture.read_text())
         output = yaml.dumps(data)
         fixture.write_text(output)
 

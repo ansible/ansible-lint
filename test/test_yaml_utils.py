@@ -241,11 +241,11 @@ def test_formatted_yaml_loader_dumper(
 
     yaml = ansiblelint.yaml_utils.FormattedYAML()
 
-    data_before = yaml.loads(before_content)
+    data_before = yaml.load(before_content)
     dump_from_before = yaml.dumps(data_before)
-    data_prettier = yaml.loads(prettier_content)
+    data_prettier = yaml.load(prettier_content)
     dump_from_prettier = yaml.dumps(data_prettier)
-    data_after = yaml.loads(after_content)
+    data_after = yaml.load(after_content)
     dump_from_after = yaml.dumps(data_after)
 
     # comparing data does not work because the Comment objects
@@ -276,7 +276,7 @@ def fixture_lintable(file_path: str) -> Lintable:
 def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
     """Return the loaded YAML data for the Lintable."""
     yaml = ansiblelint.yaml_utils.FormattedYAML()
-    data: CommentedMap | CommentedSeq = yaml.loads(lintable.content)
+    data: CommentedMap | CommentedSeq = yaml.load(lintable.content)
     return data
 
 
