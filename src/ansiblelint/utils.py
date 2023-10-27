@@ -34,6 +34,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
+import ruamel.yaml.parser
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.parsing.convert_bool import boolean
@@ -910,8 +911,9 @@ def parse_yaml_linenumbers(
         yaml.parser.ParserError,
         yaml.scanner.ScannerError,
         yaml.constructor.ConstructorError,
+        ruamel.yaml.parser.ParserError,
     ) as exc:
-        msg = "Failed to load YAML file"
+        msg = f"Failed to load YAML file: {lintable.path}"
         raise RuntimeError(msg) from exc
 
     if len(result) == 0:
