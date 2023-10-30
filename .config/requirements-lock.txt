@@ -14,7 +14,7 @@ cffi==1.16.0
 charset-normalizer==3.3.1
 click==8.1.7
 cryptography==41.0.5
-filelock==3.12.4
+filelock==3.13.0
 idna==3.4
 importlib-resources==5.0.7
 jinja2==3.1.2
@@ -34,7 +34,7 @@ referencing==0.30.2
 requests==2.31.0
 rich==13.6.0
 rpds-py==0.10.6
-ruamel-yaml==0.18.2
+ruamel-yaml==0.18.3
 subprocess-tee==0.4.1
 tomli==2.0.1
 typing-extensions==4.8.0
