@@ -94,7 +94,7 @@ class Transformer:
                 # any other files. (Based on suggestion from ruamel.yaml author)
                 yaml = FormattedYAML()
 
-                ruamel_data = yaml.loads(data)
+                ruamel_data = yaml.load(data)
                 if not isinstance(ruamel_data, (CommentedMap, CommentedSeq)):
                     # This is an empty vars file or similar which loads as None.
                     # It is not safe to write this file or data-loss is likely.
@@ -114,6 +114,7 @@ class Transformer:
                 continue
 
             if file_is_yaml:
+                _logger.debug("Dumping %s using YAML (%s)", file, yaml.version)
                 # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
 
