@@ -35,7 +35,7 @@ from ansiblelint.utils import Task
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
     from ruamel.yaml.comments import LineCol
-    from ruamel.yaml.compat import StreamTextType, VersionType
+    from ruamel.yaml.compat import StreamTextType
     from ruamel.yaml.nodes import ScalarNode
     from ruamel.yaml.representer import RoundTripRepresenter
     from ruamel.yaml.tokens import CommentToken
@@ -758,7 +758,7 @@ class FormattedYAML(YAML):
         pure: bool = False,
         output: Any = None,
         plug_ins: list[str] | None = None,
-        version: VersionType | None = None,
+        version: tuple[int, int] | None = None,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -822,8 +822,8 @@ class FormattedYAML(YAML):
             if isinstance(version, str):
                 x, y = version.split(".", maxsplit=1)
                 version = (int(x), int(y))
-            self._yaml_version_default: VersionType = version
-            self._yaml_version: VersionType = self._yaml_version_default
+            self._yaml_version_default: tuple[int, int] = version
+            self._yaml_version: tuple[int, int] = self._yaml_version_default
         super().__init__(typ=typ, pure=pure, output=output, plug_ins=plug_ins)
 
         # NB: We ignore some mypy issues because ruamel.yaml typehints are not great.
@@ -925,7 +925,7 @@ class FormattedYAML(YAML):
         return cast(dict[str, Union[bool, int, str]], config)
 
     @property
-    def version(self) -> VersionType | None:
+    def version(self) -> tuple[int, int] | None:
         """Return the YAML version used to parse or dump.
 
         Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
@@ -938,7 +938,7 @@ class FormattedYAML(YAML):
         return None
 
     @version.setter
-    def version(self, value: str | tuple[int, int] | None) -> None:
+    def version(self, value: tuple[int, int] | None) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.

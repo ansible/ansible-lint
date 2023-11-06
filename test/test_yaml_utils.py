@@ -15,7 +15,6 @@ from ansiblelint.utils import task_in_list
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
-    from ruamel.yaml.compat import VersionType
     from ruamel.yaml.emitter import Emitter
 
 fixtures_dir = Path(__file__).parent / "fixtures"
@@ -244,7 +243,7 @@ def load_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]
         pytest.param("---\nfoo: YES\n", "---\nfoo: YES\n", None, id="11"),
     ),
 )
-def test_fmt(before: str, after: str, version: VersionType) -> None:
+def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:
     """Tests behavior of formatter in regards to different YAML versions, specified or not."""
     yaml = ansiblelint.yaml_utils.FormattedYAML(version=version)
     data = yaml.load(before)
