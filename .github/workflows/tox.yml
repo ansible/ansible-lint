@@ -96,12 +96,12 @@ jobs:
             ~/.ansible/roles
           key: ${{ matrix.name || matrix.passed_name }}-${{ hashFiles('tools/test-eco.sh', 'requirements.yml', 'examples/playbooks/collections/requirements.yml') }}
 
-      - name: Set up Python ${{ matrix.python_version || '3.9' }}
+      - name: Set up Python ${{ matrix.python_version || '3.10' }}
         if: "!contains(matrix.shell, 'wsl')"
         uses: actions/setup-python@v4
         with:
           cache: pip
-          python-version: ${{ matrix.python_version || '3.9' }}
+          python-version: ${{ matrix.python_version || '3.10' }}
 
       - uses: actions/setup-node@v4
         with:
