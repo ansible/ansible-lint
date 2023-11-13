@@ -34,6 +34,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
+import ruamel.yaml.parser
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.parsing.convert_bool import boolean
@@ -702,7 +703,11 @@ class Task(dict[str, Any]):
     @property
     def name(self) -> str | None:
         """Return the name of the task."""
-        return self.raw_task.get("name", None)
+        name = self.raw_task.get("name", None)
+        if name is not None and not isinstance(name, str):
+            msg = "Task name can only be a string."
+            raise RuntimeError(msg)
+        return name
 
     @property
     def action(self) -> str:
@@ -906,8 +911,9 @@ def parse_yaml_linenumbers(
         yaml.parser.ParserError,
         yaml.scanner.ScannerError,
         yaml.constructor.ConstructorError,
+        ruamel.yaml.parser.ParserError,
     ) as exc:
-        msg = "Failed to load YAML file"
+        msg = f"Failed to load YAML file: {lintable.path}"
         raise RuntimeError(msg) from exc
 
     if len(result) == 0:

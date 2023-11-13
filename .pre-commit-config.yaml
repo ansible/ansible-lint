@@ -64,18 +64,18 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v7.3.1
+    rev: v7.3.2
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.27.0
+    rev: 0.27.1
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: end-of-file-fixer
         # ignore formatting-prettier to have an accurate prettier comparison
@@ -131,17 +131,17 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.0.292"
+    rev: "v0.1.4"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/psf/black
-    rev: 23.9.1
+    rev: 23.10.1
     hooks:
       - id: black
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
+    rev: v1.6.1
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -189,6 +189,7 @@ repos:
           - rich>=13.2.0
           - ruamel-yaml-clib>=0.2.7
           - ruamel-yaml>=0.18.2
+          - setuptools # needed for pkg_resources import
           - typing_extensions
           - wcmatch
           - yamllint
@@ -202,7 +203,7 @@ repos:
         entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
         files: ^.config\/requirements.*$
         language: python
-        language_version: "3.9" # minimal we support officially
+        language_version: "3.10" # minimal we support officially
         pass_filenames: false
         stages: [manual]
         additional_dependencies:
@@ -214,7 +215,7 @@ repos:
         entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
         files: ^.config\/requirements.*$
         language: python
-        language_version: "3.9" # minimal we support officially
+        language_version: "3.10" # minimal we support officially
         pass_filenames: false
         additional_dependencies:
           - pip>=22.3.1
@@ -226,7 +227,7 @@ repos:
         files: ^.config\/requirements.*$
         alias: up
         stages: [manual]
-        language_version: "3.9" # minimal we support officially
+        language_version: "3.10" # minimal we support officially
         additional_dependencies:
           - pip>=22.3.1
   - # keep at bottom as these are slower

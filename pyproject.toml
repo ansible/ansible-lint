@@ -205,18 +205,19 @@ junit_family = "xunit1"
 junit_suite_name = "ansible_lint_test_suite"
 minversion = "4.6.6"
 norecursedirs = [
+  "*.egg",
+  ".cache",
+  ".eggs",
+  ".git",
+  ".github",
+  ".mypy_cache",
+  ".projects",
+  ".tox",
   "build",
   "collections",
   "dist",
   "docs",
   "src/ansible_lint.egg-info",
-  ".cache",
-  ".eggs",
-  ".git",
-  ".github",
-  ".tox",
-  "*.egg",
-  ".projects",
 ]
 python_files = [
   "test_*.py",
@@ -232,7 +233,6 @@ python_files = [
 xfail_strict = true
 
 [tool.ruff]
-required-version = "0.0.292"
 ignore = [
   "D203", # incompatible with D211
   "D213", # incompatible with D212

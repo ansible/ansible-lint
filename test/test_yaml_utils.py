@@ -202,8 +202,7 @@ def test_custom_ruamel_yaml_emitter(
     assert output == expected_output
 
 
-@pytest.fixture(name="yaml_formatting_fixtures")
-def fixture_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]:
+def load_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]:
     """Get the contents for the formatting fixture files.
 
     To regenerate these fixtures, please run ``pytest --regenerate-formatting-fixtures``.
@@ -220,32 +219,67 @@ def fixture_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, s
 
 
 @pytest.mark.parametrize(
-    "fixture_filename",
+    ("before", "after", "version"),
     (
-        pytest.param("fmt-1.yml", id="1"),
-        pytest.param("fmt-2.yml", id="2"),
-        pytest.param("fmt-3.yml", id="3"),
-        pytest.param("fmt-4.yml", id="4"),
-        pytest.param("fmt-5.yml", id="5"),
+        pytest.param("---\nfoo: bar\n", "---\nfoo: bar\n", None, id="1"),
+        # verify that 'on' is not translated to bool (1.2 behavior)
+        pytest.param("---\nfoo: on\n", "---\nfoo: on\n", None, id="2"),
+        # When version is manually mentioned by us, we expect to output without version directive
+        pytest.param("---\nfoo: on\n", "---\nfoo: on\n", (1, 2), id="3"),
+        pytest.param("---\nfoo: on\n", "---\nfoo: true\n", (1, 1), id="4"),
+        pytest.param("%YAML 1.1\n---\nfoo: on\n", "---\nfoo: true\n", (1, 1), id="5"),
+        # verify that in-line directive takes precedence but dumping strips if we mention a specific version
+        pytest.param("%YAML 1.1\n---\nfoo: on\n", "---\nfoo: true\n", (1, 2), id="6"),
+        # verify that version directive are kept if present
+        pytest.param("%YAML 1.1\n---\nfoo: on\n", "---\nfoo: true\n", None, id="7"),
+        pytest.param(
+            "%YAML 1.2\n---\nfoo: on\n",
+            "%YAML 1.2\n---\nfoo: on\n",
+            None,
+            id="8",
+        ),
+        pytest.param("---\nfoo: YES\n", "---\nfoo: true\n", (1, 1), id="9"),
+        pytest.param("---\nfoo: YES\n", "---\nfoo: YES\n", (1, 2), id="10"),
+        pytest.param("---\nfoo: YES\n", "---\nfoo: YES\n", None, id="11"),
+    ),
+)
+def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:
+    """Tests behavior of formatter in regards to different YAML versions, specified or not."""
+    yaml = ansiblelint.yaml_utils.FormattedYAML(version=version)
+    data = yaml.load(before)
+    result = yaml.dumps(data)
+    assert result == after
+
+
+@pytest.mark.parametrize(
+    ("fixture_filename", "version"),
+    (
+        pytest.param("fmt-1.yml", (1, 1), id="1"),
+        pytest.param("fmt-2.yml", (1, 1), id="2"),
+        pytest.param("fmt-3.yml", (1, 1), id="3"),
+        pytest.param("fmt-4.yml", (1, 1), id="4"),
+        pytest.param("fmt-5.yml", (1, 1), id="5"),
     ),
 )
 def test_formatted_yaml_loader_dumper(
-    yaml_formatting_fixtures: tuple[str, str, str],
-    fixture_filename: str,  # noqa: ARG001
+    fixture_filename: str,
+    version: tuple[int, int],
 ) -> None:
     """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
     # pylint: disable=unused-argument
-    before_content, prettier_content, after_content = yaml_formatting_fixtures
+    before_content, prettier_content, after_content = load_yaml_formatting_fixtures(
+        fixture_filename,
+    )
     assert before_content != prettier_content
     assert before_content != after_content
 
-    yaml = ansiblelint.yaml_utils.FormattedYAML()
+    yaml = ansiblelint.yaml_utils.FormattedYAML(version=version)
 
-    data_before = yaml.loads(before_content)
+    data_before = yaml.load(before_content)
     dump_from_before = yaml.dumps(data_before)
-    data_prettier = yaml.loads(prettier_content)
+    data_prettier = yaml.load(prettier_content)
     dump_from_prettier = yaml.dumps(data_prettier)
-    data_after = yaml.loads(after_content)
+    data_after = yaml.load(after_content)
     dump_from_after = yaml.dumps(data_after)
 
     # comparing data does not work because the Comment objects
@@ -276,7 +310,7 @@ def fixture_lintable(file_path: str) -> Lintable:
 def fixture_ruamel_data(lintable: Lintable) -> CommentedMap | CommentedSeq:
     """Return the loaded YAML data for the Lintable."""
     yaml = ansiblelint.yaml_utils.FormattedYAML()
-    data: CommentedMap | CommentedSeq = yaml.loads(lintable.content)
+    data: CommentedMap | CommentedSeq = yaml.load(lintable.content)
     return data
 
 

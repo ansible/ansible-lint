@@ -8,7 +8,11 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
+from ansiblelint.yaml_utils import (
+    FormattedYAML,
+    get_path_to_play,
+    get_path_to_task,
+)
 
 if TYPE_CHECKING:
     from ansiblelint.config import Options
@@ -92,9 +96,14 @@ class Transformer:
                 # We need a fresh YAML() instance for each load because ruamel.yaml
                 # stores intermediate state during load which could affect loading
                 # any other files. (Based on suggestion from ruamel.yaml author)
-                yaml = FormattedYAML()
+                yaml = FormattedYAML(
+                    # Ansible only uses YAML 1.1, but others files should use newer 1.2 (ruamel.yaml defaults to 1.2)
+                    version=(1, 1)
+                    if file.is_owned_by_ansible()
+                    else None,
+                )
 
-                ruamel_data = yaml.loads(data)
+                ruamel_data = yaml.load(data)
                 if not isinstance(ruamel_data, (CommentedMap, CommentedSeq)):
                     # This is an empty vars file or similar which loads as None.
                     # It is not safe to write this file or data-loss is likely.
@@ -108,12 +117,8 @@ class Transformer:
             if self.write_set != {"none"}:
                 self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
-            if not file.is_owned_by_ansible():
-                # Do nothing until we enable support for YAML 1.2
-                # https://github.com/ansible/ansible-lint/issues/3811
-                continue
-
             if file_is_yaml:
+                _logger.debug("Dumping %s using YAML (%s)", file, yaml.version)
                 # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
 
