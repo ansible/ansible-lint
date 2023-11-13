@@ -12,13 +12,11 @@
         "build": true
     },
     "git.ignoreLimitWarning": true,
-    "grammarly.domain": "technical",
+    "grammarly.config.documentDomain": "academic",
     "grammarly.files.include": [
         "**/*.txt",
         "**/*.md"
     ],
-    "grammarly.hideUnavailablePremiumAlerts": true,
-    "grammarly.showExamples": true,
     "python.analysis.exclude": [
         "build"
     ],
