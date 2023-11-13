@@ -22,17 +22,15 @@
     "python.analysis.exclude": [
         "build"
     ],
-    "python.formatting.provider": "black",
-    "python.linting.flake8Args": [
+    "flake8.args": [
         "--ignore=E501,W503"
-    ],
-    "python.linting.flake8Enabled": false,
-    "python.linting.mypyCategorySeverity.error": "Warning",
-    "python.linting.mypyEnabled": true,
-    "python.linting.pylintEnabled": true,
+      ],
     "python.terminal.activateEnvironment": true,
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
+    "mypy-type-checker.severity": {
+        "error": "Warning",
+      },
     "sortLines.filterBlankLines": true,
     "yaml.completion": true,
     "yaml.customTags": [
