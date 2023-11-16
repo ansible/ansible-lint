@@ -99,6 +99,7 @@ class BaseRule:
                         str(file),
                         exc,
                     )
+                    _logger.debug("Ignored exception details", exc_info=True)
         else:
             matches.extend(self.matchdir(file))
         return matches
