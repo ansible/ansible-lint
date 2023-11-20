@@ -9,6 +9,7 @@ name: release
 jobs:
   # https://github.com/marketplace/actions/actions-tagger
   actions-tagger:
+    needs: pypi # do not move the mobile tag until we publish
     runs-on: windows-latest
     permissions:
       # Give the default GITHUB_TOKEN write permission.

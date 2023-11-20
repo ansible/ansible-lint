@@ -288,4 +288,15 @@ dependencies = { file = [".config/requirements.in"] }
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
+tag_regex = "^(?P<prefix>v)?(?P<version>[0-9.]+)(?P<suffix>.*)?$"
 write_to = "src/ansiblelint/_version.py"
+# To prevent accidental pick of mobile version tags such 'v6'
+git_describe_command = [
+  "git",
+  "describe",
+  "--dirty",
+  "--tags",
+  "--long",
+  "--match",
+  "v*.*",
+]
