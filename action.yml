@@ -38,6 +38,7 @@ runs:
     # https://github.com/actions/setup-python/issues/361
     - name: Generate .git/ansible-lint-requirements.txt
       shell: bash
+      working-directory: ${{ steps.inputs.outputs.working_directory }}
       run: |
         wget --output-document=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ github.action_ref || 'main' }}/.config/requirements-lock.txt
 
@@ -46,7 +47,7 @@ runs:
       uses: actions/setup-python@v4
       with:
         cache: pip
-        cache-dependency-path: .git/ansible-lint-requirements.txt
+        cache-dependency-path: ${{ steps.inputs.outputs.working_directory }}/.git/ansible-lint-requirements.txt
         python-version: "3.11"
 
     - name: Install ansible-lint
