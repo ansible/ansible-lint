@@ -21,6 +21,16 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Process inputs
+      id: inputs
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.working_directory }}" ]]; then
+          echo "working_directory=${{ inputs.working_directory }}" >> $GITHUB_OUTPUT
+        else
+          echo "working_directory=${{ github.workspace }}" >> $GITHUB_OUTPUT
+        fi
+
     # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
     # folder, so we are forced to stick this temporary file inside .git, so it
     # will not affect the linted repository.
@@ -49,16 +59,6 @@ runs:
         cd $GITHUB_ACTION_PATH
         pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}"
         ansible-lint --version
-
-    - name: Process inputs
-      id: inputs
-      shell: bash
-      run: |
-        if [[ -n "${{ inputs.working_directory }}" ]]; then
-          echo "working_directory=${{ inputs.working_directory }}" >> $GITHUB_OUTPUT
-        else
-          echo "working_directory=${{ github.workspace }}" >> $GITHUB_OUTPUT
-        fi
 
     - name: Run ansible-lint
       shell: bash
