@@ -20,9 +20,6 @@
     "python.analysis.exclude": [
         "build"
     ],
-    "flake8.args": [
-        "--ignore=E501,W503"
-      ],
     "python.terminal.activateEnvironment": true,
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
