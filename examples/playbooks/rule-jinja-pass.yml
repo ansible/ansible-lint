@@ -84,3 +84,7 @@
     - name: "Bug https://github.com/ansible/ansible-lint/issues/3155"
       ansible.builtin.debug:
         msg: "Is changed:{{ date_cmd is changed }}"
+
+    - name: Bug https://github.com/ansible/ansible-lint/issues/3908
+      ansible.builtin.debug:
+        msg: "{{ foo | ansible.builtin.mandatory(msg='My message') }}"
