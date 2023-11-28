@@ -1,0 +1,7 @@
+---
+- name: Fixture for nodeps with missing filter
+  hosts: localhost
+  tasks:
+    - name: Calling a module that is not installed
+      ansible.builtin.debug:
+        msg: "{{ foo | missing_filter }}"

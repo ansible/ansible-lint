@@ -82,3 +82,25 @@ def test_get_version_warning(
     else:
         assert check in msg
     assert len(msg.split("\n")) == outlen
+
+
+@pytest.mark.parametrize(
+    ("lintable"),
+    (
+        pytest.param("examples/playbooks/nodeps.yml", id="1"),
+        pytest.param("examples/playbooks/nodeps2.yml", id="2"),
+    ),
+)
+def test_nodeps(lintable: str) -> None:
+    """Asserts ability to be called w/ or w/o venv activation."""
+    env = os.environ.copy()
+    env["ANSIBLE_LINT_NODEPS"] = "1"
+    py_path = Path(sys.executable).parent
+    proc = subprocess.run(
+        [str(py_path / "ansible-lint"), lintable],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    assert proc.returncode == 0, proc
