@@ -1,5 +1,4 @@
 """Tests related to task inclusions."""
-import sys
 
 import pytest
 
@@ -14,9 +13,7 @@ from ansiblelint.runner import Runner
         pytest.param(
             "examples/playbooks/blockincludes.yml",
             4,
-            3
-            if sys.version_info >= (3, 10, 0)
-            else 4,  # 3 with py310/ansible2.16, or 4 with py39/ansible2.15,
+            3,
             id="blockincludes",
         ),
         pytest.param(

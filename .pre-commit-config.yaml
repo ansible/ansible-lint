@@ -34,7 +34,7 @@ repos:
       - id: check-useless-excludes
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: v3.0.3
+    rev: v3.1.0
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting

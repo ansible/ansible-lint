@@ -796,6 +796,11 @@
       "title": "play-role",
       "type": "object"
     },
+    "removed-include-module": {
+      "markdownDescription": "See [include module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_module.html)",
+      "not": {},
+      "title": "Replace 'include' with either 'ansible.builtin.include_tasks' or 'ansible.builtin.import_tasks'"
+    },
     "tags": {
       "anyOf": [
         {
@@ -846,6 +851,12 @@
         "action": {
           "title": "Action",
           "type": "string"
+        },
+        "ansible.builtin.include": {
+          "$ref": "#/$defs/removed-include-module"
+        },
+        "ansible.legacy.include": {
+          "$ref": "#/$defs/removed-include-module"
         },
         "any_errors_fatal": {
           "$ref": "#/$defs/templated-boolean",
@@ -931,6 +942,9 @@
         "ignore_unreachable": {
           "title": "Ignore Unreachable",
           "type": "boolean"
+        },
+        "include": {
+          "$ref": "#/$defs/removed-include-module"
         },
         "listen": {
           "anyOf": [

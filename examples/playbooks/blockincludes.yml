@@ -14,7 +14,7 @@
             - name: Block level 3
               block:
                 - name: Include under block level 3 # noqa: deprecated-module
-                  ansible.builtin.include: "{{ varset }}.yml"
+                  ansible.builtin.include_tasks: "{{ varset }}.yml"
                 - name: Block level 4
                   block:
                     - name: INCLUDE under block level 4
