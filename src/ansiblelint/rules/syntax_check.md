@@ -9,7 +9,7 @@ You can exclude these files from linting, but it is better to make sure they can
 be loaded by Ansible. This is often achieved by editing the inventory file
 and/or `ansible.cfg` so ansible can load required variables.
 
-If undefined variables cause the failure, you can use the jinja `default()`
+If undefined variables cause the failure, you can use the Jinja `default()`
 filter to provide fallback values, like in the example below.
 
 This rule is among the few `unskippable` rules that cannot be added to
@@ -20,9 +20,13 @@ fixtures that are invalid on purpose.
 One of the most common sources of errors is a failure to assert the presence of
 various variables at the beginning of the playbook.
 
-This rule can produce messages like below:
+This rule can produce messages like:
 
-- `syntax-check[empty-playbook]` is raised when a playbook file has no content.
+- `syntax-check[empty-playbook]`: Empty playbook, nothing to do
+- `syntax-check[malformed]`: A malformed block was encountered while loading a block
+- `syntax-check[missing-file]`: Unable to retrieve file contents ... Could not find or access ...
+- `syntax-check[unknown-module]`: couldn't resolve module/action
+- `syntax-check[specific]`: for other errors not mentioned above.
 
 ## Problematic code
 

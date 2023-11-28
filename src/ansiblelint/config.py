@@ -173,6 +173,12 @@ class Options:  # pylint: disable=too-many-instance-attributes
     ignore_file: Path | None = None
     max_tasks: int = 100
     max_block_depth: int = 20
+    nodeps: bool = bool(int(os.environ.get("ANSIBLE_LINT_NODEPS", "0")))
+
+    def __post_init__(self) -> None:
+        """Extra initialization logic."""
+        if self.nodeps:
+            self.offline = True
 
 
 options = Options()

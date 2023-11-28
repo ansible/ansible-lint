@@ -527,7 +527,7 @@
         },
         "max_fail_percentage": {
           "title": "Max Fail Percentage",
-          "type": "number"
+          "$ref": "#/$defs/templated-integer"
         },
         "module_defaults": {
           "title": "Module Defaults"

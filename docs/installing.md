@@ -27,7 +27,7 @@ automation content.
       [discussion](https://github.com/ansible/ansible-lint/discussions/2820#discussioncomment-4400380).
 
     Pull requests to improve installation instructions are welcome. Any new issues
-    related to installation will be closed and locked.
+    related to the installation will be closed and locked.
 
 For a container image, we recommend using
 [creator-ee](https://github.com/ansible/creator-ee/), which includes
@@ -49,6 +49,17 @@ current Python environment as an alternative to creating a virtual environment.
 # This also installs ansible-core if it is not already installed
 pip3 install ansible-lint
 ```
+
+!!! note
+
+    If you want to install the exact versions of all dependencies that were used
+    to test a specific version of ansible-lint, you can add `lock` extra. This
+    will only work with Python 3.10 or newer. Do this only inside a
+    virtual environment.
+
+    ```bash
+    pip3 install "ansible-lint[lock]"
+    ```
 
 ## Installing on Fedora and RHEL
 

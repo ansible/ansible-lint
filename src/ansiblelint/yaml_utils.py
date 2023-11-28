@@ -44,6 +44,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+
 YAMLLINT_CONFIG = """
 extends: default
 rules:
@@ -750,13 +751,14 @@ class FormattedEmitter(Emitter):
 class FormattedYAML(YAML):
     """A YAML loader/dumper that handles ansible content better by default."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         *,
         typ: str | None = None,
         pure: bool = False,
         output: Any = None,
         plug_ins: list[str] | None = None,
+        version: tuple[int, int] | None = None,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -816,10 +818,12 @@ class FormattedYAML(YAML):
               tasks:
                 - name: Task
         """
-        # Default to reading/dumping YAML 1.1 (ruamel.yaml defaults to 1.2)
-        self._yaml_version_default: tuple[int, int] = (1, 1)
-        self._yaml_version: str | tuple[int, int] = self._yaml_version_default
-
+        if version:
+            if isinstance(version, str):
+                x, y = version.split(".", maxsplit=1)
+                version = (int(x), int(y))
+            self._yaml_version_default: tuple[int, int] = version
+            self._yaml_version: tuple[int, int] = self._yaml_version_default
         super().__init__(typ=typ, pure=pure, output=output, plug_ins=plug_ins)
 
         # NB: We ignore some mypy issues because ruamel.yaml typehints are not great.
@@ -920,8 +924,8 @@ class FormattedYAML(YAML):
 
         return cast(dict[str, Union[bool, int, str]], config)
 
-    @property  # type: ignore[override]
-    def version(self) -> str | tuple[int, int]:
+    @property
+    def version(self) -> tuple[int, int] | None:
         """Return the YAML version used to parse or dump.
 
         Ansible uses PyYAML which only supports YAML 1.1. ruamel.yaml defaults to 1.2.
@@ -929,17 +933,23 @@ class FormattedYAML(YAML):
         We can relax the version requirement once ansible uses a version of PyYAML
         that includes this PR: https://github.com/yaml/pyyaml/pull/555
         """
-        return self._yaml_version
+        if hasattr(self, "_yaml_version"):
+            return self._yaml_version
+        return None
 
     @version.setter
-    def version(self, value: str | tuple[int, int] | None) -> None:
+    def version(self, value: tuple[int, int] | None) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.
         So, if a file does not include the directive, it sets this to None.
         But, None effectively resets the parsing version to YAML 1.2 (ruamel's default).
         """
-        self._yaml_version = value if value is not None else self._yaml_version_default
+        if value is not None:
+            self._yaml_version = value
+        elif hasattr(self, "_yaml_version_default"):
+            self._yaml_version = self._yaml_version_default
+        # We do nothing if the object did not have a previous default version defined
 
     def load(self, stream: Path | StreamTextType) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
@@ -977,7 +987,11 @@ class FormattedYAML(YAML):
                 stream.write(preamble_comment)
             self.dump(data, stream)
             text = stream.getvalue()
-        return self._post_process_yaml(text)
+        strip_version_directive = hasattr(self, "_yaml_version_default")
+        return self._post_process_yaml(
+            text,
+            strip_version_directive=strip_version_directive,
+        )
 
     def _prevent_wrapping_flow_style(self, data: Any) -> None:
         if not isinstance(data, (CommentedMap, CommentedSeq)):
@@ -1065,7 +1079,7 @@ class FormattedYAML(YAML):
         return text, "".join(preamble_comments) or None
 
     @staticmethod
-    def _post_process_yaml(text: str) -> str:
+    def _post_process_yaml(text: str, *, strip_version_directive: bool = False) -> str:
         """Handle known issues with ruamel.yaml dumping.
 
         Make sure there's only one newline at the end of the file.
@@ -1077,6 +1091,10 @@ class FormattedYAML(YAML):
 
         Make sure null list items don't end in a space.
         """
+        # remove YAML directive
+        if strip_version_directive and text.startswith("%YAML"):
+            text = text.split("\n", 1)[1]
+
         text = text.rstrip("\n") + "\n"
 
         lines = text.splitlines(keepends=True)

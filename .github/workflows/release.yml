@@ -9,6 +9,7 @@ name: release
 jobs:
   # https://github.com/marketplace/actions/actions-tagger
   actions-tagger:
+    needs: pypi # do not move the mobile tag until we publish
     runs-on: windows-latest
     permissions:
       # Give the default GITHUB_TOKEN write permission.
@@ -32,10 +33,10 @@ jobs:
       TOXENV: pkg
 
     steps:
-      - name: Switch to using Python 3.9 by default
+      - name: Switch to using Python 3.10 by default
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: "3.10"
 
       - name: Install tox
         run: python3 -m pip install --user "tox>=4.0.0"

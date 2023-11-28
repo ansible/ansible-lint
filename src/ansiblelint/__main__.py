@@ -318,6 +318,7 @@ def main(argv: list[str] | None = None) -> int:
             ),
         )
         or options.offline
+        or options.nodeps
     )
 
     if not skip_schema_update:

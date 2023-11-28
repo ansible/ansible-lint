@@ -21,6 +21,16 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Process inputs
+      id: inputs
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.working_directory }}" ]]; then
+          echo "working_directory=${{ inputs.working_directory }}" >> $GITHUB_OUTPUT
+        else
+          echo "working_directory=${{ github.workspace }}" >> $GITHUB_OUTPUT
+        fi
+
     # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
     # folder, so we are forced to stick this temporary file inside .git, so it
     # will not affect the linted repository.
@@ -30,6 +40,7 @@ runs:
       shell: bash
       env:
         GH_ACTION_REF: ${{ github.action_ref || 'main' }}
+      working-directory: ${{ steps.inputs.outputs.working_directory }}
       run: |
         wget --output-document=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt
 
@@ -38,7 +49,7 @@ runs:
       uses: actions/setup-python@v4
       with:
         cache: pip
-        cache-dependency-path: .git/ansible-lint-requirements.txt
+        cache-dependency-path: ${{ steps.inputs.outputs.working_directory }}/.git/ansible-lint-requirements.txt
         python-version: "3.11"
 
     - name: Install ansible-lint
@@ -53,16 +64,6 @@ runs:
         cd $GITHUB_ACTION_PATH
         pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
         ansible-lint --version
-
-    - name: Process inputs
-      id: inputs
-      shell: bash
-      run: |
-        if [[ -n "${{ inputs.working_directory }}" ]]; then
-          echo "working_directory=${{ inputs.working_directory }}" >> $GITHUB_OUTPUT
-        else
-          echo "working_directory=${{ github.workspace }}" >> $GITHUB_OUTPUT
-        fi
 
     - name: Run ansible-lint
       shell: bash

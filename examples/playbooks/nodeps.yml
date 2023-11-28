@@ -1,0 +1,6 @@
+---
+- name: Example
+  hosts: localhost
+  tasks:
+    - name: Calling a module that is not installed
+      a.b.c: {}

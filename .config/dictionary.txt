@@ -208,6 +208,7 @@ matchtasks
 matchvar
 matchyaml
 maxdepth
+maxsplit
 minversion
 mkdir
 mkdocs
