@@ -285,7 +285,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
 def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
-    path_inject()
+    path_inject(argv[0] if argv and argv[0] else "")
 
     if argv is None:  # pragma: no cover
         argv = sys.argv
@@ -410,7 +410,7 @@ def _run_cli_entrypoint() -> None:
         raise SystemExit(exc) from exc
 
 
-def path_inject() -> None:
+def path_inject(own_location: str = "") -> None:
     """Add python interpreter path to top of PATH to fix outside venv calling."""
     # This make it possible to call ansible-lint that was installed inside a
     # virtualenv without having to pre-activate it. Otherwise subprocess will
@@ -450,6 +450,14 @@ def path_inject() -> None:
         and pipx_path not in str(py_path)
     ):
         inject_paths.append(str(py_path))
+
+    # last option, if nothing else is found, just look next to ourselves...
+    if (
+        own_location
+        and (Path(own_location).parent / "ansible").exists()
+        and str(Path(own_location).parent) not in paths
+    ):
+        inject_paths.append(str(Path(own_location).parent))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
         if inject_paths:
