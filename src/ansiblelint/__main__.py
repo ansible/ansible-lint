@@ -36,6 +36,17 @@ from ansible_compat.prerun import get_cache_dir
 from filelock import FileLock, Timeout
 from rich.markup import escape
 
+from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
+
+# safety check for broken ansible core, needs to happen first
+try:
+    # pylint: disable=unused-import
+    from ansible.parsing.dataloader import DataLoader  # noqa: F401
+
+except Exception as _exc:  # pylint: disable=broad-exception-caught # noqa: BLE001
+    logging.fatal(_exc)
+    sys.exit(RC.INVALID_CONFIG)
+# pylint: disable=ungrouped-imports
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
@@ -53,7 +64,6 @@ from ansiblelint.config import (
     log_entries,
     options,
 )
-from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
 from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import normalize_tag

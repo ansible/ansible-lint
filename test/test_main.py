@@ -10,6 +10,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from ansiblelint.config import get_version_warning
+from ansiblelint.constants import RC
 
 
 @pytest.mark.parametrize(
@@ -104,3 +105,20 @@ def test_nodeps(lintable: str) -> None:
         env=env,
     )
     assert proc.returncode == 0, proc
+
+
+def test_broken_ansible_cfg() -> None:
+    """Asserts behavior when encountering broken ansible.cfg files."""
+    py_path = Path(sys.executable).parent
+    proc = subprocess.run(
+        [str(py_path / "ansible-lint"), "--version"],
+        check=False,
+        capture_output=True,
+        text=True,
+        cwd="test/fixtures/broken-ansible.cfg",
+    )
+    assert proc.returncode == RC.INVALID_CONFIG, proc
+    assert (
+        "Invalid type for configuration option setting: DEFAULT_GATHER_TIMEOUT"
+        in proc.stderr
+    )
