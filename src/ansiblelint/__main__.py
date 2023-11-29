@@ -452,6 +452,7 @@ def path_inject(own_location: str = "") -> None:
         inject_paths.append(str(py_path))
 
     # last option, if nothing else is found, just look next to ourselves...
+    own_location = os.path.realpath(own_location)
     if (
         own_location
         and (Path(own_location).parent / "ansible").exists()
@@ -460,7 +461,7 @@ def path_inject(own_location: str = "") -> None:
         inject_paths.append(str(Path(own_location).parent))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
-        if inject_paths:
+        if inject_paths and not all("pipx" in p for p in inject_paths):
             print(  # noqa: T201
                 f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
                 file=sys.stderr,
