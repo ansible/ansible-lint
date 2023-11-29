@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 import black
 import jinja2
-from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleParserError
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from jinja2.exceptions import TemplateSyntaxError
 
@@ -132,6 +132,8 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             variables=deannotate(task.get("vars", {})),
                             fail_on_error=True,  # we later decide which ones to ignore or not
                         )
+                    except AnsibleFilterError:
+                        bypass = True
                     # ValueError RepresenterError
                     except AnsibleError as exc:
                         bypass = False
