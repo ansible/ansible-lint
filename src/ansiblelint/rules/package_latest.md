@@ -32,13 +32,13 @@ If you do want to update packages to the latest version, you should also set the
         name: some-package
         state: latest # <- Installs the latest package.
 
-    - name: Install Ansible with update_only to false
+    - name: Install sudo with update_only to false
       ansible.builtin.yum:
         name: sudo
         state: latest
         update_only: false # <- Updates and installs packages.
 
-    - name: Install Ansible with only_upgrade to false
+    - name: Install sudo with only_upgrade to false
       ansible.builtin.apt:
         name: sudo
         state: latest
@@ -69,13 +69,13 @@ If you do want to update packages to the latest version, you should also set the
         name: some-package
         state: present # <- Ensures the package is installed.
 
-    - name: Update Ansible with update_only to true
+    - name: Update sudo with update_only to true
       ansible.builtin.yum:
         name: sudo
         state: latest
         update_only: true # <- Updates but does not install additional packages.
 
-    - name: Install Ansible with only_upgrade to false
+    - name: Install sudo with only_upgrade to true
       ansible.builtin.apt:
         name: sudo
         state: latest

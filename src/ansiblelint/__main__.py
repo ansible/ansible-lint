@@ -36,6 +36,17 @@ from ansible_compat.prerun import get_cache_dir
 from filelock import FileLock, Timeout
 from rich.markup import escape
 
+from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
+
+# safety check for broken ansible core, needs to happen first
+try:
+    # pylint: disable=unused-import
+    from ansible.parsing.dataloader import DataLoader  # noqa: F401
+
+except Exception as _exc:  # pylint: disable=broad-exception-caught # noqa: BLE001
+    logging.fatal(_exc)
+    sys.exit(RC.INVALID_CONFIG)
+# pylint: disable=ungrouped-imports
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
@@ -53,7 +64,6 @@ from ansiblelint.config import (
     log_entries,
     options,
 )
-from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
 from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import normalize_tag
@@ -275,7 +285,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
 def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
-    path_inject()
+    path_inject(argv[0] if argv and argv[0] else "")
 
     if argv is None:  # pragma: no cover
         argv = sys.argv
@@ -318,6 +328,7 @@ def main(argv: list[str] | None = None) -> int:
             ),
         )
         or options.offline
+        or options.nodeps
     )
 
     if not skip_schema_update:
@@ -399,7 +410,7 @@ def _run_cli_entrypoint() -> None:
         raise SystemExit(exc) from exc
 
 
-def path_inject() -> None:
+def path_inject(own_location: str = "") -> None:
     """Add python interpreter path to top of PATH to fix outside venv calling."""
     # This make it possible to call ansible-lint that was installed inside a
     # virtualenv without having to pre-activate it. Otherwise subprocess will
@@ -440,8 +451,17 @@ def path_inject() -> None:
     ):
         inject_paths.append(str(py_path))
 
+    # last option, if nothing else is found, just look next to ourselves...
+    own_location = os.path.realpath(own_location)
+    if (
+        own_location
+        and (Path(own_location).parent / "ansible").exists()
+        and str(Path(own_location).parent) not in paths
+    ):
+        inject_paths.append(str(Path(own_location).parent))
+
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
-        if inject_paths:
+        if inject_paths and not all("pipx" in p for p in inject_paths):
             print(  # noqa: T201
                 f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
                 file=sys.stderr,
