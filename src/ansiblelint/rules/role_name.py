@@ -94,6 +94,20 @@ class RoleNames(AnsibleLintRule):
         if file.kind not in ("meta", "role", "playbook"):
             return result
 
+        if file.kind == "meta":
+            for role in file.data["dependencies"]:
+                role_name = role["role"]
+                if "/" in role_name:
+                    result.append(
+                        self.create_matcherror(
+                            f"Avoid using paths when importing roles. ({role_name})",
+                            filename=file,
+                            lineno=role["__line__"],
+                            tag=f"{self.id}[path]",
+                        ),
+                    )
+            return result
+
         if file.kind == "playbook":
             for play in file.data:
                 if "roles" in play:
@@ -168,4 +182,27 @@ if "pytest" in sys.modules:
         results = Runner(test_file, rules=default_rules_collection).run()
         for result in results:
             assert result.tag == "role-name[path]"
+        assert len(results) == failure
+
+    @pytest.mark.parametrize(
+        ("test_file", "failure"),
+        (pytest.param("examples/roles/role_with_deps_paths", 2, id="fail"),),
+    )
+    def test_role_deps_path_names(
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failure: int,
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(
+            test_file,
+            rules=default_rules_collection,
+        ).run()
+        expected_errors = (
+            ("role-name[path]", 3),
+            ("role-name[path]", 9),
+        )
+        for idx, result in enumerate(results):
+            assert result.tag == expected_errors[idx][0]
+            assert result.lineno == expected_errors[idx][1]
         assert len(results) == failure
