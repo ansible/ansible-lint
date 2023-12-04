@@ -1,9 +1,11 @@
 """Test schemas modules."""
 import json
 import logging
+import os
 import subprocess
 import sys
 import urllib
+import warnings
 from pathlib import Path
 from typing import Any
 from unittest.mock import DEFAULT, MagicMock, patch
@@ -89,9 +91,17 @@ def test_spdx() -> None:
         schema = json.load(f)
         spx_enum = schema["$defs"]["SPDXLicenseEnum"]["enum"]
     if set(spx_enum) != license_ids:
-        with galaxy_json.open("w", encoding="utf-8") as f:
-            schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
-            json.dump(schema, f, indent=2)
-        pytest.fail(
-            "SPDX license list inside galaxy.json JSON Schema file was updated.",
-        )
+        # In absence of a
+        if os.environ.get("PIP_CONSTRAINT", "/dev/null") != "/dev/null":
+            with galaxy_json.open("w", encoding="utf-8") as f:
+                schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
+                json.dump(schema, f, indent=2)
+            pytest.fail(
+                "SPDX license list inside galaxy.json JSON Schema file was updated.",
+            )
+        else:
+            warnings.warn(
+                "test_spdx failure was ignored because constraints were not pinned (PIP_CONSTRAINTS). This is expected for py39 and py-devel jobs.",
+                category=pytest.PytestWarning,
+                stacklevel=1,
+            )
