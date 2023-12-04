@@ -648,9 +648,7 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/galaxy.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
-  "examples": [
-    "galaxy.yml"
-  ],
+  "examples": ["galaxy.yml"],
   "markdownDescription": "https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
   "properties": {
     "authors": {
