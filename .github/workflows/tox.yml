@@ -54,7 +54,6 @@ jobs:
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs:
       - prepare
-      - test-action
     defaults:
       run:
         shell: ${{ matrix.shell || 'bash'}}
