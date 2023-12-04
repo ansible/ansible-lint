@@ -14,7 +14,7 @@ ci:
   submodules: true
 exclude: >
   (?x)^(
-    .config/requirements.*|
+    .config/.*requirements.*|
     .vscode/extensions.json|
     .vscode/settings.json|
     examples/broken/encoding.yml|
@@ -200,8 +200,8 @@ repos:
         name: lock
         alias: lock
         always_run: true
-        entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
-        files: ^.config\/requirements.*$
+        entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/lock-requirements.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
+        files: ^.config\/.*requirements.*$
         language: python
         language_version: "3.10" # minimal we support officially
         pass_filenames: false
@@ -213,7 +213,7 @@ repos:
         alias: deps
         always_run: true
         entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
-        files: ^.config\/requirements.*$
+        files: ^.config\/.*requirements.*$
         language: python
         language_version: "3.10" # minimal we support officially
         pass_filenames: false
@@ -224,7 +224,7 @@ repos:
         language: python
         always_run: true
         pass_filenames: false
-        files: ^.config\/requirements.*$
+        files: ^.config\/.*requirements.*$
         alias: up
         stages: [manual]
         language_version: "3.10" # minimal we support officially
