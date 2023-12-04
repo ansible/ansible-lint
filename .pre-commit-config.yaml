@@ -160,7 +160,7 @@ repos:
           - ruamel-yaml>=0.18.2
           - subprocess-tee
           - types-PyYAML
-          - types-jsonschema>=4.4.2
+          - types-jsonschema>=4.20.0.0
           - types-pkg_resources
           - types-setuptools
           - wcmatch
@@ -181,7 +181,7 @@ repos:
           - black>=22.10.0
           - docutils
           - filelock>=3.12.2
-          - jsonschema>=4.9.0
+          - jsonschema>=4.20.0
           - license-expression >= 30.1.1
           - pytest-mock
           - pytest>=7.2.2
@@ -200,7 +200,7 @@ repos:
         name: lock
         alias: lock
         always_run: true
-        entry: pip-compile --upgrade --resolver=backtracking -q --no-annotate --output-file=.config/lock-requirements.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
+        entry: pip-compile --upgrade -q --no-annotate --output-file=.config/lock-requirements.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
         files: ^.config\/.*requirements.*$
         language: python
         language_version: "3.10" # minimal we support officially
@@ -212,7 +212,7 @@ repos:
         name: deps
         alias: deps
         always_run: true
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
+        entry: pip-compile -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
         files: ^.config\/.*requirements.*$
         language: python
         language_version: "3.10" # minimal we support officially
@@ -220,7 +220,7 @@ repos:
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile --resolver=backtracking -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib  --unsafe-package resolvelib --upgrade
+        entry: pip-compile -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib  --unsafe-package resolvelib --upgrade
         language: python
         always_run: true
         pass_filenames: false
