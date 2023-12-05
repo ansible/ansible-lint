@@ -175,9 +175,11 @@ class NameRule(AnsibleLintRule, TransformMixin):
             target_task = self.seek(match.yaml_path, data)
             # Not using capitalize(), since that rewrites the rest of the name to lower case
             task_name = target_task["name"]
-            if "|" in task_name: # if using prefix
+            if "|" in task_name:  # if using prefix
                 [file_name, update_task_name] = task_name.split("|")
-                target_task["name"] = f"{file_name.strip()} | {update_task_name.strip()[:1].upper()}{update_task_name.strip()[1:]}"
+                target_task[
+                    "name"
+                ] = f"{file_name.strip()} | {update_task_name.strip()[:1].upper()}{update_task_name.strip()[1:]}"
             else:
                 target_task[
                     "name"
