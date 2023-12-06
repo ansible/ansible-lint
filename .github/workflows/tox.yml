@@ -54,7 +54,6 @@ jobs:
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs:
       - prepare
-      - test-action
     defaults:
       run:
         shell: ${{ matrix.shell || 'bash'}}
@@ -70,7 +69,7 @@ jobs:
     env:
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 848
+      PYTEST_REQPASS: 849
     steps:
       - uses: actions/checkout@v4
         with:
