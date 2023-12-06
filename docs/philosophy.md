@@ -93,7 +93,7 @@ only when a major version is released.
 Not really. The certification process is likely to use only a subset of rules.
 At this time, we are working on building that list.
 
-### Why lots of official Ansible docs examples are not passing linting?
+### Why do many official Ansible docs examples fail to pass linting?
 
 Most of the official examples are written to exemplify specific features, and
 some might conflict with our rules. Still, we plan to include linting of
