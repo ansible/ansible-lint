@@ -111,7 +111,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 if filter_key not in val:
                     return True
 
-                [k, v] = val.split("=")
+                [k, v] = val.split(filter_key)
                 filter_dict[k] = v
                 return False
 
@@ -121,14 +121,19 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                     k, v = task.popitem(False)
                     # identify module as key and process its value
                     if len(k.split(".")) == 3 and isinstance(v, str):
-                        # Filter the module options and command
-                        module_opts["cmd"] = " ".join(
-                            [
-                                item
-                                for item in v.split(" ")
-                                if filter_values(item, "=", module_opts)
-                            ],
-                        )
+                        # if it is a message
+                        if "=" in v:
+                            [key, value] = v.split("=")
+                            module_opts[key] = value.strip()
+                        else:
+                            # Filter the module options and command
+                            module_opts["cmd"] = " ".join(
+                                [
+                                    item
+                                    for item in v.split(" ")
+                                    if filter_values(item, "=", module_opts)
+                                ],
+                            )
 
                         sorted_module_opts = {}
                         for key in sorted(
