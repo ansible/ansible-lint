@@ -10,5 +10,5 @@
       ansible.builtin.raw: executable=/bin/bash echo foo # <-- don't use executable=
       changed_when: false
 
-    - name: Example task with fqcn and no-free-form errors
+    - name: Example task with usage for '=' as module params
       ansible.builtin.debug: msg='Hello there world'

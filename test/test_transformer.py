@@ -169,6 +169,13 @@ def fixture_runner_result(
             True,
             id="invalid_transform",
         ),
+        pytest.param(
+            "examples/roles/name_prefix/tasks/test.yml",
+            1,
+            True,
+            True,
+            id="name_case_with_prefix",
+        ),
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
