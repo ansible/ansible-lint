@@ -205,7 +205,7 @@ class App:
                 ignore_file.writelines(sorted(lines))
         elif matched_rules and not self.options.quiet:
             console_stderr.print(
-                "Read [link=https://ansible-lint.readthedocs.io/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations.",
+                "Read [link=https://ansible.readthedocs.io/projects/lint/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations.",
             )
 
         # Do not deprecate the old tags just yet. Why? Because it is not currently feasible

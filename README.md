@@ -53,11 +53,11 @@ ansible-lint was created by [Will Thames] and is now maintained as part of the
 [Ansible] by [Red Hat] project.
 
 [ansible]: https://ansible.com
-[contribution guidelines]: https://ansible-lint.readthedocs.io/contributing
+[contribution guidelines]: https://ansible.readthedocs.io/projects/lint/contributing
 [gplv3]: https://github.com/ansible/ansible-lint/blob/main/COPYING
 [mit]:
   https://github.com/ansible/ansible-lint/blob/main/docs/licenses/LICENSE.mit.txt
 [red hat]: https://redhat.com
 [will thames]: https://github.com/willthames
 [ansible-lint-action]:
-  https://ansible-lint.readthedocs.io/installing/#installing-from-source-code
+  https://ansible.readthedocs.io/projects/lint/installing/#installing-from-source-code

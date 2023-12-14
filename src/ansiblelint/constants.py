@@ -5,7 +5,7 @@ from typing import Literal
 
 DEFAULT_RULESDIR = Path(__file__).parent / "rules"
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
-RULE_DOC_URL = "https://ansible-lint.readthedocs.io/rules/"
+RULE_DOC_URL = "https://ansible.readthedocs.io/projects/lint/rules/"
 SKIP_SCHEMA_UPDATE = "ANSIBLE_LINT_SKIP_SCHEMA_UPDATE"
 
 ENV_VARS_HELP = {
