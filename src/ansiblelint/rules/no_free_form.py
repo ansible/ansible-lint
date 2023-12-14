@@ -122,9 +122,8 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                     # identify module as key and process its value
                     if len(k.split(".")) == 3 and isinstance(v, str):
                         # if it is a message
-                        if "=" in v:
-                            [key, value] = v.split("=")
-                            module_opts[key] = value.strip()
+                        if "msg" in v:
+                            filter_values(v, "=", module_opts)
                         else:
                             # Filter the module options and command
                             module_opts["cmd"] = " ".join(
@@ -157,7 +156,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                             [
                                 item
                                 for item in v.split(" ")
-                                if filter_values(item, "executable=", exec_key_val)
+                                if filter_values(item, "=", exec_key_val)
                             ],
                         )
                         task["args"] = exec_key_val
