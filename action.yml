@@ -21,35 +21,6 @@ inputs:
 runs:
   using: composite
   steps:
-    # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
-    # folder, so we are forced to stick this temporary file inside .git, so it
-    # will not affect the linted repository.
-    # https://github.com/actions/toolkit/issues/1035
-    # https://github.com/actions/setup-python/issues/361
-    - name: Generate .git/ansible-lint-requirements.txt
-      shell: bash
-      run: |
-        wget --output-document=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/${{ github.action_ref || 'main' }}/.config/requirements-lock.txt
-
-    - name: Set up Python
-      if: inputs.setup_python == 'true'
-      uses: actions/setup-python@v4
-      with:
-        cache: pip
-        cache-dependency-path: .git/ansible-lint-requirements.txt
-        python-version: "3.11"
-
-    - name: Install ansible-lint
-      shell: bash
-      # We need to set the version manually because $GITHUB_ACTION_PATH is not
-      # a git clone and setuptools-scm would not be able to determine the version.
-      # git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}
-      # SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }}
-      run: |
-        cd $GITHUB_ACTION_PATH
-        pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}"
-        ansible-lint --version
-
     - name: Process inputs
       id: inputs
       shell: bash
@@ -59,6 +30,40 @@ runs:
         else
           echo "working_directory=${{ github.workspace }}" >> $GITHUB_OUTPUT
         fi
+
+    # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
+    # folder, so we are forced to stick this temporary file inside .git, so it
+    # will not affect the linted repository.
+    # https://github.com/actions/toolkit/issues/1035
+    # https://github.com/actions/setup-python/issues/361
+    - name: Generate .git/ansible-lint-requirements.txt
+      shell: bash
+      env:
+        GH_ACTION_REF: ${{ github.action_ref || 'main' }}
+      working-directory: ${{ steps.inputs.outputs.working_directory }}
+      run: |
+        wget --output-document=.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/lock-requirements.txt
+
+    - name: Set up Python
+      if: inputs.setup_python == 'true'
+      uses: actions/setup-python@v5
+      with:
+        cache: pip
+        cache-dependency-path: ${{ steps.inputs.outputs.working_directory }}/.git/ansible-lint-requirements.txt
+        python-version: "3.11"
+
+    - name: Install ansible-lint
+      shell: bash
+      env:
+        GH_ACTION_REF: ${{ github.action_ref || 'main' }}
+      # We need to set the version manually because $GITHUB_ACTION_PATH is not
+      # a git clone and setuptools-scm would not be able to determine the version.
+      # git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}
+      # SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }}
+      run: |
+        cd $GITHUB_ACTION_PATH
+        pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
+        ansible-lint --version
 
     - name: Run ansible-lint
       shell: bash

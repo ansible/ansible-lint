@@ -5,7 +5,7 @@ from typing import Literal
 
 DEFAULT_RULESDIR = Path(__file__).parent / "rules"
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
-RULE_DOC_URL = "https://ansible-lint.readthedocs.io/rules/"
+RULE_DOC_URL = "https://ansible.readthedocs.io/projects/lint/rules/"
 SKIP_SCHEMA_UPDATE = "ANSIBLE_LINT_SKIP_SCHEMA_UPDATE"
 
 ENV_VARS_HELP = {
@@ -13,6 +13,7 @@ ENV_VARS_HELP = {
     "ANSIBLE_LINT_IGNORE_FILE": "Define it to override the name of the default ignore file `.ansible-lint-ignore`",
     "ANSIBLE_LINT_WRITE_TMP": "Tells linter to dump fixes into different temp files instead of overriding original. Used internally for testing.",
     SKIP_SCHEMA_UPDATE: "Tells ansible-lint to skip schema refresh.",
+    "ANSIBLE_LINT_NODEPS": "Avoids installing content dependencies and avoids performing checks that would fail when modules are not installed. Far less violations will be reported.",
 }
 
 EPILOG = (

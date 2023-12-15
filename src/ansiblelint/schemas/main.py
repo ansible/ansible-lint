@@ -55,19 +55,29 @@ def validate_file_schema(file: Lintable) -> list[str]:
             return []
         if error.context:
             error = find_best_deep_match(error)
-        message = f"{error.json_path} {error.message}"
+        # determine if we want to use our own messages embedded into schemas inside title/markdownDescription fields
+        if "not" in error.schema and len(error.schema["not"]) == 0:
+            message = error.schema["title"]
+            schema = error.schema
+        else:
+            message = f"{error.json_path} {error.message}"
 
         documentation_url = ""
-        for k in ("description", "markdownDescription"):
-            if k in schema:
-                # Find standalone URLs and also markdown urls.
-                match = re.search(
-                    r"\[.*?\]\((https?://[^\s]+)\)|https?://[^\s]+",
-                    schema[k],
-                )
-                if match:
-                    documentation_url = match[0] if match[0] else match[1]
-                    break
+        for json_schema in (error.schema, schema):
+            for k in ("description", "markdownDescription"):
+                if k in json_schema:
+                    # Find standalone URLs and also markdown urls.
+                    match = re.search(
+                        r"\[.*?\]\((?P<url>https?://[^\s]+)\)|(?P<url2>https?://[^\s]+)",
+                        json_schema[k],
+                    )
+                    if match:
+                        documentation_url = next(
+                            x for x in match.groups() if x is not None
+                        )
+                        break
+            if documentation_url:
+                break
         if documentation_url:
             if not message.endswith("."):
                 message += "."
@@ -86,7 +96,7 @@ def validate_file_schema(file: Lintable) -> list[str]:
                     schema[k],
                 )
                 if match:
-                    documentation_url = match[0] if match[0] else match[1]
+                    documentation_url = match.groups()[0]
                     break
         if documentation_url:
             if not message.endswith("."):

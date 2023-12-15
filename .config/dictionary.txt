@@ -50,6 +50,7 @@ autodetected
 autodiscovery
 autodoc
 autofix
+autohide
 autorefs
 autoupdate
 awcrosby

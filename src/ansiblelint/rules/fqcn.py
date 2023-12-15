@@ -5,10 +5,9 @@ import logging
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansible.plugins.loader import module_loader
-
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.utils import load_plugin
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -116,9 +115,12 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
     ) -> list[MatchError]:
         result = []
         module = task["action"]["__ansible_module_original__"]
+        if not isinstance(module, str):
+            msg = "Invalid data for module."
+            raise RuntimeError(msg)
 
         if module not in self.module_aliases:
-            loaded_module = module_loader.find_plugin_with_context(module)
+            loaded_module = load_plugin(module)
             target = loaded_module.resolved_fqcn
             self.module_aliases[module] = target
             if target is None:
@@ -137,10 +139,16 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                     1,
                 )
                 if module != legacy_module:
+                    if module == "ansible.builtin.include":
+                        message = f"Avoid deprecated module ({module})"
+                        details = "Use `ansible.builtin.include_task` or `ansible.builtin.import_tasks` instead."
+                    else:
+                        message = f"Use FQCN for builtin module actions ({module})."
+                        details = f"Use `{module_alias}` or `{legacy_module}` instead."
                     result.append(
                         self.create_matcherror(
-                            message=f"Use FQCN for builtin module actions ({module}).",
-                            details=f"Use `{module_alias}` or `{legacy_module}` instead.",
+                            message=message,
+                            details=details,
                             filename=file,
                             lineno=task["__line__"],
                             tag="fqcn[action-core]",
