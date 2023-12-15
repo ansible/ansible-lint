@@ -136,7 +136,7 @@ def fixture_runner_result(
         ),
         pytest.param(
             "examples/playbooks/transform-no-free-form.yml",
-            2,
+            3,
             True,
             True,
             id="no_free_form_transform",

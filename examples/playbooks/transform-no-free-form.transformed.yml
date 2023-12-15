@@ -13,3 +13,7 @@
       args:
         executable: /bin/bash
       changed_when: false
+
+    - name: Example task with usage for '=' as module params
+      ansible.builtin.debug:
+        msg: "'Hello there world'"
