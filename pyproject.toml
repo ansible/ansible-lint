@@ -42,7 +42,7 @@ keywords = ["ansible", "lint"]
 
 [project.urls]
 homepage = "https://github.com/ansible/ansible-lint"
-documentation = "https://ansible-lint.readthedocs.io/"
+documentation = "https://ansible.readthedocs.io/projects/lint/"
 repository = "https://github.com/ansible/ansible-lint"
 changelog = "https://github.com/ansible/ansible-lint/releases"
 
