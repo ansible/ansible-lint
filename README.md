@@ -36,9 +36,9 @@ For more details, see [ansible-lint-action].
 
 # Using ansible-lint with Trunk Check
 [trunk check](https://docs.trunk.io/docs) is a meta-linter which allows you to run `ansible-lint` on
-your codebase without having to install it yourself, and can scan all of your files or only the most recent changes. 
+your codebase without having to install it yourself, and can scan all of your files or only the most recent changes.
 
-Once you have [initialized trunk in your repo](https://docs.trunk.io/docs/check-get-started), 
+Once you have [initialized trunk in your repo](https://docs.trunk.io/docs/check-get-started),
 to enable the latest ansible-lint, just run:
 
 ```shell
@@ -51,7 +51,7 @@ Then just run:
 trunk check
 ```
 
-and it will check your modified files via ansible-lint and, if applicable, show you the results. 
+and it will check your modified files via ansible-lint and, if applicable, show you the results.
 For more information, check the [trunk docs](https://docs.trunk.io/docs/check).
 You can also see ansible-lint issues inline in VS Code via the
 [Trunk VS Code extension](https://marketplace.visualstudio.com/items?itemName=trunk.io). The code
