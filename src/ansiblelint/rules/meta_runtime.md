@@ -2,21 +2,14 @@
 
 This rule checks the meta/runtime.yml `requires_ansible` key against the list of currently supported versions of ansible-core.
 
-This rule can produce messages such:
-
-- `requires_ansible` key must be set to a supported version.
-
-Currently supported versions of ansible-core are:
-
-- `2.13.x`
-- `2.14.x`
-- `2.15.x`
-
 This rule can produce messages such as:
 
-- `meta-runtime[unsupported-version]` - `requires_ansible` key must contain a supported version - 2.13.x, 2.14.x, 2.15.x.
+- `meta-runtime[unsupported-version]` - `requires_ansible` key must refer to a currently supported version such: >=2.14.0, >=2.15.0, >=2.16.0
 - `meta-runtime[invalid-version]` - `requires_ansible` is not a valid requirement specification
 
+Please note that the linter will allow only a full version of Ansible such `2.16.0` and not allow their short form, like `2.16`. This is a safety measure
+for asking authors to mention an explicit version that they tested with. Over the years we spotted multiple problems caused by the use of the short versions, users
+ended up trying an outdated version that was never tested against by the collection maintainer.
 
 ## Problematic code
 
