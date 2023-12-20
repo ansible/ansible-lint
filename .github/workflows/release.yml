@@ -19,7 +19,8 @@ jobs:
       - uses: Actions-R-Us/actions-tagger@latest
         with:
           token: "${{ github.token }}"
-          publish_latest_tag: true
+          # Do not activate latest tag because it seems to affect RTD builds
+          # publish_latest_tag: true
   pypi:
     name: Publish to PyPI registry
     environment: release
