@@ -34,7 +34,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
     supported_ansible = ["2.14.", "2.15.", "2.16."]
     supported_ansible_examples = [f">={x}0" for x in supported_ansible]
     _ids = {
-        "meta-runtime[unsupported-version]": f"'requires_ansible' key must refer to a currently supported version such: {', '.join(supported_ansible_examples)}",
+        "meta-runtime[unsupported-version]": f"'requires_ansible' key must refer to a currently supported version such as: {', '.join(supported_ansible_examples)}",
         "meta-runtime[invalid-version]": "'requires_ansible' is not a valid requirement specification",
     }
 
