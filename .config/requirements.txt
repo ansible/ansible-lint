@@ -34,7 +34,6 @@ ghp-import==2.1.0
 griffe==0.36.4
 htmlmin2==0.1.13
 idna==3.4
-importlib-metadata==6.8.0
 iniconfig==2.0.0
 isort==5.12.0
 jinja2==3.1.2
@@ -106,7 +105,6 @@ watchdog==3.0.0
 wcmatch==8.5
 webencodings==0.5.1
 yamllint==1.32.0
-zipp==3.17.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # resolvelib
