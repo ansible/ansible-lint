@@ -42,7 +42,7 @@ keywords = ["ansible", "lint"]
 
 [project.urls]
 homepage = "https://github.com/ansible/ansible-lint"
-documentation = "https://ansible-lint.readthedocs.io/"
+documentation = "https://ansible.readthedocs.io/projects/lint/"
 repository = "https://github.com/ansible/ansible-lint"
 changelog = "https://github.com/ansible/ansible-lint/releases"
 
@@ -284,7 +284,7 @@ known-first-party = ["ansiblelint"]
 optional-dependencies.docs = { file = [".config/docs-requirements.txt"] }
 optional-dependencies.test = { file = [".config/test-requirements.txt"] }
 optional-dependencies.lock = { file = [".config/lock-requirements.txt"] }
-dependencies = { file = [".config/requirements.in"] }
+dependencies = { file = [".config/runtime-requirements.txt"] }
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"

@@ -113,7 +113,7 @@ jobs:
 
 Due to limitations on how GitHub Actions are processing arguments, we do not
 plan to provide extra options. You will have to make use of
-[ansible-lint own configuration file](https://ansible-lint.readthedocs.io/configuring/)
+[ansible-lint own configuration file](https://ansible.readthedocs.io/projects/lint/configuring/)
 for altering its behavior.
 
 To also enable [dependabot][dependabot] automatic updates the newer versions of

@@ -1,6 +1,6 @@
 ---
 site_name: Ansible Lint Documentation
-site_url: https://ansible-lint.readthedocs.io/
+site_url: https://ansible.readthedocs.io/projects/lint/
 repo_url: https://github.com/ansible/ansible-lint
 edit_uri: blob/main/docs/
 copyright: Copyright © 2023 Red Hat, Inc.
@@ -13,13 +13,28 @@ extra_css:
 theme:
   name: ansible
   features:
-    - content.code.copy
+    - announce.dismiss
     - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - content.tooltips
+    - header.autohide
     - navigation.expand
-    - navigation.sections
-    - navigation.instant
+    - navigation.footer
     - navigation.indexes
+    - navigation.instant
+    - navigation.path
+    - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
     - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
     - toc.integrate
 extra:
   social:
@@ -46,11 +61,12 @@ extra:
       name: GitHub
 
 nav:
-  - User Guide:
+  - Home:
       - home: index.md
-      - philosophy.md
-      - installing.md
+      - Philosophy: philosophy.md
       - usage.md
+  - Setup:
+      - installing.md
       - configuring.md
       - profiles.md
       - autofix.md
