@@ -9,7 +9,6 @@ updates:
     labels:
       - dependabot-deps-updates
       - skip-changelog
-    versioning-strategy: lockfile-only
     groups:
       dependencies:
         patterns:
