@@ -32,6 +32,10 @@ repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.23.1
+    hooks:
+      - id: toml-sort-fix
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
     rev: v4.0.0-alpha.8
@@ -64,7 +68,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.2.1
+    rev: v8.3.0
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -131,7 +135,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.1.9"
+    rev: "v0.1.11"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
