@@ -5,7 +5,7 @@
 #    pip-compile --no-annotate --output-file=.config/lock-requirements.txt --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
 ansible-compat==4.1.11
-ansible-core==2.16.0
+ansible-core==2.16.1
 attrs==23.1.0
 black==23.10.1
 bracex==2.4
