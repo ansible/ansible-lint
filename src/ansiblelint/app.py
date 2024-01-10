@@ -47,7 +47,9 @@ class App:
 
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(
-            isolated=True, require_module=True, verbosity=options.verbosity
+            isolated=True,
+            require_module=True,
+            verbosity=options.verbosity,
         )
 
     def render_matches(self, matches: list[MatchError]) -> None:
