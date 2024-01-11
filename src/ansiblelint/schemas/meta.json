@@ -512,7 +512,7 @@
         "namespace": {
           "markdownDescription": "Used by molecule and ansible-lint to compute FQRN for roles outside collections",
           "minLength": 2,
-          "pattern": "^[a-z][a-z0-9_]+$",
+          "pattern": "^[a-z][a-z0-9_-]+$",
           "title": "Namespace Name",
           "type": "string"
         },
