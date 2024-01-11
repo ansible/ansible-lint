@@ -27,6 +27,7 @@ csscompressor==0.9.5
 cssselect2==0.7.0
 defusedxml==0.7.1
 dill==0.3.7
+dnspython==2.4.2
 exceptiongroup==1.2.0
 execnet==2.0.2
 filelock==3.13.1
@@ -42,6 +43,7 @@ jsmin==3.0.1
 jsonschema==4.20.0
 jsonschema-specifications==2023.12.1
 license-expression==30.2.0
+linkchecker==10.4.0
 markdown==3.5.2
 markdown-exec==1.8.0
 markdown-include==0.8.1
