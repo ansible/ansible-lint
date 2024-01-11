@@ -9,13 +9,10 @@ updates:
     labels:
       - dependabot-deps-updates
       - skip-changelog
-    versioning-strategy: lockfile-only
-    ignore:
-      - dependency-name: mypy
-      - dependency-name: pipdeptree
-      - dependency-name: pylint
-      - dependency-name: types-jsonschema
-      - dependency-name: types-pyyaml
+    groups:
+      dependencies:
+        patterns:
+          - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

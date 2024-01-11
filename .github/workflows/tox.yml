@@ -104,7 +104,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: "npm"
           cache-dependency-path: test/schemas/package-lock.json
 
@@ -137,17 +137,14 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           name: ${{ matrix.passed_name }}
-          fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
 
       - name: Archive logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: logs.zip
           path: .tox/**/log/
-        # https://github.com/actions/upload-artifact/issues/123
-        continue-on-error: true
 
       - name: Report failure if git reports dirty status
         run: |

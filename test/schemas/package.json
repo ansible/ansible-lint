@@ -3,7 +3,7 @@
     "ajv-formats": "^2.1.1",
     "js-yaml": "^4.1.0",
     "safe-stable-stringify": "^2.4.3",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "vscode-json-languageservice": "^5.3.7"
   },
   "scripts": {
@@ -12,15 +12,15 @@
     "test": "python3 src/rebuild.py && mocha"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.9",
-    "@types/js-yaml": "^4.0.8",
+    "@types/chai": "^4.3.11",
+    "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^5.1.2",
-    "@types/mocha": "^10.0.4",
-    "@types/node": "^20.8.10",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.6",
     "chai": "^4.3.10",
     "minimatch": "^9.0.3",
     "mocha": "^10.2.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   },
   "directories": {
     "test": "./src"
