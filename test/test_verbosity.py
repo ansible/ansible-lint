@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from ansiblelint.testing import run_ansible_lint
+from ansiblelint.text import strip_ansi_escape
 
 
 # substrs is a list of tuples, where:
@@ -83,6 +84,9 @@ def test_verbosity(
     else:
         result = run_ansible_lint(str(fakerole), cwd=project_path)
 
+    result.stderr = strip_ansi_escape(result.stderr)
+    result.stdout = strip_ansi_escape(result.stdout)
+    assert result.returncode == 2, result
     for substr, invert in substrs:
         if invert:
             assert substr not in result.stderr, result.stderr
