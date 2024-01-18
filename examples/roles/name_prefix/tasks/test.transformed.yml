@@ -1,0 +1,8 @@
+---
+- name: test | Not cap
+  ansible.builtin.debug:
+    msg: not cap
+
+- name: test | Cap
+  ansible.builtin.debug:
+    msg: Cap
