@@ -170,11 +170,11 @@ def fixture_runner_result(
             id="invalid_transform",
         ),
         pytest.param(
-            "examples/roles/name_prefix/tasks/test.yml",
-            1,
+            "examples/roles/name_casing_prefix/tasks/test.yml",
+            5,
             True,
             True,
-            id="name_case_with_prefix",
+            id="name_casing_and_name_case_with_prefix",
         ),
     ),
 )

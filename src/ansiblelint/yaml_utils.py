@@ -422,6 +422,8 @@ def _get_path_to_task_in_nested_tasks_block(
             continue
         next_task_key = task_keys_by_index.get(task_index + 1, None)
         if next_task_key is not None:
+            if task.lc.data[next_task_key][2] < lineno:
+                continue
             next_task_key_line_index = task.lc.data[next_task_key][0]
         else:
             next_task_key_line_index = None
