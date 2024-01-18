@@ -174,7 +174,14 @@ def fixture_runner_result(
             1,
             True,
             True,
-            id="name_case_with_prefix",
+            id="name_casing_prefix",
+        ),
+        pytest.param(
+            "examples/roles/name_casing/tasks/main.yml",
+            2,
+            True,
+            True,
+            id="name_case",
         ),
     ),
 )
