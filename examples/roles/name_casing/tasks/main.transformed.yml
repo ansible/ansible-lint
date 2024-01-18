@@ -1,0 +1,15 @@
+---
+- name: Test nested tasks within block and always
+  block:
+    - name: Test1
+      ansible.builtin.debug:
+        msg: Foo
+
+    - name: Test2
+      ansible.builtin.debug:
+        msg: Bar
+
+  always:
+    - name: From always block to be auto fixed as name[casing] scenario
+      ansible.builtin.debug:
+        msg: Baz
