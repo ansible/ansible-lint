@@ -279,10 +279,9 @@ max-complexity = 20
 ]
 
 [tool.setuptools.dynamic]
-dependencies = {file = [".config/runtime-requirements.txt"]}
-optional-dependencies.docs = {file = [".config/docs-requirements.txt"]}
-optional-dependencies.test = {file = [".config/test-requirements.txt"]}
-optional-dependencies.lock = {file = [".config/lock-requirements.txt"]}
+dependencies = {file = [".config/requirements.in"]}
+optional-dependencies.docs = {file = [".config/requirements-docs.in"]}
+optional-dependencies.test = {file = [".config/requirements-test.in"]}
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"

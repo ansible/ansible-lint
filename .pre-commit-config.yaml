@@ -14,6 +14,7 @@ ci:
   submodules: true
 exclude: >
   (?x)^(
+    .config/constraints.txt|
     .config/.*requirements.*|
     .vscode/extensions.json|
     .vscode/settings.json|
@@ -64,9 +65,9 @@ repos:
           )$
         always_run: true
         additional_dependencies:
-          - prettier
-          - prettier-plugin-toml
-          - prettier-plugin-sort-json
+          - prettier@3.2.4
+          - prettier-plugin-toml@2.0.1
+          - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v8.3.0
     hooks:
@@ -135,7 +136,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.1.11"
+    rev: "v0.1.13"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -204,7 +205,7 @@ repos:
         name: lock
         alias: lock
         always_run: true
-        entry: pip-compile --upgrade -q --no-annotate --output-file=.config/lock-requirements.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
+        entry: pip-compile --upgrade -q --no-annotate --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
         files: ^.config\/.*requirements.*$
         language: python
         language_version: "3.10" # minimal we support officially
@@ -216,7 +217,7 @@ repos:
         name: deps
         alias: deps
         always_run: true
-        entry: pip-compile -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
+        entry: pip-compile -q --no-annotate --output-file=.config/constraints.txt pyproject.toml --all-extras --strip-extras --unsafe-package ruamel-yaml-clib --unsafe-package resolvelib
         files: ^.config\/.*requirements.*$
         language: python
         language_version: "3.10" # minimal we support officially
@@ -224,7 +225,7 @@ repos:
         additional_dependencies:
           - pip>=22.3.1
       - id: pip-compile
-        entry: pip-compile -q --no-annotate --output-file=.config/requirements.txt pyproject.toml --extra docs --extra test --strip-extras --unsafe-package ruamel-yaml-clib  --unsafe-package resolvelib --upgrade
+        entry: pip-compile -q --no-annotate --output-file=.config/constraints.txt pyproject.toml --all-extras --strip-extras --unsafe-package ruamel-yaml-clib  --unsafe-package resolvelib --upgrade
         language: python
         always_run: true
         pass_filenames: false
