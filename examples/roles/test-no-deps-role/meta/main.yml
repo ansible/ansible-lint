@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  author: Ajinkya Udgirkar
+  author: audgirka
   description: your role description
   company: Red Hat
   role_name: test_no_deps_role # if absent directory name hosting role is used instead
