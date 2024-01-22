@@ -155,4 +155,5 @@ def run_ansible_lint(
         cwd=cwd,
         env=_env,
         text=True,
+        encoding="utf-8",
     )
