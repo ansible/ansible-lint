@@ -37,8 +37,8 @@
     "evenBetterToml.formatter.alignComments": false,
     "[python]": {
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true,
-            "source.fixAll": true
-          }
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit"
+        }
     }
 }

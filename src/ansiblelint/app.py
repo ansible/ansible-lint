@@ -50,6 +50,7 @@ class App:
             isolated=True,
             require_module=True,
             project_dir=Path(options.project_dir) or None,
+            verbosity=options.verbosity,
         )
 
     def render_matches(self, matches: list[MatchError]) -> None:

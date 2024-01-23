@@ -1,8 +1,7 @@
 [build-system]
 requires = [
   "setuptools >= 65.3.0", # required by pyproject+setuptools_scm integration and editable installs
-  "setuptools_scm[toml] >= 7.0.5", # required for "no-local-version" scheme
-
+  "setuptools_scm[toml] >= 7.0.5" # required for "no-local-version" scheme
 ]
 build-backend = "setuptools.build_meta"
 
@@ -13,9 +12,9 @@ dynamic = ["version", "dependencies", "optional-dependencies"]
 name = "ansible-lint"
 description = "Checks playbooks for practices and behavior that could potentially be improved"
 readme = "README.md"
-authors = [{ "name" = "Will Thames", "email" = "will@thames.id.au" }]
-maintainers = [{ "name" = "Ansible by Red Hat", "email" = "info@ansible.com" }]
-license = { text = "GPLv3+" }
+authors = [{"name" = "Will Thames", "email" = "will@thames.id.au"}]
+maintainers = [{"name" = "Ansible by Red Hat", "email" = "info@ansible.com"}]
+license = {text = "GPLv3+"}
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Console",
@@ -36,18 +35,18 @@ classifiers = [
   "Topic :: System :: Systems Administration",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
-  "Topic :: Utilities",
+  "Topic :: Utilities"
 ]
 keywords = ["ansible", "lint"]
+
+[project.scripts]
+ansible-lint = "ansiblelint.__main__:_run_cli_entrypoint"
 
 [project.urls]
 homepage = "https://github.com/ansible/ansible-lint"
 documentation = "https://ansible.readthedocs.io/projects/lint/"
 repository = "https://github.com/ansible/ansible-lint"
 changelog = "https://github.com/ansible/ansible-lint/releases"
-
-[project.scripts]
-ansible-lint = "ansiblelint.__main__:_run_cli_entrypoint"
 
 [tool.black]
 target-version = ["py39"]
@@ -56,14 +55,6 @@ target-version = ["py39"]
 skip = ".tox,.mypy_cache,build,.git,.eggs,pip-wheel-metadata"
 # indention is a typo in ruamel.yaml's API
 ignore-words-list = "indention"
-
-[tool.coverage.run]
-source = ["src"]
-# Do not use branch until bug is fixes:
-# https://github.com/nedbat/coveragepy/issues/605
-# branch = true
-parallel = true
-concurrency = ["multiprocessing", "thread"]
 
 # Keep this default because xml/report do not know to use load it from config file:
 # data_file = ".coverage"
@@ -80,6 +71,14 @@ skip_empty = true
 # During development we might remove code (files) with coverage data, and we dont want to fail:
 ignore_errors = true
 show_missing = true
+
+[tool.coverage.run]
+source = ["src"]
+# Do not use branch until bug is fixes:
+# https://github.com/nedbat/coveragepy/issues/605
+# branch = true
+parallel = true
+concurrency = ["multiprocessing", "thread"]
 
 [tool.isort]
 profile = "black"
@@ -117,23 +116,22 @@ module = [
   "ansiblelint._version", # generated
   "license_expression",
   "ruamel.yaml",
-  "yamllint.*",
+  "yamllint.*"
 ]
 ignore_missing_imports = true
 ignore_errors = true
 
-[tool.pylint.MAIN]
-extension-pkg-allow-list = ["black.parsing"]
-
 [tool.pylint.IMPORTS]
 preferred-modules = ["py:pathlib", "unittest:pytest"]
+
+[tool.pylint.MAIN]
+extension-pkg-allow-list = ["black.parsing"]
 
 [tool.pylint.MASTER]
 bad-names = [
   # spell-checker:ignore linenumber
   "linenumber", # use lineno instead
-  "line_number", # use lineno instead
-
+  "line_number" # use lineno instead
 ]
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
@@ -154,10 +152,10 @@ disable = [
   # https://github.com/PyCQA/pylint/issues/850
   "cyclic-import",
   # https://github.com/PyCQA/pylint/issues/8453
-  "preferred-module",
+  "preferred-module"
 ]
 enable = [
-  "useless-suppression", # Identify unneeded pylint disable statements
+  "useless-suppression" # Identify unneeded pylint disable statements
 ]
 
 [tool.pylint.REPORTING]
@@ -196,7 +194,7 @@ filterwarnings = [
   # https://github.com/ansible/ansible/issues/81906
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
   # https://github.com/ansible/ansible/pull/80968
-  "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning",
+  "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning"
 ]
 junit_duration_report = "call"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
@@ -217,7 +215,7 @@ norecursedirs = [
   "collections",
   "dist",
   "docs",
-  "src/ansible_lint.egg-info",
+  "src/ansible_lint.egg-info"
 ]
 python_files = [
   "test_*.py",
@@ -225,7 +223,7 @@ python_files = [
   # Needed to discover legacy nose test modules:
   "Test*.py",
   # Needed to discover embedded Rule tests
-  "rules/*.py",
+  "rules/*.py"
 ]
 # Using --pyargs instead of testpath as we embed some tests
 # See: https://github.com/pytest-dev/pytest/issues/6451#issuecomment-687043537
@@ -251,16 +249,12 @@ ignore = [
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "TRY",
   "PERF203",
-  "PD011", # We are not using pandas, any .values attributes are unrelated
+  "PD011" # We are not using pandas, any .values attributes are unrelated
 ]
 select = ["ALL"]
 target-version = "py39"
 # Same as Black.
 line-length = 88
-
-[tool.ruff.mccabe]
-# Implicit 10 is too low for our codebase, even black uses 18 as default.
-max-complexity = 20
 
 [tool.ruff.flake8-builtins]
 builtins-ignorelist = ["id"]
@@ -271,20 +265,24 @@ parametrize-values-type = "tuple"
 [tool.ruff.isort]
 known-first-party = ["ansiblelint"]
 
+[tool.ruff.mccabe]
+# Implicit 10 is too low for our codebase, even black uses 18 as default.
+max-complexity = 20
+
 [tool.ruff.per-file-ignores]
 "test/**/*.py" = ["S"]
 "src/ansiblelint/rules/*.py" = ["S"]
 "src/ansiblelint/testing/*.py" = ["S"]
 # Temporary disabled until we fix them:
 "src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings}.py" = [
-  "PTH",
+  "PTH"
 ]
 
 [tool.setuptools.dynamic]
-optional-dependencies.docs = { file = [".config/docs-requirements.txt"] }
-optional-dependencies.test = { file = [".config/test-requirements.txt"] }
-optional-dependencies.lock = { file = [".config/lock-requirements.txt"] }
-dependencies = { file = [".config/requirements.in"] }
+dependencies = {file = [".config/runtime-requirements.txt"]}
+optional-dependencies.docs = {file = [".config/docs-requirements.txt"]}
+optional-dependencies.test = {file = [".config/test-requirements.txt"]}
+optional-dependencies.lock = {file = [".config/lock-requirements.txt"]}
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
@@ -298,5 +296,5 @@ git_describe_command = [
   "--tags",
   "--long",
   "--match",
-  "v*.*",
+  "v*.*"
 ]

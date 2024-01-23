@@ -136,7 +136,7 @@ def fixture_runner_result(
         ),
         pytest.param(
             "examples/playbooks/transform-no-free-form.yml",
-            2,
+            3,
             True,
             True,
             id="no_free_form_transform",
@@ -174,7 +174,14 @@ def fixture_runner_result(
             1,
             True,
             True,
-            id="name_case_with_prefix",
+            id="name_casing_prefix",
+        ),
+        pytest.param(
+            "examples/roles/name_casing/tasks/main.yml",
+            2,
+            True,
+            True,
+            id="name_case",
         ),
     ),
 )

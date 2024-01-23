@@ -12,7 +12,7 @@ version can report:
 
 As jinja2 syntax is closely following Python one we aim to follow
 [black](https://black.readthedocs.io/en/stable/) formatting rules. If you are
-curious how black would reformat a small sniped feel free to visit
+curious how black would reformat a small snippet feel free to visit
 [online black formatter](https://black.vercel.app/) site. Keep in mind to not
 include the entire jinja2 template, so instead of `{{ 1+2==3 }}`, do paste
 only `1+2==3`.

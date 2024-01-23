@@ -111,7 +111,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 if filter_key not in val:
                     return True
 
-                [k, v] = val.split("=")
+                [k, v] = val.split(filter_key)
                 filter_dict[k] = v
                 return False
 
@@ -121,14 +121,18 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                     k, v = task.popitem(False)
                     # identify module as key and process its value
                     if len(k.split(".")) == 3 and isinstance(v, str):
-                        # Filter the module options and command
-                        module_opts["cmd"] = " ".join(
-                            [
-                                item
-                                for item in v.split(" ")
-                                if filter_values(item, "=", module_opts)
-                            ],
-                        )
+                        # if it is a message
+                        if "msg" in v:
+                            filter_values(v, "=", module_opts)
+                        else:
+                            # Filter the module options and command
+                            module_opts["cmd"] = " ".join(
+                                [
+                                    item
+                                    for item in v.split(" ")
+                                    if filter_values(item, "=", module_opts)
+                                ],
+                            )
 
                         sorted_module_opts = {}
                         for key in sorted(
@@ -152,7 +156,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                             [
                                 item
                                 for item in v.split(" ")
-                                if filter_values(item, "executable=", exec_key_val)
+                                if filter_values(item, "=", exec_key_val)
                             ],
                         )
                         task["args"] = exec_key_val
