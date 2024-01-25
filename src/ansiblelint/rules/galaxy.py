@@ -7,8 +7,6 @@ from functools import total_ordering
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import FILENAME_KEY, LINE_NUMBER_KEY
-from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
@@ -38,6 +36,7 @@ class GalaxyRule(AnsibleLintRule):
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
+        changelog_file_data = []
         if file.kind == "changelog":
             global CHANGELOG_FILE
             CHANGELOG_FILE = list(changelog_file_data.data.get("releases", None).keys())
