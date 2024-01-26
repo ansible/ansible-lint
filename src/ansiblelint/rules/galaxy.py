@@ -37,9 +37,9 @@ class GalaxyRule(AnsibleLintRule):
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
         changelog_file_data = []
+        global CHANGELOG_FILE
         if file.kind == "changelog":
-            global CHANGELOG_FILE
-            CHANGELOG_FILE = list(changelog_file_data.data.get("releases", None).keys())
+            CHANGELOG_FILE = list(file.data.get("releases", None).keys())
 
         if file.kind != "galaxy":  # type: ignore[comparison-overlap]
             return []
@@ -102,7 +102,7 @@ class GalaxyRule(AnsibleLintRule):
                 ),
             )
         else:
-            if Version(data.get("version")) != Version(changelog_file_data[-2]):
+            if Version(data.get("version")) != Version(changelog_file_data[-3]):
                 results.append(
                     self.create_matcherror(
                         message="Version in galaxy.yaml and the latest version in changelog should be same.",
