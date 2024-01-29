@@ -132,7 +132,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     cwd: Path = Path(".")
     display_relative_path: bool = True
     exclude_paths: list[str] = field(default_factory=list)
-    format: str = "brief"  # noqa: A003
+    format: str = "brief"
     lintables: list[str] = field(default_factory=list)
     list_rules: bool = False
     list_tags: bool = False
