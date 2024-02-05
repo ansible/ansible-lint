@@ -1,4 +1,5 @@
 """Custom rule used as fixture."""
+
 from ansiblelint.rules import AnsibleLintRule
 
 

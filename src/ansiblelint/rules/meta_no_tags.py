@@ -1,4 +1,5 @@
 """Implementation of meta-no-tags rule."""
+
 from __future__ import annotations
 
 import re

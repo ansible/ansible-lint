@@ -1,4 +1,5 @@
 """Implementation of no-jinja-when rule."""
+
 from __future__ import annotations
 
 import re

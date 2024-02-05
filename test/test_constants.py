@@ -1,4 +1,5 @@
 """Tests for constants module."""
+
 from ansiblelint.constants import States
 
 

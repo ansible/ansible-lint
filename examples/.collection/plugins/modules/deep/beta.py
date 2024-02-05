@@ -1,6 +1,5 @@
 """An ansible test module."""
 
-
 DOCUMENTATION = """
 module: mod_2
 author:

@@ -1,4 +1,5 @@
 """Test schemas modules."""
+
 import json
 import logging
 import os

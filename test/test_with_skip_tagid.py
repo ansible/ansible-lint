@@ -1,4 +1,5 @@
 """Tests related to skip tag id."""
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.yaml_rule import YamllintRule
 from ansiblelint.runner import Runner

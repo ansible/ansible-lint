@@ -1,4 +1,5 @@
 """Rule definition for JSON Schema Validations."""
+
 from __future__ import annotations
 
 import logging

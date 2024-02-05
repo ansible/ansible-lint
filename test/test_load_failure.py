@@ -1,4 +1,5 @@
 """Tests for LoadFailureRule."""
+
 import pytest
 
 from ansiblelint.rules import RulesCollection

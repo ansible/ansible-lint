@@ -1,4 +1,5 @@
 """Rule definition for usage of builtin actions only."""
+
 from __future__ import annotations
 
 import os

@@ -1,4 +1,5 @@
 """Exceptions and error representations."""
+
 from __future__ import annotations
 
 import functools

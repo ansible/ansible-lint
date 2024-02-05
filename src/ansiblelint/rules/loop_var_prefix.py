@@ -1,4 +1,5 @@
 """Optional Ansible-lint rule to enforce use of prefix on role loop vars."""
+
 from __future__ import annotations
 
 import re

@@ -1,4 +1,5 @@
 """Test Rule that needs_raw_task."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

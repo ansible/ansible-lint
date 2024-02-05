@@ -1,4 +1,5 @@
 """Optional Ansible-lint rule to warn use of run_once with strategy free."""
+
 from __future__ import annotations
 
 import sys
@@ -34,7 +35,7 @@ class RunOnce(AnsibleLintRule):
         if not file or file.kind != "playbook" or not data:
             return []
 
-        strategy = data.get("strategy", None)
+        strategy = data.get("strategy")
         run_once = data.get("run_once", False)
         if (not strategy and not run_once) or strategy != "free":
             return []
