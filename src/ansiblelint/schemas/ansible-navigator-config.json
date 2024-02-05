@@ -10,7 +10,7 @@
                     "additionalProperties": false,
                     "properties": {
                         "cmdline": {
-                            "description": "Extra parameters passed to the corresponding command",
+                            "description": "Extra parameters passed to the underlying ansible command (e.g. ansible-playbook, ansible-doc, etc)",
                             "type": "string"
                         },
                         "config": {

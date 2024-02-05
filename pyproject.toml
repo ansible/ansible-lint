@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 # https://peps.python.org/pep-0621/#readme
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dynamic = ["version", "dependencies", "optional-dependencies"]
 name = "ansible-lint"
 description = "Checks playbooks for practices and behavior that could potentially be improved"
@@ -26,7 +26,6 @@ classifiers = [
   "Operating System :: POSIX",
   "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -94,7 +93,7 @@ ensure_newline_before_comments = true
 line_length = 88
 
 [tool.mypy]
-python_version = 3.9
+python_version = 3.10
 strict = true
 color_output = true
 error_summary = true
@@ -167,7 +166,7 @@ score = "n"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
-pythonVersion = "3.9"
+pythonVersion = "3.10"
 include = ["src"]
 # https://github.com/microsoft/pyright/issues/777
 "stubPath" = ""
