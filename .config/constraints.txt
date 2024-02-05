@@ -6,7 +6,7 @@
 #
 ansible-compat==4.1.11
 ansible-core==2.16.3
-astroid==3.0.3
+astroid==3.0.2
 attrs==23.2.0
 babel==2.14.0
 beautifulsoup4==4.12.3
