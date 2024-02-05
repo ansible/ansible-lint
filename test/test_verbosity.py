@@ -1,4 +1,5 @@
 """Tests related to our logging/verbosity setup."""
+
 from __future__ import annotations
 
 from pathlib import Path

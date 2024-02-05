@@ -1,4 +1,5 @@
 """Tests for config module."""
+
 from ansiblelint.config import PROFILES
 from ansiblelint.rules import RulesCollection
 

@@ -1,4 +1,5 @@
 """Rule for checking content of jinja template strings."""
+
 from __future__ import annotations
 
 import logging

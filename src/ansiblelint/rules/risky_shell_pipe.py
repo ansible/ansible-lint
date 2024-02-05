@@ -1,4 +1,5 @@
 """Implementation of risky-shell-pipe rule."""
+
 from __future__ import annotations
 
 import re

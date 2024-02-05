@@ -1,4 +1,5 @@
 """Tests for internal rules."""
+
 from ansiblelint._internal.rules import BaseRule
 
 

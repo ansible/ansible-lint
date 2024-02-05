@@ -1,4 +1,5 @@
 """Utility helpers to simplify working with yaml-based data."""
+
 # pylint: disable=too-many-lines
 from __future__ import annotations
 
@@ -1141,9 +1142,9 @@ class FormattedYAML(YAML):
 
 def clean_json(
     obj: Any,
-    func: Callable[[str], Any] = lambda key: key.startswith("__")
-    if isinstance(key, str)
-    else False,
+    func: Callable[[str], Any] = lambda key: (
+        key.startswith("__") if isinstance(key, str) else False
+    ),
 ) -> Any:
     """Remove all keys matching the condition from a nested JSON-like object.
 

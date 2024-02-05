@@ -1,4 +1,5 @@
 """Utils to generate rules documentation."""
+
 import logging
 from collections.abc import Iterable
 

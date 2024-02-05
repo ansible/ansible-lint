@@ -1,4 +1,5 @@
 """Runner implementation."""
+
 from __future__ import annotations
 
 import json
@@ -184,9 +185,9 @@ class Runner:
                     else:
                         filename = warn.source
                         match = MatchError(
-                            message=warn.message
-                            if isinstance(warn.message, str)
-                            else "?",
+                            message=(
+                                warn.message if isinstance(warn.message, str) else "?"
+                            ),
                             rule=self.rules["warning"],
                             filename=str(filename),
                         )

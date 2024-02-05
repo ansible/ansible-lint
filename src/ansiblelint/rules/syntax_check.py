@@ -1,4 +1,5 @@
 """Rule definition for ansible syntax check."""
+
 from __future__ import annotations
 
 import re

@@ -1,4 +1,5 @@
 """Transformer implementation."""
+
 from __future__ import annotations
 
 import logging
@@ -98,9 +99,7 @@ class Transformer:
                 # any other files. (Based on suggestion from ruamel.yaml author)
                 yaml = FormattedYAML(
                     # Ansible only uses YAML 1.1, but others files should use newer 1.2 (ruamel.yaml defaults to 1.2)
-                    version=(1, 1)
-                    if file.is_owned_by_ansible()
-                    else None,
+                    version=(1, 1) if file.is_owned_by_ansible() else None,
                 )
 
                 ruamel_data = yaml.load(data)

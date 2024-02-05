@@ -1,4 +1,5 @@
 """Implementation of GalaxyRule."""
+
 from __future__ import annotations
 
 import sys
@@ -63,8 +64,8 @@ class GalaxyRule(AnsibleLintRule):
         for path in changelog_paths:
             if path.is_file():
                 changelog_found = 1
-        galaxy_tag_list = data.get("tags", None)
-        collection_deps = data.get("dependencies", None)
+        galaxy_tag_list = data.get("tags")
+        collection_deps = data.get("dependencies")
         if collection_deps:
             for dep, ver in collection_deps.items():
                 if (

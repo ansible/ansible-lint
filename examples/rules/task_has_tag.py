@@ -1,4 +1,5 @@
 """Example implementation of a rule requiring tasks to have tags set."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

@@ -1,4 +1,5 @@
 """Implementation of no-prompting rule."""
+
 from __future__ import annotations
 
 import sys
@@ -33,7 +34,7 @@ class NoPromptingRule(AnsibleLintRule):
         if file.kind != "playbook":  # pragma: no cover
             return []
 
-        vars_prompt = data.get("vars_prompt", None)
+        vars_prompt = data.get("vars_prompt")
         if not vars_prompt:
             return []
         return [

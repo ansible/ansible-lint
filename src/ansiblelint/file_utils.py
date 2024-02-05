@@ -1,4 +1,5 @@
 """Utility functions related to file operations."""
+
 from __future__ import annotations
 
 import copy
