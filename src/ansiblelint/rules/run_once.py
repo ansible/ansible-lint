@@ -1,4 +1,5 @@
 """Optional Ansible-lint rule to warn use of run_once with strategy free."""
+
 from __future__ import annotations
 
 import sys

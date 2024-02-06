@@ -1,4 +1,5 @@
 """Tests related to role paths."""
+
 from __future__ import annotations
 
 import os

@@ -1,4 +1,5 @@
 """Utility to generate some complex patterns."""
+
 import copy
 import json
 import keyword
@@ -63,11 +64,11 @@ def is_ref_used(obj: Any, ref: str) -> bool:
         if obj.get("$ref", None) == ref_use:
             return True
         for _ in obj.values():
-            if isinstance(_, (dict, list)) and is_ref_used(_, ref):
+            if isinstance(_, dict | list) and is_ref_used(_, ref):
                 return True
     elif isinstance(obj, list):
         for _ in obj:
-            if isinstance(_, (dict, list)) and is_ref_used(_, ref):
+            if isinstance(_, dict | list) and is_ref_used(_, ref):
                 return True
     return False
 
@@ -119,9 +120,9 @@ if __name__ == "__main__":
         for key, value in combined_json["$defs"][subschema].items():
             sub_json[key] = value
         sub_json["$comment"] = "Generated from ansible.json, do not edit."
-        sub_json[
-            "$id"
-        ] = f"https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/{subschema}.json"
+        sub_json["$id"] = (
+            f"https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/{subschema}.json"
+        )
 
         # Remove all unreferenced ($ref) definitions ($defs) recursively
         while True:

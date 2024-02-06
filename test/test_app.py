@@ -1,4 +1,5 @@
 """Test for app module."""
+
 from pathlib import Path
 
 from ansiblelint.constants import RC

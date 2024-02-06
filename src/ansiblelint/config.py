@@ -1,4 +1,5 @@
 """Store configuration options as a singleton."""
+
 from __future__ import annotations
 
 import json

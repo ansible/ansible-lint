@@ -1,4 +1,5 @@
 """Test related to import of invalid files."""
+
 import pytest
 
 from ansiblelint.rules import RulesCollection

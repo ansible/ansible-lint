@@ -1,4 +1,5 @@
 """Rule definition for usage of fully qualified collection names for builtins."""
+
 from __future__ import annotations
 
 import logging

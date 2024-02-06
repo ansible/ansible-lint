@@ -1,4 +1,5 @@
 """Implementation of avoid-implicit rule."""
+
 # https://github.com/ansible/ansible-lint/issues/2501
 from __future__ import annotations
 

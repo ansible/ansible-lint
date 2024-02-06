@@ -1,4 +1,5 @@
 """Implementation of GalaxyRule."""
+
 from __future__ import annotations
 
 import sys
@@ -167,7 +168,7 @@ class Version:
 def _coerce(other: object) -> Version:
     if isinstance(other, str):
         other = Version(other)
-    if isinstance(other, (int, float)):
+    if isinstance(other, int | float):
         other = Version(str(other))
     if isinstance(other, Version):
         return other

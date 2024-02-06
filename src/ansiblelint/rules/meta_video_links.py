@@ -1,4 +1,5 @@
 """Implementation of meta-video-links rule."""
+
 # Copyright (c) 2018, Ansible Project
 from __future__ import annotations
 
