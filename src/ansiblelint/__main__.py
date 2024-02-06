@@ -205,10 +205,10 @@ def _do_transform(result: LintResult, opts: Options) -> None:
 
 def support_banner() -> None:
     """Display support banner when running on unsupported platform."""
-    if sys.version_info < (3, 9, 0):  # pragma: no cover # noqa: UP036
+    if sys.version_info < (3, 10, 0):  # pragma: no cover
         prefix = "::warning::" if "GITHUB_ACTION" in os.environ else "WARNING: "
         console_stderr.print(
-            f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will soon require 3.9. Do not report bugs for this version.",
+            f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will soon require 3.10. Do not report bugs for this version.",
             style="bold red",
         )
 

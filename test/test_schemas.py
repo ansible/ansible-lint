@@ -101,7 +101,7 @@ def test_spdx() -> None:
             )
         else:
             warnings.warn(
-                "test_spdx failure was ignored because constraints were not pinned (PIP_CONSTRAINTS). This is expected for py39 and py-devel jobs.",
+                "test_spdx failure was ignored because constraints were not pinned (PIP_CONSTRAINTS). This is expected for py310 and py-devel jobs.",
                 category=pytest.PytestWarning,
                 stacklevel=1,
             )

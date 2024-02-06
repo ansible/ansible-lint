@@ -2,7 +2,7 @@
 name: Bug report
 about: >
   Create a bug report. Ensure that it does reproduce on the main branch with
-  python >=3.9.  For anything else, please use the discussion link below.
+  python >=3.10.  For anything else, please use the discussion link below.
 labels: bug, new
 ---
 
@@ -53,8 +53,8 @@ Possible security bugs should be reported via email to `security@ansible.com`
 
 <!--- Describe what happened. If possible run with extra verbosity (-vvvv) -->
 
-Please give some details of what is happening.
-Include a [minimum complete verifiable example] with:
+Please give some details of what is happening. Include a [minimum complete
+verifiable example] with:
 
 - minimized playbook to reproduce the error
 - the output of running ansible-lint including the command line used

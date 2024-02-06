@@ -28,8 +28,9 @@ jobs:
         id: generate_matrix
         uses: coactions/dynamic-matrix@v1
         with:
-          min_python: "3.9"
+          min_python: "3.10"
           max_python: "3.12"
+          default_python: "3.10"
           other_names: |
             lint
             pkg
