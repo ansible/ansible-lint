@@ -186,9 +186,7 @@ def ansible_template(
                     _logger.warning(err)
                     raise
 
-                templar.environment.filters._delegatee[missing_filter] = (
-                    mock_filter  # noqa: SLF001
-                )
+                templar.environment.filters._delegatee[missing_filter] = mock_filter
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
