@@ -93,7 +93,7 @@ ensure_newline_before_comments = true
 line_length = 88
 
 [tool.mypy]
-python_version = 3.10
+python_version = "3.10"
 strict = true
 color_output = true
 error_summary = true
@@ -107,7 +107,7 @@ disallow_any_generics = true
 # site-packages is here to help vscode mypy integration getting confused
 exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
 # https://github.com/python/mypy/issues/12664
-no_incremental = true
+incremental = false
 
 [[tool.mypy.overrides]]
 module = [
