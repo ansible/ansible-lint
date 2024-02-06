@@ -51,6 +51,7 @@ jobs:
           args: .ansible-lint
   build:
     name: ${{ matrix.name }}
+    environment: test
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs:
       - prepare
@@ -139,6 +140,7 @@ jobs:
           name: ${{ matrix.passed_name }}
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
+          fail_ci_if_error: true
 
       - name: Archive logs
         uses: actions/upload-artifact@v3
