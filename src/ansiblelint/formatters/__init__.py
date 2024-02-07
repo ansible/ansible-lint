@@ -1,4 +1,5 @@
 """Output formatters."""
+
 from __future__ import annotations
 
 import hashlib
@@ -288,9 +289,9 @@ class SarifFormatter(BaseFormatter[Any]):
             "ruleId": match.tag,
             "level": self.get_sarif_result_severity_level(match),
             "message": {
-                "text": str(match.details)
-                if str(match.details)
-                else str(match.message),
+                "text": (
+                    str(match.details) if str(match.details) else str(match.message)
+                ),
             },
             "locations": [
                 {

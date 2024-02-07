@@ -1,4 +1,5 @@
 """Tests for text module."""
+
 from typing import Any
 
 import pytest

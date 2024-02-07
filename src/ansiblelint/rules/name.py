@@ -1,4 +1,5 @@
 """Implementation of NameRule."""
+
 from __future__ import annotations
 
 import re
@@ -178,9 +179,9 @@ class NameRule(AnsibleLintRule, TransformMixin):
             if task_name:
                 if "|" in task_name:  # if using prefix
                     [file_name, update_task_name] = task_name.split("|")
-                    target_task[
-                        "name"
-                    ] = f"{file_name.strip()} | {update_task_name.strip()[:1].upper()}{update_task_name.strip()[1:]}"
+                    target_task["name"] = (
+                        f"{file_name.strip()} | {update_task_name.strip()[:1].upper()}{update_task_name.strip()[1:]}"
+                    )
                 else:
                     target_task["name"] = f"{task_name[:1].upper()}{task_name[1:]}"
                 match.fixed = True

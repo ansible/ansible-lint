@@ -1,4 +1,5 @@
 """Implementation of no-relative-paths rule."""
+
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
 

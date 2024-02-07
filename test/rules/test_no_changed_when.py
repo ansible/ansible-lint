@@ -1,4 +1,5 @@
 """Tests for no-change-when rule."""
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.no_changed_when import CommandHasChangesCheckRule
 from ansiblelint.runner import Runner

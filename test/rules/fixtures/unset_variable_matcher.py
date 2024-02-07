@@ -1,4 +1,5 @@
 """Custom linting rule used as test fixture."""
+
 from ansiblelint.rules import AnsibleLintRule
 
 

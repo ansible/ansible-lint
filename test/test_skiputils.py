@@ -1,4 +1,5 @@
 """Validate ansiblelint.skip_utils."""
+
 from __future__ import annotations
 
 from pathlib import Path

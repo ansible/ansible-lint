@@ -1,4 +1,5 @@
 """CLI parser setup and helpers."""
+
 from __future__ import annotations
 
 import argparse
@@ -7,7 +8,7 @@ import os
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.config import (
     DEFAULT_KINDS,
@@ -29,7 +30,7 @@ from ansiblelint.schemas.main import validate_file_schema
 from ansiblelint.yaml_utils import clean_json
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Callable, Sequence
 
 
 _logger = logging.getLogger(__name__)
@@ -134,7 +135,7 @@ class AbspathArgAction(argparse.Action):
         values: str | Sequence[Any] | None,
         option_string: str | None = None,
     ) -> None:
-        if isinstance(values, (str, Path)):
+        if isinstance(values, str | Path):
             values = [values]
         if values:
             normalized_values = [

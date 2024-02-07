@@ -1,4 +1,5 @@
 """Implementation of playbook-extension rule."""
+
 # Copyright (c) 2016, Tsukinowa Inc. <info@tsukinowa.jp>
 # Copyright (c) 2018, Ansible Project
 from __future__ import annotations

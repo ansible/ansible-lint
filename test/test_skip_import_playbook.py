@@ -1,4 +1,5 @@
 """Test related to skipping import_playbook."""
+
 from pathlib import Path
 
 import pytest

@@ -1,4 +1,5 @@
 """Implementation of empty-string-compare rule."""
+
 # Copyright (c) 2016, Will Thames and contributors
 # Copyright (c) 2018, Ansible Project
 

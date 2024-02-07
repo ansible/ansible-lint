@@ -1,4 +1,5 @@
 """Utils related to logging."""
+
 import logging
 import time
 from collections.abc import Iterator

@@ -1,4 +1,5 @@
 """Tests related to ansiblelint.__main__ module."""
+
 import os
 import shutil
 import subprocess

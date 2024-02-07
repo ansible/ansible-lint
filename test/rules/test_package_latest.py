@@ -1,4 +1,5 @@
 """Tests for package-latest rule."""
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.package_latest import PackageIsNotLatestRule
 from ansiblelint.runner import Runner

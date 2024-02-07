@@ -48,7 +48,7 @@ repository = "https://github.com/ansible/ansible-lint"
 changelog = "https://github.com/ansible/ansible-lint/releases"
 
 [tool.black]
-target-version = ["py39"]
+target-version = ["py310"]
 
 [tool.codespell]
 skip = ".tox,.mypy_cache,build,.git,.eggs,pip-wheel-metadata"
@@ -251,7 +251,7 @@ ignore = [
   "PD011" # We are not using pandas, any .values attributes are unrelated
 ]
 select = ["ALL"]
-target-version = "py39"
+target-version = "py310"
 # Same as Black.
 line-length = 88
 

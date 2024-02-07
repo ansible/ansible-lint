@@ -1,4 +1,5 @@
 """Implementation of no-prompting rule."""
+
 from __future__ import annotations
 
 import sys

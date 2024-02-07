@@ -1,4 +1,5 @@
 """Tests for the --profile feature."""
+
 import platform
 import subprocess
 import sys
