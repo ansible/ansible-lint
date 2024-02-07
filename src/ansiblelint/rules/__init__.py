@@ -93,7 +93,7 @@ class AnsibleLintRule(BaseRule):
         match_type: str | None = None
         while not match_type and frame is not None:
             func_name = frame.f_code.co_name
-            match_type = match_types.get(func_name, None)
+            match_type = match_types.get(func_name)
             if match_type:
                 # add the match_type to the match
                 match.match_type = match_type
@@ -558,7 +558,7 @@ class RulesCollection:
                 tags[tag] = list(rule.ids())
         result = "# List of tags and rules they cover\n"
         for tag in sorted(tags):
-            desc = tag_desc.get(tag, None)
+            desc = tag_desc.get(tag)
             if desc:
                 result += f"{tag}:  # {desc}\n"
             else:

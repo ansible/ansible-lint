@@ -29,6 +29,7 @@ class BaseFormatter(Generic[T]):
     ----
         base_dir (str|Path): reference directory against which display relative path.
         display_relative_path (bool): whether to show path as relative or absolute
+
     """
 
     def __init__(self, base_dir: str | Path, display_relative_path: bool) -> None:

@@ -35,7 +35,7 @@ class RunOnce(AnsibleLintRule):
         if not file or file.kind != "playbook" or not data:
             return []
 
-        strategy = data.get("strategy", None)
+        strategy = data.get("strategy")
         run_once = data.get("run_once", False)
         if (not strategy and not run_once) or strategy != "free":
             return []

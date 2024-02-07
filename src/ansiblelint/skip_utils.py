@@ -240,7 +240,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
         if not task or not is_nested_task(task):
             return
         for k in NESTED_TASK_KEYS:
-            if k in task and task[k]:
+            if task.get(k):
                 if hasattr(task[k], "get"):
                     continue
                 for subtask in task[k]:
