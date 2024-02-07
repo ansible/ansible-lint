@@ -221,12 +221,12 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         """
         if isinstance(obj, CommentedMap):
             last = list(obj.keys())[-1]
-            if not isinstance(obj[last], (CommentedSeq, CommentedMap)):
+            if not isinstance(obj[last], CommentedSeq | CommentedMap):
                 obj.ca.items[last] = comment
                 return
             self._attach_comment_end(obj[last], comment)
         elif isinstance(obj, CommentedSeq):
-            if not isinstance(obj[-1], (CommentedSeq, CommentedMap)):
+            if not isinstance(obj[-1], CommentedSeq | CommentedMap):
                 obj.ca.items[len(obj)] = comment
                 return
             self._attach_comment_end(obj[-1], comment)

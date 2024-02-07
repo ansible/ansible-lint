@@ -147,7 +147,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         )
                         if ignored_re.search(orig_exc_message) or isinstance(
                             orig_exc,
-                            (AnsibleParserError, TypeError),
+                            AnsibleParserError | TypeError,
                         ):
                             # An unhandled exception occurred while running the lookup plugin 'template'. Error was a <class 'ansible.errors.AnsibleError'>, original message: the template file ... could not be found for the lookup. the template file ... could not be found for the lookup
 
@@ -155,7 +155,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             # AnsibleError(TemplateSyntaxError): template error while templating string: Could not load "ipwrap": 'Invalid plugin FQCN (ansible.netcommon.ipwrap): unable to locate collection ansible.netcommon'. String: Foo {{ buildset_registry.host | ipwrap }}. Could not load "ipwrap": 'Invalid plugin FQCN (ansible.netcommon.ipwrap): unable to locate collection ansible.netcommon'
                             bypass = True
                         elif (
-                            isinstance(orig_exc, (AnsibleError, TemplateSyntaxError))
+                            isinstance(orig_exc, AnsibleError | TemplateSyntaxError)
                             and match
                         ):
                             error = match.group("error")

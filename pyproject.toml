@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 # https://peps.python.org/pep-0621/#readme
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dynamic = ["version", "dependencies", "optional-dependencies"]
 name = "ansible-lint"
 description = "Checks playbooks for practices and behavior that could potentially be improved"
@@ -26,7 +26,6 @@ classifiers = [
   "Operating System :: POSIX",
   "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -49,7 +48,7 @@ repository = "https://github.com/ansible/ansible-lint"
 changelog = "https://github.com/ansible/ansible-lint/releases"
 
 [tool.black]
-target-version = ["py39"]
+target-version = ["py310"]
 
 [tool.codespell]
 skip = ".tox,.mypy_cache,build,.git,.eggs,pip-wheel-metadata"
@@ -94,7 +93,7 @@ ensure_newline_before_comments = true
 line_length = 88
 
 [tool.mypy]
-python_version = 3.9
+python_version = "3.10"
 strict = true
 color_output = true
 error_summary = true
@@ -108,7 +107,7 @@ disallow_any_generics = true
 # site-packages is here to help vscode mypy integration getting confused
 exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
 # https://github.com/python/mypy/issues/12664
-no_incremental = true
+incremental = false
 
 [[tool.mypy.overrides]]
 module = [
@@ -167,7 +166,7 @@ score = "n"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
-pythonVersion = "3.9"
+pythonVersion = "3.10"
 include = ["src"]
 # https://github.com/microsoft/pyright/issues/777
 "stubPath" = ""
@@ -252,7 +251,7 @@ ignore = [
   "PD011" # We are not using pandas, any .values attributes are unrelated
 ]
 select = ["ALL"]
-target-version = "py39"
+target-version = "py310"
 # Same as Black.
 line-length = 88
 

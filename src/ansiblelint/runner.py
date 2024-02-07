@@ -48,8 +48,7 @@ from ansiblelint.utils import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
-    from typing import Callable
+    from collections.abc import Callable, Generator
 
     from ansiblelint.config import Options
     from ansiblelint.constants import FileType

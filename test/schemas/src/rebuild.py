@@ -64,11 +64,11 @@ def is_ref_used(obj: Any, ref: str) -> bool:
         if obj.get("$ref", None) == ref_use:
             return True
         for _ in obj.values():
-            if isinstance(_, (dict, list)) and is_ref_used(_, ref):
+            if isinstance(_, dict | list) and is_ref_used(_, ref):
                 return True
     elif isinstance(obj, list):
         for _ in obj:
-            if isinstance(_, (dict, list)) and is_ref_used(_, ref):
+            if isinstance(_, dict | list) and is_ref_used(_, ref):
                 return True
     return False
 

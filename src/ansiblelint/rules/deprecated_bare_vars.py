@@ -66,7 +66,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                 # we just need to check that one variable, and not iterate over it like
                 # it's a list. Otherwise, loop through and check all items.
                 items = task[loop_type]
-                if not isinstance(items, (list, tuple)):
+                if not isinstance(items, list | tuple):
                     items = [items]
                 for var in items:
                     return self._matchvar(var, task, loop_type)
