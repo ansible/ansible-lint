@@ -6,7 +6,7 @@
 #
 ansible-compat==4.1.11
 ansible-core==2.16.3
-astroid==3.0.2
+astroid==3.0.3
 attrs==23.2.0
 babel==2.14.0
 beautifulsoup4==4.12.3
@@ -53,11 +53,11 @@ mccabe==0.7.0
 mdurl==0.1.2
 mergedeep==1.3.4
 mkdocs==1.5.3
-mkdocs-ansible==0.2.1
+mkdocs-ansible==24.2.1
 mkdocs-autorefs==0.5.0
 mkdocs-gen-files==0.5.0
 mkdocs-htmlproofer-plugin==1.0.0
-mkdocs-material==9.5.7
+mkdocs-material==9.5.8
 mkdocs-material-extensions==1.3.1
 mkdocs-minify-plugin==0.8.0
 mkdocs-monorepo-plugin==1.1.0
@@ -91,7 +91,7 @@ regex==2023.12.25
 requests==2.31.0
 rich==13.7.0
 rpds-py==0.17.1
-ruamel-yaml==0.18.5
+ruamel-yaml==0.18.6
 six==1.16.0
 soupsieve==2.5
 subprocess-tee==0.4.1
@@ -103,10 +103,10 @@ types-jsonschema==4.21.0.20240118
 types-pyyaml==6.0.12.12
 typing-extensions==4.9.0
 urllib3==2.2.0
-watchdog==3.0.0
+watchdog==4.0.0
 wcmatch==8.5
 webencodings==0.5.1
-yamllint==1.33.0
+yamllint==1.34.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # resolvelib

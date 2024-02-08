@@ -29,12 +29,12 @@ pyyaml==6.0.1
 referencing==0.33.0
 rich==13.7.0
 rpds-py==0.17.1
-ruamel-yaml==0.18.5
+ruamel-yaml==0.18.6
 subprocess-tee==0.4.1
 tomli==2.0.1
 typing-extensions==4.9.0
 wcmatch==8.5
-yamllint==1.33.0
+yamllint==1.34.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # resolvelib
