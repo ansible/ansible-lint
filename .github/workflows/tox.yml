@@ -208,7 +208,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Merge logs into a single archive
         uses: actions/upload-artifact/merge@v4
         with:
