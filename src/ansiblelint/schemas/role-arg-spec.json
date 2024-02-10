@@ -32,12 +32,7 @@
           ]
         },
         "support": {
-          "enum": [
-            "full",
-            "partial",
-            "none",
-            "N/A"
-          ],
+          "enum": ["full", "partial", "none", "N/A"],
           "type": "string"
         },
         "version_added": {
