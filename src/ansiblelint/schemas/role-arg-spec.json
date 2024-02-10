@@ -31,6 +31,32 @@
             }
           ]
         },
+        "membership": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "platform": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
         "support": {
           "enum": ["full", "partial", "none", "N/A"],
           "type": "string"

@@ -100,6 +100,11 @@ argument_specs:
         details:
           - Does not work if O(my_app_int=5).
         version_added: 1.2.0
+      action_group:
+        description:
+          - Use C(group/foo.bar.baz) in C(module_defaults) to set authentication options for the C(foo.bar) modules used by this role.
+        support: full
+        membership: foo.bar.baz
     options:
       my_app_int:
         type: "int"
