@@ -6,6 +6,9 @@ argument_specs:
     description: "a longer description"
     version_added: 1.2.3
     author: Foobar Baz
+    notes:
+      - This is a note.
+      - This is another note.
     options:
       my_app_int:
         type: "int"
@@ -69,6 +72,10 @@ argument_specs:
           foo: "bar"
           bar: ["foo", "baz"]
 
+    requirements:
+      - Requirement 1
+      - Requirement 2
+
     seealso:
       - module: community.foo.bar
       - module: community.foo.baz
@@ -120,4 +127,6 @@ argument_specs:
     description:
       - First paragraph.
       - Second paragraph.
+    notes: A note.
     options: {}
+    requirements: A requirement
