@@ -64,6 +64,9 @@
             }
           ]
         },
+        "examples": {
+          "type": "string"
+        },
         "options": {
           "additionalProperties": {
             "$ref": "#/$defs/option"
