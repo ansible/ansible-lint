@@ -89,6 +89,17 @@ argument_specs:
     author:
       - Foobar Baz
       - Bert Foo
+    attributes:
+      idempotent:
+        description: Whether the role is idempotent.
+        support: full
+      check_mode:
+        description:
+          - Whether the role supports check mode.
+        support: partial
+        details:
+          - Does not work if O(my_app_int=5).
+        version_added: 1.2.0
     options:
       my_app_int:
         type: "int"
