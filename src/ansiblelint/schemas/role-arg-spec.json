@@ -141,11 +141,37 @@
         "examples": {
           "type": "string"
         },
+        "notes": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
         "options": {
           "additionalProperties": {
             "$ref": "#/$defs/option"
           },
           "type": "object"
+        },
+        "requirements": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
         },
         "seealso": {
           "items": {
