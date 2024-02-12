@@ -1,5 +1,73 @@
 {
   "$defs": {
+    "attribute": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Detailed explanation of what this attribute does. It should be written in full sentences.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "details": {
+          "description": "Detailed explanation of what this attribute does. It should be written in full sentences.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "membership": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "platform": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "support": {
+          "enum": ["full", "partial", "none", "N/A"],
+          "type": "string"
+        },
+        "version_added": {
+          "type": "string"
+        }
+      },
+      "required": ["description", "support"],
+      "title": "Attribute"
+    },
     "datatype": {
       "enum": [
         "str",
@@ -38,6 +106,12 @@
     "entry_point": {
       "additionalProperties": false,
       "properties": {
+        "attributes": {
+          "additionalProperties": {
+            "$ref": "#/$defs/attribute"
+          },
+          "type": "object"
+        },
         "author": {
           "oneOf": [
             {
