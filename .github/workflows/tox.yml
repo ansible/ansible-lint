@@ -144,9 +144,9 @@ jobs:
           fail_ci_if_error: true
 
       - name: Archive logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs.zip
+          name: logs-${{ matrix.name }}.zip
           path: .tox/**/log/
 
       - name: Report failure if git reports dirty status
@@ -208,6 +208,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Merge logs into a single archive
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: logs.zip
+          pattern: logs*.zip
+          delete-merged: true
+
+      - name: Check codecov.io status
+        if: github.event_name == 'pull_request'
+        uses: coactions/codecov-status@main
+
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
