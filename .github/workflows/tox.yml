@@ -141,7 +141,7 @@ jobs:
           name: ${{ matrix.passed_name }}
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
-          fail_ci_if_error: true
+          fail_ci_if_error: false # optional (default = false)
 
       - name: Archive logs
         uses: actions/upload-artifact@v4
