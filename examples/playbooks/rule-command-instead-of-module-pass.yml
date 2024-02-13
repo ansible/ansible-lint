@@ -5,9 +5,11 @@
     - name: Print current git branch
       ansible.builtin.command: git branch
       changed_when: false
+
     - name: Print git log
       ansible.builtin.command: git log
       changed_when: false
+
     - name: Install git lfs support
       ansible.builtin.command: git lfs install
       changed_when: false
@@ -34,4 +36,12 @@
 
     - name: Clear yum cache
       ansible.builtin.command: ""
+      changed_when: false
+
+    - name: Print yum history
+      ansible.builtin.command: yum history
+      changed_when: false
+
+    - name: Print yum info
+      ansible.builtin.command: yum info
       changed_when: false
