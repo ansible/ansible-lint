@@ -43,5 +43,5 @@
       changed_when: false
 
     - name: Print yum info
-      ansible.builtin.command: yum info
+      ansible.builtin.command: yum info bash
       changed_when: false
