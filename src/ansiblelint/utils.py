@@ -32,7 +32,7 @@ from collections.abc import ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import ruamel.yaml.parser
 import yaml
@@ -69,6 +69,8 @@ from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, removeprefix
 
+if TYPE_CHECKING:
+    from ansiblelint.rules import RulesCollection
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
@@ -280,6 +282,8 @@ def _include_children(
     k: str,
     v: Any,
     parent_type: FileType,
+    # pylint: disable=unused-argument
+    rules: RulesCollection | None = None,  # noqa: ARG001
 ) -> list[Lintable]:
     # handle special case include_tasks: name=filename.yml
     if k in INCLUSION_ACTION_NAMES and isinstance(v, dict) and "file" in v:
@@ -313,6 +317,7 @@ def _taskshandlers_children(
     k: str,
     v: None | Any,
     parent_type: FileType,
+    rules: RulesCollection | None = None,
 ) -> list[Lintable]:
     results: list[Lintable] = []
     if v is None:
@@ -337,19 +342,13 @@ def _taskshandlers_children(
 
         if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
             task_handler = normalize_task_v2(task_handler)
-            _validate_task_handler_action_for_role(task_handler["action"])
+            _validate_task_handler_action_for_role(task_handler["action"], rules)
             name = task_handler["action"].get("name")
             if has_jinja(name):
                 # we cannot deal with dynamic imports
                 continue
             results.extend(
-                _roles_children(
-                    basedir,
-                    k,
-                    [name],
-                    parent_type,
-                    main=task_handler["action"].get("tasks_from", "main"),
-                ),
+                _roles_children(basedir, k, [name], parent_type),
             )
             continue
 
@@ -412,16 +411,24 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     raise LookupError(msg)
 
 
-def _validate_task_handler_action_for_role(th_action: dict[str, Any]) -> None:
+def _validate_task_handler_action_for_role(
+    th_action: dict[str, Any],
+    rules: RulesCollection | None = None,
+) -> None:
     """Verify that the task handler action is valid for role include."""
     module = th_action["__ansible_module__"]
 
     if "name" not in th_action:
-        raise MatchError(message=f"Failed to find required 'name' key in {module!s}")
+        raise MatchError(
+            message=f"Failed to find required 'name' key in {module!s}",
+            rule=rules.rules[0] if rules else RuntimeErrorRule(),
+            filename=rules.options.lintables[0] if rules.options.lintables else ".",
+        )
 
     if not isinstance(th_action["name"], str):
         raise MatchError(
             message=f"Value assigned to 'name' key on '{module!s}' is not a string.",
+            rule=rules.rules[1] if rules else RuntimeErrorRule(),
         )
 
 
@@ -430,7 +437,7 @@ def _roles_children(
     k: str,
     v: Sequence[Any],
     parent_type: FileType,  # noqa: ARG001
-    main: str = "main",
+    rules: RulesCollection | None = None,  # noqa: ARG001
 ) -> list[Lintable]:
     # pylint: disable=unused-argument # parent_type)
     results: list[Lintable] = []
@@ -445,14 +452,13 @@ def _roles_children(
                         _look_for_role_files(
                             basedir,
                             role.get("role", role.get("name")),
-                            main=main,
                         ),
                     )
             elif k != "dependencies":
                 msg = f'role dict {role} does not contain a "role" or "name" key'
                 raise SystemExit(msg)
         else:
-            results.extend(_look_for_role_files(basedir, role, main=main))
+            results.extend(_look_for_role_files(basedir, role))
     return results
 
 
@@ -487,12 +493,7 @@ def _rolepath(basedir: str, role: str) -> str | None:
     return role_path
 
 
-def _look_for_role_files(
-    basedir: str,
-    role: str,
-    main: str | None = "main",  # noqa: ARG001
-) -> list[Lintable]:
-    # pylint: disable=unused-argument # main
+def _look_for_role_files(basedir: str, role: str) -> list[Lintable]:
     role_path = _rolepath(basedir, role)
     if not role_path:  # pragma: no branch
         return []
