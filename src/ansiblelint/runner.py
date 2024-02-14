@@ -27,10 +27,6 @@ from ansible_compat.runtime import AnsibleWarning
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
-from ansiblelint._internal.rules import (
-    BaseRule,
-    LoadingFailureRule,
-)
 from ansiblelint.app import App, get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
@@ -50,6 +46,7 @@ from ansiblelint.utils import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
 
+    from ansiblelint._internal.rules import BaseRule
     from ansiblelint.config import Options
     from ansiblelint.constants import FileType
     from ansiblelint.rules import RulesCollection
@@ -458,7 +455,7 @@ class Runner:
                 except MatchError as exc:
                     if not exc.filename:  # pragma: no branch
                         exc.filename = str(lintable.path)
-                    exc.rule = LoadingFailureRule()
+                    # exc.rule = self.rules.rules[2]
                     yield exc
                 except AttributeError:
                     yield MatchError(lintable=lintable, rule=self.rules["load-failure"])
@@ -523,7 +520,10 @@ class Runner:
     ) -> list[Lintable]:
         """Flatten the traversed play tasks."""
         # pylint: disable=unused-argument
-        delegate_map: dict[str, Callable[[str, Any, Any, FileType], list[Lintable]]] = {
+        delegate_map: dict[
+            str,
+            Callable[[str, Any, Any, FileType, RulesCollection], list[Lintable]],
+        ] = {
             "tasks": _taskshandlers_children,
             "pre_tasks": _taskshandlers_children,
             "post_tasks": _taskshandlers_children,
@@ -550,7 +550,7 @@ class Runner:
                 {"playbook_dir": PLAYBOOK_DIR or str(basedir.resolve())},
                 fail_on_undefined=False,
             )
-            return delegate_map[k](str(basedir), k, v, parent_type)
+            return delegate_map[k](str(basedir), k, v, parent_type, self.rules)
         return []
 
     def plugin_children(self, lintable: Lintable) -> list[Lintable]:
