@@ -422,7 +422,9 @@ def _validate_task_handler_action_for_role(
         raise MatchError(
             message=f"Failed to find required 'name' key in {module!s}",
             rule=rules.rules[0] if rules else RuntimeErrorRule(),
-            filename=rules.options.lintables[0] if rules.options.lintables else ".",
+            filename=(
+                rules.options.lintables[0] if rules and rules.options.lintables else "."
+            ),
         )
 
     if not isinstance(th_action["name"], str):

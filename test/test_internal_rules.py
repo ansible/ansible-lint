@@ -23,7 +23,8 @@ def test_base_rule_url() -> None:
     ),
 )
 def test_incorrect_module_args(
-    path: str, default_rules_collection: RulesCollection
+    path: str,
+    default_rules_collection: RulesCollection,
 ) -> None:
     """Check that we fail when file encoding is wrong."""
     runner = Runner(path, rules=default_rules_collection)
