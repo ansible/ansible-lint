@@ -10,7 +10,7 @@
       action: ansible.builtin.command echo {{this_variable}} is not set in this playbook
 
     - name: Trailing whitespace
-      action: ansible.builtin.command echo do nothing   
+      action: ansible.builtin.command echo do nothing
 
     - name: Run git check
       action: ansible.builtin.git a=b c=d
@@ -33,8 +33,8 @@
     - name: Passing git as an argument to another task
       action: ansible.builtin.debug msg="{{item}}"
       with_items:
-      - git  # yamllint wrong indentation
-      - bobbins
+        - git # yamllint wrong indentation
+        - bobbins
 
     - name: Yum latest
       ansible.builtin.yum: state=latest name=httpd
