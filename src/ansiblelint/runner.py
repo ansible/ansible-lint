@@ -36,9 +36,7 @@ from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
 from ansiblelint.utils import (
     PLAYBOOK_DIR,
-    _include_children,
-    _roles_children,
-    _taskshandlers_children,
+    HandleChildren,
     parse_examples_from_plugin,
     template,
 )
@@ -455,7 +453,7 @@ class Runner:
                 except MatchError as exc:
                     if not exc.filename:  # pragma: no branch
                         exc.filename = str(lintable.path)
-                    # exc.rule = self.rules.rules[2]
+                    exc.rule = self.rules.rules[1]
                     yield exc
                 except AttributeError:
                     yield MatchError(lintable=lintable, rule=self.rules["load-failure"])
@@ -520,25 +518,28 @@ class Runner:
     ) -> list[Lintable]:
         """Flatten the traversed play tasks."""
         # pylint: disable=unused-argument
+
+        handlers = HandleChildren(self.rules)
+
         delegate_map: dict[
             str,
-            Callable[[str, Any, Any, FileType, RulesCollection], list[Lintable]],
+            Callable[[str, Any, Any, FileType], list[Lintable]],
         ] = {
-            "tasks": _taskshandlers_children,
-            "pre_tasks": _taskshandlers_children,
-            "post_tasks": _taskshandlers_children,
-            "block": _taskshandlers_children,
-            "include": _include_children,
-            "ansible.builtin.include": _include_children,
-            "import_playbook": _include_children,
-            "ansible.builtin.import_playbook": _include_children,
-            "roles": _roles_children,
-            "dependencies": _roles_children,
-            "handlers": _taskshandlers_children,
-            "include_tasks": _include_children,
-            "ansible.builtin.include_tasks": _include_children,
-            "import_tasks": _include_children,
-            "ansible.builtin.import_tasks": _include_children,
+            "tasks": handlers.taskshandlers_children,
+            "pre_tasks": handlers.taskshandlers_children,
+            "post_tasks": handlers.taskshandlers_children,
+            "block": handlers.taskshandlers_children,
+            "include": handlers.include_children,
+            "ansible.builtin.include": handlers.include_children,
+            "import_playbook": handlers.include_children,
+            "ansible.builtin.import_playbook": handlers.include_children,
+            "roles": handlers.roles_children,
+            "dependencies": handlers.roles_children,
+            "handlers": handlers.taskshandlers_children,
+            "include_tasks": handlers.include_children,
+            "ansible.builtin.include_tasks": handlers.include_children,
+            "import_tasks": handlers.include_children,
+            "ansible.builtin.import_tasks": handlers.include_children,
         }
         (k, v) = item
         add_all_plugin_dirs(str(basedir.resolve()))
@@ -550,7 +551,7 @@ class Runner:
                 {"playbook_dir": PLAYBOOK_DIR or str(basedir.resolve())},
                 fail_on_undefined=False,
             )
-            return delegate_map[k](str(basedir), k, v, parent_type, self.rules)
+            return delegate_map[k](str(basedir), k, v, parent_type)
         return []
 
     def plugin_children(self, lintable: Lintable) -> list[Lintable]:

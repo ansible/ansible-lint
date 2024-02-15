@@ -30,6 +30,6 @@ def test_incorrect_module_args(
     runner = Runner(path, rules=default_rules_collection)
     matches = runner.run()
     assert len(matches) == 1, matches
-    assert matches[0].rule.id == "internal-error"
+    assert matches[0].rule.id == "load-failure"
     assert "Failed to find required 'name' key in include_role" in matches[0].message
     assert matches[0].tag == "internal-error"

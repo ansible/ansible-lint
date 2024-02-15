@@ -50,7 +50,10 @@ from ansible.utils.collection_loader import AnsibleCollectionConfig
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-from ansiblelint._internal.rules import AnsibleParserErrorRule, RuntimeErrorRule
+from ansiblelint._internal.rules import (
+    AnsibleParserErrorRule,
+    RuntimeErrorRule,
+)
 from ansiblelint.app import get_app
 from ansiblelint.config import Options, options
 from ansiblelint.constants import (
@@ -277,107 +280,169 @@ def template(
     return value
 
 
-def _include_children(
-    basedir: str,
-    k: str,
-    v: Any,
-    parent_type: FileType,
-    # pylint: disable=unused-argument
-    rules: RulesCollection | None = None,  # noqa: ARG001
-) -> list[Lintable]:
-    # handle special case include_tasks: name=filename.yml
-    if k in INCLUSION_ACTION_NAMES and isinstance(v, dict) and "file" in v:
-        v = v["file"]
+@dataclass
+class HandleChildren:
+    """Parse task, roles and children."""
 
-    # we cannot really parse any jinja2 in includes, so we ignore them
-    if not v or "{{" in v:
-        return []
+    rules: RulesCollection = field(init=True, repr=False)
 
-    if "import_playbook" in k and COLLECTION_PLAY_RE.match(v):
-        # Any import_playbooks from collections should be ignored as ansible
-        # own syntax check will handle them.
-        return []
+    def include_children(
+        self,
+        basedir: str,
+        k: str,
+        v: Any,
+        parent_type: FileType,
+    ) -> list[Lintable]:
+        """Include children."""
+        # handle special case include_tasks: name=filename.yml
+        if k in INCLUSION_ACTION_NAMES and isinstance(v, dict) and "file" in v:
+            v = v["file"]
 
-    # handle include: filename.yml tags=blah
-    # pylint: disable=unused-variable
-    (command, args, kwargs) = tokenize(f"{k}: {v}")
+        # we cannot really parse any jinja2 in includes, so we ignore them
+        if not v or "{{" in v:
+            return []
 
-    result = path_dwim(basedir, args[0])
-    while basedir not in ["", "/"]:
-        if os.path.exists(result):
-            break
-        basedir = os.path.dirname(basedir)
+        if "import_playbook" in k and COLLECTION_PLAY_RE.match(v):
+            # Any import_playbooks from collections should be ignored as ansible
+            # own syntax check will handle them.
+            return []
+
+        # handle include: filename.yml tags=blah
+        # pylint: disable=unused-variable
+        (command, args, kwargs) = tokenize(f"{k}: {v}")
+
         result = path_dwim(basedir, args[0])
+        while basedir not in ["", "/"]:
+            if os.path.exists(result):
+                break
+            basedir = os.path.dirname(basedir)
+            result = path_dwim(basedir, args[0])
 
-    return [Lintable(result, kind=parent_type)]
+        return [Lintable(result, kind=parent_type)]
 
-
-def _taskshandlers_children(
-    basedir: str,
-    k: str,
-    v: None | Any,
-    parent_type: FileType,
-    rules: RulesCollection | None = None,
-) -> list[Lintable]:
-    results: list[Lintable] = []
-    if v is None:
-        raise MatchError(
-            message="A malformed block was encountered while loading a block.",
-            rule=RuntimeErrorRule(),
-        )
-    for task_handler in v:
-        # ignore empty tasks, `-`
-        if not task_handler:
-            continue
-
-        with contextlib.suppress(LookupError):
-            children = _get_task_handler_children_for_tasks_or_playbooks(
-                task_handler,
-                basedir,
-                k,
-                parent_type,
+    def taskshandlers_children(
+        self,
+        basedir: str,
+        k: str,
+        v: None | Any,
+        parent_type: FileType,
+    ) -> list[Lintable]:
+        """TasksHandlers Children."""
+        results: list[Lintable] = []
+        if v is None:
+            raise MatchError(
+                message="A malformed block was encountered while loading a block.",
+                rule=RuntimeErrorRule(),
             )
-            results.append(children)
-            continue
-
-        if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
-            task_handler = normalize_task_v2(task_handler)
-            _validate_task_handler_action_for_role(task_handler["action"], rules)
-            name = task_handler["action"].get("name")
-            if has_jinja(name):
-                # we cannot deal with dynamic imports
+        for task_handler in v:
+            # ignore empty tasks, `-`
+            if not task_handler:
                 continue
-            results.extend(
-                _roles_children(basedir, k, [name], parent_type),
-            )
-            continue
 
-        if "block" not in task_handler:
-            continue
-
-        results.extend(
-            _taskshandlers_children(basedir, k, task_handler["block"], parent_type),
-        )
-        if "rescue" in task_handler:
-            results.extend(
-                _taskshandlers_children(
+            with contextlib.suppress(LookupError):
+                children = _get_task_handler_children_for_tasks_or_playbooks(
+                    task_handler,
                     basedir,
                     k,
-                    task_handler["rescue"],
+                    parent_type,
+                )
+                results.append(children)
+                continue
+
+            if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
+                task_handler = normalize_task_v2(task_handler)
+                self._validate_task_handler_action_for_role(task_handler["action"])
+                name = task_handler["action"].get("name")
+                if has_jinja(name):
+                    # we cannot deal with dynamic imports
+                    continue
+                results.extend(
+                    self.roles_children(basedir, k, [name], parent_type),
+                )
+                continue
+
+            if "block" not in task_handler:
+                continue
+
+            results.extend(
+                self.taskshandlers_children(
+                    basedir,
+                    k,
+                    task_handler["block"],
                     parent_type,
                 ),
             )
-        if "always" in task_handler:
-            results.extend(
-                _taskshandlers_children(
-                    basedir,
-                    k,
-                    task_handler["always"],
-                    parent_type,
+            if "rescue" in task_handler:
+                results.extend(
+                    self.taskshandlers_children(
+                        basedir,
+                        k,
+                        task_handler["rescue"],
+                        parent_type,
+                    ),
+                )
+            if "always" in task_handler:
+                results.extend(
+                    self.taskshandlers_children(
+                        basedir,
+                        k,
+                        task_handler["always"],
+                        parent_type,
+                    ),
+                )
+
+        return results
+
+    def _validate_task_handler_action_for_role(self, th_action: dict[str, Any]) -> None:
+        """Verify that the task handler action is valid for role include."""
+        module = th_action["__ansible_module__"]
+
+        if "name" not in th_action:
+            raise MatchError(
+                message=f"Failed to find required 'name' key in {module!s}",
+                rule=self.rules.rules[0],
+                filename=(
+                    self.rules.options.lintables[0]
+                    if self.rules.options.lintables
+                    else "."
                 ),
             )
 
-    return results
+        if not isinstance(th_action["name"], str):
+            raise MatchError(
+                message=f"Value assigned to 'name' key on '{module!s}' is not a string.",
+                rule=self.rules.rules[1],
+            )
+
+    def roles_children(
+        self,
+        basedir: str,
+        k: str,
+        v: Sequence[Any],
+        parent_type: FileType,
+    ) -> list[Lintable]:
+        """Roles children."""
+        # pylint: disable=unused-argument # parent_type)
+        results: list[Lintable] = []
+        if not v:
+            # typing does not prevent junk from being passed in
+            return results
+        for role in v:
+            if isinstance(role, dict):
+                if "role" in role or "name" in role:
+                    if "tags" not in role or "skip_ansible_lint" not in role["tags"]:
+                        results.extend(
+                            _look_for_role_files(
+                                basedir,
+                                role.get("role", role.get("name")),
+                            ),
+                        )
+                elif k != "dependencies":
+                    msg = f'role dict {role} does not contain a "role" or "name" key'
+                    raise SystemExit(msg)
+            else:
+                results.extend(_look_for_role_files(basedir, role))
+        return results
 
 
 def _get_task_handler_children_for_tasks_or_playbooks(
@@ -409,59 +474,6 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             return Lintable(f, kind=child_type)
     msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
     raise LookupError(msg)
-
-
-def _validate_task_handler_action_for_role(
-    th_action: dict[str, Any],
-    rules: RulesCollection | None = None,
-) -> None:
-    """Verify that the task handler action is valid for role include."""
-    module = th_action["__ansible_module__"]
-
-    if "name" not in th_action:
-        raise MatchError(
-            message=f"Failed to find required 'name' key in {module!s}",
-            rule=rules.rules[0] if rules else RuntimeErrorRule(),
-            filename=(
-                rules.options.lintables[0] if rules and rules.options.lintables else "."
-            ),
-        )
-
-    if not isinstance(th_action["name"], str):
-        raise MatchError(
-            message=f"Value assigned to 'name' key on '{module!s}' is not a string.",
-            rule=rules.rules[1] if rules else RuntimeErrorRule(),
-        )
-
-
-def _roles_children(
-    basedir: str,
-    k: str,
-    v: Sequence[Any],
-    parent_type: FileType,  # noqa: ARG001
-    rules: RulesCollection | None = None,  # noqa: ARG001
-) -> list[Lintable]:
-    # pylint: disable=unused-argument # parent_type)
-    results: list[Lintable] = []
-    if not v:
-        # typing does not prevent junk from being passed in
-        return results
-    for role in v:
-        if isinstance(role, dict):
-            if "role" in role or "name" in role:
-                if "tags" not in role or "skip_ansible_lint" not in role["tags"]:
-                    results.extend(
-                        _look_for_role_files(
-                            basedir,
-                            role.get("role", role.get("name")),
-                        ),
-                    )
-            elif k != "dependencies":
-                msg = f'role dict {role} does not contain a "role" or "name" key'
-                raise SystemExit(msg)
-        else:
-            results.extend(_look_for_role_files(basedir, role))
-    return results
 
 
 def _rolepath(basedir: str, role: str) -> str | None:
