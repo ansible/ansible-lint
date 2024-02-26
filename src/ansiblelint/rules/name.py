@@ -201,6 +201,15 @@ class NameRule(AnsibleLintRule, TransformMixin):
                                     if orig_task_name == task["notify"][idx]:
                                         task["notify"][idx] = updated_task_name
 
+                    if isinstance(item, dict) and "handlers" in item:
+                        for task in item["handlers"]:
+                            listener_task_name = task.get("listen", None)
+                            if (
+                                listener_task_name
+                                and listener_task_name == orig_task_name
+                            ):
+                                task["listen"] = updated_task_name
+
                 target_task["name"] = updated_task_name
                 match.fixed = True
 

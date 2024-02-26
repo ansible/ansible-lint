@@ -21,3 +21,8 @@
     - name: My handler
       ansible.builtin.debug:
         msg: I never run :(
+
+    - name: Test task for listen
+      ansible.builtin.debug:
+        msg: I never run :(
+      listen: My handler
