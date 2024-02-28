@@ -357,7 +357,7 @@
               "37",
               "38",
               "39",
-	      "40",
+              "40",
               "all"
             ],
             "type": "string"
@@ -1101,7 +1101,7 @@
               "lucid",
               "lunar",
               "mantic",
-	      "noble",
+              "noble",
               "maverick",
               "natty",
               "oneiric",
