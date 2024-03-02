@@ -79,6 +79,7 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__name__)
+# cache_dir_lock could be set in `initialize_options`
 cache_dir_lock: None | FileLock = None
 
 
@@ -144,8 +145,9 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     if options.cache_dir:
         options.cache_dir.mkdir(parents=True, exist_ok=True)
 
+    global cache_dir_lock  # pylint: disable=global-statement
     if not options.offline:  # pragma: no cover
-        cache_dir_lock = FileLock(  # pylint: disable=redefined-outer-name
+        cache_dir_lock = FileLock(
             f"{options.cache_dir}/.lock",
         )
         try:
