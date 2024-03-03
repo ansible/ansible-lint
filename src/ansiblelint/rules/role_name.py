@@ -102,7 +102,8 @@ class RoleNames(AnsibleLintRule):
                 elif isinstance(role, str):
                     role_name = role
                 else:
-                    raise ValueError("role dependency has unexpected type")
+                    msg = "Role dependency has unexpected type."
+                    raise RuntimeError(msg)
                 if "/" in role_name:
                     result.append(
                         self.create_matcherror(
