@@ -11,3 +11,4 @@ galaxy_info:
 
 dependencies:
   - version: foo # invalid, should have at least name, role or src properties
+  - 1234 # invalid, needs to be a string

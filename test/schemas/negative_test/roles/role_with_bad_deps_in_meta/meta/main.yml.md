@@ -53,6 +53,31 @@
     "schemaPath": "#/properties/dependencies/items/anyOf"
   },
   {
+    "instancePath": "/dependencies/1",
+    "keyword": "type",
+    "message": "must be string",
+    "params": {
+      "type": "string"
+    },
+    "schemaPath": "#/properties/dependencies/items/anyOf/0/type"
+  },
+  {
+    "instancePath": "/dependencies/1",
+    "keyword": "type",
+    "message": "must be object",
+    "params": {
+      "type": "object"
+    },
+    "schemaPath": "#/type"
+  },
+  {
+    "instancePath": "/dependencies/1",
+    "keyword": "anyOf",
+    "message": "must match a schema in anyOf",
+    "params": {},
+    "schemaPath": "#/properties/dependencies/items/anyOf"
+  },
+  {
     "instancePath": "/galaxy_info",
     "keyword": "required",
     "message": "must have required property 'author'",
@@ -116,6 +141,31 @@ stdout:
         {
           "path": "$.dependencies[0]",
           "message": "'name' is a required property"
+        }
+      ]
+    },
+    {
+      "filename": "negative_test/roles/role_with_bad_deps_in_meta/meta/main.yml",
+      "path": "$.dependencies[1]",
+      "message": "1234 is not valid under any of the given schemas",
+      "has_sub_errors": true,
+      "best_match": {
+        "path": "$.dependencies[1]",
+        "message": "1234 is not of type 'string'"
+      },
+      "best_deep_match": {
+        "path": "$.dependencies[1]",
+        "message": "1234 is not of type 'string'"
+      },
+      "num_sub_errors": 1,
+      "sub_errors": [
+        {
+          "path": "$.dependencies[1]",
+          "message": "1234 is not of type 'string'"
+        },
+        {
+          "path": "$.dependencies[1]",
+          "message": "1234 is not of type 'object'"
         }
       ]
     },
