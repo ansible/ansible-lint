@@ -4,6 +4,15 @@
 [
   {
     "instancePath": "/dependencies/0",
+    "keyword": "type",
+    "message": "must be string",
+    "params": {
+      "type": "string"
+    },
+    "schemaPath": "#/properties/dependencies/items/anyOf/0/type"
+  },
+  {
+    "instancePath": "/dependencies/0",
     "keyword": "required",
     "message": "must have required property 'role'",
     "params": {
@@ -35,6 +44,13 @@
     "message": "must match a schema in anyOf",
     "params": {},
     "schemaPath": "#/anyOf"
+  },
+  {
+    "instancePath": "/dependencies/0",
+    "keyword": "anyOf",
+    "message": "must match a schema in anyOf",
+    "params": {},
+    "schemaPath": "#/properties/dependencies/items/anyOf"
   },
   {
     "instancePath": "/galaxy_info",
@@ -73,14 +89,22 @@ stdout:
       "has_sub_errors": true,
       "best_match": {
         "path": "$.dependencies[0]",
-        "message": "'role' is a required property"
+        "message": "{'version': 'foo'} is not of type 'string'"
       },
       "best_deep_match": {
         "path": "$.dependencies[0]",
-        "message": "'role' is a required property"
+        "message": "{'version': 'foo'} is not of type 'string'"
       },
-      "num_sub_errors": 2,
+      "num_sub_errors": 4,
       "sub_errors": [
+        {
+          "path": "$.dependencies[0]",
+          "message": "{'version': 'foo'} is not of type 'string'"
+        },
+        {
+          "path": "$.dependencies[0]",
+          "message": "{'version': 'foo'} is not valid under any of the given schemas"
+        },
         {
           "path": "$.dependencies[0]",
           "message": "'role' is a required property"
