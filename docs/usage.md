@@ -43,8 +43,8 @@ repositories.
 ## Gradual adoption
 
 For an easier gradual adoption, adopters should consider [ignore
-file][configuring.md#ignoring-rules-for-entire-files] feature. This allows the
-quick introduction of a linter pipeline for preventing addition of new
+file][ignoring-rules-for-entire-files] feature. This allows the
+quick introduction of a linter pipeline for preventing the addition of new
 violations, while known violations are ignored. Some people can work on
 addressing these historical violations while others may continue to work on
 other maintenance tasks.
