@@ -1,4 +1,5 @@
 """Implementation of NoFreeFormRule."""
+
 from __future__ import annotations
 
 import functools

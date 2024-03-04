@@ -199,7 +199,7 @@ def _append_skipped_rules(
     ruamel_tasks = _get_tasks_from_blocks(ruamel_task_blocks)
 
     # append skipped_rules for each task
-    for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks):
+    for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks, strict=False):
         # ignore empty tasks
         if not pyyaml_task and not ruamel_task:
             continue
@@ -240,7 +240,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
         if not task or not is_nested_task(task):
             return
         for k in NESTED_TASK_KEYS:
-            if k in task and task[k]:
+            if task.get(k):
                 if hasattr(task[k], "get"):
                     continue
                 for subtask in task[k]:
@@ -279,16 +279,16 @@ def _get_rule_skips_from_yaml(
         yaml_comment_obj_strings.append(str(obj.ca.items))
         if isinstance(obj, dict):
             for val in obj.values():
-                if isinstance(val, (dict, list)):
+                if isinstance(val, dict | list):
                     traverse_yaml(val)
         elif isinstance(obj, list):
             for element in obj:
-                if isinstance(element, (dict, list)):
+                if isinstance(element, dict | list):
                     traverse_yaml(element)
         else:
             return
 
-    if isinstance(yaml_input, (dict, list)):
+    if isinstance(yaml_input, dict | list):
         traverse_yaml(yaml_input)
 
     rule_id_list = []

@@ -1,4 +1,5 @@
 """Test strict mode."""
+
 import os
 
 import pytest

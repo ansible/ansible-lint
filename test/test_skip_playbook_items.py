@@ -1,4 +1,5 @@
 """Tests related to use of noqa inside playbooks."""
+
 import pytest
 
 from ansiblelint.testing import RunFromText

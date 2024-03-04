@@ -1,4 +1,5 @@
 """Test ability to import playbooks."""
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 

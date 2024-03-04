@@ -1,4 +1,5 @@
 """Utility helpers to simplify working with yaml-based data."""
+
 # pylint: disable=too-many-lines
 from __future__ import annotations
 
@@ -6,11 +7,11 @@ import functools
 import logging
 import os
 import re
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from io import StringIO
 from pathlib import Path
 from re import Pattern
-from typing import TYPE_CHECKING, Any, Callable, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import ruamel.yaml.events
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, Format
@@ -200,7 +201,7 @@ def _nested_items_path(
     """
     # we have to cast each convert_to_tuples assignment or mypy complains
     # that both assignments (for dict and list) do not have the same type
-    convert_to_tuples_type = Callable[[], Iterator[tuple[Union[str, int], Any]]]
+    convert_to_tuples_type = Callable[[], Iterator[tuple[str | int, Any]]]
     if isinstance(data_collection, dict):
         convert_data_collection_to_tuples = cast(
             convert_to_tuples_type,
@@ -218,7 +219,7 @@ def _nested_items_path(
         if key in (*ANNOTATION_KEYS, *ignored_keys):
             continue
         yield key, value, parent_path
-        if isinstance(value, (dict, list)):
+        if isinstance(value, dict | list):
             yield from _nested_items_path(
                 data_collection=value,
                 parent_path=[*parent_path, key],
@@ -710,12 +711,10 @@ class FormattedEmitter(Emitter):
             and not value.strip()
             and not isinstance(
                 self.event,
-                (
-                    ruamel.yaml.events.CollectionEndEvent,
-                    ruamel.yaml.events.DocumentEndEvent,
-                    ruamel.yaml.events.StreamEndEvent,
-                    ruamel.yaml.events.MappingStartEvent,
-                ),
+                ruamel.yaml.events.CollectionEndEvent
+                | ruamel.yaml.events.DocumentEndEvent
+                | ruamel.yaml.events.StreamEndEvent
+                | ruamel.yaml.events.MappingStartEvent,
             )
         ):
             # drop pure whitespace pre comments
@@ -924,7 +923,7 @@ class FormattedYAML(YAML):
                 elif quote_type == "double":
                     config["preferred_quote"] = '"'
 
-        return cast(dict[str, Union[bool, int, str]], config)
+        return cast(dict[str, bool | int | str], config)
 
     @property
     def version(self) -> tuple[int, int] | None:
@@ -972,7 +971,7 @@ class FormattedYAML(YAML):
             _logger.error("Invalid yaml, verify the file contents and try again.")
         if preamble_comment is not None and isinstance(
             data,
-            (CommentedMap, CommentedSeq),
+            CommentedMap | CommentedSeq,
         ):
             data.preamble_comment = preamble_comment  # type: ignore[union-attr]
         # Because data can validly also be None for empty documents, we cannot
@@ -996,10 +995,10 @@ class FormattedYAML(YAML):
         )
 
     def _prevent_wrapping_flow_style(self, data: Any) -> None:
-        if not isinstance(data, (CommentedMap, CommentedSeq)):
+        if not isinstance(data, CommentedMap | CommentedSeq):
             return
         for key, value, parent_path in nested_items_path(data):
-            if not isinstance(value, (CommentedMap, CommentedSeq)):
+            if not isinstance(value, CommentedMap | CommentedSeq):
                 continue
             fa: Format = value.fa
             if fa.flow_style():
@@ -1141,9 +1140,9 @@ class FormattedYAML(YAML):
 
 def clean_json(
     obj: Any,
-    func: Callable[[str], Any] = lambda key: key.startswith("__")
-    if isinstance(key, str)
-    else False,
+    func: Callable[[str], Any] = lambda key: (
+        key.startswith("__") if isinstance(key, str) else False
+    ),
 ) -> Any:
     """Remove all keys matching the condition from a nested JSON-like object.
 

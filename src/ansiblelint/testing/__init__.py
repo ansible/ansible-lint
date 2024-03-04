@@ -1,4 +1,5 @@
 """Test utils for ansible-lint."""
+
 from __future__ import annotations
 
 import os
@@ -155,4 +156,5 @@ def run_ansible_lint(
         cwd=cwd,
         env=_env,
         text=True,
+        encoding="utf-8",
     )

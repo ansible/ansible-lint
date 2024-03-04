@@ -1,4 +1,5 @@
 """Implementation of NameRule."""
+
 from __future__ import annotations
 
 import re
@@ -6,6 +7,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
@@ -13,7 +15,6 @@ if TYPE_CHECKING:
 
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
-    from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
 
@@ -172,22 +173,48 @@ class NameRule(AnsibleLintRule, TransformMixin):
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
         if match.tag == "name[casing]":
-            target_task = self.seek(match.yaml_path, data)
-            # Not using capitalize(), since that rewrites the rest of the name to lower case
-            task_name = target_task.get("name", None)
-            if task_name:
+
+            def update_task_name(task_name: str) -> str:
+                """Capitalize the first work of the task name."""
+                # Not using capitalize(), since that rewrites the rest of the name to lower case
                 if "|" in task_name:  # if using prefix
                     [file_name, update_task_name] = task_name.split("|")
-                    target_task[
-                        "name"
-                    ] = f"{file_name.strip()} | {update_task_name.strip()[:1].upper()}{update_task_name.strip()[1:]}"
-                else:
-                    target_task["name"] = f"{task_name[:1].upper()}{task_name[1:]}"
+                    return f"{file_name.strip()} | {update_task_name.strip()[:1].upper()}{update_task_name.strip()[1:]}"
+
+                return f"{task_name[:1].upper()}{task_name[1:]}"
+
+            target_task = self.seek(match.yaml_path, data)
+            orig_task_name = target_task.get("name", None)
+            # pylint: disable=too-many-nested-blocks
+            if orig_task_name:
+                updated_task_name = update_task_name(orig_task_name)
+                for item in data:
+                    if isinstance(item, dict) and "tasks" in item:
+                        for task in item["tasks"]:
+                            if (
+                                isinstance(task["notify"], str)
+                                and orig_task_name == task["notify"]
+                            ):
+                                task["notify"] = updated_task_name
+                            elif isinstance(task["notify"], list):
+                                for idx in range(len(task["notify"])):
+                                    if orig_task_name == task["notify"][idx]:
+                                        task["notify"][idx] = updated_task_name
+
+                    if isinstance(item, dict) and "handlers" in item:
+                        for task in item["handlers"]:
+                            listener_task_name = task.get("listen", None)
+                            if (
+                                listener_task_name
+                                and listener_task_name == orig_task_name
+                            ):
+                                task["listen"] = updated_task_name
+
+                target_task["name"] = updated_task_name
                 match.fixed = True
 
 
 if "pytest" in sys.modules:
-    from ansiblelint.file_utils import Lintable
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 

@@ -1,4 +1,5 @@
 """Module containing cached JSON schemas."""
+
 import json
 import logging
 import os

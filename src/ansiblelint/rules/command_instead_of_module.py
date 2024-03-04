@@ -1,4 +1,5 @@
 """Implementation of command-instead-of-module rule."""
+
 # Copyright (c) 2013-2014 Will Thames <will@thames.id.au>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -77,7 +78,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             "show-environment",
             "status",
         ],
-        "yum": ["clean"],
+        "yum": ["clean", "history", "info"],
         "rpm": ["--nodeps"],
     }
 

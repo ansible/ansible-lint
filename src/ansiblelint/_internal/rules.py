@@ -1,4 +1,5 @@
 """Internally used rule classes."""
+
 from __future__ import annotations
 
 import inspect
@@ -57,7 +58,7 @@ class BaseRule:
     _collection: RulesCollection | None = None
 
     @property
-    def help(self) -> str:  # noqa: A003
+    def help(self) -> str:
         """Return a help markdown string for the rule."""
         if self._help is None:
             self._help = ""

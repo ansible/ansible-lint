@@ -1,4 +1,5 @@
 """Test playbooks with local content."""
+
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 

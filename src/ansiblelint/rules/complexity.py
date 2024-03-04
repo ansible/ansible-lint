@@ -1,4 +1,5 @@
 """Implementation of limiting number of tasks."""
+
 from __future__ import annotations
 
 import re

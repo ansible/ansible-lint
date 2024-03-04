@@ -206,6 +206,9 @@
                             },
                             {
                                 "$ref": "#/$defs/shutdown-action"
+                            },
+                            {
+                                "$ref": "#/$defs/pg-notify-action"
                             }
                         ]
                     }
@@ -244,6 +247,9 @@
                         },
                         {
                             "$ref": "#/$defs/shutdown-action"
+                        },
+                        {
+                            "$ref": "#/$defs/pg-notify-action"
                         }
                     ]
                 }
@@ -507,6 +513,42 @@
             },
             "required": [
                 "run_workflow_template"
+            ],
+            "additionalProperties": false
+        },
+        "pg-notify-action": {
+            "type": "object",
+            "properties": {
+                "pg_notify": {
+                    "type": "object",
+                    "properties": {
+                        "dsn": {
+                            "type": "string"
+                        },
+                        "channel": {
+                            "type": "string"
+                        },
+                        "event": {
+                            "type": [
+                                "string",
+                                "object"
+                            ]
+                        },
+                        "remove_meta": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    "required": [
+                        "dsn",
+                        "channel",
+                        "event"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "pg_notify"
             ],
             "additionalProperties": false
         },

@@ -1,4 +1,5 @@
 """Test cli arguments and config."""
+
 from __future__ import annotations
 
 import os

@@ -28,8 +28,9 @@ jobs:
         id: generate_matrix
         uses: coactions/dynamic-matrix@v1
         with:
-          min_python: "3.9"
+          min_python: "3.10"
           max_python: "3.12"
+          default_python: "3.10"
           other_names: |
             lint
             pkg
@@ -51,6 +52,7 @@ jobs:
           args: .ansible-lint
   build:
     name: ${{ matrix.name }}
+    environment: test
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs:
       - prepare
@@ -69,7 +71,7 @@ jobs:
     env:
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 851
+      PYTEST_REQPASS: 852
     steps:
       - uses: actions/checkout@v4
         with:
@@ -134,16 +136,17 @@ jobs:
 
       - name: Upload coverage data
         if: ${{ startsWith(matrix.passed_name, 'py') }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           name: ${{ matrix.passed_name }}
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
+          fail_ci_if_error: true
 
       - name: Archive logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs.zip
+          name: logs-${{ matrix.name }}.zip
           path: .tox/**/log/
 
       - name: Report failure if git reports dirty status
@@ -205,6 +208,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Merge logs into a single archive
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: logs.zip
+          pattern: logs*.zip
+          delete-merged: true
+
+      - name: Check codecov.io status
+        if: github.event_name == 'pull_request'
+        uses: coactions/codecov-status@main
+
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:

@@ -1,4 +1,5 @@
 """Implementation of yaml linting rule (yamllint integration)."""
+
 from __future__ import annotations
 
 import logging

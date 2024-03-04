@@ -1,18 +1,15 @@
 """Transformer implementation."""
+
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Union, cast
+from typing import TYPE_CHECKING, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.yaml_utils import (
-    FormattedYAML,
-    get_path_to_play,
-    get_path_to_task,
-)
+from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
 
 if TYPE_CHECKING:
     from ansiblelint.config import Options
@@ -98,13 +95,11 @@ class Transformer:
                 # any other files. (Based on suggestion from ruamel.yaml author)
                 yaml = FormattedYAML(
                     # Ansible only uses YAML 1.1, but others files should use newer 1.2 (ruamel.yaml defaults to 1.2)
-                    version=(1, 1)
-                    if file.is_owned_by_ansible()
-                    else None,
+                    version=(1, 1) if file.is_owned_by_ansible() else None,
                 )
 
                 ruamel_data = yaml.load(data)
-                if not isinstance(ruamel_data, (CommentedMap, CommentedSeq)):
+                if not isinstance(ruamel_data, CommentedMap | CommentedSeq):
                     # This is an empty vars file or similar which loads as None.
                     # It is not safe to write this file or data-loss is likely.
                     # Only maps and sequences can preserve comments. Skip it.
@@ -144,7 +139,7 @@ class Transformer:
                     # rule transform not requested. Skip it.
                     continue
             if file_is_yaml and not match.yaml_path:
-                data = cast(Union[CommentedMap, CommentedSeq], data)
+                data = cast(CommentedMap | CommentedSeq, data)
                 if match.match_type == "play":
                     match.yaml_path = get_path_to_play(file, match.lineno, data)
                 elif match.task or file.kind in (

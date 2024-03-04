@@ -1,4 +1,5 @@
 """Assure samples produced desire outcomes."""
+
 import pytest
 
 from ansiblelint.app import get_app

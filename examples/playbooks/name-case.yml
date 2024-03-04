@@ -1,4 +1,28 @@
 ---
 - name: this lacks a capitalization
   hosts: localhost
-  tasks: []
+  tasks:
+    - name: Task that always changes
+      ansible.builtin.debug:
+        msg: I always change!
+      changed_when: true
+      notify: my handler
+
+    - name: Task with notify as list
+      ansible.builtin.debug:
+        msg: I always change!
+      changed_when: true
+      notify:
+        - my handler 1
+        - my handler
+        - my handler 2
+
+  handlers:
+    - name: my handler
+      ansible.builtin.debug:
+        msg: I never run :(
+
+    - name: Test task for listen
+      ansible.builtin.debug:
+        msg: I never run :(
+      listen: "my handler"

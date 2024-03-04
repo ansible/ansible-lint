@@ -1,4 +1,5 @@
 """Implementation of role-name rule."""
+
 # Copyright (c) 2020 Gael Chamoulaud <gchamoul@redhat.com>
 # Copyright (c) 2020 Sorin Sbarnea <ssbarnea@redhat.com>
 #
@@ -95,7 +96,7 @@ class RoleNames(AnsibleLintRule):
             return result
 
         if file.kind == "meta":
-            for role in file.data["dependencies"]:
+            for role in file.data.get("dependencies", []):
                 role_name = role["role"]
                 if "/" in role_name:
                     result.append(
@@ -205,4 +206,20 @@ if "pytest" in sys.modules:
         for idx, result in enumerate(results):
             assert result.tag == expected_errors[idx][0]
             assert result.lineno == expected_errors[idx][1]
+        assert len(results) == failure
+
+    @pytest.mark.parametrize(
+        ("test_file", "failure"),
+        (pytest.param("examples/roles/test-no-deps-role", 0, id="no_deps"),),
+    )
+    def test_role_no_deps(
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failure: int,
+    ) -> None:
+        """Test role if no dependencies are present in meta/main.yml."""
+        results = Runner(
+            test_file,
+            rules=default_rules_collection,
+        ).run()
         assert len(results) == failure

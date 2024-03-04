@@ -3,6 +3,7 @@
 This module contains tests that validate that linter does not produce errors
 when encountering what counts as valid Ansible syntax.
 """
+
 from ansiblelint.testing import RunFromText
 
 PB_WITH_NULL_TASKS = """\

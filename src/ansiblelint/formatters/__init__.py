@@ -1,4 +1,5 @@
 """Output formatters."""
+
 from __future__ import annotations
 
 import hashlib
@@ -28,6 +29,7 @@ class BaseFormatter(Generic[T]):
     ----
         base_dir (str|Path): reference directory against which display relative path.
         display_relative_path (bool): whether to show path as relative or absolute
+
     """
 
     def __init__(self, base_dir: str | Path, display_relative_path: bool) -> None:
@@ -288,9 +290,9 @@ class SarifFormatter(BaseFormatter[Any]):
             "ruleId": match.tag,
             "level": self.get_sarif_result_severity_level(match),
             "message": {
-                "text": str(match.details)
-                if str(match.details)
-                else str(match.message),
+                "text": (
+                    str(match.details) if str(match.details) else str(match.message)
+                ),
             },
             "locations": [
                 {

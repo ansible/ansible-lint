@@ -1,4 +1,5 @@
 """Tests for yaml-related utility functions."""
+
 from __future__ import annotations
 
 from io import StringIO
@@ -266,7 +267,6 @@ def test_formatted_yaml_loader_dumper(
     version: tuple[int, int],
 ) -> None:
     """Ensure that FormattedYAML loads/dumps formatting fixtures consistently."""
-    # pylint: disable=unused-argument
     before_content, prettier_content, after_content = load_yaml_formatting_fixtures(
         fixture_filename,
     )

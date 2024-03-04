@@ -1,4 +1,5 @@
 """Optional rule for avoiding keeping owner/group when transferring files."""
+
 from __future__ import annotations
 
 import re

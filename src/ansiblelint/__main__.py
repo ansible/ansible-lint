@@ -30,7 +30,7 @@ import shutil
 import site
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, TextIO
+from typing import TYPE_CHECKING, Any, TextIO
 
 from ansible_compat.prerun import get_cache_dir
 from filelock import FileLock, Timeout
@@ -71,6 +71,8 @@ from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
+
+    from collections.abc import Callable
 
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
@@ -205,12 +207,6 @@ def _do_transform(result: LintResult, opts: Options) -> None:
 
 def support_banner() -> None:
     """Display support banner when running on unsupported platform."""
-    if sys.version_info < (3, 9, 0):  # pragma: no cover # noqa: UP036
-        prefix = "::warning::" if "GITHUB_ACTION" in os.environ else "WARNING: "
-        console_stderr.print(
-            f"{prefix}ansible-lint is no longer tested under Python {sys.version_info.major}.{sys.version_info.minor} and will soon require 3.9. Do not report bugs for this version.",
-            style="bold red",
-        )
 
 
 def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) -> None:

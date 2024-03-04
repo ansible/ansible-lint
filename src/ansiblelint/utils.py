@@ -28,7 +28,7 @@ import inspect
 import logging
 import os
 import re
-from collections.abc import Generator, ItemsView, Iterator, Mapping, Sequence
+from collections.abc import ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
@@ -50,10 +50,7 @@ from ansible.utils.collection_loader import AnsibleCollectionConfig
 from yaml.composer import Composer
 from yaml.representer import RepresenterError
 
-from ansiblelint._internal.rules import (
-    AnsibleParserErrorRule,
-    RuntimeErrorRule,
-)
+from ansiblelint._internal.rules import AnsibleParserErrorRule, RuntimeErrorRule
 from ansiblelint.app import get_app
 from ansiblelint.config import Options, options
 from ansiblelint.constants import (
@@ -189,9 +186,7 @@ def ansible_template(
                     _logger.warning(err)
                     raise
 
-                templar.environment.filters._delegatee[  # noqa: SLF001
-                    missing_filter
-                ] = mock_filter
+                templar.environment.filters._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
@@ -779,7 +774,7 @@ class Task(dict[str, Any]):
         """Allow access as task[...]."""
         return self.normalized_task[index]
 
-    def __iter__(self) -> Generator[str, None, None]:
+    def __iter__(self) -> Iterator[str]:
         """Provide support for 'key in task'."""
         yield from (f for f in self.normalized_task)
 
