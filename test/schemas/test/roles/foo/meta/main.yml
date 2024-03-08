@@ -5,6 +5,7 @@ dependencies:
     version: "1.0"
   - name: ansible-role-bar
     version: "1.0"
+  - ansible-role-baz
   # from Bitbucket
   - src: git+http://bitbucket.org/willthames/git-ansible-galaxy
     version: v1.4

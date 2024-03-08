@@ -1520,7 +1520,14 @@
     },
     "dependencies": {
       "items": {
-        "$ref": "#/$defs/DependencyModel"
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "#/$defs/DependencyModel"
+          }
+        ]
       },
       "title": "Dependencies",
       "type": "array"
