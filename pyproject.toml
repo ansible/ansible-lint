@@ -248,7 +248,8 @@ ignore = [
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "TRY",
   "PERF203",
-  "PD011" # We are not using pandas, any .values attributes are unrelated
+  "PD011", # We are not using pandas, any .values attributes are unrelated
+  "PLW0603" # global lock file in cache dir
 ]
 select = ["ALL"]
 target-version = "py310"

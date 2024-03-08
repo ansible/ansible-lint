@@ -79,7 +79,6 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__name__)
-cache_dir_lock: None | FileLock = None
 
 
 class LintLogHandler(logging.Handler):
@@ -120,8 +119,9 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def initialize_options(arguments: list[str] | None = None) -> None:
+def initialize_options(arguments: list[str] | None = None) -> None | FileLock:
     """Load config options and store them inside options module."""
+    cache_dir_lock = None
     new_options = cli.get_config(arguments or [])
     new_options.cwd = pathlib.Path.cwd()
 
@@ -145,7 +145,7 @@ def initialize_options(arguments: list[str] | None = None) -> None:
         options.cache_dir.mkdir(parents=True, exist_ok=True)
 
     if not options.offline:  # pragma: no cover
-        cache_dir_lock = FileLock(  # pylint: disable=redefined-outer-name
+        cache_dir_lock = FileLock(
             f"{options.cache_dir}/.lock",
         )
         try:
@@ -159,6 +159,8 @@ def initialize_options(arguments: list[str] | None = None) -> None:
     # Avoid extra output noise from Ansible about using devel versions
     if "ANSIBLE_DEVEL_WARNING" not in os.environ:  # pragma: no branch
         os.environ["ANSIBLE_DEVEL_WARNING"] = "false"
+
+    return cache_dir_lock
 
 
 def _do_list(rules: RulesCollection) -> int:
@@ -285,7 +287,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if argv is None:  # pragma: no cover
         argv = sys.argv
-    initialize_options(argv[1:])
+    cache_dir_lock = initialize_options(argv[1:])
 
     console_options["force_terminal"] = options.colored
     reconfigure(console_options)
