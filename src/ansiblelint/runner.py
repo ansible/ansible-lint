@@ -453,7 +453,7 @@ class Runner:
                 except MatchError as exc:
                     if not exc.filename:  # pragma: no branch
                         exc.filename = str(lintable.path)
-                    exc.rule = self.rules.rules[1]
+                    exc.rule = self.rules["load-failure"]
                     yield exc
                 except AttributeError:
                     yield MatchError(lintable=lintable, rule=self.rules["load-failure"])
