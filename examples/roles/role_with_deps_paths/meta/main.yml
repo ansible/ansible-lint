@@ -7,3 +7,4 @@ dependencies:
     vars:
       param: baz
   - role: subfolder/2nd_role
+  - subfolder/3rd_role

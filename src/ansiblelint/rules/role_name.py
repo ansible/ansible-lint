@@ -97,13 +97,19 @@ class RoleNames(AnsibleLintRule):
 
         if file.kind == "meta":
             for role in file.data.get("dependencies", []):
-                role_name = role["role"]
+                if isinstance(role, dict):
+                    role_name = role["role"]
+                elif isinstance(role, str):
+                    role_name = role
+                else:
+                    msg = "Role dependency has unexpected type."
+                    raise RuntimeError(msg)
                 if "/" in role_name:
                     result.append(
                         self.create_matcherror(
                             f"Avoid using paths when importing roles. ({role_name})",
                             filename=file,
-                            lineno=role["__line__"],
+                            lineno=role_name.ansible_pos[1],
                             tag=f"{self.id}[path]",
                         ),
                     )
@@ -187,7 +193,7 @@ if "pytest" in sys.modules:
 
     @pytest.mark.parametrize(
         ("test_file", "failure"),
-        (pytest.param("examples/roles/role_with_deps_paths", 2, id="fail"),),
+        (pytest.param("examples/roles/role_with_deps_paths", 3, id="fail"),),
     )
     def test_role_deps_path_names(
         default_rules_collection: RulesCollection,
@@ -202,7 +208,9 @@ if "pytest" in sys.modules:
         expected_errors = (
             ("role-name[path]", 3),
             ("role-name[path]", 9),
+            ("role-name[path]", 10),
         )
+        assert len(expected_errors) == failure
         for idx, result in enumerate(results):
             assert result.tag == expected_errors[idx][0]
             assert result.lineno == expected_errors[idx][1]
