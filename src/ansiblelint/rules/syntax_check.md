@@ -28,6 +28,14 @@ This rule can produce messages like:
 - `syntax-check[unknown-module]`: couldn't resolve module/action
 - `syntax-check[specific]`: for other errors not mentioned above.
 
+## syntax-check[unknown-module]
+
+The linter relies on ansible-core code to load the ansible code and it will
+produce a syntax error if the code refers to ansible content that is not
+installed. You must ensure that all collections and roles used inside your
+repository are listed inside a [`requirements.yml`](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file) file, so the linter can
+install them when they are missing.
+
 ## Problematic code
 
 ```yaml

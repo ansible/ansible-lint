@@ -357,6 +357,7 @@
               "37",
               "38",
               "39",
+              "40",
               "all"
             ],
             "type": "string"
@@ -847,7 +848,15 @@
         "versions": {
           "default": "all",
           "items": {
-            "enum": ["17.01", "18.06", "19.07", "21.02", "22.03", "all"],
+            "enum": [
+              "17.01",
+              "18.06",
+              "19.07",
+              "21.02",
+              "22.03",
+              "23.05",
+              "all"
+            ],
             "type": "string"
           },
           "type": "array"
@@ -1092,6 +1101,7 @@
               "lucid",
               "lunar",
               "mantic",
+              "noble",
               "maverick",
               "natty",
               "oneiric",
