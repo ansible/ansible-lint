@@ -88,6 +88,7 @@ PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 
 _logger = logging.getLogger(__name__)
 
+
 def _init_dataloader():
     dataloader = DataLoader()
     if hasattr(dataloader, "set_vault_password"):
@@ -96,18 +97,30 @@ def _init_dataloader():
         _logger.debug("Reading vault password file: %s", C.DEFAULT_VAULT_PASSWORD_FILE)
         # read vault_pass from a file
         try:
-            file_vault_secret = get_file_vault_secret(filename=C.DEFAULT_VAULT_PASSWORD_FILE,
-                                                      vault_id=C.DEFAULT_VAULT_IDENTITY,
-                                                      loader=dataloader)
+            file_vault_secret = get_file_vault_secret(
+                filename=C.DEFAULT_VAULT_PASSWORD_FILE,
+                vault_id=C.DEFAULT_VAULT_IDENTITY,
+                loader=dataloader,
+            )
         except AnsibleError as exc:
-            _logger.warning("Error getting vault password file (%s): %s", C.DEFAULT_VAULT_PASSWORD_FILE, to_text(exc))
+            _logger.warning(
+                "Error getting vault password file (%s): %s",
+                C.DEFAULT_VAULT_PASSWORD_FILE,
+                to_text(exc),
+            )
         else:
             try:
                 file_vault_secret.load()
             except AnsibleError as exc:
-                _logger.warning("Error in vault password file loading (%s): %s", C.DEFAULT_VAULT_PASSWORD_FILE, to_text(exc))
+                _logger.warning(
+                    "Error in vault password file loading (%s): %s",
+                    C.DEFAULT_VAULT_PASSWORD_FILE,
+                    to_text(exc),
+                )
             else:
-                dataloader.set_vault_secrets([(C.DEFAULT_VAULT_IDENTITY, file_vault_secret)])
+                dataloader.set_vault_secrets(
+                    [(C.DEFAULT_VAULT_IDENTITY, file_vault_secret)]
+                )
     return dataloader
 
 
