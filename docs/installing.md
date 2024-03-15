@@ -13,9 +13,9 @@ automation content.
     this document. Before raising any bugs related to installation, review all of
     the following details:
 
-    - You should use installation methods outlined in this document only.
+    - You should use the installation methods outlined in this document only.
     - You should upgrade the Python installer (`pip` or `pipx`) to the latest
-      version available from pypi.org. If you used a system package manager, you
+      version available from pypi.org. If you use a system package manager, you
       will need to upgrade the installer to a newer version.
     - If you are installing from a git zip archive, which is not supported but
       should work, ensure you use the main branch and the latest version of pip and
@@ -30,10 +30,11 @@ automation content.
     related to the installation will be closed and locked.
 
 For a container image, we recommend using
-[creator-ee](https://github.com/ansible/creator-ee/), which includes
-Ansible-lint. If you have a use case that the `creator-ee` container doesn't
-satisfy, please contact the team through the
-[discussions](https://github.com/ansible/ansible-lint/discussions) forum.
+[creator-ee](https://github.com/ansible/creator-ee/) which includes
+`ansible-dev-tools` (it combines critical Ansible development packages into a
+unified Python package). If you have a use case that the `creator-ee` container
+doesn't satisfy, please contact the team through the
+[discussion](https://github.com/ansible/ansible-lint/discussions) forum.
 
 You can also run Ansible-lint on your source code with the
 [Ansible-lint GitHub action](https://github.com/marketplace/actions/run-ansible-lint)
@@ -41,16 +42,28 @@ instead of installing it directly.
 
 ## Installing the latest version
 
-You can install the most recent version of Ansible-lint with the [pip3] or
-[pipx] Python package manager. Use [pipx] to isolate Ansible-lint from your
-current Python environment as an alternative to creating a virtual environment.
+The **recommended** approach to install `ansible-lint` is using the
+`ansible-dev-tools` package.
+[Ansible Development Tools (ADT)](https://ansible.readthedocs.io/projects/dev-tools/)
+aims to streamline the setup and usage of several tools needed in order to
+create [Ansible](https://www.ansible.com) content. ADT combines critical Ansible
+development packages into a unified Python package.
 
 ```bash
 # This also installs ansible-core if it is not already installed
-pip3 install ansible-lint
+pip3 install ansible-dev-tools
 ```
 
-!!! note
+!!! Standalone Installation
+
+    You can install the most recent version of Ansible-lint with the [pip3] or
+    [pipx] Python package manager. Use [pipx] to isolate Ansible-lint from your
+    current Python environment as an alternative to creating a virtual environment.
+
+    ```bash
+    # This also installs ansible-core if it is not already installed
+    pip3 install ansible-lint
+    ```
 
     If you want to install the exact versions of all dependencies that were used
     to test a specific version of ansible-lint, you can add `lock` extra. This
@@ -114,9 +127,9 @@ jobs:
 Due to limitations on how GitHub Actions are processing arguments, we do not
 plan to provide extra options. You will have to make use of
 [ansible-lint own configuration file](https://ansible.readthedocs.io/projects/lint/configuring/)
-for altering its behavior.
+to alter its behavior.
 
-To also enable [dependabot][dependabot] automatic updates the newer versions of
+To also enable [dependabot][dependabot] automatic updates, the newer versions of
 ansible-lint action you should create a file similar to
 [.github/dependabot.yml][.github/dependabot.yml]
 
