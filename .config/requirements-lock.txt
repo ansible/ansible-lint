@@ -7,7 +7,7 @@
 ansible-compat==4.1.11
 ansible-core==2.16.4
 attrs==23.2.0
-black==24.2.0
+black==24.3.0
 bracex==2.4
 cffi==1.16.0
 click==8.1.7
@@ -20,13 +20,13 @@ markdown-it-py==3.0.0
 markupsafe==2.1.5
 mdurl==0.1.2
 mypy-extensions==1.0.0
-packaging==23.2
+packaging==24.0
 pathspec==0.12.1
 platformdirs==4.2.0
 pycparser==2.21
 pygments==2.17.2
 pyyaml==6.0.1
-referencing==0.33.0
+referencing==0.34.0
 rich==13.7.1
 rpds-py==0.18.0
 ruamel-yaml==0.18.6
