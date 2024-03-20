@@ -42,33 +42,34 @@ instead of installing it directly.
 
 ## Installing the latest version
 
-The **recommended** approach to install `ansible-lint` is using the
-`ansible-dev-tools` package.
-[Ansible Development Tools (ADT)](https://ansible.readthedocs.io/projects/dev-tools/)
-aims to streamline the setup and usage of several tools needed in order to
-create [Ansible](https://www.ansible.com) content. ADT combines critical Ansible
-development packages into a unified Python package.
+!!! Recommendation
 
-```bash
-# This also installs ansible-core if it is not already installed
-pip3 install ansible-dev-tools
-```
-
-!!! Standalone Installation
-
-    You can install the most recent version of Ansible-lint with the [pip3] or
-    [pipx] Python package manager. Use [pipx] to isolate Ansible-lint from your
-    current Python environment as an alternative to creating a virtual environment.
+    The **recommended** approach to install `ansible-lint` is using the
+    `ansible-dev-tools` package.
+    [Ansible Development Tools (ADT)](https://ansible.readthedocs.io/projects/dev-tools/)
+    aims to streamline the setup and usage of several tools needed in order to
+    create [Ansible](https://www.ansible.com) content. ADT combines critical Ansible
+    development packages into a unified Python package.
 
     ```bash
     # This also installs ansible-core if it is not already installed
-    pip3 install ansible-lint
+    pip3 install ansible-dev-tools
     ```
 
-    If you want to install the exact versions of all dependencies that were used
-    to test a specific version of ansible-lint, you can add `lock` extra. This
-    will only work with Python 3.10 or newer. Do this only inside a
-    virtual environment.
+You can install the most recent version of Ansible-lint with the [pip3] or
+[pipx] Python package manager. Use [pipx] to isolate Ansible-lint from your
+current Python environment as an alternative to creating a virtual environment.
+
+```bash
+# This also installs ansible-core if it is not already installed
+pip3 install ansible-lint
+```
+
+!!! note
+
+    If you want to install the exact versions of all dependencies that were used to
+    test a specific version of ansible-lint, you can add `lock` extra. This will
+    only work with Python 3.10 or newer. Do this only inside a virtual environment.
 
     ```bash
     pip3 install "ansible-lint[lock]"
