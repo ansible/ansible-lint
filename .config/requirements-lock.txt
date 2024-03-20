@@ -7,7 +7,7 @@
 ansible-compat==4.1.11
 ansible-core==2.16.4
 attrs==23.2.0
-black==24.2.0
+black==24.3.0
 bracex==2.4
 cffi==1.16.0
 click==8.1.7
