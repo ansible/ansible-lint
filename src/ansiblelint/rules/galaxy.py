@@ -41,6 +41,7 @@ class GalaxyRule(AnsibleLintRule):
             "application",
             "cloud",
             "database",
+            "eda",
             "infrastructure",
             "linux",
             "monitoring",
