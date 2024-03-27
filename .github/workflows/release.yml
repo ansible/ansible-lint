@@ -49,7 +49,7 @@ jobs:
           submodules: true
 
       - name: Build dists
-        run: python -m tox
+        run: python3 -m tox
 
       - name: Publish to pypi.org
         if: >- # "create" workflows run separately from "push" & "pull_request"
