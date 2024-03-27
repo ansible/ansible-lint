@@ -76,7 +76,7 @@ describe("schemas under f/", function () {
             }
             // validate using check-jsonschema (python-jsonschema):
             // const py = exec();
-            // Do not use python -m ... calling notation because for some
+            // Do not use python3 -m ... calling notation because for some
             // reason, nodejs environment lacks some env variables needed
             // and breaks usage from inside virtualenvs.
             const proc = spawnSync(
