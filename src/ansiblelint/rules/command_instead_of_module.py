@@ -72,6 +72,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         "git": ["branch", "log", "lfs", "rev-parse"],
         "systemctl": [
             "--version",
+            "get-default",
             "kill",
             "set-default",
             "set-property",
