@@ -119,7 +119,7 @@ def _init_dataloader():
                 )
             else:
                 dataloader.set_vault_secrets(
-                    [(C.DEFAULT_VAULT_IDENTITY, file_vault_secret)]
+                    [(C.DEFAULT_VAULT_IDENTITY, file_vault_secret)],
                 )
     return dataloader
 
