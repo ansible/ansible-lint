@@ -22,6 +22,10 @@
       ansible.builtin.command: systemctl show-environment
       changed_when: false
 
+    - name: Get systemd runlevel
+      ansible.builtin.command: systemctl get-default
+      changed_when: false
+
     - name: Set systemd runlevel
       ansible.builtin.command: systemctl set-default multi-user.target
       changed_when: false
