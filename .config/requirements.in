@@ -3,7 +3,7 @@ will-not-work-on-windows-try-from-wsl-instead; platform_system=='Windows'
 ansible-core>=2.12.0 # GPLv3
 ansible-compat>=4.1.11 # GPLv3
 # alphabetically sorted:
-black>=22.8.0 # MIT
+black>=24.3.0 # MIT (security)
 filelock>=3.3.0 # The Unlicense
 jsonschema>=4.10.0 # MIT, version needed for improved errors
 packaging>=21.3 # Apache-2.0,BSD-2-Clause
