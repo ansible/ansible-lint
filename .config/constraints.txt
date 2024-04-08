@@ -10,7 +10,7 @@ astroid==3.1.0
 attrs==23.2.0
 babel==2.14.0
 beautifulsoup4==4.12.3
-black==24.2.0
+black==24.3.0
 boolean-py==4.0
 bracex==2.4
 cairocffi==1.6.1
