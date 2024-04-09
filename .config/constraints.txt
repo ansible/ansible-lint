@@ -42,7 +42,7 @@ jmespath==1.0.1
 jsmin==3.0.1
 jsonschema==4.21.1
 jsonschema-specifications==2023.12.1
-license-expression==30.2.0
+license-expression==30.3.0
 linkchecker==10.4.0
 markdown==3.5.2
 markdown-exec==1.8.0
