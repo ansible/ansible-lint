@@ -109,8 +109,8 @@ class AnsibleLintRule(BaseRule):
         match.task = task
         if not match.details:
             match.details = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-        if match.lineno < task[LINE_NUMBER_KEY]:
-            match.lineno = task[LINE_NUMBER_KEY]
+
+        match.lineno = max(match.lineno, task[LINE_NUMBER_KEY])
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
