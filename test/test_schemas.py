@@ -93,7 +93,7 @@ def test_spdx() -> None:
         spx_enum = schema["$defs"]["SPDXLicenseEnum"]["enum"]
     if set(spx_enum) != license_ids:
         # In absence of a
-        if os.environ.get("PIP_CONSTRAINT", "/dev/null") != "/dev/null":
+        if os.environ.get("PIP_CONSTRAINT", "/dev/null") == "/dev/null":
             with galaxy_json.open("w", encoding="utf-8") as f:
                 schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
                 json.dump(schema, f, indent=2)
