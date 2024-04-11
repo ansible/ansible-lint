@@ -42,19 +42,7 @@ instead of installing it directly.
 
 ## Installing the latest version
 
-!!! Recommendation
-
-    The **recommended** approach to install `ansible-lint` is using the
-    `ansible-dev-tools` package.
-    [Ansible Development Tools (ADT)](https://ansible.readthedocs.io/projects/dev-tools/)
-    aims to streamline the setup and usage of several tools needed in order to
-    create [Ansible](https://www.ansible.com) content. ADT combines critical Ansible
-    development packages into a unified Python package.
-
-    ```bash
-    # This also installs ansible-core if it is not already installed
-    pip3 install ansible-dev-tools
-    ```
+{{ install_from_adt("ansible-lint") }}
 
 You can install the most recent version of Ansible-lint with the [pip3] or
 [pipx] Python package manager. Use [pipx] to isolate Ansible-lint from your

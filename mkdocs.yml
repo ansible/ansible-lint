@@ -131,6 +131,8 @@ exclude_docs: |
 
 plugins:
   - autorefs
+  - macros:
+      modules: [mkdocs-ansible:mkdocs_ansible]
   - markdown-exec
   - gen-files:
       scripts:
