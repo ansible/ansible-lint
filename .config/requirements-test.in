@@ -2,7 +2,7 @@ black # IDE support
 coverage-enable-subprocess # see https://github.com/nedbat/coveragepy/issues/1341#issuecomment-1228942657
 coverage[toml] >= 6.4.4
 jmespath
-license-expression >= 30.1.1 # Apache 2.0
+license-expression >= 30.3.0 # Apache 2.0
 mypy # IDE support
 netaddr # needed by ipwrap filter
 psutil # soft-dep of pytest-xdist
