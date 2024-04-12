@@ -450,13 +450,11 @@ def path_inject(own_location: str = "") -> None:
         inject_paths.append(str(py_path))
 
     # last option, if nothing else is found, just look next to ourselves...
-    own_location = os.path.realpath(own_location)
-    if (
-        own_location
-        and (Path(own_location).parent / "ansible").exists()
-        and str(Path(own_location).parent) not in paths
-    ):
-        inject_paths.append(str(Path(own_location).parent))
+    if own_location:
+        own_location = os.path.realpath(own_location)
+        parent = Path(own_location).parent
+        if (parent / "ansible").exists() and str(parent) not in paths:
+            inject_paths.append(str(parent))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
         if inject_paths and not all("pipx" in p for p in inject_paths):
