@@ -191,6 +191,11 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 for item in data:
                     if isinstance(item, dict) and "tasks" in item:
                         for task in item["tasks"]:
+                            # We want to rewrite task names in the notify keyword,
+                            # but if there isn't one, we don't need to do anything.
+                            if "notify" not in task:
+                                continue
+
                             if (
                                 isinstance(task["notify"], str)
                                 and orig_task_name == task["notify"]
