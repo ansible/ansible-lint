@@ -1,3 +1,8 @@
+---
+# YAML header
+render_macros: true
+---
+
 # Installing
 
 Install Ansible-lint to apply rules and follow best practices with your
