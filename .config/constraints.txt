@@ -10,7 +10,7 @@ astroid==3.1.0
 attrs==23.2.0
 babel==2.14.0
 beautifulsoup4==4.12.3
-black==24.3.0
+black==24.4.0
 boolean-py==4.0
 bracex==2.4
 cairocffi==1.6.1
@@ -30,11 +30,11 @@ dill==0.3.8
 dnspython==2.6.1
 exceptiongroup==1.2.0
 execnet==2.1.1
-filelock==3.13.3
+filelock==3.13.4
 ghp-import==2.1.0
 griffe==0.42.1
 htmlmin2==0.1.13
-idna==3.6
+idna==3.7
 iniconfig==2.0.0
 isort==5.13.2
 jinja2==3.1.3
@@ -72,7 +72,7 @@ paginate==0.5.6
 pathspec==0.12.1
 pillow==10.3.0
 pip==24.0
-pipdeptree==2.17.0
+pipdeptree==2.18.1
 platformdirs==4.2.0
 pluggy==1.4.0
 psutil==5.9.8
