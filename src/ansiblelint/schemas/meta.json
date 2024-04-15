@@ -110,6 +110,25 @@
       "title": "ArchLinuxPlatformModel",
       "type": "object"
     },
+    "AstraLinuxPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "Astra Linux",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["1.8", "1.7", "1.6", "2.12", "all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "AstraLinuxPlatformModel",
+      "type": "object"
+    },
     "ClearLinuxPlatformModel": {
       "properties": {
         "name": {
