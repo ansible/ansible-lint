@@ -396,7 +396,7 @@ class RulesCollection:
         else:
             self.options = options
         self.profile = []
-        self.app = app or get_app(offline=True)
+        self.app = app or get_app(cached=True)
 
         if profile_name:
             self.profile = PROFILES[profile_name]

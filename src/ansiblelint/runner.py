@@ -232,7 +232,7 @@ class Runner:
 
         # -- phase 1 : syntax check in parallel --
         if not self.skip_ansible_syntax_check:
-            app = get_app(offline=True)
+            app = get_app(cached=True)
 
             def worker(lintable: Lintable) -> list[MatchError]:
                 return self._get_ansible_syntax_check_matches(
