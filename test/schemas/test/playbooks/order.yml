@@ -1,0 +1,10 @@
+---
+- name: Test
+  hosts: all
+  order: "{{ host_order | default('shuffle') }}"
+  gather_facts: false
+  serial: 1
+  tasks:
+    - name: ABC
+      ansible.builtin.debug:
+        msg: "hello"
