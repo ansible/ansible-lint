@@ -545,15 +545,22 @@
           "$ref": "#/$defs/templated-boolean"
         },
         "order": {
-          "enum": [
-            "default",
-            "sorted",
-            "reverse_sorted",
-            "reverse_inventory",
-            "shuffle"
+          "oneOf": [
+            {
+              "enum": [
+                "default",
+                "sorted",
+                "reverse_sorted",
+                "reverse_inventory",
+                "shuffle"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/full-jinja"
+            }
           ],
-          "title": "Order",
-          "type": "string"
+          "title": "Order"
         },
         "port": {
           "$ref": "#/$defs/templated-integer",
