@@ -157,6 +157,13 @@ def fixture_runner_result(
             id="key_order_play_transform",
         ),
         pytest.param(
+            "examples/playbooks/transform-key-order-block.yml",
+            1,
+            True,
+            True,
+            id="key_order_block_transform",
+        ),
+        pytest.param(
             "examples/.github/workflows/sample.yml",
             0,
             False,
