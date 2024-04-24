@@ -220,6 +220,10 @@
       "title": "Entry Point",
       "type": "object"
     },
+    "full-jinja": {
+      "pattern": "^\\{[\\{%](.|[\r\n])*[\\}%]\\}$",
+      "type": "string"
+    },
     "option": {
       "additionalProperties": false,
       "markdownDescription": "See [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)",
@@ -228,7 +232,15 @@
           "type": "string"
         },
         "choices": {
-          "type": "array"
+          "oneOf": [
+            {
+              "type": "array"
+            },
+            {
+              "$ref": "#/$defs/full-jinja",
+              "type": "string"
+            }
+          ]
         },
         "default": {
           "default": "None"
