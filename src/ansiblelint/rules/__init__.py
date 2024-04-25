@@ -503,11 +503,16 @@ class RulesCollection:
                 or rule.has_dynamic_tags
                 or not set(rule.tags).union([rule.id]).isdisjoint(tags)
             ):
-                _logger.debug("Running rule %s", rule.id)
-                rule_definition = set(rule.tags)
-                rule_definition.add(rule.id)
-                if set(rule_definition).isdisjoint(skip_list):
-                    matches.extend(rule.getmatches(file))
+                if tags and set(rule.tags).union(list(rule.ids().keys())).isdisjoint(
+                    tags,
+                ):
+                    _logger.debug("Skipping rule %s", rule.id)
+                else:
+                    _logger.debug("Running rule %s", rule.id)
+                    rule_definition = set(rule.tags)
+                    rule_definition.add(rule.id)
+                    if set(rule_definition).isdisjoint(skip_list):
+                        matches.extend(rule.getmatches(file))
             else:
                 _logger.debug("Skipping rule %s", rule.id)
 
