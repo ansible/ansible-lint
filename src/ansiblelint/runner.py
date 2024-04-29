@@ -393,7 +393,10 @@ class Runner:
                         filename = lintable
                     column = int(groups.get("column", 1))
 
-                    if pattern.tag == "unknown-module" and app.options.nodeps:
+                    if (
+                        pattern.tag in ("unknown-module", "specific")
+                        and app.options.nodeps
+                    ):
                         ignore_rc = True
                     else:
                         results.append(
