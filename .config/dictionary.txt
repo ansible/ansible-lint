@@ -10,6 +10,7 @@ Chamoulaud
 DISTRO
 DOTGLOB
 ENVVAR
+EPEL
 EPIPE # linux
 Fimport
 Jython
