@@ -28,8 +28,11 @@ def fixture_runner_result(
     config_options: Options,
     default_rules_collection: RulesCollection,
     playbook_str: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> LintResult:
     """Fixture that runs the Runner to populate a LintResult for a given file."""
+    # needed for testing transformer when roles/modules are missing:
+    monkeypatch.setenv("ANSIBLE_LINT_NODEPS", "1")
     config_options.lintables = [playbook_str]
     result = get_matches(rules=default_rules_collection, options=config_options)
     return result
@@ -191,6 +194,13 @@ def fixture_runner_result(
             True,
             id="name_case_roles",
         ),
+        pytest.param(
+            "examples/playbooks/4114/transform-with-missing-role-and-modules.yml",
+            1,
+            True,
+            True,
+            id="4114",
+        ),
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
@@ -210,11 +220,12 @@ def test_transformer(  # pylint: disable=too-many-arguments
     assert Lintable(playbook_str).is_owned_by_ansible() == is_owned_by_ansible
     playbook = Path(playbook_str)
     config_options.write_list = ["all"]
-    transformer = Transformer(result=runner_result, options=config_options)
-    transformer.run()
 
     matches = runner_result.matches
     assert len(matches) == matches_count
+
+    transformer = Transformer(result=runner_result, options=config_options)
+    transformer.run()
 
     orig_content = playbook.read_text(encoding="utf-8")
     if transformed:
