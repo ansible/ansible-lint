@@ -1,0 +1,13 @@
+---
+- name: Test
+  hosts: localhost
+  tasks:
+    - name: Debug
+      ansible.builtin.debug:
+        msg: ignore_unreachable should be a boolean
+      ignore_unreachable: true
+
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "foo"
+      ignore_unreachable: '{{ "yes" | bool }}'
