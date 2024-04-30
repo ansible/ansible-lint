@@ -1,8 +1,6 @@
 {
   "colors": true,
-  "extensions": [
-    "ts"
-  ],
+  "extensions": ["ts"],
   "require": "ts-node/register",
   "node-option": [
     "experimental-specifier-resolution=node",
