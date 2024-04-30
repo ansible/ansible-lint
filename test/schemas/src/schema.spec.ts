@@ -5,9 +5,7 @@ import { minimatch } from "minimatch";
 import yaml from "js-yaml";
 import { assert } from "chai";
 import stringify from "safe-stable-stringify";
-import { integer } from "vscode-languageserver-types";
-import { exec } from "child_process";
-const spawnSync = require("child_process").spawnSync;
+import { spawnSync } from "child_process";
 
 function ansiRegex({ onlyFirst = false } = {}) {
   const pattern = [
@@ -86,7 +84,7 @@ describe("schemas under f/", function () {
             if (proc.status != 0) {
               // real errors are sent to stderr due to https://github.com/python-jsonschema/check-jsonschema/issues/88
               errors_md += "# check-jsonschema\n\nstdout:\n\n```json\n";
-              errors_md += stripAnsi(proc.output[1]);
+              errors_md += stripAnsi(proc.output[1] || "");
               errors_md += "```\n";
               if (proc.output[2]) {
                 errors_md += "\nstderr:\n\n```\n";
