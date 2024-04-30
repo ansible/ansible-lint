@@ -1,7 +1,11 @@
 {
   "colors": true,
-  "extension": ["ts"],
+  "extensions": ["ts"],
   "require": "ts-node/register",
+  "node-option": [
+    "experimental-specifier-resolution=node",
+    "loader=ts-node/esm"
+  ],
   "slow": "500",
   "spec": "src/**/*.spec.ts"
 }
