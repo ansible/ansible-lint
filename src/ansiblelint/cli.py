@@ -526,8 +526,8 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         v = getattr(cli_config, entry) or file_value
         setattr(cli_config, entry, v)
 
-    for entry, default in scalar_map.items():
-        file_value = file_config.pop(entry, default)
+    for entry, default_scalar in scalar_map.items():
+        file_value = file_config.pop(entry, default_scalar)
         v = getattr(cli_config, entry, None) or file_value
         setattr(cli_config, entry, v)
 
