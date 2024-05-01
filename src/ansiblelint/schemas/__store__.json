@@ -44,7 +44,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
   "role-arg-spec": {
-    "etag": "74fc5d429919813f2c977a2e3ed2afee1ca3dba242f6978bded8199895642db6",
+    "etag": "e41a42e1ca634a9eb2edbc4a180f404bdc71e17aafa464e6651387c08152bbc5",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json"
   },
   "rulebook": {
