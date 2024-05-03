@@ -334,7 +334,7 @@ class HandleChildren:
     ) -> list[Lintable]:
         """TasksHandlers Children."""
         results: list[Lintable] = []
-        if v is None:
+        if v is None or isinstance(v, int | str):
             raise MatchError(
                 message="A malformed block was encountered while loading a block.",
                 rule=RuntimeErrorRule(),
@@ -463,7 +463,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     for task_handler_key in INCLUSION_ACTION_NAMES:
         with contextlib.suppress(KeyError):
             # ignore empty tasks
-            if not task_handler:  # pragma: no branch
+            if not task_handler or isinstance(task_handler, str):  # pragma: no branch
                 continue
 
             file_name = task_handler[task_handler_key]

@@ -18,31 +18,37 @@ def test_example(default_rules_collection: RulesCollection) -> None:
 
 
 @pytest.mark.parametrize(
-    ("filename", "line", "column"),
+    ("filename", "expected_results"),
     (
         pytest.param(
             "examples/playbooks/syntax-error-string.yml",
-            6,
-            7,
+            [("syntax-check[unknown-module]", 6, 7)],
             id="0",
         ),
-        pytest.param("examples/playbooks/syntax-error.yml", 2, 3, id="1"),
+        pytest.param(
+            "examples/playbooks/syntax-error.yml",
+            [("syntax-check[specific]", 2, 3)],
+            id="1",
+        ),
     ),
 )
 def test_example_syntax_error(
     default_rules_collection: RulesCollection,
     filename: str,
-    line: int,
-    column: int,
+    expected_results: list[tuple[str, int | None, int | None]],
 ) -> None:
     """Validates that loading valid YAML string produce error."""
     result = Runner(filename, rules=default_rules_collection).run()
-    assert len(result) == 1
-    assert result[0].rule.id == "syntax-check"
-    # This also ensures that line and column numbers start at 1, so they
-    # match what editors will show (or output from other linters)
-    assert result[0].lineno == line
-    assert result[0].column == column
+    assert len(result) == len(expected_results)
+    for i, expected in enumerate(expected_results):
+        if expected[0] is not None:
+            assert result[i].tag == expected[0]
+        # This also ensures that line and column numbers start at 1, so they
+        # match what editors will show (or output from other linters)
+        if expected[1] is not None:
+            assert result[i].lineno == expected[1]
+        if expected[2] is not None:
+            assert result[i].column == expected[2]
 
 
 def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
