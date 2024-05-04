@@ -1,0 +1,10 @@
+---
+- name: Fixture for testing adjacent plugins
+  hosts: localhost
+  tasks:
+    - name: Call adjacent action plugin
+      some_action: {}
+
+    - name: Call adjacent filter plugin
+      ansible.builtin.debug:
+        msg: "{{ 'foo' | some_filter }}"

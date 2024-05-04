@@ -44,7 +44,12 @@ from ansible.parsing.plugin_docs import read_docstring
 from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
-from ansible.plugins.loader import PluginLoadContext, add_all_plugin_dirs, module_loader
+from ansible.plugins.loader import (
+    PluginLoadContext,
+    action_loader,
+    add_all_plugin_dirs,
+    module_loader,
+)
 from ansible.template import Templar
 from ansible.utils.collection_loader import AnsibleCollectionConfig
 from yaml.composer import Composer
@@ -1071,11 +1076,17 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
 @lru_cache
 def load_plugin(name: str) -> PluginLoadContext:
     """Return loaded ansible plugin/module."""
-    loaded_module = module_loader.find_plugin_with_context(
+    loaded_module = action_loader.find_plugin_with_context(
         name,
         ignore_deprecated=True,
         check_aliases=True,
     )
+    if not loaded_module.resolved:
+        loaded_module = module_loader.find_plugin_with_context(
+            name,
+            ignore_deprecated=True,
+            check_aliases=True,
+        )
     if not loaded_module.resolved and name.startswith("ansible.builtin."):
         # fallback to core behavior of using legacy
         loaded_module = module_loader.find_plugin_with_context(

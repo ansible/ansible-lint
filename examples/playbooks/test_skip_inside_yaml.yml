@@ -44,9 +44,9 @@
     - name: Test no-free-form # <-- 3 no-free-form
       ansible.builtin.command: creates=B chmod 644 A # noqa: no-free-form
     - name: Test no-free-form # <-- 4 no-free-form
-      ansible.builtin.command: warn=yes creates=B chmod 644 A # noqa: no-free-form
+      ansible.builtin.command: creates=B chmod 644 A # noqa: no-free-form
     - name: Test no-free-form (skipped via no warn)
-      ansible.builtin.command: warn=no creates=B chmod 644 A # noqa: no-free-form
+      ansible.builtin.command: creates=B chmod 644 A # noqa: no-free-form
     - name: Test no-free-form (skipped via skip_ansible_lint)
       ansible.builtin.command: creates=B chmod 644 A # noqa: no-free-form
       tags:
