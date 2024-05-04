@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__package__)
+_CACHED_APP = None
 
 
 class App:
@@ -386,8 +387,19 @@ def _sanitize_list_options(tag_list: list[str]) -> list[str]:
 
 
 @lru_cache
-def get_app(*, offline: bool | None = None) -> App:
+def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
+    # Avoids ever running the app initialization twice if cached argument
+    # is mentioned.
+    if cached:
+        if offline is not None:
+            msg = (
+                "get_app should never be called with other arguments when cached=True."
+            )
+            raise RuntimeError(msg)
+        if cached and _CACHED_APP is not None:
+            return _CACHED_APP
+
     if offline is None:
         offline = default_options.offline
 

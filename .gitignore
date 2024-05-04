@@ -38,7 +38,7 @@ pip-log.txt
 .python-version
 
 # Coverage artifacts
-.coverage
+.coverage*
 coverage*.xml
 pip-wheel-metadata
 .test-results/

@@ -6,4 +6,4 @@ on: # <-- this is invalid by YAML 1.2 spec as it loads as true boolean.
 
 jobs:
   ack:
-    uses: ansible/devtools/.github/workflows/ack.yml@main
+    uses: ansible/team-devtools/.github/workflows/ack.yml@main

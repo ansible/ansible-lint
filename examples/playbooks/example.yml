@@ -36,8 +36,8 @@
       - git  # yamllint wrong indentation
       - bobbins
 
-    - name: Yum latest
-      ansible.builtin.yum: state=latest name=httpd
+    - name: Dnf latest
+      ansible.builtin.dnf: state=latest name=httpd
 
     - ansible.builtin.debug: msg="debug task without a name"
 

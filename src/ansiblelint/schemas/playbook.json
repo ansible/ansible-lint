@@ -171,8 +171,8 @@
           "$ref": "#/$defs/ignore_errors"
         },
         "ignore_unreachable": {
-          "title": "Ignore Unreachable",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Ignore Unreachable"
         },
         "module_defaults": {
           "title": "Module Defaults"
@@ -537,8 +537,8 @@
           "$ref": "#/$defs/ignore_errors"
         },
         "ignore_unreachable": {
-          "title": "Ignore Unreachable",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Ignore Unreachable"
         },
         "max_fail_percentage": {
           "$ref": "#/$defs/templated-integer",
@@ -555,15 +555,22 @@
           "$ref": "#/$defs/templated-boolean"
         },
         "order": {
-          "enum": [
-            "default",
-            "sorted",
-            "reverse_sorted",
-            "reverse_inventory",
-            "shuffle"
+          "oneOf": [
+            {
+              "enum": [
+                "default",
+                "sorted",
+                "reverse_sorted",
+                "reverse_inventory",
+                "shuffle"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/full-jinja"
+            }
           ],
-          "title": "Order",
-          "type": "string"
+          "title": "Order"
         },
         "port": {
           "$ref": "#/$defs/templated-integer",
@@ -740,8 +747,8 @@
           "$ref": "#/$defs/ignore_errors"
         },
         "ignore_unreachable": {
-          "title": "Ignore Unreachable",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Ignore Unreachable"
         },
         "module_defaults": {
           "title": "Module Defaults"
@@ -940,8 +947,8 @@
           "$ref": "#/$defs/ignore_errors"
         },
         "ignore_unreachable": {
-          "title": "Ignore Unreachable",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Ignore Unreachable"
         },
         "include": {
           "$ref": "#/$defs/removed-include-module"

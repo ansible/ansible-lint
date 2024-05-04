@@ -47,7 +47,12 @@ from ansible.parsing.vault import get_file_vault_secret
 from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
-from ansible.plugins.loader import PluginLoadContext, add_all_plugin_dirs, module_loader
+from ansible.plugins.loader import (
+    PluginLoadContext,
+    action_loader,
+    add_all_plugin_dirs,
+    module_loader,
+)
 from ansible.template import Templar
 from ansible.utils.collection_loader import AnsibleCollectionConfig
 from yaml.composer import Composer
@@ -528,7 +533,7 @@ def _rolepath(basedir: str, role: str) -> str | None:
         path_dwim(basedir, os.path.join("..", role)),
     ]
 
-    for loc in get_app(offline=True).runtime.config.default_roles_path:
+    for loc in get_app(cached=True).runtime.config.default_roles_path:
         loc = os.path.expanduser(loc)
         possible_paths.append(path_dwim(loc, role))
 
@@ -1109,11 +1114,17 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
 @lru_cache
 def load_plugin(name: str) -> PluginLoadContext:
     """Return loaded ansible plugin/module."""
-    loaded_module = module_loader.find_plugin_with_context(
+    loaded_module = action_loader.find_plugin_with_context(
         name,
         ignore_deprecated=True,
         check_aliases=True,
     )
+    if not loaded_module.resolved:
+        loaded_module = module_loader.find_plugin_with_context(
+            name,
+            ignore_deprecated=True,
+            check_aliases=True,
+        )
     if not loaded_module.resolved and name.startswith("ansible.builtin."):
         # fallback to core behavior of using legacy
         loaded_module = module_loader.find_plugin_with_context(

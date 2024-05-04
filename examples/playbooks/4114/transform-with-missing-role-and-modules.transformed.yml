@@ -1,0 +1,13 @@
+---
+- name: Reproducer for bug 4114
+  hosts: localhost
+  roles:
+    - this_role_is_missing
+  tasks:
+    - name: Task referring to a missing module
+      this_module_does_not_exist:
+        foo: bar
+
+    - name: Use raw to echo
+      ansible.builtin.debug: # <-- this should be converted to fqcn
+        msg: some message!

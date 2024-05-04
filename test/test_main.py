@@ -120,6 +120,6 @@ def test_broken_ansible_cfg() -> None:
     )
     assert proc.returncode == RC.INVALID_CONFIG, proc
     assert (
-        "Invalid type for configuration option setting: DEFAULT_GATHER_TIMEOUT"
+        "Invalid type for configuration option setting: CACHE_PLUGIN_TIMEOUT"
         in proc.stderr
     )

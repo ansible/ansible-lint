@@ -40,6 +40,8 @@ jobs:
             eco
             pre
             py310-devel
+            py310-lower
+            py312-lower
           platforms: linux,macos
   test-action:
     runs-on: ubuntu-latest
@@ -71,7 +73,7 @@ jobs:
     env:
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 853
+      PYTEST_REQPASS: 857
     steps:
       - uses: actions/checkout@v4
         with:

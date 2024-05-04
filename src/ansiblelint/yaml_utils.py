@@ -305,6 +305,10 @@ def _get_path_to_task_in_playbook(
         else:
             next_play_line_index = None
 
+        # We clearly haven't found the right spot yet if a following play starts on an earlier line.
+        if next_play_line_index and lineno > next_play_line_index:
+            continue
+
         play_keys = list(play.keys())
         for tasks_keyword in PLAYBOOK_TASK_KEYWORDS:
             if not play.get(tasks_keyword):
