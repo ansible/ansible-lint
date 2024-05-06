@@ -69,7 +69,7 @@ repos:
           - prettier-plugin-toml@2.0.1
           - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.7.0
+    rev: v8.8.0
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -136,7 +136,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.4.2"
+    rev: "v0.4.3"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
