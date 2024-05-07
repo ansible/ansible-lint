@@ -23,6 +23,8 @@ from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
 
+    from ansiblelint.errors import MatchError
+
 
 _logger = logging.getLogger(__package__)
 
@@ -201,6 +203,7 @@ class Lintable:
         self.line_offset = (
             0  # Amount to offset line numbers by to get accurate position
         )
+        self.matches: list[MatchError] = []
 
         if isinstance(name, str):
             name = Path(name)
@@ -390,6 +393,12 @@ class Lintable:
     def is_owned_by_ansible(self) -> bool:
         """Return true for YAML files that are managed by Ansible."""
         return self.kind in ANSIBLE_OWNED_KINDS
+
+    def failed(self) -> bool:
+        """Return true if we already found syntax-check errors on this file."""
+        return any(
+            match.rule.id in ("syntax-check", "load-failure") for match in self.matches
+        )
 
     @property
     def data(self) -> Any:

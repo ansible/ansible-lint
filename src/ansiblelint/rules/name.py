@@ -40,9 +40,11 @@ class NameRule(AnsibleLintRule, TransformMixin):
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
-        results = []
+        results: list[MatchError] = []
         if file.kind != "playbook":
             return []
+        if file.failed():
+            return results
         if "name" not in data:
             return [
                 self.create_matcherror(
@@ -66,7 +68,9 @@ class NameRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
-        results = []
+        results: list[MatchError] = []
+        if file and file.failed():
+            return results
         name = task.get("name")
         if not name:
             results.append(

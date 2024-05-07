@@ -96,7 +96,7 @@ class BaseRule:
                     _logger.warning(
                         "Ignored exception from %s.%s while processing %s: %s",
                         self.__class__.__name__,
-                        method,
+                        method.__name__,
                         str(file),
                         exc,
                     )

@@ -97,7 +97,11 @@ class ValidateSchemaRule(AnsibleLintRule):
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""
         results: list[MatchError] = []
-        if not data or file.kind not in ("tasks", "handlers", "playbook"):
+        if (
+            not data
+            or file.kind not in ("tasks", "handlers", "playbook")
+            or file.failed()
+        ):
             return results
         # check at play level
         results.extend(self._get_field_matches(file=file, data=data))
@@ -132,9 +136,13 @@ class ValidateSchemaRule(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str | MatchError | list[MatchError]:
-        results = []
+        results: list[MatchError] = []
         if not file:
             file = Lintable("", kind="tasks")
+
+        if file.failed():
+            return results
+
         results.extend(self._get_field_matches(file=file, data=task.raw_task))
         for key in pre_checks["task"]:
             if key in task.raw_task:
@@ -154,6 +162,10 @@ class ValidateSchemaRule(AnsibleLintRule):
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return JSON validation errors found as a list of MatchError(s)."""
         result: list[MatchError] = []
+
+        if file.failed():
+            return result
+
         if file.kind not in JSON_SCHEMAS:
             return result
 
