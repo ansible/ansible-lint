@@ -101,6 +101,11 @@ class MatchError(ValueError):
 
         self.lineno += self.lintable.line_offset
 
+        # We make the lintable aware that we found a match inside it, as this
+        # can be used to skip running other rules that do require current one
+        # to pass.
+        self.lintable.matches.append(self)
+
     @functools.cached_property
     def level(self) -> str:
         """Return the level of the rule: error, warning or notice."""

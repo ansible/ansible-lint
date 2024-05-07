@@ -116,7 +116,9 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
-        result = []
+        result: list[MatchError] = []
+        if file and file.failed():
+            return result
         module = task["action"]["__ansible_module_original__"]
         if not isinstance(module, str):
             msg = "Invalid data for module."

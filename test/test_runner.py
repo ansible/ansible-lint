@@ -103,8 +103,7 @@ def test_runner_exclude_globs(
     )
 
     matches = runner.run()
-    # we expect to find one match from the very few .yaml file we have there (most of them have .yml extension)
-    assert len(matches) == 1
+    assert len(matches) == 83
 
 
 @pytest.mark.parametrize(
