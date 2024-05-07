@@ -168,7 +168,7 @@ class BaseRule:
         rule_config = self.options.rules.get(self.id, {})
         if not isinstance(rule_config, dict):  # pragma: no branch
             msg = f"Invalid rule config for {self.id}: {rule_config}"
-            raise RuntimeError(msg)
+            raise RuntimeError(msg)  # noqa: TRY004
         return rule_config
 
     @property

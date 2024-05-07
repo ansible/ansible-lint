@@ -487,7 +487,7 @@ class Runner:
                 playbook_ds = ansiblelint.utils.parse_yaml_from_file(str(lintable.path))
             except AnsibleError as exc:
                 msg = f"Loading {lintable.filename} caused an {type(exc).__name__} exception: {exc}, file was ignored."
-                logging.error(msg)
+                logging.exception(msg)
                 # raise SystemExit(exc) from exc
                 return []
         results = []

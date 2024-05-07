@@ -33,10 +33,11 @@ repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
-  - repo: https://github.com/pappasam/toml-sort
-    rev: v0.23.1
-    hooks:
-      - id: toml-sort-fix
+  # https://github.com/pappasam/toml-sort/issues/69
+  # - repo: https://github.com/pappasam/toml-sort
+  #   rev: v0.23.1
+  #   hooks:
+  #     - id: toml-sort-fix
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
     rev: v4.0.0-alpha.8

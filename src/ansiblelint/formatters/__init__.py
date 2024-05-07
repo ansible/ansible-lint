@@ -146,7 +146,7 @@ class CodeclimateJSONFormatter(BaseFormatter[Any]):
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             msg = f"The {self.__class__} was expecting a list of MatchError."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
 
         result = []
         for match in matches:
@@ -213,7 +213,7 @@ class SarifFormatter(BaseFormatter[Any]):
         """Format a list of match errors as a JSON string."""
         if not isinstance(matches, list):
             msg = f"The {self.__class__} was expecting a list of MatchError."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
 
         root_path = Path(str(self.base_dir)).as_uri()
         root_path = root_path + "/" if not root_path.endswith("/") else root_path

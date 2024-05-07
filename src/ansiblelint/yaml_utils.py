@@ -286,7 +286,7 @@ def get_path_to_play(
         lc = play.lc
         if not isinstance(lc.line, int):
             msg = f"expected lc.line to be an int, got {lc.line!r}"
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         if lc.line == line_index:
             return [play_index]
         if play_index > 0 and prev_play_line_index < line_index < lc.line:
@@ -423,7 +423,7 @@ def _get_path_to_task_in_tasks_block(
 
         if not isinstance(task.lc.line, int):
             msg = f"expected task.lc.line to be an int, got {task.lc.line!r}"
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         if task.lc.line == line_index:
             return [task_index]
         if task_index > 0 and prev_task_line_index < line_index < task.lc.line:
@@ -1005,7 +1005,9 @@ class FormattedYAML(YAML):
             data = self.load_all(stream=text)
         except ParserError:
             data = None
-            _logger.error("Invalid yaml, verify the file contents and try again.")
+            _logger.error(  # noqa: TRY400
+                "Invalid yaml, verify the file contents and try again.",
+            )
         if preamble_comment is not None and isinstance(
             data,
             CommentedMap | CommentedSeq,

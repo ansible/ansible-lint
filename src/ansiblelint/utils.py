@@ -174,7 +174,6 @@ def ansible_template(
     for _i in range(10):
         try:
             templated = templar.template(varname, **kwargs)
-            return templated
         except AnsibleError as exc:
             if lookup_error in exc.message:
                 return varname
@@ -203,6 +202,7 @@ def ansible_template(
                     options.mock_filters.append(missing_filter)
                 continue
             raise
+        return templated
     return None
 
 
@@ -603,7 +603,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
 
     if not isinstance(action, str):
         msg = f"Task actions can only be strings, got {action}"
-        raise RuntimeError(msg)
+        raise TypeError(msg)
     action_unnormalized = action
     # convert builtin fqn calls to short forms because most rules know only
     # about short calls but in the future we may switch the normalization to do
@@ -730,7 +730,7 @@ class Task(dict[str, Any]):
         action_name = self.normalized_task["action"]["__ansible_module_original__"]
         if not isinstance(action_name, str):
             msg = "Task actions can only be strings."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         return action_name
 
     @property
@@ -764,7 +764,7 @@ class Task(dict[str, Any]):
                 self._normalized_task = self.raw_task
         if isinstance(self._normalized_task, _MISSING_TYPE):
             msg = "Task was not normalized"
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         return self._normalized_task
 
     @property
@@ -890,7 +890,7 @@ def parse_yaml_linenumbers(
         node = Composer.compose_node(loader, parent, index)
         if not isinstance(node, yaml.nodes.Node):
             msg = "Unexpected yaml data."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
