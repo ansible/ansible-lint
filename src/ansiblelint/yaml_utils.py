@@ -7,6 +7,7 @@ import functools
 import logging
 import os
 import re
+import sys
 from collections.abc import Callable, Iterator, Sequence
 from io import StringIO
 from pathlib import Path
@@ -30,6 +31,7 @@ from ansiblelint.constants import (
     ANNOTATION_KEYS,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
+    RC,
 )
 from ansiblelint.utils import Task
 
@@ -44,30 +46,6 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 _logger = logging.getLogger(__name__)
-
-
-YAMLLINT_CONFIG = """
-extends: default
-rules:
-  comments:
-    # https://github.com/prettier/prettier/issues/6780
-    min-spaces-from-content: 1
-  # https://github.com/adrienverge/yamllint/issues/384
-  comments-indentation: false
-  document-start: disable
-  # 160 chars was the default used by old E204 rule, but
-  # you can easily change it or disable in your .yamllint file.
-  line-length:
-    max: 160
-  # We are adding an extra space inside braces as that's how prettier does it
-  # and we are trying not to fight other linters.
-  braces:
-    min-spaces-inside: 0  # yamllint defaults to 0
-    max-spaces-inside: 1  # yamllint defaults to 0
-  octal-values:
-    forbid-implicit-octal: true  # yamllint defaults to false
-    forbid-explicit-octal: true  # yamllint defaults to false
-"""
 
 
 def deannotate(data: Any) -> Any:
@@ -85,10 +63,9 @@ def deannotate(data: Any) -> Any:
     return data
 
 
-@functools.lru_cache(maxsize=1)
 def load_yamllint_config() -> YamlLintConfig:
     """Load our default yamllint config and any customized override file."""
-    config = YamlLintConfig(content=YAMLLINT_CONFIG)
+    config = YamlLintConfig(file=Path(__file__).parent / "data" / ".yamllint")
     # if we detect local yamllint config we use it but raise a warning
     # as this is likely to get out of sync with our internal config.
     for path in [
@@ -105,10 +82,66 @@ def load_yamllint_config() -> YamlLintConfig:
                 "internal yamllint config.",
                 file,
             )
-            config_override = YamlLintConfig(file=str(file))
-            config_override.extend(config)
-            config = config_override
+            custom_config = YamlLintConfig(file=str(file))
+            custom_config.extend(config)
+            config = custom_config
             break
+
+    # Look for settings incompatible with our reformatting
+    checks: list[tuple[str, str | int | bool]] = [
+        (
+            "comments.min-spaces-from-content",
+            1,
+        ),
+        (
+            "comments-indentation",
+            False,
+        ),
+        (
+            "braces.min-spaces-inside",
+            0,
+        ),
+        (
+            "braces.max-spaces-inside",
+            1,
+        ),
+        (
+            "octal-values.forbid-implicit-octal",
+            True,
+        ),
+        (
+            "octal-values.forbid-explicit-octal",
+            True,
+        ),
+        # (
+        #     "key-duplicates.forbid-duplicated-merge-keys", # v1.34.0+
+        #     True,
+        # ),
+        # (
+        #   "quoted-strings.quote-type", "double",
+        # ),
+        # (
+        #   "quoted-strings.required", "only-when-needed",
+        # ),
+    ]
+    errors = []
+    for setting, expected_value in checks:
+        v = config.rules
+        for key in setting.split("."):
+            if not isinstance(v, dict):  # pragma: no cover
+                break
+            if key not in v:  # pragma: no cover
+                break
+            v = v[key]
+        if v != expected_value:
+            msg = f"{setting} must be {str(expected_value).lower()}"
+            errors.append(msg)
+    if errors:
+        nl = "\n"
+        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {nl + '  - '.join(errors)}.{nl}{nl}Read https://ansible.readthedocs.io/projects/lint/rules/yaml/ for more details regarding why we have these requirements."
+        logging.fatal(msg)
+        sys.exit(RC.INVALID_CONFIG)
+
     _logger.debug("Effective yamllint rules used: %s", config.rules)
     return config
 

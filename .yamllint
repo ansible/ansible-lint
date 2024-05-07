@@ -1,16 +1,25 @@
 ---
 rules:
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
   comments:
     # prettier compatibility
     min-spaces-from-content: 1
+  comments-indentation: false
   document-start:
     present: true
+  key-duplicates:
+    forbid-duplicated-merge-keys: true
   indentation:
     level: error
     indent-sequences: consistent
   octal-values:
     forbid-implicit-octal: true
     forbid-explicit-octal: true
+  # quoted-strings:
+  #   quote-type: double
+  #   required: only-when-needed
 ignore: |
   .tox
   examples/playbooks/example.yml
