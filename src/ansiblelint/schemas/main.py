@@ -83,7 +83,6 @@ def validate_file_schema(file: Lintable) -> list[str]:
             if not message.endswith("."):
                 message += "."
             message += f" See {documentation_url}"
-        return [message]
     except yaml.constructor.ConstructorError as exc:
         return [f"Failed to load YAML file '{file.path}': {exc.problem}"]
     except ValidationError as exc:
@@ -103,6 +102,8 @@ def validate_file_schema(file: Lintable) -> list[str]:
             if not message.endswith("."):
                 message += "."
             message += f" See {documentation_url}"
+        return [message]
+    else:
         return [message]
     return []
 

@@ -72,9 +72,9 @@ def is_relative_to(path: Path, *other: Any) -> bool:
     """Return True if the path is relative to another path or False."""
     try:
         path.resolve().absolute().relative_to(*other)
-        return True
     except ValueError:
         return False
+    return True
 
 
 def normpath_path(path: str | Path) -> Path:

@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools >= 65.3.0", # required by pyproject+setuptools_scm integration and editable installs
-  "setuptools_scm[toml] >= 7.0.5" # required for "no-local-version" scheme
+  "setuptools_scm[toml] >= 7.0.5", # required for "no-local-version" scheme
 ]
 build-backend = "setuptools.build_meta"
 
@@ -12,9 +12,9 @@ dynamic = ["version", "dependencies", "optional-dependencies"]
 name = "ansible-lint"
 description = "Checks playbooks for practices and behavior that could potentially be improved"
 readme = "README.md"
-authors = [{"name" = "Will Thames", "email" = "will@thames.id.au"}]
-maintainers = [{"name" = "Ansible by Red Hat", "email" = "info@ansible.com"}]
-license = {text = "GPLv3+"}
+authors = [{ "name" = "Will Thames", "email" = "will@thames.id.au" }]
+maintainers = [{ "name" = "Ansible by Red Hat", "email" = "info@ansible.com" }]
+license = { text = "GPLv3+" }
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Console",
@@ -34,7 +34,7 @@ classifiers = [
   "Topic :: System :: Systems Administration",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
-  "Topic :: Utilities"
+  "Topic :: Utilities",
 ]
 keywords = ["ansible", "lint"]
 
@@ -115,7 +115,7 @@ module = [
   "ansiblelint._version", # generated
   "license_expression",
   "ruamel.yaml",
-  "yamllint.*"
+  "yamllint.*",
 ]
 ignore_missing_imports = true
 ignore_errors = true
@@ -130,7 +130,7 @@ extension-pkg-allow-list = ["black.parsing"]
 bad-names = [
   # spell-checker:ignore linenumber
   "linenumber", # use lineno instead
-  "line_number" # use lineno instead
+  "line_number", # use lineno instead
 ]
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
@@ -143,6 +143,8 @@ max-statements = 60
 disable = [
   # Disabled on purpose:
   "line-too-long", # covered by black
+  "no-else-raise", # conflicts with ruff TRY
+  "no-else-return", # conflicts with ruff TRY
   "protected-access", # covered by ruff SLF001
   "too-many-branches", # covered by ruff C901
   # TODO(ssbarnea): remove temporary skips adding during initial adoption:
@@ -151,10 +153,10 @@ disable = [
   # https://github.com/PyCQA/pylint/issues/850
   "cyclic-import",
   # https://github.com/PyCQA/pylint/issues/8453
-  "preferred-module"
+  "preferred-module",
 ]
 enable = [
-  "useless-suppression" # Identify unneeded pylint disable statements
+  "useless-suppression", # Identify unneeded pylint disable statements
 ]
 
 [tool.pylint.REPORTING]
@@ -193,7 +195,7 @@ filterwarnings = [
   # https://github.com/ansible/ansible/issues/81906
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
   # https://github.com/ansible/ansible/pull/80968
-  "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning"
+  "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning",
 ]
 junit_duration_report = "call"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
@@ -214,7 +216,7 @@ norecursedirs = [
   "collections",
   "dist",
   "docs",
-  "src/ansible_lint.egg-info"
+  "src/ansible_lint.egg-info",
 ]
 python_files = [
   "test_*.py",
@@ -222,7 +224,7 @@ python_files = [
   # Needed to discover legacy nose test modules:
   "Test*.py",
   # Needed to discover embedded Rule tests
-  "rules/*.py"
+  "rules/*.py",
 ]
 # Using --pyargs instead of testpath as we embed some tests
 # See: https://github.com/pytest-dev/pytest/issues/6451#issuecomment-687043537
@@ -230,7 +232,10 @@ python_files = [
 xfail_strict = true
 
 [tool.ruff]
-ignore = [
+target-version = "py310"
+# Same as Black.
+line-length = 88
+lint.ignore = [
   "D203", # incompatible with D211
   "D213", # incompatible with D212
   "E501", # we use black
@@ -246,42 +251,38 @@ ignore = [
   "FBT003",
   "PLR",
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
-  "TRY",
   "PERF203",
   "PD011", # We are not using pandas, any .values attributes are unrelated
-  "PLW0603" # global lock file in cache dir
+  "PLW0603", # global lock file in cache dir
 ]
-select = ["ALL"]
-target-version = "py310"
-# Same as Black.
-line-length = 88
+lint.select = ["ALL"]
 
-[tool.ruff.flake8-builtins]
+[tool.ruff.lint.flake8-builtins]
 builtins-ignorelist = ["id"]
 
-[tool.ruff.flake8-pytest-style]
+[tool.ruff.lint.flake8-pytest-style]
 parametrize-values-type = "tuple"
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["ansiblelint"]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 # Implicit 10 is too low for our codebase, even black uses 18 as default.
 max-complexity = 20
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "test/**/*.py" = ["S"]
 "src/ansiblelint/rules/*.py" = ["S"]
 "src/ansiblelint/testing/*.py" = ["S"]
 # Temporary disabled until we fix them:
 "src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings}.py" = [
-  "PTH"
+  "PTH",
 ]
 
 [tool.setuptools.dynamic]
-dependencies = {file = [".config/requirements.in"]}
-optional-dependencies.docs = {file = [".config/requirements-docs.in"]}
-optional-dependencies.test = {file = [".config/requirements-test.in"]}
+dependencies = { file = [".config/requirements.in"] }
+optional-dependencies.docs = { file = [".config/requirements-docs.in"] }
+optional-dependencies.test = { file = [".config/requirements-test.in"] }
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
@@ -295,5 +296,5 @@ git_describe_command = [
   "--tags",
   "--long",
   "--match",
-  "v*.*"
+  "v*.*",
 ]

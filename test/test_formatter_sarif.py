@@ -93,7 +93,7 @@ class TestSarifFormatter:
     def test_sarif_single_match(self) -> None:
         """Test negative case. Only lists are allowed. Otherwise, a RuntimeError will be raised."""
         assert isinstance(self.formatter, SarifFormatter)
-        with pytest.raises(RuntimeError):
+        with pytest.raises(TypeError):
             self.formatter.format_result(self.matches[0])  # type: ignore[arg-type]
 
     def test_sarif_format(self) -> None:

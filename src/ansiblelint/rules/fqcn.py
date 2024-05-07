@@ -122,7 +122,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
         module = task["action"]["__ansible_module_original__"]
         if not isinstance(module, str):
             msg = "Invalid data for module."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
 
         if module not in self.module_aliases:
             loaded_module = load_plugin(module)
@@ -159,31 +159,30 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                             tag="fqcn[action-core]",
                         ),
                     )
-            else:
-                if module.count(".") < 2:
-                    result.append(
-                        self.create_matcherror(
-                            message=f"Use FQCN for module actions, such `{self.module_aliases[module]}`.",
-                            details=f"Action `{module}` is not FQCN.",
-                            filename=file,
-                            lineno=task["__line__"],
-                            tag="fqcn[action]",
-                        ),
-                    )
-                # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once # noqa: FIX002
-                # community team is flattening these.
-                # https://github.com/ansible-community/community-topics/issues/147
-                elif not module.startswith("community.general.") or module.startswith(
-                    "community.network.",
-                ):
-                    result.append(
-                        self.create_matcherror(
-                            message=f"You should use canonical module name `{self.module_aliases[module]}` instead of `{module}`.",
-                            filename=file,
-                            lineno=task["__line__"],
-                            tag="fqcn[canonical]",
-                        ),
-                    )
+            elif module.count(".") < 2:
+                result.append(
+                    self.create_matcherror(
+                        message=f"Use FQCN for module actions, such `{self.module_aliases[module]}`.",
+                        details=f"Action `{module}` is not FQCN.",
+                        filename=file,
+                        lineno=task["__line__"],
+                        tag="fqcn[action]",
+                    ),
+                )
+            # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once # noqa: FIX002
+            # community team is flattening these.
+            # https://github.com/ansible-community/community-topics/issues/147
+            elif not module.startswith("community.general.") or module.startswith(
+                "community.network.",
+            ):
+                result.append(
+                    self.create_matcherror(
+                        message=f"You should use canonical module name `{self.module_aliases[module]}` instead of `{module}`.",
+                        filename=file,
+                        lineno=task["__line__"],
+                        tag="fqcn[canonical]",
+                    ),
+                )
         return result
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
