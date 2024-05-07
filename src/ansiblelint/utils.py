@@ -202,8 +202,7 @@ def ansible_template(
                     options.mock_filters.append(missing_filter)
                 continue
             raise
-        else:
-            return templated
+        return templated
     return None
 
 

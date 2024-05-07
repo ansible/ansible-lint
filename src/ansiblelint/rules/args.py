@@ -191,8 +191,7 @@ class ArgsRule(AnsibleLintRule):
                 sanitized_results = self._sanitize_results(results, module_name)
             except ValidationPassedError:
                 return []
-            else:
-                return sanitized_results
+            return sanitized_results
 
     # pylint: disable=unused-argument
     def _sanitize_results(

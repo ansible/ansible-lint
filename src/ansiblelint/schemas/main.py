@@ -103,9 +103,7 @@ def validate_file_schema(file: Lintable) -> list[str]:
                 message += "."
             message += f" See {documentation_url}"
         return [message]
-    else:
-        return [message]
-    return []
+    return [message]
 
 
 def _deep_match_relevance(error: jsonschema.ValidationError) -> tuple[bool | int, ...]:
