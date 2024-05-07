@@ -106,6 +106,8 @@ class Runner:
             checked_files = set()
         self.checked_files = checked_files
 
+        self.app = get_app(cached=True)
+
     def _update_exclude_paths(self, exclude_paths: list[str]) -> None:
         if exclude_paths:
             # These will be (potentially) relative paths
@@ -232,12 +234,12 @@ class Runner:
 
         # -- phase 1 : syntax check in parallel --
         if not self.skip_ansible_syntax_check:
-            app = get_app(cached=True)
+            # app = get_app(cached=True)
 
             def worker(lintable: Lintable) -> list[MatchError]:
                 return self._get_ansible_syntax_check_matches(
                     lintable=lintable,
-                    app=app,
+                    app=self.app,
                 )
 
             for lintable in self.lintables:
@@ -518,7 +520,6 @@ class Runner:
                 if path != path_str:
                     child.path = Path(path)
                     child.name = child.path.name
-
                 results.append(child)
         return results
 
@@ -532,7 +533,7 @@ class Runner:
         """Flatten the traversed play tasks."""
         # pylint: disable=unused-argument
 
-        handlers = HandleChildren(self.rules)
+        handlers = HandleChildren(self.rules, app=self.app)
 
         delegate_map: dict[
             str,
