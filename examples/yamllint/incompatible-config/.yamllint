@@ -1,0 +1,14 @@
+# This config file is full of yamllint configuration settings that are
+# incompatible with ansible-lint. It used for testing their detection.
+rules:
+  comments:
+    min-spaces-from-content: 2
+  comments-indentation: false
+  braces:
+    min-spaces-inside: 1
+    max-spaces-inside: 2
+  key-duplicates:
+    forbid-duplicated-merge-keys: false
+  octal-values:
+    forbid-implicit-octal: false
+    forbid-explicit-octal: false
