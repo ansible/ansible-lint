@@ -36,6 +36,17 @@ installed. You must ensure that all collections and roles used inside your
 repository are listed inside a [`requirements.yml`](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file) file, so the linter can
 install them when they are missing.
 
+Valid location for `requirements.yml` are:
+
+- `requirements.yml`
+- `roles/requirements.yml`
+- `collections/requirements.yml`
+- `tests/requirements.yml`
+- `tests/integration/requirements.yml`
+- `tests/unit/requirements.yml`
+
+Note: If requirements are test related then they should be inside `tests/`.
+
 ## Problematic code
 
 ```yaml

@@ -1,5 +1,6 @@
 """Tests for yaml-related utility functions."""
 
+# pylint: disable=too-many-lines
 from __future__ import annotations
 
 from io import StringIO
@@ -11,7 +12,8 @@ from ruamel.yaml.main import YAML
 from yamllint.linter import run as run_yamllint
 
 import ansiblelint.yaml_utils
-from ansiblelint.file_utils import Lintable
+from ansiblelint.constants import RC
+from ansiblelint.file_utils import Lintable, cwd
 from ansiblelint.utils import task_in_list
 
 if TYPE_CHECKING:
@@ -989,3 +991,12 @@ def test_deannotate(
 ) -> None:
     """Ensure deannotate works as intended."""
     assert ansiblelint.yaml_utils.deannotate(before) == after
+
+
+def test_yamllint_incompatible_config() -> None:
+    """Ensure we can detect incompatible yamllint settings."""
+    with (
+        cwd(Path("examples/yamllint/incompatible-config")),
+        pytest.raises(SystemExit, match=f"^{RC.INVALID_CONFIG}$"),
+    ):
+        ansiblelint.yaml_utils.load_yamllint_config()

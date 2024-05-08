@@ -1,0 +1,25 @@
+extends: default
+rules:
+  comments:
+    # https://github.com/prettier/prettier/issues/6780
+    min-spaces-from-content: 1
+  # https://github.com/adrienverge/yamllint/issues/384
+  comments-indentation: false
+  document-start: disable
+  # 160 chars was the default used by old E204 rule, but
+  # you can easily change it or disable in your .yamllint file.
+  line-length:
+    max: 160
+  # We are adding an extra space inside braces as that's how prettier does it
+  # and we are trying not to fight other linters.
+  braces:
+    min-spaces-inside: 0 # yamllint defaults to 0
+    max-spaces-inside: 1 # yamllint defaults to 0
+  # key-duplicates:
+  #   forbid-duplicated-merge-keys: true # not enabled by default
+  octal-values:
+    forbid-implicit-octal: true # yamllint defaults to false
+    forbid-explicit-octal: true # yamllint defaults to false
+  # quoted-strings:
+  #   quote-type: double
+  #   required: only-when-needed

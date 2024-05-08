@@ -35,7 +35,7 @@ class ComplexityRule(AnsibleLintRule):
         tasks = data.get("tasks", [])
         if not isinstance(self._collection, RulesCollection):
             msg = "Rules cannot be run outside a rule collection."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         if len(tasks) > self._collection.options.max_tasks:
             results.append(
                 self.create_matcherror(
@@ -53,7 +53,7 @@ class ComplexityRule(AnsibleLintRule):
 
         if not isinstance(self._collection, RulesCollection):
             msg = "Rules cannot be run outside a rule collection."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
 
         if task.action == "block/always/rescue":
             block_depth = self.calculate_block_depth(task)

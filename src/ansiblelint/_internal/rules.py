@@ -96,7 +96,7 @@ class BaseRule:
                     _logger.warning(
                         "Ignored exception from %s.%s while processing %s: %s",
                         self.__class__.__name__,
-                        method,
+                        method.__name__,
                         str(file),
                         exc,
                     )
@@ -168,7 +168,7 @@ class BaseRule:
         rule_config = self.options.rules.get(self.id, {})
         if not isinstance(rule_config, dict):  # pragma: no branch
             msg = f"Invalid rule config for {self.id}: {rule_config}"
-            raise RuntimeError(msg)
+            raise RuntimeError(msg)  # noqa: TRY004
         return rule_config
 
     @property
