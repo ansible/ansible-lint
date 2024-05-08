@@ -1,0 +1,7 @@
+---
+- name: This is correct
+  ansible.builtin.assert:
+    that: true
+- name: A phony prefix | This is also correct
+  ansible.builtin.assert:
+    that: true
