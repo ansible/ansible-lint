@@ -1,6 +1,5 @@
 Adrián
 Autobuild
-audgirka
 CLICOLOR
 CODENOTIFY
 CODEOWNERS
@@ -45,6 +44,7 @@ apport
 argparsing
 argspecs
 arxcruz
+audgirka
 auditd
 autobuild
 autoclass
@@ -379,6 +379,7 @@ tmpfs
 toctree
 toidentifier
 tomli
+tomlsort
 toolset
 tripleo
 tuco
