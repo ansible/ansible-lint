@@ -262,6 +262,7 @@ def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:
         pytest.param("fmt-3.yml", (1, 1), id="3"),
         pytest.param("fmt-4.yml", (1, 1), id="4"),
         pytest.param("fmt-5.yml", (1, 1), id="5"),
+        pytest.param("fmt-hex.yml", (1, 1), id="hex"),
     ),
 )
 def test_formatted_yaml_loader_dumper(

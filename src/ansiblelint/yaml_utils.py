@@ -24,7 +24,7 @@ from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
 from ruamel.yaml.main import YAML
 from ruamel.yaml.parser import ParserError
-from ruamel.yaml.scalarint import ScalarInt
+from ruamel.yaml.scalarint import HexInt, ScalarInt
 from yamllint.config import YamlLintConfig
 
 from ansiblelint.constants import (
@@ -541,7 +541,9 @@ class CustomConstructor(RoundTripConstructor):
             value_s = value_su.replace("_", "")
             if value_s[0] in "+-":
                 value_s = value_s[1:]
-            if value_s[0] == "0":
+            if value_s[0:2] == "0x":
+                ret = HexInt(ret, width=len(value_s) - 2)
+            elif value_s[0] == "0":
                 # got an octal in YAML 1.1
                 ret = OctalIntYAML11(
                     ret,
@@ -630,6 +632,9 @@ class FormattedEmitter(Emitter):
             and len(self.event.value) > 1
         ):
             if self.event.tag == "tag:yaml.org,2002:int" and self.event.implicit[0]:
+                if self.event.value.startswith("0x"):
+                    self.event.tag = "tag:yaml.org,2002:str"
+                    return ""
                 # ensures that "0123" string does not lose its quoting
                 self.event.tag = "tag:yaml.org,2002:str"
                 self.event.implicit = (True, True, True)
