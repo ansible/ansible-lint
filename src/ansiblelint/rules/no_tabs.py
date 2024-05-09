@@ -29,6 +29,10 @@ class NoTabsRule(AnsibleLintRule):
         ("lineinfile", "insertbefore"),
         ("lineinfile", "regexp"),
         ("lineinfile", "line"),
+        ("win_lineinfile", "insertafter"),
+        ("win_lineinfile", "insertbefore"),
+        ("win_lineinfile", "regexp"),
+        ("win_lineinfile", "line"),
         ("ansible.builtin.lineinfile", "insertafter"),
         ("ansible.builtin.lineinfile", "insertbefore"),
         ("ansible.builtin.lineinfile", "regexp"),
@@ -37,6 +41,10 @@ class NoTabsRule(AnsibleLintRule):
         ("ansible.legacy.lineinfile", "insertbefore"),
         ("ansible.legacy.lineinfile", "regexp"),
         ("ansible.legacy.lineinfile", "line"),
+        ("community.windows.win_lineinfile", "insertafter"),
+        ("community.windows.win_lineinfile", "insertbefore"),
+        ("community.windows.win_lineinfile", "regexp"),
+        ("community.windows.win_lineinfile", "line"),
     ]
 
     def matchtask(
@@ -69,6 +77,12 @@ if "pytest" in sys.modules:
             "examples/playbooks/rule-no-tabs.yml",
             rules=default_rules_collection,
         ).run()
-        assert results[0].lineno == 10
-        assert results[0].message == NoTabsRule().shortdesc
-        assert len(results) == 2
+        expected_results = [
+            (10, NoTabsRule().shortdesc),
+            (13, NoTabsRule().shortdesc),
+        ]
+        for i, expected in enumerate(expected_results):
+            assert len(results) >= i + 1
+            assert results[i].lineno == expected[0]
+            assert results[i].message == expected[1]
+        assert len(results) == len(expected), results
