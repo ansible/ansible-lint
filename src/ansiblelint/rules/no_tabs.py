@@ -8,6 +8,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.text import has_jinja
 from ansiblelint.yaml_utils import nested_items_path
 
 if TYPE_CHECKING:
@@ -45,9 +46,14 @@ class NoTabsRule(AnsibleLintRule):
     ) -> bool | str:
         action = task["action"]["__ansible_module__"]
         for k, v, _ in nested_items_path(task):
-            if isinstance(k, str) and "\t" in k:
+            if isinstance(k, str) and "\t" in k and not has_jinja(k):
                 return True
-            if isinstance(v, str) and "\t" in v and (action, k) not in self.allow_list:
+            if (
+                isinstance(v, str)
+                and "\t" in v
+                and (action, k) not in self.allow_list
+                and not has_jinja(v)
+            ):
                 return True
         return False
 
