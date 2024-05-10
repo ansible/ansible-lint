@@ -455,15 +455,16 @@ def test_transform_na(
         transformer.run()
 
     assert called
-    assert len(caplog.records) == 2
+    logs = [record for record in caplog.records if record.module == "transformer"]
+    assert len(logs) == 2
 
     log_0 = f"{transformer.FIX_NA_MSG} {TransformTests.match_id()}"
-    assert caplog.records[0].message == log_0
-    assert caplog.records[0].levelname == "DEBUG"
+    assert logs[0].message == log_0
+    assert logs[0].levelname == "DEBUG"
 
     log_1 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
-    assert caplog.records[1].message == log_1
-    assert caplog.records[1].levelname == "DEBUG"
+    assert logs[1].message == log_1
+    assert logs[1].levelname == "DEBUG"
 
 
 def test_transform_no_tb(
@@ -491,33 +492,34 @@ def test_transform_no_tb(
         setattr(result.matches[0].rule, "transform", transform)  # noqa: B010
     else:
         err = "Rule is not a TransformMixin"
-        raise RuntimeError(err)
+        raise TypeError(err)
 
     transformer = Transformer(result=result, options=options)
     with caplog.at_level(10):
         transformer.run()
 
-    assert len(caplog.records) == 5
+    logs = [record for record in caplog.records if record.module == "transformer"]
+    assert len(logs) == 5
 
     log_0 = f"{transformer.FIX_APPLY_MSG} {TransformTests.match_id()}"
-    assert caplog.records[0].message == log_0
-    assert caplog.records[0].levelname == "DEBUG"
+    assert logs[0].message == log_0
+    assert logs[0].levelname == "DEBUG"
 
     log_1 = f"{transformer.FIX_FAILED_MSG} {TransformTests.match_id()}"
-    assert caplog.records[1].message == log_1
-    assert caplog.records[1].levelname == "ERROR"
+    assert logs[1].message == log_1
+    assert logs[1].levelname == "ERROR"
 
     log_2 = exception_msg
-    assert caplog.records[2].message == log_2
-    assert caplog.records[2].levelname == "ERROR"
+    assert logs[2].message == log_2
+    assert logs[2].levelname == "ERROR"
 
     log_3 = f"{transformer.FIX_ISSUE_MSG}"
-    assert caplog.records[3].message == log_3
-    assert caplog.records[3].levelname == "ERROR"
+    assert logs[3].message == log_3
+    assert logs[3].levelname == "ERROR"
 
     log_4 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
-    assert caplog.records[4].message == log_4
-    assert caplog.records[4].levelname == "DEBUG"
+    assert logs[4].message == log_4
+    assert logs[4].levelname == "DEBUG"
 
 
 def test_transform_applied(
@@ -536,19 +538,20 @@ def test_transform_applied(
     with caplog.at_level(10):
         transformer.run()
 
-    assert len(caplog.records) == 3
+    logs = [record for record in caplog.records if record.module == "transformer"]
+    assert len(logs) == 3
 
     log_0 = f"{transformer.FIX_APPLY_MSG} {TransformTests.match_id()}"
-    assert caplog.records[0].message == log_0
-    assert caplog.records[0].levelname == "DEBUG"
+    assert logs[0].message == log_0
+    assert logs[0].levelname == "DEBUG"
 
     log_1 = f"{transformer.FIX_APPLIED_MSG} {TransformTests.match_id()}"
-    assert caplog.records[1].message == log_1
-    assert caplog.records[1].levelname == "DEBUG"
+    assert logs[1].message == log_1
+    assert logs[1].levelname == "DEBUG"
 
     log_2 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
-    assert caplog.records[2].message == log_2
-    assert caplog.records[2].levelname == "DEBUG"
+    assert logs[2].message == log_2
+    assert logs[2].levelname == "DEBUG"
 
 
 def test_transform_not_enabled(
@@ -568,15 +571,16 @@ def test_transform_not_enabled(
     with caplog.at_level(10):
         transformer.run()
 
-    assert len(caplog.records) == 2
+    logs = [record for record in caplog.records if record.module == "transformer"]
+    assert len(logs) == 2
 
     log_0 = f"{transformer.FIX_NE_MSG} {TransformTests.match_id()}"
-    assert caplog.records[0].message == log_0
-    assert caplog.records[0].levelname == "DEBUG"
+    assert logs[0].message == log_0
+    assert logs[0].levelname == "DEBUG"
 
     log_1 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
-    assert caplog.records[1].message == log_1
-    assert caplog.records[1].levelname == "DEBUG"
+    assert logs[1].message == log_1
+    assert logs[1].levelname == "DEBUG"
 
 
 def test_transform_not_applied(
@@ -609,23 +613,24 @@ def test_transform_not_applied(
         setattr(result.matches[0].rule, "transform", transform)  # noqa: B010
     else:
         err = "Rule is not a TransformMixin"
-        raise RuntimeError(err)
+        raise TypeError(err)
 
     transformer = Transformer(result=result, options=options)
     with caplog.at_level(10):
         transformer.run()
 
     assert called
-    assert len(caplog.records) == 3
+    logs = [record for record in caplog.records if record.module == "transformer"]
+    assert len(logs) == 3
 
     log_0 = f"{transformer.FIX_APPLY_MSG} {TransformTests.match_id()}"
-    assert caplog.records[0].message == log_0
-    assert caplog.records[0].levelname == "DEBUG"
+    assert logs[0].message == log_0
+    assert logs[0].levelname == "DEBUG"
 
     log_1 = f"{transformer.FIX_NOT_APPLIED_MSG} {TransformTests.match_id()}"
-    assert caplog.records[1].message == log_1
-    assert caplog.records[1].levelname == "ERROR"
+    assert logs[1].message == log_1
+    assert logs[1].levelname == "ERROR"
 
     log_2 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
-    assert caplog.records[2].message == log_2
-    assert caplog.records[2].levelname == "DEBUG"
+    assert logs[2].message == log_2
+    assert logs[2].levelname == "DEBUG"
