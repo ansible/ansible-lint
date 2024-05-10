@@ -35,6 +35,7 @@ class Transformer:
 
     def __init__(self, result: LintResult, options: Options):
         """Initialize a Transformer instance."""
+        self._options = options
         self.write_set = self.effective_write_set(options.write_list)
 
         self.matches: list[MatchError] = result.matches
@@ -129,14 +130,16 @@ class Transformer:
     ) -> None:
         """Do Rule-Transforms handling any last-minute MatchError inspections."""
         for match in sorted(matches):
+            match_id = f"{match.tag}/{match.match_type} {match.filename}:{match.lineno}"
             if not isinstance(match.rule, TransformMixin):
+                logging.debug("Rule specific fix not available for: %s", match_id)
                 continue
             if self.write_set != {"all"}:
                 rule = cast(AnsibleLintRule, match.rule)
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if rule_definition.isdisjoint(self.write_set):
-                    # rule transform not requested. Skip it.
+                    logging.debug("Rule specific fix not enabled for: %s", match_id)
                     continue
             if file_is_yaml and not match.yaml_path:
                 data = cast(CommentedMap | CommentedSeq, data)
@@ -148,4 +151,15 @@ class Transformer:
                     "playbook",
                 ):
                     match.yaml_path = get_path_to_task(file, match.lineno, data)
-            match.rule.transform(match, file, data)
+
+            logging.debug("Applying rule specific fix for: %s", match_id)
+            try:
+                match.rule.transform(match, file, data)
+            except Exception as exc: # pylint: disable=broad-except
+                _logger.error("Rule specific fix failed for: %s", match_id)
+                _logger.exception(exc)
+                msg = "Please file an issue for this with the task or playbook that caused the error."
+                _logger.error(msg)
+                continue
+            state = "was" if match.fixed else "was not"
+            _logger.debug("Rule specific fix %s applied for: %s", state, match_id)
