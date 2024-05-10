@@ -47,7 +47,6 @@ class Transformer:
 
     def __init__(self, result: LintResult, options: Options):
         """Initialize a Transformer instance."""
-        self._options = options
         self.write_set = self.effective_write_set(options.write_list)
 
         self.matches: list[MatchError] = result.matches
