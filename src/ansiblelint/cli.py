@@ -92,7 +92,7 @@ def load_config(config_file: str | None) -> tuple[dict[Any, Any], str | None]:
     config = clean_json(config_lintable.data)
     if not isinstance(config, dict):
         msg = "Schema failed to properly validate the config file."
-        raise RuntimeError(msg)
+        raise TypeError(msg)
     config["config_file"] = config_path
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)

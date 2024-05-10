@@ -106,6 +106,8 @@ class Runner:
             checked_files = set()
         self.checked_files = checked_files
 
+        self.app = get_app(cached=True)
+
     def _update_exclude_paths(self, exclude_paths: list[str]) -> None:
         if exclude_paths:
             # These will be (potentially) relative paths
@@ -232,12 +234,12 @@ class Runner:
 
         # -- phase 1 : syntax check in parallel --
         if not self.skip_ansible_syntax_check:
-            app = get_app(cached=True)
+            # app = get_app(cached=True)
 
             def worker(lintable: Lintable) -> list[MatchError]:
                 return self._get_ansible_syntax_check_matches(
                     lintable=lintable,
-                    app=app,
+                    app=self.app,
                 )
 
             for lintable in self.lintables:
@@ -260,28 +262,28 @@ class Runner:
                 matches.extend(data)
 
             matches = self._filter_excluded_matches(matches)
+
         # -- phase 2 ---
-        if not matches:
-            # do our processing only when ansible syntax check passed in order
-            # to avoid causing runtime exceptions. Our processing is not as
-            # resilient to be able process garbage.
-            matches.extend(self._emit_matches(files))
+        # do our processing only when ansible syntax check passed in order
+        # to avoid causing runtime exceptions. Our processing is not as
+        # resilient to be able process garbage.
+        matches.extend(self._emit_matches(files))
 
-            # remove duplicates from files list
-            files = [value for n, value in enumerate(files) if value not in files[:n]]
+        # remove duplicates from files list
+        files = [value for n, value in enumerate(files) if value not in files[:n]]
 
-            for file in self.lintables:
-                if file in self.checked_files or not file.kind:
-                    continue
-                _logger.debug(
-                    "Examining %s of type %s",
-                    ansiblelint.file_utils.normpath(file.path),
-                    file.kind,
-                )
+        for file in self.lintables:
+            if file in self.checked_files or not file.kind or file.failed():
+                continue
+            _logger.debug(
+                "Examining %s of type %s",
+                ansiblelint.file_utils.normpath(file.path),
+                file.kind,
+            )
 
-                matches.extend(
-                    self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list),
-                )
+            matches.extend(
+                self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list),
+            )
 
         # update list of checked files
         self.checked_files.update(self.lintables)
@@ -387,7 +389,14 @@ class Runner:
                     details = groups.get("details", "")
                     lineno = int(groups.get("line", 1))
 
-                    if "filename" in groups:
+                    if (
+                        "filename" in groups
+                        and str(lintable.path.absolute()) != groups["filename"]
+                        and lintable.filename != groups["filename"]
+                    ):
+                        # avoids creating a new lintable object if the filename
+                        # is matching as this might prevent Lintable.failed()
+                        # feature from working well.
                         filename = Lintable(groups["filename"])
                     else:
                         filename = lintable
@@ -479,7 +488,10 @@ class Runner:
             try:
                 playbook_ds = ansiblelint.utils.parse_yaml_from_file(str(lintable.path))
             except AnsibleError as exc:
-                raise SystemExit(exc) from exc
+                msg = f"Loading {lintable.filename} caused an {type(exc).__name__} exception: {exc}, file was ignored."
+                logging.exception(msg)
+                # raise SystemExit(exc) from exc
+                return []
         results = []
         # playbook_ds can be an AnsibleUnicode string, which we consider invalid
         if isinstance(playbook_ds, str):
@@ -508,7 +520,6 @@ class Runner:
                 if path != path_str:
                     child.path = Path(path)
                     child.name = child.path.name
-
                 results.append(child)
         return results
 
@@ -522,7 +533,7 @@ class Runner:
         """Flatten the traversed play tasks."""
         # pylint: disable=unused-argument
 
-        handlers = HandleChildren(self.rules)
+        handlers = HandleChildren(self.rules, app=self.app)
 
         delegate_map: dict[
             str,

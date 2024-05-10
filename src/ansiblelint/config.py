@@ -130,7 +130,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     cache_dir: Path | None = None
     colored: bool = True
     configured: bool = False
-    cwd: Path = Path(".")
+    cwd: Path = Path()
     display_relative_path: bool = True
     exclude_paths: list[str] = field(default_factory=list)
     format: str = "brief"

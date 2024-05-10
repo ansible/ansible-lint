@@ -17,3 +17,15 @@ def test_task_hook_import_playbook(default_rules_collection: RulesCollection) ->
     assert "Commands should not change things" in results_text
     assert "[name]" in results_text
     assert "All tasks should be named" in results_text
+
+
+def test_import_playbook_from_collection(
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Assures import_playbook from collection."""
+    playbook_path = "examples/playbooks/test_import_playbook.yml"
+    runner = Runner(playbook_path, rules=default_rules_collection)
+    results = runner.run()
+
+    assert len(runner.lintables) == 1
+    assert len(results) == 0

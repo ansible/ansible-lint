@@ -18,3 +18,9 @@
         path: some.txt
         regexp: ^\t$
         line: string with \t inside
+    - name: Should not trigger inside jinja
+      vars:
+        deep:
+          "some{{ '\t' }}stuff": true
+      ansible.builtin.debug:
+        msg: "{{ 'foo' + '\t' + 'bar' }}"

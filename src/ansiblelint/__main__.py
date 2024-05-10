@@ -151,7 +151,7 @@ def initialize_options(arguments: list[str] | None = None) -> None | FileLock:
         try:
             cache_dir_lock.acquire(timeout=180)
         except Timeout:  # pragma: no cover
-            _logger.error(
+            _logger.error(  # noqa: TRY400
                 "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
             sys.exit(RC.LOCK_TIMEOUT)

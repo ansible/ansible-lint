@@ -457,7 +457,7 @@ class RulesCollection:
         """Return a rule from inside the collection based on its id."""
         if not isinstance(item, str):
             msg = f"Expected str but got {type(item)} when trying to access rule by it's id"
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         for rule in self.rules:
             if rule.id == item:
                 return rule

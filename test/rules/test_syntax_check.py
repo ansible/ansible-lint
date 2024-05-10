@@ -16,18 +16,25 @@ def test_get_ansible_syntax_check_matches(
         kind="playbook",
     )
 
-    result = Runner(lintable, rules=default_rules_collection).run()
+    result = sorted(Runner(lintable, rules=default_rules_collection).run())
 
-    assert result[0].lineno == 4
-    assert result[0].column == 7
-    assert (
-        result[0].message
-        == "conflicting action statements: ansible.builtin.debug, ansible.builtin.command"
-    )
-    # We internally convert absolute paths returned by ansible into paths
-    # relative to current directory.
-    assert result[0].filename.endswith("/conflicting_action.yml")
-    assert len(result) == 1
+    expected_results = [
+        [
+            "syntax-check[specific]",
+            4,
+            7,
+            "conflicting action statements: ansible.builtin.debug, ansible.builtin.command",
+        ],
+    ]
+    assert len(result) == len(expected_results)
+    for index, expected in enumerate(expected_results):
+        assert result[index].tag == expected[0]
+        assert result[index].lineno == expected[1]
+        assert result[index].column == expected[2]
+        assert str(expected[3]) in result[index].message
+        # We internally convert absolute paths returned by ansible into paths
+        # relative to current directory.
+        assert result[index].filename.endswith("/conflicting_action.yml")
 
 
 def test_empty_playbook(default_rules_collection: RulesCollection) -> None:

@@ -25,7 +25,7 @@
     "python.testing.unittestEnabled": false,
     "mypy-type-checker.severity": {
         "error": "Warning",
-      },
+    },
     "sortLines.filterBlankLines": true,
     "yaml.completion": true,
     "yaml.customTags": [
@@ -39,6 +39,8 @@
         "editor.codeActionsOnSave": {
             "source.organizeImports": "explicit",
             "source.fixAll": "explicit"
-        }
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
     }
 }
