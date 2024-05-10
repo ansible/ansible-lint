@@ -1,11 +1,13 @@
+# cspell:ignore classinfo
 """Tests for Transformer."""
 
 from __future__ import annotations
 
+import builtins
 import os
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import pytest
@@ -13,6 +15,7 @@ import pytest
 import ansiblelint.__main__ as main
 from ansiblelint.app import App
 from ansiblelint.file_utils import Lintable
+from ansiblelint.rules import TransformMixin
 
 # noinspection PyProtectedMember
 from ansiblelint.runner import LintResult, get_matches
@@ -20,6 +23,7 @@ from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
     from ansiblelint.config import Options
+    from ansiblelint.errors import MatchError
     from ansiblelint.rules import RulesCollection
 
 
@@ -354,3 +358,274 @@ def test_pruned_err_after_fix(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
     main.main()
     assert fix_called
     assert report_called
+
+
+class TransformTests:
+    """A carrier for some common test constants."""
+
+    FILE_NAME = "examples/playbooks/transform-no-free-form.yml"
+    FILE_TYPE = "playbook"
+    LINENO = 5
+    ID = "no-free-form"
+    MATCH_TYPE = "task"
+    VERSION_PART = "version=(1, 1)"
+
+    @classmethod
+    def match_id(cls) -> str:
+        """Generate a match id.
+
+        :returns: Match id string
+        """
+        return f"{cls.ID}/{cls.MATCH_TYPE} {cls.FILE_NAME}:{cls.LINENO}"
+
+    @classmethod
+    def rewrite_part(cls) -> str:
+        """Generate a rewrite part.
+
+        :returns: Rewrite part string
+        """
+        return f"{cls.FILE_NAME} ({cls.FILE_TYPE}), {cls.VERSION_PART}"
+
+
+@pytest.fixture(name="test_result")
+def fixture_test_result(
+    config_options: Options,
+    default_rules_collection: RulesCollection,
+) -> tuple[LintResult, Options]:
+    """Fixture that runs the Runner to populate a LintResult for a given file.
+
+    The results are confirmed and a limited to a single match.
+
+    :param config_options: Configuration options
+    :param default_rules_collection: Default rules collection
+    :returns: Tuple of LintResult and Options
+    """
+    config_options.write_list = [TransformTests.ID]
+    config_options.lintables = [TransformTests.FILE_NAME]
+
+    result = get_matches(rules=default_rules_collection, options=config_options)
+    match = result.matches[0]
+
+    def write(*_args: Any, **_kwargs: Any) -> None:
+        """Don't rewrite the test fixture.
+
+        :param _args: Arguments
+        :param _kwargs: Keyword arguments
+        """
+
+    setattr(match.lintable, "write", write)  # noqa: B010
+
+    assert match.rule.id == TransformTests.ID
+    assert match.filename == TransformTests.FILE_NAME
+    assert match.lineno == TransformTests.LINENO
+    assert match.match_type == TransformTests.MATCH_TYPE
+    result.matches = [match]
+
+    return result, config_options
+
+
+def test_transform_na(
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: pytest.MonkeyPatch,
+    test_result: tuple[LintResult, Options],
+) -> None:
+    """Test the transformer is not available.
+
+    :param caplog: Log capture fixture
+    :param monkeypatch: Monkeypatch
+    :param test_result: Test result fixture
+    """
+    result = test_result[0]
+    options = test_result[1]
+
+    _isinstance = builtins.isinstance
+    called = False
+
+    def mp_isinstance(t_object: Any, classinfo: type) -> bool:
+        if classinfo is TransformMixin:
+            nonlocal called
+            called = True
+            return False
+        return _isinstance(t_object, classinfo)
+
+    monkeypatch.setattr(builtins, "isinstance", mp_isinstance)
+
+    transformer = Transformer(result=result, options=options)
+    with caplog.at_level(10):
+        transformer.run()
+
+    assert called
+    assert len(caplog.records) == 2
+
+    log_0 = f"{transformer.FIX_NA_MSG} {TransformTests.match_id()}"
+    assert caplog.records[0].message == log_0
+    assert caplog.records[0].levelname == "DEBUG"
+
+    log_1 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
+    assert caplog.records[1].message == log_1
+    assert caplog.records[1].levelname == "DEBUG"
+
+
+def test_transform_no_tb(
+    caplog: pytest.LogCaptureFixture,
+    test_result: tuple[LintResult, Options],
+) -> None:
+    """Test the transformer does not traceback.
+
+    :param caplog: Log capture fixture
+    :param test_result: Test result fixture
+    :raises RuntimeError: If the rule is not a TransformMixin
+    """
+    result = test_result[0]
+    options = test_result[1]
+    exception_msg = "FixFailure"
+
+    def transform(*_args: Any, **_kwargs: Any) -> None:
+        """Raise an exception for the transform call.
+
+        :raises RuntimeError: Always
+        """
+        raise RuntimeError(exception_msg)
+
+    if isinstance(result.matches[0].rule, TransformMixin):
+        setattr(result.matches[0].rule, "transform", transform)  # noqa: B010
+    else:
+        err = "Rule is not a TransformMixin"
+        raise RuntimeError(err)
+
+    transformer = Transformer(result=result, options=options)
+    with caplog.at_level(10):
+        transformer.run()
+
+    assert len(caplog.records) == 5
+
+    log_0 = f"{transformer.FIX_APPLY_MSG} {TransformTests.match_id()}"
+    assert caplog.records[0].message == log_0
+    assert caplog.records[0].levelname == "DEBUG"
+
+    log_1 = f"{transformer.FIX_FAILED_MSG} {TransformTests.match_id()}"
+    assert caplog.records[1].message == log_1
+    assert caplog.records[1].levelname == "ERROR"
+
+    log_2 = exception_msg
+    assert caplog.records[2].message == log_2
+    assert caplog.records[2].levelname == "ERROR"
+
+    log_3 = f"{transformer.FIX_ISSUE_MSG}"
+    assert caplog.records[3].message == log_3
+    assert caplog.records[3].levelname == "ERROR"
+
+    log_4 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
+    assert caplog.records[4].message == log_4
+    assert caplog.records[4].levelname == "DEBUG"
+
+
+def test_transform_applied(
+    caplog: pytest.LogCaptureFixture,
+    test_result: tuple[LintResult, Options],
+) -> None:
+    """Test the transformer is applied.
+
+    :param caplog: Log capture fixture
+    :param test_result: Test result fixture
+    """
+    result = test_result[0]
+    options = test_result[1]
+
+    transformer = Transformer(result=result, options=options)
+    with caplog.at_level(10):
+        transformer.run()
+
+    assert len(caplog.records) == 3
+
+    log_0 = f"{transformer.FIX_APPLY_MSG} {TransformTests.match_id()}"
+    assert caplog.records[0].message == log_0
+    assert caplog.records[0].levelname == "DEBUG"
+
+    log_1 = f"{transformer.FIX_APPLIED_MSG} {TransformTests.match_id()}"
+    assert caplog.records[1].message == log_1
+    assert caplog.records[1].levelname == "DEBUG"
+
+    log_2 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
+    assert caplog.records[2].message == log_2
+    assert caplog.records[2].levelname == "DEBUG"
+
+
+def test_transform_not_enabled(
+    caplog: pytest.LogCaptureFixture,
+    test_result: tuple[LintResult, Options],
+) -> None:
+    """Test the transformer is not enabled.
+
+    :param caplog: Log capture fixture
+    :param test_result: Test result fixture
+    """
+    result = test_result[0]
+    options = test_result[1]
+    options.write_list = []
+
+    transformer = Transformer(result=result, options=options)
+    with caplog.at_level(10):
+        transformer.run()
+
+    assert len(caplog.records) == 2
+
+    log_0 = f"{transformer.FIX_NE_MSG} {TransformTests.match_id()}"
+    assert caplog.records[0].message == log_0
+    assert caplog.records[0].levelname == "DEBUG"
+
+    log_1 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
+    assert caplog.records[1].message == log_1
+    assert caplog.records[1].levelname == "DEBUG"
+
+
+def test_transform_not_applied(
+    caplog: pytest.LogCaptureFixture,
+    test_result: tuple[LintResult, Options],
+) -> None:
+    """Test the transformer is not applied.
+
+    :param caplog: Log capture fixture
+    :param test_result: Test result fixture
+    :raises RuntimeError: If the rule is not a TransformMixin
+    """
+    result = test_result[0]
+    options = test_result[1]
+
+    called = False
+
+    def transform(match: MatchError, *_args: Any, **_kwargs: Any) -> None:
+        """Do not apply the transform.
+
+        :param match: Match object
+        :param _args: Arguments
+        :param _kwargs: Keyword arguments
+        """
+        nonlocal called
+        called = True
+        match.fixed = False
+
+    if isinstance(result.matches[0].rule, TransformMixin):
+        setattr(result.matches[0].rule, "transform", transform)  # noqa: B010
+    else:
+        err = "Rule is not a TransformMixin"
+        raise RuntimeError(err)
+
+    transformer = Transformer(result=result, options=options)
+    with caplog.at_level(10):
+        transformer.run()
+
+    assert called
+    assert len(caplog.records) == 3
+
+    log_0 = f"{transformer.FIX_APPLY_MSG} {TransformTests.match_id()}"
+    assert caplog.records[0].message == log_0
+    assert caplog.records[0].levelname == "DEBUG"
+
+    log_1 = f"{transformer.FIX_NOT_APPLIED_MSG} {TransformTests.match_id()}"
+    assert caplog.records[1].message == log_1
+    assert caplog.records[1].levelname == "ERROR"
+
+    log_2 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
+    assert caplog.records[2].message == log_2
+    assert caplog.records[2].levelname == "DEBUG"
