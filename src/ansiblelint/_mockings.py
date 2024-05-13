@@ -47,7 +47,7 @@ def _make_module_stub(module_name: str, options: Options) -> None:
         path.mkdir(exist_ok=True, parents=True)
         _write_module_stub(
             filename=module_file,
-            name=module_file,
+            name=module_name,
             namespace=namespace,
             collection=collection,
         )

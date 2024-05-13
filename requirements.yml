@@ -7,3 +7,4 @@ collections:
   - community.docker
   - community.general
   - community.molecule
+  - community.windows

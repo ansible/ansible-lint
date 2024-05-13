@@ -16,7 +16,18 @@
     - name: Should not trigger no-tabs rules # noqa fqcn
       lineinfile:
         path: some.txt
-        regexp: ^\t$
+        regexp: "^\t$"
+        line: string with \t inside
+    # Disabled as attempt to mock it would trigger an error validating its arguments
+    # - name: Should not trigger no-tabs rules # noqa fqcn
+    #   win_lineinfile:
+    #     path: some.txt
+    #     regexp: "^\t$"
+    #     line: string with \t inside
+    - name: Should not trigger no-tabs rules
+      community.windows.win_lineinfile:
+        path: some.txt
+        regexp: "^\t$"
         line: string with \t inside
     - name: Should not trigger inside jinja
       vars:
