@@ -1,0 +1,4 @@
+---
+- # missing name
+  hosts: localhost
+  tasks: []
