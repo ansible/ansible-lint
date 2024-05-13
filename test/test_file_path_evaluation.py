@@ -43,14 +43,14 @@ LAYOUT_IMPORTS: dict[str, str] = {
     "tasks/subtasks/subtask_1.yml": textwrap.dedent(
         """\
         ---
-        - name: subtask_1 | From subtask 1 import subtask 2
+        - name: subtasks | subtask_1 | From subtask 1 import subtask 2
           ansible.builtin.import_tasks: tasks/subtasks/subtask_2.yml
         """,
     ),
     "tasks/subtasks/subtask_2.yml": textwrap.dedent(
         """\
         ---
-        - name: subtask_2 | From subtask 2 do something
+        - name: subtasks | subtask_2 | From subtask 2 do something
           debug:  # <-- expected to raise fqcn[action-core]
             msg: |
               Something...
@@ -87,14 +87,14 @@ LAYOUT_INCLUDES: dict[str, str] = {
     "tasks/subtasks/subtask_1.yml": textwrap.dedent(
         """\
         ---
-        - name: subtask_1 | From subtask 1 import subtask 2
+        - name: subtasks | subtask_1 | From subtask 1 import subtask 2
           ansible.builtin.include_tasks: tasks/subtasks/subtask_2.yml
         """,
     ),
     "tasks/subtasks/subtask_2.yml": textwrap.dedent(
         """\
         ---
-        - name: subtask_2 | From subtask 2 do something
+        - name: subtasks | subtask_2 | From subtask 2 do something
           debug:  # <-- expected to raise fqcn[action-core]
             msg: |
               Something...

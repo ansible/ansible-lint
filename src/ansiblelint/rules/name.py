@@ -6,6 +6,9 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
+import wcmatch.pathlib
+import wcmatch.wcmatch
+
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
@@ -144,10 +147,15 @@ class NameRule(AnsibleLintRule, TransformMixin):
         # stage one check prefix
         effective_name = name
         if self._collection and lintable:
-            prefix = self._collection.options.task_name_prefix.format(
-                stem=lintable.path.stem,
-            )
-            if lintable.kind == "tasks" and lintable.path.stem != "main":
+            full_stem = self._find_full_stem(lintable)
+            stems = [
+                self._collection.options.task_name_prefix.format(stem=stem)
+                for stem in wcmatch.pathlib.PurePath(
+                    full_stem,
+                ).parts
+            ]
+            prefix = "".join(stems)
+            if lintable.kind == "tasks" and full_stem != "main":
                 if not name.startswith(prefix):
                     # For the moment in order to raise errors this rule needs to be
                     # enabled manually. Still, we do allow use of prefixes even without
@@ -188,6 +196,35 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 ),
             )
         return results
+
+    def _find_full_stem(self, lintable: Lintable) -> str:
+        lintable_dir = wcmatch.pathlib.PurePath(lintable.dir)
+        stem = lintable.path.stem
+        kind = str(lintable.kind)
+
+        stems = [lintable_dir.name]
+        lintable_dir = lintable_dir.parent
+        pathex = lintable_dir / stem
+        for entry in self.options.kinds:
+            for key, value in entry.items():
+                if kind == key:
+                    glob = value
+
+        while pathex.globmatch(
+            glob,
+            flags=(
+                wcmatch.pathlib.GLOBSTAR
+                | wcmatch.pathlib.BRACE
+                | wcmatch.pathlib.DOTGLOB
+            ),
+        ):
+            stems.insert(0, lintable_dir.name)
+            lintable_dir = lintable_dir.parent
+            pathex = lintable_dir / stem
+
+        if stems[0].startswith(kind):
+            del stems[0]
+        return str(wcmatch.pathlib.PurePath(*stems, stem))
 
     def transform(
         self,
@@ -263,6 +300,19 @@ if "pytest" in sys.modules:
         errs = bad_runner.run()
         assert len(errs) == 5
 
+    def test_name_prefix_positive(config_options: Options) -> None:
+        """Positive test for name[prefix]."""
+        config_options.enable_list = ["name[prefix]"]
+        collection = RulesCollection(options=config_options)
+        collection.register(NameRule())
+        success = Lintable(
+            "examples/playbooks/tasks/main.yml",
+            kind="tasks",
+        )
+        good_runner = Runner(success, rules=collection)
+        results = good_runner.run()
+        assert len(results) == 0
+
     def test_name_prefix_negative(config_options: Options) -> None:
         """Negative test for name[missing]."""
         config_options.enable_list = ["name[prefix]"]
@@ -279,6 +329,36 @@ if "pytest" in sys.modules:
         assert results[0].tag == "name[casing]"
         assert results[1].tag == "name[prefix]"
         assert results[2].tag == "name[prefix]"
+
+    def test_name_prefix_negative_2(config_options: Options) -> None:
+        """Negative test for name[prefix]."""
+        config_options.enable_list = ["name[prefix]"]
+        collection = RulesCollection(options=config_options)
+        collection.register(NameRule())
+        failure = Lintable(
+            "examples/playbooks/tasks/partial_prefix/foo.yml",
+            kind="tasks",
+        )
+        bad_runner = Runner(failure, rules=collection)
+        results = bad_runner.run()
+        assert len(results) == 2
+        assert results[0].tag == "name[prefix]"
+        assert results[1].tag == "name[prefix]"
+
+    def test_name_prefix_negative_3(config_options: Options) -> None:
+        """Negative test for name[prefix]."""
+        config_options.enable_list = ["name[prefix]"]
+        collection = RulesCollection(options=config_options)
+        collection.register(NameRule())
+        failure = Lintable(
+            "examples/playbooks/tasks/partial_prefix/main.yml",
+            kind="tasks",
+        )
+        bad_runner = Runner(failure, rules=collection)
+        results = bad_runner.run()
+        assert len(results) == 2
+        assert results[0].tag == "name[prefix]"
+        assert results[1].tag == "name[prefix]"
 
     def test_rule_name_lowercase() -> None:
         """Negative test for a task that starts with lowercase."""
