@@ -92,6 +92,25 @@ class NameRule(AnsibleLintRule, TransformMixin):
                     lineno=task[LINE_NUMBER_KEY],
                 ),
             )
+
+        notify = task.get("notify")
+        if notify:
+            if isinstance(notify, str):
+                notify = [notify]
+            results.extend(
+                [
+                    self.create_matcherror(
+                        message=f"Task notify '{handler}' should start with an uppercase letter.",
+                        lineno=task[LINE_NUMBER_KEY],
+                        tag="name[casing]",
+                        filename=file,
+                    )
+                    for handler in notify
+                    if handler[0].isalpha()
+                    and handler[0].islower()
+                    and not handler[0].isupper()
+                ],
+            )
         return results
 
     def _prefix_check(
@@ -351,6 +370,23 @@ if "pytest" in sys.modules:
         assert len(errs) == 1
         assert errs[0].tag == "name[casing]"
         assert errs[0].rule.id == "name"
+
+    def test_rule_notify_lowercase() -> None:
+        """Negative test for a task notify that starts with lowercase."""
+        collection = RulesCollection()
+        collection.register(NameRule())
+        failure = "examples/playbooks/name_case_notify_fail.yml"
+        bad_runner = Runner(failure, rules=collection)
+        errs = bad_runner.run()
+        assert len(errs) == 4
+        assert errs[0].tag == "name[casing]"
+        assert errs[1].tag == "name[casing]"
+        assert errs[2].tag == "name[casing]"
+        assert errs[3].tag == "name[casing]"
+        assert errs[0].rule.id == "name"
+        assert errs[1].rule.id == "name"
+        assert errs[2].rule.id == "name"
+        assert errs[3].rule.id == "name"
 
     def test_name_play() -> None:
         """Positive test for name[play]."""
