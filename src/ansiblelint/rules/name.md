@@ -21,12 +21,21 @@ If you want to ignore some of the messages above, you can add any of them to the
 
 ## name[prefix]
 
-This rule applies only to included task files that are not named `main.yml`. It
-suggests adding the stem of the file as a prefix to the task name.
+This rule applies only to included task files that are not named `main.yml` or
+are embedded within subdirectories. It suggests adding the stems of the file
+path as a prefix to the task name.
 
 For example, if you have a task named `Restart server` inside a file named
 `tasks/deploy.yml`, this rule suggests renaming it to `deploy | Restart server`,
-so it would be easier to identify where it comes from.
+so it would be easier to identify where it comes from. If the file was named
+`tasks/main.yml`, then the rule would have no effect.
+
+For task files that are embedded within subdirectories, these subdirectories
+will also be appended as part of the prefix. For example, if you have a task
+named `Terminate server` inside a file named `tasks/foo/destroy.yml`, this rule
+suggests renaming it to `foo | destroy | Terminate server`. If the file was
+named `tasks/foo/main.yml` then the rule would recommend renaming the task to
+`foo | main | Terminate server`.
 
 For the moment, this sub-rule is just an **opt-in**, so you need to add it to
 your `enable_list` to activate it.
