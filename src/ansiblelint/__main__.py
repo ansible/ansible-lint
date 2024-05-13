@@ -373,7 +373,15 @@ def main(argv: list[str] | None = None) -> int:
             match.ignored = True
             _logger.debug("Ignored: %s", match)
 
+    if app.yamllint_config.incompatible:
+        logging.log(
+            level=logging.ERROR if options.write_list else logging.WARNING,
+            msg=app.yamllint_config.incompatible,
+        )
+
     if options.write_list:
+        if app.yamllint_config.incompatible:
+            sys.exit(RC.INVALID_CONFIG)
         fix(runtime_options=options, result=result, rules=rules)
 
     app.render_matches(result.matches)

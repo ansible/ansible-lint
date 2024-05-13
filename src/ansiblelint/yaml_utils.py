@@ -7,7 +7,6 @@ import functools
 import logging
 import os
 import re
-import sys
 from collections.abc import Callable, Iterator, Sequence
 from io import StringIO
 from pathlib import Path
@@ -31,7 +30,6 @@ from ansiblelint.constants import (
     ANNOTATION_KEYS,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
-    RC,
 )
 from ansiblelint.utils import Task
 
@@ -46,6 +44,19 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 _logger = logging.getLogger(__name__)
+
+
+class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc]
+    """Extension of YamlLintConfig."""
+
+    def __init__(
+        self,
+        content: str | None = None,
+        file: str | Path | None = None,
+    ) -> None:
+        """Initialize config."""
+        super().__init__(content, file)
+        self.incompatible = ""
 
 
 def deannotate(data: Any) -> Any:
@@ -63,9 +74,10 @@ def deannotate(data: Any) -> Any:
     return data
 
 
-def load_yamllint_config() -> YamlLintConfig:
+def load_yamllint_config() -> CustomYamlLintConfig:
     """Load our default yamllint config and any customized override file."""
-    config = YamlLintConfig(file=Path(__file__).parent / "data" / ".yamllint")
+    config = CustomYamlLintConfig(file=Path(__file__).parent / "data" / ".yamllint")
+    config.incompatible = ""
     # if we detect local yamllint config we use it but raise a warning
     # as this is likely to get out of sync with our internal config.
     for path in [
@@ -82,7 +94,7 @@ def load_yamllint_config() -> YamlLintConfig:
                 "internal yamllint config.",
                 file,
             )
-            custom_config = YamlLintConfig(file=str(file))
+            custom_config = CustomYamlLintConfig(file=str(file))
             custom_config.extend(config)
             config = custom_config
             break
@@ -138,9 +150,8 @@ def load_yamllint_config() -> YamlLintConfig:
             errors.append(msg)
     if errors:
         nl = "\n"
-        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {nl + '  - '.join(errors)}.{nl}{nl}Read https://ansible.readthedocs.io/projects/lint/rules/yaml/ for more details regarding why we have these requirements."
-        logging.fatal(msg)
-        sys.exit(RC.INVALID_CONFIG)
+        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {(nl + '  - ').join(errors)}.{nl}{nl}Read https://ansible.readthedocs.io/projects/lint/rules/yaml/ for more details regarding why we have these requirements. Fix mode will not be available."
+        config.incompatible = msg
 
     _logger.debug("Effective yamllint rules used: %s", config.rules)
     return config

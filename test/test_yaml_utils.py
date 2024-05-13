@@ -12,7 +12,6 @@ from ruamel.yaml.main import YAML
 from yamllint.linter import run as run_yamllint
 
 import ansiblelint.yaml_utils
-from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable, cwd
 from ansiblelint.utils import task_in_list
 
@@ -996,8 +995,6 @@ def test_deannotate(
 
 def test_yamllint_incompatible_config() -> None:
     """Ensure we can detect incompatible yamllint settings."""
-    with (
-        cwd(Path("examples/yamllint/incompatible-config")),
-        pytest.raises(SystemExit, match=f"^{RC.INVALID_CONFIG}$"),
-    ):
-        ansiblelint.yaml_utils.load_yamllint_config()
+    with (cwd(Path("examples/yamllint/incompatible-config")),):
+        config = ansiblelint.yaml_utils.load_yamllint_config()
+        assert config.incompatible

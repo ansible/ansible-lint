@@ -162,8 +162,8 @@ repos:
           - pytest-mock
           - pytest>=7.2.2
           - rich>=13.2.0
-          - ruamel-yaml-clib>=0.2.7
-          - ruamel-yaml>=0.18.2
+          - ruamel-yaml-clib>=0.2.8
+          - ruamel-yaml>=0.18.6
           - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.20.0.0
