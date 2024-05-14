@@ -1,6 +1,5 @@
 """Tests for yaml-related utility functions."""
 
-# pylint: disable=too-many-lines
 from __future__ import annotations
 
 from io import StringIO
