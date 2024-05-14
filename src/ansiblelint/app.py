@@ -6,6 +6,7 @@ import copy
 import itertools
 import logging
 import os
+import sys
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -21,6 +22,7 @@ from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RC, RULE_DOC_URL
 from ansiblelint.loaders import IGNORE_FILE
+from ansiblelint.requirements import Reqs
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
@@ -53,9 +55,18 @@ class App:
             require_module=True,
             verbosity=options.verbosity,
         )
+        self.reqs = Reqs("ansible-lint")
+        package = "ansible-core"
+        if not self.reqs.matches(
+            package,
+            str(self.runtime.version),
+        ):  # pragma: no cover
+            msg = f"ansible-lint requires {package}{','.join(str(x) for x in self.reqs[package])} and current version is {self.runtime.version}"
+            logging.error(msg)
+            sys.exit(RC.INVALID_CONFIG)
 
         # pylint: disable=import-outside-toplevel
-        from ansiblelint.yaml_utils import load_yamllint_config  # noqa: 811,I001
+        from ansiblelint.yaml_utils import load_yamllint_config  # noqa: 811, I001
 
         self.yamllint_config = load_yamllint_config()
 

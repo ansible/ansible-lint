@@ -2,7 +2,7 @@
 # automatically updated by dependabot. This should be kept in sync with
 # minimal requirements configured inside .config/requirements.in
 ansible-core==2.13.0
-ansible-compat==24.5.1a0 # GPLv3
+ansible-compat==24.5.1 # GPLv3
 black==24.3.0 # MIT (security)
 filelock==3.3.0 # The Unlicense
 jsonschema==4.10.0 # MIT, version needed for improved errors
