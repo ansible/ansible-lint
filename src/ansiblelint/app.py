@@ -54,6 +54,11 @@ class App:
             verbosity=options.verbosity,
         )
 
+        # pylint: disable=import-outside-toplevel
+        from ansiblelint.yaml_utils import load_yamllint_config  # noqa: 811,I001
+
+        self.yamllint_config = load_yamllint_config()
+
     def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
