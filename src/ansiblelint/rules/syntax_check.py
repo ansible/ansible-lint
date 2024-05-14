@@ -28,6 +28,13 @@ OUTPUT_PATTERNS = (
         ),
     ),
     KnownError(
+        tag="no-file",
+        regex=re.compile(
+            r"^ERROR! (?P<title>No file specified for [^\n]*)",
+            re.MULTILINE | re.S | re.DOTALL,
+        ),
+    ),
+    KnownError(
         tag="empty-playbook",
         regex=re.compile(
             "Empty playbook, nothing to do",

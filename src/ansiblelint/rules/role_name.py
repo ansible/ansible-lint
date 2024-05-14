@@ -164,7 +164,7 @@ class RoleNames(AnsibleLintRule):
             if meta_data:
                 try:
                     return str(meta_data["galaxy_info"]["role_name"])
-                except KeyError:
+                except (KeyError, TypeError):
                     pass
         return default
 

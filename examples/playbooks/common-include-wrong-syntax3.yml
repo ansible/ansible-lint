@@ -1,0 +1,7 @@
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - name: Fixture
+      ansible.builtin.include_role:
+        name: include_wrong_syntax

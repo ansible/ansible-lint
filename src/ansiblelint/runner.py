@@ -455,6 +455,9 @@ class Runner:
         visited: set[Lintable] = set()
         while visited != self.lintables:
             for lintable in self.lintables - visited:
+                visited.add(lintable)
+                if not lintable.path.exists():
+                    continue
                 try:
                     children = self.find_children(lintable)
                     for child in children:
@@ -468,8 +471,10 @@ class Runner:
                     exc.rule = self.rules["load-failure"]
                     yield exc
                 except AttributeError:
-                    yield MatchError(lintable=lintable, rule=self.rules["load-failure"])
-                visited.add(lintable)
+                    yield MatchError(
+                        lintable=lintable,
+                        rule=self.rules["load-failure"],
+                    )
 
     def find_children(self, lintable: Lintable) -> list[Lintable]:
         """Traverse children of a single file or folder."""
@@ -490,7 +495,6 @@ class Runner:
             except AnsibleError as exc:
                 msg = f"Loading {lintable.filename} caused an {type(exc).__name__} exception: {exc}, file was ignored."
                 logging.exception(msg)
-                # raise SystemExit(exc) from exc
                 return []
         results = []
         # playbook_ds can be an AnsibleUnicode string, which we consider invalid

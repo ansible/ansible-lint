@@ -28,7 +28,7 @@ import inspect
 import logging
 import os
 import re
-from collections.abc import ItemsView, Iterator, Mapping, Sequence
+from collections.abc import ItemsView, Iterable, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
@@ -290,7 +290,7 @@ class HandleChildren:
     rules: RulesCollection = field(init=True, repr=False)
     app: App
 
-    def include_children(
+    def include_children(  # pylint: disable=too-many-return-statements
         self,
         lintable: Lintable,
         k: str,
@@ -325,14 +325,21 @@ class HandleChildren:
             return []
 
         # handle include: filename.yml tags=blah
-        (args, _) = tokenize(v)
+        (args, kwargs) = tokenize(v)
 
-        result = path_dwim(basedir, args[0])
+        if args:
+            file = args[0]
+        elif "file" in kwargs:
+            file = kwargs["file"]
+        else:
+            return []
+
+        result = path_dwim(basedir, file)
         while basedir not in ["", "/"]:
             if os.path.exists(result):
                 break
             basedir = os.path.dirname(basedir)
-            result = path_dwim(basedir, args[0])
+            result = path_dwim(basedir, file)
 
         return [Lintable(result, kind=parent_type)]
 
@@ -430,7 +437,7 @@ class HandleChildren:
         # pylint: disable=unused-argument # parent_type)
         basedir = str(lintable.path.parent)
         results: list[Lintable] = []
-        if not v:
+        if not v or not isinstance(v, Iterable):
             # typing does not prevent junk from being passed in
             return results
         for role in v:
@@ -467,10 +474,24 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             if not task_handler or isinstance(task_handler, str):  # pragma: no branch
                 continue
 
-            file_name = task_handler[task_handler_key]
-            if isinstance(file_name, Mapping) and file_name.get("file", None):
-                file_name = file_name["file"]
+            file_name = ""
+            action_args = task_handler[task_handler_key]
+            if isinstance(action_args, str):
+                (args, kwargs) = tokenize(action_args)
+                if len(args) == 1:
+                    file_name = args[0]
+                elif kwargs.get("file", None):
+                    file_name = kwargs["file"]
+                else:
+                    # ignore invalid data (syntax check will outside the scope)
+                    continue
 
+            if isinstance(action_args, Mapping) and action_args.get("file", None):
+                file_name = action_args["file"]
+
+            if not file_name:
+                # ignore invalid data (syntax check will outside the scope)
+                continue
             f = path_dwim(basedir, file_name)
             while basedir not in ["", "/"]:
                 if os.path.exists(f):

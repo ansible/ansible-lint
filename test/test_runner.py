@@ -178,6 +178,52 @@ def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> N
     assert len(run2) == 0
 
 
+@pytest.mark.parametrize(
+    ("filename", "failures", "checked_files_no"),
+    (
+        pytest.param(
+            "examples/playbooks/common-include-wrong-syntax.yml",
+            1,
+            1,
+            id="1",
+        ),
+        pytest.param(
+            "examples/playbooks/common-include-wrong-syntax2.yml",
+            1,
+            1,
+            id="2",
+        ),
+        pytest.param(
+            "examples/playbooks/common-include-wrong-syntax3.yml",
+            0,
+            2,
+            id="3",
+        ),
+    ),
+)
+def test_include_wrong_syntax(
+    filename: str,
+    failures: int,
+    checked_files_no: int,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Ensure that lintables aren't double-checked."""
+    checked_files: set[Lintable] = set()
+
+    path = Path(filename).resolve()
+    runner = Runner(
+        path,
+        rules=default_rules_collection,
+        verbosity=0,
+        checked_files=checked_files,
+    )
+    result = runner.run()
+    assert len(runner.checked_files) == checked_files_no
+    assert len(result) == failures, result
+    for item in result:
+        assert item.tag == "syntax-check[no-file]"
+
+
 def test_runner_not_found(default_rules_collection: RulesCollection) -> None:
     """Ensure that lintables aren't double-checked."""
     checked_files: set[Lintable] = set()

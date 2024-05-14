@@ -1,0 +1,9 @@
+---
+- name: Fixture for test coverage
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Some include with invalid syntax
+      ansible.builtin.include_tasks: "file="
+    - name: Some include with invalid syntax
+      ansible.builtin.include_tasks: other=tasks/included-with-lint.yml
