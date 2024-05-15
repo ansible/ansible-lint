@@ -642,14 +642,29 @@ class FormattedEmitter(Emitter):
             and self.event.value.startswith("0")
             and len(self.event.value) > 1
         ):
-            if self.event.tag == "tag:yaml.org,2002:int" and self.event.implicit[0]:
-                if self.event.value.startswith("0x"):
-                    self.event.tag = "tag:yaml.org,2002:str"
-                    return ""
-                # ensures that "0123" string does not lose its quoting
+            # We have an as-yet unquoted token that starts with "0" (but is not itself the digit 0).
+            # It could be:
+            # - hexadecimal like "0xF1" or ; comes tagged as int. Should continue unquoted to continue as an int.
+            # - octal like "0666" or "0o755"; comes tagged as str. **Should** be quoted to be cross-YAML compatible.
+            # - string like "0.0.0.0" and "00-header". Should not be quoted, unless it has a quote in it.
+            if (
+                self.event.value.startswith("0x")
+                and self.event.tag == "tag:yaml.org,2002:int"
+                and self.event.implicit[0]
+            ):
+                # hexadecimal
+                self.event.tag = "tag:yaml.org,2002:str"
+                return ""
+            try:
+                int(self.event.value, 8)
+            except ValueError:
+                pass
+                # fallthrough to string
+            else:
+                # octal
                 self.event.tag = "tag:yaml.org,2002:str"
                 self.event.implicit = (True, True, True)
-            return '"'
+                return '"'
         if style != "'":
             # block scalar, double quoted, etc.
             return style
